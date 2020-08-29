@@ -1,0 +1,401 @@
+# This file helps mrt_cmake_modules to understand how to use external packages.
+# Every package.xml entry here is resolved into a sequence of cmake calls and added to
+# MRT_INCLUDE_DIRS, MRT_LIBRARY_DIRS and MRT_LIBRARIES, respectively.
+# Every entry has the following format:
+# name: The name of the findscript. Will be translated into Find<name>.cmake. Scripts in the cmake folder of this package will be considered as well.
+# components (optional): components to be specified in the 'find_package(<name> COMPONENTS <components>)' call in cmake.
+# include_dirs (optional): [<list of variables set by findscript containing the packages include dirs>]
+# libraries (optional): [<list of variables set by findscript containing the packages libraries>]
+# library_dirs (optional): [<list of variables set by findscript containing the packages library dirs>]
+# targets (optional): [<list of cmake targets defined by findscript (for newer versions)>]
+# warning (optional): Outputs this as a cmake warning whenever this dependency is used (useful for deprecating things)
+aravis:
+  include_dirs: [Aravis_INCLUDE_DIRS]
+  libraries: [Aravis_LIBRARIES]
+  library_dirs: []
+  name: Aravis
+benchmark:
+  name: benchmark
+  targets: ['benchmark::benchmark']
+boost:
+  components: [wserialization thread random serialization log_setup prg_exec_monitor
+      wave system signals chrono filesystem locale timer date_time regex graph program_options
+      unit_test_framework log atomic]
+  include_dirs: [Boost_INCLUDE_DIRS]
+  libraries: [Boost_LIBRARIES]
+  library_dirs: [Boost_LIBRARY_DIRS]
+  name: Boost
+boost-python:
+  include_dirs: [BoostPython_INCLUDE_DIRS]
+  libraries: [BoostPython_LIBRARIES]
+  name: BoostPython
+  warning: Usage of boost-python in package.xml is deprecated. Use 'libboost-python-dev' instead!
+cgal:
+  components: []
+  include_dirs: [CGAL_INCLUDE_DIRS]
+  libraries: [CGAL_LIBRARIES]
+  library_dirs: []
+  name: CGAL
+coinor-libipopt-dev:
+  components: []
+  include_dirs: [IPOPT_INCLUDE_DIRS]
+  libraries: [IPOPT_LIBRARIES]
+  library_dirs: []
+  name: Ipopt
+cuda:
+  components: []
+  include_dirs: [CUDA_INCLUDE_DIRS]
+  libraries: [CUDA_LIBRARIES]
+  library_dirs: []
+  name: MrtCUDA
+eigen:
+  components: []
+  include_dirs: [EIGEN3_INCLUDE_DIR]
+  libraries: []
+  library_dirs: []
+  name: Eigen3
+flann:
+  include_dirs: [FLANN_INCLUDE_DIRS]
+  libraries: [FLANN_LIBRARIES]
+  library_dirs: []
+  name: Flann
+geographiclib:
+  components: []
+  include_dirs: [GeographicLib_INCLUDE_DIRS]
+  libraries: [GeographicLib_LIBRARIES]
+  library_dirs: []
+  name: GeographicLib
+glut:
+  components: []
+  include_dirs: [GLUT_INCLUDE_DIR]
+  libraries: [GLUT_LIBRARIES]
+  library_dirs: []
+  name: GLUT
+gtest:
+  include_dirs: [gtest_INCLUDE_DIRS]
+  libraries: [gtest_LIBRARIES]
+  name: gtest
+libann-dev:
+  components: []
+  include_dirs: [ANN_INCLUDE_DIR]
+  libraries: [ANN_LIBRARIES]
+  library_dirs: []
+  name: ANN
+libboost-python:
+  include_dirs: [BoostPython_INCLUDE_DIRS]
+  libraries: [BoostPython_LIBRARIES]
+  name: BoostPython
+  warning: Usage of libboost-python in package.xml is deprecated. Use 'libboost-python-dev' instead!
+libboost-python-dev:
+  include_dirs: [BoostPython_INCLUDE_DIRS]
+  libraries: [BoostPython_LIBRARIES]
+  name: BoostPython
+libcairo2-dev:
+  components: []
+  include_dirs: [CAIRO_INCLUDE_DIRS]
+  libraries: [CAIRO_LIBRARIES]
+  library_dirs: []
+  name: Cairo
+libcereal-dev:
+  components: []
+  include_dirs: [Cereal_INCLUDE_DIR]
+  libraries: []
+  library_dirs: []
+  name: Cereal
+libceres-dev:
+  name: Ceres
+  targets: [ceres]
+libconsole-bridge-dev:
+  targets: ["console_bridge"]
+  name: console_bridge
+libgeographic-dev:
+  components: []
+  include_dirs: [GeographicLib_INCLUDE_DIRS]
+  libraries: [GeographicLib_LIBRARIES]
+  library_dirs: []
+  name: GeographicLib
+  warning: Usage of libgeographic-dev in package.xml is deprecated. Use 'geographiclib' instead!
+libgoogle-glog-dev:
+  components: []
+  include_dirs: [GLOG_INCLUDE_DIRS]
+  libraries: [GLOG_LIBRARY]
+  library_dirs: []
+  name: Glog
+libgps:
+  include_dirs: [LIBGPS_INCLUDE_DIR]
+  libraries: [LIBGPS_LIBRARY]
+  name: libgps
+libgsl:
+  components: []
+  include_dirs: [GSL_INCLUDE_DIRS]
+  libraries: [GSL_LIBRARIES]
+  name: GSL
+libigl:
+  components: []
+  include_dirs: []
+  libraries: [IGL_LIBRARIES]
+  library_dirs: []
+  name: IGL
+libjsoncpp-dev:
+  name: JsonCpp
+  targets: ['JsonCpp::JsonCpp']
+  components: []
+liblapack-dev:
+  name: LAPACK
+  libraries: [LAPACK_LIBRARIES]
+libnlopt-dev:
+  components: []
+  include_dirs: [nlopt_INCLUDE_DIR]
+  libraries: [nlopt_LIBRARIES]
+  library_dirs: []
+  name: nlopt
+libopencv-dev:
+  components: []
+  include_dirs: [OpenCV_INCLUDE_DIRS]
+  libraries: [OpenCV_LIBS]
+  library_dirs: []
+  name: OpenCV
+libpcl-all-dev:
+  components: []
+  targets: ['mrt_pcl::pcl']
+  name: MrtPCL
+libpoco-dev:
+  components: [Foundation]
+  libraries: [Poco_LIBRARIES]
+  name: Poco
+libsqlite3-dev:
+  components: []
+  include_dirs: [SQLITE3_INCLUDE_DIRS]
+  libraries: [SQLITE3_LIBRARIES]
+  library_dirs: []
+  name: Sqlite3
+libssl-dev:
+  include_dirs: [OPENSSL_INCLUDE_DIR]
+  libraries: [OPENSSL_LIBRARIES]
+  library_dirs: []
+  name: OpenSSL
+libtesseract:
+  components: []
+  include_dirs: [Tesseract_INCLUDE_DIR]
+  libraries: [Tesseract_LIBRARIES]
+  library_dirs: []
+  name: Tesseract
+libvtk:
+  components: []
+  include_dirs: [VTK_INCLUDE_DIRS]
+  libraries: [VTK_LIBRARIES]
+  library_dirs: []
+  name: MrtVTK
+libpng++-dev:
+  components: []
+  include_dirs: [PNG++_INCLUDE_DIRS]
+  libraries: [PNG++_LIBRARIES]
+  library_dirs: []
+  name: PNG++
+mrt_ann:
+  components: []
+  include_dirs: [ANN_INCLUDE_DIR]
+  libraries: [ANN_LIBRARIES]
+  library_dirs: []
+  name: ANN
+  warning: Usage of mrt_ann in package.xml is deprecated. Use 'libann-dev' instead!
+mrt_benchmark:
+  name: benchmark
+  targets: ['benchmark::benchmark']
+  warning: Usage of mrt_benchmark in package.xml is deprecated. Use 'benchmark' instead!
+mrt_c_tensorflow:
+  components: []
+  include_dirs: [TENSORFLOW_C_INCLUDE_DIRS]
+  libraries: [TENSORFLOW_LIBRARIES]
+  library_dirs: []
+  name: CTensorflow
+mrt_cereal:
+  components: []
+  include_dirs: [Cereal_INCLUDE_DIR]
+  libraries: []
+  library_dirs: []
+  name: Cereal
+  warning: Usage of mrt_cereal in package.xml is deprecated. Use 'libcereal-dev' instead!
+mrt_ceres:
+  name: Ceres
+  targets: [ceres]
+  warning: Usage of mrt_ceres in package.xml is deprecated. Use 'libceres-dev' instead!
+mrt_cgal:
+  components: []
+  include_dirs: [CGAL_INCLUDE_DIRS]
+  libraries: [CGAL_LIBRARIES]
+  library_dirs: []
+  name: CGAL
+  warning: Usage of mrt_cgal in package.xml is deprecated. Use 'cgal' instead!
+mrt_ebus:
+  components: []
+  include_dirs: [ebus-sdk_INCLUDE_DIR]
+  libraries: [ebus-sdk_LIBRARIES]
+  library_dirs: []
+  name: ebus-sdk
+mrt_metis:
+  components: []
+  include_dirs: [Metis_INCLUDE_DIR]
+  libraries: [Metis_LIBRARIES]
+  library_dirs: []
+  name: Metis
+mrt_nlopt:
+  components: []
+  include_dirs: [nlopt_INCLUDE_DIR]
+  libraries: [nlopt_LIBRARIES]
+  library_dirs: []
+  name: nlopt
+  warning: Usage of mrt_nlopt in package.xml is deprecated. Use 'libnlopt-dev' instead!
+mrt_opencv:
+  components: []
+  include_dirs: [OpenCV_INCLUDE_DIRS]
+  libraries: [OpenCV_LIBS]
+  library_dirs: []
+  name: OpenCV
+  warning: Usage of mrt_opencv in package.xml is deprecated. Use 'libopencv-dev' instead!
+mrt_pcl:
+  components: []
+  targets: ['mrt_pcl::pcl']
+  name: MrtPCL
+  warning: Usage of mrt_pcl in package.xml is deprecated. Use 'libpcl-all-dev' instead!
+mrt_protobuf:
+  components: []
+  include_dirs: [PROTOBUF_INCLUDE_DIR]
+  libraries: [PROTOBUF_LIBRARIES]
+  library_dirs: []
+  name: Protobuf
+  warning: Usage of mrt_protobuf in package.xml is deprecated. Use 'protobuf-dev'
+    instead!
+mrt_qt-dev:
+  components: [Core Gui DBus Network OpenGL OpenGLExtensions Sql Test Xml Widgets
+      Concurrent Svg]
+  include_dirs: [QT_INCLUDES]
+  libraries: [QT_LIBRARIES]
+  name: MrtQt5
+mrt_qt4-dev:
+  components: [QtCore QTGui Qt3Support QtDBus QtDesigner QtDesignerComponents QtHelp
+      QtNetwork QtOpenGL QtScript QtScriptTools QtSql QtSvg QtTest QtUiTools QtWebKit
+      QtXml QtXmlPatterns]
+  include_dirs: [QT_INCLUDES]
+  libraries: [QT_LIBRARIES]
+  name: MrtQt4
+  warning: Usage of mrt_qt4-dev in package.xml is deprecated. Use 'mrt_qt-dev' instead!
+mrt_qt5-dev:
+  components: [Core Gui DBus Network OpenGL OpenGLExtensions Sql Test Xml Widgets
+      Concurrent Svg]
+  include_dirs: [QT_INCLUDES]
+  libraries: [QT_LIBRARIES]
+  name: MrtQt5
+mrt_sdl2:
+  components: []
+  include_dirs: [SDL2_INCLUDE_DIRS]
+  libraries: [SDL2_LIBRARIES]
+  library_dirs: []
+  name: SDL2
+  warning: Usage of mrt_sdl2 in package.xml is deprecated. Use 'sdl2' instead!
+mrt_suitesparse:
+  components: []
+  include_dirs: [SUITESPARSE_INCLUDE_DIRS]
+  libraries: [SUITESPARSE_LIBRARIES]
+  library_dirs: []
+  name: SuiteSparse
+  warning: Usage of mrt_suitesparse in package.xml is deprecated. Use 'suitesparse'
+    instead!
+mrt_tensorflow:
+  components: []
+  include_dirs: [TENSORFLOW_INCLUDE_DIRS]
+  libraries: [TENSORFLOW_LIBRARIES]
+  library_dirs: []
+  name: Tensorflow
+mrt_tesseract:
+  components: []
+  include_dirs: [Tesseract_INCLUDE_DIR]
+  libraries: [Tesseract_LIBRARIES]
+  library_dirs: []
+  name: Tesseract
+  warning: Usage of mrt_tesseract in package.xml is deprecated. Use 'libtesseract'
+    instead!
+mrt_vtk:
+  components: []
+  include_dirs: [VTK_INCLUDE_DIRS]
+  libraries: [VTK_LIBRARIES]
+  library_dirs: []
+  name: MrtVTK
+  warning: Usage of mrt_vtk in package.xml is deprecated. Use 'libvtk' instead!
+opencv:
+  components: []
+  include_dirs: [OpenCV_INCLUDE_DIRS]
+  libraries: [OpenCV_LIBS]
+  library_dirs: []
+  name: OpenCV
+  warning: Usage of opencv in package.xml is deprecated. Use 'libopencv-dev' instead!
+opengl:
+  components: []
+  include_dirs: [OPENGL_INCLUDE_DIR]
+  libraries: [OPENGL_LIBRARIES]
+  library_dirs: []
+  name: MrtOpenGL
+png++:
+  components: []
+  include_dirs: [PNG++_INCLUDE_DIRS]
+  libraries: [PNG++_LIBRARIES]
+  library_dirs: []
+  name: PNG++
+  warning: Usage of png++ in package.xml is deprecated. Use 'libpng++-dev' instead!
+protobuf-dev:
+  components: []
+  include_dirs: [PROTOBUF_INCLUDE_DIR]
+  libraries: [PROTOBUF_LIBRARIES]
+  library_dirs: []
+  name: Protobuf
+pugixml:
+  components: []
+  include_dirs: [PUGIXML_INCLUDE_DIRS]
+  libraries: [PUGIXML_LIBRARIES]
+  library_dirs: []
+  name: pugixml
+  warning: Usage of pugixml in package.xml is deprecated. Use 'pugixml-dev' instead!
+pugixml-dev:
+  components: []
+  include_dirs: [PUGIXML_INCLUDE_DIRS]
+  libraries: [PUGIXML_LIBRARIES]
+  library_dirs: []
+  name: pugixml
+pybind11-dev:
+  include_dirs: []
+  libraries: []
+  library_dirs: []
+  name: pybind11
+range_v3:
+  name: range-v3
+  targets: [range-v3]
+sdl2:
+  components: []
+  include_dirs: [SDL2_INCLUDE_DIRS]
+  libraries: [SDL2_LIBRARIES]
+  library_dirs: []
+  name: SDL2
+suitesparse:
+  components: []
+  include_dirs: [SUITESPARSE_INCLUDE_DIRS]
+  libraries: [SUITESPARSE_LIBRARIES]
+  library_dirs: []
+  name: SuiteSparse
+tbb:
+  name: TBB
+  targets: [tbb]
+tinyxml:
+  components: []
+  include_dirs: [TINYXML_INCLUDE_DIR]
+  libraries: [TINYXML_LIBRARIES]
+  library_dirs: []
+  name: TinyXML
+tinyxml2:
+  components: []
+  include_dirs: [TinyXML2_INCLUDE_DIR]
+  libraries: [TinyXML2_LIBRARIES]
+  library_dirs: []
+  name: TinyXML2
+yaml-cpp:
+  name: yaml-cpp
+  targets: [yaml-cpp]

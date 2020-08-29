@@ -1,0 +1,4 @@
+include:
+   - project: 'pub/mrt_build_config'
+     ref: master
+     file: '/ci_templates/gbp_project.yml'

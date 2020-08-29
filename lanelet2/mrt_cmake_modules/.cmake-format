@@ -1,0 +1,50 @@
+tab_size: 4
+line_width: 120
+enable_markup: False
+additional_commands:
+  mrt_add_executable:
+    pargs: 1
+    kwargs:
+      FOLDER: "*"
+      FILES: "*"
+      DEPENDS: "*"
+      LIBRARIES: "*"
+  mrt_add_links:
+    pargs: 1
+    flags: [CUDA, NO_SANITIZER, TEST]
+  _mrt_export_package:
+    kwargs:
+      EXPORTS: "*"
+      TARGETS: "*"
+      LIBRARIES: "*"
+  mrt_add_nodelet:
+    pargs: 1
+    kwargs:
+      FOLDER: "*"
+      TARGETNAME: "*"
+      DEPENDS: "*"
+      LIBRARIES: "*"
+  mrt_add_library:
+    pargs: 1
+    kwargs:
+      INCLUDES: "*"
+      SOURCES: "*"
+      DEPENDS: "*"
+      LIBRARIES: "*"
+  _mrt_export_package:
+    kwargs:
+      EXPORTS: "*"
+      TARGETS: "*"
+      LIBRARIES: "*"
+  _mrt_run_test:
+    pargs: 3
+    flags: [REDIRECT_STDERR]
+    kwargs:
+      COMMAND: "*"
+      COVERAGE_DIR: "*"
+  configure_package_config_file:
+    pargs: 2
+    flags: [NO_SET_AND_CHECK_MACRO, NO_CHECK_REQUIRED_COMPONENTS_MACRO]
+    kwargs:
+      INSTALL_DESTINATION: "*"
+

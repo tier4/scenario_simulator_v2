@@ -1,0 +1,546 @@
+actionlib:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+actionlib_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+actionlib_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+angles:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+bond:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+bond_core:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+bondcpp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+bondpy:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+camera_calibration:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+camera_calibration_parsers:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+camera_info_manager:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+catkin:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+class_loader:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+cmake_modules:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+collada_parser:
+  ubuntu: {xenial: mrt-ros-xenial}
+collada_urdf:
+  ubuntu: {xenial: mrt-ros-xenial}
+common_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+common_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+compressed_depth_image_transport:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+compressed_image_transport:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+control_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+control_toolbox:
+  ubuntu: {bionic: mrt-ros-bionic}
+controller_interface:
+  ubuntu: {bionic: mrt-ros-bionic}
+controller_manager:
+  ubuntu: {bionic: mrt-ros-bionic}
+controller_manager_msgs:
+  ubuntu: {bionic: mrt-ros-bionic}
+costmap_2d:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+cpp_common:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+cv_bridge:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+depth_image_proc:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+desktop:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+desktop_full:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+diagnostic_aggregator:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+diagnostic_analysis:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+diagnostic_common_diagnostics:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+diagnostic_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+diagnostic_updater:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+diagnostics:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+diff_drive_controller:
+  ubuntu: {bionic: mrt-ros-bionic}
+dynamic_reconfigure:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+eigen_conversions:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+eigen_stl_containers:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+executive_smach:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+filters:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+forward_command_controller:
+  ubuntu: {bionic: mrt-ros-bionic}
+gazebo_dev:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+gazebo_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+gazebo_plugins:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+gazebo_ros:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+gazebo_ros_control:
+  ubuntu: {bionic: mrt-ros-bionic}
+gazebo_ros_pkgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+gencpp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+geneus:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+genlisp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+genmsg:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+gennodejs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+genpy:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+geodesy:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+geographic_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+geometric_shapes:
+  ubuntu: {xenial: mrt-ros-xenial}
+geometry:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+geometry_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+geometry_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+gl_dependency:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+graph_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+grid_map:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_core:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_cv:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_demos:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_filters:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_loader:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_msgs:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_octomap:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_ros:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_rviz_plugin:
+  ubuntu: {bionic: mrt-ros-bionic}
+grid_map_visualization:
+  ubuntu: {bionic: mrt-ros-bionic}
+hardware_interface:
+  ubuntu: {bionic: mrt-ros-bionic}
+image_common:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_geometry:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_pipeline:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_proc:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_publisher:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_rotate:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_transport:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_transport_plugins:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+image_view:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+interactive_marker_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+interactive_markers:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+joint_limits_interface:
+  ubuntu: {bionic: mrt-ros-bionic}
+joint_state_controller:
+  ubuntu: {bionic: mrt-ros-bionic}
+joint_state_publisher:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+kdl_conversions:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+kdl_parser:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+kdl_parser_py:
+  ubuntu: {bionic: mrt-ros-bionic}
+laser_assembler:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+laser_filters:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+laser_geometry:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+laser_pipeline:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+librviz_tutorial:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+map_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+map_server:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+media_export:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+message_filters:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+message_generation:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+message_runtime:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+mk:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+nav_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+nodelet:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+nodelet_core:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+nodelet_topic_tools:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+nodelet_tutorial_math:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+octomap:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+octomap_msgs:
+  ubuntu: {bionic: mrt-ros-bionic}
+opencv3:
+  ubuntu: {xenial: mrt-ros-xenial}
+orocos_kdl:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+pcl_conversions:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+pcl_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+pcl_ros:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+perception:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+perception_pcl:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+pluginlib:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+pluginlib_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+polled_camera:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+position_controllers:
+  ubuntu: {bionic: mrt-ros-bionic}
+python_orocos_kdl:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+python_qt_binding:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+qt_dotgraph:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+qt_gui:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+qt_gui_cpp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+qt_gui_py_common:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+qwt_dependency:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+random_numbers:
+  ubuntu: {xenial: mrt-ros-xenial}
+realtime_tools:
+  ubuntu: {bionic: mrt-ros-bionic}
+resource_retriever:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+robot:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+robot_model:
+  ubuntu: {xenial: mrt-ros-xenial}
+robot_state_publisher:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+ros:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+ros_base:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+ros_comm:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+ros_core:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+ros_environment:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+ros_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosapi:
+  ubuntu: {bionic: mrt-ros-bionic}
+rosauth:
+  ubuntu: {bionic: mrt-ros-bionic}
+rosbag:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosbag_migration_rule:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosbag_storage:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosbash:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosboost_cfg:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosbridge_library:
+  ubuntu: {bionic: mrt-ros-bionic}
+rosbridge_msgs:
+  ubuntu: {bionic: mrt-ros-bionic}
+rosbridge_server:
+  ubuntu: {bionic: mrt-ros-bionic}
+rosbuild:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosclean:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosconsole:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosconsole_bridge:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roscpp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roscpp_core:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roscpp_serialization:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roscpp_traits:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roscpp_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roscreate:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosgraph:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosgraph_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roslang:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roslaunch:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roslib:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roslint:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roslisp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roslz4:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosmake:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosmaster:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosmsg:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosnode:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosout:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rospack:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosparam:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rospy:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rospy_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosservice:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rostest:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rostime:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rostopic:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rosunit:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+roswtf:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_action:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_bag:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_bag_plugins:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_common_plugins:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_console:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_dep:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_graph:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_gui:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_gui_cpp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_gui_py:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_image_view:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_launch:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_logger_level:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_moveit:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_msg:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_nav_view:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_plot:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_pose_view:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_publisher:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_py_common:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_py_console:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_reconfigure:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_robot_dashboard:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_robot_monitor:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_robot_plugins:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_robot_steering:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_runtime_monitor:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_rviz:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_service_caller:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_shell:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_srv:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_tf_tree:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_top:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_topic:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rqt_web:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rviz:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rviz_plugin_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rviz_python_tutorial:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+rviz_visual_tools:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+self_test:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+sensor_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+shape_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+simulators:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+smach:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+smach_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+smach_ros:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+smclib:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+socketcan_interface:
+  ubuntu: {bionic: mrt-ros-bionic}
+stage:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+stage_ros:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+std_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+std_srvs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+stereo_image_proc:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+stereo_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2_eigen:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2_geometry_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2_kdl:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2_py:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2_ros:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+tf2_sensor_msgs:
+  ubuntu: {bionic: mrt-ros-bionic}
+tf_conversions:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+theora_image_transport:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+topic_tools:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+trajectory_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+transmission_interface:
+  ubuntu: {bionic: mrt-ros-bionic}
+turtle_actionlib:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+turtle_tf:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+turtle_tf2:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+turtlesim:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+unique_id:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+urdf:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+urdf_parser_plugin:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+urdf_sim_tutorial:
+  ubuntu: {bionic: mrt-ros-bionic}
+urdf_tutorial:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+urdfdom_py:
+  ubuntu: {bionic: mrt-ros-bionic}
+uuid_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+vision_opencv:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+visualization_marker_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+visualization_msgs:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+visualization_tutorials:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+viz:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+voxel_grid:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+webkit_dependency:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+xacro:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}
+xmlrpcpp:
+  ubuntu: {bionic: mrt-ros-bionic, xenial: mrt-ros-xenial}

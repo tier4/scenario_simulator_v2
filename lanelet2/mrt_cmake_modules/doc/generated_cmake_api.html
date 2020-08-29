@@ -1,0 +1,953 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Extracted CMake API reference &#8212; mrt_cmake_modules 1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">mrt_cmake_modules 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="#">
+              <img class="logo" src="_static/mrt.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Extracted CMake API reference</a><ul>
+<li><a class="reference internal" href="#public-cmake-functions-macros">Public CMake functions / macros</a></li>
+<li><a class="reference internal" href="#mrt-add-executable"><cite>mrt_add_executable</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-library"><cite>mrt_add_library</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-links"><cite>mrt_add_links</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-node-and-nodelet"><cite>mrt_add_node_and_nodelet</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-nodelet"><cite>mrt_add_nodelet</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-nosetests"><cite>mrt_add_nosetests</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-python-api"><cite>mrt_add_python_api</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-ros-tests"><cite>mrt_add_ros_tests</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-tests"><cite>mrt_add_tests</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-to-ide"><cite>mrt_add_to_ide</cite></a></li>
+<li><a class="reference internal" href="#mrt-install"><cite>mrt_install</cite></a></li>
+<li><a class="reference internal" href="#mrt-parse-package-xml"><cite>mrt_parse_package_xml</cite></a></li>
+<li><a class="reference internal" href="#mrt-python-module-setup"><cite>mrt_python_module_setup</cite></a></li>
+<li><a class="reference internal" href="#non-public-cmake-functions-macros">Non-public CMake functions / macros</a></li>
+<li><a class="reference internal" href="#glog-report-not-found"><cite>GLOG_REPORT_NOT_FOUND</cite></a></li>
+<li><a class="reference internal" href="#glog-reset-find-library-prefix"><cite>GLOG_RESET_FIND_LIBRARY_PREFIX</cite></a></li>
+<li><a class="reference internal" href="#suitesparse-report-not-found"><cite>SUITESPARSE_REPORT_NOT_FOUND</cite></a></li>
+<li><a class="reference internal" href="#suitesparse-reset-find-library-prefix"><cite>SUITESPARSE_RESET_FIND_LIBRARY_PREFIX</cite></a></li>
+<li><a class="reference internal" href="#mrt-run-test"><cite>_mrt_run_test</cite></a></li>
+<li><a class="reference internal" href="#generate-ros-parameter-files"><cite>generate_ros_parameter_files</cite></a></li>
+<li><a class="reference internal" href="#glob-folders"><cite>glob_folders</cite></a></li>
+<li><a class="reference internal" href="#glob-ros-files"><cite>glob_ros_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-action-files"><cite>mrt_add_action_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-message-files"><cite>mrt_add_message_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-service-files"><cite>mrt_add_service_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-glob-files"><cite>mrt_glob_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-glob-files-recurse"><cite>mrt_glob_files_recurse</cite></a></li>
+<li><a class="reference internal" href="#mrt-glob-folders"><cite>mrt_glob_folders</cite></a></li>
+<li><a class="reference internal" href="#suitesparse-find-component"><cite>suitesparse_find_component</cite></a></li>
+<li><a class="reference internal" href="#not-documented-cmake-functions-macros">Not documented CMake functions / macros</a></li>
+<li><a class="reference internal" href="#cleanup-includes"><cite>_cleanup_includes</cite></a></li>
+<li><a class="reference internal" href="#cleanup-libraries"><cite>_cleanup_libraries</cite></a></li>
+<li><a class="reference internal" href="#find-dep"><cite>_find_dep</cite></a></li>
+<li><a class="reference internal" href="#get-libs-and-incs-recursive"><cite>_get_libs_and_incs_recursive</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-nosetests-impl"><cite>_mrt_add_nosetests_impl</cite></a></li>
+<li><a class="reference internal" href="#mrt-create-executable-gtest"><cite>_mrt_create_executable_gtest</cite></a></li>
+<li><a class="reference internal" href="#mrt-export-package"><cite>_mrt_export_package</cite></a></li>
+<li><a class="reference internal" href="#mrt-get-python-destination"><cite>_mrt_get_python_destination</cite></a></li>
+<li><a class="reference internal" href="#remove-generator-expressions"><cite>_remove_generator_expressions</cite></a></li>
+<li><a class="reference internal" href="#setup-coverage-info"><cite>_setup_coverage_info</cite></a></li>
+<li><a class="reference internal" href="#catkin-install-python"><cite>catkin_install_python</cite></a></li>
+<li><a class="reference internal" href="#catkin-package"><cite>catkin_package</cite></a></li>
+<li><a class="reference internal" href="#catkin-package-xml"><cite>catkin_package_xml</cite></a></li>
+<li><a class="reference internal" href="#generate-ros-interface-files"><cite>generate_ros_interface_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-gtest"><cite>mrt_add_gtest</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-rostest"><cite>mrt_add_rostest</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-rostest-gtest"><cite>mrt_add_rostest_gtest</cite></a></li>
+<li><a class="reference internal" href="#mrt-init-testing"><cite>mrt_init_testing</cite></a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/generated_cmake_api.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="extracted-cmake-api-reference">
+<h1><a class="toc-backref" href="#id1">Extracted CMake API reference</a><a class="headerlink" href="#extracted-cmake-api-reference" title="Permalink to this headline">¶</a></h1>
+<p>This page was auto-generated from cmake source files using generate_cmake_rst.py</p>
+<div class="contents topic" id="contents">
+<p class="topic-title">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#extracted-cmake-api-reference" id="id1">Extracted CMake API reference</a><ul>
+<li><a class="reference internal" href="#public-cmake-functions-macros" id="id2">Public CMake functions / macros</a></li>
+<li><a class="reference internal" href="#mrt-add-executable" id="id3"><cite>mrt_add_executable</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-library" id="id4"><cite>mrt_add_library</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-links" id="id5"><cite>mrt_add_links</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-node-and-nodelet" id="id6"><cite>mrt_add_node_and_nodelet</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-nodelet" id="id7"><cite>mrt_add_nodelet</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-nosetests" id="id8"><cite>mrt_add_nosetests</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-python-api" id="id9"><cite>mrt_add_python_api</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-ros-tests" id="id10"><cite>mrt_add_ros_tests</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-tests" id="id11"><cite>mrt_add_tests</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-to-ide" id="id12"><cite>mrt_add_to_ide</cite></a></li>
+<li><a class="reference internal" href="#mrt-install" id="id13"><cite>mrt_install</cite></a></li>
+<li><a class="reference internal" href="#mrt-parse-package-xml" id="id14"><cite>mrt_parse_package_xml</cite></a></li>
+<li><a class="reference internal" href="#mrt-python-module-setup" id="id15"><cite>mrt_python_module_setup</cite></a></li>
+<li><a class="reference internal" href="#non-public-cmake-functions-macros" id="id16">Non-public CMake functions / macros</a></li>
+<li><a class="reference internal" href="#glog-report-not-found" id="id17"><cite>GLOG_REPORT_NOT_FOUND</cite></a></li>
+<li><a class="reference internal" href="#glog-reset-find-library-prefix" id="id18"><cite>GLOG_RESET_FIND_LIBRARY_PREFIX</cite></a></li>
+<li><a class="reference internal" href="#suitesparse-report-not-found" id="id19"><cite>SUITESPARSE_REPORT_NOT_FOUND</cite></a></li>
+<li><a class="reference internal" href="#suitesparse-reset-find-library-prefix" id="id20"><cite>SUITESPARSE_RESET_FIND_LIBRARY_PREFIX</cite></a></li>
+<li><a class="reference internal" href="#mrt-run-test" id="id21"><cite>_mrt_run_test</cite></a></li>
+<li><a class="reference internal" href="#generate-ros-parameter-files" id="id22"><cite>generate_ros_parameter_files</cite></a></li>
+<li><a class="reference internal" href="#glob-folders" id="id23"><cite>glob_folders</cite></a></li>
+<li><a class="reference internal" href="#glob-ros-files" id="id24"><cite>glob_ros_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-action-files" id="id25"><cite>mrt_add_action_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-message-files" id="id26"><cite>mrt_add_message_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-service-files" id="id27"><cite>mrt_add_service_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-glob-files" id="id28"><cite>mrt_glob_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-glob-files-recurse" id="id29"><cite>mrt_glob_files_recurse</cite></a></li>
+<li><a class="reference internal" href="#mrt-glob-folders" id="id30"><cite>mrt_glob_folders</cite></a></li>
+<li><a class="reference internal" href="#suitesparse-find-component" id="id31"><cite>suitesparse_find_component</cite></a></li>
+<li><a class="reference internal" href="#not-documented-cmake-functions-macros" id="id32">Not documented CMake functions / macros</a></li>
+<li><a class="reference internal" href="#cleanup-includes" id="id33"><cite>_cleanup_includes</cite></a></li>
+<li><a class="reference internal" href="#cleanup-libraries" id="id34"><cite>_cleanup_libraries</cite></a></li>
+<li><a class="reference internal" href="#find-dep" id="id35"><cite>_find_dep</cite></a></li>
+<li><a class="reference internal" href="#get-libs-and-incs-recursive" id="id36"><cite>_get_libs_and_incs_recursive</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-nosetests-impl" id="id37"><cite>_mrt_add_nosetests_impl</cite></a></li>
+<li><a class="reference internal" href="#mrt-create-executable-gtest" id="id38"><cite>_mrt_create_executable_gtest</cite></a></li>
+<li><a class="reference internal" href="#mrt-export-package" id="id39"><cite>_mrt_export_package</cite></a></li>
+<li><a class="reference internal" href="#mrt-get-python-destination" id="id40"><cite>_mrt_get_python_destination</cite></a></li>
+<li><a class="reference internal" href="#remove-generator-expressions" id="id41"><cite>_remove_generator_expressions</cite></a></li>
+<li><a class="reference internal" href="#setup-coverage-info" id="id42"><cite>_setup_coverage_info</cite></a></li>
+<li><a class="reference internal" href="#catkin-install-python" id="id43"><cite>catkin_install_python</cite></a></li>
+<li><a class="reference internal" href="#catkin-package" id="id44"><cite>catkin_package</cite></a></li>
+<li><a class="reference internal" href="#catkin-package-xml" id="id45"><cite>catkin_package_xml</cite></a></li>
+<li><a class="reference internal" href="#generate-ros-interface-files" id="id46"><cite>generate_ros_interface_files</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-gtest" id="id47"><cite>mrt_add_gtest</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-rostest" id="id48"><cite>mrt_add_rostest</cite></a></li>
+<li><a class="reference internal" href="#mrt-add-rostest-gtest" id="id49"><cite>mrt_add_rostest_gtest</cite></a></li>
+<li><a class="reference internal" href="#mrt-init-testing" id="id50"><cite>mrt_init_testing</cite></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="public-cmake-functions-macros">
+<h2><a class="toc-backref" href="#id2">Public CMake functions / macros</a><a class="headerlink" href="#public-cmake-functions-macros" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#mrt_add_executable" title="mrt_add_executable"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_executable()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_library" title="mrt_add_library"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_library()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_links" title="mrt_add_links"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_links()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_node_and_nodelet" title="mrt_add_node_and_nodelet"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_node_and_nodelet()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_nodelet" title="mrt_add_nodelet"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_nodelet()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_nosetests" title="mrt_add_nosetests"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_nosetests()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_python_api" title="mrt_add_python_api"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_python_api()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_ros_tests" title="mrt_add_ros_tests"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_ros_tests()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_tests" title="mrt_add_tests"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_tests()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_to_ide" title="mrt_add_to_ide"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_to_ide()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_install" title="mrt_install"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_install()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_parse_package_xml" title="mrt_parse_package_xml"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_parse_package_xml()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_python_module_setup" title="mrt_python_module_setup"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_python_module_setup()</span></code></a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="mrt-add-executable">
+<span id="mrt-add-executable-ref"></span><h2><a class="toc-backref" href="#id3"><cite>mrt_add_executable</cite></a><a class="headerlink" href="#mrt-add-executable" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_executable">
+<code class="descname">mrt_add_executable</code><span class="sig-paren">(</span><em>execname</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_executable" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds an executable.</p>
+<p>This command ensures the executable is compiled with all necessary dependencies.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.</p>
+</div>
+<p>The files are automatically added to the list of installable targets so that <code class="docutils literal notranslate"><span class="pre">mrt_install</span></code> can mark them for installation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>execname</strong> (<em>string</em>) – name of the executable</li>
+<li><strong>FOLDER</strong> (<em>string</em>) – Folder containing the .cpp/.cc-files and .h/.hh/.hpp files for the executable, relative to <code class="docutils literal notranslate"><span class="pre">${PROJECT_SOURCE_DIR}</span></code>.</li>
+<li><strong>FILES</strong> (<em>list of strings</em>) – List of extra source files to add. This or the FOLDER parameter is mandatory.</li>
+<li><strong>DEPENDS</strong> (<em>list of strings</em>) – List of extra (non-catkin, non-mrt) dependencies. This should only be required for including external projects.</li>
+<li><strong>LIBRARIES</strong> (<em>list of strings</em>) – Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_executable</span><span class="p">(</span> <span class="n">example_package</span>
+    <span class="n">FOLDER</span> <span class="n">src</span><span class="o">/</span><span class="n">example_package</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-library">
+<span id="mrt-add-library-ref"></span><h2><a class="toc-backref" href="#id4"><cite>mrt_add_library</cite></a><a class="headerlink" href="#mrt-add-library" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_library">
+<code class="descname">mrt_add_library</code><span class="sig-paren">(</span><em>libname</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_library" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds a library.</p>
+<p>This command ensures the library is compiled with all necessary dependencies. If no files are passed, the command will return silently.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.</p>
+</div>
+<p>The files are automatically added to the list of installable targets so that <code class="docutils literal notranslate"><span class="pre">mrt_install</span></code> can mark them for installation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>libname</strong> (<em>string</em>) – Name of the library to generate as first argument (without lib or .so)</li>
+<li><strong>INCLUDES</strong> (<em>list of strings</em>) – Public include files needed to use the library, absolute or relative to ${PROJECT_SOURCE_DIR}</li>
+<li><strong>SOURCES</strong> (<em>list of strings</em>) – Source files and private headers to be added. If no source files are passed, a header-only library is assumed</li>
+<li><strong>DEPENDS</strong> (<em>list of strings</em>) – List of extra (non-catkin, non-mrt) dependencies. This should only be required for including external projects.</li>
+<li><strong>LIBRARIES</strong> (<em>list of strings</em>) – Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_library</span><span class="p">(</span> <span class="n">example_package</span>
+    <span class="n">INCLUDES</span> <span class="n">include</span><span class="o">/</span><span class="n">example_package</span><span class="o">/</span><span class="n">myclass</span><span class="o">.</span><span class="n">h</span> <span class="n">include</span><span class="o">/</span><span class="n">example_package</span><span class="o">/</span><span class="n">myclass2</span><span class="o">.</span><span class="n">h</span>
+    <span class="n">SOURCES</span> <span class="n">src</span><span class="o">/</span><span class="n">myclass</span><span class="o">.</span><span class="n">cpp</span> <span class="n">src</span><span class="o">/</span><span class="n">myclass</span><span class="o">.</span><span class="n">cpp</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-links">
+<span id="mrt-add-links-ref"></span><h2><a class="toc-backref" href="#id5"><cite>mrt_add_links</cite></a><a class="headerlink" href="#mrt-add-links" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_links">
+<code class="descname">mrt_add_links</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_links" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds all the librares and targets that this target should be linked against. This includes dependencies found by AutoDeps, compiler flags and sanitizers.
+Also sets all local include directories usually required by the target</p>
+<p>This function is automatically called for all targets created with mrt_add_(executable/library/test/…).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>CUDA</strong> – indicates this is cuda and not C++ code</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_links</span><span class="p">(</span><span class="n">my_target</span> <span class="p">[</span><span class="n">CUDA</span><span class="p">]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-node-and-nodelet">
+<span id="mrt-add-node-and-nodelet-ref"></span><h2><a class="toc-backref" href="#id6"><cite>mrt_add_node_and_nodelet</cite></a><a class="headerlink" href="#mrt-add-node-and-nodelet" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_node_and_nodelet">
+<code class="descname">mrt_add_node_and_nodelet</code><span class="sig-paren">(</span><em>basename</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_node_and_nodelet" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds a node and a corresponding nodelet.</p>
+<p>This command ensures the node/nodelet are compiled with all necessary dependencies. Make sure to add lib{NAME}_nodelet to the <code class="docutils literal notranslate"><span class="pre">nodelet_plugins.xml</span></code> file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.</p>
+</div>
+<p>The files are automatically added to the list of installable targets so that <code class="docutils literal notranslate"><span class="pre">mrt_install</span></code> can mark them for installation.</p>
+<p>It requires a <code class="docutils literal notranslate"><span class="pre">*_nodelet.cpp</span></code> file and a <code class="docutils literal notranslate"><span class="pre">*_node.cpp</span></code> file to be present in this folder. It will then compile a nodelet-library, create an executable from the <code class="docutils literal notranslate"><span class="pre">*_node.cpp</span></code> file and link the executable with the nodelet library.</p>
+<p>Unless the variable <code class="docutils literal notranslate"><span class="pre">${MRT_NO_FAIL_ON_TESTS}</span></code> is set, failing unittests will result in a failed build.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>basename</strong> (<em>string</em>) – base name of the node/nodelet (_nodelet will be appended for the nodelet name to avoid conflicts with library packages)</li>
+<li><strong>FOLDER</strong> (<em>string</em>) – Folder with cpp files for the executable, relative to <code class="docutils literal notranslate"><span class="pre">${PROJECT_SOURCE_DIR}</span></code></li>
+<li><strong>DEPENDS</strong> (<em>list of strings</em>) – List of extra (non-catkin, non-mrt) CMAKE dependencies. This should only be required for including external projects.</li>
+<li><strong>LIBRARIES</strong> (<em>list of strings</em>) – Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_node_and_nodelet</span><span class="p">(</span> <span class="n">example_package</span>
+    <span class="n">FOLDER</span> <span class="n">src</span><span class="o">/</span><span class="n">example_package</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting entry in the <code class="docutils literal notranslate"><span class="pre">nodelet_plugins.xml</span></code> is thus: &lt;library path=”lib/libexample_package_nodelet”&gt;</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-nodelet">
+<span id="mrt-add-nodelet-ref"></span><h2><a class="toc-backref" href="#id7"><cite>mrt_add_nodelet</cite></a><a class="headerlink" href="#mrt-add-nodelet" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_nodelet">
+<code class="descname">mrt_add_nodelet</code><span class="sig-paren">(</span><em>nodeletname</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_nodelet" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds a nodelet.</p>
+<p>This command ensures the nodelet is compiled with all necessary dependencies. Make sure to add lib{PROJECT_NAME}-{NAME}-nodelet to the <code class="docutils literal notranslate"><span class="pre">nodelet_plugins.xml</span></code> file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.</p>
+</div>
+<p>The files are automatically added to the list of installable targets so that <code class="docutils literal notranslate"><span class="pre">mrt_install</span></code> can mark them for installation.</p>
+<p>It requires a <code class="docutils literal notranslate"><span class="pre">*_nodelet.cpp</span></code>-File to be present in this folder.
+The command will look for a <code class="docutils literal notranslate"><span class="pre">*_node.cpp</span></code>-file and remove it from the list of files to avoid <code class="docutils literal notranslate"><span class="pre">main()</span></code>-functions to be compiled into the library.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>nodeletname</strong> (<em>string</em>) – base name of the nodelet (_nodelet will be appended to the base name to avoid conflicts with library packages)</li>
+<li><strong>FOLDER</strong> (<em>string</em>) – Folder with cpp files for the executable, relative to <code class="docutils literal notranslate"><span class="pre">${PROJECT_SOURCE_DIR}</span></code></li>
+<li><strong>DEPENDS</strong> (<em>list of strings</em>) – List of extra (non-catkin, non-mrt) CMAKE dependencies. This should only be required for including external projects.</li>
+<li><strong>LIBRARIES</strong> (<em>list of strings</em>) – Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects</li>
+<li><strong>TARGETNAME</strong> (<em>string</em>) – Choose the name of the internal CMAKE target. Will be autogenerated if not specified.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_nodelet</span><span class="p">(</span> <span class="n">example_package</span>
+    <span class="n">FOLDER</span> <span class="n">src</span><span class="o">/</span><span class="n">example_package</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>The resulting entry in the <code class="docutils literal notranslate"><span class="pre">nodelet_plugins.xml</span></code> is thus: &lt;library path=”lib/libexample_package-example_package-nodelet”&gt;</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-nosetests">
+<span id="mrt-add-nosetests-ref"></span><h2><a class="toc-backref" href="#id8"><cite>mrt_add_nosetests</cite></a><a class="headerlink" href="#mrt-add-nosetests" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_nosetests">
+<code class="descname">mrt_add_nosetests</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_nosetests" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds python nosetest contained in a folder. Wraps the function catkin_add_nosetests.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>folder</strong> (<em>string</em>) – folder containing the tests (relative to <code class="docutils literal notranslate"><span class="pre">${PROJECT_SOURCE_DIR}</span></code>) as first argument</li>
+<li><strong>DEPENDS</strong> (<em>list of strings</em>) – Additional (non-catkin, non-mrt) dependencies (e.g. with catkin_download_test_data)</li>
+<li><strong>DEPENDENCIES</strong> (<em>list of strings</em>) – Alias for DEPENDS</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_nosetests</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-python-api">
+<span id="mrt-add-python-api-ref"></span><h2><a class="toc-backref" href="#id9"><cite>mrt_add_python_api</cite></a><a class="headerlink" href="#mrt-add-python-api" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_python_api">
+<code class="descname">mrt_add_python_api</code><span class="sig-paren">(</span><em>modulename</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_python_api" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Generates a python module from boost-python cpp files.</p>
+<p>Each &lt;file&gt;.cpp will become a seperate &lt;file&gt;.py submodule within &lt;modulename&gt;. After building and sourcing you can use the modules simply with “import &lt;modulename&gt;.&lt;file&gt;”.</p>
+<p>The files are automatically linked with boost-python libraries and a python module is generated
+and installed from the resulting library. If this project declares any libraries with <code class="docutils literal notranslate"><span class="pre">mrt_add_library()</span></code>, they will automatically be linked with this library.</p>
+<p>This function will define the compiler variable <code class="docutils literal notranslate"><span class="pre">PYTHON_API_MODULE_NAME</span></code> with the name of the generated library. This can be used in the <code class="docutils literal notranslate"><span class="pre">BOOST_PYTHON_MODULE</span></code> C++ Macro.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function can only be called once per package.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>modulename</strong> (<em>string</em>) – Name of the module needs to be passed as first parameter.</li>
+<li><strong>FILES</strong> (<em>list of strings</em>) – list of C++ files defining the BOOST-Python API.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_python_api</span><span class="p">(</span> <span class="n">example_package</span>
+    <span class="n">FILES</span> <span class="n">python_api</span><span class="o">/</span><span class="n">python</span><span class="o">.</span><span class="n">cpp</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-ros-tests">
+<span id="mrt-add-ros-tests-ref"></span><h2><a class="toc-backref" href="#id10"><cite>mrt_add_ros_tests</cite></a><a class="headerlink" href="#mrt-add-ros-tests" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_ros_tests">
+<code class="descname">mrt_add_ros_tests</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_ros_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds all rostests (identified by a .test file) contained in a folder as unittests.</p>
+<p>If a .cpp file exists with the same name, it will be added and comiled as a gtest test.
+Unittests can be run with “catkin run_tests” or similar. “-test” will be appended to the name of the test node to avoid conflicts (i.e. the type argument should then be &lt;test … type=”mytest-test”/&gt; in a mytest.test file).</p>
+<p>Unittests will always be executed with the folder as cwd. E.g. if the test folder contains a sub-folder “test_data”, it can simply be accessed as “test_data”.</p>
+<p>If coverage information is enabled (by setting <code class="docutils literal notranslate"><span class="pre">MRT_ENABLE_COVARAGE</span></code> to true), coverage analysis will be performed after unittests have run. The results can be found in the package’s build folder in the folder “coverage”.</p>
+<p>Unless the variable <code class="docutils literal notranslate"><span class="pre">${MRT_NO_FAIL_ON_TESTS}</span></code> is set, failing unittests will result in a failed build.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>folder</strong> (<em>string</em>) – folder containing the tests (relative to <code class="docutils literal notranslate"><span class="pre">${PROJECT_SOURCE_DIR}</span></code>) as first argument</li>
+<li><strong>LIBRARIES</strong> (<em>list of strings</em>) – Additional (non-catkin, non-mrt) libraries to link to</li>
+<li><strong>DEPENDS</strong> (<em>list of strings</em>) – Additional (non-catkin, non-mrt) dependencies (e.g. with catkin_download_test_data)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_ros_tests</span><span class="p">(</span> <span class="n">test</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-tests">
+<span id="mrt-add-tests-ref"></span><h2><a class="toc-backref" href="#id11"><cite>mrt_add_tests</cite></a><a class="headerlink" href="#mrt-add-tests" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_tests">
+<code class="descname">mrt_add_tests</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Adds all gtests (without a corresponding .test file) contained in a folder as unittests.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>folder</strong> (<em>string</em>) – folder containing the tests (relative to <code class="docutils literal notranslate"><span class="pre">${PROJECT_SOURCE_DIR}</span></code>) as first argument</li>
+<li><strong>LIBRARIES</strong> (<em>list of strings</em>) – Additional (non-catkin, non-mrt) libraries to link to</li>
+<li><strong>DEPENDS</strong> (<em>list of strings</em>) – Additional (non-catkin, non-mrt) dependencies (e.g. with catkin_download_test_data)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Unittests will be executed with the folder as cwd if ctest or the run_test target is used. E.g. if the test folder contains a sub-folder “test_data”, it can simply be accessed as “test_data”.
+Another way of getting the location of the project root folder path is to <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;test/test_utility.hpp&quot;</span></code> and use the variable <code class="docutils literal notranslate"><span class="pre">&lt;project_name&gt;::test::projectRootDir</span></code>.</p>
+<p>Unless the variable <code class="docutils literal notranslate"><span class="pre">${MRT_NO_FAIL_ON_TESTS}</span></code> is set, failing unittests will result in a failed build.</p>
+<p>If coverage information is enabled (by setting <code class="docutils literal notranslate"><span class="pre">MRT_ENABLE_COVARAGE</span></code> to true), coverage analysis will be performed after unittests have run. The results can be found in the package’s build folder in the folder “coverage”.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_add_tests</span><span class="p">(</span> <span class="n">test</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-to-ide">
+<span id="mrt-add-to-ide-ref"></span><h2><a class="toc-backref" href="#id12"><cite>mrt_add_to_ide</cite></a><a class="headerlink" href="#mrt-add-to-ide" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_to_ide">
+<code class="descname">mrt_add_to_ide</code><span class="sig-paren">(</span><em>files</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_to_ide" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Once upon a time this used to make non-code files known to IDEs that parse Cmake output. But as this
+messes up with the target determination mechanism used by most ides and garbages up the target view.</p>
+<p>Therefore this function is no longer used and only here for backwards compability.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-install">
+<span id="mrt-install-ref"></span><h2><a class="toc-backref" href="#id13"><cite>mrt_install</cite></a><a class="headerlink" href="#mrt-install" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_install">
+<code class="descname">mrt_install</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mrt_install" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Installs all relevant project files.</p>
+<p>All targets added by the mrt_add_&lt;library/executable/nodelet/…&gt; commands will be installed automatically when using this command. Other files/folders (launchfiles, scripts) need to be specified explicitly.
+Non existing files and folders will be silently ignored.</p>
+<p>If the project contains a file cmake/&lt;project-name&gt;-extras.cmake[.in], it will be automatically included by all depending projects. This allows to export cmake functions, etc. If the file ends with [.in], it will be configured by cmake
+and the variables “&#64;DEVELSPACE&#64;” “&#64;INSTALLSPACE&#64;” will be replaced by true or files depending on the build type, &#64;PROJECT_SPACE_DIR&#64; to the devel/install folder and &#64;PKT_CMAKE_DIR&#64; to the cmake folder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>PROGRAMS</strong> (<em>list of strings</em>) – List of all folders and files that are programs (python scripts will be indentified and treated separately). Files will be made executable.</li>
+<li><strong>FILES</strong> (<em>list of strings</em>) – List of non-executable files and folders. Subfolders will be installed recursively.</li>
+<li><strong>EXPORT_LIBS</strong> (<em>list of (interface) library targets</em>) – List of non-mrt-created libraries that should be installed and exported</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_install</span><span class="p">(</span>
+    <span class="n">PROGRAMS</span> <span class="n">scripts</span>
+    <span class="n">FILES</span> <span class="n">launch</span> <span class="n">nodelet_plugins</span><span class="o">.</span><span class="n">xml</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-parse-package-xml">
+<span id="mrt-parse-package-xml-ref"></span><h2><a class="toc-backref" href="#id14"><cite>mrt_parse_package_xml</cite></a><a class="headerlink" href="#mrt-parse-package-xml" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_parse_package_xml">
+<code class="descname">mrt_parse_package_xml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mrt_parse_package_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Parses the package.xml and sets its information in form of cmake variables as ${PACKAGE_NAME}_&lt;info&gt;, where info is
+one of version, VERSION, MAINTAINER, PACKAGE_FORMAT, &lt;BUILD/BUILD_EXPORT/TEST/EXEC/…&gt;_DEPENDS, URL_&lt;WEBSITE/BUGTRACKER/REPOSITORY&gt;</p>
+<p>This function must be called before any other of the mrt_* functions can be called.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-python-module-setup">
+<span id="mrt-python-module-setup-ref"></span><h2><a class="toc-backref" href="#id15"><cite>mrt_python_module_setup</cite></a><a class="headerlink" href="#mrt-python-module-setup" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_python_module_setup">
+<code class="descname">mrt_python_module_setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mrt_python_module_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Automatically sets up and installs python modules located under <code class="docutils literal notranslate"><span class="pre">src/${PROJECT_NAME}</span></code>.
+Modules can afterwards simply be included using “import &lt;project_name&gt;” in python.</p>
+<p>The python folder (under src/${PROJECT_NAME}) is required to have an __init__.py file.</p>
+<p>The command will automatically generate a setup.py in your project folder.
+This file should not be commited, as it will be regenerated at every new CMAKE run.
+Due to restrictions imposed by catkin (searches hardcoded for this setup.py), the file cannot
+be placed elsewhere.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mrt_python_module_setup</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="non-public-cmake-functions-macros">
+<h2><a class="toc-backref" href="#id16">Non-public CMake functions / macros</a><a class="headerlink" href="#non-public-cmake-functions-macros" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#GLOG_REPORT_NOT_FOUND" title="GLOG_REPORT_NOT_FOUND"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">GLOG_REPORT_NOT_FOUND()</span></code></a></li>
+<li><a class="reference internal" href="#GLOG_RESET_FIND_LIBRARY_PREFIX" title="GLOG_RESET_FIND_LIBRARY_PREFIX"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">GLOG_RESET_FIND_LIBRARY_PREFIX()</span></code></a></li>
+<li><a class="reference internal" href="#SUITESPARSE_REPORT_NOT_FOUND" title="SUITESPARSE_REPORT_NOT_FOUND"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">SUITESPARSE_REPORT_NOT_FOUND()</span></code></a></li>
+<li><a class="reference internal" href="#SUITESPARSE_RESET_FIND_LIBRARY_PREFIX" title="SUITESPARSE_RESET_FIND_LIBRARY_PREFIX"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">SUITESPARSE_RESET_FIND_LIBRARY_PREFIX()</span></code></a></li>
+<li><a class="reference internal" href="#_mrt_run_test" title="_mrt_run_test"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">_mrt_run_test()</span></code></a></li>
+<li><a class="reference internal" href="#generate_ros_parameter_files" title="generate_ros_parameter_files"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">generate_ros_parameter_files()</span></code></a></li>
+<li><a class="reference internal" href="#glob_folders" title="glob_folders"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">glob_folders()</span></code></a></li>
+<li><a class="reference internal" href="#glob_ros_files" title="glob_ros_files"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">glob_ros_files()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_action_files" title="mrt_add_action_files"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_action_files()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_message_files" title="mrt_add_message_files"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_message_files()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_add_service_files" title="mrt_add_service_files"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_add_service_files()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_glob_files" title="mrt_glob_files"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_glob_files()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_glob_files_recurse" title="mrt_glob_files_recurse"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_glob_files_recurse()</span></code></a></li>
+<li><a class="reference internal" href="#mrt_glob_folders" title="mrt_glob_folders"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">mrt_glob_folders()</span></code></a></li>
+<li><a class="reference internal" href="#suitesparse_find_component" title="suitesparse_find_component"><code class="xref cmake cmake-macro docutils literal notranslate"><span class="pre">suitesparse_find_component()</span></code></a></li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="glog-report-not-found">
+<span id="glog-report-not-found-ref"></span><h2><a class="toc-backref" href="#id17"><cite>GLOG_REPORT_NOT_FOUND</cite></a><a class="headerlink" href="#glog-report-not-found" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="GLOG_REPORT_NOT_FOUND">
+<code class="descname">GLOG_REPORT_NOT_FOUND</code><span class="sig-paren">(</span><em>REASON_MSG</em><span class="sig-paren">)</span><a class="headerlink" href="#GLOG_REPORT_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in Modules/FindGlog.cmake]</em></p>
+<p>Called if we failed to find glog or any of it’s required dependencies,
+unsets all public (designed to be used externally) variables and reports
+error message at priority depending upon [REQUIRED/QUIET/&lt;NONE&gt;] argument.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="glog-reset-find-library-prefix">
+<span id="glog-reset-find-library-prefix-ref"></span><h2><a class="toc-backref" href="#id18"><cite>GLOG_RESET_FIND_LIBRARY_PREFIX</cite></a><a class="headerlink" href="#glog-reset-find-library-prefix" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="GLOG_RESET_FIND_LIBRARY_PREFIX">
+<code class="descname">GLOG_RESET_FIND_LIBRARY_PREFIX</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#GLOG_RESET_FIND_LIBRARY_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in Modules/FindGlog.cmake]</em></p>
+<p>Reset CALLERS_CMAKE_FIND_LIBRARY_PREFIXES to its value when
+FindGlog was invoked.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="suitesparse-report-not-found">
+<span id="suitesparse-report-not-found-ref"></span><h2><a class="toc-backref" href="#id19"><cite>SUITESPARSE_REPORT_NOT_FOUND</cite></a><a class="headerlink" href="#suitesparse-report-not-found" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="SUITESPARSE_REPORT_NOT_FOUND">
+<code class="descname">SUITESPARSE_REPORT_NOT_FOUND</code><span class="sig-paren">(</span><em>REASON_MSG</em><span class="sig-paren">)</span><a class="headerlink" href="#SUITESPARSE_REPORT_NOT_FOUND" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in Modules/FindSuiteSparse.cmake]</em></p>
+<p>Called if we failed to find SuiteSparse or any of it’s required dependencies,
+unsets all public (designed to be used externally) variables and reports
+error message at priority depending upon [REQUIRED/QUIET/&lt;NONE&gt;] argument.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="suitesparse-reset-find-library-prefix">
+<span id="suitesparse-reset-find-library-prefix-ref"></span><h2><a class="toc-backref" href="#id20"><cite>SUITESPARSE_RESET_FIND_LIBRARY_PREFIX</cite></a><a class="headerlink" href="#suitesparse-reset-find-library-prefix" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="SUITESPARSE_RESET_FIND_LIBRARY_PREFIX">
+<code class="descname">SUITESPARSE_RESET_FIND_LIBRARY_PREFIX</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#SUITESPARSE_RESET_FIND_LIBRARY_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in Modules/FindSuiteSparse.cmake]</em></p>
+<p>Reset CALLERS_CMAKE_FIND_LIBRARY_PREFIXES to its value when
+FindSuiteSparse was invoked.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-run-test">
+<span id="mrt-run-test-ref"></span><h2><a class="toc-backref" href="#id21"><cite>_mrt_run_test</cite></a><a class="headerlink" href="#mrt-run-test" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_mrt_run_test">
+<code class="descname">_mrt_run_test</code><span class="sig-paren">(</span><em>target_name</em>, <em>working_dir</em>, <em>result_xml_path</em><span class="sig-paren">)</span><a class="headerlink" href="#_mrt_run_test" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/MrtTesting.cmake]</em></p>
+<p>All paths have to be absolute</p>
+</dd></dl>
+
+</div>
+<div class="section" id="generate-ros-parameter-files">
+<span id="generate-ros-parameter-files-ref"></span><h2><a class="toc-backref" href="#id22"><cite>generate_ros_parameter_files</cite></a><a class="headerlink" href="#generate-ros-parameter-files" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="generate_ros_parameter_files">
+<code class="descname">generate_ros_parameter_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#generate_ros_parameter_files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>define rosparam/rosinterface_handler macro for compability. Macros will be overriden by the actual macros defined by the packages, if existing.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="glob-folders">
+<span id="glob-folders-ref"></span><h2><a class="toc-backref" href="#id23"><cite>glob_folders</cite></a><a class="headerlink" href="#glob-folders" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="glob_folders">
+<code class="descname">glob_folders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#glob_folders" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Deprecated function. Use ‘mrt_glob_folders’ instead.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="glob-ros-files">
+<span id="glob-ros-files-ref"></span><h2><a class="toc-backref" href="#id24"><cite>glob_ros_files</cite></a><a class="headerlink" href="#glob-ros-files" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="glob_ros_files">
+<code class="descname">glob_ros_files</code><span class="sig-paren">(</span><em>excecutable_name</em>, <em>extension_name</em><span class="sig-paren">)</span><a class="headerlink" href="#glob_ros_files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Deprecated function. Use one of ‘mrt_add_message_files’, ‘mrt_add_service_files’ or ‘mrt_add_action_files’.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-action-files">
+<span id="mrt-add-action-files-ref"></span><h2><a class="toc-backref" href="#id25"><cite>mrt_add_action_files</cite></a><a class="headerlink" href="#mrt-add-action-files" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_action_files">
+<code class="descname">mrt_add_action_files</code><span class="sig-paren">(</span><em>folder_name</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_action_files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Globs for action files and calls add_action_files</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-message-files">
+<span id="mrt-add-message-files-ref"></span><h2><a class="toc-backref" href="#id26"><cite>mrt_add_message_files</cite></a><a class="headerlink" href="#mrt-add-message-files" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_message_files">
+<code class="descname">mrt_add_message_files</code><span class="sig-paren">(</span><em>folder_name</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_message_files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Globs for message files and calls add_message_files</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-service-files">
+<span id="mrt-add-service-files-ref"></span><h2><a class="toc-backref" href="#id27"><cite>mrt_add_service_files</cite></a><a class="headerlink" href="#mrt-add-service-files" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_service_files">
+<code class="descname">mrt_add_service_files</code><span class="sig-paren">(</span><em>folder_name</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_service_files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Globs for service files and calls add_service_files</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-glob-files">
+<span id="mrt-glob-files-ref"></span><h2><a class="toc-backref" href="#id28"><cite>mrt_glob_files</cite></a><a class="headerlink" href="#mrt-glob-files" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_glob_files">
+<code class="descname">mrt_glob_files</code><span class="sig-paren">(</span><em>varname</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_glob_files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Globs files in the currect project dir.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-glob-files-recurse">
+<span id="mrt-glob-files-recurse-ref"></span><h2><a class="toc-backref" href="#id29"><cite>mrt_glob_files_recurse</cite></a><a class="headerlink" href="#mrt-glob-files-recurse" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_glob_files_recurse">
+<code class="descname">mrt_glob_files_recurse</code><span class="sig-paren">(</span><em>varname</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_glob_files_recurse" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Globs files recursivly in the currect project dir.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-glob-folders">
+<span id="mrt-glob-folders-ref"></span><h2><a class="toc-backref" href="#id30"><cite>mrt_glob_folders</cite></a><a class="headerlink" href="#mrt-glob-folders" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_glob_folders">
+<code class="descname">mrt_glob_folders</code><span class="sig-paren">(</span><em>DIRECTORY_LIST</em>, <em>SEARCH_DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_glob_folders" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+<p>Glob for folders in the search directory.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="suitesparse-find-component">
+<span id="suitesparse-find-component-ref"></span><h2><a class="toc-backref" href="#id31"><cite>suitesparse_find_component</cite></a><a class="headerlink" href="#suitesparse-find-component" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="suitesparse_find_component">
+<code class="descname">suitesparse_find_component</code><span class="sig-paren">(</span><em>COMPONENT</em><span class="sig-paren">)</span><a class="headerlink" href="#suitesparse_find_component" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in Modules/FindSuiteSparse.cmake]</em></p>
+<p>Wrappers to find_path/library that pass the SuiteSparse search hints/paths.</p>
+<dl class="docutils">
+<dt>suitesparse_find_component(&lt;component&gt; [FILES name1 [name2 …]]</dt>
+<dd>[LIBRARIES name1 [name2 …]]
+[REQUIRED])</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="not-documented-cmake-functions-macros">
+<h2><a class="toc-backref" href="#id32">Not documented CMake functions / macros</a><a class="headerlink" href="#not-documented-cmake-functions-macros" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="cleanup-includes">
+<span id="cleanup-includes-ref"></span><h2><a class="toc-backref" href="#id33"><cite>_cleanup_includes</cite></a><a class="headerlink" href="#cleanup-includes" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_cleanup_includes">
+<code class="descname">_cleanup_includes</code><span class="sig-paren">(</span><em>targets</em><span class="sig-paren">)</span><a class="headerlink" href="#_cleanup_includes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/FindAutoDeps.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="cleanup-libraries">
+<span id="cleanup-libraries-ref"></span><h2><a class="toc-backref" href="#id34"><cite>_cleanup_libraries</cite></a><a class="headerlink" href="#cleanup-libraries" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_cleanup_libraries">
+<code class="descname">_cleanup_libraries</code><span class="sig-paren">(</span><em>var_name_libs</em><span class="sig-paren">)</span><a class="headerlink" href="#_cleanup_libraries" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/FindAutoDeps.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="find-dep">
+<span id="find-dep-ref"></span><h2><a class="toc-backref" href="#id35"><cite>_find_dep</cite></a><a class="headerlink" href="#find-dep" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_find_dep">
+<code class="descname">_find_dep</code><span class="sig-paren">(</span><em>output_target</em>, <em>component</em><span class="sig-paren">)</span><a class="headerlink" href="#_find_dep" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in Modules/FindAutoDeps.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="get-libs-and-incs-recursive">
+<span id="get-libs-and-incs-recursive-ref"></span><h2><a class="toc-backref" href="#id36"><cite>_get_libs_and_incs_recursive</cite></a><a class="headerlink" href="#get-libs-and-incs-recursive" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_get_libs_and_incs_recursive">
+<code class="descname">_get_libs_and_incs_recursive</code><span class="sig-paren">(</span><em>out_libs</em>, <em>out_incs</em>, <em>lib</em><span class="sig-paren">)</span><a class="headerlink" href="#_get_libs_and_incs_recursive" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/FindAutoDeps.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-nosetests-impl">
+<span id="mrt-add-nosetests-impl-ref"></span><h2><a class="toc-backref" href="#id37"><cite>_mrt_add_nosetests_impl</cite></a><a class="headerlink" href="#mrt-add-nosetests-impl" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_mrt_add_nosetests_impl">
+<code class="descname">_mrt_add_nosetests_impl</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="headerlink" href="#_mrt_add_nosetests_impl" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/MrtTesting.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-create-executable-gtest">
+<span id="mrt-create-executable-gtest-ref"></span><h2><a class="toc-backref" href="#id38"><cite>_mrt_create_executable_gtest</cite></a><a class="headerlink" href="#mrt-create-executable-gtest" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_mrt_create_executable_gtest">
+<code class="descname">_mrt_create_executable_gtest</code><span class="sig-paren">(</span><em>target</em>, <em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#_mrt_create_executable_gtest" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/MrtTesting.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-export-package">
+<span id="mrt-export-package-ref"></span><h2><a class="toc-backref" href="#id39"><cite>_mrt_export_package</cite></a><a class="headerlink" href="#mrt-export-package" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_mrt_export_package">
+<code class="descname">_mrt_export_package</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_mrt_export_package" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/ExportPackage.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-get-python-destination">
+<span id="mrt-get-python-destination-ref"></span><h2><a class="toc-backref" href="#id40"><cite>_mrt_get_python_destination</cite></a><a class="headerlink" href="#mrt-get-python-destination" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_mrt_get_python_destination">
+<code class="descname">_mrt_get_python_destination</code><span class="sig-paren">(</span><em>output_var</em><span class="sig-paren">)</span><a class="headerlink" href="#_mrt_get_python_destination" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in mrt_cmake_modules-macros.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="remove-generator-expressions">
+<span id="remove-generator-expressions-ref"></span><h2><a class="toc-backref" href="#id41"><cite>_remove_generator_expressions</cite></a><a class="headerlink" href="#remove-generator-expressions" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_remove_generator_expressions">
+<code class="descname">_remove_generator_expressions</code><span class="sig-paren">(</span><em>libs_arg</em><span class="sig-paren">)</span><a class="headerlink" href="#_remove_generator_expressions" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/FindAutoDeps.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="setup-coverage-info">
+<span id="setup-coverage-info-ref"></span><h2><a class="toc-backref" href="#id42"><cite>_setup_coverage_info</cite></a><a class="headerlink" href="#setup-coverage-info" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="_setup_coverage_info">
+<code class="descname">_setup_coverage_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_setup_coverage_info" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="catkin-install-python">
+<span id="catkin-install-python-ref"></span><h2><a class="toc-backref" href="#id43"><cite>catkin_install_python</cite></a><a class="headerlink" href="#catkin-install-python" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="catkin_install_python">
+<code class="descname">catkin_install_python</code><span class="sig-paren">(</span><em>programs</em><span class="sig-paren">)</span><a class="headerlink" href="#catkin_install_python" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/CatkinMockForConan.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="catkin-package">
+<span id="catkin-package-ref"></span><h2><a class="toc-backref" href="#id44"><cite>catkin_package</cite></a><a class="headerlink" href="#catkin-package" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="catkin_package">
+<code class="descname">catkin_package</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#catkin_package" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/CatkinMockForConan.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="catkin-package-xml">
+<span id="catkin-package-xml-ref"></span><h2><a class="toc-backref" href="#id45"><cite>catkin_package_xml</cite></a><a class="headerlink" href="#catkin-package-xml" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="catkin_package_xml">
+<code class="descname">catkin_package_xml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#catkin_package_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/CatkinMockForConan.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="generate-ros-interface-files">
+<span id="generate-ros-interface-files-ref"></span><h2><a class="toc-backref" href="#id46"><cite>generate_ros_interface_files</cite></a><a class="headerlink" href="#generate-ros-interface-files" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="generate_ros_interface_files">
+<code class="descname">generate_ros_interface_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#generate_ros_interface_files" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[macro defined in mrt_cmake_modules-macros.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-gtest">
+<span id="mrt-add-gtest-ref"></span><h2><a class="toc-backref" href="#id47"><cite>mrt_add_gtest</cite></a><a class="headerlink" href="#mrt-add-gtest" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_gtest">
+<code class="descname">mrt_add_gtest</code><span class="sig-paren">(</span><em>target</em>, <em>file</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_gtest" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/MrtTesting.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-rostest">
+<span id="mrt-add-rostest-ref"></span><h2><a class="toc-backref" href="#id48"><cite>mrt_add_rostest</cite></a><a class="headerlink" href="#mrt-add-rostest" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_rostest">
+<code class="descname">mrt_add_rostest</code><span class="sig-paren">(</span><em>target</em>, <em>launch_file</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_rostest" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/MrtTesting.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-add-rostest-gtest">
+<span id="mrt-add-rostest-gtest-ref"></span><h2><a class="toc-backref" href="#id49"><cite>mrt_add_rostest_gtest</cite></a><a class="headerlink" href="#mrt-add-rostest-gtest" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_add_rostest_gtest">
+<code class="descname">mrt_add_rostest_gtest</code><span class="sig-paren">(</span><em>target</em>, <em>launch_file</em>, <em>cpp_file</em><span class="sig-paren">)</span><a class="headerlink" href="#mrt_add_rostest_gtest" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/MrtTesting.cmake]</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="mrt-init-testing">
+<span id="mrt-init-testing-ref"></span><h2><a class="toc-backref" href="#id50"><cite>mrt_init_testing</cite></a><a class="headerlink" href="#mrt-init-testing" title="Permalink to this headline">¶</a></h2>
+<dl class="macro">
+<dt id="mrt_init_testing">
+<code class="descname">mrt_init_testing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mrt_init_testing" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>[function defined in Modules/MrtTesting.cmake]</em></p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">mrt_cmake_modules 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright MRT --  Version 0a23aeace5f902546e1295295556fb306b3df421, Mon, 24 Feb 2020.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,501 @@
+Extracted CMake API reference
+=============================
+This page was auto-generated from cmake source files using generate_cmake_rst.py
+
+.. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+.. !!!!!! Auto-generated file, do not modify
+.. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+.. contents::
+
+
+Public CMake functions / macros
+-------------------------------
+
+ * :cmake:macro:`mrt_add_executable`
+ * :cmake:macro:`mrt_add_library`
+ * :cmake:macro:`mrt_add_node_and_nodelet`
+ * :cmake:macro:`mrt_add_nodelet`
+ * :cmake:macro:`mrt_add_nosetests`
+ * :cmake:macro:`mrt_add_python_api`
+ * :cmake:macro:`mrt_add_ros_tests`
+ * :cmake:macro:`mrt_add_tests`
+ * :cmake:macro:`mrt_add_to_ide`
+ * :cmake:macro:`mrt_install`
+ * :cmake:macro:`mrt_python_module_setup`
+
+.. _`mrt_add_executable_ref`:
+
+`mrt_add_executable`
+--------------------
+
+.. cmake:macro:: mrt_add_executable(execname)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Adds an executable.
+
+ This command ensures the executable is compiled with all necessary dependencies.
+
+ .. note:: Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.
+
+ The files are automatically added to the list of installable targets so that ``mrt_install`` can mark them for installation.
+
+ :param execname: name of the executable
+ :type execname: string
+ :param FOLDER: Folder containing the .cpp/.cc-files and .h/.hh/.hpp files for the executable, relative to ``${PROJECT_SOURCE_DIR}``.
+ :type FOLDER: string
+ :param FILES: List of extra source files to add. This or the FOLDER parameter is mandatory.
+ :type FILES: list of strings
+ :param DEPENDS: List of extra (non-catkin, non-mrt) dependencies. This should only be required for including external projects.
+ :type DEPENDS: list of strings
+ :param LIBRARIES: Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects
+ :type LIBRARIES: list of strings
+
+ Example:
+ ::
+
+   mrt_add_executable( example_package
+       FOLDER src/example_package
+       )
+
+
+
+.. _`mrt_add_library_ref`:
+
+`mrt_add_library`
+-----------------
+
+.. cmake:macro:: mrt_add_library(libname)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Adds a library.
+
+ This command ensures the library is compiled with all necessary dependencies. If no files are passed, the command will return silently.
+
+ .. note:: Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.
+
+ The files are automatically added to the list of installable targets so that ``mrt_install`` can mark them for installation.
+
+ :param libname: Name of the library to generate as first argument (without lib or .so)
+ :type libname: string
+ :param INCLUDES: Include files needed for the library, absolute or relative to ${PROJECT_SOURCE_DIR}
+ :type INCLUDES: list of strings
+ :param SOURCES: Source files to be added. If empty, a header-only library is assumed
+ :type SOURCES: list of strings
+ :param DEPENDS: List of extra (non-catkin, non-mrt) dependencies. This should only be required for including external projects.
+ :type DEPENDS: list of strings
+ :param LIBRARIES: Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects
+ :type LIBRARIES: list of strings
+
+ Example:
+ ::
+
+   mrt_add_library( example_package
+       INCLUDES include/example_package/myclass.h include/example_package/myclass2.h
+       SOURCES src/myclass.cpp src/myclass.cpp
+       )
+
+
+
+.. _`mrt_add_node_and_nodelet_ref`:
+
+`mrt_add_node_and_nodelet`
+--------------------------
+
+.. cmake:macro:: mrt_add_node_and_nodelet(basename)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Adds a node and a corresponding nodelet.
+
+ This command ensures the node/nodelet are compiled with all necessary dependencies. Make sure to add lib{NAME}_nodelet to the ``nodelet_plugins.xml`` file.
+
+ .. note:: Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.
+
+ The files are automatically added to the list of installable targets so that ``mrt_install`` can mark them for installation.
+
+ It requires a ``*_nodelet.cpp`` file and a ``*_node.cpp`` file to be present in this folder. It will then compile a nodelet-library, create an executable from the ``*_node.cpp`` file and link the executable with the nodelet library.
+
+ Unless the variable ``${MRT_NO_FAIL_ON_TESTS}`` is set, failing unittests will result in a failed build.
+
+ :param basename: base name of the node/nodelet (_nodelet will be appended for the nodelet name to avoid conflicts with library packages)
+ :type basename: string
+ :param FOLDER: Folder with cpp files for the executable, relative to ``${PROJECT_SOURCE_DIR}``
+ :type FOLDER: string
+ :param DEPENDS: List of extra (non-catkin, non-mrt) CMAKE dependencies. This should only be required for including external projects.
+ :type DEPENDS: list of strings
+ :param LIBRARIES: Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects
+ :type LIBRARIES: list of strings
+
+ Example:
+ ::
+
+   mrt_add_node_and_nodelet( example_package
+       FOLDER src/example_package
+       )
+
+ The resulting entry in the ``nodelet_plugins.xml`` is thus: <library path="lib/libexample_package_nodelet">
+
+
+
+.. _`mrt_add_nodelet_ref`:
+
+`mrt_add_nodelet`
+-----------------
+
+.. cmake:macro:: mrt_add_nodelet(nodeletname)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Adds a nodelet.
+
+ This command ensures the nodelet is compiled with all necessary dependencies. Make sure to add lib{NAME}_nodelet to the ``nodelet_plugins.xml`` file.
+
+ .. note:: Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.
+
+ The files are automatically added to the list of installable targets so that ``mrt_install`` can mark them for installation.
+
+ It requires a ``*_nodelet.cpp``-File to be present in this folder.
+ The command will look for a ``*_node.cpp``-file and remove it from the list of files to avoid ``main()``-functions to be compiled into the library.
+
+ :param nodeletname: base name of the nodelet (_nodelet will be appended to the base name to avoid conflicts with library packages)
+ :type nodeletname: string
+ :param FOLDER: Folder with cpp files for the executable, relative to ``${PROJECT_SOURCE_DIR}``
+ :type FOLDER: string
+ :param DEPENDS: List of extra (non-catkin, non-mrt) CMAKE dependencies. This should only be required for including external projects.
+ :type DEPENDS: list of strings
+ :param LIBRARIES: Extra (non-catkin, non-mrt) libraries to link to. This should only be required for external projects
+ :type LIBRARIES: list of strings
+ :param TARGETNAME: Choose the name of the internal CMAKE target. Will be autogenerated if not specified.
+ :type TARGETNAME: string
+
+ Example:
+ ::
+
+   mrt_add_nodelet( example_package
+       FOLDER src/example_package
+       )
+
+ The resulting entry in the ``nodelet_plugins.xml`` is thus: <library path="lib/libexample_package_nodelet">
+
+
+
+.. _`mrt_add_nosetests_ref`:
+
+`mrt_add_nosetests`
+-------------------
+
+.. cmake:macro:: mrt_add_nosetests(folder)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+ Adds python nosetest contained in a folder. Wraps the function catkin_add_nosetests.
+
+ :param folder: folder containing the tests (relative to ``${PROJECT_SOURCE_DIR}``) as first argument
+ :type folder: string
+ :param DEPENDS: Additional (non-catkin, non-mrt) dependencies (e.g. with catkin_download_test_data)
+ :type DEPENDS: list of strings
+ :param DEPENDENCIES: Alias for DEPENDS
+ :type DEPENDENCIES: list of strings
+
+ Example:
+ ::
+
+   mrt_add_nosetests(test)
+
+
+
+.. _`mrt_add_python_api_ref`:
+
+`mrt_add_python_api`
+--------------------
+
+.. cmake:macro:: mrt_add_python_api(modulename)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Generates a python module from boost-python cpp files.
+
+ Each <file>.cpp will become a seperate <file>.py submodule within <modulename>. After building and sourcing you can use the modules simply with "import <modulename>.<file>".
+
+ The files are automatically linked with boost-python libraries and a python module is generated
+ and installed from the resulting library. If this project declares any libraries with ``mrt_add_library()``, they will automatically be linked with this library.
+
+ This function will define the compiler variable ``PYTHON_API_MODULE_NAME`` with the name of the generated library. This can be used in the ``BOOST_PYTHON_MODULE`` C++ Macro.
+
+ .. note:: This function can only be called once per package.
+
+ :param modulename: Name of the module needs to be passed as first parameter.
+ :type modulename: string
+ :param FILES: list of C++ files defining the BOOST-Python API.
+ :type FILES: list of strings
+
+ Example:
+ ::
+
+   mrt_add_python_api( example_package
+       FILES python_api/python.cpp
+       )
+
+
+
+.. _`mrt_add_ros_tests_ref`:
+
+`mrt_add_ros_tests`
+-------------------
+
+.. cmake:macro:: mrt_add_ros_tests(folder)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Adds all rostests (identified by a .test file) contained in a folder as unittests.
+
+ If a .cpp file exists with the same name, it will be added and comiled as a gtest test.
+ Unittests can be run with "catkin run_tests" or similar. "-test" will be appended to the name of the test node to avoid conflicts (i.e. the type argument should then be <test ... type="mytest-test"/> in a mytest.test file).
+
+ Unittests will always be executed with the folder as cwd. E.g. if the test folder contains a sub-folder "test_data", it can simply be accessed as "test_data".
+
+ If coverage information is enabled (by setting ``MRT_ENABLE_COVARAGE`` to true), coverage analysis will be performed after unittests have run. The results can be found in the package's build folder in the folder "coverage".
+
+ Unless the variable ``${MRT_NO_FAIL_ON_TESTS}`` is set, failing unittests will result in a failed build.
+
+ :param folder: folder containing the tests (relative to ``${PROJECT_SOURCE_DIR}``) as first argument
+ :type folder: string
+ :param LIBRARIES: Additional (non-catkin, non-mrt) libraries to link to
+ :type LIBRARIES: list of strings
+ :param DEPENDS: Additional (non-catkin, non-mrt) dependencies (e.g. with catkin_download_test_data)
+ :type DEPENDS: list of strings
+
+ Example:
+ ::
+
+   mrt_add_ros_tests( test
+       )
+
+
+
+.. _`mrt_add_tests_ref`:
+
+`mrt_add_tests`
+---------------
+
+.. cmake:macro:: mrt_add_tests(folder)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Adds all gtests (without a corresponding .test file) contained in a folder as unittests.
+
+ :param folder: folder containing the tests (relative to ``${PROJECT_SOURCE_DIR}``) as first argument
+ :type folder: string
+ :param LIBRARIES: Additional (non-catkin, non-mrt) libraries to link to
+ :type LIBRARIES: list of strings
+ :param DEPENDS: Additional (non-catkin, non-mrt) dependencies (e.g. with catkin_download_test_data)
+ :type DEPENDS: list of strings
+
+
+ Unittests will always be executed with the folder as cwd. E.g. if the test folder contains a sub-folder "test_data", it can simply be accessed as "test_data".
+
+ Unless the variable ``${MRT_NO_FAIL_ON_TESTS}`` is set, failing unittests will result in a failed build.
+
+ If coverage information is enabled (by setting ``MRT_ENABLE_COVARAGE`` to true), coverage analysis will be performed after unittests have run. The results can be found in the package's build folder in the folder "coverage".
+
+ Example:
+ ::
+
+   mrt_add_tests( test
+       )
+
+
+
+.. _`mrt_add_to_ide_ref`:
+
+`mrt_add_to_ide`
+----------------
+
+.. cmake:macro:: mrt_add_to_ide(files)
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Adds a file or folder or a list of each to the list of files shown by the IDE
+ The files will not be marked for installation. Paths should be relative to ``PROJECT_SOURCE_DIR``
+
+ If a file or folder does not exist, it will be ignored without warning.
+
+ Example:
+ ::
+
+  mrt_add_to_ide(
+      myfile1 myfile2.txt myFolder
+      )
+
+
+
+.. _`mrt_install_ref`:
+
+`mrt_install`
+-------------
+
+.. cmake:macro:: mrt_install()
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+ Installs all relevant project files.
+
+ All targets added by the mrt_add_<library/executable/nodelet/...> commands will be installed automatically when using this command. Other files/folders (launchfiles, scripts) need to be specified explicitly.
+ Non existing files and folders will be silently ignored. All files will be marked as project files for IDEs.
+
+ :param PROGRAMS: List of all folders and files that are programs (python scripts will be indentified and treated separately). Files will be made executable.
+ :type PROGRAMS: list of strings
+ :param FILES: List of non-executable files and folders. Subfolders will be installed recursively.
+ :type FILES: list of strings
+
+ Example:
+ ::
+
+   mrt_install(
+       PROGRAMS scripts
+       FILES launch nodelet_plugins.xml
+       )
+
+
+
+.. _`mrt_python_module_setup_ref`:
+
+`mrt_python_module_setup`
+-------------------------
+
+.. cmake:macro:: mrt_python_module_setup()
+
+ *[function defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Automatically sets up and installs python modules located under ``src/${PROJECT_NAME}``.
+ Modules can afterwards simply be included using "import <project_name>" in python.
+
+ The python folder (under src/${PROJECT_NAME}) is required to have an __init__.py file.
+
+ The command will automatically generate a setup.py in your project folder.
+ This file should not be commited, as it will be regenerated at every new CMAKE run.
+ Due to restrictions imposed by catkin (searches hardcoded for this setup.py), the file cannot
+ be placed elsewhere.
+
+ Example:
+ ::
+
+   mrt_python_module_setup()
+
+
+
+Non-public CMake functions / macros
+-----------------------------------
+
+ * :cmake:macro:`_list_append_deduplicate`
+ * :cmake:macro:`_list_append_unique`
+ * :cmake:macro:`_mrt_register_test`
+ * :cmake:macro:`_pack_libraries_with_build_configuration`
+ * :cmake:macro:`_unpack_libraries_with_build_configuration`
+ * :cmake:macro:`generate_ros_parameter_files`
+
+.. _`_list_append_deduplicate_ref`:
+
+`_list_append_deduplicate`
+--------------------------
+
+.. cmake:macro:: _list_append_deduplicate(listname)
+
+ *[macro defined in mrt_cmake_modulesConfig.cmake]*
+
+ append elements to a list and remove existing duplicates from the list
+ copied from catkin/cmake/list_append_deduplicate.cmake to keep pkgConfig
+ self contained
+
+.. _`_list_append_unique_ref`:
+
+`_list_append_unique`
+---------------------
+
+.. cmake:macro:: _list_append_unique(listname)
+
+ *[macro defined in mrt_cmake_modulesConfig.cmake]*
+
+ append elements to a list if they are not already in the list
+ copied from catkin/cmake/list_append_unique.cmake to keep pkgConfig
+ self contained
+
+.. _`_mrt_register_test_ref`:
+
+`_mrt_register_test`
+--------------------
+
+.. cmake:macro:: _mrt_register_test()
+
+ *[macro defined in mrt_cmake_modules-extras.cmake]*
+
+
+ Registers the custom check_tests command and adds a dependency for a certain unittest
+
+ Example:
+ ::
+
+  _mrt_register_test(
+      )
+
+
+.. _`_pack_libraries_with_build_configuration_ref`:
+
+`_pack_libraries_with_build_configuration`
+------------------------------------------
+
+.. cmake:macro:: _pack_libraries_with_build_configuration(VAR)
+
+ *[macro defined in mrt_cmake_modulesConfig.cmake]*
+
+ pack a list of libraries with optional build configuration keywords
+ copied from catkin/cmake/catkin_libraries.cmake to keep pkgConfig
+ self contained
+
+.. _`_unpack_libraries_with_build_configuration_ref`:
+
+`_unpack_libraries_with_build_configuration`
+--------------------------------------------
+
+.. cmake:macro:: _unpack_libraries_with_build_configuration(VAR)
+
+ *[macro defined in mrt_cmake_modulesConfig.cmake]*
+
+ unpack a list of libraries with optional build configuration keyword prefixes
+ copied from catkin/cmake/catkin_libraries.cmake to keep pkgConfig
+ self contained
+
+.. _`generate_ros_parameter_files_ref`:
+
+`generate_ros_parameter_files`
+------------------------------
+
+.. cmake:macro:: generate_ros_parameter_files()
+
+ *[macro defined in mrt_cmake_modules-extras.cmake]*
+
+ define rosparam/rosinterface_handler macro for compability. Macros will be overriden by the actual macros defined by the packages, if existing.
+
+Not documented CMake functions / macros
+---------------------------------------
+
+.. _`generate_ros_interface_files_ref`:
+
+`generate_ros_interface_files`
+------------------------------
+
+.. cmake:macro:: generate_ros_interface_files()
+
+ *[macro defined in mrt_cmake_modules-extras.cmake]*

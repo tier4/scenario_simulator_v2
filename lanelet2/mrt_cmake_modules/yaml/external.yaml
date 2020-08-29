@@ -1,0 +1,51 @@
+# This file contains all packages that should be resolved externally
+# Note that Gitlab will always be checked first when resolving dependencies!
+#
+# When adding new entries, please make sure that:
+# 1. The package provided there is stable and can be relied on
+# 2. The package is a normal catkin package
+# 3. The package name, the name for the dependency and the name in its package.xml are all identical
+# 4. New entries are always in alphabetical order
+# 5. You know what you are doing. Pushing changes will affect all users globally.
+#
+# Entries must look like this:
+# example_package:                                  <-- Name for the dependency (matching its package.xml)
+#   url: https://github.com/me/example_package.git  <-- required, any url pointing to a repository is possible here
+#   vcs: git                                        <-- optional (defaults to "git"), everything that wstool supports: git, hg, svn, bzr
+#   version: master                                 <-- optional (defaults to its default branch), branch, tag, commit, ...
+#
+# or this:
+# example_package: https://github.com/me/example_package.git (short version assuming git packages)
+
+automated_driving_msgs: https://github.com/fzi-forschungszentrum-informatik/automated_driving_msgs.git
+iai_kinect2: https://github.com/code-iai/iai_kinect2.git
+image_undistort: https://github.com/ethz-asl/image_undistort.git
+lanelet2: https://github.com/fzi-forschungszentrum-informatik/Lanelet2.git
+libnabo: https://github.com/ethz-asl/libnabo
+libpointmatcher: https://github.com/ethz-asl/libpointmatcher.git
+mrt_cmake_modules: https://github.com/KIT-MRT/mrt_cmake_modules.git
+rosinterface_handler: https://github.com/KIT-MRT/rosinterface_handler.git
+rosparam_handler: https://github.com/cbandera/rosparam_handler.git
+rviz_satellite: https://github.com/gareth-cross/rviz_satellite.git
+ct: https://github.com/ethz-adrl/control-toolbox.git
+kindr: https://github.com/ANYbotics/kindr.git
+
+# CoInCar-Sim (https://github.com/coincar-sim/coincarsim_getting_started)
+desired_motion_rviz_plugin_ros: https://github.com/coincar-sim/desired_motion_rviz_plugin_ros.git
+lanelet_rviz_plugin_ros: https://github.com/coincar-sim/lanelet_rviz_plugin_ros.git
+lanelet2_interface_ros: https://github.com/coincar-sim/lanelet2_interface_ros.git
+motion_state_rviz_plugin_ros: https://github.com/coincar-sim/motion_state_rviz_plugin_ros.git
+object_state_array_rviz_plugin_ros: https://github.com/coincar-sim/object_state_array_rviz_plugin_ros.git
+sim_sample_actuator_ros_tool: https://github.com/coincar-sim/sim_sample_actuator_ros_tool.git
+sim_sample_communication_ros_tool: https://github.com/coincar-sim/sim_sample_communication_ros_tool.git
+sim_sample_perception_ros_tool: https://github.com/coincar-sim/sim_sample_perception_ros_tool.git
+sim_sample_planning_ros_tool: https://github.com/coincar-sim/sim_sample_planning_ros_tool.git
+sim_sample_prediction_ros_tool: https://github.com/coincar-sim/sim_sample_prediction_ros_tool.git
+simulation_initialization_ros_tool: https://github.com/coincar-sim/simulation_initialization_ros_tool.git
+simulation_management_ros_tool: https://github.com/coincar-sim/simulation_management_ros_tool.git
+simulation_only_msgs: https://github.com/coincar-sim/simulation_only_msgs.git
+util_automated_driving_msgs: https://github.com/coincar-sim/util_automated_driving_msgs.git
+util_eigen_geometry: https://github.com/coincar-sim/util_eigen_geometry.git
+util_geometry_msgs: https://github.com/coincar-sim/util_geometry_msgs.git
+util_rviz: https://github.com/coincar-sim/util_rviz.git
+util_simulation_only_msgs: https://github.com/coincar-sim/util_simulation_only_msgs.git

@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+# this file is taken and converted from a bash script from catkin to correctly install python modules
+import os
+import sys
+import subprocess
+
+python_interpreter = "@PYTHON_EXECUTABLE@"
+if not python_interpreter:
+    python_interpreter = "python"
+
+if "DESTDIR" in os.environ:
+    if not os.path.isabs(os.environ["DESTDIR"]):
+        print("DESTDIR argument must be absolute...\notherwise python's distutils will bork things.")
+        sys.exit(1)
+    destdir_arg = ["--root={}".format(os.environ["DESTDIR"])]
+else:
+    destdir_arg = []
+
+
+def print_and_run(cmd, env):
+    print(" ".join(cmd))
+    subprocess.check_call(cmd, env=env)
+
+os.chdir("@CMAKE_CURRENT_BINARY_DIR@")
+install_dir = "$DESTDIR@CMAKE_INSTALL_PREFIX@/@PYTHON_INSTALL_DIR@"
+print("Creating {}".format(install_dir))
+try:
+    os.makedirs(install_dir)
+except OSError:
+    pass
+
+env = os.environ.copy()
+env["PYTHONPATH"] = "@CMAKE_INSTALL_PREFIX@/@PYTHON_INSTALL_DIR@:@CMAKE_BINARY_DIR@/@PYTHON_INSTALL_DIR@:{}".format(env.get("PYTHONPATH", ""))
+env["CATKIN_BINARY_DIR"] = "@CMAKE_BINARY_DIR@"
+setuptools_arg = "@SETUPTOOLS_ARG_EXTRA@"
+setuptools_arg = [setuptools_arg] if setuptools_arg else []
+cmd = [python_interpreter, "@CMAKE_CURRENT_BINARY_DIR@/setup.py", "build", "--build-base", "@CMAKE_CURRENT_BINARY_DIR@", "install"] + destdir_arg + \
+      setuptools_arg + ["--prefix=@CMAKE_INSTALL_PREFIX@", "--install-scripts=@CMAKE_INSTALL_PREFIX@/@CATKIN_GLOBAL_BIN_DESTINATION@"]
+
+print_and_run(cmd, env)

@@ -1,0 +1,104 @@
+# This file extends ros official base.yamls by packages not yet available within ros.
+aravis:
+  ubuntu: [mrt-libaravis-dev]
+boost-python:
+  ubuntu: [libpython-dev, libboost-python-dev]
+coverage:
+  ubuntu: [lcov]
+cuda:
+  ubuntu:
+    bionic: [cuda-toolkit-10-2, g++-8]
+    xenial: [cuda-toolkit-9-2, g++-6]
+flann:
+  ubuntu: [libflann-dev]
+freeglut3-dev:
+  ubuntu: [freeglut3-dev]
+libboost-python:
+  ubuntu: [libpython-dev, libboost-python-dev]
+libboost-python-dev:
+  ubuntu: [libpython-dev, libboost-python-dev]
+libceres-dev:
+  ubuntu: [mrt-libceres-dev]
+libgeographic-dev:
+  ubuntu: [libgeographic-dev]
+libjsoncpp-dev:
+  ubuntu: [libjsoncpp-dev]
+liblmdb:
+  ubuntu: [liblmdb-dev]
+libopencv-dev:
+  ubuntu: [mrt-libopencv-dev]
+libxext-dev:
+  ubuntu: [libxext-dev]
+libxrandr-dev:
+  ubuntu: [libxrandr-dev]
+mbed_cli:
+  ubuntu: [mrt-mbed-cli]
+mrt_ann:
+  ubuntu: [libann-dev]
+mrt_benchmark:
+  ubuntu: [mrt-benchmark-dev]
+mrt_c_tensorflow:
+  ubuntu: [mrt-tensorflow-dev]
+mrt_cereal:
+  ubuntu: [libcereal-dev]
+mrt_ceres:
+  ubuntu: [mrt-libceres-dev]
+mrt_cgal:
+  ubuntu: [libcgal-dev]
+mrt_ebus:
+  ubuntu: [ebus-sdk]
+mrt_gnu_arm_embedded_toolchain:
+  ubuntu:
+    bionic: [gcc-arm-embedded]
+    xenial: [mrt-gnu-arm-embedded-toolchain]
+mrt_leptonica:
+  ubuntu: [libleptonica-dev]
+mrt_metis:
+  ubuntu: [libmetis-dev]
+mrt_nlopt:
+  ubuntu: [libnlopt-dev]
+mrt_opencv:
+  ubuntu: [mrt-libopencv-dev]
+mrt_pcl:
+  ubuntu:
+    bionic: [libpcl-dev]
+    xenial: [mrt-libpcl-all-dev]
+mrt_protobuf:
+  ubuntu: [libprotobuf-dev, protobuf-compiler, libprotoc-dev, python-protobuf]
+mrt_qt-dev:
+  ubuntu: [qt5-default, libqt5svg5-dev]
+mrt_qt4-dev:
+  ubuntu: [libqt4-dev, libqt4-opengl-dev, libqtwebkit-dev]
+mrt_qt5-dev:
+  ubuntu: [qt5-default, libqt5svg5-dev]
+mrt_sdl2:
+  ubuntu: [libsdl2-dev]
+mrt_suitesparse:
+  ubuntu: [libsuitesparse-dev]
+mrt_tensorflow:
+  ubuntu: [mrt-tensorflow-dev]
+mrt_tensorflow_addons:
+  ubuntu: [mrt-tensorflow-addons]
+mrt_tesseract:
+  ubuntu: [libtesseract-dev]
+mrt_vtk:
+  ubuntu:
+    bionic: [libvtk6-dev]
+    trusty: [mrt-vtk-dev]
+    xenial: [mrt-libvtk-dev]
+opencv:
+  ubuntu: [mrt-libopencv-dev]
+png++:
+  ubuntu: [libpng++-dev]
+pugixml:
+  ubuntu: [libpugixml-dev]
+pybind11-dev:
+  ubuntu: [mrt-pybind11-dev]
+python-gdal:
+  ubuntu: [python-gdal]
+python-nlopt:
+  ubuntu: [python-nlopt]
+range_v3:
+  ubuntu: [librange-v3-dev]
+uuid-dev:
+  ubuntu: [uuid-dev]

@@ -1,0 +1,52 @@
+# This file contains a list of metapackages and the packages they contain.
+# This is required for resolving dependencies that are part of metapackages.
+# The format is <metapackage>: [<package1>, <package2>, ...]
+
+lanelet2:
+- lanelet2
+- lanelet2_core
+- lanelet2_io
+- lanelet2_projection
+- lanelet2_traffic_rules
+- lanelet2_routing
+- lanelet2_python
+- lanelet2_maps
+- lanelet2_validation
+- lanelet2_examples
+
+sceneshot:
+- sceneshot
+- sceneshot_core
+- sceneshot_critical_areas
+- sceneshot_free_space
+- sceneshot_gridmap
+- sceneshot_gridmap_elevation
+- sceneshot_gridmap_fusion
+- sceneshot_gridmap_pcl
+- sceneshot_gridmap_recursion
+- sceneshot_gridmap_sensor
+- sceneshot_io
+- sceneshot_io_simulation
+- sceneshot_object_detection
+- sceneshot_object_tracking
+
+sceneshot_ros_tool:
+- sceneshot_dynamic_reconfigure_ros
+- sceneshot_ros
+- sceneshot_ros_tool
+
+ct:
+- ct
+- ct_optcon
+- ct_models
+- ct_core
+- ct_rbd
+
+mesh_tools:
+- hdf5_map_io
+- label_manager
+- mesh_msgs
+- mesh_msgs_hdf5
+- mesh_msgs_transform
+- mesh_tools
+- rviz_mesh_plugin
