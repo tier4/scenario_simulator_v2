@@ -58,15 +58,16 @@ bool exists(const std::vector<int> & array, const int element)
 void getContactingLanelets(
   const lanelet::LaneletMapPtr lanelet_map,
   const lanelet::traffic_rules::TrafficRulesPtr traffic_rules,
-  const lanelet::BasicPoint2d search_point, std::vector<int> * contacting_lanelet_ids)
+  const lanelet::BasicPoint2d search_point, std::vector<int> * contacting_lanelet_ids,
+  const rclcpp::Logger & logger)
 {
   if (!lanelet_map) {
-    //ROS_ERROR_STREAM("No lanelet map is set!");
+    RCLCPP_ERROR_STREAM(logger, "No lanelet map is set!");
     return;
   }
 
   if (contacting_lanelet_ids == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << " contacting_lanelet_ids is null pointer!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << " contacting_lanelet_ids is null pointer!");
     return;
   }
 
@@ -112,7 +113,7 @@ std::pair<size_t, size_t> findNearestIndexPair(
   const std::vector<double> & accumulated_lengths, const double target_length)
 {
   // List size
-  const auto N = accumulated_lengths.size();
+  const size_t N = accumulated_lengths.size();
 
   // Front
   if (target_length < accumulated_lengths.at(1)) {
@@ -125,7 +126,7 @@ std::pair<size_t, size_t> findNearestIndexPair(
   }
 
   // Middle
-  for (auto i = 1; i < N; ++i) {
+  for (size_t i = 1; i < N; ++i) {
     if (
       accumulated_lengths.at(i - 1) <= target_length &&
       target_length <= accumulated_lengths.at(i)) {
@@ -301,27 +302,24 @@ lanelet::ConstLanelets getConflictingLanelets(
 }
 
 bool lineStringWithWidthToPolygon(
-  const lanelet::ConstLineString3d & linestring, lanelet::ConstPolygon3d * polygon)
+  const lanelet::ConstLineString3d & linestring,
+  lanelet::ConstPolygon3d * polygon,
+  const rclcpp::Logger & logger)
 {
   if (polygon == nullptr) {
-    //ROS_ERROR_STREAM(__func__ << ": polygon is null pointer! Failed to convert to polygon.");
+    RCLCPP_ERROR_STREAM(logger, __func__ << ": polygon is null pointer! Failed to convert to polygon.");
     return false;
   }
   if (linestring.size() != 2) {
-    /*
-    ROS_ERROR_STREAM(
-      __func__ << ": linestring" << linestring.id() << " must have 2 points! (" << linestring.size()
-               << " != 2)" << std::endl
-               << "Failed to convert to polygon.");
-    */
+    RCLCPP_ERROR_STREAM(logger, __func__ << ": linestring" << linestring.id() 
+      << " must have 2 points! (" << linestring.size()
+      << " != 2)" << std::endl << "Failed to convert to polygon.");
     return false;
   }
   if (!linestring.hasAttribute("width")) {
-    /*
-    ROS_ERROR_STREAM(
+    RCLCPP_ERROR_STREAM(logger,
       __func__ << ": linestring" << linestring.id()
-               << " does not have width tag. Failed to convert to polygon.");
-    */
+      << " does not have width tag. Failed to convert to polygon.");
     return false;
   }
 
@@ -375,10 +373,12 @@ double getLaneletLength3d(const lanelet::ConstLanelets & lanelet_sequence)
 }
 
 lanelet::ArcCoordinates getArcCoordinates(
-  const lanelet::ConstLanelets & lanelet_sequence, const geometry_msgs::msg::Pose & pose)
+  const lanelet::ConstLanelets & lanelet_sequence,
+  const geometry_msgs::msg::Pose & pose,
+  const rclcpp::Logger & logger)
 {
   lanelet::ConstLanelet closest_lanelet;
-  lanelet::utils::query::getClosestLanelet(lanelet_sequence, pose, &closest_lanelet);
+  lanelet::utils::query::getClosestLanelet(lanelet_sequence, pose, &closest_lanelet, logger);
 
   double length = 0;
   lanelet::ArcCoordinates arc_coordinates;
