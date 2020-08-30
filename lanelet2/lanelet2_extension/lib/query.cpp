@@ -53,11 +53,11 @@ namespace utils
 {
 // returns all lanelets in laneletLayer - don't know how to convert
 // PrimitveLayer<Lanelets> -> std::vector<Lanelets>
-lanelet::ConstLanelets query::laneletLayer(const lanelet::LaneletMapConstPtr & ll_map)
+lanelet::ConstLanelets query::laneletLayer(const lanelet::LaneletMapConstPtr & ll_map, const rclcpp::Logger & logger)
 {
   lanelet::ConstLanelets lanelets;
   if (!ll_map) {
-    ROS_WARN("No map received!");
+    RCLCPP_WARN(logger, "No map received!");
     return lanelets;
   }
 
@@ -216,9 +216,10 @@ lanelet::ConstLineStrings3d query::getAllParkingSpaces(
 
 bool query::getLinkedLanelet(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr, lanelet::ConstLanelet * linked_lanelet)
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr, lanelet::ConstLanelet * linked_lanelet,
+  const rclcpp::Logger & logger)
 {
-  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr);
+  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr, logger);
   const auto & all_road_lanelets = query::roadLanelets(all_lanelets);
   const auto & all_parking_lots = query::getAllParkingLots(lanelet_map_ptr);
   return query::getLinkedLanelet(
@@ -250,9 +251,10 @@ bool query::getLinkedLanelet(
 
 lanelet::ConstLanelets query::getLinkedLanelets(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr)
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr,
+  const rclcpp::Logger & logger)
 {
-  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr);
+  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr, logger);
   const auto & all_road_lanelets = query::roadLanelets(all_lanelets);
   const auto & all_parking_lots = query::getAllParkingLots(lanelet_map_ptr);
 
@@ -528,10 +530,10 @@ ConstLanelets query::getLaneletsWithinRange(
 }
 
 ConstLanelets query::getLaneletsWithinRange(
-  const lanelet::ConstLanelets & lanelets, const geometry_msgs::Point & search_point,
+  const lanelet::ConstLanelets & lanelets, const geometry_msgs::msg::Point & search_point,
   const double range)
 {
-  getLaneletsWithinRange(lanelets, lanelet::BasicPoint2d(search_point.x, search_point.y), range);
+  return getLaneletsWithinRange(lanelets, lanelet::BasicPoint2d(search_point.x, search_point.y), range);
 }
 
 ConstLanelets query::getLaneChangeableNeighbors(
@@ -542,7 +544,7 @@ ConstLanelets query::getLaneChangeableNeighbors(
 
 ConstLanelets query::getLaneChangeableNeighbors(
   const routing::RoutingGraphPtr & graph, const ConstLanelets & road_lanelets,
-  const geometry_msgs::Point & search_point)
+  const geometry_msgs::msg::Point & search_point)
 {
   const auto lanelets =
     getLaneletsWithinRange(road_lanelets, search_point, std::numeric_limits<double>::epsilon());
@@ -599,7 +601,7 @@ ConstLanelets query::getAllNeighborsLeft(
 
 ConstLanelets query::getAllNeighbors(
   const routing::RoutingGraphPtr & graph, const ConstLanelets & road_lanelets,
-  const geometry_msgs::Point & search_point)
+  const geometry_msgs::msg::Point & search_point)
 {
   const auto lanelets =
     getLaneletsWithinRange(road_lanelets, search_point, std::numeric_limits<double>::epsilon());
@@ -612,11 +614,11 @@ ConstLanelets query::getAllNeighbors(
 }
 
 bool query::getClosestLanelet(
-  const ConstLanelets & lanelets, const geometry_msgs::Pose & search_pose,
-  ConstLanelet * closest_lanelet_ptr)
+  const ConstLanelets & lanelets, const geometry_msgs::msg::Pose & search_pose,
+  ConstLanelet * closest_lanelet_ptr, const rclcpp::Logger & logger)
 {
   if (closest_lanelet_ptr == nullptr) {
-    ROS_ERROR("argument closest_lanelet_ptr is null! Failed to find closest lanelet");
+    RCLCPP_ERROR(logger, "argument closest_lanelet_ptr is null! Failed to find closest lanelet");
     return false;
   }
 

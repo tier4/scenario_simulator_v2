@@ -23,9 +23,9 @@
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_routing/RoutingGraph.h>
 
-#include <geometry_msgs/Point.h>
-#include <geometry_msgs/PolygonStamped.h>
-#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/polygon_stamped.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <lanelet2_extension/regulatory_elements/autoware_traffic_light.h>
 #include <lanelet2_extension/regulatory_elements/detection_area.h>
 
@@ -51,7 +51,7 @@ namespace query
  * @param  ll_Map [input lanelet map]
  * @return        [all lanelets in the map]
  */
-lanelet::ConstLanelets laneletLayer(const lanelet::LaneletMapConstPtr & ll_Map);
+lanelet::ConstLanelets laneletLayer(const lanelet::LaneletMapConstPtr & ll_Map, const rclcpp::Logger & logger);
 
 /**
  * [subtypeLanelets extracts Lanelet that has given subtype attribute]
@@ -121,14 +121,17 @@ bool getLinkedLanelet(
   const lanelet::ConstPolygons3d & all_parking_lots, lanelet::ConstLanelet * linked_lanelet);
 bool getLinkedLanelet(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr, lanelet::ConstLanelet * linked_lanelet);
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr,
+  lanelet::ConstLanelet * linked_lanelet,
+  const rclcpp::Logger & logger);
 lanelet::ConstLanelets getLinkedLanelets(
   const lanelet::ConstLineString3d & parking_space,
   const lanelet::ConstLanelets & all_road_lanelets,
   const lanelet::ConstPolygons3d & all_parking_lots);
 lanelet::ConstLanelets getLinkedLanelets(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr);
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr,
+  const rclcpp::Logger & logger);
 
 // get linked parking lot from lanelet
 bool getLinkedParkingLot(
@@ -174,14 +177,14 @@ ConstLanelets getLaneletsWithinRange(
   const lanelet::ConstLanelets & lanelets, const lanelet::BasicPoint2d & search_point,
   const double range);
 ConstLanelets getLaneletsWithinRange(
-  const lanelet::ConstLanelets & lanelets, const geometry_msgs::Point & search_point,
+  const lanelet::ConstLanelets & lanelets, const geometry_msgs::msg::Point & search_point,
   const double range);
 
 ConstLanelets getLaneChangeableNeighbors(
   const routing::RoutingGraphPtr & graph, const ConstLanelet & lanelet);
 ConstLanelets getLaneChangeableNeighbors(
   const routing::RoutingGraphPtr & graph, const ConstLanelets & road_lanelets,
-  const geometry_msgs::Point & search_point);
+  const geometry_msgs::msg::Point & search_point);
 
 ConstLanelets getAllNeighbors(const routing::RoutingGraphPtr & graph, const ConstLanelet & lanelet);
 ConstLanelets getAllNeighborsLeft(
@@ -190,11 +193,11 @@ ConstLanelets getAllNeighborsRight(
   const routing::RoutingGraphPtr & graph, const ConstLanelet & lanelet);
 ConstLanelets getAllNeighbors(
   const routing::RoutingGraphPtr & graph, const ConstLanelets & road_lanelets,
-  const geometry_msgs::Point & search_point);
+  const geometry_msgs::msg::Point & search_point);
 
 bool getClosestLanelet(
-  const ConstLanelets & lanelets, const geometry_msgs::Pose & search_pose,
-  ConstLanelet * closest_lanelet_ptr);
+  const ConstLanelets & lanelets, const geometry_msgs::msg::Pose & search_pose,
+  ConstLanelet * closest_lanelet_ptr, const rclcpp::Logger & logger);
 
 /**
  * [getSucceedingLaneletSequences retrieves a sequence of lanelets after the given lanelet.
