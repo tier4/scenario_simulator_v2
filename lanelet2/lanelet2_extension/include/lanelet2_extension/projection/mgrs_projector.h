@@ -19,6 +19,7 @@
 #ifndef LANELET2_EXTENSION_PROJECTION_MGRS_PROJECTOR_H
 #define LANELET2_EXTENSION_PROJECTION_MGRS_PROJECTOR_H
 
+#include <rclcpp/rclcpp.hpp>
 #include <lanelet2_io/Exceptions.h>
 #include <lanelet2_io/Projection.h>
 #include <GeographicLib/MGRS.hpp>
@@ -33,7 +34,7 @@ namespace projection
 class MGRSProjector : public Projector
 {
 public:
-  explicit MGRSProjector(Origin origin = Origin({0.0, 0.0}));  // NOLINT
+  explicit MGRSProjector(rclcpp::Logger logger, Origin origin = Origin({0.0, 0.0}));  // NOLINT
 
   /**
    * [MGRSProjector::forward projects gps lat/lon to MGRS 100km grid]
@@ -107,6 +108,11 @@ private:
    * reverse function will use this if isMGRSCodeSet() returns false.
    */
   mutable std::string projected_grid_;
+
+  /**
+   * logger for ROS2
+   */
+  rclcpp::Logger logger_;
 };
 
 }  // namespace projection

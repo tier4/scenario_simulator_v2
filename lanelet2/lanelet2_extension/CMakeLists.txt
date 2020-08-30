@@ -39,6 +39,7 @@ find_path(PUGIXML_INCLUDE_DIRS
 add_compile_options(-std=c++14)
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(rclcpp REQUIRED)
 ament_auto_find_build_dependencies()
 
 include_directories(
@@ -51,12 +52,13 @@ add_definitions(${GeographicLib_DEFINITIONS})
 
 ament_auto_add_library(lanelet2_extension_lib SHARED
   lib/autoware_osm_parser.cpp
+  lib/autoware_traffic_light.cpp
+  lib/detection_area.cpp
+  lib/road_marking.cpp
+  lib/mgrs_projector.cpp
 )
 
 #add_library( lanelet2_extension_lib
-#  lib/autoware_osm_parser.cpp
-#  lib/autoware_traffic_light.cpp
-#  lib/detection_area.cpp
 #  lib/message_conversion.cpp
 #  lib/mgrs_projector.cpp
 #  lib/query.cpp
