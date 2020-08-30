@@ -27,7 +27,7 @@ namespace lanelet
 {
 namespace projection
 {
-MGRSProjector::MGRSProjector(rclcpp::Logger logger, Origin origin) : Projector(origin), logger_(logger) {}
+MGRSProjector::MGRSProjector(const rclcpp::Logger & logger, Origin origin) : Projector(origin), logger_(logger) {}
 
 BasicPoint3d MGRSProjector::forward(const GPSPoint & gps) const
 {

@@ -40,10 +40,10 @@ namespace utils
 {
 namespace conversion
 {
-void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::MapBin * msg)
+void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::MapBin * msg, const rclcpp::Logger &logger)
 {
   if (msg == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << "msg is null pointer!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "msg is null pointer!");
     return;
   }
 
@@ -59,16 +59,15 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::M
   msg->data.assign(data_str.begin(), data_str.end());
 }
 
-void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map)
+void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map, const rclcpp::Logger & logger)
 {
   if (!map) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": map is null pointer!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "msg is null pointer!");
     return;
   }
 
   std::string data_str;
   data_str.assign(msg.data.begin(), msg.data.end());
-
   std::stringstream ss;
   ss << data_str;
   boost::archive::binary_iarchive oa(ss);
@@ -82,48 +81,49 @@ void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::Lanele
 void fromBinMsg(
   const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
-  lanelet::routing::RoutingGraphPtr * routing_graph)
+  lanelet::routing::RoutingGraphPtr * routing_graph,
+  const rclcpp::Logger & logger)
 {
-  fromBinMsg(msg, map);
+  fromBinMsg(msg, map, logger);
   *traffic_rules = lanelet::traffic_rules::TrafficRulesFactory::create(
     lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   *routing_graph = lanelet::routing::RoutingGraph::build(*map, **traffic_rules);
 }
 
-void toGeomMsgPt(const geometry_msgs::msg::Point32 & src, geometry_msgs::msg::Point * dst)
+void toGeomMsgPt(const geometry_msgs::msg::Point32 & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
 {
   if (dst == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << "pointer is null!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
     return;
   }
   dst->x = src.x;
   dst->y = src.y;
   dst->z = src.z;
 }
-void toGeomMsgPt(const Eigen::Vector3d & src, geometry_msgs::msg::Point * dst)
+void toGeomMsgPt(const Eigen::Vector3d & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
 {
   if (dst == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << "pointer is null!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
     return;
   }
   dst->x = src.x();
   dst->y = src.y();
   dst->z = src.z();
 }
-void toGeomMsgPt(const lanelet::ConstPoint3d & src, geometry_msgs::msg::Point * dst)
+void toGeomMsgPt(const lanelet::ConstPoint3d & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
 {
   if (dst == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << "pointer is null!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
     return;
   }
   dst->x = src.x();
   dst->y = src.y();
   dst->z = src.z();
 }
-void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * dst)
+void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
 {
   if (dst == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << "pointer is null!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
     return;
   }
   dst->x = src.x();
@@ -131,10 +131,10 @@ void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * 
   dst->z = 0;
 }
 
-void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * dst)
+void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * dst, const rclcpp::Logger & logger)
 {
   if (dst == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << "pointer is null!");
+    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
     return;
   }
   dst->x = src.x();
@@ -142,28 +142,28 @@ void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * ds
   dst->z = src.z();
 }
 
-geometry_msgs::msg::Point toGeomMsgPt(const geometry_msgs::msg::Point32 & src)
+geometry_msgs::msg::Point toGeomMsgPt(const geometry_msgs::msg::Point32 & src, const rclcpp::Logger & logger)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst);
+  toGeomMsgPt(src, &dst, logger);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const Eigen::Vector3d & src)
+geometry_msgs::msg::Point toGeomMsgPt(const Eigen::Vector3d & src, const rclcpp::Logger & logger)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst);
+  toGeomMsgPt(src, &dst, logger);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint3d & src)
+geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint3d & src, const rclcpp::Logger & logger)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst);
+  toGeomMsgPt(src, &dst, logger);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint2d & src)
+geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint2d & src, const rclcpp::Logger & logger)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst);
+  toGeomMsgPt(src, &dst, logger);
   return dst;
 }
 
@@ -179,13 +179,13 @@ void toLaneletPoint(const geometry_msgs::msg::Point & src, lanelet::ConstPoint3d
   *dst = lanelet::Point3d(lanelet::InvalId, src.x, src.y, src.z);
 }
 
-void toGeomMsgPoly(const lanelet::ConstPolygon3d & ll_poly, geometry_msgs::msg::Polygon * geom_poly)
+void toGeomMsgPoly(const lanelet::ConstPolygon3d & ll_poly, geometry_msgs::msg::Polygon * geom_poly, const rclcpp::Logger & logger)
 {
   geom_poly->points.clear();
   geom_poly->points.reserve(ll_poly.size());
   for (const auto & ll_pt : ll_poly) {
     geometry_msgs::msg::Point32 geom_pt32;
-    utils::conversion::toGeomMsgPt32(ll_pt.basicPoint(), &geom_pt32);
+    utils::conversion::toGeomMsgPt32(ll_pt.basicPoint(), &geom_pt32, logger);
     geom_poly->points.push_back(geom_pt32);
   }
 }

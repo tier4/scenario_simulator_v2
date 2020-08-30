@@ -34,7 +34,7 @@ namespace projection
 class MGRSProjector : public Projector
 {
 public:
-  explicit MGRSProjector(rclcpp::Logger logger, Origin origin = Origin({0.0, 0.0}));  // NOLINT
+  explicit MGRSProjector(const rclcpp::Logger & logger, Origin origin = Origin({0.0, 0.0}));  // NOLINT
 
   /**
    * [MGRSProjector::forward projects gps lat/lon to MGRS 100km grid]
