@@ -56,12 +56,11 @@ ament_auto_add_library(lanelet2_extension_lib SHARED
   lib/detection_area.cpp
   lib/road_marking.cpp
   lib/mgrs_projector.cpp
+#  lib/query.cpp
 )
 
 #add_library( lanelet2_extension_lib
 #  lib/message_conversion.cpp
-#  lib/mgrs_projector.cpp
-#  lib/query.cpp
 #  lib/road_marking.cpp
 #  lib/utilities.cpp
 #  lib/visualization.cpp
