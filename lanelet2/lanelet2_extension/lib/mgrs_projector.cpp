@@ -22,6 +22,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace lanelet
 {

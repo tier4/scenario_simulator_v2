@@ -33,6 +33,10 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <memory>
+#include <limits>
+#include <queue>
+#include <deque>
 
 using lanelet::utils::to2D;
 namespace

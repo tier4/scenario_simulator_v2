@@ -23,6 +23,8 @@
 
 #include <algorithm>
 #include <vector>
+#include <utility>
+#include <memory>
 
 namespace lanelet
 {

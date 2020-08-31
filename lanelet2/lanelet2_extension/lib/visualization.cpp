@@ -16,6 +16,7 @@
  * Authors: Simon Thompson, Ryohsuke Mitsudome
  */
 
+#include <lanelet2_extension/exception.hpp>
 #include <lanelet2_extension/utility/message_conversion.hpp>
 #include <lanelet2_extension/utility/query.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
@@ -40,11 +41,14 @@ bool exists(const std::unordered_set<T> & set, const T & element)
 }
 
 void adjacentPoints(
-  const int i, const int N, const geometry_msgs::msg::Polygon poly, geometry_msgs::msg::Point32 * p0,
+  const int i, const int N, const geometry_msgs::msg::Polygon poly,
+  geometry_msgs::msg::Point32 * p0,
   geometry_msgs::msg::Point32 * p1, geometry_msgs::msg::Point32 * p2)
 {
   if (p0 == nullptr || p1 == nullptr || p2 == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": either p0, p1, or p2 is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << ": either p0, p1, or p2 is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 
@@ -87,16 +91,18 @@ void lightAsMarker(
   lanelet::ConstPoint3d p, visualization_msgs::msg::Marker * marker, const std::string ns)
 {
   if (marker == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": marker is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << ": marker is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 
   marker->header.frame_id = "map";
   marker->header.stamp = rclcpp::Time();
-  marker->frame_locked - true;
+  marker->frame_locked = true;
   marker->ns = ns;
   marker->id = p.id();
-  marker->lifetime = rclcpp::Duration(0,0);
+  marker->lifetime = rclcpp::Duration(0, 0);
   marker->type = visualization_msgs::msg::Marker::SPHERE;
   marker->pose.position.x = p.x();
   marker->pose.position.y = p.y();
@@ -136,7 +142,9 @@ void laneletDirectionAsMarker(
   const std::string ns)
 {
   if (marker == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": marker is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << ": marker is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 
@@ -146,7 +154,7 @@ void laneletDirectionAsMarker(
   marker->ns = ns;
   marker->id = id;
   marker->type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
-  marker->lifetime = rclcpp::Duration(0,0);
+  marker->lifetime = rclcpp::Duration(0, 0);
 
   lanelet::BasicPoint3d pt[3];
   pt[0].x() = 0.0;
@@ -180,7 +188,7 @@ void laneletDirectionAsMarker(
   marker->color.a = 0.999;
 
   lanelet::Attribute attr = ll.attribute("turn_direction");
-  double turn_dir = 0;
+  // double turn_dir = 0;
 
   std_msgs::msg::ColorRGBA c;
   c.r = 0.0;
@@ -189,18 +197,18 @@ void laneletDirectionAsMarker(
   c.a = 0.6;
 
   if (isLaneletAttributeValue(ll, "turn_direction", "right")) {
-    turn_dir = -M_PI / 2.0;
+    // turn_dir = -M_PI / 2.0;
     c.r = 1.0;
     c.g = 0.0;
     c.b = 1.0;
   } else if (isLaneletAttributeValue(ll, "turn_direction", "left")) {
-    turn_dir = M_PI / 2.0;
+    // turn_dir = M_PI / 2.0;
     c.r = 0.0;
     c.g = 1.0;
     c.b = 1.0;
   }
 
-  for (int ci = 0; ci < center_ls.size() - 1; ) {
+  for (size_t ci = 0; ci < center_ls.size() - 1; ) {
     pc = center_ls[ci];
     if (center_ls.size() > 1) {
       pc2 = center_ls[ci + 1];
@@ -310,7 +318,9 @@ void visualization::lanelet2Triangle(
   const lanelet::ConstLanelet & ll, std::vector<geometry_msgs::msg::Polygon> * triangles)
 {
   if (triangles == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": triangles is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << ": triangles is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 
@@ -364,11 +374,7 @@ void visualization::polygon2Triangle(
       }
     }
     if (clipped_vertex < 0 || clipped_vertex >= N) {
-      /*
-      ROS_WARN(
-        "Could not find valid vertex for ear clipping triangulation. Triangulation result might be "
-        "invalid");
-      */
+      lanelet::HdMapException("Could not find valid vertex for ear clipping triangulation. Triangulation result might be invalid");
       clipped_vertex = 0;
     }
 
@@ -409,7 +415,9 @@ void visualization::lanelet2Polygon(
   const lanelet::ConstLanelet & ll, geometry_msgs::msg::Polygon * polygon)
 {
   if (polygon == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": polygon is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << ": polygon is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 
@@ -492,7 +500,8 @@ visualization_msgs::msg::MarkerArray visualization::autowareTrafficLightsAsMarke
 }
 
 visualization_msgs::msg::MarkerArray visualization::detectionAreasAsMarkerArray(
-  const std::vector<lanelet::DetectionAreaConstPtr> & da_reg_elems, const std_msgs::msg::ColorRGBA c,
+  const std::vector<lanelet::DetectionAreaConstPtr> & da_reg_elems,
+  const std_msgs::msg::ColorRGBA c,
   const rclcpp::Duration duration)
 {
   visualization_msgs::msg::MarkerArray marker_array;
@@ -524,7 +533,6 @@ visualization_msgs::msg::MarkerArray visualization::detectionAreasAsMarkerArray(
   marker.color.b = 1.0f;
   marker.color.a = 0.999;
 
-  int da_count = 0;
   for (const auto & da_reg_elem : da_reg_elems) {
     marker.points.clear();
     marker.colors.clear();
@@ -601,7 +609,9 @@ visualization_msgs::msg::MarkerArray visualization::parkingSpacesAsMarkerArray(
         marker_array.markers.push_back(marker);
       }
     } else {
-      //ROS_ERROR_STREAM("parking space " << linestring.id() << " failed conversion.");
+      std::stringstream sstream;
+      sstream << "parking space " << linestring.id() << " failed conversion.";
+      lanelet::HdMapException(sstream.str());
     }
   }
   return marker_array;
@@ -609,7 +619,7 @@ visualization_msgs::msg::MarkerArray visualization::parkingSpacesAsMarkerArray(
 
 visualization_msgs::msg::MarkerArray visualization::lineStringsAsMarkerArray(
   const std::vector<lanelet::ConstLineString3d> line_strings, const std::string name_space,
-  const std_msgs::msg::ColorRGBA c, const double lss)
+  const std_msgs::msg::ColorRGBA c)
 {
   std::unordered_set<lanelet::Id> added;
   visualization_msgs::msg::MarkerArray ls_marker_array;
@@ -627,7 +637,8 @@ visualization_msgs::msg::MarkerArray visualization::lineStringsAsMarkerArray(
 }
 
 visualization_msgs::msg::MarkerArray visualization::laneletsBoundaryAsMarkerArray(
-  const lanelet::ConstLanelets & lanelets, const std_msgs::msg::ColorRGBA c, const bool viz_centerline)
+  const lanelet::ConstLanelets & lanelets, const std_msgs::msg::ColorRGBA c,
+  const bool viz_centerline)
 {
   double lss = 0.05;  // line string size
   std::unordered_set<lanelet::Id> added;
@@ -710,7 +721,7 @@ visualization_msgs::msg::MarkerArray visualization::laneletsAsTriangleMarkerArra
   marker.ns = ns;
   marker.id = 0;
   marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
-  marker.lifetime = rclcpp::Duration(0,0);
+  marker.lifetime = rclcpp::Duration(0, 0);
   marker.pose.position.x = 0.0;  // p.x();
   marker.pose.position.y = 0.0;  // p.y();
   marker.pose.position.z = 0.0;  // p.z();
@@ -749,11 +760,14 @@ visualization_msgs::msg::MarkerArray visualization::laneletsAsTriangleMarkerArra
 }
 
 void visualization::trafficLight2TriangleMarker(
-  const lanelet::ConstLineString3d ls, visualization_msgs::msg::Marker * marker, const std::string ns,
+  const lanelet::ConstLineString3d ls, visualization_msgs::msg::Marker * marker,
+  const std::string ns,
   const std_msgs::msg::ColorRGBA cl, const rclcpp::Duration duration, const double scale)
 {
   if (marker == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": marker is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << ": marker is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
   marker->header.frame_id = "map";
@@ -822,10 +836,13 @@ void visualization::trafficLight2TriangleMarker(
 
 void visualization::lineString2Marker(
   const lanelet::ConstLineString3d ls, visualization_msgs::msg::Marker * line_strip,
-  const std::string frame_id, const std::string ns, const std_msgs::msg::ColorRGBA c, const float lss)
+  const std::string frame_id, const std::string ns, const std_msgs::msg::ColorRGBA c,
+  const float lss)
 {
   if (line_strip == nullptr) {
-    //ROS_ERROR_STREAM(__FUNCTION__ << ": line_strip is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << ": line_strip is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 

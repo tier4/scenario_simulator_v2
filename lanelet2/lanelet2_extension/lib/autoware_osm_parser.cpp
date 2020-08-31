@@ -24,6 +24,7 @@
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 
 #include <string>
+#include <memory>
 
 namespace lanelet
 {
