@@ -31,6 +31,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <algorithm>
 
 namespace
 {
@@ -260,7 +261,7 @@ bool isWithinTriangle(
   double c2 = (c.x - b.x) * (p.y - c.y) - (c.y - b.y) * (p.x - c.x);
   double c3 = (a.x - c.x) * (p.y - a.y) - (a.y - c.y) * (p.x - a.x);
 
-  return c1 > 0.0 && c2 > 0.0 && c3 > 0.0 || c1 < 0.0 && c2 < 0.0 && c3 < 0.0;
+  return (c1 > 0.0 && c2 > 0.0 && c3 > 0.0) || (c1 < 0.0 && c2 < 0.0 && c3 < 0.0);
 }
 
 visualization_msgs::msg::Marker polygonAsMarker(
@@ -374,7 +375,9 @@ void visualization::polygon2Triangle(
       }
     }
     if (clipped_vertex < 0 || clipped_vertex >= N) {
-      lanelet::HdMapException("Could not find valid vertex for ear clipping triangulation. Triangulation result might be invalid");
+      lanelet::HdMapException(
+        R"(Could not find valid vertex for ear clipping triangulation. 
+        Triangulation result might be invalid)");
       clipped_vertex = 0;
     }
 

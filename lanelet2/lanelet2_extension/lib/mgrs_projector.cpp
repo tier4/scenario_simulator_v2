@@ -63,9 +63,9 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
 
   if (!prev_projected_grid.empty() && prev_projected_grid != projected_grid_) {
     std::string message =
-      "Projected MGRS Grid changed from last projection. Projected point \
-      might be far away from previously projected point.\n\
-      You may want to use different projector.";
+      R"(Projected MGRS Grid changed from last projection.
+      Projected point might be far away from previously projected point.
+      You may want to use different projector.)";
     RCLCPP_ERROR(logger_, message);
   }
 
@@ -82,8 +82,8 @@ GPSPoint MGRSProjector::reverse(const BasicPoint3d & mgrs_point) const
     gps = reverse(mgrs_point, projected_grid_);
   } else {
     std::string message =
-      "cannot run reverse operation if mgrs code is not set in projector.\n \
-      use setMGRSCode function or explicitly give mgrs code as an argument.";
+      R"(cannot run reverse operation if mgrs code is not set in projector.
+      Use setMGRSCode function or explicitly give mgrs code as an argument.)";
     RCLCPP_ERROR(logger_, message);
   }
   return gps;
