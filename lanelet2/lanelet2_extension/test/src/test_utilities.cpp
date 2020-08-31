@@ -29,7 +29,8 @@ using lanelet::utils::getId;
 class TestSuite : public ::testing::Test
 {
 public:
-  TestSuite() : sample_map_ptr(new lanelet::LaneletMap())
+  TestSuite()
+  : sample_map_ptr(new lanelet::LaneletMap())
   {  // NOLINT
     // create sample lanelets
     Point3d p1, p2, p3, p4, p5, p6, p7, p8, p9, p10;

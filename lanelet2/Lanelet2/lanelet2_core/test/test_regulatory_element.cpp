@@ -7,9 +7,11 @@ using namespace lanelet;
 
 using GenericRegulatoryElementPtr = std::shared_ptr<GenericRegulatoryElement>;
 
-class RegulatoryElementTest : public ::testing::Test {
- protected:
-  void SetUp() override {
+class RegulatoryElementTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
     p1 = Point3d(++id, 0., 1., 1.);
     p2 = Point3d(++id, 1., 1., 1.);
     p3 = Point3d(++id, 0., 0., 0.);
@@ -30,7 +32,8 @@ class RegulatoryElementTest : public ::testing::Test {
 
     regelemData = std::make_shared<RegulatoryElementData>(++id);
   }
-  GenericRegulatoryElementPtr getGenericRegelem() {
+  GenericRegulatoryElementPtr getGenericRegelem()
+  {
     regelemData->parameters[RoleName::Yield].emplace_back(ll1);
     regelemData->parameters[RoleName::Cancels].emplace_back(ls1);
     regelemData->parameters[RoleName::Refers].emplace_back(ar);
@@ -39,7 +42,7 @@ class RegulatoryElementTest : public ::testing::Test {
     return genericRegelem;
   }
 
- public:
+public:
   Id id{0};
   Point3d p1, p2, p3, p4, p5, p6;
   LineString3d ls1, ls2, ls3, ls4, ls5, ls6;
@@ -110,15 +113,16 @@ TEST_F(RegulatoryElementTest, addGenericRegulatoryElementToLanelet) {  // NOLINT
 
 // ============ Traffic Light ===========================
 TEST_F(RegulatoryElementTest,  // NOLINT
-       FactoryCannotConstructInvalidTrafficLight) {
+  FactoryCannotConstructInvalidTrafficLight) {
   // NOLINTNEXTLINE
-  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::TrafficLight, regelemData), InvalidInputError);
+  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::TrafficLight,
+    regelemData), InvalidInputError);
 }
 
 TEST_F(RegulatoryElementTest, FactoryConstructsTrafficLight) {  // NOLINT
   auto tl = TrafficLight::make(++id, AttributeMap(), {ls5}, ls4);
   auto factoryTl = RegulatoryElementFactory::create(tl->attribute(AttributeName::Subtype).value(),
-                                                    std::const_pointer_cast<RegulatoryElementData>(tl->constData()));
+      std::const_pointer_cast<RegulatoryElementData>(tl->constData()));
   EXPECT_TRUE(!!std::dynamic_pointer_cast<TrafficLight>(factoryTl));
 }
 
@@ -141,13 +145,14 @@ TEST_F(RegulatoryElementTest, TrafficLightCreationFomPolygonWorks) {  // NOLINT
 // ============ Traffic Sign ===========================
 TEST_F(RegulatoryElementTest, FactoryCannotConstructInvalidTrafficSign) {  // NOLINT
   // NOLINTNEXTLINE
-  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::TrafficSign, regelemData), InvalidInputError);
+  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::TrafficSign,
+    regelemData), InvalidInputError);
 }
 
 TEST_F(RegulatoryElementTest, FactoryConstructsTrafficSign) {  // NOLINT
   auto ts = TrafficSign::make(++id, AttributeMap(), {{ls5}, "de205"}, {}, {ls4});
   auto factoryTs = RegulatoryElementFactory::create(ts->attribute(AttributeName::Subtype).value(),
-                                                    std::const_pointer_cast<RegulatoryElementData>(ts->constData()));
+      std::const_pointer_cast<RegulatoryElementData>(ts->constData()));
   EXPECT_TRUE(!!std::dynamic_pointer_cast<TrafficSign>(factoryTs));
 }
 
@@ -176,25 +181,27 @@ TEST_F(RegulatoryElementTest, ConstructValidTrafficSign) {  // NOLINT
 // ============ Speed limit ===========================
 TEST_F(RegulatoryElementTest, FactoryCannotConstructInvalidSpeedLimit) {  // NOLINT
   // NOLINTNEXTLINE
-  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::SpeedLimit, regelemData), InvalidInputError);
+  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::SpeedLimit,
+    regelemData), InvalidInputError);
 }
 TEST_F(RegulatoryElementTest, FactoryConstructsSpeedLimit) {  // NOLINT
   auto sl = SpeedLimit::make(++id, AttributeMap(), {{ls5}, "de205"}, {}, {ls4});
   auto factorySl = RegulatoryElementFactory::create(sl->attribute(AttributeName::Subtype).value(),
-                                                    std::const_pointer_cast<RegulatoryElementData>(sl->constData()));
+      std::const_pointer_cast<RegulatoryElementData>(sl->constData()));
   EXPECT_TRUE(!!std::dynamic_pointer_cast<SpeedLimit>(factorySl));
 }
 
 // ============ Right of way ===========================
 TEST_F(RegulatoryElementTest, FactoryCannotConstructInvalidRightOfWay) {  // NOLINT
   // NOLINTNEXTLINE
-  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::RightOfWay, regelemData), InvalidInputError);
+  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::RightOfWay,
+    regelemData), InvalidInputError);
 }
 
 TEST_F(RegulatoryElementTest, FactoryConstructsRightOfWay) {  // NOLINT
   auto row = RightOfWay::make(++id, AttributeMap(), {ll1}, {ll2}, ls1);
   auto factoryRow = RegulatoryElementFactory::create(row->attribute(AttributeName::Subtype).value(),
-                                                     std::const_pointer_cast<RegulatoryElementData>(row->constData()));
+      std::const_pointer_cast<RegulatoryElementData>(row->constData()));
   EXPECT_TRUE(!!std::dynamic_pointer_cast<RightOfWay>(factoryRow));
 }
 
@@ -217,17 +224,19 @@ TEST_F(RegulatoryElementTest, FactoryCannotConstructInvalidAllWayStop) {  // NOL
   regelemData->parameters[RoleName::Yield].emplace_back(ll2);
   regelemData->parameters[RoleName::RefLine].emplace_back(ls1);
   // NOLINTNEXTLINE
-  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::AllWayStop, regelemData), InvalidInputError);
+  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::AllWayStop,
+    regelemData), InvalidInputError);
   regelemData->parameters[RoleName::RefLine].emplace_back(ls1);
   regelemData->parameters[RoleName::RightOfWay].emplace_back(ll1);
   // NOLINTNEXTLINE
-  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::AllWayStop, regelemData), InvalidInputError);
+  EXPECT_THROW(RegulatoryElementFactory::create(AttributeValueString::AllWayStop,
+    regelemData), InvalidInputError);
 }
 
 TEST_F(RegulatoryElementTest, FactoryConstructsAllWayStop) {  // NOLINT
   auto row = AllWayStop::make(++id, AttributeMap(), {{ll1, ls1}});
   auto factoryAws = RegulatoryElementFactory::create(row->attribute(AttributeName::Subtype).value(),
-                                                     std::const_pointer_cast<RegulatoryElementData>(row->constData()));
+      std::const_pointer_cast<RegulatoryElementData>(row->constData()));
   EXPECT_TRUE(!!std::dynamic_pointer_cast<AllWayStop>(factoryAws));
 }
 

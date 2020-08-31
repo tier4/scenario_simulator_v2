@@ -8,12 +8,12 @@
 #include "lanelet2_validation/Validation.h"
 
 TEST(TestAllValidators, onExampleMap) {  // NOLINT
-  const char* args[] = {"validator",      "../../lanelet2_maps/res/mapping_example.osm",
-                        "--participants", "vehicle",
-                        "--participants", "pedestrian",
-                        "--lat",          "49",
-                        "--lon",          "8.4"};
-  auto cfg = lanelet::validation::parseCommandLine(sizeof(args) / sizeof(const char*), args);
+  const char * args[] = {"validator", "../../lanelet2_maps/res/mapping_example.osm",
+    "--participants", "vehicle",
+    "--participants", "pedestrian",
+    "--lat", "49",
+    "--lon", "8.4"};
+  auto cfg = lanelet::validation::parseCommandLine(sizeof(args) / sizeof(const char *), args);
   EXPECT_EQ(0, lanelet::validation::runFromConfig(cfg));
 }
 

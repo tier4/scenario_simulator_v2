@@ -2,13 +2,15 @@
 #include <stdexcept>
 #include <vector>
 
-namespace lanelet {
+namespace lanelet
+{
 
 /**
  * @brief Generic lanelet error class.
  * All errors lanelet2 will throw derive from this type
  */
-class LaneletError : public std::runtime_error {
+class LaneletError : public std::runtime_error
+{
   using std::runtime_error::runtime_error;
 };
 
@@ -17,18 +19,21 @@ class LaneletError : public std::runtime_error {
  *
  * Construction is not exception-save, don't throw this on memory errors!
  */
-class LaneletMultiError : public LaneletError {
- public:
+class LaneletMultiError : public LaneletError
+{
+public:
   using ErrorMessages = std::vector<std::string>;
-  explicit LaneletMultiError(const std::string& err) : LaneletError(err), errorMessages{{err}} {}
+  explicit LaneletMultiError(const std::string & err)
+  : LaneletError(err), errorMessages{{err}} {}
   explicit LaneletMultiError(ErrorMessages messages = {})
-      : LaneletError(combineErrors(messages)), errorMessages(std::move(messages)) {}
+  : LaneletError(combineErrors(messages)), errorMessages(std::move(messages)) {}
   const ErrorMessages errorMessages;  //!< The individual error strings
 
- private:
-  static std::string combineErrors(const ErrorMessages& m) {
+private:
+  static std::string combineErrors(const ErrorMessages & m)
+  {
     std::string result;
-    for (const auto& message : m) {
+    for (const auto & message : m) {
       result += message;
       result += '\n';
     }
@@ -39,28 +44,32 @@ class LaneletMultiError : public LaneletError {
 /**
  * @brief Thrown when an attribute has been queried that does not exist.
  */
-class NoSuchAttributeError : public LaneletError {
+class NoSuchAttributeError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 
 /**
  * @brief Thrown when an element is not part of the map
  */
-class NoSuchPrimitiveError : public LaneletError {
+class NoSuchPrimitiveError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 
 /**
  * @brief Thrown when a function was called with invalid input arguments.
  */
-class InvalidInputError : public LaneletError {
+class InvalidInputError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 
 /**
  * @brief Thrown when a geometric operation is not valid.
  */
-class GeometryError : public LaneletError {
+class GeometryError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 
@@ -68,7 +77,8 @@ class GeometryError : public LaneletError {
  * @brief Thrown when the state of a lanelet object is invalid
  * E.g. when an linestring has no points or member pointers are NULL
  */
-class InvalidObjectStateError : public LaneletError {
+class InvalidObjectStateError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 
@@ -77,7 +87,8 @@ class InvalidObjectStateError : public LaneletError {
  * If this is violated, this exception is thrown (usually checked at object
  * construction).
  */
-class NullptrError : public LaneletError {
+class NullptrError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 

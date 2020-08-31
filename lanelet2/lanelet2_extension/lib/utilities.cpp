@@ -130,7 +130,8 @@ std::pair<size_t, size_t> findNearestIndexPair(
   for (size_t i = 1; i < N; ++i) {
     if (
       accumulated_lengths.at(i - 1) <= target_length &&
-      target_length <= accumulated_lengths.at(i)) {
+      target_length <= accumulated_lengths.at(i))
+    {
       return std::make_pair(i - 1, i);
     }
   }
@@ -277,7 +278,9 @@ lanelet::LineString3d generateFineCenterline(
   return centerline;
 }
 
-void overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_map, const double resolution, const bool force_overwrite)
+void overwriteLaneletsCenterline(
+  lanelet::LaneletMapPtr lanelet_map, const double resolution,
+  const bool force_overwrite)
 {
   for (auto & lanelet_obj : lanelet_map->laneletLayer) {
     if (force_overwrite || !lanelet_obj.hasCustomCenterline()) {
@@ -314,16 +317,16 @@ bool lineStringWithWidthToPolygon(
   }
   if (linestring.size() != 2) {
     std::stringstream sstream;
-    sstream << __func__ << ": linestring" << linestring.id() 
-      << " must have 2 points! (" << linestring.size()
-      << " != 2)" << std::endl << "Failed to convert to polygon.";
+    sstream << __func__ << ": linestring" << linestring.id() <<
+      " must have 2 points! (" << linestring.size() <<
+      " != 2)" << std::endl << "Failed to convert to polygon.";
     lanelet::HdMapException(sstream.str());
     return false;
   }
   if (!linestring.hasAttribute("width")) {
     std::stringstream sstream;
-    sstream << __func__ << ": linestring" << linestring.id()
-      << " does not have width tag. Failed to convert to polygon.";
+    sstream << __func__ << ": linestring" << linestring.id() <<
+      " does not have width tag. Failed to convert to polygon.";
     lanelet::HdMapException(sstream.str());
     return false;
   }

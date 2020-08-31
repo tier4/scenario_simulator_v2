@@ -27,7 +27,8 @@ namespace lanelet
 {
 namespace projection
 {
-MGRSProjector::MGRSProjector(const rclcpp::Logger & logger, Origin origin) : Projector(origin), logger_(logger) {}
+MGRSProjector::MGRSProjector(const rclcpp::Logger & logger, Origin origin)
+: Projector(origin), logger_(logger) {}
 
 BasicPoint3d MGRSProjector::forward(const GPSPoint & gps) const
 {
@@ -60,7 +61,8 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
   projected_grid_ = mgrs_code;
 
   if (!prev_projected_grid.empty() && prev_projected_grid != projected_grid_) {
-    std::string message = "Projected MGRS Grid changed from last projection. Projected point \
+    std::string message =
+      "Projected MGRS Grid changed from last projection. Projected point \
       might be far away from previously projected point.\n\
       You may want to use different projector.";
     RCLCPP_ERROR(logger_, message);
@@ -78,7 +80,8 @@ GPSPoint MGRSProjector::reverse(const BasicPoint3d & mgrs_point) const
   } else if (!projected_grid_.empty()) {
     gps = reverse(mgrs_point, projected_grid_);
   } else {
-    std::string message = "cannot run reverse operation if mgrs code is not set in projector.\n \
+    std::string message =
+      "cannot run reverse operation if mgrs code is not set in projector.\n \
       use setMGRSCode function or explicitly give mgrs code as an argument.";
     RCLCPP_ERROR(logger_, message);
   }
@@ -100,7 +103,8 @@ GPSPoint MGRSProjector::reverse(
     utm_point.y() += fmod(mgrs_point.y(), pow(10, 5 - prec));
     GeographicLib::UTMUPS::Reverse(zone, northp, utm_point.x(), utm_point.y(), gps.lat, gps.lon);
   } catch (GeographicLib::GeographicErr err) {
-    std::string message = "Failed to convert from MGRS to WGS " + static_cast<std::string>(err.what());
+    std::string message = "Failed to convert from MGRS to WGS " +
+      static_cast<std::string>(err.what());
     RCLCPP_WARN(logger_, message);
     return gps;
   }
@@ -108,7 +112,7 @@ GPSPoint MGRSProjector::reverse(
   return gps;
 }
 
-void MGRSProjector::setMGRSCode(const std::string & mgrs_code) { mgrs_code_ = mgrs_code; }
+void MGRSProjector::setMGRSCode(const std::string & mgrs_code) {mgrs_code_ = mgrs_code;}
 
 void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
 {

@@ -8,17 +8,21 @@
 #include "lanelet2_core/primitives/RegulatoryElement.h"
 #include "lanelet2_core/utility/Utilities.h"
 
-namespace lanelet {
-namespace internal {
-template <typename T>
-struct SearchBox {
+namespace lanelet
+{
+namespace internal
+{
+template<typename T>
+struct SearchBox
+{
   using Type = BoundingBox2d;
 };
-template <>
-struct SearchBox<Point3d> {
+template<>
+struct SearchBox<Point3d>
+{
   using Type = BasicPoint2d;
 };
-template <typename T>
+template<typename T>
 using SearchBoxT = typename SearchBox<T>::Type;
 }  // namespace internal
    /**
@@ -34,9 +38,10 @@ using SearchBoxT = typename SearchBox<T>::Type;
     * Internally, the elements are identified by their id, therefore it is
     * absolutely important that an id is unique within one layer.
     */
-template <typename T>
-class PrimitiveLayer {
- public:
+template<typename T>
+class PrimitiveLayer
+{
+public:
   using PrimitiveT = T;
   using ConstPrimitiveT = traits::ConstPrimitiveType<T>;
   using Map = std::unordered_map<Id, T>;
@@ -47,14 +52,15 @@ class PrimitiveLayer {
 
   //! iterator that gives the primitive when dereferencing, not a std:pair
   using iterator =  //  NOLINT
-      internal::TransformIterator<typename Map::iterator, PrimitiveT, internal::PairConverter<PrimitiveT>>;
+    internal::TransformIterator<typename Map::iterator, PrimitiveT,
+      internal::PairConverter<PrimitiveT>>;
 
   //! iterator that gives a const primitive, not a std::pair
   using const_iterator =  // NOLINT
-      internal::TransformIterator<typename Map::const_iterator, const ConstPrimitiveT,
-                                  internal::PairConverter<const ConstPrimitiveT>>;
-  PrimitiveLayer(const PrimitiveLayer& rhs) = delete;
-  PrimitiveLayer& operator=(const PrimitiveLayer& rhs) = delete;
+    internal::TransformIterator<typename Map::const_iterator, const ConstPrimitiveT,
+      internal::PairConverter<const ConstPrimitiveT>>;
+  PrimitiveLayer(const PrimitiveLayer & rhs) = delete;
+  PrimitiveLayer & operator=(const PrimitiveLayer & rhs) = delete;
 
   /**
    * @brief checks whether an element exists in this layer
@@ -99,14 +105,15 @@ class PrimitiveLayer {
    * lookup.
    */
   std::vector<ConstPrimitiveT> findUsages(
-      const traits::ConstPrimitiveType<traits::OwnedT<PrimitiveT>>& primitive) const;
+    const traits::ConstPrimitiveType<traits::OwnedT<PrimitiveT>> & primitive) const;
 
   /**
    * @brief finds usages of an owned type within this layer
    *
    * This is the non-const version to find usages of a primitive in a layer.
    */
-  std::vector<PrimitiveT> findUsages(const traits::ConstPrimitiveType<traits::OwnedT<PrimitiveT>>& primitive);
+  std::vector<PrimitiveT> findUsages(
+    const traits::ConstPrimitiveType<traits::OwnedT<PrimitiveT>> & primitive);
 
   /**
    * @brief iterator to beginning of the elements (not ordered by id!)
@@ -143,16 +150,18 @@ class PrimitiveLayer {
    * @brief returns whether this layer contains something
    * @return true if no elements
    */
-  bool empty() const { return elements_.empty(); }
+  bool empty() const {return elements_.empty();}
 
   /**
    * @brief returns number of elements in this layer
    * @return number of elements
    */
-  size_t size() const { return elements_.size(); }
+  size_t size() const {return elements_.size();}
 
-  using ConstSearchFunction = std::function<bool(const internal::SearchBoxT<T>& box, const ConstPrimitiveT& prim)>;
-  using SearchFunction = std::function<bool(const internal::SearchBoxT<T>& box, const PrimitiveT& prim)>;
+  using ConstSearchFunction = std::function<bool (const internal::SearchBoxT<T> & box,
+      const ConstPrimitiveT & prim)>;
+  using SearchFunction = std::function<bool (const internal::SearchBoxT<T> & box,
+      const PrimitiveT & prim)>;
 
   /**
    * @brief searches for elements within a search area
@@ -168,8 +177,8 @@ class PrimitiveLayer {
    * consistency, even if it does not make sense for this type. It will always
    * return an empty vector.
    */
-  ConstPrimitiveVec search(const BoundingBox2d& area) const;
-  PrimitiveVec search(const BoundingBox2d& area);
+  ConstPrimitiveVec search(const BoundingBox2d & area) const;
+  PrimitiveVec search(const BoundingBox2d & area);
 
   /**
    * @brief searches within search area until a search function returns true.
@@ -180,8 +189,10 @@ class PrimitiveLayer {
    * primitives to func until the result is true. This is the returned object.
    * If no such object exists, the Optional will be empty.
    */
-  OptConstPrimitiveT searchUntil(const BoundingBox2d& area, const ConstSearchFunction& func) const;
-  OptPrimitiveT searchUntil(const BoundingBox2d& area, const SearchFunction& func);
+  OptConstPrimitiveT searchUntil(
+    const BoundingBox2d & area,
+    const ConstSearchFunction & func) const;
+  OptPrimitiveT searchUntil(const BoundingBox2d & area, const SearchFunction & func);
 
   /**
    * @brief search for the n nearest elements to a point
@@ -199,10 +210,13 @@ class PrimitiveLayer {
    * If you are not happy with this, have a look at nearestUntil, or one of the
    * free functions, like geometry::findNearest.
    */
-  ConstPrimitiveVec nearest(const BasicPoint2d& point, unsigned n) const;
-  PrimitiveVec nearest(const BasicPoint2d& point, unsigned n);
-  ConstPrimitiveVec nearest(const Point2d& point, unsigned n) const { return nearest(point.basicPoint(), n); }
-  PrimitiveVec nearest(const Point2d& point, unsigned n) { return nearest(point.basicPoint(), n); }
+  ConstPrimitiveVec nearest(const BasicPoint2d & point, unsigned n) const;
+  PrimitiveVec nearest(const BasicPoint2d & point, unsigned n);
+  ConstPrimitiveVec nearest(const Point2d & point, unsigned n) const
+  {
+    return nearest(point.basicPoint(), n);
+  }
+  PrimitiveVec nearest(const Point2d & point, unsigned n) {return nearest(point.basicPoint(), n);}
 
   /**
    * @brief repeatedly calls a user-defined predicate until it returns true.
@@ -213,12 +227,18 @@ class PrimitiveLayer {
    * query point iteratively calls func until true is returned. This can be used
    * for iterative queries.
    */
-  OptConstPrimitiveT nearestUntil(const BasicPoint2d& point, const ConstSearchFunction& func) const;
-  OptPrimitiveT nearestUntil(const BasicPoint2d& point, const SearchFunction& func);
-  OptConstPrimitiveT nearestUntil(const ConstPoint2d& point, const ConstSearchFunction& func) const {
+  OptConstPrimitiveT nearestUntil(
+    const BasicPoint2d & point,
+    const ConstSearchFunction & func) const;
+  OptPrimitiveT nearestUntil(const BasicPoint2d & point, const SearchFunction & func);
+  OptConstPrimitiveT nearestUntil(
+    const ConstPoint2d & point,
+    const ConstSearchFunction & func) const
+  {
     return nearestUntil(point.basicPoint2d(), func);
   }
-  OptPrimitiveT nearestUntil(const Point2d& point, const SearchFunction& func) {
+  OptPrimitiveT nearestUntil(const Point2d & point, const SearchFunction & func)
+  {
     return nearestUntil(point.basicPoint2d(), func);
   }
 
@@ -232,16 +252,16 @@ class PrimitiveLayer {
    */
   Id uniqueId() const;
 
- protected:
+protected:
   friend class LaneletMap;  // only the map can create or modify layers
   friend class LaneletMapLayers;
   friend class LaneletSubmap;
-  explicit PrimitiveLayer(const Map& primitives = Map());
-  PrimitiveLayer(PrimitiveLayer&& rhs) noexcept;
-  PrimitiveLayer& operator=(PrimitiveLayer&& rhs) noexcept;
+  explicit PrimitiveLayer(const Map & primitives = Map());
+  PrimitiveLayer(PrimitiveLayer && rhs) noexcept;
+  PrimitiveLayer & operator=(PrimitiveLayer && rhs) noexcept;
   ~PrimitiveLayer() noexcept;
 
-  void add(const PrimitiveT& element);
+  void add(const PrimitiveT & element);
   void remove(Id element);
 
   // NOLINTNEXTLINE
@@ -262,43 +282,45 @@ extern template class PrimitiveLayer<RegulatoryElementPtr>;
 #endif
 
 //! Specialized map layer for Area.
-class AreaLayer : public PrimitiveLayer<Area> {
- public:
+class AreaLayer : public PrimitiveLayer<Area>
+{
+public:
   using PrimitiveLayer::findUsages;
   AreaLayer() = default;
   ~AreaLayer() = default;
-  AreaLayer(const AreaLayer&) = delete;
-  AreaLayer operator=(AreaLayer&) = delete;
-  Areas findUsages(const RegulatoryElementConstPtr& regElem);
-  ConstAreas findUsages(const RegulatoryElementConstPtr& regElem) const;
+  AreaLayer(const AreaLayer &) = delete;
+  AreaLayer operator=(AreaLayer &) = delete;
+  Areas findUsages(const RegulatoryElementConstPtr & regElem);
+  ConstAreas findUsages(const RegulatoryElementConstPtr & regElem) const;
 
- private:
+private:
   friend class LaneletMap;
   friend class LaneletMapLayers;
   friend class LaneletSubmap;
   using PrimitiveLayer<Area>::PrimitiveLayer;
-  AreaLayer(AreaLayer&& rhs) noexcept = default;
-  AreaLayer& operator=(AreaLayer&& rhs) noexcept = default;
+  AreaLayer(AreaLayer && rhs) noexcept = default;
+  AreaLayer & operator=(AreaLayer && rhs) noexcept = default;
 };
 
 //! Specialized map layer for Lanelet.
-class LaneletLayer : public PrimitiveLayer<Lanelet> {
- public:
+class LaneletLayer : public PrimitiveLayer<Lanelet>
+{
+public:
   using PrimitiveLayer::findUsages;
   LaneletLayer() = default;
   ~LaneletLayer() = default;
-  LaneletLayer(const LaneletLayer&) = delete;
-  LaneletLayer operator=(LaneletLayer&) = delete;
-  Lanelets findUsages(const RegulatoryElementConstPtr& regElem);
-  ConstLanelets findUsages(const RegulatoryElementConstPtr& regElem) const;
+  LaneletLayer(const LaneletLayer &) = delete;
+  LaneletLayer operator=(LaneletLayer &) = delete;
+  Lanelets findUsages(const RegulatoryElementConstPtr & regElem);
+  ConstLanelets findUsages(const RegulatoryElementConstPtr & regElem) const;
 
- private:
+private:
   friend class LaneletMap;
   friend class LaneletMapLayers;
   friend class LaneletSubmap;
   using PrimitiveLayer<Lanelet>::PrimitiveLayer;
-  LaneletLayer(LaneletLayer&& rhs) noexcept = default;
-  LaneletLayer& operator=(LaneletLayer&& rhs) noexcept = default;
+  LaneletLayer(LaneletLayer && rhs) noexcept = default;
+  LaneletLayer & operator=(LaneletLayer && rhs) noexcept = default;
 };
 
 using PolygonLayer = PrimitiveLayer<Polygon3d>;
@@ -309,13 +331,14 @@ using RegulatoryElementLayer = PrimitiveLayer<RegulatoryElementPtr>;
 /**
  * @brief Container for all layers of a lanelet map. Used by both LaneletMap and LaneletSubmap
  */
-class LaneletMapLayers {
- public:
+class LaneletMapLayers
+{
+public:
   LaneletMapLayers() = default;
-  LaneletMapLayers(LaneletMapLayers&& rhs) noexcept = default;
-  LaneletMapLayers& operator=(LaneletMapLayers&& rhs) noexcept = default;
-  LaneletMapLayers(const LaneletMapLayers& rhs) = delete;
-  LaneletMapLayers& operator=(const LaneletMapLayers& rhs) = delete;
+  LaneletMapLayers(LaneletMapLayers && rhs) noexcept = default;
+  LaneletMapLayers & operator=(LaneletMapLayers && rhs) noexcept = default;
+  LaneletMapLayers(const LaneletMapLayers & rhs) = delete;
+  LaneletMapLayers & operator=(const LaneletMapLayers & rhs) = delete;
   ~LaneletMapLayers() noexcept = default;
 
   /**
@@ -333,19 +356,24 @@ class LaneletMapLayers {
    * way to create a map because this will result in the most efficient RTree
    * structure for fastest lookups.
    */
-  LaneletMapLayers(const LaneletLayer::Map& lanelets, const AreaLayer::Map& areas,
-                   const RegulatoryElementLayer::Map& regulatoryElements, const PolygonLayer::Map& polygons,
-                   const LineStringLayer::Map& lineStrings, const PointLayer::Map& points);
+  LaneletMapLayers(
+    const LaneletLayer::Map & lanelets, const AreaLayer::Map & areas,
+    const RegulatoryElementLayer::Map & regulatoryElements, const PolygonLayer::Map & polygons,
+    const LineStringLayer::Map & lineStrings, const PointLayer::Map & points);
 
   //! Returns whether all layers of this object are empty
-  bool empty() const noexcept {
-    return laneletLayer.empty() && areaLayer.empty() && regulatoryElementLayer.empty() && polygonLayer.empty() &&
+  bool empty() const noexcept
+  {
+    return laneletLayer.empty() && areaLayer.empty() && regulatoryElementLayer.empty() &&
+           polygonLayer.empty() &&
            lineStringLayer.empty() && pointLayer.empty();
   }
 
   //! Returns the total number of elements in all layers
-  size_t size() const noexcept {
-    return laneletLayer.size() + areaLayer.size() + regulatoryElementLayer.size() + polygonLayer.size() +
+  size_t size() const noexcept
+  {
+    return laneletLayer.size() + areaLayer.size() + regulatoryElementLayer.size() +
+           polygonLayer.size() +
            lineStringLayer.size() + pointLayer.size();
   }
 
@@ -371,8 +399,9 @@ class LaneletMapLayers {
  * elements that in turn also reference lanelets, these lanelets will also be added to the map. If this behaviour is not
  * what you want, consider using a LaneletSubmap.
  */
-class LaneletMap : public LaneletMapLayers {
- public:
+class LaneletMap : public LaneletMapLayers
+{
+public:
   using LaneletMapLayers::LaneletMapLayers;
 
   /**
@@ -406,7 +435,7 @@ class LaneletMap : public LaneletMapLayers {
    * Id, they will be assigned a new, unique id. Otherwise you are responsible
    * for making sure that the id has not already been for a different element.
    */
-  void add(const RegulatoryElementPtr& regElem);
+  void add(const RegulatoryElementPtr & regElem);
 
   /**
    * @brief adds a new polygon and all elements it owns to the map.
@@ -447,15 +476,18 @@ class LaneletMap : public LaneletMapLayers {
  * If you want to have a function that can operate on both LaneletMap and LaneletSubmap, consider using their common
  * base class LaneletMapLayers as an input parameter for it.
  */
-class LaneletSubmap : public LaneletMapLayers {
- public:
+class LaneletSubmap : public LaneletMapLayers
+{
+public:
   LaneletSubmap() = default;
   using LaneletMapLayers::LaneletMapLayers;
 
   //! Constructs a submap from a moved-from LaneletMap
-  explicit LaneletSubmap(LaneletMap&& rhs) noexcept : LaneletMapLayers{std::move(rhs)} {}
-  LaneletSubmap& operator=(LaneletMap&& rhs) {
-    static_cast<LaneletMapLayers&>(*this) = std::move(rhs);
+  explicit LaneletSubmap(LaneletMap && rhs) noexcept
+  : LaneletMapLayers{std::move(rhs)} {}
+  LaneletSubmap & operator=(LaneletMap && rhs)
+  {
+    static_cast<LaneletMapLayers &>(*this) = std::move(rhs);
     return *this;
   }
 
@@ -474,7 +506,7 @@ class LaneletSubmap : public LaneletMapLayers {
   void add(Area area);
 
   //! adds a new regulatory element to the submap.
-  void add(const RegulatoryElementPtr& regElem);
+  void add(const RegulatoryElementPtr & regElem);
 
   //! adds a new polygon to the submap
   void add(Polygon3d polygon);
@@ -491,34 +523,39 @@ class LaneletSubmap : public LaneletMapLayers {
 
   //! In order to let areas and lanelets get out of scope, this function ensures they stay alive. LaneletSubmap::add
   //! already handles this for you, so there is usually no need to call this.
-  void trackParameters(const RegulatoryElement& regelem);
+  void trackParameters(const RegulatoryElement & regelem);
 
- private:
+private:
   //! In order to not let lanelets/areas referenced by regelems get out of scope, we keep a reference to them here
   std::vector<boost::variant<ConstLanelet, ConstArea>> regelemObjects_;
 };
 
-namespace utils {
-template <typename PrimitiveT>
+namespace utils
+{
+template<typename PrimitiveT>
 using ConstLayerPrimitive = typename PrimitiveLayer<PrimitiveT>::ConstPrimitiveT;
 
 //! Efficiently create a LaneletMap from a vector of things. All elements must have a valid id!
-LaneletMapUPtr createMap(const Points3d& fromPoints);
-LaneletMapUPtr createMap(const LineStrings3d& fromLineStrings);
-LaneletMapUPtr createMap(const Polygons3d& fromPolygons);
-LaneletMapUPtr createMap(const Lanelets& fromLanelets);
-LaneletMapUPtr createMap(const Areas& fromAreas);
-LaneletMapUPtr createMap(const Lanelets& fromLanelets, const Areas& fromAreas);
-LaneletMapConstUPtr createConstMap(const ConstLanelets& fromLanelets, const ConstAreas& fromAreas);
+LaneletMapUPtr createMap(const Points3d & fromPoints);
+LaneletMapUPtr createMap(const LineStrings3d & fromLineStrings);
+LaneletMapUPtr createMap(const Polygons3d & fromPolygons);
+LaneletMapUPtr createMap(const Lanelets & fromLanelets);
+LaneletMapUPtr createMap(const Areas & fromAreas);
+LaneletMapUPtr createMap(const Lanelets & fromLanelets, const Areas & fromAreas);
+LaneletMapConstUPtr createConstMap(
+  const ConstLanelets & fromLanelets,
+  const ConstAreas & fromAreas);
 
 //! Efficiently create a LaneletSubmap from a vector of things. All elements must have a valid id!
-LaneletSubmapUPtr createSubmap(const Points3d& fromPoints);
-LaneletSubmapUPtr createSubmap(const LineStrings3d& fromLineStrings);
-LaneletSubmapUPtr createSubmap(const Polygons3d& fromPolygons);
-LaneletSubmapUPtr createSubmap(const Lanelets& fromLanelets);
-LaneletSubmapUPtr createSubmap(const Areas& fromAreas);
-LaneletSubmapUPtr createSubmap(const Lanelets& fromLanelets, const Areas& fromAreas);
-LaneletSubmapConstUPtr createConstSubmap(const ConstLanelets& fromLanelets, const ConstAreas& fromAreas);
+LaneletSubmapUPtr createSubmap(const Points3d & fromPoints);
+LaneletSubmapUPtr createSubmap(const LineStrings3d & fromLineStrings);
+LaneletSubmapUPtr createSubmap(const Polygons3d & fromPolygons);
+LaneletSubmapUPtr createSubmap(const Lanelets & fromLanelets);
+LaneletSubmapUPtr createSubmap(const Areas & fromAreas);
+LaneletSubmapUPtr createSubmap(const Lanelets & fromLanelets, const Areas & fromAreas);
+LaneletSubmapConstUPtr createConstSubmap(
+  const ConstLanelets & fromLanelets,
+  const ConstAreas & fromAreas);
 
 /**
  * @brief returns a unique id by incrementing a counter each time this is
@@ -537,29 +574,35 @@ Id getId();
 //! Function is thread safe.
 void registerId(Id id);
 
-template <typename PrimitiveT>
-std::vector<ConstLayerPrimitive<PrimitiveT>> findUsages(const PrimitiveLayer<PrimitiveT>& layer, Id id);
+template<typename PrimitiveT>
+std::vector<ConstLayerPrimitive<PrimitiveT>> findUsages(
+  const PrimitiveLayer<PrimitiveT> & layer,
+  Id id);
 
-ConstLanelets findUsagesInLanelets(const LaneletMapLayers& map, const ConstPoint3d& p);
-ConstAreas findUsagesInAreas(const LaneletMapLayers& map, const ConstPoint3d& p);
+ConstLanelets findUsagesInLanelets(const LaneletMapLayers & map, const ConstPoint3d & p);
+ConstAreas findUsagesInAreas(const LaneletMapLayers & map, const ConstPoint3d & p);
 
 }  // namespace utils
 
-namespace traits {
-template <typename T>
-struct LayerPrimitive {
+namespace traits
+{
+template<typename T>
+struct LayerPrimitive
+{
   using Type = typename T::PrimitiveT;
 };
-template <typename T>
-struct LayerPrimitive<const T> {
+template<typename T>
+struct LayerPrimitive<const T>
+{
   using Type = typename T::ConstPrimitiveT;
 };
 
-template <typename T>
+template<typename T>
 using LayerPrimitiveType = typename LayerPrimitive<T>::Type;
 }  // namespace traits
 
-namespace geometry {
+namespace geometry
+{
 /**
  * @brief returns the nearest n primitives to a point.
  * @return vector of the n closest primitives together with their distance in
@@ -573,18 +616,25 @@ namespace geometry {
  * Example: `std::vector<std::pair<double, Lanelet>> closeLanelets = findNearest(laneletMap.laneletLayer,
  * BasicPoint2d(1,0), 5);`
  */
-template <typename PrimT>
-std::vector<std::pair<double, PrimT>> findNearest(PrimitiveLayer<PrimT>& map, const BasicPoint2d& pt, unsigned count);
-template <typename PrimT>
-std::vector<std::pair<double, traits::ConstPrimitiveType<PrimT>>> findNearest(const PrimitiveLayer<PrimT>& map,
-                                                                              const BasicPoint2d& pt, unsigned count);
+template<typename PrimT>
+std::vector<std::pair<double, PrimT>> findNearest(
+  PrimitiveLayer<PrimT> & map,
+  const BasicPoint2d & pt, unsigned count);
+template<typename PrimT>
+std::vector<std::pair<double, traits::ConstPrimitiveType<PrimT>>> findNearest(
+  const PrimitiveLayer<PrimT> & map,
+  const BasicPoint2d & pt, unsigned count);
 
 #ifndef LANELET_LAYER_DEFINITION
 // clang-format off
 // NOLINTNEXTLINE
-#define EXTERN_FIND_NEAREST(PRIM) extern template std::vector<std::pair<double, PRIM>> findNearest(PrimitiveLayer<PRIM>&, const BasicPoint2d&, unsigned)
+#define EXTERN_FIND_NEAREST(PRIM) extern template std::vector<std::pair<double, PRIM>> findNearest( \
+    PrimitiveLayer<PRIM>&, const BasicPoint2d &, unsigned)
 // NOLINTNEXTLINE
-#define EXTERN_CONST_FIND_NEAREST(PRIM) extern template std::vector<std::pair<double, traits::ConstPrimitiveType<PRIM>>> findNearest(const PrimitiveLayer<PRIM>&, const BasicPoint2d&, unsigned)
+#define EXTERN_CONST_FIND_NEAREST(PRIM) extern template std::vector<std::pair<double, \
+    traits::ConstPrimitiveType<PRIM>>> findNearest(const PrimitiveLayer<PRIM>&, \
+    const BasicPoint2d &, \
+    unsigned)
 // clang-format on
 EXTERN_FIND_NEAREST(Area);
 EXTERN_FIND_NEAREST(Polygon3d);

@@ -5,8 +5,8 @@
 
 using namespace lanelet;
 
-constexpr bool isTwod(const BasicPoint2d& /*unused*/) { return true; }
-constexpr bool isTwod(const BasicPoint3d& /*unused*/) { return false; }
+constexpr bool isTwod(const BasicPoint2d & /*unused*/) {return true;}
+constexpr bool isTwod(const BasicPoint3d & /*unused*/) {return false;}
 
 TEST(testPoint, constructDestroy) {  // NOLINT
   Point3d p;

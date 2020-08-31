@@ -9,12 +9,14 @@
 
 using namespace lanelet;
 
-struct MyStuff {
+struct MyStuff
+{
   int i{};
 };
 
-template <typename T>
-T writeAndLoad(const T& t) {
+template<typename T>
+T writeAndLoad(const T & t)
+{
   std::stringstream ss;
   boost::archive::binary_oarchive oa(ss);
   oa << t;
@@ -29,8 +31,9 @@ TEST(Serialize, Attribute) {  // NOLINT
   EXPECT_EQ(am, writeAndLoad(am));
 }
 
-class SerializeTest : public ::testing::Test {
- public:
+class SerializeTest : public ::testing::Test
+{
+public:
   int id{0};
   lanelet::AttributeMap attr{{"key", "value"}};
   lanelet::Point3d p1{test_setup::setUpPoint(id)};
@@ -54,16 +57,17 @@ TEST_F(SerializeTest, Regelem) {  // NOLINT
 }
 
 TEST_F(SerializeTest, Lanelet) {  // NOLINT
-  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genericRegelem)->addParameter("lanelet", llt);
+  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genericRegelem)->addParameter(
+    "lanelet", llt);
   llt.addRegulatoryElement(genericRegelem);
   auto lltLoad = writeAndLoad(llt);
   EXPECT_EQ(llt.inverted(), lltLoad.inverted());
   EXPECT_EQ(*llt.constData(), *lltLoad.constData());
   EXPECT_EQ(lltLoad.regulatoryElementsAs<GenericRegulatoryElement>()
-                .front()
-                ->getParameters<lanelet::ConstLanelet>("lanelet")
-                .front(),
-            lltLoad);
+    .front()
+    ->getParameters<lanelet::ConstLanelet>("lanelet")
+    .front(),
+    lltLoad);
 }
 
 TEST(OsmHandler, LaneletWithCenterline) {  // NOLINT
@@ -78,19 +82,21 @@ TEST(OsmHandler, LaneletWithCenterline) {  // NOLINT
 }
 
 TEST_F(SerializeTest, Area) {  // NOLINT
-  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genericRegelem)->addParameter("area", ar);
+  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genericRegelem)->addParameter("area",
+    ar);
   ar.addRegulatoryElement(genericRegelem);
   auto arLoad = writeAndLoad(ar);
   EXPECT_EQ(*ar.constData(), *arLoad.constData());
   EXPECT_EQ(arLoad.regulatoryElementsAs<GenericRegulatoryElement>()
-                .front()
-                ->getParameters<lanelet::ConstArea>("area")
-                .front(),
-            arLoad);
+    .front()
+    ->getParameters<lanelet::ConstArea>("area")
+    .front(),
+    arLoad);
 }
 
 TEST_F(SerializeTest, LaneletMap) {  // NOLINT
-  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genericRegelem)->addParameter("lanelet", llt);
+  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genericRegelem)->addParameter(
+    "lanelet", llt);
   auto map = lanelet::utils::createMap({llt});
   auto mapLoad = writeAndLoad(*map);
   EXPECT_EQ(*map, mapLoad);

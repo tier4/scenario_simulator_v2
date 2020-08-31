@@ -1,28 +1,32 @@
 #include "lanelet2_projection/UTM.h"
 #include <GeographicLib/UTMUPS.hpp>
 
-namespace lanelet {
-namespace projection {
+namespace lanelet
+{
+namespace projection
+{
 
 UtmProjector::UtmProjector(Origin origin, const bool useOffset, const bool throwInPaddingArea)
-    : Projector(origin), useOffset_{useOffset}, throwInPaddingArea_{throwInPaddingArea} {
+: Projector(origin), useOffset_{useOffset}, throwInPaddingArea_{throwInPaddingArea}
+{
   double x = 0;
   double y = 0;
   GeographicLib::UTMUPS::Forward(this->origin().position.lat, this->origin().position.lon, zone_,
-                                 isInNorthernHemisphere_, x, y);
+    isInNorthernHemisphere_, x, y);
   if (useOffset_) {
     xOffset_ = x;
     yOffset_ = y;
   }
 }
 
-BasicPoint3d UtmProjector::forward(const GPSPoint& gps) const {
+BasicPoint3d UtmProjector::forward(const GPSPoint & gps) const
+{
   BasicPoint3d utm{0., 0., gps.ele};
   int zone{};
   bool northp{};
   try {
     GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp, utm.x(), utm.y());
-  } catch (GeographicLib::GeographicErr& e) {
+  } catch (GeographicLib::GeographicErr & e) {
     throw ForwardProjectionError(e.what());
   }
 
@@ -35,9 +39,10 @@ BasicPoint3d UtmProjector::forward(const GPSPoint& gps) const {
     double yAfterTransfer = 0;
     int zoneAfterTransfer = 0;
     try {
-      GeographicLib::UTMUPS::Transfer(zone, northp, utm.x(), utm.y(), zone_, isInNorthernHemisphere_, xAfterTransfer,
-                                      yAfterTransfer, zoneAfterTransfer);
-    } catch (GeographicLib::GeographicErr& e) {
+      GeographicLib::UTMUPS::Transfer(zone, northp, utm.x(),
+        utm.y(), zone_, isInNorthernHemisphere_, xAfterTransfer,
+        yAfterTransfer, zoneAfterTransfer);
+    } catch (GeographicLib::GeographicErr & e) {
       throw ForwardProjectionError(e.what());
     }
 
@@ -56,12 +61,14 @@ BasicPoint3d UtmProjector::forward(const GPSPoint& gps) const {
   return utm;
 }
 
-GPSPoint UtmProjector::reverse(const BasicPoint3d& utm) const {
+GPSPoint UtmProjector::reverse(const BasicPoint3d & utm) const
+{
   GPSPoint gps{0., 0., utm.z()};
   try {
-    GeographicLib::UTMUPS::Reverse(zone_, isInNorthernHemisphere_, useOffset_ ? utm.x() + xOffset_ : utm.x(),
-                                   useOffset_ ? utm.y() + yOffset_ : utm.y(), gps.lat, gps.lon);
-  } catch (GeographicLib::GeographicErr& e) {
+    GeographicLib::UTMUPS::Reverse(zone_, isInNorthernHemisphere_,
+      useOffset_ ? utm.x() + xOffset_ : utm.x(),
+      useOffset_ ? utm.y() + yOffset_ : utm.y(), gps.lat, gps.lon);
+  } catch (GeographicLib::GeographicErr & e) {
     throw ReverseProjectionError(e.what());
   }
 
@@ -69,9 +76,10 @@ GPSPoint UtmProjector::reverse(const BasicPoint3d& utm) const {
     // for zone compliance testing:
     try {
       forward(gps);
-    } catch (ForwardProjectionError& e) {
+    } catch (ForwardProjectionError & e) {
       throw ReverseProjectionError(e.what());
-    };
+    }
+    ;
   }
   return gps;
 }

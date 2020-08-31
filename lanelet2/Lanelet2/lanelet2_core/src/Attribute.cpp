@@ -5,9 +5,12 @@
 #include "lanelet2_core/Exceptions.h"
 #include "lanelet2_core/utility/Units.h"
 
-namespace lanelet {
-namespace {
-Optional<Velocity> getUnit(const std::string& value, size_t pos) {
+namespace lanelet
+{
+namespace
+{
+Optional<Velocity> getUnit(const std::string & value, size_t pos)
+{
   using namespace units::literals;
   if (pos >= value.size()) {
     return 1._kmh;
@@ -27,15 +30,17 @@ Optional<Velocity> getUnit(const std::string& value, size_t pos) {
   return {};
 }
 
-template <typename T>
-T store(std::shared_ptr<Attribute::Cache>& cache, T&& value) {
+template<typename T>
+T store(std::shared_ptr<Attribute::Cache> & cache, T && value)
+{
   auto newCache = std::make_shared<Attribute::Cache>(value);
   std::atomic_store_explicit(&cache, newCache, std::memory_order_release);
   return value;
 }
 
-template <typename T>
-T* load(const std::shared_ptr<Attribute::Cache>& cache) {
+template<typename T>
+T * load(const std::shared_ptr<Attribute::Cache> & cache)
+{
   auto c = std::atomic_load_explicit(&cache, std::memory_order_acquire);
   if (!c) {
     return nullptr;
@@ -44,28 +49,35 @@ T* load(const std::shared_ptr<Attribute::Cache>& cache) {
 }
 }  // namespace
 
-Attribute::Attribute(Id value) : value_(std::to_string(value)) { store(cache_, value); }
+Attribute::Attribute(Id value)
+: value_(std::to_string(value)) {store(cache_, value);}
 
-Attribute::Attribute(bool value) : value_(std::to_string(int(value))) { store(cache_, value); }
+Attribute::Attribute(bool value)
+: value_(std::to_string(int (value))) {store(cache_, value);}
 
-Attribute::Attribute(int value) : value_(std::to_string(value)) { store(cache_, value); }
+Attribute::Attribute(int value)
+: value_(std::to_string(value)) {store(cache_, value);}
 
-Attribute::Attribute(double value) : value_(std::to_string(value)) { store(cache_, value); }
+Attribute::Attribute(double value)
+: value_(std::to_string(value)) {store(cache_, value);}
 
-Attribute::Attribute(const Velocity& value) : value_{std::to_string(units::KmHQuantity(value).value())} {
+Attribute::Attribute(const Velocity & value)
+: value_{std::to_string(units::KmHQuantity(value).value())}
+{
   store(cache_, value);
 }
 
-Optional<bool> Attribute::asBool() const {
+Optional<bool> Attribute::asBool() const
+{
   // try load from cache
-  auto* val = load<bool>(cache_);
+  auto * val = load<bool>(cache_);
   if (val != nullptr) {
     return *val;
   }
   // need to compute value
   try {
     return boost::lexical_cast<bool>(value());
-  } catch (boost::bad_lexical_cast&) {
+  } catch (boost::bad_lexical_cast &) {
     if (value() == "true" || value() == "yes") {
       return store(cache_, true);
     }
@@ -76,51 +88,55 @@ Optional<bool> Attribute::asBool() const {
   }
 }
 
-Optional<double> Attribute::asDouble() const {
+Optional<double> Attribute::asDouble() const
+{
   // try load from cache
-  auto* val = load<double>(cache_);
+  auto * val = load<double>(cache_);
   if (val != nullptr) {
     return *val;
   }
   // need to compute value
   try {
     return store(cache_, boost::lexical_cast<double>(value()));
-  } catch (boost::bad_lexical_cast&) {
+  } catch (boost::bad_lexical_cast &) {
     return {};
   }
 }
 
-Optional<Id> Attribute::asId() const {
+Optional<Id> Attribute::asId() const
+{
   // try load from cache
-  auto* val = load<Id>(cache_);
+  auto * val = load<Id>(cache_);
   if (val != nullptr) {
     return *val;
   }
   // need to compute value
   try {
     return store(cache_, boost::lexical_cast<Id>(value()));
-  } catch (boost::bad_lexical_cast&) {
+  } catch (boost::bad_lexical_cast &) {
     return {};
   }
 }
 
-Optional<int> Attribute::asInt() const {
+Optional<int> Attribute::asInt() const
+{
   // try load from cache
-  auto* val = load<int>(cache_);
+  auto * val = load<int>(cache_);
   if (val != nullptr) {
     return *val;
   }
   // need to compute value
   try {
     return store(cache_, boost::lexical_cast<int>(value()));
-  } catch (boost::bad_lexical_cast&) {
+  } catch (boost::bad_lexical_cast &) {
     return {};
   }
 }
 
-Optional<Velocity> Attribute::asVelocity() const {
+Optional<Velocity> Attribute::asVelocity() const
+{
   // try load from cache
-  auto* val = load<Velocity>(cache_);
+  auto * val = load<Velocity>(cache_);
   if (val != nullptr) {
     return *val;
   }
@@ -138,13 +154,14 @@ Optional<Velocity> Attribute::asVelocity() const {
     if (unit) {
       return store(cache_, velocity * *unit);
     }
-  } catch (std::exception&) {
+  } catch (std::exception &) {
   }
   // ok, give up
   return {};
 }
 
-void Attribute::setValue(const std::string& value) {
+void Attribute::setValue(const std::string & value)
+{
   std::atomic_store_explicit(&cache_, std::shared_ptr<Cache>(), std::memory_order_release);
   this->value_ = value;
 }

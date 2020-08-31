@@ -3,7 +3,8 @@
 #include "lanelet2_core/Forward.h"
 #include "lanelet2_core/primitives/LineString.h"
 
-namespace lanelet {
+namespace lanelet
+{
 
 /**
  * @brief Primitive 2d polygon with basic points
@@ -14,9 +15,11 @@ namespace lanelet {
  * need to create a new type that will be recognized as polygon by
  * boost::geometry (and not as linestring).
  */
-class BasicPolygon2d : public BasicLineString2d {
- public:
-  explicit BasicPolygon2d(const BasicLineString2d& other) : BasicLineString2d(other) {}
+class BasicPolygon2d : public BasicLineString2d
+{
+public:
+  explicit BasicPolygon2d(const BasicLineString2d & other)
+  : BasicLineString2d(other) {}
   using TwoDType = BasicPolygon2d;
   using ThreeDType = BasicPolygon3d;
   using HybridType = BasicPolygon2d;
@@ -34,9 +37,11 @@ class BasicPolygon2d : public BasicLineString2d {
  * need to create a new type that will be recognized as polygon by
  * boost::geometry (and not as linestring).
  */
-class BasicPolygon3d : public BasicLineString3d {
- public:
-  explicit BasicPolygon3d(const BasicLineString3d& other) : BasicLineString3d(other) {}
+class BasicPolygon3d : public BasicLineString3d
+{
+public:
+  explicit BasicPolygon3d(const BasicLineString3d & other)
+  : BasicLineString3d(other) {}
   using TwoDType = BasicPolygon2d;
   using ThreeDType = BasicPolygon3d;
   using HybridType = BasicPolygon3d;
@@ -78,8 +83,9 @@ class BasicPolygon3d : public BasicLineString3d {
  * @ingroup PolygonPrimitives
  * @ingroup ConstPrimitives
  */
-class ConstPolygon2d : public ConstLineStringImpl<Point2d> {
- public:
+class ConstPolygon2d : public ConstLineStringImpl<Point2d>
+{
+public:
   using ConstLineStringImpl::ConstLineStringImpl;
   using ConstType = ConstPolygon2d;
   using MutableType = Polygon2d;
@@ -95,13 +101,14 @@ class ConstPolygon2d : public ConstLineStringImpl<Point2d> {
    * self-intersecting! If you want to ensure this, use boost::polygon's
    * is_valid.
    */
-  explicit ConstPolygon2d(const ConstLineString2d& other) : ConstLineStringImpl(other) {}
-  explicit operator ConstLineString2d() const { return ConstLineString2d(constData(), inverted()); }
+  explicit ConstPolygon2d(const ConstLineString2d & other)
+  : ConstLineStringImpl(other) {}
+  explicit operator ConstLineString2d() const {return ConstLineString2d(constData(), inverted());}
 
   ConstPolygon2d() = default;
 
   //! create a simple 2d polygon from this (just a vector)
-  BasicPolygon2d basicPolygon() const { return {basicBegin(), basicEnd()}; }
+  BasicPolygon2d basicPolygon() const {return {basicBegin(), basicEnd()};}
 
   //! implicit conversion to a basic polygon in 2d
   operator BasicPolygon2d() const {  // NOLINT
@@ -109,7 +116,7 @@ class ConstPolygon2d : public ConstLineStringImpl<Point2d> {
   }
 
   //! Returns the number of (geometrically valid) segments.
-  size_t numSegments() const noexcept { return size() < 2 ? 0 : size(); }
+  size_t numSegments() const noexcept {return size() < 2 ? 0 : size();}
 };
 
 /**
@@ -118,8 +125,9 @@ class ConstPolygon2d : public ConstLineStringImpl<Point2d> {
  * @ingroup PolygonPrimitives
  * @ingroup ConstPrimitives
  */
-class ConstPolygon3d : public ConstLineStringImpl<Point3d> {
- public:
+class ConstPolygon3d : public ConstLineStringImpl<Point3d>
+{
+public:
   using ConstLineStringImpl::ConstLineStringImpl;
   using ConstType = ConstPolygon3d;
   using MutableType = Polygon3d;
@@ -132,11 +140,12 @@ class ConstPolygon3d : public ConstLineStringImpl<Point3d> {
 
   //! Conversion from ConstLineString3d. Does not ensure validity of the
   //! polygon!
-  explicit ConstPolygon3d(const ConstLineString3d& other) : ConstLineStringImpl(other) {}
-  explicit operator ConstLineString3d() const { return ConstLineString3d(constData(), inverted()); }
+  explicit ConstPolygon3d(const ConstLineString3d & other)
+  : ConstLineStringImpl(other) {}
+  explicit operator ConstLineString3d() const {return ConstLineString3d(constData(), inverted());}
 
   //! create a simple 3d polygon from this (just a vector)
-  BasicPolygon3d basicPolygon() const { return {basicBegin(), basicEnd()}; }
+  BasicPolygon3d basicPolygon() const {return {basicBegin(), basicEnd()};}
 
   //! implicit conversion to a basic polygon
   operator BasicPolygon3d() const {  // NOLINT
@@ -144,7 +153,7 @@ class ConstPolygon3d : public ConstLineStringImpl<Point3d> {
   }
 
   //! Returns the number of (geometrically valid) segments.
-  size_t numSegments() const noexcept { return size() < 2 ? 0 : size(); }
+  size_t numSegments() const noexcept {return size() < 2 ? 0 : size();}
 };
 
 /**
@@ -153,8 +162,9 @@ class ConstPolygon3d : public ConstLineStringImpl<Point3d> {
  * @ingroup PolygonPrimitives
  * @ingroup Primitives
  */
-class Polygon3d : public LineStringImpl<ConstPolygon3d> {
- public:
+class Polygon3d : public LineStringImpl<ConstPolygon3d>
+{
+public:
   using LineStringImpl::LineStringImpl;
   using ConstType = ConstPolygon3d;
   using MutableType = Polygon3d;
@@ -164,13 +174,14 @@ class Polygon3d : public LineStringImpl<ConstPolygon3d> {
   Polygon3d() = default;  // gcc5 needs this
 
   //! Conversion from LineString3d. Does not ensure validity of the polygon!
-  explicit Polygon3d(const LineString3d& other) : LineStringImpl(other) {}
-  explicit operator LineString3d() const { return LineString3d(data(), inverted()); }
+  explicit Polygon3d(const LineString3d & other)
+  : LineStringImpl(other) {}
+  explicit operator LineString3d() const {return LineString3d(data(), inverted());}
 
   friend class Polygon2d;
 
   //! create a simple 3d polygon from this (just a vector)
-  BasicPolygon3d basicPolygon() const { return {basicBegin(), basicEnd()}; }
+  BasicPolygon3d basicPolygon() const {return {basicBegin(), basicEnd()};}
 
   //! implicit conversion to a basic polygon
   operator BasicPolygon3d() const {  // NOLINT
@@ -184,8 +195,9 @@ class Polygon3d : public LineStringImpl<ConstPolygon3d> {
  * @ingroup PolygonPrimitives
  * @ingroup Primitives
  */
-class Polygon2d : public LineStringImpl<ConstPolygon2d> {
- public:
+class Polygon2d : public LineStringImpl<ConstPolygon2d>
+{
+public:
   using LineStringImpl::LineStringImpl;
   using ConstType = ConstPolygon2d;
   using MutableType = Polygon2d;
@@ -195,13 +207,15 @@ class Polygon2d : public LineStringImpl<ConstPolygon2d> {
   Polygon2d() = default;
 
   //! Conversion from LineString2d. Does not ensure validity of the polygon!
-  explicit Polygon2d(const LineString2d& other) : LineStringImpl(other) {}
-  explicit operator LineString2d() const { return LineString2d(data(), inverted()); }
+  explicit Polygon2d(const LineString2d & other)
+  : LineStringImpl(other) {}
+  explicit operator LineString2d() const {return LineString2d(data(), inverted());}
 
   /**
    * @brief create a simple 2d polygon from this (just a vector)
    */
-  inline BasicPolygon2d basicPolygon() const {
+  inline BasicPolygon2d basicPolygon() const
+  {
     BasicPolygon2d::allocator_type alloc;  // gcc produces undef refs otherwise
     return BasicPolygon2d(basicBegin(), basicEnd(), alloc);
   }
@@ -224,8 +238,9 @@ class Polygon2d : public LineStringImpl<ConstPolygon2d> {
  *
  * As with all lanelet primitives, conversion from other primitives is cheap.
  */
-class ConstHybridPolygon3d : public ConstPolygon3d {
- public:
+class ConstHybridPolygon3d : public ConstPolygon3d
+{
+public:
   using const_iterator = BasicIterator;  // NOLINT
   using iterator = BasicIterator;        // NOLINT
 
@@ -238,22 +253,26 @@ class ConstHybridPolygon3d : public ConstPolygon3d {
   ConstHybridPolygon3d() = default;
 
   //! Conversion from ConstPolygon3d
-  explicit ConstHybridPolygon3d(const ConstPolygon3d& poly) : ConstPolygon3d(poly) {}
+  explicit ConstHybridPolygon3d(const ConstPolygon3d & poly)
+  : ConstPolygon3d(poly) {}
 
   //! BasicPoint3d Iterator to begin
-  BasicIterator begin() const noexcept { return basicBegin(); }
+  BasicIterator begin() const noexcept {return basicBegin();}
 
   //! BasicPoint3d Iterator to past-the-end
-  BasicIterator end() const noexcept { return basicEnd(); }
+  BasicIterator end() const noexcept {return basicEnd();}
 
   //! Get first BasicPoint3d
-  const BasicPointType& front() const noexcept { return ConstPolygon3d::front().basicPoint(); }
+  const BasicPointType & front() const noexcept {return ConstPolygon3d::front().basicPoint();}
 
   //! Get last BasicPoint3d
-  const BasicPointType& back() const noexcept { return ConstPolygon3d::back().basicPoint(); }
+  const BasicPointType & back() const noexcept {return ConstPolygon3d::back().basicPoint();}
 
   //! access BasicPoint3d at specific position
-  const BasicPointType& operator[](size_t idx) const noexcept { return ConstPolygon3d::operator[](idx).basicPoint(); }
+  const BasicPointType & operator[](size_t idx) const noexcept
+  {
+    return ConstPolygon3d::operator[](idx).basicPoint();
+  }
 };
 
 /**
@@ -269,8 +288,9 @@ class ConstHybridPolygon3d : public ConstPolygon3d {
  *
  * As with all lanelet primitives, conversion from other primitives is cheap.
  */
-class ConstHybridPolygon2d : public ConstPolygon2d {
- public:
+class ConstHybridPolygon2d : public ConstPolygon2d
+{
+public:
   using const_iterator = BasicIterator;  // NOLINT
   using iterator = BasicIterator;        // NOLINT
 
@@ -284,22 +304,26 @@ class ConstHybridPolygon2d : public ConstPolygon2d {
   ConstHybridPolygon2d() = default;
 
   //! Conversion from ConstPolygon2d
-  explicit ConstHybridPolygon2d(const ConstPolygon2d& poly) : ConstPolygon2d(poly) {}
+  explicit ConstHybridPolygon2d(const ConstPolygon2d & poly)
+  : ConstPolygon2d(poly) {}
 
   //! BasicPoint2d Iterator to begin
-  BasicIterator begin() const noexcept { return basicBegin(); }
+  BasicIterator begin() const noexcept {return basicBegin();}
 
   //! BasicPoint2d Iterator to past-the-end
-  BasicIterator end() const noexcept { return basicEnd(); }
+  BasicIterator end() const noexcept {return basicEnd();}
 
   //! Get first BasicPoint2d
-  BasicPointType front() const noexcept { return ConstPolygon2d::front().basicPoint(); }
+  BasicPointType front() const noexcept {return ConstPolygon2d::front().basicPoint();}
 
   //! Get last BasicPoint2d
-  BasicPointType back() const noexcept { return ConstPolygon2d::back().basicPoint(); }
+  BasicPointType back() const noexcept {return ConstPolygon2d::back().basicPoint();}
 
   //! access element at specific position
-  BasicPointType operator[](size_t idx) const noexcept { return ConstPolygon2d::operator[](idx).basicPoint(); }
+  BasicPointType operator[](size_t idx) const noexcept
+  {
+    return ConstPolygon2d::operator[](idx).basicPoint();
+  }
 };
 
 /**
@@ -309,8 +333,9 @@ class ConstHybridPolygon2d : public ConstPolygon2d {
  * This class is thought for geometry calculations,
  * it has no properties of a normal lanelet primitive.
  */
-class BasicPolygonWithHoles3d {
- public:
+class BasicPolygonWithHoles3d
+{
+public:
   BasicPolygon3d outer;
   BasicPolygons3d inner;
 };
@@ -322,90 +347,104 @@ class BasicPolygonWithHoles3d {
  * This class is thought for geometry calculations,
  * it has no properties of a normal lanelet primitive.
  */
-class BasicPolygonWithHoles2d {
- public:
+class BasicPolygonWithHoles2d
+{
+public:
   BasicPolygon2d outer;
   BasicPolygons2d inner;
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const ConstPolygon2d& obj) {
+inline std::ostream & operator<<(std::ostream & stream, const ConstPolygon2d & obj)
+{
   return stream << ConstLineString2d(obj);
 }
 
-inline std::ostream& operator<<(std::ostream& stream, const ConstPolygon3d& obj) {
+inline std::ostream & operator<<(std::ostream & stream, const ConstPolygon3d & obj)
+{
   return stream << ConstLineString2d(obj);
 }
 
-namespace internal {
+namespace internal
+{
 
-template <>
-class Converter<const ConstPolygon3d> {
- public:
-  template <typename T>
-  const ConstPolygon3d& convert(const T& t) const {
+template<>
+class Converter<const ConstPolygon3d>
+{
+public:
+  template<typename T>
+  const ConstPolygon3d & convert(const T & t) const
+  {
     val_ = t;
     return val_;
   }
 
- private:
+private:
   mutable ConstPolygon3d val_;
 };
-template <>
-class Converter<const ConstPolygon2d> {
- public:
-  template <typename T>
-  const ConstPolygon2d& convert(const T& t) const {
+template<>
+class Converter<const ConstPolygon2d>
+{
+public:
+  template<typename T>
+  const ConstPolygon2d & convert(const T & t) const
+  {
     val_ = t;
     return val_;
   }
 
- private:
+private:
   mutable ConstPolygon2d val_;
 };
 }  // namespace internal
 
-namespace traits {
-template <typename T>
-constexpr bool isPolygonT() {
+namespace traits
+{
+template<typename T>
+constexpr bool isPolygonT()
+{
   return isCategory<T, traits::PolygonTag>();
 }
 
-template <>
-struct PrimitiveTraits<BasicPolygon2d> {
+template<>
+struct PrimitiveTraits<BasicPolygon2d>
+{
   using ConstType = BasicPolygon2d;
   using MutableType = BasicPolygon2d;
   using TwoDType = BasicPolygon2d;
   using ThreeDType = BasicPolygon3d;
   using Category = PolygonTag;
 };
-template <>
-struct PrimitiveTraits<BasicPolygon3d> {
+template<>
+struct PrimitiveTraits<BasicPolygon3d>
+{
   using ConstType = BasicPolygon3d;
   using MutableType = BasicPolygon3d;
   using TwoDType = BasicPolygon2d;
   using ThreeDType = BasicPolygon3d;
   using Category = PolygonTag;
 };
-template <>
-inline BasicPolygon2d to2D<BasicPolygon3d>(const BasicPolygon3d& primitive) {
+template<>
+inline BasicPolygon2d to2D<BasicPolygon3d>(const BasicPolygon3d & primitive)
+{
   BasicPolygon2d p2d(primitive.size());
   std::transform(primitive.begin(), primitive.end(), p2d.begin(), utils::to2D<BasicPoint3d>);
   return p2d;
 }
 }  // namespace traits
-template <typename T, typename RetT>
+template<typename T, typename RetT>
 using IfPoly = std::enable_if_t<traits::isPolygonT<T>(), RetT>;
 
 }  // namespace lanelet
 
 // Hash function for usage in containers
-namespace std {
-template <>
-struct hash<lanelet::Polygon3d> : public lanelet::HashBase<lanelet::Polygon3d> {};
-template <>
-struct hash<lanelet::ConstPolygon3d> : public lanelet::HashBase<lanelet::ConstPolygon3d> {};
-template <>
-struct hash<lanelet::Polygon2d> : public lanelet::HashBase<lanelet::Polygon2d> {};
-template <>
-struct hash<lanelet::ConstPolygon2d> : public lanelet::HashBase<lanelet::ConstPolygon2d> {};
+namespace std
+{
+template<>
+struct hash<lanelet::Polygon3d>: public lanelet::HashBase<lanelet::Polygon3d> {};
+template<>
+struct hash<lanelet::ConstPolygon3d>: public lanelet::HashBase<lanelet::ConstPolygon3d> {};
+template<>
+struct hash<lanelet::Polygon2d>: public lanelet::HashBase<lanelet::Polygon2d> {};
+template<>
+struct hash<lanelet::ConstPolygon2d>: public lanelet::HashBase<lanelet::ConstPolygon2d> {};
 }  // namespace std

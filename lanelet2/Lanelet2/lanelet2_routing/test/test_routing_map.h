@@ -10,74 +10,89 @@
 
 /// The coordinates and relations for this test can be found in "LaneletTestMap.xml" which can be viewed in
 /// https://www.draw.io
-namespace lanelet {
-namespace routing {
-namespace tests {
+namespace lanelet
+{
+namespace routing
+{
+namespace tests
+{
 
-inline RoutingGraphPtr setUpGermanVehicleGraph(LaneletMap& map, double laneChangeCost = 2.,
-                                               double participantHeight = 2.) {
+inline RoutingGraphPtr setUpGermanVehicleGraph(
+  LaneletMap & map, double laneChangeCost = 2.,
+  double participantHeight = 2.)
+{
   traffic_rules::TrafficRulesPtr trafficRules{traffic_rules::TrafficRulesFactory::create(
       Locations::Germany, Participants::Vehicle, traffic_rules::TrafficRules::Configuration())};
   RoutingCostPtrs costPtrs{std::make_shared<RoutingCostDistance>(laneChangeCost),
-                           std::make_shared<RoutingCostTravelTime>(laneChangeCost)};
+    std::make_shared<RoutingCostTravelTime>(laneChangeCost)};
   RoutingGraph::Configuration configuration;
   configuration.insert(std::make_pair(RoutingGraph::ParticipantHeight, participantHeight));
   return RoutingGraph::build(map, *trafficRules, costPtrs, configuration);
 }
 
-inline RoutingGraphPtr setUpGermanPedestrianGraph(LaneletMap& map, double laneChangeCost = 2.) {
+inline RoutingGraphPtr setUpGermanPedestrianGraph(LaneletMap & map, double laneChangeCost = 2.)
+{
   traffic_rules::TrafficRulesPtr trafficRules{
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian)};
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian)};
   RoutingCostPtrs costPtrs{std::make_shared<RoutingCostDistance>(laneChangeCost)};
   return RoutingGraph::build(map, *trafficRules, costPtrs);
 }
 
-inline RoutingGraphPtr setUpGermanBicycleGraph(LaneletMap& map, double laneChangeCost = 2.) {
+inline RoutingGraphPtr setUpGermanBicycleGraph(LaneletMap & map, double laneChangeCost = 2.)
+{
   traffic_rules::TrafficRulesPtr trafficRules{
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Bicycle)};
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Bicycle)};
   RoutingCostPtrs costPtrs{std::make_shared<RoutingCostDistance>(laneChangeCost)};
   return RoutingGraph::build(map, *trafficRules, costPtrs);
 }
 
-class RoutingGraphTestData {
- public:
-  RoutingGraphTestData() {
+class RoutingGraphTestData
+{
+public:
+  RoutingGraphTestData()
+  {
     initPoints();
     initLineStrings();
     initLanelets();
     initAreas();
-    laneletMap = std::make_shared<LaneletMap>(lanelets, areas, std::unordered_map<Id, RegulatoryElementPtr>(),
-                                              std::unordered_map<Id, Polygon3d>(), lines, points);
+    laneletMap = std::make_shared<LaneletMap>(lanelets, areas, std::unordered_map<Id,
+        RegulatoryElementPtr>(),
+        std::unordered_map<Id, Polygon3d>(), lines, points);
     vehicleGraph = setUpGermanVehicleGraph(*laneletMap, laneChangeCost);
     pedestrianGraph = setUpGermanPedestrianGraph(*laneletMap, laneChangeCost);
     bicycleGraph = setUpGermanBicycleGraph(*laneletMap, laneChangeCost);
   }
 
-  void addPoint(double x, double y, double z) {
+  void addPoint(double x, double y, double z)
+  {
     pointId++;
     points.insert(std::pair<Id, Point3d>(pointId, Point3d(pointId, x, y, z)));
   }
 
-  void addLine(const Points3d& points) {
+  void addLine(const Points3d & points)
+  {
     lineId++;
     lines.insert(std::pair<Id, LineString3d>(lineId, LineString3d(lineId, points)));
   }
 
-  void addLaneletVehicle(const LineString3d& left, const LineString3d& right) {
+  void addLaneletVehicle(const LineString3d & left, const LineString3d & right)
+  {
     laneletId++;
     Lanelet ll{laneletId, left, right};
     ll.setAttribute(AttributeName::Subtype, AttributeValueString::Road);
     lanelets.insert(std::make_pair(laneletId, ll));
   }
 
-  void addLaneletPedestrian(const LineString3d& left, const LineString3d& right) {
+  void addLaneletPedestrian(const LineString3d & left, const LineString3d & right)
+  {
     laneletId++;
     Lanelet ll{laneletId, left, right};
     ll.setAttribute(AttributeName::Subtype, AttributeValueString::Crosswalk);
     lanelets.insert(std::make_pair(laneletId, ll));
   }
 
-  void addAreaPedestrian(const LineStrings3d& outerBound) {
+  void addAreaPedestrian(const LineStrings3d & outerBound)
+  {
     Area area(areaId, outerBound);
     area.setAttribute(AttributeName::Subtype, AttributeValueString::Crosswalk);
     areas.emplace(areaId, area);
@@ -96,8 +111,9 @@ class RoutingGraphTestData {
   RoutingGraphPtr vehicleGraph, pedestrianGraph, bicycleGraph;
   LaneletMapPtr laneletMap;
 
- private:
-  void initPoints() {
+private:
+  void initPoints()
+  {
     points.clear();
     addPoint(0., 1., 0.);  // p1
     addPoint(1., 1., 0.);
@@ -225,7 +241,8 @@ class RoutingGraphTestData {
     addPoint(19, 14, 0);  // p131
   }
 
-  void initLineStrings() {
+  void initLineStrings()
+  {
     lines.clear();
     addLine(Points3d{points.at(1), points.at(2)});  // l1001
     lines.at(1001).setAttribute(AttributeNamesString::LaneChange, true);
@@ -389,7 +406,8 @@ class RoutingGraphTestData {
     lines.at(1205).setAttribute(AttributeName::Type, AttributeValueString::LineThin);
     lines.at(1205).setAttribute(AttributeName::Type, AttributeValueString::Dashed);
   }
-  void initLanelets() {
+  void initLanelets()
+  {
     lanelets.clear();
     addLaneletVehicle(lines.at(1001), lines.at(1002));  // ll2001
     addLaneletVehicle(lines.at(1003), lines.at(1004));
@@ -464,58 +482,64 @@ class RoutingGraphTestData {
     addLaneletVehicle(lines.at(1216), lines.at(1215));  // ll2068
   }
 
-  void initAreas() {
-    addAreaPedestrian({lines.at(1102), lines.at(1088), lines.at(1089), lines.at(1090), lines.at(1091), lines.at(1092),
-                       lines.at(1093), lines.at(1094)});                                           // ar3000
+  void initAreas()
+  {
+    addAreaPedestrian({lines.at(1102), lines.at(1088), lines.at(1089), lines.at(1090), lines.at(
+          1091), lines.at(1092),
+        lines.at(1093), lines.at(1094)});                                                          // ar3000
     addAreaPedestrian({lines.at(1095), lines.at(1097), lines.at(1096), lines.at(1091).invert()});  // ar3001
     //    addAreaPedestrian({lines.at(1096).invert(), lines.at(1092), lines.at(1103), lines.at(1104)});  // ar3002
     addAreaPedestrian(
-        {lines.at(1096), lines.at(1104).invert(), lines.at(1103).invert(), lines.at(1092).invert()});  // ar3002
+      {lines.at(1096), lines.at(1104).invert(), lines.at(1103).invert(), lines.at(1092).invert()});    // ar3002
     areas.at(3002).setAttribute(AttributeName::Subtype, AttributeValueString::Walkway);
   }
 };
 
-namespace {                            // NOLINT
-static RoutingGraphTestData testData;  // NOLINT
+namespace                              // NOLINT
+{static RoutingGraphTestData testData; // NOLINT
 }  // namespace
 
-class RoutingGraphTest : public ::testing::Test {
- public:
-  const std::unordered_map<Id, Lanelet>& lanelets{testData.lanelets};
-  const std::unordered_map<Id, Area>& areas{testData.areas};
-  const std::unordered_map<Id, Point3d>& points{testData.points};
-  const std::unordered_map<Id, LineString3d>& lines{testData.lines};
+class RoutingGraphTest : public ::testing::Test
+{
+public:
+  const std::unordered_map<Id, Lanelet> & lanelets{testData.lanelets};
+  const std::unordered_map<Id, Area> & areas{testData.areas};
+  const std::unordered_map<Id, Point3d> & points{testData.points};
+  const std::unordered_map<Id, LineString3d> & lines{testData.lines};
   const LaneletMapConstPtr laneletMap{testData.laneletMap};
 };
 
-class GermanVehicleGraph : public RoutingGraphTest {
- protected:
-  GermanVehicleGraph() { EXPECT_NO_THROW(graph->checkValidity()); }  // NOLINT
+class GermanVehicleGraph : public RoutingGraphTest
+{
+protected:
+  GermanVehicleGraph() {EXPECT_NO_THROW(graph->checkValidity());}    // NOLINT
 
- public:
+public:
   RoutingGraphConstPtr graph{testData.vehicleGraph};
   uint8_t numCostModules{2};
 };
 
-class GermanPedestrianGraph : public RoutingGraphTest {
- protected:
-  GermanPedestrianGraph() { EXPECT_NO_THROW(graph->checkValidity()); }  // NOLINT
+class GermanPedestrianGraph : public RoutingGraphTest
+{
+protected:
+  GermanPedestrianGraph() {EXPECT_NO_THROW(graph->checkValidity());}    // NOLINT
 
- public:
+public:
   RoutingGraphConstPtr graph{testData.pedestrianGraph};
   uint8_t numCostModules{2};
 };
 
-class GermanBicycleGraph : public RoutingGraphTest {
- protected:
-  GermanBicycleGraph() { EXPECT_NO_THROW(graph->checkValidity()); }  // NOLINT
+class GermanBicycleGraph : public RoutingGraphTest
+{
+protected:
+  GermanBicycleGraph() {EXPECT_NO_THROW(graph->checkValidity());}    // NOLINT
 
- public:
+public:
   RoutingGraphConstPtr graph{testData.bicycleGraph};
   uint8_t numCostModules{2};
 };
 
-template <typename T>
+template<typename T>
 class AllGraphsTest : public T {};
 
 using AllGraphs = testing::Types<GermanVehicleGraph, GermanPedestrianGraph, GermanBicycleGraph>;

@@ -3,14 +3,18 @@
 #include "lanelet2_routing/Route.h"
 #include "lanelet2_routing/internal/Graph.h"
 
-namespace lanelet {
-namespace routing {
+namespace lanelet
+{
+namespace routing
+{
 class RoutingGraph;
 
-namespace internal {
+namespace internal
+{
 //! Builder class to create a route from a routing graph and the shortest path
-class RouteBuilder {
- public:
+class RouteBuilder
+{
+public:
   /** @note Important things about pending elements:
    *  Pending elements are lanelets that can be reached from the shortest path (e.g. a lanelet right of a shortest
    * path lanelet), but we don't know yet if we can reach the lanelet of the shortest path using that lanelet. This
@@ -31,12 +35,14 @@ class RouteBuilder {
    * to the goal. So in the context of the route this is not a diverging situation but rather it's just one lanelet
    * (the right one) is following its predecessor. We would say that they are part of the same lane since there's no
    * other way to go. */
-  explicit RouteBuilder(const RoutingGraphGraph& g) : graph_{g} {}
-  Optional<Route> getRouteFromShortestPath(const LaneletPath& path, bool withLaneChanges = true,
-                                           RoutingCostId costId = 0);
+  explicit RouteBuilder(const RoutingGraphGraph & g)
+  : graph_{g} {}
+  Optional<Route> getRouteFromShortestPath(
+    const LaneletPath & path, bool withLaneChanges = true,
+    RoutingCostId costId = 0);
 
- private:
-  const RoutingGraphGraph& graph_;
+private:
+  const RoutingGraphGraph & graph_;
 };
 
 }  // namespace internal

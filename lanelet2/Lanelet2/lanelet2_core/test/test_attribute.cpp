@@ -84,9 +84,9 @@ TEST(Attribute, as) {  // NOLINT
   EXPECT_EQ(0, *attr.as<Optional<int>>());
   EXPECT_EQ("0", *attr.as<std::string>());
   EXPECT_EQ("0", *attr.as<Optional<std::string>>());
-  auto opt = attr.as<const char*>();
+  auto opt = attr.as<const char *>();
   EXPECT_EQ(std::string("0"), *opt);
-  opt = attr.as<Optional<const char*>>();
+  opt = attr.as<Optional<const char *>>();
   EXPECT_EQ(std::string("0"), *opt);
   EXPECT_EQ(0, *attr.as<Id>());
 }

@@ -12,7 +12,8 @@ using namespace lanelet::routing;
 using namespace lanelet::routing::internal;
 using namespace lanelet::routing::tests;
 
-GraphType getSimpleGraph() {
+GraphType getSimpleGraph()
+{
   /*        3
    *    (1)---(3)
    *    /1 \1 /  \3
@@ -28,10 +29,10 @@ GraphType getSimpleGraph() {
   auto v3 = boost::add_vertex(g);
   auto v4 = boost::add_vertex(g);
   auto v5 = boost::add_vertex(g);
-  auto addEdge = [](auto v0, auto v1, auto& g, double c) {
-    auto e = boost::add_edge(v0, v1, g);
-    g[e.first].routingCost = c;
-  };
+  auto addEdge = [](auto v0, auto v1, auto & g, double c) {
+      auto e = boost::add_edge(v0, v1, g);
+      g[e.first].routingCost = c;
+    };
   addEdge(v0, v1, g, 1);
   addEdge(v0, v2, g, 2);
   addEdge(v1, v3, g, 3);
@@ -49,15 +50,15 @@ TEST(DijkstraSearch, onSimpleGraph) {
   std::vector<double> expCost{0, 1, 2, 3, 2, 6};
   std::vector<size_t> length{1, 2, 2, 3, 3, 4};
   std::vector<GraphType::vertex_descriptor> predecessors{0, 0, 0, 2, 1, 3};
-  searcher.query(0, [&](const VertexVisitInformation& v) -> bool {
-    EXPECT_DOUBLE_EQ(expCost[v.vertex], v.cost) << v.vertex;
-    EXPECT_EQ(length[v.vertex], v.length) << v.vertex;
-    EXPECT_EQ(predecessors[v.vertex], v.predecessor) << v.vertex;
-    EXPECT_EQ(v.length, v.numLaneChanges + 1);
-    return v.vertex != 4;
-  });
+  searcher.query(0, [&](const VertexVisitInformation & v) -> bool {
+      EXPECT_DOUBLE_EQ(expCost[v.vertex], v.cost) << v.vertex;
+      EXPECT_EQ(length[v.vertex], v.length) << v.vertex;
+      EXPECT_EQ(predecessors[v.vertex], v.predecessor) << v.vertex;
+      EXPECT_EQ(v.length, v.numLaneChanges + 1);
+      return v.vertex != 4;
+    });
   EXPECT_EQ(searcher.getMap().size(), boost::num_vertices(g));
-  for (const auto& v : searcher.getMap()) {
+  for (const auto & v : searcher.getMap()) {
     EXPECT_EQ(v.second.predicate, v.first != 4) << v.first;
     EXPECT_EQ(v.second.isLeaf, v.first == 5 || v.first == 4) << v.first;
   }
@@ -143,7 +144,8 @@ TEST_F(GermanVehicleGraph, GetShortestPathInvalid) {  // NOLINT
   auto shortestPath = graph->shortestPath(invalidLanelet, lanelets.at(2004), 0);
   EXPECT_FALSE(!!shortestPath);
 
-  EXPECT_THROW(graph->shortestPath(lanelets.at(2001), lanelets.at(2004), numCostModules), InvalidInputError);  // NOLINT
+  EXPECT_THROW(graph->shortestPath(lanelets.at(2001), lanelets.at(
+      2004), numCostModules), InvalidInputError);                                                              // NOLINT
 }
 
 TEST_F(GermanVehicleGraph, GetShortestPathVia1) {  // NOLINT
@@ -196,12 +198,14 @@ TEST_F(GermanVehicleGraph, GetShortestPathViaInvalid) {  // NOLINT
   interm.push_back(static_cast<ConstLanelet>(lanelets.at(2003)));
   interm.push_back(static_cast<ConstLanelet>(lanelets.at(2007)));
   // NOLINTNEXTLINE
-  EXPECT_THROW(graph->shortestPathVia(lanelets.at(2001), interm, lanelets.at(2002), numCostModules), InvalidInputError);
+  EXPECT_THROW(graph->shortestPathVia(lanelets.at(2001), interm, lanelets.at(
+      2002), numCostModules), InvalidInputError);
 }
 
-template <typename LaneletsT>
-bool containsLanelet(const LaneletsT& reachableSet, Id lltId) {
-  return !!utils::findIf(reachableSet, [lltId](auto& llt) { return llt.id() == lltId; });
+template<typename LaneletsT>
+bool containsLanelet(const LaneletsT & reachableSet, Id lltId)
+{
+  return !!utils::findIf(reachableSet, [lltId](auto & llt) {return llt.id() == lltId;});
 }
 
 TEST_F(GermanVehicleGraph, reachableSet) {  // NOLINT
@@ -284,7 +288,7 @@ TEST_F(GermanVehicleGraph, possiblePathsMinRoutingCosts) {  // NOLINT
 
   routes = graph->possiblePaths(lanelets.at(2002), 4.0, 0, true);
   ASSERT_EQ(routes.size(), 1ul);
-  auto& firstRoute = *routes.begin();
+  auto & firstRoute = *routes.begin();
   EXPECT_EQ(firstRoute.size(), 3ul);
   EXPECT_TRUE(containsLanelet(firstRoute, 2006));
 }
@@ -293,7 +297,7 @@ TEST_F(GermanVehicleGraph, possiblePathsMaxHose) {  // NOLINT
   // Max Hose Problem
   auto routes = graph->possiblePaths(lanelets.at(2017), 10.0, 0, true);
   ASSERT_EQ(routes.size(), 1ul);
-  auto& firstRoute = *routes.begin();
+  auto & firstRoute = *routes.begin();
   EXPECT_EQ(firstRoute.size(), 5ul);
   EXPECT_TRUE(containsLanelet(firstRoute, 2024));
 }
@@ -302,7 +306,7 @@ TEST_F(GermanVehicleGraph, possiblePathsMinLanelets) {  // NOLINT
   // MIN NUMBER LANELETS - With lane changes
   auto routes = graph->possiblePaths(lanelets.at(2001), 2, false);
   EXPECT_EQ(routes.size(), 1ul);
-  auto& firstRoute = *routes.begin();
+  auto & firstRoute = *routes.begin();
   ASSERT_EQ(firstRoute.size(), 2ul);
   EXPECT_TRUE(containsLanelet(firstRoute, 2002));
   EXPECT_EQ(firstRoute.getRemainingLane(firstRoute.begin()).size(), firstRoute.size());
@@ -319,7 +323,8 @@ TEST_F(GermanVehicleGraph, possiblePathsMinLanelets) {  // NOLINT
 
 TEST_F(GermanVehicleGraph, possiblePathsInvalid) {  // NOLINT
   // Invalid num costs length
-  EXPECT_THROW(graph->possiblePaths(lanelets.at(2002), 0., numCostModules, true), InvalidInputError);  // NOLINT
+  EXPECT_THROW(graph->possiblePaths(lanelets.at(2002), 0., numCostModules, true),
+    InvalidInputError);                                                                                // NOLINT
   auto routes = graph->possiblePaths(lanelets.at(2002), 0.);
   ASSERT_EQ(routes.size(), 1ul);
   EXPECT_EQ(routes[0].size(), 1ul);
@@ -358,82 +363,88 @@ TEST_F(GermanVehicleGraph, forEachSuccessorIsMonotonic) {  // NOLINT
   double lastVal = 0.;
   bool lanelet2010Seen = false;
   bool lanelet2013Seen = false;
-  graph->forEachSuccessor(lanelets.at(2007), [&](const LaneletVisitInformation& i) {
-    if (i.cost == 0.) {
-      EXPECT_EQ(i.lanelet.id(), 2007) << "First lanelet must be 2007";
-    }
-    EXPECT_LE(lastVal, i.cost);
-    lastVal = i.cost;
-    lanelet2010Seen |= i.lanelet.id() == 2010;
-    lanelet2013Seen |= i.lanelet.id() == 2013;
-    return i.lanelet.id() != 2010 && i.lanelet.id() != 2014;
-  });
+  graph->forEachSuccessor(lanelets.at(2007), [&](const LaneletVisitInformation & i) {
+      if (i.cost == 0.) {
+        EXPECT_EQ(i.lanelet.id(), 2007) << "First lanelet must be 2007";
+      }
+      EXPECT_LE(lastVal, i.cost);
+      lastVal = i.cost;
+      lanelet2010Seen |= i.lanelet.id() == 2010;
+      lanelet2013Seen |= i.lanelet.id() == 2013;
+      return i.lanelet.id() != 2010 && i.lanelet.id() != 2014;
+    });
   EXPECT_TRUE(lanelet2010Seen);
   EXPECT_FALSE(lanelet2013Seen);
 }
 
 TEST_F(GermanPedestrianGraph, forEachSuccessorIncludingAreasReachesLanelet) {  // NOLINT
   class TargetFound {};
-  auto throwIfTarget = [&](const LaneletOrAreaVisitInformation& i) {
-    if (i.laneletOrArea.id() == 2053) {
-      throw TargetFound{};
-    }
-    return true;
-  };
-  EXPECT_THROW(graph->forEachSuccessorIncludingAreas(lanelets.at(2050), throwIfTarget), TargetFound);  // NOLINT
+  auto throwIfTarget = [&](const LaneletOrAreaVisitInformation & i) {
+      if (i.laneletOrArea.id() == 2053) {
+        throw TargetFound{};
+      }
+      return true;
+    };
+  EXPECT_THROW(graph->forEachSuccessorIncludingAreas(lanelets.at(2050), throwIfTarget),
+    TargetFound);                                                                                      // NOLINT
 }
 
 TEST_F(GermanPedestrianGraph, forEachPredecessorIncludingAreasReachesLanelet) {  // NOLINT
   class TargetFound {};
-  auto throwIfTarget = [&](const LaneletOrAreaVisitInformation& i) {
-    if (i.laneletOrArea.id() == 2050) {
-      throw TargetFound{};
-    }
-    return true;
-  };
-  EXPECT_THROW(graph->forEachPredecessorIncludingAreas(lanelets.at(2053), throwIfTarget), TargetFound);  // NOLINT
+  auto throwIfTarget = [&](const LaneletOrAreaVisitInformation & i) {
+      if (i.laneletOrArea.id() == 2050) {
+        throw TargetFound{};
+      }
+      return true;
+    };
+  EXPECT_THROW(graph->forEachPredecessorIncludingAreas(lanelets.at(
+      2053), throwIfTarget), TargetFound);                                                               // NOLINT
 }
 
 TEST_F(GermanVehicleGraph, forEachPredecessorIncludingAreasReachesLanelet) {  // NOLINT
   class TargetFound {};
-  auto throwIfTarget = [&](const LaneletOrAreaVisitInformation& i) {
-    if (i.laneletOrArea.id() == 2004) {
-      throw TargetFound{};
-    }
-    return true;
-  };
-  EXPECT_THROW(graph->forEachPredecessorIncludingAreas(lanelets.at(2007), throwIfTarget), TargetFound);  // NOLINT
+  auto throwIfTarget = [&](const LaneletOrAreaVisitInformation & i) {
+      if (i.laneletOrArea.id() == 2004) {
+        throw TargetFound{};
+      }
+      return true;
+    };
+  EXPECT_THROW(graph->forEachPredecessorIncludingAreas(lanelets.at(
+      2007), throwIfTarget), TargetFound);                                                               // NOLINT
 }
 
 TEST_F(GermanVehicleGraph, forEachPredecessorReachesLanelet) {  // NOLINT
   class TargetFound {};
-  auto throwIfTarget = [&](const LaneletVisitInformation& i) {
-    if (i.lanelet.id() == 2004) {
-      throw TargetFound{};
-    }
-    return true;
-  };
+  auto throwIfTarget = [&](const LaneletVisitInformation & i) {
+      if (i.lanelet.id() == 2004) {
+        throw TargetFound{};
+      }
+      return true;
+    };
   EXPECT_THROW(graph->forEachPredecessor(lanelets.at(2007), throwIfTarget), TargetFound);  // NOLINT
 }
 
 TEST_F(GermanPedestrianGraph, shortestPathIncludingAreasFromArea) {  // NOLINT
   auto path =
-      graph->shortestPathIncludingAreas(ConstLaneletOrArea(areas.at(3001)), ConstLaneletOrArea(lanelets.at(2053)));
+    graph->shortestPathIncludingAreas(ConstLaneletOrArea(areas.at(3001)),
+      ConstLaneletOrArea(lanelets.at(2053)));
   ASSERT_TRUE(!!path);
   EXPECT_EQ(path->size(), 2ul);
 }
 
 TEST_F(GermanPedestrianGraph, shortestPathIncludingAreasThroughAreas) {
   auto path =
-      graph->shortestPathIncludingAreas(ConstLaneletOrArea(lanelets.at(2050)), ConstLaneletOrArea(lanelets.at(2053)));
+    graph->shortestPathIncludingAreas(ConstLaneletOrArea(lanelets.at(2050)),
+      ConstLaneletOrArea(lanelets.at(2053)));
   ASSERT_TRUE(!!path);
   EXPECT_EQ(path->size(), 4ul);
 }
 
 TEST_F(GermanPedestrianGraph, shortestPathIncludingAreasViaThroughAreas) {
   auto path =
-      graph->shortestPathIncludingAreasVia(ConstLaneletOrArea(lanelets.at(2050)), {ConstLaneletOrArea(areas.at(3002))},
-                                           ConstLaneletOrArea(lanelets.at(2053)));
+    graph->shortestPathIncludingAreasVia(ConstLaneletOrArea(lanelets.at(2050)),
+      {ConstLaneletOrArea(areas.at(3002))},
+      ConstLaneletOrArea(lanelets.at(2053)));
   ASSERT_TRUE(!!path);
   EXPECT_EQ(path->size(), 6ul);
 }
@@ -443,8 +454,9 @@ TEST(RoutingCostInitialization, NegativeLaneChangeCost) {    // NOLINT
   EXPECT_THROW(RoutingCostDistance(-1), InvalidInputError);  // NOLINT
 }
 
-class ConfigurationInitialization : public ::testing::Test {
- public:
+class ConfigurationInitialization : public ::testing::Test
+{
+public:
   LaneletMapPtr emptyMap = std::make_shared<LaneletMap>();
 
   // Initialize traffic rules and routing cost calculation module

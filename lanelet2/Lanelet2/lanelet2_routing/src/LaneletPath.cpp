@@ -2,12 +2,18 @@
 #include <lanelet2_core/geometry/Area.h>
 #include <lanelet2_core/geometry/Lanelet.h>
 
-namespace lanelet {
-namespace routing {
+namespace lanelet
+{
+namespace routing
+{
 
-namespace {
+namespace
+{
 
-ConstLineStrings3d extractBetween(const ConstLineStrings3d& wrappedLS, const size_t start, const size_t end) {
+ConstLineStrings3d extractBetween(
+  const ConstLineStrings3d & wrappedLS, const size_t start,
+  const size_t end)
+{
   auto startIt = std::next(wrappedLS.begin(), start);
   auto endIt = std::next(wrappedLS.begin(), end);
   auto size = (start >= end) ? wrappedLS.size() - (start - end) - 1 : end - start - 1;
@@ -22,10 +28,12 @@ ConstLineStrings3d extractBetween(const ConstLineStrings3d& wrappedLS, const siz
   return between;
 }
 
-std::pair<ConstLineStrings3d, ConstLineStrings3d> extractBounds(const ConstArea& area,
-                                                                const ConstLineString3d& rearCommon,
-                                                                const ConstLineString3d& frontCommon) {
-  const auto& bounds = area.outerBound();
+std::pair<ConstLineStrings3d, ConstLineStrings3d> extractBounds(
+  const ConstArea & area,
+  const ConstLineString3d & rearCommon,
+  const ConstLineString3d & frontCommon)
+{
+  const auto & bounds = area.outerBound();
   auto frontIt = std::find(bounds.begin(), bounds.end(), frontCommon);
   if (frontIt == bounds.end()) {
     throw InvalidInputError("line string front not found");
@@ -39,9 +47,12 @@ std::pair<ConstLineStrings3d, ConstLineStrings3d> extractBounds(const ConstArea&
   return std::make_pair(extractBetween(bounds, end, start), extractBetween(bounds, start, end));
 }
 
-ConstLineStrings3d extractExceptBorder(const ConstArea& area, const ConstLineString3d& border) {
-  const auto& bounds = area.outerBound();
-  auto frontIt = std::find_if(bounds.begin(), bounds.end(), [&border](auto& ls) { return ls == border; });
+ConstLineStrings3d extractExceptBorder(const ConstArea & area, const ConstLineString3d & border)
+{
+  const auto & bounds = area.outerBound();
+  auto frontIt = std::find_if(bounds.begin(), bounds.end(), [&border](auto & ls) {
+        return ls == border;
+      });
   if (frontIt == bounds.end()) {
     throw InvalidInputError("Given line string not in area");
   }
@@ -49,56 +60,68 @@ ConstLineStrings3d extractExceptBorder(const ConstArea& area, const ConstLineStr
   return extractBetween(bounds, idx, idx);
 }
 
-void appendLineStrings(const ConstLineStrings3d& lss, BasicLineString3d& target, const bool reversed,
-                       const bool omitLast, const bool omitFirst) {
+void appendLineStrings(
+  const ConstLineStrings3d & lss, BasicLineString3d & target, const bool reversed,
+  const bool omitLast, const bool omitFirst)
+{
   auto compound = CompoundLineString3d(lss);
   if (compound.size() < ((omitLast || omitFirst) ? (omitFirst && omitLast) ? 3 : 2 : 1)) {
     return;
   }
   if (!reversed) {
     target.insert(target.end(), std::next(compound.basicBegin(), omitFirst ? 1 : 0),
-                  std::prev(compound.basicEnd(), omitLast ? 1 : 0));
+      std::prev(compound.basicEnd(), omitLast ? 1 : 0));
   } else {
-    const auto& basicLS = compound.basicLineString();
+    const auto & basicLS = compound.basicLineString();
     target.insert(target.end(), std::next(basicLS.rbegin(), omitFirst ? 1 : 0),
-                  std::prev(basicLS.rend(), omitLast ? 1 : 0));
+      std::prev(basicLS.rend(), omitLast ? 1 : 0));
   }
 }
 
-void appendLineStringsExceptFirst(const ConstLineStrings3d& lss, BasicLineString3d& target, const bool reversed) {
+void appendLineStringsExceptFirst(
+  const ConstLineStrings3d & lss, BasicLineString3d & target,
+  const bool reversed)
+{
   appendLineStrings(lss, target, reversed, false, true);
 }
 
-void appendLineStrings(const ConstLineStrings3d& lss, BasicLineString3d& target) {
+void appendLineStrings(const ConstLineStrings3d & lss, BasicLineString3d & target)
+{
   appendLineStrings(lss, target, false, false, false);
 }
 
-void appendLineStringsExceptFirstAndLast(const ConstLineStrings3d& lss, BasicLineString3d& target) {
+void appendLineStringsExceptFirstAndLast(const ConstLineStrings3d & lss, BasicLineString3d & target)
+{
   appendLineStrings(lss, target, false, true, true);
 }
 
-struct Head {
+struct Head
+{
   ConstLaneletOrArea cur;
   Optional<ConstLaneletOrArea> next;
 };
 
 enum class LaneletAdjacency { Following, Preceding, Left, Right };
-struct LaneletPairAdjacency {
+struct LaneletPairAdjacency
+{
   LaneletAdjacency ll;
   LaneletAdjacency other;
 };
-struct AdjacencyAndBorder {
+struct AdjacencyAndBorder
+{
   LaneletAdjacency adjacency{LaneletAdjacency::Preceding};
   ConstLineString3d border;
 };
-struct BoundsResult {
+struct BoundsResult
+{
   Optional<ConstLineString3d> prevBorder;
   Optional<LaneletAdjacency> llAdjacency;
   BasicPolygon3d left;
   BasicPolygon3d right;
 };
 
-Optional<AdjacencyAndBorder> getLaneletAdjacency(const ConstLanelet& ll, const ConstArea& ar) {
+Optional<AdjacencyAndBorder> getLaneletAdjacency(const ConstLanelet & ll, const ConstArea & ar)
+{
   auto res = geometry::determineCommonLineFollowing(ar, ll);
   if (res) {
     return AdjacencyAndBorder{LaneletAdjacency::Following, *res};
@@ -116,7 +139,8 @@ Optional<AdjacencyAndBorder> getLaneletAdjacency(const ConstLanelet& ll, const C
   return {};
 }
 
-LaneletPairAdjacency getLaneletAdjacency(const ConstLanelet& ll, const ConstLanelet& other) {
+LaneletPairAdjacency getLaneletAdjacency(const ConstLanelet & ll, const ConstLanelet & other)
+{
   if (geometry::follows(ll, other)) {
     return LaneletPairAdjacency{LaneletAdjacency::Preceding, LaneletAdjacency::Following};
   }
@@ -132,13 +156,17 @@ LaneletPairAdjacency getLaneletAdjacency(const ConstLanelet& ll, const ConstLane
   return {};
 }
 
-void appendExtractedClockwise(BasicPolygon3d& target, const ConstLanelet& ll, const LaneletAdjacency& adj) {
+void appendExtractedClockwise(
+  BasicPolygon3d & target, const ConstLanelet & ll,
+  const LaneletAdjacency & adj)
+{
   if (adj == LaneletAdjacency::Right) {
     target.insert(target.end(), ll.leftBound().basicBegin() + 1, ll.leftBound().basicEnd());
   } else if (adj == LaneletAdjacency::Preceding) {
     target.emplace_back(utils::toBasicPoint(ll.rightBound().back()));
   } else if (adj == LaneletAdjacency::Left) {
-    target.insert(target.end(), ll.rightBound().invert().basicBegin() + 1, ll.rightBound().invert().basicEnd());
+    target.insert(target.end(), ll.rightBound().invert().basicBegin() + 1,
+      ll.rightBound().invert().basicEnd());
   } else if (adj == LaneletAdjacency::Following) {
     target.emplace_back(utils::toBasicPoint(ll.leftBound().front()));
   } else {
@@ -146,9 +174,13 @@ void appendExtractedClockwise(BasicPolygon3d& target, const ConstLanelet& ll, co
   }
 }
 
-void appendExtractedCounterClockwise(BasicPolygon3d& target, const ConstLanelet& ll, const LaneletAdjacency& adj) {
+void appendExtractedCounterClockwise(
+  BasicPolygon3d & target, const ConstLanelet & ll,
+  const LaneletAdjacency & adj)
+{
   if (adj == LaneletAdjacency::Right) {
-    target.insert(target.end(), ll.leftBound().invert().basicBegin() + 1, ll.leftBound().invert().basicEnd());
+    target.insert(target.end(), ll.leftBound().invert().basicBegin() + 1,
+      ll.leftBound().invert().basicEnd());
   } else if (adj == LaneletAdjacency::Preceding) {
     target.emplace_back(utils::toBasicPoint(ll.leftBound().back()));
   } else if (adj == LaneletAdjacency::Left) {
@@ -160,7 +192,8 @@ void appendExtractedCounterClockwise(BasicPolygon3d& target, const ConstLanelet&
   }
 }
 
-void appendFirst(BasicPolygon3d& poly, const ConstLanelet& ll, const LaneletAdjacency& in) {
+void appendFirst(BasicPolygon3d & poly, const ConstLanelet & ll, const LaneletAdjacency & in)
+{
   if (in == LaneletAdjacency::Following) {
     poly.emplace_back(utils::toBasicPoint(ll.leftBound().front()));
   } else if (in == LaneletAdjacency::Right) {
@@ -175,12 +208,14 @@ void appendFirst(BasicPolygon3d& poly, const ConstLanelet& ll, const LaneletAdja
 }
 
 using AdjMap = std::map<LaneletAdjacency, LaneletAdjacency>;
-void appendLaneletBoundsLeft(BasicPolygon3d& poly, const ConstLanelet& ll, const LaneletAdjacency& in,
-                             const LaneletAdjacency& out) {
+void appendLaneletBoundsLeft(
+  BasicPolygon3d & poly, const ConstLanelet & ll, const LaneletAdjacency & in,
+  const LaneletAdjacency & out)
+{
   const AdjMap cw{{LaneletAdjacency::Left, LaneletAdjacency::Following},
-                  {LaneletAdjacency::Following, LaneletAdjacency::Right},
-                  {LaneletAdjacency::Right, LaneletAdjacency::Preceding},
-                  {LaneletAdjacency::Preceding, LaneletAdjacency::Left}};
+    {LaneletAdjacency::Following, LaneletAdjacency::Right},
+    {LaneletAdjacency::Right, LaneletAdjacency::Preceding},
+    {LaneletAdjacency::Preceding, LaneletAdjacency::Left}};
   auto cwNext = cw.at(in);
   while (cwNext != out) {
     appendExtractedClockwise(poly, ll, cwNext);
@@ -188,12 +223,14 @@ void appendLaneletBoundsLeft(BasicPolygon3d& poly, const ConstLanelet& ll, const
   }
 }
 
-void appendLaneletBoundsRight(BasicPolygon3d& poly, const ConstLanelet& ll, const LaneletAdjacency& in,
-                              const LaneletAdjacency& out) {
+void appendLaneletBoundsRight(
+  BasicPolygon3d & poly, const ConstLanelet & ll, const LaneletAdjacency & in,
+  const LaneletAdjacency & out)
+{
   const AdjMap ccw{{LaneletAdjacency::Left, LaneletAdjacency::Preceding},
-                   {LaneletAdjacency::Preceding, LaneletAdjacency::Right},
-                   {LaneletAdjacency::Right, LaneletAdjacency::Following},
-                   {LaneletAdjacency::Following, LaneletAdjacency::Left}};
+    {LaneletAdjacency::Preceding, LaneletAdjacency::Right},
+    {LaneletAdjacency::Right, LaneletAdjacency::Following},
+    {LaneletAdjacency::Following, LaneletAdjacency::Left}};
   auto ccwNext = ccw.at(in);
   while (ccwNext != out) {
     appendExtractedCounterClockwise(poly, ll, ccwNext);
@@ -201,8 +238,10 @@ void appendLaneletBoundsRight(BasicPolygon3d& poly, const ConstLanelet& ll, cons
   }
 }
 
-void appendLaneletBounds(BoundsResult& br, const ConstLanelet& ll, const LaneletAdjacency& in,
-                         const LaneletAdjacency& out) {
+void appendLaneletBounds(
+  BoundsResult & br, const ConstLanelet & ll, const LaneletAdjacency & in,
+  const LaneletAdjacency & out)
+{
   appendLaneletBoundsLeft(br.left, ll, in, out);
   if (in != out) {
     appendLaneletBoundsRight(br.right, ll, in, out);
@@ -214,7 +253,8 @@ void appendLaneletBounds(BoundsResult& br, const ConstLanelet& ll, const Lanelet
  * @param head
  * @return border between cur area and next primitive in cur area
  */
-ConstLineString3d getBorder(BoundsResult& br, const Head& head) {
+ConstLineString3d getBorder(BoundsResult & br, const Head & head)
+{
   if (head.next->isArea()) {
     br.prevBorder = geometry::determineCommonLine(*(head.next->area()), *head.cur.area());
     if (!br.prevBorder) {
@@ -230,7 +270,8 @@ ConstLineString3d getBorder(BoundsResult& br, const Head& head) {
   return adj->border;
 }
 
-void addLaneletPair(BoundsResult& res, const Head& head, const bool notTail = true) {
+void addLaneletPair(BoundsResult & res, const Head & head, const bool notTail = true)
+{
   auto adj = getLaneletAdjacency(*head.cur.lanelet(), *head.next->lanelet());
   if (!notTail) {
     appendFirst(res.left, *head.cur.lanelet(), adj.ll);
@@ -239,7 +280,8 @@ void addLaneletPair(BoundsResult& res, const Head& head, const bool notTail = tr
   res.llAdjacency = adj.other;
 }
 
-void addLaneletAreaHead(BoundsResult& res, const Head& head, const bool notTail = true) {
+void addLaneletAreaHead(BoundsResult & res, const Head & head, const bool notTail = true)
+{
   auto adj = getLaneletAdjacency(*head.cur.lanelet(), *head.next->area());
   if (!adj) {
     throw std::runtime_error("Did not find adjacency");
@@ -247,11 +289,13 @@ void addLaneletAreaHead(BoundsResult& res, const Head& head, const bool notTail 
   if (!notTail) {
     appendFirst(res.left, *head.cur.lanelet(), adj->adjacency);
   }
-  appendLaneletBounds(res, *head.cur.lanelet(), notTail ? *res.llAdjacency : adj->adjacency, adj->adjacency);
+  appendLaneletBounds(res,
+    *head.cur.lanelet(), notTail ? *res.llAdjacency : adj->adjacency, adj->adjacency);
   res.prevBorder = adj->border;
 }
 
-void addLanelet(BoundsResult& res, const Head& head) {
+void addLanelet(BoundsResult & res, const Head & head)
+{
   if (!head.next) {
     appendLaneletBounds(res, *head.cur.lanelet(), *res.llAdjacency, *res.llAdjacency);
     res.left.pop_back();  // ugly AF
@@ -262,7 +306,8 @@ void addLanelet(BoundsResult& res, const Head& head) {
   }
 }
 
-void addFirstArea(BoundsResult& res, const Head& head) {
+void addFirstArea(BoundsResult & res, const Head & head)
+{
   auto thisBorder = getBorder(res, head);
   if (!head.cur.area()) {
     throw GeometryError("Uninitialized area");
@@ -270,7 +315,8 @@ void addFirstArea(BoundsResult& res, const Head& head) {
   appendLineStrings(extractExceptBorder(*head.cur.area(), thisBorder), res.left);
 }
 
-void addFirstLanelet(BoundsResult& res, const Head& head) {
+void addFirstLanelet(BoundsResult & res, const Head & head)
+{
   if (!head.next) {
     throw std::runtime_error("Following primitive not intialized");
   }
@@ -281,7 +327,8 @@ void addFirstLanelet(BoundsResult& res, const Head& head) {
   }
 }
 
-void addArea(BoundsResult& br, const Head& head) {
+void addArea(BoundsResult & br, const Head & head)
+{
   auto oldBorder = *br.prevBorder;
   auto border = getBorder(br, head);
   auto bounds = extractBounds(*head.cur.area(), oldBorder, border);
@@ -289,7 +336,8 @@ void addArea(BoundsResult& br, const Head& head) {
   appendLineStringsExceptFirst(bounds.second, br.right, true);
 }
 
-BoundsResult appendTail(const Head& head) {
+BoundsResult appendTail(const Head & head)
+{
   BoundsResult res;
   if (!head.next) {
     throw InvalidInputError("Tail must have successor, results must be empty");
@@ -302,14 +350,17 @@ BoundsResult appendTail(const Head& head) {
   return res;
 }
 
-void appendFinalArea(const Head& head, BoundsResult& br) {
+void appendFinalArea(const Head & head, BoundsResult & br)
+{
   if (!br.prevBorder) {
     throw InvalidInputError("border not given for area");
   }
-  appendLineStringsExceptFirstAndLast(extractExceptBorder(*head.cur.area(), *br.prevBorder), br.left);
+  appendLineStringsExceptFirstAndLast(extractExceptBorder(*head.cur.area(), *br.prevBorder),
+    br.left);
 }
 
-void appendBounds(const Head& head, BoundsResult& br) {
+void appendBounds(const Head & head, BoundsResult & br)
+{
   if (head.cur.isLanelet()) {
     addLanelet(br, head);
   } else {
@@ -322,11 +373,14 @@ void appendBounds(const Head& head, BoundsResult& br) {
 }
 }  // namespace
 
-LaneletSequence LaneletPath::getRemainingLane(LaneletPath::const_iterator laneletPosition) const {
+LaneletSequence LaneletPath::getRemainingLane(LaneletPath::const_iterator laneletPosition) const
+{
   ConstLanelets lane;
   while (laneletPosition != lanelets_.end()) {
     lane.push_back(*laneletPosition);
-    if (laneletPosition + 1 == lanelets_.end() || !geometry::follows(*laneletPosition, *std::next(laneletPosition))) {
+    if (laneletPosition + 1 == lanelets_.end() ||
+      !geometry::follows(*laneletPosition, *std::next(laneletPosition)))
+    {
       break;
     }
     ++laneletPosition;
@@ -334,7 +388,8 @@ LaneletSequence LaneletPath::getRemainingLane(LaneletPath::const_iterator lanele
   return lane;
 }
 
-BasicPolygon3d getEnclosingPolygon3d(const LaneletOrAreaPath& path) {
+BasicPolygon3d getEnclosingPolygon3d(const LaneletOrAreaPath & path)
+{
   if (path.empty()) {
     return BasicPolygon3d();
   }
@@ -343,10 +398,12 @@ BasicPolygon3d getEnclosingPolygon3d(const LaneletOrAreaPath& path) {
   }
   auto boundsResult = appendTail(Head{path[0], path[1]});
   for (size_t curIdx = 1; curIdx < path.size(); ++curIdx) {
-    appendBounds(Head{path[curIdx], (curIdx + 1 < path.size()) ? path[curIdx + 1] : Optional<ConstLaneletOrArea>()},
-                 boundsResult);
+    appendBounds(Head{path[curIdx],
+        (curIdx + 1 < path.size()) ? path[curIdx + 1] : Optional<ConstLaneletOrArea>()},
+      boundsResult);
   }
-  boundsResult.left.insert(boundsResult.left.end(), boundsResult.right.rbegin(), boundsResult.right.rend());
+  boundsResult.left.insert(boundsResult.left.end(),
+    boundsResult.right.rbegin(), boundsResult.right.rend());
   return std::move(boundsResult.left);
 }
 }  // namespace routing

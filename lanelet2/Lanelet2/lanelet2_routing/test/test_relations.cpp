@@ -185,7 +185,8 @@ TEST_F(GermanVehicleGraph, FollowingWithoutLaneChangeMaxHose) {  // NOLINT
 
   following = graph->following(lanelets.at(2021), false);
   EXPECT_EQ(following.size(), 1ul);
-  EXPECT_TRUE(std::find(following.begin(), following.end(), lanelets.at(2020).invert()) != following.end());
+  EXPECT_TRUE(std::find(following.begin(), following.end(), lanelets.at(
+      2020).invert()) != following.end());
 
   following = graph->following(lanelets.at(2020).invert(), false);
   EXPECT_EQ(following.size(), 1ul);
@@ -258,7 +259,8 @@ TEST_F(GermanVehicleGraph, FollowingWithLaneChangeMaxHose) {  // NOLINT
 
   following = graph->following(lanelets.at(2021), true);
   EXPECT_EQ(following.size(), 1ul);
-  EXPECT_TRUE(std::find(following.begin(), following.end(), lanelets.at(2020).invert()) != following.end());
+  EXPECT_TRUE(std::find(following.begin(), following.end(), lanelets.at(
+      2020).invert()) != following.end());
 
   following = graph->following(lanelets.at(2020).invert(), true);
   EXPECT_EQ(following.size(), 1ul);
@@ -338,7 +340,8 @@ TEST_F(GermanVehicleGraph, PreviousWithoutLaneChangeMaxHose) {  // NOLINT
 
   previous = graph->previous(lanelets.at(2018), false);
   EXPECT_EQ(previous.size(), 1ul);
-  EXPECT_TRUE(std::find(previous.begin(), previous.end(), lanelets.at(2020).invert()) != previous.end());
+  EXPECT_TRUE(std::find(previous.begin(), previous.end(), lanelets.at(
+      2020).invert()) != previous.end());
 
   previous = graph->previous(lanelets.at(2016), false);
   EXPECT_EQ(previous.size(), 1ul);
@@ -424,7 +427,8 @@ TEST_F(GermanVehicleGraph, PreviousWithLaneChangeMaxHose) {  // NOLINT
 
   previous = graph->previous(lanelets.at(2018), true);
   EXPECT_EQ(previous.size(), 1ul);
-  EXPECT_TRUE(std::find(previous.begin(), previous.end(), lanelets.at(2020).invert()) != previous.end());
+  EXPECT_TRUE(std::find(previous.begin(), previous.end(), lanelets.at(
+      2020).invert()) != previous.end());
 
   previous = graph->previous(lanelets.at(2016), true);
   EXPECT_EQ(previous.size(), 1ul);

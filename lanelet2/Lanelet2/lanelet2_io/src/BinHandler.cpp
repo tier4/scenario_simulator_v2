@@ -6,17 +6,23 @@
 #include "lanelet2_io/io_handlers/Factory.h"
 #include "lanelet2_io/io_handlers/Serialize.h"
 
-namespace lanelet {
-namespace io_handlers {
+namespace lanelet
+{
+namespace io_handlers
+{
 
-namespace {
+namespace
+{
 // register with factories
 RegisterParser<BinParser> regParser;
 RegisterWriter<BinWriter> regWriter;
 
 }  // namespace
 
-void BinWriter::write(const std::string& filename, const LaneletMap& laneletMap, ErrorMessages& /*errors*/) const {
+void BinWriter::write(
+  const std::string & filename, const LaneletMap & laneletMap,
+  ErrorMessages & /*errors*/) const
+{
   std::ofstream fs(filename, std::ofstream::binary);
   if (!fs.good()) {
     throw ParseError("Failed open archive " + filename);
@@ -27,7 +33,10 @@ void BinWriter::write(const std::string& filename, const LaneletMap& laneletMap,
   oa << idCounter;
 }
 
-std::unique_ptr<LaneletMap> BinParser::parse(const std::string& filename, ErrorMessages& /*errors*/) const {
+std::unique_ptr<LaneletMap> BinParser::parse(
+  const std::string & filename,
+  ErrorMessages & /*errors*/) const
+{
   std::ifstream fs(filename, std::ifstream::binary);
   if (!fs.good()) {
     throw ParseError("Failed open archive " + filename);

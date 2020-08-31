@@ -5,7 +5,8 @@
 #include "lanelet2_io/Configuration.h"
 #include "lanelet2_io/Projection.h"
 
-namespace lanelet {
+namespace lanelet
+{
 using ErrorMessages = std::vector<std::string>;
 /**
  * @brief Loads a lanelet map from a file.
@@ -25,9 +26,10 @@ using ErrorMessages = std::vector<std::string>;
  * It can not be stressed enough that it is important to provide a valid origin to write/load maps with georeferenced
  * (lat/lon) data. If no origin is specified, the loaded map will most likely be not correctly located and deformed.
  */
-std::unique_ptr<LaneletMap> load(const std::string& filename, const Origin& origin = Origin::defaultOrigin(),
-                                 ErrorMessages* errors = nullptr,
-                                 const io::Configuration& params = io::Configuration());
+std::unique_ptr<LaneletMap> load(
+  const std::string & filename, const Origin & origin = Origin::defaultOrigin(),
+  ErrorMessages * errors = nullptr,
+  const io::Configuration & params = io::Configuration());
 
 /**
  * @brief Loads a lanelet map from a file.
@@ -41,9 +43,10 @@ std::unique_ptr<LaneletMap> load(const std::string& filename, const Origin& orig
  * not null, the loader will instead try to recover and only throw on unrecoverable errors (ie if the map did not
  * exist). However, the loaded map will be incomplete if errors occurred.
  */
-std::unique_ptr<LaneletMap> load(const std::string& filename, const Projector& projector,
-                                 ErrorMessages* errors = nullptr,
-                                 const io::Configuration& params = io::Configuration());
+std::unique_ptr<LaneletMap> load(
+  const std::string & filename, const Projector & projector,
+  ErrorMessages * errors = nullptr,
+  const io::Configuration & params = io::Configuration());
 
 /**
  * @brief Loads a lanelet map from a file.
@@ -59,9 +62,10 @@ std::unique_ptr<LaneletMap> load(const std::string& filename, const Projector& p
  * @throws lanelet2::IOError if the file did not exist, could not be parsed, the default origin was provided for a map
  * that requires osm conversion or extension is not supported
  */
-std::unique_ptr<LaneletMap> load(const std::string& filename, const std::string& parserName,
-                                 const Origin& origin = Origin::defaultOrigin(), ErrorMessages* errors = nullptr,
-                                 const io::Configuration& params = io::Configuration());
+std::unique_ptr<LaneletMap> load(
+  const std::string & filename, const std::string & parserName,
+  const Origin & origin = Origin::defaultOrigin(), ErrorMessages * errors = nullptr,
+  const io::Configuration & params = io::Configuration());
 
 /**
  * @brief Loads a lanelet map from file.
@@ -75,9 +79,10 @@ std::unique_ptr<LaneletMap> load(const std::string& filename, const std::string&
  * @return Loaded map. Pointer is aways valid. Otherwise, an exception will be thrown
  * @throws lanelet2::IOError if the file did not exist, could not be parsed or extension is not supported
  */
-std::unique_ptr<LaneletMap> load(const std::string& filename, const std::string& parserName, const Projector& projector,
-                                 ErrorMessages* errors = nullptr,
-                                 const io::Configuration& params = io::Configuration());
+std::unique_ptr<LaneletMap> load(
+  const std::string & filename, const std::string & parserName, const Projector & projector,
+  ErrorMessages * errors = nullptr,
+  const io::Configuration & params = io::Configuration());
 
 /**
  * @brief returns the names of the currently registered parsers (parsers from plugins included)
@@ -108,8 +113,10 @@ std::vector<std::string> supportedParserExtensions();
  * It can not be stressed enough that it is important to provide a valid origin to write/load maps with georeferenced
  * (lat/lon) data. If no origin is specified, the written map will most likely be not correctly located and deformed.
  */
-void write(const std::string& filename, const lanelet::LaneletMap& map, const Origin& origin = Origin::defaultOrigin(),
-           ErrorMessages* errors = nullptr, const io::Configuration& params = io::Configuration());
+void write(
+  const std::string & filename, const lanelet::LaneletMap & map,
+  const Origin & origin = Origin::defaultOrigin(),
+  ErrorMessages * errors = nullptr, const io::Configuration & params = io::Configuration());
 
 /**
  * @brief writes a map to a file
@@ -122,8 +129,9 @@ void write(const std::string& filename, const lanelet::LaneletMap& map, const Or
  * @param params extra parameters for the writer (if required). If empty, default parameters will be used.
  * @throws lanelet2::IOError if the file could not be created or writing failed.
  */
-void write(const std::string& filename, const LaneletMap& map, const Projector& projector,
-           ErrorMessages* errors = nullptr, const io::Configuration& params = io::Configuration());
+void write(
+  const std::string & filename, const LaneletMap & map, const Projector & projector,
+  ErrorMessages * errors = nullptr, const io::Configuration & params = io::Configuration());
 
 /**
  * @brief writes a map to a file
@@ -136,9 +144,10 @@ void write(const std::string& filename, const LaneletMap& map, const Projector& 
  * @param params extra parameters for the writer (if required). If empty, default parameters will be used.
  * @throws lanelet2::IOError if the file could not be created or writing failed.
  */
-void write(const std::string& filename, const lanelet::LaneletMap& map, const std::string& writerName,
-           const Origin& origin = Origin::defaultOrigin(), ErrorMessages* errors = nullptr,
-           const io::Configuration& params = io::Configuration());
+void write(
+  const std::string & filename, const lanelet::LaneletMap & map, const std::string & writerName,
+  const Origin & origin = Origin::defaultOrigin(), ErrorMessages * errors = nullptr,
+  const io::Configuration & params = io::Configuration());
 
 /**
  * @brief writes a map to a file
@@ -151,9 +160,10 @@ void write(const std::string& filename, const lanelet::LaneletMap& map, const st
  * @param params extra parameters for the writer (if required). If empty, default parameters will be used.
  * @throws lanelet2::IOError if the file could not be created or writing failed.
  */
-void write(const std::string& filename, const LaneletMap& map, const std::string& writerName,
-           const Projector& projector, ErrorMessages* errors = nullptr,
-           const io::Configuration& params = io::Configuration());
+void write(
+  const std::string & filename, const LaneletMap & map, const std::string & writerName,
+  const Projector & projector, ErrorMessages * errors = nullptr,
+  const io::Configuration & params = io::Configuration());
 
 /**
  * @brief returns the names of the currently registered writing (writers from plugins included)

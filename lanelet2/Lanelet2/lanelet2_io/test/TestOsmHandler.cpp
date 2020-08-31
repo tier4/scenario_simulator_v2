@@ -8,8 +8,9 @@
 
 using namespace lanelet;
 
-template <typename T, typename TT>
-T writeAndLoad(const T& value, TT(LaneletMapLayers::*layer)) {
+template<typename T, typename TT>
+T writeAndLoad(const T & value, TT(LaneletMapLayers::* layer))
+{
   LaneletMap llmap;
   llmap.add(value);
 
@@ -22,7 +23,7 @@ T writeAndLoad(const T& value, TT(LaneletMapLayers::*layer)) {
   auto loadedMap = parser.fromOsmFile(*file, errsLoad);
   EXPECT_TRUE(errsWrite.empty());
   EXPECT_TRUE(errsLoad.empty());
-  auto& valueLayer = llmap.*layer;
+  auto & valueLayer = llmap.*layer;
   EXPECT_EQ(1ul, valueLayer.size());
   return valueLayer.get(utils::getId(value));
 }
@@ -31,16 +32,17 @@ TEST(OsmHandler, writeAndLoadMapWithOneLanelet) {  // NOLINT
   auto num = 1;
   Lanelet llt = test_setup::setUpLanelet(num);
   auto genRegelem = test_setup::setUpGenericRegulatoryElement(num);
-  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genRegelem)->addParameter("lanelet", llt);
+  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genRegelem)->addParameter("lanelet",
+    llt);
   llt.addRegulatoryElement(genRegelem);
   auto lltLoad = writeAndLoad(llt, &LaneletMap::laneletLayer);
   EXPECT_EQ(llt.inverted(), lltLoad.inverted());
   EXPECT_EQ(*llt.constData(), *lltLoad.constData());
   EXPECT_EQ(lltLoad.regulatoryElementsAs<GenericRegulatoryElement>()
-                .front()
-                ->getParameters<lanelet::ConstLanelet>("lanelet")
-                .front(),
-            lltLoad);
+    .front()
+    ->getParameters<lanelet::ConstLanelet>("lanelet")
+    .front(),
+    lltLoad);
 }
 
 TEST(OsmHandler, writeAndLoadMapWithCenterlineLanelet) {  // NOLINT
@@ -65,22 +67,24 @@ TEST(OsmHandler, writeAndLoadMapWithOneArea) {  // NOLINT
   auto num = 1;
   auto ar = test_setup::setUpArea(num);
   auto genRegelem = test_setup::setUpGenericRegulatoryElement(num);
-  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genRegelem)->addParameter("area", ar);
+  std::dynamic_pointer_cast<lanelet::GenericRegulatoryElement>(genRegelem)->addParameter("area",
+    ar);
   ar.addRegulatoryElement(genRegelem);
   auto arLoad = writeAndLoad(ar, &LaneletMap::areaLayer);
   EXPECT_EQ(*ar.constData(), *arLoad.constData());
   EXPECT_EQ(arLoad.regulatoryElementsAs<GenericRegulatoryElement>()
-                .front()
-                ->getParameters<lanelet::ConstArea>("area")
-                .front(),
-            arLoad);
+    .front()
+    ->getParameters<lanelet::ConstArea>("area")
+    .front(),
+    arLoad);
 }
 
 TEST(OsmHandler, writeAndLoadMapWithRegElem) {  // NOLINT
   auto map = std::make_unique<lanelet::LaneletMap>();
   auto num = 1;
   auto regElem = test_setup::setUpRegulatoryElement(num);
-  auto rLoad = writeAndLoad(lanelet::RegulatoryElementPtr(regElem), &LaneletMap::regulatoryElementLayer);
+  auto rLoad = writeAndLoad(lanelet::RegulatoryElementPtr(
+        regElem), &LaneletMap::regulatoryElementLayer);
   EXPECT_EQ(*regElem->constData(), *rLoad->constData());
 }
 

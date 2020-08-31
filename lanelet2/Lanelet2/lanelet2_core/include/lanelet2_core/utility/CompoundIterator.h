@@ -3,8 +3,10 @@
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <iostream>
 
-namespace lanelet {
-namespace internal {
+namespace lanelet
+{
+namespace internal
+{
 
 /**
  * @brief This iterator iterates over a container of containers as if it was one
@@ -15,45 +17,50 @@ namespace internal {
  *
  * The iterator is only bidirectional, i.e. it allows no random access in O(0).
  */
-template <typename ContainerT>
+template<typename ContainerT>
 class UniqueCompoundIterator
-    : public boost::iterator_facade<UniqueCompoundIterator<ContainerT>,
-                                    std::remove_reference_t<decltype(*ContainerT().begin()->begin())>,
-                                    std::random_access_iterator_tag> {
+  : public boost::iterator_facade<UniqueCompoundIterator<ContainerT>,
+    std::remove_reference_t<decltype(*ContainerT().begin()->begin())>,
+    std::random_access_iterator_tag>
+{
   using Base = boost::iterator_facade<UniqueCompoundIterator<ContainerT>,
-                                      std::remove_reference_t<decltype(*ContainerT().begin()->begin())>,
-                                      std::random_access_iterator_tag>;
+      std::remove_reference_t<decltype(*ContainerT().begin()->begin())>,
+      std::random_access_iterator_tag>;
 
- public:
+public:
   using ItOuter = std::decay_t<decltype(ContainerT().begin())>;
   using ItInner = std::decay_t<decltype(ItOuter()->begin())>;
   UniqueCompoundIterator() = default;
-  static UniqueCompoundIterator begin(ContainerT& c) {
+  static UniqueCompoundIterator begin(ContainerT & c)
+  {
     auto itBegin = firstNonempty(c);
     if (itBegin != c.end()) {
       return UniqueCompoundIterator(c, itBegin, itBegin->begin());
     }
     return UniqueCompoundIterator(c, itBegin, ItInner());
   }
-  static UniqueCompoundIterator end(ContainerT& c) { return UniqueCompoundIterator(c, c.end(), {}); }
+  static UniqueCompoundIterator end(ContainerT & c) {return UniqueCompoundIterator(c, c.end(), {});}
 
- private:
+private:
   friend class boost::iterator_core_access;
-  UniqueCompoundIterator(ContainerT& c, ItOuter itOuter, ItInner itInner)
-      : c_{&c}, itOuter_{itOuter}, itInner_{itInner} {}
-  static ItOuter firstNonempty(ContainerT& c) {
-    return std::find_if(c.begin(), c.end(), [](auto& c) { return !c.empty(); });
+  UniqueCompoundIterator(ContainerT & c, ItOuter itOuter, ItInner itInner)
+  : c_{&c}, itOuter_{itOuter}, itInner_{itInner} {}
+  static ItOuter firstNonempty(ContainerT & c)
+  {
+    return std::find_if(c.begin(), c.end(), [](auto & c) {return !c.empty();});
   }
 
-  void increment() {
-    auto& old = *(*this);
+  void increment()
+  {
+    auto & old = *(*this);
     auto endIt = end(*c_);
     do {
       incrementOne();
     } while ((*this) != endIt && old == *(*this));
   }
 
-  void decrement() {
+  void decrement()
+  {
     decrementOne();
     const auto startIt = begin(*c_);
     if (*this == startIt) {
@@ -70,7 +77,8 @@ class UniqueCompoundIterator
     *this = next;
   }
 
-  void incrementOne() {
+  void incrementOne()
+  {
     if (itOuter_->end() == std::next(itInner_)) {
       do {
         ++itOuter_;
@@ -85,7 +93,8 @@ class UniqueCompoundIterator
     }
   }
 
-  void decrementOne() {
+  void decrementOne()
+  {
     if (itOuter_ == c_->end() || itInner_ == itOuter_->begin()) {
       const auto begin = firstNonempty(*c_);
       do {
@@ -97,7 +106,8 @@ class UniqueCompoundIterator
     }
   }
 
-  void advance(typename Base::difference_type d) {
+  void advance(typename Base::difference_type d)
+  {
     if (d > 0) {
       for (; d != 0; d--) {
         increment();
@@ -109,8 +119,10 @@ class UniqueCompoundIterator
     }
   }
 
-  typename Base::difference_type distance_to(  // NOLINT
-      UniqueCompoundIterator other) const {
+  typename Base::difference_type distance_to(
+    // NOLINT
+    UniqueCompoundIterator other) const
+  {
     typename Base::difference_type d{};
     auto cp = *this;
     if (other.itOuter_ > itOuter_ || (other.itOuter_ == itOuter_ && other.itInner_ > itInner_)) {
@@ -127,11 +139,14 @@ class UniqueCompoundIterator
     return d;
   }
 
-  bool equal(UniqueCompoundIterator other) const { return itOuter_ == other.itOuter_ && itInner_ == other.itInner_; }
+  bool equal(UniqueCompoundIterator other) const
+  {
+    return itOuter_ == other.itOuter_ && itInner_ == other.itInner_;
+  }
 
-  decltype(auto) dereference() const { return *itInner_; }
+  decltype(auto) dereference() const {return *itInner_;}
 
-  ContainerT* c_{nullptr};
+  ContainerT * c_{nullptr};
   ItOuter itOuter_;
   ItInner itInner_;
 };

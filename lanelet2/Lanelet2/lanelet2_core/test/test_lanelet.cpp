@@ -9,25 +9,32 @@
 using namespace std::literals;
 using namespace lanelet;
 
-Lanelet bufferLanelet(Lanelet llt, double z) {
-  auto bufferPoints = [&llt, z](const auto& elem) {
-    return Point3d(llt.id() + elem.id(), elem.x(), elem.y(), elem.z() + z);
-  };
-  LineString3d left(llt.id() + llt.leftBound().id(), utils::transform(llt.leftBound(), bufferPoints));
-  LineString3d right(llt.id() + llt.rightBound().id(), utils::transform(llt.rightBound(), bufferPoints));
+Lanelet bufferLanelet(Lanelet llt, double z)
+{
+  auto bufferPoints = [&llt, z](const auto & elem) {
+      return Point3d(llt.id() + elem.id(), elem.x(), elem.y(), elem.z() + z);
+    };
+  LineString3d left(llt.id() + llt.leftBound().id(),
+    utils::transform(llt.leftBound(), bufferPoints));
+  LineString3d right(llt.id() + llt.rightBound().id(),
+    utils::transform(llt.rightBound(), bufferPoints));
   return Lanelet(llt.id(), left, right);
-};
+}
 
-void testHasIntersection(const ConstHybridLineString2d& ls, const ConstHybridLineString2d& lsRef) {
+void testHasIntersection(const ConstHybridLineString2d & ls, const ConstHybridLineString2d & lsRef)
+{
   Points2d intersectionPts;
   boost::geometry::intersection(ls, lsRef, intersectionPts);
-  for (auto& pt : intersectionPts) {
-    EXPECT_TRUE(geometry::distance(pt, lsRef.front()) < 0.01 || geometry::distance(pt, lsRef.back()) < 0.01);
+  for (auto & pt : intersectionPts) {
+    EXPECT_TRUE(geometry::distance(pt, lsRef.front()) < 0.01 || geometry::distance(pt,
+      lsRef.back()) < 0.01);
   }
 }
 
-void testCenterline(const ConstLineString3d& centerline, const ConstLineString3d& leftBound,
-                    const ConstLineString3d& rightBound) {
+void testCenterline(
+  const ConstLineString3d & centerline, const ConstLineString3d & leftBound,
+  const ConstLineString3d & rightBound)
+{
   EXPECT_GE(centerline.size(), 2ul);
   ConstHybridLineString2d lb(leftBound);
   ConstHybridLineString2d rb(rightBound);
@@ -36,9 +43,11 @@ void testCenterline(const ConstLineString3d& centerline, const ConstLineString3d
   testHasIntersection(c, rb);
 }
 
-class LaneletTest : public ::testing::Test {
- protected:
-  void SetUp() override {
+class LaneletTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
     id = 0;
     p1 = Point3d(++id, 0., 1., 1.);
     p2 = Point3d(++id, 1., 1., 1.);
@@ -57,7 +66,7 @@ class LaneletTest : public ::testing::Test {
     constRitterLanelet = ritterLanelet;
   }
 
- public:
+public:
   Id id{1};
   Point3d p1, p2, p3, p4, p5, p6, p7, p8, p9;
   LineString3d left, right, other, outside;
@@ -203,7 +212,8 @@ TEST_F(LaneletTest, intersects3d) {  // NOLINT
   EXPECT_TRUE(intersects3d(ritterLanelet, bufferLanelet(ritterLanelet, 0), 1.));
   EXPECT_FALSE(intersects3d(ritterLanelet, bufferLanelet(ritterLanelet, 2), 1.));
   EXPECT_FALSE(intersects3d(ritterLanelet, bufferLanelet(ritterLanelet, -2), 1.));
-  EXPECT_TRUE(intersects3d(bufferLanelet(ritterLanelet, -100), bufferLanelet(ritterLanelet, -101), 3.));
+  EXPECT_TRUE(intersects3d(bufferLanelet(ritterLanelet, -100), bufferLanelet(ritterLanelet, -101),
+    3.));
   EXPECT_FALSE(intersects3d(lanelet1, lanelet2));
   EXPECT_TRUE(intersects3d(ritterLanelet, lanelet2, 3));
 }
@@ -228,7 +238,8 @@ TEST_F(LaneletTest, distance) {  // NOLINT
   EXPECT_DOUBLE_EQ(0., geometry::distance2d(constRitterLanelet, Point2d(InvalId, 0, 0)));
   EXPECT_DOUBLE_EQ(1., geometry::distance2d(constRitterLanelet, Point2d(InvalId, -1, 0)));
   EXPECT_DOUBLE_EQ(std::sqrt(.5), geometry::distanceToCenterline3d(constRitterLanelet, p1));
-  EXPECT_DOUBLE_EQ(0.5, geometry::distanceToCenterline2d(constRitterLanelet, Point2d(InvalId, 0, 0)));
+  EXPECT_DOUBLE_EQ(0.5,
+    geometry::distanceToCenterline2d(constRitterLanelet, Point2d(InvalId, 0, 0)));
 }
 
 TEST_F(LaneletTest, comparison) {  // NOLINT
@@ -273,7 +284,8 @@ TEST(LaneletBasic, emptyLanelet) {  // NOLINT
   EXPECT_EQ(empty.centerline().size(), 0ul);
 }
 
-Lanelet buildComplexTestCase() {
+Lanelet buildComplexTestCase()
+{
   /*
    * Shape looks roughly like this:
    *  |  |\    /| |
@@ -298,7 +310,8 @@ Lanelet buildComplexTestCase() {
   return lanelet;
 }
 
-Lanelet buildLinearTestCase(size_t numPoints) {
+Lanelet buildLinearTestCase(size_t numPoints)
+{
   Id id{1};
   LineString3d left(++id);
   LineString3d right(++id);
@@ -309,7 +322,8 @@ Lanelet buildLinearTestCase(size_t numPoints) {
   return Lanelet(++id, left, right);
 }
 
-Lanelet buildTouchingTestCase(bool inverted) {
+Lanelet buildTouchingTestCase(bool inverted)
+{
   /*
    * Shape:
    * \__

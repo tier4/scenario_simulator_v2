@@ -9,8 +9,10 @@
 #include "lanelet2_routing/LaneletPath.h"
 #include "lanelet2_routing/Types.h"
 
-namespace lanelet {
-namespace routing {
+namespace lanelet
+{
+namespace routing
+{
 
 /** @brief The famous route object that marks a route from A to B.
  *
@@ -31,22 +33,24 @@ namespace routing {
  * - Routes can also be circular (e.g. if start and end lanelet are the same). The "last" lanelet of the route will then
  * have the first lanelet of the route as successor.
  * */
-class Route {
- public:
+class Route
+{
+public:
   using Errors = std::vector<std::string>;
   Route();
-  Route(const Route& other) = delete;
-  Route& operator=(const Route& other) = delete;
-  Route& operator=(Route&& other) noexcept;
-  Route(Route&& other) noexcept;
+  Route(const Route & other) = delete;
+  Route & operator=(const Route & other) = delete;
+  Route & operator=(Route && other) noexcept;
+  Route(Route && other) noexcept;
   ~Route() noexcept;
 
   //! Constructs a route. Not supposed to be called directly. Use RoutingGraph to obtain routes.
-  Route(LaneletPath shortestPath, std::unique_ptr<internal::RouteGraph> graph,
-        LaneletSubmapConstPtr laneletSubmap) noexcept;
+  Route(
+    LaneletPath shortestPath, std::unique_ptr<internal::RouteGraph> graph,
+    LaneletSubmapConstPtr laneletSubmap) noexcept;
 
   /** @brief Returns the shortest path that was the base of this route */
-  inline const LaneletPath& shortestPath() const noexcept { return shortestPath_; }
+  inline const LaneletPath & shortestPath() const noexcept {return shortestPath_;}
 
   /**
    * @brief Obtains the remaining shortest path to the destination. If the route is circular, the result will always
@@ -54,7 +58,7 @@ class Route {
    * @param ll a lanelet on the shortest path
    * @return shortest path where lanelet is the first element. Nothing if the lanelet is not on the shortest path.
    */
-  LaneletPath remainingShortestPath(const ConstLanelet& ll) const;
+  LaneletPath remainingShortestPath(const ConstLanelet & ll) const;
 
   /** @brief Returns the complete lane a Lanelet belongs to. Circular lanes will always have 'll' as the first element.
    *  @param ll Lanelet to get lane for
@@ -62,12 +66,12 @@ class Route {
    *
    * If
    */
-  LaneletSequence fullLane(const ConstLanelet& ll) const;
+  LaneletSequence fullLane(const ConstLanelet & ll) const;
 
   /** @brief Returns that remaining lane a Lanelet belongs to
    *  @param ll Lanelet to get remaining lane for
    *  @return All remaining lanelets of that lane. Nothing if Lanelet is not part of the route.*/
-  LaneletSequence remainingLane(const ConstLanelet& ll) const;
+  LaneletSequence remainingLane(const ConstLanelet & ll) const;
 
   /** @brief Get the 2d length of the shortest path of this route */
   double length2d() const;
@@ -81,7 +85,7 @@ class Route {
    *  Can be used to do spatial lookups like 'which Lanelets of the route are close to my position'. It does not contain
    * anything beyond that, no points, linestrings, etc.
    */
-  inline LaneletSubmapConstPtr laneletSubmap() const noexcept { return laneletSubmap_; }
+  inline LaneletSubmapConstPtr laneletSubmap() const noexcept {return laneletSubmap_;}
 
   /** @brief A LaneletMap with all lanelets that are part of the route and those referenced by regelems.
    *  @return A laneletMap with all lanelets of the route, excluding regulatory elements.
@@ -92,8 +96,10 @@ class Route {
    * Due to this behaviour that the map can contain lanelets that are not on the route, this function is deprecated.
    * laneletSubmap() only returns lanelets on the map. To get the old behaviour use laneletSubmap()->laneletMap().
    */
-  [[deprecated("Use laneletSubmap() to obtain a view on the elements within this route")]] inline LaneletMapConstPtr
-  laneletMap() const noexcept {
+  [[deprecated("Use laneletSubmap() to obtain a view on the elements within this route")]] inline
+  LaneletMapConstPtr
+  laneletMap() const noexcept
+  {
     return laneletSubmap_->laneletMap();
   }
 
@@ -113,20 +119,20 @@ class Route {
    * @return Relations to following lanelets in the route. Nothing if 'lanelet' is not part of the route. The relation
    * will always be "succesor"
    */
-  LaneletRelations followingRelations(const ConstLanelet& lanelet) const;
+  LaneletRelations followingRelations(const ConstLanelet & lanelet) const;
 
   //! Similar to followingRelations but directly provides the following lanelets within the Route
-  ConstLanelets following(const ConstLanelet& lanelet) const;
+  ConstLanelets following(const ConstLanelet & lanelet) const;
 
   /** @brief Provides information of the previous lanelets within the Route
    *  @param lanelet Lanelet to get information about.
    * @return Relations to previous lanelets in the route. Nothing if 'lanelet' is not part of the route. The type
    * will always be "successor".
    */
-  LaneletRelations previousRelations(const ConstLanelet& lanelet) const;
+  LaneletRelations previousRelations(const ConstLanelet & lanelet) const;
 
   //! Similar to followingRelations but directly provides the following lanelets within the Route
-  ConstLanelets previous(const ConstLanelet& lanelet) const;
+  ConstLanelets previous(const ConstLanelet & lanelet) const;
 
   /** @brief Provides information of the lanelet left of a given lanelet within the Route
    *  @note The returned lanelet can include a lanelet that can be switched or not-switched to. The relation will be
@@ -134,7 +140,7 @@ class Route {
    *  @param lanelet Lanelet to get information about.
    * @return Relation to lanelet left of the input lanelet in the route. Nothing if 'lanelet' is not part of the
    * route.*/
-  Optional<LaneletRelation> leftRelation(const ConstLanelet& lanelet) const;
+  Optional<LaneletRelation> leftRelation(const ConstLanelet & lanelet) const;
 
   /** @brief Provides information of the *all* lanelets left of a given lanelet within the Route.
    *  @note The returned lanelets include lanelets that can be switched or not-switched to. The relations will be
@@ -142,7 +148,7 @@ class Route {
    *  @param lanelet Lanelet to get information about.
    * @return Relations to lanelets left of the input lanelet in the route. Nothing if 'lanelet' is not part of the
    * route.*/
-  LaneletRelations leftRelations(const ConstLanelet& lanelet) const;
+  LaneletRelations leftRelations(const ConstLanelet & lanelet) const;
 
   /** @brief Provides information of the lanelet right of a given lanelet within the Route
    *  @note The returned lanelet can include a lanelet that can be switched or not-switched to. The relation will be
@@ -150,7 +156,7 @@ class Route {
    *  @param lanelet Lanelet to get information about.
    * @return Relation to lanelet right of the input lanelet in the route. Nothing if 'lanelet' is not part of the
    * route.*/
-  Optional<LaneletRelation> rightRelation(const ConstLanelet& lanelet) const;
+  Optional<LaneletRelation> rightRelation(const ConstLanelet & lanelet) const;
 
   /** @brief Provides information of the *all* lanelets right of a given lanelet within the Route.
    *  @note The returned lanelets include lanelets that can be switched or not-switched to. The relations will be
@@ -158,21 +164,21 @@ class Route {
    *  @param lanelet Lanelet to get information about.
    * @return Relations to lanelets right of the input lanelet in the route. Nothing if 'lanelet' is not part of the
    * route.*/
-  LaneletRelations rightRelations(const ConstLanelet& lanelet) const;
+  LaneletRelations rightRelations(const ConstLanelet & lanelet) const;
 
   //! Can be used to search the route object with a custom function that is called for the successors of lanelet.
   //! This function works similar to RoutingGraph::forEachSuccessor. Which costs and whether lane changes are used to
   //! determine the shortest path depends on the cost id that was used to create this route object.
-  void forEachSuccessor(const ConstLanelet& lanelet, const LaneletVisitFunction& f) const;
+  void forEachSuccessor(const ConstLanelet & lanelet, const LaneletVisitFunction & f) const;
 
   //! Similar to forEachSuccessor but goes backwards in the routing graph instead of forwards.
-  void forEachPredecessor(const ConstLanelet& lanelet, const LaneletVisitFunction& f) const;
+  void forEachPredecessor(const ConstLanelet & lanelet, const LaneletVisitFunction & f) const;
 
   /** @brief Information about conflicting lanelets of a lanelet within the route
    *  @param lanelet Lanelet to find conflicting lanelets to
    *  @return Vector of conflicting lanelets. Empty vector if input lanelet is not part of the route.
    *  @see conflictingInMap */
-  ConstLanelets conflictingInRoute(const ConstLanelet& lanelet) const;
+  ConstLanelets conflictingInRoute(const ConstLanelet & lanelet) const;
 
   /** @brief Information about conflicting lanelets of a lanelet within all passable lanelets in the laneletMap
    *  @param lanelet Lanelet to find conflicting lanelets to
@@ -180,7 +186,7 @@ class Route {
    * also conflicting in route are returned as well.
    *  @see conflictingInRoute
    */
-  ConstLaneletOrAreas conflictingInMap(const ConstLanelet& lanelet) const;
+  ConstLaneletOrAreas conflictingInMap(const ConstLanelet & lanelet) const;
 
   /**
    * @brief Provides all lanelets in the map that conflict with any lanelet in the route.
@@ -188,7 +194,7 @@ class Route {
   ConstLaneletOrAreas allConflictingInMap() const;
 
   //! Checks if a specific lanelet is part of the route
-  bool contains(const ConstLanelet& lanelet) const;
+  bool contains(const ConstLanelet & lanelet) const;
 
   /** @brief Perform some sanity checks on the route
    *  @param throwOnError Throw or not-throw an exception if errors are found
@@ -196,10 +202,10 @@ class Route {
    *  @return Vector of errors if no-throw is chosen and errors are found */
   Errors checkValidity(bool throwOnError = false) const;
 
- private:
+private:
   std::unique_ptr<internal::RouteGraph> graph_;  ///< The internal graph
   LaneletPath shortestPath_;                     ///< The underlying shortest path used to create the route
   LaneletSubmapConstPtr laneletSubmap_;          ///< LaneletSubmap with all lanelets that are part of the route
 };
-};  // namespace routing
-};  // namespace lanelet
+}   // namespace routing
+}   // namespace lanelet

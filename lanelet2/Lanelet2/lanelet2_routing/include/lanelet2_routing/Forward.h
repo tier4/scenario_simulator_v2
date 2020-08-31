@@ -6,13 +6,16 @@
 #include <unordered_map>
 #include <vector>
 
-namespace lanelet {
-namespace routing {
-namespace internal {
+namespace lanelet
+{
+namespace routing
+{
+namespace internal
+{
 
 using IdPair = std::pair<Id, Id>;
 
-template <typename BaseGraphT>
+template<typename BaseGraphT>
 class Graph;
 
 class RoutingGraphGraph;
@@ -52,7 +55,8 @@ using LaneletOrAreaPaths = std::vector<LaneletOrAreaPath>;
 //!
 //! @note The relation between b and a is different than between a and b. There is also no obvious
 //! symmetry. When a is left of b, b can be either right or adjacent right to b.
-enum class RelationType : uint8_t {
+enum class RelationType : uint8_t
+{
   None = 0,                 //!< No relation
   Successor = 0b1,          //!< A (the only) direct, reachable successor. Not merging and not diverging.
   Left = 0b10,              //!< (the only) directly adjacent, reachable left neighbour
@@ -65,21 +69,24 @@ enum class RelationType : uint8_t {
 
 using RelationUnderlyingType = std::underlying_type_t<RelationType>;
 
-constexpr RelationType allRelations() { return static_cast<RelationType>(0b1111111); }
+constexpr RelationType allRelations() {return static_cast<RelationType>(0b1111111);}
 static_assert(allRelations() > RelationType::Area, "allRelations is wrong!");
 
-constexpr RelationType operator~(RelationType r) { return RelationType(~RelationUnderlyingType(r)); }
-constexpr RelationType operator&(RelationType r1, RelationType r2) {
+constexpr RelationType operator~(RelationType r) {return RelationType(~RelationUnderlyingType(r));}
+constexpr RelationType operator&(RelationType r1, RelationType r2)
+{
   return RelationType(RelationUnderlyingType(r1) & RelationUnderlyingType(r2));
 }
-constexpr RelationType operator&=(RelationType& r1, RelationType r2) { return r1 = r1 & r2; }
-constexpr RelationType operator|(RelationType r1, RelationType r2) {
+constexpr RelationType operator&=(RelationType & r1, RelationType r2) {return r1 = r1 & r2;}
+constexpr RelationType operator|(RelationType r1, RelationType r2)
+{
   return RelationType(std::underlying_type_t<RelationType>(r1) | RelationUnderlyingType(r2));
 }
-constexpr RelationType operator|=(RelationType& r1, RelationType r2) { return r1 = r1 | r2; }
+constexpr RelationType operator|=(RelationType & r1, RelationType r2) {return r1 = r1 | r2;}
 
 // Used for graph export
-inline std::string relationToString(RelationType type) {
+inline std::string relationToString(RelationType type)
+{
   switch (type) {
     case RelationType::None:
       return "None";
@@ -101,7 +108,8 @@ inline std::string relationToString(RelationType type) {
   return "";  // some compilers need that
 }
 
-inline std::string relationToColor(RelationType type) {
+inline std::string relationToColor(RelationType type)
+{
   switch (type) {
     case RelationType::None:
       return "";

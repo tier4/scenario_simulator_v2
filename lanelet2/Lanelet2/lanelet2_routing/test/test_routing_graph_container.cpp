@@ -9,9 +9,11 @@ using namespace lanelet;
 using namespace lanelet::routing;
 using namespace lanelet::routing::tests;
 
-class RoutingGraphContainerTest : public RoutingGraphTest {
- public:
-  RoutingGraphContainerTest() {
+class RoutingGraphContainerTest : public RoutingGraphTest
+{
+public:
+  RoutingGraphContainerTest()
+  {
     std::vector<RoutingGraphConstPtr> graphs{testData.vehicleGraph, testData.pedestrianGraph};
     container = std::make_unique<RoutingGraphContainer>(graphs);
   }
@@ -19,12 +21,18 @@ class RoutingGraphContainerTest : public RoutingGraphTest {
   RoutingGraphContainerUPtr container;
 };
 
-class RouteRoutingGraphContainerTest : public RoutingGraphContainerTest {
- public:
-  void getAndCheckRoute(const RoutingGraphConstPtr& graph, Id from, Id to, routing::RoutingCostId routingCostId = 0) {
-    ASSERT_NE(graph->passableSubmap()->laneletLayer.find(from), graph->passableSubmap()->laneletLayer.end());
+class RouteRoutingGraphContainerTest : public RoutingGraphContainerTest
+{
+public:
+  void getAndCheckRoute(
+    const RoutingGraphConstPtr & graph, Id from, Id to,
+    routing::RoutingCostId routingCostId = 0)
+  {
+    ASSERT_NE(graph->passableSubmap()->laneletLayer.find(from),
+      graph->passableSubmap()->laneletLayer.end());
     ConstLanelet fromLanelet{*graph->passableSubmap()->laneletLayer.find(from)};
-    ASSERT_NE(graph->passableSubmap()->laneletLayer.find(to), graph->passableSubmap()->laneletLayer.end());
+    ASSERT_NE(graph->passableSubmap()->laneletLayer.find(to),
+      graph->passableSubmap()->laneletLayer.end());
     ConstLanelet toLanelet{*graph->passableSubmap()->laneletLayer.find(to)};
     Optional<Route> tempRoute = graph->getRoute(fromLanelet, toLanelet, routingCostId);
     ASSERT_TRUE(!!tempRoute);
@@ -68,7 +76,8 @@ TEST_F(RouteRoutingGraphContainerTest, ConflictingOfRouteInGraph) {  // NOLINT
 
 TEST_F(RouteRoutingGraphContainerTest, ConflictingOfRouteInGraphs) {  // NOLINT
   getAndCheckRoute(container->routingGraphs()[0], 2017, 2024);
-  RoutingGraphContainer::ConflictingInGraphs result{container->conflictingOfRouteInGraphs(route.get(), 0)};
+  RoutingGraphContainer::ConflictingInGraphs result{container->conflictingOfRouteInGraphs(
+      route.get(), 0)};
   ASSERT_EQ(result.size(), 2ul);
 
   ConstLanelets conflictingVehicle{result[0].second};

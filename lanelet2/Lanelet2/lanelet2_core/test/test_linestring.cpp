@@ -3,9 +3,11 @@
 #include "lanelet2_core/primitives/LineString.h"
 using namespace lanelet;
 
-class LineStringPoints : public ::testing::Test {
- protected:
-  void SetUp() override {
+class LineStringPoints : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
     Id id{1};
     p11 = Point3d(++id, 0., 0., 0.);
     p12 = Point3d(++id, 0., 1., 0.);
@@ -19,18 +21,20 @@ class LineStringPoints : public ::testing::Test {
     p43 = Point3d(++id, 1, 1. + sqrt(3) / 3., 0.);
   }
 
- public:
+public:
   Point3d p11, p12, p13;
   Point3d p21, p22, p23;
   Point3d p31, p32, p33;
   Point3d p43;
 };
 
-template <typename T>
-class Point2dTypeTest : public ::testing::Test {
- protected:
+template<typename T>
+class Point2dTypeTest : public ::testing::Test
+{
+protected:
   using Point2dT = T;
-  void SetUp() override {
+  void SetUp() override
+  {
     Id id{1};
     p1 = Point2d(++id, 1., 0., 0.);
     p2 = Point2d(++id, 0., 1., 0.);
@@ -38,33 +42,38 @@ class Point2dTypeTest : public ::testing::Test {
     p4 = Point2d(++id, 0., 1., 0.);
   }
 
- public:
+public:
   Point2dT p1, p2, p3, p4;
 };
 
-template <typename T>
-class LineStringTypeTest : public LineStringPoints {
- protected:
+template<typename T>
+class LineStringTypeTest : public LineStringPoints
+{
+protected:
   using LineStringT = T;
-  void SetUp() override {
+  void SetUp() override
+  {
     LineStringPoints::SetUp();
     Id id{10};
     ls1 =
-        LineStringT(++id, {p11, p12, p13}, AttributeMap{{AttributeNamesString::Type, AttributeValueString::Curbstone}});
+      LineStringT(++id, {p11, p12, p13}, AttributeMap{{AttributeNamesString::Type,
+          AttributeValueString::Curbstone}});
     ls2 = LineStringT(++id, {p21, p22, p23});
     ls3 = LineStringT(++id, {p31, p32, p33});
     ls4 = LineStringT(++id, {p11, p12, p43});
   }
 
- public:
+public:
   LineStringT ls1, ls2, ls3, ls4;
 };
 
-template <typename T>
-class CompoundLineStringTypeTest : public LineStringPoints {
- protected:
+template<typename T>
+class CompoundLineStringTypeTest : public LineStringPoints
+{
+protected:
   using LineStringT = T;
-  void SetUp() override {
+  void SetUp() override
+  {
     LineStringPoints::SetUp();
     Id id{10};
     LineString3d tempLs1 = LineString3d{++id, {p11, p12}};
@@ -78,76 +87,93 @@ class CompoundLineStringTypeTest : public LineStringPoints {
     ls4 = LineStringT({tempLs1, tempLs5});
   }
 
- public:
+public:
   LineStringT ls1, ls2, ls3, ls4;
 };
 
-template <typename T>
-auto getZ(const T& p) -> std::enable_if_t<!traits::is2D<T>(), double> {
+template<typename T>
+auto getZ(const T & p)->std::enable_if_t<!traits::is2D<T>(), double>
+{
   return p.z();
 }
-template <typename T>
-auto getZ(const T & /*p*/) -> std::enable_if_t<traits::is2D<T>(), double> {
+template<typename T>
+auto getZ(const T & /*p*/)->std::enable_if_t<traits::is2D<T>(), double>
+{
   return 0.;
 }
 
-template <>
-class LineStringTypeTest<CompoundLineString2d> : public CompoundLineStringTypeTest<CompoundLineString2d> {};
+template<>
+class LineStringTypeTest<CompoundLineString2d>: public CompoundLineStringTypeTest<CompoundLineString2d>
+{
+};
 
-template <>
-class LineStringTypeTest<CompoundLineString3d> : public CompoundLineStringTypeTest<CompoundLineString3d> {};
+template<>
+class LineStringTypeTest<CompoundLineString3d>: public CompoundLineStringTypeTest<CompoundLineString3d>
+{
+};
 
-template <>
-class LineStringTypeTest<CompoundHybridLineString2d> : public CompoundLineStringTypeTest<CompoundHybridLineString2d> {};
+template<>
+class LineStringTypeTest<CompoundHybridLineString2d>: public CompoundLineStringTypeTest<CompoundHybridLineString2d>
+{
+};
 
-template <>
-class LineStringTypeTest<CompoundHybridLineString3d> : public CompoundLineStringTypeTest<CompoundHybridLineString3d> {};
+template<>
+class LineStringTypeTest<CompoundHybridLineString3d>: public CompoundLineStringTypeTest<CompoundHybridLineString3d>
+{
+};
 
-template <typename T>
+template<typename T>
 class AllLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class NormalLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class MutableLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class PrimitiveLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class NonHybridLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class HybridLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class ThreeDLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class TwoDLineStringsTest : public LineStringTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class TwoDPointsTest : public Point2dTypeTest<T> {};
 
-template <typename T>
+template<typename T>
 class BasicLineStringsTest : public LineStringTypeTest<T> {};
 using TwoDPoints = testing::Types<BasicPoint2d, Point2d, ConstPoint2d>;
-using AllLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d, ConstLineString3d,
-                                      ConstHybridLineString2d, ConstHybridLineString3d, CompoundLineString2d,
-                                      CompoundLineString3d, CompoundHybridLineString2d, CompoundHybridLineString3d>;
-using NormalLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d, ConstLineString3d>;
-using ThreeDLineStrings = testing::Types<LineString3d, ConstLineString3d, ConstHybridLineString3d, CompoundLineString3d,
-                                         CompoundHybridLineString3d>;
-using TwoDLineStrings = testing::Types<LineString2d, ConstLineString2d, ConstHybridLineString2d, CompoundLineString2d,
-                                       CompoundHybridLineString2d>;
+using AllLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d,
+    ConstLineString3d,
+    ConstHybridLineString2d, ConstHybridLineString3d, CompoundLineString2d,
+    CompoundLineString3d, CompoundHybridLineString2d, CompoundHybridLineString3d>;
+using NormalLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d,
+    ConstLineString3d>;
+using ThreeDLineStrings = testing::Types<LineString3d, ConstLineString3d, ConstHybridLineString3d,
+    CompoundLineString3d,
+    CompoundHybridLineString3d>;
+using TwoDLineStrings = testing::Types<LineString2d, ConstLineString2d, ConstHybridLineString2d,
+    CompoundLineString2d,
+    CompoundHybridLineString2d>;
 using MutableLineStrings = testing::Types<LineString2d, LineString3d>;
-using PrimitiveLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d, ConstLineString3d,
-                                            ConstHybridLineString2d, ConstHybridLineString3d>;
-using NonHybridLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d, ConstLineString3d,
-                                            CompoundLineString2d, CompoundLineString3d>;
-using HybridLineStrings = testing::Types<ConstHybridLineString2d, ConstHybridLineString3d, CompoundHybridLineString2d,
-                                         CompoundHybridLineString3d>;
+using PrimitiveLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d,
+    ConstLineString3d,
+    ConstHybridLineString2d, ConstHybridLineString3d>;
+using NonHybridLineStrings = testing::Types<LineString2d, LineString3d, ConstLineString2d,
+    ConstLineString3d,
+    CompoundLineString2d, CompoundLineString3d>;
+using HybridLineStrings = testing::Types<ConstHybridLineString2d, ConstHybridLineString3d,
+    CompoundHybridLineString2d,
+    CompoundHybridLineString3d>;
 
 using BasicLineStrings = testing::Types<BasicLineString2d, BasicLineString3d>;
 
@@ -180,7 +206,7 @@ TYPED_TEST(PrimitiveLineStringsTest, constConversion) {  // NOLINT
 }
 
 TYPED_TEST(AllLineStringsTest, iteration) {  // NOLINT
-  auto xs = utils::transform(this->ls1, [](const auto& elem) { return elem.x(); });
+  auto xs = utils::transform(this->ls1, [](const auto & elem) {return elem.x();});
   EXPECT_EQ(3ul, xs.size());
   for (auto x : xs) {
     EXPECT_EQ(0, x);
@@ -189,7 +215,7 @@ TYPED_TEST(AllLineStringsTest, iteration) {  // NOLINT
 
 TYPED_TEST(AllLineStringsTest, invert) {  // NOLINT
   auto invertLs = this->ls1.invert();
-  auto ys = utils::transform(invertLs, [](const auto& elem) { return elem.y(); });
+  auto ys = utils::transform(invertLs, [](const auto & elem) {return elem.y();});
   ASSERT_EQ(3ul, ys.size());
   EXPECT_EQ(0, ys[2]);
   EXPECT_EQ(2, ys[0]);
@@ -275,10 +301,10 @@ TYPED_TEST(AllLineStringsTest, length) {  // NOLINT
 }
 
 TYPED_TEST(MutableLineStringsTest, boostConvert) {  // NOLINT
-  auto equal = [](auto& ls1, auto& ls2) {
-    return std::equal(ls1.begin(), ls1.end(), ls2.begin(), ls2.end(),
-                      [](auto& p1, auto& p2) { return p1.basicPoint() == p2.basicPoint(); });
-  };
+  auto equal = [](auto & ls1, auto & ls2) {
+      return std::equal(ls1.begin(), ls1.end(), ls2.begin(), ls2.end(),
+               [](auto & p1, auto & p2) {return p1.basicPoint() == p2.basicPoint();});
+    };
   typename TypeParam::BasicLineString basicLineString;
   TypeParam convertedLineString;
   auto testLs = this->ls1.invert();
@@ -352,11 +378,12 @@ TYPED_TEST(AllLineStringsTest, segmentsInverse) {  // NOLINT
 
 TYPED_TEST(TwoDPointsTest, checkCurvature) {
   EXPECT_DOUBLE_EQ(1., geometry::curvature2d(this->p1, this->p2, this->p3));
-  EXPECT_DOUBLE_EQ(std::numeric_limits<double>::infinity(), geometry::curvature2d(this->p1, this->p2, this->p4));
+  EXPECT_DOUBLE_EQ(std::numeric_limits<double>::infinity(),
+    geometry::curvature2d(this->p1, this->p2, this->p4));
 }
 
 TYPED_TEST(TwoDLineStringsTest, signedDistance) {  // NOLINT
-  auto isLeft = [this](const BasicPoint2d& p) { return geometry::signedDistance(this->ls2, p) > 0; };
+  auto isLeft = [this](const BasicPoint2d & p) {return geometry::signedDistance(this->ls2, p) > 0;};
   auto d = geometry::signedDistance(this->ls2, BasicPoint2d(2, -1));
   EXPECT_DOUBLE_EQ(-1., d);
   auto d2 = geometry::signedDistance(this->ls2, BasicPoint2d(3, 0.5));
@@ -371,7 +398,7 @@ TYPED_TEST(TwoDLineStringsTest, signedDistance) {  // NOLINT
 }
 
 TYPED_TEST(ThreeDLineStringsTest, signedDistance) {  // NOLINT
-  auto isLeft = [this](const BasicPoint3d& p) { return geometry::signedDistance(this->ls1, p) > 0; };
+  auto isLeft = [this](const BasicPoint3d & p) {return geometry::signedDistance(this->ls1, p) > 0;};
   auto d = geometry::signedDistance(this->ls1, BasicPoint3d(2, 0, 0));
   EXPECT_DOUBLE_EQ(-2., d);
   auto d2 = geometry::signedDistance(this->ls1, BasicPoint3d(-1, 1, 0));
@@ -447,7 +474,8 @@ TYPED_TEST(TwoDLineStringsTest, offset) {
   Point3d p4 = Point3d(++id, 4., 3.);
   LineString3d ls(++id, Points3d{p1, p2, p3, p4});
   auto ap = geometry::offset(utils::to2D(ls), 1.);
-  BasicLineString2d comp({BasicPoint2d(0, 0), BasicPoint2d(0, 2), BasicPoint2d(3, 2), BasicPoint2d(3, 3)});
+  BasicLineString2d comp({BasicPoint2d(0, 0), BasicPoint2d(0, 2), BasicPoint2d(3, 2),
+      BasicPoint2d(3, 3)});
   // required due to numeric approximation errors
   for (size_t i = 0; i < ls.size(); ++i) {
     EXPECT_NEAR(ap[i].x(), comp[i].x(), 1e-9);
@@ -466,16 +494,20 @@ TYPED_TEST(TwoDLineStringsTest, offset) {
   Point3d p19 = Point3d(++id, 2, 1.5);
 
   BasicLineString2d l1{utils::toBasicPoint(utils::to2D(p11)), utils::toBasicPoint(utils::to2D(p12)),
-                       utils::toBasicPoint(utils::to2D(p13))};
+    utils::toBasicPoint(utils::to2D(p13))};
   BasicLineString2d l2{utils::toBasicPoint(utils::to2D(p11)), utils::toBasicPoint(utils::to2D(p12)),
-                       utils::toBasicPoint(utils::to2D(p13a))};
+    utils::toBasicPoint(utils::to2D(p13a))};
   auto lss = geometry::offset(l1, 0.5);
   EXPECT_TRUE(boost::geometry::equals(
-      lss, BasicLineString2d{utils::toBasicPoint(utils::to2D(p14)), BasicPoint2d{0.5, 0.5}, BasicPoint2d{0, 0.5}}));
+      lss,
+      BasicLineString2d{utils::toBasicPoint(utils::to2D(p14)), BasicPoint2d{0.5, 0.5},
+        BasicPoint2d{0, 0.5}}));
   auto lss2 = geometry::offset(l2, 0.5);
   EXPECT_TRUE(boost::geometry::equals(
-      lss2, BasicLineString2d{utils::toBasicPoint(utils::to2D(p14)), utils::toBasicPoint(utils::to2D(p18)),
-                              utils::toBasicPoint(utils::to2D(p19))}));
+      lss2,
+      BasicLineString2d{utils::toBasicPoint(utils::to2D(p14)),
+        utils::toBasicPoint(utils::to2D(p18)),
+        utils::toBasicPoint(utils::to2D(p19))}));
 }
 
 TYPED_TEST(MutableLineStringsTest, closestSegment) {
@@ -495,7 +527,9 @@ TYPED_TEST(MutableLineStringsTest, closestSegment) {
 TYPED_TEST(TwoDLineStringsTest, shiftLateral) {
   EXPECT_EQ(this->ls4.size(), 3ul);
 
-  auto shifted = geometry::internal::shiftLateral(this->ls4, 1, 1., geometry::internal::makeVincinity(this->ls4, 1));
+  auto shifted = geometry::internal::shiftLateral(this->ls4, 1, 1., geometry::internal::makeVincinity(
+        this->ls4,
+        1));
   EXPECT_TRUE(boost::geometry::equals(shifted, BasicPoint2d(-1, 1. + sqrt(3) / 3)));
 }
 

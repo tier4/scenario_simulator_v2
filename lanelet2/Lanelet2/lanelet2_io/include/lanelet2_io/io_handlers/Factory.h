@@ -9,16 +9,19 @@
 #include "lanelet2_io/io_handlers/Parser.h"
 #include "lanelet2_io/io_handlers/Writer.h"
 
-namespace lanelet {
-namespace io_handlers {
+namespace lanelet
+{
+namespace io_handlers
+{
 /**
  * @brief Factory class for all suppored lanelet map parsers
  */
-class ParserFactory {  // NOLINT
- public:
-  using ParserCreationFcn = std::function<Parser*(const Projector&, const io::Configuration&)>;
+class ParserFactory    // NOLINT
+{
+public:
+  using ParserCreationFcn = std::function<Parser *(const Projector &, const io::Configuration &)>;
 
-  static ParserFactory& instance();
+  static ParserFactory & instance();
 
   /**
    * @brief creates a parser that matches the given name.
@@ -28,8 +31,9 @@ class ParserFactory {  // NOLINT
    * @return created parser
    * @throws a lanelet2::UnsupportedIOHandlerError if handler is not registered
    */
-  static Parser::Ptr create(const std::string& parserName, const Projector& projector,
-                            const io::Configuration& config = io::Configuration());
+  static Parser::Ptr create(
+    const std::string & parserName, const Projector & projector,
+    const io::Configuration & config = io::Configuration());
 
   /**
    * @brief creates a matching parser for the given file extension
@@ -40,8 +44,9 @@ class ParserFactory {  // NOLINT
    * @throws a lanelet2::UnsupportedExtensionError if extension is not
    * registered
    */
-  static Parser::Ptr createFromExtension(const std::string& extension, const Projector& projector,
-                                         const io::Configuration& config = io::Configuration());
+  static Parser::Ptr createFromExtension(
+    const std::string & extension, const Projector & projector,
+    const io::Configuration & config = io::Configuration());
 
   /**
    * @brief returns all available parsers as vector
@@ -55,12 +60,13 @@ class ParserFactory {  // NOLINT
    */
   static std::vector<std::string> availableExtensions();
 
-  template <typename T>
+  template<typename T>
   friend class RegisterParser;
 
- private:
-  void registerParser(const std::string& strategy, const std::string& extension,
-                      const ParserCreationFcn& factoryFunction);
+private:
+  void registerParser(
+    const std::string & strategy, const std::string & extension,
+    const ParserCreationFcn & factoryFunction);
 
   ParserFactory() = default;
   std::map<std::string, ParserCreationFcn> registry_;
@@ -70,11 +76,12 @@ class ParserFactory {  // NOLINT
 /**
  * @brief Factory class for all supported lanelet map writers
  */
-class WriterFactory {  // NOLINT
- public:
-  using WriterCreationFcn = std::function<Writer*(const Projector&, const io::Configuration&)>;
+class WriterFactory    // NOLINT
+{
+public:
+  using WriterCreationFcn = std::function<Writer *(const Projector &, const io::Configuration &)>;
 
-  static WriterFactory& instance();
+  static WriterFactory & instance();
 
   /**
    * @brief creates a writer that matches the given name.
@@ -84,8 +91,9 @@ class WriterFactory {  // NOLINT
    * @return created writer
    * @throws a lanelet2::UnsupportedIOHandlerError if handler is not registered
    */
-  static Writer::Ptr create(const std::string& writerName, const Projector& projector,
-                            const io::Configuration& config = io::Configuration());
+  static Writer::Ptr create(
+    const std::string & writerName, const Projector & projector,
+    const io::Configuration & config = io::Configuration());
 
   /**
    * @brief creates a matching writer for the given file extension
@@ -96,8 +104,9 @@ class WriterFactory {  // NOLINT
    * @throws a lanelet2::UnsupportedExtensionError if extension is not
    * registered
    */
-  static Writer::Ptr createFromExtension(const std::string& extension, const Projector& projector,
-                                         const io::Configuration& config = io::Configuration());
+  static Writer::Ptr createFromExtension(
+    const std::string & extension, const Projector & projector,
+    const io::Configuration & config = io::Configuration());
 
   /**
    * @brief returns all available writers as vector
@@ -111,12 +120,13 @@ class WriterFactory {  // NOLINT
    */
   static std::vector<std::string> availableExtensions();
 
-  template <typename T>
+  template<typename T>
   friend class RegisterWriter;
 
- private:
-  void registerWriter(const std::string& strategy, const std::string& extension,
-                      const WriterCreationFcn& factoryFunction);
+private:
+  void registerWriter(
+    const std::string & strategy, const std::string & extension,
+    const WriterCreationFcn & factoryFunction);
 
   WriterFactory() = default;
   std::map<std::string, WriterCreationFcn> registry_;
@@ -129,15 +139,18 @@ class WriterFactory {  // NOLINT
  * Registration might look like this:
  *   static RegisterWriter<Mywriter> register;
  */
-template <class T>
-class RegisterWriter {
- public:
-  RegisterWriter() {
+template<class T>
+class RegisterWriter
+{
+public:
+  RegisterWriter()
+  {
     static_assert(!utils::strequal(T::name(), ""), "You did not overload the name() function!");
     WriterFactory::instance().registerWriter(
-        T::name(), T::extension(), [](const Projector& projector, const io::Configuration& config) -> Writer* {
-          return new T(projector, config);
-        });
+      T::name(), T::extension(), [](const Projector & projector,
+      const io::Configuration & config) -> Writer * {
+        return new T(projector, config);
+      });
   }
 };
 
@@ -147,15 +160,18 @@ class RegisterWriter {
  * Registration might look like this:
  *   static RegisterParser<Myparser> register;
  */
-template <class T>
-class RegisterParser {
- public:
-  RegisterParser() {
+template<class T>
+class RegisterParser
+{
+public:
+  RegisterParser()
+  {
     static_assert(!utils::strequal(T::name(), ""), "You did not overload the name() function!");
     ParserFactory::instance().registerParser(
-        T::name(), T::extension(), [](const Projector& projector, const io::Configuration& config) -> Parser* {
-          return new T(projector, config);
-        });
+      T::name(), T::extension(), [](const Projector & projector,
+      const io::Configuration & config) -> Parser * {
+        return new T(projector, config);
+      });
   }
 };
 }  // namespace io_handlers

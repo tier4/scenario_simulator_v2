@@ -1,21 +1,25 @@
 #pragma once
 #include <lanelet2_io/Projection.h>
 
-namespace lanelet {
-namespace projection {
+namespace lanelet
+{
+namespace projection
+{
 
 //! Implements the usual elliptical mercator projection
 //! This is the same transformation used by liblanelet(1).
-class Mercator : public Projector {
- public:
-  explicit Mercator(const Origin& origin = Origin::defaultOrigin())
-      : Projector(origin), offset_{rawForward(origin.position)} {}
+class Mercator : public Projector
+{
+public:
+  explicit Mercator(const Origin & origin = Origin::defaultOrigin())
+  : Projector(origin), offset_{rawForward(origin.position)} {}
 
-  BasicPoint3d forward(const GPSPoint& pGps) const override { return rawForward(pGps) - offset_; }
-  GPSPoint reverse(const BasicPoint3d& p) const override { return rawReverse(p + offset_); }
+  BasicPoint3d forward(const GPSPoint & pGps) const override {return rawForward(pGps) - offset_;}
+  GPSPoint reverse(const BasicPoint3d & p) const override {return rawReverse(p + offset_);}
 
- private:
-  static BasicPoint3d rawForward(const GPSPoint& p) {
+private:
+  static BasicPoint3d rawForward(const GPSPoint & p)
+  {
     double lat = std::min(89.5, std::max(p.lat, -89.5));
     double phi = lat * M_PI / 180.0;
     double con = Eccent * std::sin(phi);
@@ -25,7 +29,8 @@ class Mercator : public Projector {
     const double x = RMajor * p.lon * M_PI / 180.;
     return {x, y, p.ele};
   }
-  static GPSPoint rawReverse(const BasicPoint3d& p) {
+  static GPSPoint rawReverse(const BasicPoint3d & p)
+  {
     double ts = std::exp(-p.y() / RMajor);
     double phi = M_PI / 2 - 2 * std::atan(ts);
     double dphi = 1.0;

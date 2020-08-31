@@ -4,11 +4,13 @@
 
 #include <stdexcept>
 
-namespace lanelet {
+namespace lanelet
+{
 /**
  * @brief Thrown when an export to the provided file(name) cannot be done.
  */
-class ExportError : public LaneletError {
+class ExportError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 
@@ -16,7 +18,8 @@ class ExportError : public LaneletError {
  * @brief Thrown when an there's an error in the routing graph.
  * It will feature further information.
  */
-class RoutingGraphError : public LaneletError {
+class RoutingGraphError : public LaneletError
+{
   using LaneletError::LaneletError;
 };
 

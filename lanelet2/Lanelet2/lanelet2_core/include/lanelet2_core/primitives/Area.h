@@ -12,7 +12,8 @@
 #include "lanelet2_core/primitives/Primitive.h"
 #include "lanelet2_core/utility/Optional.h"
 
-namespace lanelet {
+namespace lanelet
+{
 //! @defgroup AreaPrimitives Area
 //! @ingroup Primitives
 //!
@@ -39,65 +40,80 @@ using ConstInnerBounds = std::vector<ConstLineStrings3d>;
 
 //! @brief Common data management class for all Area-Typed objects.
 //! @ingroup DataObjects
-class AreaData : public PrimitiveData {
- public:
+class AreaData : public PrimitiveData
+{
+public:
   //! Constructs a new, AreaData object
-  AreaData(Id id, LineStrings3d outerBound, std::vector<LineStrings3d> innerBounds = std::vector<LineStrings3d>(),
-           AttributeMap attributes = AttributeMap(), RegulatoryElementPtrs regulatoryElements = RegulatoryElementPtrs())
-      : PrimitiveData(id, std::move(attributes)),
-        outerBound_{std::move(outerBound)},
-        innerBounds_{std::move(innerBounds)},
-        regulatoryElements_{std::move(regulatoryElements)} {
+  AreaData(
+    Id id, LineStrings3d outerBound,
+    std::vector<LineStrings3d> innerBounds = std::vector<LineStrings3d>(),
+    AttributeMap attributes = AttributeMap(),
+    RegulatoryElementPtrs regulatoryElements = RegulatoryElementPtrs())
+  : PrimitiveData(id, std::move(attributes)),
+    outerBound_{std::move(outerBound)},
+    innerBounds_{std::move(innerBounds)},
+    regulatoryElements_{std::move(regulatoryElements)}
+  {
     resetCache();
   }
 
-  ConstLineStrings3d outerBound() const {
-    return utils::transform(outerBound_, [](const auto& elem) { return ConstLineString3d(elem); });
+  ConstLineStrings3d outerBound() const
+  {
+    return utils::transform(outerBound_, [](const auto & elem) {return ConstLineString3d(elem);});
   }
-  ConstInnerBounds innerBounds() const {
-    return utils::transform(innerBounds_, [](const auto& elem) {
-      return utils::transform(elem, [](const auto& ls) { return ConstLineString3d(ls); });
-    });
+  ConstInnerBounds innerBounds() const
+  {
+    return utils::transform(innerBounds_, [](const auto & elem) {
+               return utils::transform(elem, [](const auto & ls) {return ConstLineString3d(ls);});
+             });
   }
-  const LineStrings3d& outerBound() { return outerBound_; }
-  const InnerBounds& innerBounds() { return innerBounds_; }
+  const LineStrings3d & outerBound() {return outerBound_;}
+  const InnerBounds & innerBounds() {return innerBounds_;}
 
-  const CompoundPolygon3d& outerBoundPolygon() const { return outerBoundPolygon_; }
+  const CompoundPolygon3d & outerBoundPolygon() const {return outerBoundPolygon_;}
 
-  const CompoundPolygons3d& innerBoundPolygons() const { return innerBoundPolygons_; }
+  const CompoundPolygons3d & innerBoundPolygons() const {return innerBoundPolygons_;}
 
-  RegulatoryElementConstPtrs regulatoryElements() const {
-    return utils::transform(regulatoryElements_, [](const auto& elem) { return RegulatoryElementConstPtr(elem); });
+  RegulatoryElementConstPtrs regulatoryElements() const
+  {
+    return utils::transform(regulatoryElements_, [](const auto & elem) {
+               return RegulatoryElementConstPtr(elem);
+             });
   }
-  RegulatoryElementPtrs& regulatoryElements() { return regulatoryElements_; }
+  RegulatoryElementPtrs & regulatoryElements() {return regulatoryElements_;}
 
-  template <typename RegElemT>
-  std::vector<std::shared_ptr<const RegElemT>> regulatoryElementsAs() const {
+  template<typename RegElemT>
+  std::vector<std::shared_ptr<const RegElemT>> regulatoryElementsAs() const
+  {
     return utils::transformSharedPtr<const RegElemT>(regulatoryElements_);
   }
-  template <typename RegElemT>
-  std::vector<std::shared_ptr<RegElemT>> regulatoryElementsAs() {
+  template<typename RegElemT>
+  std::vector<std::shared_ptr<RegElemT>> regulatoryElementsAs()
+  {
     return utils::transformSharedPtr<RegElemT>(regulatoryElements_);
   }
 
   //! sets a new outer bound.
-  void setOuterBound(const LineStrings3d& bound) {
+  void setOuterBound(const LineStrings3d & bound)
+  {
     outerBound_ = bound;
     resetCache();
   }
 
-  void setInnerBounds(const std::vector<LineStrings3d>& bounds) {
+  void setInnerBounds(const std::vector<LineStrings3d> & bounds)
+  {
     innerBounds_ = bounds;
     resetCache();
   }
 
-  void resetCache() {
+  void resetCache()
+  {
     outerBoundPolygon_ = CompoundPolygon3d(utils::addConst(*this).outerBound());
     innerBoundPolygons_ = utils::transform(utils::addConst(*this).innerBounds(),
-                                           [](const auto& elem) { return CompoundPolygon3d(elem); });
+        [](const auto & elem) {return CompoundPolygon3d(elem);});
   }
 
- private:
+private:
   LineStrings3d outerBound_;                  //!< linestrings that together form the outer bound
   std::vector<LineStrings3d> innerBounds_;    //!< vector of ls for inner bounds
   RegulatoryElementPtrs regulatoryElements_;  //!< regulatory elements that apply
@@ -110,8 +126,9 @@ class AreaData : public PrimitiveData {
 //! @brief A const (i.e. immutable) Area.
 //! @ingroup AreaPrimitives
 //! @ingroup ConstPrimitives
-class ConstArea : public ConstPrimitive<AreaData> {
- public:
+class ConstArea : public ConstPrimitive<AreaData>
+{
+public:
   using ConstType = ConstArea;
   using MutableType = Area;
   using TwoDType = ConstArea;
@@ -124,7 +141,8 @@ class ConstArea : public ConstPrimitive<AreaData> {
    *
    * This construction is only useful for copying.
    */
-  explicit ConstArea(Id id = InvalId) : ConstArea(std::make_shared<AreaData>(id, LineStrings3d())) {}
+  explicit ConstArea(Id id = InvalId)
+  : ConstArea(std::make_shared<AreaData>(id, LineStrings3d())) {}
 
   /**
    * @brief Constructs a new area
@@ -137,28 +155,31 @@ class ConstArea : public ConstPrimitive<AreaData> {
    *
    * This is the constructor that you most probably want to use.
    */
-  ConstArea(Id id, const LineStrings3d& outerBound, const InnerBounds& innerBounds = InnerBounds(),
-            const AttributeMap& attributes = AttributeMap(),
-            const RegulatoryElementPtrs& regulatoryElements = RegulatoryElementPtrs())
-      : ConstPrimitive{std::make_shared<AreaData>(id, outerBound, innerBounds, attributes, regulatoryElements)} {}
+  ConstArea(
+    Id id, const LineStrings3d & outerBound, const InnerBounds & innerBounds = InnerBounds(),
+    const AttributeMap & attributes = AttributeMap(),
+    const RegulatoryElementPtrs & regulatoryElements = RegulatoryElementPtrs())
+  : ConstPrimitive{std::make_shared<AreaData>(id, outerBound, innerBounds, attributes,
+        regulatoryElements)} {}
 
   //! Constructor to construct from the data of a different Area
-  explicit ConstArea(const std::shared_ptr<const AreaData>& data) : ConstPrimitive<AreaData>(data) {}
+  explicit ConstArea(const std::shared_ptr<const AreaData> & data)
+  : ConstPrimitive<AreaData>(data) {}
 
   //! Get linestrings that form the outer bound
-  ConstLineStrings3d outerBound() const { return constData()->outerBound(); }
+  ConstLineStrings3d outerBound() const {return constData()->outerBound();}
 
   //! get the linestrings that form the inner bounds
-  ConstInnerBounds innerBounds() const { return constData()->innerBounds(); }
+  ConstInnerBounds innerBounds() const {return constData()->innerBounds();}
 
   /**
    * @brief get the outer bound as polygon
    * @return the polygon
    */
-  CompoundPolygon3d outerBoundPolygon() const { return constData()->outerBoundPolygon(); }
+  CompoundPolygon3d outerBoundPolygon() const {return constData()->outerBoundPolygon();}
 
   //! get the inner bounds as polygon
-  CompoundPolygons3d innerBoundPolygons() const { return constData()->innerBoundPolygons(); }
+  CompoundPolygons3d innerBoundPolygons() const {return constData()->innerBoundPolygons();}
 
   /**
    * @brief generates a basic polygon in 2d with holes for this area
@@ -166,9 +187,10 @@ class ConstArea : public ConstPrimitive<AreaData> {
    * The generated polygon only has the points, no ids or attributes. It is
    * thought for geometry calculations.
    */
-  BasicPolygonWithHoles3d basicPolygonWithHoles3d() const {
+  BasicPolygonWithHoles3d basicPolygonWithHoles3d() const
+  {
     return {outerBoundPolygon().basicPolygon(),
-            utils::transform(innerBoundPolygons(), [](const auto& poly) { return poly.basicPolygon(); })};
+      utils::transform(innerBoundPolygons(), [](const auto & poly) {return poly.basicPolygon();})};
   }
 
   /**
@@ -177,13 +199,16 @@ class ConstArea : public ConstPrimitive<AreaData> {
    * The generated polygon only has the points, no ids or attributes. It is
    * thought for geometry calculations.
    */
-  BasicPolygonWithHoles2d basicPolygonWithHoles2d() const {
+  BasicPolygonWithHoles2d basicPolygonWithHoles2d() const
+  {
     return {traits::to2D(outerBoundPolygon()).basicPolygon(),
-            utils::transform(innerBoundPolygons(), [](const auto& poly) { return traits::to2D(poly).basicPolygon(); })};
+      utils::transform(innerBoundPolygons(), [](const auto & poly) {
+          return traits::to2D(poly).basicPolygon();
+        })};
   }
 
   //! get a list of regulatory elements that affect this area
-  RegulatoryElementConstPtrs regulatoryElements() const { return constData()->regulatoryElements(); }
+  RegulatoryElementConstPtrs regulatoryElements() const {return constData()->regulatoryElements();}
 
   /**
    * @brief get the regulatoryElements that could be converted to a type
@@ -193,8 +218,9 @@ class ConstArea : public ConstPrimitive<AreaData> {
    * E.g. regulatoryElementsAs<TrafficLight>() will return all regulatory
    * elements that are traffic lights.
    */
-  template <typename RegElemT>
-  std::vector<std::shared_ptr<const RegElemT>> regulatoryElementsAs() const {
+  template<typename RegElemT>
+  std::vector<std::shared_ptr<const RegElemT>> regulatoryElementsAs() const
+  {
     return constData()->regulatoryElementsAs<RegElemT>();
   }
 };
@@ -202,15 +228,17 @@ class ConstArea : public ConstPrimitive<AreaData> {
 //! @brief Famous Area class that represents a basic area as element of the map.
 //! @ingroup AreaPrimitives
 //! @ingroup Primitives
-class Area : public Primitive<ConstArea> {
- public:
+class Area : public Primitive<ConstArea>
+{
+public:
   using Primitive::Primitive;
   using TwoDType = Area;
   using ThreeDType = Area;
   friend class ConstWeakArea;
   Area() = default;
-  Area(const AreaDataConstPtr&) = delete;
-  explicit Area(const AreaDataPtr& data) : Primitive{data} {}
+  Area(const AreaDataConstPtr &) = delete;
+  explicit Area(const AreaDataPtr & data)
+  : Primitive{data} {}
 
   using Primitive::innerBounds;
   using Primitive::outerBound;
@@ -218,25 +246,26 @@ class Area : public Primitive<ConstArea> {
   using Primitive::regulatoryElementsAs;
 
   //! Get linestrings that form the outer bound
-  const LineStrings3d& outerBound() { return data()->outerBound(); }
+  const LineStrings3d & outerBound() {return data()->outerBound();}
 
   //! Get the linestrings that form the inner bound
-  const InnerBounds& innerBounds() { return data()->innerBounds(); }
+  const InnerBounds & innerBounds() {return data()->innerBounds();}
 
   //! Sets a new outer bound and resets the cache
-  void setOuterBound(const LineStrings3d& bound) { data()->setOuterBound(bound); }
+  void setOuterBound(const LineStrings3d & bound) {data()->setOuterBound(bound);}
 
   //! sets a new inner bound and resets the cache
-  void setInnerBounds(const std::vector<LineStrings3d>& bounds) { data()->setInnerBounds(bounds); }
+  void setInnerBounds(const std::vector<LineStrings3d> & bounds) {data()->setInnerBounds(bounds);}
 
   //! return regulatoryElements that affect this area.
-  const RegulatoryElementPtrs& regulatoryElements() { return data()->regulatoryElements(); }
+  const RegulatoryElementPtrs & regulatoryElements() {return data()->regulatoryElements();}
 
   /**
    * @brief adds a new regulatory element
    * @throws nullptr error if regElem is a nullptr
    */
-  void addRegulatoryElement(RegulatoryElementPtr regElem) {
+  void addRegulatoryElement(RegulatoryElementPtr regElem)
+  {
     if (regElem == nullptr) {
       throw NullptrError("regulatory element is a nullptr.");
     }
@@ -244,8 +273,9 @@ class Area : public Primitive<ConstArea> {
   }
 
   //! removes a regulatory element, returns true on success
-  bool removeRegulatoryElement(const RegulatoryElementPtr& regElem) {
-    auto& regElems = data()->regulatoryElements();
+  bool removeRegulatoryElement(const RegulatoryElementPtr & regElem)
+  {
+    auto & regElems = data()->regulatoryElements();
     auto remove = std::find(regElems.begin(), regElems.end(), regElem);
     if (remove != regElems.end()) {
       regElems.erase(remove);
@@ -255,8 +285,9 @@ class Area : public Primitive<ConstArea> {
   }
 
   //! get the regulatoryElements that could be converted to RegElemT
-  template <typename RegElemT>
-  std::vector<std::shared_ptr<RegElemT>> regulatoryElementsAs() {
+  template<typename RegElemT>
+  std::vector<std::shared_ptr<RegElemT>> regulatoryElementsAs()
+  {
     return data()->regulatoryElementsAs<RegElemT>();
   }
 };
@@ -267,26 +298,27 @@ class Area : public Primitive<ConstArea> {
  * It works conceptually similar to a std::weak_ptr. This is the immutable
  * version of a WeakArea and returns a ConstArea when lock() is called.
  */
-class ConstWeakArea {
- public:
+class ConstWeakArea
+{
+public:
   using ConstType = ConstWeakArea;
   using MutableType = WeakArea;
   using TwoDType = ConstWeakArea;
   using ThreeDType = ConstWeakArea;
   ConstWeakArea() = default;
   ConstWeakArea(ConstArea area)  // NOLINT
-      : areaData_(area.constData()) {}
+  : areaData_(area.constData()) {}
 
   /**
    * @brief Obtains the original ConstArea.
    * @throws NullptrError if the managed lanelet expired.
    */
-  ConstArea lock() const { return ConstArea(areaData_.lock()); }
+  ConstArea lock() const {return ConstArea(areaData_.lock());}
 
   //! tests whether the WeakArea is still valid
-  bool expired() const noexcept { return areaData_.expired(); }
+  bool expired() const noexcept {return areaData_.expired();}
 
- protected:
+protected:
   std::weak_ptr<const AreaData> areaData_;  // NOLINT
 };
 
@@ -296,19 +328,22 @@ class ConstWeakArea {
  * It works conceptually similar to a std::weak_ptr. This is the mutable
  * version of a WeakArea.
  */
-class WeakArea final : public ConstWeakArea {
- public:
+class WeakArea final : public ConstWeakArea
+{
+public:
   WeakArea() = default;
-  WeakArea(Area llet) : ConstWeakArea(std::move(llet)) {}  // NOLINT
+  WeakArea(Area llet)
+  : ConstWeakArea(std::move(llet)) {}                      // NOLINT
 
   /**
    * @brief Obtains the original ConstArea
    * @throws NullptrError if the managed lanelet expired.
    */
-  Area lock() const { return Area(std::const_pointer_cast<AreaData>(areaData_.lock())); }
+  Area lock() const {return Area(std::const_pointer_cast<AreaData>(areaData_.lock()));}
 };
 
-namespace utils {
+namespace utils
+{
 /**
  * @brief returns true if element of a regulatory element has a matching Id
  * @param ll the element holding other primitives
@@ -320,16 +355,21 @@ namespace utils {
  * elements, only ids of regulatory elements itself.
  * A similar implementation exists for linestrings and regulatory elements.
  */
-inline bool has(const ConstArea& ll, Id id) { return has(ll.outerBoundPolygon(), id); }
+inline bool has(const ConstArea & ll, Id id) {return has(ll.outerBoundPolygon(), id);}
 }  // namespace utils
 
-inline bool operator==(const ConstArea& lhs, const ConstArea& rhs) { return lhs.constData() == rhs.constData(); }
-inline bool operator!=(const ConstArea& lhs, const ConstArea& rhs) { return !(lhs == rhs); }
-inline bool operator==(const ConstWeakArea& lhs, const ConstWeakArea& rhs) {
+inline bool operator==(const ConstArea & lhs, const ConstArea & rhs)
+{
+  return lhs.constData() == rhs.constData();
+}
+inline bool operator!=(const ConstArea & lhs, const ConstArea & rhs) {return !(lhs == rhs);}
+inline bool operator==(const ConstWeakArea & lhs, const ConstWeakArea & rhs)
+{
   return !lhs.expired() && !rhs.expired() && lhs.lock() == rhs.lock();
 }
-inline bool operator!=(const ConstWeakArea& lhs, const ConstWeakArea& rhs) { return !(lhs == rhs); }
-inline std::ostream& operator<<(std::ostream& stream, const ConstArea& obj) {
+inline bool operator!=(const ConstWeakArea & lhs, const ConstWeakArea & rhs) {return !(lhs == rhs);}
+inline std::ostream & operator<<(std::ostream & stream, const ConstArea & obj)
+{
   stream << "[id: ";
   stream << obj.id();
   auto obId = obj.outerBoundPolygon().ids();
@@ -341,7 +381,7 @@ inline std::ostream& operator<<(std::ostream& stream, const ConstArea& obj) {
   auto ibs = obj.innerBoundPolygons();
   if (!ibs.empty()) {
     stream << " inner: ";
-    for (const auto& ib : ibs) {
+    for (const auto & ib : ibs) {
       stream << "[";
       auto ibId = ib.ids();
       std::copy(ibId.begin(), ibId.end(), std::ostream_iterator<Id>(stream, ","));
@@ -352,22 +392,25 @@ inline std::ostream& operator<<(std::ostream& stream, const ConstArea& obj) {
   return stream;
 }
 
-namespace traits {
-template <typename T>
-constexpr bool isAreaT() {
+namespace traits
+{
+template<typename T>
+constexpr bool isAreaT()
+{
   return isCategory<T, traits::AreaTag>();
 }
 }  // namespace traits
 
-template <typename T, typename RetT>
+template<typename T, typename RetT>
 using IfAr = std::enable_if_t<traits::isAreaT<T>(), RetT>;
 
 }  // namespace lanelet
 
 // Hash function for usage in containers
-namespace std {
-template <>
-struct hash<lanelet::Area> : public lanelet::HashBase<lanelet::Area> {};
-template <>
-struct hash<lanelet::ConstArea> : public lanelet::HashBase<lanelet::ConstArea> {};
+namespace std
+{
+template<>
+struct hash<lanelet::Area>: public lanelet::HashBase<lanelet::Area> {};
+template<>
+struct hash<lanelet::ConstArea>: public lanelet::HashBase<lanelet::ConstArea> {};
 }  // namespace std

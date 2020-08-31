@@ -10,7 +10,10 @@ using AttrStr = lanelet::AttributeNamesString;
 using Value = lanelet::AttributeValueString;
 using lanelet::Participants;
 
-lanelet::RegulatoryElementPtr getSpeedLimit(const std::string& type, const lanelet::AttributeMap& attributes = {}) {
+lanelet::RegulatoryElementPtr getSpeedLimit(
+  const std::string & type,
+  const lanelet::AttributeMap & attributes = {})
+{
   using namespace lanelet;
   Point3d p1{10, 0, -1};
 
@@ -19,22 +22,27 @@ lanelet::RegulatoryElementPtr getSpeedLimit(const std::string& type, const lanel
   return SpeedLimit::make(5, attributes, {{sign}, type});
 }
 
-lanelet::traffic_rules::TrafficRulesPtr germanVehicleRules() {
+lanelet::traffic_rules::TrafficRulesPtr germanVehicleRules()
+{
   using namespace lanelet;
   return traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle, {});
-};
+}
 
-lanelet::traffic_rules::TrafficRulesPtr germanBikeRules() {
+lanelet::traffic_rules::TrafficRulesPtr germanBikeRules()
+{
   using namespace lanelet;
   return traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Bicycle, {});
 }
 
-lanelet::traffic_rules::TrafficRulesPtr germanPedestrianRules() {
+lanelet::traffic_rules::TrafficRulesPtr germanPedestrianRules()
+{
   using namespace lanelet;
-  return traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian, {});
+  return traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian,
+           {});
 }
 
-class TrafficRules : public ::testing::Test {
+class TrafficRules : public ::testing::Test
+{
   /* looks like this:
    * p1----ls4----p8
    *
@@ -50,31 +58,41 @@ class TrafficRules : public ::testing::Test {
    *              |            |            /
    * p1----ls1----p2----ls8----p11----ls9--/
    */
- public:
-  lanelet::Point3d p1{1, 0, 0}, p2{2, 2, 0}, p3{3, 0, 2}, p4{4, 2, 2}, p5{5, 0, 4}, p6{6, 2, 4}, p7{7, 0, 6},
-      p8{8, 2, 6}, p9{9, 4, 2}, p10{10, 4, 4}, p11{11, 4, 0}, p12{12, 5, 1};
-  lanelet::LineString3d ls1{1, {p1, p2}}, ls2{2, {p3, p4}}, ls3{3, {p5, p6}}, ls4{4, {p7, p8}}, ls5{5, {p4, p9}},
-      ls6{6, {p6, p10}}, ls7{7, {p2, p4}}, ls8{8, {p9, p11, p2}}, ls9{9, {p9, p12, p11}};
-  lanelet::AttributeMap vehicleAttr{{AttrStr::Subtype, Value::Road}, {AttrStr::Location, Value::Urban}};
-  lanelet::AttributeMap pedestrianAttr{{AttrStr::Subtype, Value::Walkway}, {AttrStr::Location, Value::Urban}};
-  lanelet::Lanelet lanelet{1, ls3, ls2, vehicleAttr}, left{2, ls4, ls3, vehicleAttr}, right{3, ls2, ls1, vehicleAttr},
-      next{4, ls6, ls5, vehicleAttr};
+
+public:
+  lanelet::Point3d p1{1, 0, 0}, p2{2, 2, 0}, p3{3, 0, 2}, p4{4, 2, 2}, p5{5, 0, 4}, p6{6, 2, 4},
+  p7{7, 0, 6},
+  p8{8, 2, 6}, p9{9, 4, 2}, p10{10, 4, 4}, p11{11, 4, 0}, p12{12, 5, 1};
+  lanelet::LineString3d ls1{1, {p1, p2}}, ls2{2, {p3, p4}}, ls3{3, {p5, p6}}, ls4{4, {p7, p8}},
+  ls5{5, {p4, p9}},
+  ls6{6, {p6, p10}}, ls7{7, {p2, p4}}, ls8{8, {p9, p11, p2}}, ls9{9, {p9, p12, p11}};
+  lanelet::AttributeMap vehicleAttr{{AttrStr::Subtype, Value::Road},
+    {AttrStr::Location, Value::Urban}};
+  lanelet::AttributeMap pedestrianAttr{{AttrStr::Subtype, Value::Walkway},
+    {AttrStr::Location, Value::Urban}};
+  lanelet::Lanelet lanelet{1, ls3, ls2, vehicleAttr}, left{2, ls4, ls3, vehicleAttr},
+  right{3, ls2, ls1, vehicleAttr},
+  next{4, ls6, ls5, vehicleAttr};
   lanelet::Area area{1, {ls8, ls7, ls5}, {}, vehicleAttr}, nextArea{2, {ls9, ls8.invert()}};
 };
 
-class GermanTrafficRulesVehicle : public TrafficRules {
- public:
+class GermanTrafficRulesVehicle : public TrafficRules
+{
+public:
   lanelet::traffic_rules::TrafficRulesPtr germanVehicle{germanVehicleRules()};
 };
 
-class GermanTrafficRulesBike : public TrafficRules {
- public:
+class GermanTrafficRulesBike : public TrafficRules
+{
+public:
   lanelet::traffic_rules::TrafficRulesPtr germanBike{germanBikeRules()};
 };
 
-class GermanTrafficRulesPedestrian : public TrafficRules {
- public:
-  GermanTrafficRulesPedestrian() {
+class GermanTrafficRulesPedestrian : public TrafficRules
+{
+public:
+  GermanTrafficRulesPedestrian()
+  {
     lanelet.attributes() = pedestrianAttr;
     right.attributes() = pedestrianAttr;
     next.attributes() = pedestrianAttr;
@@ -83,7 +101,8 @@ class GermanTrafficRulesPedestrian : public TrafficRules {
   lanelet::traffic_rules::TrafficRulesPtr germanPedestrian{germanPedestrianRules()};
 };
 
-namespace can_drive {
+namespace can_drive
+{
 TEST_F(GermanTrafficRulesVehicle, vehicleCanPassRoadLanelet) {  // NOLINT
   using namespace std::string_literals;
   lanelet.setAttribute(Attr::Subtype, Value::Road);
@@ -137,7 +156,8 @@ TEST_F(GermanTrafficRulesVehicle, carsCanDriveWhereCarsDrive) {  // NOLINT
   using namespace lanelet;
   lanelet.setAttribute(Attr::Subtype, Value::Road);
   lanelet.setAttribute(Participants::tag(Participants::VehicleCar), true);
-  auto germanCar = traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::VehicleCar);
+  auto germanCar = traffic_rules::TrafficRulesFactory::create(Locations::Germany,
+      Participants::VehicleCar);
   EXPECT_TRUE(germanCar->canPass(lanelet));
 }
 
@@ -316,7 +336,8 @@ TEST_F(GermanTrafficRulesPedestrian, cannotCrossUnrelated) {  // NOLINT
 }
 }  // namespace can_drive
 
-namespace speed_limits {
+namespace speed_limits
+{
 using namespace lanelet::units::literals;
 TEST_F(GermanTrafficRulesVehicle, defaultUrbanSpeedlimitIfNoSpeedLimitSet) {  // NOLINT
   lanelet.setAttribute(Attr::Location, Value::Urban);
@@ -415,7 +436,8 @@ TEST_F(GermanTrafficRulesVehicle, determinesSpeedLimit120) {  // NOLINT
 }
 }  // namespace speed_limits
 
-namespace lane_change {
+namespace lane_change
+{
 
 TEST_F(GermanTrafficRulesVehicle, canNotLaneChangeLeftWithDefaultLine) {  // NOLINT
   EXPECT_FALSE(germanVehicle->canChangeLane(lanelet, left));
@@ -517,7 +539,8 @@ TEST_F(GermanTrafficRulesVehicle, canLaneChangeRightExplicitly) {  // NOLINT
 }
 }  // namespace lane_change
 
-namespace other {
+namespace other
+{
 
 TEST_F(GermanTrafficRulesVehicle, normalRegelemIsNotDynamic) {  // NOLINT
   lanelet.addRegulatoryElement(getSpeedLimit("de274-60"));
@@ -542,7 +565,8 @@ TEST_F(GermanTrafficRulesPedestrian, locationIsGermany) {  // NOLINT
 
 TEST_F(GermanTrafficRulesVehicle, factoryReturnsVehicleForCar) {  // NOLINT
   using namespace lanelet;
-  auto trafficRules = traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::VehicleCar, {});
+  auto trafficRules = traffic_rules::TrafficRulesFactory::create(Locations::Germany,
+      Participants::VehicleCar, {});
   EXPECT_EQ(trafficRules->participant(), Participants::VehicleCar);
 }
 }  // namespace other

@@ -21,9 +21,11 @@ using namespace lanelet::routing;
  *                            12      11
  */
 
-class LaneletOrAreaTest : public ::testing::Test {
- private:
-  void SetUp() override {
+class LaneletOrAreaTest : public ::testing::Test
+{
+private:
+  void SetUp() override
+  {
     Id id(1000);
     p1 = Point3d(++id, 0, 0, 0);
     p2 = Point3d(++id, 1, 0, 0);
@@ -65,35 +67,44 @@ class LaneletOrAreaTest : public ::testing::Test {
     laneletPath = LaneletOrAreaPath({ConstLaneletOrArea(l1), ConstLaneletOrArea(l2)});
     bothPath = LaneletOrAreaPath({ConstLaneletOrArea(a2), ConstLaneletOrArea(l1)});
     invAreaPath = LaneletOrAreaPath({ConstLaneletOrArea(l1.invert()), ConstLaneletOrArea(a2)});
-    invLLPath = LaneletOrAreaPath({ConstLaneletOrArea(l2.invert()), ConstLaneletOrArea(l1.invert())});
+    invLLPath =
+      LaneletOrAreaPath({ConstLaneletOrArea(l2.invert()), ConstLaneletOrArea(l1.invert())});
     longPath = LaneletOrAreaPath(
-        {ConstLaneletOrArea(a1), ConstLaneletOrArea(a2), ConstLaneletOrArea(l1), ConstLaneletOrArea(l2)});
-    longInvPath = LaneletOrAreaPath({ConstLaneletOrArea(l2.invert()), ConstLaneletOrArea(l1.invert()),
-                                     ConstLaneletOrArea(a2), ConstLaneletOrArea(a1)});
-    sidePath = LaneletOrAreaPath({ConstLaneletOrArea(a1), ConstLaneletOrArea(l3), ConstLaneletOrArea(l4)});
+      {ConstLaneletOrArea(a1), ConstLaneletOrArea(a2), ConstLaneletOrArea(l1), ConstLaneletOrArea(
+          l2)});
+    longInvPath = LaneletOrAreaPath({ConstLaneletOrArea(l2.invert()), ConstLaneletOrArea(
+            l1.invert()),
+          ConstLaneletOrArea(a2), ConstLaneletOrArea(a1)});
+    sidePath = LaneletOrAreaPath({ConstLaneletOrArea(a1), ConstLaneletOrArea(l3), ConstLaneletOrArea(
+            l4)});
     sideInvPath = LaneletOrAreaPath({ConstLaneletOrArea(l3), ConstLaneletOrArea(a1)});
-    cornerPath = LaneletOrAreaPath({ConstLaneletOrArea(l1), ConstLaneletOrArea(l2), ConstLaneletOrArea(a51)});
+    cornerPath = LaneletOrAreaPath({ConstLaneletOrArea(l1), ConstLaneletOrArea(
+            l2), ConstLaneletOrArea(a51)});
     cornerPathInv =
-        LaneletOrAreaPath({ConstLaneletOrArea(a51), ConstLaneletOrArea(l2.invert()), ConstLaneletOrArea(l1.invert())});
+      LaneletOrAreaPath({ConstLaneletOrArea(a51), ConstLaneletOrArea(
+            l2.invert()), ConstLaneletOrArea(l1.invert())});
   }
 
- public:
+public:
   Point3d p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
   LineString3d ls1, ls2, ls3, ls4, ls5, ls6, ls7, ls8, ls9, ls10, ls11, ls12, ls13;
   Lanelet l1, l2, l3, l4;
   Area a1, a2, a51;
-  LaneletOrAreaPath areaPath, laneletPath, bothPath, invAreaPath, invLLPath, longPath, longInvPath, sidePath,
-      sideInvPath, cornerPath, cornerPathInv;
+  LaneletOrAreaPath areaPath, laneletPath, bothPath, invAreaPath, invLLPath, longPath, longInvPath,
+    sidePath,
+    sideInvPath, cornerPath, cornerPathInv;
 };
-namespace {
-void checkIdentical(const BasicPolygon3d& lhs, const BasicPolygon3d& rhs) {
-  auto to2D = [](const BasicPolygon3d& p3d) {
-    BasicPolygon2d p2d(p3d.size());
-    for (size_t i = 0; i < p3d.size(); ++i) {
-      p2d[i] = p3d.at(i).head<2>();
-    }
-    return p2d;
-  };
+namespace
+{
+void checkIdentical(const BasicPolygon3d & lhs, const BasicPolygon3d & rhs)
+{
+  auto to2D = [](const BasicPolygon3d & p3d) {
+      BasicPolygon2d p2d(p3d.size());
+      for (size_t i = 0; i < p3d.size(); ++i) {
+        p2d[i] = p3d.at(i).head<2>();
+      }
+      return p2d;
+    };
   BasicPolygon2d lhs2d = to2D(lhs);
   BasicPolygon2d rhs2d = to2D(rhs);
   // equals is buggy in older boost versions
@@ -102,7 +113,8 @@ void checkIdentical(const BasicPolygon3d& lhs, const BasicPolygon3d& rhs) {
 #endif
 }
 
-void checkEvenlySpaced(const BasicPolygon3d& poly, const double dist = 1.) {
+void checkEvenlySpaced(const BasicPolygon3d & poly, const double dist = 1.)
+{
   for (size_t i = 0; i + 1 < poly.size(); ++i) {
     EXPECT_DOUBLE_EQ(boost::geometry::distance(poly.at(i), poly.at(i + 1)), dist);
   }

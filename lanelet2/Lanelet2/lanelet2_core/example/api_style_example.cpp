@@ -1,5 +1,3 @@
-
-
 /* This is more or less pseudo code and illustrates how the usage of the library
  * could look like in
  * the end. Always following the principle "Keep in mind that code is read much
@@ -21,7 +19,7 @@ Reader::Ptr reader(new OSMReader());  // could also be BinaryReader()
 reader->setMap(map);
 reader->readFromFile(filename);
 
-Routing : Ptr routing(new LaneletRoutingAlgo1());  // different algos possible
+Routing: Ptr routing(new LaneletRoutingAlgo1());   // different algos possible
                                                    // with differing complexity
 
 routing->setMap(map);

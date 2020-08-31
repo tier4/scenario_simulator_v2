@@ -9,14 +9,18 @@
 #include "lanelet2_core/utility/HybridMap.h"
 #include "lanelet2_core/utility/Optional.h"
 
-namespace lanelet {
-namespace internal {
-template <typename ValueT>
-struct ValueOf {
+namespace lanelet
+{
+namespace internal
+{
+template<typename ValueT>
+struct ValueOf
+{
   using Type = std::decay_t<ValueT>;
 };
-template <typename ValueT>
-struct ValueOf<Optional<ValueT>> {
+template<typename ValueT>
+struct ValueOf<Optional<ValueT>>
+{
   using Type = ValueT;
 };
 }  // namespace internal
@@ -28,22 +32,26 @@ struct ValueOf<Optional<ValueT>> {
     * The result of the last as... is cached, therefore repeated calls to the same
     * as.. function are very cheap.
     */
-class Attribute {
-  template <typename T>
+class Attribute
+{
+  template<typename T>
   using ValueOfT = typename internal::ValueOf<T>::Type;
 
- public:
+public:
   using Cache = boost::variant<bool, double, Id, int, Velocity>;
 
   Attribute() = default;
-  Attribute(const std::string& value) : value_{value} {}        // NOLINT
-  Attribute(std::string&& value) : value_{std::move(value)} {}  // NOLINT
-  Attribute(const char* value) : value_(value) {}               // NOLINT
+  Attribute(const std::string & value)
+  : value_{value} {}                                            // NOLINT
+  Attribute(std::string && value)
+  : value_{std::move(value)} {}                                 // NOLINT
+  Attribute(const char * value)
+  : value_(value) {}                                            // NOLINT
   Attribute(bool value);                                        // NOLINT
   Attribute(Id value);                                          // NOLINT
   Attribute(int value);                                         // NOLINT
   Attribute(double value);                                      // NOLINT
-  Attribute(const Velocity& value);                             // NOLINT
+  Attribute(const Velocity & value);                             // NOLINT
 
   /**
    * @brief interpret this attribute as bool value
@@ -85,103 +93,121 @@ class Attribute {
   /**
    * @brief templated version. Works ony for the as.. above
    */
-  template <typename T>
+  template<typename T>
   Optional<ValueOfT<T>> as() const;
 
   /**
    * @brief gets the value of this attribute
    * @return value
    */
-  const std::string& value() const { return value_; }
+  const std::string & value() const {return value_;}
 
   /**
    * @brief set the value of this attribute
    * @param value new value
    */
-  void setValue(const std::string& value);
+  void setValue(const std::string & value);
 
- private:
+private:
   std::string value_;                     //!< internal value of this parameter
   mutable std::shared_ptr<Cache> cache_;  //!< cache for the last queried value
 };
 
-template <>
-inline Optional<double> Attribute::as<double>() const {
+template<>
+inline Optional<double> Attribute::as<double>() const
+{
   return asDouble();
 }
 
-template <>
-inline Optional<double> Attribute::as<Optional<double>>() const {
+template<>
+inline Optional<double> Attribute::as<Optional<double>>() const
+{
   return asDouble();
 }
 
-template <>
-inline Optional<int> Attribute::as<int>() const {
+template<>
+inline Optional<int> Attribute::as<int>() const
+{
   return asInt();
 }
 
-template <>
-inline Optional<int> Attribute::as<Optional<int>>() const {
+template<>
+inline Optional<int> Attribute::as<Optional<int>>() const
+{
   return asInt();
 }
 
-template <>
-inline Optional<bool> Attribute::as<bool>() const {
+template<>
+inline Optional<bool> Attribute::as<bool>() const
+{
   return asBool();
 }
 
-template <>
-inline Optional<bool> Attribute::as<Optional<bool>>() const {
+template<>
+inline Optional<bool> Attribute::as<Optional<bool>>() const
+{
   return asBool();
 }
 
-template <>
-inline Optional<Id> Attribute::as<Id>() const {
+template<>
+inline Optional<Id> Attribute::as<Id>() const
+{
   return asId();
 }
 
-template <>
-inline Optional<Id> Attribute::as<Optional<Id>>() const {
+template<>
+inline Optional<Id> Attribute::as<Optional<Id>>() const
+{
   return asId();
 }
 
-template <>
-inline Optional<Velocity> Attribute::as<Velocity>() const {
+template<>
+inline Optional<Velocity> Attribute::as<Velocity>() const
+{
   return asVelocity();
 }
 
-template <>
-inline Optional<Velocity> Attribute::as<Optional<Velocity>>() const {
+template<>
+inline Optional<Velocity> Attribute::as<Optional<Velocity>>() const
+{
   return asVelocity();
 }
 
-template <>
-inline Optional<std::string> Attribute::as<std::string>() const {
+template<>
+inline Optional<std::string> Attribute::as<std::string>() const
+{
   return value();
 }
 
-template <>
-inline Optional<std::string> Attribute::as<Optional<std::string>>() const {
+template<>
+inline Optional<std::string> Attribute::as<Optional<std::string>>() const
+{
   return value();
 }
 
-template <>
-inline Optional<const char*> Attribute::as<const char*>() const {
+template<>
+inline Optional<const char *> Attribute::as<const char *>() const
+{
   return value().c_str();
 }
 
-template <>
-inline Optional<const char*> Attribute::as<Optional<const char*>>() const {
+template<>
+inline Optional<const char *> Attribute::as<Optional<const char *>>() const
+{
   return value().c_str();
 }
 
-inline bool operator==(const Attribute& lhs, const Attribute& rhs) { return lhs.value() == rhs.value(); }
-inline bool operator!=(const Attribute& lhs, const Attribute& rhs) { return !(lhs == rhs); }
+inline bool operator==(const Attribute & lhs, const Attribute & rhs)
+{
+  return lhs.value() == rhs.value();
+}
+inline bool operator!=(const Attribute & lhs, const Attribute & rhs) {return !(lhs == rhs);}
 
 /**
  * @brief Typical Attributes names within lanelet
  */
-enum class AttributeName {
+enum class AttributeName
+{
   Type,
   Subtype,
   OneWay,
@@ -192,14 +218,15 @@ enum class AttributeName {
   Dynamic
 };
 
-using AttributeNamesItem = std::pair<const char*, const AttributeName>;
+using AttributeNamesItem = std::pair<const char *, const AttributeName>;
 
 /**
  * @brief Lists which attribute strings are mapped to which enum value
  *
  * Needs to be in a class because we want external linkage
  */
-struct AttributeNamesString {
+struct AttributeNamesString
+{
   static constexpr const char Type[] = "type";
   static constexpr const char Subtype[] = "subtype";
   static constexpr const char OneWay[] = "one_way";
@@ -234,19 +261,21 @@ struct AttributeNamesString {
   static constexpr const char SignType[] = "sign_type";
 
   static constexpr AttributeNamesItem Map[] = {{Type, AttributeName::Type},
-                                               {Subtype, AttributeName::Subtype},
-                                               {OneWay, AttributeName::OneWay},
-                                               {ParticipantVehicle, AttributeName::ParticipantVehicle},
-                                               {ParticipantPedestrian, AttributeName::ParticipantPedestrian},
-                                               {SpeedLimit, AttributeName::SpeedLimit},
-                                               {Location, AttributeName::Location},
-                                               {Dynamic, AttributeName::Dynamic}};
+    {Subtype, AttributeName::Subtype},
+    {OneWay, AttributeName::OneWay},
+    {ParticipantVehicle, AttributeName::ParticipantVehicle},
+    {ParticipantPedestrian, AttributeName::ParticipantPedestrian},
+    {SpeedLimit, AttributeName::SpeedLimit},
+    {Location, AttributeName::Location},
+    {Dynamic, AttributeName::Dynamic}};
 };
 
 //! parts of tag that have to be combined with either Participants:, OneWay: or SpeedLimit to generate an override.
-struct Participants {
+struct Participants
+{
   //! Obtain the tag for the participant override
-  static std::string tag(const std::string& participant) {
+  static std::string tag(const std::string & participant)
+  {
     return AttributeNamesString::Participant + (":" + participant);
   }
   static constexpr const char Vehicle[] = "vehicle";
@@ -267,7 +296,8 @@ struct Participants {
  *
  * This is for convenience when comparing attribute values
  */
-struct AttributeValueString {
+struct AttributeValueString
+{
   // lanelet types
   static constexpr const char Node[] = "node";
   static constexpr const char Way[] = "way";
@@ -365,12 +395,17 @@ struct AttributeValueString {
   static constexpr const char AllWayStop[] = "all_way_stop";
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const Attribute& obj) { return stream << obj.value(); }
+inline std::ostream & operator<<(std::ostream & stream, const Attribute & obj)
+{
+  return stream << obj.value();
+}
 
-using AttributeMap = HybridMap<Attribute, decltype(AttributeNamesString::Map)&, AttributeNamesString::Map>;
+using AttributeMap = HybridMap<Attribute, decltype(AttributeNamesString::Map) &,
+    AttributeNamesString::Map>;
 
-inline std::ostream& operator<<(std::ostream& stream, const AttributeMap& obj) {
-  for (const auto& o : obj) {
+inline std::ostream & operator<<(std::ostream & stream, const AttributeMap & obj)
+{
+  for (const auto & o : obj) {
     stream << o.first << ": " << o.second << " ";
   }
   return stream;

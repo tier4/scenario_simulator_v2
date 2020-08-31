@@ -4,9 +4,11 @@
 using namespace lanelet;
 using UtmProjector = lanelet::projection::UtmProjector;
 
-class UTMProjectionTest : public ::testing::Test {
- public:
-  void SetUp() override {
+class UTMProjectionTest : public ::testing::Test
+{
+public:
+  void SetUp() override
+  {
     utmProjector = std::make_shared<UtmProjector>(origin);
     utmProjectorNoOffset = std::make_shared<UtmProjector>(origin, false);
     utmProjectorNoOffsetThrow = std::make_shared<UtmProjector>(origin, false, true);
@@ -49,21 +51,24 @@ TEST_F(UTMProjectionTest, TestForwardOutOfHemisphere) {  // NOLINT
   // origin is in northern hemisphere
   double latTest = -originLat;                                       // southern hemisphere
   ASSERT_NO_THROW(utmProjector->forward({latTest, originLon, 0.}));  // NOLINT
-  ASSERT_THROW(utmProjectorNoOffsetThrow->forward({latTest, originLon, 0.}), ForwardProjectionError);  // NOLINT
+  ASSERT_THROW(utmProjectorNoOffsetThrow->forward({latTest, originLon, 0.}),
+    ForwardProjectionError);                                                                           // NOLINT
 }
 
 TEST_F(UTMProjectionTest, TestForwardOutOfZoneButInPadding) {  // NOLINT
   // origin is in UTM zone 32
   double lonTest = 5.;  // UTM zone 31 but less than 100km away from zone 32
   ASSERT_NO_THROW(utmProjector->forward({originLat, lonTest, 0.}));                                    // NOLINT
-  ASSERT_THROW(utmProjectorNoOffsetThrow->forward({originLat, lonTest, 0.}), ForwardProjectionError);  // NOLINT
+  ASSERT_THROW(utmProjectorNoOffsetThrow->forward({originLat, lonTest, 0.}),
+    ForwardProjectionError);                                                                           // NOLINT
 }
 
 TEST_F(UTMProjectionTest, TestForwardOutOfZoneOutOfPadding) {  // NOLINT
   // origin is in UTM zone 32
   double lonTest = 0.;  // UTM zone 31 and out of padding area of zone 32
   ASSERT_THROW(utmProjector->forward({originLat, lonTest, 0.}), ForwardProjectionError);               // NOLINT
-  ASSERT_THROW(utmProjectorNoOffsetThrow->forward({originLat, lonTest, 0.}), ForwardProjectionError);  // NOLINT
+  ASSERT_THROW(utmProjectorNoOffsetThrow->forward({originLat, lonTest, 0.}),
+    ForwardProjectionError);                                                                           // NOLINT
 }
 
 TEST_F(UTMProjectionTest, TestReverseOutOfZoneButInPadding) {  // NOLINT

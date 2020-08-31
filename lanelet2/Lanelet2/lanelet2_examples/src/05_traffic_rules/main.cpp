@@ -11,13 +11,15 @@
 
 void part1UsingTrafficRules();
 
-int main() {
+int main()
+{
   // this tutorial shows how to use traffic rule objects to interpret map data
   part1UsingTrafficRules();
   return 0;
 }
 
-void part1UsingTrafficRules() {
+void part1UsingTrafficRules()
+{
   using namespace lanelet;
   using namespace lanelet::units::literals;
 
@@ -26,9 +28,9 @@ void part1UsingTrafficRules() {
   LineString3d middleLs{examples::getLineStringAtY(2)};
   LineString3d rightLs{examples::getLineStringAtY(0)};
   LineString3d nextLeftLs{utils::getId(),
-                          {middleLs.back(), Point3d(utils::getId(), middleLs.back().x() + 1., middleLs.back().y())}};
+    {middleLs.back(), Point3d(utils::getId(), middleLs.back().x() + 1., middleLs.back().y())}};
   LineString3d nextRightLs{utils::getId(),
-                           {rightLs.back(), Point3d(utils::getId(), rightLs.back().x() + 1, rightLs.back().y())}};
+    {rightLs.back(), Point3d(utils::getId(), rightLs.back().x() + 1, rightLs.back().y())}};
   Lanelet left{utils::getId(), leftLs, middleLs};
   Lanelet right{utils::getId(), middleLs, rightLs};
   Lanelet next{utils::getId(), nextLeftLs, nextRightLs};
@@ -37,9 +39,9 @@ void part1UsingTrafficRules() {
   // we use the traffic rules factory to get an traffic rules object that interprets the lanelets from the perspective
   // of a german vehicle.
   traffic_rules::TrafficRulesPtr trafficRules =
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
   traffic_rules::TrafficRulesPtr pedestrianRules =
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian);
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian);
 
   // now we can ask the traffic rules specific things about the lanelet. For now, we have not added any tags, so we
   // get a default interpretation of the lanelet:
@@ -83,7 +85,7 @@ void part1UsingTrafficRules() {
   // if we now add a speed limit regulatory element, the speed limit changes
   LineString3d sign = examples::getLineStringAtX(3);
   SpeedLimit::Ptr speedLimit =
-      SpeedLimit::make(utils::getId(), {}, {{sign}, "de274-60"});  // id of a speed limit 60 sign in germany
+    SpeedLimit::make(utils::getId(), {}, {{sign}, "de274-60"});    // id of a speed limit 60 sign in germany
   right.addRegulatoryElement(speedLimit);
   assert(trafficRules->speedLimit(right).speedLimit == 60_kmh);
 

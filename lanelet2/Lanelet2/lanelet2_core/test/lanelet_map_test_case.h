@@ -1,32 +1,39 @@
 #pragma once
 #include "lanelet2_core/LaneletMap.h"
 
-namespace lanelet {
-namespace test_cases {
+namespace lanelet
+{
+namespace test_cases
+{
 
 using utils::getId;
 
-template <typename T>
-std::unordered_map<Id, T> makeMap(const std::initializer_list<T>& vec) {
+template<typename T>
+std::unordered_map<Id, T> makeMap(const std::initializer_list<T> & vec)
+{
   std::unordered_map<Id, T> map;
-  for (const auto& elem : vec) {
+  for (const auto & elem : vec) {
     map.insert(std::make_pair(elem.id(), elem));
   }
   return map;
 }
 
-template <>
-inline std::unordered_map<Id, RegulatoryElementPtr> makeMap(const std::initializer_list<RegulatoryElementPtr>& vec) {
+template<>
+inline std::unordered_map<Id, RegulatoryElementPtr> makeMap(
+  const std::initializer_list<RegulatoryElementPtr> & vec)
+{
   std::unordered_map<Id, RegulatoryElementPtr> map;
-  for (const auto& elem : vec) {
+  for (const auto & elem : vec) {
     map.insert(std::make_pair(elem->id(), elem));
   }
   return map;
 }
 
-class LaneletMapTestCase {
- public:
-  LaneletMapTestCase() {
+class LaneletMapTestCase
+{
+public:
+  LaneletMapTestCase()
+  {
     /**
    p1------left-------p2
    |front             |
@@ -65,12 +72,15 @@ class LaneletMapTestCase {
 
     ar1 = Area(getId(), {left, rear.invert(), right.invert(), front});
 
-    map = std::make_shared<LaneletMap>(makeMap({ll1}), makeMap({ar1}), makeMap({regelem1}), makeMap({poly1}),
-                                       makeMap({left, right, front, rear}), makeMap({p1, p2, p3, p4}));
+    map =
+      std::make_shared<LaneletMap>(makeMap({ll1}), makeMap({ar1}), makeMap({regelem1}),
+        makeMap({poly1}),
+        makeMap({left, right, front, rear}), makeMap({p1, p2, p3, p4}));
   }
 
-  template <typename Test>
-  void testConstAndNonConst(Test&& test) {
+  template<typename Test>
+  void testConstAndNonConst(Test && test)
+  {
     test(map);
     LaneletMapConstPtr cMap(map);
     test(cMap);

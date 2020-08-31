@@ -9,25 +9,30 @@ using namespace lanelet::routing;
 using namespace lanelet::routing::tests;
 namespace fs = boost::filesystem;
 
-class Tempfile {
- public:
-  Tempfile() {
+class Tempfile
+{
+public:
+  Tempfile()
+  {
     char path[] = {"/tmp/lanelet2_unittest.XXXXXX"};
-    auto* res = mkdtemp(path);
+    auto * res = mkdtemp(path);
     if (res == nullptr) {
       throw lanelet::LaneletError("Failed to crate temporary directory");
     }
     path_ = path;
   }
-  Tempfile(const Tempfile&) = delete;
-  Tempfile(Tempfile&&) = delete;
-  Tempfile& operator=(const Tempfile&) = delete;
-  Tempfile& operator=(Tempfile&&) = delete;
-  ~Tempfile() { fs::remove_all(fs::path(path_)); }
+  Tempfile(const Tempfile &) = delete;
+  Tempfile(Tempfile &&) = delete;
+  Tempfile & operator=(const Tempfile &) = delete;
+  Tempfile & operator=(Tempfile &&) = delete;
+  ~Tempfile() {fs::remove_all(fs::path(path_));}
 
-  auto operator()(const std::string& str) const noexcept -> std::string { return (fs::path(path_) / str).string(); }
+  auto operator()(const std::string & str) const noexcept->std::string
+  {
+    return (fs::path(path_) / str).string();
+  }
 
- private:
+private:
   std::string path_;
 };
 
@@ -59,7 +64,8 @@ TEST_F(GermanVehicleGraph, GraphMLExport) {                                // NO
 
 TEST_F(GermanVehicleGraph, GraphMLExportError) {                                                             // NOLINT
   EXPECT_THROW(graph->exportGraphML("", RelationType::None), lanelet::InvalidInputError);                    // NOLINT
-  EXPECT_THROW(graph->exportGraphML("/place/that/doesnt/exist", RelationType::None), lanelet::ExportError);  // NOLINT
+  EXPECT_THROW(graph->exportGraphML("/place/that/doesnt/exist",
+    RelationType::None), lanelet::ExportError);                                                              // NOLINT
 }
 
 TEST_F(GermanVehicleGraph, DebugLaneletMap) {  // NOLINT
@@ -91,10 +97,10 @@ TEST_F(GermanBicycleGraph, DebugLaneletMap) {  // NOLINT
 TYPED_TEST(AllGraphsTest, CheckDebugLaneletMap) {
   ASSERT_NO_THROW(this->graph->getDebugLaneletMap());  // NOLINT
   const LaneletMapPtr map{this->graph->getDebugLaneletMap()};
-  for (const auto& it : map->pointLayer) {
+  for (const auto & it : map->pointLayer) {
     EXPECT_NO_THROW(it.attribute("id"));  // NOLINT
   }
-  for (const auto& it : map->lineStringLayer) {
+  for (const auto & it : map->lineStringLayer) {
     EXPECT_NO_THROW(it.attribute("relation"));  // NOLINT
   }
 }

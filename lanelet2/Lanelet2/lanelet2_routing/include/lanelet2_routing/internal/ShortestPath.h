@@ -6,12 +6,16 @@
 #include "lanelet2_routing/internal/Graph.h"
 #include "lanelet2_routing/internal/GraphUtils.h"
 
-namespace lanelet {
-namespace routing {
-namespace internal {
+namespace lanelet
+{
+namespace routing
+{
+namespace internal
+{
 
 //! This object carries the required information for the graph neighbourhood search
-struct VertexVisitInformation {
+struct VertexVisitInformation
+{
   RoutingGraphGraph::Vertex vertex{};
   RoutingGraphGraph::Vertex predecessor{};
   double cost{};
@@ -19,7 +23,8 @@ struct VertexVisitInformation {
   size_t numLaneChanges{};
 };
 
-struct VertexState {
+struct VertexState
+{
   RoutingGraphGraph::Vertex predecessor{};  //!< The vertex this refers to
   double cost{};                            //!< Current accumulated cost
   size_t length{};                          //!< Number of vertices to this vertex (including this one)
@@ -28,20 +33,24 @@ struct VertexState {
   bool isLeaf{true};                        //!< True if it has no successor that is on the shortest path
 };
 
-template <typename VertexT>
+template<typename VertexT>
 using DijkstraSearchMap = std::map<VertexT, VertexState>;
 
-template <typename VertexT>
-struct DijkstraCostMap {
+template<typename VertexT>
+struct DijkstraCostMap
+{
   using key_type = VertexT;                             // NOLINT
   using value_type = double;                            // NOLINT
   using reference = void;                               // NOLINT
   using category = boost::read_write_property_map_tag;  // NOLINT
-  DijkstraSearchMap<VertexT>* map{};
+  DijkstraSearchMap<VertexT> * map{};
 };
 
-template <typename VertexT>
-inline typename DijkstraCostMap<VertexT>::value_type get(const DijkstraCostMap<VertexT>& map, VertexT key) {
+template<typename VertexT>
+inline typename DijkstraCostMap<VertexT>::value_type get(
+  const DijkstraCostMap<VertexT> & map,
+  VertexT key)
+{
   auto val = map.map->find(key);
   if (val != map.map->end()) {
     return val->second.cost;
@@ -49,86 +58,100 @@ inline typename DijkstraCostMap<VertexT>::value_type get(const DijkstraCostMap<V
   return std::numeric_limits<double>::infinity();
 }
 
-template <typename VertexT>
-inline void put(DijkstraCostMap<VertexT>& map, VertexT key, typename DijkstraCostMap<VertexT>::value_type value) {
+template<typename VertexT>
+inline void put(
+  DijkstraCostMap<VertexT> & map, VertexT key,
+  typename DijkstraCostMap<VertexT>::value_type value)
+{
   (*map.map)[key].cost = value;
 }
 
-template <typename G>
-class DijkstraStyleSearch {
- public:
+template<typename G>
+class DijkstraStyleSearch
+{
+public:
   using VertexType = typename boost::graph_traits<G>::vertex_descriptor;
   using EdgeType = typename boost::graph_traits<G>::edge_descriptor;
   using DijkstraSearchMapType = DijkstraSearchMap<VertexType>;
-  using VisitCallback = std::function<bool(const VertexVisitInformation&)>;
+  using VisitCallback = std::function<bool (const VertexVisitInformation &)>;
 
- private:
-  class LeafFilter {
-   public:
+private:
+  class LeafFilter
+  {
+public:
     LeafFilter() = default;
-    LeafFilter(const DijkstraSearchMapType& m, const G& g) : m_{&m}, g_{&g} {}
-    bool operator()(EdgeType e) const { return (*m_).at(boost::source(e, *g_)).predicate; }
+    LeafFilter(const DijkstraSearchMapType & m, const G & g)
+    : m_{&m}, g_{&g} {}
+    bool operator()(EdgeType e) const {return (*m_).at(boost::source(e, *g_)).predicate;}
 
-   private:
-    const DijkstraSearchMapType* m_{};
-    const G* g_{};
+private:
+    const DijkstraSearchMapType * m_{};
+    const G * g_{};
   };
   using SearchGraph = boost::filtered_graph<G, LeafFilter>;
 
-  template <typename Func>
-  class DijkstraStyleVisitor : public boost::default_dijkstra_visitor {
+  template<typename Func>
+  class DijkstraStyleVisitor : public boost::default_dijkstra_visitor
+  {
     using FuncT = std::remove_reference_t<Func>;
 
-   public:
+public:
     DijkstraStyleVisitor() = default;
-    DijkstraStyleVisitor(DijkstraSearchMapType& map, FuncT* cb) : map_{&map}, cb_{cb} {}
+    DijkstraStyleVisitor(DijkstraSearchMapType & map, FuncT * cb)
+    : map_{&map}, cb_{cb} {}
 
     // called whenever a minimal edge is discovered
-    void examine_vertex(VertexType v, const SearchGraph& /*g*/) {  // NOLINT
-      auto& state = map_->at(v);
+    void examine_vertex(VertexType v, const SearchGraph & /*g*/)    // NOLINT
+    {
+      auto & state = map_->at(v);
       state.predicate =
-          ((*cb_)(VertexVisitInformation{v, state.predecessor, state.cost, state.length, state.numLaneChanges}));
+        ((*cb_)(VertexVisitInformation{v, state.predecessor, state.cost, state.length,
+          state.numLaneChanges}));
       map_->at(state.predecessor).isLeaf = v == state.predecessor;  // necessary for the initial vertex
     }
 
-    void edge_relaxed(EdgeType e, const SearchGraph& g) {  // NOLINT
-      // called whenever a shorter path to e is discovered and before "examine vertex" is called
+    void edge_relaxed(EdgeType e, const SearchGraph & g)    // NOLINT
+    { // called whenever a shorter path to e is discovered and before "examine vertex" is called
       // cost is automatically updated by the dijkstra algorithm
-      auto& predecessor = (*map_).at(boost::source(e, g));
-      auto& follower = (*map_)[boost::target(e, g)];
+      auto & predecessor = (*map_).at(boost::source(e, g));
+      auto & follower = (*map_)[boost::target(e, g)];
       follower.length = predecessor.length + 1;
       follower.predecessor = boost::source(e, g);
-      follower.numLaneChanges = predecessor.numLaneChanges + (g[e].relation != RelationType::Successor);
+      follower.numLaneChanges = predecessor.numLaneChanges +
+        (g[e].relation != RelationType::Successor);
     }
 
-   private:
-    DijkstraSearchMapType* map_{};
-    FuncT* cb_{};
+private:
+    DijkstraSearchMapType * map_{};
+    FuncT * cb_{};
   };
 
- public:
+public:
   //! Constructor for the graph search
-  explicit DijkstraStyleSearch(const G& graph) : graph_{graph, LeafFilter{vertices_, graph}} {}
+  explicit DijkstraStyleSearch(const G & graph)
+  : graph_{graph, LeafFilter{vertices_, graph}} {}
 
   //! Performs the dijkstra style search by calling func whenever the shortest path for a certain vertex is
   //! discovered. Whenever func returns false, the successor edges of this vertex will not be visited.
-  template <typename Func>
-  void query(VertexType start, Func&& func) {
+  template<typename Func>
+  void query(VertexType start, Func && func)
+  {
     vertices_.clear();
     vertices_.emplace(start, VertexState{start, 0., 1, 0, true, true});
     DijkstraStyleVisitor<decltype(func)> visitor{vertices_, &func};
     auto inf = std::numeric_limits<double>::infinity();
     // offering sane defaults seems to have been impossible...
     boost::dijkstra_shortest_paths_no_color_map_no_init(
-        graph_, start, boost::dummy_property_map{}, DijkstraCostMap<VertexType>{&vertices_},
-        boost::get(&EdgeInfo::routingCost, graph_), boost::get(boost::vertex_index, graph_), std::less<double>{},
-        boost::closed_plus<double>{}, inf, 0., visitor);
+      graph_, start, boost::dummy_property_map{}, DijkstraCostMap<VertexType>{&vertices_},
+      boost::get(&EdgeInfo::routingCost, graph_), boost::get(boost::vertex_index,
+      graph_), std::less<double>{},
+      boost::closed_plus<double>{}, inf, 0., visitor);
   }
 
   //! Returns the result
-  const DijkstraSearchMapType& getMap() const { return vertices_; }
+  const DijkstraSearchMapType & getMap() const {return vertices_;}
 
- private:
+private:
   SearchGraph graph_;
   DijkstraSearchMapType vertices_;
 };

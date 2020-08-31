@@ -10,7 +10,8 @@
 // we want assert statements to work in release mode
 #undef NDEBUG
 
-namespace {
+namespace
+{
 std::string exampleMapPath = std::string(PKG_DIR) + "/../lanelet2_maps/res/mapping_example.osm";
 }  // namespace
 
@@ -18,7 +19,8 @@ void part1CreatingAndUsingRoutingGraphs();
 void part2UsingRoutes();
 void part3UsingRoutingGraphContainers();
 
-int main() {
+int main()
+{
   // this tutorial finally shows you how to use routing graphs.
   part1CreatingAndUsingRoutingGraphs();
   part2UsingRoutes();
@@ -26,7 +28,8 @@ int main() {
   return 0;
 }
 
-void part1CreatingAndUsingRoutingGraphs() {
+void part1CreatingAndUsingRoutingGraphs()
+{
   using namespace lanelet;
   // a routing graph is created from a map, traffic rules and routing cost. Each routing graph can be created with
   // multiple different routing cost calculations. By default distance and time (using the speed limit of each
@@ -35,7 +38,7 @@ void part1CreatingAndUsingRoutingGraphs() {
   // make a routing graph for vehicles:
   LaneletMapPtr map = load(exampleMapPath, projection::UtmProjector(Origin({49, 8.4})));
   traffic_rules::TrafficRulesPtr trafficRules =
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
   routing::RoutingGraphUPtr routingGraph = routing::RoutingGraph::build(*map, *trafficRules);
 
   // the routing graph can be used to query thre different kinds of information: Neighbourhood relations for a
@@ -87,11 +90,12 @@ void part1CreatingAndUsingRoutingGraphs() {
   routingGraph->checkValidity();
 }
 
-void part2UsingRoutes() {
+void part2UsingRoutes()
+{
   using namespace lanelet;
   LaneletMapPtr map = load(exampleMapPath, projection::UtmProjector(Origin({49, 8.4})));
   traffic_rules::TrafficRulesPtr trafficRules =
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
   routing::RoutingGraphUPtr routingGraph = routing::RoutingGraph::build(*map, *trafficRules);
   ConstLanelet lanelet = map->laneletLayer.get(4984315);
   ConstLanelet toLanelet = map->laneletLayer.get(2925017);
@@ -123,16 +127,17 @@ void part2UsingRoutes() {
   assert(!routeMap->laneletLayer.empty());
 }
 
-void part3UsingRoutingGraphContainers() {
+void part3UsingRoutingGraphContainers()
+{
   // since routing graphs only contain primitives that are usable for one specific participant, we can not use them to
   // query possible conflicts between different participants. This problem is solved by the routing graph container:
   // It finds conflicts between individual participants by comparing the topology of the different graphs.
   using namespace lanelet;
   LaneletMapPtr map = load(exampleMapPath, projection::UtmProjector(Origin({49, 8.4})));
   traffic_rules::TrafficRulesPtr trafficRules =
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Vehicle);
   traffic_rules::TrafficRulesPtr pedestrianRules =
-      traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian);
+    traffic_rules::TrafficRulesFactory::create(Locations::Germany, Participants::Pedestrian);
   routing::RoutingGraphConstPtr vehicleGraph = routing::RoutingGraph::build(*map, *trafficRules);
   routing::RoutingGraphConstPtr pedestrGraph = routing::RoutingGraph::build(*map, *pedestrianRules);
   routing::RoutingGraphContainer graphs({vehicleGraph, pedestrGraph});

@@ -10,7 +10,8 @@
 /**
  * @namespace lanelet basic namespace for everything in lanelet2
  */
-namespace lanelet {
+namespace lanelet
+{
 
 // PrimitiveData
 class PrimitiveData;
@@ -200,7 +201,8 @@ constexpr Id InvalId = 0;  //!< indicates a primitive that is not part of a map
 using Ids = std::vector<Id>;
 
 // Velocity definitions
-namespace units {
+namespace units
+{
 using MPS = boost::units::unit<boost::units::velocity_dimension, boost::units::si::system>;
 using MPS2 = boost::units::unit<boost::units::acceleration_dimension, boost::units::si::system>;
 using MPSQuantity = boost::units::quantity<MPS>;

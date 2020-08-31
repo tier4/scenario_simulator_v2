@@ -3,12 +3,15 @@
 #include <sstream>
 #include <vector>
 
-namespace lanelet {
-namespace validation {
+namespace lanelet
+{
+namespace validation
+{
 enum class Severity { Error, Warning, Info };
 enum class Primitive { Point, LineString, Polygon, Lanelet, Area, RegulatoryElement, Primitive };
 
-inline const char* toString(Severity severity) {
+inline const char * toString(Severity severity)
+{
   switch (severity) {
     case Severity::Error:
       return "Error";
@@ -20,7 +23,8 @@ inline const char* toString(Severity severity) {
   return "";
 }
 
-inline const char* toString(Primitive primitive) {
+inline const char * toString(Primitive primitive)
+{
   switch (primitive) {
     case Primitive::Point:
       return "point";
@@ -40,12 +44,15 @@ inline const char* toString(Primitive primitive) {
   return "";
 }
 
-struct Issue {
+struct Issue
+{
   Issue() = default;
-  Issue(Severity severity, std::string message) : severity{severity}, message{std::move(message)} {}
+  Issue(Severity severity, std::string message)
+  : severity{severity}, message{std::move(message)} {}
   Issue(Severity severity, Primitive primitive, Id id, std::string message)
-      : severity{severity}, primitive{primitive}, id{id}, message{std::move(message)} {}
-  std::string buildReport() const {
+  : severity{severity}, primitive{primitive}, id{id}, message{std::move(message)} {}
+  std::string buildReport() const
+  {
     std::stringstream ss;
     ss << toString(severity) << ": ";
     if (id != InvalId) {

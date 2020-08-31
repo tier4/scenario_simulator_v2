@@ -5,69 +5,93 @@
 #include "lanelet2_core/primitives/LineString.h"
 #include "lanelet2_core/primitives/Traits.h"
 
-namespace lanelet {
-namespace geometry {
-namespace internal {
+namespace lanelet
+{
+namespace geometry
+{
+namespace internal
+{
 
-struct SelfIntersectionLong {
+struct SelfIntersectionLong
+{
   size_t idx;
   double s;  // coordinate along linestring
 };
 
-struct SelfIntersection2d {
+struct SelfIntersection2d
+{
   SelfIntersectionLong firstSegment;
   SelfIntersectionLong lastSegment;
   BasicPoint2d intersectionPoint;
 };
 using SelfIntersections2d = std::vector<SelfIntersection2d>;
 
-struct PointVincinity {
+struct PointVincinity
+{
   const BasicPoint2d preceding;
   const BasicPoint2d following;
 };
 
-template <typename T>
-struct GetGeometry<T, IfLS<T, void>> {
-  static inline auto twoD(const T& geometry) { return traits::toHybrid(traits::to2D(geometry)); }
-  static inline auto threeD(const T& geometry) { return traits::toHybrid(traits::to3D(geometry)); }
+template<typename T>
+struct GetGeometry<T, IfLS<T, void>>
+{
+  static inline auto twoD(const T & geometry) {return traits::toHybrid(traits::to2D(geometry));}
+  static inline auto threeD(const T & geometry) {return traits::toHybrid(traits::to3D(geometry));}
 };
 
-inline auto crossProd(const BasicPoint3d& p1, const BasicPoint3d& p2) { return p1.cross(p2).eval(); }
-inline auto crossProd(const BasicPoint2d& p1, const BasicPoint2d& p2) {
+inline auto crossProd(const BasicPoint3d & p1, const BasicPoint3d & p2)
+{
+  return p1.cross(p2).eval();
+}
+inline auto crossProd(const BasicPoint2d & p1, const BasicPoint2d & p2)
+{
   return BasicPoint3d(p1.x(), p1.y(), 0.).cross(BasicPoint3d(p2.x(), p2.y(), 0.)).eval();
 }
 // required for Polygon triangulation
-inline auto crossProd(const Eigen::Matrix<double, 2, 1>& p1, const Eigen::Matrix<double, 2, 1>& p2) {
+inline auto crossProd(
+  const Eigen::Matrix<double, 2, 1> & p1, const Eigen::Matrix<double, 2,
+  1> & p2)
+{
   return BasicPoint3d(p1.x(), p1.y(), 0.).cross(BasicPoint3d(p2.x(), p2.y(), 0.)).eval();
 }
 
-template <typename LineStringT, typename BasicPointT>
-auto findPoint(const LineStringT& ls, const BasicPointT& p) {
-  return std::find_if(ls.begin(), ls.end(), [&p](const auto& elem) { return boost::geometry::equals(elem, p); });
+template<typename LineStringT, typename BasicPointT>
+auto findPoint(const LineStringT & ls, const BasicPointT & p)
+{
+  return std::find_if(ls.begin(), ls.end(), [&p](const auto & elem) {
+             return boost::geometry::equals(elem, p);
+           });
 }
 
-template <typename PointT>
-bool pointIsLeftOf(const PointT& pSeg1, const PointT& pSeg2, const PointT& p) {
+template<typename PointT>
+bool pointIsLeftOf(const PointT & pSeg1, const PointT & pSeg2, const PointT & p)
+{
   return crossProd(PointT(pSeg2 - pSeg1), PointT(p - pSeg1)).z() > 0;
 }
 
-template <typename LineStringT>
-LineStringT invert(const LineStringT& ls) {
+template<typename LineStringT>
+LineStringT invert(const LineStringT & ls)
+{
   return ls.invert();
 }
 
-template <>
-inline BasicLineString2d invert(const BasicLineString2d& ls) {
+template<>
+inline BasicLineString2d invert(const BasicLineString2d & ls)
+{
   return BasicLineString2d{ls.rbegin(), ls.rend()};
 }
 
-template <>
-inline BasicLineString3d invert(const BasicLineString3d& ls) {
+template<>
+inline BasicLineString3d invert(const BasicLineString3d & ls)
+{
   return BasicLineString3d{ls.rbegin(), ls.rend()};
 }
 
-template <typename LineStringT, typename BasicPointT>
-bool isLeftOf(const LineStringT& ls, const BasicPointT& p, const helper::ProjectedPoint<BasicPointT>& projectedPoint) {
+template<typename LineStringT, typename BasicPointT>
+bool isLeftOf(
+  const LineStringT & ls, const BasicPointT & p,
+  const helper::ProjectedPoint<BasicPointT> & projectedPoint)
+{
   BasicPointT pSeg1 = projectedPoint.result->segmentPoint1;
   BasicPointT pSeg2 = projectedPoint.result->segmentPoint2;
   BasicPointT projPoint = projectedPoint.result->projectedPoint;
@@ -78,7 +102,10 @@ bool isLeftOf(const LineStringT& ls, const BasicPointT& p, const helper::Project
       // see stackoverflow.com/questions/10583212
       BasicPointT nextSegPoint;
       boost::geometry::convert(*nextSegPointIt, nextSegPoint);
-      if (isLeft != pointIsLeftOf(pSeg2, nextSegPoint, p) && isLeft == pointIsLeftOf(pSeg1, pSeg2, nextSegPoint)) {
+      if (isLeft !=
+        pointIsLeftOf(pSeg2, nextSegPoint, p) && isLeft == pointIsLeftOf(pSeg1, pSeg2,
+        nextSegPoint))
+      {
         return !isLeft;
       }
     }
@@ -86,8 +113,11 @@ bool isLeftOf(const LineStringT& ls, const BasicPointT& p, const helper::Project
   return isLeft;
 }
 
-template <typename LineStringT, typename PointT>
-std::pair<double, helper::ProjectedPoint<PointT>> signedDistanceImpl(const LineStringT lineString, const PointT& p) {
+template<typename LineStringT, typename PointT>
+std::pair<double, helper::ProjectedPoint<PointT>> signedDistanceImpl(
+  const LineStringT lineString,
+  const PointT & p)
+{
   using BasicPoint = PointT;
   helper::ProjectedPoint<BasicPoint> projectedPoint;
   const auto d = distance(lineString, p, projectedPoint);
@@ -95,33 +125,44 @@ std::pair<double, helper::ProjectedPoint<PointT>> signedDistanceImpl(const LineS
   return {isLeft ? d : -d, projectedPoint};
 }
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const ConstHybridLineString3d& l1,
-                                                       const ConstHybridLineString3d& l2);
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const ConstHybridLineString3d & l1,
+  const ConstHybridLineString3d & l2);
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const CompoundHybridLineString3d& l1,
-                                                       const CompoundHybridLineString3d& l2);
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const CompoundHybridLineString3d & l1,
+  const CompoundHybridLineString3d & l2);
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const ConstHybridLineString3d& l1, const BasicLineString3d& l2);
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const ConstHybridLineString3d & l1,
+  const BasicLineString3d & l2);
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const BasicLineString3d& l1, const ConstHybridLineString3d& l2);
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const BasicLineString3d & l1,
+  const ConstHybridLineString3d & l2);
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const BasicLineString3d& l1, const BasicLineString3d& l2);
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const BasicLineString3d & l1,
+  const BasicLineString3d & l2);
 
-template <typename HybridLineStringT>
-BasicPoint2d fromArcCoords(const HybridLineStringT& hLineString, const BasicPoint2d& projStart, const size_t startIdx,
-                           const size_t endIdx, const double distance) {
+template<typename HybridLineStringT>
+BasicPoint2d fromArcCoords(
+  const HybridLineStringT & hLineString, const BasicPoint2d & projStart, const size_t startIdx,
+  const size_t endIdx, const double distance)
+{
   if (hLineString.size() < startIdx) {
     throw InvalidInputError(std::string("Linestring point out of bounds. Linestring size ") +
-                            std::to_string(hLineString.size()) + ", startIdx " + std::to_string(startIdx));
+            std::to_string(hLineString.size()) + ", startIdx " + std::to_string(startIdx));
   }
   if (hLineString.size() < endIdx) {
     throw InvalidInputError(std::string("Linestring point out of bounds. Linestring size ") +
-                            std::to_string(hLineString.size()) + ", endIdx " + std::to_string(endIdx));
+            std::to_string(hLineString.size()) + ", endIdx " + std::to_string(endIdx));
   }
   if (startIdx == endIdx) {
     throw InvalidInputError(
-        std::string("Can't determine shift direction from two identical points on linestring. Point index ") +
-        std::to_string(startIdx));
+            std::string(
+              "Can't determine shift direction from two identical points on linestring. Point index ") +
+            std::to_string(startIdx));
   }
   const auto dx(hLineString[endIdx](0) - hLineString[startIdx](0));
   const auto dy(hLineString[endIdx](1) - hLineString[startIdx](1));
@@ -135,18 +176,21 @@ BasicPoint2d fromArcCoords(const HybridLineStringT& hLineString, const BasicPoin
  * @param idx index of point to create vincininty around
  * @return pair of preceding and following point (zero if not applicable)
  */
-template <typename LineString2dT>
-PointVincinity makeVincinity(const LineString2dT& lineString, const size_t idx) {
+template<typename LineString2dT>
+PointVincinity makeVincinity(const LineString2dT & lineString, const size_t idx)
+{
   if (idx == 0) {
     return PointVincinity{BasicPoint2d::Zero(),
-                          utils::toBasicPoint(lineString[idx + 1]) - utils::toBasicPoint(lineString[idx])};
+      utils::toBasicPoint(lineString[idx + 1]) - utils::toBasicPoint(lineString[idx])};
   }
   if (idx + 1 == lineString.size()) {
-    return PointVincinity{utils::toBasicPoint(lineString[idx]) - utils::toBasicPoint(lineString[idx - 1]),
-                          BasicPoint2d::Zero()};
+    return PointVincinity{utils::toBasicPoint(lineString[idx]) -
+      utils::toBasicPoint(lineString[idx - 1]),
+      BasicPoint2d::Zero()};
   }
-  return PointVincinity{utils::toBasicPoint(lineString[idx]) - utils::toBasicPoint(lineString[idx - 1]),
-                        utils::toBasicPoint(lineString[idx + 1]) - utils::toBasicPoint(lineString[idx])};
+  return PointVincinity{utils::toBasicPoint(lineString[idx]) -
+    utils::toBasicPoint(lineString[idx - 1]),
+    utils::toBasicPoint(lineString[idx + 1]) - utils::toBasicPoint(lineString[idx])};
 }
 
 /**
@@ -157,9 +201,11 @@ PointVincinity makeVincinity(const LineString2dT& lineString, const size_t idx) 
  * @param pv following and preveding point on line string
  * @return shifted point
  */
-template <typename LineString2dT>
-BasicPoint2d shiftLateral(const LineString2dT& lineString, const size_t idx, const double offset,
-                          const PointVincinity& pv) {
+template<typename LineString2dT>
+BasicPoint2d shiftLateral(
+  const LineString2dT & lineString, const size_t idx, const double offset,
+  const PointVincinity & pv)
+{
   Eigen::Vector2d perpendicular;
   double realOffset = offset;
   const auto epsilon{1.e-5};
@@ -180,10 +226,12 @@ BasicPoint2d shiftLateral(const LineString2dT& lineString, const size_t idx, con
 /**
  * @return Point and true if convex
  */
-template <typename LineString2dT>
-bool isConvex(const LineString2dT& lineString, const size_t idx, const bool offsetPositive) {
+template<typename LineString2dT>
+bool isConvex(const LineString2dT & lineString, const size_t idx, const bool offsetPositive)
+{
   if (idx != 0 && idx + 1 != lineString.size()) {
-    auto isLeft = pointIsLeftOf<BasicPoint2d>(lineString[idx - 1], lineString[idx], lineString[idx + 1]);
+    auto isLeft =
+      pointIsLeftOf<BasicPoint2d>(lineString[idx - 1], lineString[idx], lineString[idx + 1]);
     return offsetPositive ? !isLeft : isLeft;
   }
   return true;
@@ -191,9 +239,11 @@ bool isConvex(const LineString2dT& lineString, const size_t idx, const bool offs
 
 enum class Convexity { Concave, Convex, ConvexSharp };
 
-template <typename LineString2dT>
-Convexity getConvexity(const LineString2dT& lineString, const size_t idx, const PointVincinity& pv,
-                       const bool offsetPositive) {
+template<typename LineString2dT>
+Convexity getConvexity(
+  const LineString2dT & lineString, const size_t idx, const PointVincinity & pv,
+  const bool offsetPositive)
+{
   if (!isConvex(lineString, idx, offsetPositive)) {
     return Convexity::Concave;
   }
@@ -203,12 +253,13 @@ Convexity getConvexity(const LineString2dT& lineString, const size_t idx, const 
   return Convexity::Convex;
 }
 
-template <typename LineStringT>
-BasicPoints2d sortAlongS(const LineStringT& ls, const BasicPoints2d& points) {
+template<typename LineStringT>
+BasicPoints2d sortAlongS(const LineStringT & ls, const BasicPoints2d & points)
+{
   auto idxs = sortAlongSIdxs(ls, points);
   BasicPoints2d ret;
   ret.reserve(idxs.size());
-  for (const auto& i : idxs) {
+  for (const auto & i : idxs) {
     ret.emplace_back(points.at(i));
   }
   return ret;
@@ -221,15 +272,20 @@ BasicPoints2d sortAlongS(const LineStringT& ls, const BasicPoints2d& points) {
  * @param idx index of point to shift (negative means counting from back)
  * @param distance to shift (left = positive)
  */
-template <typename LineString2dT>
-BasicPoint2d lateralShiftPointAtIndex(const LineString2dT& lineString, const int idx, const double distance) {
+template<typename LineString2dT>
+BasicPoint2d lateralShiftPointAtIndex(
+  const LineString2dT & lineString, const int idx,
+  const double distance)
+{
   if (std::abs(idx) + 1 > lineString.size()) {
     throw InvalidInputError("Index out of bounds");
   }
-  int startIdx = (idx >= 0) ? std::max(0, idx - 1) : std::max(0, static_cast<int>(lineString.size()) + idx - 1);
-  int endIdx = (idx >= 0)
-                   ? std::min(idx + 1, static_cast<int>(lineString.size()) - 1)
-                   : std::min(static_cast<int>(lineString.size()) + idx + 1, static_cast<int>(lineString.size()) - 1);
+  int startIdx = (idx >= 0) ? std::max(0, idx - 1) : std::max(0,
+      static_cast<int>(lineString.size()) + idx - 1);
+  int endIdx = (idx >= 0) ?
+    std::min(idx + 1, static_cast<int>(lineString.size()) - 1) :
+    std::min(static_cast<int>(lineString.size()) + idx + 1,
+      static_cast<int>(lineString.size()) - 1);
   int pIdx = (idx >= 0) ? idx : static_cast<int>(lineString.size()) + idx;
   auto hLineString = utils::toHybrid(lineString);
   return internal::fromArcCoords(hLineString, hLineString[pIdx], startIdx, endIdx, distance);
@@ -240,7 +296,8 @@ using IndexedSegment2d = std::pair<BasicSegment2d, size_t>;
 using IndexedSegmentTree = bgi::rtree<IndexedSegment2d, bgi::linear<4>>;
 using SegmentTree = bgi::rtree<BasicSegment2d, bgi::linear<4>>;
 
-struct LineStringsCoordinate {
+struct LineStringsCoordinate
+{
   const size_t lineStringIdx;
   const size_t segmentIdx;
 };
@@ -251,8 +308,9 @@ struct LineStringsCoordinate {
  * @throws InvalidInputError if the line string size is below 2
  * @return a search tree
  */
-template <typename LineString2dT>
-inline SegmentTree makeSegmentTree(const LineString2dT& lineString) {
+template<typename LineString2dT>
+inline SegmentTree makeSegmentTree(const LineString2dT & lineString)
+{
   if (lineString.size() < 2) {
     throw InvalidInputError("Need line string size of at least 2 to make tree");
   }
@@ -261,7 +319,7 @@ inline SegmentTree makeSegmentTree(const LineString2dT& lineString) {
   segContainer.reserve(lineString.size() - 1);
   for (size_t i = 0; i < lineString.size() - 1; ++i) {
     segContainer.emplace_back(
-        BasicSegment2d{utils::toBasicPoint(lineString[i]), utils::toBasicPoint(lineString[i + 1])});
+      BasicSegment2d{utils::toBasicPoint(lineString[i]), utils::toBasicPoint(lineString[i + 1])});
   }
   tree.insert(segContainer);
 
@@ -274,7 +332,8 @@ inline SegmentTree makeSegmentTree(const LineString2dT& lineString) {
  * @throws InvalidInputError if the line string size is below 2
  * @return a search tree
  */
-inline IndexedSegmentTree makeIndexedSegmenTree(const BasicLineString2d& lineString) {
+inline IndexedSegmentTree makeIndexedSegmenTree(const BasicLineString2d & lineString)
+{
   if (lineString.size() < 2) {
     throw InvalidInputError("Need line string size of at least 2 to make tree");
   }
@@ -282,7 +341,8 @@ inline IndexedSegmentTree makeIndexedSegmenTree(const BasicLineString2d& lineStr
   std::vector<std::pair<BasicSegment2d, size_t>> segContainer;
   segContainer.reserve(lineString.size() - 1);
   for (size_t i = 0; i < lineString.size() - 1; ++i) {
-    segContainer.emplace_back(std::make_pair(BasicSegment2d{lineString.at(i), lineString.at(i + 1)}, i));
+    segContainer.emplace_back(std::make_pair(BasicSegment2d{lineString.at(i), lineString.at(i + 1)},
+      i));
   }
   tree.insert(segContainer);
   return tree;
@@ -294,11 +354,14 @@ inline IndexedSegmentTree makeIndexedSegmenTree(const BasicLineString2d& lineStr
  * @param minS start coordinate along the segment
  * @return index of the search result in selfIntersections
  */
-inline Optional<size_t> getLowestSAbove(const SelfIntersections2d& selfIntersections, const double minS) {
+inline Optional<size_t> getLowestSAbove(
+  const SelfIntersections2d & selfIntersections,
+  const double minS)
+{
   double curMinS = std::numeric_limits<double>::max();
   Optional<size_t> res;
   for (size_t i = 0; i < selfIntersections.size(); ++i) {
-    const auto& ci = selfIntersections.at(i);
+    const auto & ci = selfIntersections.at(i);
     if (ci.firstSegment.s > minS && ci.firstSegment.s < curMinS) {
       res = i;
       curMinS = ci.firstSegment.s;
@@ -314,28 +377,33 @@ inline Optional<size_t> getLowestSAbove(const SelfIntersections2d& selfIntersect
  * @param seg index of the segment to be evaluated
  * @return a list of intersections involving the given segment
  */
-inline SelfIntersections2d getSelfIntersectionsAt(const IndexedSegmentTree& tree, const size_t segToCheck,
-                                                  const BasicSegment2d& seg) {
+inline SelfIntersections2d getSelfIntersectionsAt(
+  const IndexedSegmentTree & tree, const size_t segToCheck,
+  const BasicSegment2d & seg)
+{
   SelfIntersections2d curSegIntersections;
   for (auto it = tree.qbegin(bgi::intersects(seg)); it != tree.qend(); ++it) {
-    const auto& otherSegIdx = it->second;
-    const auto& otherSeg = it->first;
-    if (otherSeg.first != seg.second && otherSeg.second != seg.first && otherSeg.first != seg.first &&
-        otherSegIdx > segToCheck) {
+    const auto & otherSegIdx = it->second;
+    const auto & otherSeg = it->first;
+    if (otherSeg.first != seg.second && otherSeg.second != seg.first &&
+      otherSeg.first != seg.first &&
+      otherSegIdx > segToCheck)
+    {
       BasicPoints2d intersectionPoints;
       boost::geometry::intersection(seg, otherSeg, intersectionPoints);
       const auto intersectionPoint = intersectionPoints.front();
       auto firstS = (intersectionPoint - seg.first).norm();
       auto lastS = (intersectionPoint - otherSeg.first).norm();
       curSegIntersections.emplace_back(SelfIntersection2d{SelfIntersectionLong{segToCheck, firstS},
-                                                          SelfIntersectionLong{otherSegIdx, lastS}, intersectionPoint});
+          SelfIntersectionLong{otherSegIdx, lastS}, intersectionPoint});
     }
   }
 
   return curSegIntersections;
 }
 
-struct PointSearchResult {
+struct PointSearchResult
+{
   const BasicPoint2d nextPoint;
   const size_t nextSegIdx;
   const double lastS;
@@ -349,19 +417,22 @@ struct PointSearchResult {
  * @param i segment index
  * @return coordinate of next point on the walk
  */
-inline PointSearchResult findNextPoint(const SelfIntersections2d& curSegIntersections, const BasicSegment2d& seg,
-                                       const double lastS, const size_t i) {
+inline PointSearchResult findNextPoint(
+  const SelfIntersections2d & curSegIntersections, const BasicSegment2d & seg,
+  const double lastS, const size_t i)
+{
   if (!curSegIntersections.empty()) {
     auto possibeNextIntersection = getLowestSAbove(curSegIntersections, lastS);
     if (possibeNextIntersection) {
-      const auto& ni = curSegIntersections.at(*possibeNextIntersection);
+      const auto & ni = curSegIntersections.at(*possibeNextIntersection);
       return PointSearchResult{ni.intersectionPoint, ni.lastSegment.idx, ni.lastSegment.s};
     }
   }
   return PointSearchResult{seg.second, i + 1, 0.};
 }
 
-inline BasicLineString2d removeSelfIntersections(const BasicLineString2d& lineString) {
+inline BasicLineString2d removeSelfIntersections(const BasicLineString2d & lineString)
+{
   if (lineString.size() <= 3) {
     return lineString;
   }
@@ -389,11 +460,13 @@ inline BasicLineString2d removeSelfIntersections(const BasicLineString2d& lineSt
  * @param distance shifting distance (left is positive)
  * @param epsilon maximum allowed difference between requested and actual minimum offset
  */
-template <typename LineString2dT>
-inline void checkForInversion(const LineString2dT& oldLS, const BasicLineString2d& offsetLS, const double distance,
-                              const double epsilon = 1.e-7) {
+template<typename LineString2dT>
+inline void checkForInversion(
+  const LineString2dT & oldLS, const BasicLineString2d & offsetLS, const double distance,
+  const double epsilon = 1.e-7)
+{
   auto tree = internal::makeSegmentTree(oldLS);
-  for (const auto& p : offsetLS) {
+  for (const auto & p : offsetLS) {
     auto it = tree.qbegin(internal::bgi::nearest(p, 1));
     auto pd = geometry::distance2d(BasicLineString2d{it->first, it->second}, p);
     if (pd + epsilon < distance) {
@@ -411,9 +484,11 @@ inline void checkForInversion(const LineString2dT& oldLS, const BasicLineString2
  * @param pv following and preveding point on line string
  * @return shifted point
  */
-template <typename LineString2dT>
-inline BasicPoint2d shiftPerpendicular(const LineString2dT& lineString, const size_t idx, const double distance,
-                                       const bool asLast, const PointVincinity& pv) {
+template<typename LineString2dT>
+inline BasicPoint2d shiftPerpendicular(
+  const LineString2dT & lineString, const size_t idx, const double distance,
+  const bool asLast, const PointVincinity & pv)
+{
   if (idx == 0 && asLast) {
     throw GeometryError("Can't shift first point of line string as endpoint of segment");
   }
@@ -434,9 +509,11 @@ inline BasicPoint2d shiftPerpendicular(const LineString2dT& lineString, const si
  * @param pv following and preveding point on line string
  * @return shifted points
  */
-template <typename LineString2dT>
-inline BasicLineString2d shiftConvexSharp(const LineString2dT& lineString, const size_t idx, const double distance,
-                                          const PointVincinity& pv) {
+template<typename LineString2dT>
+inline BasicLineString2d shiftConvexSharp(
+  const LineString2dT & lineString, const size_t idx, const double distance,
+  const PointVincinity & pv)
+{
   if (idx == 0) {
     throw GeometryError("Can't shift first point of line string as sharp convex");
   }
@@ -445,9 +522,11 @@ inline BasicLineString2d shiftConvexSharp(const LineString2dT& lineString, const
   }
   BasicPoint2d firstP = shiftPerpendicular(lineString, idx, distance, true, pv);
   BasicPoint2d lastP = shiftPerpendicular(lineString, idx, distance, false, pv);
-  auto alpha = M_PI - std::acos(pv.following.dot(pv.preceding) / (pv.preceding.norm() * pv.following.norm()));
+  auto alpha = M_PI -
+    std::acos(pv.following.dot(pv.preceding) / (pv.preceding.norm() * pv.following.norm()));
   auto overshoot = distance * std::tan(M_PI_4 - alpha / 4);
-  return {firstP + pv.preceding.normalized() * overshoot, lastP - pv.following.normalized() * overshoot};
+  return {firstP + pv.preceding.normalized() * overshoot,
+    lastP - pv.following.normalized() * overshoot};
 }
 
 /**
@@ -458,12 +537,15 @@ inline BasicLineString2d shiftConvexSharp(const LineString2dT& lineString, const
  * @param pv following and preveding point on line string
  * @return shifted point(s), bool indicating insertion was still convex
  */
-template <typename LineString2dT>
-inline std::pair<BasicLineString2d, bool> shiftPoint(const LineString2dT& lineString, const double distance,
-                                                     const size_t idx, const PointVincinity& pv) {
+template<typename LineString2dT>
+inline std::pair<BasicLineString2d, bool> shiftPoint(
+  const LineString2dT & lineString, const double distance,
+  const size_t idx, const PointVincinity & pv)
+{
   auto convexity = internal::getConvexity(lineString, idx, pv, distance > 0);
   if (convexity == Convexity::Concave) {
-    return std::make_pair(BasicLineString2d{shiftPerpendicular(lineString, idx, distance, true, pv)}, false);
+    return std::make_pair(BasicLineString2d{shiftPerpendicular(lineString, idx, distance, true,
+               pv)}, false);
   }
   if (convexity == Convexity::Convex) {
     return std::make_pair(BasicLineString2d{shiftLateral(lineString, idx, distance, pv)}, true);
@@ -480,8 +562,11 @@ inline std::pair<BasicLineString2d, bool> shiftPoint(const LineString2dT& lineSt
  * @param distance offset distance (left is positive)
  * @return list of line strings, each one is convex. Guaranteed to intersect at non-convex parts
  */
-template <typename LineString2dT>
-inline std::vector<BasicLineString2d> extractConvex(const LineString2dT& lineString, const double distance) {
+template<typename LineString2dT>
+inline std::vector<BasicLineString2d> extractConvex(
+  const LineString2dT & lineString,
+  const double distance)
+{
   std::vector<BasicLineString2d> offsets;
   size_t curIdx{0};
   while (curIdx + 1 < lineString.size()) {
@@ -503,7 +588,8 @@ inline std::vector<BasicLineString2d> extractConvex(const LineString2dT& lineStr
 
 using SegmentMap = std::map<size_t, LineStringsCoordinate>;
 
-struct SegmentSearch {
+struct SegmentSearch
+{
   IndexedSegmentTree tree;
   SegmentMap map;
 };
@@ -514,12 +600,13 @@ struct SegmentSearch {
  * @return search tree and mapping from segment index of uncut linestring to linestring and segment index of substring
  */
 
-inline SegmentSearch makeTree(const std::vector<BasicLineString2d>& convexSubStrings) {
+inline SegmentSearch makeTree(const std::vector<BasicLineString2d> & convexSubStrings)
+{
   IndexedSegmentTree tree;
   SegmentMap segMap;
   size_t idx{0};
   for (size_t i = 0; i < convexSubStrings.size(); ++i) {
-    const auto& ss = convexSubStrings.at(i);
+    const auto & ss = convexSubStrings.at(i);
     for (size_t j = 0; j + 1 < ss.size(); ++j) {
       BasicSegment2d seg{utils::toBasicPoint(ss.at(j)), utils::toBasicPoint(ss.at(j + 1))};
       tree.insert(std::make_pair(seg, idx));
@@ -539,8 +626,10 @@ inline SegmentSearch makeTree(const std::vector<BasicLineString2d>& convexSubStr
  * @param segMap mapping from segment index of uncut linestring to linestring and segment index of substring
  * @return joined line string
  */
-inline BasicLineString2d joinSubStrings(const std::vector<BasicLineString2d>& convexSubStrings,
-                                        const IndexedSegmentTree& tree, const SegmentMap& segMap) {
+inline BasicLineString2d joinSubStrings(
+  const std::vector<BasicLineString2d> & convexSubStrings,
+  const IndexedSegmentTree & tree, const SegmentMap & segMap)
+{
   if (convexSubStrings.empty()) {
     return BasicLineString2d();
   }
@@ -552,7 +641,7 @@ inline BasicLineString2d joinSubStrings(const std::vector<BasicLineString2d>& co
   size_t i = 0;
   size_t idx = 0;
   while (i < convexSubStrings.size()) {
-    const auto& ls = convexSubStrings.at(i);
+    const auto & ls = convexSubStrings.at(i);
     for (size_t j = 0; j + 1 < ls.size(); ++j) {
       BasicSegment2d curSeg{ls.at(j), ls.at(j + 1)};
       auto curSegIntersections = getSelfIntersectionsAt(tree, idx, curSeg);
@@ -576,15 +665,19 @@ inline BasicLineString2d joinSubStrings(const std::vector<BasicLineString2d>& co
 
 }  // namespace internal
 
-template <typename LineStringIterator>
-double rangedLength(LineStringIterator start, LineStringIterator end) {
+template<typename LineStringIterator>
+double rangedLength(LineStringIterator start, LineStringIterator end)
+{
   double l = 0.;
-  helper::forEachPair(start, end, [&l](const auto& seg1, const auto& seg2) { l += distance(seg1, seg2); });
+  helper::forEachPair(start, end, [&l](const auto & seg1, const auto & seg2) {
+      l += distance(seg1, seg2);
+    });
   return l;
 }
 
-template <typename LineStringT>
-std::vector<double> lengthRatios(const LineStringT& lineString) {
+template<typename LineStringT>
+std::vector<double> lengthRatios(const LineStringT & lineString)
+{
   std::vector<double> lengths;
   if (lineString.size() <= 1) {
     return lengths;
@@ -594,21 +687,25 @@ std::vector<double> lengthRatios(const LineStringT& lineString) {
   }
   const auto totalLength = length(lineString);
   lengths.reserve(lineString.size() - 1);
-  helper::forEachPair(lineString.begin(), lineString.end(), [&lengths, &totalLength](const auto& p1, const auto& p2) {
-    lengths.push_back(distance(p1, p2) / totalLength);
-  });
+  helper::forEachPair(lineString.begin(), lineString.end(),
+    [&lengths, &totalLength](const auto & p1, const auto & p2) {
+      lengths.push_back(distance(p1, p2) / totalLength);
+    });
   return lengths;
 }
 
-template <typename LineStringT>
-std::vector<double> accumulatedLengthRatios(const LineStringT& lineString) {
+template<typename LineStringT>
+std::vector<double> accumulatedLengthRatios(const LineStringT & lineString)
+{
   auto lengths = lengthRatios(lineString);
-  helper::forEachPair(lengths.begin(), lengths.end(), [](const auto& l1, auto& l2) { l2 += l1; });
+  helper::forEachPair(lengths.begin(), lengths.end(), [](const auto & l1, auto & l2) {l2 += l1;});
   return lengths;
 }
 
-template <typename LineStringT>
-traits::BasicPointT<traits::PointType<LineStringT>> interpolatedPointAtDistance(LineStringT lineString, double dist) {
+template<typename LineStringT>
+traits::BasicPointT<traits::PointType<LineStringT>> interpolatedPointAtDistance(
+  LineStringT lineString, double dist)
+{
   assert(!lineString.empty());
   if (dist < 0) {
     lineString = internal::invert(lineString);
@@ -616,8 +713,10 @@ traits::BasicPointT<traits::PointType<LineStringT>> interpolatedPointAtDistance(
   }
 
   double currentCumulativeLength = 0.0;
-  for (auto first = lineString.begin(), second = std::next(lineString.begin()); second != lineString.end();
-       ++first, ++second) {
+  for (auto first = lineString.begin(), second = std::next(lineString.begin());
+    second != lineString.end();
+    ++first, ++second)
+  {
     auto p1 = traits::toBasicPoint(*first);
     auto p2 = traits::toBasicPoint(*second);
     double currentLength = distance(p1, p2);
@@ -633,8 +732,9 @@ traits::BasicPointT<traits::PointType<LineStringT>> interpolatedPointAtDistance(
   return traits::toBasicPoint(lineString.back());
 }
 
-template <typename LineStringT>
-traits::PointType<LineStringT> nearestPointAtDistance(LineStringT lineString, double dist) {
+template<typename LineStringT>
+traits::PointType<LineStringT> nearestPointAtDistance(LineStringT lineString, double dist)
+{
   using traits::toBasicPoint;
   assert(!lineString.empty());
   if (dist < 0) {
@@ -642,10 +742,12 @@ traits::PointType<LineStringT> nearestPointAtDistance(LineStringT lineString, do
     dist = -dist;
   }
   double currentCumulativeLength = 0.0;
-  for (auto first = lineString.begin(), second = std::next(lineString.begin()); second != lineString.end();
-       ++first, ++second) {
-    const auto& p1 = *first;
-    const auto& p2 = *second;
+  for (auto first = lineString.begin(), second = std::next(lineString.begin());
+    second != lineString.end();
+    ++first, ++second)
+  {
+    const auto & p1 = *first;
+    const auto & p2 = *second;
     double currentLength = distance(p1, p2);
     currentCumulativeLength += currentLength;
     if (currentCumulativeLength >= dist) {
@@ -659,22 +761,26 @@ traits::PointType<LineStringT> nearestPointAtDistance(LineStringT lineString, do
   return lineString.back();
 }
 
-template <typename LineString3dT>
-double signedDistance(const LineString3dT& lineString, const BasicPoint3d& p) {
+template<typename LineString3dT>
+double signedDistance(const LineString3dT & lineString, const BasicPoint3d & p)
+{
   static_assert(traits::is3D<LineString3dT>(), "Please call this function with a 3D type!");
   return internal::signedDistanceImpl(lineString, p).first;
 }
 
-template <typename LineString2dT>
-double signedDistance(const LineString2dT& lineString, const BasicPoint2d& p) {
+template<typename LineString2dT>
+double signedDistance(const LineString2dT & lineString, const BasicPoint2d & p)
+{
   static_assert(traits::is2D<LineString2dT>(), "Please call this function with a 2D type!");
   return internal::signedDistanceImpl(lineString, p).first;
 }
 
-template <typename Point2dT>
-double curvature2d(const Point2dT& p1, const Point2dT& p2, const Point2dT& p3) {
+template<typename Point2dT>
+double curvature2d(const Point2dT & p1, const Point2dT & p2, const Point2dT & p3)
+{
   // see https://en.wikipedia.org/wiki/Menger_curvature#Definition
-  const double area = 0.5 * ((p2.x() - p1.x()) * (p3.y() - p1.y()) - (p2.y() - p1.y()) * (p3.x() - p1.x()));
+  const double area = 0.5 *
+    ((p2.x() - p1.x()) * (p3.y() - p1.y()) - (p2.y() - p1.y()) * (p3.x() - p1.x()));
   const double side1 = distance(p1, p2);
   const double side2 = distance(p1, p3);
   const double side3 = distance(p2, p3);
@@ -685,99 +791,118 @@ double curvature2d(const Point2dT& p1, const Point2dT& p2, const Point2dT& p3) {
   return std::fabs(4 * area / product);
 }
 
-template <typename LineString2dT>
-ArcCoordinates toArcCoordinates(const LineString2dT& lineString, const BasicPoint2d& point) {
+template<typename LineString2dT>
+ArcCoordinates toArcCoordinates(const LineString2dT & lineString, const BasicPoint2d & point)
+{
   auto res = internal::signedDistanceImpl(lineString, point);
   auto dist = res.first;
-  const auto& projectedPoint = res.second;
+  const auto & projectedPoint = res.second;
   // find first point in segment in linestring
   double length = 0.;
-  auto accumulateLength = [&length, &point = projectedPoint.result->segmentPoint1](const auto& first,
-                                                                                   const auto& second) {
-    if (boost::geometry::equals(first, point)) {
-      return true;
-    }
-    length += distance(first, second);
-    return false;
-  };
+  auto accumulateLength =
+    [&length, & point = projectedPoint.result->segmentPoint1](const auto & first,
+      const auto & second) {
+      if (boost::geometry::equals(first, point)) {
+        return true;
+      }
+      length += distance(first, second);
+      return false;
+    };
   helper::forEachPairUntil(lineString.begin(), lineString.end(), accumulateLength);
   length += distance(projectedPoint.result->segmentPoint1, projectedPoint.result->projectedPoint);
   return {length, dist};
 }
 
-template <typename LineString3dT>
-IfLS<LineString3dT, BoundingBox3d> boundingBox3d(const LineString3dT& lineString) {
+template<typename LineString3dT>
+IfLS<LineString3dT, BoundingBox3d> boundingBox3d(const LineString3dT & lineString)
+{
   static_assert(traits::is3D<LineString3dT>(), "Please call this function with a 3D type!");
   BoundingBox3d bb;
-  for (const auto& p : lineString) {
+  for (const auto & p : lineString) {
     bb.extend(traits::toBasicPoint(p));
   }
   return bb;
 }
 
-template <typename LineString2dT>
-IfLS<LineString2dT, BoundingBox2d> boundingBox2d(const LineString2dT& lineString) {
+template<typename LineString2dT>
+IfLS<LineString2dT, BoundingBox2d> boundingBox2d(const LineString2dT & lineString)
+{
   BoundingBox2d bb;
-  for (const auto& p : traits::to2D(lineString)) {
+  for (const auto & p : traits::to2D(lineString)) {
     bb.extend(traits::toBasicPoint(p));
   }
   return bb;
 }
 
-template <typename LineString3dT, typename>
-BasicPoint3d project(const LineString3dT& lineString, const BasicPoint3d& pointToProject) {
+template<typename LineString3dT, typename>
+BasicPoint3d project(const LineString3dT & lineString, const BasicPoint3d & pointToProject)
+{
   static_assert(traits::is3D<LineString3dT>(), "Please call this function with a 3D type!");
   helper::ProjectedPoint<BasicPoint3d> projectedPoint;
   distance(lineString, pointToProject, projectedPoint);
   return projectedPoint.result->projectedPoint;
 }
 
-template <typename LineString2dT, typename>
-BasicPoint2d project(const LineString2dT& lineString, const BasicPoint2d& pointToProject) {
+template<typename LineString2dT, typename>
+BasicPoint2d project(const LineString2dT & lineString, const BasicPoint2d & pointToProject)
+{
   static_assert(traits::is2D<LineString2dT>(), "Please call this function with a 2D type!");
   helper::ProjectedPoint<BasicPoint2d> projectedPoint;
   distance(lineString, pointToProject, projectedPoint);
   return projectedPoint.result->projectedPoint;
 }
 
-template <typename LineString3dT>
-IfLS<LineString3dT, bool> intersects3d(const LineString3dT& linestring, const LineString3dT& otherLinestring,
-                                       double heightTolerance) {
+template<typename LineString3dT>
+IfLS<LineString3dT, bool> intersects3d(
+  const LineString3dT & linestring, const LineString3dT & otherLinestring,
+  double heightTolerance)
+{
   auto ls2d(traits::toHybrid(traits::to2D(linestring)));
   auto ols2d(traits::toHybrid(traits::to2D(otherLinestring)));
   BasicPoints2d intersections;
   boost::geometry::intersection(ls2d, ols2d, intersections);
-  auto distanceSmallerTolerance = [heightTolerance, &linestring, &otherLinestring](const auto& point) {
-    auto pProj1 = project(linestring, BasicPoint3d(point.x(), point.y(), 0));
-    auto pProj2 = project(otherLinestring, BasicPoint3d(point.x(), point.y(), 0));
-    return distance(pProj1, pProj2) < heightTolerance;
-  };
+  auto distanceSmallerTolerance =
+    [heightTolerance, &linestring, &otherLinestring](const auto & point) {
+      auto pProj1 = project(linestring, BasicPoint3d(point.x(), point.y(), 0));
+      auto pProj2 = project(otherLinestring, BasicPoint3d(point.x(), point.y(), 0));
+      return distance(pProj1, pProj2) < heightTolerance;
+    };
   return std::any_of(intersections.begin(), intersections.end(), distanceSmallerTolerance);
 }
 
-template <typename LineString3dT>
-IfLS<LineString3dT, std::pair<BasicPoint3d, BasicPoint3d>> projectedPoint3d(const LineString3dT& l1,
-                                                                            const LineString3dT& l2) {
+template<typename LineString3dT>
+IfLS<LineString3dT, std::pair<BasicPoint3d, BasicPoint3d>> projectedPoint3d(
+  const LineString3dT & l1,
+  const LineString3dT & l2)
+{
   static_assert(traits::is3D<LineString3dT>(), "Please call this function with a 3D type!");
   return internal::projectedPoint3d(traits::toHybrid(l1), traits::toHybrid(l2));
 }
 
-template <typename LineString3d1T, typename LineString3d2T>
-IfLS2<LineString3d1T, LineString3d2T, double> distance3d(const LineString3d1T& l1, const LineString3d2T& l2) {
-  auto projPoint = internal::projectedPoint3d(traits::toHybrid(traits::to3D(l1)), traits::toHybrid(traits::to3D(l2)));
+template<typename LineString3d1T, typename LineString3d2T>
+IfLS2<LineString3d1T, LineString3d2T, double> distance3d(
+  const LineString3d1T & l1,
+  const LineString3d2T & l2)
+{
+  auto projPoint =
+    internal::projectedPoint3d(traits::toHybrid(traits::to3D(l1)),
+      traits::toHybrid(traits::to3D(l2)));
   return (projPoint.first - projPoint.second).norm();
 }
 
-template <typename LineString1T, typename LineString2T>
-std::pair<LineString1T, LineString2T> align(LineString1T left, LineString2T right) {
+template<typename LineString1T, typename LineString2T>
+std::pair<LineString1T, LineString2T> align(LineString1T left, LineString2T right)
+{
   using traits::toBasicPoint;
   // degenerated case
   if ((left.size() <= 1 && right.size() <= 1) || right.empty() || left.empty()) {
     return {left, right};
   }
-  auto getMiddlePoint = [](auto& ls) {
-    return ls.size() > 2 ? toBasicPoint(ls[ls.size() / 2]) : (toBasicPoint(ls.front()) + toBasicPoint(ls.back())) * 0.5;
-  };
+  auto getMiddlePoint = [](auto & ls) {
+      return ls.size() >
+             2 ? toBasicPoint(ls[ls.size() / 2]) : (toBasicPoint(ls.front()) +
+             toBasicPoint(ls.back())) * 0.5;
+    };
   //! @todo this sadly is a bit heuristical...
   bool rightOfLeft = signedDistance(left, getMiddlePoint(right)) < 0;
   if (!rightOfLeft && left.size() > 1) {
@@ -791,8 +916,9 @@ std::pair<LineString1T, LineString2T> align(LineString1T left, LineString2T righ
   return {left, right};
 }
 
-template <typename LineString2dT>
-BasicPoint2d fromArcCoordinates(const LineString2dT& lineString, const ArcCoordinates& arcCoords) {
+template<typename LineString2dT>
+BasicPoint2d fromArcCoordinates(const LineString2dT & lineString, const ArcCoordinates & arcCoords)
+{
   if (lineString.size() < 2) {
     throw InvalidInputError("Can't use arc coordinates on degenerated line string");
   }
@@ -812,44 +938,51 @@ BasicPoint2d fromArcCoordinates(const LineString2dT& lineString, const ArcCoordi
     endIdx = lineString.size() - 1;
     startIdx = endIdx - 1;
   }
-  return internal::fromArcCoords(hLineString, interpolatedPointAtDistance(utils::to2D(lineString), arcCoords.length),
-                                 startIdx, endIdx, arcCoords.distance);
+  return internal::fromArcCoords(hLineString,
+           interpolatedPointAtDistance(utils::to2D(lineString), arcCoords.length),
+           startIdx, endIdx, arcCoords.distance);
 }
 
-template <typename LineString2dT>
-BasicLineString2d offsetNoThrow(const LineString2dT& lineString, const double distance) {
+template<typename LineString2dT>
+BasicLineString2d offsetNoThrow(const LineString2dT & lineString, const double distance)
+{
   auto convexSubStrings = internal::extractConvex(lineString, distance);
   auto segSearch = internal::makeTree(convexSubStrings);
   auto newLS = internal::joinSubStrings(convexSubStrings, segSearch.tree, segSearch.map);
   return newLS;
 }
 
-template <typename LineString2dT>
-BasicLineString2d offset(const LineString2dT& lineString, const double distance) {
+template<typename LineString2dT>
+BasicLineString2d offset(const LineString2dT & lineString, const double distance)
+{
   auto newLS = offsetNoThrow(lineString, distance);
   internal::checkForInversion(lineString, newLS, distance);
   return newLS;
 }
 
-template <typename LineString3dT, typename>
-Segment<traits::PointType<LineString3dT>> closestSegment(const LineString3dT& lineString,
-                                                         const BasicPoint3d& pointToProject) {
+template<typename LineString3dT, typename>
+Segment<traits::PointType<LineString3dT>> closestSegment(
+  const LineString3dT & lineString,
+  const BasicPoint3d & pointToProject)
+{
   static_assert(traits::is3D<LineString3dT>(), "Please call this function with a 3D type!");
   helper::ProjectedPoint<traits::PointType<LineString3dT>> projectedPoint;
   distance(utils::toHybrid(lineString), pointToProject, projectedPoint);
   return Segment<traits::PointType<LineString3dT>>(projectedPoint.result->segmentPoint1,
-                                                   projectedPoint.result->segmentPoint2);
+           projectedPoint.result->segmentPoint2);
 }
 
 //! Projects the given point in 2d to the LineString.
-template <typename LineString2dT, typename>
-Segment<traits::PointType<LineString2dT>> closestSegment(const LineString2dT& lineString,
-                                                         const BasicPoint2d& pointToProject) {
+template<typename LineString2dT, typename>
+Segment<traits::PointType<LineString2dT>> closestSegment(
+  const LineString2dT & lineString,
+  const BasicPoint2d & pointToProject)
+{
   static_assert(traits::is2D<LineString2dT>(), "Please call this function with a 2D type!");
   helper::ProjectedPoint<traits::PointType<LineString2dT>> projectedPoint;
   distance(utils::toHybrid(lineString), pointToProject, projectedPoint);
   return Segment<traits::PointType<LineString2dT>>(projectedPoint.result->segmentPoint1,
-                                                   projectedPoint.result->segmentPoint2);
+           projectedPoint.result->segmentPoint2);
 }
 }  // namespace geometry
 }  // namespace lanelet

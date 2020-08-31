@@ -33,7 +33,7 @@ using lanelet::utils::getId;
 
 namespace
 {
-template <typename T>
+template<typename T>
 std::vector<T> convertToVector(T item)
 {
   std::vector<T> vector = {item};

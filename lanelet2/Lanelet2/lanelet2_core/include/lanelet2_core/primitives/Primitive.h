@@ -8,7 +8,8 @@
 #include "lanelet2_core/Exceptions.h"
 #include "lanelet2_core/primitives/Traits.h"
 
-namespace lanelet {
+namespace lanelet
+{
 //! @defgroup DataObjects lanelet data management
 //! All the data of lanelets are managed by these objects. Usually you should
 //! not get in contact with them, as the lanelet Primitives and ConstPrimitives
@@ -27,22 +28,25 @@ namespace lanelet {
  * This is only an implementation class and only meant to be derived from, never
  * instanciated.
  */
-class PrimitiveData {
- public:
+class PrimitiveData
+{
+public:
   PrimitiveData() noexcept = default;
-  PrimitiveData(PrimitiveData&& rhs) noexcept = default;
-  PrimitiveData& operator=(PrimitiveData&& rhs) noexcept = default;
-  PrimitiveData(const PrimitiveData& rhs) = default;
-  PrimitiveData& operator=(const PrimitiveData& rhs) = default;
+  PrimitiveData(PrimitiveData && rhs) noexcept = default;
+  PrimitiveData & operator=(PrimitiveData && rhs) noexcept = default;
+  PrimitiveData(const PrimitiveData & rhs) = default;
+  PrimitiveData & operator=(const PrimitiveData & rhs) = default;
 
   /**
    * @brief Constructs a PrimitiveData object
    */
-  explicit PrimitiveData(Id id, AttributeMap attributes = AttributeMap()) : id{id}, attributes{std::move(attributes)} {}
+  explicit PrimitiveData(Id id, AttributeMap attributes = AttributeMap())
+  : id{id}, attributes{std::move(attributes)} {}
 
   Id id{InvalId};           //!< Id of this primitive (unique across one map)
   AttributeMap attributes;  //!< attributes of this primitive
- protected:
+
+protected:
   ~PrimitiveData() = default;
 };  // class PrimitiveData
 
@@ -65,37 +69,43 @@ class PrimitiveData {
  * @tparam Data Type of the data object that this ConstPrimitive holds
  * @ingroup ConstPrimitive
  */
-template <typename Data>
-class ConstPrimitive {
- public:
+template<typename Data>
+class ConstPrimitive
+{
+public:
   using DataType = Data;
   static constexpr bool IsConst = true;
   /**
    * @brief Construct from a pointer to the data
    * @param data internal data for this primitive. Must not be null.
    */
-  explicit ConstPrimitive(const std::shared_ptr<const Data>& data) : constData_{data} {
+  explicit ConstPrimitive(const std::shared_ptr<const Data> & data)
+  : constData_{data}
+  {
     if (!data) {
       throw lanelet::NullptrError("Nullptr passed to constructor!");
     }
   }
 
   // Comparison
-  bool operator==(const ConstPrimitive& rhs) const { return this->constData_ == rhs.constData_; }
-  bool operator!=(const ConstPrimitive& rhs) const { return !(*this == rhs); }
+  bool operator==(const ConstPrimitive & rhs) const {return this->constData_ == rhs.constData_;}
+  bool operator!=(const ConstPrimitive & rhs) const {return !(*this == rhs);}
 
   //! get the attributes of this primitive
-  const AttributeMap& attributes() const { return constData_->attributes; }
+  const AttributeMap & attributes() const {return constData_->attributes;}
 
   //! get the unique id of this primitive
   /**
    * Keep in mind that the Id can also be InvalId, if the element is a temporary
    * structure that is not a part of the map.
    */
-  Id id() const noexcept { return constData_->id; }
+  Id id() const noexcept {return constData_->id;}
 
   //! check whether this primitive has a specific attribute
-  bool hasAttribute(const std::string& name) const noexcept { return attributes().find(name) != attributes().end(); }
+  bool hasAttribute(const std::string & name) const noexcept
+  {
+    return attributes().find(name) != attributes().end();
+  }
 
   //! check for an attribute (enum version)
   /**
@@ -103,16 +113,20 @@ class ConstPrimitive {
    * basically the difference between access via a vector and a std::map lookup.
    * However, this kind of access only works for the most common attribte names.
    */
-  bool hasAttribute(AttributeName name) const noexcept { return attributes().find(name) != attributes().end(); }
+  bool hasAttribute(AttributeName name) const noexcept
+  {
+    return attributes().find(name) != attributes().end();
+  }
 
   /**
    * @brief retrieve an attribute
    * @throws NoSuchAttributeError if it does not exist
    */
-  const Attribute& attribute(const std::string& name) const {
+  const Attribute & attribute(const std::string & name) const
+  {
     try {
       return attributes().at(name);
-    } catch (std::out_of_range& err) {
+    } catch (std::out_of_range & err) {
       throw NoSuchAttributeError(err.what());
     }
   }
@@ -121,10 +135,11 @@ class ConstPrimitive {
    * @brief retrieve an attribute (enum version)
    * @throws NoSuchAttributeError if it does not exist
    */
-  const Attribute& attribute(AttributeName name) const {
+  const Attribute & attribute(AttributeName name) const
+  {
     try {
       return attributes().at(name);
-    } catch (std::out_of_range& err) {
+    } catch (std::out_of_range & err) {
       throw NoSuchAttributeError(err.what());
     }
   }
@@ -138,8 +153,9 @@ class ConstPrimitive {
    * T can also be an Optional so that you get an empty optional if the value
    * did not exist or could not be converted.
    */
-  template <typename T>
-  T attributeOr(const std::string& name, T defaultVal) const noexcept {
+  template<typename T>
+  T attributeOr(const std::string & name, T defaultVal) const noexcept
+  {
     auto elem = attributes().find(name);
     if (elem == attributes().end()) {
       return defaultVal;
@@ -160,8 +176,9 @@ class ConstPrimitive {
    * T can also be an Optional so that you get an empty optional if the value
    * did not exist or could not be converted.
    */
-  template <typename T>
-  T attributeOr(AttributeName name, T defaultVal) const {
+  template<typename T>
+  T attributeOr(AttributeName name, T defaultVal) const
+  {
     auto elem = attributes().find(name);
     if (elem == attributes().end()) {
       return defaultVal;
@@ -174,17 +191,17 @@ class ConstPrimitive {
   }
 
   //! get the internal data of this primitive
-  const std::shared_ptr<const Data>& constData() const { return constData_; }
+  const std::shared_ptr<const Data> & constData() const {return constData_;}
 
- protected:
+protected:
   // This class is only an implementation class and should never be instanciated
-  ConstPrimitive(ConstPrimitive&& rhs) noexcept = default;
-  ConstPrimitive& operator=(ConstPrimitive&& rhs) noexcept = default;
-  ConstPrimitive(const ConstPrimitive& rhs) = default;
-  ConstPrimitive& operator=(const ConstPrimitive& rhs) = default;
+  ConstPrimitive(ConstPrimitive && rhs) noexcept = default;
+  ConstPrimitive & operator=(ConstPrimitive && rhs) noexcept = default;
+  ConstPrimitive(const ConstPrimitive & rhs) = default;
+  ConstPrimitive & operator=(const ConstPrimitive & rhs) = default;
   ~ConstPrimitive() noexcept = default;
 
- private:
+private:
   std::shared_ptr<const Data> constData_;  //!< the data this primitive holds
 
 };  // class ConstPrimitive
@@ -238,27 +255,31 @@ class ConstPrimitive {
  * derives from
  * @ingroup Primitive
  */
-template <typename DerivedConstPrimitive>
-class Primitive : public DerivedConstPrimitive {
- public:
+template<typename DerivedConstPrimitive>
+class Primitive : public DerivedConstPrimitive
+{
+public:
   Primitive() = default;  // not inherited
   using DataType = typename DerivedConstPrimitive::DataType;
   using DerivedConstPrimitive::DerivedConstPrimitive;
   static constexpr bool IsConst = false;
 
   // needs a non-const shared_ptr to construct
-  Primitive(const std::shared_ptr<const DataType>&) = delete;
+  Primitive(const std::shared_ptr<const DataType> &) = delete;
 
   //! Construct a new primitive from shared_ptr to its data
-  explicit Primitive(const std::shared_ptr<DataType>& data) : DerivedConstPrimitive(data) {
+  explicit Primitive(const std::shared_ptr<DataType> & data)
+  : DerivedConstPrimitive(data)
+  {
     if (!data) {
       throw lanelet::NullptrError("Nullptr passed to constructor!");
     }
   }
 
   //! Construct from another primitive. Only works if both share the same
-  template <typename OtherT>
-  explicit Primitive(const Primitive<OtherT>& rhs) : DerivedConstPrimitive(rhs) {}
+  template<typename OtherT>
+  explicit Primitive(const Primitive<OtherT> & rhs)
+  : DerivedConstPrimitive(rhs) {}
 
   /**
    * @brief set a new id for this primitive
@@ -266,78 +287,93 @@ class Primitive : public DerivedConstPrimitive {
    * This is the best way to corrupt a map, because all primitives are
    * identified by their id. Make sure you know what you are doing!
    */
-  void setId(Id id) noexcept { data()->id = id; }
+  void setId(Id id) noexcept {data()->id = id;}
 
   //! @brief set or overwrite an attribute
-  void setAttribute(const std::string& name, const Attribute& attribute) { attributes()[name] = attribute; }
+  void setAttribute(const std::string & name, const Attribute & attribute)
+  {
+    attributes()[name] = attribute;
+  }
 
   //! set or overwrite an attribute (enum version)
-  void setAttribute(AttributeName name, const Attribute& attribute) { attributes()[name] = attribute; }
+  void setAttribute(AttributeName name, const Attribute & attribute)
+  {
+    attributes()[name] = attribute;
+  }
 
   // need this for copy construction to work
-  template <typename>
+  template<typename>
   friend class Primitive;
 
   using DerivedConstPrimitive::attributes;
   //! get the attributes in a mutable way
-  AttributeMap& attributes() noexcept { return data()->attributes; }
+  AttributeMap & attributes() noexcept {return data()->attributes;}
 
- protected:
-  std::shared_ptr<DataType> data() const {
+protected:
+  std::shared_ptr<DataType> data() const
+  {
     // const_pointer_cast is ok. Non-const primitives cannot be created without
     // a non-const pointer.
     return std::const_pointer_cast<DataType>(this->constData());
   }
 
   // This class is only an implementation class and should never be instanciated
-  Primitive(Primitive&& rhs) noexcept;
-  Primitive& operator=(Primitive&& rhs) noexcept;
-  Primitive(const Primitive& rhs) noexcept;
-  Primitive& operator=(const Primitive& rhs) noexcept;
+  Primitive(Primitive && rhs) noexcept;
+  Primitive & operator=(Primitive && rhs) noexcept;
+  Primitive(const Primitive & rhs) noexcept;
+  Primitive & operator=(const Primitive & rhs) noexcept;
   ~Primitive() noexcept = default;  // NOLINT
 };
 
-namespace traits {
+namespace traits
+{
 
-namespace internal {
-template <typename PrimitiveT>
+namespace internal
+{
+template<typename PrimitiveT>
 class IsPrimitiveHelper : public std::false_type {};
-template <typename PrimitiveT>
-class IsPrimitiveHelper<ConstPrimitive<PrimitiveT>> : public std::true_type {};
+template<typename PrimitiveT>
+class IsPrimitiveHelper<ConstPrimitive<PrimitiveT>>: public std::true_type {};
 
-template <typename DataT>
-bool isLaneletPrimitiveHelper(ConstPrimitive<DataT>* /*unused*/, int /*unused*/) {
+template<typename DataT>
+bool isLaneletPrimitiveHelper(ConstPrimitive<DataT> * /*unused*/, int /*unused*/)
+{
   return true;
 }
 
-template <typename NotPrimitive>
-bool isLaneletPrimitiveHelper(NotPrimitive* /*unused*/, long /*unused*/) {  // NOLINT
+template<typename NotPrimitive>
+bool isLaneletPrimitiveHelper(NotPrimitive * /*unused*/, long /*unused*/)    // NOLINT
+{
   return false;
 }
 }  // namespace internal
 
-template <typename PrimitiveT>
-constexpr bool isLaneletPrimitive() {
-  PrimitiveT* v = nullptr;
+template<typename PrimitiveT>
+constexpr bool isLaneletPrimitive()
+{
+  PrimitiveT * v = nullptr;
   return IsLaneletPrimitiveHelper(v, 0);
 }
 }  // namespace traits
 
-template <typename PrimitiveT>
-struct HashBase {
-  size_t operator()(const PrimitiveT& x) const noexcept { return std::hash<Id>()(x.id()); }
+template<typename PrimitiveT>
+struct HashBase
+{
+  size_t operator()(const PrimitiveT & x) const noexcept {return std::hash<Id>()(x.id());}
 };
 
-template <typename DerivedConstPrimitive>
-Primitive<DerivedConstPrimitive>::Primitive(Primitive&& rhs) noexcept = default;
+template<typename DerivedConstPrimitive>
+Primitive<DerivedConstPrimitive>::Primitive(Primitive && rhs) noexcept = default;
 
-template <typename DerivedConstPrimitive>
-Primitive<DerivedConstPrimitive>& Primitive<DerivedConstPrimitive>::operator=(Primitive&& rhs) noexcept = default;
+template<typename DerivedConstPrimitive>
+Primitive<DerivedConstPrimitive> & Primitive<DerivedConstPrimitive>::operator=(Primitive && rhs)
+noexcept = default;
 
-template <typename DerivedConstPrimitive>
-Primitive<DerivedConstPrimitive>::Primitive(const Primitive& rhs) noexcept = default;
+template<typename DerivedConstPrimitive>
+Primitive<DerivedConstPrimitive>::Primitive(const Primitive & rhs) noexcept = default;
 
-template <typename DerivedConstPrimitive>
-Primitive<DerivedConstPrimitive>& Primitive<DerivedConstPrimitive>::operator=(const Primitive& rhs) noexcept = default;
+template<typename DerivedConstPrimitive>
+Primitive<DerivedConstPrimitive> & Primitive<DerivedConstPrimitive>::operator=(
+  const Primitive & rhs) noexcept = default;
 
 }  // namespace lanelet

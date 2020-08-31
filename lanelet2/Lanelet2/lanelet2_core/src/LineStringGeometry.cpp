@@ -9,12 +9,16 @@
 #include "lanelet2_core/geometry/LineString.h"
 #include "lanelet2_core/geometry/Polygon.h"
 
-namespace lanelet {
-namespace geometry {
-namespace {
+namespace lanelet
+{
+namespace geometry
+{
+namespace
+{
 using V3d = BasicPoint3d;
 
-struct LineParams {
+struct LineParams
+{
   double sN;
   double sD;
   double tN;
@@ -23,7 +27,8 @@ struct LineParams {
 
 constexpr double SmallNum = 1.e-10;
 
-inline LineParams calculateLineParams(double a, double b, double c, double d, double e, double den) {
+inline LineParams calculateLineParams(double a, double b, double c, double d, double e, double den)
+{
   // compute the line parameters of the two closest points
   if (den < SmallNum) {  // the lines are almost parallel
     // force using point P0 on segment S1
@@ -49,8 +54,10 @@ inline LineParams calculateLineParams(double a, double b, double c, double d, do
   return lp;
 }
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const BasicPoint3d& p1, const BasicPoint3d& p2,
-                                                       const BasicPoint3d& q1, const BasicPoint3d& q2) {
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const BasicPoint3d & p1, const BasicPoint3d & p2,
+  const BasicPoint3d & q1, const BasicPoint3d & q2)
+{
   // see http://geomalgorithms.com/a07-_distance.html
   V3d w = p1 - q1;
   V3d u = p2 - p1;
@@ -102,9 +109,11 @@ using Box = bgm::box<bgm::point<double, 3, boost::geometry::cs::cartesian>>;
 using Node = std::pair<Box, BasicSegment>;
 using RTree = bgi::rtree<Node, bgi::linear<8>>;
 
-template <typename LineString1T, typename LineString2T>
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dOrdered(const LineString1T& smallerRange,
-                                                              const LineString2T& greaterRange) {
+template<typename LineString1T, typename LineString2T>
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dOrdered(
+  const LineString1T & smallerRange,
+  const LineString2T & greaterRange)
+{
   // catch some degerated cases
   ConstHybridLineString3d duplicate;
   if (smallerRange.size() == 1 && greaterRange.size() == 1) {
@@ -112,7 +121,8 @@ std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dOrdered(const LineString1T
     return ret;
   }
   auto values =
-      utils::transform(bg::segments_begin(greaterRange), bg::segments_end(greaterRange), [](const auto& segm) {
+    utils::transform(bg::segments_begin(greaterRange), bg::segments_end(greaterRange),
+      [](const auto & segm) {
         Box box;
         boost::geometry::envelope(segm, box);
         return Node(box, segm);
@@ -125,14 +135,17 @@ std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dOrdered(const LineString1T
   for (auto it = bg::segments_begin(smallerRange); it != bg::segments_end(smallerRange); ++it) {
     Box queryBox;
     bg::envelope(*it, queryBox);
-    for (auto qIt = tree.qbegin(bgi::nearest(queryBox, unsigned(greaterRange.size()))); qIt != tree.qend();
-         ++qIt, first = false) {
-      const auto& nearest = *qIt;
+    for (auto qIt = tree.qbegin(bgi::nearest(queryBox, unsigned(greaterRange.size())));
+      qIt != tree.qend();
+      ++qIt, first = false)
+    {
+      const auto & nearest = *qIt;
       auto dBox = boost::geometry::distance(nearest.first, queryBox);
       if (!first && dBox > dMin) {
         break;
       }
-      auto projPair = projectedPoint3d(*nearest.second.first, *nearest.second.second, *it->first, *it->second);
+      auto projPair = projectedPoint3d(*nearest.second.first, *nearest.second.second, *it->first,
+          *it->second);
       auto d = (projPair.first - projPair.second).norm();
       if (first || d < dMin) {
         closestPair = projPair;
@@ -143,8 +156,11 @@ std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dOrdered(const LineString1T
   return closestPair;
 }
 
-template <typename LineString1T, typename LineString2T>
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dImpl(const LineString1T& l1, const LineString2T& l2) {
+template<typename LineString1T, typename LineString2T>
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dImpl(
+  const LineString1T & l1,
+  const LineString2T & l2)
+{
   if (l1.size() < l2.size()) {
     return projectedPoint3dOrdered(l1, l2);
   }
@@ -153,49 +169,75 @@ std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3dImpl(const LineString1T& l
 }
 }  // namespace
 
-namespace internal {
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const CompoundHybridLineString3d& l1,
-                                                       const CompoundHybridLineString3d& l2) {
+namespace internal
+{
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const CompoundHybridLineString3d & l1,
+  const CompoundHybridLineString3d & l2)
+{
   return projectedPoint3dImpl(l1, l2);
 }
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const ConstHybridLineString3d& l1,
-                                                       const ConstHybridLineString3d& l2) {
-  return projectedPoint3dImpl(l1, l2);
-}
-
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const ConstHybridLineString3d& l1, const BasicLineString3d& l2) {
-  return projectedPoint3dImpl(l1, l2);
-}
-
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const BasicLineString3d& l1, const ConstHybridLineString3d& l2) {
-  return projectedPoint3dImpl(l1, l2);
-};
-
-std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(const BasicLineString3d& l1, const BasicLineString3d& l2) {
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const ConstHybridLineString3d & l1,
+  const ConstHybridLineString3d & l2)
+{
   return projectedPoint3dImpl(l1, l2);
 }
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedBorderPoint3d(const ConstHybridPolygon3d& l1,
-                                                             const ConstHybridPolygon3d& l2) {
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const ConstHybridLineString3d & l1,
+  const BasicLineString3d & l2)
+{
   return projectedPoint3dImpl(l1, l2);
 }
 
-std::pair<BasicPoint3d, BasicPoint3d> projectedBorderPoint3d(const CompoundHybridPolygon3d& l1,
-                                                             const CompoundHybridPolygon3d& l2) {
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const BasicLineString3d & l1,
+  const ConstHybridLineString3d & l2)
+{
+  return projectedPoint3dImpl(l1, l2);
+}
+
+std::pair<BasicPoint3d, BasicPoint3d> projectedPoint3d(
+  const BasicLineString3d & l1,
+  const BasicLineString3d & l2)
+{
+  return projectedPoint3dImpl(l1, l2);
+}
+
+std::pair<BasicPoint3d, BasicPoint3d> projectedBorderPoint3d(
+  const ConstHybridPolygon3d & l1,
+  const ConstHybridPolygon3d & l2)
+{
+  return projectedPoint3dImpl(l1, l2);
+}
+
+std::pair<BasicPoint3d, BasicPoint3d> projectedBorderPoint3d(
+  const CompoundHybridPolygon3d & l1,
+  const CompoundHybridPolygon3d & l2)
+{
   return projectedPoint3dImpl(l1, l2);  // NOLINT
 }
 
 }  // namespace internal
 
-Segment<BasicPoint2d> closestSegment(const BasicLineString2d& lineString, const BasicPoint2d& pointToProject) {
+Segment<BasicPoint2d> closestSegment(
+  const BasicLineString2d & lineString,
+  const BasicPoint2d & pointToProject)
+{
   helper::ProjectedPoint<BasicPoint2d> projectedPoint;
   distance(lineString, pointToProject, projectedPoint);
-  return Segment<BasicPoint2d>(projectedPoint.result->segmentPoint1, projectedPoint.result->segmentPoint2);
+  return Segment<BasicPoint2d>(projectedPoint.result->segmentPoint1,
+           projectedPoint.result->segmentPoint2);
 }
-Segment<BasicPoint3d> closestSegment(const BasicLineString3d& lineString, const BasicPoint3d& pointToProject) {
+Segment<BasicPoint3d> closestSegment(
+  const BasicLineString3d & lineString,
+  const BasicPoint3d & pointToProject)
+{
   helper::ProjectedPoint<BasicPoint3d> projectedPoint;
   distance(lineString, pointToProject, projectedPoint);
-  return Segment<BasicPoint3d>(projectedPoint.result->segmentPoint1, projectedPoint.result->segmentPoint2);
+  return Segment<BasicPoint3d>(projectedPoint.result->segmentPoint1,
+           projectedPoint.result->segmentPoint2);
 }
 }  // namespace geometry
 }  // namespace lanelet

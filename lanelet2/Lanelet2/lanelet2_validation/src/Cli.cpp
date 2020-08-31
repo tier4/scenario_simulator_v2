@@ -4,35 +4,30 @@
 
 namespace po = boost::program_options;
 
-namespace lanelet {
-namespace validation {
+namespace lanelet
+{
+namespace validation
+{
 
-CommandLineConfig parseCommandLine(int argc, const char* argv[]) {
+CommandLineConfig parseCommandLine(int argc, const char * argv[])
+{
   CommandLineConfig cfg;
-  auto& config = cfg.validationConfig;
+  auto & config = cfg.validationConfig;
   po::options_description desc(
-      "Runs a set of validators on a map. Think of it like a linter. The following checks are available:");
-  desc.add_options()("help,h", "this help message")
-
-      ("map_file", po::value<std::string>(), "Path to the map to be validated")
-
-          ("filter,f", po::value(&config.checksFilter),
-           "Comma separated list of regexes to filter the applicable tests. Will run all tests by default. Example: "
-           "routing_graph.* to run all checks for the routing graph")
-
-              ("location,l", po::value(&config.location)->default_value(config.location),
-               "Location of the map (for instanciating the traffic rules), e.g. de for Germany")
-
-                  ("participants,p", po::value(&config.participants)->composing(),
-                   "Participants for which the routing graph will be instanciated (default: vehicle)")
-
-                      ("lat", po::value(&config.origin.lat)->default_value(config.origin.lat),
-                       "latitude coordinate of map origin")
-
-                          ("lon", po::value(&config.origin.lon)->default_value(config.origin.lon),
-                           "longitude coofdinate of map origin")
-
-                              ("print", "Only print the checks that will be run, but dont run them");
+    "Runs a set of validators on a map. Think of it like a linter. The following checks are available:");
+  desc.add_options()("help,h", "this help message")("map_file", po::value<std::string>(),
+    "Path to the map to be validated")("filter,f", po::value(&config.checksFilter),
+    "Comma separated list of regexes to filter the applicable tests. Will run all tests by default. Example: "
+    "routing_graph.* to run all checks for the routing graph")("location,l",
+    po::value(&config.location)->default_value(config.location),
+    "Location of the map (for instanciating the traffic rules), e.g. de for Germany")(
+    "participants,p", po::value(&config.participants)->composing(),
+    "Participants for which the routing graph will be instanciated (default: vehicle)")("lat",
+    po::value(&config.origin.lat)->default_value(config.origin.lat),
+    "latitude coordinate of map origin")("lon",
+    po::value(&config.origin.lon)->default_value(config.origin.lon),
+    "longitude coofdinate of map origin")("print",
+    "Only print the checks that will be run, but dont run them");
   po::variables_map vm;
   po::positional_options_description pos;
   pos.add("map_file", 1);
@@ -51,18 +46,20 @@ CommandLineConfig parseCommandLine(int argc, const char* argv[]) {
   return cfg;
 }
 
-void printAllIssues(const std::vector<DetectedIssues>& issues) {
+void printAllIssues(const std::vector<DetectedIssues> & issues)
+{
   auto allIssues = buildReport(issues);
-  for (auto& issue : allIssues.errors) {
+  for (auto & issue : allIssues.errors) {
     std::cerr << issue << '\n';
   }
-  for (auto& issue : allIssues.warnings) {
+  for (auto & issue : allIssues.warnings) {
     std::cout << issue << '\n';
   }
   std::cout << allIssues.warnings.size() + allIssues.errors.size() << " issues found.\n";
 }
 
-int runFromConfig(const CommandLineConfig& config) {
+int runFromConfig(const CommandLineConfig & config)
+{
   if (config.help) {
     return 0;
   }
@@ -72,7 +69,7 @@ int runFromConfig(const CommandLineConfig& config) {
       std::cout << "No checks found matching '" << config.validationConfig.checksFilter << "'\n";
     } else {
       std::cout << "Will use following checks:\n";
-      for (auto& check : checks) {
+      for (auto & check : checks) {
         std::cout << check << '\n';
       }
     }

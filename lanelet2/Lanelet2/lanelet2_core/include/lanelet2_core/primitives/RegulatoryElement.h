@@ -11,7 +11,8 @@
 #include "lanelet2_core/primitives/Primitive.h"
 #include "lanelet2_core/utility/HybridMap.h"
 
-namespace lanelet {
+namespace lanelet
+{
 //! @defgroup RegulatoryElementPrimitives Regulatory Element
 //! @ingroup Primitives
 //!
@@ -51,7 +52,8 @@ namespace lanelet {
 //! package, preferably for all countries that have this rule.
 
 //! Typical role names within lanelet (for faster lookup)
-enum class RoleName {
+enum class RoleName
+{
   Refers,      //!< The primitive(s) that are the origin of this rule (ie signs)
   RefLine,     //!< The referring line where the rule becomes active
   RightOfWay,  //!< A lanelet that has right of way in a relation
@@ -61,7 +63,8 @@ enum class RoleName {
 };
 
 //! Lists which role strings are mapped to which enum value
-struct RoleNameString {
+struct RoleNameString
+{
   static constexpr const char Refers[] = "refers";
   static constexpr const char RefLine[] = "ref_line";
   static constexpr const char Yield[] = "yield";
@@ -78,10 +81,10 @@ struct RoleNameString {
   static constexpr const char Lanelet[] = "lanelet";
   static constexpr const char RegulatoryElement[] = "regulatory_element";
 
-  using RoleNamesItem = std::pair<const char*, const RoleName>;
-  static constexpr RoleNamesItem Map[]{{Refers, RoleName::Refers},   {RefLine, RoleName::RefLine},
-                                       {Yield, RoleName::Yield},     {RightOfWay, RoleName::RightOfWay},
-                                       {Cancels, RoleName::Cancels}, {CancelLine, RoleName::CancelLine}};
+  using RoleNamesItem = std::pair<const char *, const RoleName>;
+  static constexpr RoleNamesItem Map[]{{Refers, RoleName::Refers}, {RefLine, RoleName::RefLine},
+    {Yield, RoleName::Yield}, {RightOfWay, RoleName::RightOfWay},
+    {Cancels, RoleName::Cancels}, {CancelLine, RoleName::CancelLine}};
 };
 
 //! We call every element of a rule a "parameter"
@@ -90,11 +93,13 @@ using RuleParameter = boost::variant<Point3d, LineString3d, Polygon3d, WeakLanel
 
 //! Const-version of the parameters
 using ConstRuleParameter =
-    boost::variant<ConstPoint3d, ConstLineString3d, ConstPolygon3d, ConstWeakLanelet, ConstWeakArea>;
+  boost::variant<ConstPoint3d, ConstLineString3d, ConstPolygon3d, ConstWeakLanelet, ConstWeakArea>;
 
-namespace traits {
-template <>
-struct PrimitiveTraits<RuleParameter> {
+namespace traits
+{
+template<>
+struct PrimitiveTraits<RuleParameter>
+{
   using DataType = void;
   using ConstType = ConstRuleParameter;
   using MutableType = RuleParameter;
@@ -102,8 +107,9 @@ struct PrimitiveTraits<RuleParameter> {
   using ThreeDType = void;
   using Category = void;
 };
-template <>
-struct PrimitiveTraits<ConstRuleParameter> {
+template<>
+struct PrimitiveTraits<ConstRuleParameter>
+{
   using DataType = void;
   using ConstType = ConstRuleParameter;
   using MutableType = RuleParameter;
@@ -112,8 +118,8 @@ struct PrimitiveTraits<ConstRuleParameter> {
   using Category = void;
 };
 
-template <>
-ConstRuleParameter toConst<RuleParameter>(const RuleParameter& primitive);
+template<>
+ConstRuleParameter toConst<RuleParameter>(const RuleParameter & primitive);
 }  // namespace traits
 
 //! Multiple parameters can have the same role in a rule (eg traffic_lights)
@@ -123,18 +129,22 @@ using RuleParameters = std::vector<RuleParameter>;
 using ConstRuleParameters = std::vector<ConstRuleParameter>;
 
 //! Rules are stored in a map internally
-using RuleParameterMap = HybridMap<RuleParameters, decltype(RoleNameString::Map)&, RoleNameString::Map>;
+using RuleParameterMap = HybridMap<RuleParameters, decltype(RoleNameString::Map) &,
+    RoleNameString::Map>;
 
 //! Rules are stored in a map internally (const version)
-using ConstRuleParameterMap = HybridMap<ConstRuleParameters, decltype(RoleNameString::Map)&, RoleNameString::Map>;
+using ConstRuleParameterMap = HybridMap<ConstRuleParameters, decltype(RoleNameString::Map) &,
+    RoleNameString::Map>;
 
 //! @brief Data container for all RegulatoryElement types
 //! @ingroup DataObjects
-class RegulatoryElementData : public PrimitiveData {
- public:
-  explicit RegulatoryElementData(Id id, RuleParameterMap parameters = RuleParameterMap(),
-                                 const AttributeMap& attributes = AttributeMap())
-      : PrimitiveData(id, attributes), parameters{std::move(parameters)} {}
+class RegulatoryElementData : public PrimitiveData
+{
+public:
+  explicit RegulatoryElementData(
+    Id id, RuleParameterMap parameters = RuleParameterMap(),
+    const AttributeMap & attributes = AttributeMap())
+  : PrimitiveData(id, attributes), parameters{std::move(parameters)} {}
   RuleParameterMap parameters;
 };
 
@@ -143,25 +153,28 @@ class RegulatoryElementData : public PrimitiveData {
  * parameter of a regulatory element
  * @see RegulatoryElement::applyVisitor
  */
-class RuleParameterVisitor : public boost::static_visitor<void> {  // NOLINT
- public:
-  virtual void operator()(const ConstPoint3d& /*unused*/) {}
-  virtual void operator()(const ConstLineString3d& /*unused*/) {}
-  virtual void operator()(const ConstPolygon3d& /*unused*/) {}
-  virtual void operator()(const ConstWeakLanelet& /*unused*/) {}
-  virtual void operator()(const ConstWeakArea& /*unused*/) {}
+class RuleParameterVisitor : public boost::static_visitor<void>    // NOLINT
+{
+public:
+  virtual void operator()(const ConstPoint3d & /*unused*/) {}
+  virtual void operator()(const ConstLineString3d & /*unused*/) {}
+  virtual void operator()(const ConstPolygon3d & /*unused*/) {}
+  virtual void operator()(const ConstWeakLanelet & /*unused*/) {}
+  virtual void operator()(const ConstWeakArea & /*unused*/) {}
   virtual ~RuleParameterVisitor() = default;
   std::string role;  //!< applyVisitor will set the current role here
 };
 
-namespace internal {
-class MutableParameterVisitor : public boost::static_visitor<void> {  // NOLINT
- public:
-  virtual void operator()(const Point3d /*unused*/&) = 0;
-  virtual void operator()(const LineString3d& /*unused*/) = 0;
-  virtual void operator()(const Polygon3d& /*unused*/) = 0;
-  virtual void operator()(const WeakLanelet& /*unused*/) = 0;
-  virtual void operator()(const WeakArea& /*unused*/) = 0;
+namespace internal
+{
+class MutableParameterVisitor : public boost::static_visitor<void>    // NOLINT
+{
+public:
+  virtual void operator()(const Point3d /*unused*/ &) = 0;
+  virtual void operator()(const LineString3d & /*unused*/) = 0;
+  virtual void operator()(const Polygon3d & /*unused*/) = 0;
+  virtual void operator()(const WeakLanelet & /*unused*/) = 0;
+  virtual void operator()(const WeakArea & /*unused*/) = 0;
   virtual ~MutableParameterVisitor() = default;
   std::string role;  //!< applyVisitor will set the current role here
 };
@@ -171,9 +184,10 @@ class MutableParameterVisitor : public boost::static_visitor<void> {  // NOLINT
 //! @ingroup RegulatoryElementPrimitives
 //! @ingroup ConstPrimitives
 class RegulatoryElement  // NOLINT
-    : public ConstPrimitive<RegulatoryElementData>,
-      private boost::noncopyable {
- public:
+  : public ConstPrimitive<RegulatoryElementData>,
+  private boost::noncopyable
+{
+public:
   using ConstType = RegulatoryElement;
   using MutableType = GenericRegulatoryElement;
   using TwoDType = RegulatoryElement;
@@ -191,14 +205,15 @@ class RegulatoryElement  // NOLINT
    * This is the best way to corrupt a map, because all primitives are
    * identified by their id. Make sure you know what you are doing!
    */
-  void setId(Id id) noexcept { data()->id = id; }
+  void setId(Id id) noexcept {data()->id = id;}
 
   //! Returns all parameters as const object (coversion overhead for const)
   ConstRuleParameterMap getParameters() const;
 
   //! Returns a vector of all RuleParameters that could be converted to T.
-  template <typename T>
-  std::vector<T> getParameters(const std::string& role) const {
+  template<typename T>
+  std::vector<T> getParameters(const std::string & role) const
+  {
     static_assert(traits::isConst<T>(), "You must pass a const primitive type");
     auto it = constData()->parameters.find(role);
     if (it == constData()->parameters.end()) {
@@ -209,8 +224,9 @@ class RegulatoryElement  // NOLINT
 
   //! Returns a vector of all RuleParameters that could be converted to T (enum
   //! version).
-  template <typename T>
-  std::vector<T> getParameters(RoleName role) const {
+  template<typename T>
+  std::vector<T> getParameters(RoleName role) const
+  {
     static_assert(traits::isConst<T>(), "You must pass a const primitive type");
     auto it = constData()->parameters.find(role);
     if (it == constData()->parameters.end()) {
@@ -220,32 +236,40 @@ class RegulatoryElement  // NOLINT
   }
 
   //! returns all the roles this regulatory element has
-  std::vector<std::string> roles() const {
-    return utils::transform(parameters(), [](const auto& elem) { return elem.first; });
+  std::vector<std::string> roles() const
+  {
+    return utils::transform(parameters(), [](const auto & elem) {return elem.first;});
   }
 
   //! Finds a parameter by its id, independent of the role
-  template <typename T>
+  template<typename T>
   Optional<T> find(Id id) const;
 
   //! returns true if this object contains no parameters
-  bool empty() const { return constData()->parameters.empty(); }
+  bool empty() const {return constData()->parameters.empty();}
 
   //! get the number of roles in this regulatoryElement
-  size_t size() const { return constData()->parameters.size(); }
+  size_t size() const {return constData()->parameters.size();}
 
   //! applies a visitor to every parameter in the regulatory element
-  void applyVisitor(RuleParameterVisitor& visitor) const;
+  void applyVisitor(RuleParameterVisitor & visitor) const;
 
- protected:
-  const_iterator begin() const { return constData()->parameters.begin(); }
-  const_iterator end() const { return constData()->parameters.end(); }
-  void applyVisitor(internal::MutableParameterVisitor& visitor) const;
-  const RuleParameterMap& parameters() const { return constData()->parameters; }
-  RuleParameterMap& parameters() { return std::const_pointer_cast<RegulatoryElementData>(constData())->parameters; }
-  RegulatoryElementDataPtr data() { return std::const_pointer_cast<RegulatoryElementData>(constData()); }
-  template <typename T>
-  std::vector<T> getParameters(RoleName role) {
+protected:
+  const_iterator begin() const {return constData()->parameters.begin();}
+  const_iterator end() const {return constData()->parameters.end();}
+  void applyVisitor(internal::MutableParameterVisitor & visitor) const;
+  const RuleParameterMap & parameters() const {return constData()->parameters;}
+  RuleParameterMap & parameters()
+  {
+    return std::const_pointer_cast<RegulatoryElementData>(constData())->parameters;
+  }
+  RegulatoryElementDataPtr data()
+  {
+    return std::const_pointer_cast<RegulatoryElementData>(constData());
+  }
+  template<typename T>
+  std::vector<T> getParameters(RoleName role)
+  {
     auto it = data()->parameters.find(role);
     if (it == data()->parameters.end()) {
       return {};
@@ -255,10 +279,12 @@ class RegulatoryElement  // NOLINT
 
   friend class RegulatoryElementFactory;
   friend class LaneletMap;  // Needs access to add all parameters of a regElem
-  explicit RegulatoryElement(Id id = InvalId, const RuleParameterMap& members = RuleParameterMap(),
-                             const AttributeMap& attributes = AttributeMap())
-      : ConstPrimitive(std::make_shared<RegulatoryElementData>(id, members, attributes)) {}
-  explicit RegulatoryElement(const RegulatoryElementDataPtr& data) : ConstPrimitive(data) {}
+  explicit RegulatoryElement(
+    Id id = InvalId, const RuleParameterMap & members = RuleParameterMap(),
+    const AttributeMap & attributes = AttributeMap())
+  : ConstPrimitive(std::make_shared<RegulatoryElementData>(id, members, attributes)) {}
+  explicit RegulatoryElement(const RegulatoryElementDataPtr & data)
+  : ConstPrimitive(data) {}
 };
 
 /**
@@ -266,51 +292,57 @@ class RegulatoryElement  // NOLINT
  * @ingroup RegulatoryElementPrimitives
  * @ingroup Primitives
  */
-class GenericRegulatoryElement final : public Primitive<RegulatoryElement> {
- public:
+class GenericRegulatoryElement final : public Primitive<RegulatoryElement>
+{
+public:
   static constexpr char RuleName[] = "regulatory_element";
-  explicit GenericRegulatoryElement(const RegulatoryElementDataPtr& data)
-      : Primitive<lanelet::RegulatoryElement>(data) {}
+  explicit GenericRegulatoryElement(const RegulatoryElementDataPtr & data)
+  : Primitive<lanelet::RegulatoryElement>(data) {}
 
   //! Construct generically from id, parameters and attributes
-  explicit GenericRegulatoryElement(Id id = InvalId, const RuleParameterMap& parameters = RuleParameterMap(),
-                                    const AttributeMap& attributes = AttributeMap())
-      : Primitive<lanelet::RegulatoryElement>(id, parameters, attributes) {}
+  explicit GenericRegulatoryElement(
+    Id id = InvalId, const RuleParameterMap & parameters = RuleParameterMap(),
+    const AttributeMap & attributes = AttributeMap())
+  : Primitive<lanelet::RegulatoryElement>(id, parameters, attributes) {}
 
   //! Add a (mutable) primitive to the regulatory element
-  template <typename PrimitiveT>
-  void addParameter(const std::string& role, const PrimitiveT& primitive);
+  template<typename PrimitiveT>
+  void addParameter(const std::string & role, const PrimitiveT & primitive);
 
   //! Add a (mutable) primitive (RoleName version)
-  template <typename PrimitiveT>
-  void addParameter(RoleName role, const PrimitiveT& primitive);
+  template<typename PrimitiveT>
+  void addParameter(RoleName role, const PrimitiveT & primitive);
 
   using Primitive<RegulatoryElement>::getParameters;
 
   //! getter for all parameters of a regulatory element.
-  RuleParameterMap& parameters() noexcept { return data()->parameters; }
+  RuleParameterMap & parameters() noexcept {return data()->parameters;}
 };
 
-namespace traits {
-template <>
-inline Id getId<RegulatoryElementPtr>(const RegulatoryElementPtr& prim) {
+namespace traits
+{
+template<>
+inline Id getId<RegulatoryElementPtr>(const RegulatoryElementPtr & prim)
+{
   return prim->id();
 }
 
-template <>
-inline Id getId<RegulatoryElementConstPtr>(const RegulatoryElementConstPtr& prim) {
+template<>
+inline Id getId<RegulatoryElementConstPtr>(const RegulatoryElementConstPtr & prim)
+{
   return prim->id();
 }
 
 //! Extracts the id of a rule parameter
-template <>
-Id getId<RuleParameter>(const RuleParameter& prim);
+template<>
+Id getId<RuleParameter>(const RuleParameter & prim);
 
-template <>
-Id getId<ConstRuleParameter>(const ConstRuleParameter& prim);
+template<>
+Id getId<ConstRuleParameter>(const ConstRuleParameter & prim);
 }  // namespace traits
 
-namespace utils {
+namespace utils
+{
 /**
  * @brief returns true if element of a regulatory element has a matching Id
  * @param regElem the element holding other primitives
@@ -321,17 +353,19 @@ namespace utils {
  * Works for linestrings and polylines.
  * A similar implementation exists for linestrings and lanelets.
  */
-bool has(const RegulatoryElement& regElem, Id id);
-inline bool has(const RegulatoryElementConstPtr& ls, Id id) { return has(*ls, id); }
+bool has(const RegulatoryElement & regElem, Id id);
+inline bool has(const RegulatoryElementConstPtr & ls, Id id) {return has(*ls, id);}
 }  // namespace utils
 
 /**
  * @brief Creates regulatory elements based on their type
  */
-class RegulatoryElementFactory {
- public:
-  using FactoryFcn = std::function<RegulatoryElementPtr(const RegulatoryElementDataPtr&)>;
-  void registerStrategy(const std::string& strategy, const FactoryFcn& factoryFunction) {
+class RegulatoryElementFactory
+{
+public:
+  using FactoryFcn = std::function<RegulatoryElementPtr(const RegulatoryElementDataPtr &)>;
+  void registerStrategy(const std::string & strategy, const FactoryFcn & factoryFunction)
+  {
     registry_[strategy] = factoryFunction;
   }
 
@@ -347,19 +381,21 @@ class RegulatoryElementFactory {
    * The factory will make sure that the subtype tag of the returned object
    * matches the ruleName as is required by liblanelet.
    */
-  static RegulatoryElementPtr create(std::string ruleName, const RegulatoryElementDataPtr& data);
+  static RegulatoryElementPtr create(std::string ruleName, const RegulatoryElementDataPtr & data);
 
-  static RegulatoryElementPtr create(const std::string& ruleName, Id id, const RuleParameterMap& map,
-                                     const AttributeMap& attributes = AttributeMap()) {
+  static RegulatoryElementPtr create(
+    const std::string & ruleName, Id id, const RuleParameterMap & map,
+    const AttributeMap & attributes = AttributeMap())
+  {
     return create(ruleName, std::make_shared<RegulatoryElementData>(id, map, attributes));
   }
 
   //! returns regulatory element names that this factory can handle
   static std::vector<std::string> availableRules();
 
-  static RegulatoryElementFactory& instance();
+  static RegulatoryElementFactory & instance();
 
- private:
+private:
   RegulatoryElementFactory() = default;
   std::map<std::string, FactoryFcn> registry_;
 };
@@ -379,35 +415,40 @@ class RegulatoryElementFactory {
  * RegulatoryElementDataPtr as argument. The constructor of this class is
  * allowed to throw when the data passed to it is invalid.
  */
-template <class T>
-class RegisterRegulatoryElement {
- public:
-  RegisterRegulatoryElement() {
+template<class T>
+class RegisterRegulatoryElement
+{
+public:
+  RegisterRegulatoryElement()
+  {
     static_assert(!utils::strequal(T::RuleName, "basic_regulatory_element"),
-                  "You did not provide a RuleName for your regulatoryElement!");
+      "You did not provide a RuleName for your regulatoryElement!");
     RegulatoryElementFactory::instance().registerStrategy(
-        T::RuleName, [](const RegulatoryElementDataPtr& data) -> RegulatoryElementPtr {
-          return std::shared_ptr<T>(new T(data));  // have to use new because of friendship
-        });
+      T::RuleName, [](const RegulatoryElementDataPtr & data) -> RegulatoryElementPtr {
+        return std::shared_ptr<T>(new T(data));    // have to use new because of friendship
+      });
   }
 };
 
-template <typename PrimitiveT>
-void GenericRegulatoryElement::addParameter(const std::string& role, const PrimitiveT& primitive) {
+template<typename PrimitiveT>
+void GenericRegulatoryElement::addParameter(const std::string & role, const PrimitiveT & primitive)
+{
   parameters()[role].push_back(primitive);
 }
 
-template <typename PrimitiveT>
-void GenericRegulatoryElement::addParameter(RoleName role, const PrimitiveT& primitive) {
+template<typename PrimitiveT>
+void GenericRegulatoryElement::addParameter(RoleName role, const PrimitiveT & primitive)
+{
   parameters()[role].push_back(primitive);
 }
 
-template <typename T>
-Optional<T> RegulatoryElement::find(Id id) const {
+template<typename T>
+Optional<T> RegulatoryElement::find(Id id) const
+{
   static_assert(traits::isConst<T>(), "You must pass a const primitive type!");
   using MutableT = traits::MutablePrimitiveType<T>;
-  for (const auto& params : parameters()) {
-    for (const auto& elem : params.second) {
+  for (const auto & params : parameters()) {
+    for (const auto & elem : params.second) {
       auto telem = boost::get<MutableT>(&elem);
       if (telem && telem->id() == id) {
         return *telem;
@@ -417,10 +458,11 @@ Optional<T> RegulatoryElement::find(Id id) const {
   return {};
 }
 
-template <>
-inline Optional<ConstRuleParameter> RegulatoryElement::find(Id id) const {
-  for (const auto& params : parameters()) {
-    for (const auto& elem : params.second) {
+template<>
+inline Optional<ConstRuleParameter> RegulatoryElement::find(Id id) const
+{
+  for (const auto & params : parameters()) {
+    for (const auto & elem : params.second) {
       if (utils::getId(elem) == id) {
         return traits::toConst(elem);
       }
@@ -429,11 +471,12 @@ inline Optional<ConstRuleParameter> RegulatoryElement::find(Id id) const {
   return {};
 }
 
-template <>
-inline boost::optional<ConstLanelet> RegulatoryElement::find<ConstLanelet>(Id id) const {
-  for (const auto& params : parameters()) {
-    for (const auto& elem : params.second) {
-      const auto* telem = boost::get<WeakLanelet>(&elem);
+template<>
+inline boost::optional<ConstLanelet> RegulatoryElement::find<ConstLanelet>(Id id) const
+{
+  for (const auto & params : parameters()) {
+    for (const auto & elem : params.second) {
+      const auto * telem = boost::get<WeakLanelet>(&elem);
       if (telem != nullptr && !telem->expired() && telem->lock().id() == id) {
         return telem->lock();
       }
@@ -442,11 +485,12 @@ inline boost::optional<ConstLanelet> RegulatoryElement::find<ConstLanelet>(Id id
   return {};
 }
 
-template <>
-inline boost::optional<ConstArea> RegulatoryElement::find<ConstArea>(Id id) const {
-  for (const auto& params : parameters()) {
-    for (const auto& elem : params.second) {
-      const auto* telem = boost::get<WeakArea>(&elem);
+template<>
+inline boost::optional<ConstArea> RegulatoryElement::find<ConstArea>(Id id) const
+{
+  for (const auto & params : parameters()) {
+    for (const auto & elem : params.second) {
+      const auto * telem = boost::get<WeakArea>(&elem);
       if (telem != nullptr && !telem->expired() && telem->lock().id() == id) {
         return telem->lock();
       }
@@ -455,18 +499,20 @@ inline boost::optional<ConstArea> RegulatoryElement::find<ConstArea>(Id id) cons
   return {};
 }
 
-std::ostream& operator<<(std::ostream& stream, const RegulatoryElement& obj);
+std::ostream & operator<<(std::ostream & stream, const RegulatoryElement & obj);
 
-template <>
-inline std::vector<ConstLanelet> RegulatoryElement::getParameters(const std::string& role) const {
+template<>
+inline std::vector<ConstLanelet> RegulatoryElement::getParameters(const std::string & role) const
+{
   auto it = parameters().find(role);
   if (it == parameters().end()) {
     return {};
   }
   return utils::strong(utils::getVariant<ConstWeakLanelet>(it->second));
 }
-template <>
-inline std::vector<ConstLanelet> RegulatoryElement::getParameters(RoleName role) const {
+template<>
+inline std::vector<ConstLanelet> RegulatoryElement::getParameters(RoleName role) const
+{
   auto it = parameters().find(role);
   if (it == parameters().end()) {
     return {};
@@ -474,16 +520,18 @@ inline std::vector<ConstLanelet> RegulatoryElement::getParameters(RoleName role)
   return utils::strong(utils::getVariant<ConstWeakLanelet>(it->second));
 }
 
-template <>
-inline std::vector<ConstArea> RegulatoryElement::getParameters(const std::string& role) const {
+template<>
+inline std::vector<ConstArea> RegulatoryElement::getParameters(const std::string & role) const
+{
   auto it = parameters().find(role);
   if (it == parameters().end()) {
     return {};
   }
   return utils::strong(utils::getVariant<ConstWeakArea>(it->second));
 }
-template <>
-inline std::vector<ConstArea> RegulatoryElement::getParameters(RoleName role) const {
+template<>
+inline std::vector<ConstArea> RegulatoryElement::getParameters(RoleName role) const
+{
   auto it = parameters().find(role);
   if (it == parameters().end()) {
     return {};
@@ -491,25 +539,29 @@ inline std::vector<ConstArea> RegulatoryElement::getParameters(RoleName role) co
   return utils::strong(utils::getVariant<ConstWeakArea>(it->second));
 }
 
-namespace traits {
-template <typename T>
-constexpr bool isRegulatoryElementT() {
+namespace traits
+{
+template<typename T>
+constexpr bool isRegulatoryElementT()
+{
   using DataT = typename PrimitiveTraits<T>::DataType;
   return std::is_same<DataT, RegulatoryElementData>::value;
 }
-template <>
-struct Owned<RegulatoryElementPtr> {
+template<>
+struct Owned<RegulatoryElementPtr>
+{
   using Type = RuleParameter;
 };
 }  // namespace traits
 
-template <typename T, typename RetT>
+template<typename T, typename RetT>
 using IfRE = std::enable_if_t<traits::isRegulatoryElementT<T>(), RetT>;
 
 }  // namespace lanelet
 
 // Hash function for usage in containers
-namespace std {
-template <>
-struct hash<lanelet::RegulatoryElement> : public lanelet::HashBase<lanelet::RegulatoryElement> {};
+namespace std
+{
+template<>
+struct hash<lanelet::RegulatoryElement>: public lanelet::HashBase<lanelet::RegulatoryElement> {};
 }  // namespace std

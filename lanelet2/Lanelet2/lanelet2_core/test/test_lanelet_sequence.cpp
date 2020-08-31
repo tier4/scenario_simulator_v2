@@ -9,9 +9,11 @@
 using namespace std::literals;
 using namespace lanelet;
 
-class LaneletSequenceTest : public ::testing::Test {
- protected:
-  void SetUp() override {
+class LaneletSequenceTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
     id = 0;
     p1 = Point3d(++id, 0., 1., 1.);
     p2 = Point3d(++id, 1., 1., 1.);
@@ -30,7 +32,7 @@ class LaneletSequenceTest : public ::testing::Test {
     cll = LaneletSequence({ll1, ll2});
   }
 
- public:
+public:
   Id id{1};
   Point3d p1, p2, p3, p4, p5, p6, p7;
   Points3d pointsInOrder;
@@ -54,8 +56,10 @@ TEST_F(LaneletSequenceTest, PolygonHasNoDuplicates) {  // NOLINT
 
 TEST_F(LaneletSequenceTest, AppendsCenterline) {  // NOLINT
   auto cl = cll.centerline();
-  BasicLineString3d clExpect{BasicPoint3d(0, 0.5, 0.5), BasicPoint3d(0.5, 0.5, 0.5), BasicPoint3d(2, 0.5, 0.5)};
-  for (const auto& p : clExpect) {
+  BasicLineString3d clExpect{BasicPoint3d(0, 0.5, 0.5), BasicPoint3d(0.5, 0.5, 0.5), BasicPoint3d(2,
+      0.5,
+      0.5)};
+  for (const auto & p : clExpect) {
     EXPECT_FLOAT_EQ(geometry::distance(p, cl), 0.f);
   }
 }
@@ -76,7 +80,8 @@ TEST_F(LaneletSequenceTest, ConstructFromLaneletSequences) {  // NOLINT
 }
 
 TEST_F(LaneletSequenceTest, RegulatoryElementExtraction) {  // NOLINT
-  auto tl = TrafficLight::make(++id, AttributeMap(), LineStringsOrPolygons3d({left1, right1}), left1);
+  auto tl =
+    TrafficLight::make(++id, AttributeMap(), LineStringsOrPolygons3d({left1, right1}), left1);
   auto ts = TrafficSign::make(++id, AttributeMap(), {{left2}, "de205"}, {}, {right2});
   ll1.addRegulatoryElement(tl);
   ll2.addRegulatoryElement(ts);

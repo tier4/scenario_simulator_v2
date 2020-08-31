@@ -25,7 +25,8 @@ void part4Lanelets();
 void part5Areas();
 void part6Geometry();
 
-int main() {
+int main()
+{
   // this tutorial is divided into 6 parts that teach you about all the primitives, one by one and finally how to use
   // them for geometry calculations.
   part0Primitives();
@@ -38,7 +39,8 @@ int main() {
   return 0;
 }
 
-void part0Primitives() {
+void part0Primitives()
+{
   using namespace lanelet;
   using namespace lanelet::units::literals;  // this enables us to use _kmh for velocities
   // there are many concepts that are similar across all primitives of lanelet2. Once you have understood one of
@@ -93,7 +95,7 @@ void part0Primitives() {
   assert(pConst.z() == 3);
   // actually, and this is more advanced, we do not even have to make a copy, because internally Point3d inherits
   // from ConstPoint3d
-  ConstPoint3d& pConstRef = p;
+  ConstPoint3d & pConstRef = p;
   // pConstRef is now a reference to the const part of the point:
   assert(pConstRef.z() == 3);
 
@@ -108,7 +110,8 @@ void part0Primitives() {
   assert(p.constData() == pConst.constData());
 }
 
-void part1Points() {
+void part1Points()
+{
   using namespace lanelet;
   // this is a normal point with x=1, y=2, z=3.
   Point3d p3d(utils::getId(), 1, 2, 3);
@@ -120,7 +123,7 @@ void part1Points() {
 
   // we can also get access to a BasicPoint which is actually an Eigen point and can be used in time critical
   // computations:
-  BasicPoint3d& p3dBasic = p3d.basicPoint();
+  BasicPoint3d & p3dBasic = p3d.basicPoint();
 
   // modifying this reference to the basic point also modifies the actual point data:
   p3dBasic.z() = 4;
@@ -147,7 +150,8 @@ void part1Points() {
   assert(p3dNew.constData() == p3d.constData());  // still the same underlying data
 }
 
-void part2LineStrings() {
+void part2LineStrings()
+{
   using namespace lanelet;
   // LineStrings are created from a set of points with linear interpolation between them.
   Point3d p1{utils::getId(), 0, 0, 0};
@@ -158,7 +162,7 @@ void part2LineStrings() {
   // conceptually, linestrings are similar to an std::vector. You can access individal points or loop over them.
   assert(ls[1] == p2);
   assert(ls.size() == 3);
-  for (Point3d& p : ls) {
+  for (Point3d & p : ls) {
     assert(p.y() == 0);
   }
   ls.push_back(Point3d(utils::getId(), 3, 0, 0));
@@ -215,7 +219,8 @@ void part2LineStrings() {
   assert(lsBasic.front() == lsHybrid.front());
 }
 
-void part3Polygons() {
+void part3Polygons()
+{
   using namespace lanelet;
   // polygons are very, very similar to linestrings. the only actual difference is that there is a last, implicit
   // segment between the last and the first point that closes the polygon. The interface is basically the same:
@@ -242,7 +247,8 @@ void part3Polygons() {
   assert(polyHybrid.constData() == poly2dConst.constData());
 }
 
-void part4Lanelets() {
+void part4Lanelets()
+{
   using namespace lanelet;
   // Technically, lanelets are not very special, they have a left and a right bound. You already know how to create
   // them, so lets skip that.
@@ -298,7 +304,8 @@ void part4Lanelets() {
   assert(lanelet.regulatoryElements().empty());
 }
 
-void part5Areas() {
+void part5Areas()
+{
   using namespace lanelet;
   // areas are similar to lanelets in their design. But instead of left and right bound they have set of lineStrings
   // that are connected and together form the outer bound. They must be in clockwise order
@@ -328,7 +335,8 @@ void part5Areas() {
   assert(area.regulatoryElements().empty());
 }
 
-void part6Geometry() {
+void part6Geometry()
+{
   using namespace lanelet;
   // lanelet2 allows lots of geometry calculations with all kinds of primitives. This tutorial only shows some of them
   // to show you the basic idea. There are many more algorithms that you can find in the geometry folder in
@@ -366,7 +374,7 @@ void part6Geometry() {
   assert(pProj.y() == 2);
 
   ArcCoordinates arcCoordinates =
-      geometry::toArcCoordinates(utils::to2D(ls), utils::to2D(point));  // transforms the point into arc coordinates
+    geometry::toArcCoordinates(utils::to2D(ls), utils::to2D(point));    // transforms the point into arc coordinates
   assert(arcCoordinates.distance == 2);                                 // signed distance to linestring
   assert(arcCoordinates.length == 1);                                   // length along linestring
 

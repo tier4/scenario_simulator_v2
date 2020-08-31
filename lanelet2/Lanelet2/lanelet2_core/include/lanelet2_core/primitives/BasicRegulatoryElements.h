@@ -6,21 +6,25 @@
 #include "lanelet2_core/primitives/LineStringOrPolygon.h"
 #include "lanelet2_core/primitives/RegulatoryElement.h"
 
-namespace lanelet {
+namespace lanelet
+{
 
 /**
  * @brief Represents a traffic light restriction on the lanelet
  * @ingroup RegulatoryElementPrimitives
  * @ingroup Primitives
  */
-class TrafficLight : public RegulatoryElement {
- public:
+class TrafficLight : public RegulatoryElement
+{
+public:
   using Ptr = std::shared_ptr<TrafficLight>;
   static constexpr char RuleName[] = "traffic_light";
   //! Directly construct a stop line from its required rule parameters.
   //! Might modify the input data in oder to get correct tags.
-  static Ptr make(Id id, const AttributeMap& attributes, const LineStringsOrPolygons3d& trafficLights,
-                  const Optional<LineString3d>& stopLine = {}) {
+  static Ptr make(
+    Id id, const AttributeMap & attributes, const LineStringsOrPolygons3d & trafficLights,
+    const Optional<LineString3d> & stopLine = {})
+  {
     return Ptr{new TrafficLight(id, attributes, trafficLights, stopLine)};
   }
 
@@ -48,33 +52,35 @@ class TrafficLight : public RegulatoryElement {
    * Traffic lights are represented as linestrings that start at the left edge
    * of a traffic light and end at the right edge.
    */
-  void addTrafficLight(const LineStringOrPolygon3d& primitive);
+  void addTrafficLight(const LineStringOrPolygon3d & primitive);
 
   /**
    * @brief remove a traffic light
    * @param primitive the primitive
    * @return true if the traffic light existed and was removed
    */
-  bool removeTrafficLight(const LineStringOrPolygon3d& primitive);
+  bool removeTrafficLight(const LineStringOrPolygon3d & primitive);
 
   /**
    * @brief set a new stop line, overwrite the old one
    * @param stopLine new stop line
    */
-  void setStopLine(const LineString3d& stopLine);
+  void setStopLine(const LineString3d & stopLine);
 
   //! Deletes the stop line
   void removeStopLine();
 
- protected:
+protected:
   friend class RegisterRegulatoryElement<TrafficLight>;
-  TrafficLight(Id id, const AttributeMap& attributes, const LineStringsOrPolygons3d& trafficLights,
-               const Optional<LineString3d>& stopLine);
-  explicit TrafficLight(const RegulatoryElementDataPtr& data);
+  TrafficLight(
+    Id id, const AttributeMap & attributes, const LineStringsOrPolygons3d & trafficLights,
+    const Optional<LineString3d> & stopLine);
+  explicit TrafficLight(const RegulatoryElementDataPtr & data);
 };
 
 //! Enum to distinguish maneuver types
-enum class ManeuverType {
+enum class ManeuverType
+{
   Yield,       //!> Lanelet has right of way
   RightOfWay,  //!< Lanelet has to yield
   Unknown      //!< Lanelet ist not part of relation
@@ -83,8 +89,9 @@ enum class ManeuverType {
 //! @brief Defines right of way restrictions
 //! @ingroup RegulatoryElementPrimitives
 //! @ingroup Primitives
-class RightOfWay : public RegulatoryElement {
- public:
+class RightOfWay : public RegulatoryElement
+{
+public:
   using Ptr = std::shared_ptr<RightOfWay>;
   static constexpr char RuleName[] = "right_of_way";
 
@@ -97,13 +104,15 @@ class RightOfWay : public RegulatoryElement {
    * @param stopLine line where to stop. If there is none, stop at the end of
    * the lanelet.
    */
-  static Ptr make(Id id, const AttributeMap& attributes, const Lanelets& rightOfWay, const Lanelets& yield,
-                  const Optional<LineString3d>& stopLine = {}) {
+  static Ptr make(
+    Id id, const AttributeMap & attributes, const Lanelets & rightOfWay, const Lanelets & yield,
+    const Optional<LineString3d> & stopLine = {})
+  {
     return Ptr{new RightOfWay(id, attributes, rightOfWay, yield, stopLine)};
   }
 
   //! returns whether a lanelet has to yield or has right of way
-  ManeuverType getManeuver(const ConstLanelet& lanelet) const;
+  ManeuverType getManeuver(const ConstLanelet & lanelet) const;
 
   //! get the lanelets have right of way
   ConstLanelets rightOfWayLanelets() const;
@@ -118,35 +127,38 @@ class RightOfWay : public RegulatoryElement {
   Optional<LineString3d> stopLine();
 
   //! Overwrites the stop line
-  void setStopLine(const LineString3d& stopLine);
+  void setStopLine(const LineString3d & stopLine);
 
   //! Adds a lanelet for RightOfWay
-  void addRightOfWayLanelet(const Lanelet& lanelet);
+  void addRightOfWayLanelet(const Lanelet & lanelet);
 
   //! Add yielding lanelet
-  void addYieldLanelet(const Lanelet& lanelet);
+  void addYieldLanelet(const Lanelet & lanelet);
 
   //! Removes a right of way lanelet and returns true on success
-  bool removeRightOfWayLanelet(const Lanelet& lanelet);
+  bool removeRightOfWayLanelet(const Lanelet & lanelet);
 
   //! Removes a yielding lanelet and returns true no success
-  bool removeYieldLanelet(const Lanelet& lanelet);
+  bool removeYieldLanelet(const Lanelet & lanelet);
 
   //! Removes the stop line
   void removeStopLine();
 
- protected:
+protected:
   friend class RegisterRegulatoryElement<RightOfWay>;
-  RightOfWay(Id id, const AttributeMap& attributes, const Lanelets& rightOfWay, const Lanelets& yield,
-             const Optional<LineString3d>& stopLine = {});
-  explicit RightOfWay(const RegulatoryElementDataPtr& data);
+  RightOfWay(
+    Id id, const AttributeMap & attributes, const Lanelets & rightOfWay, const Lanelets & yield,
+    const Optional<LineString3d> & stopLine = {});
+  explicit RightOfWay(const RegulatoryElementDataPtr & data);
 };
 
-struct LaneletWithStopLine {
+struct LaneletWithStopLine
+{
   Lanelet lanelet;
   Optional<LineString3d> stopLine;
 };
-struct ConstLaneletWithStopLine {
+struct ConstLaneletWithStopLine
+{
   ConstLanelet lanelet;
   Optional<ConstLineString3d> stopLine;
 };
@@ -159,8 +171,9 @@ using LaneletsWithStopLines = std::vector<LaneletWithStopLine>;
 //!
 //! The distance to the intersection is represented either by the distance to the stop line, if present, otherwise the
 //! distance to the end of the lanelet.
-class AllWayStop : public RegulatoryElement {
- public:
+class AllWayStop : public RegulatoryElement
+{
+public:
   using Ptr = std::shared_ptr<AllWayStop>;
   static constexpr char RuleName[] = "all_way_stop";
 
@@ -171,8 +184,10 @@ class AllWayStop : public RegulatoryElement {
    * @param lltsWithStop lanelets with stop line. Either all lanelets have a stop line or none.
    * @param signs traffic signs that constitute this rule
    */
-  static Ptr make(Id id, const AttributeMap& attributes, const LaneletsWithStopLines& lltsWithStop,
-                  const LineStringsOrPolygons3d& signs = {}) {
+  static Ptr make(
+    Id id, const AttributeMap & attributes, const LaneletsWithStopLines & lltsWithStop,
+    const LineStringsOrPolygons3d & signs = {})
+  {
     return Ptr{new AllWayStop(id, attributes, lltsWithStop, signs)};
   }
 
@@ -182,18 +197,18 @@ class AllWayStop : public RegulatoryElement {
 
   //! Adds a new lanelet with stop line. This will throw if the other lanelets did not have a stop line and vice versa
   //! @throws InvalidInputError if stop line is inconsistent
-  void addLanelet(const LaneletWithStopLine& lltWithStop);
+  void addLanelet(const LaneletWithStopLine & lltWithStop);
 
   //! Removes a lanelet and the associated stop line, if there is one
-  bool removeLanelet(const Lanelet& llt);
+  bool removeLanelet(const Lanelet & llt);
 
   //! get the stop lines
   ConstLineStrings3d stopLines() const;
   LineStrings3d stopLines();
 
   //! gets the stop line for a lanelet, if there is one
-  Optional<ConstLineString3d> getStopLine(const ConstLanelet& llt) const;
-  Optional<LineString3d> getStopLine(const ConstLanelet& llt);
+  Optional<ConstLineString3d> getStopLine(const ConstLanelet & llt) const;
+  Optional<LineString3d> getStopLine(const ConstLanelet & llt);
 
   //! get list of traffic signs that constitute this AllWayStop if existing
   ConstLineStringsOrPolygons3d trafficSigns() const;
@@ -203,20 +218,22 @@ class AllWayStop : public RegulatoryElement {
   /** Traffic signs are represented as linestrings that start at the left edge
    * and end at the right edge of a traffic sign.
    */
-  void addTrafficSign(const LineStringOrPolygon3d& sign);
+  void addTrafficSign(const LineStringOrPolygon3d & sign);
 
   //! removes a traffic sign and returns true on success
-  bool removeTrafficSign(const LineStringOrPolygon3d& sign);
+  bool removeTrafficSign(const LineStringOrPolygon3d & sign);
 
- protected:
+protected:
   friend class RegisterRegulatoryElement<AllWayStop>;
-  AllWayStop(Id id, const AttributeMap& attributes, const LaneletsWithStopLines& lltsWithStop,
-             const LineStringsOrPolygons3d& signs);
-  explicit AllWayStop(const RegulatoryElementDataPtr& data);
+  AllWayStop(
+    Id id, const AttributeMap & attributes, const LaneletsWithStopLines & lltsWithStop,
+    const LineStringsOrPolygons3d & signs);
+  explicit AllWayStop(const RegulatoryElementDataPtr & data);
 };
 
 //! Used as input argument to create TrafficSign regElem
-struct TrafficSignsWithType {
+struct TrafficSignsWithType
+{
   LineStringsOrPolygons3d trafficSigns;  //!< Lists relevant traffic signs
   std::string type{""};                  //! Lists their type. If empty, it is assumed that this
                                          //! is found in the attributes of trafficSigns.
@@ -226,8 +243,9 @@ struct TrafficSignsWithType {
 //! @brief Expresses a generic traffic sign rule
 //! @ingroup RegulatoryElementPrimitives
 //! @ingroup Primitives
-class TrafficSign : public RegulatoryElement {
- public:
+class TrafficSign : public RegulatoryElement
+{
+public:
   using Ptr = std::shared_ptr<TrafficSign>;
   static constexpr char RuleName[] = "traffic_sign";
 
@@ -246,10 +264,13 @@ class TrafficSign : public RegulatoryElement {
    * @param refLines lines from where the rule becomes valid. Can be empty.
    * @param cancelLines lines after which a rule becomes invalid. Can be empty.
    */
-  static Ptr make(Id id, const AttributeMap& attributes, const TrafficSignsWithType& trafficSigns,
-                  const TrafficSignsWithType& cancellingTrafficSigns = {}, const LineStrings3d& refLines = {},
-                  const LineStrings3d& cancelLines = {}) {
-    return Ptr(new TrafficSign(id, attributes, trafficSigns, cancellingTrafficSigns, refLines, cancelLines));
+  static Ptr make(
+    Id id, const AttributeMap & attributes, const TrafficSignsWithType & trafficSigns,
+    const TrafficSignsWithType & cancellingTrafficSigns = {}, const LineStrings3d & refLines = {},
+    const LineStrings3d & cancelLines = {})
+  {
+    return Ptr(new TrafficSign(id, attributes, trafficSigns, cancellingTrafficSigns, refLines,
+             cancelLines));
   }
 
   //! returns the traffic signs
@@ -287,36 +308,37 @@ class TrafficSign : public RegulatoryElement {
   /** Traffic signs are represented as linestrings that start at the left edge
    * and end at the right edge of a traffic sign.
    */
-  void addTrafficSign(const LineStringOrPolygon3d& sign);
+  void addTrafficSign(const LineStringOrPolygon3d & sign);
 
   //! remove a traffic sign and returns true on success
-  bool removeTrafficSign(const LineStringOrPolygon3d& sign);
+  bool removeTrafficSign(const LineStringOrPolygon3d & sign);
 
   //! Add new cancelling traffic sign
-  void addCancellingTrafficSign(const TrafficSignsWithType& signs);
+  void addCancellingTrafficSign(const TrafficSignsWithType & signs);
 
   //! remove a cancelling traffic sign, returns true on success
-  bool removeCancellingTrafficSign(const LineStringOrPolygon3d& sign);
+  bool removeCancellingTrafficSign(const LineStringOrPolygon3d & sign);
 
   //! Add a new reference line
-  void addRefLine(const LineString3d& line);
+  void addRefLine(const LineString3d & line);
 
   //! Remove a reference line. Returns true on success.
-  bool removeRefLine(const LineString3d& line);
+  bool removeRefLine(const LineString3d & line);
 
   //! Add a new line from where the sign becomes inactive
-  void addCancellingRefLine(const LineString3d& line);
+  void addCancellingRefLine(const LineString3d & line);
 
   //! Remove a cancelling line. Returns true on success.
-  bool removeCancellingRefLine(const LineString3d& line);
+  bool removeCancellingRefLine(const LineString3d & line);
 
- protected:
-  TrafficSign(Id id, const AttributeMap& attributes, const TrafficSignsWithType& trafficSigns,
-              const TrafficSignsWithType& cancellingTrafficSigns = {}, const LineStrings3d& refLines = {},
-              const LineStrings3d& cancelLines = {});
+protected:
+  TrafficSign(
+    Id id, const AttributeMap & attributes, const TrafficSignsWithType & trafficSigns,
+    const TrafficSignsWithType & cancellingTrafficSigns = {}, const LineStrings3d & refLines = {},
+    const LineStrings3d & cancelLines = {});
 
   friend class RegisterRegulatoryElement<TrafficSign>;
-  explicit TrafficSign(const RegulatoryElementDataPtr& data);
+  explicit TrafficSign(const RegulatoryElementDataPtr & data);
 };
 
 /**
@@ -332,30 +354,38 @@ class TrafficSign : public RegulatoryElement {
  * the regulatory element. However this is not recommended, because will make it
  * hard to track where the speed limit originates.
  */
-class SpeedLimit : public TrafficSign {
- public:
+class SpeedLimit : public TrafficSign
+{
+public:
   using Ptr = std::shared_ptr<SpeedLimit>;
   static constexpr char RuleName[] = "speed_limit";
 
   //! Create a speed limit regulatory element. Similar to a traffic sign.
-  static Ptr make(Id id, const AttributeMap& attributes, const TrafficSignsWithType& trafficSigns,
-                  const TrafficSignsWithType& cancellingTrafficSigns = {}, const LineStrings3d& refLines = {},
-                  const LineStrings3d& cancelLines = {}) {
-    return Ptr(new SpeedLimit(id, attributes, trafficSigns, cancellingTrafficSigns, refLines, cancelLines));
+  static Ptr make(
+    Id id, const AttributeMap & attributes, const TrafficSignsWithType & trafficSigns,
+    const TrafficSignsWithType & cancellingTrafficSigns = {}, const LineStrings3d & refLines = {},
+    const LineStrings3d & cancelLines = {})
+  {
+    return Ptr(new SpeedLimit(id, attributes, trafficSigns, cancellingTrafficSigns, refLines,
+             cancelLines));
   }
 
   //! Create a speed limit regulatory element only from a type or speed limit without actual sign
-  static Ptr make(Id id, AttributeMap attributes, const std::string& signType, const LineStrings3d& refLines = {},
-                  const LineStrings3d& cancelLines = {}) {
+  static Ptr make(
+    Id id, AttributeMap attributes, const std::string & signType,
+    const LineStrings3d & refLines = {},
+    const LineStrings3d & cancelLines = {})
+  {
     attributes.insert(std::make_pair(AttributeNamesString::SignType, signType));
     return Ptr(new SpeedLimit(id, attributes, {}, {}, refLines, cancelLines));
   }
 
- protected:
+protected:
   friend class RegisterRegulatoryElement<SpeedLimit>;
-  SpeedLimit(Id id, const AttributeMap& attributes, const TrafficSignsWithType& trafficSigns,
-             const TrafficSignsWithType& cancellingTrafficSigns = {}, const LineStrings3d& refLines = {},
-             const LineStrings3d& cancelLines = {});
-  explicit SpeedLimit(const RegulatoryElementDataPtr& data);
+  SpeedLimit(
+    Id id, const AttributeMap & attributes, const TrafficSignsWithType & trafficSigns,
+    const TrafficSignsWithType & cancellingTrafficSigns = {}, const LineStrings3d & refLines = {},
+    const LineStrings3d & cancelLines = {});
+  explicit SpeedLimit(const RegulatoryElementDataPtr & data);
 };
 }  // namespace lanelet

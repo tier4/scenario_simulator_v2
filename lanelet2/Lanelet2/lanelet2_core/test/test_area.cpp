@@ -23,14 +23,17 @@ using namespace lanelet;
  *   O--->
  *       x
  */
-class TestArea : public testing::Test {
- public:
-  TestArea() {
+class TestArea : public testing::Test
+{
+public:
+  TestArea()
+  {
     for (auto i = 0u; i < 4; ++i) {
       pointsLeft.push_back(Point3d(++id, i, 1));   // 1, 3, 5, 7
       pointsRight.push_back(Point3d(++id, i, 0));  // 2, 4, 6, 8
     }
-    firstCircle = LineString3d(++id, {pointsLeft[0], pointsLeft[1], pointsRight[1], pointsRight[0]});  // 9
+    firstCircle =
+      LineString3d(++id, {pointsLeft[0], pointsLeft[1], pointsRight[1], pointsRight[0]});              // 9
     firstCircle1 = LineString3d(++id, {pointsLeft[0], pointsLeft[1]});                                 // 10
     firstCircle2 = LineString3d(++id, {pointsLeft[1], pointsRight[1]});                                // 11
     firstCircle3 = LineString3d(++id, {pointsRight[1], pointsRight[0]});                               // 12
@@ -38,8 +41,10 @@ class TestArea : public testing::Test {
     secondCircle2 = LineString3d(++id, {pointsLeft[2], pointsRight[2]});                               // 14
     secondCircle3 = LineString3d(++id, {pointsRight[2], pointsRight[1]});                              // 15
     auto holeId = ++id;                                                                                // 16
-    hole = LineString3d(holeId, {Point3d(++id, 1.25, 0.25), Point3d(++id, 1.75, 0.25), Point3d(++id, 1.75, 0.75),
-                                 Point3d(++id, 1.25, 0.75)});                                  // 17, 18, 19, 20
+    hole =
+      LineString3d(holeId,
+        {Point3d(++id, 1.25, 0.25), Point3d(++id, 1.75, 0.25), Point3d(++id, 1.75, 0.75),
+          Point3d(++id, 1.25, 0.75)});                                                         // 17, 18, 19, 20
     thirdLine1 = LineString3d(++id, {pointsLeft[2], pointsLeft[3]});                           // 21
     thirdLine2 = LineString3d(++id, {pointsRight[2], pointsRight[3]});                         // 22
     auto lineId = ++id;                                                                        // 23
@@ -57,8 +62,9 @@ class TestArea : public testing::Test {
 
   Id id{0};
   Points3d pointsLeft, pointsRight;
-  LineString3d firstCircle, firstCircle1, firstCircle2, firstCircle3, secondCircle1, secondCircle2, secondCircle3, hole,
-      thirdLine1, thirdLine2, rightLine;
+  LineString3d firstCircle, firstCircle1, firstCircle2, firstCircle3, secondCircle1, secondCircle2,
+    secondCircle3, hole,
+    thirdLine1, thirdLine2, rightLine;
   Area area1, area2, area3, area4;
   Lanelet laneletFollowing, laneletRight, laneletBelow, laneletUpwards;
   RegulatoryElementPtr regelem;
@@ -175,7 +181,8 @@ TEST_F(TestArea, determineCommonLineFollowingOrPreceding) {
   res = geometry::determineCommonLineFollowingOrPreceding(area2, laneletFollowing.invert());
   ASSERT_TRUE(!!res);
   EXPECT_EQ(res->id(), 14);
-  EXPECT_FALSE(!!geometry::determineCommonLineFollowingOrPreceding(area1, laneletFollowing.invert()));
+  EXPECT_FALSE(!!geometry::determineCommonLineFollowingOrPreceding(area1,
+    laneletFollowing.invert()));
   EXPECT_FALSE(!!geometry::determineCommonLineFollowingOrPreceding(area1, laneletFollowing));
   EXPECT_FALSE(!!geometry::determineCommonLineFollowingOrPreceding(area2, laneletRight));
   EXPECT_FALSE(!!geometry::determineCommonLineFollowingOrPreceding(area1, laneletBelow));

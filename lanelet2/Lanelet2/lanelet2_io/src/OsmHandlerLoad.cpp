@@ -13,51 +13,65 @@
 
 using namespace std::string_literals;
 
-namespace lanelet {
-namespace io_handlers {
+namespace lanelet
+{
+namespace io_handlers
+{
 
 using Errors = std::vector<std::string>;
 
-namespace {
+namespace
+{
 // register with factories
 RegisterParser<OsmParser> regParser;
 using traits::to2D;
-bool isValid(const LineStrings3d& lss) {
-  BasicPolygon2d ls(utils::concatenate(lss, [](const auto& elem) { return to2D(elem).basicLineString(); }));
+bool isValid(const LineStrings3d & lss)
+{
+  BasicPolygon2d ls(utils::concatenate(lss, [](const auto & elem) {
+      return to2D(elem).basicLineString();
+    }));
   return boost::geometry::is_valid(ls);
 }
 
-void reverse(LineStrings3d& lss) {
-  for (auto& ls : lss) {
+void reverse(LineStrings3d & lss)
+{
+  for (auto & ls : lss) {
     ls = ls.invert();
   }
   std::reverse(lss.begin(), lss.end());
 }
 
-template <typename PrimT>
-PrimT getDummy(Id id) {
+template<typename PrimT>
+PrimT getDummy(Id id)
+{
   return PrimT(id);
 }
-template <>
-RegulatoryElementPtr getDummy<RegulatoryElementPtr>(Id id) {
+template<>
+RegulatoryElementPtr getDummy<RegulatoryElementPtr>(Id id)
+{
   return std::make_shared<GenericRegulatoryElement>(std::make_shared<RegulatoryElementData>(id));
 }
 
-Errors buildErrorMessage(const std::string& errorIntro, const Errors& errors) {
+Errors buildErrorMessage(const std::string & errorIntro, const Errors & errors)
+{
   if (errors.empty()) {
     return {};
   }
   Errors message{errorIntro};
   message.reserve(errors.size() + 1);
-  for (const auto& error : errors) {
+  for (const auto & error : errors) {
     message.push_back("\t- " + error);
   }
   return message;
 }
 
-class FromFileLoader {  // NOLINT
- public:
-  static std::unique_ptr<LaneletMap> loadMap(const osm::File& file, const Projector& projector, ErrorMessages& errors) {
+class FromFileLoader    // NOLINT
+{
+public:
+  static std::unique_ptr<LaneletMap> loadMap(
+    const osm::File & file, const Projector & projector,
+    ErrorMessages & errors)
+  {
     FromFileLoader loader;
 
     loader.loadNodes(file.nodes, projector);
@@ -69,15 +83,16 @@ class FromFileLoader {  // NOLINT
     loader.addRegulatoryElements(laneletsWithRelation);
     loader.addRegulatoryElements(areasWithRelation);
     errors = std::move(loader.errors_);
-    return std::make_unique<LaneletMap>(loader.lanelets_, loader.areas_, loader.regulatoryElements_, loader.polygons_,
-                                        loader.lineStrings_, loader.points_);
+    return std::make_unique<LaneletMap>(loader.lanelets_, loader.areas_, loader.regulatoryElements_,
+             loader.polygons_,
+             loader.lineStrings_, loader.points_);
   }
 
- private:
-  template <typename PrimT>
-  using PrimitiveWithRegulatoryElement = std::pair<PrimT, const osm::Relation*>;
+private:
+  template<typename PrimT>
+  using PrimitiveWithRegulatoryElement = std::pair<PrimT, const osm::Relation *>;
 
-  template <typename PrimT>
+  template<typename PrimT>
   using PrimitivesWithRegulatoryElement = std::vector<PrimitiveWithRegulatoryElement<PrimT>>;
 
   using AreasWithRegulatoryElements = PrimitivesWithRegulatoryElement<Area>;
@@ -85,23 +100,26 @@ class FromFileLoader {  // NOLINT
 
   FromFileLoader() = default;
 
-  void loadNodes(const lanelet::osm::Nodes& nodes, const Projector& projector) {
-    for (const auto& nodeElem : nodes) {
-      const auto& node = nodeElem.second;
+  void loadNodes(const lanelet::osm::Nodes & nodes, const Projector & projector)
+  {
+    for (const auto & nodeElem : nodes) {
+      const auto & node = nodeElem.second;
       try {
-        points_.emplace(node.id, Point3d(node.id, projector.forward(node.point), getAttributes(node.attributes)));
-      } catch (ForwardProjectionError& e) {
+        points_.emplace(node.id,
+          Point3d(node.id, projector.forward(node.point), getAttributes(node.attributes)));
+      } catch (ForwardProjectionError & e) {
         parserError(node.id, e.what());
       }
     }
   }
-  void loadWays(const lanelet::osm::Ways& ways) {
-    for (const auto& wayElem : ways) {
-      const auto& way = wayElem.second;
+  void loadWays(const lanelet::osm::Ways & ways)
+  {
+    for (const auto & wayElem : ways) {
+      const auto & way = wayElem.second;
       // reconstruct points
       Points3d points;
       points = utils::transform(way.nodes,
-                                [this, &way](const auto& n) { return this->getOrGetDummy(points_, n->id, way.id); });
+          [this, &way](const auto & n) {return this->getOrGetDummy(points_, n->id, way.id);});
       if (points.empty()) {
         parserError(way.id, "Ways must have at least one point!");
         continue;
@@ -120,13 +138,14 @@ class FromFileLoader {  // NOLINT
     }
   }
 
-  LaneletsWithRegulatoryElements loadLanelets(const lanelet::osm::Relations& relations) {
+  LaneletsWithRegulatoryElements loadLanelets(const lanelet::osm::Relations & relations)
+  {
     // The regulatory elements are not parsed yet. We store lanelets with one
     // for
     // later.
     LaneletsWithRegulatoryElements llWithRegulatoryElement;
-    for (const auto& relElem : relations) {
-      const auto& llElem = relElem.second;
+    for (const auto & relElem : relations) {
+      const auto & llElem = relElem.second;
       if (!isType<AttributeValueString::Lanelet>(llElem)) {
         continue;
       }
@@ -155,11 +174,12 @@ class FromFileLoader {  // NOLINT
     return llWithRegulatoryElement;
   }
 
-  AreasWithRegulatoryElements loadAreas(const lanelet::osm::Relations& relations) {
+  AreasWithRegulatoryElements loadAreas(const lanelet::osm::Relations & relations)
+  {
     // regElems are not parsed yet. We store areas with one for later.
     AreasWithRegulatoryElements arWithRegulatoryElement;
-    for (const auto& relElem : relations) {
-      const auto& arElem = relElem.second;
+    for (const auto & relElem : relations) {
+      const auto & arElem = relElem.second;
       if (!isType<AttributeValueString::Multipolygon>(arElem)) {
         continue;
       }
@@ -183,9 +203,10 @@ class FromFileLoader {  // NOLINT
     return arWithRegulatoryElement;
   }
 
-  void loadRegulatoryElements(const osm::Relations& relations) {
-    for (const auto& relElem : relations) {
-      const auto& regElem = relElem.second;
+  void loadRegulatoryElements(const osm::Relations & relations)
+  {
+    for (const auto & relElem : relations) {
+      const auto & regElem = relElem.second;
       if (!isType<AttributeValueString::RegulatoryElement>(regElem)) {
         continue;
       }
@@ -202,40 +223,46 @@ class FromFileLoader {  // NOLINT
       try {
         auto regElem = RegulatoryElementFactory::create(regelemType, regelemData);
         regulatoryElements_.emplace(id, regElem);
-      } catch (std::exception& e) {
-        parserError(id, "Creating a regulatory element of type "s + regelemType + " failed: " + e.what());
+      } catch (std::exception & e) {
+        parserError(id,
+          "Creating a regulatory element of type "s + regelemType + " failed: " + e.what());
       }
     }
   }
 
-  template <typename PrimT>
-  void addRegulatoryElements(std::vector<std::pair<PrimT, const osm::Relation*>>& addTos) {
-    for (auto& addTo : addTos) {
-      osm::forEachMember(addTo.second->members, RoleNameString::RegulatoryElement, [&](const osm::Role& role) {
-        auto regElem = getOrGetDummy(regulatoryElements_, role.second->id, addTo.first.id());
-        addTo.first.addRegulatoryElement(regElem);
-      });
+  template<typename PrimT>
+  void addRegulatoryElements(std::vector<std::pair<PrimT, const osm::Relation *>> & addTos)
+  {
+    for (auto & addTo : addTos) {
+      osm::forEachMember(addTo.second->members, RoleNameString::RegulatoryElement,
+        [&](const osm::Role & role) {
+          auto regElem = getOrGetDummy(regulatoryElements_, role.second->id, addTo.first.id());
+          addTo.first.addRegulatoryElement(regElem);
+        });
     }
   }
 
   // helper functions
-  template <const char* Type>
-  bool isType(const lanelet::osm::Relation& relation) {
+  template<const char * Type>
+  bool isType(const lanelet::osm::Relation & relation)
+  {
     auto attr = relation.attributes.find(AttributeNamesString::Type);
     return attr != relation.attributes.end() && attr->second == Type;
   }
 
-  static lanelet::AttributeMap getAttributes(const lanelet::osm::Attributes& osmAttributes) {
+  static lanelet::AttributeMap getAttributes(const lanelet::osm::Attributes & osmAttributes)
+  {
     lanelet::AttributeMap attributes;
-    for (const auto& osmAttr : osmAttributes) {
+    for (const auto & osmAttr : osmAttributes) {
       attributes.insert(std::make_pair(osmAttr.first, lanelet::Attribute(osmAttr.second)));
     }
     return attributes;
   }
 
-  LineString3d getLaneletBorder(const osm::Relation& llElem, const std::string& role) {
+  LineString3d getLaneletBorder(const osm::Relation & llElem, const std::string & role)
+  {
     size_t numMembers = 0;
-    osm::forEachMember(llElem.members, role, [&](auto& /*role*/) { ++numMembers; });
+    osm::forEachMember(llElem.members, role, [&](auto & /*role*/) {++numMembers;});
     if (numMembers != 1) {
       parserError(llElem.id, "Lanelet has not exactly one "s + role + " border!");
       return LineString3d(llElem.id);
@@ -248,27 +275,31 @@ class FromFileLoader {  // NOLINT
     return getOrGetDummy(lineStrings_, member->second->id, llElem.id);
   }
 
-  LineStrings3d getLinestrings(const osm::Roles& roles, const std::string& roleName, Id refId) {
+  LineStrings3d getLinestrings(const osm::Roles & roles, const std::string & roleName, Id refId)
+  {
     LineStrings3d linestrings;
-    osm::forEachMember(roles, roleName, [&](auto& member) {
-      if (member.second->type() != AttributeValueString::Way) {
-        auto msg = roleName + " ring must consist of ways but id " + std::to_string(member.second->id) +
-                   " is of type " + member.second->type() + "!";
-        msg[0] = std::toupper(msg[0]);
-        this->parserError(refId, msg);
-        return;
-      }
-      auto elem = lineStrings_.find(member.second->id);
-      if (elem == lineStrings_.end()) {
-        this->parserError(refId, "Failed to get id "s + std::to_string(member.second->id) + " from map");
-        return;
-      }
-      linestrings.push_back(elem->second);
-    });
+    osm::forEachMember(roles, roleName, [&](auto & member) {
+        if (member.second->type() != AttributeValueString::Way) {
+          auto msg = roleName + " ring must consist of ways but id " +
+          std::to_string(member.second->id) +
+          " is of type " + member.second->type() + "!";
+          msg[0] = std::toupper(msg[0]);
+          this->parserError(refId, msg);
+          return;
+        }
+        auto elem = lineStrings_.find(member.second->id);
+        if (elem == lineStrings_.end()) {
+          this->parserError(refId,
+          "Failed to get id "s + std::to_string(member.second->id) + " from map");
+          return;
+        }
+        linestrings.push_back(elem->second);
+      });
     return linestrings;
   }
 
-  LineStrings3d getOuterRing(const osm::Relation& area) {
+  LineStrings3d getOuterRing(const osm::Relation & area)
+  {
     auto outerLs = getLinestrings(area.members, RoleNameString::Outer, area.id);
     if (outerLs.empty()) {
       parserError(area.id, "Areas must have at least one outer border!");
@@ -282,15 +313,17 @@ class FromFileLoader {  // NOLINT
     return outerRings.front();
   }
 
-  std::vector<LineStrings3d> getInnerRing(const osm::Relation& area) {
+  std::vector<LineStrings3d> getInnerRing(const osm::Relation & area)
+  {
     auto innerLs = getLinestrings(area.members, RoleNameString::Inner, area.id);
     return assembleBoundary(innerLs, area.id);
   }
 
-  RuleParameterMap getRulesForRegulatoryElement(Id currElemId, const osm::Roles& roles) {
+  RuleParameterMap getRulesForRegulatoryElement(Id currElemId, const osm::Roles & roles)
+  {
     RuleParameterMap rules;
-    for (const auto& memberPair : roles) {
-      const auto& member = memberPair.second;
+    for (const auto & memberPair : roles) {
+      const auto & member = memberPair.second;
       if (member->type() == AttributeValueString::Node) {
         auto newMember = getOrGetDummy(points_, member->id, currElemId);
         rules[memberPair.first].emplace_back(newMember);
@@ -308,7 +341,8 @@ class FromFileLoader {  // NOLINT
         auto type = member->attributes.find(AttributeNamesString::Type);
         if (type == member->attributes.end()) {
           parserError(currElemId,
-                      "Relation refers to another relation "s + std::to_string(member->id) + " without a type tag!");
+            "Relation refers to another relation "s + std::to_string(
+              member->id) + " without a type tag!");
         } else if (type->second == AttributeValueString::Lanelet) {
           auto newMember = getOrGetDummy(lanelets_, member->id, currElemId);
           rules[memberPair.first].emplace_back(newMember);
@@ -317,34 +351,39 @@ class FromFileLoader {  // NOLINT
           rules[memberPair.first].emplace_back(newMember);
         } else if (type->second == AttributeValueString::RegulatoryElement) {
           parserError(currElemId,
-                      "Regulatory element refers to another "
-                      "regulatory element. This is not "
-                      "supported.");
+            "Regulatory element refers to another "
+            "regulatory element. This is not "
+            "supported.");
         } else {
-          parserError(currElemId, "Member of regulatory_element has unsupported type "s + type->second);
+          parserError(currElemId,
+            "Member of regulatory_element has unsupported type "s + type->second);
         }
       }
     }
     return rules;
   }
 
-  std::vector<LineStrings3d> assembleBoundary(LineStrings3d lineStrings, Id id) {
+  std::vector<LineStrings3d> assembleBoundary(LineStrings3d lineStrings, Id id)
+  {
     std::reverse(lineStrings.begin(), lineStrings.end());  // its easier to pop from a vector...
     std::vector<LineStrings3d> rings;
     rings.emplace_back(LineStrings3d());
     while (!lineStrings.empty()) {
-      auto& currRing = rings.back();
+      auto & currRing = rings.back();
       if (currRing.empty()) {
         currRing.push_back(lineStrings.back());
         lineStrings.pop_back();
       } else {
         const auto lastId = currRing.back().back().id();
-        auto elem = std::find_if(lineStrings.rbegin(), lineStrings.rend(), [lastId](const auto& elem) {
-          return elem.back().id() == lastId || elem.front().id() == lastId;
-        });
+        auto elem =
+          std::find_if(lineStrings.rbegin(), lineStrings.rend(), [lastId](const auto & elem) {
+              return elem.back().id() == lastId || elem.front().id() == lastId;
+            });
         // we are unable to close the current ring
         if (elem == lineStrings.rend()) {
-          parserError(id, "Could not complete boundary around linestring " + std::to_string(currRing.back().id()));
+          parserError(id,
+            "Could not complete boundary around linestring " +
+            std::to_string(currRing.back().id()));
           rings.back() = LineStrings3d();
           continue;
         }
@@ -375,17 +414,21 @@ class FromFileLoader {  // NOLINT
     return rings;
   }
 
-  template <typename PrimT>
-  PrimT getOrGetDummy(const typename std::unordered_map<Id, PrimT>& map, Id id, Id currentPrimitiveId) {
+  template<typename PrimT>
+  PrimT getOrGetDummy(
+    const typename std::unordered_map<Id, PrimT> & map, Id id,
+    Id currentPrimitiveId)
+  {
     try {
       return map.at(id);
-    } catch (std::out_of_range&) {
+    } catch (std::out_of_range &) {
       parserError(currentPrimitiveId, "Failed to get id "s + std::to_string(id) + " from map");
       return getDummy<PrimT>(id);
     }
   }
 
-  void parserError(Id id, const std::string& what) {
+  void parserError(Id id, const std::string & what)
+  {
     auto errstr = "Error parsing primitive "s + std::to_string(id) + ": " + what;
     errors_.push_back(errstr);
   }
@@ -399,26 +442,32 @@ class FromFileLoader {  // NOLINT
   PointLayer::Map points_;
 };
 
-template <typename MapT>
-void registerIds(const MapT& map) {
+template<typename MapT>
+void registerIds(const MapT & map)
+{
   if (!map.empty()) {
     utils::registerId(map.rbegin()->first);
   }
 }
 
-void testAndPrintLocaleWarning(ErrorMessages& errors) {
-  auto* decimalPoint = std::localeconv()->decimal_point;
+void testAndPrintLocaleWarning(ErrorMessages & errors)
+{
+  auto * decimalPoint = std::localeconv()->decimal_point;
   if (decimalPoint == nullptr || *decimalPoint != '.') {
     std::stringstream ss;
-    ss << "Warning: Current decimal point of the C locale is set to \""
-       << (decimalPoint == nullptr ? ' ' : *decimalPoint) << "\". The loaded map will have wrong coordinates!\n";
+    ss << "Warning: Current decimal point of the C locale is set to \"" <<
+    (decimalPoint ==
+    nullptr ? ' ' : *decimalPoint) << "\". The loaded map will have wrong coordinates!\n";
     errors.emplace_back(ss.str());
     std::cerr << errors.back();
   }
 }
 }  // namespace
 
-std::unique_ptr<LaneletMap> OsmParser::parse(const std::string& filename, ErrorMessages& errors) const {
+std::unique_ptr<LaneletMap> OsmParser::parse(
+  const std::string & filename,
+  ErrorMessages & errors) const
+{
   // read xml
   pugi::xml_document doc;
   auto result = doc.load_file(filename.c_str());
@@ -433,11 +482,16 @@ std::unique_ptr<LaneletMap> OsmParser::parse(const std::string& filename, ErrorM
   registerIds(file.nodes);
   registerIds(file.ways);
   registerIds(file.relations);
-  errors = buildErrorMessage("Errors ocurred while parsing Lanelet Map:", utils::concatenate({osmReadErrors, errors}));
+  errors =
+    buildErrorMessage("Errors ocurred while parsing Lanelet Map:",
+      utils::concatenate({osmReadErrors, errors}));
   return map;
 }
 
-std::unique_ptr<LaneletMap> OsmParser::fromOsmFile(const osm::File& file, ErrorMessages& errors) const {
+std::unique_ptr<LaneletMap> OsmParser::fromOsmFile(
+  const osm::File & file,
+  ErrorMessages & errors) const
+{
   return FromFileLoader::loadMap(file, projector(), errors);
 }
 }  // namespace io_handlers
