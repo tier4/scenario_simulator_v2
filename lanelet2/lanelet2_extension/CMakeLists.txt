@@ -20,7 +20,7 @@ find_package(ament_cmake REQUIRED)
 find_package(PkgConfig)
 find_path(GeographicLib_INCLUDE_DIR GeographicLib/Config.h
   PATH_SUFFIXES GeographicLib
-  )
+)
 set(GeographicLib_INCLUDE_DIRS ${GeographicLib_INCLUDE_DIR})
 
 find_library(GeographicLib_LIBRARIES
@@ -63,7 +63,6 @@ ament_auto_add_library(lanelet2_extension_lib SHARED
 )
 
 #add_library( lanelet2_extension_lib
-#  
 #  lib/visualization.cpp
 #)
 
