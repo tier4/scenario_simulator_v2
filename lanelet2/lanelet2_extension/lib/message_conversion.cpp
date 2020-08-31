@@ -17,8 +17,8 @@
  */
 
 #include <lanelet2_extension/exception.hpp>
-#include <lanelet2_extension/projection/mgrs_projector.h>
-#include <lanelet2_extension/utility/message_conversion.h>
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <lanelet2_extension/utility/message_conversion.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 #include <lanelet2_core/primitives/Lanelet.h>

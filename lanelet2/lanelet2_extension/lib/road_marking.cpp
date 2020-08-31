@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
+#include <lanelet2_extension/regulatory_elements/road_marking.hpp>
+
 #include <boost/variant.hpp>
 
 #include <lanelet2_core/primitives/RegulatoryElement.h>
-#include <lanelet2_extension/regulatory_elements/road_marking.h>
 
 #include <algorithm>
 #include <vector>
