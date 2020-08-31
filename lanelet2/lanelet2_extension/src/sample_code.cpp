@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <lanelet2_extension/projection/mgrs_projector.h>
-#include <lanelet2_extension/regulatory_elements/autoware_traffic_light.h>
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp>
 
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_io/Io.h>
@@ -112,12 +112,12 @@ void usingAutowareTrafficLight(const std::string map_file_path)
 
 int main(int argc, char * argv[])
 {
-  ros::init(argc, argv, "lanelet2_extension_example");
-  ros::NodeHandle nh;
-  ros::NodeHandle pnh("~");
+  //ros::init(argc, argv, "lanelet2_extension_example");
+  //ros::NodeHandle nh;
+  //ros::NodeHandle pnh("~");
 
   std::string map_file_path;
-  pnh.param("map_file", map_file_path, map_file_path);
+  //pnh.param("map_file", map_file_path, map_file_path);
 
   loadingAutowareOSMFile(map_file_path);
   usingMGRSProjector();

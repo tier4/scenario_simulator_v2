@@ -38,6 +38,21 @@ public:
 protected:
   std::string error_message_;
 };
+
+class HdMapFormatException : public std::exception
+{
+public:
+  explicit HdMapFormatException(const std::string & msg)
+  : error_message_(msg) {}
+  virtual ~HdMapFormatException() throw () {}
+  virtual const char * what() const throw ()
+  {
+    return error_message_.c_str();
+  }
+
+protected:
+  std::string error_message_;
+};
 }  // namespace lanelet
 
 #endif  // LANELET2_EXTENSION__EXCEPTION_HPP_

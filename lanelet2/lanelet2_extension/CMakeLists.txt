@@ -61,6 +61,7 @@ ament_auto_add_library(lanelet2_extension_lib SHARED
   lib/road_marking.cpp
   lib/utilities.cpp
   lib/visualization.cpp
+  lib/validation.cpp
 )
 
 #add_dependencies(lanelet2_extension_lib
