@@ -16,8 +16,8 @@
  * Authors: Simon Thompson, Ryohsuke Mitsudome
  */
 
-#ifndef LANELET2_EXTENSION_UTILITY_QUERY_H
-#define LANELET2_EXTENSION_UTILITY_QUERY_H
+#ifndef LANELET2_EXTENSION__UTILITY__QUERY_HPP_
+#define LANELET2_EXTENSION__UTILITY__QUERY_HPP_
 
 #include <lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp>
 #include <lanelet2_extension/regulatory_elements/detection_area.hpp>
@@ -32,6 +32,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace lanelet
 {
@@ -228,4 +229,4 @@ std::vector<lanelet::ConstLanelets> getPreceedingLaneletSequences(
 }  // namespace utils
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_UTILITY_QUERY_H
+#endif  // LANELET2_EXTENSION__UTILITY__QUERY_HPP_

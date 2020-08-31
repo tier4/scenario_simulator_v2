@@ -16,12 +16,14 @@
  * Authors: Ryohsuke Mitsudome
  */
 
-#ifndef LANELET2_EXTENSION_REGULATORY_ELEMENTS_AUTOWARE_TRAFFIC_LIGHT_H
-#define LANELET2_EXTENSION_REGULATORY_ELEMENTS_AUTOWARE_TRAFFIC_LIGHT_H
+#ifndef LANELET2_EXTENSION__REGULATORY_ELEMENTS__AUTOWARE_TRAFFIC_LIGHT_HPP_
+#define LANELET2_EXTENSION__REGULATORY_ELEMENTS__AUTOWARE_TRAFFIC_LIGHT_HPP_
 
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/Lanelet.h>
+
 #include <vector>
+#include <memory>
 
 namespace lanelet
 {
@@ -93,4 +95,4 @@ cpp file #endif
 }  // namespace autoware
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_REGULATORY_ELEMENTS_AUTOWARE_TRAFFIC_LIGHT_H
+#endif  // LANELET2_EXTENSION__REGULATORY_ELEMENTS__AUTOWARE_TRAFFIC_LIGHT_HPP_

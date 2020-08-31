@@ -16,8 +16,8 @@
  * Authors: Simon Thompson, Ryohsuke Mitsudome
  */
 
-#ifndef LANELET2_EXTENSION_PROJECTION_MGRS_PROJECTOR_H
-#define LANELET2_EXTENSION_PROJECTION_MGRS_PROJECTOR_H
+#ifndef LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_
+#define LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <lanelet2_io/Exceptions.h>
@@ -26,6 +26,7 @@
 #include <GeographicLib/UTMUPS.hpp>
 
 #include <string>
+#include <utility>
 
 namespace lanelet
 {
@@ -118,4 +119,4 @@ private:
 }  // namespace projection
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_PROJECTION_MGRS_PROJECTOR_H
+#endif  // LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_

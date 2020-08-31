@@ -16,8 +16,8 @@
  * Authors: Kenji Miyake, Ryohsuke Mitsudome
  */
 
-#ifndef LANELET2_EXTENSION_UTILITY_UTILITIES_H
-#define LANELET2_EXTENSION_UTILITY_UTILITIES_H
+#ifndef LANELET2_EXTENSION__UTILITY__UTILITIES_HPP_
+#define LANELET2_EXTENSION__UTILITY__UTILITIES_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -69,4 +69,4 @@ double getLaneletAngle(
 }  // namespace utils
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_UTILITY_UTILITIES_H
+#endif  // LANELET2_EXTENSION__UTILITY__UTILITIES_HPP_

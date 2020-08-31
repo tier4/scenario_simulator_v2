@@ -16,8 +16,8 @@
  * Authors: Simon Thompson, Ryohsuke Mitsudome
  */
 
-#ifndef LANELET2_EXTENSION_VISUALIZATION_VISUALIZATION_H
-#define LANELET2_EXTENSION_VISUALIZATION_VISUALIZATION_H
+#ifndef LANELET2_EXTENSION__VISUALIZATION__VISUALIZATION_HPP_
+#define LANELET2_EXTENSION__VISUALIZATION__VISUALIZATION_HPP_
 
 #include <geometry_msgs/PolygonStamped.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -172,4 +172,4 @@ visualization_msgs::MarkerArray parkingSpacesAsMarkerArray(
 }  // namespace visualization
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_VISUALIZATION_VISUALIZATION_H
+#endif  // LANELET2_EXTENSION__VISUALIZATION__VISUALIZATION_HPP_

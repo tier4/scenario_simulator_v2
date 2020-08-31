@@ -16,12 +16,13 @@
  * Authors: Ryohsuke Mitsudome
  */
 
-#ifndef LANELET2_EXTENSION_IO_AUTOWARE_OSM_PARSER_H
-#define LANELET2_EXTENSION_IO_AUTOWARE_OSM_PARSER_H
+#ifndef LANELET2_EXTENSION__IO__AUTOWARE_OSM_PARSER_HPP_
+#define LANELET2_EXTENSION__IO__AUTOWARE_OSM_PARSER_HPP_
 
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 
 #include <string>
+#include <memory>
 
 namespace lanelet
 {
@@ -60,4 +61,4 @@ public:
 }  // namespace io_handlers
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_IO_AUTOWARE_OSM_PARSER_H
+#endif  // LANELET2_EXTENSION__IO__AUTOWARE_OSM_PARSER_HPP_

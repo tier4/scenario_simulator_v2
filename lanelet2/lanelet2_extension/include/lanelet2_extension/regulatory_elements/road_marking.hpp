@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-#ifndef LANELET2_EXTENSION_REGULATORY_ELEMENTS_ROAD_MARKING_H
-#define LANELET2_EXTENSION_REGULATORY_ELEMENTS_ROAD_MARKING_H
+#ifndef LANELET2_EXTENSION__REGULATORY_ELEMENTS__ROAD_MARKING_HPP_
+#define LANELET2_EXTENSION__REGULATORY_ELEMENTS__ROAD_MARKING_HPP_
 
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/LineString.h>
+
 #include <vector>
+#include <memory>
 
 namespace lanelet
 {
@@ -68,4 +70,4 @@ static lanelet::RegisterRegulatoryElement<RoadMarking> regRoadMarking;
 }  // namespace autoware
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_REGULATORY_ELEMENTS_ROAD_MARKING_H
+#endif  // LANELET2_EXTENSION__REGULATORY_ELEMENTS__ROAD_MARKING_HPP_

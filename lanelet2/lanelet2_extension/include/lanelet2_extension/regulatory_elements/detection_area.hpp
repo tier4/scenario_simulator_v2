@@ -16,12 +16,14 @@
  * Authors: Ryohsuke Mitsudome
  */
 
-#ifndef LANELET2_EXTENSION_REGULATORY_ELEMENTS_DETECTION_AREA_H
-#define LANELET2_EXTENSION_REGULATORY_ELEMENTS_DETECTION_AREA_H
+#ifndef LANELET2_EXTENSION__REGULATORY_ELEMENTS__DETECTION_AREA_HPP_
+#define LANELET2_EXTENSION__REGULATORY_ELEMENTS__DETECTION_AREA_HPP_
 
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/Lanelet.h>
+
 #include <vector>
+#include <memory>
 
 namespace lanelet
 {
@@ -92,4 +94,4 @@ static lanelet::RegisterRegulatoryElement<DetectionArea> regDetectionArea;
 }  // namespace autoware
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION_REGULATORY_ELEMENTS_DETECTION_AREA_H
+#endif  // LANELET2_EXTENSION__REGULATORY_ELEMENTS__DETECTION_AREA_HPP_
