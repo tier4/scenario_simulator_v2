@@ -21,15 +21,17 @@
 
 #include <set>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace lanelet
 {
 namespace projection
 {
 MGRSProjector::MGRSProjector(const rclcpp::Logger & logger, Origin origin)
-: Projector(origin), logger_(logger) {}
+: Projector(origin), logger_(logger)
+{
+}
 
 BasicPoint3d MGRSProjector::forward(const GPSPoint & gps) const
 {
@@ -104,8 +106,8 @@ GPSPoint MGRSProjector::reverse(
     utm_point.y() += fmod(mgrs_point.y(), pow(10, 5 - prec));
     GeographicLib::UTMUPS::Reverse(zone, northp, utm_point.x(), utm_point.y(), gps.lat, gps.lon);
   } catch (GeographicLib::GeographicErr err) {
-    std::string message = "Failed to convert from MGRS to WGS " +
-      static_cast<std::string>(err.what());
+    std::string message =
+      "Failed to convert from MGRS to WGS " + static_cast<std::string>(err.what());
     RCLCPP_WARN(logger_, message);
     return gps;
   }
@@ -113,7 +115,7 @@ GPSPoint MGRSProjector::reverse(
   return gps;
 }
 
-void MGRSProjector::setMGRSCode(const std::string & mgrs_code) {mgrs_code_ = mgrs_code;}
+void MGRSProjector::setMGRSCode(const std::string & mgrs_code) { mgrs_code_ = mgrs_code; }
 
 void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
 {

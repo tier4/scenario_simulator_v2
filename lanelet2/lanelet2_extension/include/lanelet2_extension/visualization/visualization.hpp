@@ -22,8 +22,8 @@
 #include <lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp>
 #include <lanelet2_extension/utility/query.hpp>
 
-#include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/polygon_stamped.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <lanelet2_core/LaneletMap.h>
@@ -85,9 +85,8 @@ void lineString2Marker(
  */
 void trafficLight2TriangleMarker(
   const lanelet::ConstLineString3d ls, visualization_msgs::msg::Marker * marker,
-  const std::string ns,
-  const std_msgs::msg::ColorRGBA cl, const rclcpp::Duration duration = rclcpp::Duration(0, 0),
-  const double scale = 1.0);
+  const std::string ns, const std_msgs::msg::ColorRGBA cl,
+  const rclcpp::Duration duration = rclcpp::Duration(0, 0), const double scale = 1.0);
 
 /**
  * [laneletsBoundaryAsMarkerArray create marker array to visualize shape of
@@ -165,8 +164,7 @@ visualization_msgs::msg::MarkerArray trafficLightsAsTriangleMarkerArray(
  */
 visualization_msgs::msg::MarkerArray detectionAreasAsMarkerArray(
   const std::vector<lanelet::DetectionAreaConstPtr> & da_reg_elems,
-  const std_msgs::msg::ColorRGBA c,
-  const rclcpp::Duration duration = rclcpp::Duration(0, 0));
+  const std_msgs::msg::ColorRGBA c, const rclcpp::Duration duration = rclcpp::Duration(0, 0));
 
 visualization_msgs::msg::MarkerArray parkingLotsAsMarkerArray(
   const lanelet::ConstPolygons3d & parking_lots, const std_msgs::msg::ColorRGBA & c);

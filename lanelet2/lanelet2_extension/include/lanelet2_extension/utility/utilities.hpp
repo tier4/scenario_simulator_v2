@@ -46,8 +46,7 @@ lanelet::ConstLanelets getConflictingLanelets(
   const lanelet::routing::RoutingGraphConstPtr & graph, const lanelet::ConstLanelet & lanelet);
 
 bool lineStringWithWidthToPolygon(
-  const lanelet::ConstLineString3d & linestring,
-  lanelet::ConstPolygon3d * polygon);
+  const lanelet::ConstLineString3d & linestring, lanelet::ConstPolygon3d * polygon);
 
 double getLaneletLength2d(const lanelet::ConstLanelet & lanelet);
 double getLaneletLength3d(const lanelet::ConstLanelet & lanelet);
@@ -55,8 +54,7 @@ double getLaneletLength2d(const lanelet::ConstLanelets & lanelet_sequence);
 double getLaneletLength3d(const lanelet::ConstLanelets & lanelet_sequence);
 
 lanelet::ArcCoordinates getArcCoordinates(
-  const lanelet::ConstLanelets & lanelet_sequence,
-  const geometry_msgs::msg::Pose & pose);
+  const lanelet::ConstLanelets & lanelet_sequence, const geometry_msgs::msg::Pose & pose);
 
 lanelet::ConstLineString3d getClosestSegment(
   const lanelet::BasicPoint2d & search_pt, const lanelet::ConstLineString3d & linestring);

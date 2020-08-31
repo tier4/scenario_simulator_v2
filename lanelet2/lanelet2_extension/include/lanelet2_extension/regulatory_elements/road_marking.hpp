@@ -20,8 +20,8 @@
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/LineString.h>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace lanelet
 {

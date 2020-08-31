@@ -30,9 +30,9 @@
 #include <geometry_msgs/msg/polygon_stamped.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace lanelet
 {
@@ -123,8 +123,7 @@ bool getLinkedLanelet(
   const lanelet::ConstPolygons3d & all_parking_lots, lanelet::ConstLanelet * linked_lanelet);
 bool getLinkedLanelet(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr,
-  lanelet::ConstLanelet * linked_lanelet);
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr, lanelet::ConstLanelet * linked_lanelet);
 lanelet::ConstLanelets getLinkedLanelets(
   const lanelet::ConstLineString3d & parking_space,
   const lanelet::ConstLanelets & all_road_lanelets,

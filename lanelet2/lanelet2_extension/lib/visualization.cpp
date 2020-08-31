@@ -28,14 +28,14 @@
 
 #include <Eigen/Eigen>
 
+#include <algorithm>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <algorithm>
 
 namespace
 {
-template<typename T>
+template <typename T>
 bool exists(const std::unordered_set<T> & set, const T & element)
 {
   return std::find(set.begin(), set.end(), element) != set.end();
@@ -43,8 +43,8 @@ bool exists(const std::unordered_set<T> & set, const T & element)
 
 void adjacentPoints(
   const int i, const int N, const geometry_msgs::msg::Polygon poly,
-  geometry_msgs::msg::Point32 * p0,
-  geometry_msgs::msg::Point32 * p1, geometry_msgs::msg::Point32 * p2)
+  geometry_msgs::msg::Point32 * p0, geometry_msgs::msg::Point32 * p1,
+  geometry_msgs::msg::Point32 * p2)
 {
   if (p0 == nullptr || p1 == nullptr || p2 == nullptr) {
     std::stringstream sstream;
@@ -76,7 +76,9 @@ bool isAttributeValue(
   const lanelet::ConstPoint3d p, const std::string attr_str, const std::string value_str)
 {
   lanelet::Attribute attr = p.attribute(attr_str);
-  if (attr.value().compare(value_str) == 0) {return true;}
+  if (attr.value().compare(value_str) == 0) {
+    return true;
+  }
   return false;
 }
 
@@ -84,7 +86,9 @@ bool isLaneletAttributeValue(
   const lanelet::ConstLanelet ll, const std::string attr_str, const std::string value_str)
 {
   lanelet::Attribute attr = ll.attribute(attr_str);
-  if (attr.value().compare(value_str) == 0) {return true;}
+  if (attr.value().compare(value_str) == 0) {
+    return true;
+  }
   return false;
 }
 
@@ -209,7 +213,7 @@ void laneletDirectionAsMarker(
     c.b = 1.0;
   }
 
-  for (size_t ci = 0; ci < center_ls.size() - 1; ) {
+  for (size_t ci = 0; ci < center_ls.size() - 1;) {
     pc = center_ls[ci];
     if (center_ls.size() > 1) {
       pc2 = center_ls[ci + 1];
@@ -472,8 +476,8 @@ visualization_msgs::msg::MarkerArray visualization::autowareTrafficLightsAsMarke
 
     const auto lights = tl->trafficLights();
     for (const auto & lsp : lights) {
-      if (lsp.isLineString()) { // traffic ligths can either polygons or
-                                // linestrings
+      if (lsp.isLineString()) {  // traffic ligths can either polygons or
+                                 // linestrings
         lanelet::ConstLineString3d ls = static_cast<lanelet::ConstLineString3d>(lsp);
 
         visualization_msgs::msg::Marker marker;
@@ -504,8 +508,7 @@ visualization_msgs::msg::MarkerArray visualization::autowareTrafficLightsAsMarke
 
 visualization_msgs::msg::MarkerArray visualization::detectionAreasAsMarkerArray(
   const std::vector<lanelet::DetectionAreaConstPtr> & da_reg_elems,
-  const std_msgs::msg::ColorRGBA c,
-  const rclcpp::Duration duration)
+  const std_msgs::msg::ColorRGBA c, const rclcpp::Duration duration)
 {
   visualization_msgs::msg::MarkerArray marker_array;
   visualization_msgs::msg::Marker marker;
@@ -692,8 +695,8 @@ visualization_msgs::msg::MarkerArray visualization::trafficLightsAsTriangleMarke
 
     auto lights = tl->trafficLights();
     for (auto lsp : lights) {
-      if (lsp.isLineString()) { // traffic ligths can either polygons or
-                                // linestrings
+      if (lsp.isLineString()) {  // traffic ligths can either polygons or
+                                 // linestrings
         lanelet::ConstLineString3d ls = static_cast<lanelet::ConstLineString3d>(lsp);
 
         visualization_msgs::msg::Marker marker;
@@ -764,8 +767,8 @@ visualization_msgs::msg::MarkerArray visualization::laneletsAsTriangleMarkerArra
 
 void visualization::trafficLight2TriangleMarker(
   const lanelet::ConstLineString3d ls, visualization_msgs::msg::Marker * marker,
-  const std::string ns,
-  const std_msgs::msg::ColorRGBA cl, const rclcpp::Duration duration, const double scale)
+  const std::string ns, const std_msgs::msg::ColorRGBA cl, const rclcpp::Duration duration,
+  const double scale)
 {
   if (marker == nullptr) {
     std::stringstream sstream;

@@ -20,7 +20,6 @@
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/message_conversion.hpp>
 
-#include <rclcpp/rclcpp.hpp>
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_io/Exceptions.h>
 #include <lanelet2_io/Projection.h>
@@ -28,6 +27,7 @@
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
 #include <lanelet2_projection/UTM.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
