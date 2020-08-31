@@ -16,6 +16,10 @@
  * Authors: Simon Thompson, Ryohsuke Mitsudome
  */
 
+#include <lanelet2_extension/exception.hpp>
+#include <lanelet2_extension/projection/mgrs_projector.h>
+#include <lanelet2_extension/utility/message_conversion.h>
+
 #include <rclcpp/rclcpp.hpp>
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_io/Exceptions.h>
@@ -24,9 +28,6 @@
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
 #include <lanelet2_projection/UTM.h>
-
-#include <lanelet2_extension/projection/mgrs_projector.h>
-#include <lanelet2_extension/utility/message_conversion.h>
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -40,11 +41,12 @@ namespace utils
 {
 namespace conversion
 {
-void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::MapBin * msg, const rclcpp::Logger &logger)
+void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::MapBin * msg)
 {
   if (msg == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "msg is null pointer!");
-    return;
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "msg is null pointer!";
+    lanelet::HdMapException(sstream.str());
   }
 
   std::stringstream ss;
@@ -59,10 +61,12 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::M
   msg->data.assign(data_str.begin(), data_str.end());
 }
 
-void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map, const rclcpp::Logger & logger)
+void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map)
 {
   if (!map) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "msg is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "msg is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 
@@ -81,49 +85,56 @@ void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::Lanele
 void fromBinMsg(
   const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
-  lanelet::routing::RoutingGraphPtr * routing_graph,
-  const rclcpp::Logger & logger)
+  lanelet::routing::RoutingGraphPtr * routing_graph)
 {
-  fromBinMsg(msg, map, logger);
+  fromBinMsg(msg, map);
   *traffic_rules = lanelet::traffic_rules::TrafficRulesFactory::create(
     lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   *routing_graph = lanelet::routing::RoutingGraph::build(*map, **traffic_rules);
 }
 
-void toGeomMsgPt(const geometry_msgs::msg::Point32 & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
+void toGeomMsgPt(const geometry_msgs::msg::Point32 & src, geometry_msgs::msg::Point * dst)
 {
   if (dst == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "pointer is null!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
   dst->x = src.x;
   dst->y = src.y;
   dst->z = src.z;
 }
-void toGeomMsgPt(const Eigen::Vector3d & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
+void toGeomMsgPt(const Eigen::Vector3d & src, geometry_msgs::msg::Point * dst)
 {
   if (dst == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "pointer is null!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
   dst->x = src.x();
   dst->y = src.y();
   dst->z = src.z();
 }
-void toGeomMsgPt(const lanelet::ConstPoint3d & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
+void toGeomMsgPt(const lanelet::ConstPoint3d & src, geometry_msgs::msg::Point * dst)
 {
   if (dst == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "pointer is null!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
   dst->x = src.x();
   dst->y = src.y();
   dst->z = src.z();
 }
-void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * dst, const rclcpp::Logger & logger)
+void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * dst)
 {
   if (dst == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "pointer is null!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
   dst->x = src.x();
@@ -131,10 +142,12 @@ void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * 
   dst->z = 0;
 }
 
-void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * dst, const rclcpp::Logger & logger)
+void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * dst)
 {
   if (dst == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << "pointer is null!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "pointer is null!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
   dst->x = src.x();
@@ -142,28 +155,28 @@ void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * ds
   dst->z = src.z();
 }
 
-geometry_msgs::msg::Point toGeomMsgPt(const geometry_msgs::msg::Point32 & src, const rclcpp::Logger & logger)
+geometry_msgs::msg::Point toGeomMsgPt(const geometry_msgs::msg::Point32 & src)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst, logger);
+  toGeomMsgPt(src, &dst);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const Eigen::Vector3d & src, const rclcpp::Logger & logger)
+geometry_msgs::msg::Point toGeomMsgPt(const Eigen::Vector3d & src)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst, logger);
+  toGeomMsgPt(src, &dst);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint3d & src, const rclcpp::Logger & logger)
+geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint3d & src)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst, logger);
+  toGeomMsgPt(src, &dst);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint2d & src, const rclcpp::Logger & logger)
+geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint2d & src)
 {
   geometry_msgs::msg::Point dst;
-  toGeomMsgPt(src, &dst, logger);
+  toGeomMsgPt(src, &dst);
   return dst;
 }
 
@@ -179,13 +192,13 @@ void toLaneletPoint(const geometry_msgs::msg::Point & src, lanelet::ConstPoint3d
   *dst = lanelet::Point3d(lanelet::InvalId, src.x, src.y, src.z);
 }
 
-void toGeomMsgPoly(const lanelet::ConstPolygon3d & ll_poly, geometry_msgs::msg::Polygon * geom_poly, const rclcpp::Logger & logger)
+void toGeomMsgPoly(const lanelet::ConstPolygon3d & ll_poly, geometry_msgs::msg::Polygon * geom_poly)
 {
   geom_poly->points.clear();
   geom_poly->points.reserve(ll_poly.size());
   for (const auto & ll_pt : ll_poly) {
     geometry_msgs::msg::Point32 geom_pt32;
-    utils::conversion::toGeomMsgPt32(ll_pt.basicPoint(), &geom_pt32, logger);
+    utils::conversion::toGeomMsgPt32(ll_pt.basicPoint(), &geom_pt32);
     geom_poly->points.push_back(geom_pt32);
   }
 }
