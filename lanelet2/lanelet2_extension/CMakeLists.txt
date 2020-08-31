@@ -60,11 +60,8 @@ ament_auto_add_library(lanelet2_extension_lib SHARED
   lib/query.cpp
   lib/road_marking.cpp
   lib/utilities.cpp
+  lib/visualization.cpp
 )
-
-#add_library( lanelet2_extension_lib
-#  lib/visualization.cpp
-#)
 
 #add_dependencies(lanelet2_extension_lib
 #  ${${PROJECT_NAME}_EXPORTED_TARGETS}
