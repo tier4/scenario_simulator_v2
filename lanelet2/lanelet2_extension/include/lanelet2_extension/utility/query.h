@@ -51,7 +51,7 @@ namespace query
  * @param  ll_Map [input lanelet map]
  * @return        [all lanelets in the map]
  */
-lanelet::ConstLanelets laneletLayer(const lanelet::LaneletMapConstPtr & ll_Map, const rclcpp::Logger & logger);
+lanelet::ConstLanelets laneletLayer(const lanelet::LaneletMapConstPtr & ll_Map);
 
 /**
  * [subtypeLanelets extracts Lanelet that has given subtype attribute]
@@ -122,16 +122,14 @@ bool getLinkedLanelet(
 bool getLinkedLanelet(
   const lanelet::ConstLineString3d & parking_space,
   const lanelet::LaneletMapConstPtr & lanelet_map_ptr,
-  lanelet::ConstLanelet * linked_lanelet,
-  const rclcpp::Logger & logger);
+  lanelet::ConstLanelet * linked_lanelet);
 lanelet::ConstLanelets getLinkedLanelets(
   const lanelet::ConstLineString3d & parking_space,
   const lanelet::ConstLanelets & all_road_lanelets,
   const lanelet::ConstPolygons3d & all_parking_lots);
 lanelet::ConstLanelets getLinkedLanelets(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr,
-  const rclcpp::Logger & logger);
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr);
 
 // get linked parking lot from lanelet
 bool getLinkedParkingLot(
@@ -197,7 +195,7 @@ ConstLanelets getAllNeighbors(
 
 bool getClosestLanelet(
   const ConstLanelets & lanelets, const geometry_msgs::msg::Pose & search_pose,
-  ConstLanelet * closest_lanelet_ptr, const rclcpp::Logger & logger);
+  ConstLanelet * closest_lanelet_ptr);
 
 /**
  * [getSucceedingLaneletSequences retrieves a sequence of lanelets after the given lanelet.

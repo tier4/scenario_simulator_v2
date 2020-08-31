@@ -46,8 +46,7 @@ lanelet::ConstLanelets getConflictingLanelets(
 
 bool lineStringWithWidthToPolygon(
   const lanelet::ConstLineString3d & linestring,
-  lanelet::ConstPolygon3d * polygon,
-  const rclcpp::Logger & logger);
+  lanelet::ConstPolygon3d * polygon);
 
 double getLaneletLength2d(const lanelet::ConstLanelet & lanelet);
 double getLaneletLength3d(const lanelet::ConstLanelet & lanelet);
@@ -56,8 +55,7 @@ double getLaneletLength3d(const lanelet::ConstLanelets & lanelet_sequence);
 
 lanelet::ArcCoordinates getArcCoordinates(
   const lanelet::ConstLanelets & lanelet_sequence,
-  const geometry_msgs::msg::Pose & pose,
-  const rclcpp::Logger & logger);
+  const geometry_msgs::msg::Pose & pose);
 
 lanelet::ConstLineString3d getClosestSegment(
   const lanelet::BasicPoint2d & search_pt, const lanelet::ConstLineString3d & linestring);

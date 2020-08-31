@@ -17,17 +17,17 @@
  *
  */
 
+#include <lanelet2_extension/exception.hpp>
+#include <lanelet2_extension/utility/message_conversion.h>
+#include <lanelet2_extension/utility/query.h>
+#include <lanelet2_extension/utility/utilities.h>
+
 #include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_traffic_rules/TrafficRules.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <lanelet2_core/geometry/Lanelet.h>
-
-#include <lanelet2_extension/utility/message_conversion.h>
-#include <lanelet2_extension/utility/query.h>
-#include <lanelet2_extension/utility/utilities.h>
-#include <rclcpp/rclcpp.hpp>
 
 #include <algorithm>
 #include <map>
@@ -58,16 +58,17 @@ bool exists(const std::vector<int> & array, const int element)
 void getContactingLanelets(
   const lanelet::LaneletMapPtr lanelet_map,
   const lanelet::traffic_rules::TrafficRulesPtr traffic_rules,
-  const lanelet::BasicPoint2d search_point, std::vector<int> * contacting_lanelet_ids,
-  const rclcpp::Logger & logger)
+  const lanelet::BasicPoint2d search_point, std::vector<int> * contacting_lanelet_ids)
 {
   if (!lanelet_map) {
-    RCLCPP_ERROR_STREAM(logger, "No lanelet map is set!");
+    lanelet::HdMapException("No lanelet map is set!");
     return;
   }
 
   if (contacting_lanelet_ids == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __FUNCTION__ << " contacting_lanelet_ids is null pointer!");
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << " contacting_lanelet_ids is null pointer!";
+    lanelet::HdMapException(sstream.str());
     return;
   }
 
@@ -303,23 +304,27 @@ lanelet::ConstLanelets getConflictingLanelets(
 
 bool lineStringWithWidthToPolygon(
   const lanelet::ConstLineString3d & linestring,
-  lanelet::ConstPolygon3d * polygon,
-  const rclcpp::Logger & logger)
+  lanelet::ConstPolygon3d * polygon)
 {
   if (polygon == nullptr) {
-    RCLCPP_ERROR_STREAM(logger, __func__ << ": polygon is null pointer! Failed to convert to polygon.");
+    std::stringstream sstream;
+    sstream << __func__ << ": polygon is null pointer! Failed to convert to polygon.";
+    lanelet::HdMapException(sstream.str());
     return false;
   }
   if (linestring.size() != 2) {
-    RCLCPP_ERROR_STREAM(logger, __func__ << ": linestring" << linestring.id() 
+    std::stringstream sstream;
+    sstream << __func__ << ": linestring" << linestring.id() 
       << " must have 2 points! (" << linestring.size()
-      << " != 2)" << std::endl << "Failed to convert to polygon.");
+      << " != 2)" << std::endl << "Failed to convert to polygon.";
+    lanelet::HdMapException(sstream.str());
     return false;
   }
   if (!linestring.hasAttribute("width")) {
-    RCLCPP_ERROR_STREAM(logger,
-      __func__ << ": linestring" << linestring.id()
-      << " does not have width tag. Failed to convert to polygon.");
+    std::stringstream sstream;
+    sstream << __func__ << ": linestring" << linestring.id()
+      << " does not have width tag. Failed to convert to polygon.";
+    lanelet::HdMapException(sstream.str());
     return false;
   }
 
@@ -374,11 +379,10 @@ double getLaneletLength3d(const lanelet::ConstLanelets & lanelet_sequence)
 
 lanelet::ArcCoordinates getArcCoordinates(
   const lanelet::ConstLanelets & lanelet_sequence,
-  const geometry_msgs::msg::Pose & pose,
-  const rclcpp::Logger & logger)
+  const geometry_msgs::msg::Pose & pose)
 {
   lanelet::ConstLanelet closest_lanelet;
-  lanelet::utils::query::getClosestLanelet(lanelet_sequence, pose, &closest_lanelet, logger);
+  lanelet::utils::query::getClosestLanelet(lanelet_sequence, pose, &closest_lanelet);
 
   double length = 0;
   lanelet::ArcCoordinates arc_coordinates;

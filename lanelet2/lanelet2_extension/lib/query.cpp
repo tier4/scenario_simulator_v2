@@ -16,16 +16,17 @@
  * Authors: Simon Thompson, Ryohsuke Mitsudome
  */
 
+#include <lanelet2_extension/exception.hpp>
+#include <lanelet2_extension/utility/message_conversion.h>
+#include <lanelet2_extension/utility/query.h>
+#include <lanelet2_extension/utility/utilities.h>
+
 #include <rclcpp/rclcpp.hpp>
 
 #include <Eigen/Eigen>
 
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_routing/RoutingGraph.h>
-
-#include <lanelet2_extension/utility/message_conversion.h>
-#include <lanelet2_extension/utility/query.h>
-#include <lanelet2_extension/utility/utilities.h>
 
 #include <tf2/utils.h>
 
@@ -53,11 +54,11 @@ namespace utils
 {
 // returns all lanelets in laneletLayer - don't know how to convert
 // PrimitveLayer<Lanelets> -> std::vector<Lanelets>
-lanelet::ConstLanelets query::laneletLayer(const lanelet::LaneletMapConstPtr & ll_map, const rclcpp::Logger & logger)
+lanelet::ConstLanelets query::laneletLayer(const lanelet::LaneletMapConstPtr & ll_map)
 {
   lanelet::ConstLanelets lanelets;
   if (!ll_map) {
-    RCLCPP_WARN(logger, "No map received!");
+    lanelet::HdMapException("No map received!");
     return lanelets;
   }
 
@@ -216,10 +217,9 @@ lanelet::ConstLineStrings3d query::getAllParkingSpaces(
 
 bool query::getLinkedLanelet(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr, lanelet::ConstLanelet * linked_lanelet,
-  const rclcpp::Logger & logger)
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr, lanelet::ConstLanelet * linked_lanelet)
 {
-  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr, logger);
+  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr);
   const auto & all_road_lanelets = query::roadLanelets(all_lanelets);
   const auto & all_parking_lots = query::getAllParkingLots(lanelet_map_ptr);
   return query::getLinkedLanelet(
@@ -251,10 +251,9 @@ bool query::getLinkedLanelet(
 
 lanelet::ConstLanelets query::getLinkedLanelets(
   const lanelet::ConstLineString3d & parking_space,
-  const lanelet::LaneletMapConstPtr & lanelet_map_ptr,
-  const rclcpp::Logger & logger)
+  const lanelet::LaneletMapConstPtr & lanelet_map_ptr)
 {
-  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr, logger);
+  const auto & all_lanelets = query::laneletLayer(lanelet_map_ptr);
   const auto & all_road_lanelets = query::roadLanelets(all_lanelets);
   const auto & all_parking_lots = query::getAllParkingLots(lanelet_map_ptr);
 
@@ -615,10 +614,10 @@ ConstLanelets query::getAllNeighbors(
 
 bool query::getClosestLanelet(
   const ConstLanelets & lanelets, const geometry_msgs::msg::Pose & search_pose,
-  ConstLanelet * closest_lanelet_ptr, const rclcpp::Logger & logger)
+  ConstLanelet * closest_lanelet_ptr)
 {
   if (closest_lanelet_ptr == nullptr) {
-    RCLCPP_ERROR(logger, "argument closest_lanelet_ptr is null! Failed to find closest lanelet");
+    lanelet::HdMapException("argument closest_lanelet_ptr is null! Failed to find closest lanelet");
     return false;
   }
 
