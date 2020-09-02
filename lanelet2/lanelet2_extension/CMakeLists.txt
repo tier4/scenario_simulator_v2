@@ -96,20 +96,16 @@ install(TARGETS lanelet2_extension_lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-#if(CATKIN_ENABLE_TESTING)
-#  roslint_add_test()
-#  find_package(rostest REQUIRED)
-#  add_rostest_gtest(message_conversion-test test/test_message_conversion.test test/src/test_message_conversion.cpp)
-# target_link_libraries(message_conversion-test ${catkin_LIBRARIES} lanelet2_extension_lib)
-# add_rostest_gtest(projector-test test/test_projector.test test/src/test_projector.cpp)
-#  target_link_libraries(projector-test ${catkin_LIBRARIES} lanelet2_extension_lib)
-#  add_rostest_gtest(query-test test/test_query.test test/src/test_query.cpp)
-#  target_link_libraries(query-test ${catkin_LIBRARIES} lanelet2_extension_lib)
-#  add_rostest_gtest(regulatory_elements-test test/test_regulatory_elements.test test/src/test_regulatory_elements.cpp)
-#  target_link_libraries(regulatory_elements-test ${catkin_LIBRARIES} lanelet2_extension_lib)
-#  add_rostest_gtest(utilities-test test/test_utilities.test test/src/test_utilities.cpp)
-#  target_link_libraries(utilities-test ${catkin_LIBRARIES} lanelet2_extension_lib)
-#endif()
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # uncomment the line when a copyright and license is not present in all source files
+  #set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # uncomment the line when this package is not in a git repo
+  #set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ament_export_include_directories(include)
 ament_export_interfaces(export_lanelet2_extension_lib HAS_LIBRARY_TARGET)
