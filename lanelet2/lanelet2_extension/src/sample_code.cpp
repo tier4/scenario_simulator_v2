@@ -113,10 +113,10 @@ void usingAutowareTrafficLight(const std::string map_file_path, const rclcpp::Lo
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  auto node = rclcpp::Node::make_shared("minimal_publisher");
-  std::string map_file_path;
-  loadingAutowareOSMFile(map_file_path);
+  auto node = rclcpp::Node::make_shared("sample_code");
+  std::string path = argv[1];
+  loadingAutowareOSMFile(path);
   usingMGRSProjector(node->get_logger());
-  usingAutowareTrafficLight(map_file_path, node->get_logger());
+  usingAutowareTrafficLight(path, node->get_logger());
   return 0;
 }

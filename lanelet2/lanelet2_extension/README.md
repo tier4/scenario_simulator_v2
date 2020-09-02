@@ -61,5 +61,5 @@ The executable is not meanto to do anything.
 This node checks if an .osm file follows the Autoware version of Lanelet2 format.
 You can check by running:
 ```
-rosrun lanelet2_extension autoware_lanelet2_validation _map_file:=<path/to/map.osm>
+ros2 run lanelet2_extension sample_code <path/to/map.osm>
 ```
