@@ -50,7 +50,7 @@ include_directories(
 
 add_definitions(${GeographicLib_DEFINITIONS})
 
-ament_auto_add_library(lanelet2_extension_lib SHARED
+add_library(lanelet2_extension_lib SHARED
   lib/autoware_osm_parser.cpp
   lib/autoware_traffic_light.cpp
   lib/detection_area.cpp
@@ -63,39 +63,38 @@ ament_auto_add_library(lanelet2_extension_lib SHARED
   lib/visualization.cpp
   lib/validation.cpp
 )
+ament_target_dependencies(lanelet2_extension_lib
+  rclcpp
+  lanelet2_core
+  lanelet2_io
+  lanelet2_maps
+  lanelet2_projection
+  lanelet2_routing
+  lanelet2_traffic_rules
+  lanelet2_validation
+  autoware_lanelet2_msgs
+  geometry_msgs
+  visualization_msgs
+)
 
-#add_dependencies(lanelet2_extension_lib
-#  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-#  ${catkin_EXPORTED_TARGETS}
-#)
+ament_auto_add_executable(sample_code
+  src/sample_code.cpp
+)
+target_link_libraries(sample_code lanelet2_extension_lib)
 
-#target_link_libraries(lanelet2_extension_lib
-#  ${catkin_LIBRARIES}
-#  ${GeographicLib_LIBRARIES}
-#)
-
-#add_executable(lanelet2_extension_sample src/sample_code.cpp)
-#add_dependencies(lanelet2_extension_sample ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(lanelet2_extension_sample
-#  ${catkin_LIBRARIES}
-#  lanelet2_extension_lib
-#)
-
-#add_executable(autoware_lanelet2_validation src/validation.cpp)
-#add_dependencies(autoware_lanelet2_validation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(autoware_lanelet2_validation
-#  ${catkin_LIBRARIES}
-#  ${PUGIXML_LIBRAREIS}
-#  lanelet2_extension_lib
-#)
-
-#nstall(TARGETS lanelet2_extension_lib lanelet2_extension_sample autoware_lanelet2_validation
-#  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-#install(DIRECTORY include/${PROJECT_NAME}/
-#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+install(TARGETS
+  sample_code
+  DESTINATION lib/lanelet2_extension
+)
+install(TARGETS lanelet2_extension_lib
+  EXPORT export_lanelet2_extension_lib
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 #if(CATKIN_ENABLE_TESTING)
 #  roslint_add_test()
@@ -112,4 +111,6 @@ ament_auto_add_library(lanelet2_extension_lib SHARED
 #  target_link_libraries(utilities-test ${catkin_LIBRARIES} lanelet2_extension_lib)
 #endif()
 
+ament_export_include_directories(include)
+ament_export_interfaces(export_lanelet2_extension_lib HAS_LIBRARY_TARGET)
 ament_package()
