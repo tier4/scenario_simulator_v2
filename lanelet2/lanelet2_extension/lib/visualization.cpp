@@ -33,7 +33,7 @@
 
 namespace
 {
-template <typename T>
+template<typename T>
 bool exists(const std::unordered_set<T> & set, const T & element)
 {
   return std::find(set.begin(), set.end(), element) != set.end();
@@ -211,7 +211,7 @@ void laneletDirectionAsMarker(
     c.b = 1.0;
   }
 
-  for (size_t ci = 0; ci < center_ls.size() - 1;) {
+  for (size_t ci = 0; ci < center_ls.size() - 1; ) {
     pc = center_ls[ci];
     if (center_ls.size() > 1) {
       pc2 = center_ls[ci + 1];

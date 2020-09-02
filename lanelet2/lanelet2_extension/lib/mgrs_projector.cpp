@@ -113,7 +113,7 @@ GPSPoint MGRSProjector::reverse(
   return gps;
 }
 
-void MGRSProjector::setMGRSCode(const std::string & mgrs_code) { mgrs_code_ = mgrs_code; }
+void MGRSProjector::setMGRSCode(const std::string & mgrs_code) {mgrs_code_ = mgrs_code;}
 
 void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
 {

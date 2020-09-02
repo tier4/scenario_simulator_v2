@@ -25,9 +25,10 @@ namespace lanelet
 class HdMapException : public std::exception
 {
 public:
-  explicit HdMapException(const std::string & msg) : error_message_(msg) {}
+  explicit HdMapException(const std::string & msg)
+  : error_message_(msg) {}
   virtual ~HdMapException() throw() {}
-  virtual const char * what() const throw() { return error_message_.c_str(); }
+  virtual const char * what() const throw() {return error_message_.c_str();}
 
 protected:
   std::string error_message_;
@@ -36,9 +37,10 @@ protected:
 class HdMapFormatException : public std::exception
 {
 public:
-  explicit HdMapFormatException(const std::string & msg) : error_message_(msg) {}
+  explicit HdMapFormatException(const std::string & msg)
+  : error_message_(msg) {}
   virtual ~HdMapFormatException() throw() {}
-  virtual const char * what() const throw() { return error_message_.c_str(); }
+  virtual const char * what() const throw() {return error_message_.c_str();}
 
 protected:
   std::string error_message_;

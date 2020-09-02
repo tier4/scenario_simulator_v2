@@ -592,8 +592,8 @@ ConstLanelets query::getAllNeighborsRight(
     (!!graph->right(lanelet)) ? graph->right(lanelet) : graph->adjacentRight(lanelet);
   while (!!right_lane) {
     lanelets.push_back(right_lane.get());
-    right_lane = (!!graph->right(right_lane.get())) ? graph->right(right_lane.get())
-                                                    : graph->adjacentRight(right_lane.get());
+    right_lane = (!!graph->right(right_lane.get())) ? graph->right(right_lane.get()) :
+      graph->adjacentRight(right_lane.get());
   }
   return lanelets;
 }
@@ -605,8 +605,8 @@ ConstLanelets query::getAllNeighborsLeft(
   auto left_lane = (!!graph->left(lanelet)) ? graph->left(lanelet) : graph->adjacentLeft(lanelet);
   while (!!left_lane) {
     lanelets.push_back(left_lane.get());
-    left_lane = (!!graph->left(left_lane.get())) ? graph->left(left_lane.get())
-                                                 : graph->adjacentLeft(left_lane.get());
+    left_lane = (!!graph->left(left_lane.get())) ? graph->left(left_lane.get()) :
+      graph->adjacentLeft(left_lane.get());
   }
   return lanelets;
 }
