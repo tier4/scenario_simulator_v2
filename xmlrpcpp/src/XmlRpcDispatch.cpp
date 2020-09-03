@@ -1,4 +1,3 @@
-
 #include "xmlrpcpp/XmlRpcDispatch.h"
 #include "xmlrpcpp/XmlRpcSource.h"
 #include "xmlrpcpp/XmlRpcUtil.h"
@@ -12,7 +11,7 @@
 
 #if defined(_WINDOWS)
 # include <winsock2.h>
-static int poll( struct pollfd *pfd, int nfds, int timeout)
+static int poll(struct pollfd * pfd, int nfds, int timeout)
 {
   // workaround: "Windows 8 Bugs 309411 – WSAPoll does not report failed connections"
   // https://curl.haxx.se/mail/lib-2012-10/0038.html
@@ -23,30 +22,24 @@ static int poll( struct pollfd *pfd, int nfds, int timeout)
   FD_SET error;
   FD_ZERO(&writable);
   FD_ZERO(&error);
-  for (int i = 0; i < nfds; ++i)
-  {
-    if (pfd[i].events & POLLOUT)
-    {
+  for (int i = 0; i < nfds; ++i) {
+    if (pfd[i].events & POLLOUT) {
       FD_SET(pfd[i].fd, &writable);
       FD_SET(pfd[i].fd, &error);
     }
   }
 
   int connectionError = 0;
-  if (writable.fd_count > 0)
-  {
+  if (writable.fd_count > 0) {
     int result = select(0, nullptr, &writable, &error, nullptr);
-    if (SOCKET_ERROR == result)
-    {
+    if (SOCKET_ERROR == result) {
       return SOCKET_ERROR;
     }
 
-    if (0 != result)
-    {
-      for (int i = 0; i < nfds; ++i)
-      {
+    if (0 != result) {
+      for (int i = 0; i < nfds; ++i) {
         if ((pfd[i].events & POLLOUT) &&
-            (FD_ISSET(pfd[i].fd, &error)))
+          (FD_ISSET(pfd[i].fd, &error)))
         {
           connectionError++;
         }
@@ -54,13 +47,10 @@ static int poll( struct pollfd *pfd, int nfds, int timeout)
     }
   }
 
-  if (connectionError == nfds)
-  {
+  if (connectionError == nfds) {
     // error out if all sockets are failed to connect.
     return SOCKET_ERROR;
-  }
-  else
-  {
+  } else {
     return WSAPoll(pfd, nfds, timeout);
   }
 }
@@ -94,36 +84,35 @@ XmlRpcDispatch::~XmlRpcDispatch()
 // Monitor this source for the specified events and call its event handler
 // when the event occurs
 void
-XmlRpcDispatch::addSource(XmlRpcSource* source, unsigned mask)
+XmlRpcDispatch::addSource(XmlRpcSource * source, unsigned mask)
 {
   _sources.push_back(MonitoredSource(source, mask));
 }
 
 // Stop monitoring this source. Does not close the source.
 void
-XmlRpcDispatch::removeSource(XmlRpcSource* source)
+XmlRpcDispatch::removeSource(XmlRpcSource * source)
 {
-  for (SourceList::iterator it=_sources.begin(); it!=_sources.end(); ++it)
-    if (it->getSource() == source)
-    {
+  for (SourceList::iterator it = _sources.begin(); it != _sources.end(); ++it) {
+    if (it->getSource() == source) {
       _sources.erase(it);
       break;
     }
+  }
 }
 
 
 // Modify the types of events to watch for on this source
 void
-XmlRpcDispatch::setSourceEvents(XmlRpcSource* source, unsigned eventMask)
+XmlRpcDispatch::setSourceEvents(XmlRpcSource * source, unsigned eventMask)
 {
-  for (SourceList::iterator it=_sources.begin(); it!=_sources.end(); ++it)
-    if (it->getSource() == source)
-    {
+  for (SourceList::iterator it = _sources.begin(); it != _sources.end(); ++it) {
+    if (it->getSource() == source) {
       it->getMask() = eventMask;
       break;
     }
+  }
 }
-
 
 
 // Watch current set of sources and process events
@@ -160,79 +149,80 @@ XmlRpcDispatch::work(double timeout)
 
     SourceList::iterator it;
     std::size_t i = 0;
-    for (it=_sources.begin(); it!=_sources.end(); ++it, ++i) {
+    for (it = _sources.begin(); it != _sources.end(); ++it, ++i) {
       sources[i] = it->getSource();
       fds[i].fd = sources[i]->getfd();
       fds[i].revents = 0; // some platforms may not clear this in poll()
       fds[i].events = 0;
-      if (it->getMask() & ReadableEvent) fds[i].events |= POLLIN_REQ;
-      if (it->getMask() & WritableEvent) fds[i].events |= POLLOUT_REQ;
-      if (it->getMask() & Exception) fds[i].events |= POLLEX_REQ;
+      if (it->getMask() & ReadableEvent) {fds[i].events |= POLLIN_REQ;}
+      if (it->getMask() & WritableEvent) {fds[i].events |= POLLOUT_REQ;}
+      if (it->getMask() & Exception) {fds[i].events |= POLLEX_REQ;}
     }
 
     // Check for events
     int nEvents = poll(&fds[0], source_cnt, (timeout_ms < 0) ? -1 : timeout_ms);
 
-    if (nEvents < 0)
-    {
+    if (nEvents < 0) {
 #if defined(_WINDOWS)
       XmlRpcUtil::error("Error in XmlRpcDispatch::work: error in poll (%d).", WSAGetLastError());
 #else
-      if(errno != EINTR)
+      if (errno != EINTR) {
         XmlRpcUtil::error("Error in XmlRpcDispatch::work: error in poll (%d).", nEvents);
+      }
 #endif
       _inWork = false;
       return;
     }
 
     // Process events
-    for (i=0; i < source_cnt; ++i)
-    {
-      XmlRpcSource* src = sources[i];
+    for (i = 0; i < source_cnt; ++i) {
+      XmlRpcSource * src = sources[i];
       pollfd & pfd = fds[i];
       unsigned newMask = (unsigned) -1;
       // Only handle requested events to avoid being prematurely removed from dispatch
       bool readable = (pfd.events & POLLIN_REQ) == POLLIN_REQ;
       bool writable = (pfd.events & POLLOUT_REQ) == POLLOUT_REQ;
       bool oob = (pfd.events & POLLEX_REQ) == POLLEX_REQ;
-      if (readable && (pfd.revents & POLLIN_CHK))
+      if (readable && (pfd.revents & POLLIN_CHK)) {
         newMask &= src->handleEvent(ReadableEvent);
-      if (writable && (pfd.revents & POLLOUT_CHK))
+      }
+      if (writable && (pfd.revents & POLLOUT_CHK)) {
         newMask &= src->handleEvent(WritableEvent);
-      if (oob && (pfd.revents & POLLEX_CHK))
+      }
+      if (oob && (pfd.revents & POLLEX_CHK)) {
         newMask &= src->handleEvent(Exception);
+      }
 
       // Find the source iterator. It may have moved as a result of the way
       // that sources are removed and added in the call stack starting
       // from the handleEvent() calls above.
       SourceList::iterator thisIt;
-      for (thisIt = _sources.begin(); thisIt != _sources.end(); thisIt++)
-      {
-        if(thisIt->getSource() == src)
+      for (thisIt = _sources.begin(); thisIt != _sources.end(); thisIt++) {
+        if (thisIt->getSource() == src) {
           break;
+        }
       }
-      if(thisIt == _sources.end())
-      {
+      if (thisIt == _sources.end()) {
         XmlRpcUtil::error("Error in XmlRpcDispatch::work: couldn't find source iterator");
         continue;
       }
 
-      if ( ! newMask) {
+      if (!newMask) {
         _sources.erase(thisIt);  // Stop monitoring this one
-        if ( ! src->getKeepOpen())
+        if (!src->getKeepOpen()) {
           src->close();
+        }
       } else if (newMask != (unsigned) -1) {
         thisIt->getMask() = newMask;
       }
     }
 
     // Check whether to clear all sources
-    if (_doClear)
-    {
+    if (_doClear) {
       SourceList closeList = _sources;
       _sources.clear();
-      for (SourceList::iterator it=closeList.begin(); it!=closeList.end(); ++it) {
-	XmlRpcSource *src = it->getSource();
+      for (SourceList::iterator it = closeList.begin(); it != closeList.end(); ++it) {
+        XmlRpcSource * src = it->getSource();
         src->close();
       }
 
@@ -240,8 +230,9 @@ XmlRpcDispatch::work(double timeout)
     }
 
     // Check whether end time has passed
-    if (0 <= _endTime && getTime() > _endTime)
+    if (0 <= _endTime && getTime() > _endTime) {
       break;
+    }
   }
 
   _inWork = false;
@@ -260,23 +251,24 @@ XmlRpcDispatch::exit()
 void
 XmlRpcDispatch::clear()
 {
-  if (_inWork)
+  if (_inWork) {
     _doClear = true;  // Finish reporting current events before clearing
-  else
-  {
+  } else {
     SourceList closeList = _sources;
     _sources.clear();
-    for (SourceList::iterator it=closeList.begin(); it!=closeList.end(); ++it)
+    for (SourceList::iterator it = closeList.begin(); it != closeList.end(); ++it) {
       it->getSource()->close();
+    }
   }
 }
 
-void XmlRpcDispatch::normalizeSecNSec(uint64_t& sec, uint64_t& nsec)
+void XmlRpcDispatch::normalizeSecNSec(uint64_t & sec, uint64_t & nsec)
 {
   uint64_t nsec_part = nsec % 1000000000UL;
   uint64_t sec_part = nsec / 1000000000UL;
-  if (sec + sec_part > std::numeric_limits<uint32_t>::max())
+  if (sec + sec_part > std::numeric_limits<uint32_t>::max()) {
     throw std::runtime_error("Time is out of dual 32-bit range");
+  }
   sec += sec_part;
   nsec = nsec_part;
 }
@@ -285,20 +277,19 @@ double
 XmlRpcDispatch::getTime()
 {
 #ifdef USE_FTIME
-  struct timeb	tbuff;
+  struct timeb tbuff;
 
   ftime(&tbuff);
-  return ((double) tbuff.time + ((double)tbuff.millitm / 1000.0) +
-	  ((double) tbuff.timezone * 60));
+  return (double) tbuff.time + ((double)tbuff.millitm / 1000.0) +
+         ((double) tbuff.timezone * 60);
 #else
   uint32_t sec, nsec;
   uint64_t now_s = 0;
-  uint64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+  uint64_t now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+    std::chrono::steady_clock::now().time_since_epoch()).count();
   normalizeSecNSec(now_s, now_ns);
   sec = (uint32_t)now_s;
   nsec = (uint32_t)now_ns;
-  return ((double)sec + (double)nsec / 1e9);
+  return (double)sec + (double)nsec / 1e9;
 #endif /* USE_FTIME */
 }
-
-

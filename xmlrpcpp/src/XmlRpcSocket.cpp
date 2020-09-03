@@ -30,11 +30,11 @@
 #ifdef ETIMEDOUT
   #undef ETIMEDOUT
 #endif
-# define EAGAIN		WSATRY_AGAIN
-# define EINTR			WSAEINTR
-# define EINPROGRESS	WSAEINPROGRESS
-# define EWOULDBLOCK	WSAEWOULDBLOCK
-# define ETIMEDOUT	    WSAETIMEDOUT
+# define EAGAIN         WSATRY_AGAIN
+# define EINTR                  WSAEINTR
+# define EINPROGRESS    WSAEINPROGRESS
+# define EWOULDBLOCK    WSAEWOULDBLOCK
+# define ETIMEDOUT          WSAETIMEDOUT
 #else
 extern "C" {
 # include <unistd.h>
@@ -71,9 +71,8 @@ bool XmlRpcSocket::s_use_ipv6_ = false;
 static void initWinSock()
 {
   static bool wsInit = false;
-  if (! wsInit)
-  {
-    WORD wVersionRequested = MAKEWORD( 2, 0 );
+  if (!wsInit) {
+    WORD wVersionRequested = MAKEWORD(2, 0);
     WSADATA wsaData;
     WSAStartup(wVersionRequested, &wsaData);
     wsInit = true;
@@ -92,7 +91,7 @@ static inline bool
 nonFatalError()
 {
   int err = XmlRpcSocket::getError();
-  return (err == EINPROGRESS || err == EAGAIN || err == EWOULDBLOCK || err == EINTR);
+  return err == EINPROGRESS || err == EAGAIN || err == EWOULDBLOCK || err == EINTR;
 }
 
 int
@@ -115,16 +114,14 @@ XmlRpcSocket::close(int fd)
 }
 
 
-
-
 bool
 XmlRpcSocket::setNonBlocking(int fd)
 {
 #if defined(_WINDOWS)
   unsigned long flag = 1;
-  return (ioctlsocket((SOCKET)fd, FIONBIO, &flag) == 0);
+  return ioctlsocket((SOCKET)fd, FIONBIO, &flag) == 0;
 #else
-  return (fcntl(fd, F_SETFL, O_NONBLOCK) == 0);
+  return fcntl(fd, F_SETFL, O_NONBLOCK) == 0;
 #endif // _WINDOWS
 }
 
@@ -134,7 +131,7 @@ XmlRpcSocket::setReuseAddr(int fd)
 {
   // Allow this port to be re-bound immediately so server re-starts are not delayed
   int sflag = 1;
-  return (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&sflag, sizeof(sflag)) == 0);
+  return setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&sflag, sizeof(sflag)) == 0;
 }
 
 
@@ -146,18 +143,15 @@ XmlRpcSocket::bind(int fd, int port)
   socklen_t ss_len;
   memset(&ss, 0, sizeof(ss));
 
-  if (s_use_ipv6_)
-  {
-    sockaddr_in6 *address = (sockaddr_in6 *)&ss;
+  if (s_use_ipv6_) {
+    sockaddr_in6 * address = (sockaddr_in6 *)&ss;
     ss_len = sizeof(sockaddr_in6);
 
     address->sin6_family = AF_INET6;
     address->sin6_addr = in6addr_any;
     address->sin6_port = htons((u_short) port);
-  }
-  else
-  {
-    sockaddr_in *address = (sockaddr_in *)&ss;
+  } else {
+    sockaddr_in * address = (sockaddr_in *)&ss;
     ss_len = sizeof(sockaddr_in);
 
     address->sin_family = AF_INET;
@@ -165,7 +159,7 @@ XmlRpcSocket::bind(int fd, int port)
     address->sin_port = htons((u_short) port);
   }
 
-  return (::bind(fd, (sockaddr*)&ss, ss_len) == 0);
+  return ::bind(fd, (sockaddr *)&ss, ss_len) == 0;
 }
 
 
@@ -173,7 +167,7 @@ XmlRpcSocket::bind(int fd, int port)
 bool
 XmlRpcSocket::listen(int fd, int backlog)
 {
-  return (::listen(fd, backlog) == 0);
+  return ::listen(fd, backlog) == 0;
 }
 
 
@@ -186,49 +180,50 @@ XmlRpcSocket::accept(int fd)
 #else
   socklen_t
 #endif
-    addrlen = sizeof(addr);
+  addrlen = sizeof(addr);
   // accept will truncate the address if the buffer is too small.
   // As we are not using it, no special case for IPv6
   // has to be made.
-  return (int) ::accept(fd, (struct sockaddr*)&addr, &addrlen);
+  return (int) ::accept(fd, (struct sockaddr *)&addr, &addrlen);
 }
-
 
 
 // Connect a socket to a server (from a client)
 bool
-XmlRpcSocket::connect(int fd, const std::string& host, int port)
+XmlRpcSocket::connect(int fd, const std::string & host, int port)
 {
   sockaddr_storage ss;
   socklen_t ss_len;
   memset(&ss, 0, sizeof(ss));
 
-  struct addrinfo* addr;
+  struct addrinfo * addr;
   struct addrinfo hints;
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_UNSPEC;
   int getaddr_err = getaddrinfo(host.c_str(), NULL, &hints, &addr);
   if (0 != getaddr_err) {
 #if !defined(_WINDOWS)
-    if(getaddr_err == EAI_SYSTEM) {
-      XmlRpcUtil::error("Couldn't find an %s address for [%s]: %s\n", s_use_ipv6_ ? "AF_INET6" : "AF_INET", host.c_str(), XmlRpcSocket::getErrorMsg().c_str());
+    if (getaddr_err == EAI_SYSTEM) {
+      XmlRpcUtil::error("Couldn't find an %s address for [%s]: %s\n",
+        s_use_ipv6_ ? "AF_INET6" : "AF_INET",
+        host.c_str(), XmlRpcSocket::getErrorMsg().c_str());
     } else {
 #else
     {
 #endif
-      XmlRpcUtil::error("Couldn't find an %s address for [%s]: %s\n", s_use_ipv6_ ? "AF_INET6" : "AF_INET", host.c_str(), gai_strerror(getaddr_err));
+      XmlRpcUtil::error("Couldn't find an %s address for [%s]: %s\n",
+        s_use_ipv6_ ? "AF_INET6" : "AF_INET", host.c_str(), gai_strerror(
+          getaddr_err));
     }
     return false;
   }
 
   bool found = false;
-  struct addrinfo* it = addr;
+  struct addrinfo * it = addr;
 
-  for (; it; it = it->ai_next)
-  {
-    if (!s_use_ipv6_ && it->ai_family == AF_INET)
-    {
-      sockaddr_in *address = (sockaddr_in *)&ss;
+  for (; it; it = it->ai_next) {
+    if (!s_use_ipv6_ && it->ai_family == AF_INET) {
+      sockaddr_in * address = (sockaddr_in *)&ss;
       ss_len = sizeof(sockaddr_in);
 
       memcpy(address, it->ai_addr, it->ai_addrlen);
@@ -239,9 +234,8 @@ XmlRpcSocket::connect(int fd, const std::string& host, int port)
       found = true;
       break;
     }
-    if (s_use_ipv6_ && it->ai_family == AF_INET6)
-    {
-      sockaddr_in6 *address = (sockaddr_in6 *)&ss;
+    if (s_use_ipv6_ && it->ai_family == AF_INET6) {
+      sockaddr_in6 * address = (sockaddr_in6 *)&ss;
       ss_len = sizeof(sockaddr_in6);
 
       memcpy(address, it->ai_addr, it->ai_addrlen);
@@ -250,25 +244,26 @@ XmlRpcSocket::connect(int fd, const std::string& host, int port)
 
       char buf[128];
       // TODO IPV6: check if this also works under Windows
-      XmlRpcUtil::log(5, "found ipv6 host as %s\n", inet_ntop(AF_INET6, (void*)&(address->sin6_addr), buf, sizeof(buf)));
+      XmlRpcUtil::log(5, "found ipv6 host as %s\n",
+        inet_ntop(AF_INET6, (void *)&(address->sin6_addr), buf, sizeof(buf)));
       found = true;
       break;
     }
 
   }
 
-  if (!found)
-  {
-    XmlRpcUtil::error("Couldn't find an %s address for [%s]\n", s_use_ipv6_ ? "AF_INET6" : "AF_INET", host.c_str());
+  if (!found) {
+    XmlRpcUtil::error("Couldn't find an %s address for [%s]\n",
+      s_use_ipv6_ ? "AF_INET6" : "AF_INET", host.c_str());
     freeaddrinfo(addr);
     return false;
   }
 
   // For asynch operation, this will return EWOULDBLOCK (windows) or
   // EINPROGRESS (linux) and we just need to wait for the socket to be writable...
-  int result = ::connect(fd, (sockaddr*)&ss, ss_len);
+  int result = ::connect(fd, (sockaddr *)&ss, ss_len);
   bool success = true;
-  if (result != 0 ) {
+  if (result != 0) {
     int error = getError();
     // platform check here, EWOULDBLOCK on WIN32 and EINPROGRESS otherwise
 #if defined(_WINDOWS)
@@ -287,10 +282,9 @@ XmlRpcSocket::connect(int fd, const std::string& host, int port)
 }
 
 
-
 // Read available text from the specified socket. Returns false on error.
 bool
-XmlRpcSocket::nbRead(int fd, std::string& s, bool *eof)
+XmlRpcSocket::nbRead(int fd, std::string & s, bool * eof)
 {
   const int READ_SIZE = 4096;   // Number of bytes to attempt to read at a time
   char readBuf[READ_SIZE];
@@ -298,11 +292,11 @@ XmlRpcSocket::nbRead(int fd, std::string& s, bool *eof)
   bool wouldBlock = false;
   *eof = false;
 
-  while ( ! wouldBlock && ! *eof) {
+  while (!wouldBlock && !*eof) {
 #if defined(_WINDOWS)
-    int n = recv(fd, readBuf, READ_SIZE-1, 0);
+    int n = recv(fd, readBuf, READ_SIZE - 1, 0);
 #else
-    int n = read(fd, readBuf, READ_SIZE-1);
+    int n = read(fd, readBuf, READ_SIZE - 1);
 #endif
     XmlRpcUtil::log(5, "XmlRpcSocket::nbRead: read/recv returned %d.", n);
 
@@ -323,13 +317,13 @@ XmlRpcSocket::nbRead(int fd, std::string& s, bool *eof)
 
 // Write text to the specified socket. Returns false on error.
 bool
-XmlRpcSocket::nbWrite(int fd, const std::string& s, int *bytesSoFar)
+XmlRpcSocket::nbWrite(int fd, const std::string & s, int * bytesSoFar)
 {
   int nToWrite = int(s.length()) - *bytesSoFar;
-  char *sp = const_cast<char*>(s.c_str()) + *bytesSoFar;
+  char * sp = const_cast<char *>(s.c_str()) + *bytesSoFar;
   bool wouldBlock = false;
 
-  while ( nToWrite > 0 && ! wouldBlock ) {
+  while (nToWrite > 0 && !wouldBlock) {
 #if defined(_WINDOWS)
     int n = send(fd, sp, nToWrite, 0);
 #else
@@ -375,7 +369,7 @@ std::string
 XmlRpcSocket::getErrorMsg(int error)
 {
   char err[60];
-  std::snprintf(err,sizeof(err),"%s",strerror(error));
+  std::snprintf(err, sizeof(err), "%s", strerror(error));
   return std::string(err);
 }
 
@@ -383,12 +377,11 @@ int XmlRpcSocket::get_port(int socket)
 {
   sockaddr_storage ss;
   socklen_t ss_len = sizeof(ss);
-  if(getsockname(socket, (sockaddr *)&ss, &ss_len) == 0) {
-    sockaddr_in *sin = (sockaddr_in *)&ss;
-    sockaddr_in6 *sin6 = (sockaddr_in6 *)&ss;
+  if (getsockname(socket, (sockaddr *)&ss, &ss_len) == 0) {
+    sockaddr_in * sin = (sockaddr_in *)&ss;
+    sockaddr_in6 * sin6 = (sockaddr_in6 *)&ss;
 
-    switch (ss.ss_family)
-    {
+    switch (ss.ss_family) {
       case AF_INET:
         return ntohs(sin->sin_port);
       case AF_INET6:
@@ -397,4 +390,3 @@ int XmlRpcSocket::get_port(int socket)
   }
   return 0;
 }
-

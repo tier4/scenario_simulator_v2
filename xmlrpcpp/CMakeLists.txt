@@ -5,15 +5,7 @@ if(NOT WIN32)
   set_directory_properties(PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra")
 endif()
 
-#find_package(catkin REQUIRED COMPONENTS cpp_common rostime)
-
-# The CFG_EXTRAS is only for compatibility, to be removed in Lunar.
-#catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES xmlrpcpp
-#  CATKIN_DEPENDS cpp_common rostime
-#  CFG_EXTRAS xmlrpcpp-extras.cmake
-#)
+find_package(ament_cmake REQUIRED)
 
 include_directories(
   include
@@ -42,16 +34,4 @@ install(
   DESTINATION include
 )
 
-#target_link_libraries(xmlrpcpp ${catkin_LIBRARIES})
-#if(WIN32)
-#  target_link_libraries(xmlrpcpp ws2_32)
-#endif()
-
-#install(TARGETS xmlrpcpp
-#  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
-
-#if (CATKIN_ENABLE_TESTING)
-#  add_subdirectory(test)
-#endif()
+ament_package()
