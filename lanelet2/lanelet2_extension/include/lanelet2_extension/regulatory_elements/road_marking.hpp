@@ -21,20 +21,17 @@
 #include <memory>
 #include <vector>
 
-namespace lanelet
-{
-namespace autoware
-{
-class RoadMarking : public lanelet::RegulatoryElement
-{
-public:
+namespace lanelet {
+namespace autoware {
+class RoadMarking : public lanelet::RegulatoryElement {
+ public:
   using Ptr = std::shared_ptr<RoadMarking>;
   static constexpr char RuleName[] = "road_marking";
 
   //! Directly construct a stop line from its required rule parameters.
   //! Might modify the input data in oder to get correct tags.
-  static Ptr make(Id id, const AttributeMap & attributes, const LineString3d & road_marking)
-  {
+  static Ptr make(Id id, const AttributeMap& attributes,
+                  const LineString3d& road_marking) {
     return Ptr{new RoadMarking(id, attributes, road_marking)};
   }
 
@@ -49,19 +46,20 @@ public:
    * @brief add a new road marking
    * @param primitive road marking to add
    */
-  void setRoadMarking(const LineString3d & primitive);
+  void setRoadMarking(const LineString3d& primitive);
 
   /**
    * @brief remove a road marking
    */
   void removeRoadMarking();
 
-private:
+ private:
   // the following lines are required so that lanelet2 can create this object
   // when loading a map with this regulatory element
   friend class lanelet::RegisterRegulatoryElement<RoadMarking>;
-  RoadMarking(Id id, const AttributeMap & attributes, const LineString3d & roadMarking);
-  explicit RoadMarking(const lanelet::RegulatoryElementDataPtr & data);
+  RoadMarking(Id id, const AttributeMap& attributes,
+              const LineString3d& roadMarking);
+  explicit RoadMarking(const lanelet::RegulatoryElementDataPtr& data);
 };
 static lanelet::RegisterRegulatoryElement<RoadMarking> regRoadMarking;
 

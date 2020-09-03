@@ -33,14 +33,11 @@
 #include <sstream>
 #include <string>
 
-namespace lanelet
-{
-namespace utils
-{
-namespace conversion
-{
-void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::MapBin * msg)
-{
+namespace lanelet {
+namespace utils {
+namespace conversion {
+void toBinMsg(const lanelet::LaneletMapPtr& map,
+              autoware_lanelet2_msgs::msg::MapBin* msg) {
   if (msg == nullptr) {
     std::stringstream sstream;
     sstream << __FUNCTION__ << "msg is null pointer!";
@@ -59,8 +56,8 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::M
   msg->data.assign(data_str.begin(), data_str.end());
 }
 
-void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map)
-{
+void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin& msg,
+                lanelet::LaneletMapPtr map) {
   if (!map) {
     std::stringstream sstream;
     sstream << __FUNCTION__ << "msg is null pointer!";
@@ -80,19 +77,18 @@ void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::Lanele
   // *map = std::move(laneletMap);
 }
 
-void fromBinMsg(
-  const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map,
-  lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
-  lanelet::routing::RoutingGraphPtr * routing_graph)
-{
+void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin& msg,
+                lanelet::LaneletMapPtr map,
+                lanelet::traffic_rules::TrafficRulesPtr* traffic_rules,
+                lanelet::routing::RoutingGraphPtr* routing_graph) {
   fromBinMsg(msg, map);
   *traffic_rules = lanelet::traffic_rules::TrafficRulesFactory::create(
-    lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+      lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   *routing_graph = lanelet::routing::RoutingGraph::build(*map, **traffic_rules);
 }
 
-void toGeomMsgPt(const geometry_msgs::msg::Point32 & src, geometry_msgs::msg::Point * dst)
-{
+void toGeomMsgPt(const geometry_msgs::msg::Point32& src,
+                 geometry_msgs::msg::Point* dst) {
   if (dst == nullptr) {
     std::stringstream sstream;
     sstream << __FUNCTION__ << "pointer is null!";
@@ -103,8 +99,7 @@ void toGeomMsgPt(const geometry_msgs::msg::Point32 & src, geometry_msgs::msg::Po
   dst->y = src.y;
   dst->z = src.z;
 }
-void toGeomMsgPt(const Eigen::Vector3d & src, geometry_msgs::msg::Point * dst)
-{
+void toGeomMsgPt(const Eigen::Vector3d& src, geometry_msgs::msg::Point* dst) {
   if (dst == nullptr) {
     std::stringstream sstream;
     sstream << __FUNCTION__ << "pointer is null!";
@@ -115,8 +110,8 @@ void toGeomMsgPt(const Eigen::Vector3d & src, geometry_msgs::msg::Point * dst)
   dst->y = src.y();
   dst->z = src.z();
 }
-void toGeomMsgPt(const lanelet::ConstPoint3d & src, geometry_msgs::msg::Point * dst)
-{
+void toGeomMsgPt(const lanelet::ConstPoint3d& src,
+                 geometry_msgs::msg::Point* dst) {
   if (dst == nullptr) {
     std::stringstream sstream;
     sstream << __FUNCTION__ << "pointer is null!";
@@ -127,8 +122,8 @@ void toGeomMsgPt(const lanelet::ConstPoint3d & src, geometry_msgs::msg::Point * 
   dst->y = src.y();
   dst->z = src.z();
 }
-void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * dst)
-{
+void toGeomMsgPt(const lanelet::ConstPoint2d& src,
+                 geometry_msgs::msg::Point* dst) {
   if (dst == nullptr) {
     std::stringstream sstream;
     sstream << __FUNCTION__ << "pointer is null!";
@@ -140,8 +135,8 @@ void toGeomMsgPt(const lanelet::ConstPoint2d & src, geometry_msgs::msg::Point * 
   dst->z = 0;
 }
 
-void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * dst)
-{
+void toGeomMsgPt32(const Eigen::Vector3d& src,
+                   geometry_msgs::msg::Point32* dst) {
   if (dst == nullptr) {
     std::stringstream sstream;
     sstream << __FUNCTION__ << "pointer is null!";
@@ -153,48 +148,43 @@ void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * ds
   dst->z = src.z();
 }
 
-geometry_msgs::msg::Point toGeomMsgPt(const geometry_msgs::msg::Point32 & src)
-{
+geometry_msgs::msg::Point toGeomMsgPt(const geometry_msgs::msg::Point32& src) {
   geometry_msgs::msg::Point dst;
   toGeomMsgPt(src, &dst);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const Eigen::Vector3d & src)
-{
+geometry_msgs::msg::Point toGeomMsgPt(const Eigen::Vector3d& src) {
   geometry_msgs::msg::Point dst;
   toGeomMsgPt(src, &dst);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint3d & src)
-{
+geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint3d& src) {
   geometry_msgs::msg::Point dst;
   toGeomMsgPt(src, &dst);
   return dst;
 }
-geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint2d & src)
-{
+geometry_msgs::msg::Point toGeomMsgPt(const lanelet::ConstPoint2d& src) {
   geometry_msgs::msg::Point dst;
   toGeomMsgPt(src, &dst);
   return dst;
 }
 
-lanelet::ConstPoint3d toLaneletPoint(const geometry_msgs::msg::Point & src)
-{
+lanelet::ConstPoint3d toLaneletPoint(const geometry_msgs::msg::Point& src) {
   lanelet::ConstPoint3d dst;
   toLaneletPoint(src, &dst);
   return dst;
 }
 
-void toLaneletPoint(const geometry_msgs::msg::Point & src, lanelet::ConstPoint3d * dst)
-{
+void toLaneletPoint(const geometry_msgs::msg::Point& src,
+                    lanelet::ConstPoint3d* dst) {
   *dst = lanelet::Point3d(lanelet::InvalId, src.x, src.y, src.z);
 }
 
-void toGeomMsgPoly(const lanelet::ConstPolygon3d & ll_poly, geometry_msgs::msg::Polygon * geom_poly)
-{
+void toGeomMsgPoly(const lanelet::ConstPolygon3d& ll_poly,
+                   geometry_msgs::msg::Polygon* geom_poly) {
   geom_poly->points.clear();
   geom_poly->points.reserve(ll_poly.size());
-  for (const auto & ll_pt : ll_poly) {
+  for (const auto& ll_pt : ll_poly) {
     geometry_msgs::msg::Point32 geom_pt32;
     utils::conversion::toGeomMsgPt32(ll_pt.basicPoint(), &geom_pt32);
     geom_poly->points.push_back(geom_pt32);

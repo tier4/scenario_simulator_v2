@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
+#include <lanelet2_extension/utility/utilities.hpp>
 #include <map>
 
 using lanelet::Lanelet;
@@ -23,12 +23,9 @@ using lanelet::LineString3d;
 using lanelet::Point3d;
 using lanelet::utils::getId;
 
-class TestSuite : public ::testing::Test
-{
-public:
-  TestSuite()
-  : sample_map_ptr(new lanelet::LaneletMap())
-  {  // NOLINT
+class TestSuite : public ::testing::Test {
+ public:
+  TestSuite() : sample_map_ptr(new lanelet::LaneletMap()) {  // NOLINT
     // create sample lanelets
     Point3d p1, p2, p3, p4, p5, p6, p7, p8, p9, p10;
 
@@ -60,19 +57,19 @@ public:
 
     road_lanelet = Lanelet(getId(), ls_left, ls_right);
     road_lanelet.attributes()[lanelet::AttributeName::Subtype] =
-      lanelet::AttributeValueString::Road;
+        lanelet::AttributeValueString::Road;
 
     next_lanelet = Lanelet(getId(), ls_left2, ls_right2);
     next_lanelet.attributes()[lanelet::AttributeName::Subtype] =
-      lanelet::AttributeValueString::Road;
+        lanelet::AttributeValueString::Road;
 
     next_lanelet2 = Lanelet(getId(), ls_left3, ls_right3);
     next_lanelet2.attributes()[lanelet::AttributeName::Subtype] =
-      lanelet::AttributeValueString::Road;
+        lanelet::AttributeValueString::Road;
 
     merging_lanelet = Lanelet(getId(), ls_left4, ls_right4);
     merging_lanelet.attributes()[lanelet::AttributeName::Subtype] =
-      lanelet::AttributeValueString::Road;
+        lanelet::AttributeValueString::Road;
 
     sample_map_ptr->add(road_lanelet);
     sample_map_ptr->add(next_lanelet);
@@ -87,22 +84,22 @@ public:
   Lanelet next_lanelet2;
   Lanelet merging_lanelet;
 
-private:
+ private:
 };
 
-TEST_F(TestSuite, OverwriteLaneletsCenterline)
-{
+TEST_F(TestSuite, OverwriteLaneletsCenterline) {
   double resolution = 5.0;
   bool force_overwrite = false;
-  lanelet::utils::overwriteLaneletsCenterline(sample_map_ptr, resolution, force_overwrite);
+  lanelet::utils::overwriteLaneletsCenterline(sample_map_ptr, resolution,
+                                              force_overwrite);
 
-  for (const auto & lanelet : sample_map_ptr->laneletLayer) {
-    ASSERT_TRUE(lanelet.hasCustomCenterline()) << "failed to calculate fine centerline";
+  for (const auto& lanelet : sample_map_ptr->laneletLayer) {
+    ASSERT_TRUE(lanelet.hasCustomCenterline())
+        << "failed to calculate fine centerline";
   }
 }
 
-int main(int argc, char ** argv)
-{
+int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -22,23 +22,17 @@
 #include <utility>
 #include <vector>
 
-namespace lanelet
-{
-namespace projection
-{
-MGRSProjector::MGRSProjector(Origin origin)
-: Projector(origin)
-{
-}
+namespace lanelet {
+namespace projection {
+MGRSProjector::MGRSProjector(Origin origin) : Projector(origin) {}
 
-BasicPoint3d MGRSProjector::forward(const GPSPoint & gps) const
-{
+BasicPoint3d MGRSProjector::forward(const GPSPoint& gps) const {
   BasicPoint3d mgrs_point(forward(gps, 0));
   return mgrs_point;
 }
 
-BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) const
-{
+BasicPoint3d MGRSProjector::forward(const GPSPoint& gps,
+                                    const int precision) const {
   std::string prev_projected_grid = projected_grid_;
 
   BasicPoint3d mgrs_point{0., 0., gps.ele};
@@ -48,9 +42,10 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
   std::string mgrs_code;
 
   try {
-    GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp, utm_point.x(), utm_point.y());
-    GeographicLib::MGRS::Forward(
-      zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
+    GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp,
+                                   utm_point.x(), utm_point.y());
+    GeographicLib::MGRS::Forward(zone, northp, utm_point.x(), utm_point.y(),
+                                 gps.lat, precision, mgrs_code);
   } catch (GeographicLib::GeographicErr err) {
     return mgrs_point;
   }
@@ -62,7 +57,7 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
 
   if (!prev_projected_grid.empty() && prev_projected_grid != projected_grid_) {
     std::string message =
-      R"(Projected MGRS Grid changed from last projection.
+        R"(Projected MGRS Grid changed from last projection.
       Projected point might be far away from previously projected point.
       You may want to use different projector.)";
     throw lanelet::HdMapException(message);
@@ -71,8 +66,7 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
   return mgrs_point;
 }
 
-GPSPoint MGRSProjector::reverse(const BasicPoint3d & mgrs_point) const
-{
+GPSPoint MGRSProjector::reverse(const BasicPoint3d& mgrs_point) const {
   GPSPoint gps{0., 0., 0.};
   // reverse function cannot be used if mgrs_code_ is not set
   if (isMGRSCodeSet()) {
@@ -81,49 +75,51 @@ GPSPoint MGRSProjector::reverse(const BasicPoint3d & mgrs_point) const
     gps = reverse(mgrs_point, projected_grid_);
   } else {
     std::string message =
-      R"(cannot run reverse operation if mgrs code is not set in projector.
+        R"(cannot run reverse operation if mgrs code is not set in projector.
       Use setMGRSCode function or explicitly give mgrs code as an argument.)";
     throw lanelet::HdMapException(message);
   }
   return gps;
 }
 
-GPSPoint MGRSProjector::reverse(
-  const BasicPoint3d & mgrs_point, const std::string & mgrs_code) const
-{
+GPSPoint MGRSProjector::reverse(const BasicPoint3d& mgrs_point,
+                                const std::string& mgrs_code) const {
   GPSPoint gps{0., 0., mgrs_point.z()};
   BasicPoint3d utm_point{0., 0., gps.ele};
 
   int zone, prec;
   bool northp;
   try {
-    GeographicLib::MGRS::Reverse(
-      mgrs_code, zone, northp, utm_point.x(), utm_point.y(), prec, false);
+    GeographicLib::MGRS::Reverse(mgrs_code, zone, northp, utm_point.x(),
+                                 utm_point.y(), prec, false);
     utm_point.x() += fmod(mgrs_point.x(), pow(10, 5 - prec));
     utm_point.y() += fmod(mgrs_point.y(), pow(10, 5 - prec));
-    GeographicLib::UTMUPS::Reverse(zone, northp, utm_point.x(), utm_point.y(), gps.lat, gps.lon);
+    GeographicLib::UTMUPS::Reverse(zone, northp, utm_point.x(), utm_point.y(),
+                                   gps.lat, gps.lon);
   } catch (GeographicLib::GeographicErr err) {
-    std::string message =
-      "Failed to convert from MGRS to WGS " + static_cast<std::string>(err.what());
+    std::string message = "Failed to convert from MGRS to WGS " +
+                          static_cast<std::string>(err.what());
     throw lanelet::HdMapException(message);
   }
 
   return gps;
 }
 
-void MGRSProjector::setMGRSCode(const std::string & mgrs_code) {mgrs_code_ = mgrs_code;}
+void MGRSProjector::setMGRSCode(const std::string& mgrs_code) {
+  mgrs_code_ = mgrs_code;
+}
 
-void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
-{
+void MGRSProjector::setMGRSCode(const GPSPoint& gps, const int precision) {
   BasicPoint3d utm_point{0., 0., gps.ele};
   int zone;
   bool northp;
   std::string mgrs_code;
 
   try {
-    GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp, utm_point.x(), utm_point.y());
-    GeographicLib::MGRS::Forward(
-      zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
+    GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp,
+                                   utm_point.x(), utm_point.y());
+    GeographicLib::MGRS::Forward(zone, northp, utm_point.x(), utm_point.y(),
+                                 gps.lat, precision, mgrs_code);
   } catch (GeographicLib::GeographicErr err) {
     throw lanelet::HdMapException(err.what());
   }

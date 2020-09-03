@@ -23,28 +23,25 @@
 #include <memory>
 #include <vector>
 
-namespace lanelet
-{
-namespace autoware
-{
-struct AutowareRoleNameString
-{
+namespace lanelet {
+namespace autoware {
+struct AutowareRoleNameString {
   static constexpr const char LightBulbs[] = "light_bulbs";
 };
 
-class AutowareTrafficLight : public lanelet::TrafficLight
-{
-public:
+class AutowareTrafficLight : public lanelet::TrafficLight {
+ public:
   using Ptr = std::shared_ptr<AutowareTrafficLight>;
   static constexpr char RuleName[] = "traffic_light";
 
   //! Directly construct a stop line from its required rule parameters.
   //! Might modify the input data in oder to get correct tags.
-  static Ptr make(
-    Id id, const AttributeMap & attributes, const LineStringsOrPolygons3d & trafficLights,
-    const Optional<LineString3d> & stopLine = {}, const LineStrings3d & lightBulbs = {})
-  {
-    return Ptr{new AutowareTrafficLight(id, attributes, trafficLights, stopLine, lightBulbs)};
+  static Ptr make(Id id, const AttributeMap& attributes,
+                  const LineStringsOrPolygons3d& trafficLights,
+                  const Optional<LineString3d>& stopLine = {},
+                  const LineStrings3d& lightBulbs = {}) {
+    return Ptr{new AutowareTrafficLight(id, attributes, trafficLights, stopLine,
+                                        lightBulbs)};
   }
 
   /**
@@ -63,25 +60,27 @@ public:
    * Traffic light bulbs are represented as linestrings with each point
    * expressing position of each light bulb (lamp).
    */
-  void addLightBulbs(const LineStringOrPolygon3d & primitive);
+  void addLightBulbs(const LineStringOrPolygon3d& primitive);
 
   /**
    * @brief remove a traffic light bulb
    * @param primitive the primitive
    * @return true if the traffic light bulb existed and was removed
    */
-  bool removeLightBulbs(const LineStringOrPolygon3d & primitive);
+  bool removeLightBulbs(const LineStringOrPolygon3d& primitive);
 
-private:
+ private:
   // the following lines are required so that lanelet2 can create this object
   // when loading a map with this regulatory element
   friend class lanelet::RegisterRegulatoryElement<AutowareTrafficLight>;
-  AutowareTrafficLight(
-    Id id, const AttributeMap & attributes, const LineStringsOrPolygons3d & trafficLights,
-    const Optional<LineString3d> & stopLine, const LineStrings3d & lightBulbs);
-  explicit AutowareTrafficLight(const lanelet::RegulatoryElementDataPtr & data);
+  AutowareTrafficLight(Id id, const AttributeMap& attributes,
+                       const LineStringsOrPolygons3d& trafficLights,
+                       const Optional<LineString3d>& stopLine,
+                       const LineStrings3d& lightBulbs);
+  explicit AutowareTrafficLight(const lanelet::RegulatoryElementDataPtr& data);
 };
-static lanelet::RegisterRegulatoryElement<AutowareTrafficLight> regAutowareTraffic;
+static lanelet::RegisterRegulatoryElement<AutowareTrafficLight>
+    regAutowareTraffic;
 
 // moved to lanelet2_extension/lib/autoware_traffic_light.cpp to avoid multiple
 // defintion errors

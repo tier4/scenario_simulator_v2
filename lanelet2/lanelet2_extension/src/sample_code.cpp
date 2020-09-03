@@ -24,27 +24,27 @@
 #include <iostream>
 #include <string>
 
-void loadingAutowareOSMFile(const std::string map_file_path)
-{
+void loadingAutowareOSMFile(const std::string map_file_path) {
   lanelet::LaneletMapPtr lanelet_map;
   lanelet::ErrorMessages errors;
   lanelet::GPSPoint gps_point;
   gps_point.lat = 49.0;
   gps_point.lon = 8.4;
   lanelet::Origin origin(gps_point);
-  lanelet::projection::UtmProjector projector(lanelet::Origin(gps_point), true, false);
+  lanelet::projection::UtmProjector projector(lanelet::Origin(gps_point), true,
+                                              false);
 
   // Autoware OSM file parser is registered into lanelet2 library.
   // Therefore, you can used it by just specifying "autoware_osm_handler" parser
   // in load function.
-  lanelet_map = lanelet::load(map_file_path, "autoware_osm_handler", projector, &errors);
+  lanelet_map =
+      lanelet::load(map_file_path, "autoware_osm_handler", projector, &errors);
 
   // If you want to use default parser, explicitly name the parser
   lanelet_map = lanelet::load(map_file_path, "osm_handler", projector, &errors);
 }
 
-void usingMGRSProjector()
-{
+void usingMGRSProjector() {
   // MGRS Projector projects lat/lon to x,y,z point in MGRS 100km grid.
   // The origin is automatically calcaulted so you don't have to select any
   // origin.
@@ -67,22 +67,25 @@ void usingMGRSProjector()
   // You have to set which MGRS grid it is from or it will reuse last projected
   // grid
   lanelet::GPSPoint projected_gps_point = projector.reverse(mgrs_point);
-  std::cout << projected_gps_point.lat << " " << projected_gps_point.lon << std::endl;
-  lanelet::GPSPoint projected_gps_point2 = projector.reverse(mgrs_point, mgrs_grid);
-  std::cout << projected_gps_point2.lat << " " << projected_gps_point2.lon << " " << std::endl;
+  std::cout << projected_gps_point.lat << " " << projected_gps_point.lon
+            << std::endl;
+  lanelet::GPSPoint projected_gps_point2 =
+      projector.reverse(mgrs_point, mgrs_grid);
+  std::cout << projected_gps_point2.lat << " " << projected_gps_point2.lon
+            << " " << std::endl;
 }
 
-void usingAutowareTrafficLight(const std::string map_file_path)
-{
+void usingAutowareTrafficLight(const std::string map_file_path) {
   lanelet::LaneletMapPtr lanelet_map;
   lanelet::ErrorMessages errors;
   lanelet::projection::MGRSProjector projector;
-  lanelet_map = lanelet::load(map_file_path, "autoware_osm_handler", projector, &errors);
+  lanelet_map =
+      lanelet::load(map_file_path, "autoware_osm_handler", projector, &errors);
 
   for (auto lanelet : lanelet_map->laneletLayer) {
     // You can access to traffic light element as AutowareTrafficLight class
     auto autoware_traffic_lights =
-      lanelet.regulatoryElementsAs<lanelet::autoware::AutowareTrafficLight>();
+        lanelet.regulatoryElementsAs<lanelet::autoware::AutowareTrafficLight>();
     for (auto light : autoware_traffic_lights) {
       // You can access to the position of each lamps(light bulb) in traffic
       // light
@@ -108,8 +111,7 @@ void usingAutowareTrafficLight(const std::string map_file_path)
   }
 }
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char* argv[]) {
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("sample_code");
   std::string path = argv[1];

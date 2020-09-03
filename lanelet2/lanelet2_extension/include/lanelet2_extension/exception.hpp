@@ -20,29 +20,24 @@
 #include <exception>
 #include <string>
 
-namespace lanelet
-{
-class HdMapException : public std::exception
-{
-public:
-  explicit HdMapException(const std::string & msg)
-  : error_message_(msg) {}
+namespace lanelet {
+class HdMapException : public std::exception {
+ public:
+  explicit HdMapException(const std::string& msg) : error_message_(msg) {}
   virtual ~HdMapException() throw() {}
-  virtual const char * what() const throw() {return error_message_.c_str();}
+  virtual const char* what() const throw() { return error_message_.c_str(); }
 
-protected:
+ protected:
   std::string error_message_;
 };
 
-class HdMapFormatException : public std::exception
-{
-public:
-  explicit HdMapFormatException(const std::string & msg)
-  : error_message_(msg) {}
+class HdMapFormatException : public std::exception {
+ public:
+  explicit HdMapFormatException(const std::string& msg) : error_message_(msg) {}
   virtual ~HdMapFormatException() throw() {}
-  virtual const char * what() const throw() {return error_message_.c_str();}
+  virtual const char* what() const throw() { return error_message_.c_str(); }
 
-protected:
+ protected:
   std::string error_message_;
 };
 }  // namespace lanelet
