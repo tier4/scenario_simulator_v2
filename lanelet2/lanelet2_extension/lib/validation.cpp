@@ -142,11 +142,11 @@ void validateTurnDirection(const lanelet::LaneletMapPtr lanelet_map)
   }
 }
 
-void validateAll(std::string map_path, rclcpp::Logger logger)
+void validateAll(std::string map_path)
 {
   lanelet::LaneletMapPtr lanelet_map;
   lanelet::ErrorMessages errors;
-  lanelet::projection::MGRSProjector projector(logger);
+  lanelet::projection::MGRSProjector projector;
   lanelet_map = lanelet::load(map_path, "autoware_osm_handler", projector, &errors);
   validateElevationTag(map_path);
   validateTrafficLight(lanelet_map);

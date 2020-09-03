@@ -13,10 +13,9 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <lanelet2_extension/utility/utilities.h>
+#include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
-#include <ros/ros.h>
 #include <map>
 
 using lanelet::Lanelet;
@@ -105,6 +104,5 @@ TEST_F(TestSuite, OverwriteLaneletsCenterline)
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "TestNode");
   return RUN_ALL_TESTS();
 }

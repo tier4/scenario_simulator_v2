@@ -43,12 +43,12 @@ void loadingAutowareOSMFile(const std::string map_file_path)
   lanelet_map = lanelet::load(map_file_path, "osm_handler", projector, &errors);
 }
 
-void usingMGRSProjector(const rclcpp::Logger & logger)
+void usingMGRSProjector()
 {
   // MGRS Projector projects lat/lon to x,y,z point in MGRS 100km grid.
   // The origin is automatically calcaulted so you don't have to select any
   // origin.
-  lanelet::projection::MGRSProjector projector(logger);
+  lanelet::projection::MGRSProjector projector;
 
   // Let's convert lat/lng point into mgrs xyz point.
   lanelet::GPSPoint gps_point;
@@ -72,11 +72,11 @@ void usingMGRSProjector(const rclcpp::Logger & logger)
   std::cout << projected_gps_point2.lat << " " << projected_gps_point2.lon << " " << std::endl;
 }
 
-void usingAutowareTrafficLight(const std::string map_file_path, const rclcpp::Logger & logger)
+void usingAutowareTrafficLight(const std::string map_file_path)
 {
   lanelet::LaneletMapPtr lanelet_map;
   lanelet::ErrorMessages errors;
-  lanelet::projection::MGRSProjector projector(logger);
+  lanelet::projection::MGRSProjector projector;
   lanelet_map = lanelet::load(map_file_path, "autoware_osm_handler", projector, &errors);
 
   for (auto lanelet : lanelet_map->laneletLayer) {
@@ -114,7 +114,7 @@ int main(int argc, char * argv[])
   auto node = rclcpp::Node::make_shared("sample_code");
   std::string path = argv[1];
   loadingAutowareOSMFile(path);
-  usingMGRSProjector(node->get_logger());
-  usingAutowareTrafficLight(path, node->get_logger());
+  usingMGRSProjector();
+  usingAutowareTrafficLight(path);
   return 0;
 }
