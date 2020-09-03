@@ -1,6 +1,6 @@
 name: ROS2-Dashing
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
     job1:
@@ -52,6 +52,7 @@ jobs:
                   colcon test-result --verbose
             - name: Slack Notification
               uses: 8398a7/action-slack@v2
+              if: failure()
               with:
                 status: ${{ job.status }}
               env:
