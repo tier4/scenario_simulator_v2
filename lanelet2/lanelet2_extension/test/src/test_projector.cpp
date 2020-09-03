@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <ros/ros.h>
-
 #include <gtest/gtest.h>
 #include <math.h>
 
-#include <lanelet2_extension/projection/mgrs_projector.h>
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
 
 class TestSuite : public ::testing::Test
 {
@@ -80,6 +78,5 @@ TEST(TestSuite, ReverseProjection)
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "TestNode");
   return RUN_ALL_TESTS();
 }

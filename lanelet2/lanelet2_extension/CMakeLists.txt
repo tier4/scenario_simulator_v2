@@ -98,13 +98,44 @@ install(TARGETS lanelet2_extension_lib
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
+
+  ament_add_gtest(test_message_conversion test/src/test_message_conversion.cpp)
+  if(TARGET test_message_conversion)
+    ament_target_dependencies(test_message_conversion
+      rclcpp
+      lanelet2_core
+      lanelet2_io
+      lanelet2_maps
+      lanelet2_projection
+      lanelet2_routing
+      lanelet2_traffic_rules
+      lanelet2_validation
+      autoware_lanelet2_msgs
+      geometry_msgs
+      visualization_msgs
+    )
+    target_link_libraries(test_message_conversion lanelet2_extension_lib)
+  endif()
+
+  ament_add_gtest(test_projector test/src/test_projector.cpp)
+  if(TARGET test_projector)
+    ament_target_dependencies(test_projector
+      rclcpp
+      lanelet2_core
+      lanelet2_io
+      lanelet2_maps
+      lanelet2_projection
+      lanelet2_routing
+      lanelet2_traffic_rules
+      lanelet2_validation
+      autoware_lanelet2_msgs
+      geometry_msgs
+      visualization_msgs
+    )
+    target_link_libraries(test_projector lanelet2_extension_lib)
+  endif()
+
 endif()
 
 ament_export_include_directories(include)

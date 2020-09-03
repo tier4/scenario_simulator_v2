@@ -26,8 +26,8 @@ namespace lanelet
 {
 namespace projection
 {
-MGRSProjector::MGRSProjector(const rclcpp::Logger & logger, Origin origin)
-: Projector(origin), logger_(logger)
+MGRSProjector::MGRSProjector(Origin origin)
+: Projector(origin)
 {
 }
 
@@ -52,7 +52,6 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
     GeographicLib::MGRS::Forward(
       zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
   } catch (GeographicLib::GeographicErr err) {
-    RCLCPP_ERROR(logger_, err.what());
     return mgrs_point;
   }
 
@@ -66,7 +65,7 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
       R"(Projected MGRS Grid changed from last projection.
       Projected point might be far away from previously projected point.
       You may want to use different projector.)";
-    RCLCPP_ERROR(logger_, message);
+    throw lanelet::HdMapException(message);
   }
 
   return mgrs_point;
@@ -84,7 +83,7 @@ GPSPoint MGRSProjector::reverse(const BasicPoint3d & mgrs_point) const
     std::string message =
       R"(cannot run reverse operation if mgrs code is not set in projector.
       Use setMGRSCode function or explicitly give mgrs code as an argument.)";
-    RCLCPP_ERROR(logger_, message);
+    throw lanelet::HdMapException(message);
   }
   return gps;
 }
@@ -106,8 +105,7 @@ GPSPoint MGRSProjector::reverse(
   } catch (GeographicLib::GeographicErr err) {
     std::string message =
       "Failed to convert from MGRS to WGS " + static_cast<std::string>(err.what());
-    RCLCPP_WARN(logger_, message);
-    return gps;
+    throw lanelet::HdMapException(message);
   }
 
   return gps;
@@ -127,7 +125,7 @@ void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
     GeographicLib::MGRS::Forward(
       zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
   } catch (GeographicLib::GeographicErr err) {
-    RCLCPP_WARN(logger_, err.what());
+    throw lanelet::HdMapException(err.what());
   }
 
   setMGRSCode(mgrs_code);
