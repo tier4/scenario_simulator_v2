@@ -58,6 +58,8 @@ jobs:
               uses: AutoModality/action-xunit-viewer@v1
               with:
                 results: ~/ros2_ws/build/lanelet2_extension/Testing
+            - name: Setup tmate session
+              uses: mxschmitt/action-tmate@v1
             - name: The generated report
               run: echo "The report is ${{ steps.xunit-viewer.outputs.report-file }}"    
             - name: Attach the report
