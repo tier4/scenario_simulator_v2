@@ -1,6 +1,9 @@
 name: ROS2-Dashing
 
-on: [push, pull_request]
+on:
+  schedule:
+  - cron: 0 0 * * *
+  pull_request:
 
 jobs:
     job1:
@@ -50,3 +53,11 @@ jobs:
                   cd ~/ros2_ws
                   colcon test --packages-select lanelet2_extension
                   colcon test-result --verbose
+            - name: Slack Notification
+              uses: 8398a7/action-slack@v2
+              if: failure()
+              with:
+                status: ${{ job.status }}
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
