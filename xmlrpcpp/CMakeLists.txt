@@ -33,5 +33,11 @@ install(
   DIRECTORY include/
   DESTINATION include
 )
+install(TARGETS xmlrpcpp
+  EXPORT export_xmlrpcpp
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
+ament_export_interfaces(export_xmlrpcpp HAS_LIBRARY_TARGET)
 ament_package()
