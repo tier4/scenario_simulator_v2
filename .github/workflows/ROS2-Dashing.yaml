@@ -51,7 +51,7 @@ jobs:
                   source /opt/ros/dashing/setup.bash
                   source ~/ros2_ws/install/setup.bash
                   cd ~/ros2_ws
-                  colcon test --packages-select lanelet2_extension
+                  colcon test
                   colcon test-result --verbose
             - name: Slack Notification
               uses: 8398a7/action-slack@v2
