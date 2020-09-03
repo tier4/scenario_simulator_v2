@@ -1,6 +1,9 @@
 name: ROS2-Dashing
 
-on: [pull_request]
+on:
+  schedule:
+  - cron: 0 0 * * *
+  pull_request:
 
 jobs:
     job1:
