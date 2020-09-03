@@ -13,12 +13,11 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <ros/ros.h>
 
 #include <lanelet2_core/Attribute.h>
 #include <lanelet2_core/LaneletMap.h>
 
-#include <lanelet2_extension/regulatory_elements/autoware_traffic_light.h>
+#include <lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp>
 
 #include <math.h>
 #include <vector>
@@ -122,6 +121,5 @@ TEST(TestSuite, TrafficLightWorksAsExpected)
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "TestNode");
   return RUN_ALL_TESTS();
 }

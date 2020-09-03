@@ -13,9 +13,8 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <lanelet2_extension/utility/query.h>
+#include <lanelet2_extension/utility/query.hpp>
 #include <math.h>
-#include <ros/ros.h>
 
 using lanelet::Lanelet;
 using lanelet::LineString3d;
@@ -128,6 +127,5 @@ TEST_F(TestSuite, QueryStopLine)
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "TestNode");
   return RUN_ALL_TESTS();
 }

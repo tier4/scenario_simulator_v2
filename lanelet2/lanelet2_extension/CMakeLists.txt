@@ -136,6 +136,60 @@ if(BUILD_TESTING)
     target_link_libraries(test_projector lanelet2_extension_lib)
   endif()
 
+  ament_add_gtest(test_query test/src/test_query.cpp)
+  if(TARGET test_query)
+    ament_target_dependencies(test_query
+      rclcpp
+      lanelet2_core
+      lanelet2_io
+      lanelet2_maps
+      lanelet2_projection
+      lanelet2_routing
+      lanelet2_traffic_rules
+      lanelet2_validation
+      autoware_lanelet2_msgs
+      geometry_msgs
+      visualization_msgs
+    )
+    target_link_libraries(test_query lanelet2_extension_lib)
+  endif()
+
+  ament_add_gtest(test_regulatory_elements test/src/test_regulatory_elements.cpp)
+  if(TARGET test_regulatory_elements)
+    ament_target_dependencies(test_regulatory_elements
+      rclcpp
+      lanelet2_core
+      lanelet2_io
+      lanelet2_maps
+      lanelet2_projection
+      lanelet2_routing
+      lanelet2_traffic_rules
+      lanelet2_validation
+      autoware_lanelet2_msgs
+      geometry_msgs
+      visualization_msgs
+    )
+    target_link_libraries(test_regulatory_elements lanelet2_extension_lib)
+  endif()
+
+  ament_add_gtest(test_utilities test/src/test_utilities.cpp)
+  if(TARGET test_utilities)
+    ament_target_dependencies(test_utilities
+      rclcpp
+      lanelet2_core
+      lanelet2_io
+      lanelet2_maps
+      lanelet2_projection
+      lanelet2_routing
+      lanelet2_traffic_rules
+      lanelet2_validation
+      autoware_lanelet2_msgs
+      geometry_msgs
+      visualization_msgs
+    )
+    target_link_libraries(test_utilities lanelet2_extension_lib)
+  endif()
+
 endif()
 
 ament_export_include_directories(include)
