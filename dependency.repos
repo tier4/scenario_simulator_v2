@@ -11,3 +11,7 @@ repositories:
     type: git
     url: https://github.com/PickNikRobotics/rviz_visual_tools.git
     version: eloquent-cleanup
+  interactive_markers:
+    type: git
+    url: https://github.com/ros-visualization/interactive_markers.git
+    version: eloquent
