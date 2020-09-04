@@ -15,3 +15,7 @@ repositories:
     type: git
     url: https://github.com/ros-visualization/interactive_markers.git
     version: eloquent
+  common_interfaces:
+    type: git
+    url: https://github.com/ros2/common_interfaces.git
+    version: eloquent
