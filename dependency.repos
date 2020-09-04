@@ -7,3 +7,7 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/document_generator.git
     version: master
+  rviz_visual_tools:
+    type: git
+    url: https://github.com/PickNikRobotics/rviz_visual_tools.git
+    version: eloquent-cleanup
