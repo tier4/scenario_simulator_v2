@@ -39,9 +39,9 @@ TEST(Core, objectBinder)
 {
   using namespace scenario_runner;
 
-  const auto hoge { make<Double>(3.14) };
+  const auto hoge {make<Double>(3.14)};
 
-  const auto result { hoge.evaluate() };
+  const auto result {hoge.evaluate()};
 
   EXPECT_TRUE(result.is<Double>());
   EXPECT_TRUE(result.as<Double>().data = 3.14);
@@ -54,7 +54,7 @@ TEST(Core, objectBinder)
 //   OpenSCENARIO osc { XOSC("lane_change.xosc"), "127.0.0.1", 8080 };
 // }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
 

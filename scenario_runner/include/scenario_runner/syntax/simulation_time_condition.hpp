@@ -3,57 +3,59 @@
 
 #include <scenario_runner/syntax/rule.hpp>
 
-namespace scenario_runner { inline namespace syntax
+namespace scenario_runner
+{inline namespace syntax
 {
-  /* ==== SimulationTimeCondition ==============================================
-   *
-   * <xsd:complexType name="SimulationTimeCondition">
-   *   <xsd:attribute name="value" type="Double" use="required"/>
-   *   <xsd:attribute name="rule" type="Rule" use="required"/>
-   * </xsd:complexType>
-   *
-   * ======================================================================== */
-  struct SimulationTimeCondition
+/* ==== SimulationTimeCondition ==============================================
+ *
+ * <xsd:complexType name="SimulationTimeCondition">
+ *   <xsd:attribute name="value" type="Double" use="required"/>
+ *   <xsd:attribute name="rule" type="Rule" use="required"/>
+ * </xsd:complexType>
+ *
+ * ======================================================================== */
+struct SimulationTimeCondition
+{
+  const Double value;
+
+  const Rule compare;
+
+  auto begin() const
   {
-    const Double value;
+    static const auto time {std::chrono::high_resolution_clock::now()};
+    return time;
+  }
 
-    const Rule compare;
+  template<typename Node, typename Scope>
+  explicit SimulationTimeCondition(const Node & node, Scope & scope)
+  : value{readAttribute<Double>(node, scope, "value")},
+    compare{readAttribute<Rule>(node, scope, "rule")}
+  {
+    begin();
+  }
 
-    auto begin() const
-    {
-      static const auto time { std::chrono::high_resolution_clock::now() };
-      return time;
-    }
+  auto evaluate() const
+  {
+    const auto simulation_time {
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::high_resolution_clock::now() - begin()
+      ).count()
+    };
 
-    template <typename Node, typename Scope>
-    explicit SimulationTimeCondition(const Node& node, Scope& scope)
-      : value { readAttribute<Double>(node, scope, "value") }
-      , compare { readAttribute<Rule>(node, scope, "rule") }
-    {
-      begin();
-    }
+    const auto specified_time {
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::seconds(value)
+      ).count()
+    };
 
-    auto evaluate() const
-    {
-      const auto simulation_time {
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-          std::chrono::high_resolution_clock::now() - begin()
-          ).count()
-      };
+    const auto result {compare(simulation_time, specified_time) ? true_v : false_v};
 
-      const auto specified_time {
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-          std::chrono::seconds(value)
-          ).count()
-      };
+    std::cout << indent << "SimulationTime [" << simulation_time << " is " << compare << " " <<
+      specified_time << "? => " << result << "]" << std::endl;
 
-      const auto result { compare(simulation_time, specified_time) ? true_v : false_v };
-
-      std::cout << indent << "SimulationTime [" << simulation_time << " is " << compare << " " << specified_time << "? => " << result << "]" << std::endl;
-
-      return result;
-    }
-  };
+    return result;
+  }
+};
 }}  // namespace scenario_runner::syntax
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_

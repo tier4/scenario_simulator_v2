@@ -3,40 +3,57 @@
 
 #include <scenario_runner/syntax/catalog_location.hpp>
 
-namespace scenario_runner { inline namespace syntax
+namespace scenario_runner
+{inline namespace syntax
 {
-  /* ==== CatalogLocations =====================================================
-   *
-   * <xsd:complexType name="CatalogLocations">
-   *   <xsd:all>
-   *     <xsd:element name="VehicleCatalog" minOccurs="0" type="VehicleCatalogLocation"/>
-   *     <xsd:element name="ControllerCatalog" minOccurs="0" type="ControllerCatalogLocation"/>
-   *     <xsd:element name="PedestrianCatalog" minOccurs="0" type="PedestrianCatalogLocation"/>
-   *     <xsd:element name="MiscObjectCatalog" minOccurs="0" type="MiscObjectCatalogLocation"/>
-   *     <xsd:element name="EnvironmentCatalog" minOccurs="0" type="EnvironmentCatalogLocation"/>
-   *     <xsd:element name="ManeuverCatalog" minOccurs="0" type="ManeuverCatalogLocation"/>
-   *     <xsd:element name="TrajectoryCatalog" minOccurs="0" type="TrajectoryCatalogLocation"/>
-   *     <xsd:element name="RouteCatalog" minOccurs="0" type="RouteCatalogLocation"/>
-   *   </xsd:all>
-   * </xsd:complexType>
-   *
-   * ======================================================================== */
-  struct CatalogLocations
-    : public std::unordered_map<String, CatalogLocation>
+/* ==== CatalogLocations =====================================================
+ *
+ * <xsd:complexType name="CatalogLocations">
+ *   <xsd:all>
+ *     <xsd:element name="VehicleCatalog" minOccurs="0" type="VehicleCatalogLocation"/>
+ *     <xsd:element name="ControllerCatalog" minOccurs="0" type="ControllerCatalogLocation"/>
+ *     <xsd:element name="PedestrianCatalog" minOccurs="0" type="PedestrianCatalogLocation"/>
+ *     <xsd:element name="MiscObjectCatalog" minOccurs="0" type="MiscObjectCatalogLocation"/>
+ *     <xsd:element name="EnvironmentCatalog" minOccurs="0" type="EnvironmentCatalogLocation"/>
+ *     <xsd:element name="ManeuverCatalog" minOccurs="0" type="ManeuverCatalogLocation"/>
+ *     <xsd:element name="TrajectoryCatalog" minOccurs="0" type="TrajectoryCatalogLocation"/>
+ *     <xsd:element name="RouteCatalog" minOccurs="0" type="RouteCatalogLocation"/>
+ *   </xsd:all>
+ * </xsd:complexType>
+ *
+ * ======================================================================== */
+struct CatalogLocations
+  : public std::unordered_map<String, CatalogLocation>
+{
+  template<typename Node, typename Scope>
+  explicit CatalogLocations(const Node & node, Scope & outer_scope)
   {
-    template <typename Node, typename Scope>
-    explicit CatalogLocations(const Node& node, Scope& outer_scope)
-    {
-      callWithElements(node,     "VehicleCatalog", 0, 1, [&](auto&& node) { emplace(    "VehicleCatalog", CatalogLocation(node, outer_scope)); });
-      callWithElements(node,  "ControllerCatalog", 0, 1, [&](auto&& node) { emplace( "ControllerCatalog", CatalogLocation(node, outer_scope)); });
-      callWithElements(node,  "PedestrianCatalog", 0, 1, [&](auto&& node) { emplace( "PedestrianCatalog", CatalogLocation(node, outer_scope)); });
-      callWithElements(node,  "MiscObjectCatalog", 0, 1, [&](auto&& node) { emplace( "MiscObjectCatalog", CatalogLocation(node, outer_scope)); });
-      callWithElements(node, "EnvironmentCatalog", 0, 1, [&](auto&& node) { emplace("EnvironmentCatalog", CatalogLocation(node, outer_scope)); });
-      callWithElements(node,    "ManeuverCatalog", 0, 1, [&](auto&& node) { emplace(   "ManeuverCatalog", CatalogLocation(node, outer_scope)); });
-      callWithElements(node,  "TrajectoryCatalog", 0, 1, [&](auto&& node) { emplace( "TrajectoryCatalog", CatalogLocation(node, outer_scope)); });
-      callWithElements(node,       "RouteCatalog", 0, 1, [&](auto&& node) { emplace(      "RouteCatalog", CatalogLocation(node, outer_scope)); });
-    }
-  };
+    callWithElements(node, "VehicleCatalog", 0, 1, [&](auto && node) {
+        emplace("VehicleCatalog", CatalogLocation(node, outer_scope));
+      });
+    callWithElements(node, "ControllerCatalog", 0, 1, [&](auto && node) {
+        emplace("ControllerCatalog", CatalogLocation(node, outer_scope));
+      });
+    callWithElements(node, "PedestrianCatalog", 0, 1, [&](auto && node) {
+        emplace("PedestrianCatalog", CatalogLocation(node, outer_scope));
+      });
+    callWithElements(node, "MiscObjectCatalog", 0, 1, [&](auto && node) {
+        emplace("MiscObjectCatalog", CatalogLocation(node, outer_scope));
+      });
+    callWithElements(node, "EnvironmentCatalog", 0, 1, [&](auto && node) {
+        emplace("EnvironmentCatalog", CatalogLocation(node, outer_scope));
+      });
+    callWithElements(node, "ManeuverCatalog", 0, 1, [&](auto && node) {
+        emplace("ManeuverCatalog", CatalogLocation(node, outer_scope));
+      });
+    callWithElements(node, "TrajectoryCatalog", 0, 1, [&](auto && node) {
+        emplace("TrajectoryCatalog", CatalogLocation(node, outer_scope));
+      });
+    callWithElements(node, "RouteCatalog", 0, 1, [&](auto && node) {
+        emplace("RouteCatalog", CatalogLocation(node, outer_scope));
+      });
+  }
+};
 }}  // namespace scenario_runner::syntax
 
 #endif  // SCENARIO_RUNNER__SYNTAX__CATALOG_LOCATIONS_HPP_

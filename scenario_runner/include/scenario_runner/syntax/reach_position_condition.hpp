@@ -4,72 +4,75 @@
 #include <scenario_runner/syntax/position.hpp>
 #include <scenario_runner/syntax/triggering_entities.hpp>
 
-namespace scenario_runner { inline namespace syntax
+namespace scenario_runner
+{inline namespace syntax
 {
-  /* ==== ReachPositionCondition ===============================================
-   *
-   * <xsd:complexType name="ReachPositionCondition">
-   *   <xsd:all>
-   *     <xsd:element name="Position" type="Position"/>
-   *   </xsd:all>
-   *   <xsd:attribute name="tolerance" type="Double" use="required"/>
-   * </xsd:complexType>
-   *
-   * ======================================================================== */
-  struct ReachPositionCondition
+/* ==== ReachPositionCondition ===============================================
+ *
+ * <xsd:complexType name="ReachPositionCondition">
+ *   <xsd:all>
+ *     <xsd:element name="Position" type="Position"/>
+ *   </xsd:all>
+ *   <xsd:attribute name="tolerance" type="Double" use="required"/>
+ * </xsd:complexType>
+ *
+ * ======================================================================== */
+struct ReachPositionCondition
+{
+  const Double tolerance;
+
+  Scope inner_scope;
+
+  const Position position;
+
+  const TriggeringEntities trigger;
+
+  template<typename Node>
+  explicit ReachPositionCondition(
+    const Node & node, Scope & outer_scope,
+    const TriggeringEntities & trigger)
+  : tolerance{readAttribute<Double>(node, outer_scope, "tolerance")},
+    inner_scope{outer_scope},
+    position{readElement<Position>("Position", node, inner_scope)},
+    trigger{trigger}
+  {}
+
+  auto evaluate()
   {
-    const Double tolerance;
+    return false_v;
 
-    Scope inner_scope;
-
-    const Position position;
-
-    const TriggeringEntities trigger;
-
-    template <typename Node>
-    explicit ReachPositionCondition(const Node& node, Scope& outer_scope, const TriggeringEntities& trigger)
-      : tolerance   { readAttribute<Double>(node, outer_scope, "tolerance") }
-      , inner_scope { outer_scope }
-      , position    { readElement<Position>("Position", node, inner_scope) }
-      , trigger     { trigger }
-    {}
-
-    auto evaluate()
-    {
-      return false_v;
-
-      // if (position.is<WorldPosition>())
-      // {
-      //   return
-      //     asBoolean(
-      //       trigger([&](auto&& entity)
-      //       {
-      //         return inner_scope.connection->entity->reachPosition(
-      //                  entity,
-      //                  position.as<WorldPosition>(),
-      //                  tolerance);
-      //       }));
-      // }
-      // else if (position.is<LanePosition>())
-      // {
-      //   return
-      //     asBoolean(
-      //       trigger([&](auto&& entity)
-      //       {
-      //         return inner_scope.connection->entity->reachPosition(
-      //                  entity,
-      //                  Integer(position.as<LanePosition>().lane_id),
-      //                  position.as<LanePosition>().s,
-      //                  position.as<LanePosition>().offset,
-      //                  tolerance);
-      //       }));
-      // }
-      // else
-      // {
-      //   THROW(ImplementationFault);
-      // }
-    }
-  };
+    // if (position.is<WorldPosition>())
+    // {
+    //   return
+    //     asBoolean(
+    //       trigger([&](auto&& entity)
+    //       {
+    //         return inner_scope.connection->entity->reachPosition(
+    //                  entity,
+    //                  position.as<WorldPosition>(),
+    //                  tolerance);
+    //       }));
+    // }
+    // else if (position.is<LanePosition>())
+    // {
+    //   return
+    //     asBoolean(
+    //       trigger([&](auto&& entity)
+    //       {
+    //         return inner_scope.connection->entity->reachPosition(
+    //                  entity,
+    //                  Integer(position.as<LanePosition>().lane_id),
+    //                  position.as<LanePosition>().s,
+    //                  position.as<LanePosition>().offset,
+    //                  tolerance);
+    //       }));
+    // }
+    // else
+    // {
+    //   THROW(ImplementationFault);
+    // }
+  }
+};
 }}  // namespace scenario_runner::syntax
 
 #endif  // SCENARIO_RUNNER__SYNTAX__REACH_POSITION_CONDITION_HPP_

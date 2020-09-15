@@ -4,22 +4,18 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace scenario_runner { inline namespace console
+namespace scenario_runner
+{inline namespace console
 {
-  auto is_console = [](const auto& os)
+auto is_console = [](const auto & os)
   {
-    if (os.rdbuf() == std::cout.rdbuf())
-    {
+    if (os.rdbuf() == std::cout.rdbuf()) {
       static const auto result {static_cast<bool>(::isatty(STDOUT_FILENO))};
       return result;
-    }
-    else if (os.rdbuf() == std::cerr.rdbuf())
-    {
+    } else if (os.rdbuf() == std::cerr.rdbuf()) {
       static const auto result {static_cast<bool>(::isatty(STDERR_FILENO))};
       return result;
-    }
-    else
-    {
+    } else {
       return false;
     }
   };

@@ -3,9 +3,10 @@
 
 #include <scenario_runner/validator/all.hpp>
 
-namespace scenario_runner { inline namespace validator
+namespace scenario_runner
+{inline namespace validator
 {
-  using Sequence = All; // XXX Temporary
+using Sequence = All;   // XXX Temporary
 }}  // namespace scenario_runner::validator
 
 #endif  // SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP

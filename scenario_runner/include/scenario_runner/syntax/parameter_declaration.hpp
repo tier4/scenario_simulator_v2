@@ -3,40 +3,40 @@
 
 #include <scenario_runner/reader/attribute.hpp>
 
-namespace scenario_runner { inline namespace syntax
+namespace scenario_runner
+{inline namespace syntax
 {
-  /* ==== ParameterDeclaration =================================================
-   *
-   * <xsd:complexType name="ParameterDeclaration">
-   *   <xsd:attribute name="name" type="String" use="required"/>
-   *   <xsd:attribute name="parameterType" type="ParameterType" use="required"/>
-   *   <xsd:attribute name="value" type="String" use="required"/>
-   * </xsd:complexType>
-   *
-   * ======================================================================== */
-  struct ParameterDeclaration
+/* ==== ParameterDeclaration =================================================
+ *
+ * <xsd:complexType name="ParameterDeclaration">
+ *   <xsd:attribute name="name" type="String" use="required"/>
+ *   <xsd:attribute name="parameterType" type="ParameterType" use="required"/>
+ *   <xsd:attribute name="value" type="String" use="required"/>
+ * </xsd:complexType>
+ *
+ * ======================================================================== */
+struct ParameterDeclaration
+{
+  const String name;
+
+  const ParameterType parameter_type;
+
+  const String value;
+
+  ParameterDeclaration() = default;
+
+  template<typename Node, typename Scope>
+  explicit ParameterDeclaration(const Node & node, Scope & scope)
+  : name{readAttribute<String>(node, scope, "name")},
+    parameter_type{readAttribute<ParameterType>(node, scope, "parameterType")},
+    value{readAttribute<String>(node, scope, "value")}
   {
-    const String name;
+    scope.parameters.emplace(name, evaluate());
+  }
 
-    const ParameterType parameter_type;
-
-    const String value;
-
-    ParameterDeclaration() = default;
-
-    template <typename Node, typename Scope>
-    explicit ParameterDeclaration(const Node& node, Scope& scope)
-      : name           { readAttribute<String>       (node, scope, "name") }
-      , parameter_type { readAttribute<ParameterType>(node, scope, "parameterType") }
-      , value          { readAttribute<String>       (node, scope, "value") }
-    {
-      scope.parameters.emplace(name, evaluate());
-    }
-
-    Object evaluate() const
-    {
-      switch (parameter_type)
-      {
+  Object evaluate() const
+  {
+    switch (parameter_type) {
       case ParameterType::INTEGER:
         return make<Integer>(value);
 
@@ -60,21 +60,23 @@ namespace scenario_runner { inline namespace syntax
 
       default:
         return unspecified;
-      }
     }
-  };
-
-  template <typename... Ts>
-  std::basic_ostream<Ts...>& operator <<(std::basic_ostream<Ts...>& os, const ParameterDeclaration& declaration)
-  {
-    return os << indent
-              << blue << "<ParameterDeclaration"
-              << " " << highlight("name", declaration.name)
-              << " " << highlight("parameterType", declaration.parameter_type)
-              << " " << highlight("value", declaration.value)
-              << blue << "/>"
-              << reset;
   }
+};
+
+template<typename ... Ts>
+std::basic_ostream<Ts...> & operator<<(
+  std::basic_ostream<Ts...> & os,
+  const ParameterDeclaration & declaration)
+{
+  return os << indent <<
+         blue << "<ParameterDeclaration" <<
+         " " << highlight("name", declaration.name) <<
+         " " << highlight("parameterType", declaration.parameter_type) <<
+         " " << highlight("value", declaration.value) <<
+         blue << "/>" <<
+         reset;
+}
 }}  // namespace scenario_runner::syntax
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PARAMETER_DECLARATION_HPP_

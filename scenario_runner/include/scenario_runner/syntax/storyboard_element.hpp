@@ -4,132 +4,127 @@
 #include <boost/scope_exit.hpp>
 #include <scenario_runner/syntax/storyboard_element_state.hpp>
 
-namespace scenario_runner { inline namespace syntax
+namespace scenario_runner
+{inline namespace syntax
 {
-  template <typename T>
-  struct StoryboardElement
+template<typename T>
+struct StoryboardElement
+{
+  Object state {standby_state};
+
+  const UnsignedInteger maximum_execution_count;
+
+  UnsignedInteger execution_count {0};
+
+  explicit constexpr StoryboardElement(UnsignedInteger maximum_execution_count = 1)
+  : maximum_execution_count{maximum_execution_count}
+  {}
+
+  const auto & currentState() const
   {
-    Object state { standby_state };
+    return state;
+  }
 
-    const UnsignedInteger maximum_execution_count;
+    #define BOILERPLATE(NAME, STATE) \
+  constexpr auto NAME() const noexcept \
+  { \
+    return currentState().template as<StoryboardElementState>(__FILE__, \
+             __LINE__) == StoryboardElementState::STATE; \
+  } static_assert(true, "")
 
-    UnsignedInteger execution_count { 0 };
-
-    explicit constexpr StoryboardElement(UnsignedInteger maximum_execution_count = 1)
-      : maximum_execution_count { maximum_execution_count }
-    {}
-
-    const auto& currentState() const
-    {
-      return state;
-    }
-
-    #define BOILERPLATE(NAME, STATE)                                           \
-    constexpr auto NAME() const noexcept                                       \
-    {                                                                          \
-      return currentState().template as<StoryboardElementState>(__FILE__, __LINE__) == StoryboardElementState::STATE; \
-    } static_assert(true, "")
-
-    BOILERPLATE(standby, standbyState);
-    BOILERPLATE(starting, startTransition);
-    BOILERPLATE(running, runningState);
-    BOILERPLATE(ending, endTransition);
-    BOILERPLATE(complete, completeState);
-    BOILERPLATE(stopping, stopTransition);
-    BOILERPLATE(skipping, skipTransition);
+  BOILERPLATE(standby, standbyState);
+  BOILERPLATE(starting, startTransition);
+  BOILERPLATE(running, runningState);
+  BOILERPLATE(ending, endTransition);
+  BOILERPLATE(complete, completeState);
+  BOILERPLATE(stopping, stopTransition);
+  BOILERPLATE(skipping, skipTransition);
 
     #undef BOILERPLATE
 
-    static constexpr void start() noexcept
-    {}
+  static constexpr void start() noexcept
+  {}
 
-    Object override()
-    {
-      if (not complete() and not stopping())
-      {
-        return state = stop_transition;
-      }
-      else
-      {
-        return state;
-      }
+  Object override ()
+  {
+    if (not complete() and not stopping()) {
+      return state = stop_transition;
+    } else {
+      return state;
+    }
+  }
+
+private:
+  template<typename ... Ts>
+  constexpr decltype(auto) ready(Ts && ... xs) const
+  {
+    return static_cast<const T &>(*this).ready(std::forward<decltype(xs)>(xs)...);
+  }
+
+  template<typename ... Ts>
+  constexpr decltype(auto) accomplished(Ts && ... xs) const
+  {
+    return static_cast<const T &>(*this).accomplished(std::forward<decltype(xs)>(xs)...);
+  }
+
+  template<typename ... Ts>
+  constexpr decltype(auto) stopTriggered(Ts && ... xs) const
+  {
+    return static_cast<const T &>(*this).stopTriggered(std::forward<decltype(xs)>(xs)...);
+  }
+
+protected:
+  template<typename U, typename Node, typename Scope>
+  decltype(auto) makeStoryboardElement(const Node & node, Scope & inner_scope)
+  {
+    const auto name {readAttribute<String>(node, inner_scope, "name")};
+
+    const auto result {
+      inner_scope.storyboard_elements.emplace(
+        name.empty() ? std::string("annonymous-") +
+        std::to_string(inner_scope.storyboard_elements.size()) :
+        name,
+        make<U>(node, inner_scope))
+    };
+
+    if (not cdr(result)) {
+      std::stringstream ss {};
+      ss << "detected redefinition of StoryboardElement named \'" << name << "\'";
+      throw SyntaxError {ss.str()};
+    } else {
+      static_cast<T &>(*this).push_back(car(result)->second);
+      return car(result)->second;
+    }
+  }
+
+public:
+  /* ==== States and Transitions of StoryboardElements =======================
+   *
+   * See https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
+   *
+   * ====================================================================== */
+  auto evaluate()
+  {
+    if (stopTriggered()) {
+      override ();
     }
 
-  private:
-    template <typename... Ts>
-    constexpr decltype(auto) ready(Ts&&... xs) const
+    std::cout << (indent++) <<
+      "Evaluating " <<
+      cyan <<
+      "\"" <<
+      static_cast<const T &>(*this).name <<
+      "\"" <<
+      reset <<
+      " [" << state << "] " <<
+      std::endl;
+
+    BOOST_SCOPE_EXIT_ALL()
     {
-      return static_cast<const T&>(*this).ready(std::forward<decltype(xs)>(xs)...);
-    }
+      --indent;
+    };
 
-    template <typename... Ts>
-    constexpr decltype(auto) accomplished(Ts&&... xs) const
-    {
-      return static_cast<const T&>(*this).accomplished(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    constexpr decltype(auto) stopTriggered(Ts&&... xs) const
-    {
-      return static_cast<const T&>(*this).stopTriggered(std::forward<decltype(xs)>(xs)...);
-    }
-
-  protected:
-    template <typename U, typename Node, typename Scope>
-    decltype(auto) makeStoryboardElement(const Node& node, Scope& inner_scope)
-    {
-      const auto name { readAttribute<String>(node, inner_scope, "name") };
-
-      const auto result {
-        inner_scope.storyboard_elements.emplace(
-          name.empty() ? std::string("annonymous-") + std::to_string(inner_scope.storyboard_elements.size())
-                       : name,
-          make<U>(node, inner_scope))
-      };
-
-      if (not cdr(result))
-      {
-        std::stringstream ss {};
-        ss << "detected redefinition of StoryboardElement named \'" << name << "\'";
-        throw SyntaxError { ss.str() };
-      }
-      else
-      {
-        static_cast<T&>(*this).push_back(car(result)->second);
-        return car(result)->second;
-      }
-    }
-
-  public:
-    /* ==== States and Transitions of StoryboardElements =======================
-     *
-     * See https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
-     *
-     * ====================================================================== */
-    auto evaluate()
-    {
-      if (stopTriggered())
-      {
-        override();
-      }
-
-      std::cout << (indent++)
-                << "Evaluating "
-                << cyan
-                << "\""
-                << static_cast<const T&>(*this).name
-                << "\""
-                << reset
-                << " [" << state << "] "
-                << std::endl;
-
-      BOOST_SCOPE_EXIT_ALL()
-      {
-        --indent;
-      };
-
-      switch (currentState().template as<StoryboardElementState>(__FILE__, __LINE__))
-      {
+    switch (currentState().template as<StoryboardElementState>(__FILE__, __LINE__)) {
       /* ---- StandBy ----------------------------------------------------------
        *
        * This is the default initialization state of a StoryboardElement. When
@@ -142,16 +137,13 @@ namespace scenario_runner { inline namespace syntax
        * -------------------------------------------------------------------- */
       case StoryboardElementState::standbyState:
 
-        if (not ready())
-        {
+        if (not ready()) {
           return state;
-        }
-        else
-        {
-          std::cout << indent
-                    << typeid(T).name()
-                    << "::evaluate [" << state << " => " << start_transition << "]"
-                    << std::endl;
+        } else {
+          std::cout << indent <<
+            typeid(T).name() <<
+            "::evaluate [" << state << " => " << start_transition << "]" <<
+            std::endl;
 
           return state = start_transition;
         }
@@ -165,14 +157,14 @@ namespace scenario_runner { inline namespace syntax
        * -------------------------------------------------------------------- */
       case StoryboardElementState::startTransition:
 
-        static_cast<T&>(*this).start();
+        static_cast<T &>(*this).start();
 
         ++execution_count;
 
-        std::cout << indent
-                  << typeid(T).name()
-                  << "::evaluate [" << state << " => " << running_state << "]"
-                  << std::endl;
+        std::cout << indent <<
+          typeid(T).name() <<
+          "::evaluate [" << state << " => " << running_state << "]" <<
+          std::endl;
 
         return state = running_state;
 
@@ -216,18 +208,15 @@ namespace scenario_runner { inline namespace syntax
        * -------------------------------------------------------------------- */
       case StoryboardElementState::runningState:
 
-        static_cast<T&>(*this).run();
+        static_cast<T &>(*this).run();
 
-        if (not accomplished())
-        {
+        if (not accomplished()) {
           return state;
-        }
-        else
-        {
-          std::cout << indent
-                    << typeid(T).name()
-                    << "::evaluate [" << state << " => " << end_transition << "]"
-                    << std::endl;
+        } else {
+          std::cout << indent <<
+            typeid(T).name() <<
+            "::evaluate [" << state << " => " << end_transition << "]" <<
+            std::endl;
 
           return state = end_transition;
         }
@@ -244,12 +233,9 @@ namespace scenario_runner { inline namespace syntax
        * -------------------------------------------------------------------- */
       case StoryboardElementState::endTransition:
 
-        if (execution_count < maximum_execution_count) // check for completeness
-        {
+        if (execution_count < maximum_execution_count) { // check for completeness
           return state = standby_state;
-        }
-        else
-        {
+        } else {
           return state = complete_state;
         }
 
@@ -307,24 +293,21 @@ namespace scenario_runner { inline namespace syntax
       default:
       case StoryboardElementState::stopTransition:
 
-        if (not accomplished())
-        {
-          static_cast<T&>(*this).stop();
+        if (not accomplished()) {
+          static_cast<T &>(*this).stop();
 
           return state;
-        }
-        else
-        {
-          std::cout << indent
-                    << typeid(T).name()
-                    << "::stop [" << state << " => " << complete_state << "]"
-                    << std::endl;
+        } else {
+          std::cout << indent <<
+            typeid(T).name() <<
+            "::stop [" << state << " => " << complete_state << "]" <<
+            std::endl;
 
           return state = complete_state;
         }
-      }
     }
-  };
+  }
+};
 }}  // namespace scenario_runner::syntax
 
 #endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT
