@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSCENARIO>
+  <FileHeader revMajor="0" revMinor="0" date="2020-08-24T16:00:00" description="test" author="Tatsuya Yamasaki"/>
+
+  <ParameterDeclarations>
+    <ParameterDeclaration name="initial-lane-id" parameterType="string" value="178"/>
+  </ParameterDeclarations>
+
+  <CatalogLocations/>
+
+  <RoadNetwork>
+    <LogicFile filepath="./"/>
+    <SceneGraphFile filepath="./"/>
+  </RoadNetwork>
+
+  <Entities>
+    <ScenarioObject name="ego">
+      <Vehicle name="default-car" vehicleCategory="car">
+        <ParameterDeclarations/>
+        <Performance maxSpeed="69.444" maxAcceleration="200" maxDeceleration="10.0"/>
+        <BoundingBox>
+          <Center x="1.4" y="0.0" z="0.8"/>
+          <Dimensions width="2.0" length="4.2" height="1.6"/>
+        </BoundingBox>
+        <Axles>
+          <FrontAxle maxSteering="0.5" wheelDiameter="0.5" trackWidth="1.75" positionX="2.8" positionZ="0.25"/>
+          <RearAxle maxSteering="0.0" wheelDiameter="0.5" trackWidth="1.75" positionX="0.0" positionZ="0.25"/>
+        </Axles>
+        <Properties>
+          <Property name="isEgo" value="true"/>
+        </Properties>
+      </Vehicle>
+    </ScenarioObject>
+
+    <ScenarioObject name="npc">
+      <Vehicle name="default-car" vehicleCategory="car">
+        <ParameterDeclarations/>
+        <Performance maxSpeed="69.444" maxAcceleration="200" maxDeceleration="10.0"/>
+        <BoundingBox>
+          <Center x="1.4" y="0.0" z="0.8"/>
+          <Dimensions width="2.0" length="4.2" height="1.6"/>
+        </BoundingBox>
+        <Axles>
+          <FrontAxle maxSteering="0.5" wheelDiameter="0.5" trackWidth="1.75" positionX="2.8" positionZ="0.25"/>
+          <RearAxle maxSteering="0.0" wheelDiameter="0.5" trackWidth="1.75" positionX="0.0" positionZ="0.25"/>
+        </Axles>
+        <Properties>
+          <Property name="isEgo" value="true"/>
+        </Properties>
+      </Vehicle>
+    </ScenarioObject>
+
+    <ScenarioObject name="Tatsuya Yamasaki">
+      <Pedestrian model="unspecified" mass="63.9" name="japanese-24-male-average" pedestrianCategory="pedestrian">
+        <BoundingBox>
+          <Center x="0.0" y="0.0" z="0.9604"/>
+          <Dimensions width="0.42875" length="0.42875" height="1.715"/>
+        </BoundingBox>
+        <Properties>
+          <Property name="age" value="24"/>
+          <Property name="sex" value="male"/>
+        </Properties>
+      </Pedestrian>
+    </ScenarioObject>
+  </Entities>
+
+  <Storyboard>
+    <Init>
+      <Actions>
+        <Private entityRef="ego">
+          <PrivateAction>
+            <TeleportAction>
+              <Position>
+                <LanePosition laneId="$initial-lane-id" s="0"/>
+              </Position>
+            </TeleportAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <LongitudinalAction>
+              <SpeedAction>
+                <SpeedActionDynamics dynamicsShape="step" value="0" dynamicsDimension="time"/>
+                <SpeedActionTarget>
+                  <AbsoluteTargetSpeed value="10"/>
+                </SpeedActionTarget>
+              </SpeedAction>
+            </LongitudinalAction>
+          </PrivateAction>
+        </Private>
+
+        <Private entityRef="npc">
+          <PrivateAction>
+            <TeleportAction>
+              <Position>
+                <LanePosition laneId="$initial-lane-id" s="10"/>
+              </Position>
+            </TeleportAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <LongitudinalAction>
+              <SpeedAction>
+                <SpeedActionDynamics dynamicsShape="step" value="10" dynamicsDimension="rate"/>
+                <SpeedActionTarget>
+                  <AbsoluteTargetSpeed value="10"/>
+                </SpeedActionTarget>
+              </SpeedAction>
+            </LongitudinalAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <RoutingAction>
+              <AcquirePositionAction>
+                <Position>
+                  <LanePosition laneId="180" s="0"/>
+                </Position>
+              </AcquirePositionAction>
+            </RoutingAction>
+          </PrivateAction>
+        </Private>
+      </Actions>
+    </Init>
+
+    <Story name="main">
+      <ParameterDeclarations/>
+
+      <Act name="act-1">
+        <ManeuverGroup name="overtake" maximumExecutionCount="1">
+          <Actors>
+            <EntityRef entityRef="ego"/>
+          </Actors>
+
+          <Maneuver name="overtake">
+            <ParameterDeclarations>
+              <ParameterDeclaration name="target-lane-id" parameterType="string" value="179"/>
+            </ParameterDeclarations>
+
+            <Event name="sequence-1-of-3" priority="overwrite">
+              <Action name="lane-change">
+                <PrivateAction>
+                  <LateralAction>
+                    <LaneChangeAction>
+                      <LaneChangeActionDynamics dynamicsShape="linear" value="10" dynamicsDimension="time"/>
+                      <LaneChangeTarget>
+                        <AbsoluteTargetLane value="$target-lane-id"/>
+                      </LaneChangeTarget>
+                    </LaneChangeAction>
+                  </LateralAction>
+                </PrivateAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="when-approaching-vehicle-ahead" conditionEdge="none">
+                    <ByEntityCondition>
+                      <TriggeringEntities triggeringEntitiesRule="any">
+                        <EntityRef entityRef="ego"/>
+                      </TriggeringEntities>
+                      <EntityCondition>
+                        <RelativeDistanceCondition entityRef="npc" relativeDistanceType="longitudinal" value="15" freespace="true" rule="lessThan"/>
+                      </EntityCondition>
+                    </ByEntityCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+
+            <Event name="seqeunce-2-of-3" priority="overwrite">
+              <Action name="accelerate">
+                <PrivateAction>
+                  <LongitudinalAction>
+                    <SpeedAction>
+                      <SpeedActionDynamics dynamicsShape="linear" value="0" dynamicsDimension="time"/>
+                      <SpeedActionTarget>
+                        <AbsoluteTargetSpeed value="20"/>
+                      </SpeedActionTarget>
+                    </SpeedAction>
+                  </LongitudinalAction>
+                </PrivateAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="after-sequence-1-of-3" conditionEdge="none">
+                    <ByValueCondition>
+                      <StoryboardElementStateCondition storyboardElementRef="sequence-1-of-3" storyboardElementType="event" state="endTransition"/>
+                    </ByValueCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+
+            <Event name="sequence-3-of-3" priority="overwrite">
+              <Action name="cut-in">
+                <PrivateAction>
+                  <LateralAction>
+                    <LaneChangeAction>
+                      <LaneChangeActionDynamics dynamicsShape="linear" value="10" dynamicsDimension="time"/>
+                      <LaneChangeTarget>
+                        <AbsoluteTargetLane value="$initial-lane-id"/>
+                      </LaneChangeTarget>
+                    </LaneChangeAction>
+                  </LateralAction>
+                </PrivateAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="the-time-headway-greater-than-1" conditionEdge="none">
+                    <ByEntityCondition>
+                      <TriggeringEntities triggeringEntitiesRule="any">
+                        <EntityRef entityRef="ego"/>
+                      </TriggeringEntities>
+                      <EntityCondition>
+                        <TimeHeadwayCondition entityRef="npc" value="1" freespace="false" alongRoute="true" rule="greaterThan"/>
+                      </EntityCondition>
+                    </ByEntityCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+
+        <ManeuverGroup name="pedestrian-crossing" maximumExecutionCount="1">
+          <Actors>
+            <EntityRef entityRef="Tatsuya Yamasaki"/>
+          </Actors>
+          <Maneuver name="pedestrian-crossing">
+            <ParameterDeclarations/>
+            <Event name="spawn" priority="overwrite">
+              <Action name="teleport">
+                <PrivateAction>
+                  <TeleportAction>
+                    <Position>
+                      <LanePosition laneId="879" s="0"/>
+                    </Position>
+                  </TeleportAction>
+                </PrivateAction>
+              </Action>
+              <Action name="walk">
+                <PrivateAction>
+                  <LongitudinalAction>
+                    <SpeedAction>
+                      <SpeedActionDynamics dynamicsShape="step" value="0" dynamicsDimension="time"/>
+                      <SpeedActionTarget>
+                        <AbsoluteTargetSpeed value="1"/>
+                      </SpeedActionTarget>
+                    </SpeedAction>
+                  </LongitudinalAction>
+                </PrivateAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="after-overtake" conditionEdge="none">
+                    <ByValueCondition>
+                      <StoryboardElementStateCondition storyboardElementRef="overtake" storyboardElementType="maneuverGroup" state="endTransition"/>
+                    </ByValueCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+
+        <ManeuverGroup name="aori" maximumExecutionCount="1">
+          <Actors>
+            <EntityRef entityRef="npc"/>
+          </Actors>
+          <Maneuver name="speed-up">
+            <ParameterDeclarations/>
+            <Event name="speed-up" priority="overwrite">
+              <Action name="speed-up">
+                <PrivateAction>
+                  <LongitudinalAction>
+                    <SpeedAction>
+                      <SpeedActionDynamics dynamicsShape="linear" value="0" dynamicsDimension="time"/>
+                      <SpeedActionTarget>
+                        <AbsoluteTargetSpeed value="30"/>
+                      </SpeedActionTarget>
+                    </SpeedAction>
+                  </LongitudinalAction>
+                </PrivateAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="after-overtake" conditionEdge="none">
+                    <ByValueCondition>
+                      <StoryboardElementStateCondition storyboardElementRef="overtake" storyboardElementType="maneuverGroup" state="endTransition"/>
+                    </ByValueCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+
+        <StartTrigger>
+          <ConditionGroup>
+            <Condition name="start-immediately" conditionEdge="none">
+              <ByValueCondition>
+                <SimulationTimeCondition value="0" rule="greaterThan"/>
+              </ByValueCondition>
+            </Condition>
+          </ConditionGroup>
+        </StartTrigger>
+      </Act>
+    </Story>
+
+    <StopTrigger>
+      <ConditionGroup>
+        <Condition name="this-scenario-must-be-completed-within-40-seconds" conditionEdge="none">
+          <ByValueCondition>
+            <SimulationTimeCondition value="40" rule="greaterThan"/>
+          </ByValueCondition>
+        </Condition>
+      </ConditionGroup>
+    </StopTrigger>
+  </Storyboard>
+</OpenSCENARIO>
