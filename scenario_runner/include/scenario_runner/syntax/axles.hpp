@@ -17,8 +17,11 @@
 
 #include <scenario_runner/syntax/axle.hpp>
 
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Axles ================================================================
  *
@@ -66,6 +69,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Axl
 
   return os << (--indent) << blue << "</Axles>" << reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__AXLES_HPP_

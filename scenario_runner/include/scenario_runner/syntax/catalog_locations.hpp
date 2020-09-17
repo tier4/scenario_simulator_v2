@@ -17,8 +17,11 @@
 
 #include <scenario_runner/syntax/catalog_location.hpp>
 
+#include <unordered_map>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== CatalogLocations =====================================================
  *
@@ -68,6 +71,7 @@ struct CatalogLocations
       });
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__CATALOG_LOCATIONS_HPP_

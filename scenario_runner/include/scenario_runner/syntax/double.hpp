@@ -17,10 +17,14 @@
 
 #include <boost/lexical_cast.hpp>
 #include <std_msgs/msg/float64.hpp>
+
+#include <limits>
 #include <regex>
+#include <string>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 struct Double
   : public std_msgs::msg::Float64
@@ -82,6 +86,7 @@ std::istream & operator>>(std::istream & is, Double & rhs)
 
   return is;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__DOUBLE_HPP_

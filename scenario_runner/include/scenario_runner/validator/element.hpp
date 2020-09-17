@@ -15,13 +15,19 @@
 #ifndef SCENARIO_RUNNER__VALIDATOR__ELEMENT_HPP_
 #define SCENARIO_RUNNER__VALIDATOR__ELEMENT_HPP_
 
-#include <functional>
-#include <limits>
 #include <scenario_runner/scope.hpp>
 #include <scenario_runner/utility/pugi_extension.hpp>
 
+#include <functional>
+#include <limits>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 namespace scenario_runner
-{inline namespace validator
+{
+inline namespace validator
 {
 struct Element
   : public std::vector<Object>
@@ -83,7 +89,7 @@ struct Elements
   {}
 
   template<typename T, typename ... Ts>
-  void defineGroup(T & group, Ts && ... xs) // XXX DIRTY HACK
+  void defineGroup(T & group, Ts && ... xs)  // XXX DIRTY HACK
   {
     for (const auto & each : group) {
       emplace(
@@ -161,7 +167,7 @@ struct Elements
     auto iter {
       std::find_if(std::begin(*this), std::end(*this), [](auto && each)
         {
-          return not std::get<1>(each).empty() and std::get<1>(each)[0].type() == typeid(T);
+          return !std::get<1>(each).empty() && std::get<1>(each)[0].type() == typeid(T);
         })
     };
 
@@ -181,6 +187,7 @@ struct Elements
     return elements<T>()[0].template as<T>();
   }
 };
-}}  // namespace scenario_runner::validator
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__VALIDATOR__ELEMENT_HPP_

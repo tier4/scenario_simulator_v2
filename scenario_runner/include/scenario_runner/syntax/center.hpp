@@ -19,7 +19,8 @@
 #include <scenario_runner/reader/element.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Center ===============================================================
  *
@@ -51,6 +52,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Cen
          " " << highlight("y", rhs.y) <<
          " " << highlight("z", rhs.z) << blue << "/>" << reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__CENTER_HPP_

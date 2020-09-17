@@ -17,8 +17,11 @@
 
 #include <scenario_runner/syntax/absolute_target_lane.hpp>
 
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== LaneChangeTarget =====================================================
  *
@@ -44,6 +47,7 @@ struct LaneChangeTarget
       });
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__LANE_CHANGE_TARGET_HPP_

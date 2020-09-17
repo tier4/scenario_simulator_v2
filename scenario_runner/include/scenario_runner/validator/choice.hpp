@@ -18,8 +18,12 @@
 #include <scenario_runner/iterator/size.hpp>
 #include <scenario_runner/validator/element.hpp>
 
+#include <string>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace validator
+{
+inline namespace validator
 {
 struct Choice
   : public Elements
@@ -72,6 +76,7 @@ struct Choice
     }
   }
 };
-}}  // namespace scenario_runner::validator
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__VALIDATOR__CHOICE_HPP_

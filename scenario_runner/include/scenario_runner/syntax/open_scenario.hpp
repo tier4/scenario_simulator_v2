@@ -21,8 +21,13 @@
 #include <scenario_runner/syntax/road_network.hpp>
 #include <scenario_runner/syntax/storyboard.hpp>
 
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ScenarioDefinition ===================================================
  *
@@ -109,7 +114,7 @@ struct ScenarioDefinition
   }
 
   template<typename ... Ts>
-  auto init(Ts && ... xs) // TODO RENAME TO 'start'
+  auto init(Ts && ... xs)  // RENAME TO 'start'
   {
     // if (inner_scope.connection and inner_scope.connection->simulation)
     // {
@@ -184,7 +189,7 @@ struct OpenSCENARIO
 
     const auto result {load_file(scenario.c_str())};
 
-    if (not result) {
+    if (!result) {
       std::stringstream ss {};
       ss << "while loading scenario \"" << scenario << "\" => " << result.description();
       throw SyntaxError {ss.str()};
@@ -237,6 +242,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Ope
 {
   return os << unspecified;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__OPEN_SCENARIO_HPP_

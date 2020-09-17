@@ -21,7 +21,8 @@
 #include <scenario_runner/syntax/teleport_action.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== PrivateAction ========================================================
  *
@@ -74,6 +75,7 @@ struct PrivateAction
       });
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PRIVATE_ACTION_HPP_

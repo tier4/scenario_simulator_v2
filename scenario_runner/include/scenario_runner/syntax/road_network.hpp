@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/traffic_signals.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== RoadNetwork ==========================================================
  *
@@ -48,6 +49,7 @@ struct RoadNetwork
     traffic_signals{readElement<TrafficSignals>("TrafficSignals", node, outer_scope)}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ROAD_NETWORK_HPP_

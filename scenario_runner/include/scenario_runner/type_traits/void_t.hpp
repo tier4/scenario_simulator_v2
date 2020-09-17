@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__VOID_T_HPP
-#define SCENARIO_RUNNER__TYPE_TRAITS__VOID_T_HPP
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__VOID_T_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__VOID_T_HPP_
 
 #include <type_traits>
 
 namespace scenario_runner
-{inline namespace type_traits
+{
+inline namespace type_traits
 {
 template<typename ...>
 using void_t = void;
-}}  // namespace scenario_runner::type_traits
+}
+}  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__VOID_T_HPP
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__VOID_T_HPP_

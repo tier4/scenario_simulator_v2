@@ -18,7 +18,8 @@
 #include <scenario_runner/reader/attribute.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ParameterDeclaration =================================================
  *
@@ -91,6 +92,7 @@ std::basic_ostream<Ts...> & operator<<(
          blue << "/>" <<
          reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PARAMETER_DECLARATION_HPP_

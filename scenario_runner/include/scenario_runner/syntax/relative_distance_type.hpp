@@ -15,8 +15,11 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_
 #define SCENARIO_RUNNER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== RelativeDistanceType =================================================
  *
@@ -46,7 +49,7 @@ struct RelativeDistanceType
   }
   value;
 
-  explicit RelativeDistanceType() = default;
+  RelativeDistanceType() = default;
 
   explicit RelativeDistanceType(value_type value)
   : value{value}
@@ -105,6 +108,7 @@ std::basic_ostream<Ts...> & operator<<(
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_

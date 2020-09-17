@@ -19,7 +19,8 @@
 #include <scenario_runner/reader/attribute.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== RelativeTargetSpeed ==================================================
  *
@@ -50,6 +51,7 @@ struct RelativeTargetSpeed
     continuous{readAttribute<Boolean>(node, scope, "continuous", false)}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__RELATIVE_TARGET_SPEED_HPP_

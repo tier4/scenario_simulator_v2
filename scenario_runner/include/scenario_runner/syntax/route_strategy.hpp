@@ -17,8 +17,11 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== RouteStrategy ========================================================
  *
@@ -61,12 +64,12 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RouteStra
 
   is >> buffer;
 
-    #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      strategy = RouteStrategy::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define SUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) \
+  { \
+    strategy = RouteStrategy::IDENTIFIER; \
+    return is; \
+  } while (false)
 
   SUPPORTED(shortest);
 
@@ -114,6 +117,7 @@ std::basic_ostream<Ts...> & operator<<(
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ROUTE_STRATEGY_HPP_

@@ -18,7 +18,8 @@
 #include <scenario_runner/scope.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Directory ============================================================
  *
@@ -36,6 +37,7 @@ struct Directory
   : path{readAttribute<String>(node, outer_scope, "path")}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__DIRECTORY_HPP_

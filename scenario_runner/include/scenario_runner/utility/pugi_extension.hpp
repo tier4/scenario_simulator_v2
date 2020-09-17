@@ -17,6 +17,8 @@
 
 #include <pugixml.hpp>
 
+#include <string>
+
 std::ostream & operator<<(std::ostream & os, const pugi::xml_node & node)
 {
   static std::size_t depth {0};

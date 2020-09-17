@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/lane_change_action.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== LateralAction ========================================================
  *
@@ -46,6 +47,7 @@ struct LateralAction
     callWithElements(node, "LateralDistanceAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__LATERAL_ACTION_HPP_

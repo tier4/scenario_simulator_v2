@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/directory.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== CatalogLocation ======================================================
  *
@@ -39,6 +40,7 @@ struct CatalogLocation
   : directory{readElement<Directory>("Directory", node, outer_scope)}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__CATALOG_LOCATION_HPP_

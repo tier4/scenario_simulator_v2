@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/scenario_object.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Entities =============================================================
  *
@@ -45,6 +46,7 @@ struct Entities
     callWithElements(parent, "EntitySelection", 0, unbounded, THROW_UNSUPPORTED_ERROR(parent));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ENTITIES_HPP_

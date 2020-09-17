@@ -20,33 +20,28 @@ find_package(std_msgs          REQUIRED)
 
 add_executable(${PROJECT_NAME}_node
   src/${PROJECT_NAME}_node.cpp
-  src/object.cpp
-  )
+  src/object.cpp)
 
 target_include_directories(${PROJECT_NAME}_node
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
-  )
+    $<INSTALL_INTERFACE:include>)
 
 ament_target_dependencies(${PROJECT_NAME}_node
   geometry_msgs
   rclcpp
   rclcpp_components
-  std_msgs
-  )
+  std_msgs)
 
 target_link_libraries(${PROJECT_NAME}_node
-  pugixml
-  )
+  pugixml)
 
 install(
   DIRECTORY
     config
     include
     launch
-  DESTINATION share/${PROJECT_NAME}
-  )
+  DESTINATION share/${PROJECT_NAME})
 
 install(
   TARGETS ${PROJECT_NAME}_node

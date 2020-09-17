@@ -15,11 +15,13 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__TRIGGER_HPP_
 #define SCENARIO_RUNNER__SYNTAX__TRIGGER_HPP_
 
-#include <chrono> // TODO REMOVE
 #include <scenario_runner/syntax/condition_group.hpp>
 
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Trigger ==============================================================
  *
@@ -60,6 +62,7 @@ struct Trigger
       }));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRIGGER_HPP_

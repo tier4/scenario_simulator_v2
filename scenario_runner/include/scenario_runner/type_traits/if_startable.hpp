@@ -18,7 +18,8 @@
 #include <scenario_runner/concepts/startable.hpp>
 
 namespace scenario_runner
-{inline namespace type_traits
+{
+inline namespace type_traits
 {
 template<typename T, typename = void>
 struct IfStartable
@@ -35,6 +36,7 @@ struct IfStartable<T, typename std::enable_if<Startable<T>::value>::type>
     return callee.start();
   }
 };
-}}  // namespace scenario_runner::type_traits
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_STARTABLE_HPP_

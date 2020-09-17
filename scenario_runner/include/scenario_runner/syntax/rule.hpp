@@ -15,11 +15,16 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__RULE_HPP_
 #define SCENARIO_RUNNER__SYNTAX__RULE_HPP_
 
-#include <functional>
 #include <scenario_runner/reader/attribute.hpp>
 
+#include <functional>
+#include <limits>
+#include <string>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 template<typename T, typename = void>
 struct equal_to
@@ -133,6 +138,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Rul
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__RULE_HPP_

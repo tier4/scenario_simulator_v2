@@ -17,8 +17,11 @@
 
 #include <scenario_runner/validator/element.hpp>
 
+#include <utility>
+
 namespace scenario_runner
-{inline namespace validator
+{
+inline namespace validator
 {
 struct All
   : public Elements
@@ -52,6 +55,7 @@ struct All
     return unspecified;
   }
 };
-}}  // namespace scenario_runner::validator
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__VALIDATOR__ALL_HPP_

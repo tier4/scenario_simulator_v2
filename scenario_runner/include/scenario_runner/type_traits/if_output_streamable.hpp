@@ -20,7 +20,8 @@
 #include <scenario_runner/utility/indent.hpp>
 
 namespace scenario_runner
-{inline namespace type_traits
+{
+inline namespace type_traits
 {
 template<typename T, typename = void>
 struct IfOutputStreamable
@@ -39,6 +40,7 @@ struct IfOutputStreamable<T, typename std::enable_if<OutputStreamable<T>::value>
     return os << something;
   }
 };
-}}  // namespace scenario_runner::type_traits
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_OUTPUT_STREAMABLE_HPP_

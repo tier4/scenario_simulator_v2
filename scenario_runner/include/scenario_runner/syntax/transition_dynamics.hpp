@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/dynamics_shape.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== TransitionDynamics ===================================================
  *
@@ -45,6 +46,7 @@ struct TransitionDynamics
     dynamics_dimension{readAttribute<DynamicsDimension>(node, scope, "dynamicsDimension")}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRANSITION_DYNAMICS_HPP_

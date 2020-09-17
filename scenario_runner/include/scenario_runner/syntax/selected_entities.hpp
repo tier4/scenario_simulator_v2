@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/entity_ref.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== SelectedEntities =====================================================
  *
@@ -33,6 +34,7 @@ namespace scenario_runner
  * ======================================================================== */
 struct SelectedEntities
 {};
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SELECTED_ENTITIES_HPP_

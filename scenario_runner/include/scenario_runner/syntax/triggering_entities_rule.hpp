@@ -17,8 +17,13 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== TriggeringEntitiesRule ===============================================
  *
@@ -116,6 +121,7 @@ std::basic_ostream<Ts...> & operator<<(
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRIGGERING_ENTITIES_RULE_HPP_

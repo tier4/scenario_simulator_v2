@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/rule.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== SimulationTimeCondition ==============================================
  *
@@ -70,6 +71,7 @@ struct SimulationTimeCondition
     return result;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_

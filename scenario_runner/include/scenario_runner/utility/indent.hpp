@@ -16,9 +16,11 @@
 #define SCENARIO_RUNNER__UTILITY__INDENT_HPP_
 
 #include <iostream>
+#include <string>
 
 namespace scenario_runner
-{inline namespace utility
+{
+inline namespace utility
 {
 struct Indent
 {
@@ -64,6 +66,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Ind
 {
   return os << std::string(indent.depth * 2, ' ');
 }
-}}  // namespace scenario_runner::utility
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__UTILITY__INDENT_HPP_

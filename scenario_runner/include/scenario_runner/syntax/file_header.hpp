@@ -18,7 +18,8 @@
 #include <scenario_runner/reader/attribute.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== FileHeader ===========================================================
  *
@@ -36,7 +37,7 @@ struct FileHeader
   const UnsignedShort revMajor;
   const UnsignedShort revMinor;
 
-  const String date;   // TODO type DateTime
+  const String date;
 
   const String description;
 
@@ -51,6 +52,7 @@ struct FileHeader
     author{readAttribute<String>(node, outer_scope, "author")}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__FILE_HEADER_HPP_

@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/triggering_entities.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== CollisionCondition ===================================================
  *
@@ -48,6 +49,7 @@ struct CollisionCondition
     return false_v;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__COLLISION_CONDITION_HPP_

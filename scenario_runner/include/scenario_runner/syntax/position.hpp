@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/world_position.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Position =============================================================
  *
@@ -62,6 +63,7 @@ struct Position
     callWithElements(node, "RoutePosition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__POSITION_HPP_

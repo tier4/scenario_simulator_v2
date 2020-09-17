@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__SYNTAX__ENTIRY_REF_HPP_
-#define SCENARIO_RUNNER__SYNTAX__ENTIRY_REF_HPP_
+#ifndef SCENARIO_RUNNER__SYNTAX__ENTITY_REF_HPP_
+#define SCENARIO_RUNNER__SYNTAX__ENTITY_REF_HPP_
 
 #include <scenario_runner/reader/attribute.hpp>
 
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== EntityRef ============================================================
  *
@@ -40,6 +43,7 @@ struct EntityRef
   : String{readAttribute<String>(node, scope, "entityRef")}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__SYNTAX__ENTIRY_REF_HPP_
+#endif  // SCENARIO_RUNNER__SYNTAX__ENTITY_REF_HPP_

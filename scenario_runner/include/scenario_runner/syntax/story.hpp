@@ -18,8 +18,12 @@
 #include <scenario_runner/syntax/act.hpp>
 #include <scenario_runner/syntax/storyboard_element.hpp>
 
+#include <string>
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Story ================================================================
  *
@@ -98,6 +102,7 @@ struct Story
     }
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__STORY_HPP_

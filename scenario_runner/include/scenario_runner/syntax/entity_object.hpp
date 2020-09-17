@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/vehicle.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== EntityObject =========================================================
  *
@@ -54,6 +55,7 @@ struct EntityObject
     callWithElements(node, "MiscObject", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ENTITY_OBJECT_HPP_

@@ -20,7 +20,8 @@
 // #include <quaternion_operation/quaternion_operation.h>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== WorldPosition ========================================================
  *
@@ -67,6 +68,7 @@ struct WorldPosition
     return pose;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__WORLD_POSITION_HPP_

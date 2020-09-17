@@ -18,8 +18,12 @@
 #include <scenario_runner/syntax/entity_ref.hpp>
 #include <scenario_runner/syntax/triggering_entities_rule.hpp>
 
+#include <utility>
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== TriggeringEntities ===================================================
  *
@@ -52,6 +56,7 @@ struct TriggeringEntities
     return verify(std::begin(*this), std::end(*this), std::forward<decltype(xs)>(xs)...);
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRIGGERING_ENTITIES_HPP_

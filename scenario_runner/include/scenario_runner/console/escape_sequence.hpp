@@ -17,8 +17,11 @@
 
 #include <scenario_runner/console/is_console.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace console
+{
+inline namespace console
 {
 template<typename ... Ts>
 auto & escape_sequence(std::basic_ostream<Ts...> & os, const std::string & code)
@@ -52,7 +55,7 @@ BOILERPLATE("[34m", blue);
 BOILERPLATE("[35m", magenta);
 BOILERPLATE("[36m", cyan);
 BOILERPLATE("[37m", white);
-}
+}  // namespace foreground
 
 namespace background
 {
@@ -64,9 +67,10 @@ BOILERPLATE("[44m", blue);
 BOILERPLATE("[45m", magenta);
 BOILERPLATE("[46m", cyan);
 BOILERPLATE("[47m", white);
-}
+}  // namespace background
 
   #undef BOILERPLATE
-}}  // namespace scenario_runner::console
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__CONSOLE__ESCAPE_SEQUENCE_HPP_

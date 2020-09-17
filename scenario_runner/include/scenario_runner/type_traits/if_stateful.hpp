@@ -18,7 +18,8 @@
 #include <scenario_runner/concepts/stateful.hpp>
 
 namespace scenario_runner
-{inline namespace type_traits
+{
+inline namespace type_traits
 {
 template<typename T, typename = void>
 struct IfStateful
@@ -41,6 +42,7 @@ struct IfStateful<T, typename std::enable_if<Stateful<T>::value>::type>
     return callee.currentState();
   }
 };
-}}  // namespace scenario_runner::type_traits
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_STATEFUL_HPP_

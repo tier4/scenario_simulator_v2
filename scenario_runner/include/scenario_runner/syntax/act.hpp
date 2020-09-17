@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/storyboard_element.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Act ==================================================================
  *
@@ -41,11 +42,6 @@ struct Act
 
   Scope inner_scope;
 
-  // TODO
-  // - define type StartTrigger StopTrigger
-  // - type StartTrigger is not default_constructible
-  // - type StopTrigger is default_constructible
-  // - use function 'readElement<T>' at member initialization list
   Object start_trigger, stop_trigger;
 
   template<typename Node>
@@ -76,7 +72,7 @@ struct Act
 
   auto stopTriggered() const
   {
-    return stop_trigger and stop_trigger.evaluate().as<Boolean>();
+    return stop_trigger && stop_trigger.evaluate().as<Boolean>();
   }
 
   /* -------------------------------------------------------------------------
@@ -110,6 +106,7 @@ struct Act
     }
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ACT_HPP_

@@ -18,8 +18,11 @@
 #include <boost/lexical_cast.hpp>
 #include <std_msgs/msg/u_int16.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 struct UnsignedShort
   : public std_msgs::msg::UInt16
@@ -63,6 +66,7 @@ decltype(auto) operator>>(std::basic_istream<Ts...>&is, UnsignedShort & rhs)
 {
   return is >> rhs.data;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__UNSIGNED_SHORT_HPP_

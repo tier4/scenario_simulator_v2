@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/init_actions.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Init ================================================================
  *
@@ -37,6 +38,7 @@ struct Init
   : InitActions{readElement<InitActions>("Actions", node, scope)}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__INIT_HPP_

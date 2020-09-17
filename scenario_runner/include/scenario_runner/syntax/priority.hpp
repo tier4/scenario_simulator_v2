@@ -17,8 +17,11 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Priority =============================================================
  *
@@ -55,7 +58,7 @@ struct Priority
     parallel,
   } value;
 
-  explicit Priority() = default;
+  Priority() = default;
 
   explicit Priority(value_type value)
   : value{value}
@@ -123,7 +126,8 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Pri
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PRIORITY_HPP_

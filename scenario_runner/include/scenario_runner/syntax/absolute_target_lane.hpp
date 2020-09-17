@@ -18,7 +18,8 @@
 #include <scenario_runner/reader/attribute.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== AbsoluteTargetLane ===================================================
  *
@@ -36,6 +37,7 @@ struct AbsoluteTargetLane
   : value{readAttribute<std::decay<decltype(value)>::type>(node, scope, "value")}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ABSOLUTE_TARGET_LANE_HPP_

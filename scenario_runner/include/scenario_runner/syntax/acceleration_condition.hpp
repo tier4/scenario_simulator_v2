@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/triggering_entities.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== AccelerationCondition ================================================
  *
@@ -61,6 +62,7 @@ struct AccelerationCondition
     return false_v;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ACCELERATION_CONDITION_HPP_

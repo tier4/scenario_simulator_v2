@@ -17,7 +17,9 @@
 
 #include <scenario_runner/syntax/entity_ref.hpp>
 // #include <simulation_controller/api/api.hpp>
+
 #include <unordered_map>
+#include <vector>
 
 namespace scenario_runner
 {
@@ -88,6 +90,6 @@ public:
   //   }
   // }
 };
-}  // scenario_runner
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SCOPE_HPP_

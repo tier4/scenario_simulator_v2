@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/object_type.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ByType ===============================================================
  *
@@ -29,6 +30,7 @@ namespace scenario_runner
  * ======================================================================== */
 struct ByType
 {};
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__BY_TYPE_HPP_

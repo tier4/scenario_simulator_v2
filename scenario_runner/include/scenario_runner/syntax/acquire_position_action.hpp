@@ -17,8 +17,12 @@
 
 #include <scenario_runner/syntax/position.hpp>
 
+#include <string>
+#include <unordered_map>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== AcquirePositionAction ================================================
  *
@@ -67,7 +71,7 @@ struct AcquirePositionAction
     #ifndef SCENARIO_RUNNER_NO_EXTENSION
     if (position.is<LanePosition>()) {
       for (auto && each : accomplishments) {
-        if (not cdr(each)) {
+        if (!cdr(each)) {
           // cdr(each) =
           //   inner_scope.connection->entity->reachPosition(
           //     car(each),
@@ -87,6 +91,7 @@ struct AcquirePositionAction
     #endif
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ACQUIRE_POSITION_ACTION_HPP_

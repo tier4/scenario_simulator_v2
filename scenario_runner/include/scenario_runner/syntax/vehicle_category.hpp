@@ -17,8 +17,12 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== VehicleCategory ======================================================
  *
@@ -61,7 +65,7 @@ struct VehicleCategory
     van,
   } value;
 
-  explicit VehicleCategory() = default;
+  VehicleCategory() = default;
 
   explicit constexpr VehicleCategory(value_type value)
   : value{value}
@@ -80,12 +84,12 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
 
   is >> buffer;
 
-    #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      category.value = VehicleCategory::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define SUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) \
+  { \
+    category.value = VehicleCategory::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   SUPPORTED(bicycle);
   SUPPORTED(bus);
@@ -95,14 +99,15 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
 
     #undef SUPPORTED
 
-    #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  #define UNSUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) \
+  { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" << buffer << \
+      "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } while (false)
 
   UNSUPPORTED(semitrailer);
   UNSUPPORTED(trailer);
@@ -145,6 +150,7 @@ std::basic_ostream<Ts...> & operator<<(
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__VEHICLE_CATEGORY_HPP_

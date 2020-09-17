@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/route.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== AssignRouteAction ====================================================
  *
@@ -49,6 +50,7 @@ struct AssignRouteAction
     return unspecified;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_

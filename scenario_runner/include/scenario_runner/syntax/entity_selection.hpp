@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/selected_entities.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== EntitySelection ======================================================
  *
@@ -32,7 +33,7 @@ namespace scenario_runner
  * ======================================================================== */
 struct EntitySelection
 {};
-
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ENTITY_SELECTION_HPP_

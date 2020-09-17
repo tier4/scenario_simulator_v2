@@ -21,7 +21,8 @@
 #include <scenario_runner/syntax/trigger.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Event ================================================================
  *
@@ -110,6 +111,7 @@ struct Event
     }
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__EVENT_HPP_

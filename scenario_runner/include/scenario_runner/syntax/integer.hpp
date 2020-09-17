@@ -18,8 +18,11 @@
 #include <boost/lexical_cast.hpp>
 #include <std_msgs/msg/int32.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 struct Integer
   : public std_msgs::msg::Int32
@@ -52,6 +55,7 @@ decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const Integer & rhs)
 {
   return os << rhs.data;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__INTEGER_HPP_

@@ -18,7 +18,8 @@
 #include <utility>
 
 namespace scenario_runner
-{inline namespace utility
+{
+inline namespace utility
 {
 auto car = [] (auto && pare) noexcept->decltype(auto)
 {
@@ -43,6 +44,7 @@ COMPOSE(cdar, cdr, car);
 COMPOSE(cddr, cdr, cdr);
 
   #undef COMPOSE
-}}  // namespace scenario_runner::utility
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__UTILITY__PAIR_HPP_

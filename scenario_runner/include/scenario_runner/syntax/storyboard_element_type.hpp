@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCEANRIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_
-#define SCEANRIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_
+#ifndef SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_
+#define SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_
+
+#include <string>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== StoryboardElementType ================================================
  *
@@ -51,7 +54,7 @@ struct StoryboardElementType
     story,
   } value;
 
-  explicit constexpr StoryboardElementType(value_type = {})
+  explicit constexpr StoryboardElementType(value_type value = {})
   : value{value}
   {}
 
@@ -114,6 +117,7 @@ std::basic_ostream<Ts...> & operator<<(
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
-#endif  // SCEANRIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_
+#endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_

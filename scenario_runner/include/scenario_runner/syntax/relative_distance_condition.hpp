@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/triggering_entities.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== RelativeDistanceCondition ============================================
  *
@@ -64,8 +65,6 @@ struct RelativeDistanceCondition
 
   auto evaluate()
   {
-    // TODO USE PARAMETER 'freespace'
-
     // switch (relative_distance_type)
     // {
     // case RelativeDistanceType::longitudinal:
@@ -74,7 +73,8 @@ struct RelativeDistanceCondition
     //     asBoolean(
     //       verify([&](auto&& subject)
     //       {
-    //         const auto distance { std::fabs(inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.x) };
+    //         const auto distance { std::fabs(inner_scope.connection->entity->getRelativePose(
+    //         subject, entity_ref).position.x) };
     //         std::cout << "DISTANCE: " << distance << std::endl;
     //         return compare(distance, value);
     //       }));
@@ -85,7 +85,8 @@ struct RelativeDistanceCondition
     //     asBoolean(
     //       verify([&](auto&& subject)
     //       {
-    //         const auto distance { std::fabs(inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.y) };
+    //         const auto distance { std::fabs(inner_scope.connection->entity->getRelativePose(
+    //         subject, entity_ref).position.y) };
     //         std::cout << "DISTANCE: " << distance << std::endl;
     //         return compare(distance, value);
     //       }));
@@ -112,6 +113,7 @@ struct RelativeDistanceCondition
     return false_v;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_

@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/absolute_target_speed.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== SpeedActionTarget ====================================================
  *
@@ -48,6 +49,7 @@ struct SpeedActionTarget
       });
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SPEED_ACTION_TARGET_HPP_

@@ -21,7 +21,8 @@
 #include <scenario_runner/syntax/properties.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Pedestrian ===========================================================
  *
@@ -79,10 +80,10 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Ped
          " " <<
          highlight("pedestrianCategory", rhs.pedestrian_category) << blue << ">\n" << reset <<
          rhs.parameter_declarations << "\n" <<
-         rhs.bounding_box << "\n"
-         // TODO properties
-            << (--indent) << blue << "</Pedestrian>" << reset;
+         rhs.bounding_box << "\n" <<
+         (--indent) << blue << "</Pedestrian>" << reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PEDESTRIAN_HPP_

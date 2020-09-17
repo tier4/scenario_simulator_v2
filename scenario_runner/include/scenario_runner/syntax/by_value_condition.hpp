@@ -20,7 +20,8 @@
 #include <scenario_runner/syntax/traffic_signal_condition.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ByValueCondition =====================================================
  *
@@ -67,6 +68,7 @@ struct ByValueCondition
     callWithElements(node, "TrafficSignalControllerCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__BY_VALUE_CONDITION_HPP_

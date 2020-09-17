@@ -17,8 +17,11 @@
 
 #include <scenario_runner/syntax/traffic_signal_action.hpp>
 
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== InfrastructureAction =================================================
  *
@@ -45,6 +48,7 @@ struct InfrastructureAction
     return unspecified;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__INFRASTRUCTURE_ACTION_HPP_

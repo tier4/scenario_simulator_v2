@@ -17,8 +17,11 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== DynamicsShape ========================================================
  *
@@ -126,6 +129,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Dyn
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__DYNAMICS_SHAPE_HPP_

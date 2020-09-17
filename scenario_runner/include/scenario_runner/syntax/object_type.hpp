@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__SYNTAX__HOGE_HPP_
-#define SCENARIO_RUNNER__SYNTAX__HOGE_HPP_
+#ifndef SCENARIO_RUNNER__SYNTAX__OBJECT_TYPE_HPP_
+#define SCENARIO_RUNNER__SYNTAX__OBJECT_TYPE_HPP_
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ObjectType ===========================================================
  *
@@ -38,6 +39,7 @@ namespace scenario_runner
  * ======================================================================== */
 struct ObjectType
 {};
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__SYNTAX__HOGE_HPP_
+#endif  // SCENARIO_RUNNER__SYNTAX__OBJECT_TYPE_HPP_

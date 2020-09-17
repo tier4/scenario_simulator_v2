@@ -17,8 +17,11 @@
 
 #include <scenario_runner/reader/attribute.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ConditionEdge ============================================================
  *
@@ -85,7 +88,7 @@ struct ConditionEdge
   }
   value;
 
-  explicit ConditionEdge() = default;
+  ConditionEdge() = default;
 
   explicit ConditionEdge(value_type value)
   : value{value}
@@ -104,12 +107,12 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Condition
 
   is >> buffer;
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      edge.value = ConditionEdge::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) \
+  { \
+    edge.value = ConditionEdge::IDENTIFIER; \
+    return is; \
+  } while (false)
 
   BOILERPLATE(rising);
   BOILERPLATE(falling);
@@ -127,14 +130,14 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ConditionEdge & edge)
 {
   switch (edge) {
-      #define BOILERPLATE(IDENTIFIER) case ConditionEdge::IDENTIFIER: return os << #IDENTIFIER;
+    #define BOILERPLATE(IDENTIFIER) case ConditionEdge::IDENTIFIER: return os << #IDENTIFIER;
 
     BOILERPLATE(rising);
     BOILERPLATE(falling);
     BOILERPLATE(risingOrFalling);
     BOILERPLATE(none);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};
@@ -143,6 +146,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Con
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__CONDITION_EDGE_HPP_

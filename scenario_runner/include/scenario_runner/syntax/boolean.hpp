@@ -16,15 +16,17 @@
 #define SCENARIO_RUNNER__SYNTAX__BOOLEAN_HPP_
 
 #include <boost/io/ios_state.hpp>
-#include <iomanip>
 #include <scenario_runner/object.hpp>
 
+#include <iomanip>
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Boolean ==============================================================
  *
- * TODO
  *
  * ======================================================================== */
 struct Boolean
@@ -38,11 +40,11 @@ struct Boolean
     data = value;
   }
 
-  Boolean(const std::string & target)
+  explicit Boolean(const std::string & target)
   {
     std::stringstream interpreter {};
 
-    if (not (interpreter << target and interpreter >> std::boolalpha >> data)) {
+    if (!(interpreter << target && interpreter >> std::boolalpha >> data)) {
       std::stringstream ss {};
       ss << "can't treat value " << std::quoted(target) << " as type Boolean";
       throw SyntaxError {ss.str()};
@@ -76,6 +78,7 @@ auto asBoolean(bool value)
 {
   return value ? true_v : false_v;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__BOOLEAN_HPP_

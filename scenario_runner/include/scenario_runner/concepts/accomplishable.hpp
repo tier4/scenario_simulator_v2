@@ -18,7 +18,8 @@
 #include <scenario_runner/type_traits/void_t.hpp>
 
 namespace scenario_runner
-{inline namespace concepts
+{
+inline namespace concepts
 {
 template<typename T, typename = void>
 struct Accomplishable
@@ -29,6 +30,7 @@ template<typename T>
 struct Accomplishable<T, void_t<decltype(std::declval<T>().accomplished())>>
   : public std::true_type
 {};
-}}  // namespace scenario_runner::concepts
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__CONCEPTS__ACCOMPLISHABLE_HPP_

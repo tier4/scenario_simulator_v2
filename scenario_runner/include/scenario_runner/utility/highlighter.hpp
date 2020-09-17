@@ -16,9 +16,12 @@
 #define SCENARIO_RUNNER__UTILITY__HIGHLIGHTER_HPP_
 
 #include <iostream>
+#include <string>
+#include <utility>
 
 namespace scenario_runner
-{inline namespace utility
+{
+inline namespace utility
 {
 struct AttributeHighlighter
 {
@@ -43,6 +46,7 @@ auto highlight(const std::string & name, const T & value)
 {
   return AttributeHighlighter {name, boost::lexical_cast<std::string>(value)};
 }
-}}  // namespace scenario_runner::utility
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__UTILITY__HIGHLIGHTER_HPP_

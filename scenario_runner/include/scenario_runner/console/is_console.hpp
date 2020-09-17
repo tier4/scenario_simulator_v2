@@ -15,11 +15,13 @@
 #ifndef SCENARIO_RUNNER__CONSOLE__IS_CONSOLE_HPP_
 #define SCENARIO_RUNNER__CONSOLE__IS_CONSOLE_HPP_
 
-#include <iostream>
 #include <unistd.h>
 
+#include <iostream>
+
 namespace scenario_runner
-{inline namespace console
+{
+inline namespace console
 {
 auto is_console = [](const auto & os)
   {
@@ -33,6 +35,7 @@ auto is_console = [](const auto & os)
       return false;
     }
   };
-}}  // namespace scenario_runner::console
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__CONSOLE__IS_CONSOLE_HPP_

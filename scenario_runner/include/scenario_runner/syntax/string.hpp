@@ -17,8 +17,11 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== String ===============================================================
  *
@@ -26,6 +29,7 @@ namespace scenario_runner
  *
  * ======================================================================== */
 using String = std::string;
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__STRING_HPP_

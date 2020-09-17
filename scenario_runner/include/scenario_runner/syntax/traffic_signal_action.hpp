@@ -18,8 +18,11 @@
 #include <scenario_runner/syntax/traffic_signal_state_action.hpp>
 #include <scenario_runner/validator/choice.hpp>
 
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== TrafficSignalAction ==================================================
  *
@@ -48,6 +51,7 @@ struct TrafficSignalAction
     return unspecified;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_

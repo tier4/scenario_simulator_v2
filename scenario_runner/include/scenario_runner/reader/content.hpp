@@ -19,8 +19,11 @@
 #include <scenario_runner/syntax/parameter_type.hpp>
 #include <scenario_runner/utility/pugi_extension.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace reader
+{
+inline namespace reader
 {
 template<typename T, typename Node, typename Scope>
 T readContent(const Node & node, const Scope &)
@@ -28,6 +31,7 @@ T readContent(const Node & node, const Scope &)
   const std::string text {node.text().get()};
   return boost::lexical_cast<T>(boost::algorithm::trim_copy(text));
 }
-}}  // namespace scenario_runner::reader
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__READER__CONTENT_HPP_

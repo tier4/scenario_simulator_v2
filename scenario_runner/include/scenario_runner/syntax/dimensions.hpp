@@ -19,7 +19,8 @@
 #include <scenario_runner/reader/element.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Dimensions ===========================================================
  *
@@ -51,6 +52,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Dim
          " " << highlight("length", rhs.length) <<
          " " << highlight("height", rhs.height) << blue << "/>" << reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__DIMENSIONS_HPP_

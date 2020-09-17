@@ -23,7 +23,8 @@
 #include <scenario_runner/syntax/vehicle_category.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Vehicle ==============================================================
  *
@@ -80,10 +81,10 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Veh
          rhs.parameter_declarations << "\n" <<
          rhs.bounding_box << "\n" <<
          rhs.performance << "\n" <<
-         rhs.axles << "\n"
-         // TODO properties
-            << (--indent) << blue << "</Vehicle>" << reset;
+         rhs.axles << "\n" <<
+         (--indent) << blue << "</Vehicle>" << reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__VEHICLE_HPP_

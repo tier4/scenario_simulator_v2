@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/infrastructure_action.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== GlobalAction =========================================================
  *
@@ -46,6 +47,7 @@ struct GlobalAction
     callWithElements(node, "TrafficAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__GLOBAL_ACTION_HPP_

@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/triggering_entities.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ReachPositionCondition ===============================================
  *
@@ -87,6 +88,7 @@ struct ReachPositionCondition
     // }
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__REACH_POSITION_CONDITION_HPP_

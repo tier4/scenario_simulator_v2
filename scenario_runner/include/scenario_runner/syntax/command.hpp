@@ -17,8 +17,11 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Command ==============================================================
  *
@@ -36,7 +39,7 @@ struct Command
   }
   value;
 
-  explicit Command() = default;
+  Command() = default;
 
   explicit Command(value_type value)
   : value{value}
@@ -61,12 +64,12 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command &
 
   is >> buffer;
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      command = Command::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) \
+  { \
+    command = Command::IDENTIFIER; \
+    return is; \
+  }
 
   BOILERPLATE(debugAccomplishment);
   BOILERPLATE(exitFailure);
@@ -84,14 +87,14 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Command & command)
 {
   switch (command) {
-      #define BOILERPLATE(NAME) case Command::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case Command::NAME: return os << #NAME;
 
     BOILERPLATE(debugAccomplishment);
     BOILERPLATE(exitFailure);
     BOILERPLATE(exitSuccess);
     BOILERPLATE(print);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};
@@ -100,7 +103,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Com
       throw ImplementationFault {ss.str()};
   }
 }
-
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__COMMAND_HPP_

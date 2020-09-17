@@ -18,8 +18,11 @@
 #include <boost/lexical_cast.hpp>
 #include <std_msgs/msg/u_int64.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 struct UnsignedInteger
   : public std_msgs::msg::UInt64
@@ -65,6 +68,7 @@ decltype(auto) operator>>(std::basic_istream<Ts...>&is, UnsignedInteger & rhs)
 }
 
 using UnsignedInt = UnsignedInteger;
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__UNSIGNED_INTEGER_HPP_

@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/entity_ref.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Actors ===============================================================
  *
@@ -33,7 +34,7 @@ namespace scenario_runner
 struct Actors
 {
   // Indicates whether the triggering entities are considered actors.
-  const Boolean select_triggering_entities;   // TODO BOOLEAN
+  const Boolean select_triggering_entities;
 
   template<typename Node, typename Scope>
   explicit Actors(const Node & node, Scope & scope)
@@ -46,6 +47,7 @@ struct Actors
       });
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ACTORS_HPP_

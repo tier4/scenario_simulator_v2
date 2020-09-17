@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__SYNTAX__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_
-#define SCENARIO_RUNNER__SYNTAX__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_
 
+#include <string>
 #include <type_traits>
 
 namespace scenario_runner
-{inline namespace type_traits
+{
+inline namespace type_traits
 {
 template<typename T, typename = void>
 struct IfNotNothrowDefaultConstructible
@@ -42,6 +44,7 @@ struct IfNotNothrowDefaultConstructible<T,
     return T {};
   }
 };
-}}  // namespace scenario_runner::type_traits
+}
+}  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__SYNTAX__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_

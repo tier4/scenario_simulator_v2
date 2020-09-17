@@ -17,8 +17,11 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== SpeedTargetValueType =================================================
  *
@@ -52,9 +55,7 @@ struct SpeedTargetValueType
     factor,
   } value;
 
-  explicit SpeedTargetValueType() = default;
-
-  SpeedTargetValueType(value_type value)
+  SpeedTargetValueType(value_type value = {})
   : value{value}
   {}
 
@@ -71,7 +72,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTarg
 
   is >> buffer;
 
-    #define SUPPORTED(IDENTIFIER) \
+  #define SUPPORTED(IDENTIFIER) \
   if (buffer == #IDENTIFIER) do \
     { \
       type.value = SpeedTargetValueType::IDENTIFIER; \
@@ -80,9 +81,9 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTarg
 
   SUPPORTED(delta);
 
-    #undef SUPPORTED
+  #undef SUPPORTED
 
-    #define UNSUPPORTED(IDENTIFIER) \
+  #define UNSUPPORTED(IDENTIFIER) \
   if (buffer == #IDENTIFIER) do \
     { \
       std::stringstream ss {}; \
@@ -93,7 +94,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTarg
 
   UNSUPPORTED(factor);
 
-    #undef UNSUPPORTED
+  #undef UNSUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type SpeedTargetValueType";
@@ -106,12 +107,12 @@ std::basic_ostream<Ts...> & operator<<(
   const SpeedTargetValueType & type)
 {
   switch (type) {
-      #define BOILERPLATE(NAME) case SpeedTargetValueType::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case SpeedTargetValueType::NAME: return os << #NAME;
 
     BOILERPLATE(delta);
     BOILERPLATE(factor);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};
@@ -120,6 +121,7 @@ std::basic_ostream<Ts...> & operator<<(
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SPEED_TARGET_VALUE_TYPE_HPP_

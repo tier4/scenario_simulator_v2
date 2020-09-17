@@ -19,11 +19,12 @@
 #include <scenario_runner/utility/highlighter.hpp>
 #include <scenario_runner/utility/pugi_extension.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace reader
 {
-// TODO
-// T readAttribute(const std::string& name, const Node& node, const Scope& scope)
+inline namespace reader
+{
 template<typename T, typename Node, typename Scope>
 T readAttribute(const Node & node, const Scope & scope, const std::string & name)
 {
@@ -67,8 +68,6 @@ T readAttribute(const Node & node, const Scope & scope, const std::string & name
   }
 }
 
-// TODO
-// T readAttribute(const std::string& name, const Node& node, const Scope& scope)
 template<typename T, typename Node, typename Scope>
 T readAttribute(const Node & node, const Scope & scope, const std::string & name, T && value)
 {
@@ -78,6 +77,7 @@ T readAttribute(const Node & node, const Scope & scope, const std::string & name
     return value;
   }
 }
-}}  // namespace scenario_runner::reader
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__READER__ATTRIBUTE_HPP_

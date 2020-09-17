@@ -17,8 +17,11 @@
 
 #include <scenario_runner/object.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== StoryboardElementState ===============================================
  *
@@ -237,17 +240,22 @@ std::basic_ostream<Ts...> & operator<<(
   }
 }
 
-static const auto standby_state {make<StoryboardElementState>(StoryboardElementState::standbyState)};
-static const auto running_state {make<StoryboardElementState>(StoryboardElementState::runningState)};
-static const auto complete_state {make<StoryboardElementState>(StoryboardElementState::completeState)};
+static const auto standby_state {
+  make<StoryboardElementState>(StoryboardElementState::standbyState)};
+static const auto running_state {
+  make<StoryboardElementState>(StoryboardElementState::runningState)};
+static const auto complete_state {
+  make<StoryboardElementState>(StoryboardElementState::completeState)};
 
 static const auto start_transition {make<StoryboardElementState>(
     StoryboardElementState::startTransition)};
-static const auto end_transition {make<StoryboardElementState>(StoryboardElementState::endTransition)};
+static const auto end_transition {make<StoryboardElementState>(
+    StoryboardElementState::endTransition)};
 static const auto stop_transition {make<StoryboardElementState>(
     StoryboardElementState::stopTransition)};
 static const auto skip_transition {make<StoryboardElementState>(
     StoryboardElementState::skipTransition)};
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_STATE_HPP_

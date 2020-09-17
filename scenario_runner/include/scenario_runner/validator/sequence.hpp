@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP
-#define SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP
+#ifndef SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP_
+#define SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP_
 
 #include <scenario_runner/validator/all.hpp>
 
 namespace scenario_runner
-{inline namespace validator
+{
+inline namespace validator
 {
 using Sequence = All;   // XXX Temporary
-}}  // namespace scenario_runner::validator
+}
+}  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP
+#endif  // SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP_

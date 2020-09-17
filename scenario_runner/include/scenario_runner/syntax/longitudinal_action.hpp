@@ -18,7 +18,8 @@
 #include <scenario_runner/syntax/speed_action.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== LongitudinalAction ===================================================
  *
@@ -46,6 +47,7 @@ struct LongitudinalAction
 
   using Object::evaluate;
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__LONGITUDINAL_ACTION_HPP_

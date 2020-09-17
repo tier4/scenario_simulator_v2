@@ -18,8 +18,12 @@
 #include <scenario_runner/syntax/parameter_type.hpp>
 #include <scenario_runner/utility/pugi_extension.hpp>
 
+#include <string>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace validator
+{
+inline namespace validator
 {
 template<typename T>
 T readUnsupportedAttribute(
@@ -57,6 +61,7 @@ T readOptionalAttribute(const pugi::xml_node & node, const std::string & name, c
     return value;
   }
 }
-}}  // namespace scenario_runner::validator
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__VALIDATOR__ATTRIBUTE_HPP_

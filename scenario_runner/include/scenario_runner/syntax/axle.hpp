@@ -19,7 +19,8 @@
 #include <scenario_runner/reader/element.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Axle =================================================================
  *
@@ -91,6 +92,7 @@ struct AdditionalAxle
 BOILERPLATE(AdditionalAxle);
 
   #undef BOILERPLATE
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__AXLE_HPP_

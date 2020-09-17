@@ -18,7 +18,8 @@
 #include <scenario_runner/concepts/accomplishable.hpp>
 
 namespace scenario_runner
-{inline namespace type_traits
+{
+inline namespace type_traits
 {
 template<typename T, typename = void>
 struct IfAccomplishable
@@ -37,6 +38,7 @@ struct IfAccomplishable<T, typename std::enable_if<Accomplishable<T>::value>::ty
     return callee.accomplished();
   }
 };
-}}  // namespace scenario_runner::type_traits
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_ACCOMPLISHABLE_HPP_

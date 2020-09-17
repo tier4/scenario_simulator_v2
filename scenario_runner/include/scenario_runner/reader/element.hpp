@@ -20,8 +20,13 @@
 #include <scenario_runner/type_traits/if_not_default_constructible.hpp>
 #include <scenario_runner/utility/pugi_extension.hpp>
 
+#include <limits>
+#include <string>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace reader
+{
+inline namespace reader
 {
 constexpr auto unbounded {std::numeric_limits<std::size_t>::max()};
 
@@ -31,7 +36,7 @@ auto readElement(const std::string & name, const Node & parent, Ts && ... xs)
   if (const auto child {parent.child(name.c_str())}) {
     return T {child, std::forward<decltype(xs)>(xs)...};
   } else {
-    return IfNotDefaultConstructible<T>::error(parent.name(), name);   // TODO => IfNotNothrowDefaultConstructible
+    return IfNotDefaultConstructible<T>::error(parent.name(), name);
   }
 }
 
@@ -109,6 +114,7 @@ decltype(auto) callWithElement(const pugi::xml_node & parent, const std::string 
       "\') is valid OpenSCENARIO element, but is not supported"; \
     throw SyntaxError {ss.str()}; \
   }
-}}  // namespace scenario_runner::reader
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__READER__ELEMENT_HPP_

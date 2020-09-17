@@ -19,8 +19,12 @@
 #include <scenario_runner/syntax/speed_action_target.hpp>
 #include <scenario_runner/syntax/transition_dynamics.hpp>
 
+#include <string>
+#include <unordered_map>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== SpeedAction ==========================================================
  *
@@ -58,7 +62,8 @@ struct SpeedAction
 
         switch (speed_action_dynamics.dynamics_shape) {
           case DynamicsShape::linear:
-            // inner_scope.connection->entity->setTargetSpeed(each, speed_action_target.as<AbsoluteTargetSpeed>().value, true);
+            // inner_scope.connection->entity->setTargetSpeed(
+            // each, speed_action_target.as<AbsoluteTargetSpeed>().value, true);
             break;
 
           case DynamicsShape::step:
@@ -86,13 +91,13 @@ struct SpeedAction
   {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       for (auto && each : accomplishments) {
-        if (not cdr(each)) {
+        if (!cdr(each)) {
           try {
             // cdr(each) =
             //   Rule(Rule::equalTo)(
             //     inner_scope.getEntityStatus(car(each)).twist.linear.x,
             //     speed_action_target.as<AbsoluteTargetSpeed>().value);
-          } catch (const SemanticError &) { // XXX DIRTY HACK!!!
+          } catch (const SemanticError &) {  // XXX DIRTY HACK!!!
             // NOTE maybe lane-changing
             cdr(each) = false;
           }
@@ -104,8 +109,8 @@ struct SpeedAction
       THROW(ImplementationFault);
     }
   }
-
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SPEED_ACTION_HPP_

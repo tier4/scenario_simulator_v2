@@ -19,7 +19,8 @@
 #include <scenario_runner/reader/element.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Performance ==========================================================
  *
@@ -53,6 +54,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Per
          " " << highlight("maxAcceleration", rhs.max_acceleration) <<
          " " << highlight("maxDeceleration", rhs.max_deceleration) << blue << "/>" << reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PERFORMANCE_HPP_

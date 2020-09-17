@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT
-#define SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT
+#ifndef SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_HPP_
+#define SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
 #include <boost/scope_exit.hpp>
 #include <scenario_runner/syntax/storyboard_element_state.hpp>
 
+#include <string>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 template<typename T>
 struct StoryboardElement
@@ -61,7 +65,7 @@ struct StoryboardElement
 
   Object override ()
   {
-    if (not complete() and not stopping()) {
+    if (!complete() && !stopping()) {
       return state = stop_transition;
     } else {
       return state;
@@ -101,7 +105,7 @@ protected:
         make<U>(node, inner_scope))
     };
 
-    if (not cdr(result)) {
+    if (!cdr(result)) {
       std::stringstream ss {};
       ss << "detected redefinition of StoryboardElement named \'" << name << "\'";
       throw SyntaxError {ss.str()};
@@ -151,7 +155,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::standbyState:
 
-        if (not ready()) {
+        if (!ready()) {
           return state;
         } else {
           std::cout << indent <<
@@ -224,7 +228,7 @@ public:
 
         static_cast<T &>(*this).run();
 
-        if (not accomplished()) {
+        if (!accomplished()) {
           return state;
         } else {
           std::cout << indent <<
@@ -247,7 +251,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::endTransition:
 
-        if (execution_count < maximum_execution_count) { // check for completeness
+        if (execution_count < maximum_execution_count) {  // check for completeness
           return state = standby_state;
         } else {
           return state = complete_state;
@@ -307,7 +311,7 @@ public:
       default:
       case StoryboardElementState::stopTransition:
 
-        if (not accomplished()) {
+        if (!accomplished()) {
           static_cast<T &>(*this).stop();
 
           return state;
@@ -322,6 +326,7 @@ public:
     }
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT
+#endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_HPP_

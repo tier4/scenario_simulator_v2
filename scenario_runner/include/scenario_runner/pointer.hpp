@@ -15,10 +15,6 @@
 #ifndef SCENARIO_RUNNER__POINTER_HPP_
 #define SCENARIO_RUNNER__POINTER_HPP_
 
-#include <memory>
-#include <typeinfo>
-#include <utility>
-
 #include <scenario_runner/error.hpp>
 #include <scenario_runner/type_traits/if_accomplishable.hpp>
 #include <scenario_runner/type_traits/if_evaluable.hpp>
@@ -26,6 +22,10 @@
 #include <scenario_runner/type_traits/if_startable.hpp>
 #include <scenario_runner/type_traits/if_stateful.hpp>
 #include <scenario_runner/utility/pair.hpp>
+
+#include <memory>
+#include <typeinfo>
+#include <utility>
 
 #define DEBUG() std::cout << green << __FILE__ << magenta << ":" << cyan << __LINE__ << reset << \
     std::endl

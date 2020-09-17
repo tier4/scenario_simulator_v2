@@ -22,8 +22,11 @@
 #include <scenario_runner/syntax/unsigned_integer.hpp>
 #include <scenario_runner/syntax/unsigned_short.hpp>
 
+#include <string>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ParameterType ========================================================
  *
@@ -77,7 +80,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Parameter
 
   is >> buffer;
 
-    #define SUPPORTED(NAME, IDENTIFIER) \
+  #define SUPPORTED(NAME, IDENTIFIER) \
   if (buffer == NAME) do \
     { \
       type.value = ParameterType::IDENTIFIER; \
@@ -92,7 +95,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Parameter
   SUPPORTED("boolean", BOOLEAN);
   SUPPORTED("dateTime", DATE_TIME);
 
-    #undef SUPPORTED
+  #undef SUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type ParameterType";
@@ -103,7 +106,7 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ParameterType & type)
 {
   switch (type) {
-      #define BOILERPLATE(NAME, IDENTIFIER) case ParameterType::IDENTIFIER: return os << NAME;
+    #define BOILERPLATE(NAME, IDENTIFIER) case ParameterType::IDENTIFIER: return os << NAME;
 
     BOILERPLATE("integer", INTEGER);
     BOILERPLATE("double", DOUBLE);
@@ -113,7 +116,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Par
     BOILERPLATE("boolean", BOOLEAN);
     BOILERPLATE("dateTime", DATE_TIME);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};
@@ -122,6 +125,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Par
       throw ImplementationFault {ss.str()};
   }
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PARAMETER_TYPE_HPP_

@@ -16,7 +16,8 @@
 #define SCENARIO_RUNNER__SYNTAX__PROPERTIES_HPP_
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Properties ===========================================================
  *
@@ -36,6 +37,7 @@ struct Properties
   explicit Properties(const Node &, Scope &)
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PROPERTIES_HPP_

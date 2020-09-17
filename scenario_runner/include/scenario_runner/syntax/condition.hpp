@@ -20,7 +20,8 @@
 #include <scenario_runner/syntax/condition_edge.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Condition ============================================================
  *
@@ -74,6 +75,7 @@ struct Condition
     return Object::evaluate();
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__CONDITION_HPP_

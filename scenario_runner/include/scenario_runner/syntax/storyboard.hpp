@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/story.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Storyboard ===========================================================
  *
@@ -96,6 +97,7 @@ struct Storyboard
     }
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_HPP_

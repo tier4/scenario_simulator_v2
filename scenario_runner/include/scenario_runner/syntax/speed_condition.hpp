@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/triggering_entities.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== SpeedCondition =======================================================
  *
@@ -61,6 +62,7 @@ struct SpeedCondition
     return false_v;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SPEED_CONDITION_HPP_

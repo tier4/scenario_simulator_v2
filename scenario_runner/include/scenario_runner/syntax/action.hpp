@@ -21,7 +21,8 @@
 #include <scenario_runner/syntax/user_defined_action.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Action ===============================================================
  *
@@ -105,6 +106,7 @@ struct Action
     Object::evaluate();
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ACTION_HPP_

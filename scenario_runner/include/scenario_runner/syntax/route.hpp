@@ -18,8 +18,12 @@
 #include <scenario_runner/syntax/parameter_declarations.hpp>
 #include <scenario_runner/syntax/waypoint.hpp>
 
+#include <string>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Route ================================================================
  *
@@ -56,6 +60,7 @@ struct Route
     return unspecified;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ROUTE_HPP_

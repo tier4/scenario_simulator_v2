@@ -19,7 +19,8 @@
 #include <scenario_runner/syntax/reference_context.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Orientation ==========================================================
  *
@@ -47,6 +48,7 @@ struct Orientation
     r{readAttribute<Double>(node, scope, "r", 0)}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__ORIENTATION_HPP_

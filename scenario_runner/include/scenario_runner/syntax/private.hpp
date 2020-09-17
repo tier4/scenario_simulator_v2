@@ -17,8 +17,11 @@
 
 #include <scenario_runner/syntax/private_action.hpp>
 
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== Private ==============================================================
  *
@@ -57,6 +60,7 @@ struct Private
     return unspecified;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PRIVATE_HPP_

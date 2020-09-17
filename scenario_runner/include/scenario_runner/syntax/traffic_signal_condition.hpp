@@ -18,7 +18,8 @@
 #include <scenario_runner/reader/attribute.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== TrafficSignalCondition ===============================================
  *
@@ -45,7 +46,7 @@ struct TrafficSignalCondition
     return unspecified;
   }
 };
-
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNAL_CONDITION_HPP_

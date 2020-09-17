@@ -19,8 +19,11 @@
 #include <scenario_runner/validator/choice.hpp>
 #include <scenario_runner/validator/sequence.hpp>
 
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ObjectController =====================================================
  *
@@ -49,6 +52,7 @@ struct ObjectController
     return unspecified;
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__OBJECT_CONTROLLER_HPP_

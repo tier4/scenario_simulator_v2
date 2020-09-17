@@ -18,7 +18,8 @@
 #include <scenario_runner/reader/attribute.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== File =================================================================
  *
@@ -31,7 +32,7 @@ struct File
 {
   const String filepath;
 
-  explicit File()
+  File()
   : filepath{"./"}
   {}
 
@@ -40,6 +41,7 @@ struct File
   : filepath{readAttribute<String>(node, outer_scope, "filepath")}
   {}
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__FILE_HPP_

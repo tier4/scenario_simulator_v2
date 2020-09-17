@@ -17,8 +17,11 @@
 
 #include <scenario_runner/concepts/evaluable.hpp>
 
+#include <utility>
+
 namespace scenario_runner
-{inline namespace type_traits
+{
+inline namespace type_traits
 {
 template<typename T, typename = void>
 struct IfEvaluable
@@ -39,6 +42,7 @@ struct IfEvaluable<T, typename std::enable_if<Evaluable<T>::value>::type>
     return object.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
-}}  // namespace scenario_runner::type_traits
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_EVALUABLE_HPP_

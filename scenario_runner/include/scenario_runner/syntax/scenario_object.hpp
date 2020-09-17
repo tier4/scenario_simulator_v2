@@ -20,7 +20,8 @@
 #include <scenario_runner/syntax/object_controller.hpp>
 
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ScenarioObject =======================================================
  *
@@ -62,7 +63,8 @@ struct ScenarioObject
   auto evaluate()
   {
     std::cout << indent << "spawn(false, " << name << ", ...)\n" << entity_object << std::endl;
-    // return asBoolean(inner_scope.connection->entity->spawn(false, name, boost::lexical_cast<String>(entity_object)));
+    // return asBoolean(inner_scope.connection->entity->spawn(
+    // false, name, boost::lexical_cast<String>(entity_object)));
     return unspecified;
   }
 };
@@ -75,6 +77,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Sce
          rhs.entity_object << "\n" <<
          (--indent) << blue << "</ScenarioObject>" << reset;
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__SCENARIO_OBJECT_HPP_

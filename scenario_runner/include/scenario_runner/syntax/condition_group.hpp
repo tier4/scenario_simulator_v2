@@ -17,8 +17,11 @@
 
 #include <scenario_runner/syntax/condition.hpp>
 
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ConditionGroup =======================================================
  *
@@ -55,6 +58,7 @@ struct ConditionGroup
       }));
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__CONDITION_GROUP_HPP_

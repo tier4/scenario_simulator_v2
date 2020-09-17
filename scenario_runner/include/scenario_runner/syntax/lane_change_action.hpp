@@ -15,12 +15,16 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 #define SCENARIO_RUNNER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 
-#include <chrono>
 #include <scenario_runner/syntax/lane_change_target.hpp>
 #include <scenario_runner/syntax/transition_dynamics.hpp>
 
+#include <string>
+#include <unordered_map>
+#include <utility>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== LaneChangeAction =====================================================
  *
@@ -75,7 +79,7 @@ struct LaneChangeAction
   {
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       for (auto && each : accomplishments) {
-        if (not cdr(each)) {
+        if (!cdr(each)) {
           // cdr(each) =
           //   inner_scope.connection->entity->isInLanelet(
           //     car(each),
@@ -89,6 +93,7 @@ struct LaneChangeAction
     }
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__LANE_CHANGE_ACTION_HPP_

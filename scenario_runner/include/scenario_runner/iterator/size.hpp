@@ -18,13 +18,15 @@
 #include <iterator>
 
 namespace scenario_runner
-{inline namespace iterator
+{
+inline namespace iterator
 {
 template<typename T>
 auto size(const T & range)
 {
   return std::distance(std::begin(range), std::end(range));
 }
-}}  // namespace scenario_runner::iterator
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__ITERATOR__SIZE_HPP_

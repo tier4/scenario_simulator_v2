@@ -19,8 +19,11 @@
 #include <scenario_runner/scope.hpp>
 #include <scenario_runner/syntax/parameter_declaration.hpp>
 
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== ParameterDeclarations ================================================
  *
@@ -54,6 +57,7 @@ std::basic_ostream<Ts...> & operator<<(
   return os << (indent++) << blue << "<ParameterDeclarations>" << reset << "\n" <<
          (--indent) << blue << "</ParameterDeclarations>";
 }
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__PARAMETER_DECLARATIONS_HPP_

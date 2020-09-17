@@ -18,8 +18,14 @@
 #include <scenario_runner/validator/attribute.hpp>
 #include <scenario_runner/validator/sequence.hpp>
 
+#include <limits>
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace scenario_runner
-{inline namespace syntax
+{
+inline namespace syntax
 {
 /* ==== TrafficSignalState ===================================================
  *
@@ -127,7 +133,7 @@ struct TrafficSignalController
 struct TrafficSignals
   : public std::vector<TrafficSignalController>
 {
-  explicit TrafficSignals() = default;
+  TrafficSignals() = default;
 
   template<typename Node, typename Scope>
   explicit TrafficSignals(const Node & node, Scope & outer_scope)
@@ -138,6 +144,7 @@ struct TrafficSignals
       });
   }
 };
-}}  // namespace scenario_runner::syntax
+}
+}  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNALS_HPP_
