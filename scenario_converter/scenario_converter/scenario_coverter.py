@@ -6,7 +6,6 @@ from scenario_converter.scenario_regressor import Regressor
 from scenario_converter.scenario_logger import Logger
 from collections import OrderedDict, defaultdict
 from bs4 import BeautifulSoup
-import time
 import argparse
 import copy
 import re
@@ -58,7 +57,7 @@ class ScenarioConverter:
         if "ScenarioModifiers" in root_data:
             scenario_modifiers = dict(root_data["ScenarioModifiers"])
             if "ScenarioModifier" in scenario_modifiers:
-                scenario_modifier=scenario_modifiers["ScenarioModifier"]
+                scenario_modifier = scenario_modifiers["ScenarioModifier"]
         if scenario_modifier is None:
             print("No Scenario Modifiers Detected")
         return length, scenario_modifier
