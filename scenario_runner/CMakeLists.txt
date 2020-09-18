@@ -37,17 +37,21 @@ target_link_libraries(${PROJECT_NAME}_node
   pugixml)
 
 install(
+  TARGETS ${PROJECT_NAME}_node
+  DESTINATION lib/${PROJECT_NAME})
+
+install(
   DIRECTORY
     config
     include
     launch
   DESTINATION share/${PROJECT_NAME})
 
-install(
-  TARGETS ${PROJECT_NAME}_node
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+# install(
+#   TARGETS
+#   ARCHIVE DESTINATION lib
+#   LIBRARY DESTINATION lib
+#   RUNTIME DESTINATION bin)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
