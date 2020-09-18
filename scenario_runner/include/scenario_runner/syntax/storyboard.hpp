@@ -82,8 +82,8 @@ struct Storyboard
 
   auto accomplished() const
   {
-    auto check = [](auto && each)
-      {
+    auto check =
+      [](auto && each) {
         return each.template as<Story>().complete();
       };
 
