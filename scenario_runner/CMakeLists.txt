@@ -45,6 +45,7 @@ install(
     config
     include
     launch
+    example
   DESTINATION share/${PROJECT_NAME})
 
 # install(

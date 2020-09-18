@@ -12,16 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from launch import LaunchDescription
-from launch_ros.actions import Node
+import ament_index_python.packages
+import launch
+import launch_ros.actions
+import os
 
 
 def generate_launch_description():
 
-    return LaunchDescription([
-        Node(
+    return launch.LaunchDescription([
+        launch_ros.actions.Node(
             package='scenario_runner',
             node_executable='scenario_runner_node',
             node_name='scenario_runner',
-            output='screen')
+            output='screen',
+            parameters=[{
+                'verbose': 'true',
+                'scenario': os.path.join(
+                    ament_index_python.packages.get_package_share_directory('scenario_runner'),
+                    'example/lane_change.xosc')
+                }]
+            )
         ])

@@ -43,14 +43,17 @@ int main(int argc, char ** argv)
 
   auto node {rclcpp::Node::make_shared("scenario_runner_node")};
 
-  std::string scenario {};
-  // handle.getParam("scenario", scenario);
-  //
-  // bool verbose { false };
-  // handle.getParam("verbose", verbose);
-  //
-  // int port {};
-  // handle.param<int>("port", port, 8080);
+  std::string scenario {""};
+  (*node).declare_parameter<decltype(scenario)>("scenario", scenario);
+  (*node).get_parameter("scenario", scenario);
+
+  bool verbose {false};
+  (*node).declare_parameter<decltype(verbose)>("verbose", verbose);
+  (*node).get_parameter("verbose", verbose);
+
+  int port {8080};
+  (*node).declare_parameter<decltype(port)>("port", port);
+  (*node).get_parameter("port", port);
 
   try {
     scenario_runner::OpenSCENARIO osc {scenario, "127.0.0.1", 8080};
