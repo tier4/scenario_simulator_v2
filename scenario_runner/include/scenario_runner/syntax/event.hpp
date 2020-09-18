@@ -53,7 +53,8 @@ struct Event
 
   template<typename Node, typename Scope>
   explicit Event(const Node & node, Scope & outer_scope)
-  : StoryboardElement{readAttribute<UnsignedInt>(node, outer_scope, "maximumExecutionCount", 1)},
+  : StoryboardElement{
+      readAttribute<UnsignedInt>(node, outer_scope, "maximumExecutionCount", UnsignedInt(1))},
     name{readAttribute<String>(node, outer_scope, "name")},
     priority{readAttribute<Priority>(node, outer_scope, "priority")},
     inner_scope{outer_scope}

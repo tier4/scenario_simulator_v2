@@ -65,9 +65,7 @@ struct VehicleCategory
     van,
   } value;
 
-  VehicleCategory() = default;
-
-  explicit constexpr VehicleCategory(value_type value)
+  explicit constexpr VehicleCategory(value_type value = {})
   : value{value}
   {}
 
@@ -85,8 +83,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
   is >> buffer;
 
   #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) \
-  { \
+  if (buffer == #IDENTIFIER) { \
     category.value = VehicleCategory::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
@@ -100,14 +97,13 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
     #undef SUPPORTED
 
   #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) \
-  { \
+  if (buffer == #IDENTIFIER) { \
     std::stringstream ss { \
     }; \
     ss << "given value \'" << buffer << \
       "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
     throw ImplementationFault {ss.str()}; \
-  } while (false)
+  } static_assert(true, "")
 
   UNSUPPORTED(semitrailer);
   UNSUPPORTED(trailer);
@@ -115,7 +111,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
   UNSUPPORTED(tram);
   UNSUPPORTED(van);
 
-    #undef UNSUPPORTED
+  #undef UNSUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type VehicleCategory";
@@ -128,7 +124,7 @@ std::basic_ostream<Ts...> & operator<<(
   const VehicleCategory & category)
 {
   switch (category) {
-      #define BOILERPLATE(NAME) case VehicleCategory::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case VehicleCategory::NAME: return os << #NAME;
 
     BOILERPLATE(bicycle);
     BOILERPLATE(bus);
@@ -141,7 +137,7 @@ std::basic_ostream<Ts...> & operator<<(
     BOILERPLATE(truck);
     BOILERPLATE(van);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

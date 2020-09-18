@@ -29,7 +29,7 @@ struct UnsignedShort
 {
   using value_type = decltype(std_msgs::msg::UInt16::data);
 
-  UnsignedShort(value_type value = {})
+  explicit UnsignedShort(value_type value = {})
   {
     data = value;
   }

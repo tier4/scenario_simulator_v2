@@ -49,7 +49,7 @@ struct ManeuverGroup
   template<typename Node, typename Scope>
   explicit ManeuverGroup(const Node & node, Scope & outer_scope)
   : StoryboardElement{readAttribute<UnsignedInteger>(node, outer_scope, "maximumExecutionCount",
-        1)},
+        UnsignedInteger())},
     name{readAttribute<String>(node, outer_scope, "name")},
     inner_scope{outer_scope},
     actors{readElement<Actors>("Actors", node, inner_scope)}

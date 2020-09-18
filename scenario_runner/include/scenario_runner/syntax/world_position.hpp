@@ -43,10 +43,10 @@ struct WorldPosition
   explicit WorldPosition(const Node & node, Scope & scope)
   : x{readAttribute<Double>(node, scope, "x")},
     y{readAttribute<Double>(node, scope, "y")},
-    z{readAttribute<Double>(node, scope, "z", 0)},
-    h{readAttribute<Double>(node, scope, "h", 0)},       // yaw
-    p{readAttribute<Double>(node, scope, "p", 0)},
-    r{readAttribute<Double>(node, scope, "r", 0)}
+    z{readAttribute<Double>(node, scope, "z", Double())},
+    h{readAttribute<Double>(node, scope, "h", Double())},       // yaw
+    p{readAttribute<Double>(node, scope, "p", Double())},
+    r{readAttribute<Double>(node, scope, "r", Double())}
   {}
 
   operator geometry_msgs::msg::Pose() const

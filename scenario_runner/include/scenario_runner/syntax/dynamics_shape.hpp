@@ -78,31 +78,30 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, DynamicsS
 
   is >> buffer;
 
-    #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      shape = DynamicsShape::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define SUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    shape = DynamicsShape::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   SUPPORTED(linear);
   SUPPORTED(step);
 
-    #undef SUPPORTED
+  #undef SUPPORTED
 
-    #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type DynamicsShape, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  #define UNSUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" << buffer << \
+      "\' is valid OpenSCENARIO value of type DynamicsShape, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } static_assert(true, "")
 
   UNSUPPORTED(cubic);
   UNSUPPORTED(sinusoidal);
 
-    #undef UNSUPPORTED
+  #undef UNSUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type DynamicsShape";
@@ -113,14 +112,14 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const DynamicsShape & shape)
 {
   switch (shape) {
-      #define BOILERPLATE(NAME) case DynamicsShape::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case DynamicsShape::NAME: return os << #NAME;
 
     BOILERPLATE(linear);
     BOILERPLATE(cubic);
     BOILERPLATE(sinusoidal);
     BOILERPLATE(step);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

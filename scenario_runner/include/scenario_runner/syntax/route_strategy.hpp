@@ -65,30 +65,29 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RouteStra
   is >> buffer;
 
   #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) \
-  { \
+  if (buffer == #IDENTIFIER) { \
     strategy = RouteStrategy::IDENTIFIER; \
     return is; \
-  } while (false)
+  } static_assert(true, "")
 
   SUPPORTED(shortest);
 
-    #undef SUPPORTED
+  #undef SUPPORTED
 
-    #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type RouteStrategy, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  #define UNSUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" << buffer << \
+      "\' is valid OpenSCENARIO value of type RouteStrategy, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } static_assert(true, "")
 
   UNSUPPORTED(fastest);
   UNSUPPORTED(leastIntersections);
   UNSUPPORTED(random);
 
-    #undef UNSUPPORTED
+  #undef UNSUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type RouteStrategy";
@@ -101,14 +100,14 @@ std::basic_ostream<Ts...> & operator<<(
   const RouteStrategy & strategy)
 {
   switch (strategy) {
-      #define BOILERPLATE(NAME) case RouteStrategy::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case RouteStrategy::NAME: return os << #NAME;
 
     BOILERPLATE(fastest);
     BOILERPLATE(shortest);
     BOILERPLATE(leastIntersections);
     BOILERPLATE(random);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

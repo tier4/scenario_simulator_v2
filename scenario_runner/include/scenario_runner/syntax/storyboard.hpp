@@ -43,7 +43,7 @@ struct Storyboard
 
   Trigger stop_trigger;
 
-  const String name {"Storyboard"};     // XXX DIRTY HACK!!!
+  const String name {"Storyboard"};  // XXX DIRTY HACK!!!
 
   template<typename Node, typename Scope>
   explicit Storyboard(const Node & node, Scope & outer_scope)

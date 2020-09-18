@@ -49,13 +49,11 @@ struct RelativeDistanceType
   }
   value;
 
-  RelativeDistanceType() = default;
-
-  explicit RelativeDistanceType(value_type value)
+  explicit constexpr RelativeDistanceType(value_type value = {})
   : value{value}
   {}
 
-  operator value_type() const noexcept
+  constexpr operator value_type() const noexcept
   {
     return value;
   }
@@ -68,18 +66,17 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RelativeD
 
   is >> buffer;
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      type.value = RelativeDistanceType::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    type.value = RelativeDistanceType::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   BOILERPLATE(longitudinal);
   BOILERPLATE(lateral);
   BOILERPLATE(cartesianDistance);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type RelativeDistanceType";
@@ -92,14 +89,13 @@ std::basic_ostream<Ts...> & operator<<(
   const RelativeDistanceType & type)
 {
   switch (type) {
-      #define BOILERPLATE(IDENTIFIER) case RelativeDistanceType::IDENTIFIER: return os << \
-           #IDENTIFIER;
+    #define BOILERPLATE(ID) case RelativeDistanceType::ID: return os << #ID;
 
     BOILERPLATE(longitudinal);
     BOILERPLATE(lateral);
     BOILERPLATE(cartesianDistance);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

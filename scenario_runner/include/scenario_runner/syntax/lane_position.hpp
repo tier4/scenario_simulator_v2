@@ -46,7 +46,7 @@ struct LanePosition
   explicit LanePosition(const Node & node, Scope & scope)
   : road_id{readAttribute<String>(node, scope, "roadId", "")},
     lane_id{readAttribute<String>(node, scope, "laneId")},
-    offset{readAttribute<Double>(node, scope, "offset", 0)},
+    offset{readAttribute<Double>(node, scope, "offset", Double())},
     s{readAttribute<Double>(node, scope, "s")},
     orientation{readElement<Orientation>("Orientation", node, scope)}
   {}

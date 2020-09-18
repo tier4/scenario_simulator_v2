@@ -55,11 +55,11 @@ struct SpeedTargetValueType
     factor,
   } value;
 
-  SpeedTargetValueType(value_type value = {})
+  explicit constexpr SpeedTargetValueType(value_type value = delta)
   : value{value}
   {}
 
-  operator value_type() const noexcept
+  constexpr operator value_type() const noexcept
   {
     return value;
   }
@@ -73,24 +73,24 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTarg
   is >> buffer;
 
   #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      type.value = SpeedTargetValueType::IDENTIFIER; \
-      return is; \
-    } while (false)
+  if (buffer == #IDENTIFIER) { \
+    type.value = SpeedTargetValueType::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   SUPPORTED(delta);
 
   #undef SUPPORTED
 
   #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type SpeedTargetValueType, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  if (buffer == #IDENTIFIER) { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" \
+       << buffer \
+       << "\' is valid OpenSCENARIO value of type SpeedTargetValueType, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } static_assert(true, "")
 
   UNSUPPORTED(factor);
 

@@ -29,7 +29,7 @@ struct UnsignedInteger
 {
   using value_type = decltype(std_msgs::msg::UInt64::data);
 
-  UnsignedInteger(value_type value = {})
+  explicit UnsignedInteger(value_type value = {})
   {
     data = value;
   }

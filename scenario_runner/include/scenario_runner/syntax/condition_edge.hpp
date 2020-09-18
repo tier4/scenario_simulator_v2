@@ -88,9 +88,7 @@ struct ConditionEdge
   }
   value;
 
-  ConditionEdge() = default;
-
-  explicit ConditionEdge(value_type value)
+  explicit constexpr ConditionEdge(value_type value = {})
   : value{value}
   {}
 
@@ -108,18 +106,17 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Condition
   is >> buffer;
 
   #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) \
-  { \
+  if (buffer == #IDENTIFIER) { \
     edge.value = ConditionEdge::IDENTIFIER; \
     return is; \
-  } while (false)
+  } static_assert(true, "")
 
   BOILERPLATE(rising);
   BOILERPLATE(falling);
   BOILERPLATE(risingOrFalling);
   BOILERPLATE(none);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type ConditionEdge";
@@ -130,7 +127,7 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ConditionEdge & edge)
 {
   switch (edge) {
-    #define BOILERPLATE(IDENTIFIER) case ConditionEdge::IDENTIFIER: return os << #IDENTIFIER;
+    #define BOILERPLATE(ID) case ConditionEdge::ID: return os << #ID;
 
     BOILERPLATE(rising);
     BOILERPLATE(falling);

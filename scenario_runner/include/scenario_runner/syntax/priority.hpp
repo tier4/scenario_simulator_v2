@@ -58,13 +58,11 @@ struct Priority
     parallel,
   } value;
 
-  Priority() = default;
-
-  explicit Priority(value_type value)
+  explicit constexpr Priority(value_type value = {})
   : value{value}
   {}
 
-  operator value_type() const noexcept
+  constexpr operator value_type() const noexcept
   {
     return value;
   }
@@ -77,30 +75,29 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Priority 
 
   is >> buffer;
 
-    #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      priority.value = Priority::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define SUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    priority.value = Priority::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   SUPPORTED(overwrite);
 
-    #undef SUPPORTED
+  #undef SUPPORTED
 
-    #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type Priority, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  #define UNSUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" << buffer << \
+      "\' is valid OpenSCENARIO value of type Priority, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } static_assert(true, "")
 
   UNSUPPORTED(skip);
   UNSUPPORTED(parallel);
 
-    #undef UNSUPPORTED
+  #undef UNSUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type Priority";
@@ -111,13 +108,13 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Priority & priority)
 {
   switch (priority) {
-      #define BOILERPLATE(NAME) case Priority::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case Priority::NAME: return os << #NAME;
 
     BOILERPLATE(overwrite);
     BOILERPLATE(skip);
     BOILERPLATE(parallel);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

@@ -83,17 +83,16 @@ std::basic_istream<Ts...> & operator>>(
 
   is >> buffer;
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      rule.value = TriggeringEntitiesRule::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    rule.value = TriggeringEntitiesRule::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   BOILERPLATE(all);
   BOILERPLATE(any);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type TriggeringEntitiesRule";
@@ -106,13 +105,12 @@ std::basic_ostream<Ts...> & operator<<(
   const TriggeringEntitiesRule & rule)
 {
   switch (rule) {
-      #define BOILERPLATE(IDENTIFIER) case TriggeringEntitiesRule::IDENTIFIER: return os << \
-           #IDENTIFIER;
+    #define BOILERPLATE(ID) case TriggeringEntitiesRule::ID: return os << #ID;
 
     BOILERPLATE(all);
     BOILERPLATE(any);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

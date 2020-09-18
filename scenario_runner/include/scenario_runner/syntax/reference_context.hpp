@@ -64,29 +64,28 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Reference
 
   is >> buffer;
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      context.value = ReferenceContext::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    context.value = ReferenceContext::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   BOILERPLATE(relative);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type ReferenceContext, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" << buffer << \
+      "\' is valid OpenSCENARIO value of type ReferenceContext, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } static_assert(true, "")
 
   BOILERPLATE(absolute);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type ReferenceContext";
@@ -99,12 +98,12 @@ std::basic_ostream<Ts...> & operator<<(
   const ReferenceContext & context)
 {
   switch (context) {
-      #define BOILERPLATE(IDENTIFIER) case ReferenceContext::IDENTIFIER: return os << #IDENTIFIER;
+    #define BOILERPLATE(ID) case ReferenceContext::ID: return os << #ID;
 
     BOILERPLATE(absolute);
     BOILERPLATE(relative);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

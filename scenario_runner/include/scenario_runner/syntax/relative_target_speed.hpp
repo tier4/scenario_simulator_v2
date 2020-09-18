@@ -47,8 +47,8 @@ struct RelativeTargetSpeed
   : entity_ref{readAttribute<String>(node, scope, "entityRef")},
     value{readAttribute<Double>(node, scope, "value")},
     speed_target_value_type{readAttribute<SpeedTargetValueType>(node, scope, "speedTargetValueType",
-        SpeedTargetValueType::delta)},
-    continuous{readAttribute<Boolean>(node, scope, "continuous", false)}
+        SpeedTargetValueType())},
+    continuous{readAttribute<Boolean>(node, scope, "continuous", Boolean())}
   {}
 };
 }

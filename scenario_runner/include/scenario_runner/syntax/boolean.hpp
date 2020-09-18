@@ -35,10 +35,9 @@ struct Boolean
 
   value_type data;
 
-  Boolean(value_type value = {}) noexcept
-  {
-    data = value;
-  }
+  explicit constexpr Boolean(value_type value = false) noexcept
+  : data{value}
+  {}
 
   explicit Boolean(const std::string & target)
   {
@@ -51,7 +50,13 @@ struct Boolean
     }
   }
 
-  operator value_type() const noexcept
+  auto & operator=(const value_type & rhs) noexcept
+  {
+    data = rhs;
+    return *this;
+  }
+
+  constexpr operator value_type() const noexcept
   {
     return data;
   }

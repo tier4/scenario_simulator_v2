@@ -102,18 +102,17 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Rule & ru
 
   is >> buffer;
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      rule.value = Rule::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    rule.value = Rule::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   BOILERPLATE(greaterThan);
   BOILERPLATE(lessThan);
   BOILERPLATE(equalTo);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type Rule";
@@ -124,13 +123,13 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Rule & rule)
 {
   switch (rule) {
-      #define BOILERPLATE(IDENTIFIER) case Rule::IDENTIFIER: return os << #IDENTIFIER;
+    #define BOILERPLATE(ID) case Rule::ID: return os << #ID;
 
     BOILERPLATE(greaterThan);
     BOILERPLATE(lessThan);
     BOILERPLATE(equalTo);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

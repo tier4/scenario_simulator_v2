@@ -39,13 +39,11 @@ struct Command
   }
   value;
 
-  Command() = default;
-
-  explicit Command(value_type value)
+  explicit constexpr Command(value_type value = {})
   : value{value}
   {}
 
-  operator value_type() const noexcept
+  constexpr operator value_type() const noexcept
   {
     return value;
   }
@@ -65,8 +63,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command &
   is >> buffer;
 
   #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) \
-  { \
+  if (buffer == #IDENTIFIER) { \
     command = Command::IDENTIFIER; \
     return is; \
   }
@@ -76,7 +73,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command &
   BOILERPLATE(exitSuccess);
   BOILERPLATE(print);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type Command";

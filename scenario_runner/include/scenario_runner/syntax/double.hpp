@@ -31,7 +31,7 @@ struct Double
 {
   using value_type = decltype(std_msgs::msg::Float64::data);
 
-  Double(value_type value = {})
+  explicit Double(value_type value = {})
   {
     data = value;
   }

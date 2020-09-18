@@ -81,11 +81,10 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Parameter
   is >> buffer;
 
   #define SUPPORTED(NAME, IDENTIFIER) \
-  if (buffer == NAME) do \
-    { \
-      type.value = ParameterType::IDENTIFIER; \
-      return is; \
-    } while (false)
+  if (buffer == NAME) { \
+    type.value = ParameterType::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   SUPPORTED("integer", INTEGER);
   SUPPORTED("double", DOUBLE);
@@ -106,7 +105,7 @@ template<typename ... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ParameterType & type)
 {
   switch (type) {
-    #define BOILERPLATE(NAME, IDENTIFIER) case ParameterType::IDENTIFIER: return os << NAME;
+    #define BOILERPLATE(NAME, ID) case ParameterType::ID: return os << NAME;
 
     BOILERPLATE("integer", INTEGER);
     BOILERPLATE("double", DOUBLE);

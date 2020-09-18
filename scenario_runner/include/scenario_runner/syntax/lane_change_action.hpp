@@ -49,7 +49,7 @@ struct LaneChangeAction
 
   template<typename Node>
   explicit LaneChangeAction(const Node & node, Scope & outer_scope)
-  : target_lane_offset{readAttribute<Double>(node, outer_scope, "targetLaneOffset", 0)},
+  : target_lane_offset{readAttribute<Double>(node, outer_scope, "targetLaneOffset", Double())},
     inner_scope{outer_scope},
     lane_change_action_dynamics{readElement<TransitionDynamics>("LaneChangeActionDynamics", node,
         inner_scope)},

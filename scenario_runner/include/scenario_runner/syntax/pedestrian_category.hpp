@@ -67,30 +67,29 @@ std::basic_istream<Ts...> & operator>>(
 
   is >> buffer;
 
-    #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      category.value = PedestrianCategory::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define SUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    category.value = PedestrianCategory::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   SUPPORTED(pedestrian);
 
-    #undef SUPPORTED
+  #undef SUPPORTED
 
-    #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type PedestrianCategory, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  #define UNSUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" << buffer << \
+      "\' is valid OpenSCENARIO value of type PedestrianCategory, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } static_assert(true, "")
 
   UNSUPPORTED(wheelchair);
   UNSUPPORTED(animal);
 
-    #undef UNSUPPORTED
+  #undef UNSUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type PedestrianCategory";
@@ -103,13 +102,13 @@ std::basic_ostream<Ts...> & operator<<(
   const PedestrianCategory & category)
 {
   switch (category) {
-      #define BOILERPLATE(NAME) case PedestrianCategory::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case PedestrianCategory::NAME: return os << #NAME;
 
     BOILERPLATE(pedestrian);
     BOILERPLATE(wheelchair);
     BOILERPLATE(animal);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

@@ -47,7 +47,7 @@ struct Route
   template<typename Node, typename ... Ts>
   explicit Route(const Node & node, Ts && ... xs)
   : name{readRequiredAttribute<std::decay<decltype(name)>::type>(node, "name")},
-    closed{readUnsupportedAttribute<std::decay<decltype(closed)>::type>(node, "closed", false)}
+    closed{readUnsupportedAttribute<std::decay<decltype(closed)>::type>(node, "closed", Boolean())}
   {
     defineElement<ParameterDeclarations>("ParameterDeclarations", 0, 1);
     defineElement<Waypoint>("Waypoint", 2, unbounded);

@@ -74,29 +74,28 @@ std::basic_istream<Ts...> & operator>>(
 
   is >> buffer;
 
-    #define SUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      dimension = DynamicsDimension::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define SUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    dimension = DynamicsDimension::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   SUPPORTED(rate);
   SUPPORTED(time);
   SUPPORTED(distance);
 
-    #undef SUPPORTED
+  #undef SUPPORTED
 
-    #define UNSUPPORTED(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      std::stringstream ss {}; \
-      ss << "given value \'" << buffer << \
-        "\' is valid OpenSCENARIO value of type DynamicsDimension, but it is not supported"; \
-      throw ImplementationFault {ss.str()}; \
-    } while (false)
+  #define UNSUPPORTED(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    std::stringstream ss { \
+    }; \
+    ss << "given value \'" << buffer << \
+      "\' is valid OpenSCENARIO value of type DynamicsDimension, but it is not supported"; \
+    throw ImplementationFault {ss.str()}; \
+  } static_assert(true, "")
 
-    #undef UNSUPPORTED
+  #undef UNSUPPORTED
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type DynamicsDimension";
@@ -109,13 +108,13 @@ std::basic_ostream<Ts...> & operator<<(
   const DynamicsDimension & dimension)
 {
   switch (dimension) {
-      #define BOILERPLATE(NAME) case DynamicsDimension::NAME: return os << #NAME;
+    #define BOILERPLATE(NAME) case DynamicsDimension::NAME: return os << #NAME;
 
     BOILERPLATE(rate);
     BOILERPLATE(time);
     BOILERPLATE(distance);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

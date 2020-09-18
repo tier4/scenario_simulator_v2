@@ -16,6 +16,7 @@
 #define SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
 #include <boost/scope_exit.hpp>
+#include <c++/7/bits/c++config.h>
 #include <scenario_runner/syntax/storyboard_element_state.hpp>
 
 #include <string>
@@ -30,11 +31,11 @@ struct StoryboardElement
 {
   Object state {standby_state};
 
-  const UnsignedInteger maximum_execution_count;
+  const std::size_t maximum_execution_count;
 
-  UnsignedInteger execution_count {0};
+  std::size_t execution_count {0};
 
-  explicit constexpr StoryboardElement(UnsignedInteger maximum_execution_count = 1)
+  explicit constexpr StoryboardElement(std::size_t maximum_execution_count = 1)
   : maximum_execution_count{maximum_execution_count}
   {}
 
@@ -43,7 +44,7 @@ struct StoryboardElement
     return state;
   }
 
-    #define BOILERPLATE(NAME, STATE) \
+  #define BOILERPLATE(NAME, STATE) \
   constexpr auto NAME() const noexcept \
   { \
     return currentState().template as<StoryboardElementState>(__FILE__, \
@@ -58,7 +59,7 @@ struct StoryboardElement
   BOILERPLATE(stopping, stopTransition);
   BOILERPLATE(skipping, skipTransition);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   static constexpr void start() noexcept
   {}

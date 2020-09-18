@@ -69,8 +69,7 @@ struct ImplementationFault
 };
 
   #define THROW(TYPENAME) \
-  do \
-  { \
+  do { \
     std::stringstream ss {}; \
     ss << __FILE__ << ":" << __LINE__; \
     throw TYPENAME {ss.str()}; \
@@ -79,14 +78,12 @@ struct ImplementationFault
   #define THROW_IMPLEMENTATION_FAULT() THROW(ImplementationFault)
 
   #define UNIMPLEMENTED(NAME) \
-  do \
-  { \
+  do { \
     std::stringstream ss {}; \
     ss << "given class \'" << NAME << \
       "\' is valid OpenSCENARIO element, but is not yet implemented"; \
     throw ImplementationFault {ss.str()}; \
-  } \
-  while (false)
+  } while (false)
 }  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__ERROR_HPP_

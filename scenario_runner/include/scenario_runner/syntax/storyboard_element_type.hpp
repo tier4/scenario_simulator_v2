@@ -71,12 +71,11 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Storyboar
 
   is >> buffer;
 
-    #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) do \
-    { \
-      type.value = StoryboardElementType::IDENTIFIER; \
-      return is; \
-    } while (false)
+  #define BOILERPLATE(IDENTIFIER) \
+  if (buffer == #IDENTIFIER) { \
+    type.value = StoryboardElementType::IDENTIFIER; \
+    return is; \
+  } static_assert(true, "")
 
   BOILERPLATE(act);
   BOILERPLATE(action);
@@ -85,7 +84,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Storyboar
   BOILERPLATE(maneuverGroup);
   BOILERPLATE(story);
 
-    #undef BOILERPLATE
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type StoryboardElementType";
@@ -98,8 +97,7 @@ std::basic_ostream<Ts...> & operator<<(
   const StoryboardElementType & type)
 {
   switch (type) {
-      #define BOILERPLATE(IDENTIFIER) case StoryboardElementType::IDENTIFIER: return os << \
-           #IDENTIFIER;
+    #define BOILERPLATE(ID) case StoryboardElementType::ID: return os << #ID;
 
     BOILERPLATE(act);
     BOILERPLATE(action);
@@ -108,7 +106,7 @@ std::basic_ostream<Ts...> & operator<<(
     BOILERPLATE(maneuverGroup);
     BOILERPLATE(story);
 
-      #undef BOILERPLATE
+    #undef BOILERPLATE
 
     default:
       std::stringstream ss {};

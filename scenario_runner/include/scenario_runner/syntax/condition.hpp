@@ -48,7 +48,7 @@ struct Condition
   template<typename Node, typename Scope>
   explicit Condition(const Node & node, Scope & scope)
   : name{readAttribute<String>(node, scope, "name")},
-    delay{readAttribute<Double>(node, scope, "delay", 0)},
+    delay{readAttribute<Double>(node, scope, "delay", Double())},
     condition_edge{readAttribute<ConditionEdge>(node, scope, "conditionEdge")}
   {
     callWithElements(node, "ByEntityCondition", 0, 1, [&](auto && node)
