@@ -20,6 +20,7 @@
 #include <scenario_runner/type_traits/if_not_default_constructible.hpp>
 #include <scenario_runner/utility/pugi_extension.hpp>
 
+#include <iterator>
 #include <limits>
 #include <string>
 #include <utility>
@@ -28,7 +29,13 @@ namespace scenario_runner
 {
 inline namespace reader
 {
-constexpr auto unbounded {std::numeric_limits<std::size_t>::max()};
+constexpr auto unbounded {
+  std::numeric_limits<
+    typename std::iterator_traits<
+      typename pugi::xml_node::iterator
+    >::difference_type
+  >::max()
+};
 
 template<typename T, typename Node, typename ... Ts>
 auto readElement(const std::string & name, const Node & parent, Ts && ... xs)
@@ -49,6 +56,8 @@ void callWithElements(
   Callee && call_with)
 {
   const auto children {parent.children(name.c_str())};
+
+  // NOTE ament_uncrustify says this malformed indentation is beautiful, and forced us to do so.
 
   if (const auto size {iterator::size(children)}) {
     if (min_occurs != 0 && size < min_occurs) {

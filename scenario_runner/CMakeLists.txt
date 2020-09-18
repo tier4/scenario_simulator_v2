@@ -43,9 +43,9 @@ install(
 install(
   DIRECTORY
     config
+    example
     include
     launch
-    example
   DESTINATION share/${PROJECT_NAME})
 
 # install(
