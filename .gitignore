@@ -1,2 +1,3 @@
 external/*
 .vscode
+*.pyc
