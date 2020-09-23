@@ -1,3 +1,4 @@
 external/*
 .vscode
 *.pyc
+*.log
