@@ -16,11 +16,14 @@ setup(
     maintainer='tanaka-car',
     maintainer_email='ttatcoder@outlook.jp',
     description='scenario launcher package',
-    license='TODO: License declaration',
+    license='Apache License 2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'scenario_launcher = scenario_launcher.scenario_launcher:main'
+            'scenario_launcher = scenario_launcher.scenario_launcher:main',
+            'database_handler = scenario_launcher.database_handler:main',
+            'result_reporter = scenario_launcher.result_reporter:main',
+            'test_runner = scenario_launcher.test_runner.test_client:main'
         ],
     },
 )
