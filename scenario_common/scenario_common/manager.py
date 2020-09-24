@@ -47,6 +47,12 @@ class Manager():
         print("\x1b[0m", end="")
 
     @staticmethod
+    def print_separator(message):
+        print("\x1b[35m", end="")
+        print("------- " + message + " -----")
+        print("\x1b[0m", end="")
+
+    @staticmethod
     def print_progress_bar(i, max):
         progress_bar_size = 40
         current_progress = int(i * progress_bar_size / max)
@@ -59,24 +65,26 @@ class Manager():
 
     @staticmethod
     def read_data(path, mode="r"):
+        data = None
         try:
             with open(path, mode) as file:
                 file_type = Manager.get_suffix(path)
-                if(file_type == "yaml"):
+                if(file_type == ".yaml"):
                     data = yaml.safe_load(file)
                 else:
                     data = file.read()
         except FileNotFoundError:
-            Manager.print_exception("unable to fopen: " + str(path))
+            Manager.print_exception("FileNotFoundError: " + str(path))
         return data
 
     @staticmethod
     def path_checker(path):
+        path = str(path)
         is_path = os.path.exists(path)
         if(is_path):
-            Manager.print_process("path: "+path+"exists")
+            Manager.print_process("path: " + path + " exists")
         else:
-            Manager.print_exception("path: "+path+"not exists")
+            Manager.print_exception("path: " + path + " not exists")
         return is_path
 
     @staticmethod
@@ -84,7 +92,7 @@ class Manager():
         try:
             with open(path, mode) as file:
                 file_type = Manager.get_suffix(path)
-                if(file_type == "json"):
+                if(file_type == ".json"):
                     json.dump(data,
                               file,
                               indent=2,
