@@ -22,7 +22,7 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='scenario_launcher',
-            node_executable='test_runner',
-            node_name='test_runner'
+            node_executable='dummy_runner',
+            node_name='dummy_runner'
         )
     ])

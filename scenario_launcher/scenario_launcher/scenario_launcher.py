@@ -23,7 +23,6 @@ from subprocess import PIPE
 from multiprocessing import Process
 import argparse
 import subprocess
-import sys
 import time
 import xmlrpc.client
 
@@ -37,8 +36,8 @@ class Launcher:
     def __init__(self, timeout, database):
         self.timeout = timeout
         self.database_path = database
-        self.roslaunch_parent = None
         self.monitoring_process = None
+        self.runner_process = None
         self.scenario_counter = 0
         self.launch_path = ""
         self.log_path = ""
@@ -57,16 +56,23 @@ class Launcher:
         Manager.print_process(
             "Set Maximum Simulation Time: " + str(self.timeout))
         while (time.time() - start) < self.timeout:
-            print("    Running")
+            print("    Monitoring in Launcher")
+            if(not self.client.get_simulation_running()):
+                Manager.print_exception("    scenario runner not running")
+                return
+            else:
+                print("    runner running")
             time.sleep(self.SLEEP_RATE)
+        Manager.print_process("Reached to Maximum Simulation Time")
 
-    def launch_runner(self):
+    @staticmethod
+    def launch_runner():
+        print("    start dummy runner")
         subprocess.run("ros2 launch scenario_launcher dummy_runner.launch.py",
                        shell=True, stdout=PIPE, stderr=PIPE)
-        # subprocess.run("ros2 run scenario_launcher test_runner",
-        #                shell=True, stdout=PIPE, stderr=PIPE)
 
-    def run_server(self):
+    @staticmethod
+    def run_server():
         monitoring = MonitoringServer()
         monitoring.run()
         return
@@ -74,26 +80,25 @@ class Launcher:
     def run_scenario(self, scenario):
         self.scenario_counter = self.scenario_counter + 1
         time.sleep(self.SLEEP_RATE)
-        self.launch_runner()
+        self.runner_process = Process(target=Launcher.launch_runner)
+        self.runner_process.start()
         self.wait_until_simulation_finished()
-        Manager.print_process("Reached to Maximum Simulation Time")
         results = {}
         results['code'] = self.client.get_exit_status()
         results['simulation_time'] = self.client.get_simulation_time()
         results['traveled_distance'] = self.client.get_traveled_distance()
         Reporter.write_result(self.log_path, results, scenario)
-        sys.exit(0)
         print("")
 
     def run_all_scenarios(self):
-        self.monitoring_process = Process(target=self.run_server)
+        self.monitoring_process = Process(target=Launcher.run_server)
         self.monitoring_process.start()
         for index, scenario in enumerate(self.scenario_list):
+            print(str(index+1), scenario)
+        for index, scenario in enumerate(self.scenario_list):
             Manager.print_process("running scenario " + scenario)
-            print(str(index), scenario)
             self.run_scenario(scenario)
         time.sleep(1)
-        self.client.terminate_server()
         self.monitoring_process.terminate()
 
     def __del__(self):

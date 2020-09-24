@@ -26,7 +26,8 @@ setup(
             'scenario_launcher = scenario_launcher.scenario_launcher:main',
             'database_handler = scenario_launcher.database_handler:main',
             'result_reporter = scenario_launcher.result_reporter:main',
-            'test_runner = scenario_launcher.test_runner.test_client:main'
+            'test_runner = scenario_launcher.test_runner.test_client:main',
+            'dummy_runner = scenario_launcher.test_runner.dummy_runner:main'
         ],
     },
 )
