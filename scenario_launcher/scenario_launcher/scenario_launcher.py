@@ -49,18 +49,6 @@ class Launcher:
             = DatabaseHandler.read_database()
         self.run_all_scenarios()
 
-    def wait_until_simulation_finished(self):
-        start = time.time()
-        while (time.time() - start) < self.timeout:
-            print("    Monitoring in Launcher")
-            if(not self.client.get_simulation_running()):
-                Manager.print_exception("    scenario runner not running")
-                return
-            else:
-                print("    runner running")
-            time.sleep(self.SLEEP_RATE)
-        Manager.print_process("Reached to Maximum Simulation Time")
-
     @staticmethod
     def launch_runner():
         print("    start dummy runner")
@@ -73,15 +61,27 @@ class Launcher:
         monitoring.run()
         return
 
+    def launcher_monitoring(self):
+        start = time.time()
+        while (time.time() - start) < self.timeout:
+            print("    Monitoring in Launcher")
+            if(not self.client.get_simulation_running()):
+                Manager.print_exception("    scenario runner not running")
+                return
+            else:
+                print("    runner running")
+            time.sleep(self.SLEEP_RATE)
+        Manager.print_process("Reached to Maximum Simulation Time")
+
     def run_scenario(self, scenario):
         Manager.print_process(
             "Set Maximum Simulation Time: " + str(self.timeout))
         self.runner_process = Process(target=Launcher.launch_runner)
         self.runner_process.start()
         time.sleep(self.SLEEP_RATE)
-        self.wait_until_simulation_finished()
+        self.launcher_monitoring()
         results = {}
-        results['code'] = self.client.get_exit_status()
+        results['code'] = self.client.get_exit_code()
         results['simulation_time'] = self.client.get_simulation_time()
         results['traveled_distance'] = self.client.get_traveled_distance()
         Reporter.write_result(self.log_path, results, scenario)
@@ -94,11 +94,12 @@ class Launcher:
         self.monitoring_process.start()
         for index, scenario in enumerate(self.scenario_list):
             print(str(index+1), scenario)
+        Manager.ask_continuation()
+        time.sleep(1)
         for index, scenario in enumerate(self.scenario_list):
-            Manager.print_separator("scenario launch " + str(index))
+            Manager.print_separator("scenario launch " + str(index+1))
             Manager.print_process("running scenario " + scenario)
             self.run_scenario(scenario)
-        time.sleep(1)
         self.monitoring_process.terminate()
 
     def __del__(self):

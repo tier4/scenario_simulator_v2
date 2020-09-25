@@ -157,12 +157,8 @@ class ScenarioConverter:
         else:
             num_files = 1
         print("")
-        Manager.print_process(
-            str(num_files) + " files will be created continue ? \n [y/n]:")
-        answer = input()
-        if (answer is not "y"):
-            print("abort creating files")
-            sys.exit()
+        Manager.print_process(str(num_files) + " files will be created")
+        Manager.ask_continuation()
 
         if (bind is None):
             xosc_path = ret_path(xosc_dir, xosc_name, id)

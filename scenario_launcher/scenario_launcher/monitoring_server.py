@@ -28,6 +28,7 @@ class MonitoringServer:
     def __init__(self):
         print("init monitoring server") if self.IS_DEBUG_MODE else None
         self.server = None
+        self.simulation_initialized = False
         self.simulation_running = True
         self.simulation_time = 0
         self.exit_status = 42
@@ -46,43 +47,45 @@ class MonitoringServer:
         self.server = None
         time.sleep(1)
 
+    def set_simulation_initialized(self, simulation_initialized):
+        print("    simulation initialized: " + str(simulation_initialized))
+        self.simulation_initialized = simulation_initialized
+
+    def get_simulation_initialized(self): return self.simulation_initialized
+
     def set_simulation_running(self, simulation_running):
         print("    scenario_runner running: " + str(simulation_running))
         self.simulation_running = simulation_running
+
+    def get_simulation_running(self): return self.simulation_running
 
     def set_exit_code(self, status):
         print("    exit status: " + str(status)+"\n")
         self.exit_status = status
 
+    def get_exit_code(self): return self.exit_status
+
     def update_traveled_distance(self, new_traveled_distance):
         print("    traveled distance: " + str(new_traveled_distance))
         self.traveled_distance = new_traveled_distance
+
+    def get_traveled_distance(self): return self.traveled_distance
 
     def update_simulation_time(self, new_simulation_time):
         print("    simulation time: " + str(new_simulation_time))
         self.simulation_time = new_simulation_time
 
-    def get_exit_status(self):
-        return self.exit_status
-
-    def get_simulation_time(self):
-        return self.simulation_time
-
-    def get_traveled_distance(self):
-        return self.traveled_distance
-
-    def get_simulation_running(self):
-        return self.simulation_running
+    def get_simulation_time(self): return self.simulation_time
 
     def register_functions(self):
-        self.server.register_function(self.update_simulation_time)
-        self.server.register_function(self.update_traveled_distance)
         self.server.register_function(self.set_simulation_running)
-        self.server.register_function(self.set_exit_code)
-        self.server.register_function(self.get_exit_status)
-        self.server.register_function(self.get_simulation_time)
-        self.server.register_function(self.get_traveled_distance)
         self.server.register_function(self.get_simulation_running)
+        self.server.register_function(self.set_exit_code)
+        self.server.register_function(self.get_exit_code)
+        self.server.register_function(self.update_simulation_time)
+        self.server.register_function(self.get_simulation_time)
+        self.server.register_function(self.update_traveled_distance)
+        self.server.register_function(self.get_traveled_distance)
         self.server.register_function(self.terminate_server)
 
     def run(self):

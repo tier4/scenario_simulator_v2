@@ -18,6 +18,7 @@
 import json
 import os
 import pathlib
+import sys
 import yaml
 
 
@@ -63,6 +64,14 @@ class Manager():
               "[{0}] {1} % \033[1C".format(progress_bar, int(i * 100. / max)),
               end='')
         return
+
+    @staticmethod
+    def ask_continuation():
+        Manager.print_process("continue ? \n [y/n]:")
+        answer = input()
+        if (answer is not "y"):
+            print("abort creating files")
+            sys.exit()
 
     @staticmethod
     def read_data(path, mode="r"):
