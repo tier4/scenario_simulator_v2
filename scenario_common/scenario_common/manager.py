@@ -15,9 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import yaml
 import json
+import os
+import pathlib
+import yaml
 
 
 class Manager():
@@ -68,7 +69,7 @@ class Manager():
         data = None
         try:
             with open(path, mode) as file:
-                file_type = Manager.get_suffix(path)
+                file_type = pathlib.Path(path).suffix
                 if(file_type == ".yaml"):
                     data = yaml.safe_load(file)
                 else:
@@ -91,7 +92,7 @@ class Manager():
     def write_data(path, data, mode="w"):
         try:
             with open(path, mode) as file:
-                file_type = Manager.get_suffix(path)
+                file_type = pathlib.Path(path).suffix
                 if(file_type == ".json"):
                     json.dump(data,
                               file,
@@ -117,22 +118,6 @@ class Manager():
             else:
                 print(" -> Because of unkown failure")
 
-    @staticmethod
-    def get_file_name(path):
-        return os.path.splitext(os.path.basename(path))[0]
-
-    @staticmethod
-    def get_suffix(path):
-        return os.path.splitext(os.path.basename(path))[1]
-
-    @staticmethod
-    def get_folder_name(path):
-        return os.path.basename(os.path.dirname(path))
-
-    @staticmethod
-    def get_dir(path):
-        return os.path.dirname(path)
-
 
 if __name__ == "__main__":
     for i in range(11):
@@ -142,6 +127,3 @@ if __name__ == "__main__":
     Manager.print_success("Success")
     Manager.print_exception("Exception")
     Manager.print_error("Failure")
-    print(Manager.get_suffix(__file__))
-    print(Manager.get_dir(__file__))
-    print(Manager.get_folder_name(__file__))
