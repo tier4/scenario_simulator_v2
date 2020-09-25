@@ -15,14 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from scenario_common.manager import Manager
 from scenario_launcher.database_handler import DatabaseHandler
 from scenario_launcher.monitoring_server import MonitoringServer
 from scenario_launcher.result_reporter import Reporter
-from scenario_common.manager import Manager
-from subprocess import PIPE
-from multiprocessing import Process
 import argparse
-import subprocess
+from multiprocessing import Process
+import subprocess as sb
 import time
 import xmlrpc.client
 
@@ -44,7 +43,7 @@ class Launcher:
         self.map_dict = dict()
 
     def main(self):
-        subprocess.run(self.PKILLER, shell=True, stdout=PIPE, stderr=PIPE)
+        sb.run(self.PKILLER, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
         self.client = xmlrpc.client.Server(self.SERVER_URI)
         self.log_path, self.scenario_list, self.map_dict \
             = DatabaseHandler.read_database()
@@ -65,8 +64,8 @@ class Launcher:
     @staticmethod
     def launch_runner():
         print("    start dummy runner")
-        subprocess.run("ros2 launch scenario_launcher dummy_runner.launch.py",
-                       shell=True, stdout=PIPE, stderr=PIPE)
+        sb.run("ros2 launch scenario_launcher dummy_runner.launch.py",
+               shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
 
     @staticmethod
     def run_server():
@@ -103,7 +102,7 @@ class Launcher:
         self.monitoring_process.terminate()
 
     def __del__(self):
-        subprocess.run(self.PKILLER, shell=True, stdout=PIPE, stderr=PIPE)
+        sb.run(self.PKILLER, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
 
 
 def main():
