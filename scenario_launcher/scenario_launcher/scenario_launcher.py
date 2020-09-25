@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from scenario_common.logger import Logger
 from scenario_common.manager import Manager
 from scenario_launcher.database_handler import DatabaseHandler
 from scenario_launcher.monitoring_server import MonitoringServer
@@ -51,7 +52,7 @@ class Launcher:
 
     @staticmethod
     def launch_runner():
-        print("    start dummy runner")
+        Logger.print_info("    start dummy runner")
         sb.run("ros2 launch scenario_launcher dummy_runner.launch.py",
                shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
 
@@ -64,17 +65,17 @@ class Launcher:
     def launcher_monitoring(self):
         start = time.time()
         while (time.time() - start) < self.timeout:
-            print("    Monitoring in Launcher")
+            Logger.print_info("    Monitoring in Launcher")
             if(not self.client.get_simulation_running()):
-                Manager.print_exception("    scenario runner not running")
+                Logger.print_error("    scenario runner not running")
                 return
             else:
-                print("    runner running")
+                Logger.print_info("    runner running")
             time.sleep(self.SLEEP_RATE)
-        Manager.print_process("Reached to Maximum Simulation Time")
+        Logger.print_info("Reached to Maximum Simulation Time")
 
     def run_scenario(self, scenario):
-        Manager.print_process(
+        Logger.print_process(
             "Set Maximum Simulation Time: " + str(self.timeout))
         self.runner_process = Process(target=Launcher.launch_runner)
         self.runner_process.start()
@@ -88,17 +89,17 @@ class Launcher:
         print("")
 
     def run_all_scenarios(self):
-        Manager.print_separator("scenario preprocess")
+        Logger.print_separator("scenario preprocess")
         Manager.mkdir(self.log_path)
         self.monitoring_process = Process(target=Launcher.run_server)
         self.monitoring_process.start()
         for index, scenario in enumerate(self.scenario_list):
             print(str(index+1), scenario)
+        time.sleep(2)
         Manager.ask_continuation()
-        time.sleep(1)
         for index, scenario in enumerate(self.scenario_list):
-            Manager.print_separator("scenario launch " + str(index+1))
-            Manager.print_process("running scenario " + scenario)
+            Logger.print_separator("scenario launch " + str(index+1))
+            Logger.print_process("running scenario " + scenario)
             self.run_scenario(scenario)
         self.monitoring_process.terminate()
 
