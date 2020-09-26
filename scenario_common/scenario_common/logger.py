@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from logging import getLogger, StreamHandler, Formatter, FileHandler, DEBUG, addLevelName
+from logging import getLogger, StreamHandler, Formatter, FileHandler, DEBUG
 import logging
 import datetime
 import pathlib
@@ -38,7 +38,7 @@ class Logger:
     @staticmethod
     def print_error(message):
         logger.success("\x1b[1;31m{0}\x1b[0m".format(message))
-        
+
     @staticmethod
     def print_warning(message):
         logger.critical("\x1b[33m{0}\x1b[0m".format(message))

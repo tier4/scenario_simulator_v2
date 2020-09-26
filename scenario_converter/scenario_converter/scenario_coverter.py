@@ -27,7 +27,6 @@ import itertools
 import os
 import pathlib
 import re
-import sys
 import xmlplain
 import xmltodict
 

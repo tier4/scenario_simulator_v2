@@ -16,7 +16,6 @@
 # limitations under the License.
 
 from scenario_common.logger import Logger
-from scenario_common.manager import Manager
 from collections import OrderedDict
 import itertools
 import numpy as np
