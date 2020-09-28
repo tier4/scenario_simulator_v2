@@ -12,8 +12,8 @@ namespace simulation_controller
             az_(az), bz_(bz), cz_(cz), dz_(dz)
         {}
 
-        HermiteCurve::HermiteCurve(geometry_msgs::Pose start_pose, geometry_msgs::Pose goal_pose,
-            geometry_msgs::Vector3 start_vec, geometry_msgs::Vector3 goal_vec)
+        HermiteCurve::HermiteCurve(geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
+            geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec)
         {
             ax_ = 2 * start_pose.position.x - 2 * goal_pose.position.x + start_vec.x + goal_vec.x;
             bx_ = -3 * start_pose.position.x + 3 * goal_pose.position.x - 2 * start_vec.x - goal_vec.x;
@@ -31,53 +31,53 @@ namespace simulation_controller
             dz_ = start_pose.position.z;
         }
 
-        std::vector<geometry_msgs::Point> HermiteCurve::getTrajectory()
+        std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
         {
-            std::vector<geometry_msgs::Point> ret;
+            std::vector<geometry_msgs::msg::Point> ret;
             for(int i=0; i<=100; i++)
             {
                 double t=(double)i/100.0;
-                geometry_msgs::Point p = getPoint(t);
+                geometry_msgs::msg::Point p = getPoint(t);
                 ret.push_back(p);
             }
             return ret;
         }
 
-        geometry_msgs::Point HermiteCurve::getPoint(double s,bool autoscale)
+        geometry_msgs::msg::Point HermiteCurve::getPoint(double s,bool autoscale)
         {
             if(autoscale)
             {
                 s = s/getLength();
             }
-            geometry_msgs::Point p;
+            geometry_msgs::msg::Point p;
             p.x = ax_ * std::pow(s, 3) + bx_ * std::pow(s, 2) + cx_ * s + dx_;
             p.y = ay_ * std::pow(s, 3) + by_ * std::pow(s, 2) + cy_ * s + dy_;
             p.z = az_ * std::pow(s, 3) + bz_ * std::pow(s, 2) + cz_ * s + dz_;
             return p;
         }
 
-        geometry_msgs::Vector3 HermiteCurve::getTangentVector(double s,bool autoscale)
+        geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s,bool autoscale)
         {
             if(autoscale)
             {
                 s = s/getLength();
             }
-            geometry_msgs::Vector3 vec;
+            geometry_msgs::msg::Vector3 vec;
             vec.x = 3 * ax_ * s * s + 2 * bx_ * s + cx_;
             vec.y = 3 * ay_ * s * s + 2 * by_ * s + cy_;
             vec.z = 3 * az_ * s * s + 2 * bz_ * s + cz_;
             return vec;
         }
 
-        geometry_msgs::Pose HermiteCurve::getPose(double s,bool autoscale)
+        geometry_msgs::msg::Pose HermiteCurve::getPose(double s,bool autoscale)
         {
             if(autoscale)
             {
                 s = s/getLength();
             }
-            geometry_msgs::Pose pose;
-            geometry_msgs::Vector3 tangent_vec = getTangentVector(s, false);
-            geometry_msgs::Vector3 rpy;
+            geometry_msgs::msg::Pose pose;
+            geometry_msgs::msg::Vector3 tangent_vec = getTangentVector(s, false);
+            geometry_msgs::msg::Vector3 rpy;
             rpy.x = 0.0;
             rpy.y = 0.0;
             rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);

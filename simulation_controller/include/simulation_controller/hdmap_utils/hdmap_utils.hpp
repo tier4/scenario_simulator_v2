@@ -3,10 +3,10 @@
 
 #include <simulation_controller/entity/entity_status.hpp>
 #include <simulation_controller/math/hermite_curve.hpp>
-#include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <autoware_lanelet2_msgs/MapBin.h>
-#include <geometry_msgs/Vector3.h>
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <autoware_auto_msgs/msg/had_map_bin.hpp>
+#include <geometry_msgs/msg/vector3.h>
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Matrix3x3.h>
@@ -14,8 +14,8 @@
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
-#include <lanelet2_extension/utility/message_conversion.h>
-#include <lanelet2_extension/utility/utilities.h>
+#include <lanelet2_extension/utility/message_conversion.hpp>
+#include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_routing/Route.h>
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_routing/RoutingGraph.h>
@@ -39,11 +39,11 @@ namespace hdmap_utils
     {
     public:
         HdMapUtils(std::string lanelet_topic);
-        std::vector<geometry_msgs::Point> toMapPoints(int lanelet_id, std::vector<double> s);
-        boost::optional<geometry_msgs::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Quaternion quat);
-        boost::optional<geometry_msgs::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Vector3 rpy);
-        boost::optional<geometry_msgs::PoseStamped> toMapPose(int lanelet_id, double s, double offset);
-        boost::optional<geometry_msgs::PoseStamped> toMapPose(simulation_controller::entity::EntityStatus status);
+        std::vector<geometry_msgs::msg::Point> toMapPoints(int lanelet_id, std::vector<double> s);
+        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Quaternion quat);
+        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Vector3 rpy);
+        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset);
+        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(simulation_controller::entity::EntityStatus status);
         std::vector<int> getNextLaneletIds(int lanelet_id, std::string turn_direction);
         std::vector<int> getNextLaneletIds(int lanelet_id) const;
         std::vector<int> getPreviousLaneletIds(int lanelet_id) const;
@@ -53,8 +53,8 @@ namespace hdmap_utils
         boost::optional<double> getLongitudinalDistance(int from_lanelet_id, double from_s, int to_lanelet_id, double to_s);
         double getSpeedLimit(std::vector<int> lanelet_ids);
         std::vector<int> getFollowingLanelets(int lanelet_id, double distance = 100);
-        std::vector<geometry_msgs::Point> getCenterPoints(int lanelet_id);
-        std::vector<geometry_msgs::Point> clipTrajectoryFromLaneletIds(int lanelet_id, double s, 
+        std::vector<geometry_msgs::msg::Point> getCenterPoints(int lanelet_id);
+        std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(int lanelet_id, double s, 
             std::vector<int> lanelet_ids, double foward_distance=20);
         bool canChangeLane(int from_lanlet_id, int to_lanelet_id);
         boost::optional<std::pair<simulation_controller::math::HermiteCurve,double>> getLaneChangeTrajectory(geometry_msgs::Pose from_pose, int to_lanelet_id);
@@ -66,14 +66,14 @@ namespace hdmap_utils
         boost::optional<double> getCollisionPointInLaneCoordinate(int lanelet_id, int crossing_lanelet_id);
     private:
         geometry_msgs::Vector3 getVectorFromPose(geometry_msgs::Pose pose, double magnitude);
-        void mapCallback(const autoware_lanelet2_msgs::MapBin & msg);
+        void mapCallback(const autoware_auto_msgs::MapBin & msg);
         lanelet::LaneletMapPtr lanelet_map_ptr_;
         lanelet::routing::RoutingGraphConstPtr vehicle_routing_graph_ptr_;
         lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
         lanelet::routing::RoutingGraphConstPtr pedestrian_routing_graph_ptr_;
         lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
         lanelet::routing::RoutingGraphContainerUPtr overall_graphs_ptr_;
-        double getTrajectoryLength(std::vector<geometry_msgs::Point> trajectory);
+        double getTrajectoryLength(std::vector<geometry_msgs::msg::Point> trajectory);
         std::vector<double> calcEuclidDist(const std::vector<double> & x, const std::vector<double> & y, const std::vector<double> & z);
     };
 }

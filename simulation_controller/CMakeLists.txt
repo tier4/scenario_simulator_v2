@@ -22,13 +22,31 @@ find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
+find_package(lanelet2_core REQUIRED)
 find_package(lanelet2_extension REQUIRED)
 find_package(autoware_auto_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(spline_interpolation REQUIRED)
+find_package(quaternion_operation REQUIRED)
+
+find_package(Eigen3 REQUIRED)
 
 include_directories(
   include
+  ${EIGEN3_INCLUDE_DIR}
+)
+
+add_library(simulation_controller
+  src/hdmap_utils/hdmap_utils.cpp
+  src/math/hermite_curve.cpp
+)
+ament_target_dependencies(simulation_controller
+  rclcpp
+  geometry_msgs
+  quaternion_operation
+  autoware_auto_msgs
+  lanelet2_core
+  lanelet2_extension
 )
 
 #add_library(simulation_controller
@@ -47,11 +65,9 @@ include_directories(
   #src/behavior/pedestrian/acquire_position_action.cpp
   #src/behavior/pedestrian/lane_change_action.cpp
   #src/behavior/action_node.cpp
-  #src/hdmap_utils/hdmap_utils.cpp
   #src/api/api.cpp
   #src/api/entity_api_impl.cpp
   #src/api/simulation_api_impl.cpp
-  #src/math/hermite_curve.cpp
 #)
 #target_link_libraries(simulation_controller
 #  pugixml

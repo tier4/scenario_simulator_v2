@@ -1,8 +1,8 @@
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_controller/math/hermite_curve.hpp>
 
-#include <spline_interpolation/spline_interpolation.h>
-#include <quaternion_operation/quaternion_operation.h>
+#include <spline_interpolation/spline_interpolation.hpp>
+#include <quaternion_operation/quaternion_operation.hpp>
 #include <lanelet2_core/utility/Units.h>
 
 #include <boost/archive/binary_iarchive.hpp>
@@ -22,8 +22,9 @@ namespace hdmap_utils
         try
         {
             lanelet_map_ptr_ = std::make_shared<lanelet::LaneletMap>();
-            auto map_ptr = ros::topic::waitForMessage<autoware_lanelet2_msgs::MapBin>(lanelet_topic, ros::Duration(5));
-            autoware_lanelet2_msgs::MapBin map = *map_ptr;
+            /*
+            auto map_ptr = ros::topic::waitForMessage<autoware_auto_msgs::MapBin>(lanelet_topic, ros::Duration(5));
+            autoware_auto_msgs::MapBin map = *map_ptr;
             lanelet::utils::conversion::fromBinMsg(map, lanelet_map_ptr_);
             traffic_rules_vehicle_ptr_ =
                 lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, 
@@ -39,6 +40,7 @@ namespace hdmap_utils
             all_graphs.push_back(vehicle_routing_graph_ptr_);
             all_graphs.push_back(pedestrian_routing_graph_ptr_);
             overall_graphs_ptr_ = std::make_unique<lanelet::routing::RoutingGraphContainer>(all_graphs);
+            */
         }
         catch(...)
         {
@@ -114,10 +116,10 @@ namespace hdmap_utils
         return ret;
     }
 
-    std::vector<geometry_msgs::Point> HdMapUtils::clipTrajectoryFromLaneletIds(int lanelet_id, double s,
+    std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(int lanelet_id, double s,
         std::vector<int> lanelet_ids, double foward_distance)
     {
-        std::vector<geometry_msgs::Point> ret;
+        std::vector<geometry_msgs::msg::Point> ret;
         bool on_traj = false;
         double rest_distance = foward_distance;
         for(auto id_itr = lanelet_ids.begin(); id_itr != lanelet_ids.end(); id_itr++)
@@ -278,14 +280,14 @@ namespace hdmap_utils
         return ret;
     }
 
-    std::vector<geometry_msgs::Point> HdMapUtils::getCenterPoints(int lanelet_id)
+    std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(int lanelet_id)
     {
-        std::vector<geometry_msgs::Point> ret;
+        std::vector<geometry_msgs::msg::Point> ret;
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
         const auto centerline = lanelet.centerline();
         for(auto i=0; i<centerline.size(); i++)
         {
-            geometry_msgs::Point p;
+            geometry_msgs::msg::Point p;
             p.x = centerline[i].x();
             p.y = centerline[i].y();
             p.z = centerline[i].z();
@@ -349,7 +351,7 @@ namespace hdmap_utils
         return ret;
     }
 
-    double HdMapUtils::getTrajectoryLength(std::vector<geometry_msgs::Point> trajectory)
+    double HdMapUtils::getTrajectoryLength(std::vector<geometry_msgs::msg::Point> trajectory)
     {
         double ret = 0.0;
         for(int i=0; i<trajectory.size()-1; i++)
@@ -400,15 +402,15 @@ namespace hdmap_utils
     boost::optional<simulation_controller::math::HermiteCurve> HdMapUtils::getLaneChangeTrajectory(
         geometry_msgs::Pose from_pose, int to_lanelet_id, double to_s, double tangent_vector_size)
     {
-        std::vector<geometry_msgs::Point> ret;
+        std::vector<geometry_msgs::msg::Point> ret;
         auto to_vec = getTangentVector(to_lanelet_id, to_s);
         auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
         if(!to_vec || !goal_pose)
         {
             return boost::none;
         }
-        geometry_msgs::Vector3 start_vec = getVectorFromPose(from_pose,tangent_vector_size);
-        geometry_msgs::Vector3 goal_vec = to_vec.get();
+        geometry_msgs::msg::Vector3 start_vec = getVectorFromPose(from_pose,tangent_vector_size);
+        geometry_msgs::msg::Vector3 goal_vec = to_vec.get();
         goal_vec.x = goal_vec.x * tangent_vector_size;
         goal_vec.y = goal_vec.y * tangent_vector_size;
         goal_vec.z = goal_vec.z * tangent_vector_size;
@@ -416,11 +418,11 @@ namespace hdmap_utils
         return curve;
     }
 
-    geometry_msgs::Vector3 HdMapUtils::getVectorFromPose(geometry_msgs::Pose pose, double magnitude)
+    geometry_msgs::msg::Vector3 HdMapUtils::getVectorFromPose(geometry_msgs::Pose pose, double magnitude)
     {
-        geometry_msgs::Vector3 dir =
+        geometry_msgs::msg::Vector3 dir =
             quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
-        geometry_msgs::Vector3 vector;
+        geometry_msgs::msg::Vector3 vector;
         vector.x = magnitude * std::cos(dir.z);
         vector.y = magnitude * std::sin(dir.z);
         vector.z = 0;
@@ -429,7 +431,7 @@ namespace hdmap_utils
 
     bool HdMapUtils::isInLanelet(int lanelet_id, double s)
     {
-        geometry_msgs::PoseStamped ret;
+        geometry_msgs::msg::PoseStamped ret;
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
 
         const auto centerline = lanelet.centerline();
@@ -466,9 +468,9 @@ namespace hdmap_utils
         return true;
     }
 
-    std::vector<geometry_msgs::Point> HdMapUtils::toMapPoints(int lanelet_id, std::vector<double> s)
+    std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(int lanelet_id, std::vector<double> s)
     {
-        std::vector<geometry_msgs::Point> ret;
+        std::vector<geometry_msgs::msg::Point> ret;
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
         const auto centerline = lanelet.centerline();
         std::vector<double> base_x;
@@ -497,7 +499,7 @@ namespace hdmap_utils
         }
         for(int i=0; i<s.size(); i++)
         {
-            geometry_msgs::Point p;
+            geometry_msgs::msg::Point p;
             p.x = resampled_x[i];
             p.y = resampled_y[i];
             p.z = resampled_z[i];
@@ -506,27 +508,27 @@ namespace hdmap_utils
         return ret;
     }
 
-    boost::optional<geometry_msgs::PoseStamped> HdMapUtils::toMapPose(simulation_controller::entity::EntityStatus status)
+    boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(simulation_controller::entity::EntityStatus status)
     {
         if(status.coordinate == simulation_controller::entity::WORLD)
         {
-            geometry_msgs::PoseStamped ret;
+            geometry_msgs::msg::PoseStamped ret;
             ret.header.frame_id = "map";
             ret.pose = status.pose;
             return ret;
         }
         if(status.coordinate == simulation_controller::entity::LANE)
         {
-            boost::optional<geometry_msgs::PoseStamped> ret;
+            boost::optional<geometry_msgs::msg::PoseStamped> ret;
             ret = toMapPose(status.lanelet_id, status.s, status.offset, status.rpy);
             return ret;
         }
         return boost::none;
     }
 
-    boost::optional<geometry_msgs::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Quaternion quat)
+    boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Quaternion quat)
     {
-        geometry_msgs::PoseStamped ret;
+        geometry_msgs::msg::PoseStamped ret;
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
         const auto straight_lanelet_ids = getNextLaneletIds(lanelet.id(),"straight");
         boost::optional<lanelet::Lanelet> next_lanelet = boost::none;
@@ -587,11 +589,11 @@ namespace hdmap_utils
         {
             return boost::none;
         }
-        geometry_msgs::Vector3 tangent_vec;
+        geometry_msgs::msg::Vector3 tangent_vec;
         tangent_vec.x = (resampled_x[1] - resampled_x[0])/diff;
         tangent_vec.y = (resampled_y[1] - resampled_y[0])/diff;
         tangent_vec.z = (resampled_z[1] - resampled_z[0])/diff;
-        geometry_msgs::Vector3 rpy;
+        geometry_msgs::msg::Vector3 rpy;
         rpy.x = 0.0;
         rpy.y = 0.0;
         rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
@@ -604,21 +606,21 @@ namespace hdmap_utils
         return ret;
     }
 
-    boost::optional<geometry_msgs::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Vector3 rpy)
+    boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset, geometry_msgs::msg::Vector3 rpy)
     {
         return toMapPose(lanelet_id, s, offset, quaternion_operation::convertEulerAngleToQuaternion(rpy));
     }
 
-    boost::optional<geometry_msgs::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset)
+    boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset)
     {
-        geometry_msgs::Vector3 rpy;
+        geometry_msgs::msg::Vector3 rpy;
         rpy.x = 0;
         rpy.y = 0;
         rpy.z = 0;
         return toMapPose(lanelet_id, s, offset, rpy);
     }
 
-    boost::optional<geometry_msgs::Vector3> HdMapUtils::getTangentVector(int lanelet_id, double s)
+    boost::optional<geometry_msgs::msg::Vector3> HdMapUtils::getTangentVector(int lanelet_id, double s)
     {
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
         std::vector<double> base_x;
@@ -650,7 +652,7 @@ namespace hdmap_utils
         {
             return boost::none;
         }
-        geometry_msgs::Vector3 tangent_vec;
+        geometry_msgs::msg::Vector3 tangent_vec;
         tangent_vec.x = (resampled_x[1] - resampled_x[0])/diff;
         tangent_vec.y = (resampled_y[1] - resampled_y[0])/diff;
         tangent_vec.z = (resampled_z[1] - resampled_z[0])/diff;

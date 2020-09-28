@@ -1,10 +1,10 @@
 #ifndef SIMULATION_CONTROLLER___ENTITY_STATUS_HPP_
 #define SIMULATION_CONTROLLER___ENTITY_STATUS_HPP_
 
-#include <ros/ros.h>
-#include <geometry_msgs/Pose.h>
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Accel.h>
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/accel.hpp>
 
 namespace simulation_controller
 {

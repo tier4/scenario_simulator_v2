@@ -18,9 +18,9 @@
   <build_depend>geometry_msgs</build_depend>
   <build_export_depend>geometry_msgs</build_export_depend>
   <exec_depend>geometry_msgs</exec_depend>
-  <build_depend>autoware_lanelet2_msgs</build_depend>
-  <build_export_depend>autoware_lanelet2_msgs</build_export_depend>
-  <exec_depend>autoware_lanelet2_msgs</exec_depend>
+  <build_depend>autoware_auto_msgs</build_depend>
+  <build_export_depend>autoware_auto_msgs</build_export_depend>
+  <exec_depend>autoware_auto_msgs</exec_depend>
   <build_depend>lanelet2_core</build_depend>
   <build_export_depend>lanelet2_core</build_export_depend>
   <exec_depend>lanelet2_core</exec_depend>
