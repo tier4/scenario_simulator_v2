@@ -1,3 +1,5 @@
+"""Generate launch description for scenario runner."""
+
 # Copyright 2015-2020 Autoware Foundation. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,14 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 import ament_index_python.packages
 import launch
 import launch_ros.actions
-import os
 
 
 def generate_launch_description():
-
+    """Generate launch description for scenario runner."""
     return launch.LaunchDescription([
         launch_ros.actions.Node(
             package='scenario_runner',
