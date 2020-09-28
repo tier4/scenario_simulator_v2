@@ -59,7 +59,7 @@ private:
 // ^ NOTE This broken indent was forced by ament_uncrustify.
     std::ostream & write(std::ostream & os) const override
     {
-      return WhenHasStreamOutputOperator<Bound>::applyIt(os, *this);
+      return IfHasStreamOutputOperator<Bound>::applyIt(os, *this);
     }
 
     Pointer evaluate(const Pointer & else_) override

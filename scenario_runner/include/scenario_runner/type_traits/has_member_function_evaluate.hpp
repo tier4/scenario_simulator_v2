@@ -21,14 +21,14 @@ namespace scenario_runner
 {
 inline namespace type_traits
 {
-template<typename T, typename ... Ts, typename = void>
+template<typename T, typename = void>
 struct HasMemberFunctionEvaluate
   : public std::false_type
 {};
 
-template<typename T, typename ... Ts>
+template<typename T>
 struct HasMemberFunctionEvaluate<T,
-  void_t<decltype(std::declval<T>().evaluate(std::declval<Ts>()...))>>
+  void_t<decltype(std::declval<T>().evaluate())>>
   : public std::true_type
 {};
 }

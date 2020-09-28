@@ -15,7 +15,7 @@
 #ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_EVALUATE_HPP_
 #define SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_EVALUATE_HPP_
 
-#include <scenario_runner/concepts/evaluable.hpp>
+#include <scenario_runner/type_traits/has_member_function_evaluate.hpp>
 
 #include <utility>
 
@@ -27,9 +27,9 @@ template<typename T, typename = void>
 struct IfHasMemberFunctionEvaluate
 {
   template<typename Result>
-  static Result callIt(T &&, const Result & alternate)
+  static constexpr Result callIt(T &, const Result & as_self_evaluating)
   {
-    return alternate;
+    return as_self_evaluating;
   }
 };
 
@@ -40,9 +40,9 @@ struct IfHasMemberFunctionEvaluate<T,
   >::type>
 {
   template<typename Result>
-  static Result callIt(T && consequent, const Result &)
+  static constexpr Result callIt(T & then, const Result &)
   {
-    return consequent.evaluate();
+    return then.evaluate();
   }
 };
 }
