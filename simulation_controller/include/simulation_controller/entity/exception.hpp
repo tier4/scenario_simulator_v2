@@ -6,18 +6,14 @@ namespace simulation_controller
     class SimulationRuntimeError : public std::runtime_error
     {
     public:
-        SimulationRuntimeError(const char *message, int res=0) : error_info_(res), runtime_error(message) {};
-        SimulationRuntimeError(std::string message, int res=0) : error_info_(res), runtime_error(message.c_str()) {};
-    private:
-        int error_info_;
+        SimulationRuntimeError(const char *message) : runtime_error(message) {};
+        SimulationRuntimeError(std::string message) : runtime_error(message.c_str()) {};
     };
 
     class SplineInterpolationError : public std::runtime_error
     {
     public:
-        SplineInterpolationError(const char *message, int res=0) : error_info_(res), runtime_error(message) {};
-    private:
-        int error_info_;
+        SplineInterpolationError(const char *message) : runtime_error(message) {};
     };
 }  // namespace simulation_controller
 

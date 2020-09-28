@@ -4,7 +4,7 @@
 #include <simulation_controller/entity/entity_status.hpp>
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
 
-#include <visualization_msgs/MarkerArray.h>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #include <boost/optional.hpp>
 
@@ -38,7 +38,7 @@ namespace simulation_controller
             virtual ~EntityBase() = default;
             const std::string type;
             const std::string name;
-            const CoordinateFrameTypes getStatusCoordinateFrameType() const;
+            const CoordinateFrameTypes & getStatusCoordinateFrameType() const;
             const EntityStatus getStatus(CoordinateFrameTypes coordinate=CoordinateFrameTypes::WORLD) const;
             bool setStatus(const EntityStatus &status);
             bool setVisibility(bool visibility);

@@ -1,7 +1,7 @@
 #include <simulation_controller/entity/entity_base.hpp>
 #include <simulation_controller/entity/exception.hpp>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace simulation_controller
 {
@@ -147,7 +147,7 @@ namespace simulation_controller
             return true;
         }
 
-        const CoordinateFrameTypes EntityBase::getStatusCoordinateFrameType() const
+        const CoordinateFrameTypes & EntityBase::getStatusCoordinateFrameType() const
         {
             return this->status_->coordinate;
         }

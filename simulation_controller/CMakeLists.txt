@@ -43,6 +43,7 @@ add_library(simulation_controller
   src/hdmap_utils/hdmap_utils.cpp
   src/math/hermite_curve.cpp
   src/entity/entity_status.cpp
+  src/entity/entity_base.cpp
   src/behavior/action_node.cpp
   src/color_utils/color_utils.cpp
 )
@@ -63,7 +64,6 @@ ament_target_dependencies(simulation_controller
   #src/entity/ego_entity.cpp
   #src/entity/vehicle_entity.cpp
   #src/entity/pedestrian_entity.cpp
-  #src/entity/entity_base.cpp
   #src/entity/entity_manager.cpp
   #src/behavior/vehicle/behavior_tree.cpp
   #src/behavior/vehicle/follow_lane_action.cpp
