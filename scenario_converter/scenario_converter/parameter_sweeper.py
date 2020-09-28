@@ -15,11 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_converter.scenario_logger import Logger
+from scenario_common.logger import Logger
 from collections import OrderedDict
-import re
 import itertools
 import numpy as np
+import re
 
 
 class ParameterSweeper:
@@ -64,16 +64,15 @@ class ParameterSweeper:
         bind = ParameterSweeper.get_modifier_bindings(modifier_dict)
         for item in itertools.product(*bind):
             xosc_text = "CAR SPEED"
-            Logger().print_process("parameter distribution at file: " +
-                                   str(item))
-            # print(item)
+            Logger.print_process(
+                "parameter distribution at file: " + str(item))
             for index2, item2 in enumerate(item):
                 # print(item2)
                 pattern = str(item2[0])
                 repl = str(item2[1])
                 print("replace " + str(item2[0]) + " --> " + str(item2[1]))
                 xosc_text = re.sub(pattern, repl, xosc_text)
-            Logger().print_success(xosc_text)
+            Logger.print_success(xosc_text)
             return xosc_text
         return xosc_text
 

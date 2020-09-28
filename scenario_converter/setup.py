@@ -16,7 +16,7 @@ setup(
     maintainer='tanaka-car',
     maintainer_email='ttatcoder@outlook.jp',
     description='scenario converter package for autoware.auto',
-    license='TODO: License declaration',
+    license='Apache License 2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [

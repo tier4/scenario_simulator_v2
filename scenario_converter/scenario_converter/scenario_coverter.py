@@ -15,20 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_converter.file_handler import FileHandler
 from scenario_converter.parameter_sweeper import ParameterSweeper
 from scenario_converter.scenario_regressor import Regressor
-from scenario_converter.scenario_logger import Logger
+from scenario_common.logger import Logger
+from scenario_common.manager import Manager
 from collections import OrderedDict, defaultdict
 from bs4 import BeautifulSoup
 import argparse
 import copy
-import re
 import itertools
-import xmltodict
-import xmlplain
 import os
-import sys
+import pathlib
+import re
+import xmlplain
+import xmltodict
 
 
 class ScenarioConverter:
@@ -44,6 +44,7 @@ class ScenarioConverter:
 
     @staticmethod
     def convert(yaml_path, xosc_dir, log_path):
+        Logger.print_separator("Scenario Preprocess")
         xosc_dict = None
         root_data = ScenarioConverter.convert_yaml2dict(yaml_path)
         length, modifier = ScenarioConverter.check_modifier_dict(root_data)
@@ -53,16 +54,17 @@ class ScenarioConverter:
             xosc_dict = dict(list(root_data.items())[1:])
         xosc_dict = ScenarioConverter.extract_open_scenario(xosc_dict)
         xosc_text = ScenarioConverter.convert_dict2xosc(xosc_dict, xosc_dir)
-        Logger.mkdir_with_check(FileHandler.get_dir(log_path))
-        Logger.mkdir_with_check(xosc_dir)
+        Manager.mkdir(pathlib.Path(log_path).parent)
+        Manager.mkdir(xosc_dir)
+        Logger.print_separator("Start Conversion")
         ScenarioConverter.apply_parameter_distribution(modifier, xosc_text,
                                                        xosc_dir, yaml_path,
                                                        log_path)
-        print("\n")
-        Logger.print_success("input: " + yaml_path)
-        Logger.print_success("output: " + xosc_dir)
-        Logger.print_success("log: " + os.path.abspath(log_path))
-        Logger().print_success("!!! Conversion Done !!!")
+        print("")
+        Logger.print_separator("Conversion Done")
+        Logger.print_process("input: " + yaml_path)
+        Logger.print_process("output: " + xosc_dir)
+        Logger.print_process("log: " + os.path.abspath(log_path))
 
     @staticmethod
     def check_modifier_dict(root_data):
@@ -74,7 +76,7 @@ class ScenarioConverter:
             if "ScenarioModifier" in scenario_modifiers:
                 scenario_modifier = scenario_modifiers["ScenarioModifier"]
         if scenario_modifier is None:
-            print("No Scenario Modifiers Detected")
+            Logger.print_info("No Scenario Modifiers Detected")
         return length, scenario_modifier
 
     @staticmethod
@@ -119,9 +121,9 @@ class ScenarioConverter:
 
     @staticmethod
     def convert_yaml2dict(yaml_scenario_path):
-        read_yaml = Logger.fopen_with_check(yaml_scenario_path)
-        root = xmlplain.obj_from_yaml(read_yaml)
-        read_yaml.close()
+        Manager.path_checker(yaml_scenario_path)
+        with open(yaml_scenario_path, "r") as file:
+            root = xmlplain.obj_from_yaml(file)
         return root
 
     @staticmethod
@@ -138,7 +140,7 @@ class ScenarioConverter:
     def apply_parameter_distribution(modifier_dict, xosc_text, xosc_dir,
                                      yaml_path, log_path):
         bind = ParameterSweeper.get_modifier_bindings(modifier_dict)
-        xosc_name = FileHandler.get_file_name(yaml_path)
+        xosc_name = pathlib.Path(yaml_path).stem
         id = 1
 
         def ret_path(xosc_dir, xosc_name, id):
@@ -155,21 +157,16 @@ class ScenarioConverter:
         else:
             num_files = 1
         print("")
-        Logger.print_process(
-            str(num_files) + " files will be created continue ? \n [y/n]:")
-        answer = input()
-        if (answer is not "y"):
-            print("abort creating files")
-            sys.exit()
-
+        Logger.print_process(str(num_files) + " files will be created")
+        Manager.ask_continuation()
         if (bind is None):
             xosc_path = ret_path(xosc_dir, xosc_name, id)
             Logger.print_progress_bar(1, 1)
+            print("\n")
             ScenarioConverter.write_converted_log(id, " None ", log_path,
                                                   xosc_path, yaml_path)
             ScenarioConverter.write_converted_xosc(xosc_text, xosc_path)
             return
-
         for item in itertools.product(*bind):
             xosc_path = ret_path(xosc_dir, xosc_name, id)
             converted_xosc_text = copy.deepcopy(xosc_text)
@@ -189,28 +186,23 @@ class ScenarioConverter:
     @staticmethod
     def write_converted_log(id, item, log_path, xosc_path, yaml_path):
         log_text = (" file name: " +
-                    str(FileHandler.get_file_name(xosc_path) + ".xosc") +
+                    str(pathlib.Path(xosc_path).stem + ".xosc") +
                     " parameter distribution case " + str(id) + "\033[1A")
-        Logger().print_process(log_text)
+        Logger.print_process(log_text)
         with open(log_path, 'a') as f:
             f.write(log_text)
 
     @staticmethod
     def write_converted_xosc(xosc_text, xosc_path):
         converted_xosc_text = copy.deepcopy(xosc_text)
-        write_xml = Logger.fopen_with_check(xosc_path, "wb")
         xosc_text = converted_xosc_text.encode("utf-8")
         xosc_text = BeautifulSoup(xosc_text, 'xml')
         xosc_text = xosc_text.prettify()
-        write_xml.write(xosc_text.encode("utf-8"))
-        write_xml.close()
+        Manager.write_data(xosc_path, xosc_text.encode("utf-8"), "wb")
         return
 
 
 def main():
-    if sys.version_info < (3, 5):
-        Logger.print_exception('ament requires Python 3.5 or higher.')
-        sys.exit(1)
     parser = argparse.ArgumentParser(description='launch simulator')
 
     parser.add_argument('--input',
