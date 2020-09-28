@@ -1,0 +1,27 @@
+<root>
+    <BehaviorTree>
+    <Fallback name="root">
+        <AcquirePosition name="acquire_position"
+            request="{request}"
+            hdmap_utils="{hdmap_utils}"
+            trajectory="{trajectory}"
+            current_time="{current_time}"
+            step_time="{step_time}"
+            entity_status="{entity_status}"
+            pedestrian_parameters="{pedestrian_parameters}"
+            updated_status="{updated_status}"
+            target_speed="{target_speed}"
+            target_status="{target_status}"/>
+        <FollowLane name="follow_lane"
+            request="{request}"
+            hdmap_utils="{hdmap_utils}"
+            trajectory="{trajectory}"
+            current_time="{current_time}"
+            step_time="{step_time}"
+            entity_status="{entity_status}"
+            pedestrian_parameters="{pedestrian_parameters}"
+            updated_status="{updated_status}"
+            target_speed="{target_speed}"/>
+    </Fallback>
+    </BehaviorTree>
+</root>
