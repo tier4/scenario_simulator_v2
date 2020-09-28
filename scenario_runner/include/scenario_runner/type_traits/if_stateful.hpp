@@ -25,7 +25,7 @@ template<typename T, typename = void>
 struct IfStateful
 {
   template<typename Result>
-  static const Result & currentState(const T &)
+  static const Result & state(const T &)
   {
     std::stringstream ss {};
     ss << "class " << typeid(T).name() << " is not stateful";
@@ -37,9 +37,9 @@ template<typename T>
 struct IfStateful<T, typename std::enable_if<Stateful<T>::value>::type>
 {
   template<typename Result>
-  static const Result & currentState(const T & callee)
+  static const Result & state(const T & callee)
   {
-    return callee.currentState();
+    return callee.state();
   }
 };
 }

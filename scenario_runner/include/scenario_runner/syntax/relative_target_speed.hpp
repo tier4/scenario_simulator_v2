@@ -44,11 +44,12 @@ struct RelativeTargetSpeed
 
   template<typename Node, typename Scope>
   explicit RelativeTargetSpeed(const Node & node, Scope & scope)
-  : entity_ref{readAttribute<String>(node, scope, "entityRef")},
-    value{readAttribute<Double>(node, scope, "value")},
-    speed_target_value_type{readAttribute<SpeedTargetValueType>(node, scope, "speedTargetValueType",
-        SpeedTargetValueType())},
-    continuous{readAttribute<Boolean>(node, scope, "continuous", Boolean())}
+  : entity_ref{readAttribute<String>("entityRef", node, scope)},
+    value{readAttribute<Double>("value", node, scope)},
+    speed_target_value_type{
+      readAttribute<SpeedTargetValueType>(
+        "speedTargetValueType", node, scope, SpeedTargetValueType())},
+    continuous{readAttribute<Boolean>("continuous", node, scope, Boolean())}
   {}
 };
 }

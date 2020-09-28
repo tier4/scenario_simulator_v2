@@ -43,8 +43,8 @@ struct SimulationTimeCondition
 
   template<typename Node, typename Scope>
   explicit SimulationTimeCondition(const Node & node, Scope & scope)
-  : value{readAttribute<Double>(node, scope, "value")},
-    compare{readAttribute<Rule>(node, scope, "rule")}
+  : value{readAttribute<Double>("value", node, scope)},
+    compare{readAttribute<Rule>("rule", node, scope)}
   {
     begin();
   }

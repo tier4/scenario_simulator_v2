@@ -41,12 +41,12 @@ struct WorldPosition
 
   template<typename Node, typename Scope>
   explicit WorldPosition(const Node & node, Scope & scope)
-  : x{readAttribute<Double>(node, scope, "x")},
-    y{readAttribute<Double>(node, scope, "y")},
-    z{readAttribute<Double>(node, scope, "z", Double())},
-    h{readAttribute<Double>(node, scope, "h", Double())},       // yaw
-    p{readAttribute<Double>(node, scope, "p", Double())},
-    r{readAttribute<Double>(node, scope, "r", Double())}
+  : x{readAttribute<Double>("x", node, scope)},
+    y{readAttribute<Double>("y", node, scope)},
+    z{readAttribute<Double>("z", node, scope, Double())},
+    h{readAttribute<Double>("h", node, scope, Double())},       // yaw
+    p{readAttribute<Double>("p", node, scope, Double())},
+    r{readAttribute<Double>("r", node, scope, Double())}
   {}
 
   operator geometry_msgs::msg::Pose() const

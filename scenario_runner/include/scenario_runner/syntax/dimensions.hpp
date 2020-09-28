@@ -39,9 +39,9 @@ struct Dimensions
 
   template<typename Node, typename Scope>
   explicit Dimensions(const Node & node, Scope & scope)
-  : width{readAttribute<Double>(node, scope, "width")},
-    length{readAttribute<Double>(node, scope, "length")},
-    height{readAttribute<Double>(node, scope, "height")}
+  : width{readAttribute<Double>("width", node, scope)},
+    length{readAttribute<Double>("length", node, scope)},
+    height{readAttribute<Double>("height", node, scope)}
   {}
 };
 

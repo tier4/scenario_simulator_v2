@@ -34,7 +34,6 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct RoadNetwork
-  : public Sequence
 {
   const File logic_file;
 

@@ -26,7 +26,7 @@ namespace scenario_runner
 inline namespace reader
 {
 template<typename T, typename Node, typename Scope>
-T readAttribute(const Node & node, const Scope & scope, const std::string & name)
+T readAttribute(const std::string & name, const Node & node, const Scope & scope)
 {
   if (const auto & attribute {node.attribute(name.c_str())}) {
     const std::string value {attribute.value()};
@@ -69,10 +69,10 @@ T readAttribute(const Node & node, const Scope & scope, const std::string & name
 }
 
 template<typename T, typename Node, typename Scope>
-T readAttribute(const Node & node, const Scope & scope, const std::string & name, T && value)
+T readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
 {
   if (node.attribute(name.c_str())) {
-    return readAttribute<T>(node, scope, name);
+    return readAttribute<T>(name, node, scope);
   } else {
     return value;
   }

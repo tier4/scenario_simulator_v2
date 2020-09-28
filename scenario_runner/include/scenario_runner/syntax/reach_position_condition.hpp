@@ -46,7 +46,7 @@ struct ReachPositionCondition
   explicit ReachPositionCondition(
     const Node & node, Scope & outer_scope,
     const TriggeringEntities & trigger)
-  : tolerance{readAttribute<Double>(node, outer_scope, "tolerance")},
+  : tolerance{readAttribute<Double>("tolerance", node, outer_scope)},
     inner_scope{outer_scope},
     position{readElement<Position>("Position", node, inner_scope)},
     trigger{trigger}

@@ -38,7 +38,7 @@ struct File
 
   template<typename Node, typename Scope>
   explicit File(const Node & node, Scope & outer_scope)
-  : filepath{readAttribute<String>(node, outer_scope, "filepath")}
+  : filepath{readAttribute<String>("filepath", node, outer_scope)}
   {}
 };
 }

@@ -41,9 +41,9 @@ struct Performance
 
   template<typename Node, typename Scope>
   explicit Performance(const Node & node, Scope & scope)
-  : max_speed{readAttribute<Double>(node, scope, "maxSpeed")},
-    max_acceleration{readAttribute<Double>(node, scope, "maxAcceleration")},
-    max_deceleration{readAttribute<Double>(node, scope, "maxDeceleration")}
+  : max_speed{readAttribute<Double>("maxSpeed", node, scope)},
+    max_acceleration{readAttribute<Double>("maxAcceleration", node, scope)},
+    max_deceleration{readAttribute<Double>("maxDeceleration", node, scope)}
   {}
 };
 

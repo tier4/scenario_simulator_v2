@@ -38,10 +38,11 @@ struct Actors
 
   template<typename Node, typename Scope>
   explicit Actors(const Node & node, Scope & scope)
-  : select_triggering_entities{readAttribute<Boolean>(node, scope, "selectTriggeringEntities",
-        Boolean())}
+  : select_triggering_entities{
+      readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean())}
   {
-    callWithElements(node, "EntityRef", 0, unbounded, [&](auto && node)
+    callWithElements(
+      node, "EntityRef", 0, unbounded, [&](auto && node)
       {
         scope.actors.emplace_back(node, scope);
       });

@@ -27,7 +27,7 @@ struct Stateful
 {};
 
 template<typename T>
-struct Stateful<T, void_t<decltype(std::declval<T>().currentState())>>
+struct Stateful<T, void_t<decltype(std::declval<T>().state())>>
   : public std::true_type
 {};
 }

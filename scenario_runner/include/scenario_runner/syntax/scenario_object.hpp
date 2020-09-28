@@ -44,14 +44,14 @@ struct ScenarioObject
 
   template<typename Node>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
-    inner_scope{outer_scope}
+  : name{readAttribute<String>("name", node, outer_scope)},
+    inner_scope{outer_scope},
+    entity_object{make<EntityObject>(node, inner_scope)}
   {
-    entity_object = make<EntityObject>(node, inner_scope);
-
-    callWithElements(node, "ObjectController", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "ObjectController", 0, 1, [&](auto && node)
       {
-        return object_controller = make<ObjectController>(node, inner_scope);
+        return object_controller.rebind<ObjectController>(node, inner_scope);
       });
   }
 

@@ -44,15 +44,17 @@ struct Maneuver
 
   template<typename Node, typename Scope>
   explicit Maneuver(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
+  : name{readAttribute<String>("name", node, outer_scope)},
     inner_scope{outer_scope}
   {
-    callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "ParameterDeclarations", 0, 1, [&](auto && node)
       {
         return make<ParameterDeclarations>(node, inner_scope);
       });
 
-    callWithElements(node, "Event", 1, unbounded, [&](auto && node)
+    callWithElements(
+      node, "Event", 1, unbounded, [&](auto && node)
       {
         return makeStoryboardElement<Event>(node, inner_scope);
       });
@@ -77,10 +79,11 @@ struct Maneuver
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(std::begin(*this), std::end(*this), [](auto && each)
-             {
-               return each.template as<Event>().complete();
-             });
+    return std::all_of(
+      std::begin(*this), std::end(*this), [](auto && each)
+      {
+        return each.template as<Event>().complete();
+      });
   }
 
   using StoryboardElement::evaluate;

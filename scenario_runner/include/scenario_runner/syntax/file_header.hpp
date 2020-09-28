@@ -45,11 +45,11 @@ struct FileHeader
 
   template<typename Node, typename Scope>
   explicit FileHeader(const Node & node, Scope & outer_scope)
-  : revMajor{readAttribute<UnsignedShort>(node, outer_scope, "revMajor")},
-    revMinor{readAttribute<UnsignedShort>(node, outer_scope, "revMinor")},
-    date{readAttribute<String>(node, outer_scope, "date")},
-    description{readAttribute<String>(node, outer_scope, "description")},
-    author{readAttribute<String>(node, outer_scope, "author")}
+  : revMajor{readAttribute<UnsignedShort>("revMajor", node, outer_scope)},
+    revMinor{readAttribute<UnsignedShort>("revMinor", node, outer_scope)},
+    date{readAttribute<String>("date", node, outer_scope)},
+    description{readAttribute<String>("description", node, outer_scope)},
+    author{readAttribute<String>("author", node, outer_scope)}
   {}
 };
 }

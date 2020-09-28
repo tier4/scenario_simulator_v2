@@ -43,7 +43,7 @@ struct Expression
     return false;
   }
 
-  virtual const Pointer<Expression> & currentState() const
+  virtual const Pointer<Expression> & state() const
   {
     std::stringstream ss {};
     ss << "class Expression is not stateful";

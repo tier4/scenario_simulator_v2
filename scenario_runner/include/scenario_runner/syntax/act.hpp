@@ -46,20 +46,23 @@ struct Act
 
   template<typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
+  : name{readAttribute<String>("name", node, outer_scope)},
     inner_scope{outer_scope}
   {
-    callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node)
+    callWithElements(
+      node, "ManeuverGroup", 1, unbounded, [&](auto && node)
       {
         return makeStoryboardElement<ManeuverGroup>(node, inner_scope);
       });
 
-    callWithElements(node, "StartTrigger", 1, 1, [&](auto && node)
+    callWithElements(
+      node, "StartTrigger", 1, 1, [&](auto && node)
       {
         return start_trigger.rebind<Trigger>(node, inner_scope);
       });
 
-    callWithElements(node, "StopTrigger", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "StopTrigger", 0, 1, [&](auto && node)
       {
         return stop_trigger.rebind<Trigger>(node, inner_scope);
       });

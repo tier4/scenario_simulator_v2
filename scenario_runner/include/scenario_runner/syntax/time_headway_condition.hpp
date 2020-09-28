@@ -53,11 +53,11 @@ struct TimeHeadwayCondition
   explicit TimeHeadwayCondition(
     const Node & node, Scope & outer_scope,
     const TriggeringEntities & trigger)
-  : entity_ref{readAttribute<String>(node, outer_scope, "entityRef")},
-    value{readAttribute<Double>(node, outer_scope, "value")},
-    freespace{readAttribute<Boolean>(node, outer_scope, "freespace")},
-    along_route{readAttribute<Boolean>(node, outer_scope, "alongRoute")},
-    compare{readAttribute<Rule>(node, outer_scope, "rule")},
+  : entity_ref{readAttribute<String>("entityRef", node, outer_scope)},
+    value{readAttribute<Double>("value", node, outer_scope)},
+    freespace{readAttribute<Boolean>("freespace", node, outer_scope)},
+    along_route{readAttribute<Boolean>("alongRoute", node, outer_scope)},
+    compare{readAttribute<Rule>("rule", node, outer_scope)},
     inner_scope{outer_scope},
     trigger{trigger}
   {}
