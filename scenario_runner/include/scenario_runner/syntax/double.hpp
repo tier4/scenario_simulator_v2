@@ -49,6 +49,11 @@ struct Double
   {
     return data;
   }
+
+  static auto infinity() noexcept
+  {
+    return static_cast<Double>(std::numeric_limits<value_type>::infinity());
+  }
 };
 
 template<typename ... Ts>

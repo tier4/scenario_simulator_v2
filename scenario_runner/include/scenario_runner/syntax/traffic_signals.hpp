@@ -15,8 +15,8 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 #define SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
-#include <scenario_runner/validator/attribute.hpp>
-#include <scenario_runner/validator/sequence.hpp>
+#include <scenario_runner/reader/attribute.hpp>
+#include <scenario_runner/reader/element.hpp>
 
 #include <limits>
 #include <string>
@@ -37,18 +37,13 @@ inline namespace syntax
  * ======================================================================== */
 struct TrafficSignalState
 {
-  const std::string traffic_signal_id, state;
+  const String traffic_signal_id, state;
 
-  template<typename ... Ts>
-  explicit TrafficSignalState(const pugi::xml_node & node, Ts && ...)
-  : traffic_signal_id{readRequiredAttribute<std::string>(node, "trafficSignalId")},
-    state{readRequiredAttribute<std::string>(node, "state")}
+  template<typename Node, typename Scope>
+  explicit TrafficSignalState(const Node & node, Scope & scope)
+  : traffic_signal_id{readAttribute<String>(node, scope, "trafficSignalId")},
+    state{readAttribute<String>(node, scope, "state")}
   {}
-
-  decltype(auto) evaluate() const noexcept
-  {
-    return unspecified;
-  }
 };
 
 /* ==== Phase ================================================================
@@ -63,29 +58,24 @@ struct TrafficSignalState
  *
  * ======================================================================== */
 struct Phase
-  : public Sequence
 {
-  const std::string name;
-  const double duration;
+  const String name;
 
-  template<typename ... Ts>
-  explicit Phase(const pugi::xml_node & node, Ts && ... xs)
-  : name{readRequiredAttribute<std::string>(node, "name")},
-    duration{readUnsupportedAttribute<double>(node, "duration",
-        std::numeric_limits<double>::infinity())}
-  {
-    defineElement<TrafficSignalState>("TrafficSignalState", 0, unbounded);
+  const Double duration;
 
-    validate(node, std::forward<decltype(xs)>(xs)...);
-  }
+  const TrafficSignalState state;
 
-  decltype(auto) evaluate() const noexcept
-  {
-    return unspecified;
-  }
+  template<typename Node, typename Scope>
+  explicit Phase(const Node & node, Scope & outer_scope)
+  : name{readAttribute<String>(node, outer_scope, "name")},
+    duration{
+      readAttribute<Double>(
+        node, outer_scope, "duration", Double::infinity())},
+    state{readElement<TrafficSignalState>("TrafficSignalState", node, outer_scope)}
+  {}
 };
 
-/* ==== TrafficSignalController =======================================================
+/* ==== TrafficSignalController ================================================
  *
  * <xsd:complexType name="TrafficSignalController">
  *   <xsd:sequence>
@@ -96,32 +86,27 @@ struct Phase
  *   <xsd:attribute name="reference" type="String" use="optional"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * ========================================================================== */
 struct TrafficSignalController
-  : public Sequence
 {
-  const std::string name;
-  const double delay;
-  const std::string reference;
+  const String name;
 
-  template<typename ... Ts>
-  explicit TrafficSignalController(const pugi::xml_node & node, Ts && ... xs)
-  : name{readRequiredAttribute<std::string>(node, "name")},
-    delay{readUnsupportedAttribute<double>(node, "delay")},
-    reference{readUnsupportedAttribute<std::string>(node, "reference")}
-  {
-    defineElement<Phase>("Phase", 0, unbounded);
+  const Double delay;
 
-    validate(node, std::forward<decltype(xs)>(xs)...);
-  }
+  const String reference;
 
-  decltype(auto) evaluate() const noexcept
-  {
-    return unspecified;
-  }
+  const Phase phase;
+
+  template<typename Node, typename Scope>
+  explicit TrafficSignalController(const Node & node, Scope & outer_scope)
+  : name{readAttribute<String>(node, outer_scope, "name")},
+    delay{readAttribute<Double>(node, outer_scope, "delay")},
+    reference{readAttribute<String>(node, outer_scope, "reference")},
+    phase{readElement<Phase>("Phase", node, outer_scope)}
+  {}
 };
 
-/* ==== TrafficSignals =======================================================
+/* ==== TrafficSignals =========================================================
  *
  * <xsd:complexType name="TrafficSignals">
  *   <xsd:sequence>
@@ -129,7 +114,7 @@ struct TrafficSignalController
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * ========================================================================== */
 struct TrafficSignals
   : public std::vector<TrafficSignalController>
 {
@@ -138,7 +123,8 @@ struct TrafficSignals
   template<typename Node, typename Scope>
   explicit TrafficSignals(const Node & node, Scope & outer_scope)
   {
-    callWithElements(node, "TrafficSignalController", 0, unbounded, [&](auto && node)
+    callWithElements(
+      node, "TrafficSignalController", 0, unbounded, [&](auto && node)
       {
         emplace_back(node, outer_scope);
       });
