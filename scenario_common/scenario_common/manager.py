@@ -15,9 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import yaml
 import json
+import os
+import pathlib
+import yaml
 
 
 class Manager():
@@ -47,6 +48,12 @@ class Manager():
         print("\x1b[0m", end="")
 
     @staticmethod
+    def print_separator(message):
+        print("\x1b[35m", end="")
+        print("------- " + message + " -----")
+        print("\x1b[0m", end="")
+
+    @staticmethod
     def print_progress_bar(i, max):
         progress_bar_size = 40
         current_progress = int(i * progress_bar_size / max)
@@ -59,32 +66,34 @@ class Manager():
 
     @staticmethod
     def read_data(path, mode="r"):
+        data = None
         try:
             with open(path, mode) as file:
-                file_type = Manager.get_suffix(path)
-                if(file_type == "yaml"):
+                file_type = pathlib.Path(path).suffix
+                if(file_type == ".yaml"):
                     data = yaml.safe_load(file)
                 else:
                     data = file.read()
         except FileNotFoundError:
-            Manager.print_exception("unable to fopen: " + str(path))
+            Manager.print_exception("FileNotFoundError: " + str(path))
         return data
 
     @staticmethod
     def path_checker(path):
+        path = str(path)
         is_path = os.path.exists(path)
         if(is_path):
-            Manager.print_process("path: "+path+"exists")
+            Manager.print_process("path: " + path + " exists")
         else:
-            Manager.print_exception("path: "+path+"not exists")
+            Manager.print_exception("path: " + path + " not exists")
         return is_path
 
     @staticmethod
     def write_data(path, data, mode="w"):
         try:
             with open(path, mode) as file:
-                file_type = Manager.get_suffix(path)
-                if(file_type == "json"):
+                file_type = pathlib.Path(path).suffix
+                if(file_type == ".json"):
                     json.dump(data,
                               file,
                               indent=2,
@@ -109,22 +118,6 @@ class Manager():
             else:
                 print(" -> Because of unkown failure")
 
-    @staticmethod
-    def get_file_name(path):
-        return os.path.splitext(os.path.basename(path))[0]
-
-    @staticmethod
-    def get_suffix(path):
-        return os.path.splitext(os.path.basename(path))[1]
-
-    @staticmethod
-    def get_folder_name(path):
-        return os.path.basename(os.path.dirname(path))
-
-    @staticmethod
-    def get_dir(path):
-        return os.path.dirname(path)
-
 
 if __name__ == "__main__":
     for i in range(11):
@@ -134,6 +127,3 @@ if __name__ == "__main__":
     Manager.print_success("Success")
     Manager.print_exception("Exception")
     Manager.print_error("Failure")
-    print(Manager.get_suffix(__file__))
-    print(Manager.get_dir(__file__))
-    print(Manager.get_folder_name(__file__))

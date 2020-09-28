@@ -16,47 +16,37 @@
 # limitations under the License.
 
 from scenario_common.manager import Manager
-import argparse
-import yaml
+import pathlib
 
 
 class DatabaseHandler():
 
+    DATABASE_PATH = "config/scenario_database.yaml"
+
     @staticmethod
-    def read_database(database_path):
-        # database をopenしてデータを取り出す
-        file = open(database_path, "r")
-        database = yaml.safe_load(file)
-        file.close()
-        # あるか確認
-        launch_path = Manager.path_checker(database["Launch"])
-        log_path = database["Log"]
-        Manager.mkdir(log_path)
+    def read_database():
+        Manager.print_separator("scenario database")
+        launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
+        print("package path: " + str(launcher_package_path))
+        database_path = launcher_package_path / DatabaseHandler.DATABASE_PATH
+        database = Manager.read_data(database_path)
+        log_path = str(launcher_package_path / database["Log"])
         scenario_path = []
         for scenario in database["Scenario"]:
-            # あるか確認
+            scenario = str(launcher_package_path / scenario)
             Manager.path_checker(scenario)
             scenario_path.append(scenario)
-        print("load scenario path from yaml")
         map_path = dict()
         map_database = database["Map"][0]
-        print(type(map_database))
-        for key, val in map_database.items():
-            # あるか確認
-            Manager.path_checker(val)
-            map_path[key] = val
-        print("")
-        return launch_path, log_path, scenario_path, map_path
+        for key, map in map_database.items():
+            map = str(launcher_package_path / map)
+            Manager.path_checker(map)
+            map_path[key] = map
+        return log_path, scenario_path, map_path
 
 
 def main():
-    parser = argparse.ArgumentParser(description='load arguements')
-    # for testing start this script from scenario simulator.auto directory
-    parser.add_argument(
-        '--database', default="scenario_launcher/config/scenario_databse.yaml")
-    args = parser.parse_args()
-    launch_path, log_path, scenario_path, map_path = DatabaseHandler.read_database(
-        args.database)
+    log_path, scenario_path, map_path = DatabaseHandler.read_database()
 
 
 if __name__ == "__main__":

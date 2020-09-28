@@ -15,14 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from scenario_common.manager import Manager
 from scenario_launcher.database_handler import DatabaseHandler
 from scenario_launcher.monitoring_server import MonitoringServer
 from scenario_launcher.result_reporter import Reporter
-from scenario_common.manager import Manager
-from subprocess import PIPE
-from multiprocessing import Process
 import argparse
-import subprocess
+from multiprocessing import Process
+import subprocess as sb
 import time
 import xmlrpc.client
 
@@ -33,28 +32,25 @@ class Launcher:
     SLEEP_RATE = 1
     PKILLER = "kill -9 `lsof -w -n -i tcp:10000| awk '{print $2}'|awk 'END{print}'`;"
 
-    def __init__(self, timeout, database):
+    def __init__(self, timeout):
         self.timeout = timeout
-        self.database_path = database
+        self.database_path = None
         self.monitoring_process = None
         self.runner_process = None
-        self.scenario_counter = 0
         self.launch_path = ""
         self.log_path = ""
         self.scenario_list = dict()
         self.map_dict = dict()
 
     def main(self):
-        subprocess.run(self.PKILLER, shell=True, stdout=PIPE, stderr=PIPE)
+        sb.run(self.PKILLER, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
         self.client = xmlrpc.client.Server(self.SERVER_URI)
-        self.launch_path, self.log_path, self.scenario_list, self.map_dict \
-            = DatabaseHandler.read_database(self.database_path)
+        self.log_path, self.scenario_list, self.map_dict \
+            = DatabaseHandler.read_database()
         self.run_all_scenarios()
 
     def wait_until_simulation_finished(self):
         start = time.time()
-        Manager.print_process(
-            "Set Maximum Simulation Time: " + str(self.timeout))
         while (time.time() - start) < self.timeout:
             print("    Monitoring in Launcher")
             if(not self.client.get_simulation_running()):
@@ -68,8 +64,8 @@ class Launcher:
     @staticmethod
     def launch_runner():
         print("    start dummy runner")
-        subprocess.run("ros2 launch scenario_launcher dummy_runner.launch.py",
-                       shell=True, stdout=PIPE, stderr=PIPE)
+        sb.run("ros2 launch scenario_launcher dummy_runner.launch.py",
+               shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
 
     @staticmethod
     def run_server():
@@ -78,10 +74,11 @@ class Launcher:
         return
 
     def run_scenario(self, scenario):
-        self.scenario_counter = self.scenario_counter + 1
-        time.sleep(self.SLEEP_RATE)
+        Manager.print_process(
+            "Set Maximum Simulation Time: " + str(self.timeout))
         self.runner_process = Process(target=Launcher.launch_runner)
         self.runner_process.start()
+        time.sleep(self.SLEEP_RATE)
         self.wait_until_simulation_finished()
         results = {}
         results['code'] = self.client.get_exit_status()
@@ -91,18 +88,21 @@ class Launcher:
         print("")
 
     def run_all_scenarios(self):
+        Manager.print_separator("scenario preprocess")
+        Manager.mkdir(self.log_path)
         self.monitoring_process = Process(target=Launcher.run_server)
         self.monitoring_process.start()
         for index, scenario in enumerate(self.scenario_list):
             print(str(index+1), scenario)
         for index, scenario in enumerate(self.scenario_list):
+            Manager.print_separator("scenario launch " + str(index))
             Manager.print_process("running scenario " + scenario)
             self.run_scenario(scenario)
         time.sleep(1)
         self.monitoring_process.terminate()
 
     def __del__(self):
-        subprocess.run(self.PKILLER, shell=True, stdout=PIPE, stderr=PIPE)
+        sb.run(self.PKILLER, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
 
 
 def main():
@@ -113,10 +113,6 @@ def main():
                         default=10,
                         help='Specify simulation time limit in seconds. \
                   The default is 180 seconds.')
-    # default path is scenario simulator.auto
-    parser.add_argument('--database',
-                        default='scenario_launcher/config/scenario_databse.yaml',
-                        help='Specify the database path')
 
     parser.add_argument('--log',
                         default='screen',
@@ -126,7 +122,7 @@ def main():
                         help='Specify the scenario you want to execute.')
 
     args = parser.parse_args()
-    launcher = Launcher(args.timeout, args.database)
+    launcher = Launcher(args.timeout)
     launcher.main()
 
 

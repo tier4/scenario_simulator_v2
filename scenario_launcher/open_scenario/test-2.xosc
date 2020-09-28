@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OpenSCENARIO>
+ <FileHeader author="" date="2020-09-11T07:45:39.061Z" description="" revMajor="1" revMinor="0"/>
+ <ParameterDeclarations/>
+ <RoadNetwork>
+  <LogicFile filepath="lanelet2_map.osm"/>
+  <SceneGraphFile filepath=""/>
+  <TrafficSignals/>
+ </RoadNetwork>
+ <Entities>
+  <ScenarioObject>
+   <Vehicle name="" vehicleCategory="car">
+    <BoundingBox>
+     <Center x="0" y="0" z="1.25"/>
+     <Dimensions height="2.5" length="4.77" width="2.25"/>
+    </BoundingBox>
+    <Performance maxAcceleration="inf" maxDeceleration="inf" maxSpeed="30"/>
+    <Axles>
+     <FrontAxle maxSteering="3.1415" positionX="1" positionZ="0.3" trackWidth="4" wheelDiameter="0.6"/>
+     <RearAxle maxSteering="3.1415" positionX="-1" positionZ="0.3" trackWidth="4" wheelDiameter="0.6"/>
+    </Axles>
+    <Properties>
+     <Property>
+      <Property>
+      </Property>
+     </Property>
+    </Properties>
+   </Vehicle>
+   <Storyboard>
+    <Init>
+     <Actions>
+      <Private>
+       <PrivateAction>
+        <TeleportAction>
+         <Position>
+          <LanePosition laneId="34513" offset="0.1283" roadId="" s="17.9354">
+           <Orientation h="0" p="-0.0" r="0" type="relative"/>
+          </LanePosition>
+         </Position>
+        </TeleportAction>
+       </PrivateAction>
+       <PrivateAction>
+        <RoutingAction>
+         <AcquirePositionAction>
+          <Position>
+           <LanePosition laneId="34675" offset="0" roadId="" s="0">
+            <Orientation h="0" p="-0.0" r="0" type="relative"/>
+           </LanePosition>
+          </Position>
+         </AcquirePositionAction>
+        </RoutingAction>
+       </PrivateAction>
+       <PrivateAction>
+        <LongitudinalAction>
+         <SpeedAction>
+          <SpeedActionDynamics dynamicsDimension="time" dynamicsShape="step" value="0"/>
+          <SpeedActionTarget>
+           <AbsoluteTargetSpeed value="1000"/>
+          </SpeedActionTarget>
+         </SpeedAction>
+        </LongitudinalAction>
+       </PrivateAction>
+       <PrivateAction>
+        <LateralAction>
+         <LaneChangeAction>
+          <LaneChangeActionDynamics dynamicsDimension="time" dynamicsShape="linear" value="0"/>
+          <LaneChangeTarget>
+           <AbsoluteTargetLane value="34513"/>
+          </LaneChangeTarget>
+         </LaneChangeAction>
+        </LateralAction>
+       </PrivateAction>
+      </Private>
+     </Actions>
+    </Init>
+    <Story>
+     <Act>
+      <ManeuverGroup>
+       <Actors selectTriggeringEntities="false">
+        <EntityRef>
+         <EntityRef>
+         </EntityRef>
+         <Maneuver>
+          <Event>
+           <StartTrigger>
+            <ConditionGroup>
+             <Condition>
+              <ByEntityCondition>
+               <TriggeringEntities triggeringEntitiesRule="any">
+                <EntityRef>
+                 <EntityRef>
+                 </EntityRef>
+                 <EntityCondition>
+                  <ReachPositionCondition tolerance="1">
+                   <Position>
+                    <LanePosition laneId="34675" offset="0" roadId="" s="0">
+                     <Orientation h="0" p="-0.0" r="0" type="relative"/>
+                    </LanePosition>
+                   </Position>
+                  </ReachPositionCondition>
+                 </EntityCondition>
+                </EntityRef>
+               </TriggeringEntities>
+              </ByEntityCondition>
+             </Condition>
+             <Action>
+              <UserDefinedAction>
+               <CustomCommandAction type="exitSuccess"/>
+              </UserDefinedAction>
+             </Action>
+            </ConditionGroup>
+            <Event name="" priority="overwrite">
+             <StartTrigger>
+              <ConditionGroup>
+               <Condition>
+                <ByValueCondition>
+                 <SimulationTimeCondition rule="greaterThan" value="300"/>
+                </ByValueCondition>
+               </Condition>
+              </ConditionGroup>
+             </StartTrigger>
+             <Action>
+              <UserDefinedAction>
+               <CustomCommandAction type="exitFailure"/>
+              </UserDefinedAction>
+             </Action>
+            </Event>
+           </StartTrigger>
+          </Event>
+          <StartTrigger>
+           <ConditionGroup>
+            <Condition>
+             <ByValueCondition>
+              <SimulationTimeCondition rule="greaterThan" value="0"/>
+             </ByValueCondition>
+            </Condition>
+           </ConditionGroup>
+          </StartTrigger>
+         </Maneuver>
+        </EntityRef>
+        <StopTrigger>
+         <ConditionGroup>
+          <Condition>
+           <ByValueCondition>
+            <SimulationTimeCondition rule="greaterThan" value="300"/>
+           </ByValueCondition>
+          </Condition>
+         </ConditionGroup>
+        </StopTrigger>
+       </Actors>
+      </ManeuverGroup>
+     </Act>
+    </Story>
+   </Storyboard>
+  </ScenarioObject>
+ </Entities>
+</OpenSCENARIO>
