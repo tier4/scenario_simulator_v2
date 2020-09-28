@@ -5,6 +5,13 @@
 #include <quaternion_operation/quaternion_operation.h>
 #include <lanelet2_core/utility/Units.h>
 
+#include <lanelet2_extension/io/autoware_osm_parser.hpp>
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <lanelet2_extension/utility/message_conversion.hpp>
+#include <lanelet2_extension/utility/utilities.hpp>
+#include <lanelet2_io/Io.h>
+#include <lanelet2_projection/UTM.h>
+
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/geometry.hpp>
@@ -17,35 +24,29 @@
 
 namespace hdmap_utils
 {
-    HdMapUtils::HdMapUtils(std::string lanelet_topic)
+    HdMapUtils::HdMapUtils(std::string lanelet_path)
     {
-        try
-        {
-            lanelet_map_ptr_ = std::make_shared<lanelet::LaneletMap>();
-            /*
-            auto map_ptr = ros::topic::waitForMessage<autoware_auto_msgs::msg::HADMapBin>(lanelet_topic, ros::Duration(5));
-            autoware_auto_msgs::msg::HADMapBin map = *map_ptr;
-            lanelet::utils::conversion::fromBinMsg(map, lanelet_map_ptr_);
-            traffic_rules_vehicle_ptr_ =
-                lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, 
-                lanelet::Participants::Vehicle);
-            vehicle_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, 
-                *traffic_rules_vehicle_ptr_);
-            traffic_rules_pedestrian_ptr_ =
-                lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, 
-                lanelet::Participants::Pedestrian);
-            pedestrian_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, 
-                *traffic_rules_pedestrian_ptr_);
-            std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
-            all_graphs.push_back(vehicle_routing_graph_ptr_);
-            all_graphs.push_back(pedestrian_routing_graph_ptr_);
-            overall_graphs_ptr_ = std::make_unique<lanelet::routing::RoutingGraphContainer>(all_graphs);
-            */
-        }
-        catch(...)
+        lanelet::projection::MGRSProjector projector;
+        lanelet::ErrorMessages errors;
+        lanelet_map_ptr_ = lanelet::load(lanelet_path, projector, &errors);
+        if (!errors.empty())
         {
             throw HdMapError("failed to load vector map");
         }
+        traffic_rules_vehicle_ptr_ =
+            lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, 
+            lanelet::Participants::Vehicle);
+        vehicle_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, 
+            *traffic_rules_vehicle_ptr_);
+        traffic_rules_pedestrian_ptr_ =
+            lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, 
+            lanelet::Participants::Pedestrian);
+        pedestrian_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, 
+            *traffic_rules_pedestrian_ptr_);
+        std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
+        all_graphs.push_back(vehicle_routing_graph_ptr_);
+        all_graphs.push_back(pedestrian_routing_graph_ptr_);
+        overall_graphs_ptr_ = std::make_unique<lanelet::routing::RoutingGraphContainer>(all_graphs);
     }
 
     boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(int lanelet_id, int crossing_lanelet_id)
@@ -285,13 +286,13 @@ namespace hdmap_utils
         std::vector<geometry_msgs::msg::Point> ret;
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
         const auto centerline = lanelet.centerline();
-        for(auto i=0; i<centerline.size(); i++)
+        for(const auto & point : centerline)
         {
             geometry_msgs::msg::Point p;
-            p.x = centerline[i].x();
-            p.y = centerline[i].y();
-            p.z = centerline[i].z();
-            ret.push_back(p);
+            p.x = point.x();
+            p.y = point.y();
+            p.z = point.z();
+            ret.emplace_back(p);
         }
         return ret;
     }
@@ -301,7 +302,7 @@ namespace hdmap_utils
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
         const auto centerline = lanelet.centerline();
         double ret = 0;
-        for(auto i=0; i<centerline.size()-1; i++)
+        for(size_t i=0; i<centerline.size()-1; i++)
         {
             double x_diff = centerline[i].x() - centerline[i+1].x();
             double y_diff = centerline[i].y() - centerline[i+1].y();
@@ -354,7 +355,7 @@ namespace hdmap_utils
     double HdMapUtils::getTrajectoryLength(std::vector<geometry_msgs::msg::Point> trajectory)
     {
         double ret = 0.0;
-        for(int i=0; i<trajectory.size()-1; i++)
+        for(size_t i=0; i<trajectory.size()-1; i++)
         {
             ret = ret + std::sqrt(std::pow(trajectory[i+1].x-trajectory[i].x,2)
                 + std::pow(trajectory[i+1].y-trajectory[i].y,2)
@@ -497,7 +498,7 @@ namespace hdmap_utils
         {
             return ret;
         }
-        for(int i=0; i<s.size(); i++)
+        for(size_t i=0; i<s.size(); i++)
         {
             geometry_msgs::msg::Point p;
             p.x = resampled_x[i];
@@ -683,7 +684,7 @@ namespace hdmap_utils
                 return (to_s - from_s);
             }
         }
-        double dist_from = getLaneletLength(from_lanelet_id) - from_s;
+        // double dist_from = getLaneletLength(from_lanelet_id) - from_s;
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
         const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
         lanelet::Optional<lanelet::routing::Route> route = vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, true);

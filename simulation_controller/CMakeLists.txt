@@ -24,7 +24,9 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(lanelet2_core REQUIRED)
 find_package(lanelet2_routing REQUIRED)
+find_package(lanelet2_io REQUIRED)
 find_package(lanelet2_extension REQUIRED)
+find_package(lanelet2_projection REQUIRED)
 find_package(autoware_auto_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(spline_interpolation REQUIRED)
@@ -38,8 +40,8 @@ include_directories(
 )
 
 add_library(simulation_controller
-  #src/hdmap_utils/hdmap_utils.cpp
-  #src/math/hermite_curve.cpp
+  src/hdmap_utils/hdmap_utils.cpp
+  src/math/hermite_curve.cpp
   src/entity/entity_status.cpp
 )
 ament_target_dependencies(simulation_controller
@@ -48,7 +50,9 @@ ament_target_dependencies(simulation_controller
   quaternion_operation
   autoware_auto_msgs
   lanelet2_core
+  lanelet2_io
   lanelet2_routing
+  lanelet2_projection
   lanelet2_extension
   spline_interpolation
 )

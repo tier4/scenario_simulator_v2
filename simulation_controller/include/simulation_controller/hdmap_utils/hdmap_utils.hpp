@@ -30,15 +30,13 @@ namespace hdmap_utils
     class HdMapError : public std::runtime_error
     {
     public:
-        HdMapError(const char *message, int res=0) : error_info_(res), runtime_error(message) {};
-    private:
-        int error_info_;
+        HdMapError(const char *message) : runtime_error(message) {};
     };
 
     class HdMapUtils
     {
     public:
-        HdMapUtils(std::string lanelet_topic);
+        HdMapUtils(std::string lanelet_path);
         std::vector<geometry_msgs::msg::Point> toMapPoints(int lanelet_id, std::vector<double> s);
         boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
         boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::msg::Vector3 rpy);

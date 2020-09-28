@@ -115,7 +115,7 @@ namespace simulation_controller
         {
             auto trajectory = getTrajectory();
             double ret = 0.0;
-            for(int i=0; i<trajectory.size()-1; i++)
+            for(size_t i=0; i<trajectory.size()-1; i++)
             {
                 ret = ret + std::sqrt(std::pow(trajectory[i+1].x-trajectory[i].x,2) 
                     + std::pow(trajectory[i+1].y-trajectory[i].y,2) 
