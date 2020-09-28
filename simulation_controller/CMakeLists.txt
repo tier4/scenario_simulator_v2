@@ -25,32 +25,10 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(lanelet2_extension REQUIRED)
 find_package(autoware_auto_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
-
-#find_package(catkin REQUIRED COMPONENTS
-#  roslib
-#  spline_interpolation
-#)
-#catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES simulation_controller
-#  CATKIN_DEPENDS
-#    roscpp
-#    std_msgs
-#    geometry_msgs
-#    tf2_ros
-#    tf2_geometry_msgs
-#    roslib
-#    visualization_msgs
-#    lanelet2_extension
-#    spline_interpolation
-#    quaternion_operation
-#    behaviortree_cpp_v3
-#  DEPENDS system_lib
-#)
+find_package(spline_interpolation REQUIRED)
 
 include_directories(
   include
-  ${catkin_INCLUDE_DIRS}
 )
 
 #add_library(simulation_controller
