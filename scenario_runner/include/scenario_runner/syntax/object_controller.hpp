@@ -15,9 +15,7 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__OBJECT_CONTROLLER_HPP_
 #define SCENARIO_RUNNER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
-#include <scenario_runner/validator/attribute.hpp>
-#include <scenario_runner/validator/choice.hpp>
-#include <scenario_runner/validator/sequence.hpp>
+#include <scenario_runner/reader/element.hpp>
 
 #include <utility>
 
@@ -36,20 +34,13 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct ObjectController
-  : public Choice
+  : public Object
 {
-  template<typename ... Ts>
-  explicit ObjectController(Ts && ... xs)
+  template<typename Node, typename Scope>
+  explicit ObjectController(const Node & node, Scope &)
   {
-    defineElementAsUnsupported("CatalogReference", 0, 1);
-    defineElementAsUnimplemented("Controller", 0, 1);
-
-    validate(std::forward<decltype(xs)>(xs)...);
-  }
-
-  auto evaluate() const noexcept
-  {
-    return unspecified;
+    callWithElements(node, "CatalogReference", 0, 1, THROW_UNSUPPORTED_ERROR(node));
+    callWithElements(node, "Controller", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 };
 }

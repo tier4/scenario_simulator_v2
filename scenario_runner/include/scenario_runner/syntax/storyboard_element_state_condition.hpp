@@ -22,7 +22,7 @@ namespace scenario_runner
 {
 inline namespace syntax
 {
-/* ==== StoryboardElementStateCondition ======================================
+/* ==== StoryboardElementStateCondition ========================================
  *
  * <xsd:complexType name="StoryboardElementStateCondition">
  *   <xsd:attribute name="storyboardElementType" type="StoryboardElementType" use="required"/>
@@ -30,7 +30,7 @@ inline namespace syntax
  *   <xsd:attribute name="state" type="StoryboardElementState" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * ========================================================================== */
 struct StoryboardElementStateCondition
 {
   const String name;
@@ -43,9 +43,9 @@ struct StoryboardElementStateCondition
 
   template<typename Node, typename Scope>
   explicit StoryboardElementStateCondition(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "storyboardElementRef")},
-    type{readAttribute<StoryboardElementType>(node, outer_scope, "storyboardElementType")},
-    state{readAttribute<StoryboardElementState>(node, outer_scope, "state")},
+  : name{readAttribute<String>("storyboardElementRef", node, outer_scope)},
+    type{readAttribute<StoryboardElementType>("storyboardElementType", node, outer_scope)},
+    state{readAttribute<StoryboardElementState>("state", node, outer_scope)},
     inner_scope{outer_scope}
   {}
 
@@ -56,7 +56,7 @@ struct StoryboardElementStateCondition
 
   auto evaluate() const
   {
-    const auto result {compare(inner_scope.storyboard_elements.at(name).currentState(), state)};
+    const auto result {compare(inner_scope.storyboard_elements.at(name).state(), state)};
 
     std::cout << indent <<
       "StoryboardElementState [Is " <<
@@ -75,7 +75,7 @@ struct StoryboardElementStateCondition
     return result;
   }
 };
-}
+}  // inline namespace syntax
 }  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_STATE_CONDITION_HPP_

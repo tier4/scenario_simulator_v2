@@ -42,9 +42,9 @@ struct ParameterDeclaration
 
   template<typename Node, typename Scope>
   explicit ParameterDeclaration(const Node & node, Scope & scope)
-  : name{readAttribute<String>(node, scope, "name")},
-    parameter_type{readAttribute<ParameterType>(node, scope, "parameterType")},
-    value{readAttribute<String>(node, scope, "value")}
+  : name{readAttribute<String>("name", node, scope)},
+    parameter_type{readAttribute<ParameterType>("parameterType", node, scope)},
+    value{readAttribute<String>("value", node, scope)}
   {
     scope.parameters.emplace(name, evaluate());
   }

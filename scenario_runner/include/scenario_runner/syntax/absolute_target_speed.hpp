@@ -21,20 +21,20 @@ namespace scenario_runner
 {
 inline namespace syntax
 {
-/* ==== AbsoluteTargetSpeed ==================================================
+/* ==== AbsoluteTargetSpeed ====================================================
  *
  * <xsd:complexType name="AbsoluteTargetSpeed">
  *   <xsd:attribute name="value" type="Double" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * ========================================================================== */
 struct AbsoluteTargetSpeed
 {
   const Double value;
 
   template<typename Node, typename Scope>
   explicit AbsoluteTargetSpeed(const Node & node, Scope & scope)
-  : value{readAttribute<Double>(node, scope, "value")}
+  : value{readAttribute<Double>("value", node, scope)}
   {}
 };
 }

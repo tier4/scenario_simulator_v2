@@ -35,15 +35,16 @@ inline namespace syntax
 struct Entities
 {
   template<typename Node>
-  explicit Entities(const Node & parent, Scope & scope)
+  explicit Entities(const Node & node, Scope & scope)
   {
-    callWithElements(parent, "ScenarioObject", 0, unbounded, [&](auto && child)
+    callWithElements(
+      node, "ScenarioObject", 0, unbounded, [&](auto && node)
       {
-        scope.entities.emplace(readAttribute<String>(child, scope, "name"),
-        make<ScenarioObject>(child, scope));
+        scope.entities.emplace(readAttribute<String>("name", node, scope),
+        make<ScenarioObject>(node, scope));
       });
 
-    callWithElements(parent, "EntitySelection", 0, unbounded, THROW_UNSUPPORTED_ERROR(parent));
+    callWithElements(node, "EntitySelection", 0, unbounded, THROW_UNSUPPORTED_ERROR(node));
   }
 };
 }

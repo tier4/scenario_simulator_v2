@@ -71,9 +71,9 @@ private:
       return IfAccomplishable<Bound>::invoke(*this);
     }
 
-    const Pointer & currentState() const override
+    const Pointer & state() const override
     {
-      return IfStateful<Bound>::template currentState<Pointer>(*this);
+      return IfStateful<Bound>::template state<Pointer>(*this);
     }
 
     void start() override
@@ -161,9 +161,9 @@ public:
   }
 
   template<typename ... Ts>
-  decltype(auto) currentState(Ts && ... xs) const
+  decltype(auto) state(Ts && ... xs) const
   {
-    return binding().currentState(std::forward<decltype(xs)>(xs)...);
+    return binding().state(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>

@@ -43,9 +43,10 @@ struct Private
   : inner_scope{outer_scope}
   {
     inner_scope.actors.emplace_back(
-      readAttribute<String>(node, inner_scope, "entityRef"));
+      readAttribute<String>("entityRef", node, inner_scope));
 
-    callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node)
+    callWithElements(
+      node, "PrivateAction", 1, unbounded, [&](auto && node)
       {
         emplace_back(node, inner_scope);
       });

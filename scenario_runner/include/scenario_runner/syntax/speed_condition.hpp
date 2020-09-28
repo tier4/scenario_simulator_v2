@@ -44,8 +44,8 @@ struct SpeedCondition
   explicit SpeedCondition(
     const Node & node, Scope & outer_scope,
     const TriggeringEntities & trigger)
-  : value{readAttribute<Double>(node, outer_scope, "value")},
-    compare{readAttribute<Rule>(node, outer_scope, "rule")},
+  : value{readAttribute<Double>("value", node, outer_scope)},
+    compare{readAttribute<Rule>("rule", node, outer_scope)},
     inner_scope{outer_scope},
     trigger{trigger}
   {}

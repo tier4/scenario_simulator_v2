@@ -42,10 +42,10 @@ struct Orientation
 
   template<typename Node, typename Scope>
   explicit Orientation(const Node & node, Scope & scope)
-  : type{readAttribute<ReferenceContext>(node, scope, "type", ReferenceContext::relative)},
-    h{readAttribute<Double>(node, scope, "h", Double())},
-    p{readAttribute<Double>(node, scope, "p", Double())},
-    r{readAttribute<Double>(node, scope, "r", Double())}
+  : type{readAttribute<ReferenceContext>("type", node, scope, ReferenceContext::relative)},
+    h{readAttribute<Double>("h", node, scope, Double())},
+    p{readAttribute<Double>("p", node, scope, Double())},
+    r{readAttribute<Double>("r", node, scope, Double())}
   {}
 };
 }

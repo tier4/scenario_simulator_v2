@@ -40,7 +40,7 @@ struct EntityRef
 
   template<typename Node, typename Scope>
   explicit EntityRef(const Node & node, Scope & scope)
-  : String{readAttribute<String>(node, scope, "entityRef")}
+  : String{readAttribute<String>("entityRef", node, scope)}
   {}
 };
 }
