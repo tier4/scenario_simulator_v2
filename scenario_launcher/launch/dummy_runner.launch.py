@@ -14,30 +14,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import os
-
-
-class FileHandler():
-
-    @staticmethod
-    def get_file_name(path):
-        return os.path.splitext(os.path.basename(path))[0]
-
-    @staticmethod
-    def get_folder_name(path):
-        return os.path.basename(os.path.dirname(path))
-
-    @staticmethod
-    def get_dir(path):
-        return os.path.dirname(path)
-
-    @staticmethod
-    def get_dir_name(path):
-        return os.path.dirname(path) + "/"
+from launch import LaunchDescription
+from launch_ros.actions import Node
 
 
-if __name__ == "__main__":
-    dir_name = FileHandler.get_dir_name(__file__)
-    dir_name = FileHandler().get_dir(__file__)
-    file_name = FileHandler().get_folder_name(__file__)
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='scenario_launcher',
+            node_executable='dummy_runner',
+            node_name='dummy_runner'
+        )
+    ])
