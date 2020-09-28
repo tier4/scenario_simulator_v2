@@ -30,7 +30,4 @@ def generate_launch_description():
                 'verbose': 'true',
                 'scenario': os.path.join(
                     ament_index_python.packages.get_package_share_directory('scenario_runner'),
-                    'example/lane_change.xosc')
-                }]
-            )
-        ])
+                    'example/lane_change.xosc')}])])

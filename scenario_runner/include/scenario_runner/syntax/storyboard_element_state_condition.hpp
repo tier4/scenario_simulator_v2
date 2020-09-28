@@ -22,7 +22,7 @@ namespace scenario_runner
 {
 inline namespace syntax
 {
-/* ==== StoryboardElementStateCondition ======================================
+/* ==== StoryboardElementStateCondition ========================================
  *
  * <xsd:complexType name="StoryboardElementStateCondition">
  *   <xsd:attribute name="storyboardElementType" type="StoryboardElementType" use="required"/>
@@ -30,7 +30,7 @@ inline namespace syntax
  *   <xsd:attribute name="state" type="StoryboardElementState" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * ========================================================================== */
 struct StoryboardElementStateCondition
 {
   const String name;
@@ -75,7 +75,7 @@ struct StoryboardElementStateCondition
     return result;
   }
 };
-}
+}  // inline namespace syntax
 }  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_STATE_CONDITION_HPP_

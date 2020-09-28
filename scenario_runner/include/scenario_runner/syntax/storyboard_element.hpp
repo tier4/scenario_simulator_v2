@@ -16,7 +16,6 @@
 #define SCENARIO_RUNNER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
 #include <boost/scope_exit.hpp>
-#include <c++/7/bits/c++config.h>
 #include <scenario_runner/syntax/storyboard_element_state.hpp>
 
 #include <string>
@@ -29,7 +28,7 @@ inline namespace syntax
 template<typename T>
 struct StoryboardElement
 {
-  Object state {standby_state};
+  Object current_state {standby_state};
 
   const std::size_t maximum_execution_count;
 
@@ -41,7 +40,7 @@ struct StoryboardElement
 
   const auto & currentState() const
   {
-    return state;
+    return current_state;
   }
 
   #define BOILERPLATE(NAME, STATE) \
@@ -67,9 +66,9 @@ struct StoryboardElement
   Object override ()
   {
     if (!complete() && !stopping()) {
-      return state = stop_transition;
+      return current_state = stop_transition;
     } else {
-      return state;
+      return current_state;
     }
   }
 
@@ -135,7 +134,7 @@ public:
       static_cast<const T &>(*this).name <<
       "\"" <<
       reset <<
-      " [" << state << "] " <<
+      " [" << current_state << "] " <<
       std::endl;
 
     BOOST_SCOPE_EXIT_ALL()
@@ -157,14 +156,14 @@ public:
       case StoryboardElementState::standbyState:
 
         if (!ready()) {
-          return state;
+          return current_state;
         } else {
           std::cout << indent <<
             typeid(T).name() <<
-            "::evaluate [" << state << " => " << start_transition << "]" <<
+            "::evaluate [" << current_state << " => " << start_transition << "]" <<
             std::endl;
 
-          return state = start_transition;
+          return current_state = start_transition;
         }
 
       /* ---- Start ------------------------------------------------------------
@@ -182,10 +181,10 @@ public:
 
         std::cout << indent <<
           typeid(T).name() <<
-          "::evaluate [" << state << " => " << running_state << "]" <<
+          "::evaluate [" << current_state << " => " << running_state << "]" <<
           std::endl;
 
-        return state = running_state;
+        return current_state = running_state;
 
       /* ---- Running ----------------------------------------------------------
        *
@@ -230,14 +229,14 @@ public:
         static_cast<T &>(*this).run();
 
         if (!accomplished()) {
-          return state;
+          return current_state;
         } else {
           std::cout << indent <<
             typeid(T).name() <<
-            "::evaluate [" << state << " => " << end_transition << "]" <<
+            "::evaluate [" << current_state << " => " << end_transition << "]" <<
             std::endl;
 
-          return state = end_transition;
+          return current_state = end_transition;
         }
 
       /* ---- End --------------------------------------------------------------
@@ -253,9 +252,9 @@ public:
       case StoryboardElementState::endTransition:
 
         if (execution_count < maximum_execution_count) {  // check for completeness
-          return state = standby_state;
+          return current_state = standby_state;
         } else {
-          return state = complete_state;
+          return current_state = complete_state;
         }
 
       /* ---- Complete ---------------------------------------------------------
@@ -281,7 +280,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::completeState:
 
-        return state;
+        return current_state;
 
       /* ---- Skip -------------------------------------------------------------
        *
@@ -293,7 +292,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::skipTransition:
 
-        return state;
+        return current_state;
 
       /* ---- Stop -------------------------------------------------------------
        *
@@ -315,14 +314,14 @@ public:
         if (!accomplished()) {
           static_cast<T &>(*this).stop();
 
-          return state;
+          return current_state;
         } else {
           std::cout << indent <<
             typeid(T).name() <<
-            "::stop [" << state << " => " << complete_state << "]" <<
+            "::stop [" << current_state << " => " << complete_state << "]" <<
             std::endl;
 
-          return state = complete_state;
+          return current_state = complete_state;
         }
     }
   }

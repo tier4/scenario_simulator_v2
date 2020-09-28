@@ -95,7 +95,7 @@ struct Action
   void stop()
   {
     if (overridden) {
-      state = complete_state;
+      current_state = complete_state;
     } else {
       overridden = true;
     }
