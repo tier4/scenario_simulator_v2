@@ -38,7 +38,7 @@ struct StoryboardElement
   : maximum_execution_count{maximum_execution_count}
   {}
 
-  const auto & currentState() const
+  const auto & state() const
   {
     return current_state;
   }
@@ -46,7 +46,7 @@ struct StoryboardElement
   #define BOILERPLATE(NAME, STATE) \
   constexpr auto NAME() const noexcept \
   { \
-    return currentState().template as<StoryboardElementState>(__FILE__, \
+    return state().template as<StoryboardElementState>(__FILE__, \
              __LINE__) == StoryboardElementState::STATE; \
   } static_assert(true, "")
 
@@ -142,7 +142,7 @@ public:
       --indent;
     };
 
-    switch (currentState().template as<StoryboardElementState>(__FILE__, __LINE__)) {
+    switch (state().template as<StoryboardElementState>(__FILE__, __LINE__)) {
       /* ---- StandBy ----------------------------------------------------------
        *
        * This is the default initialization state of a StoryboardElement. When

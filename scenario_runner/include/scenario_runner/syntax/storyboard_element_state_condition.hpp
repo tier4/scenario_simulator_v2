@@ -56,7 +56,7 @@ struct StoryboardElementStateCondition
 
   auto evaluate() const
   {
-    const auto result {compare(inner_scope.storyboard_elements.at(name).currentState(), state)};
+    const auto result {compare(inner_scope.storyboard_elements.at(name).state(), state)};
 
     std::cout << indent <<
       "StoryboardElementState [Is " <<
