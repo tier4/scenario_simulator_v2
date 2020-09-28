@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_OUTPUT_STREAMABLE_HPP_
-#define SCENARIO_RUNNER__TYPE_TRAITS__IF_OUTPUT_STREAMABLE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__WHEN_HAS_STREAM_OUTPUT_OPERATOR_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__WHEN_HAS_STREAM_OUTPUT_OPERATOR_HPP_
 
-#include <scenario_runner/concepts/output_streamable.hpp>
+#include <scenario_runner/type_traits/has_stream_output_operator.hpp>
 #include <scenario_runner/console/escape_sequence.hpp>
 #include <scenario_runner/utility/indent.hpp>
 
@@ -24,23 +24,26 @@ namespace scenario_runner
 inline namespace type_traits
 {
 template<typename T, typename = void>
-struct IfOutputStreamable
+struct WhenHasStreamOutputOperator
 {
-  static std::ostream & invoke(std::ostream & os, const T &)
+  static std::ostream & applyIt(std::ostream & os, const T &)
   {
     return os << indent << blue << "<" << typeid(T).name() << "/>" << reset;
   }
 };
 
 template<typename T>
-struct IfOutputStreamable<T, typename std::enable_if<OutputStreamable<T>::value>::type>
+struct WhenHasStreamOutputOperator<T,
+  typename std::enable_if<
+    HasStreamOutputOperator<T>::value
+  >::type>
 {
-  static std::ostream & invoke(std::ostream & os, const T & something)
+  static std::ostream & applyIt(std::ostream & os, const T & rhs)
   {
-    return os << something;
+    return os << rhs;
   }
 };
 }
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_OUTPUT_STREAMABLE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__WHEN_HAS_STREAM_OUTPUT_OPERATOR_HPP_

@@ -28,7 +28,7 @@ struct Expression
 
   virtual std::ostream & write(std::ostream & os) const
   {
-    return IfOutputStreamable<Expression>::invoke(os, *this);
+    return WhenHasStreamOutputOperator<Expression>::applyIt(os, *this);
   }
 
   virtual Pointer<Expression> evaluate(const Pointer<Expression> &)

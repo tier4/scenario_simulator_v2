@@ -18,9 +18,9 @@
 #include <scenario_runner/error.hpp>
 #include <scenario_runner/type_traits/if_accomplishable.hpp>
 #include <scenario_runner/type_traits/if_evaluable.hpp>
-#include <scenario_runner/type_traits/if_output_streamable.hpp>
 #include <scenario_runner/type_traits/if_startable.hpp>
 #include <scenario_runner/type_traits/if_stateful.hpp>
+#include <scenario_runner/type_traits/when_has_stream_output_operator.hpp>
 #include <scenario_runner/utility/pair.hpp>
 
 #include <memory>
@@ -56,9 +56,10 @@ class Pointer
     }
 
 private:
+// ^ NOTE This broken indent was forced by ament_uncrustify.
     std::ostream & write(std::ostream & os) const override
     {
-      return IfOutputStreamable<Bound>::invoke(os, *this);
+      return WhenHasStreamOutputOperator<Bound>::applyIt(os, *this);
     }
 
     Pointer evaluate(const Pointer & as_is) override

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__CONCEPTS__OUTPUT_STREAMABLE_HPP_
-#define SCENARIO_RUNNER__CONCEPTS__OUTPUT_STREAMABLE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__HAS_STREAM_OUTPUT_OPERATOR_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__HAS_STREAM_OUTPUT_OPERATOR_HPP_
 
 #include <scenario_runner/type_traits/void_t.hpp>
 
@@ -24,16 +24,16 @@ namespace scenario_runner
 inline namespace concepts
 {
 template<typename T, typename = void>
-struct OutputStreamable
+struct HasStreamOutputOperator
   : public std::false_type
 {};
 
 template<typename T>
-struct OutputStreamable<T,
+struct HasStreamOutputOperator<T,
   void_t<decltype(std::declval<std::ostream &>() << std::declval<const T &>())>>
   : public std::true_type
 {};
 }
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__CONCEPTS__OUTPUT_STREAMABLE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__HAS_STREAM_OUTPUT_OPERATOR_HPP_
