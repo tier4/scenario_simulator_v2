@@ -43,6 +43,8 @@ add_library(simulation_controller
   src/hdmap_utils/hdmap_utils.cpp
   src/math/hermite_curve.cpp
   src/entity/entity_status.cpp
+  src/behavior/action_node.cpp
+  src/color_utils/color_utils.cpp
 )
 ament_target_dependencies(simulation_controller
   rclcpp
@@ -63,7 +65,6 @@ ament_target_dependencies(simulation_controller
   #src/entity/pedestrian_entity.cpp
   #src/entity/entity_base.cpp
   #src/entity/entity_manager.cpp
-  #src/color_utils/color_utils.cpp
   #src/behavior/vehicle/behavior_tree.cpp
   #src/behavior/vehicle/follow_lane_action.cpp
   #src/behavior/vehicle/acquire_position_action.cpp
@@ -72,7 +73,6 @@ ament_target_dependencies(simulation_controller
   #src/behavior/pedestrian/follow_lane_action.cpp
   #src/behavior/pedestrian/acquire_position_action.cpp
   #src/behavior/pedestrian/lane_change_action.cpp
-  #src/behavior/action_node.cpp
   #src/api/api.cpp
   #src/api/entity_api_impl.cpp
   #src/api/simulation_api_impl.cpp

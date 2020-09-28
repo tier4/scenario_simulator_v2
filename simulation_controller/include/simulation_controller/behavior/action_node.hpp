@@ -8,9 +8,7 @@ namespace entity_behavior
     class BehaviorTreeRuntimeError : public std::runtime_error
     {
     public:
-        BehaviorTreeRuntimeError(const char *message, int res=0) : error_info_(res), runtime_error(message) {};
-    private:
-        int error_info_;
+        BehaviorTreeRuntimeError(const char *message) : runtime_error(message) {};
     };
 
     class ActionNode : public BT::ActionNodeBase

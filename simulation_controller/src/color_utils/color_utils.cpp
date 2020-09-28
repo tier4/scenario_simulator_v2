@@ -12,9 +12,9 @@ namespace color_utils
  * @param alpha alpha value of the color
  * @return std_msgs::msg::ColorRGBA 
  */
-std_msgs::ColorRGBA fromHsv(double h, double s, double v, double alpha)
+std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
 {
-  std_msgs::ColorRGBA color;
+  std_msgs::msg::ColorRGBA color;
   color.a = alpha;
   float r = v;
   float g = v;
@@ -63,9 +63,9 @@ std_msgs::ColorRGBA fromHsv(double h, double s, double v, double alpha)
  * @param alpha alpha value of the color
  * @return std_msgs::msg::ColorRGBA 
  */
-std_msgs::ColorRGBA makeColorMsg(std::string preset_name, double alpha)
+std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha)
 {
-  std_msgs::ColorRGBA c_msg;
+  std_msgs::msg::ColorRGBA c_msg;
   c_msg.a = alpha;
   if (c_msg.a < 0.) c_msg.a = 0.;
   if (c_msg.a > 1.) c_msg.a = 1.;
