@@ -21,31 +21,14 @@ namespace simulation_controller
         public:
             EntityStatus() = default;
             EntityStatus(double t, 
-                geometry_msgs::Pose pose, 
-                geometry_msgs::Twist twist, 
-                geometry_msgs::Accel accel) : 
-                    time(t), 
-                    pose(pose), 
-                    twist(twist), 
-                    accel(accel)
-                    {
-                        coordinate = WORLD;
-                    };
+                geometry_msgs::msg::Pose pose, 
+                geometry_msgs::msg::Twist twist, 
+                geometry_msgs::msg::Accel accel);
             EntityStatus(double t, 
                 int lanelet_id, double s, double offset,
-                geometry_msgs::Vector3 rpy,
-                geometry_msgs::Twist twist, 
-                geometry_msgs::Accel accel) : 
-                    time(t), 
-                    twist(twist),
-                    lanelet_id(lanelet_id),
-                    offset(offset),
-                    rpy(rpy),
-                    s(s),
-                    accel(accel)
-                    {
-                        coordinate = LANE;
-                    };
+                geometry_msgs::msg::Vector3 rpy,
+                geometry_msgs::msg::Twist twist, 
+                geometry_msgs::msg::Accel accel);
             EntityStatus& operator =(const EntityStatus& obj)
             {
                 this->time = obj.time;
@@ -61,15 +44,15 @@ namespace simulation_controller
             }
             double time;
             CoordinateFrameTypes coordinate;
-            geometry_msgs::Twist twist;
-            geometry_msgs::Accel accel;
+            geometry_msgs::msg::Twist twist;
+            geometry_msgs::msg::Accel accel;
             /* Field for Lene Pose */
             int lanelet_id;
             double offset;
             double s;
-            geometry_msgs::Vector3 rpy;
+            geometry_msgs::msg::Vector3 rpy;
             /* Field for world pose */
-            geometry_msgs::Pose pose;
+            geometry_msgs::msg::Pose pose;
         };
     }
 }

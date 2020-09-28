@@ -40,8 +40,8 @@ namespace hdmap_utils
     public:
         HdMapUtils(std::string lanelet_topic);
         std::vector<geometry_msgs::msg::Point> toMapPoints(int lanelet_id, std::vector<double> s);
-        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Quaternion quat);
-        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Vector3 rpy);
+        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
+        boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset, geometry_msgs::msg::Vector3 rpy);
         boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(int lanelet_id, double s, double offset);
         boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(simulation_controller::entity::EntityStatus status);
         std::vector<int> getNextLaneletIds(int lanelet_id, std::string turn_direction);
@@ -57,16 +57,16 @@ namespace hdmap_utils
         std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(int lanelet_id, double s, 
             std::vector<int> lanelet_ids, double foward_distance=20);
         bool canChangeLane(int from_lanlet_id, int to_lanelet_id);
-        boost::optional<std::pair<simulation_controller::math::HermiteCurve,double>> getLaneChangeTrajectory(geometry_msgs::Pose from_pose, int to_lanelet_id);
-        boost::optional<simulation_controller::math::HermiteCurve> getLaneChangeTrajectory(geometry_msgs::Pose from_pose, 
+        boost::optional<std::pair<simulation_controller::math::HermiteCurve,double>> getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, int to_lanelet_id);
+        boost::optional<simulation_controller::math::HermiteCurve> getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, 
             int to_lanelet_id, double to_s, double tangent_vector_size=100);
-        boost::optional<geometry_msgs::Vector3> getTangentVector(int lanelet_id, double s);
+        boost::optional<geometry_msgs::msg::Vector3> getTangentVector(int lanelet_id, double s);
         std::vector<int> getRoute(int from_lanelet_id, int to_lanelet_id);
         std::vector<int> getConflictingCrosswalkIds(std::vector<int> lanlet_ids) const;
         boost::optional<double> getCollisionPointInLaneCoordinate(int lanelet_id, int crossing_lanelet_id);
     private:
-        geometry_msgs::Vector3 getVectorFromPose(geometry_msgs::Pose pose, double magnitude);
-        void mapCallback(const autoware_auto_msgs::MapBin & msg);
+        geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
+        void mapCallback(const autoware_auto_msgs::msg::HADMapBin & msg);
         lanelet::LaneletMapPtr lanelet_map_ptr_;
         lanelet::routing::RoutingGraphConstPtr vehicle_routing_graph_ptr_;
         lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;

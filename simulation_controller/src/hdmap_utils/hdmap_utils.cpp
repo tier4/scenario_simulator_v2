@@ -2,7 +2,7 @@
 #include <simulation_controller/math/hermite_curve.hpp>
 
 #include <spline_interpolation/spline_interpolation.hpp>
-#include <quaternion_operation/quaternion_operation.hpp>
+#include <quaternion_operation/quaternion_operation.h>
 #include <lanelet2_core/utility/Units.h>
 
 #include <boost/archive/binary_iarchive.hpp>
@@ -23,8 +23,8 @@ namespace hdmap_utils
         {
             lanelet_map_ptr_ = std::make_shared<lanelet::LaneletMap>();
             /*
-            auto map_ptr = ros::topic::waitForMessage<autoware_auto_msgs::MapBin>(lanelet_topic, ros::Duration(5));
-            autoware_auto_msgs::MapBin map = *map_ptr;
+            auto map_ptr = ros::topic::waitForMessage<autoware_auto_msgs::msg::HADMapBin>(lanelet_topic, ros::Duration(5));
+            autoware_auto_msgs::msg::HADMapBin map = *map_ptr;
             lanelet::utils::conversion::fromBinMsg(map, lanelet_map_ptr_);
             traffic_rules_vehicle_ptr_ =
                 lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, 
@@ -363,7 +363,7 @@ namespace hdmap_utils
         return ret;
     }
 
-    boost::optional<std::pair<simulation_controller::math::HermiteCurve,double>> HdMapUtils::getLaneChangeTrajectory(geometry_msgs::Pose from_pose, int to_lanelet_id)
+    boost::optional<std::pair<simulation_controller::math::HermiteCurve,double>> HdMapUtils::getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, int to_lanelet_id)
     {
         double to_length = getLaneletLength(to_lanelet_id);
         std::vector<double> evaluation,target_s;
@@ -400,7 +400,7 @@ namespace hdmap_utils
     }
 
     boost::optional<simulation_controller::math::HermiteCurve> HdMapUtils::getLaneChangeTrajectory(
-        geometry_msgs::Pose from_pose, int to_lanelet_id, double to_s, double tangent_vector_size)
+        geometry_msgs::msg::Pose from_pose, int to_lanelet_id, double to_s, double tangent_vector_size)
     {
         std::vector<geometry_msgs::msg::Point> ret;
         auto to_vec = getTangentVector(to_lanelet_id, to_s);
@@ -418,7 +418,7 @@ namespace hdmap_utils
         return curve;
     }
 
-    geometry_msgs::msg::Vector3 HdMapUtils::getVectorFromPose(geometry_msgs::Pose pose, double magnitude)
+    geometry_msgs::msg::Vector3 HdMapUtils::getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude)
     {
         geometry_msgs::msg::Vector3 dir =
             quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
@@ -526,7 +526,7 @@ namespace hdmap_utils
         return boost::none;
     }
 
-    boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset, geometry_msgs::Quaternion quat)
+    boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(int lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat)
     {
         geometry_msgs::msg::PoseStamped ret;
         const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);

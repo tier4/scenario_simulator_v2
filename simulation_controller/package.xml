@@ -32,10 +32,10 @@
   <depend>visualization_msgs</depend>
   <depend>std_msgs</depend>
   <depend>lanelet2_extension</depend>
+  <depend>lanelet2_routing</depend>
   <depend>spline_interpolation</depend>
   <depend>quaternion_operation</depend>
   <depend>behaviortree_cpp_v3</depend>
-  <depend>autoware_auto_msgs</depend>
   <test_depend>rostest</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
