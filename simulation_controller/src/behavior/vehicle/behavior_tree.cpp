@@ -53,7 +53,7 @@ namespace entity_behavior
             applyRecursiveVisitor(tree_.rootNode(), visitor);
         }
 
-        const BT::NodeStatus BehaviorTree::tick(double current_time, double step_time)
+        const BT::NodeStatus & BehaviorTree::tick(double current_time, double step_time)
         {
             setValueToBlackBoard("current_time", current_time);
             setValueToBlackBoard("step_time", step_time);

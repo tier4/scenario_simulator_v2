@@ -4,14 +4,14 @@
 // headers in pugixml
 #include "pugixml.hpp"
 
-#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/msg/vector3.hpp>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/foreach.hpp>
 
 #include <sstream>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace simulation_controller
 {
@@ -129,11 +129,11 @@ namespace simulation_controller
                 Performance performance,
                 BoundingBox bounding_box,
                 Axles axles)
-                : name(name)
-                , vehicle_categoly(vehicle_categoly)
-                , performance(performance)
+                : performance(performance)
                 , bounding_box(bounding_box)
                 , axles(axles)
+                , name(name)
+                , vehicle_categoly(vehicle_categoly)
                 {};
             const Performance performance;
             const BoundingBox bounding_box;

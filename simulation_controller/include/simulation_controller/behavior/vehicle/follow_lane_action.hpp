@@ -30,7 +30,7 @@ namespace entity_behavior
                     BT::InputPort<double>("step_time"),
                     BT::InputPort<boost::optional<double>>("target_speed"),
                     BT::InputPort<std::shared_ptr<simulation_controller::entity::VehicleParameters>>("vehicle_parameters"),
-                    BT::OutputPort<std::vector<geometry_msgs::Point>>("trajectory"),
+                    BT::OutputPort<std::vector<geometry_msgs::msg::Point>>("trajectory"),
                     BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
                     BT::OutputPort<std::string>("request"),
                     BT::InputPort<std::unordered_map<std::string,simulation_controller::entity::EntityStatus>>("other_entity_status"),

@@ -45,6 +45,7 @@ add_library(simulation_controller
   src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/behavior/action_node.cpp
+  src/behavior/vehicle/follow_lane_action.cpp
   src/color_utils/color_utils.cpp
 )
 ament_target_dependencies(simulation_controller
@@ -66,7 +67,6 @@ ament_target_dependencies(simulation_controller
   #src/entity/pedestrian_entity.cpp
   #src/entity/entity_manager.cpp
   #src/behavior/vehicle/behavior_tree.cpp
-  #src/behavior/vehicle/follow_lane_action.cpp
   #src/behavior/vehicle/acquire_position_action.cpp
   #src/behavior/vehicle/lane_change_action.cpp
   #src/behavior/pedestrian/behavior_tree.cpp
