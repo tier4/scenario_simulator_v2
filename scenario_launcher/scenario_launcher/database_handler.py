@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from scenario_common.logger import Logger
 from scenario_common.manager import Manager
 import pathlib
 
@@ -25,7 +26,7 @@ class DatabaseHandler():
 
     @staticmethod
     def read_database():
-        Manager.print_separator("scenario database")
+        Logger.print_separator("scenario database")
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         print("package path: " + str(launcher_package_path))
         database_path = launcher_package_path / DatabaseHandler.DATABASE_PATH

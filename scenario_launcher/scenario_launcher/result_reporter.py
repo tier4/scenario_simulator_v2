@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_common.manager import Manager
+from scenario_common.logger import Logger
 import json
 import pathlib
 
@@ -28,22 +28,22 @@ class Reporter():
     # write out simulation result
     @staticmethod
     def write_result(log_dir, results, scenario_path):
-        print("write result json")
+        Logger.print_info("write result json")
         if results["code"] == 0:  # boost::exit_success
             results["message"] = "exit_success"
-            Manager.print_success("-------> Success")
+            Logger.print_success("-------> Success")
         elif results["code"] == 201:  # boost::exit_test_failure
             results["message"] = "exit_test_failure"
-            Manager.print_error("-------> Failure")
+            Logger.print_error("-------> Failure")
         elif results["code"] == 1:  # boost::exit_failure
             results["message"] = "exit_failure"
-            Manager.print_error("-------> TimeOver")
+            Logger.print_error("-------> TimeOver")
         elif results["code"] == 200:  # boost::exit_exception_failure
             results["message"] = "exit_exception_failure"
-            Manager.print_exception("-------> Invalid")
+            Logger.print_error("-------> Invalid")
         else:
             results["message"] = "scenario_runner broken"
-            Manager.print_error("-------> Broken")
+            Logger.print_error("-------> Broken")
         results["path"] = scenario_path
         result_file_name = pathlib.PurePosixPath(
             scenario_path).stem + Reporter.RESULT_FILE_NAME
@@ -55,7 +55,7 @@ class Reporter():
                       ensure_ascii=False,
                       sort_keys=True,
                       separators=(',', ': '))
-        Manager.print_process("write out result to: " + log_path)
+        Logger.print_process("write out result to: " + log_path)
 
 
 if __name__ == "__main__":

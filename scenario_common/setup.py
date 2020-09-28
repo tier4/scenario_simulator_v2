@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'logger = scenario_common.logger:main'
         ],
     },
 )

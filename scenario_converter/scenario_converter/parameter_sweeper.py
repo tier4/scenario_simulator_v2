@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_common.manager import Manager
+from scenario_common.logger import Logger
 from collections import OrderedDict
 import itertools
 import numpy as np
@@ -64,7 +64,7 @@ class ParameterSweeper:
         bind = ParameterSweeper.get_modifier_bindings(modifier_dict)
         for item in itertools.product(*bind):
             xosc_text = "CAR SPEED"
-            Manager.print_process(
+            Logger.print_process(
                 "parameter distribution at file: " + str(item))
             for index2, item2 in enumerate(item):
                 # print(item2)
@@ -72,7 +72,7 @@ class ParameterSweeper:
                 repl = str(item2[1])
                 print("replace " + str(item2[0]) + " --> " + str(item2[1]))
                 xosc_text = re.sub(pattern, repl, xosc_text)
-            Manager.print_success(xosc_text)
+            Logger.print_success(xosc_text)
             return xosc_text
         return xosc_text
 

@@ -15,54 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from scenario_common.logger import Logger
 import json
 import os
 import pathlib
+import sys
 import yaml
 
 
 class Manager():
 
     @staticmethod
-    def print_process(message):
-        print("\x1b[36m", end="")
-        print(message)
-        print("\x1b[0m", end="")
-
-    @staticmethod
-    def print_success(message):
-        print("\x1b[32m", end="")
-        print(message)
-        print("\x1b[0m", end="")
-
-    @staticmethod
-    def print_error(message):
-        print("\x1b[1;31m", end="")
-        print(message)
-        print("\x1b[0m", end="")
-
-    @staticmethod
-    def print_exception(message):
-        print("\x1b[33m", end="")
-        print(message)
-        print("\x1b[0m", end="")
-
-    @staticmethod
-    def print_separator(message):
-        print("\x1b[35m", end="")
-        print("------- " + message + " -----")
-        print("\x1b[0m", end="")
-
-    @staticmethod
-    def print_progress_bar(i, max):
-        progress_bar_size = 40
-        current_progress = int(i * progress_bar_size / max)
-        progress_bar = ('>' * current_progress) + \
-            (' ' * (progress_bar_size - current_progress))
-        print("\r" +
-              "[{0}] {1} % \033[1C".format(progress_bar, int(i * 100. / max)),
-              end='')
-        return
+    def ask_continuation():
+        Logger.print_process("continue ? \n [y/n]:")
+        answer = input()
+        if (answer is not "y"):
+            Logger.print_info("abort creating files")
+            sys.exit()
 
     @staticmethod
     def read_data(path, mode="r"):
@@ -75,7 +44,7 @@ class Manager():
                 else:
                     data = file.read()
         except FileNotFoundError:
-            Manager.print_exception("FileNotFoundError: " + str(path))
+            Logger.print_warning("FileNotFoundError: " + str(path))
         return data
 
     @staticmethod
@@ -83,9 +52,9 @@ class Manager():
         path = str(path)
         is_path = os.path.exists(path)
         if(is_path):
-            Manager.print_process("path: " + path + " exists")
+            Logger.print_process("path: " + path + " exists")
         else:
-            Manager.print_exception("path: " + path + " not exists")
+            Logger.print_warning("path: " + path + " not exists")
         return is_path
 
     @staticmethod
@@ -102,28 +71,27 @@ class Manager():
                               separators=(',', ': '))
                 else:
                     file.write(data)
-        except FileNotFoundError:
-            Manager.print_exception("unable to fopen: " + str(path))
+        except IOError:
+            Logger.print_warning("unable to fopen: " + str(path))
         return data
 
     @staticmethod
     def mkdir(path):
-        print("Try mkdir: " + os.path.abspath(path), end="")
+        message = "Try mkdir: " + os.path.abspath(path)
         try:
             os.makedirs(path)
         except FileExistsError:
-            print("\n  But cancelled making directory", end="")
+            message = message+"\n       But cancelled making directory"
             if (os.path.exists(path)):
-                print(" -> Because folder already exist")
+                message = message+" -> Because folder already exist"
             else:
-                print(" -> Because of unkown failure")
+                message = message+" -> Because of unkown failure"
+        Logger.print_info(message)
+
+
+def main():
+    pass
 
 
 if __name__ == "__main__":
-    for i in range(11):
-        Manager.print_progress_bar(i, 10)
-    print("")
-    Manager.print_process("Process")
-    Manager.print_success("Success")
-    Manager.print_exception("Exception")
-    Manager.print_error("Failure")
+    main()
