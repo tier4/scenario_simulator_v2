@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSCENARIO>
+  <FileHeader revMajor="1" revMinor="42" date="2020-08-06T12:00:00" description="test" author="Tatsuya Yamasaki"/>
+
+  <ParameterDeclarations>
+    <ParameterDeclaration name="hoge" parameterType="string" value="Hello, world!"/>
+    <ParameterDeclaration name="fuga" parameterType="double" value="42"/>
+  </ParameterDeclarations>
+
+  <ParameterDeclarations>
+    <ParameterDeclaration name="piyo" parameterType="string" value="$hoge"/>
+  </ParameterDeclarations>
+
+  <CatalogLocations>
+    <ControllerCatalog>
+      <Directory path="./"/>
+    </ControllerCatalog>
+    <EnvironmentCatalog>
+      <Directory path="./"/>
+    </EnvironmentCatalog>
+    <ManeuverCatalog>
+      <Directory path="./"/>
+    </ManeuverCatalog>
+    <MiscObjectCatalog>
+      <Directory path="./"/>
+    </MiscObjectCatalog>
+    <PedestrianCatalog>
+      <Directory path="./"/>
+    </PedestrianCatalog>
+    <RouteCatalog>
+      <Directory path="./"/>
+    </RouteCatalog>
+    <TrajectoryCatalog>
+      <Directory path="./"/>
+    </TrajectoryCatalog>
+    <VehicleCatalog>
+      <Directory path="./"/>
+    </VehicleCatalog>
+  </CatalogLocations>
+
+  <RoadNetwork>
+    <LogicFile filepath="./"/>
+    <SceneGraphFile filepath="./"/>
+
+    <TrafficSignals>
+      <TrafficSignalController name="signal-1">
+        <Phase name="phase-1">
+          <TrafficSignalState trafficSignalId="1" state=""/>
+          <TrafficSignalState trafficSignalId="1" state=""/>
+          <TrafficSignalState trafficSignalId="1" state=""/>
+        </Phase>
+      </TrafficSignalController>
+
+      <TrafficSignalController name="signal-2">
+        <Phase name="phase-1">
+          <TrafficSignalState trafficSignalId="2" state=""/>
+          <TrafficSignalState trafficSignalId="2" state=""/>
+          <TrafficSignalState trafficSignalId="2" state=""/>
+        </Phase>
+      </TrafficSignalController>
+    </TrafficSignals>
+  </RoadNetwork>
+
+  <Entities>
+    <ScenarioObject name="scenario-object-1">
+      <Vehicle name="vehicle-1" vehicleCategory="car">
+        <ParameterDeclarations>
+          <ParameterDeclaration name="value" parameterType="double" value="42"/>
+        </ParameterDeclarations>
+        <BoundingBox>
+          <Center x="0" y="0" z="0"/>
+          <Dimensions width="0" length="0" height="0"/>
+        </BoundingBox>
+        <Performance maxSpeed="9999" maxAcceleration="9999" maxDeceleration="9999"/>
+      </Vehicle>
+    </ScenarioObject>
+
+    <ScenarioObject name="scenario-object-2">
+      <Pedestrian model="" mass="100" name="" pedestrianCategory="pedestrian">
+        <ParameterDeclarations>
+          <ParameterDeclaration name="value" parameterType="double" value="42"/>
+        </ParameterDeclarations>
+        <BoundingBox>
+          <Center x="0" y="0" z="0"/>
+          <Dimensions width="0" length="0" height="0"/>
+        </BoundingBox>
+      </Pedestrian>
+    </ScenarioObject>
+  </Entities>
+
+  <Storyboard>
+    <Init>
+      <Actions>
+        <GlobalAction>
+          <InfrastructureAction>
+            <TrafficSignalAction>
+              <TrafficSignalStateAction name="" state=""/>
+            </TrafficSignalAction>
+          </InfrastructureAction>
+        </GlobalAction>
+
+        <UserDefinedAction>
+          <CustomCommandAction type="print"> Hello, world! </CustomCommandAction>
+        </UserDefinedAction>
+
+        <UserDefinedAction>
+          <CustomCommandAction type="exitSuccess"/>
+        </UserDefinedAction>
+
+        <UserDefinedAction>
+          <CustomCommandAction type="exitFailure"/>
+        </UserDefinedAction>
+
+        <Private entityRef="Ego">
+          <PrivateAction>
+            <LongitudinalAction>
+              <SpeedAction>
+                <SpeedActionDynamics dynamicsShape="linear" value="10" dynamicsDimension="rate"/>
+                <SpeedActionTarget>
+                  <RelativeTargetSpeed entityRef="" value="10"/>
+                </SpeedActionTarget>
+              </SpeedAction>
+            </LongitudinalAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <LongitudinalAction>
+              <SpeedAction>
+                <SpeedActionDynamics dynamicsShape="step" value="10" dynamicsDimension="rate"/>
+                <SpeedActionTarget>
+                  <AbsoluteTargetSpeed value="1000000000000000000000000000000"/>
+                </SpeedActionTarget>
+              </SpeedAction>
+            </LongitudinalAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <LateralAction>
+              <LaneChangeAction>
+                <LaneChangeActionDynamics dynamicsShape="linear" value="10" dynamicsDimension="rate"/>
+                <LaneChangeTarget>
+                  <AbsoluteTargetLane value="42"/>
+                </LaneChangeTarget>
+              </LaneChangeAction>
+            </LateralAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <TeleportAction>
+              <Position>
+                <LanePosition laneId="42" s="0"/>
+              </Position>
+            </TeleportAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <RoutingAction>
+              <AssignRouteAction>
+                <Route name="">
+                  <Waypoint routeStrategy="shortest">
+                    <Position>
+                      <WorldPosition x="0" y="0" z="0" h="0" p="0" r="0"/>
+                    </Position>
+                  </Waypoint>
+                  <Waypoint routeStrategy="shortest">
+                    <Position>
+                      <WorldPosition x="0" y="0" z="0" h="0" p="0" r="0"/>
+                    </Position>
+                  </Waypoint>
+                </Route>
+              </AssignRouteAction>
+            </RoutingAction>
+          </PrivateAction>
+
+          <PrivateAction>
+            <RoutingAction>
+              <AcquirePositionAction>
+                <Position>
+                  <WorldPosition x="0" y="0" z="0" h="0" p="0" r="0"/>
+                </Position>
+              </AcquirePositionAction>
+            </RoutingAction>
+          </PrivateAction>
+        </Private>
+      </Actions>
+    </Init>
+
+    <Story name="">
+      <ParameterDeclarations>
+        <ParameterDeclaration name="x" parameterType="double" value="42"/>
+        <ParameterDeclaration name="y" parameterType="double" value="42"/>
+      </ParameterDeclarations>
+
+      <Act name="">
+        <ManeuverGroup name="">
+          <Actors>
+            <EntityRef entityRef=""/>
+            <EntityRef entityRef=""/>
+            <EntityRef entityRef=""/>
+          </Actors>
+
+          <Maneuver name="">
+            <ParameterDeclarations>
+              <ParameterDeclaration name="a" parameterType="string" value=""/>
+              <ParameterDeclaration name="b" parameterType="string" value=""/>
+            </ParameterDeclarations>
+
+            <Event priority="overwrite" name="">
+              <Action name="">
+                <GlobalAction>
+                  <InfrastructureAction>
+                    <TrafficSignalAction>
+                      <TrafficSignalStateAction name="" state=""/>
+                    </TrafficSignalAction>
+                  </InfrastructureAction>
+                </GlobalAction>
+              </Action>
+
+              <StartTrigger/>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+
+        <StartTrigger/>
+      </Act>
+    </Story>
+
+    <StopTrigger>
+      <ConditionGroup>
+        <!-- UNSUPPORTED EndofRoadCondition -->
+
+        <Condition name="" conditionEdge="none">
+          <ByEntityCondition>
+            <TriggeringEntities triggeringEntitiesRule="any">
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+            </TriggeringEntities>
+
+            <EntityCondition>
+              <CollisionCondition>
+                <EntityRef entityRef=""/>
+              </CollisionCondition>
+            </EntityCondition>
+          </ByEntityCondition>
+        </Condition>
+
+        <!-- UNSUPPORTED OffroadCondition -->
+        <!-- UNSUPPORTED TimeHeadwayCondition -->
+        <!-- UNSUPPORTED TimeToCollisionCondition -->
+
+        <Condition name="" conditionEdge="none">
+          <ByEntityCondition>
+            <TriggeringEntities triggeringEntitiesRule="any">
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+            </TriggeringEntities>
+
+            <EntityCondition>
+              <AccelerationCondition value="42" rule="lessThan"/>
+            </EntityCondition>
+          </ByEntityCondition>
+        </Condition>
+
+        <!-- UNSUPPORTED StandStillCondition -->
+
+        <Condition name="" conditionEdge="none">
+          <ByEntityCondition>
+            <TriggeringEntities triggeringEntitiesRule="any">
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+            </TriggeringEntities>
+
+            <EntityCondition>
+              <SpeedCondition value="42" rule="equalTo"/>
+            </EntityCondition>
+          </ByEntityCondition>
+        </Condition>
+
+        <!-- UNSUPPORTED RelativeSpeedCondition -->
+        <!-- UNSUPPORTED TraveledDistanceCondition -->
+
+        <Condition name="" conditionEdge="none">
+          <ByEntityCondition>
+            <TriggeringEntities triggeringEntitiesRule="any">
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+            </TriggeringEntities>
+
+            <EntityCondition>
+              <ReachPositionCondition tolerance="42">
+                <Position>
+                  <WorldPosition x="0" y="0" z="0" h="0" p="0" r="0"/>
+                </Position>
+              </ReachPositionCondition>
+            </EntityCondition>
+          </ByEntityCondition>
+        </Condition>
+
+        <Condition name="" conditionEdge="none">
+          <ByEntityCondition>
+            <TriggeringEntities triggeringEntitiesRule="any">
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+            </TriggeringEntities>
+
+            <EntityCondition>
+              <ReachPositionCondition tolerance="42">
+                <Position>
+                  <LanePosition laneId="42" offset="0" s="0">
+                    <Orientation type="relative" h="0" p="0" r="0"/>
+                  </LanePosition>
+                </Position>
+              </ReachPositionCondition>
+            </EntityCondition>
+          </ByEntityCondition>
+        </Condition>
+
+        <!-- UNSUPPORTED DistanceCondition -->
+
+        <Condition name="" conditionEdge="none">
+          <ByEntityCondition>
+            <TriggeringEntities triggeringEntitiesRule="any">
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+              <EntityRef entityRef=""/>
+            </TriggeringEntities>
+
+            <EntityCondition>
+              <RelativeDistanceCondition entityRef="" relativeDistanceType="cartesianDistance" value="42" freespace="true" rule="lessThan"/>
+            </EntityCondition>
+          </ByEntityCondition>
+        </Condition>
+      </ConditionGroup>
+
+      <ConditionGroup>
+        <!-- UNSUPPORTED ParameterCondition -->
+        <!-- UNSUPPORTED TimeOfDayCondition -->
+
+        <Condition name="" conditionEdge="none">
+          <ByValueCondition>
+            <SimulationTimeCondition value="10" rule="greaterThan"/>
+          </ByValueCondition>
+        </Condition>
+
+        <!-- UNSUPPORTED StoryboardElementStateCondition -->
+        <!-- UNSUPPORTED UserDefinedValueCondition -->
+
+        <Condition name="" conditionEdge="none">
+          <ByValueCondition>
+            <TrafficSignalCondition name="" state=""/>
+          </ByValueCondition>
+        </Condition>
+
+        <!-- UNSUPPORTED TrafficSignalControllerCondition -->
+      </ConditionGroup>
+
+      <ConditionGroup>
+        <Condition name="" conditionEdge="none">
+          <ByValueCondition>
+            <SimulationTimeCondition value="10" rule="greaterThan"/>
+          </ByValueCondition>
+        </Condition>
+      </ConditionGroup>
+    </StopTrigger>
+  </Storyboard>
+</OpenSCENARIO>
