@@ -20,6 +20,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace scenario_runner
 {
