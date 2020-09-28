@@ -1,0 +1,8 @@
+Launch: "launch/scenario_simulator.launch"
+Log: "log/log1/"
+Map:
+  - kashiwanoha: "map/kashiwanoha/kashiwanoha.osm"
+  - map2: "map/somewhere/somewhere.osm"
+Scenario:
+  - "open_scenario/test-1.xosc"
+  - "open_scenario/test-2.xosc"
