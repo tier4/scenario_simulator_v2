@@ -18,9 +18,9 @@
 #include <scenario_runner/error.hpp>
 #include <scenario_runner/type_traits/if_accomplishable.hpp>
 #include <scenario_runner/type_traits/if_has_member_function_evaluate.hpp>
+#include <scenario_runner/type_traits/if_has_member_function_state.hpp>
 #include <scenario_runner/type_traits/if_has_stream_output_operator.hpp>
 #include <scenario_runner/type_traits/if_startable.hpp>
-#include <scenario_runner/type_traits/if_stateful.hpp>
 #include <scenario_runner/utility/pair.hpp>
 
 #include <memory>
@@ -74,7 +74,7 @@ private:
 
     const Pointer & state() const override
     {
-      return IfStateful<Bound>::template state<Pointer>(*this);
+      return IfHasMemberFunctionState<Bound>::template callIt<Pointer>(*this);
     }
 
     void start() override
