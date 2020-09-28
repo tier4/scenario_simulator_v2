@@ -36,6 +36,8 @@
   <depend>spline_interpolation</depend>
   <depend>quaternion_operation</depend>
   <depend>behaviortree_cpp_v3</depend>
+  <depend>ament_index_cpp</depend>
+  
   <test_depend>rostest</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->

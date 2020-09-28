@@ -21,7 +21,7 @@ namespace entity_behavior
         {
         public:
             BehaviorTree();
-            const BT::NodeStatus & tick(double current_time, double step_time);
+            BT::NodeStatus tick(double current_time, double step_time);
             std::string getCurrentAction() const
             {
                 return current_action_;

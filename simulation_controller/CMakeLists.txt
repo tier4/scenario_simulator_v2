@@ -31,6 +31,7 @@ find_package(autoware_auto_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(spline_interpolation REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(ament_index_cpp REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
@@ -45,7 +46,10 @@ add_library(simulation_controller
   src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/behavior/action_node.cpp
+  src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_action.cpp
+  src/behavior/vehicle/lane_change_action.cpp
+  src/behavior/vehicle/acquire_position_action.cpp
   src/color_utils/color_utils.cpp
 )
 ament_target_dependencies(simulation_controller
@@ -59,6 +63,7 @@ ament_target_dependencies(simulation_controller
   lanelet2_projection
   lanelet2_extension
   spline_interpolation
+  ament_index_cpp
 )
 
 #add_library(simulation_controller
@@ -66,9 +71,6 @@ ament_target_dependencies(simulation_controller
   #src/entity/vehicle_entity.cpp
   #src/entity/pedestrian_entity.cpp
   #src/entity/entity_manager.cpp
-  #src/behavior/vehicle/behavior_tree.cpp
-  #src/behavior/vehicle/acquire_position_action.cpp
-  #src/behavior/vehicle/lane_change_action.cpp
   #src/behavior/pedestrian/behavior_tree.cpp
   #src/behavior/pedestrian/follow_lane_action.cpp
   #src/behavior/pedestrian/acquire_position_action.cpp
@@ -115,6 +117,10 @@ ament_target_dependencies(simulation_controller
 #    simulation_controller
 #    ${catkin_LIBRARIES})
 #endif ()
+
+install(DIRECTORY resource
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ament_export_include_directories(include)
 ament_package()

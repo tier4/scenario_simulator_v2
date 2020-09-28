@@ -22,7 +22,7 @@ namespace entity_behavior
             }
             if(request != "acquire_position")
             {
-                following_trajectory_ = std::vector<geometry_msgs::Point>(0);
+                following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
                 target_status_ = boost::none;
                 route_ = boost::none;
                 return BT::NodeStatus::FAILURE;
@@ -51,7 +51,7 @@ namespace entity_behavior
             if(!getInput<simulation_controller::entity::EntityStatus>("target_status", target_status))
             {
                 target_status_ = boost::none;
-                following_trajectory_ = std::vector<geometry_msgs::Point>(0);
+                following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
                 route_ = boost::none;
                 return BT::NodeStatus::FAILURE;
             }
@@ -59,7 +59,7 @@ namespace entity_behavior
             if(entity_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD)
             {
                 target_status_ = boost::none;
-                following_trajectory_ = std::vector<geometry_msgs::Point>(0);
+                following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
                 route_ = boost::none;
                 return BT::NodeStatus::FAILURE;
             }
@@ -67,7 +67,7 @@ namespace entity_behavior
             if(target_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD)
             {
                 target_status_ = boost::none;
-                following_trajectory_ = std::vector<geometry_msgs::Point>(0);
+                following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
                 route_ = boost::none;
                 return BT::NodeStatus::FAILURE;
             }
@@ -112,7 +112,7 @@ namespace entity_behavior
                 }
             }
             
-            geometry_msgs::Accel accel_new;
+            geometry_msgs::msg::Accel accel_new;
             accel_new = entity_status.accel;
             double target_accel = (target_speed.get() - entity_status.twist.linear.x) / step_time;
             if(entity_status.twist.linear.x > target_speed.get())
@@ -131,7 +131,7 @@ namespace entity_behavior
             }
 
             accel_new.linear.x = target_accel;
-            geometry_msgs::Twist twist_new;
+            geometry_msgs::msg::Twist twist_new;
             twist_new.linear.x = boost::algorithm::clamp(entity_status.twist.linear.x + accel_new.linear.x * step_time,
                 0, vehicle_param_ptr->performance.max_speed);
             twist_new.linear.y = 0.0;
@@ -145,11 +145,11 @@ namespace entity_behavior
             {
                 if(target_status.s < entity_status.s)
                 {
-                    geometry_msgs::Vector3 rpy = entity_status.rpy;
+                    geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
                     simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time, 
                         entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
                     setOutput("updated_status", entity_status_updated);
-                    following_trajectory_ = std::vector<geometry_msgs::Point>(0);
+                    following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
                     target_status_ = boost::none;
                     route_ = boost::none;
                     return BT::NodeStatus::SUCCESS;
@@ -175,7 +175,7 @@ namespace entity_behavior
                 }
                 if(is_finded && next_lanelet_id)
                 {
-                    geometry_msgs::Vector3 rpy = entity_status.rpy;
+                    geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
                     simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time, 
                         next_lanelet_id.get(), new_s, entity_status.offset, rpy, twist_new, accel_new);
                     setOutput("updated_status", entity_status_updated);
@@ -189,7 +189,7 @@ namespace entity_behavior
             }
             else
             {
-                geometry_msgs::Vector3 rpy = entity_status.rpy;
+                geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
                 simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time, 
                     entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
                 setOutput("updated_status", entity_status_updated);
