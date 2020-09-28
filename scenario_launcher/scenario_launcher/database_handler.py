@@ -15,9 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+import pathlib
+
 from scenario_common.logger import Logger
 from scenario_common.manager import Manager
-import pathlib
 
 
 class DatabaseHandler():

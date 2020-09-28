@@ -15,11 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_common.logger import Logger
-from collections import OrderedDict
+
 import itertools
 import numpy as np
 import re
+from collections import OrderedDict
+
+from scenario_common.logger import Logger
 
 
 class ParameterSweeper:

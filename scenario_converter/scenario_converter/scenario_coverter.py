@@ -15,10 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_converter.parameter_sweeper import ParameterSweeper
-from scenario_converter.scenario_regressor import Regressor
-from scenario_common.logger import Logger
-from scenario_common.manager import Manager
+
 from collections import OrderedDict, defaultdict
 from bs4 import BeautifulSoup
 import argparse
@@ -29,6 +26,11 @@ import pathlib
 import re
 import xmlplain
 import xmltodict
+
+from scenario_converter.parameter_sweeper import ParameterSweeper
+from scenario_converter.scenario_regressor import Regressor
+from scenario_common.logger import Logger
+from scenario_common.manager import Manager
 
 
 class ScenarioConverter:

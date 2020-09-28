@@ -15,9 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_common.logger import Logger
 import json
 import pathlib
+
+from scenario_common.logger import Logger
 
 
 class Reporter():
