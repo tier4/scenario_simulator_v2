@@ -95,7 +95,7 @@ protected:
   template<typename U, typename Node, typename Scope>
   decltype(auto) makeStoryboardElement(const Node & node, Scope & inner_scope)
   {
-    const auto name {readAttribute<String>(node, inner_scope, "name")};
+    const auto name {readAttribute<String>("name", node, inner_scope)};
 
     const auto result {
       inner_scope.storyboard_elements.emplace(

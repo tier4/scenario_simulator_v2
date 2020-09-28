@@ -39,8 +39,8 @@ struct TrafficSignalStateAction
 
   template<typename Node, typename Scope>
   explicit TrafficSignalStateAction(const Node & node, Scope & scope)
-  : name{readAttribute<String>(node, scope, "name")},
-    state{readAttribute<String>(node, scope, "state")}
+  : name{readAttribute<String>("name", node, scope)},
+    state{readAttribute<String>("state", node, scope)}
   {}
 };
 }

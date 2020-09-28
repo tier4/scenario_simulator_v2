@@ -53,12 +53,12 @@ struct RelativeDistanceCondition
   explicit RelativeDistanceCondition(
     const Node & node, Scope & outer_scope,
     const TriggeringEntities & triggering_entities)
-  : entity_ref{readAttribute<String>(node, outer_scope, "entityRef")},
-    relative_distance_type{readAttribute<RelativeDistanceType>(node, outer_scope,
-        "relativeDistanceType")},
-    value{readAttribute<Double>(node, outer_scope, "value")},
-    freespace{readAttribute<Boolean>(node, outer_scope, "freespace")},
-    compare{readAttribute<Rule>(node, outer_scope, "rule")},
+  : entity_ref{readAttribute<String>("entityRef", node, outer_scope)},
+    relative_distance_type{
+      readAttribute<RelativeDistanceType>("relativeDistanceType", node, outer_scope)},
+    value{readAttribute<Double>("value", node, outer_scope)},
+    freespace{readAttribute<Boolean>("freespace", node, outer_scope)},
+    compare{readAttribute<Rule>("rule", node, outer_scope)},
     inner_scope{outer_scope},
     verify{triggering_entities}
   {}

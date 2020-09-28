@@ -44,25 +44,28 @@ struct Action
 
   template<typename Node, typename Scope>
   explicit Action(const Node & node, Scope & scope)
-  : name{readAttribute<String>(node, scope, "name")}
+  : name{readAttribute<String>("name", node, scope)}
   {
-    callWithElements(node, "GlobalAction", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "GlobalAction", 0, 1, [&](auto && node)
       {
         return rebind<GlobalAction>(node, scope);
       });
 
-    callWithElements(node, "UserDefinedAction", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "UserDefinedAction", 0, 1, [&](auto && node)
       {
         return rebind<UserDefinedAction>(node, scope);
       });
 
-    callWithElements(node, "PrivateAction", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "PrivateAction", 0, 1, [&](auto && node)
       {
         return rebind<PrivateAction>(node, scope);
       });
   }
 
-  auto ready() const noexcept(noexcept(static_cast<bool>(std::declval<Object &>())))
+  auto ready() const
   {
     return static_cast<bool>(*this);
   }

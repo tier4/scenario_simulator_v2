@@ -50,8 +50,8 @@ struct Route
 
   template<typename Node, typename Scope>
   explicit Route(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
-    closed{readAttribute<Boolean>(node, outer_scope, "closed", Boolean())},
+  : name{readAttribute<String>("name", node, outer_scope)},
+    closed{readAttribute<Boolean>("closed", node, outer_scope, Boolean())},
     inner_scope{outer_scope}
   {
     callWithElements(

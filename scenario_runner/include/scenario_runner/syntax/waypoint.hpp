@@ -43,7 +43,7 @@ struct Waypoint
   template<typename Node, typename Scope>
   explicit Waypoint(const Node & node, Scope & outer_scope)
   : route_strategy{
-      readAttribute<RouteStrategy>(node, outer_scope, "routeStrategy")},
+      readAttribute<RouteStrategy>("routeStrategy", node, outer_scope)},
     position{
       readElement<Position>("Position", node, outer_scope)}
   {}

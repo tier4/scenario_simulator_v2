@@ -34,7 +34,7 @@ struct AbsoluteTargetLane
 
   template<typename Node, typename Scope>
   explicit AbsoluteTargetLane(const Node & node, Scope & scope)
-  : value{readAttribute<std::decay<decltype(value)>::type>(node, scope, "value")}
+  : value{readAttribute<String>("value", node, scope)}
   {}
 };
 }

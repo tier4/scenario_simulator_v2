@@ -41,8 +41,8 @@ struct TrafficSignalState
 
   template<typename Node, typename Scope>
   explicit TrafficSignalState(const Node & node, Scope & scope)
-  : traffic_signal_id{readAttribute<String>(node, scope, "trafficSignalId")},
-    state{readAttribute<String>(node, scope, "state")}
+  : traffic_signal_id{readAttribute<String>("trafficSignalId", node, scope)},
+    state{readAttribute<String>("state", node, scope)}
   {}
 };
 
@@ -67,10 +67,10 @@ struct Phase
 
   template<typename Node, typename Scope>
   explicit Phase(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
+  : name{readAttribute<String>("name", node, outer_scope)},
     duration{
       readAttribute<Double>(
-        node, outer_scope, "duration", Double::infinity())},
+        "duration", node, outer_scope, Double::infinity())},
     state{readElement<TrafficSignalState>("TrafficSignalState", node, outer_scope)}
   {}
 };
@@ -99,9 +99,9 @@ struct TrafficSignalController
 
   template<typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
-    delay{readAttribute<Double>(node, outer_scope, "delay")},
-    reference{readAttribute<String>(node, outer_scope, "reference")},
+  : name{readAttribute<String>("name", node, outer_scope)},
+    delay{readAttribute<Double>("delay", node, outer_scope)},
+    reference{readAttribute<String>("reference", node, outer_scope)},
     phase{readElement<Phase>("Phase", node, outer_scope)}
   {}
 };

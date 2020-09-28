@@ -61,11 +61,11 @@ struct Vehicle
 
   template<typename Node, typename Scope>
   explicit Vehicle(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
-    vehicle_category{readAttribute<VehicleCategory>(node, outer_scope, "vehicleCategory")},
+  : name{readAttribute<String>("name", node, outer_scope)},
+    vehicle_category{readAttribute<VehicleCategory>("vehicleCategory", node, outer_scope)},
     inner_scope{outer_scope},
-    parameter_declarations{readElement<ParameterDeclarations>("ParameterDeclarations", node,
-        inner_scope)},
+    parameter_declarations{
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)},
     bounding_box{readElement<BoundingBox>("BoundingBox", node, inner_scope)},
     performance{readElement<Performance>("Performance", node, inner_scope)},
     axles{readElement<Axles>("Axles", node, inner_scope)},

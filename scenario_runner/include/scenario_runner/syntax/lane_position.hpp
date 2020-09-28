@@ -44,10 +44,10 @@ struct LanePosition
 
   template<typename Node, typename Scope>
   explicit LanePosition(const Node & node, Scope & scope)
-  : road_id{readAttribute<String>(node, scope, "roadId", "")},
-    lane_id{readAttribute<String>(node, scope, "laneId")},
-    offset{readAttribute<Double>(node, scope, "offset", Double())},
-    s{readAttribute<Double>(node, scope, "s")},
+  : road_id{readAttribute<String>("roadId", node, scope, "")},
+    lane_id{readAttribute<String>("laneId", node, scope)},
+    offset{readAttribute<Double>("offset", node, scope, Double())},
+    s{readAttribute<Double>("s", node, scope)},
     orientation{readElement<Orientation>("Orientation", node, scope)}
   {}
 };
