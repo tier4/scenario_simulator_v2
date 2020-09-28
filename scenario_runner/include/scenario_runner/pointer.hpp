@@ -17,10 +17,10 @@
 
 #include <scenario_runner/error.hpp>
 #include <scenario_runner/type_traits/if_accomplishable.hpp>
-#include <scenario_runner/type_traits/if_evaluable.hpp>
+#include <scenario_runner/type_traits/if_has_member_function_evaluate.hpp>
+#include <scenario_runner/type_traits/if_has_stream_output_operator.hpp>
 #include <scenario_runner/type_traits/if_startable.hpp>
 #include <scenario_runner/type_traits/if_stateful.hpp>
-#include <scenario_runner/type_traits/when_has_stream_output_operator.hpp>
 #include <scenario_runner/utility/pair.hpp>
 
 #include <memory>
@@ -62,9 +62,9 @@ private:
       return WhenHasStreamOutputOperator<Bound>::applyIt(os, *this);
     }
 
-    Pointer evaluate(const Pointer & as_is) override
+    Pointer evaluate(const Pointer & else_) override
     {
-      return IfEvaluable<Bound>::invoke(as_is, static_cast<Bound &>(*this));
+      return IfHasMemberFunctionEvaluate<Bound>::callIt(static_cast<Bound &>(*this), else_);
     }
 
     bool accomplished() override

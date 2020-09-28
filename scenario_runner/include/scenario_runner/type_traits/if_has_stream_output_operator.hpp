@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__WHEN_HAS_STREAM_OUTPUT_OPERATOR_HPP_
-#define SCENARIO_RUNNER__TYPE_TRAITS__WHEN_HAS_STREAM_OUTPUT_OPERATOR_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_STREAM_OUTPUT_OPERATOR_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_STREAM_OUTPUT_OPERATOR_HPP_
 
 #include <scenario_runner/type_traits/has_stream_output_operator.hpp>
 #include <scenario_runner/console/escape_sequence.hpp>
@@ -24,7 +24,7 @@ namespace scenario_runner
 inline namespace type_traits
 {
 template<typename T, typename = void>
-struct WhenHasStreamOutputOperator
+struct IfHasStreamOutputOperator
 {
   static std::ostream & applyIt(std::ostream & os, const T &)
   {
@@ -33,7 +33,7 @@ struct WhenHasStreamOutputOperator
 };
 
 template<typename T>
-struct WhenHasStreamOutputOperator<T,
+struct IfHasStreamOutputOperator<T,
   typename std::enable_if<
     HasStreamOutputOperator<T>::value
   >::type>
@@ -46,4 +46,4 @@ struct WhenHasStreamOutputOperator<T,
 }
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__WHEN_HAS_STREAM_OUTPUT_OPERATOR_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_STREAM_OUTPUT_OPERATOR_HPP_
