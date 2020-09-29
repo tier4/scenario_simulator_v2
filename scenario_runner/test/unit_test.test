@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<launch>
-  <test test-name="test_scenario_runner" pkg="scenario_runner" type="unit_test_node"/>
-</launch>

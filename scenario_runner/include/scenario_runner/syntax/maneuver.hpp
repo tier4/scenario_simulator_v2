@@ -56,7 +56,7 @@ struct Maneuver
     callWithElements(
       node, "Event", 1, unbounded, [&](auto && node)
       {
-        return readStoryboardElement<Event>(node, inner_scope);
+        return push_back(readStoryboardElement<Event>(node, inner_scope));
       });
   }
 

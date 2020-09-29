@@ -54,7 +54,7 @@ struct Storyboard
     callWithElements(
       node, "Story", 1, unbounded, [&](auto && node)
       {
-        return readStoryboardElement<Story>(node, inner_scope);
+        return push_back(readStoryboardElement<Story>(node, inner_scope));
       });
   }
 

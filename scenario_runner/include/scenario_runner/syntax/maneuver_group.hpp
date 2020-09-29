@@ -60,7 +60,7 @@ struct ManeuverGroup
     callWithElements(
       node, "Maneuver", 0, unbounded, [&](auto && node)
       {
-        return readStoryboardElement<Maneuver>(node, inner_scope);
+        return push_back(readStoryboardElement<Maneuver>(node, inner_scope));
       });
   }
 

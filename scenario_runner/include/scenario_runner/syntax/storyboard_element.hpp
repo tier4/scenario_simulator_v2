@@ -20,6 +20,7 @@
 
 #include <string>
 #include <type_traits>
+#include <unordered_set>
 #include <utility>
 
 namespace scenario_runner
@@ -120,26 +121,31 @@ private:
   }
 
 protected:
+  auto rename(const std::string & name) const
+  {
+    static std::size_t id {0};
+    return name.empty() ? std::string("annonymous-") + std::to_string(++id) : name;
+  }
+
+  std::unordered_set<std::string> names;
+
+  auto unique()
+  {
+  }
+
   template<typename U, typename Node, typename Scope>
   decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope)
   {
-    const auto name {readAttribute<String>("name", node, inner_scope)};
-
-    static std::size_t serial {0};
-
-    const auto result {
-      inner_scope.storyboard_elements.emplace(
-        name.empty() ? std::string("annonymous-") + std::to_string(++serial) : name,
-        make<U>(node, inner_scope))
+    const auto name {
+      rename(readAttribute<String>("name", node, inner_scope))
     };
 
-    if (!cdr(result)) {
+    if (cdr(names.emplace(name))) {
+      return inner_scope.storyboard_elements[name] = make<U>(node, inner_scope);
+    } else {
       std::stringstream ss {};
       ss << "detected redefinition of StoryboardElement named \'" << name << "\'";
       throw SyntaxError {ss.str()};
-    } else {
-      static_cast<T &>(*this).push_back(car(result)->second);
-      return car(result)->second;
     }
   }
 
