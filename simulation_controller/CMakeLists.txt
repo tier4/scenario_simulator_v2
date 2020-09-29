@@ -82,7 +82,7 @@ target_link_libraries(entity_manager
 add_library(api SHARED
   src/api/entity_api_impl.cpp
   src/api/simulation_api_impl.cpp
-  #src/api/api.cpp
+  src/api/api.cpp
 )
 ament_target_dependencies(api
   xmlrpcpp
