@@ -4,8 +4,9 @@ namespace scenario_simulator
 {
     API::API(std::string address, int port)
     {
+        /*
         entity_manager_ptr_ = std::shared_ptr<simulation_controller::entity::EntityManager>
-            (new simulation_controller::entity::EntityManager(false));
+            (new simulation_controller::entity::EntityManager(rclcpp::NodeOptions()));*/
         client_ptr_ = std::shared_ptr<XmlRpc::XmlRpcClient>
             (new XmlRpc::XmlRpcClient(address.c_str(), port));
         simulation = std::shared_ptr<SimulationAPIImpl>

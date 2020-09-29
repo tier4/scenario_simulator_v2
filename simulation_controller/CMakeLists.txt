@@ -50,7 +50,6 @@ add_library(entity_manager SHARED
   src/entity/vehicle_entity.cpp
   src/entity/ego_entity.cpp
   src/entity/pedestrian_entity.cpp
-  src/entity/entity_manager.cpp
   src/behavior/action_node.cpp
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_action.cpp
@@ -76,17 +75,21 @@ ament_target_dependencies(entity_manager
   spline_interpolation
   ament_index_cpp
 )
-rclcpp_components_register_nodes(entity_manager
-  "simulation_controller::entity::EntityManager")
+target_link_libraries(entity_manager
+  pugixml
+)
 
 add_library(api SHARED
   src/api/entity_api_impl.cpp
+  src/api/simulation_api_impl.cpp
+  #src/api/api.cpp
 )
 ament_target_dependencies(api
   xmlrpcpp
 )
 target_link_libraries(api
   entity_manager
+  pugixml
 )
 
 install(TARGETS
@@ -95,23 +98,6 @@ install(TARGETS
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 ament_export_libraries(entity_manager)
-
-#add_library(simulation_controller
-  #src/api/api.cpp
-  #src/api/entity_api_impl.cpp
-  #src/api/simulation_api_impl.cpp
-#)
-#target_link_libraries(simulation_controller
-#  pugixml
-#  ${catkin_LIBRARIES}
-#)
-
-#install(TARGETS
-#  simulation_controller
-#  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#)
 
 #install(DIRECTORY include/${PROJECT_NAME}/
 #  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}

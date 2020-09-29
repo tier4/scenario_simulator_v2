@@ -26,17 +26,19 @@ namespace scenario_simulator
         ExecutionFailedError(const char *message) : runtime_error(message) {};
     };
     
+    template<class NodeT>
     class ApiImplBase
     {
     public:
-        ApiImplBase(std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr, std::shared_ptr<simulation_controller::entity::EntityManager> entity_manager_ptr) 
+        ApiImplBase(std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr, std::shared_ptr<simulation_controller::entity::EntityManager<NodeT>> entity_manager_ptr) 
         {
             client_ptr_ = client_ptr;
             entity_manager_ptr_ = entity_manager_ptr;
         };
     protected:
+        NodeT node_;
         std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
-        std::shared_ptr<simulation_controller::entity::EntityManager> entity_manager_ptr_;
+        std::shared_ptr<simulation_controller::entity::EntityManager<NodeT>> entity_manager_ptr_;
     };
 }
 
