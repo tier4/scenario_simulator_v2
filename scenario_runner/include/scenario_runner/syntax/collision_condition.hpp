@@ -33,7 +33,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct CollisionCondition
-  : public Object
+  : public Element
 {
   EntityRef entity_ref;
 

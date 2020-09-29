@@ -44,7 +44,7 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
       const auto iter {scope.parameters.find(value.substr(1))};
 
       if (iter != std::end(scope.parameters)) {
-        return std::get<1>(*iter).template as<T>();
+        return boost::lexical_cast<T>(boost::lexical_cast<String>(cdr(*iter)));
       } else {
         std::stringstream ss {};
         ss << "there is no parameter named '" << value.substr(1) << "' (attribute \'" << name <<

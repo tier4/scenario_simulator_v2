@@ -39,7 +39,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct ByValueCondition
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit ByValueCondition(const Node & node, Scope & scope)
@@ -48,19 +48,22 @@ struct ByValueCondition
 
     callWithElements(node, "TimeOfDayCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "SimulationTimeCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "SimulationTimeCondition", 0, 1, [&](auto && node)
       {
         return rebind<SimulationTimeCondition>(node, scope);
       });
 
-    callWithElements(node, "StoryboardElementStateCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "StoryboardElementStateCondition", 0, 1, [&](auto && node)
       {
         return rebind<StoryboardElementStateCondition>(node, scope);
       });
 
     callWithElements(node, "UserDefinedValueCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "TrafficSignalCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "TrafficSignalCondition", 0, 1, [&](auto && node)
       {
         return rebind<TrafficSignalCondition>(node, scope);
       });

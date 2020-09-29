@@ -34,19 +34,22 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct RoutingAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit RoutingAction(const Node & node, Scope & outer_scope)
   {
-    callWithElements(node, "AssignRouteAction", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "AssignRouteAction", 0, 1, [&](auto && node)
       {
         return rebind<AssignRouteAction>(node, outer_scope);
       });
 
-    callWithElements(node, "FollowTrajectoryAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
+    callWithElements(
+      node, "FollowTrajectoryAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "AcquirePositionAction", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "AcquirePositionAction", 0, 1, [&](auto && node)
       {
         return rebind<AcquirePositionAction>(node, outer_scope);
       });

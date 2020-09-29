@@ -34,8 +34,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Storyboard
-  : public StoryboardElement<Storyboard>,  // XXX ???
-  public Objects
+  : public StoryboardElement<Storyboard>, public Elements
 {
   Scope inner_scope;
 
@@ -51,9 +50,10 @@ struct Storyboard
     init{readElement<Init>("Init", node, inner_scope)},
     stop_trigger{readElement<Trigger>("StopTrigger", node, inner_scope)}
   {
-    callWithElements(node, "Story", 1, unbounded, [&](auto && element)
+    callWithElements(
+      node, "Story", 1, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<Story>(element, inner_scope);
+        return push_back(readStoryboardElement<Story>(node, inner_scope));
       });
   }
 

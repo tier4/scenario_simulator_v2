@@ -12,14 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <gtest/gtest.h>
-#include <ros/package.h>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_runner/syntax/open_scenario.hpp>
 
 #include <cstdlib>
 
-#define XOSC(...) ros::package::getPath("scenario_runner") + "/test/" __VA_ARGS__
+TEST(Syntax, LexicalScope)
+{
+  scenario_runner::OpenSCENARIO osc {
+    ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/lexical-scope.xosc",
+    "127.0.0.1",
+    8080
+  };
+}
 
 // TEST(Syntax, invalid)
 // {
@@ -50,17 +57,17 @@
 //   EXPECT_TRUE(osc.evaluate().is<Boolean>());
 // }
 
-TEST(Core, objectBinder)
-{
-  using scenario_runner::make;
-
-  const auto hoge {make<Double>(3.14)};
-
-  const auto result {hoge.evaluate()};
-
-  EXPECT_TRUE(result.is<Double>());
-  EXPECT_TRUE(result.as<Double>().data = 3.14);
-}
+// TEST(Core, objectBinder)
+// {
+//   using scenario_runner::make;
+//
+//   const auto hoge {make<Double>(3.14)};
+//
+//   const auto result {hoge.evaluate()};
+//
+//   EXPECT_TRUE(result.is<Double>());
+//   EXPECT_TRUE(result.as<Double>().data = 3.14);
+// }
 
 // TEST(Scenario, LaneChange)
 // {

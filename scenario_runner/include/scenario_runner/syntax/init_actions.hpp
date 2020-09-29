@@ -39,7 +39,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct InitActions
-  : public std::vector<Object>
+  : public Elements
 {
   template<typename Node, typename Scope>
   explicit InitActions(const Node & node, Scope & scope)

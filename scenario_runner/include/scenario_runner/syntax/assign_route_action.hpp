@@ -32,22 +32,19 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct AssignRouteAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit AssignRouteAction(const Node & node, Scope & scope)
   {
-    callWithElements(node, "Route", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "Route", 0, 1, [&](auto && node)
       {
         return rebind<Route>(node, scope);
       });
 
-    callWithElements(node, "CatalogReference", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
-
-  auto evaluate() const noexcept
-  {
-    return unspecified;
+    callWithElements(
+      node, "CatalogReference", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 };
 }

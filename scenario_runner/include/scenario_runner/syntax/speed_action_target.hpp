@@ -33,7 +33,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct SpeedActionTarget
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit SpeedActionTarget(const Node & node, Scope & scope)

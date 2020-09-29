@@ -37,8 +37,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct ManeuverGroup
-  : public StoryboardElement<ManeuverGroup>,
-  public Objects
+  : public StoryboardElement<ManeuverGroup>, public Elements
 {
   const String name;
 
@@ -57,9 +56,10 @@ struct ManeuverGroup
   {
     callWithElements(node, "CatalogReference", 0, unbounded, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node)
+    callWithElements(
+      node, "Maneuver", 0, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<Maneuver>(node, inner_scope);
+        return push_back(readStoryboardElement<Maneuver>(node, inner_scope));
       });
   }
 
@@ -82,10 +82,11 @@ struct ManeuverGroup
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(std::begin(*this), std::end(*this), [&](auto && each)
-             {
-               return each.template as<Maneuver>().complete();
-             });
+    return std::all_of(
+      std::begin(*this), std::end(*this), [&](auto && each)
+      {
+        return each.template as<Maneuver>().complete();
+      });
   }
 
   using StoryboardElement::evaluate;
