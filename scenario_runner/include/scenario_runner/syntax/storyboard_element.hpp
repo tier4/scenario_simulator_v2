@@ -121,15 +121,15 @@ private:
 
 protected:
   template<typename U, typename Node, typename Scope>
-  decltype(auto) makeStoryboardElement(const Node & node, Scope & inner_scope)
+  decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope)
   {
     const auto name {readAttribute<String>("name", node, inner_scope)};
 
+    static std::size_t serial {0};
+
     const auto result {
       inner_scope.storyboard_elements.emplace(
-        name.empty() ? std::string("annonymous-") +
-        std::to_string(inner_scope.storyboard_elements.size()) :
-        name,
+        name.empty() ? std::string("annonymous-") + std::to_string(++serial) : name,
         make<U>(node, inner_scope))
     };
 

@@ -38,7 +38,7 @@ inline namespace syntax
  * ======================================================================== */
 struct Story
   : public StoryboardElement<Story>,
-  public std::vector<Object>
+  public Objects
 {
   const String name;
 
@@ -58,7 +58,7 @@ struct Story
     callWithElements(
       node, "Act", 1, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<Act>(node, inner_scope);
+        return readStoryboardElement<Act>(node, inner_scope);
       });
   }
 

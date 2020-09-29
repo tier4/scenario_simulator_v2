@@ -57,9 +57,10 @@ struct ManeuverGroup
   {
     callWithElements(node, "CatalogReference", 0, unbounded, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node)
+    callWithElements(
+      node, "Maneuver", 0, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<Maneuver>(node, inner_scope);
+        return readStoryboardElement<Maneuver>(node, inner_scope);
       });
   }
 

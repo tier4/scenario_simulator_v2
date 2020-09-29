@@ -52,7 +52,7 @@ struct Act
     callWithElements(
       node, "ManeuverGroup", 1, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<ManeuverGroup>(node, inner_scope);
+        return readStoryboardElement<ManeuverGroup>(node, inner_scope);
       });
 
     callWithElements(

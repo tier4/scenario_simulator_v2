@@ -62,7 +62,7 @@ struct Event
     callWithElements(
       node, "Action", 1, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<Action>(node, inner_scope);
+        return readStoryboardElement<Action>(node, inner_scope);
       });
 
     callWithElements(

@@ -51,9 +51,10 @@ struct Storyboard
     init{readElement<Init>("Init", node, inner_scope)},
     stop_trigger{readElement<Trigger>("StopTrigger", node, inner_scope)}
   {
-    callWithElements(node, "Story", 1, unbounded, [&](auto && element)
+    callWithElements(
+      node, "Story", 1, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<Story>(element, inner_scope);
+        return readStoryboardElement<Story>(node, inner_scope);
       });
   }
 
