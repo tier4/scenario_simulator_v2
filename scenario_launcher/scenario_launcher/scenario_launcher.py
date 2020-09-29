@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2020 Tier IV, Inc. All rights reserved.
@@ -15,16 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
+import subprocess as sb
+import time
+import xmlrpc.client
+from multiprocessing import Process
+
 from scenario_common.logger import Logger
 from scenario_common.manager import Manager
 from scenario_launcher.database_handler import DatabaseHandler
 from scenario_launcher.monitoring_server import MonitoringServer
 from scenario_launcher.result_reporter import Reporter
-import argparse
-from multiprocessing import Process
-import subprocess as sb
-import time
-import xmlrpc.client
 
 
 class Launcher:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2020 Tier IV, Inc. All rights reserved.
@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
 import time
 from xmlrpc.server import SimpleXMLRPCServer
-import sys
 
 
 class TestServer:

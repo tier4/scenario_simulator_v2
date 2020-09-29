@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2020 Tier IV, Inc. All rights reserved.
@@ -15,9 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from scenario_common.logger import Logger
 import json
 import pathlib
+
+from scenario_common.logger import Logger
 
 
 class Reporter():
