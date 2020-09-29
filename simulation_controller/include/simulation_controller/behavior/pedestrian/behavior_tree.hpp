@@ -7,7 +7,7 @@
 #include <simulation_controller/behavior/pedestrian/acquire_position_action.hpp>
 #include <simulation_controller/behavior/pedestrian/lane_change_action.hpp>
 
-#include <geometry_msgs/Point.h>
+#include <geometry_msgs/msg/point.hpp>
 #include "behaviortree_cpp_v3/bt_factory.h"
 #include "behaviortree_cpp_v3/loggers/bt_cout_logger.h"
 
@@ -24,7 +24,7 @@ namespace entity_behavior
         {
         public:
             BehaviorTree();
-            const BT::NodeStatus tick(double current_time, double step_time);
+            BT::NodeStatus tick(double current_time, double step_time);
             std::string getCurrentAction() const
             {
                 return current_action_;
@@ -40,9 +40,9 @@ namespace entity_behavior
                 tree_.rootBlackboard()->get("updated_status", status);
                 return status;
             }
-            std::vector<geometry_msgs::Point> getTrajectory()
+            std::vector<geometry_msgs::msg::Point> getTrajectory()
             {
-                std::vector<geometry_msgs::Point> ret;
+                std::vector<geometry_msgs::msg::Point> ret;
                 tree_.rootBlackboard()->get("trajectory", ret);
                 return ret;
             }

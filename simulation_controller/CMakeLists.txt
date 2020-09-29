@@ -50,6 +50,7 @@ add_library(simulation_controller
   src/behavior/vehicle/follow_lane_action.cpp
   src/behavior/vehicle/lane_change_action.cpp
   src/behavior/vehicle/acquire_position_action.cpp
+  src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
   src/behavior/pedestrian/acquire_position_action.cpp
   src/behavior/pedestrian/lane_change_action.cpp
@@ -74,7 +75,6 @@ ament_target_dependencies(simulation_controller
   #src/entity/vehicle_entity.cpp
   #src/entity/pedestrian_entity.cpp
   #src/entity/entity_manager.cpp
-  #src/behavior/pedestrian/behavior_tree.cpp
   #src/api/api.cpp
   #src/api/entity_api_impl.cpp
   #src/api/simulation_api_impl.cpp
