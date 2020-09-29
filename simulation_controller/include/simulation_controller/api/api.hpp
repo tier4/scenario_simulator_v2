@@ -18,8 +18,11 @@ namespace scenario_simulator
     using EntityManager = simulation_controller::entity::EntityManager;
     public:
         template<class NodeT>
-        API(std::string address, int port, NodeT && node)
+        API(NodeT && node)
         {
+            std::string address = "127.0.0.1";
+            int port = 8080;
+
             auto entity_manager_ptr = std::shared_ptr<EntityManager>(new EntityManager(node));
             auto client_ptr = std::shared_ptr<XmlRpc::XmlRpcClient>
                 (new XmlRpc::XmlRpcClient(address.c_str(), port));

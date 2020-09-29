@@ -75,6 +75,7 @@ ament_target_dependencies(entity_manager
   lanelet2_extension
   spline_interpolation
   ament_index_cpp
+  behaviortree_cpp_v3
 )
 target_link_libraries(entity_manager
   pugixml
@@ -91,6 +92,28 @@ ament_target_dependencies(api
 target_link_libraries(api
   entity_manager
   pugixml
+)
+
+add_executable(scenario_runner_moc_node
+  src/moc/scenario_runner_moc_node.cpp
+)
+ament_target_dependencies(scenario_runner_moc_node
+  rclcpp
+  rclcpp_components
+  geometry_msgs
+  quaternion_operation
+  autoware_auto_msgs
+  lanelet2_core
+  lanelet2_io
+  lanelet2_routing
+  lanelet2_projection
+  lanelet2_extension
+  spline_interpolation
+  ament_index_cpp
+  behaviortree_cpp_v3
+)
+target_link_libraries(scenario_runner_moc_node
+  api
 )
 
 install(TARGETS
