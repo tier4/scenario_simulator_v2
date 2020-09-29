@@ -14,7 +14,7 @@ namespace scenario_simulator
     class XmlRpcRuntimeError : public std::runtime_error
     {
     public:
-        XmlRpcRuntimeError(const char *message, int res) : error_info_(res), runtime_error(message) {}
+        XmlRpcRuntimeError(const char *message, int res) : runtime_error(message), error_info_(res){}
     private:
         int error_info_;
     };
@@ -22,10 +22,8 @@ namespace scenario_simulator
     class ExecutionFailedError : public std::runtime_error
     {
     public:
-        ExecutionFailedError(XmlRpc::XmlRpcValue value, int res=0) : error_info_(res), runtime_error(value["message"]) {};
-        ExecutionFailedError(const char *message, int res=0) : error_info_(res), runtime_error(message) {};
-    private:
-        int error_info_;
+        ExecutionFailedError(XmlRpc::XmlRpcValue value) : runtime_error(value["message"]) {};
+        ExecutionFailedError(const char *message) : runtime_error(message) {};
     };
     
     class ApiImplBase

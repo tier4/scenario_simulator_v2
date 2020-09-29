@@ -146,7 +146,7 @@ namespace scenario_simulator
         {
             return boost::none;
         }
-        geometry_msgs::Pose pose = getRelativePose(from, to);
+        geometry_msgs::msg::Pose pose = getRelativePose(from, to);
         if(pose.position.x > 0)
         {
             return boost::none;
@@ -170,22 +170,22 @@ namespace scenario_simulator
         return entity_manager_ptr_->setEntityStatus(name, status);
     }
 
-    geometry_msgs::Pose EntityAPIImpl::getRelativePose(std::string from, std::string to)
+    geometry_msgs::msg::Pose EntityAPIImpl::getRelativePose(std::string from, std::string to)
     {
         return entity_manager_ptr_->getRelativePose(from, to);
     }
 
-    geometry_msgs::Pose EntityAPIImpl::getRelativePose(geometry_msgs::Pose from, std::string to)
+    geometry_msgs::msg::Pose EntityAPIImpl::getRelativePose(geometry_msgs::msg::Pose from, std::string to)
     {
         return entity_manager_ptr_->getRelativePose(from, to);
     }
 
-    geometry_msgs::Pose EntityAPIImpl::getRelativePose(std::string from, geometry_msgs::Pose to)
+    geometry_msgs::msg::Pose EntityAPIImpl::getRelativePose(std::string from, geometry_msgs::msg::Pose to)
     {
         return entity_manager_ptr_->getRelativePose(from, to);
     }
 
-    geometry_msgs::Pose EntityAPIImpl::getRelativePose(geometry_msgs::Pose from, geometry_msgs::Pose to)
+    geometry_msgs::msg::Pose EntityAPIImpl::getRelativePose(geometry_msgs::msg::Pose from, geometry_msgs::msg::Pose to)
     {
         return entity_manager_ptr_->getRelativePose(from, to);
     }
@@ -214,7 +214,7 @@ namespace scenario_simulator
         return;
     }
 
-    bool EntityAPIImpl::reachPosition(std::string name, geometry_msgs::Pose target_pose, double tolerance)
+    bool EntityAPIImpl::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance)
     {
         if(!entity_manager_ptr_->entityStatusSetted(name))
         {
@@ -324,30 +324,31 @@ namespace scenario_simulator
             param["time"] = status.time;
             return param;
         }
+        throw(scenario_simulator::ExecutionFailedError("coordinate does not match"));
     }
 
     simulation_controller::entity::EntityStatus EntityAPIImpl::toStatus(XmlRpc::XmlRpcValue param)
     {
         std::string coordinate = param["coordinate"];
         std::string name = param["entity/name"];
-        geometry_msgs::Pose pose;
+        geometry_msgs::msg::Pose pose;
         if(coordinate == "lane")
         {
             int lanelet_id = param["lanelet_id"];
             double s = param["s"];
             double offset = param["offset"];
-            geometry_msgs::Vector3 rpy;
+            geometry_msgs::msg::Vector3 rpy;
             rpy.x = param["roll"];
             rpy.y = param["pitch"];
             rpy.z = param["yaw"];
-            geometry_msgs::Twist twist;
+            geometry_msgs::msg::Twist twist;
             twist.linear.x = param["twist/linear/x"];
             twist.linear.y = param["twist/linear/y"];
             twist.linear.z = param["twist/linear/z"];
             twist.angular.x = param["twist/angular/x"];
             twist.angular.y = param["twist/angular/y"];
             twist.angular.z = param["twist/angular/z"];
-            geometry_msgs::Accel accel;
+            geometry_msgs::msg::Accel accel;
             accel.linear.x = param["accel/linear/x"];
             accel.linear.y = param["accel/linear/y"];
             accel.linear.z = param["accel/linear/z"];
@@ -380,14 +381,14 @@ namespace scenario_simulator
                 pose.orientation.z = param["pose/orientation/z"];
                 pose.orientation.w = param["pose/orientation/w"];
             }
-            geometry_msgs::Twist twist;
+            geometry_msgs::msg::Twist twist;
             twist.linear.x = param["twist/linear/x"];
             twist.linear.y = param["twist/linear/y"];
             twist.linear.z = param["twist/linear/z"];
             twist.angular.x = param["twist/angular/x"];
             twist.angular.y = param["twist/angular/y"];
             twist.angular.z = param["twist/angular/z"];
-            geometry_msgs::Accel accel;
+            geometry_msgs::msg::Accel accel;
             accel.linear.x = param["accel/linear/x"];
             accel.linear.y = param["accel/linear/y"];
             accel.linear.z = param["accel/linear/z"];
@@ -398,5 +399,6 @@ namespace scenario_simulator
             simulation_controller::entity::EntityStatus status(time, pose, twist, accel);
             return status;
         }
+        throw(scenario_simulator::ExecutionFailedError("coordinate does not match, coordinate : " + coordinate));
     }
 }

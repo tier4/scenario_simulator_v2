@@ -7,8 +7,8 @@
 #include <simulation_controller/entity/vehicle_parameter.hpp>
 #include <simulation_controller/entity/entity_manager.hpp>
 
-#include <ros/ros.h>
-#include <geometry_msgs/Pose.h>
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <xmlrpcpp/XmlRpcClient.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 #include <xmlrpcpp/XmlRpcException.h>
@@ -47,11 +47,11 @@ namespace scenario_simulator
         void requestLaneChange(std::string name, simulation_controller::entity::Direction direction);
         bool isInLanelet(std::string name, int lanelet_id);
         void setTargetSpeed(std::string name, double target_speed, bool continuous);
-        geometry_msgs::Pose getRelativePose(std::string from, std::string to);
-        geometry_msgs::Pose getRelativePose(geometry_msgs::Pose from, std::string to);
-        geometry_msgs::Pose getRelativePose(std::string from, geometry_msgs::Pose to);
-        geometry_msgs::Pose getRelativePose(geometry_msgs::Pose from, geometry_msgs::Pose to);
-        bool reachPosition(std::string name, geometry_msgs::Pose target_pose, double tolerance);
+        geometry_msgs::msg::Pose getRelativePose(std::string from, std::string to);
+        geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, std::string to);
+        geometry_msgs::msg::Pose getRelativePose(std::string from, geometry_msgs::msg::Pose to);
+        geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, geometry_msgs::msg::Pose to);
+        bool reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance);
         bool reachPosition(std::string name, int lanelet_id, double s, double offset, double tolerance);
         void setVerbose(bool verbose);
         boost::optional<double> getStandStillDuration(std::string name) const;

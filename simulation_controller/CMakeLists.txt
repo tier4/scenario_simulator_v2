@@ -33,6 +33,7 @@ find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(spline_interpolation REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(ament_index_cpp REQUIRED)
+find_package(xmlrpcpp REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
@@ -77,8 +78,19 @@ ament_target_dependencies(entity_manager
 )
 rclcpp_components_register_nodes(entity_manager
   "simulation_controller::entity::EntityManager")
-install(TARGETS
+
+add_library(api SHARED
+  src/api/entity_api_impl.cpp
+)
+ament_target_dependencies(api
+  xmlrpcpp
+)
+target_link_libraries(api
   entity_manager
+)
+
+install(TARGETS
+  entity_manager api
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
