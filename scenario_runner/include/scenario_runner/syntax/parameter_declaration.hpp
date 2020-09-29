@@ -17,6 +17,9 @@
 
 #include <scenario_runner/reader/attribute.hpp>
 
+#include <string>
+#include <vector>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -38,6 +41,17 @@ struct ParameterDeclaration
 
   const String value;
 
+  auto includes(const std::string & name, const std::vector<char> & chars)
+  {
+    for (const auto & each : chars) {
+      if (name.find(each) != std::string::npos) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   ParameterDeclaration() = default;
 
   template<typename Node, typename Scope>
@@ -46,7 +60,24 @@ struct ParameterDeclaration
     parameter_type{readAttribute<ParameterType>("parameterType", node, scope)},
     value{readAttribute<String>("value", node, scope)}
   {
-    scope.parameters.emplace(name, evaluate());
+    if (name.substr(0, 3) == "OSC") {
+      throw
+        SyntaxError {
+          "Parameter names starting with \"OSC\" are reserved for special use in future versions "
+          "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix."
+        };
+    } else if (includes(name, {' ', '$', '\'', '"'})) {
+      throw
+        SyntaxError {
+          "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
+          "  - \" \" (blank space)\n"
+          "  - $\n"
+          "  - \'\n"
+          "  - \"\n"
+        };
+    } else {
+      scope.parameters.emplace(name, evaluate());
+    }
   }
 
   Element evaluate() const
