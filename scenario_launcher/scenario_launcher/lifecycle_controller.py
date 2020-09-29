@@ -64,7 +64,7 @@ class LifeCycleController(Node):
         # while(self.get_lifecycle_state())
         self.node_logger.info(self.get_lifecycle_state())
         self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
-        time.sleep(2)
+        time.sleep(4)
         self.node_logger.info(self.get_lifecycle_state())
         self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
 

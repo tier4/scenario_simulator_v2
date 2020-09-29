@@ -45,19 +45,20 @@ public:
   {
   }
 
-  void run()
+
+  void publish()
   {
-    while (count_ < 5) {
-      RCLCPP_INFO(get_logger(), "scenario runner running");
-      RCLCPP_INFO(get_logger(), "count %d", count_);
-      std::this_thread::sleep_for(1s);
-      count_++;
+    static size_t count = 0;
+    auto msg = std::make_unique<std_msgs::msg::String>();
+    msg->data = "sceario runner mock" + std::to_string(++count);
+    if (!pub_->is_activated()) {
+      RCLCPP_INFO(
+        get_logger(), "Lifecycle publisher is currently inactive. Messages are not published.");
+    } else {
+      RCLCPP_INFO(
+        get_logger(), "Lifecycle publisher is active. Publishing: [%s]", msg->data.c_str());
     }
-  }
-  void reset()
-  {
-    RCLCPP_INFO(get_logger(), "reset count to 0");
-    this->count_ = 0;
+    pub_->publish(std::move(msg));
   }
 
 
@@ -65,6 +66,7 @@ public:
   on_configure(const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO(get_logger(), "on_configure() is called.");
+    auto timer_ = this->create_wall_timer(1s, std::bind(&ScenarioRunnerMock::publish, this));
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
@@ -72,7 +74,9 @@ public:
   on_activate(const rclcpp_lifecycle::State &)
   {
     RCUTILS_LOG_INFO_NAMED(get_name(), "on_activate() is called.");
-    this->run();
+    pub_ = this->create_publisher<std_msgs::msg::String>("lifecycle_chatter", 10);
+    timer_ = this->create_wall_timer(1s, std::bind(&ScenarioRunnerMock::publish, this));
+    pub_->on_activate();
     std::this_thread::sleep_for(2s);
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
@@ -80,7 +84,7 @@ public:
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
   on_deactivate(const rclcpp_lifecycle::State &)
   {
-    this->reset();
+    pub_->on_deactivate();
     RCUTILS_LOG_INFO_NAMED(get_name(), "on_deactivate() is called.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
@@ -89,7 +93,8 @@ public:
   on_cleanup(const rclcpp_lifecycle::State &)
   {
     RCUTILS_LOG_INFO_NAMED(get_name(), "on cleanup is called.");
-    this->reset();
+    timer_.reset();
+    pub_.reset();
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
@@ -99,12 +104,14 @@ public:
       get_name(),
       "on shutdown is called from state %s.",
       state.label().c_str());
-    this->reset();
+    timer_.reset();
+    pub_.reset();
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
 private:
-  int count_;
+  std::shared_ptr<rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>> pub_;
+  std::shared_ptr<rclcpp::TimerBase> timer_;
 };
 
 int main(int argc, char * argv[])
