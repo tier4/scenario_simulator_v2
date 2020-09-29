@@ -12,25 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__CONCEPTS__ACCOMPLISHABLE_HPP_
-#define SCENARIO_RUNNER__CONCEPTS__ACCOMPLISHABLE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
 
-#include <scenario_runner/type_traits/void_t.hpp>
+#include <scenario_runner/type_traits/has_member_function_accomplished.hpp>
 
 namespace scenario_runner
 {
-inline namespace concepts
+inline namespace type_traits
 {
 template<typename T, typename = void>
-struct Accomplishable
-  : public std::false_type
-{};
+struct IfHasMemberFunctionAccomplished
+{
+  static constexpr auto callIt(const T &) noexcept
+  {
+    return false;
+  }
+};
 
 template<typename T>
-struct Accomplishable<T, void_t<decltype(std::declval<T>().accomplished())>>
-  : public std::true_type
-{};
-}
+struct IfHasMemberFunctionAccomplished<T,
+  typename std::enable_if<HasMemberFunctionAccomplished<T>::value>::type>
+{
+  static decltype(auto) callIt(T & is)
+  {
+    return is.accomplished();
+  }
+};
+}  // inline namespace type_traits
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__CONCEPTS__ACCOMPLISHABLE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_

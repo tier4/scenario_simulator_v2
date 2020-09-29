@@ -16,7 +16,7 @@
 #define SCENARIO_RUNNER__POINTER_HPP_
 
 #include <scenario_runner/error.hpp>
-#include <scenario_runner/type_traits/if_accomplishable.hpp>
+#include <scenario_runner/type_traits/if_has_member_function_accomplished.hpp>
 #include <scenario_runner/type_traits/if_has_member_function_evaluate.hpp>
 #include <scenario_runner/type_traits/if_has_member_function_start.hpp>
 #include <scenario_runner/type_traits/if_has_member_function_state.hpp>
@@ -69,7 +69,7 @@ private:
 
     bool accomplished() override
     {
-      return IfAccomplishable<Bound>::invoke(*this);
+      return IfHasMemberFunctionAccomplished<Bound>::callIt(*this);
     }
 
     const Pointer & state() const override
