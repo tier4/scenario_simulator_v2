@@ -19,6 +19,7 @@
 #include <scenario_runner/syntax/storyboard_element_state.hpp>
 
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace scenario_runner
@@ -62,16 +63,35 @@ struct StoryboardElement
 
   #undef BOILERPLATE
 
-  template<typename Predicate>
-  Object changeStateIf(Predicate && predicate, const Object & new_state)
+  template<
+    typename Boolean,
+    typename = typename std::enable_if<std::is_convertible<Boolean, bool>::value>::type>
+  Object changeStateIf(
+    Boolean && test, const Object & consequent_state, const Object & alternate_state)
   {
-    if (predicate()) {
+    if (test) {
       std::cout << indent << typeid(T).name() << "::evaluate [" << current_state << " => " <<
-        new_state << "]" << std::endl;
-      return current_state = new_state;
+        consequent_state << "]" << std::endl;
+      return current_state = consequent_state;
     } else {
-      return current_state;
+      return current_state = alternate_state;
     }
+  }
+
+  template<
+    typename Boolean,
+    typename = typename std::enable_if<std::is_convertible<Boolean, bool>::value>::type>
+  decltype(auto) changeStateIf(Boolean && test, const Object & consequent_state)
+  {
+    return changeStateIf(test, consequent_state, current_state);
+  }
+
+  template<
+    typename Predicate, typename ... Ts,
+    typename = typename std::enable_if<std::is_function<Predicate>::value>::type>
+  Object changeStateIf(Predicate && predicate, Ts && ... xs)
+  {
+    return changeStateIf(predicate(), std::forward<decltype(xs)>(xs)...);
   }
 
   Object override ()
@@ -83,16 +103,10 @@ struct StoryboardElement
     }
   }
 
-private:
-  template<typename ... Ts>
-  constexpr decltype(auto) ready(Ts && ... xs) const
-  {
-    return static_cast<const T &>(*this).ready(std::forward<decltype(xs)>(xs)...);
-  }
-
   static constexpr void start() noexcept
   {}
 
+private:
   template<typename ... Ts>
   constexpr decltype(auto) accomplished(Ts && ... xs) const
   {
@@ -141,14 +155,8 @@ public:
       override ();
     }
 
-    std::cout << (indent++) <<
-      "Evaluating " <<
-      cyan <<
-      "\"" <<
-      static_cast<const T &>(*this).name <<
-      "\"" <<
-      reset <<
-      " [" << current_state << "] " <<
+    std::cout << (indent++) << "Evaluating " << cyan << "\"" <<
+      static_cast<const T &>(*this).name << "\"" << reset << " [" << current_state << "] " <<
       std::endl;
 
     BOOST_SCOPE_EXIT_ALL()
@@ -169,16 +177,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::standbyState:
 
-        if (!ready()) {
-          return current_state;
-        } else {
-          std::cout << indent <<
-            typeid(T).name() <<
-            "::evaluate [" << current_state << " => " << start_transition << "]" <<
-            std::endl;
-
-          return current_state = start_transition;
-        }
+        return changeStateIf(static_cast<const T &>(*this).ready(), start_transition);
 
       /* ---- Start ------------------------------------------------------------
        *
@@ -193,12 +192,7 @@ public:
 
         ++current_execution_count;
 
-        std::cout << indent <<
-          typeid(T).name() <<
-          "::evaluate [" << current_state << " => " << running_state << "]" <<
-          std::endl;
-
-        return current_state = running_state;
+        return changeStateIf(std::true_type(), running_state);
 
       /* ---- Running ----------------------------------------------------------
        *
@@ -242,16 +236,7 @@ public:
 
         static_cast<T &>(*this).run();
 
-        if (!accomplished()) {
-          return current_state;
-        } else {
-          std::cout << indent <<
-            typeid(T).name() <<
-            "::evaluate [" << current_state << " => " << end_transition << "]" <<
-            std::endl;
-
-          return current_state = end_transition;
-        }
+        return changeStateIf(accomplished(), end_transition);
 
       /* ---- End --------------------------------------------------------------
        *
@@ -265,11 +250,8 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::endTransition:
 
-        if (current_execution_count < maximum_execution_count) {  // check for completeness
-          return current_state = standby_state;
-        } else {
-          return current_state = complete_state;
-        }
+        return changeStateIf(
+          current_execution_count < maximum_execution_count, standby_state, complete_state);
 
       /* ---- Complete ---------------------------------------------------------
        *
