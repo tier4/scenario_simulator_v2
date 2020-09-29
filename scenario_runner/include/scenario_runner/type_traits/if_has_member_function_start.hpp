@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_STARTABLE_HPP_
-#define SCENARIO_RUNNER__TYPE_TRAITS__IF_STARTABLE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_START_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_START_HPP_
 
-#include <scenario_runner/concepts/startable.hpp>
+#include <scenario_runner/type_traits/has_member_function_start.hpp>
 
 namespace scenario_runner
 {
 inline namespace type_traits
 {
 template<typename T, typename = void>
-struct IfStartable
+struct IfHasMemberFunctionStart
 {
-  static constexpr void invoke(const T &) noexcept
+  static constexpr void callIt(const T &) noexcept
   {}
 };
 
 template<typename T>
-struct IfStartable<T, typename std::enable_if<Startable<T>::value>::type>
+struct IfHasMemberFunctionStart<T, typename std::enable_if<HasMemberFunctionStart<T>::value>::type>
 {
-  static decltype(auto) invoke(T & callee)
+  static constexpr decltype(auto) callIt(T & then)
   {
-    return callee.start();
+    return then.start();
   }
 };
 }
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_STARTABLE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_START_HPP_
