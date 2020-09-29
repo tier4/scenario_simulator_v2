@@ -34,7 +34,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct ObjectController
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit ObjectController(const Node & node, Scope &)

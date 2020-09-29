@@ -35,7 +35,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct GlobalAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit GlobalAction(const Node & node, Scope &)

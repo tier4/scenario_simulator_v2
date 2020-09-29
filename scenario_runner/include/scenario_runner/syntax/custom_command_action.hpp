@@ -45,7 +45,7 @@ struct CustomCommandAction
     content{readContent<String>(node, scope)}
   {}
 
-  Object aux;
+  Element aux;
 
   auto accomplished()
   {
@@ -91,15 +91,12 @@ struct CustomCommandAction
     std::basic_ostream<Ts...> & os,
     const CustomCommandAction & action)
   {
-    os << indent <<
-      blue << "<CustomCommandAction" <<
-      " " << highlight("type", action.command);
+    os << indent << blue << "<CustomCommandAction" << " " << highlight("type", action.command);
 
     switch (action.command) {
       case Command::print:
-        return os << blue << ">" << reset <<
-               action.content <<
-               blue << "</CustomCommandAction>" << reset;
+        return os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>" <<
+               reset;
 
       case Command::debugAccomplishment:
       default:

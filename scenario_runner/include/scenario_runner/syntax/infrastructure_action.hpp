@@ -33,7 +33,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct InfrastructureAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit InfrastructureAction(const Node & node, Scope & outer_scope)

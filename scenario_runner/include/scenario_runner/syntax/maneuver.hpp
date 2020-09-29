@@ -35,8 +35,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Maneuver
-  : public StoryboardElement<Maneuver>,
-  public Objects
+  : public StoryboardElement<Maneuver>, public Elements
 {
   const String name;
 

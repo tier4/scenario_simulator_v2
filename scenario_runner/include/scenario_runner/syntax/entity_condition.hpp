@@ -50,35 +50,39 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct EntityCondition
-  : public Object
+  : public Element
 {
   template<typename Node, typename ... Ts>
   explicit EntityCondition(const Node & node, Ts && ... xs)
   {
     callWithElements(node, "EndOfRoadCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "CollisionCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "CollisionCondition", 0, 1, [&](auto && node)
       {
         return rebind<CollisionCondition>(node, std::forward<decltype(xs)>(xs)...);
       });
 
     callWithElements(node, "OffroadCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "TimeHeadwayCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "TimeHeadwayCondition", 0, 1, [&](auto && node)
       {
         return rebind<TimeHeadwayCondition>(node, std::forward<decltype(xs)>(xs)...);
       });
 
     callWithElements(node, "TimeToCollisionCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "AccelerationCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "AccelerationCondition", 0, 1, [&](auto && node)
       {
         return rebind<AccelerationCondition>(node, std::forward<decltype(xs)>(xs)...);
       });
 
     callWithElements(node, "StandStillCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "SpeedCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "SpeedCondition", 0, 1, [&](auto && node)
       {
         return rebind<SpeedCondition>(node, std::forward<decltype(xs)>(xs)...);
       });
@@ -86,14 +90,16 @@ struct EntityCondition
     callWithElements(node, "RelativeSpeedCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
     callWithElements(node, "TraveledDistanceCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "ReachPositionCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "ReachPositionCondition", 0, 1, [&](auto && node)
       {
         return rebind<ReachPositionCondition>(node, std::forward<decltype(xs)>(xs)...);
       });
 
     callWithElements(node, "DistanceCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "RelativeDistanceCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "RelativeDistanceCondition", 0, 1, [&](auto && node)
       {
         return rebind<RelativeDistanceCondition>(node, std::forward<decltype(xs)>(xs)...);
       });

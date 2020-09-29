@@ -38,8 +38,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Event
-  : public StoryboardElement<Event>,
-  public Objects
+  : public StoryboardElement<Event>, public Elements
 {
   // Name of the event.
   const String name;
@@ -49,7 +48,7 @@ struct Event
 
   Scope inner_scope;
 
-  Object start_trigger;
+  Element start_trigger;
 
   template<typename Node, typename Scope>
   explicit Event(const Node & node, Scope & outer_scope)

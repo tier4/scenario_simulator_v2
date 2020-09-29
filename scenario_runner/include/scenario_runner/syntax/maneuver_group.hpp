@@ -37,8 +37,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct ManeuverGroup
-  : public StoryboardElement<ManeuverGroup>,
-  public Objects
+  : public StoryboardElement<ManeuverGroup>, public Elements
 {
   const String name;
 
@@ -83,10 +82,11 @@ struct ManeuverGroup
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(std::begin(*this), std::end(*this), [&](auto && each)
-             {
-               return each.template as<Maneuver>().complete();
-             });
+    return std::all_of(
+      std::begin(*this), std::end(*this), [&](auto && each)
+      {
+        return each.template as<Maneuver>().complete();
+      });
   }
 
   using StoryboardElement::evaluate;

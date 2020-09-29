@@ -37,8 +37,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Story
-  : public StoryboardElement<Story>,
-  public Objects
+  : public StoryboardElement<Story>, public Elements
 {
   const String name;
 

@@ -34,7 +34,7 @@ struct StoryboardElement
 
   std::size_t current_execution_count;
 
-  Object current_state;
+  Element current_state;
 
   explicit constexpr StoryboardElement(std::size_t maximum_execution_count = 1)
   : maximum_execution_count{maximum_execution_count},
@@ -67,8 +67,8 @@ struct StoryboardElement
   template<
     typename Boolean,
     typename = typename std::enable_if<std::is_convertible<Boolean, bool>::value>::type>
-  Object changeStateIf(
-    Boolean && test, const Object & consequent_state, const Object & alternate_state)
+  auto changeStateIf(
+    Boolean && test, const Element & consequent_state, const Element & alternate_state)
   {
     if (test) {
       std::cout << indent << typeid(T).name() << "::evaluate [" << current_state << " => " <<
@@ -82,7 +82,7 @@ struct StoryboardElement
   template<
     typename Boolean,
     typename = typename std::enable_if<std::is_convertible<Boolean, bool>::value>::type>
-  decltype(auto) changeStateIf(Boolean && test, const Object & consequent_state)
+  decltype(auto) changeStateIf(Boolean && test, const Element & consequent_state)
   {
     return changeStateIf(test, consequent_state, current_state);
   }
@@ -90,12 +90,12 @@ struct StoryboardElement
   template<
     typename Predicate, typename ... Ts,
     typename = typename std::enable_if<std::is_function<Predicate>::value>::type>
-  Object changeStateIf(Predicate && predicate, Ts && ... xs)
+  decltype(auto) changeStateIf(Predicate && predicate, Ts && ... xs)
   {
     return changeStateIf(predicate(), std::forward<decltype(xs)>(xs)...);
   }
 
-  Object override ()
+  Element override ()
   {
     if (!complete() && !stopping()) {
       return current_state = stop_transition;

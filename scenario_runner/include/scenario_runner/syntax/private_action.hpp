@@ -41,7 +41,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct PrivateAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit PrivateAction(const Node & node, Scope & scope)

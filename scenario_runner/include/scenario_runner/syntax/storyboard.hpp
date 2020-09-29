@@ -34,8 +34,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Storyboard
-  : public StoryboardElement<Storyboard>,  // XXX ???
-  public Objects
+  : public StoryboardElement<Storyboard>, public Elements
 {
   Scope inner_scope;
 
