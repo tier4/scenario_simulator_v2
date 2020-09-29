@@ -20,7 +20,7 @@ namespace simulation_controller
 
         PedestrianEntity::PedestrianEntity(std::string name, const EntityStatus &initial_state, PedestrianParameters params)
             : EntityBase(params.name, name, initial_state),
-            parameters(parameters)
+            parameters(params)
         {
             tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
             tree_ptr_->setValueToBlackBoard("pedestrian_parameters",
@@ -38,7 +38,7 @@ namespace simulation_controller
 
         PedestrianEntity::PedestrianEntity(std::string name, PedestrianParameters params)
             : EntityBase(params.name, name),
-            parameters(parameters)
+            parameters(params)
         {
             tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
             tree_ptr_->setValueToBlackBoard("pedestrian_parameters",
@@ -48,9 +48,9 @@ namespace simulation_controller
         void PedestrianEntity::requestAcquirePosition(int lanelet_id, double s, double offset)
         {
             tree_ptr_->setRequest("acquire_position");
-            geometry_msgs::Vector3 rpy;
-            geometry_msgs::Twist twist;
-            geometry_msgs::Accel accel;
+            geometry_msgs::msg::Vector3 rpy;
+            geometry_msgs::msg::Twist twist;
+            geometry_msgs::msg::Accel accel;
             auto target_status = simulation_controller::entity::EntityStatus(0, lanelet_id, s, offset, rpy, twist, accel);
             tree_ptr_->setValueToBlackBoard("target_status", target_status);
         }
@@ -102,14 +102,14 @@ namespace simulation_controller
             updateStandStillDuration(step_time);
         }
 
-        visualization_msgs::MarkerArray PedestrianEntity::generateMarker(ros::Time stamp, std_msgs::ColorRGBA color) const
+        visualization_msgs::msg::MarkerArray PedestrianEntity::generateMarker(rclcpp::Time stamp, std_msgs::msg::ColorRGBA color) const
         {
-            visualization_msgs::MarkerArray ret;
+            visualization_msgs::msg::MarkerArray ret;
             if(!status_)
             {
                 return ret;
             }
-            visualization_msgs::Marker bbox;
+            visualization_msgs::msg::Marker bbox;
             bbox.header.frame_id = name;
             bbox.header.stamp = stamp;
             bbox.ns = name;
@@ -123,14 +123,14 @@ namespace simulation_controller
             bbox.pose.orientation.z = 0.0;
             bbox.pose.orientation.w = 1.0;
             bbox.type = bbox.CUBE;
-            bbox.lifetime = ros::Duration(0.1);
+            bbox.lifetime = rclcpp::Duration(0.1);
             bbox.scale.x = parameters.bounding_box.dimensions.length;
             bbox.scale.y = parameters.bounding_box.dimensions.width;
             bbox.scale.z = parameters.bounding_box.dimensions.height;
             bbox.color = color;
             ret.markers.push_back(bbox);
 
-            visualization_msgs::Marker text;
+            visualization_msgs::msg::Marker text;
             text.header.frame_id = name;
             text.header.stamp = stamp;
             text.ns = name;
@@ -147,12 +147,12 @@ namespace simulation_controller
             text.scale.x = 0.0;
             text.scale.y = 0.0;
             text.scale.z = 1.0;
-            text.lifetime = ros::Duration(0.1);
+            text.lifetime = rclcpp::Duration(0.1);
             text.text = name;
             text.color = color;
             ret.markers.push_back(text);
 
-            visualization_msgs::Marker text_velocity;
+            visualization_msgs::msg::Marker text_velocity;
             text_velocity.header.frame_id = name;
             text_velocity.header.stamp = stamp;
             text_velocity.ns = name;
@@ -169,7 +169,7 @@ namespace simulation_controller
             text_velocity.scale.x = 0.0;
             text_velocity.scale.y = 0.0;
             text_velocity.scale.z = 0.5;
-            text_velocity.lifetime = ros::Duration(0.1);
+            text_velocity.lifetime = rclcpp::Duration(0.1);
             if(target_speed_)
             {
                 std::string current_vel = std::to_string(status_.get().twist.linear.x).substr(0,5);
@@ -184,7 +184,7 @@ namespace simulation_controller
             text_velocity.color = color_utils::makeColorMsg("lightgray", 1.0);
             ret.markers.push_back(text_velocity);
 
-            visualization_msgs::Marker text_action;
+            visualization_msgs::msg::Marker text_action;
             text_action.header.frame_id = name;
             text_action.header.stamp = stamp;
             text_action.ns = name;
@@ -201,14 +201,14 @@ namespace simulation_controller
             text_action.scale.x = 0.0;
             text_action.scale.y = 0.0;
             text_action.scale.z = 0.5;
-            text_action.lifetime = ros::Duration(0.1);
+            text_action.lifetime = rclcpp::Duration(0.1);
             text_action.text = "behavior: " + tree_ptr_->getCurrentAction();
             text_action.color = color_utils::makeColorMsg("lightgray", 1.0);
             ret.markers.push_back(text_action);
 
             if(verbose_)
             {
-                visualization_msgs::Marker trajectory_marker;
+                visualization_msgs::msg::Marker trajectory_marker;
                 trajectory_marker.header.frame_id = "map";
                 trajectory_marker.ns = name;
                 trajectory_marker.id = 4;
@@ -219,14 +219,14 @@ namespace simulation_controller
                 trajectory_marker.scale.z = 0.3;
                 trajectory_marker.color = color;
                 trajectory_marker.points = following_trajectory_;
-                trajectory_marker.lifetime = ros::Duration(0.1);
+                trajectory_marker.lifetime = rclcpp::Duration(0.1);
                 for(auto itr=trajectory_marker.points.begin(); itr!=trajectory_marker.points.end(); itr++)
                 {
                     trajectory_marker.colors.push_back(color);
                 }
                 ret.markers.push_back(trajectory_marker);
 
-                visualization_msgs::Marker text_position;
+                visualization_msgs::msg::Marker text_position;
                 text_position.header.frame_id = name;
                 text_position.header.stamp = stamp;
                 text_position.ns = name;
@@ -254,7 +254,7 @@ namespace simulation_controller
                 }
                 
                 text_position.color = color_utils::makeColorMsg("lightgray", 1.0);
-                text_position.lifetime = ros::Duration(0.1);
+                text_position.lifetime = rclcpp::Duration(0.1);
                 ret.markers.push_back(text_position);
             }
             return ret;

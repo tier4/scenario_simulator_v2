@@ -46,6 +46,8 @@ add_library(simulation_controller
   src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/entity/vehicle_entity.cpp
+  src/entity/ego_entity.cpp
+  src/entity/pedestrian_entity.cpp
   src/behavior/action_node.cpp
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_action.cpp
@@ -72,8 +74,6 @@ ament_target_dependencies(simulation_controller
 )
 
 #add_library(simulation_controller
-  #src/entity/ego_entity.cpp
-  #src/entity/pedestrian_entity.cpp
   #src/entity/entity_manager.cpp
   #src/api/api.cpp
   #src/api/entity_api_impl.cpp
