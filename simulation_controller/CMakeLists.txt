@@ -17,7 +17,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -50,7 +50,6 @@ add_library(entity_manager SHARED
   src/entity/vehicle_entity.cpp
   src/entity/ego_entity.cpp
   src/entity/pedestrian_entity.cpp
-  src/entity/entity_manager.cpp
   src/behavior/action_node.cpp
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_action.cpp
@@ -64,7 +63,7 @@ add_library(entity_manager SHARED
 )
 ament_target_dependencies(entity_manager
   rclcpp
-  rclcpp_components
+  rclcpp_lifecycle
   geometry_msgs
   quaternion_operation
   autoware_auto_msgs
@@ -82,8 +81,6 @@ target_link_libraries(entity_manager
 )
 
 add_library(api SHARED
-  src/api/entity_api_impl.cpp
-  src/api/simulation_api_impl.cpp
   src/api/api.cpp
 )
 ament_target_dependencies(api
@@ -99,7 +96,7 @@ add_executable(scenario_runner_moc_node
 )
 ament_target_dependencies(scenario_runner_moc_node
   rclcpp
-  rclcpp_components
+  rclcpp_lifecycle
   geometry_msgs
   quaternion_operation
   autoware_auto_msgs
