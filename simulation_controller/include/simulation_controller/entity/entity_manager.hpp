@@ -7,11 +7,12 @@
 #include <simulation_controller/entity/exception.hpp>
 
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
-#include <visualization_msgs/MarkerArray.h>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include <boost/any.hpp>
 #include <boost/optional.hpp>
@@ -24,36 +25,35 @@ namespace simulation_controller
 {
     namespace entity
     {
-        class EntityManager
+        class EntityManager : public rclcpp::Node
         {
         private:
             std::map<std::string, boost::any> entities_;
             std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-            bool without_lanelet_;
         public:
             void setVerbose(bool verbose);
             void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
             void requestLaneChange(std::string name, int to_lanelet_id);
             void requestLaneChange(std::string name, Direction direction);
             boost::optional<double> getLongitudinalDistance(std::string from, std::string to, double max_distance = 100);
-            geometry_msgs::Pose getRelativePose(std::string from, std::string to);
-            geometry_msgs::Pose getRelativePose(std::string from, geometry_msgs::Pose to);
-            geometry_msgs::Pose getRelativePose(geometry_msgs::Pose from, std::string to);
-            geometry_msgs::Pose getRelativePose(geometry_msgs::Pose from, geometry_msgs::Pose to) const;
-            explicit EntityManager(bool without_lanelet=false);
+            geometry_msgs::msg::Pose getRelativePose(std::string from, std::string to);
+            geometry_msgs::msg::Pose getRelativePose(std::string from, geometry_msgs::msg::Pose to);
+            geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, std::string to);
+            geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, geometry_msgs::msg::Pose to) const;
+            explicit EntityManager(const rclcpp::NodeOptions & options);
             boost::optional<VehicleParameters> getVehicleParameters(std::string name);
             std::vector<std::string> getEntityNames();
             std::vector<std::string> getVehicleEntityNames();
             std::vector<std::string> getEgoEntityNames();
-            visualization_msgs::MarkerArray generateMarker();
+            visualization_msgs::msg::MarkerArray generateMarker();
             bool setEntityStatus(std::string name, EntityStatus status);
             CoordinateFrameTypes getEntityStatusCoordinate(std::string name);
             boost::optional<EntityStatus> getEntityStatus(std::string name, CoordinateFrameTypes coordinate = CoordinateFrameTypes::WORLD);
             bool entityStatusSetted(std::string name);
             void setTargetSpeed(std::string name, double target_speed, bool continuous);
             void update(double current_time, double step_time);
-            void broadcastTransform(geometry_msgs::PoseStamped pose);
-            bool reachPosition(std::string name, geometry_msgs::Pose target_pose, double tolerance);
+            void broadcastTransform(geometry_msgs::msg::PoseStamped pose);
+            bool reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance);
             bool reachPosition(std::string name, int lanelet_id, double s, double offset, double tolerance);
             void broadcastEntityTransform();
             boost::optional<double> getStandStillDuration(std::string name);
@@ -70,10 +70,7 @@ namespace simulation_controller
                 {
                     return false;
                 }
-                if(!without_lanelet_)
-                {
-                    entity.setHdMapUtils(hdmap_utils_ptr_);
-                }
+                entity.setHdMapUtils(hdmap_utils_ptr_);
                 entities_.insert(std::make_pair(entity.name,entity));
                 return true;
             }

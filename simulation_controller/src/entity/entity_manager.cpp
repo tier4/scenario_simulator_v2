@@ -1,6 +1,5 @@
 #include <simulation_controller/entity/entity_manager.hpp>
 
-#include <ros/ros.h>
 #include <tf2/convert.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
@@ -8,13 +7,10 @@ namespace simulation_controller
 {
     namespace entity
     {
-        EntityManager::EntityManager(bool without_lanelet)
+        EntityManager::EntityManager(const rclcpp::NodeOptions & options) 
+        : Node("entity_manager", options), broadcaster_(this)
         {
-            without_lanelet_ = without_lanelet;
-            if(!without_lanelet_)
-            {
-                hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>("/map/vector_map");
-            }
+            hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>("/map/vector_map");
         }
 
         const std::unordered_map<std::string,EntityType> EntityManager::getEntityTypeList() const
@@ -132,40 +128,40 @@ namespace simulation_controller
             }
         }
 
-        geometry_msgs::Pose EntityManager::getRelativePose(geometry_msgs::Pose from, geometry_msgs::Pose to) const
+        geometry_msgs::msg::Pose EntityManager::getRelativePose(geometry_msgs::msg::Pose from, geometry_msgs::msg::Pose to) const
         {
-            geometry_msgs::Transform from_translation;
+            geometry_msgs::msg::Transform from_translation;
             from_translation.translation.x = from.position.x;
             from_translation.translation.y = from.position.y;
             from_translation.translation.z = from.position.z;
             from_translation.rotation = from.orientation;
             tf2::Transform from_tf;
-            tf2::convert(from_translation, from_tf);
-            geometry_msgs::Transform to_translation;
+            tf2::fromMsg(from_translation, from_tf);
+            geometry_msgs::msg::Transform to_translation;
             to_translation.translation.x = to.position.x;
             to_translation.translation.y = to.position.y;
             to_translation.translation.z = to.position.z;
             to_translation.rotation = to.orientation;
             tf2::Transform to_tf;
-            tf2::convert(to_translation, to_tf);
+            tf2::fromMsg(to_translation, to_tf);
             tf2::Transform tf_delta;
             tf_delta = from_tf.inverse() * to_tf;
-            geometry_msgs::Pose ret;
+            geometry_msgs::msg::Pose ret;
             tf2::toMsg(tf_delta, ret);
             return ret;
         }
 
-        geometry_msgs::Pose EntityManager::getRelativePose(geometry_msgs::Pose from, std::string to)
+        geometry_msgs::msg::Pose EntityManager::getRelativePose(geometry_msgs::msg::Pose from, std::string to)
         {
             auto to_status = getEntityStatus(to);
             if(!to_status)
             {
                 throw simulation_controller::SimulationRuntimeError("failed to get status of " + to + " entity in getRelativePose");
             }
-            return getRelativePose(to_status->pose, to);
+            return getRelativePose(from, to_status->pose);
         }
 
-        geometry_msgs::Pose EntityManager::getRelativePose(std::string from, geometry_msgs::Pose to)
+        geometry_msgs::msg::Pose EntityManager::getRelativePose(std::string from, geometry_msgs::msg::Pose to)
         {
             auto from_status = getEntityStatus(from);
             if(!from_status)
@@ -175,7 +171,7 @@ namespace simulation_controller
             return getRelativePose(from_status->pose, to);
         }
 
-        geometry_msgs::Pose EntityManager::getRelativePose(std::string from, std::string to)
+        geometry_msgs::msg::Pose EntityManager::getRelativePose(std::string from, std::string to)
         {
             auto from_status = getEntityStatus(from);
             auto to_status =  getEntityStatus(to);
@@ -240,7 +236,7 @@ namespace simulation_controller
             return boost::none;
         }
 
-        bool EntityManager::reachPosition(std::string name, geometry_msgs::Pose target_pose, double tolerance)
+        bool EntityManager::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance)
         {
             auto status = getEntityStatus(name);
             if(!status)
@@ -259,9 +255,9 @@ namespace simulation_controller
 
         bool EntityManager::reachPosition(std::string name, int lanelet_id, double s, double offset, double tolerance)
         {
-            geometry_msgs::Vector3 rpy;
-            geometry_msgs::Twist twist;
-            geometry_msgs::Accel accel;
+            geometry_msgs::msg::Vector3 rpy;
+            geometry_msgs::msg::Twist twist;
+            geometry_msgs::msg::Accel accel;
             auto target_status = simulation_controller::entity::EntityStatus(0, lanelet_id, s, offset, rpy, twist, accel);
             auto target_pose = hdmap_utils_ptr_->toMapPose(target_status);
             if(!target_pose)
@@ -282,6 +278,7 @@ namespace simulation_controller
             {
                 return boost::any_cast<const EgoEntity&>(it->second).getStatusCoordinateFrameType();
             }
+            throw simulation_controller::SimulationRuntimeError("failed to get entity status coordinate, entity name does not match, entity_name : " + name);
         }
 
         std::vector<std::string> EntityManager::getVehicleEntityNames()
@@ -328,10 +325,10 @@ namespace simulation_controller
             return boost::none;
         }
 
-        visualization_msgs::MarkerArray EntityManager::generateMarker()
+        visualization_msgs::msg::MarkerArray EntityManager::generateMarker()
         {
-            visualization_msgs::MarkerArray ret;
-            ros::Time now = ros::Time::now();
+            visualization_msgs::msg::MarkerArray ret;
+            rclcpp::Time now = get_clock()->now();
             for(auto it = entities_.begin(); it != entities_.end(); it++)
             {
                 if(it->second.type() == typeid(VehicleEntity))
@@ -353,9 +350,9 @@ namespace simulation_controller
             return ret;
         }
 
-        void EntityManager::broadcastTransform(geometry_msgs::PoseStamped pose)
+        void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose)
         {
-            geometry_msgs::TransformStamped transform_stamped;
+            geometry_msgs::msg::TransformStamped transform_stamped;
             transform_stamped.header.stamp = pose.header.stamp;
             transform_stamped.header.frame_id = "map";
             transform_stamped.child_frame_id = pose.header.frame_id;
@@ -379,7 +376,7 @@ namespace simulation_controller
                         auto pose = hdmap_utils_ptr_->toMapPose(status.get());
                         if(pose)
                         {
-                            pose->header.stamp = ros::Time::now();
+                            pose->header.stamp = get_clock()->now();
                             pose->header.frame_id = *it;
                             broadcastTransform(pose.get());
                         }
