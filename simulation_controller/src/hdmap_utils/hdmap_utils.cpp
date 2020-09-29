@@ -35,6 +35,10 @@
 #include <boost/assign/list_of.hpp>
 
 #include <algorithm>
+#include <vector>
+#include <utility>
+#include <memory>
+#include <string>
 
 namespace hdmap_utils
 {
@@ -656,13 +660,13 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
       to_lanelet, 0,
       true);
   if (!route) {
-    //std::cout << "failed to get route" << std::endl;
+    // std::cout << "failed to get route" << std::endl;
     return boost::none;
   }
   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
   double dist = 0.0;
   if (shortest_path.empty()) {
-    //std::cout << "failed to find shortest path" << std::endl;
+    // std::cout << "failed to find shortest path" << std::endl;
     return boost::none;
   }
   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__XMLRPC_WRAPPER__XMLRPC_WRAPPER_HPP_
-#define SIMULATION_CONTROLLER__XMLRPC_WRAPPER__XMLRPC_WRAPPER_HPP_
+#ifndef SIMULATION_CONTROLLER__API__API_HPP_
+#define SIMULATION_CONTROLLER__API__API_HPP_
 
 #include <simulation_controller/api/simulation_api_impl.hpp>
 #include <simulation_controller/api/entity_api_impl.hpp>
@@ -52,4 +52,4 @@ public:
 };
 }  // namespace scenario_simulator
 
-#endif  // SIMULATION_CONTROLLER__XMLRPC_WRAPPER__XMLRPC_WRAPPER_HPP_
+#endif  // SIMULATION_CONTROLLER__API__API_HPP_

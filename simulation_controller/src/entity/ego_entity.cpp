@@ -14,6 +14,8 @@
 
 #include <simulation_controller/entity/ego_entity.hpp>
 
+#include <string>
+
 namespace simulation_controller
 {
 namespace entity
@@ -30,5 +32,5 @@ EgoEntity::EgoEntity(std::string name, const pugi::xml_node & xml)
 : VehicleEntity(name, xml) {}
 EgoEntity::EgoEntity(std::string name, VehicleParameters parameters)
 : VehicleEntity(name, parameters) {}
-}      // namespace entity
-} // namespace simulation_controller
+}  // namespace entity
+}  // namespace simulation_controller

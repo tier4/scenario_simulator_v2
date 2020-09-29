@@ -19,6 +19,9 @@
 
 #include <boost/algorithm/clamp.hpp>
 
+#include <memory>
+#include <string>
+
 namespace simulation_controller
 {
 namespace entity
@@ -274,5 +277,5 @@ const
   }
   return ret;
 }
-}      // namespace entity
-} // namespace simulation_controller
+}  // namespace entity
+}  // namespace simulation_controller

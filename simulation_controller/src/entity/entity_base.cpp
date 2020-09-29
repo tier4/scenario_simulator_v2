@@ -16,6 +16,9 @@
 #include <simulation_controller/entity/exception.hpp>
 
 #include <rclcpp/rclcpp.hpp>
+#include <unordered_map>
+#include <limits>
+#include <string>
 
 namespace simulation_controller
 {
@@ -153,5 +156,5 @@ bool EntityBase::getVisibility()
 {
   return visibility_;
 }
-}      // namespace entity
-} // namespace simulation_controller
+}  // namespace entity
+}  // namespace simulation_controller

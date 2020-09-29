@@ -14,6 +14,8 @@
 
 #include <simulation_controller/math/hermite_curve.hpp>
 
+#include <vector>
+
 namespace simulation_controller
 {
 namespace math
@@ -51,23 +53,10 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (int i = 0; i <= 100; i++) {
-    double t = (double)i / 100.0;
+    double t = static_cast<double>(i) / 100.0;
     geometry_msgs::msg::Point p = getPoint(t);
     ret.push_back(p);
   }
-  return ret;
-}
-
-geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
-{
-  if (autoscale) {
-    s = s / getLength();
-  }
-  geometry_msgs::msg::Point p;
-  p.x = ax_ * std::pow(s, 3) + bx_ * std::pow(s, 2) + cx_ * s + dx_;
-  p.y = ay_ * std::pow(s, 3) + by_ * std::pow(s, 2) + cy_ * s + dy_;
-  p.z = az_ * std::pow(s, 3) + bz_ * std::pow(s, 2) + cz_ * s + dz_;
-  return p;
 }
 
 geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale)
@@ -132,5 +121,5 @@ double HermiteCurve::getLength()
   }
   return ret;
 }
-}
-}
+}  // namespace math
+}  // namespace simulation_controller
