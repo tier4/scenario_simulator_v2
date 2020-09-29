@@ -17,20 +17,22 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
-//#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <xmlrpcpp/XmlRpcClient.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 #include <xmlrpcpp/XmlRpcException.h>
 
+// headers in STL
+#include <memory>
+#include <vector>
+#include <string>
+
 // headers in pugixml
 #include "pugixml.hpp"
-#include <memory>
-#include <thread>
 
 class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
-  ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
+  explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
   : Node("scenario_runner", option), api_(this)
   {
     api_.simulation->initialize(1.0, 0.02);
@@ -48,7 +50,6 @@ public:
     simulation_controller::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
     api_.entity->spawn(false, "bob", pedestrian_params);
     api_.entity->setVerbose(false);
-    //th_ = std::thread(&ScenarioRunnerMoc::update, this);
     current_time_ = 0.0;
     target_speed_setted_ = false;
     lanechange_excuted_ = false;
@@ -75,9 +76,9 @@ private:
         api_.entity->setTargetSpeed("bob", 0.5, true);
       }
     }
-    auto dist = api_.entity->getLongitudinalDistance("ego", "npc1");     // ByEntityCondition.EntityCondition.RelativeDistanceCondition
+    auto dist = api_.entity->getLongitudinalDistance("ego", "npc1");
     if (dist) {
-      if (dist.get() < 25 && api_.entity->isInLanelet("ego", 178)) {   // StartTrigger
+      if (dist.get() < 25 && api_.entity->isInLanelet("ego", 178)) {
         api_.entity->requestLaneChange("ego", 179);
         lanechange_excuted_ = true;
       }
@@ -193,30 +194,30 @@ private:
   }
 
   std::string catalog_xml =
-    "<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>\
-            <ParameterDeclarations/>\
-            <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>\
-            <BoundingBox>\
-                <Center x='1.5' y='0.0' z='0.9'/>\
-                <Dimensions width='2.1' length='4.5' height='1.8'/>\
-            </BoundingBox>\
-            <Axles>\
-                <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>\
-                <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>\
-            </Axles>\
-            <Properties>\
-                <Property name='type' value='ego_vehicle'/>\
-            </Properties>\
-        </Vehicle>";
+    R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
+            <ParameterDeclarations/>
+            <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
+            <BoundingBox>
+                <Center x='1.5' y='0.0' z='0.9'/>
+                <Dimensions width='2.1' length='4.5' height='1.8'/>
+            </BoundingBox>
+            <Axles>
+                <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
+                <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>
+            </Axles>
+            <Properties>
+                <Property name='type' value='ego_vehicle'/>
+            </Properties>
+        </Vehicle>)";
 
-  std::string pedestrian_xml =
-    "<Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>\
-            <BoundingBox>\
-                <Center x='0.0' y='0.0' z='0.5'/>\
-                <Dimensions width='1.0' length='1.0' height='2.0'/>\
-            </BoundingBox>\
-            <Properties/>\
-        </Pedestrian>";
+  std::string pedestrian_xml = R"(
+    <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
+            <BoundingBox>
+                <Center x='0.0' y='0.0' z='0.5'/>
+                <Dimensions width='1.0' length='1.0' height='2.0'/>
+            </BoundingBox>
+            <Properties/>
+        </Pedestrian>)";
 };
 
 int main(int argc, char * argv[])
