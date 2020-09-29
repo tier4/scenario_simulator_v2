@@ -16,11 +16,11 @@
 #define SCENARIO_RUNNER__POINTER_HPP_
 
 #include <scenario_runner/error.hpp>
-#include <scenario_runner/type_traits/if_accomplishable.hpp>
-#include <scenario_runner/type_traits/if_evaluable.hpp>
-#include <scenario_runner/type_traits/if_output_streamable.hpp>
-#include <scenario_runner/type_traits/if_startable.hpp>
-#include <scenario_runner/type_traits/if_stateful.hpp>
+#include <scenario_runner/type_traits/if_has_member_function_accomplished.hpp>
+#include <scenario_runner/type_traits/if_has_member_function_evaluate.hpp>
+#include <scenario_runner/type_traits/if_has_member_function_start.hpp>
+#include <scenario_runner/type_traits/if_has_member_function_state.hpp>
+#include <scenario_runner/type_traits/if_has_stream_output_operator.hpp>
 #include <scenario_runner/utility/pair.hpp>
 
 #include <memory>
@@ -56,29 +56,30 @@ class Pointer
     }
 
 private:
+// ^ NOTE This broken indent was forced by ament_uncrustify.
     std::ostream & write(std::ostream & os) const override
     {
-      return IfOutputStreamable<Bound>::invoke(os, *this);
+      return IfHasStreamOutputOperator<Bound>::applyIt(os, *this);
     }
 
-    Pointer evaluate(const Pointer & as_is) override
+    Pointer evaluate(const Pointer & else_) override
     {
-      return IfEvaluable<Bound>::invoke(as_is, static_cast<Bound &>(*this));
+      return IfHasMemberFunctionEvaluate<Bound>::callIt(static_cast<Bound &>(*this), else_);
     }
 
     bool accomplished() override
     {
-      return IfAccomplishable<Bound>::invoke(*this);
+      return IfHasMemberFunctionAccomplished<Bound>::callIt(*this);
     }
 
     const Pointer & state() const override
     {
-      return IfStateful<Bound>::template state<Pointer>(*this);
+      return IfHasMemberFunctionState<Bound>::template callIt<Pointer>(*this);
     }
 
-    void start() override
+    void start() override  // corresponds to startTransition
     {
-      IfStartable<Bound>::invoke(*this);
+      IfHasMemberFunctionStart<Bound>::callIt(*this);
     }
   };
 
