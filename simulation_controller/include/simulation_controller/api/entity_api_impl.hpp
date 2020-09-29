@@ -17,15 +17,14 @@
 
 namespace scenario_simulator
 {
-    template<class NodeT>
-    class EntityAPIImpl : public ApiImplBase<NodeT>
+    class EntityAPIImpl : public ApiImplBase
     {
-    using ApiImplBase<NodeT>::entity_manager_ptr_;
-    using ApiImplBase<NodeT>::client_ptr_;
+    using ApiImplBase::entity_manager_ptr_;
+    using ApiImplBase::client_ptr_;
     public:
         EntityAPIImpl(std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr,
-            std::shared_ptr<simulation_controller::entity::EntityManager<NodeT>> entity_manager_ptr)
-        : ApiImplBase<NodeT>(client_ptr, entity_manager_ptr) {};
+            std::shared_ptr<simulation_controller::entity::EntityManager> entity_manager_ptr)
+        : ApiImplBase(client_ptr, entity_manager_ptr) {};
         bool spawn(bool is_ego, std::string name, 
             std::string catalog_xml,
             simulation_controller::entity::EntityStatus status)
@@ -36,7 +35,6 @@ namespace scenario_simulator
                 value[0][0]["params"] = status_value;
                 value[0][0]["params"]["entity/is_ego"] = is_ego;
                 value[0][0]["params"]["entity/catalog_xml"] = catalog_xml;
-
                 pugi::xml_document catalog_xml_doc;
                 catalog_xml_doc.load_string(catalog_xml.c_str());
                 pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");

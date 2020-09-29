@@ -25,17 +25,17 @@ namespace simulation_controller
 {
     namespace entity
     {
-        template<class NodeT>
         class EntityManager
         {
         private:
-            NodeT node_;
             std::map<std::string, boost::any> entities_;
             std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+            rclcpp::Clock::SharedPtr clock_ptr_;
         public:
+            template<class NodeT>
             EntityManager(NodeT && node): broadcaster_(node)
             {
-                node_ = node;
+                clock_ptr_ = node->get_clock();
                 hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>("/map/vector_map");
             }
             void setVerbose(bool verbose)
@@ -244,7 +244,7 @@ namespace simulation_controller
             visualization_msgs::msg::MarkerArray generateMarker()
             {
                 visualization_msgs::msg::MarkerArray ret;
-                rclcpp::Time now = node_.get_clock()->now();
+                rclcpp::Time now = clock_ptr_->now();
                 for(auto it = entities_.begin(); it != entities_.end(); it++)
                 {
                     if(it->second.type() == typeid(VehicleEntity))
@@ -467,7 +467,7 @@ namespace simulation_controller
                             auto pose = hdmap_utils_ptr_->toMapPose(status.get());
                             if(pose)
                             {
-                                pose->header.stamp = node_.get_clock()->now();
+                                pose->header.stamp = clock_ptr_->now();
                                 pose->header.frame_id = *it;
                                 broadcastTransform(pose.get());
                             }

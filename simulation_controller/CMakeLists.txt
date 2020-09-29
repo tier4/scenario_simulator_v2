@@ -50,6 +50,7 @@ add_library(entity_manager SHARED
   src/entity/vehicle_entity.cpp
   src/entity/ego_entity.cpp
   src/entity/pedestrian_entity.cpp
+  src/entity/entity_manager.cpp
   src/behavior/action_node.cpp
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_action.cpp

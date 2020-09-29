@@ -13,23 +13,23 @@
 
 namespace scenario_simulator
 {
-    template<class NodeT>
     class API
     {
-    using EntityManager = simulation_controller::entity::EntityManager<NodeT>;
+    using EntityManager = simulation_controller::entity::EntityManager;
     public:
+        template<class NodeT>
         API(std::string address, int port, NodeT && node)
         {
             auto entity_manager_ptr = std::shared_ptr<EntityManager>(new EntityManager(node));
             auto client_ptr = std::shared_ptr<XmlRpc::XmlRpcClient>
                 (new XmlRpc::XmlRpcClient(address.c_str(), port));
-            simulation = std::shared_ptr<SimulationAPIImpl<NodeT>>
-                (new SimulationAPIImpl<NodeT>(client_ptr, entity_manager_ptr));
-            entity = std::shared_ptr<EntityAPIImpl<NodeT>>
-                (new EntityAPIImpl<NodeT>(client_ptr, entity_manager_ptr));
+            simulation = std::shared_ptr<SimulationAPIImpl>
+                (new SimulationAPIImpl(client_ptr, entity_manager_ptr));
+            entity = std::shared_ptr<EntityAPIImpl>
+                (new EntityAPIImpl(client_ptr, entity_manager_ptr));
         }
-        std::shared_ptr<SimulationAPIImpl<NodeT>> simulation;
-        std::shared_ptr<EntityAPIImpl<NodeT>> entity;
+        std::shared_ptr<SimulationAPIImpl> simulation;
+        std::shared_ptr<EntityAPIImpl> entity;
     };
 }  // namespace scenario_simulator
 
