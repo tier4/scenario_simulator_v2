@@ -12,37 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_STATEFUL_HPP_
-#define SCENARIO_RUNNER__TYPE_TRAITS__IF_STATEFUL_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
 
-#include <scenario_runner/concepts/stateful.hpp>
+#include <scenario_runner/type_traits/void_t.hpp>
 
 namespace scenario_runner
 {
 inline namespace type_traits
 {
 template<typename T, typename = void>
-struct IfStateful
-{
-  template<typename Result>
-  static const Result & state(const T &)
-  {
-    std::stringstream ss {};
-    ss << "class " << typeid(T).name() << " is not stateful";
-    throw ImplementationFault {ss.str()};
-  }
-};
+struct HasMemberFunctionAccomplished
+  : public std::false_type
+{};
 
 template<typename T>
-struct IfStateful<T, typename std::enable_if<Stateful<T>::value>::type>
-{
-  template<typename Result>
-  static const Result & state(const T & callee)
-  {
-    return callee.state();
-  }
-};
-}
+struct HasMemberFunctionAccomplished<T, void_t<decltype(std::declval<T>().accomplished())>>
+  : public std::true_type
+{};
+}  // inline namespace type_traits
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_STATEFUL_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_

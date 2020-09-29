@@ -12,35 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_OUTPUT_STREAMABLE_HPP_
-#define SCENARIO_RUNNER__TYPE_TRAITS__IF_OUTPUT_STREAMABLE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_START_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_START_HPP_
 
-#include <scenario_runner/concepts/output_streamable.hpp>
-#include <scenario_runner/console/escape_sequence.hpp>
-#include <scenario_runner/utility/indent.hpp>
+#include <scenario_runner/type_traits/void_t.hpp>
 
 namespace scenario_runner
 {
 inline namespace type_traits
 {
 template<typename T, typename = void>
-struct IfOutputStreamable
-{
-  static std::ostream & invoke(std::ostream & os, const T &)
-  {
-    return os << indent << blue << "<" << typeid(T).name() << "/>" << reset;
-  }
-};
+struct HasMemberFunctionStart
+  : public std::false_type
+{};
 
 template<typename T>
-struct IfOutputStreamable<T, typename std::enable_if<OutputStreamable<T>::value>::type>
-{
-  static std::ostream & invoke(std::ostream & os, const T & something)
-  {
-    return os << something;
-  }
-};
+struct HasMemberFunctionStart<T, void_t<decltype(std::declval<T>().start())>>
+  : public std::true_type
+{};
 }
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_OUTPUT_STREAMABLE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_START_HPP_

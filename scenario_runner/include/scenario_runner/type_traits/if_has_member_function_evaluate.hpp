@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_EVALUABLE_HPP_
-#define SCENARIO_RUNNER__TYPE_TRAITS__IF_EVALUABLE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_EVALUATE_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_EVALUATE_HPP_
 
-#include <scenario_runner/concepts/evaluable.hpp>
+#include <scenario_runner/type_traits/has_member_function_evaluate.hpp>
 
 #include <utility>
 
@@ -24,25 +24,28 @@ namespace scenario_runner
 inline namespace type_traits
 {
 template<typename T, typename = void>
-struct IfEvaluable
+struct IfHasMemberFunctionEvaluate
 {
-  template<typename Result, typename U, typename ... Us>
-  static Result invoke(const Result & as_is, U &&, Us && ...)
+  template<typename Result>
+  static constexpr Result callIt(T &, const Result & as_self_evaluating)
   {
-    return as_is;
+    return as_self_evaluating;
   }
 };
 
 template<typename T>
-struct IfEvaluable<T, typename std::enable_if<Evaluable<T>::value>::type>
+struct IfHasMemberFunctionEvaluate<T,
+  typename std::enable_if<
+    HasMemberFunctionEvaluate<T>::value
+  >::type>
 {
-  template<typename Result, typename U, typename ... Us>
-  static Result invoke(const Result &, U & object, Us && ... xs)
+  template<typename Result>
+  static constexpr Result callIt(T & then, const Result &)
   {
-    return object.evaluate(std::forward<decltype(xs)>(xs)...);
+    return then.evaluate();
   }
 };
 }
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_EVALUABLE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_EVALUATE_HPP_
