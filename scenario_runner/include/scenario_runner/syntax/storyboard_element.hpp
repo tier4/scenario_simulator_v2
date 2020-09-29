@@ -28,14 +28,16 @@ inline namespace syntax
 template<typename T>
 struct StoryboardElement
 {
-  Object current_state {standby_state};
-
   const std::size_t maximum_execution_count;
 
-  std::size_t execution_count {0};
+  std::size_t current_execution_count;
+
+  Object current_state;
 
   explicit constexpr StoryboardElement(std::size_t maximum_execution_count = 1)
-  : maximum_execution_count{maximum_execution_count}
+  : maximum_execution_count{maximum_execution_count},
+    current_execution_count{0},
+    current_state{standby_state}
   {}
 
   const auto & state() const
@@ -60,8 +62,17 @@ struct StoryboardElement
 
   #undef BOILERPLATE
 
-  static constexpr void start() noexcept
-  {}
+  template<typename Predicate>
+  Object changeStateIf(Predicate && predicate, const Object & new_state)
+  {
+    if (predicate()) {
+      std::cout << indent << typeid(T).name() << "::evaluate [" << current_state << " => " <<
+        new_state << "]" << std::endl;
+      return current_state = new_state;
+    } else {
+      return current_state;
+    }
+  }
 
   Object override ()
   {
@@ -78,6 +89,9 @@ private:
   {
     return static_cast<const T &>(*this).ready(std::forward<decltype(xs)>(xs)...);
   }
+
+  static constexpr void start() noexcept
+  {}
 
   template<typename ... Ts>
   constexpr decltype(auto) accomplished(Ts && ... xs) const
@@ -177,7 +191,7 @@ public:
 
         static_cast<T &>(*this).start();
 
-        ++execution_count;
+        ++current_execution_count;
 
         std::cout << indent <<
           typeid(T).name() <<
@@ -251,7 +265,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::endTransition:
 
-        if (execution_count < maximum_execution_count) {  // check for completeness
+        if (current_execution_count < maximum_execution_count) {  // check for completeness
           return current_state = standby_state;
         } else {
           return current_state = complete_state;
