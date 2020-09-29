@@ -2,110 +2,99 @@
 
 namespace entity_behavior
 {
-    namespace pedestrian
-    {
-        LaneChangeAction::LaneChangeAction(const std::string& name,const BT::NodeConfiguration& config) 
-            : entity_behavior::ActionNode(name, config)
-        {
-            
-        }
+namespace pedestrian
+{
+LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config)
+: entity_behavior::ActionNode(name, config)
+{
 
-        BT::NodeStatus LaneChangeAction::tick()
-        {
-            std::string request;
-            if(!getInput("request", request))
-            {
-                throw BehaviorTreeRuntimeError("failed to get input request in LaneChangeAction");
-            }
-            if(request != "lane_change")
-            {
-                curve_ = boost::none;
-                current_s_ = 0;
-                return BT::NodeStatus::FAILURE;
-            }
+}
 
-            LaneChangeParameter params;
-            if(!getInput<LaneChangeParameter>("lane_change_params", params))
-            {
-                throw BehaviorTreeRuntimeError("failed to get input lane_change_params in LaneChangeAction");
-            }
+BT::NodeStatus LaneChangeAction::tick()
+{
+  std::string request;
+  if (!getInput("request", request)) {
+    throw BehaviorTreeRuntimeError("failed to get input request in LaneChangeAction");
+  }
+  if (request != "lane_change") {
+    curve_ = boost::none;
+    current_s_ = 0;
+    return BT::NodeStatus::FAILURE;
+  }
 
-            std::shared_ptr<simulation_controller::entity::PedestrianParameters> pedestrian_params_ptr;
-            if(!getInput<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>("pedestrian_parameters", pedestrian_params_ptr))
-            {
-                throw BehaviorTreeRuntimeError("failed to get input pedestrian_parameters in LaneChangeAction");
-            }
+  LaneChangeParameter params;
+  if (!getInput<LaneChangeParameter>("lane_change_params", params)) {
+    throw BehaviorTreeRuntimeError("failed to get input lane_change_params in LaneChangeAction");
+  }
 
-            double step_time,current_time;
-            if(!getInput<double>("step_time", step_time))
-            {
-                throw BehaviorTreeRuntimeError("failed to get input step_time in LaneChangeAction");
-            }
-            if(!getInput<double>("current_time", current_time))
-            {
-                throw BehaviorTreeRuntimeError("failed to get input current_time in LaneChangeAction");
-            }
+  std::shared_ptr<simulation_controller::entity::PedestrianParameters> pedestrian_params_ptr;
+  if (!getInput<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>(
+      "pedestrian_parameters", pedestrian_params_ptr))
+  {
+    throw BehaviorTreeRuntimeError("failed to get input pedestrian_parameters in LaneChangeAction");
+  }
 
-            std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
-            if(!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils_ptr))
-            {
-                throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in LaneChangeAction");
-            }
+  double step_time, current_time;
+  if (!getInput<double>("step_time", step_time)) {
+    throw BehaviorTreeRuntimeError("failed to get input step_time in LaneChangeAction");
+  }
+  if (!getInput<double>("current_time", current_time)) {
+    throw BehaviorTreeRuntimeError("failed to get input current_time in LaneChangeAction");
+  }
 
-            simulation_controller::entity::EntityStatus entity_status;
-            if(!getInput<simulation_controller::entity::EntityStatus>("entity_status", entity_status))
-            {
-                throw BehaviorTreeRuntimeError("failed to get input entity_status in LaneChangeAction");
-            }
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils_ptr)) {
+    throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in LaneChangeAction");
+  }
 
-            if(!curve_)
-            {
-                if(request == "lane_change")
-                {
-                    auto from_pose = hdmap_utils_ptr->toMapPose(entity_status);
-                    if(!from_pose)
-                    {
-                        return BT::NodeStatus::FAILURE;
-                    }
-                    auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose->pose, params.to_lanelet_id);
-                    if(ret)
-                    {
-                        curve_ = ret->first;
-                        target_s_ = ret->second;
-                        setOutput("trajectory", curve_->getTrajectory());
-                    }
-                    else
-                    {
-                        return BT::NodeStatus::FAILURE;
-                    }
-                }
-            }
-            if(curve_)
-            {
-                double current_linear_vel = entity_status.twist.linear.x;
-                current_s_ = current_s_ + current_linear_vel * step_time;
-                if(current_s_ < curve_->getLength())
-                {
-                    geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
-                    simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time, pose, entity_status.twist, entity_status.accel);
-                    setOutput("updated_status", entity_status_updated);
-                    return BT::NodeStatus::RUNNING;
-                }
-                else
-                {
-                    double s = (current_s_ - curve_->getLength()) + target_s_;
-                    curve_ = boost::none;
-                    current_s_ = 0;
-                    geometry_msgs::msg::Vector3 rpy;
-                    rpy.x = 0;
-                    rpy.y = 0;
-                    rpy.z = 0;
-                    simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time, params.to_lanelet_id, s, 0, rpy, entity_status.twist, entity_status.accel);
-                    setOutput("updated_status", entity_status_updated);
-                    return BT::NodeStatus::SUCCESS;
-                }
-            }
-            return BT::NodeStatus::FAILURE;
-        }
-    }  // namespace pedestrian
+  simulation_controller::entity::EntityStatus entity_status;
+  if (!getInput<simulation_controller::entity::EntityStatus>("entity_status", entity_status)) {
+    throw BehaviorTreeRuntimeError("failed to get input entity_status in LaneChangeAction");
+  }
+
+  if (!curve_) {
+    if (request == "lane_change") {
+      auto from_pose = hdmap_utils_ptr->toMapPose(entity_status);
+      if (!from_pose) {
+        return BT::NodeStatus::FAILURE;
+      }
+      auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose->pose, params.to_lanelet_id);
+      if (ret) {
+        curve_ = ret->first;
+        target_s_ = ret->second;
+        setOutput("trajectory", curve_->getTrajectory());
+      } else {
+        return BT::NodeStatus::FAILURE;
+      }
+    }
+  }
+  if (curve_) {
+    double current_linear_vel = entity_status.twist.linear.x;
+    current_s_ = current_s_ + current_linear_vel * step_time;
+    if (current_s_ < curve_->getLength()) {
+      geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
+      simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time,
+        pose, entity_status.twist,
+        entity_status.accel);
+      setOutput("updated_status", entity_status_updated);
+      return BT::NodeStatus::RUNNING;
+    } else {
+      double s = (current_s_ - curve_->getLength()) + target_s_;
+      curve_ = boost::none;
+      current_s_ = 0;
+      geometry_msgs::msg::Vector3 rpy;
+      rpy.x = 0;
+      rpy.y = 0;
+      rpy.z = 0;
+      simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time,
+        params.to_lanelet_id, s, 0,
+        rpy, entity_status.twist,
+        entity_status.accel);
+      setOutput("updated_status", entity_status_updated);
+      return BT::NodeStatus::SUCCESS;
+    }
+  }
+  return BT::NodeStatus::FAILURE;
+}
+}      // namespace pedestrian
 }  // namespace entity_behavior

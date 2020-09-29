@@ -3,11 +3,12 @@
 namespace entity_behavior
 {
 
-    ActionNode::ActionNode(const std::string &name, const BT::NodeConfiguration& config): BT::ActionNodeBase(name, config)
-    {}
+ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & config)
+: BT::ActionNodeBase(name, config)
+{}
 
-    BT::NodeStatus ActionNode::executeTick()
-    {
-        return BT::ActionNodeBase::executeTick();
-    }
+BT::NodeStatus ActionNode::executeTick()
+{
+  return BT::ActionNodeBase::executeTick();
+}
 }

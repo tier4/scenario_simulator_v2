@@ -5,28 +5,28 @@
 
 namespace entity_behavior
 {
-    class BehaviorTreeRuntimeError : public std::runtime_error
-    {
-    public:
-        BehaviorTreeRuntimeError(const char *message) : runtime_error(message) {};
-    };
+class BehaviorTreeRuntimeError : public std::runtime_error
+{
+public:
+  BehaviorTreeRuntimeError(const char * message)
+  : runtime_error(message) {}
+};
 
-    class ActionNode : public BT::ActionNodeBase
-    {
-    public:
+class ActionNode : public BT::ActionNodeBase
+{
+public:
+  ActionNode(const std::string & name, const BT::NodeConfiguration & config);
+  ~ActionNode() override = default;
 
-        ActionNode(const std::string& name, const BT::NodeConfiguration& config);
-        ~ActionNode() override = default;
+  /// throws if the derived class return RUNNING.
+  virtual BT::NodeStatus executeTick() override;
 
-        /// throws if the derived class return RUNNING.
-        virtual BT::NodeStatus executeTick() override;
-
-        /// You don't need to override this
-        virtual void halt() override final
-        {
-            setStatus(BT::NodeStatus::IDLE);
-        }
-    };
+  /// You don't need to override this
+  virtual void halt() override final
+  {
+    setStatus(BT::NodeStatus::IDLE);
+  }
+};
 }  // namespace entity_behavior
 
 #endif  // ENTITY_BEHAVIOR__ACTION_NODE_H_INCLUDED

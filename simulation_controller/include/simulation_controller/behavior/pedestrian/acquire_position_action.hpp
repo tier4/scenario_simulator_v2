@@ -14,37 +14,39 @@
 
 namespace entity_behavior
 {
-    namespace pedestrian
-    {
-        class AcquirePositionAction : public entity_behavior::ActionNode
-        {
-        public:
-            AcquirePositionAction(const std::string& name, const BT::NodeConfiguration& config);
-            BT::NodeStatus tick() override;
-            static BT::PortsList providedPorts()
-            {
-                return 
-                { 
-                    BT::InputPort<std::string>("request"),
-                    BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-                    BT::InputPort<simulation_controller::entity::EntityStatus>("entity_status"),
-                    BT::InputPort<double>("current_time"),
-                    BT::InputPort<double>("step_time"),
-                    BT::InputPort<boost::optional<double>>("target_speed"),
-                    BT::InputPort<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>("pedestrian_parameters"),
-                    BT::OutputPort<std::vector<geometry_msgs::msg::Point>>("trajectory"),
-                    BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
-                    BT::OutputPort<std::string>("request"),
+namespace pedestrian
+{
+class AcquirePositionAction : public entity_behavior::ActionNode
+{
+public:
+  AcquirePositionAction(const std::string & name, const BT::NodeConfiguration & config);
+  BT::NodeStatus tick() override;
+  static BT::PortsList providedPorts()
+  {
+    return
+      {
+        BT::InputPort<std::string>("request"),
+        BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
+        BT::InputPort<simulation_controller::entity::EntityStatus>("entity_status"),
+        BT::InputPort<double>("current_time"),
+        BT::InputPort<double>("step_time"),
+        BT::InputPort<boost::optional<double>>("target_speed"),
+        BT::InputPort<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>(
+          "pedestrian_parameters"),
+        BT::OutputPort<std::vector<geometry_msgs::msg::Point>>("trajectory"),
+        BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
+        BT::OutputPort<std::string>("request"),
 
-                    BT::InputPort<simulation_controller::entity::EntityStatus>("target_status")
-                };
-            }
-        private:
-            boost::optional<simulation_controller::entity::EntityStatus> target_status_;
-            std::vector<geometry_msgs::msg::Point> following_trajectory_;
-            boost::optional<std::vector<int> > route_;
-        };
-    }  // namespace pedestrian
+        BT::InputPort<simulation_controller::entity::EntityStatus>("target_status")
+      };
+  }
+
+private:
+  boost::optional<simulation_controller::entity::EntityStatus> target_status_;
+  std::vector<geometry_msgs::msg::Point> following_trajectory_;
+  boost::optional<std::vector<int>> route_;
+};
+}      // namespace pedestrian
 }  // namespace entity_behavior
 
 #endif  // ENTITY_BEHAVIOR__PEDESTRIAN__ACQUIRE_POSITION_ACTION_HPP

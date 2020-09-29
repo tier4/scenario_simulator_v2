@@ -6,11 +6,11 @@ namespace color_utils
 {
 /**
  * @brief generate std_msgs::msg::ColorRGBA message from hsv values
- * @param h hue 
- * @param s saturation 
+ * @param h hue
+ * @param s saturation
  * @param v value
  * @param alpha alpha value of the color
- * @return std_msgs::msg::ColorRGBA 
+ * @return std_msgs::msg::ColorRGBA
  */
 std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
 {
@@ -61,14 +61,14 @@ std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
  * @brief generate std_msgs::msg::ColorRGBA message from color name
  * @param preset_name the name of the color
  * @param alpha alpha value of the color
- * @return std_msgs::msg::ColorRGBA 
+ * @return std_msgs::msg::ColorRGBA
  */
 std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha)
 {
   std_msgs::msg::ColorRGBA c_msg;
   c_msg.a = alpha;
-  if (c_msg.a < 0.) c_msg.a = 0.;
-  if (c_msg.a > 1.) c_msg.a = 1.;
+  if (c_msg.a < 0.) {c_msg.a = 0.;}
+  if (c_msg.a > 1.) {c_msg.a = 1.;}
 
   auto found_itr = COLOR_NAME_DICT.find(preset_name);
   if (found_itr != COLOR_NAME_DICT.end()) {

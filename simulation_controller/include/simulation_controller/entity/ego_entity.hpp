@@ -8,17 +8,17 @@
 
 namespace simulation_controller
 {
-    namespace entity
-    {
-        class EgoEntity : public VehicleEntity
-        {
-        public:
-            EgoEntity(std::string name, const EntityStatus &initial_state, const pugi::xml_node & xml);
-            EgoEntity(std::string name, const EntityStatus &initial_state, VehicleParameters parameters);
-            EgoEntity(std::string name, const pugi::xml_node & xml);
-            EgoEntity(std::string name, VehicleParameters parameters);
-        };
-    }  // namespace entity
+namespace entity
+{
+class EgoEntity : public VehicleEntity
+{
+public:
+  EgoEntity(std::string name, const EntityStatus & initial_state, const pugi::xml_node & xml);
+  EgoEntity(std::string name, const EntityStatus & initial_state, VehicleParameters parameters);
+  EgoEntity(std::string name, const pugi::xml_node & xml);
+  EgoEntity(std::string name, VehicleParameters parameters);
+};
+}      // namespace entity
 }  // namespace simulation_controller
 
 #endif  // SIMULATION_CONTROLLER__EGO_ENTITY_HPP_

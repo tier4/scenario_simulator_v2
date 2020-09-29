@@ -108,8 +108,8 @@ private:
     }
   }
   std::function<double(void)> randomNum_ = [distr = std::uniform_real_distribution<double>(-0.5,
-      0.5),
-      gen = std::mt19937(133769420)]() mutable {return distr(gen);};
+    0.5),
+    gen = std::mt19937(133769420)]() mutable {return distr(gen);};
 };
 
 template<typename PolygonT>

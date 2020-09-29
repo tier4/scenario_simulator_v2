@@ -91,14 +91,16 @@ TEST_F(TestSuite, QueryLanelets)
 
   lanelet::ConstLanelets subtype_lanelets =
     lanelet::utils::query::subtypeLanelets(all_lanelets, lanelet::AttributeValueString::Road);
-  ASSERT_EQ(static_cast<size_t>(1), subtype_lanelets.size()) << "failed to retrieve road lanelet by subtypeLanelets";
+  ASSERT_EQ(static_cast<size_t>(1),
+    subtype_lanelets.size()) << "failed to retrieve road lanelet by subtypeLanelets";
 
   lanelet::ConstLanelets road_lanelets = lanelet::utils::query::roadLanelets(all_lanelets);
   ASSERT_EQ(static_cast<size_t>(1), road_lanelets.size()) << "failed to retrieve road lanelets";
 
   lanelet::ConstLanelets crosswalk_lanelets =
     lanelet::utils::query::crosswalkLanelets(all_lanelets);
-  ASSERT_EQ(static_cast<size_t>(1), crosswalk_lanelets.size()) << "failed to retrieve crosswalk lanelets";
+  ASSERT_EQ(static_cast<size_t>(1),
+    crosswalk_lanelets.size()) << "failed to retrieve crosswalk lanelets";
 }
 
 TEST_F(TestSuite, QueryTrafficLights)
@@ -109,7 +111,8 @@ TEST_F(TestSuite, QueryTrafficLights)
   ASSERT_EQ(static_cast<size_t>(1), traffic_lights.size()) << "failed to retrieve traffic lights";
 
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  ASSERT_EQ(static_cast<size_t>(1), autoware_traffic_lights.size()) << "failed to retrieve autoware traffic lights";
+  ASSERT_EQ(static_cast<size_t>(1),
+    autoware_traffic_lights.size()) << "failed to retrieve autoware traffic lights";
 }
 
 TEST_F(TestSuite, QueryStopLine)
@@ -118,10 +121,12 @@ TEST_F(TestSuite, QueryStopLine)
   lanelet::ConstLanelets road_lanelets = lanelet::utils::query::roadLanelets(all_lanelets);
 
   auto stop_lines = lanelet::utils::query::stopLinesLanelets(all_lanelets);
-  ASSERT_EQ(static_cast<size_t>(1), stop_lines.size()) << "failed to retrieve stop lines from all lanelets";
+  ASSERT_EQ(static_cast<size_t>(1),
+    stop_lines.size()) << "failed to retrieve stop lines from all lanelets";
 
   auto stop_lines2 = lanelet::utils::query::stopLinesLanelet(road_lanelets.front());
-  ASSERT_EQ(static_cast<size_t>(1), stop_lines2.size()) << "failed to retrieve stop lines from a lanelet";
+  ASSERT_EQ(static_cast<size_t>(1),
+    stop_lines2.size()) << "failed to retrieve stop lines from a lanelet";
 }
 
 int main(int argc, char ** argv)
