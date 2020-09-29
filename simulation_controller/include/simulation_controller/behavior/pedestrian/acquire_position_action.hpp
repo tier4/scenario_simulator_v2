@@ -6,7 +6,7 @@
 #include <simulation_controller/behavior/action_node.hpp>
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
 
-#include <geometry_msgs/Point.h>
+#include <geometry_msgs/msg/point.hpp>
 #include "behaviortree_cpp_v3/behavior_tree.h"
 #include "behaviortree_cpp_v3/bt_factory.h"
 
@@ -32,7 +32,7 @@ namespace entity_behavior
                     BT::InputPort<double>("step_time"),
                     BT::InputPort<boost::optional<double>>("target_speed"),
                     BT::InputPort<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>("pedestrian_parameters"),
-                    BT::OutputPort<std::vector<geometry_msgs::Point>>("trajectory"),
+                    BT::OutputPort<std::vector<geometry_msgs::msg::Point>>("trajectory"),
                     BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
                     BT::OutputPort<std::string>("request"),
 
@@ -41,7 +41,7 @@ namespace entity_behavior
             }
         private:
             boost::optional<simulation_controller::entity::EntityStatus> target_status_;
-            std::vector<geometry_msgs::Point> following_trajectory_;
+            std::vector<geometry_msgs::msg::Point> following_trajectory_;
             boost::optional<std::vector<int> > route_;
         };
     }  // namespace pedestrian

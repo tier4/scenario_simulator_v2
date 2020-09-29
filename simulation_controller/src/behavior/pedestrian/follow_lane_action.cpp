@@ -61,10 +61,10 @@ namespace entity_behavior
 
             if(entity_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD)
             {
-                geometry_msgs::Accel accel_new;
+                geometry_msgs::msg::Accel accel_new;
                 accel_new = entity_status.accel;
 
-                geometry_msgs::Twist twist_new;
+                geometry_msgs::msg::Twist twist_new;
                 twist_new.linear.x = entity_status.twist.linear.x + entity_status.accel.linear.x * step_time;
                 twist_new.linear.y = entity_status.twist.linear.y + entity_status.accel.linear.y * step_time;
                 twist_new.linear.z = entity_status.twist.linear.z + entity_status.accel.linear.z * step_time;
@@ -72,10 +72,10 @@ namespace entity_behavior
                 twist_new.angular.y = entity_status.twist.angular.y + entity_status.accel.angular.y * step_time;
                 twist_new.angular.z = entity_status.twist.angular.z + entity_status.accel.angular.z * step_time;
 
-                geometry_msgs::Pose pose_new;
-                geometry_msgs::Vector3 angular_trans_vec;
+                geometry_msgs::msg::Pose pose_new;
+                geometry_msgs::msg::Vector3 angular_trans_vec;
                 angular_trans_vec.z = twist_new.angular.z * step_time;
-                geometry_msgs::Quaternion angular_trans_quat =
+                geometry_msgs::msg::Quaternion angular_trans_quat =
                 quaternion_operation::convertEulerAngleToQuaternion(angular_trans_vec);
                 pose_new.orientation =
                     quaternion_operation::rotation(entity_status.pose.orientation, angular_trans_quat);
@@ -100,9 +100,9 @@ namespace entity_behavior
                 {
                     target_speed = hdmap_utils_ptr->getSpeedLimit(following_lanelets);
                 }
-                std::vector<geometry_msgs::Point> following_trajectory;
+                std::vector<geometry_msgs::msg::Point> following_trajectory;
                 following_trajectory = hdmap_utils_ptr->clipTrajectoryFromLaneletIds(entity_status.lanelet_id,entity_status.s,following_lanelets);
-                geometry_msgs::Accel accel_new;
+                geometry_msgs::msg::Accel accel_new;
                 accel_new = entity_status.accel;
                 
                 double target_accel = (target_speed.get() - entity_status.twist.linear.x) / step_time;
@@ -117,7 +117,7 @@ namespace entity_behavior
                     //target_accel = boost::algorithm::clamp(target_accel, -1*vehicle_param_ptr->performance.max_deceleration, vehicle_param_ptr->performance.max_acceleration);
                 }
                 accel_new.linear.x = target_accel;
-                geometry_msgs::Twist twist_new;
+                geometry_msgs::msg::Twist twist_new;
                 twist_new.linear.x = boost::algorithm::clamp(entity_status.twist.linear.x + accel_new.linear.x * step_time,
                     0, 5.0);
                 twist_new.linear.y = 0.0;
@@ -127,7 +127,7 @@ namespace entity_behavior
                 twist_new.angular.z = 0.0;
                 
                 double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 * step_time;
-                geometry_msgs::Vector3 rpy = entity_status.rpy;
+                geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
                 simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time, 
                     entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
                 setOutput("updated_status", entity_status_updated);

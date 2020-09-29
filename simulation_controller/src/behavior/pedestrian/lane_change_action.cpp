@@ -86,7 +86,7 @@ namespace entity_behavior
                 current_s_ = current_s_ + current_linear_vel * step_time;
                 if(current_s_ < curve_->getLength())
                 {
-                    geometry_msgs::Pose pose = curve_->getPose(current_s_, true);
+                    geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
                     simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time, pose, entity_status.twist, entity_status.accel);
                     setOutput("updated_status", entity_status_updated);
                     return BT::NodeStatus::RUNNING;
@@ -96,7 +96,7 @@ namespace entity_behavior
                     double s = (current_s_ - curve_->getLength()) + target_s_;
                     curve_ = boost::none;
                     current_s_ = 0;
-                    geometry_msgs::Vector3 rpy;
+                    geometry_msgs::msg::Vector3 rpy;
                     rpy.x = 0;
                     rpy.y = 0;
                     rpy.z = 0;

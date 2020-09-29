@@ -36,7 +36,7 @@ namespace entity_behavior
                     BT::InputPort<double>("current_time"),
                     BT::InputPort<double>("step_time"),
                     BT::InputPort<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>("pedestrian_parameters"),
-                    BT::OutputPort<std::vector<geometry_msgs::Point>>("trajectory"),
+                    BT::OutputPort<std::vector<geometry_msgs::msg::Point>>("trajectory"),
                     BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
                     
                     BT::InputPort<LaneChangeParameter>("lane_change_params")

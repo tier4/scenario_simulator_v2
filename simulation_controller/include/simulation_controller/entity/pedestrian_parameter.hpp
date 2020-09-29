@@ -4,7 +4,7 @@
 // headers in pugixml
 #include "pugixml.hpp"
 
-#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/msg/vector3.hpp>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -13,7 +13,7 @@
 
 #include <string>
 #include <sstream>
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace simulation_controller
 {
@@ -22,8 +22,9 @@ namespace simulation_controller
         struct PedestrianParameters
         {
             PedestrianParameters(const pugi::xml_node & xml) :
-                bounding_box(xml.child("Pedestrian")), name(xml.child("Pedestrian").attribute("name").as_string()),
-                pedestrian_categoly(xml.child("Pedestrian").attribute("pedestrianCategory").as_string())
+                name(xml.child("Pedestrian").attribute("name").as_string()),
+                pedestrian_categoly(xml.child("Pedestrian").attribute("pedestrianCategory").as_string()),
+                bounding_box(xml.child("Pedestrian"))
                 {};
             PedestrianParameters(std::string name, 
                 std::string pedestrian_categoly, BoundingBox bounding_box)
