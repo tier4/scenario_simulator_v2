@@ -41,9 +41,9 @@ struct TransitionDynamics
 
   template<typename Node, typename Scope>
   explicit TransitionDynamics(const Node & node, Scope & scope)
-  : dynamics_shape{readAttribute<DynamicsShape>(node, scope, "dynamicsShape")},
-    value{readAttribute<Double>(node, scope, "value")},
-    dynamics_dimension{readAttribute<DynamicsDimension>(node, scope, "dynamicsDimension")}
+  : dynamics_shape{readAttribute<DynamicsShape>("dynamicsShape", node, scope)},
+    value{readAttribute<Double>("value", node, scope)},
+    dynamics_dimension{readAttribute<DynamicsDimension>("dynamicsDimension", node, scope)}
   {}
 };
 }

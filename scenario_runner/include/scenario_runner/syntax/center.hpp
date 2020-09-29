@@ -39,9 +39,9 @@ struct Center
 
   template<typename Node, typename Scope>
   explicit Center(const Node & node, Scope & scope)
-  : x{readAttribute<Double>(node, scope, "x")},
-    y{readAttribute<Double>(node, scope, "y")},
-    z{readAttribute<Double>(node, scope, "z")}
+  : x{readAttribute<Double>("x", node, scope)},
+    y{readAttribute<Double>("y", node, scope)},
+    z{readAttribute<Double>("z", node, scope)}
   {}
 };
 

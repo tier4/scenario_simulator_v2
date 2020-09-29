@@ -12,17 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP_
-#define SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
 
-#include <scenario_runner/validator/all.hpp>
+#include <scenario_runner/type_traits/void_t.hpp>
 
 namespace scenario_runner
 {
-inline namespace validator
+inline namespace type_traits
 {
-using Sequence = All;   // XXX Temporary
-}
+template<typename T, typename = void>
+struct HasMemberFunctionAccomplished
+  : public std::false_type
+{};
+
+template<typename T>
+struct HasMemberFunctionAccomplished<T, void_t<decltype(std::declval<T>().accomplished())>>
+  : public std::true_type
+{};
+}  // inline namespace type_traits
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__VALIDATOR__SEQUENCE_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_

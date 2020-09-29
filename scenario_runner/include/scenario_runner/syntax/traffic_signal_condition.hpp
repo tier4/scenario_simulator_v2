@@ -37,14 +37,9 @@ struct TrafficSignalCondition
 
   template<typename Node, typename Scope>
   explicit TrafficSignalCondition(const Node & node, Scope & scope)
-  : name{readAttribute<String>(node, scope, "name")},
-    state{readAttribute<String>(node, scope, "state")}
+  : name{readAttribute<String>("name", node, scope)},
+    state{readAttribute<String>("state", node, scope)}
   {}
-
-  auto evaluate() const noexcept
-  {
-    return unspecified;
-  }
 };
 }
 }  // namespace scenario_runner

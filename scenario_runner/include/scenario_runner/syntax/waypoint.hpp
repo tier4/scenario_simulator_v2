@@ -35,24 +35,18 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Waypoint
-  : public Sequence
 {
   const RouteStrategy route_strategy;
 
-  template<typename Node, typename ... Ts>
-  explicit Waypoint(const Node & node, Ts && ... xs)
-  : route_strategy{readRequiredAttribute<std::decay<decltype(route_strategy)>::type>(node,
-        "routeStrategy")}
-  {
-    defineElement<Position>("Position");
+  const Position position;
 
-    validate(node, std::forward<decltype(xs)>(xs)...);
-  }
-
-  auto evaluate() const noexcept
-  {
-    return unspecified;
-  }
+  template<typename Node, typename Scope>
+  explicit Waypoint(const Node & node, Scope & outer_scope)
+  : route_strategy{
+      readAttribute<RouteStrategy>("routeStrategy", node, outer_scope)},
+    position{
+      readElement<Position>("Position", node, outer_scope)}
+  {}
 };
 }
 }  // namespace scenario_runner

@@ -20,6 +20,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace scenario_runner
 {
@@ -38,26 +39,34 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Route
-  : public Sequence
 {
-  const std::string name;
+  const String name;
 
   const Boolean closed;
 
-  template<typename Node, typename ... Ts>
-  explicit Route(const Node & node, Ts && ... xs)
-  : name{readRequiredAttribute<std::decay<decltype(name)>::type>(node, "name")},
-    closed{readUnsupportedAttribute<std::decay<decltype(closed)>::type>(node, "closed", Boolean())}
-  {
-    defineElement<ParameterDeclarations>("ParameterDeclarations", 0, 1);
-    defineElement<Waypoint>("Waypoint", 2, unbounded);
+  Scope inner_scope;
 
-    validate(node, std::forward<decltype(xs)>(xs)...);
-  }
+  std::vector<Waypoint> waypoints;
 
-  auto evaluate() const noexcept
+  template<typename Node, typename Scope>
+  explicit Route(const Node & node, Scope & outer_scope)
+  : name{readAttribute<String>("name", node, outer_scope)},
+    closed{readAttribute<Boolean>("closed", node, outer_scope, Boolean())},
+    inner_scope{outer_scope}
   {
-    return unspecified;
+    callWithElements(
+      node, "ParameterDeclarations", 0, 1,
+      [&](auto && node)
+      {
+        return ParameterDeclarations(node, inner_scope);
+      });
+
+    callWithElements(
+      node, "Waypoint", 2, unbounded,
+      [&](auto && node)
+      {
+        return waypoints.emplace_back(node, inner_scope);
+      });
   }
 };
 }

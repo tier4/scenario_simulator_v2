@@ -21,7 +21,7 @@ namespace scenario_runner
 {
 inline namespace syntax
 {
-/* ==== StoryboardElementType ================================================
+/* ==== StoryboardElementType ==================================================
  *
  * <xsd:simpleType name="StoryboardElementType">
  *   <xsd:union>
@@ -41,7 +41,7 @@ inline namespace syntax
  *   </xsd:union>
  * </xsd:simpleType>
  *
- * ======================================================================== */
+ * ========================================================================== */
 struct StoryboardElementType
 {
   enum value_type

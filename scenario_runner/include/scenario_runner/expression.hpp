@@ -28,7 +28,7 @@ struct Expression
 
   virtual std::ostream & write(std::ostream & os) const
   {
-    return IfOutputStreamable<Expression>::invoke(os, *this);
+    return IfHasStreamOutputOperator<Expression>::applyIt(os, *this);
   }
 
   virtual Pointer<Expression> evaluate(const Pointer<Expression> &)
@@ -43,7 +43,7 @@ struct Expression
     return false;
   }
 
-  virtual const Pointer<Expression> & currentState() const
+  virtual const Pointer<Expression> & state() const
   {
     std::stringstream ss {};
     ss << "class Expression is not stateful";

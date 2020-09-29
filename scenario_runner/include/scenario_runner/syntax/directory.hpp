@@ -34,7 +34,7 @@ struct Directory
 
   template<typename Node, typename Scope>
   explicit Directory(const Node & node, Scope & outer_scope)
-  : path{readAttribute<String>(node, outer_scope, "path")}
+  : path{readAttribute<String>("path", node, outer_scope)}
   {}
 };
 }

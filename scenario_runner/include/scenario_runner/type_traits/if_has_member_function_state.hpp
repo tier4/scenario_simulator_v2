@@ -12,37 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_STATEFUL_HPP_
-#define SCENARIO_RUNNER__TYPE_TRAITS__IF_STATEFUL_HPP_
+#ifndef SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
+#define SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
 
-#include <scenario_runner/concepts/stateful.hpp>
+#include <scenario_runner/type_traits/has_member_function_state.hpp>
+
+#include <sstream>
 
 namespace scenario_runner
 {
 inline namespace type_traits
 {
 template<typename T, typename = void>
-struct IfStateful
+struct IfHasMemberFunctionState
 {
   template<typename Result>
-  static const Result & currentState(const T &)
+  static const Result & callIt(const T &)
   {
     std::stringstream ss {};
-    ss << "class " << typeid(T).name() << " is not stateful";
+    ss << "class " << typeid(T).name() << " is not has member function 'state'";
     throw ImplementationFault {ss.str()};
   }
 };
 
 template<typename T>
-struct IfStateful<T, typename std::enable_if<Stateful<T>::value>::type>
+struct IfHasMemberFunctionState<T, typename std::enable_if<HasMemberFunctionState<T>::value>::type>
 {
   template<typename Result>
-  static const Result & currentState(const T & callee)
+  static const Result & callIt(const T & callee)
   {
-    return callee.currentState();
+    return callee.state();
   }
 };
 }
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_STATEFUL_HPP_
+#endif  // SCENARIO_RUNNER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_

@@ -41,7 +41,7 @@ struct CustomCommandAction
 
   template<typename Node, typename Scope>
   explicit CustomCommandAction(const Node & node, Scope & scope)
-  : command{readAttribute<Command>(node, scope, "type")},
+  : command{readAttribute<Command>("type", node, scope)},
     content{readContent<String>(node, scope)}
   {}
 

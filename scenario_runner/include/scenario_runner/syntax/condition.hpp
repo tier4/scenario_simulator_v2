@@ -47,16 +47,18 @@ struct Condition
 
   template<typename Node, typename Scope>
   explicit Condition(const Node & node, Scope & scope)
-  : name{readAttribute<String>(node, scope, "name")},
-    delay{readAttribute<Double>(node, scope, "delay", Double())},
-    condition_edge{readAttribute<ConditionEdge>(node, scope, "conditionEdge")}
+  : name{readAttribute<String>("name", node, scope)},
+    delay{readAttribute<Double>("delay", node, scope, Double())},
+    condition_edge{readAttribute<ConditionEdge>("conditionEdge", node, scope)}
   {
-    callWithElements(node, "ByEntityCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "ByEntityCondition", 0, 1, [&](auto && node)
       {
         return rebind<ByEntityCondition>(node, scope);
       });
 
-    callWithElements(node, "ByValueCondition", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "ByValueCondition", 0, 1, [&](auto && node)
       {
         return rebind<ByValueCondition>(node, scope);
       });

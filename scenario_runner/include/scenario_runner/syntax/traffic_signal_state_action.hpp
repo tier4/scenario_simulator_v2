@@ -15,7 +15,7 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 #define SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 
-#include <scenario_runner/validator/attribute.hpp>
+#include <scenario_runner/reader/attribute.hpp>
 
 #include <string>
 
@@ -33,19 +33,15 @@ inline namespace syntax
  * ======================================================================== */
 struct TrafficSignalStateAction
 {
-  const std::string name;
-  const std::string state;
+  const String name;
 
-  template<typename Node, typename ... Ts>
-  explicit TrafficSignalStateAction(const Node & node, Ts && ...)
-  : name{readRequiredAttribute<std::string>(node, "name")},
-    state{readRequiredAttribute<std::string>(node, "state")}
+  const String state;
+
+  template<typename Node, typename Scope>
+  explicit TrafficSignalStateAction(const Node & node, Scope & scope)
+  : name{readAttribute<String>("name", node, scope)},
+    state{readAttribute<String>("state", node, scope)}
   {}
-
-  auto evaluate() const noexcept
-  {
-    return unspecified;
-  }
 };
 }
 }  // namespace scenario_runner

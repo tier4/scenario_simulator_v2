@@ -42,9 +42,10 @@ struct TriggeringEntities
 
   template<typename Node, typename Scope>
   explicit TriggeringEntities(const Node & node, Scope & scope)
-  : verify{readAttribute<TriggeringEntitiesRule>(node, scope, "triggeringEntitiesRule")}
+  : verify{readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)}
   {
-    callWithElements(node, "EntityRef", 1, unbounded, [&](auto && node)
+    callWithElements(
+      node, "EntityRef", 1, unbounded, [&](auto && node)
       {
         emplace_back(node, scope);
       });

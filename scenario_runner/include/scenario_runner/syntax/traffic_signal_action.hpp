@@ -15,8 +15,8 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_
 #define SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_
 
+#include <scenario_runner/reader/element.hpp>
 #include <scenario_runner/syntax/traffic_signal_state_action.hpp>
-#include <scenario_runner/validator/choice.hpp>
 
 #include <utility>
 
@@ -35,23 +35,15 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct TrafficSignalAction
-  : public Choice
 {
-  template<typename Node, typename ... Ts>
-  explicit TrafficSignalAction(const Node & node, Ts && ... xs)
+  template<typename Node, typename Scope>
+  explicit TrafficSignalAction(const Node & node, Scope & scope)
   {
-    defineElementAsUnsupported("TrafficSignalControllerAction", 0, 1);
-    defineElement<TrafficSignalStateAction>("TrafficSignalStateAction", 0, 1);
-
-    validate(node, std::forward<decltype(xs)>(xs)...);
-  }
-
-  auto evaluate() const noexcept
-  {
-    return unspecified;
+    callWithElements(node, "TrafficSignalControllerAction", 0, 1, [](auto &&) {});
+    callWithElements(node, "TrafficSignalStateAction", 0, 1, THROW_UNSUPPORTED__ERROR(node));
   }
 };
-}
+}  // inline namespace syntax
 }  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_

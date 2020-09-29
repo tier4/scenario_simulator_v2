@@ -15,6 +15,8 @@
 #ifndef SCENARIO_RUNNER__UTILITY__HIGHLIGHTER_HPP_
 #define SCENARIO_RUNNER__UTILITY__HIGHLIGHTER_HPP_
 
+#include <scenario_runner/type_traits/has_stream_output_operator.hpp>
+
 #include <iostream>
 #include <string>
 #include <utility>
@@ -41,7 +43,7 @@ decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const AttributeHighlight
 }
 
 template<typename T,
-  typename = typename std::enable_if<OutputStreamable<T>::value>::type>
+  typename = typename std::enable_if<HasStreamOutputOperator<T>::value>::type>
 auto highlight(const std::string & name, const T & value)
 {
   return AttributeHighlighter {name, boost::lexical_cast<std::string>(value)};

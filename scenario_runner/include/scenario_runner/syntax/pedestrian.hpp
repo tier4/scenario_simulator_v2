@@ -59,13 +59,14 @@ struct Pedestrian
 
   template<typename Node, typename Scope>
   explicit Pedestrian(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>(node, outer_scope, "name")},
-    mass{readAttribute<Double>(node, outer_scope, "mass")},
-    model{readAttribute<String>(node, outer_scope, "model")},
-    pedestrian_category{readAttribute<PedestrianCategory>(node, outer_scope, "pedestrianCategory")},
+  : name{readAttribute<String>("name", node, outer_scope)},
+    mass{readAttribute<Double>("mass", node, outer_scope)},
+    model{readAttribute<String>("model", node, outer_scope)},
+    pedestrian_category{
+      readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)},
     inner_scope{outer_scope},
-    parameter_declarations{readElement<ParameterDeclarations>("ParameterDeclarations", node,
-        inner_scope)},
+    parameter_declarations{
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)},
     bounding_box{readElement<BoundingBox>("BoundingBox", node, inner_scope)},
     properties{readElement<Properties>("Properties", node, inner_scope)}
   {}

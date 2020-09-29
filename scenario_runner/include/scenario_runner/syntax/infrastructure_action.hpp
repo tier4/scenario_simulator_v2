@@ -33,22 +33,20 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct InfrastructureAction
-  : public All
+  : public Object
 {
-  template<typename Node, typename ... Ts>
-  explicit InfrastructureAction(const Node & node, Ts && ... xs)
+  template<typename Node, typename Scope>
+  explicit InfrastructureAction(const Node & node, Scope & outer_scope)
   {
-    defineElement<TrafficSignalAction>("TrafficSignalAction");
-
-    validate(node, std::forward<decltype(xs)>(xs)...);
-  }
-
-  auto evaluate() const noexcept
-  {
-    return unspecified;
+    callWithElements(
+      node, "TrafficSignalAction", 1, 1,
+      [&](auto)
+      {
+        return rebind<TrafficSignalAction>(node, outer_scope);
+      });
   }
 };
-}
+}  // inline namespace syntax
 }  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__SYNTAX__INFRASTRUCTURE_ACTION_HPP_

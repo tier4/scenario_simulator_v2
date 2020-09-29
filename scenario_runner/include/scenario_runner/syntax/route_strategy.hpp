@@ -42,19 +42,32 @@ inline namespace syntax
  * </xsd:simpleType>
  *
  * ======================================================================== */
-enum class RouteStrategy
+struct RouteStrategy
 {
-  // Fastest route.
-  fastest,
+  enum value_type
+  {
+    // Fastest route.
+    fastest,
 
-  // Shortest route.
-  shortest,
+    // Shortest route.
+    shortest,
 
-  // Route with least number of intersections.
-  leastIntersections,
+    // Route with least number of intersections.
+    leastIntersections,
 
-  // Random route.
-  random,
+    // Random route.
+    random,
+  }
+  value;
+
+  explicit constexpr RouteStrategy(value_type value = {})
+  : value{value}
+  {}
+
+  constexpr operator value_type() const noexcept
+  {
+    return value;
+  }
 };
 
 template<typename ... Ts>
@@ -66,7 +79,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RouteStra
 
   #define SUPPORTED(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
-    strategy = RouteStrategy::IDENTIFIER; \
+    strategy.value = RouteStrategy::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
@@ -112,7 +125,7 @@ std::basic_ostream<Ts...> & operator<<(
     default:
       std::stringstream ss {};
       ss << "enum class RouteStrategy holds unexpected value " <<
-        static_cast<std::underlying_type<RouteStrategy>::type>(strategy);
+        static_cast<RouteStrategy::value_type>(strategy);
       throw ImplementationFault {ss.str()};
   }
 }

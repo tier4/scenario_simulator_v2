@@ -41,15 +41,15 @@ struct Axle
 
   template<typename Node, typename Scope>
   explicit Axle(const Node & node, Scope & scope)
-  : max_steering{readAttribute<Double>(node, scope, "maxSteering")},
-    wheel_diameter{readAttribute<Double>(node, scope, "wheelDiameter")},
-    track_width{readAttribute<Double>(node, scope, "trackWidth")},
-    position_x{readAttribute<Double>(node, scope, "positionX")},
-    position_z{readAttribute<Double>(node, scope, "positionZ")}
+  : max_steering{readAttribute<Double>("maxSteering", node, scope)},
+    wheel_diameter{readAttribute<Double>("wheelDiameter", node, scope)},
+    track_width{readAttribute<Double>("trackWidth", node, scope)},
+    position_x{readAttribute<Double>("positionX", node, scope)},
+    position_z{readAttribute<Double>("positionZ", node, scope)}
   {}
 };
 
-  #define BOILERPLATE(TYPENAME) \
+#define BOILERPLATE(TYPENAME) \
   template<typename ... Ts> \
   std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const TYPENAME & rhs) \
   { \
