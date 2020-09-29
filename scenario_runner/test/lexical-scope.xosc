@@ -22,41 +22,59 @@
       <Actions/>
     </Init>
 
-    <Story name="hoge">
+    <Story name="A">
       <ParameterDeclarations>
         <ParameterDeclaration name="x" parameterType="double" value="2"/>
       </ParameterDeclarations>
 
-      <Act name="hoge">
-        <ManeuverGroup name="hoge">
+      <Act name="A">
+        <ManeuverGroup name="A">
           <Actors>
-            <EntityRef entityRef="hoge"/>
+            <EntityRef entityRef="A"/>
           </Actors>
-
-          <Maneuver name="hoge">
+          <Maneuver name="A">
             <ParameterDeclarations>
               <ParameterDeclaration name="x" parameterType="double" value="$x"/>
             </ParameterDeclarations>
-
-            <Event name="hoge" priority="overwrite">
-              <Action name="hoge">
+            <Event name="A" priority="overwrite">
+              <Action name="A">
                 <UserDefinedAction>
                   <CustomCommandAction type="print"> Event started! </CustomCommandAction>
                 </UserDefinedAction>
               </Action>
-
               <StartTrigger/>
             </Event>
           </Maneuver>
         </ManeuverGroup>
+        <StartTrigger/>
+      </Act>
 
+      <Act name="B">
+        <ManeuverGroup name="A">
+          <Actors>
+            <EntityRef entityRef="A"/>
+          </Actors>
+          <Maneuver name="A">
+            <ParameterDeclarations>
+              <ParameterDeclaration name="x" parameterType="double" value="$x"/>
+            </ParameterDeclarations>
+            <Event name="A" priority="overwrite">
+              <Action name="A">
+                <UserDefinedAction>
+                  <CustomCommandAction type="print"> Event started! </CustomCommandAction>
+                </UserDefinedAction>
+              </Action>
+              <StartTrigger/>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
         <StartTrigger/>
       </Act>
     </Story>
 
     <StopTrigger>
       <ConditionGroup>
-        <Condition name="hoge" conditionEdge="none">
+        <Condition name="A" conditionEdge="none">
           <ByValueCondition>
             <SimulationTimeCondition value="3" rule="greaterThan"/>
           </ByValueCondition>

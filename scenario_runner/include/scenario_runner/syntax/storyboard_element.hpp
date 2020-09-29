@@ -129,8 +129,9 @@ protected:
 
   std::unordered_set<std::string> names;
 
-  auto unique()
+  auto unique(const std::string & name)
   {
+    return cdr(names.emplace(name));
   }
 
   template<typename U, typename Node, typename Scope>
@@ -140,11 +141,12 @@ protected:
       rename(readAttribute<String>("name", node, inner_scope))
     };
 
-    if (cdr(names.emplace(name))) {
+    if (unique(name)) {
       return inner_scope.storyboard_elements[name] = make<U>(node, inner_scope);
     } else {
       std::stringstream ss {};
-      ss << "detected redefinition of StoryboardElement named \'" << name << "\'";
+      ss << "detected redefinition of StoryboardElement named \'" << name << "\' (class " <<
+        typeid(U).name() << ")";
       throw SyntaxError {ss.str()};
     }
   }
