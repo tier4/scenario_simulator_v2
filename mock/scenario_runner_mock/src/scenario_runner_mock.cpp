@@ -1,4 +1,4 @@
-// Copyright 2016 Open Source Robotics Foundation, Inc.
+// Copyright 2015-2020 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public:
 
   void run()
   {
-    while (count_ < 3) {
+    while (count_ < 5) {
       RCLCPP_INFO(get_logger(), "scenario runner running");
       RCLCPP_INFO(get_logger(), "count %d", count_);
       std::this_thread::sleep_for(1s);
