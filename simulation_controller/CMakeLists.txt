@@ -17,6 +17,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -40,7 +41,7 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
-add_library(simulation_controller
+add_library(entity_manager SHARED
   src/hdmap_utils/hdmap_utils.cpp
   src/math/hermite_curve.cpp
   src/entity/entity_status.cpp
@@ -60,8 +61,9 @@ add_library(simulation_controller
   src/behavior/pedestrian/lane_change_action.cpp
   src/color_utils/color_utils.cpp
 )
-ament_target_dependencies(simulation_controller
+ament_target_dependencies(entity_manager
   rclcpp
+  rclcpp_components
   geometry_msgs
   quaternion_operation
   autoware_auto_msgs
@@ -73,6 +75,14 @@ ament_target_dependencies(simulation_controller
   spline_interpolation
   ament_index_cpp
 )
+rclcpp_components_register_nodes(entity_manager
+  "simulation_controller::entity::EntityManager")
+install(TARGETS
+  entity_manager
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+ament_export_libraries(entity_manager)
 
 #add_library(simulation_controller
   #src/api/api.cpp

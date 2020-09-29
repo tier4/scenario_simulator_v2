@@ -2,6 +2,7 @@
 
 #include <tf2/convert.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <rclcpp_components/register_node_macro.hpp>
 
 namespace simulation_controller
 {
@@ -538,3 +539,5 @@ namespace simulation_controller
         }
     }  // namespace entity
 }  // namespace simulation_controller
+
+RCLCPP_COMPONENTS_REGISTER_NODE(simulation_controller::entity::EntityManager)

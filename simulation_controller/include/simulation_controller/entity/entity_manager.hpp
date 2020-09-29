@@ -21,6 +21,42 @@
 #include <map>
 #include <memory>
 
+#if __cplusplus
+extern "C" {
+#endif
+// The below macros are taken from https://gcc.gnu.org/wiki/Visibility and from
+// demos/composition/include/composition/visibility_control.h at https://github.com/ros2/demos
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef __GNUC__
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_EXPORT __attribute__((dllexport))
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_IMPORT __attribute__((dllimport))
+#else
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_EXPORT __declspec(dllexport)
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_IMPORT __declspec(dllimport)
+#endif
+#ifdef SIMULATION_CONTROLLER_ENTITY_MANAGER_BUILDING_DLL
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC SIMULATION_CONTROLLER_ENTITY_MANAGER_EXPORT
+#else
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC SIMULATION_CONTROLLER_ENTITY_MANAGER_IMPORT
+#endif
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC_TYPE SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_LOCAL
+#else
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_EXPORT __attribute__((visibility("default")))
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_IMPORT
+#if __GNUC__ >= 4
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC __attribute__((visibility("default")))
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_LOCAL __attribute__((visibility("hidden")))
+#else
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_LOCAL
+#endif
+#define SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC_TYPE
+#endif
+#if __cplusplus
+}  // extern "C"
+#endif
+
 namespace simulation_controller
 {
     namespace entity
@@ -31,6 +67,8 @@ namespace simulation_controller
             std::map<std::string, boost::any> entities_;
             std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
         public:
+            SIMULATION_CONTROLLER_ENTITY_MANAGER_PUBLIC
+            explicit EntityManager(const rclcpp::NodeOptions & options);
             void setVerbose(bool verbose);
             void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
             void requestLaneChange(std::string name, int to_lanelet_id);
@@ -40,7 +78,6 @@ namespace simulation_controller
             geometry_msgs::msg::Pose getRelativePose(std::string from, geometry_msgs::msg::Pose to);
             geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, std::string to);
             geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, geometry_msgs::msg::Pose to) const;
-            explicit EntityManager(const rclcpp::NodeOptions & options);
             boost::optional<VehicleParameters> getVehicleParameters(std::string name);
             std::vector<std::string> getEntityNames();
             std::vector<std::string> getVehicleEntityNames();
