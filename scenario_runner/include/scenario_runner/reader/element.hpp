@@ -165,15 +165,6 @@ decltype(auto) callWithElement(const pugi::xml_node & parent, const std::string 
 {
   return callWithElements(parent, name, 1, 1, std::forward<decltype(call_with)>(call_with));
 }
-
-  #define THROW_UNSUPPORTED_ERROR(PARENT) \
-  [&](auto && child) \
-  { \
-    std::stringstream ss {}; \
-    ss << "given class \'" << child.name() << "\' (element of class \'" << PARENT.name() << \
-      "\') is valid OpenSCENARIO element, but is not supported"; \
-    throw SyntaxError(ss.str()); \
-  }
 }
 }  // namespace scenario_runner
 

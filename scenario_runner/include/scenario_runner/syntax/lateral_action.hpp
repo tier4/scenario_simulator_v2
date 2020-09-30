@@ -17,6 +17,8 @@
 
 #include <scenario_runner/syntax/lane_change_action.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -37,15 +39,15 @@ struct LateralAction
 {
   template<typename Node, typename Scope>
   explicit LateralAction(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "LaneChangeAction", 0, 1, [&](auto && node)
-      {
-        return rebind<LaneChangeAction>(node, scope);
-      });
-
-    callWithElements(node, "LaneOffsetAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "LateralDistanceAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  : Element(
+      choice(
+        node,
+        std::make_pair("LaneChangeAction", [&](auto && node) {
+          return make<LaneChangeAction>(node, scope);
+        }),
+        std::make_pair("LaneOffsetAction", UNSUPPORTED()),
+        std::make_pair("LateralDistanceAction", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

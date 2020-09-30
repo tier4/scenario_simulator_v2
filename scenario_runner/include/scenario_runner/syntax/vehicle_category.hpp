@@ -82,21 +82,21 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
 
   is >> buffer;
 
-  #define SUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     category.value = VehicleCategory::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
-  SUPPORTED(bicycle);
-  SUPPORTED(bus);
-  SUPPORTED(car);
-  SUPPORTED(motorbike);
-  SUPPORTED(truck);
+  BOILERPLATE(bicycle);
+  BOILERPLATE(bus);
+  BOILERPLATE(car);
+  BOILERPLATE(motorbike);
+  BOILERPLATE(truck);
 
-    #undef SUPPORTED
+  #undef BOILERPLATE
 
-  #define UNSUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     std::stringstream ss { \
     }; \
@@ -105,13 +105,13 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
     throw ImplementationFault {ss.str()}; \
   } static_assert(true, "")
 
-  UNSUPPORTED(semitrailer);
-  UNSUPPORTED(trailer);
-  UNSUPPORTED(train);
-  UNSUPPORTED(tram);
-  UNSUPPORTED(van);
+  BOILERPLATE(semitrailer);
+  BOILERPLATE(trailer);
+  BOILERPLATE(train);
+  BOILERPLATE(tram);
+  BOILERPLATE(van);
 
-  #undef UNSUPPORTED
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type VehicleCategory";

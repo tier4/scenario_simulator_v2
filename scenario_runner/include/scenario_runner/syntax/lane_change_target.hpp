@@ -38,15 +38,14 @@ struct LaneChangeTarget
 {
   template<typename Node, typename ... Ts>
   explicit LaneChangeTarget(const Node & node, Ts && ... xs)
-  {
-    callWithElements(node, "RelativeTargetLane", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "AbsoluteTargetLane", 0, 1, [&](auto && node)
-      {
-        return rebind<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...);
-      });
-  }
+  : Element(
+      choice(
+        node,
+        std::make_pair("RelativeTargetLane", UNSUPPORTED()),
+        std::make_pair("AbsoluteTargetLane", [&](auto && node) {
+          return make<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...);
+        })))
+  {}
 };
 }
 }  // namespace scenario_runner

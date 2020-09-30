@@ -44,7 +44,7 @@ struct Entities
         make<ScenarioObject>(node, scope));
       });
 
-    callWithElements(node, "EntitySelection", 0, unbounded, THROW_UNSUPPORTED_ERROR(node));
+    callWithElements(node, "EntitySelection", 0, unbounded, UNSUPPORTED());
   }
 };
 }

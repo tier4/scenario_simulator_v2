@@ -18,6 +18,8 @@
 #include <scenario_runner/syntax/lane_position.hpp>
 #include <scenario_runner/syntax/world_position.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -41,27 +43,24 @@ inline namespace syntax
 struct Position
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit Position(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "WorldPosition", 0, 1, [&](auto && node)
-      {
-        return rebind<WorldPosition>(node, scope);
-      });
-
-    callWithElements(node, "RelativeWorldPosition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "RelativeObjectPosition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "RoadPosition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "RelativeRoadPosition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(node, "LanePosition", 0, 1, [&](auto && node)
-      {
-        return rebind<LanePosition>(node, scope);
-      });
-
-    callWithElements(node, "RelativeLanePosition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "RoutePosition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  template<typename Node, typename ... Ts>
+  explicit Position(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("WorldPosition", [&](auto && node) {
+          return make<WorldPosition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("RelativeWorldPosition", UNSUPPORTED()),
+        std::make_pair("RelativeObjectPosition", UNSUPPORTED()),
+        std::make_pair("RoadPosition", UNSUPPORTED()),
+        std::make_pair("RelativeRoadPosition", UNSUPPORTED()),
+        std::make_pair("LanePosition", [&](auto && node) {
+          return make<LanePosition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("RelativeLanePosition", UNSUPPORTED()),
+        std::make_pair("RoutePosition", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

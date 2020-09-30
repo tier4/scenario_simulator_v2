@@ -18,6 +18,8 @@
 #include <scenario_runner/syntax/acquire_position_action.hpp>
 #include <scenario_runner/syntax/assign_route_action.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -36,24 +38,19 @@ inline namespace syntax
 struct RoutingAction
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit RoutingAction(const Node & node, Scope & outer_scope)
-  {
-    callWithElements(
-      node, "AssignRouteAction", 0, 1, [&](auto && node)
-      {
-        return rebind<AssignRouteAction>(node, outer_scope);
-      });
-
-    callWithElements(
-      node, "FollowTrajectoryAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "AcquirePositionAction", 0, 1, [&](auto && node)
-      {
-        return rebind<AcquirePositionAction>(node, outer_scope);
-      });
-  }
+  template<typename Node, typename ... Ts>
+  explicit RoutingAction(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("AssignRouteAction", [&](auto && node) {
+          return make<AssignRouteAction>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("FollowTrajectoryAction", UNSUPPORTED()),
+        std::make_pair("AcquirePositionAction", [&](auto && node) {
+          return make<AcquirePositionAction>(node, std::forward<decltype(xs)>(xs)...);
+        })))
+  {}
 };
 }
 }  // namespace scenario_runner

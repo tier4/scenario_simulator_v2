@@ -17,6 +17,8 @@
 
 #include <scenario_runner/syntax/infrastructure_action.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -37,15 +39,17 @@ inline namespace syntax
 struct GlobalAction
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit GlobalAction(const Node & node, Scope &)
-  {
-    callWithElements(node, "EnvironmentAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "EntityAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "ParameterAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "InfrastructureAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "TrafficAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  template<typename Node, typename ... Ts>
+  explicit GlobalAction(const Node & node, Ts && ...)
+  : Element(
+      choice(
+        node,
+        std::make_pair("EnvironmentAction", UNSUPPORTED()),
+        std::make_pair("EntityAction", UNSUPPORTED()),
+        std::make_pair("ParameterAction", UNSUPPORTED()),
+        std::make_pair("InfrastructureAction", UNSUPPORTED()),
+        std::make_pair("TrafficAction", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

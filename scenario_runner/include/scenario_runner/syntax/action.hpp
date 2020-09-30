@@ -48,39 +48,15 @@ struct Action
   : name{readAttribute<String>("name", node, scope)}
   {
     choice(node,
-
-      std::make_pair("GlobalAction", [&](auto && node)
-      {
+      std::make_pair("GlobalAction", [&](auto && node) {
         return rebind<GlobalAction>(node, scope);
       }),
-
-      std::make_pair("UserDefinedAction", [&](auto && node)
-      {
+      std::make_pair("UserDefinedAction", [&](auto && node) {
         return rebind<UserDefinedAction>(node, scope);
       }),
-
-      std::make_pair("PrivateAction", [&](auto && node)
-      {
+      std::make_pair("PrivateAction", [&](auto && node) {
         return rebind<PrivateAction>(node, scope);
       }));
-
-    // callWithElements(
-    //   node, "GlobalAction", 0, 1, [&](auto && node)
-    //   {
-    //     return rebind<GlobalAction>(node, scope);
-    //   });
-    //
-    // callWithElements(
-    //   node, "UserDefinedAction", 0, 1, [&](auto && node)
-    //   {
-    //     return rebind<UserDefinedAction>(node, scope);
-    //   });
-    //
-    // callWithElements(
-    //   node, "PrivateAction", 0, 1, [&](auto && node)
-    //   {
-    //     return rebind<PrivateAction>(node, scope);
-    //   });
   }
 
   auto ready() const

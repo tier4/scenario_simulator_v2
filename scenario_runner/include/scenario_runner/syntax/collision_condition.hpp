@@ -18,6 +18,8 @@
 #include <scenario_runner/syntax/entity_ref.hpp>
 #include <scenario_runner/syntax/triggering_entities.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -35,14 +37,16 @@ inline namespace syntax
 struct CollisionCondition
   : public Element
 {
-  EntityRef entity_ref;
-
   template<typename Node, typename Scope>
   explicit CollisionCondition(const Node & node, Scope & scope, const TriggeringEntities &)
-  : entity_ref{readElement<EntityRef>("EntityRef", node, scope)}
-  {
-    callWithElements(node, "ByType", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  : Element(
+      choice(
+        node,
+        std::make_pair("EntityRef", [&](auto && node) {
+          return make<EntityRef>(node, scope);
+        }),
+        std::make_pair("ByType", UNSUPPORTED())))
+  {}
 
   auto evaluate() const noexcept
   {
