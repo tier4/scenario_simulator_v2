@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ENTITY_BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP
-#define ENTITY_BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP
+#ifndef SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
+#define SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
 
 #include <simulation_controller/math/hermite_curve.hpp>
 #include <simulation_controller/entity/vehicle_parameter.hpp>
@@ -21,10 +21,13 @@
 #include <simulation_controller/behavior/action_node.hpp>
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
 
-#include "behaviortree_cpp_v3/behavior_tree.h"
-#include "behaviortree_cpp_v3/bt_factory.h"
+#include <behaviortree_cpp_v3/behavior_tree.h>
+#include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <boost/optional.hpp>
+#include <string>
+#include <memory>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -66,4 +69,4 @@ private:
 }      // namespace vehicle
 }  // namespace entity_behavior
 
-#endif  // ENTITY_BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP
+#endif  // SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_

@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ENTITY_BEHAVIOR__ACTION_NODE_H_INCLUDED
-#define ENTITY_BEHAVIOR__ACTION_NODE_H_INCLUDED
+#ifndef SIMULATION_CONTROLLER__BEHAVIOR__ACTION_NODE_HPP_
+#define SIMULATION_CONTROLLER__BEHAVIOR__ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
+#include <string>
 
 namespace entity_behavior
 {
 class BehaviorTreeRuntimeError : public std::runtime_error
 {
 public:
-  BehaviorTreeRuntimeError(const char * message)
+  explicit BehaviorTreeRuntimeError(const char * message)
   : runtime_error(message) {}
 };
 
@@ -43,4 +44,4 @@ public:
 };
 }  // namespace entity_behavior
 
-#endif  // ENTITY_BEHAVIOR__ACTION_NODE_H_INCLUDED
+#endif  // SIMULATION_CONTROLLER__BEHAVIOR__ACTION_NODE_HPP_
