@@ -20,12 +20,14 @@
  * @brief Preset Color names
  */
 
-#ifndef SIMULATION_CONTROLLER__COLOR_UTIL_HPP_
-#define SIMULATION_CONTROLLER__COLOR_UTIL_HPP_
+#ifndef SIMULATION_CONTROLLER__COLOR_UTILS__COLOR_UTILS_HPP_
+#define SIMULATION_CONTROLLER__COLOR_UTILS__COLOR_UTILS_HPP_
+
+#include <std_msgs/msg/color_rgba.hpp>
 
 #include <cassert>
 #include <map>
-#include <std_msgs/msg/color_rgba.hpp>
+#include <string>
 
 namespace color_utils
 {
@@ -35,9 +37,9 @@ std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha = 1.
    */
 std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha = 1.0);
 
-///@todo Read data from text data?
+/// @todo Read data from text data?
 const std::map<std::string, std::array<float, 3>> COLOR_NAME_DICT{
-  //{"COLOR_NAME", {R, G, B}} //template
+  // {"COLOR_NAME", {R, G, B}} // template
   {"aliceblue", {0.941176, 0.972549, 1}},
   {"antiquewhite", {0.980392, 0.921569, 0.843137}},
   {"aqua", {0, 1, 1}},
@@ -180,6 +182,6 @@ const std::map<std::string, std::array<float, 3>> COLOR_NAME_DICT{
   {"yellowgreen", {0.603922, 0.803922, 0.196078}},
   {"ERROR", {0, 0, 0}}};
 
-}  // namespace color_util
+}  // namespace color_utils
 
-#endif  // SIMULATION_CONTROLLER__COLOR_UTIL_HPP_
+#endif  // SIMULATION_CONTROLLER__COLOR_UTILS__COLOR_UTILS_HPP_
