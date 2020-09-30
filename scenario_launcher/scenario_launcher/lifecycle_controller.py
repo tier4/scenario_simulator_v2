@@ -21,52 +21,50 @@ from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from lifecycle_msgs.srv import GetState
 from rclpy.node import Node
-import time
 
 from scenario_common.logger import Logger
 
 
-class LifeCycleController(Node):
+class LifecycleController(Node):
+
+    NODE_NAME = "scenario_runner_mock"
+    STATES = {}
 
     def __init__(self):
+        rclpy.init(args=self.NODE_NAME)
         super().__init__("scenario_runner_mock")
         self.state = None
         self.node_logger = self.get_logger()
         self.client_get_state = self.create_client(
             GetState, 'scenario_runner_mock/get_state')
-
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_get_state.srv_name + ' service not available')
-
         self.client_change_state = self.create_client(
             ChangeState, "scenario_runner_mock/change_state")
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_change_state.srv_name + ' service not available')
-        self.activate_node()
 
-    def activate_node(self):
+    def configure_node(self):
         self.node_logger.info(self.get_lifecycle_state())
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
-        self.node_logger.info(self.get_lifecycle_state())
-        scenario = ["scenario1", "scenario2", "scenario3"]
-        for index, val in enumerate(scenario):
-            self.node_logger.info(val)
-            self.run_scenario()
-        self.set_lifecycle_state(Transition.TRANSITION_INACTIVE_SHUTDOWN)
-
+        Logger.print_info("scenario runner state is " +
+                          self.get_lifecycle_state())
         self.node_logger.info(self.get_lifecycle_state())
 
-        Logger.print_info("state is"+self.get_lifecycle_state())
-
-    def run_scenario(self):
-        # while(self.get_lifecycle_state())
-        self.node_logger.info(self.get_lifecycle_state())
+    def activate_node(self, scenario):
+        self.node_logger.info(scenario)
         self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
-        time.sleep(4)
+        Logger.print_info("scenario runner state is " +
+                          self.get_lifecycle_state())
         self.node_logger.info(self.get_lifecycle_state())
+
+    def deactivate_node(self):
         self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
+        Logger.print_info("scenario runner state is " +
+                          self.get_lifecycle_state())
+        self.node_logger.info(self.get_lifecycle_state())
 
     def set_lifecycle_state(self, transition_id):
         reqest = ChangeState.Request()
@@ -83,15 +81,16 @@ class LifeCycleController(Node):
         return future.result().current_state.label
 
     def shutdown(self):
-        self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
+        self.set_lifecycle_state(Transition.TRANSITION_INACTIVE_SHUTDOWN)
+        Logger.print_info(self.get_lifecycle_state())
         self.destroy_node()
 
 
 def main(args=None):
-    rclpy.init(args=args)
-    test_lifecycle = LifeCycleController()
-    rclpy.spin(test_lifecycle)
-    test_lifecycle.destroy_node()
+    lifecycle_controller = LifecycleController()
+    lifecycle_controller.configure_node()
+    lifecycle_controller.activate_node("scenario1")
+    lifecycle_controller.destroy_node()
     rclpy.shutdown()
 
 
