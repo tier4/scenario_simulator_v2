@@ -76,13 +76,21 @@ ScenarioModifiers:
 ### How To Build
 when building use these commands below
 ```
-colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --catkin-skip-building-tests --cmake-clean-cache --cmake-clean-first --packages-select scenario_launcher --symlink-install
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --catkin-skip-building-tests --cmake-clean-cache --cmake-clean-first --packages-select scenario_launcher scenario_common scenario_runner_mock --symlink-install
+```
+
+### How To Test
+test by using scenario runner mock
+```
+colcon build --symlink-install --packages-select scenario_launcher scenario_common scenario_runner_mock
+source /path/to/install/local_setup.bash
+ros2 launch scenario_launcher dummy_runner.launch.py
 ```
 
 ### How To Run
-
+to run scenario launcher use these commands below
 ```
-source /path/to/install/setup.bash
+source /path/to/install/local_setup.bash
 ros2 run scenario_launcher scenario_launcher
 ```
 
