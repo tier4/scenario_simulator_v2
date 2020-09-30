@@ -16,15 +16,15 @@
 #include <simulation_controller/behavior/vehicle/lane_change_action.hpp>
 #include <simulation_controller/entity/vehicle_parameter.hpp>
 
+#include <string>
+#include <memory>
+
 namespace entity_behavior
 {
 namespace vehicle
 {
 LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config)
-: entity_behavior::ActionNode(name, config)
-{
-
-}
+: entity_behavior::ActionNode(name, config) {}
 
 BT::NodeStatus LaneChangeAction::tick()
 {

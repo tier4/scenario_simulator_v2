@@ -17,6 +17,10 @@
 
 #include <boost/algorithm/clamp.hpp>
 
+#include <string>
+#include <vector>
+#include <memory>
+
 namespace entity_behavior
 {
 namespace vehicle
@@ -24,10 +28,7 @@ namespace vehicle
 AcquirePositionAction::AcquirePositionAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
-: entity_behavior::ActionNode(name, config)
-{
-
-}
+: entity_behavior::ActionNode(name, config) {}
 
 BT::NodeStatus AcquirePositionAction::tick()
 {

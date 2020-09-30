@@ -20,6 +20,9 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <iostream>
+#include <utility>
+#include <string>
+#include <algorithm>
 
 namespace entity_behavior
 {
@@ -34,7 +37,7 @@ BehaviorTree::BehaviorTree()
   factory_.registerNodeType<entity_behavior::vehicle::LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
-  //logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);
+  // logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);
   setupLogger();
   setRequest("none");
 }
@@ -93,5 +96,5 @@ void BehaviorTree::callback(
     }
   }
 }
-}
-}
+}  // namespace vehicle
+}  // namespace entity_behavior
