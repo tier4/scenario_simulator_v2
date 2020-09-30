@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ENTITY_BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_ACTION_HPP
-#define ENTITY_BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_ACTION_HPP
+#ifndef SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_HPP_
+#define SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_HPP_
 
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_controller/entity/entity_status.hpp>
@@ -22,13 +22,14 @@
 #include <simulation_controller/behavior/pedestrian/lane_change_action.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
-#include "behaviortree_cpp_v3/bt_factory.h"
-#include "behaviortree_cpp_v3/loggers/bt_cout_logger.h"
+#include <behaviortree_cpp_v3/bt_factory.h>
+#include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
 #include <memory>
 #include <functional>
 #include <map>
 #include <vector>
+#include <string>
 
 namespace entity_behavior
 {
@@ -79,4 +80,4 @@ private:
 }      // namespace pedestrian
 }  // namespace entity_behavior
 
-#endif  // ENTITY_BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_ACTION_HPP
+#endif  // SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_HPP_
