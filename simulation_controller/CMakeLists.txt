@@ -113,39 +113,19 @@ target_link_libraries(scenario_runner_moc_node
   api
 )
 
-install(TARGETS
-  entity_manager api
+install(TARGETS entity_manager api
+  EXPORT export_api
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 ament_export_libraries(entity_manager)
+ament_export_interfaces(export_api HAS_LIBRARY_TARGET)
+ament_export_libraries(api)
 
-#install(DIRECTORY include/${PROJECT_NAME}/
-#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#)
-
-#install(
-#  DIRECTORY
-#    ${CMAKE_CURRENT_SOURCE_DIR}/resource
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
-#install(
-#  DIRECTORY
-#    ${CMAKE_CURRENT_SOURCE_DIR}/test
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
-#if (CATKIN_ENABLE_TESTING)
-#  find_package(rostest REQUIRED)
-
-#  add_rostest_gtest(test-simulation_controller
-#    test/test_simulation_controller.test
-#    test/src/test_simulation_controller.cpp
-#  )
-
-#  target_link_libraries(test-simulation_controller
-#    simulation_controller
-#    ${catkin_LIBRARIES})
-#endif ()
+install(
+  DIRECTORY "include/"
+  DESTINATION include
+)
 
 install(DIRECTORY resource
   DESTINATION share/${PROJECT_NAME}

@@ -57,6 +57,7 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
     geometry_msgs::msg::Point p = getPoint(t);
     ret.push_back(p);
   }
+  return ret;
 }
 
 geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale)
