@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HDMAP_UTILS__HDMAP_UTILS_HPP
-#define HDMAP_UTILS__HDMAP_UTILS_HPP
+#ifndef SIMULATION_CONTROLLER__HDMAP_UTILS__HDMAP_UTILS_HPP_
+#define SIMULATION_CONTROLLER__HDMAP_UTILS__HDMAP_UTILS_HPP_
 
 #include <simulation_controller/entity/entity_status.hpp>
 #include <simulation_controller/math/hermite_curve.hpp>
@@ -38,20 +38,23 @@
 
 #include <boost/optional.hpp>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace hdmap_utils
 {
 class HdMapError : public std::runtime_error
 {
 public:
-  HdMapError(const char * message)
+  explicit HdMapError(const char * message)
   : runtime_error(message) {}
 };
 
 class HdMapUtils
 {
 public:
-  HdMapUtils(std::string lanelet_path);
+  explicit HdMapUtils(std::string lanelet_path);
   std::vector<geometry_msgs::msg::Point> toMapPoints(int lanelet_id, std::vector<double> s);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
     int lanelet_id, double s,
@@ -108,6 +111,6 @@ private:
     const std::vector<double> & x, const std::vector<double> & y,
     const std::vector<double> & z);
 };
-}
+}  // namespace hdmap_utils
 
-#endif  // HDMAP_UTILS__HDMAP_UTILS_HPP
+#endif  // SIMULATION_CONTROLLER__HDMAP_UTILS__HDMAP_UTILS_HPP_
