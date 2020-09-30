@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__XMLRPC_WRAPPER__ENTITY_API_IMPL_HPP_
-#define SIMULATION_CONTROLLER__XMLRPC_WRAPPER__ENTITY_API_IMPL_HPP_
+#ifndef SIMULATION_CONTROLLER__API__ENTITY_API_IMPL_HPP_
+#define SIMULATION_CONTROLLER__API__ENTITY_API_IMPL_HPP_
 
 #include <simulation_controller/api/api_impl_base.hpp>
 #include <simulation_controller/entity/vehicle_entity.hpp>
@@ -26,8 +26,11 @@
 #include <xmlrpcpp/XmlRpcClient.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 #include <xmlrpcpp/XmlRpcException.h>
-#include <memory>
 #include <boost/optional.hpp>
+
+#include <memory>
+#include <limits>
+#include <string>
 
 namespace scenario_simulator
 {
@@ -55,7 +58,7 @@ public:
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
-    //catalog_xml_doc.has("Vehicle");
+    // catalog_xml_doc.has("Vehicle");
     if (vehicle_node != NULL) {
       if (is_ego) {
         simulation_controller::entity::EgoEntity ego(name, status, catalog_xml_doc);
@@ -111,7 +114,7 @@ public:
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
-    //catalog_xml_doc.has("Vehicle");
+    // catalog_xml_doc.has("Vehicle");
     if (vehicle_node != NULL) {
       if (is_ego) {
         simulation_controller::entity::EgoEntity ego(name, catalog_xml_doc);
@@ -391,6 +394,6 @@ public:
     throw(scenario_simulator::ExecutionFailedError("coordinate does not match"));
   }
 };
-}
+}  // namespace scenario_simulator
 
-#endif  // SIMULATION_CONTROLLER__XMLRPC_WRAPPER__ENTITY_API_IMPL_HPP_
+#endif  // SIMULATION_CONTROLLER__API__ENTITY_API_IMPL_HPP_

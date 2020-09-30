@@ -23,7 +23,9 @@
 #include <xmlrpcpp/XmlRpcClient.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 #include <xmlrpcpp/XmlRpcException.h>
+
 #include <memory>
+#include <string>
 
 namespace scenario_simulator
 {
@@ -33,7 +35,7 @@ class API
 
 public:
   template<class NodeT>
-  API(NodeT && node)
+  explicit API(NodeT && node)
   {
     std::string address = "127.0.0.1";
     int port = 8080;

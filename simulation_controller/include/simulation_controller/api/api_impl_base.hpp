@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__XMLRPC_WRAPPER__API_IMPL_BASE_HPP_
-#define SIMULATION_CONTROLLER__XMLRPC_WRAPPER__API_IMPL_BASE_HPP_
+#ifndef SIMULATION_CONTROLLER__API__API_IMPL_BASE_HPP_
+#define SIMULATION_CONTROLLER__API__API_IMPL_BASE_HPP_
 
 #include <simulation_controller/entity/entity_manager.hpp>
 #include <xmlrpcpp/XmlRpcClient.h>
@@ -38,9 +38,9 @@ private:
 class ExecutionFailedError : public std::runtime_error
 {
 public:
-  ExecutionFailedError(XmlRpc::XmlRpcValue value)
+  explicit ExecutionFailedError(XmlRpc::XmlRpcValue value)
   : runtime_error(value["message"]) {}
-  ExecutionFailedError(const char * message)
+  explicit ExecutionFailedError(const char * message)
   : runtime_error(message) {}
 };
 
@@ -59,6 +59,6 @@ protected:
   std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_controller::entity::EntityManager> entity_manager_ptr_;
 };
-}
+}  // namespace scenario_simulator
 
-#endif  // SIMULATION_CONTROLLER__XMLRPC_WRAPPER__API_IMPL_BASE_HPP_
+#endif  // SIMULATION_CONTROLLER__API__API_IMPL_BASE_HPP_

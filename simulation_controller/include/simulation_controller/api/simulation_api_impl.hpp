@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__XMLRPC_WRAPPER__SIMULATION_API_IMPL_HPP_
-#define SIMULATION_CONTROLLER__XMLRPC_WRAPPER__SIMULATION_API_IMPL_HPP_
+#ifndef SIMULATION_CONTROLLER__API__SIMULATION_API_IMPL_HPP_
+#define SIMULATION_CONTROLLER__API__SIMULATION_API_IMPL_HPP_
 
 #include <simulation_controller/api/api_impl_base.hpp>
 #include <simulation_controller/entity/entity_manager.hpp>
@@ -22,6 +22,8 @@
 #include <xmlrpcpp/XmlRpcClient.h>
 #include <xmlrpcpp/XmlRpcValue.h>
 #include <xmlrpcpp/XmlRpcException.h>
+
+#include <memory>
 
 namespace scenario_simulator
 {
@@ -39,9 +41,9 @@ public:
     double realtime_factor, double step_time, int times_try = 10,
     int duration_try_in_msec = 1000)
   {
-    //nh_ = ros::NodeHandle("");
-    //pnh_ = ros::NodeHandle("~");
-    //marker_pub_ = pnh_.advertise<visualization_msgs::MarkerArray>("marker", 10);
+    // nh_ = ros::NodeHandle("");
+    // pnh_ = ros::NodeHandle("~");
+    // marker_pub_ = pnh_.advertise<visualization_msgs::MarkerArray>("marker", 10);
     step_time_ = step_time;
     current_time_ = 0.0;
     XmlRpc::XmlRpcValue value;
@@ -97,8 +99,8 @@ private:
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
   */
-  //std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
+  // std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
 };
 }  // namespace scenario_simulator
 
-#endif  // SIMULATION_CONTROLLER__XMLRPC_WRAPPER__SIMULATION_API_IMPL_HPP_
+#endif  // SIMULATION_CONTROLLER__API__SIMULATION_API_IMPL_HPP_
