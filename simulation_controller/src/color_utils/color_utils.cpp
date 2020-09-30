@@ -15,6 +15,7 @@
 #include <simulation_controller/color_utils/color_utils.hpp>
 
 #include <iostream>
+#include <string>
 
 namespace color_utils
 {
@@ -35,8 +36,8 @@ std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
   float b = v;
   if (s > 0.0f) {
     h *= 6.0f;
-    int i = (int)h;
-    float f = h - (float)i;
+    int i = static_cast<int>(h);
+    float f = h - static_cast<float>(i);
     switch (i) {
       default:
       case 0:
@@ -96,4 +97,4 @@ std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha)
   }
   return c_msg;
 }
-}  // namespace color_util
+}  // namespace color_utils

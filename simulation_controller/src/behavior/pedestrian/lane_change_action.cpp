@@ -14,15 +14,15 @@
 
 #include <simulation_controller/behavior/pedestrian/lane_change_action.hpp>
 
+#include <string>
+#include <memory>
+
 namespace entity_behavior
 {
 namespace pedestrian
 {
 LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config)
-: entity_behavior::ActionNode(name, config)
-{
-
-}
+: entity_behavior::ActionNode(name, config) {}
 
 BT::NodeStatus LaneChangeAction::tick()
 {
