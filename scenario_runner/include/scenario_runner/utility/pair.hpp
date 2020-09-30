@@ -31,7 +31,7 @@ auto cdr = [] (auto && pare) noexcept->decltype(auto)
   return std::get<1>(pare);
 };
 
-  #define COMPOSE(NAME, F, G) \
+#define COMPOSE(NAME, F, G) \
   template<typename ... Ts> \
   constexpr decltype(auto) NAME(Ts && ... xs) \
   { \
@@ -43,7 +43,7 @@ COMPOSE(cadr, car, cdr);
 COMPOSE(cdar, cdr, car);
 COMPOSE(cddr, cdr, cdr);
 
-  #undef COMPOSE
+#undef COMPOSE
 }
 }  // namespace scenario_runner
 

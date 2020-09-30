@@ -47,23 +47,40 @@ struct Action
   explicit Action(const Node & node, Scope & scope)
   : name{readAttribute<String>("name", node, scope)}
   {
-    callWithElements(
-      node, "GlobalAction", 0, 1, [&](auto && node)
+    choice(node,
+
+      std::make_pair("GlobalAction", [&](auto && node)
       {
         return rebind<GlobalAction>(node, scope);
-      });
+      }),
 
-    callWithElements(
-      node, "UserDefinedAction", 0, 1, [&](auto && node)
+      std::make_pair("UserDefinedAction", [&](auto && node)
       {
         return rebind<UserDefinedAction>(node, scope);
-      });
+      }),
 
-    callWithElements(
-      node, "PrivateAction", 0, 1, [&](auto && node)
+      std::make_pair("PrivateAction", [&](auto && node)
       {
         return rebind<PrivateAction>(node, scope);
-      });
+      }));
+
+    // callWithElements(
+    //   node, "GlobalAction", 0, 1, [&](auto && node)
+    //   {
+    //     return rebind<GlobalAction>(node, scope);
+    //   });
+    //
+    // callWithElements(
+    //   node, "UserDefinedAction", 0, 1, [&](auto && node)
+    //   {
+    //     return rebind<UserDefinedAction>(node, scope);
+    //   });
+    //
+    // callWithElements(
+    //   node, "PrivateAction", 0, 1, [&](auto && node)
+    //   {
+    //     return rebind<PrivateAction>(node, scope);
+    //   });
   }
 
   auto ready() const
