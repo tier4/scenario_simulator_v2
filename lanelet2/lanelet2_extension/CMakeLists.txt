@@ -72,7 +72,7 @@ ament_target_dependencies(lanelet2_extension_lib
   lanelet2_routing
   lanelet2_traffic_rules
   lanelet2_validation
-  autoware_lanelet2_msgs
+  autoware_auto_msgs
   geometry_msgs
   visualization_msgs
 )
@@ -111,7 +111,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_lanelet2_msgs
+      autoware_auto_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -129,7 +129,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_lanelet2_msgs
+      autoware_auto_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -147,7 +147,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_lanelet2_msgs
+      autoware_auto_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -165,7 +165,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_lanelet2_msgs
+      autoware_auto_msgs
       geometry_msgs
       visualization_msgs
     )
@@ -183,7 +183,7 @@ if(BUILD_TESTING)
       lanelet2_routing
       lanelet2_traffic_rules
       lanelet2_validation
-      autoware_lanelet2_msgs
+      autoware_auto_msgs
       geometry_msgs
       visualization_msgs
     )

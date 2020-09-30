@@ -236,8 +236,8 @@ struct TrafficSignsWithType
 {
   LineStringsOrPolygons3d trafficSigns;  //!< Lists relevant traffic signs
   std::string type{""};                  //! Lists their type. If empty, it is assumed that this
-                                         //! is found in the attributes of trafficSigns.
-                                         //! the format is <country-code><ID>, eg de205.
+  //! is found in the attributes of trafficSigns.
+  //! the format is <country-code><ID>, eg de205.
 };
 
 //! @brief Expresses a generic traffic sign rule

@@ -39,7 +39,7 @@ namespace utils
 {
 namespace conversion
 {
-void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::MapBin * msg)
+void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMapBin * msg)
 {
   if (msg == nullptr) {
     std::stringstream sstream;
@@ -59,7 +59,7 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::M
   msg->data.assign(data_str.begin(), data_str.end());
 }
 
-void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map)
+void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map)
 {
   if (!map) {
     std::stringstream sstream;
@@ -81,7 +81,7 @@ void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::Lanele
 }
 
 void fromBinMsg(
-  const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map,
+  const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
   lanelet::routing::RoutingGraphPtr * routing_graph)
 {

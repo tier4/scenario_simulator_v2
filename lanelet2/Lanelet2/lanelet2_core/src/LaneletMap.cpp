@@ -331,7 +331,8 @@ struct PrimitiveLayer<T>::Tree
   using TreeNode = std::pair<BoundingBox2d, T>;
   using RTree = bgi::rtree<TreeNode, bgi::quadratic<16>>;
   static TreeNode treeNode(const T & elem) {return {geometry::boundingBox2d(to2D(elem)), elem};}
-  explicit Tree(const PrimitiveLayer::Map & primitives) {
+  explicit Tree(const PrimitiveLayer::Map & primitives)
+  {
     std::vector<TreeNode> nodes;
     nodes.reserve(primitives.size());
     for (auto & primitive : primitives) {
@@ -367,7 +368,8 @@ struct PrimitiveLayer<Point3d>::Tree
   using TreeNode = std::pair<BasicPoint2d, Point3d>;
   using RTree = bgi::rtree<TreeNode, bgi::quadratic<16>>;
   static TreeNode treeNode(const Point3d & p) {return {Point2d(p).basicPoint(), p};}
-  explicit Tree(const PrimitiveLayer::Map & primitives) {
+  explicit Tree(const PrimitiveLayer::Map & primitives)
+  {
     std::vector<TreeNode> nodes;
     nodes.reserve(primitives.size());
     std::transform(primitives.begin(), primitives.end(), std::back_inserter(nodes),
