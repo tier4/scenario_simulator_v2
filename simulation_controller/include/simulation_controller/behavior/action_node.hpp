@@ -34,10 +34,10 @@ public:
   ~ActionNode() override = default;
 
   /// throws if the derived class return RUNNING.
-  virtual BT::NodeStatus executeTick() override;
+  BT::NodeStatus executeTick() override;
 
   /// You don't need to override this
-  virtual void halt() override final
+  void halt() override
   {
     setStatus(BT::NodeStatus::IDLE);
   }
