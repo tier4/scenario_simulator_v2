@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER___PEDESTRIAN_PARAMETER_HPP_
-#define SIMULATION_CONTROLLER___PEDESTRIAN_PARAMETER_HPP_
+#ifndef SIMULATION_CONTROLLER__ENTITY__PEDESTRIAN_PARAMETER_HPP_
+#define SIMULATION_CONTROLLER__ENTITY__PEDESTRIAN_PARAMETER_HPP_
 
 // headers in pugixml
-#include "pugixml.hpp"
+#include <pugixml.hpp>
 
+#include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
 #include <boost/property_tree/ptree.hpp>
@@ -27,7 +28,6 @@
 
 #include <string>
 #include <sstream>
-#include <rclcpp/rclcpp.hpp>
 
 namespace simulation_controller
 {
@@ -35,7 +35,7 @@ namespace entity
 {
 struct PedestrianParameters
 {
-  PedestrianParameters(const pugi::xml_node & xml)
+  explicit PedestrianParameters(const pugi::xml_node & xml)
   : name(xml.child("Pedestrian").attribute("name").as_string()),
     pedestrian_categoly(xml.child("Pedestrian").attribute("pedestrianCategory").as_string()),
     bounding_box(xml.child("Pedestrian"))
@@ -71,7 +71,7 @@ struct PedestrianParameters
     return ss.str();
   }
 };
-}
-}
+}  // namespace entity
+}  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER___PEDESTRIAN_PARAMETER_HPP_
+#endif  // SIMULATION_CONTROLLER__ENTITY__PEDESTRIAN_PARAMETER_HPP_

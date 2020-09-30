@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER___PEDESTRIAN_ENTITY_HPP_
-#define SIMULATION_CONTROLLER___PEDESTRIAN_ENTITY_HPP_
+#ifndef SIMULATION_CONTROLLER__ENTITY__PEDESTRIAN_ENTITY_HPP_
+#define SIMULATION_CONTROLLER__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
 #include <simulation_controller/entity/entity_base.hpp>
 #include <simulation_controller/entity/pedestrian_parameter.hpp>
@@ -23,10 +23,12 @@
 #include <simulation_controller/behavior/pedestrian/behavior_tree.hpp>
 
 // headers in pugixml
-#include "pugixml.hpp"
+#include <pugixml.hpp>
 
 #include <boost/optional.hpp>
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace simulation_controller
 {
@@ -49,7 +51,7 @@ public:
   const PedestrianParameters parameters;
   void onUpdate(double current_time, double step_time) override;
   void requestAcquirePosition(int lanelet_id, double s, double offset);
-  //void requestLaneChange(int to_lanelet_id);
+  // void requestLaneChange(int to_lanelet_id);
   void cancelRequest();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
   {
@@ -62,10 +64,10 @@ private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;
   BT::NodeStatus action_status_;
   std::vector<geometry_msgs::msg::Point> following_trajectory_;
-  //entity_behavior::pedestrian::LaneChangeParameter lane_change_params_;
+  // entity_behavior::pedestrian::LaneChangeParameter lane_change_params_;
   boost::optional<double> target_speed_;
 };
-}      // namespace entity
+}  // namespace entity
 }  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER___PEDESTRIAN_ENTITY_HPP_
+#endif  // SIMULATION_CONTROLLER__ENTITY__PEDESTRIAN_ENTITY_HPP_

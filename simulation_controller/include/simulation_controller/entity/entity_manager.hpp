@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef  SIMULATOR_CONTROLLER__ENTITY_MANAGER_HPP_
-#define  SIMULATOR_CONTROLLER__ENTITY_MANAGER_HPP_
+#ifndef  SIMULATION_CONTROLLER__ENTITY__ENTITY_MANAGER_HPP_
+#define  SIMULATION_CONTROLLER__ENTITY__ENTITY_MANAGER_HPP_
 
 #include <simulation_controller/entity/ego_entity.hpp>
 #include <simulation_controller/entity/vehicle_entity.hpp>
@@ -34,6 +34,10 @@
 #include <typeinfo>
 #include <map>
 #include <memory>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <utility>
 
 namespace simulation_controller
 {
@@ -48,7 +52,7 @@ private:
 
 public:
   template<class NodeT>
-  EntityManager(NodeT && node)
+  explicit EntityManager(NodeT && node)
   : broadcaster_(node)
   {
     clock_ptr_ = node->get_clock();
@@ -240,15 +244,13 @@ public:
     rclcpp::Time now = clock_ptr_->now();
     for (auto it = entities_.begin(); it != entities_.end(); it++) {
       if (it->second.type() == typeid(VehicleEntity)) {
-        const auto marker = boost::any_cast<const VehicleEntity &>(it->second).generateMarker(now, color_utils::makeColorMsg(
-              "steelblue",
-              0.8));
+        const auto marker = boost::any_cast<const VehicleEntity &>(it->second).generateMarker(
+          now, color_utils::makeColorMsg("steelblue", 0.8));
         ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
       }
       if (it->second.type() == typeid(EgoEntity)) {
-        const auto marker = boost::any_cast<const EgoEntity &>(it->second).generateMarker(now, color_utils::makeColorMsg(
-              "forestgreen",
-              0.8));
+        const auto marker = boost::any_cast<const EgoEntity &>(it->second).generateMarker(
+          now, color_utils::makeColorMsg("forestgreen", 0.8));
         ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
       }
       if (it->second.type() == typeid(PedestrianEntity)) {
@@ -497,7 +499,7 @@ public:
     return true;
   }
 };
-}      // namespace entity
+}  // namespace entity
 }  // namespace simulation_controller
 
-#endif   // SIMULATOR_CONTROLLER__ENTITY_MANAGER_HPP_
+#endif   // SIMULATION_CONTROLLER__ENTITY__ENTITY_MANAGER_HPP_

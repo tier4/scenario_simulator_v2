@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER___VEHICLE_PARAMETER_HPP_
-#define SIMULATION_CONTROLLER___VEHICLE_PARAMETER_HPP_
+#ifndef SIMULATION_CONTROLLER__ENTITY__VEHICLE_PARAMETER_HPP_
+#define SIMULATION_CONTROLLER__ENTITY__VEHICLE_PARAMETER_HPP_
 
 // headers in pugixml
-#include "pugixml.hpp"
+#include <pugixml.hpp>
 
+#include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
 #include <boost/property_tree/ptree.hpp>
@@ -25,7 +26,7 @@
 #include <boost/foreach.hpp>
 
 #include <sstream>
-#include <rclcpp/rclcpp.hpp>
+#include <string>
 
 namespace simulation_controller
 {
@@ -33,7 +34,7 @@ namespace entity
 {
 struct Performance
 {
-  Performance(const pugi::xml_node & xml)
+  explicit Performance(const pugi::xml_node & xml)
   : max_speed(xml.child("Performance").attribute("maxSpeed").as_double()),
     max_acceleration(xml.child("Performance").attribute("maxAcceleration").as_double()),
     max_deceleration(xml.child("Performance").attribute("maxDeceleration").as_double()) {}
@@ -49,7 +50,7 @@ struct Performance
 
 struct Center
 {
-  Center(const pugi::xml_node & xml)
+  explicit Center(const pugi::xml_node & xml)
   : x(xml.child("BoundingBox").child("Center").attribute("x").as_double()),
     y(xml.child("BoundingBox").child("Center").attribute("y").as_double()),
     z(xml.child("BoundingBox").child("Center").attribute("z").as_double())
@@ -64,7 +65,7 @@ struct Center
 
 struct Dimensions
 {
-  Dimensions(const pugi::xml_node & xml)
+  explicit Dimensions(const pugi::xml_node & xml)
   : width(xml.child("BoundingBox").child("Dimensions").attribute("width").as_double()),
     length(xml.child("BoundingBox").child("Dimensions").attribute("length").as_double()),
     height(xml.child("BoundingBox").child("Dimensions").attribute("height").as_double())
@@ -79,7 +80,7 @@ struct Dimensions
 
 struct BoundingBox
 {
-  BoundingBox(const pugi::xml_node & xml)
+  explicit BoundingBox(const pugi::xml_node & xml)
   : center(xml), dimensions(xml)
   {}
   BoundingBox(Center center, Dimensions dimensions)
@@ -91,7 +92,7 @@ struct BoundingBox
 
 struct Axle
 {
-  Axle(const pugi::xml_node & xml)
+  explicit Axle(const pugi::xml_node & xml)
   : max_steering(xml.attribute("maxSteering").as_double()),
     wheel_diameter(xml.attribute("wheelDiameter").as_double()),
     track_width(xml.attribute("trackWidth").as_double()),
@@ -119,7 +120,7 @@ struct Axle
 
 struct Axles
 {
-  Axles(const pugi::xml_node & xml)
+  explicit Axles(const pugi::xml_node & xml)
   : front_axle(xml.child("Axles").child("FrontAxle")),
     rear_axle(xml.child("Axles").child("RearAxle"))
   {}
@@ -132,7 +133,7 @@ struct Axles
 
 struct VehicleParameters
 {
-  VehicleParameters(const pugi::xml_node & xml)
+  explicit VehicleParameters(const pugi::xml_node & xml)
   : performance(xml.child("Vehicle")),
     bounding_box(xml.child("Vehicle")),
     axles(xml.child("Vehicle")),
@@ -193,7 +194,7 @@ struct VehicleParameters
     return ss.str();
   }
 };
-}
-}
+}  // namespace entity
+}  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER___VEHICLE_PARAMETER_HPP_
+#endif  // SIMULATION_CONTROLLER__ENTITY__VEHICLE_PARAMETER_HPP_

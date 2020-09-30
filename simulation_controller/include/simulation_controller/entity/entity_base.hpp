@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__ENTITY_BASE_HPP_
-#define SIMULATION_CONTROLLER__ENTITY_BASE_HPP_
+#ifndef SIMULATION_CONTROLLER__ENTITY__ENTITY_BASE_HPP_
+#define SIMULATION_CONTROLLER__ENTITY__ENTITY_BASE_HPP_
 
 #include <simulation_controller/entity/entity_status.hpp>
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
@@ -25,6 +25,7 @@
 // headers in STL
 #include <string>
 #include <memory>
+#include <unordered_map>
 
 namespace simulation_controller
 {
@@ -34,7 +35,7 @@ enum class Direction
 {
   STRAIGHT = 0,
   LEFT = 1,
-  RIGHT =2
+  RIGHT = 2
 };
 
 enum class EntityType
@@ -90,7 +91,7 @@ protected:
   std::unordered_map<std::string, EntityType> entity_type_list_;
   boost::optional<double> stand_still_duration_;
 };
-}      // namespace entity
+}  // namespace entity
 }  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER__ENTITY_BASE_HPP_
+#endif  // SIMULATION_CONTROLLER__ENTITY__ENTITY_BASE_HPP_

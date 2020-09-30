@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER___VEHICLE_ENTITY_HPP_
-#define SIMULATION_CONTROLLER___VEHICLE_ENTITY_HPP_
+#ifndef SIMULATION_CONTROLLER__ENTITY__VEHICLE_ENTITY_HPP_
+#define SIMULATION_CONTROLLER__ENTITY__VEHICLE_ENTITY_HPP_
 
 #include <simulation_controller/entity/entity_base.hpp>
 #include <simulation_controller/entity/vehicle_parameter.hpp>
@@ -25,10 +25,12 @@
 #include <rclcpp/rclcpp.hpp>
 
 // headers in pugixml
-#include "pugixml.hpp"
+#include <pugixml.hpp>
 
 #include <boost/optional.hpp>
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace simulation_controller
 {
@@ -63,7 +65,7 @@ private:
   entity_behavior::vehicle::LaneChangeParameter lane_change_params_;
   boost::optional<double> target_speed_;
 };
-}      // namespace entity
+}  // namespace entity
 }  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER___VEHICLE_ENTITY_HPP_
+#endif  // SIMULATION_CONTROLLER__ENTITY__VEHICLE_ENTITY_HPP_

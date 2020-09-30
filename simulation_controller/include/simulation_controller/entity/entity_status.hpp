@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER___ENTITY_STATUS_HPP_
-#define SIMULATION_CONTROLLER___ENTITY_STATUS_HPP_
+#ifndef SIMULATION_CONTROLLER__ENTITY__ENTITY_STATUS_HPP_
+#define SIMULATION_CONTROLLER__ENTITY__ENTITY_STATUS_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -70,7 +70,7 @@ public:
   /* Field for world pose */
   geometry_msgs::msg::Pose pose;
 };
-}
-}
+}  // namespace entity
+}  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER___ENTITY_STATUS_HPP_
+#endif  // SIMULATION_CONTROLLER__ENTITY__ENTITY_STATUS_HPP_

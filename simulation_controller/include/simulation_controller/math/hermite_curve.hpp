@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP
-#define SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP
+#ifndef SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP_
+#define SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP_
 
 #include <quaternion_operation/quaternion_operation.h>
 
@@ -50,7 +50,7 @@ public:
   double getMaximu2DCurvature();
   double getLength();
 };
-}
-}
+}  // namespace math
+}  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP
+#endif  // SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP_

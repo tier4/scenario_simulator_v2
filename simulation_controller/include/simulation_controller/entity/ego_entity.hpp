@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__EGO_ENTITY_HPP_
-#define SIMULATION_CONTROLLER__EGO_ENTITY_HPP_
+#ifndef SIMULATION_CONTROLLER__ENTITY__EGO_ENTITY_HPP_
+#define SIMULATION_CONTROLLER__ENTITY__EGO_ENTITY_HPP_
 
 #include <simulation_controller/entity/vehicle_entity.hpp>
 
 // headers in pugixml
-#include "pugixml.hpp"
+#include <pugixml.hpp>
+#include <string>
 
 namespace simulation_controller
 {
@@ -35,4 +36,4 @@ public:
 }      // namespace entity
 }  // namespace simulation_controller
 
-#endif  // SIMULATION_CONTROLLER__EGO_ENTITY_HPP_
+#endif  // SIMULATION_CONTROLLER__ENTITY__EGO_ENTITY_HPP_
