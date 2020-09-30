@@ -210,7 +210,8 @@ private:
             </Properties>
         </Vehicle>)";
 
-  std::string pedestrian_xml = R"(
+  std::string pedestrian_xml =
+    R"(
     <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
             <BoundingBox>
                 <Center x='0.0' y='0.0' z='0.5'/>
