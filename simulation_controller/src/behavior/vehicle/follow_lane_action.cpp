@@ -95,12 +95,12 @@ BT::NodeStatus FollowLaneAction::tick()
     double target_accel = (target_speed.get() - entity_status.twist.linear.x) / step_time;
     if (entity_status.twist.linear.x > target_speed.get()) {
       target_accel = boost::algorithm::clamp(target_accel, -5, 0);
-      /* target_accel = boost::algorithm::clamp(target_accel, 
+      /* target_accel = boost::algorithm::clamp(target_accel,
         -1*vehicle_param_ptr->performance.max_deceleration, vehicle_param_ptr->performance.max_acceleration);
       */
     } else {
       target_accel = boost::algorithm::clamp(target_accel, 0, 3);
-      /* 
+      /*
       target_accel = boost::algorithm::clamp(target_accel,
         -1*vehicle_param_ptr->performance.max_deceleration, vehicle_param_ptr->performance.max_acceleration);
       */
