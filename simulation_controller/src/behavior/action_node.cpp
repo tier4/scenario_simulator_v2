@@ -14,6 +14,8 @@
 
 #include <simulation_controller/behavior/action_node.hpp>
 
+#include <string>
+
 namespace entity_behavior
 {
 
@@ -25,4 +27,4 @@ BT::NodeStatus ActionNode::executeTick()
 {
   return BT::ActionNodeBase::executeTick();
 }
-}
+}  // namespace entity_behavior
