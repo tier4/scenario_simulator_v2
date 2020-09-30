@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSCENARIO>
+  <FileHeader revMajor="0" revMinor="1" date="" description="lexical-scope" author="Tatsuya Yamasaki"/>
+
+  <ParameterDeclarations>
+    <ParameterDeclaration name="x" parameterType="double" value="1"/>
+    <ParameterDeclaration name="y" parameterType="double" value="$x"/>
+  </ParameterDeclarations>
+
+  <CatalogLocations/>
+
+  <RoadNetwork>
+    <LogicFile filepath="./"/>
+    <SceneGraphFile filepath="./"/>
+    <TrafficSignals/>
+  </RoadNetwork>
+
+  <Entities/>
+
+  <Storyboard>
+    <Init>
+      <Actions/>
+    </Init>
+
+    <Story name="A">
+      <ParameterDeclarations>
+        <ParameterDeclaration name="x" parameterType="double" value="2"/>
+      </ParameterDeclarations>
+
+      <Act name="A">
+        <ManeuverGroup name="A">
+          <Actors>
+            <EntityRef entityRef="A"/>
+          </Actors>
+          <Maneuver name="A">
+            <ParameterDeclarations>
+              <ParameterDeclaration name="x" parameterType="double" value="$x"/>
+            </ParameterDeclarations>
+            <Event name="A" priority="overwrite">
+              <Action name="A">
+                <UserDefinedAction>
+                  <CustomCommandAction type="print"> Event started! </CustomCommandAction>
+                </UserDefinedAction>
+              </Action>
+              <StartTrigger/>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+        <StartTrigger/>
+      </Act>
+
+      <Act name="B">
+        <ManeuverGroup name="A">
+          <Actors>
+            <EntityRef entityRef="A"/>
+          </Actors>
+          <Maneuver name="A">
+            <ParameterDeclarations>
+              <ParameterDeclaration name="x" parameterType="double" value="$x"/>
+            </ParameterDeclarations>
+            <Event name="A" priority="overwrite">
+              <Action name="A">
+                <UserDefinedAction>
+                  <CustomCommandAction type="print"> Event started! </CustomCommandAction>
+                </UserDefinedAction>
+              </Action>
+              <StartTrigger/>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+        <StartTrigger/>
+      </Act>
+    </Story>
+
+    <StopTrigger>
+      <ConditionGroup>
+        <Condition name="A" conditionEdge="none">
+          <ByValueCondition>
+            <SimulationTimeCondition value="3" rule="greaterThan"/>
+          </ByValueCondition>
+        </Condition>
+      </ConditionGroup>
+    </StopTrigger>
+  </Storyboard>
+</OpenSCENARIO>

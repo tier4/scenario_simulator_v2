@@ -32,12 +32,13 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct LongitudinalAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit LongitudinalAction(const Node & node, Scope & scope)
   {
-    callWithElements(node, "SpeedAction", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "SpeedAction", 0, 1, [&](auto && node)
       {
         return rebind<SpeedAction>(node, scope);
       });
@@ -45,7 +46,7 @@ struct LongitudinalAction
     callWithElements(node, "LongitudinalDistanceAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
   }
 
-  using Object::evaluate;
+  using Element::evaluate;
 };
 }
 }  // namespace scenario_runner

@@ -44,7 +44,7 @@ inline namespace syntax
  * ======================================================================== */
 struct ScenarioDefinition
 {
-  Object storyboard;
+  Element storyboard;
 
   Scope inner_scope;
 
@@ -54,45 +54,33 @@ struct ScenarioDefinition
   {
     std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
 
-    callWithElements(node, "ParameterDeclarations", 0, unbounded, [&](auto && each)
+    callWithElements(
+      node, "ParameterDeclarations", 0, unbounded, [&](auto && each)
       {
         return make<ParameterDeclarations>(each, inner_scope);
       });
 
     for (const auto & each : inner_scope.parameters) {
-      std::cout << indent <<
-        "<!-- Parameter " <<
-        cyan <<
-        "\'" <<
-        std::get<0>(each) <<
-        "\'" <<
-        reset <<
-        " of type " <<
-        green <<
-        std::get<1>(each).type().name() <<
-        reset <<
-        " declared as value " <<
-        cyan <<
-        "\"" <<
-        std::get<1>(each) <<
-        cyan <<
-        "\"" <<
-        reset <<
-        " -->" <<
-        std::endl;
+      std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
+        reset << " of type " << green << std::get<1>(each).type().name() << reset <<
+        " declared as value " << cyan << "\"" << std::get<1>(each) << cyan << "\"" << reset <<
+        " -->" << std::endl;
     }
 
-    callWithElements(node, "CatalogLocations", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "CatalogLocations", 0, 1, [&](auto && node)
       {
         return make<CatalogLocations>(node, inner_scope);
       });
 
-    callWithElements(node, "RoadNetwork", 1, 1, [&](auto && node)
+    callWithElements(
+      node, "RoadNetwork", 1, 1, [&](auto && node)
       {
         return make<RoadNetwork>(node, inner_scope);
       });
 
-    callWithElement(node, "Entities", [&](auto && node)
+    callWithElement(
+      node, "Entities", [&](auto && node)
       {
         return make<Entities>(node, inner_scope);
       });
@@ -105,7 +93,8 @@ struct ScenarioDefinition
 
     std::cout << (--indent) << "</Entities>" << std::endl;
 
-    callWithElement(node, "Storyboard", [&](auto && node)
+    callWithElement(
+      node, "Storyboard", [&](auto && node)
       {
         return storyboard = make<Storyboard>(node, inner_scope);
       });
@@ -179,7 +168,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Sce
 struct OpenSCENARIO
   : public pugi::xml_document
 {
-  Object category;
+  Element category;
 
   Scope global;
 

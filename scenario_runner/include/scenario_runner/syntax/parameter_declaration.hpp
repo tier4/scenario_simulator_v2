@@ -49,7 +49,7 @@ struct ParameterDeclaration
     scope.parameters.emplace(name, evaluate());
   }
 
-  Object evaluate() const
+  Element evaluate() const
   {
     switch (parameter_type) {
       case ParameterType::INTEGER:

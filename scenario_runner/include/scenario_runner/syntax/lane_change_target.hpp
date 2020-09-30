@@ -34,14 +34,15 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct LaneChangeTarget
-  : public Object
+  : public Element
 {
   template<typename Node, typename ... Ts>
   explicit LaneChangeTarget(const Node & node, Ts && ... xs)
   {
     callWithElements(node, "RelativeTargetLane", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "AbsoluteTargetLane", 0, 1, [&](auto && node)
+    callWithElements(
+      node, "AbsoluteTargetLane", 0, 1, [&](auto && node)
       {
         return rebind<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...);
       });

@@ -18,45 +18,72 @@ find_package(rclcpp            REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(std_msgs          REQUIRED)
 
-add_executable(${PROJECT_NAME}_node
-  src/${PROJECT_NAME}_node.cpp
+# ------------------------------------------------------------------------------
+#  libscenario_runner
+# ------------------------------------------------------------------------------
+
+add_library(${PROJECT_NAME} SHARED
   src/object.cpp)
 
-target_include_directories(${PROJECT_NAME}_node
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
-ament_target_dependencies(${PROJECT_NAME}_node
+ament_target_dependencies(${PROJECT_NAME}
   geometry_msgs
   rclcpp
   rclcpp_components
   std_msgs)
 
-target_link_libraries(${PROJECT_NAME}_node
-  pugixml)
+target_link_libraries(${PROJECT_NAME} pugixml)
+
+# ------------------------------------------------------------------------------
+#  scenario_runner_node
+# ------------------------------------------------------------------------------
+
+add_executable(${PROJECT_NAME}_node
+  src/${PROJECT_NAME}_node.cpp)
+
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+
+# ------------------------------------------------------------------------------
+#  make install
+# ------------------------------------------------------------------------------
 
 install(
   TARGETS ${PROJECT_NAME}_node
   DESTINATION lib/${PROJECT_NAME})
 
 install(
-  DIRECTORY
-    config
-    example
-    include
-    launch
+  DIRECTORY config example include launch test
   DESTINATION share/${PROJECT_NAME})
 
-# install(
-#   TARGETS
-#   ARCHIVE DESTINATION lib
-#   LIBRARY DESTINATION lib
-#   RUNTIME DESTINATION bin)
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT  ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+
+# ------------------------------------------------------------------------------
+#  test
+# ------------------------------------------------------------------------------
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+
+  set(${PROJECT_NAME}_TEST_DEPENDENCIES
+    ament_index_cpp
+    geometry_msgs
+    rclcpp
+    std_msgs)
+
+  ament_add_gtest(test_syntax test/test_syntax.cpp)
+  if(TARGET test_syntax)
+    ament_target_dependencies(test_syntax ${${PROJECT_NAME}_TEST_DEPENDENCIES})
+    target_link_libraries(test_syntax ${PROJECT_NAME})
+  endif()
 endif()
 
 ament_package()

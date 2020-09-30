@@ -35,8 +35,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Maneuver
-  : public StoryboardElement<Maneuver>,
-  public Objects
+  : public StoryboardElement<Maneuver>, public Elements
 {
   const String name;
 
@@ -56,7 +55,7 @@ struct Maneuver
     callWithElements(
       node, "Event", 1, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<Event>(node, inner_scope);
+        return push_back(readStoryboardElement<Event>(node, inner_scope));
       });
   }
 

@@ -21,25 +21,25 @@
 
 namespace scenario_runner
 {
-using Object = Pointer<Expression>;
+using Element = Pointer<Expression>;
 
-using Objects = std::vector<Object>;
+using Elements = std::vector<Element>;
 
-static const Object unit {nullptr};
+// static const Element unit {nullptr};
 
 template<typename T, typename ... Ts>
 inline constexpr decltype(auto) make(Ts && ... xs)
 {
-  return Object::bind<T>(std::forward<decltype(xs)>(xs)...);
+  return Element::bind<T>(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename T>
 inline constexpr decltype(auto) make(T && x)
 {
-  return Object::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));
+  return Element::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));
 }
 
-extern const Object unspecified;
+extern const Element unspecified;
 
 struct Unspecified
 {

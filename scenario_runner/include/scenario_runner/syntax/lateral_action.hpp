@@ -33,7 +33,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct LateralAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit LateralAction(const Node & node, Scope & scope)

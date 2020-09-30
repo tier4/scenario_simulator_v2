@@ -20,6 +20,8 @@
 #include <scenario_runner/syntax/storyboard_element.hpp>
 #include <scenario_runner/syntax/user_defined_action.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -37,8 +39,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Action
-  : public StoryboardElement<Action>,
-  public Object
+  : public StoryboardElement<Action>, public Element
 {
   const String name;
 
@@ -75,7 +76,7 @@ struct Action
     return false;
   }
 
-  using Object::start;
+  using Element::start;
 
   /* -------------------------------------------------------------------------
    *
@@ -89,7 +90,7 @@ struct Action
    *   complete in order to reach the completeState of the Action.
    *
    * ---------------------------------------------------------------------- */
-  using Object::accomplished;
+  using Element::accomplished;
 
   using StoryboardElement::evaluate;
 
@@ -104,9 +105,10 @@ struct Action
     }
   }
 
-  void run()
+  template<typename ... Ts>
+  decltype(auto) run(Ts && ... xs)
   {
-    Object::evaluate();
+    return Element::evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
 }

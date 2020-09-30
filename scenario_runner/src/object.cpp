@@ -16,7 +16,9 @@
 
 namespace scenario_runner
 {
-const Object unspecified {make<Unspecified>()};
+const Element unspecified {
+  make<Unspecified>()
+};
 
 std::ostream & operator<<(std::ostream & os, const Unspecified &)
 {

@@ -40,7 +40,7 @@ struct ScenarioObject
 
   Scope inner_scope;
 
-  Object entity_object, object_controller;
+  Element entity_object, object_controller;
 
   template<typename Node>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)

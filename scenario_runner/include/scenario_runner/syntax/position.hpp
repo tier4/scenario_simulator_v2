@@ -39,7 +39,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Position
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit Position(const Node & node, Scope & scope)

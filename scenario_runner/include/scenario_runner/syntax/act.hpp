@@ -35,14 +35,13 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Act
-  : public StoryboardElement<Act>,
-  public Objects
+  : public StoryboardElement<Act>, public Elements
 {
   const String name;
 
   Scope inner_scope;
 
-  Object start_trigger, stop_trigger;
+  Element start_trigger, stop_trigger;
 
   template<typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
@@ -52,7 +51,7 @@ struct Act
     callWithElements(
       node, "ManeuverGroup", 1, unbounded, [&](auto && node)
       {
-        return makeStoryboardElement<ManeuverGroup>(node, inner_scope);
+        return push_back(readStoryboardElement<ManeuverGroup>(node, inner_scope));
       });
 
     callWithElements(

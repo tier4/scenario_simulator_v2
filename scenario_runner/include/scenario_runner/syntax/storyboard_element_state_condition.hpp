@@ -49,7 +49,7 @@ struct StoryboardElementStateCondition
     inner_scope{outer_scope}
   {}
 
-  auto compare(const Object & lhs, StoryboardElementState rhs) const
+  auto compare(const Element & lhs, StoryboardElementState rhs) const
   {
     return asBoolean(lhs.as<StoryboardElementState>() == rhs);
   }
@@ -58,19 +58,8 @@ struct StoryboardElementStateCondition
   {
     const auto result {compare(inner_scope.storyboard_elements.at(name).state(), state)};
 
-    std::cout << indent <<
-      "StoryboardElementState [Is " <<
-      cyan <<
-      "\"" <<
-      name <<
-      "\"" <<
-      reset <<
-      " in " <<
-      state <<
-      "? => " <<
-      result <<
-      "]" <<
-      std::endl;
+    std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" <<
+      reset << " in " << state << "? => " << result << "]" << std::endl;
 
     return result;
   }

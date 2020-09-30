@@ -25,7 +25,7 @@ namespace scenario_runner
 {
 struct Scope
 {
-  std::unordered_map<String, Object> parameters, entities, storyboard_elements;
+  std::unordered_map<String, Element> parameters, entities, storyboard_elements;
 
   std::vector<EntityRef> actors;
 

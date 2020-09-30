@@ -35,19 +35,21 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct EntityObject
-  : public Object
+  : public Element
 {
   template<typename Node>
   explicit EntityObject(const Node & node, Scope & scope)
   {
     callWithElements(node, "CatalogReference", 0, 1, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(node, "Vehicle", 0, 1, [&](auto && element)
+    callWithElements(
+      node, "Vehicle", 0, 1, [&](auto && element)
       {
         return rebind<Vehicle>(element, scope);
       });
 
-    callWithElements(node, "Pedestrian", 0, 1, [&](auto && element) mutable
+    callWithElements(
+      node, "Pedestrian", 0, 1, [&](auto && element) mutable
       {
         return rebind<Pedestrian>(element, scope);
       });

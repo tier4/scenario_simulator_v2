@@ -31,12 +31,13 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct UserDefinedAction
-  : public Object
+  : public Element
 {
   template<typename Node, typename Scope>
   explicit UserDefinedAction(const Node & node, Scope & scope)
   {
-    callWithElements(node, "CustomCommandAction", 1, 1, [&](auto && node)
+    callWithElements(
+      node, "CustomCommandAction", 1, 1, [&](auto && node)
       {
         return rebind<CustomCommandAction>(node, scope);
       });
