@@ -81,13 +81,14 @@ public:
         if (!evaluate.as<OpenScenario>().complete()) {
           std::cout << "[Storyboard: " << evaluate.as<OpenScenario>()() << "]" << std::endl;
 
-          std::cout << "[" << (scenario_runner::standby_state.use_count() - 1) <<
-          " standby, " << (scenario_runner::running_state.use_count() - 1) <<
-          " running, " << (scenario_runner::complete_state.use_count() - 1) <<
-          " complete, and " << (scenario_runner::stop_transition.use_count() - 1) <<
-          " stopping " << " (" << (scenario_runner::start_transition.use_count() +
-          scenario_runner::end_transition.use_count() - 2) << " in transition)" << "]\n" <<
-          std::endl;
+          RCLCPP_INFO(
+            get_logger(),
+            "[%d standby (=> %d) => %d running (=> %d) => %d complete]",
+            scenario_runner::standby_state.use_count() - 1,
+            scenario_runner::start_transition.use_count() - 1,
+            scenario_runner::running_state.use_count() - 1,
+            scenario_runner::stop_transition.use_count() - 1,
+            scenario_runner::complete_state.use_count() - 1);
         } else {
           deactivate();
         }
