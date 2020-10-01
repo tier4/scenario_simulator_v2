@@ -102,7 +102,7 @@ void lightAsMarker(
 
   marker->header.frame_id = "map";
   marker->header.stamp = rclcpp::Time();
-  marker->frame_locked = true;
+  marker->frame_locked = false;
   marker->ns = ns;
   marker->id = p.id();
   marker->lifetime = rclcpp::Duration(0, 0);
@@ -153,7 +153,7 @@ void laneletDirectionAsMarker(
 
   marker->header.frame_id = "map";
   marker->header.stamp = rclcpp::Time();
-  marker->frame_locked = true;
+  marker->frame_locked = false;
   marker->ns = ns;
   marker->id = id;
   marker->type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
@@ -277,7 +277,7 @@ visualization_msgs::msg::Marker polygonAsMarker(
 
   marker.header.frame_id = "map";
   marker.header.stamp = rclcpp::Time();
-  marker.frame_locked = true;
+  marker.frame_locked = false;
   marker.id = polygon.id();
   marker.ns = name_space;
   marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
@@ -517,7 +517,7 @@ visualization_msgs::msg::MarkerArray visualization::detectionAreasAsMarkerArray(
 
   marker.header.frame_id = "map";
   marker.header.stamp = rclcpp::Time();
-  marker.frame_locked = true;
+  marker.frame_locked = false;
   marker.ns = "detection_area";
   marker.id = 0;
   marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
@@ -721,7 +721,7 @@ visualization_msgs::msg::MarkerArray visualization::laneletsAsTriangleMarkerArra
 
   marker.header.frame_id = "map";
   marker.header.stamp = rclcpp::Time();
-  marker.frame_locked = true;
+  marker.frame_locked = false;
   marker.ns = ns;
   marker.id = 0;
   marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
@@ -776,7 +776,7 @@ void visualization::trafficLight2TriangleMarker(
   }
   marker->header.frame_id = "map";
   marker->header.stamp = rclcpp::Time();
-  marker->frame_locked = true;
+  marker->frame_locked = false;
   marker->ns = ns;
   marker->id = ls.id();
   marker->type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
@@ -852,7 +852,7 @@ void visualization::lineString2Marker(
 
   line_strip->header.frame_id = frame_id;
   line_strip->header.stamp = rclcpp::Time();
-  line_strip->frame_locked = true;
+  line_strip->frame_locked = false;
   line_strip->ns = ns;
   line_strip->action = visualization_msgs::msg::Marker::ADD;
   line_strip->type = visualization_msgs::msg::Marker::LINE_STRIP;
@@ -901,7 +901,7 @@ visualization_msgs::msg::MarkerArray visualization::generateLaneletIdMarker(
     marker.pose.orientation.w = 1.0;
     marker.color = c;
     marker.scale.z = scale;
-    marker.frame_locked = true;
+    marker.frame_locked = false;
     marker.text = std::to_string(ll.id());
     markers.markers.push_back(marker);
   }

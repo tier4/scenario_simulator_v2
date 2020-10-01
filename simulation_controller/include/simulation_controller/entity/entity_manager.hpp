@@ -43,6 +43,16 @@ namespace simulation_controller
 {
 namespace entity
 {
+
+class LaneletMarkerQos : public rclcpp::QoS
+{
+public:
+  explicit LaneletMarkerQos(size_t depth = 1) : rclcpp::QoS(depth)
+  {
+    transient_local();
+  }
+};
+
 class EntityManager
 {
 private:
@@ -51,7 +61,7 @@ private:
   rclcpp::Clock::SharedPtr clock_ptr_;
 
 public:
-  template<class NodeT>
+  template<class NodeT,class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node)
   : broadcaster_(node)
   {
@@ -67,6 +77,22 @@ public:
     node->get_parameter("origin_longitude", origin.longitude);
     node->get_parameter("origin_altitude", origin.altitude);
     hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
+    const rclcpp::QoS & qos = LaneletMarkerQos();
+    const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
+      rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
+    marker_pub_ptr_ = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(node, "/lanelet/marker", qos, options);
+    visualization_msgs::msg::MarkerArray markers;
+    auto markers_raw = hdmap_utils_ptr_->generateMarker();
+    
+    std::cout << clock_ptr_->get_clock_type()  << "," << RCL_ROS_TIME << std::endl;
+    auto stamp = clock_ptr_->now();
+    for(const auto & marker_raw : markers_raw.markers)
+    {
+      visualization_msgs::msg::Marker marker = marker_raw;
+      marker.header.stamp = stamp;
+      markers.markers.emplace_back(marker);
+    }
+    marker_pub_ptr_->publish(markers);
   }
   void setVerbose(bool verbose)
   {
@@ -486,6 +512,7 @@ public:
     return ret;
   }
   tf2_ros::TransformBroadcaster broadcaster_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_ptr_;
   template<typename T>
   bool spawnEntity(T & entity)
   {

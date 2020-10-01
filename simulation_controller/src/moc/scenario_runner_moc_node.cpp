@@ -56,9 +56,10 @@ public:
     lanechange_excuted_ = false;
     bob_spawned_ = false;
     api_.entity->setTargetSpeed("npc1", 10, true);
-    using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
     */
+    using namespace std::chrono_literals;
+    update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
 
 private:
@@ -99,6 +100,7 @@ private:
       }
     }
     */
+    RCLCPP_INFO(get_logger(),"current time : " + std::to_string(current_time_) + " [sec]");
     api_.simulation->updateFrame();
     current_time_ = current_time_ + 0.02;
   }
@@ -230,5 +232,7 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   auto component = std::make_shared<ScenarioRunnerMoc>(options);
+  rclcpp::spin(component);
+  rclcpp::shutdown();
   return 0;
 }

@@ -28,19 +28,7 @@ find_package(lanelet2_core REQUIRED)
 find_package(lanelet2_routing REQUIRED)
 find_package(lanelet2_extension REQUIRED)
 find_package(visualization_msgs REQUIRED)
-
-#find_package(catkin REQUIRED COMPONENTS
-#  geometry_msgs
-#  rclcpp
-#  std_msgs
-#  tf2
-#  tf2_geometry_msgs
-#  tf2_ros
-#  simulation_controller
-#  roslib
-#  
-#  
-#)
+find_package(behaviortree_cpp_v3 REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
@@ -64,42 +52,23 @@ ament_target_dependencies(scenario_simulator
   lanelet2_routing
   lanelet2_extension
   visualization_msgs
+  behaviortree_cpp_v3
 )
 
-#add_executable(scenario_simulator_node
-#  src/scenario_simulator_node.cpp
-#  
-#  
-#)
-#target_link_libraries(scenario_simulator_node
-#  ${catkin_LIBRARIES}
-#  pugixml
-#)
+add_executable(scenario_simulator_node
+  src/scenario_simulator_node.cpp
+)
+ament_target_dependencies(scenario_simulator_node
+  rclcpp
+)
+target_link_libraries(scenario_simulator_node
+  scenario_simulator
+)
 
-#add_executable(scenario_runner_moc_node
-#  src/scenario_runner_moc_node.cpp
-#)
-#target_link_libraries(scenario_runner_moc_node
-#  ${catkin_LIBRARIES}
-#  pugixml
-#)
-
-#install(TARGETS
-#  scenario_simulator_node scenario_runner_moc_node
-#  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#)
-
-#install(DIRECTORY include/${PROJECT_NAME}/
-#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#)
-
-#install(
-#  DIRECTORY
-#    ${CMAKE_CURRENT_SOURCE_DIR}/launch
-#    ${CMAKE_CURRENT_SOURCE_DIR}/config
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(TARGETS
+  scenario_simulator_node
+  DESTINATION lib/scenario_simulator
+)
 
 ament_export_include_directories(include)
 ament_package()

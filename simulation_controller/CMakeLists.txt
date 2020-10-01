@@ -102,6 +102,7 @@ ament_target_dependencies(scenario_runner_moc_node
   rclcpp
   rclcpp_lifecycle
   geometry_msgs
+  visualization_msgs
   quaternion_operation
   autoware_auto_msgs
   lanelet2_core
@@ -138,7 +139,7 @@ install(
   DESTINATION include
 )
 
-install(DIRECTORY resource launch
+install(DIRECTORY resource launch config
   DESTINATION share/${PROJECT_NAME}
 )
 

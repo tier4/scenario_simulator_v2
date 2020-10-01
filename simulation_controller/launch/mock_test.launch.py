@@ -28,16 +28,37 @@ from launch_ros.actions import Node
 def generate_launch_description():
     """Launch description for scenario runner moc."""
     lanlet_path = os.path.join(
-            get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm')
-    print(lanlet_path)
+            get_package_share_directory('borregas_avenue_map'), 'map', 'lanelet2_map.osm')
+    rviz_config_dir = os.path.join(
+            get_package_share_directory('simulation_controller'),
+            'config',
+            'moc_test.rviz')
     description = LaunchDescription([
         Node(
             package='simulation_controller',
             node_executable='scenario_runner_moc_node',
             node_name='scenario_runner_node',
-            output='screen',
-            parameters=[{'map_path':lanlet_path,
-                "origin_latitude":35.61836750154,
-                "origin_longitude":139.78066608243}])
+            output='log',
+            parameters=[{'map_path' : lanlet_path,
+                "origin_latitude" : 35.61836750154,
+                "origin_longitude" : 139.78066608243,
+                "port" : 8080}],
+            arguments=[('__log_level:=info')]),
+        Node(
+            package='scenario_simulator',
+            node_executable='scenario_simulator_node',
+            node_name='scenario_simulator_node',
+            output='log',
+            parameters=[{
+                "port" : 8080
+            }],
+            arguments=[('__log_level:=warn')],
+            ),
+        Node(
+            package='rviz2',
+            node_executable='rviz2',
+            node_name='rviz2',
+            arguments=['-d', rviz_config_dir],
+            output='screen'),
     ])
     return description
