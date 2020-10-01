@@ -128,7 +128,7 @@ install(
   DESTINATION include
 )
 
-install(DIRECTORY resource
+install(DIRECTORY resource launch
   DESTINATION share/${PROJECT_NAME}
 )
 

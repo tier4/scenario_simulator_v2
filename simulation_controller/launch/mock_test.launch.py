@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""Launch description for scenario runner moc."""
+
 # Copyright (c) 2020 Autoware Foundation. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +19,15 @@
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch_ros.actions import LifecycleNode
 
 
 def generate_launch_description():
-    scenario_launcher = Node(
-        package='scenario_launcher',
-        node_executable='scenario_launcher',
-        output={
-                'stdout': 'log',
-                'stderr': 'screen',
-        }
-    )
-    scenario_runner_mock = LifecycleNode(
-        node_name='scenario_runner_mock',
-        package='scenario_runner_mock',
-        node_executable='scenario_runner_mock',
-        output='log'
-    )
-    return LaunchDescription([scenario_launcher, scenario_runner_mock])
+    """Launch description for scenario runner moc."""
+    description = LaunchDescription([
+        Node(
+            package='simulation_controller',
+            node_executable='scenario_runner_moc_node',
+            node_name='scenario_runner_node',
+            output='screen')
+    ])
+    return description
