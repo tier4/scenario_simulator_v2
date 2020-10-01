@@ -13,10 +13,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-find_package(geometry_msgs     REQUIRED)
-find_package(rclcpp            REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(std_msgs          REQUIRED)
+find_package(geometry_msgs    REQUIRED)
+find_package(lifecycle_msgs   REQUIRED)
+find_package(rclcpp           REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(std_msgs         REQUIRED)
 
 # ------------------------------------------------------------------------------
 #  libscenario_runner
@@ -31,8 +32,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 ament_target_dependencies(${PROJECT_NAME}
   geometry_msgs
+  lifecycle_msgs
   rclcpp
-  rclcpp_components
+  rclcpp_lifecycle
   std_msgs)
 
 target_link_libraries(${PROJECT_NAME} pugixml)
@@ -76,7 +78,9 @@ if(BUILD_TESTING)
   set(${PROJECT_NAME}_TEST_DEPENDENCIES
     ament_index_cpp
     geometry_msgs
+    lifecycle_msgs
     rclcpp
+    rclcpp_lifecycle
     std_msgs)
 
   ament_add_gtest(test_syntax test/test_syntax.cpp)

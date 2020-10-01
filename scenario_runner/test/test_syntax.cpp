@@ -21,7 +21,7 @@
 
 TEST(Syntax, LexicalScope)
 {
-  scenario_runner::OpenSCENARIO osc {
+  scenario_runner::OpenScenario osc {
     ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/lexical-scope.xosc",
     "127.0.0.1",
     8080
