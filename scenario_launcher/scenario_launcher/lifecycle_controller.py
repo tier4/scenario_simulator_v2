@@ -21,13 +21,14 @@ from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from lifecycle_msgs.srv import GetState
 from rclpy.node import Node
-
 from scenario_common.logger import Logger
+from scenario_simulator_msgs.srv import LauncherMsg
 
 
 class LifecycleController(Node):
 
     NODE_NAME = "scenario_runner_mock"
+    PARAMETER_NAME = "scenario"
     STATES = {}
 
     def __init__(self):
@@ -45,6 +46,25 @@ class LifecycleController(Node):
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_change_state.srv_name + ' service not available')
+        self.declare_parameter(self.PARAMETER_NAME)
+        self.launcher_client = self.create_client(
+            LauncherMsg, 'launcher_msg')
+        self.req = LauncherMsg.Request()
+        self.send_scenario = ""
+
+    def send_scenario_request(self):
+        future = self.launcher_client.call_async(self.req)
+        return future
+
+    def send_scenario_param(self, scenario):
+        set_scenario = rclpy.parameter.Parameter(
+            self.PARAMETER_NAME,
+            rclpy.Parameter.Type.STRING,
+            scenario
+        )
+        all_parameters = [set_scenario]
+        self.set_parameters(all_parameters)
+        return
 
     def configure_node(self):
         self.node_logger.info(self.get_lifecycle_state())
@@ -55,14 +75,19 @@ class LifecycleController(Node):
 
     def activate_node(self, scenario):
         self.node_logger.info(scenario)
+        self.req.scenario = scenario
+        self.srv = self.create_service(
+            LauncherMsg, 'launcher_msg', self.send_scenario_request)
+        self.send_scenario_param(scenario)
+        Logger.print_process("set scenario: "+scenario)
         self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
-        Logger.print_info("scenario runner state is " +
+        Logger.print_info("Activate -> scenario runner state is " +
                           self.get_lifecycle_state())
         self.node_logger.info(self.get_lifecycle_state())
 
     def deactivate_node(self):
         self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
-        Logger.print_info("scenario runner state is " +
+        Logger.print_info("Deactivate -> scenario runner state is " +
                           self.get_lifecycle_state())
         self.node_logger.info(self.get_lifecycle_state())
 
