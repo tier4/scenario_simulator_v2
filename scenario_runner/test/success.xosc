@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSCENARIO>
+  <FileHeader revMajor="0" revMinor="0" date="2020-08-24T16:00:00" description="test" author="Tatsuya Yamasaki"/>
+  <ParameterDeclarations>
+    <ParameterDeclaration name="initial-lane-id" parameterType="string" value="178"/>
+  </ParameterDeclarations>
+  <CatalogLocations/>
+  <RoadNetwork>
+    <LogicFile filepath="./"/>
+    <SceneGraphFile filepath="./"/>
+  </RoadNetwork>
+  <Entities/>
+  <Storyboard>
+    <Init>
+      <Actions>
+        <UserDefinedAction>
+          <CustomCommandAction type="print"> OpenSCENARIO.Storyboard.Init.Actions.UserDefinedAction.CustomCommandAction </CustomCommandAction>
+        </UserDefinedAction>
+      </Actions>
+    </Init>
+    <Story name="story">
+      <Act name="act">
+        <ManeuverGroup name="maneuver-group" maximumExecutionCount="1">
+          <Actors>
+            <EntityRef entityRef="_"/>
+          </Actors>
+          <Maneuver name="maneuver">
+            <Event name="event" priority="overwrite">
+              <Action name="action">
+                <UserDefinedAction>
+                  <CustomCommandAction type="print"> OpenSCENARIO.Storyboard.Story.Act.ManeuverGroup.Maneuver.Event.Action.UserDefinedAction.CustomCommandAction </CustomCommandAction>
+                </UserDefinedAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="condition" conditionEdge="none">
+                    <ByValueCondition>
+                      <SimulationTimeCondition value="3" rule="greaterThan"/>
+                    </ByValueCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+        <StartTrigger>
+          <ConditionGroup>
+            <Condition name="condition" conditionEdge="none">
+              <ByValueCondition>
+                <SimulationTimeCondition value="0" rule="greaterThan"/>
+              </ByValueCondition>
+            </Condition>
+          </ConditionGroup>
+        </StartTrigger>
+      </Act>
+    </Story>
+    <StopTrigger>
+      <ConditionGroup>
+        <Condition name="condition" conditionEdge="none">
+          <ByValueCondition>
+            <SimulationTimeCondition value="10" rule="greaterThan"/>
+          </ByValueCondition>
+        </Condition>
+      </ConditionGroup>
+    </StopTrigger>
+  </Storyboard>
+</OpenSCENARIO>

@@ -112,10 +112,10 @@ public:
           }
         } catch (const scenario_runner::ImplementationFault & error) {
           RCLCPP_ERROR(get_logger(), "%s.", error.what());
-          throw;
+          deactivate();
         } catch (const std::exception & error) {
           RCLCPP_ERROR(get_logger(), "%s.", error.what());
-          throw;
+          deactivate();
         }
       }
     );
@@ -142,7 +142,6 @@ public:
 
   Result on_error(const rclcpp_lifecycle::State &) override
   {
-    RCLCPP_ERROR(get_logger(), "ERROR!");
     return Result::SUCCESS;
   }
 };
