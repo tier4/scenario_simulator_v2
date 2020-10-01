@@ -3,8 +3,8 @@
 
 int main(int argc, char * argv[])
 {
-    ros::init(argc, argv, "scenario_simulator_node");
-    scenario_simulator::ScenarioSimulator sim;
-    ros::spin();
-    return 0;
+  ros::init(argc, argv, "scenario_simulator_node");
+  scenario_simulator::ScenarioSimulator sim;
+  ros::spin();
+  return 0;
 }

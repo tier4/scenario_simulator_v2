@@ -23,6 +23,7 @@
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/message_conversion.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
+#include <lanelet2_extension/utility/query.hpp>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
@@ -42,13 +43,15 @@
 
 namespace hdmap_utils
 {
-HdMapUtils::HdMapUtils(std::string lanelet_path)
+HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin)
 {
-  lanelet::projection::MGRSProjector projector;
+  lanelet::GPSPoint origin_gps_point {origin.latitude, origin.longitude, origin.altitude};
+  lanelet::Origin origin_lanelet {origin_gps_point};
+  lanelet::projection::UtmProjector projector(origin_lanelet);
   lanelet::ErrorMessages errors;
   lanelet_map_ptr_ = lanelet::load(lanelet_path, projector, &errors);
   if (!errors.empty()) {
-    throw HdMapError("failed to load vector map");
+    throw HdMapError("failed to load lanelet map");
   }
   traffic_rules_vehicle_ptr_ =
     lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany,
@@ -679,6 +682,156 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
     }
   }
   return dist;
+}
+
+const visualization_msgs::msg::MarkerArray & HdMapUtils::generateMarker() const
+{
+  visualization_msgs::msg::MarkerArray markers;
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
+  lanelet::ConstLanelets road_lanelets = lanelet::utils::query::roadLanelets(all_lanelets);
+  lanelet::ConstLanelets crosswalk_lanelets =
+    lanelet::utils::query::crosswalkLanelets(all_lanelets);
+  lanelet::ConstLanelets walkway_lanelets = lanelet::utils::query::walkwayLanelets(all_lanelets);
+  std::vector<lanelet::ConstLineString3d> stop_lines =
+    lanelet::utils::query::stopLinesLanelets(road_lanelets);
+  std::vector<lanelet::TrafficLightConstPtr> tl_reg_elems =
+    lanelet::utils::query::trafficLights(all_lanelets);
+  std::vector<lanelet::AutowareTrafficLightConstPtr> aw_tl_reg_elems =
+    lanelet::utils::query::autowareTrafficLights(all_lanelets);
+  std::vector<lanelet::DetectionAreaConstPtr> da_reg_elems =
+    lanelet::utils::query::detectionAreas(all_lanelets);
+  lanelet::ConstLineStrings3d parking_spaces =
+    lanelet::utils::query::getAllParkingSpaces(lanelet_map_ptr_);
+  lanelet::ConstPolygons3d parking_lots = lanelet::utils::query::getAllParkingLots(lanelet_map_ptr_);
+  return markers;
+}
+
+void HdMapUtils::overwriteLaneletsCenterline()
+{
+  for (auto & lanelet_obj : lanelet_map_ptr_->laneletLayer) {
+    if (!lanelet_obj.hasCustomCenterline()) {
+      const auto fine_center_line = generateFineCenterline(lanelet_obj, 2.0);
+      lanelet_obj.setCenterline(fine_center_line);
+    }
+  }
+}
+
+std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
+  const std::vector<double> & accumulated_lengths, const double target_length)
+{
+  // List size
+  const auto N = accumulated_lengths.size();
+
+  // Front
+  if (target_length < accumulated_lengths.at(1)) {
+    return std::make_pair(0, 1);
+  }
+
+  // Back
+  if (target_length > accumulated_lengths.at(N - 2)) {
+    return std::make_pair(N - 2, N - 1);
+  }
+
+  // Middle
+  for (size_t i = 1; i < N; ++i) {
+    if (
+      accumulated_lengths.at(i - 1) <= target_length &&
+      target_length <= accumulated_lengths.at(i))
+    {
+      return std::make_pair(i - 1, i);
+    }
+  }
+
+  // Throw an exception because this never happens
+  throw HdMapError("findNearestIndexPair(): No nearest point found.");
+}
+
+std::vector<double> HdMapUtils::calculateSegmentDistances(
+  const lanelet::ConstLineString3d & line_string)
+{
+  std::vector<double> segment_distances;
+  segment_distances.reserve(line_string.size() - 1);
+  for (size_t i = 1; i < line_string.size(); ++i) {
+    const auto distance = lanelet::geometry::distance(line_string[i], line_string[i - 1]);
+    segment_distances.push_back(distance);
+  }
+  return segment_distances;
+}
+
+std::vector<double> HdMapUtils::calculateAccumulatedLengths(
+  const lanelet::ConstLineString3d & line_string)
+{
+  const auto segment_distances = calculateSegmentDistances(line_string);
+
+  std::vector<double> accumulated_lengths{0};
+  accumulated_lengths.reserve(segment_distances.size() + 1);
+  std::partial_sum(
+    std::begin(segment_distances), std::end(segment_distances),
+    std::back_inserter(accumulated_lengths));
+  return accumulated_lengths;
+}
+
+std::vector<lanelet::BasicPoint3d> HdMapUtils::resamplePoints(
+  const lanelet::ConstLineString3d & line_string, const int32_t num_segments)
+{
+  // Calculate length
+  const auto line_length = lanelet::geometry::length(line_string);
+
+  // Calculate accumulated lengths
+  const auto accumulated_lengths = calculateAccumulatedLengths(line_string);
+
+  // Create each segment
+  std::vector<lanelet::BasicPoint3d> resampled_points;
+  for (auto i = 0; i <= num_segments; ++i) {
+    // Find two nearest points
+    const double target_length = (static_cast<double>(i) / num_segments) *
+      static_cast<double>(line_length);
+    const auto index_pair = findNearestIndexPair(accumulated_lengths, target_length);
+
+    // Apply linear interpolation
+    const lanelet::BasicPoint3d back_point = line_string[index_pair.first];
+    const lanelet::BasicPoint3d front_point = line_string[index_pair.second];
+    const auto direction_vector = (front_point - back_point);
+
+    const auto back_length = accumulated_lengths.at(index_pair.first);
+    const auto front_length = accumulated_lengths.at(index_pair.second);
+    const auto segment_length = front_length - back_length;
+    const auto target_point =
+      back_point + (direction_vector * (target_length - back_length) / segment_length);
+
+    // Add to list
+    resampled_points.push_back(target_point);
+  }
+  return resampled_points;
+}
+
+lanelet::LineString3d HdMapUtils::generateFineCenterline(
+  const lanelet::ConstLanelet & lanelet_obj, const double resolution)
+{
+  // Get length of longer border
+  const double left_length =
+    static_cast<double>(lanelet::geometry::length(lanelet_obj.leftBound()));
+  const double right_length =
+    static_cast<double>(lanelet::geometry::length(lanelet_obj.rightBound()));
+  const double longer_distance = (left_length > right_length) ? left_length : right_length;
+  const int32_t num_segments =
+    std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
+
+  // Resample points
+  const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
+  const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
+
+  // Create centerline
+  lanelet::LineString3d centerline(lanelet::utils::getId());
+  for (size_t i = 0; i < static_cast<size_t>(num_segments + 1); i++) {
+    // Add ID for the average point of left and right
+    const auto center_basic_point = (right_points.at(i) + left_points.at(i)) / 2.0;
+    const lanelet::Point3d center_point(
+      lanelet::utils::getId(), center_basic_point.x(), center_basic_point.y(),
+      center_basic_point.z());
+    centerline.push_back(center_point);
+  }
+  return centerline;
 }
 
 std::vector<double> HdMapUtils::calcEuclidDist(

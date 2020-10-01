@@ -19,31 +19,38 @@
 
 namespace scenario_simulator
 {
-    class ScenarioSimulator : public rclcpp::Node
-    {
-    public:
-        explicit ScenarioSimulator(const rclcpp::NodeOptions & options);
-        ~ScenarioSimulator();
-    private:
-        /*
-        ros::NodeHandle nh_;
-        ros::NodeHandle pnh_;
-        */
-        XmlRpc::XmlRpcServer server_;
-        int port_;
-        std::map<std::string, std::shared_ptr<scenario_simulator::XmlRpcMethod>> methods_;
-        void updateFrame(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void initialize(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void getEntityStatus(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void spawnEntity(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void despawnEntity(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void addMethod(std::string name,std::function<void(XmlRpc::XmlRpcValue&, XmlRpc::XmlRpcValue&)> func);
-        void runXmlRpc();
-        std::thread xmlrpc_thread_;
-        std::vector<std::string> getNonExistingRequredFields(std::vector<std::string> required_fields, XmlRpc::XmlRpcValue& param);
-        bool checkRequiredFields(std::vector<std::string> required_fields, XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        scenario_simulator::ScenarioSimulatorImpl impl_;
-    };
+class ScenarioSimulator : public rclcpp::Node
+{
+public:
+  explicit ScenarioSimulator(const rclcpp::NodeOptions & options);
+  ~ScenarioSimulator();
+
+private:
+  /*
+  ros::NodeHandle nh_;
+  ros::NodeHandle pnh_;
+  */
+  XmlRpc::XmlRpcServer server_;
+  int port_;
+  std::map<std::string, std::shared_ptr<scenario_simulator::XmlRpcMethod>> methods_;
+  void updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void getEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void spawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void addMethod(
+    std::string name, std::function<void(XmlRpc::XmlRpcValue &,
+    XmlRpc::XmlRpcValue &)> func);
+  void runXmlRpc();
+  std::thread xmlrpc_thread_;
+  std::vector<std::string> getNonExistingRequredFields(
+    std::vector<std::string> required_fields,
+    XmlRpc::XmlRpcValue & param);
+  bool checkRequiredFields(
+    std::vector<std::string> required_fields, XmlRpc::XmlRpcValue & param,
+    XmlRpc::XmlRpcValue & result);
+  scenario_simulator::ScenarioSimulatorImpl impl_;
+};
 }  // namespace scenario_simulator
 
 #endif  // SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_

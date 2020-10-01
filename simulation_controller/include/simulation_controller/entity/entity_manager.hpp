@@ -56,7 +56,17 @@ public:
   : broadcaster_(node)
   {
     clock_ptr_ = node->get_clock();
-    hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>("/map/vector_map");
+    node->declare_parameter("map_path", "");
+    std::string map_path;
+    node->get_parameter("map_path", map_path);
+    geographic_msgs::msg::GeoPoint origin;
+    node->declare_parameter("origin_latitude", 0);
+    node->declare_parameter("origin_longitude", 0);
+    node->declare_parameter("origin_altitude", 0);
+    node->get_parameter("origin_latitude", origin.latitude);
+    node->get_parameter("origin_longitude", origin.longitude);
+    node->get_parameter("origin_altitude", origin.altitude);
+    hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
   }
   void setVerbose(bool verbose)
   {
@@ -498,6 +508,7 @@ public:
     entities_.erase(name);
     return true;
   }
+
 };
 }  // namespace entity
 }  // namespace simulation_controller

@@ -14,22 +14,23 @@
 
 namespace scenario_simulator
 {
-    class ScenarioSimulatorImpl
-    {
-    public:
-        ScenarioSimulatorImpl();
-        void initialize(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void updateFrame(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void getEntityStatus(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void setEntityStatus(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void spawnEntity(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-        void despawnEntity(XmlRpc::XmlRpcValue& param, XmlRpc::XmlRpcValue& result);
-    private:
-        double realtime_factor_;
-        double step_time_;
-        double current_time_;
-        bool initialized_;
-    };
+class ScenarioSimulatorImpl
+{
+public:
+  ScenarioSimulatorImpl();
+  void initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void getEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void setEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void spawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+
+private:
+  double realtime_factor_;
+  double step_time_;
+  double current_time_;
+  bool initialized_;
+};
 }  // namespace scenario_simulator
 
 #endif   // SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_IMPL_HPP_

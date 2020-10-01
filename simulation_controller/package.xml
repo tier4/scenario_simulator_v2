@@ -36,6 +36,7 @@
   <depend>lanelet2_projection</depend>
   <depend>spline_interpolation</depend>
   <depend>quaternion_operation</depend>
+  <depend>geographic_msgs</depend>
   <depend>behaviortree_cpp_v3</depend>
   <depend>ament_index_cpp</depend>
   

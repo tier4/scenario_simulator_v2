@@ -34,6 +34,7 @@ find_package(spline_interpolation REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(xmlrpcpp REQUIRED)
+find_package(geographic_msgs REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
