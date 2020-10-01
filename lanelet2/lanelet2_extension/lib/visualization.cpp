@@ -884,7 +884,7 @@ visualization_msgs::msg::MarkerArray visualization::generateLaneletIdMarker(
   for (const auto & ll : road_lanelets) {
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "map";
-    marker.header.stamp = ros::Time::now();
+    marker.header.stamp = rclcpp::Time();
     marker.ns = "lanelet_id";
     marker.id = ll.id();
     marker.type = marker.TEXT_VIEW_FACING;
