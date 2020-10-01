@@ -60,9 +60,9 @@ public:
     std::string map_path;
     node->get_parameter("map_path", map_path);
     geographic_msgs::msg::GeoPoint origin;
-    node->declare_parameter("origin_latitude", 0);
-    node->declare_parameter("origin_longitude", 0);
-    node->declare_parameter("origin_altitude", 0);
+    node->declare_parameter("origin_latitude", 0.0);
+    node->declare_parameter("origin_longitude", 0.0);
+    node->declare_parameter("origin_altitude", 0.0);
     node->get_parameter("origin_latitude", origin.latitude);
     node->get_parameter("origin_longitude", origin.longitude);
     node->get_parameter("origin_altitude", origin.altitude);

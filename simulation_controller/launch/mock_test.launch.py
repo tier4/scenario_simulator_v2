@@ -17,17 +17,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
+from ament_index_python.packages import get_package_share_directory
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
     """Launch description for scenario runner moc."""
+    lanlet_path = os.path.join(
+            get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm')
+    print(lanlet_path)
     description = LaunchDescription([
         Node(
             package='simulation_controller',
             node_executable='scenario_runner_moc_node',
             node_name='scenario_runner_node',
-            output='screen')
+            output='screen',
+            parameters=[{'map_path':lanlet_path,
+                "origin_latitude":35.61836750154,
+                "origin_longitude":139.78066608243}])
     ])
     return description

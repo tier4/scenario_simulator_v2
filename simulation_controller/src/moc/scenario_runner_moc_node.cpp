@@ -36,6 +36,7 @@ public:
   : Node("scenario_runner", option), api_(this)
   {
     api_.simulation->initialize(1.0, 0.02);
+    /*
     lanechange_excuted_ = false;
 
     pugi::xml_document catalog_xml_doc;
@@ -57,11 +58,13 @@ public:
     api_.entity->setTargetSpeed("npc1", 10, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
+    */
   }
 
 private:
   void update()
   {
+    /*
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");
     if (stand_still_duration) {
       if (stand_still_duration.get() > 0.1) {
@@ -95,6 +98,7 @@ private:
         api_.entity->requestLaneChange("ego", simulation_controller::entity::Direction::LEFT);
       }
     }
+    */
     api_.simulation->updateFrame();
     current_time_ = current_time_ + 0.02;
   }
@@ -223,11 +227,6 @@ private:
 
 int main(int argc, char * argv[])
 {
-  /*
-  ros::init(argc, argv, "scenario_simulator_node");
-  ScenarioRunnerMoc moc;
-  ros::spin();
-  */
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   auto component = std::make_shared<ScenarioRunnerMoc>(options);
