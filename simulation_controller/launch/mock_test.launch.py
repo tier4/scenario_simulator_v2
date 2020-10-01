@@ -38,7 +38,7 @@ def generate_launch_description():
             package='simulation_controller',
             node_executable='scenario_runner_moc_node',
             node_name='scenario_runner_node',
-            output='log',
+            output='screen',
             parameters=[{'map_path' : lanlet_path,
                 "origin_latitude" : 35.61836750154,
                 "origin_longitude" : 139.78066608243,

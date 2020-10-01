@@ -3,7 +3,8 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /TF1/Tree1/map1
       Splitter Ratio: 0.5
     Tree Height: 796
   - Class: rviz_common/Selection
@@ -28,13 +29,41 @@ Visualization Manager:
           Enabled: true
           Name: Lanelet
           Namespaces:
-            {}
+            center_lane_line: true
+            crosswalk_lanelets: true
+            lanelet_id: true
+            left_lane_bound: true
+            right_lane_bound: true
+            road_lanelets: true
+            stop_lines: true
+            traffic_light: true
+            traffic_light_triangle: true
           Queue Size: 10
           Topic: /lanelet/marker
           Unreliable: false
           Value: true
       Enabled: true
       Name: Map
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        ego:
+          Value: true
+        map:
+          Value: true
+      Marker Scale: 8
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        map:
+          ego:
+            {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -61,7 +90,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 48.03707504272461
+      Distance: 65.86320495605469
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -76,10 +105,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5203981399536133
+      Pitch: 0.4953984022140503
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.1454033851623535
+      Yaw: 4.145412921905518
     Saved: ~
 Window Geometry:
   Displays:

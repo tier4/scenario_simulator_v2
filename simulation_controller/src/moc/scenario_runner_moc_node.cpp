@@ -36,14 +36,13 @@ public:
   : Node("scenario_runner", option), api_(this)
   {
     api_.simulation->initialize(1.0, 0.02);
-    /*
-    lanechange_excuted_ = false;
-
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_controller::entity::VehicleParameters params(catalog_xml_doc);
     api_.entity->spawn(true, "ego", params);
     api_.entity->setEntityStatus("ego", getEgoInitialStatus());
+    /*
+    lanechange_excuted_ = false;
     api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
     api_.entity->requestAcquirePosition("npc1", 180, 0, 0);
     pugi::xml_document pedestrian_xml_doc;
@@ -119,7 +118,7 @@ private:
     pose.position.y = 0.0;
     pose.position.z = 0.0;
     geometry_msgs::msg::Twist twist;
-    twist.linear.x = 10.0;
+    twist.linear.x = 0.0;
     twist.linear.y = 0.0;
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;
@@ -137,7 +136,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_controller::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 178, 0.0, 0.0, rpy, twist, accel);
+      api_.simulation->getCurrentTime(), 17, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
