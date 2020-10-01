@@ -17,6 +17,11 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 
+# launch/conifg file
+install(DIRECTORY map
+  DESTINATION share/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
