@@ -19,9 +19,6 @@
 #include <scenario_runner/scenario_runner.hpp>
 
 #include <cstdlib>
-#include <string>
-#include <thread>
-#include <type_traits>
 #include <memory>
 
 int main(int argc, char ** argv)

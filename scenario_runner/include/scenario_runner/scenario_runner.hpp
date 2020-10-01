@@ -139,6 +139,12 @@ public:
   {
     return Result::SUCCESS;
   }
+
+  Result on_error(const rclcpp_lifecycle::State &) override
+  {
+    RCLCPP_ERROR(get_logger(), "ERROR!");
+    return Result::SUCCESS;
+  }
 };
 }  // namespace scenario_runner
 
