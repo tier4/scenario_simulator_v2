@@ -27,6 +27,7 @@
 #include <lanelet2_extension/utility/query.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <lanelet2_io/Io.h>
+#include <lanelet2_io/io_handlers/Serialize.h>
 #include <lanelet2_projection/UTM.h>
 
 #include <boost/archive/binary_iarchive.hpp>
@@ -686,10 +687,24 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
   return dist;
 }
 
+const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin(){
+  std::stringstream ss;
+  boost::archive::binary_oarchive oa(ss);
+  oa << *lanelet_map_ptr_;
+  auto id_counter = lanelet::utils::getId();
+  oa << id_counter;
+  std::string tmp_str = ss.str();
+  autoware_auto_msgs::msg::HADMapBin msg;
+  msg.data.clear();
+  msg.data.resize(tmp_str.size());
+  msg.data.assign(tmp_str.begin(), tmp_str.end());
+  msg.header.frame_id = "map";
+  return msg;
+}
+
 void HdMapUtils::insertMarkerArray(
   visualization_msgs::msg::MarkerArray & a1,
-  const visualization_msgs::msg::MarkerArray & a2) const
-{
+  const visualization_msgs::msg::MarkerArray & a2) const{
   a1.markers.insert(a1.markers.end(), a2.markers.begin(), a2.markers.end());
 }
 
@@ -775,12 +790,10 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
 {
   // List size
   const auto N = accumulated_lengths.size();
-
   // Front
   if (target_length < accumulated_lengths.at(1)) {
     return std::make_pair(0, 1);
   }
-
   // Back
   if (target_length > accumulated_lengths.at(N - 2)) {
     return std::make_pair(N - 2, N - 1);

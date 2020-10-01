@@ -43,6 +43,7 @@
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <autoware_auto_msgs/msg/had_map_bin.hpp>
 
 namespace hdmap_utils
 {
@@ -57,6 +58,7 @@ class HdMapUtils
 {
 public:
   explicit HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin);
+  const autoware_auto_msgs::msg::HADMapBin toMapBin();
   void insertMarkerArray(
     visualization_msgs::msg::MarkerArray & a1,
     const visualization_msgs::msg::MarkerArray & a2) const;
