@@ -67,6 +67,11 @@ public:
     RCLCPP_INFO(get_logger(), "Connecting simulator via %s:%d", address.c_str(), port);
     evaluate.as<OpenScenario>().init();
 
+    return Result::SUCCESS;
+  }
+
+  Result on_activate(const rclcpp_lifecycle::State &) override
+  {
     using std::literals::chrono_literals::operator"" ms;
 
     timer = create_wall_timer(
@@ -89,11 +94,6 @@ public:
       }
     );
 
-    return Result::SUCCESS;
-  }
-
-  Result on_activate(const rclcpp_lifecycle::State &) override
-  {
     return Result::SUCCESS;
   }
 

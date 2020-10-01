@@ -46,8 +46,8 @@ int main(int argc, char ** argv)
 
   executor.add_node((*node).get_node_base_interface());
 
-  (*node).configure(); // XXX DIRTY HACK
-  (*node).activate(); // XXX DIRTY HACK
+  (*node).configure();
+  (*node).activate();
 
   executor.spin();
 
