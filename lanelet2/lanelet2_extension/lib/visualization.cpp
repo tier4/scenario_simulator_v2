@@ -875,4 +875,37 @@ void visualization::lineString2Marker(
   }
 }
 
+visualization_msgs::msg::MarkerArray visualization::generateLaneletIdMarker(
+  const lanelet::ConstLanelets road_lanelets,
+  const std_msgs::msg::ColorRGBA c,
+  const double scale)
+{
+  visualization_msgs::msg::MarkerArray markers;
+  for (const auto & ll : road_lanelets) {
+    visualization_msgs::msg::Marker marker;
+    marker.header.frame_id = "map";
+    marker.header.stamp = ros::Time::now();
+    marker.ns = "lanelet_id";
+    marker.id = ll.id();
+    marker.type = marker.TEXT_VIEW_FACING;
+    marker.action = marker.ADD;
+    const auto centerline = ll.centerline();
+    const size_t target_position_index = centerline.size() / 2;
+    const auto target_position = centerline[target_position_index];
+    marker.pose.position.x = target_position.x();
+    marker.pose.position.y = target_position.y();
+    marker.pose.position.z = target_position.z();
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+    marker.color = c;
+    marker.scale.z = scale;
+    marker.frame_locked = true;
+    marker.text = std::to_string(ll.id());
+    markers.markers.push_back(marker);
+  }
+  return markers;
+}
+
 }  // namespace lanelet

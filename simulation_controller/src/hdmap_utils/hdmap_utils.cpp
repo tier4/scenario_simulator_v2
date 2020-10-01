@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <simulation_controller/color_utils/color_utils.hpp>
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_controller/math/hermite_curve.hpp>
 
@@ -24,6 +25,7 @@
 #include <lanelet2_extension/utility/message_conversion.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_extension/utility/query.hpp>
+#include <lanelet2_extension/visualization/visualization.hpp>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
@@ -684,7 +686,14 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
   return dist;
 }
 
-const visualization_msgs::msg::MarkerArray & HdMapUtils::generateMarker() const
+void HdMapUtils::insertMarkerArray(
+  visualization_msgs::msg::MarkerArray & a1,
+  const visualization_msgs::msg::MarkerArray & a2) const
+{
+  a1.markers.insert(a1.markers.end(), a2.markers.begin(), a2.markers.end());
+}
+
+const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
 {
   visualization_msgs::msg::MarkerArray markers;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
@@ -702,7 +711,52 @@ const visualization_msgs::msg::MarkerArray & HdMapUtils::generateMarker() const
     lanelet::utils::query::detectionAreas(all_lanelets);
   lanelet::ConstLineStrings3d parking_spaces =
     lanelet::utils::query::getAllParkingSpaces(lanelet_map_ptr_);
-  lanelet::ConstPolygons3d parking_lots = lanelet::utils::query::getAllParkingLots(lanelet_map_ptr_);
+  lanelet::ConstPolygons3d parking_lots =
+    lanelet::utils::query::getAllParkingLots(lanelet_map_ptr_);
+
+  auto cl_ll_borders = color_utils::fromRgba(1.0, 1.0, 1.0, 0.999);
+  auto cl_road = color_utils::fromRgba(0.2, 0.7, 0.7, 0.3);
+  auto cl_cross = color_utils::fromRgba(0.2, 0.7, 0.2, 0.3);
+  auto cl_stoplines = color_utils::fromRgba(1.0, 0.0, 0.0, 0.5);
+  auto cl_trafficlights = color_utils::fromRgba(0.7, 0.7, 0.7, 0.8);
+  auto cl_detection_areas = color_utils::fromRgba(0.7, 0.7, 0.7, 0.3);
+  auto cl_parking_lots = color_utils::fromRgba(0.7, 0.7, 0.0, 0.3);
+  auto cl_parking_spaces = color_utils::fromRgba(1.0, 0.647, 0.0, 0.6);
+  auto cl_lanelet_id = color_utils::fromRgba(0.8, 0.2, 0.2, 0.999);
+
+  insertMarkerArray(
+    markers, lanelet::visualization::laneletsBoundaryAsMarkerArray(
+      road_lanelets, cl_ll_borders, true));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::laneletsAsTriangleMarkerArray("road_lanelets",
+    road_lanelets, cl_road));
+  insertMarkerArray(
+    markers, lanelet::visualization::laneletsAsTriangleMarkerArray(
+      "crosswalk_lanelets", crosswalk_lanelets, cl_cross));
+  insertMarkerArray(
+    markers, lanelet::visualization::laneletsAsTriangleMarkerArray(
+      "walkway_lanelets", walkway_lanelets, cl_cross));
+  insertMarkerArray(
+    markers, lanelet::visualization::laneletDirectionAsMarkerArray(road_lanelets));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::lineStringsAsMarkerArray(stop_lines, "stop_lines", cl_stoplines));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::autowareTrafficLightsAsMarkerArray(aw_tl_reg_elems, cl_trafficlights));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::detectionAreasAsMarkerArray(da_reg_elems, cl_detection_areas));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::parkingLotsAsMarkerArray(parking_lots, cl_parking_lots));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::parkingSpacesAsMarkerArray(parking_spaces, cl_parking_spaces));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::generateLaneletIdMarker(road_lanelets, cl_lanelet_id));
   return markers;
 }
 

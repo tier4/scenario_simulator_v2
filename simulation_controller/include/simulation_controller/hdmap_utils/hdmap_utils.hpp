@@ -57,6 +57,9 @@ class HdMapUtils
 {
 public:
   explicit HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin);
+  void insertMarkerArray(
+    visualization_msgs::msg::MarkerArray & a1,
+    const visualization_msgs::msg::MarkerArray & a2) const;
   std::vector<geometry_msgs::msg::Point> toMapPoints(int lanelet_id, std::vector<double> s);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
     int lanelet_id, double s,
@@ -98,7 +101,7 @@ public:
   boost::optional<double> getCollisionPointInLaneCoordinate(
     int lanelet_id,
     int crossing_lanelet_id);
-  const visualization_msgs::msg::MarkerArray & generateMarker() const;
+  const visualization_msgs::msg::MarkerArray generateMarker() const;
 
 private:
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
