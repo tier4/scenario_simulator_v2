@@ -75,7 +75,7 @@ class Launcher:
         # Manager.ask_continuation()
         for index, scenario in enumerate(self.scenario_list):
             Logger.print_separator("scenario launch " + str(index+1))
-            Logger.print_process("running scenario " + scenario)
+            # Logger.print_process("running scenario " + scenario)
             self.run_scenario(scenario)
         self.lifecycle_controller.shutdown()
 
