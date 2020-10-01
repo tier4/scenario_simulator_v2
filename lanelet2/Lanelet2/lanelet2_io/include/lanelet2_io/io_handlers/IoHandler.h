@@ -50,10 +50,10 @@ protected:
 
 private:
   const Projector * projector_{};       //!< projection object for lat/lon
-                                        //!< from/to x/y conversions
+  //!< from/to x/y conversions
   const io::Configuration * config_{};  //!< config object for additional parameters.
-                                        //! Parser should always use default parameters
-                                        //! if parameters are missing
+  //! Parser should always use default parameters
+  //! if parameters are missing
 
   //! using a default projector is not allowed. The implementations define how this issue is handled.
   virtual void handleDefaultProjector() const = 0;

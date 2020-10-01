@@ -28,8 +28,11 @@ public:
   CompoundPolygon2d() = default;
   explicit CompoundPolygon2d(const CompoundLineString2d & other)
   : CompoundLineStringImpl(other) {}
-  explicit operator CompoundLineString2d() const {return CompoundLineString2d(constData(),
-             inverted());}
+  explicit operator CompoundLineString2d() const
+  {
+    return CompoundLineString2d(constData(),
+             inverted());
+  }
   //! Returns the number of (geometrically valid) segments.
   size_t numSegments() const noexcept {return std::max(size_t(1), size());}
 
@@ -59,8 +62,11 @@ public:
   CompoundPolygon3d() = default;
   explicit CompoundPolygon3d(const CompoundLineString3d & other)
   : CompoundLineStringImpl(other) {}
-  explicit operator CompoundLineString3d() const {return CompoundLineString3d(constData(),
-             inverted());}
+  explicit operator CompoundLineString3d() const
+  {
+    return CompoundLineString3d(constData(),
+             inverted());
+  }
   //! Returns the number of (geometrically valid) segments.
   size_t numSegments() const noexcept {return std::max(size_t(1), size());}
 
@@ -97,8 +103,11 @@ public:
   CompoundHybridPolygon2d() = default;
   explicit CompoundHybridPolygon2d(const CompoundHybridLineString2d & other)
   : CompoundLineStringImpl(other) {}
-  explicit operator CompoundHybridLineString2d() const {return CompoundHybridLineString2d(
-      constData(), inverted());}
+  explicit operator CompoundHybridLineString2d() const
+  {
+    return CompoundHybridLineString2d(
+      constData(), inverted());
+  }
   //! Returns the number of (geometrically valid) segments.
   size_t numSegments() const noexcept {return std::max(size_t(1), size());}
   BasicLineString basicLineString() = delete;
@@ -130,8 +139,11 @@ public:
   CompoundHybridPolygon3d() = default;
   explicit CompoundHybridPolygon3d(const CompoundHybridLineString3d & other)
   : CompoundLineStringImpl(other) {}
-  explicit operator CompoundHybridLineString3d() const {return CompoundHybridLineString3d(
-      constData(), inverted());}
+  explicit operator CompoundHybridLineString3d() const
+  {
+    return CompoundHybridLineString3d(
+      constData(), inverted());
+  }
   //! Returns the number of (geometrically valid) segments.
   size_t numSegments() const noexcept {return std::max(size_t(1), size());}
   BasicLineString basicLineString() = delete;

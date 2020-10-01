@@ -55,12 +55,13 @@ private:
 
 TEST_F(TestSuite, BinMsgConversion)
 {
-  autoware_lanelet2_msgs::msg::MapBin bin_msg;
+  autoware_auto_msgs::msg::HADMapBin bin_msg;
   lanelet::LaneletMapPtr regenerated_map(new lanelet::LaneletMap);
 
   lanelet::utils::conversion::toBinMsg(single_lanelet_map_ptr, &bin_msg);
 
-  ASSERT_NE(0, bin_msg.data.size()) << "converted bin message does not have any data";
+  ASSERT_NE(static_cast<size_t>(0),
+    bin_msg.data.size()) << "converted bin message does not have any data";
 
   lanelet::utils::conversion::fromBinMsg(bin_msg, regenerated_map);
 

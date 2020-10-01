@@ -14,15 +14,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch_ros.actions import LifecycleNode
 
 
 def generate_launch_description():
-    return LaunchDescription([
-        Node(
-            package='scenario_launcher',
-            node_executable='dummy_runner',
-            node_name='dummy_runner'
-        )
-    ])
+    scenario_launcher = Node(
+        package='scenario_launcher',
+        node_executable='scenario_launcher',
+        output={
+                'stdout': 'log',
+                'stderr': 'screen',
+        }
+    )
+    scenario_runner_mock = LifecycleNode(
+        node_name='scenario_runner_mock',
+        package='scenario_runner_mock',
+        node_executable='scenario_runner_mock',
+        output='log'
+    )
+    return LaunchDescription([scenario_launcher, scenario_runner_mock])
