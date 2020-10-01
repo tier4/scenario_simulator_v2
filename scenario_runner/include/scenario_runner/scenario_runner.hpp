@@ -61,8 +61,13 @@ public:
 
     using scenario_runner::ScenarioRunner;
 
-    RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
-    evaluate.rebind<OpenScenario>(scenario, address, port);
+    try {
+      RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
+      evaluate.rebind<OpenScenario>(scenario, address, port);
+    } catch (const scenario_runner::SyntaxError & error) {
+      RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
+      return Result::FAILURE;
+    }
 
     RCLCPP_INFO(get_logger(), "Connecting simulator via %s:%d", address.c_str(), port);
     evaluate.as<OpenScenario>().init();
@@ -78,19 +83,39 @@ public:
       50ms,
       [&]()
       {
-        if (!evaluate.as<OpenScenario>().complete()) {
-          std::cout << "[Storyboard: " << evaluate.as<OpenScenario>()() << "]" << std::endl;
+        try {
+          if (!evaluate.as<OpenScenario>().complete()) {
+            std::cout << "[Storyboard: " << evaluate.as<OpenScenario>()() << "]" << std::endl;
 
-          RCLCPP_INFO(
-            get_logger(),
-            "[%d standby (=> %d) => %d running (=> %d) => %d complete]",
-            scenario_runner::standby_state.use_count() - 1,
-            scenario_runner::start_transition.use_count() - 1,
-            scenario_runner::running_state.use_count() - 1,
-            scenario_runner::stop_transition.use_count() - 1,
-            scenario_runner::complete_state.use_count() - 1);
-        } else {
-          deactivate();
+            RCLCPP_INFO(
+              get_logger(),
+              "[%d standby (=> %d) => %d running (=> %d) => %d complete]",
+              scenario_runner::standby_state.use_count() - 1,
+              scenario_runner::start_transition.use_count() - 1,
+              scenario_runner::running_state.use_count() - 1,
+              scenario_runner::stop_transition.use_count() - 1,
+              scenario_runner::complete_state.use_count() - 1);
+          } else {
+            deactivate();
+          }
+        } catch (const scenario_runner::Command & command) {
+          switch (command) {
+            case scenario_runner::Command::exitSuccess:
+              RCLCPP_INFO(get_logger(), "Simulation succeeded.");
+              deactivate();
+              break;
+
+            default:
+            case scenario_runner::Command::exitFailure:
+              RCLCPP_INFO(get_logger(), "Simulation failed.");
+              deactivate();
+          }
+        } catch (const scenario_runner::ImplementationFault & error) {
+          RCLCPP_ERROR(get_logger(), "%s.", error.what());
+          throw;
+        } catch (const std::exception & error) {
+          RCLCPP_ERROR(get_logger(), "%s.", error.what());
+          throw;
         }
       }
     );
