@@ -229,5 +229,7 @@ int main(int argc, char * argv[])
   ros::spin();
   */
   rclcpp::init(argc, argv);
+  rclcpp::NodeOptions options;
+  auto component = std::make_shared<ScenarioRunnerMoc>(options);
   return 0;
 }

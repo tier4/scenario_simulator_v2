@@ -60,7 +60,7 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
   return ret;
 }
 
-geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale)
+const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale)
 {
   if (autoscale) {
     s = s / getLength();
@@ -72,7 +72,7 @@ geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autosc
   return vec;
 }
 
-geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale)
+const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale)
 {
   if (autoscale) {
     s = s / getLength();
@@ -121,6 +121,19 @@ double HermiteCurve::getLength()
         std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
   }
   return ret;
+}
+
+const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
+{
+  if(autoscale)
+  {
+    s = s/getLength();
+  }
+  geometry_msgs::msg::Point p;
+  p.x = ax_ * std::pow(s, 3) + bx_ * std::pow(s, 2) + cx_ * s + dx_;
+  p.y = ay_ * std::pow(s, 3) + by_ * std::pow(s, 2) + cy_ * s + dy_;
+  p.z = az_ * std::pow(s, 3) + bz_ * std::pow(s, 2) + cz_ * s + dz_;
+  return p;
 }
 }  // namespace math
 }  // namespace simulation_controller

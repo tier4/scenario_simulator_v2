@@ -76,6 +76,9 @@ ament_target_dependencies(entity_manager
   spline_interpolation
   ament_index_cpp
   behaviortree_cpp_v3
+  tf2_geometry_msgs
+  tf2_ros
+  xmlrpcpp
 )
 target_link_libraries(entity_manager
   pugixml
@@ -109,6 +112,7 @@ ament_target_dependencies(scenario_runner_moc_node
   spline_interpolation
   ament_index_cpp
   behaviortree_cpp_v3
+  xmlrpcpp
 )
 target_link_libraries(scenario_runner_moc_node
   api
@@ -122,6 +126,12 @@ install(TARGETS entity_manager api
 ament_export_libraries(entity_manager)
 ament_export_interfaces(export_api HAS_LIBRARY_TARGET)
 ament_export_libraries(api)
+
+
+install(TARGETS
+  scenario_runner_moc_node
+  DESTINATION lib/simulation_controller
+)
 
 install(
   DIRECTORY "include/"
