@@ -125,9 +125,8 @@ double HermiteCurve::getLength()
 
 const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
 {
-  if(autoscale)
-  {
-    s = s/getLength();
+  if (autoscale) {
+    s = s / getLength();
   }
   geometry_msgs::msg::Point p;
   p.x = ax_ * std::pow(s, 3) + bx_ * std::pow(s, 2) + cx_ * s + dx_;

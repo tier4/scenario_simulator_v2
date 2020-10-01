@@ -687,7 +687,8 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
   return dist;
 }
 
-const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin(){
+const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin()
+{
   std::stringstream ss;
   boost::archive::binary_oarchive oa(ss);
   oa << *lanelet_map_ptr_;
@@ -704,7 +705,8 @@ const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin(){
 
 void HdMapUtils::insertMarkerArray(
   visualization_msgs::msg::MarkerArray & a1,
-  const visualization_msgs::msg::MarkerArray & a2) const{
+  const visualization_msgs::msg::MarkerArray & a2) const
+{
   a1.markers.insert(a1.markers.end(), a2.markers.begin(), a2.markers.end());
 }
 
