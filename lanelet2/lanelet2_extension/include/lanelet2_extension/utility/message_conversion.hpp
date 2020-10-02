@@ -18,7 +18,7 @@
 #define LANELET2_EXTENSION__UTILITY__MESSAGE_CONVERSION_HPP_
 
 #include <lanelet2_core/LaneletMap.h>
-#include <autoware_lanelet2_msgs/msg/map_bin.hpp>
+#include <autoware_auto_msgs/msg/had_map_bin.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/point32.hpp>
 #include <geometry_msgs/msg/polygon.hpp>
@@ -39,7 +39,7 @@ namespace conversion
  * @param map [lanelet map data]
  * @param msg [converted ROS message. Only "data" field is filled]
  */
-void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::MapBin * msg);
+void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMapBin * msg);
 
 /**
  * [fromBinMsg converts ROS message into lanelet2 data. Similar implementation
@@ -47,9 +47,9 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_lanelet2_msgs::msg::M
  * @param msg [ROS message for lanelet map]
  * @param map [Converted lanelet2 data]
  */
-void fromBinMsg(const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map);
+void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map);
 void fromBinMsg(
-  const autoware_lanelet2_msgs::msg::MapBin & msg, lanelet::LaneletMapPtr map,
+  const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
   lanelet::routing::RoutingGraphPtr * routing_graph);
 

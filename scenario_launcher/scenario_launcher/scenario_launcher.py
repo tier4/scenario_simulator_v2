@@ -16,16 +16,12 @@
 # limitations under the License.
 
 import argparse
-import subprocess as sb
 import time
-import xmlrpc.client
-from multiprocessing import Process
 
 from scenario_common.logger import Logger
 from scenario_common.manager import Manager
 from scenario_launcher.database_handler import DatabaseHandler
-from scenario_launcher.monitoring_server import MonitoringServer
-from scenario_launcher.result_reporter import Reporter
+from scenario_launcher.lifecycle_controller import LifecycleController
 
 
 class Launcher:
@@ -37,75 +33,57 @@ class Launcher:
     def __init__(self, timeout):
         self.timeout = timeout
         self.database_path = None
-        self.monitoring_process = None
-        self.runner_process = None
+        self.lifecycle_controller = None
         self.launch_path = ""
         self.log_path = ""
         self.scenario_list = dict()
         self.map_dict = dict()
 
     def main(self):
-        sb.run(self.PKILLER, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
-        self.client = xmlrpc.client.Server(self.SERVER_URI)
         self.log_path, self.scenario_list, self.map_dict \
             = DatabaseHandler.read_database()
+        self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
-
-    @staticmethod
-    def launch_runner():
-        Logger.print_info("    start dummy runner")
-        sb.run("ros2 launch scenario_launcher dummy_runner.launch.py",
-               shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
-
-    @staticmethod
-    def run_server():
-        monitoring = MonitoringServer()
-        monitoring.run()
-        return
 
     def launcher_monitoring(self):
         start = time.time()
         while (time.time() - start) < self.timeout:
             Logger.print_info("    Monitoring in Launcher")
-            if(not self.client.get_simulation_running()):
-                Logger.print_error("    scenario runner not running")
+            current_state = self.lifecycle_controller.get_lifecycle_state()
+            Logger.print_info("    scenario runner state is " + current_state)
+            if(current_state == "inactive"):
+                Logger.print_error("    end of running")
                 return
-            else:
-                Logger.print_info("    runner running")
             time.sleep(self.SLEEP_RATE)
-        Logger.print_info("Reached to Maximum Simulation Time")
+        Logger.print_warning("Reached to Maximum Simulation Time")
+        self.lifecycle_controller.deactivate_node()
 
     def run_scenario(self, scenario):
         Logger.print_process(
             "Set Maximum Simulation Time: " + str(self.timeout))
-        self.runner_process = Process(target=Launcher.launch_runner)
-        self.runner_process.start()
         time.sleep(self.SLEEP_RATE)
+        self.lifecycle_controller.activate_node(scenario)
         self.launcher_monitoring()
-        results = {}
-        results['code'] = self.client.get_exit_code()
-        results['simulation_time'] = self.client.get_simulation_time()
-        results['traveled_distance'] = self.client.get_traveled_distance()
-        Reporter.write_result(self.log_path, results, scenario)
         print("")
 
     def run_all_scenarios(self):
         Logger.print_separator("scenario preprocess")
         Manager.mkdir(self.log_path)
-        self.monitoring_process = Process(target=Launcher.run_server)
-        self.monitoring_process.start()
         for index, scenario in enumerate(self.scenario_list):
             print(str(index+1), scenario)
-        time.sleep(2)
-        Manager.ask_continuation()
         for index, scenario in enumerate(self.scenario_list):
             Logger.print_separator("scenario launch " + str(index+1))
-            Logger.print_process("running scenario " + scenario)
+            self.lifecycle_controller.configure_node()
+            if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
+                Logger.print_warning(
+                    "skip this scenario because of activation failure")
+                continue
             self.run_scenario(scenario)
-        self.monitoring_process.terminate()
+            self.lifecycle_controller.cleanup_node()
+        self.lifecycle_controller.shutdown()
 
     def __del__(self):
-        sb.run(self.PKILLER, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+        pass
 
 
 def main():
@@ -113,7 +91,7 @@ def main():
 
     parser.add_argument('--timeout',
                         type=int,
-                        default=10,
+                        default=20,
                         help='Specify simulation time limit in seconds. \
                   The default is 180 seconds.')
 

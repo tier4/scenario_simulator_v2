@@ -384,7 +384,7 @@ template<typename T>
 using SetAttrSig = void (T::*)(const std::string &, const Attribute &);
 
 template<typename T>
-using GetAttrSig = const Attribute & (ConstPrimitive<T>::*)(const std::string &)const;
+using GetAttrSig = const Attribute & (ConstPrimitive<T>::*)(const std::string &) const;
 
 template<typename LayerT = PointLayer, typename ... ClassArgs>
 auto wrapLayer(const char * layerName)
