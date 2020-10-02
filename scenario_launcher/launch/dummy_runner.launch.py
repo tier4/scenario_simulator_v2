@@ -30,9 +30,9 @@ def generate_launch_description():
         }
     )
     scenario_runner_mock = LifecycleNode(
-        node_name='scenario_runner_node',
-        package='scenario_runner',
-        node_executable='scenario_runner_node',
-        output='screen'
+        node_name='scenario_runner_mock',
+        package='scenario_runner_mock',
+        node_executable='scenario_runner_mock',
+        output='log'
     )
     return LaunchDescription([scenario_launcher, scenario_runner_mock])

@@ -27,22 +27,22 @@ from scenario_simulator_msgs.srv import LauncherMsg
 
 class LifecycleController(Node):
 
-    NODE_NAME = "scenario_runner_node"
+    NODE_NAME = "scenario_runner_mock"
     PARAMETER_NAME = "scenario"
     STATES = {}
 
     def __init__(self):
         rclpy.init(args=self.NODE_NAME)
-        super().__init__("scenario_runner_node")
+        super().__init__("scenario_runner_mock")
         self.state = None
         self.node_logger = self.get_logger()
         self.client_get_state = self.create_client(
-            GetState, 'scenario_runner_node/get_state')
+            GetState, 'scenario_runner_mock/get_state')
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_get_state.srv_name + ' service not available')
         self.client_change_state = self.create_client(
-            ChangeState, "scenario_runner_node/change_state")
+            ChangeState, "scenario_runner_mock/change_state")
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_change_state.srv_name + ' service not available')
