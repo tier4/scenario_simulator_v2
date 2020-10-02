@@ -17,15 +17,43 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_runner/syntax/open_scenario.hpp>
 
+#include <chrono>
 #include <cstdlib>
+#include <thread>
 
 TEST(Syntax, LexicalScope)
 {
-  scenario_runner::OpenSCENARIO osc {
+  scenario_runner::OpenScenario interperter {
     ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/lexical-scope.xosc",
     "127.0.0.1",
     8080
   };
+}
+
+TEST(Error, Success)
+{
+  scenario_runner::OpenScenario evaluate {
+    ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc",
+    "127.0.0.1",
+    8080
+  };
+
+  ASSERT_FALSE(evaluate.complete());
+
+  const auto begin {std::chrono::high_resolution_clock::now()};
+
+  using std::chrono_literals::operator""ms;
+
+  rclcpp::WallRate rate {50ms};
+
+  using scenario_runner::complete_state;
+
+  for (evaluate.init(); evaluate() != complete_state; rate.sleep()) {
+    ASSERT_LT(
+      std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::high_resolution_clock::now() - begin).count(),
+      20);
+  }
 }
 
 // TEST(Syntax, invalid)
