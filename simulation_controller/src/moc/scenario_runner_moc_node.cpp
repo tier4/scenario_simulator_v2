@@ -99,7 +99,7 @@ private:
       }
     }
     */
-    RCLCPP_INFO(get_logger(),"current time : " + std::to_string(current_time_) + " [sec]");
+    RCLCPP_INFO(get_logger(), "current time : " + std::to_string(current_time_) + " [sec]");
     api_.simulation->updateFrame();
     current_time_ = current_time_ + 0.02;
   }

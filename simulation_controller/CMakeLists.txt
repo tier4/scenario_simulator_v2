@@ -46,6 +46,7 @@ include_directories(
 add_library(entity_manager SHARED
   src/hdmap_utils/hdmap_utils.cpp
   src/math/hermite_curve.cpp
+  src/entity/entity_manager.cpp
   src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/entity/vehicle_entity.cpp
@@ -86,6 +87,7 @@ target_link_libraries(entity_manager
 
 add_library(api SHARED
   src/api/api.cpp
+  src/api/entity_api_impl.cpp
 )
 ament_target_dependencies(api
   xmlrpcpp

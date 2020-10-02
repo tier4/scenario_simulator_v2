@@ -54,8 +54,7 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
   lanelet::ErrorMessages errors;
   lanelet_map_ptr_ = lanelet::load(lanelet_path, projector, &errors);
   if (!errors.empty()) {
-    for(const auto & error : errors)
-    {
+    for (const auto & error : errors) {
       std::cerr << error << std::endl;
     }
     throw HdMapError("failed to load lanelet map");
