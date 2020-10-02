@@ -107,10 +107,6 @@ BT::NodeStatus FollowLaneAction::tick()
     if (!target_speed) {
       target_speed = hdmap_utils_ptr->getSpeedLimit(following_lanelets);
     }
-    std::vector<geometry_msgs::msg::Point> following_trajectory;
-    following_trajectory = hdmap_utils_ptr->clipTrajectoryFromLaneletIds(entity_status.lanelet_id,
-        entity_status.s,
-        following_lanelets);
     geometry_msgs::msg::Accel accel_new;
     accel_new = entity_status.accel;
 
@@ -142,7 +138,6 @@ BT::NodeStatus FollowLaneAction::tick()
     simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time,
       entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
     setOutput("updated_status", entity_status_updated);
-    setOutput("trajectory", following_trajectory);
     return BT::NodeStatus::RUNNING;
   }
   return BT::NodeStatus::FAILURE;

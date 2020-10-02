@@ -54,6 +54,13 @@ public:
   }
 };
 
+class EntityMarkerQos : public rclcpp::QoS
+{
+public:
+  explicit EntityMarkerQos(size_t depth = 100)
+  : rclcpp::QoS(depth) {}
+};
+
 class EntityManager
 {
 private:
@@ -73,28 +80,31 @@ public:
     geographic_msgs::msg::GeoPoint origin;
     node->declare_parameter("origin_latitude", 0.0);
     node->declare_parameter("origin_longitude", 0.0);
-    node->declare_parameter("origin_altitude", 0.0);
+    // node->declare_parameter("origin_altitude", 0.0);
     node->get_parameter("origin_latitude", origin.latitude);
     node->get_parameter("origin_longitude", origin.longitude);
-    node->get_parameter("origin_altitude", origin.altitude);
+    // node->get_parameter("origin_altitude", origin.altitude);
     hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
     const rclcpp::QoS & qos = LaneletMarkerQos();
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
-    marker_pub_ptr_ = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(node,
-        "/lanelet/marker", qos,
+    lanelet_marker_pub_ptr_ = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(node,
+        "lanelet/marker", qos,
+        options);
+    const rclcpp::QoS & entity_marker_qos = EntityMarkerQos();
+    entity_marker_pub_ptr_ = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(node,
+        "entity/marker", entity_marker_qos,
         options);
     visualization_msgs::msg::MarkerArray markers;
     auto markers_raw = hdmap_utils_ptr_->generateMarker();
 
-    std::cout << clock_ptr_->get_clock_type() << "," << RCL_ROS_TIME << std::endl;
     auto stamp = clock_ptr_->now();
     for (const auto & marker_raw : markers_raw.markers) {
       visualization_msgs::msg::Marker marker = marker_raw;
       marker.header.stamp = stamp;
       markers.markers.emplace_back(marker);
     }
-    marker_pub_ptr_->publish(markers);
+    lanelet_marker_pub_ptr_->publish(markers);
   }
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
@@ -132,7 +142,8 @@ public:
   const boost::optional<double> getStandStillDuration(std::string name) const;
   const std::unordered_map<std::string, EntityType> getEntityTypeList() const;
   tf2_ros::TransformBroadcaster broadcaster_;
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_ptr_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr entity_marker_pub_ptr_;
   template<typename T>
   bool spawnEntity(T & entity)
   {

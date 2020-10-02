@@ -64,6 +64,10 @@ public:
 private:
   void update()
   {
+    if (api_.entity->reachPosition("ego", 17, 30, 0, 10))
+    {
+      api_.entity->requestLaneChange("ego", 16);
+    }
     /*
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");
     if (stand_still_duration) {
@@ -99,7 +103,7 @@ private:
       }
     }
     */
-    RCLCPP_INFO(get_logger(), "current time : " + std::to_string(current_time_) + " [sec]");
+    // RCLCPP_INFO(get_logger(), "current time : " + std::to_string(current_time_) + " [sec]");
     api_.simulation->updateFrame();
     current_time_ = current_time_ + 0.02;
   }
@@ -118,7 +122,7 @@ private:
     pose.position.y = 0.0;
     pose.position.z = 0.0;
     geometry_msgs::msg::Twist twist;
-    twist.linear.x = 0.0;
+    twist.linear.x = 10.0;
     twist.linear.y = 0.0;
     twist.linear.z = 0.0;
     twist.angular.x = 0.0;

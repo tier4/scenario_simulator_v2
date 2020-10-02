@@ -60,7 +60,6 @@ public:
 
 private:
   boost::optional<simulation_controller::entity::EntityStatus> target_status_;
-  std::vector<geometry_msgs::msg::Point> following_trajectory_;
   boost::optional<std::vector<int>> route_;
 };
 }  // namespace vehicle

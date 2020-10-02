@@ -139,6 +139,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
   int lanelet_id, double s,
   std::vector<int> lanelet_ids, double foward_distance)
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::vector<geometry_msgs::msg::Point> ret;
   bool on_traj = false;
   double rest_distance = foward_distance;
@@ -149,7 +150,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
         for (double s_val = 0; s_val < rest_distance; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(*id_itr, s_val, 0);
           if (map_pose) {
-            ret.push_back(map_pose->pose.position);
+            ret.emplace_back(map_pose->pose.position);
           }
         }
         break;
@@ -158,7 +159,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
         for (double s_val = 0; s_val < l; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(*id_itr, s_val, 0);
           if (map_pose) {
-            ret.push_back(map_pose->pose.position);
+            ret.emplace_back(map_pose->pose.position);
           }
         }
         continue;
@@ -170,7 +171,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
         for (double s_val = s; s_val < s + foward_distance; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(lanelet_id, s_val, 0);
           if (map_pose) {
-            ret.push_back(map_pose->pose.position);
+            ret.emplace_back(map_pose->pose.position);
           }
         }
         break;
@@ -179,7 +180,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
         for (double s_val = s; s_val < l; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(lanelet_id, s_val, 0);
           if (map_pose) {
-            ret.push_back(map_pose->pose.position);
+            ret.emplace_back(map_pose->pose.position);
           }
         }
         continue;

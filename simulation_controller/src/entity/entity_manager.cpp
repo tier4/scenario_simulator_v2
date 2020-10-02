@@ -221,17 +221,17 @@ const visualization_msgs::msg::MarkerArray EntityManager::generateMarker() const
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     if (it->second.type() == typeid(VehicleEntity)) {
       const auto marker = boost::any_cast<const VehicleEntity &>(it->second).generateMarker(
-        now, color_utils::makeColorMsg("steelblue", 0.8));
+        now, color_utils::makeColorMsg("steelblue", 0.9));
       ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
     }
     if (it->second.type() == typeid(EgoEntity)) {
       const auto marker = boost::any_cast<const EgoEntity &>(it->second).generateMarker(
-        now, color_utils::makeColorMsg("forestgreen", 0.8));
+        now, color_utils::makeColorMsg("forestgreen", 0.9));
       ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
     }
     if (it->second.type() == typeid(PedestrianEntity)) {
       const auto marker = boost::any_cast<const PedestrianEntity &>(it->second).generateMarker(
-        now, color_utils::makeColorMsg("orange", 0.8));
+        now, color_utils::makeColorMsg("orange", 0.9));
       ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
     }
   }
@@ -366,6 +366,7 @@ void EntityManager::update(double current_time, double step_time)
       boost::any_cast<PedestrianEntity &>(it->second).setOtherStatus(all_status);
     }
   }
+  entity_marker_pub_ptr_->publish(generateMarker());
 }
 
 void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose)
