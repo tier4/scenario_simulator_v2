@@ -15,6 +15,7 @@
 #ifndef SCENARIO_RUNNER__SCENARIO_RUNNER_HPP_
 #define SCENARIO_RUNNER__SCENARIO_RUNNER_HPP_
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_runner/syntax/open_scenario.hpp>
@@ -50,7 +51,8 @@ public:
       name,
       rclcpp::NodeOptions().use_intra_process_comms(false)),
     port{8080},
-    scenario{"/home/yamasa/Documents/colcon_workspace/src/scenario_simulator.auto/scenario_runner/test/success.xosc"}
+    scenario{
+      ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc"}
   {
     READ_PARAMETER(port);
     READ_PARAMETER(scenario);

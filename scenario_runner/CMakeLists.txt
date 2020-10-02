@@ -23,6 +23,7 @@ execute_process(
   COMMAND tr -d "\n"
   OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
 
+find_package(ament_index_cpp         REQUIRED)
 find_package(geometry_msgs           REQUIRED)
 find_package(lifecycle_msgs          REQUIRED)
 find_package(rclcpp_lifecycle        REQUIRED)
@@ -81,7 +82,7 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  set(${PROJECT_NAME}_TEST_DEPENDENCIES ament_index_cpp ${${PROJECT_NAME}_DEPENDENCIES})
+  set(${PROJECT_NAME}_TEST_DEPENDENCIES ${${PROJECT_NAME}_DEPENDENCIES})
 
   ament_add_gtest(test_syntax test/test_syntax.cpp)
   if(TARGET test_syntax)
