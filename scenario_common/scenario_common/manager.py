@@ -89,9 +89,19 @@ class Manager():
                 message = message+" -> Because of unkown failure"
         Logger.print_info(message)
 
+    @staticmethod
+    def get_file_dir(file_path, target_file_name):
+        parent_dir = pathlib.Path(file_path).parent
+        for i in range(8):
+            parent_dir = pathlib.Path(parent_dir).parent
+        for root, dirname, filename in os.walk(parent_dir):
+            if (target_file_name in filename):
+                return root
+
 
 def main():
-    pass
+    file_dir = Manager.get_file_dir(__file__, "scenario_database.yaml")
+    Logger.print_info(file_dir)
 
 
 if __name__ == "__main__":

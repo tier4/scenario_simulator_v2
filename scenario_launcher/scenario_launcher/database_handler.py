@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import pathlib
 
 from scenario_common.logger import Logger
@@ -24,14 +23,19 @@ from scenario_common.manager import Manager
 
 class DatabaseHandler():
 
-    DATABASE_PATH = "config/scenario_database.yaml"
+    DATABASE_FILE = "scenario_database.yaml"
 
     @staticmethod
     def read_database():
         Logger.print_separator("scenario database")
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
-        print("package path: " + str(launcher_package_path))
-        database_path = launcher_package_path / DatabaseHandler.DATABASE_PATH
+        database_path = launcher_package_path / "config" / DatabaseHandler.DATABASE_FILE
+        if (not Manager.path_checker(database_path)):
+            launcher_package_path = pathlib.Path(
+                Manager.get_file_dir(__file__, DatabaseHandler.DATABASE_FILE)).parent
+            Manager.path_checker(database_path)
+        Logger.print_info("package path: " + str(launcher_package_path))
+        Logger.print_info(launcher_package_path)
         database = Manager.read_data(database_path)
         log_path = str(launcher_package_path / database["Log"])
         scenario_path = []
