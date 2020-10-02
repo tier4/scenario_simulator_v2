@@ -77,17 +77,17 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RouteStra
 
   is >> buffer;
 
-  #define SUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     strategy.value = RouteStrategy::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
-  SUPPORTED(shortest);
+  BOILERPLATE(shortest);
 
-  #undef SUPPORTED
+  #undef BOILERPLATE
 
-  #define UNSUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     std::stringstream ss { \
     }; \
@@ -96,11 +96,11 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RouteStra
     throw ImplementationFault {ss.str()}; \
   } static_assert(true, "")
 
-  UNSUPPORTED(fastest);
-  UNSUPPORTED(leastIntersections);
-  UNSUPPORTED(random);
+  BOILERPLATE(fastest);
+  BOILERPLATE(leastIntersections);
+  BOILERPLATE(random);
 
-  #undef UNSUPPORTED
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type RouteStrategy";

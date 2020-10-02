@@ -19,6 +19,8 @@
 #include <scenario_runner/syntax/by_value_condition.hpp>
 #include <scenario_runner/syntax/condition_edge.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -47,22 +49,20 @@ struct Condition
 
   template<typename Node, typename Scope>
   explicit Condition(const Node & node, Scope & scope)
-  : name{readAttribute<String>("name", node, scope)},
-    delay{readAttribute<Double>("delay", node, scope, Double())},
-    condition_edge{readAttribute<ConditionEdge>("conditionEdge", node, scope)}
-  {
-    callWithElements(
-      node, "ByEntityCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<ByEntityCondition>(node, scope);
-      });
-
-    callWithElements(
-      node, "ByValueCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<ByValueCondition>(node, scope);
-      });
-  }
+  : Element(
+      choice(
+        node,
+        std::make_pair("ByEntityCondition", [&](auto && node) {
+          return make<ByEntityCondition>(node, scope);
+        }),
+        std::make_pair("ByValueCondition", [&](auto && node) {
+          return make<ByValueCondition>(node, scope);
+        }))),
+    name{readAttribute<String>("name", node, scope)},
+  // NOTE This broken indentation was forced by ament_uncrustify.
+  delay{readAttribute<Double>("delay", node, scope, Double())},
+  condition_edge{readAttribute<ConditionEdge>("conditionEdge", node, scope)}
+  {}
 
   #ifndef NDEBUG
   using Element::evaluate;

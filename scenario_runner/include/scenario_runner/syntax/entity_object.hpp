@@ -18,6 +18,8 @@
 #include <scenario_runner/syntax/pedestrian.hpp>
 #include <scenario_runner/syntax/vehicle.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -37,25 +39,20 @@ inline namespace syntax
 struct EntityObject
   : public Element
 {
-  template<typename Node>
-  explicit EntityObject(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "CatalogReference", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "Vehicle", 0, 1, [&](auto && element)
-      {
-        return rebind<Vehicle>(element, scope);
-      });
-
-    callWithElements(
-      node, "Pedestrian", 0, 1, [&](auto && element) mutable
-      {
-        return rebind<Pedestrian>(element, scope);
-      });
-
-    callWithElements(node, "MiscObject", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  template<typename Node, typename ... Ts>
+  explicit EntityObject(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("CatalogReference", UNSUPPORTED()),
+        std::make_pair("Vehicle", [&](auto && node) {
+          return make<Vehicle>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("Pedestrian", [&](auto && node) {
+          return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("MiscObject", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

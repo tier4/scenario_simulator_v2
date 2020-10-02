@@ -35,13 +35,18 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct TrafficSignalAction
+  : public Element
 {
-  template<typename Node, typename Scope>
-  explicit TrafficSignalAction(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "TrafficSignalControllerAction", 0, 1, [](auto &&) {});
-    callWithElements(node, "TrafficSignalStateAction", 0, 1, THROW_UNSUPPORTED__ERROR(node));
-  }
+  template<typename Node, typename ... Ts>
+  explicit TrafficSignalAction(const Node & node, Ts && ...)
+  : Element(
+      choice(
+        node,
+        std::make_pair("TrafficSignalControllerAction", [&](auto &&) {
+          return unspecified;
+        }),
+        std::make_pair("TrafficSignalStateAction", UNSUPPORTED())))
+  {}
 };
 }  // inline namespace syntax
 }  // namespace scenario_runner

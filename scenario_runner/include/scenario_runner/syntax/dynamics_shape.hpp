@@ -78,18 +78,18 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, DynamicsS
 
   is >> buffer;
 
-  #define SUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     shape = DynamicsShape::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
-  SUPPORTED(linear);
-  SUPPORTED(step);
+  BOILERPLATE(linear);
+  BOILERPLATE(step);
 
-  #undef SUPPORTED
+  #undef BOILERPLATE
 
-  #define UNSUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     std::stringstream ss { \
     }; \
@@ -98,10 +98,10 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, DynamicsS
     throw ImplementationFault {ss.str()}; \
   } static_assert(true, "")
 
-  UNSUPPORTED(cubic);
-  UNSUPPORTED(sinusoidal);
+  BOILERPLATE(cubic);
+  BOILERPLATE(sinusoidal);
 
-  #undef UNSUPPORTED
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type DynamicsShape";

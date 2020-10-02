@@ -32,7 +32,6 @@ struct Command
 {
   enum value_type
   {
-    debugAccomplishment,
     exitFailure,
     exitSuccess,
     print,
@@ -68,7 +67,6 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command &
     return is; \
   }
 
-  BOILERPLATE(debugAccomplishment);
   BOILERPLATE(exitFailure);
   BOILERPLATE(exitSuccess);
   BOILERPLATE(print);
@@ -86,7 +84,6 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Com
   switch (command) {
     #define BOILERPLATE(NAME) case Command::NAME: return os << #NAME;
 
-    BOILERPLATE(debugAccomplishment);
     BOILERPLATE(exitFailure);
     BOILERPLATE(exitSuccess);
     BOILERPLATE(print);
