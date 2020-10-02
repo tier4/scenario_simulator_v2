@@ -33,7 +33,9 @@ namespace scenario_runner
 class ScenarioRunner
   : public rclcpp_lifecycle::LifecycleNode
 {
-  rclcpp::Service<scenario_simulator_msgs::srv::LauncherMsg>::SharedPtr request_scenario;
+  // using GetScenario = scenario_simulator_msgs::srv::LauncherMsg;
+  //
+  // const rclcpp::Client<GetScenario>::SharedPtr service_client;
 
   int port;
 
@@ -50,12 +52,23 @@ public:
   : rclcpp_lifecycle::LifecycleNode(
       name,
       rclcpp::NodeOptions().use_intra_process_comms(false)),
+    // service_client{create_client<GetScenario>("launcher_msg")},
     port{8080},
     scenario{
       ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc"}
   {
     READ_PARAMETER(port);
-    READ_PARAMETER(scenario);
+    // READ_PARAMETER(scenario);
+
+    // using std::chrono_literals::operator"" s;
+    //
+    // while (!(*service_client).wait_for_service(1s)) {
+    //   if (!rclcpp::ok()) {
+    //     RCLCPP_ERROR(get_logger(), "Interrupted while waiting for service.");
+    //     rclcpp::shutdown();
+    //   }
+    //   RCLCPP_INFO(get_logger(), "Waiting for service...");
+    // }
   }
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
@@ -65,6 +78,23 @@ public:
     // set rosparam map path
 
     using scenario_runner::ScenarioRunner;
+
+    // auto request {std::make_shared<GetScenario::Request>()};
+    //
+    // (*request).scenario = "hoge";  // request
+    //
+    // auto result {(*service_client).async_send_request(request)};
+    //
+    // if (rclcpp::spin_until_future_complete(shared_from_this(), result) ==
+    //   rclcpp::executor::FutureReturnCode::SUCCESS)
+    // {
+    //   RCLCPP_INFO(
+    //     get_logger(),
+    //     "Received scenario path: '%s'",
+    //     result.get()->launcher_msg.c_str());
+    // } else {
+    //   RCLCPP_ERROR(get_logger(), "Problem while waiting for response.");
+    // }
 
     try {
       RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
@@ -90,7 +120,9 @@ public:
       {
         try {
           if (!evaluate.as<OpenScenario>().complete()) {
-            std::cout << "[Storyboard: " << evaluate.as<OpenScenario>()() << "]" << std::endl;
+            const auto result {evaluate.as<OpenScenario>()()};
+
+            RCLCPP_INFO(get_logger(), "[Storyboard: %s]", boost::lexical_cast<std::string>(result));
 
             RCLCPP_INFO(
               get_logger(),
@@ -106,13 +138,13 @@ public:
         } catch (const scenario_runner::Command & command) {
           switch (command) {
             case scenario_runner::Command::exitSuccess:
-              RCLCPP_INFO(get_logger(), "Simulation succeeded.");
+              RCLCPP_INFO(get_logger(), "\x1b[1;32mSimulation succeeded.\x1b[0m");
               deactivate();
               break;
 
             default:
             case scenario_runner::Command::exitFailure:
-              RCLCPP_INFO(get_logger(), "Simulation failed.");
+              RCLCPP_INFO(get_logger(), "\x1b[1;31mSimulation failed.\x1b[0m");
               deactivate();
           }
         } catch (const scenario_runner::ImplementationFault & error) {
@@ -122,8 +154,7 @@ public:
           RCLCPP_ERROR(get_logger(), "%s.", error.what());
           deactivate();
         }
-      }
-    );
+      });
 
     return Result::SUCCESS;
   }
