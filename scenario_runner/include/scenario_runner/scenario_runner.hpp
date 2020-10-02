@@ -18,6 +18,7 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_runner/syntax/open_scenario.hpp>
+#include <scenario_simulator_msgs/srv/launcher_msg.hpp>
 
 #include <memory>
 #include <string>
@@ -31,6 +32,8 @@ namespace scenario_runner
 class ScenarioRunner
   : public rclcpp_lifecycle::LifecycleNode
 {
+  rclcpp::Service<scenario_simulator_msgs::srv::LauncherMsg>::SharedPtr request_scenario;
+
   int port;
 
   std::string scenario;
@@ -47,7 +50,7 @@ public:
       name,
       rclcpp::NodeOptions().use_intra_process_comms(false)),
     port{8080},
-    scenario{"$(scenario_runner)/example/dummy.xosc"}
+    scenario{"/home/yamasa/Documents/colcon_workspace/src/scenario_simulator.auto/scenario_runner/test/success.xosc"}
   {
     READ_PARAMETER(port);
     READ_PARAMETER(scenario);

@@ -17,11 +17,18 @@ endif()
 # reserved for future standardization" even if is standard literal operator suffix.
 add_compile_options(-Wno-literal-suffix)
 
-find_package(geometry_msgs    REQUIRED)
-find_package(lifecycle_msgs   REQUIRED)
-find_package(rclcpp           REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
-find_package(std_msgs         REQUIRED)
+execute_process(
+  COMMAND grep -e "<depend>" ${CMAKE_CURRENT_SOURCE_DIR}/package.xml
+  COMMAND sed -E "s/(.*)<(.*)>(.*)<\\/\\2>/\\3;/g"
+  COMMAND tr -d "\n"
+  OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
+
+find_package(geometry_msgs           REQUIRED)
+find_package(lifecycle_msgs          REQUIRED)
+find_package(rclcpp_lifecycle        REQUIRED)
+find_package(rclcpp                  REQUIRED)
+find_package(scenario_simulator_msgs REQUIRED)
+find_package(std_msgs                REQUIRED)
 
 # ------------------------------------------------------------------------------
 #  libscenario_runner
@@ -34,12 +41,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-ament_target_dependencies(${PROJECT_NAME}
-  geometry_msgs
-  lifecycle_msgs
-  rclcpp
-  rclcpp_lifecycle
-  std_msgs)
+ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
 
 target_link_libraries(${PROJECT_NAME} pugixml)
 
@@ -79,13 +81,7 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  set(${PROJECT_NAME}_TEST_DEPENDENCIES
-    ament_index_cpp
-    geometry_msgs
-    lifecycle_msgs
-    rclcpp
-    rclcpp_lifecycle
-    std_msgs)
+  set(${PROJECT_NAME}_TEST_DEPENDENCIES ament_index_cpp ${${PROJECT_NAME}_DEPENDENCIES})
 
   ament_add_gtest(test_syntax test/test_syntax.cpp)
   if(TARGET test_syntax)
