@@ -20,6 +20,8 @@
 #include <scenario_runner/syntax/routing_action.hpp>
 #include <scenario_runner/syntax/teleport_action.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -43,37 +45,28 @@ inline namespace syntax
 struct PrivateAction
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit PrivateAction(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "LongitudinalAction", 0, 1, [&](auto && node)
-      {
-        return rebind<LongitudinalAction>(node, scope);
-      });
-
-    callWithElements(node, "LateralAction", 0, 1, [&](auto && node)
-      {
-        return rebind<LateralAction>(node, scope);
-      });
-
-    callWithElements(node, "VisibilityAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(node, "SynchronizeAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(node, "ActivateControllerAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(node, "ControllerAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(node, "TeleportAction", 0, 1, [&](auto && node)
-      {
-        return rebind<TeleportAction>(node, scope);
-      });
-
-    callWithElements(node, "RoutingAction", 0, 1, [&](auto && node)
-      {
-        return rebind<RoutingAction>(node, scope);
-      });
-  }
+  template<typename Node, typename ... Ts>
+  explicit PrivateAction(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("LongitudinalAction", [&](auto && node) {
+          return make<LongitudinalAction>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("LateralAction", [&](auto && node) {
+          return make<LateralAction>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("VisibilityAction", UNSUPPORTED()),
+        std::make_pair("SynchronizeAction", UNSUPPORTED()),
+        std::make_pair("ActivateControllerAction", UNSUPPORTED()),
+        std::make_pair("ControllerAction", UNSUPPORTED()),
+        std::make_pair("TeleportAction", [&](auto && node) {
+          return make<TeleportAction>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("RoutingAction", [&](auto && node) {
+          return make<RoutingAction>(node, std::forward<decltype(xs)>(xs)...);
+        })))
+  {}
 };
 }
 }  // namespace scenario_runner

@@ -68,22 +68,42 @@ struct ImplementationFault
   {}
 };
 
-  #define THROW(TYPENAME) \
+#define THROW(TYPENAME) \
   do { \
     std::stringstream ss {}; \
     ss << __FILE__ << ":" << __LINE__; \
     throw TYPENAME {ss.str()}; \
   } while (false)
 
-  #define THROW_IMPLEMENTATION_FAULT() THROW(ImplementationFault)
+#define THROW_IMPLEMENTATION_FAULT() THROW(ImplementationFault)
 
-  #define UNIMPLEMENTED(NAME) \
+#define UNIMPLEMENTED(NAME) \
   do { \
     std::stringstream ss {}; \
     ss << "given class \'" << NAME << \
       "\' is valid OpenSCENARIO element, but is not yet implemented"; \
     throw ImplementationFault {ss.str()}; \
   } while (false)
+
+#define THROW_UNSUPPORTED_ERROR(PARENT) \
+  [&](auto && child) \
+  { \
+    std::stringstream ss {}; \
+    ss << "given class \'" << child.name() << "\' (element of class \'" << PARENT.name() << \
+      "\') is valid OpenSCENARIO element, but is not supported"; \
+    throw SyntaxError(ss.str()); \
+    return unspecified; \
+  }
+
+#define UNSUPPORTED() \
+  [&](auto && node) \
+  { \
+    std::stringstream ss {}; \
+    ss << "given class \'" << node.name() << \
+      " is valid OpenSCENARIO element, but is not supported"; \
+    throw SyntaxError(ss.str()); \
+    return unspecified; \
+  }
 }  // namespace scenario_runner
 
 #endif  // SCENARIO_RUNNER__ERROR_HPP_

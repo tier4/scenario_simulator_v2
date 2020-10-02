@@ -75,17 +75,17 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Priority 
 
   is >> buffer;
 
-  #define SUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     priority.value = Priority::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
-  SUPPORTED(overwrite);
+  BOILERPLATE(overwrite);
 
-  #undef SUPPORTED
+  #undef BOILERPLATE
 
-  #define UNSUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     std::stringstream ss { \
     }; \
@@ -94,10 +94,10 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Priority 
     throw ImplementationFault {ss.str()}; \
   } static_assert(true, "")
 
-  UNSUPPORTED(skip);
-  UNSUPPORTED(parallel);
+  BOILERPLATE(skip);
+  BOILERPLATE(parallel);
 
-  #undef UNSUPPORTED
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type Priority";
