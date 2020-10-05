@@ -154,7 +154,7 @@ BT::NodeStatus FollowLaneAction::tick()
         }
       }
     }
-    auto following_lanelets = hdmap_utils_ptr->getFollowingLanelets(entity_status.lanelet_id);
+    auto following_lanelets = hdmap_utils_ptr->getFollowingLanelets(entity_status.lanelet_id, 50);
     if (target_speed) {
       auto conflicting_crosswalks = hdmap_utils_ptr->getConflictingCrosswalkIds(following_lanelets);
       std::vector<simulation_controller::entity::EntityStatus> conflicting_entity_status;
@@ -251,5 +251,5 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   return BT::NodeStatus::FAILURE;
 }
-}      // namespace vehicle
+}  // namespace vehicle
 }  // namespace entity_behavior
