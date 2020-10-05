@@ -20,7 +20,6 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
@@ -33,17 +32,17 @@ def generate_launch_description():
             get_package_share_directory('simulation_controller'),
             'config',
             'moc_test.rviz')
-    description = LaunchDescription([
+    return LaunchDescription([
         Node(
             package='simulation_controller',
             node_executable='scenario_runner_moc_node',
             node_name='scenario_runner_node',
             output='screen',
-            parameters=[{'map_path' : lanlet_path,
-                "origin_latitude" : 35.903555800615614,
-                "origin_longitude" : 139.93339979022568,
-                # "origin_altitude" : -2.5,
-                "port" : 8080}],
+            parameters=[{
+                'map_path': lanlet_path,
+                'origin_latitude': 35.903555800615614,
+                'origin_longitude': 139.93339979022568,
+                'port': 8080}],
             arguments=[('__log_level:=info')]),
         Node(
             package='scenario_simulator',
@@ -51,7 +50,7 @@ def generate_launch_description():
             node_name='scenario_simulator_node',
             output='log',
             parameters=[{
-                "port" : 8080
+                'port': 8080
             }],
             arguments=[('__log_level:=warn')],
             ),
@@ -62,4 +61,3 @@ def generate_launch_description():
             arguments=['-d', rviz_config_dir],
             output='screen'),
     ])
-    return description
