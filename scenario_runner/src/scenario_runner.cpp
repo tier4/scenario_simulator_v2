@@ -22,14 +22,17 @@ namespace scenario_runner
 {
 ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("scenario_runner", options),
-  service_client{create_client<GetScenario>("launcher_msg")},
+  callback_group{
+    create_callback_group(
+      rclcpp::callback_group::CallbackGroupType::MutuallyExclusive)},
+  service_client{
+    create_client<GetScenario>(
+      "launcher_msg", rmw_qos_profile_default, callback_group)},
   port{8080},
   scenario{
     ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc"}
 {
-  using std::chrono_literals::operator"" s;
-
-  while (!(*service_client).wait_for_service(1s)) {
+  while (!(*service_client).wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
       RCLCPP_ERROR(get_logger(), "Interrupted while waiting for service.");
       rclcpp::shutdown();
@@ -47,21 +50,21 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
   (*request).scenario = "REQUEST!";
 
+  std::string scenario;
+
   auto result {
-    (*service_client).async_send_request(request)
+    service_client->async_send_request(
+      request,
+      [&](rclcpp::Client<GetScenario>::SharedFuture result) -> void
+      {
+        scenario = result.get()->launcher_msg;
+        RCLCPP_INFO(get_logger(), "Served: '%s'", scenario.c_str());
+      })
   };
 
-  if (rclcpp::spin_until_future_complete(get_node_base_interface(), result) ==
-    rclcpp::executor::FutureReturnCode::SUCCESS)
-  {
-    RCLCPP_INFO(get_logger(), "Received scenario path: '%s'", result.get()->launcher_msg.c_str());
-  } else {
-    RCLCPP_ERROR(get_logger(), "Problem while waiting for response.");
+  while (scenario.empty() && rclcpp::ok()) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
-
-  // DEBUG();
-  // result.wait();
-  // DEBUG();
 
   RCLCPP_INFO(get_logger(), "Received scenario path: '%s'", result.get()->launcher_msg.c_str());
 

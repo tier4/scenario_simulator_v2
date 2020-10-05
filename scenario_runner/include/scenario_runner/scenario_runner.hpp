@@ -75,6 +75,8 @@ class ScenarioRunner
 {
   using GetScenario = scenario_simulator_msgs::srv::LauncherMsg;  // CurrentScenario
 
+  const rclcpp::callback_group::CallbackGroup::SharedPtr callback_group;
+
   const rclcpp::Client<GetScenario>::SharedPtr service_client;
 
   int port;
