@@ -67,7 +67,19 @@ private:
   std::map<std::string, boost::any> entities_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   rclcpp::Clock::SharedPtr clock_ptr_;
-
+  visualization_msgs::msg::MarkerArray markers_raw_;
+  rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
+  void updateHdmapMarker()
+  {
+    visualization_msgs::msg::MarkerArray markers;
+    auto stamp = clock_ptr_->now();
+    for (const auto & marker_raw : markers_raw_.markers) {
+      visualization_msgs::msg::Marker marker = marker_raw;
+      marker.header.stamp = stamp;
+      markers.markers.emplace_back(marker);
+    }
+    lanelet_marker_pub_ptr_->publish(markers);
+  }
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node)
@@ -96,15 +108,10 @@ public:
         "entity/marker", entity_marker_qos,
         options);
     visualization_msgs::msg::MarkerArray markers;
-    auto markers_raw = hdmap_utils_ptr_->generateMarker();
+    markers_raw_ = hdmap_utils_ptr_->generateMarker();
 
-    auto stamp = clock_ptr_->now();
-    for (const auto & marker_raw : markers_raw.markers) {
-      visualization_msgs::msg::Marker marker = marker_raw;
-      marker.header.stamp = stamp;
-      markers.markers.emplace_back(marker);
-    }
-    lanelet_marker_pub_ptr_->publish(markers);
+    using namespace std::chrono_literals;
+    hdmap_marker_timer_ = node->create_wall_timer(1s, std::bind(&EntityManager::updateHdmapMarker, this));
   }
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);

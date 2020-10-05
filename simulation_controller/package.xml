@@ -40,7 +40,7 @@
   <depend>behaviortree_cpp_v3</depend>
   <depend>ament_index_cpp</depend>
   <depend>rviz2</depend>
-  <exec_depend>borregas_avenue_map</exec_depend>
+  <exec_depend>kashiwanoha_map</exec_depend>
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

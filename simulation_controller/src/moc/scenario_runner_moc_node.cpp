@@ -40,7 +40,7 @@ public:
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_controller::entity::VehicleParameters params(catalog_xml_doc);
     api_.entity->spawn(true, "ego", params);
-    api_.entity->setEntityStatus("ego", getEgoInitialStatus());
+    // api_.entity->setEntityStatus("ego", getEgoInitialStatus());
     /*
     lanechange_excuted_ = false;
     api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
@@ -64,11 +64,11 @@ public:
 private:
   void update()
   {
+    /*
     if (api_.entity->reachPosition("ego", 17, 30, 0, 10))
     {
       api_.entity->requestLaneChange("ego", 16);
     }
-    /*
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");
     if (stand_still_duration) {
       if (stand_still_duration.get() > 0.1) {
@@ -140,7 +140,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_controller::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 17, 0.0, 0.0, rpy, twist, accel);
+      api_.simulation->getCurrentTime(), 34399, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
