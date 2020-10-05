@@ -18,7 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 
-# launch/conifg file
+# install map file
 install(DIRECTORY map
   DESTINATION share/${PROJECT_NAME}
 )

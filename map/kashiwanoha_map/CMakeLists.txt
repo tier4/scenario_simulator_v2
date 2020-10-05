@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(borregas_avenue_map)
+project(kashiwanoha_map)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -15,6 +15,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# find dependencies
 find_package(ament_cmake REQUIRED)
 
 # install map file
