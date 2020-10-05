@@ -20,6 +20,7 @@ import time
 
 from scenario_common.logger import Logger
 from scenario_common.manager import Manager
+from scenario_launcher.converter_handler import ConverterHandler
 from scenario_launcher.database_handler import DatabaseHandler
 from scenario_launcher.lifecycle_controller import LifecycleController
 
@@ -36,13 +37,15 @@ class Launcher:
         self.lifecycle_controller = None
         self.launcher_path = ""
         self.log_path = ""
-        self.scenario_list = dict()
+        self.yaml_scenarios = []
+        self.xosc_scenarios = []
         self.map_dict = dict()
 
     def main(self):
-        self.launcher_path, self.log_path, self.scenario_list, self.map_dict \
+        self.launcher_path, self.log_path, self.yaml_scenarios, self.map_dict \
             = DatabaseHandler.read_database()
-
+        self.xosc_scenarios = ConverterHandler.convert_all_scenarios(
+            self.yaml_scenarios, self.launcher_path)
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
 
@@ -70,9 +73,9 @@ class Launcher:
     def run_all_scenarios(self):
         Logger.print_separator("scenario preprocess")
         Manager.mkdir(self.log_path)
-        for index, scenario in enumerate(self.scenario_list):
+        for index, scenario in enumerate(self.xosc_scenarios):
             print(str(index+1), scenario)
-        for index, scenario in enumerate(self.scenario_list):
+        for index, scenario in enumerate(self.xosc_scenarios):
             Logger.print_separator("scenario launch " + str(index+1))
             self.lifecycle_controller.configure_node(scenario)
             if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
