@@ -22,7 +22,8 @@ include_directories(
   include
 )
 
-add_library(spline_interpolation src/spline_interpolation.cpp)
+add_library(spline_interpolation SHARED
+  src/spline_interpolation.cpp)
 ament_target_dependencies(spline_interpolation
   rclcpp
 )
@@ -38,6 +39,7 @@ install(TARGETS spline_interpolation
   RUNTIME DESTINATION bin)
 
 ament_export_interfaces(export_spline_interpolation HAS_LIBRARY_TARGET)
+ament_export_libraries(spline_interpolation)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

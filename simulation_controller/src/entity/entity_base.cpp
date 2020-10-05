@@ -50,6 +50,9 @@ void EntityBase::updateStandStillDuration(double step_time)
   if (!status_) {
     stand_still_duration_ = boost::none;
   } else {
+    if (!stand_still_duration_) {
+      stand_still_duration_ = 0;
+    }
     if (std::fabs(status_->twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
       stand_still_duration_ = step_time + stand_still_duration_.get();
     } else {

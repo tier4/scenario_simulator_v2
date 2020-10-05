@@ -34,6 +34,7 @@ find_package(spline_interpolation REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(xmlrpcpp REQUIRED)
+find_package(geographic_msgs REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
@@ -45,6 +46,7 @@ include_directories(
 add_library(entity_manager SHARED
   src/hdmap_utils/hdmap_utils.cpp
   src/math/hermite_curve.cpp
+  src/entity/entity_manager.cpp
   src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/entity/vehicle_entity.cpp
@@ -75,6 +77,9 @@ ament_target_dependencies(entity_manager
   spline_interpolation
   ament_index_cpp
   behaviortree_cpp_v3
+  tf2_geometry_msgs
+  tf2_ros
+  xmlrpcpp
 )
 target_link_libraries(entity_manager
   pugixml
@@ -82,6 +87,7 @@ target_link_libraries(entity_manager
 
 add_library(api SHARED
   src/api/api.cpp
+  src/api/entity_api_impl.cpp
 )
 ament_target_dependencies(api
   xmlrpcpp
@@ -98,6 +104,7 @@ ament_target_dependencies(scenario_runner_moc_node
   rclcpp
   rclcpp_lifecycle
   geometry_msgs
+  visualization_msgs
   quaternion_operation
   autoware_auto_msgs
   lanelet2_core
@@ -108,46 +115,33 @@ ament_target_dependencies(scenario_runner_moc_node
   spline_interpolation
   ament_index_cpp
   behaviortree_cpp_v3
+  xmlrpcpp
 )
 target_link_libraries(scenario_runner_moc_node
   api
 )
 
-install(TARGETS
-  entity_manager api
+install(TARGETS entity_manager api
+  EXPORT export_api
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 ament_export_libraries(entity_manager)
+ament_export_interfaces(export_api HAS_LIBRARY_TARGET)
+ament_export_libraries(api)
 
-#install(DIRECTORY include/${PROJECT_NAME}/
-#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#)
 
-#install(
-#  DIRECTORY
-#    ${CMAKE_CURRENT_SOURCE_DIR}/resource
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(TARGETS
+  scenario_runner_moc_node
+  DESTINATION lib/simulation_controller
+)
 
-#install(
-#  DIRECTORY
-#    ${CMAKE_CURRENT_SOURCE_DIR}/test
-#  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(
+  DIRECTORY "include/"
+  DESTINATION include
+)
 
-#if (CATKIN_ENABLE_TESTING)
-#  find_package(rostest REQUIRED)
-
-#  add_rostest_gtest(test-simulation_controller
-#    test/test_simulation_controller.test
-#    test/src/test_simulation_controller.cpp
-#  )
-
-#  target_link_libraries(test-simulation_controller
-#    simulation_controller
-#    ${catkin_LIBRARIES})
-#endif ()
-
-install(DIRECTORY resource
+install(DIRECTORY resource launch config
   DESTINATION share/${PROJECT_NAME}
 )
 

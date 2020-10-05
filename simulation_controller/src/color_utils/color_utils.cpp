@@ -19,15 +19,32 @@
 
 namespace color_utils
 {
+
+/**
+ * @brief generate std_msgs::msg::ColorRGBA message from rgb values
+ * @param r red
+ * @param g green
+ * @param b blue
+ * @param alpha alpha value of the color
+ * @return std_msgs::msg::ColorRGBA
+ */
+const std_msgs::msg::ColorRGBA fromRgba(double r, double g, double b, double alpha)
+{
+  std_msgs::msg::ColorRGBA color;
+  color.r = r;
+  color.g = g;
+  color.b = b;
+  color.a = alpha;
+  return color;
+}
+
 /**
  * @brief generate std_msgs::msg::ColorRGBA message from hsv values
  * @param h hue
  * @param s saturation
- * @param v value
- * @param alpha alpha value of the color
- * @return std_msgs::msg::ColorRGBA
+ * @param v value別で map->odom のTFを出力するやつがいれば大丈夫かと思います。
  */
-std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
+const std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
 {
   std_msgs::msg::ColorRGBA color;
   color.a = alpha;
@@ -78,7 +95,7 @@ std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
  * @param alpha alpha value of the color
  * @return std_msgs::msg::ColorRGBA
  */
-std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha)
+const std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha)
 {
   std_msgs::msg::ColorRGBA c_msg;
   c_msg.a = alpha;

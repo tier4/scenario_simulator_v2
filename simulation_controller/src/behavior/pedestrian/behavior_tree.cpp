@@ -70,7 +70,8 @@ BT::NodeStatus BehaviorTree::tick(double current_time, double step_time)
 {
   setValueToBlackBoard("current_time", current_time);
   setValueToBlackBoard("step_time", step_time);
-  return tree_.root_node->executeTick();
+  auto ret = tree_.root_node->executeTick();
+  return ret;
 }
 
 void BehaviorTree::callback(
