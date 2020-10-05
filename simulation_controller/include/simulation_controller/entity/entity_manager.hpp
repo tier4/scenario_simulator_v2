@@ -114,7 +114,7 @@ public:
 
     hdmap_marker_timer_ =
       node->create_wall_timer(std::chrono::seconds(1),
-      std::bind(&EntityManager::updateHdmapMarker, this));
+        std::bind(&EntityManager::updateHdmapMarker, this));
   }
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
