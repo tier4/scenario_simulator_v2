@@ -38,14 +38,8 @@ class ScenarioConverter:
     OPEN_SCENARIO_TAG = "OpenSCENARIO"
     IS_DEBUG_MODE = False
 
-    def __init__(self):
-        self.xosc_path = ""
-
-    def main(self, yaml_path, xosc_dir, log_path):
-        ScenarioConverter.convert(yaml_path, xosc_dir, log_path)
-
     @staticmethod
-    def convert(yaml_path, xosc_dir, log_path):
+    def main(yaml_path, xosc_dir, log_path):
         Logger.print_separator("Scenario Preprocess")
         xosc_dict = None
         root_data = ScenarioConverter.convert_yaml2dict(yaml_path)
@@ -160,7 +154,7 @@ class ScenarioConverter:
             num_files = 1
         print("")
         Logger.print_process(str(num_files) + " files will be created")
-        Manager.ask_continuation()
+        # Manager.ask_continuation()
         if (bind is None):
             xosc_path = ret_path(xosc_dir, xosc_name, id)
             Logger.print_progress_bar(1, 1)
@@ -209,26 +203,19 @@ def main():
 
     parser.add_argument('--input',
                         type=str,
-                        default="test.yaml",
-                        help='input yaml file',
+                        help='absolute path to input yaml file',
                         required=True)
 
     parser.add_argument('--output',
                         type=str,
-                        default="converted_xosc",
-                        help='output of converterd xosc')
-
-    parser.add_argument('--log',
-                        type=str,
-                        default='log/converted.txt',
-                        help='output of converterd log')
+                        default=os.getcwd() + "/" + "converted_xosc/open_scenarios",
+                        help='absolute path to output converterd xosc file')
 
     args = parser.parse_args()
-    input_dir = os.getcwd() + "/" + args.input
-    output_dir = os.getcwd() + "/" + "converted_xosc"
-
-    scenarioConverter = ScenarioConverter()
-    scenarioConverter.main(input_dir, output_dir, args.log)
+    input_file_path = args.input
+    output_dir = args.output
+    log_dir = str(pathlib.Path(output_dir).parent)+"/converted.log"
+    ScenarioConverter.main(input_file_path, output_dir, log_dir)
 
 
 if __name__ == "__main__":
