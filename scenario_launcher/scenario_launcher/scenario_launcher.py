@@ -34,36 +34,37 @@ class Launcher:
         self.timeout = timeout
         self.database_path = None
         self.lifecycle_controller = None
-        self.launch_path = ""
+        self.launcher_path = ""
         self.log_path = ""
         self.scenario_list = dict()
         self.map_dict = dict()
 
     def main(self):
-        self.log_path, self.scenario_list, self.map_dict \
+        self.launcher_path, self.log_path, self.scenario_list, self.map_dict \
             = DatabaseHandler.read_database()
+
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
 
-    def launcher_monitoring(self):
+    def monitor_state(self):
         start = time.time()
         while (time.time() - start) < self.timeout:
             Logger.print_info("    Monitoring in Launcher")
             current_state = self.lifecycle_controller.get_lifecycle_state()
             Logger.print_info("    scenario runner state is " + current_state)
             if(current_state == "inactive"):
-                Logger.print_error("    end of running")
+                Logger.print_process("    end of running")
                 return
             time.sleep(self.SLEEP_RATE)
         Logger.print_warning("Reached to Maximum Simulation Time")
         self.lifecycle_controller.deactivate_node()
 
-    def run_scenario(self, scenario):
+    def run_scenario(self):
         Logger.print_process(
             "Set Maximum Simulation Time: " + str(self.timeout))
         time.sleep(self.SLEEP_RATE)
-        self.lifecycle_controller.activate_node(scenario)
-        self.launcher_monitoring()
+        self.lifecycle_controller.activate_node()
+        self.monitor_state()
         print("")
 
     def run_all_scenarios(self):
@@ -73,12 +74,12 @@ class Launcher:
             print(str(index+1), scenario)
         for index, scenario in enumerate(self.scenario_list):
             Logger.print_separator("scenario launch " + str(index+1))
-            self.lifecycle_controller.configure_node()
+            self.lifecycle_controller.configure_node(scenario)
             if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
                 Logger.print_warning(
                     "skip this scenario because of activation failure")
                 continue
-            self.run_scenario(scenario)
+            self.run_scenario()
             self.lifecycle_controller.cleanup_node()
         self.lifecycle_controller.shutdown()
 
