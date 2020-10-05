@@ -113,7 +113,7 @@ public:
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
 
     hdmap_marker_timer_ =
-      node->create_wall_timer(std::chrono_literals::1s,
+      node->create_wall_timer(std::chrono::seconds(1),
       std::bind(&EntityManager::updateHdmapMarker, this));
   }
   void setVerbose(bool verbose);
