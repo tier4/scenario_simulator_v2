@@ -54,7 +54,6 @@ public:
         BT::InputPort<double>("step_time"),
         BT::InputPort<std::shared_ptr<simulation_controller::entity::VehicleParameters>>(
           "vehicle_parameters"),
-        BT::OutputPort<std::vector<geometry_msgs::msg::Point>>("trajectory"),
         BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
 
         BT::InputPort<LaneChangeParameter>("lane_change_params")

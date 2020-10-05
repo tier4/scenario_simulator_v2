@@ -43,9 +43,9 @@ public:
     double ay, double by, double cy, double dy,
     double az, double bz, double cz, double dz);
   std::vector<geometry_msgs::msg::Point> getTrajectory();
-  geometry_msgs::msg::Pose getPose(double s, bool autoscale = false);
-  geometry_msgs::msg::Point getPoint(double s, bool autoscale = false);
-  geometry_msgs::msg::Vector3 getTangentVector(double s, bool autoscale = false);
+  const geometry_msgs::msg::Pose getPose(double s, bool autoscale = false);
+  const geometry_msgs::msg::Point getPoint(double s, bool autoscale = false);
+  const geometry_msgs::msg::Vector3 getTangentVector(double s, bool autoscale = false);
   double get2DCurvature(double s, bool autoscale = false);
   double getMaximu2DCurvature();
   double getLength();

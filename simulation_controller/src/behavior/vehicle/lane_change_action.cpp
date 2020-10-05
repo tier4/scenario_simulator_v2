@@ -83,7 +83,6 @@ BT::NodeStatus LaneChangeAction::tick()
       if (ret) {
         curve_ = ret->first;
         target_s_ = ret->second;
-        setOutput("trajectory", curve_->getTrajectory());
       } else {
         return BT::NodeStatus::FAILURE;
       }
