@@ -51,11 +51,13 @@ class LifecycleController(Node):
         self.send_scenario = ""
 
     def send_scenario_service(self, request, response):
-        Logger.print_info("runner request: "+request)
+        Logger.print_info("runner request: " + request.scenario)
         response.launcher_msg = self.send_scenario
+        Logger.print_info("launcher response: " + response.launcher_msg)
         return response
 
     def configure_node(self):
+        self.send_scenario = "RESPONSE!"
         self.node_logger.info(self.get_lifecycle_state())
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         Logger.print_info("Configure -> scenario runner state is " +
