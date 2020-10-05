@@ -45,38 +45,17 @@ struct CustomCommandAction
     content{readContent<String>(node, scope)}
   {}
 
-  Element aux;
-
   auto accomplished()
   {
     switch (command) {
-      case Command::debugAccomplishment:
-
-        if (!aux) {
-          aux = make(std::chrono::high_resolution_clock::now());
-          return false;
-        } else {
-          const auto elapsed {
-            std::chrono::duration_cast<std::chrono::seconds>(
-              std::chrono::high_resolution_clock::now() -
-              aux.as<decltype(std::chrono::high_resolution_clock::now())>(__FILE__, __LINE__))
-          };
-
-          return 3 < elapsed.count();
-        }
-
       default:
-        return false;
+        return true;
     }
   }
 
   auto evaluate()
   {
     switch (command) {
-      case Command::debugAccomplishment:
-        std::cout << *this << std::endl;
-        return unspecified;
-
       case Command::print:
         std::cout << content << std::endl;
         return unspecified;
@@ -98,7 +77,6 @@ struct CustomCommandAction
         return os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>" <<
                reset;
 
-      case Command::debugAccomplishment:
       default:
         return os << blue << "/>" << reset;
     }

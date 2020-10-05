@@ -17,6 +17,8 @@
 
 #include <scenario_runner/syntax/speed_action.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -34,19 +36,16 @@ inline namespace syntax
 struct LongitudinalAction
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit LongitudinalAction(const Node & node, Scope & scope)
-  {
-    callWithElements(
-      node, "SpeedAction", 0, 1, [&](auto && node)
-      {
-        return rebind<SpeedAction>(node, scope);
-      });
-
-    callWithElements(node, "LongitudinalDistanceAction", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
-
-  using Element::evaluate;
+  template<typename Node, typename ... Ts>
+  explicit LongitudinalAction(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("SpeedAction", [&](auto && node) {
+          return make<SpeedAction>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("LongitudinalDistanceAction", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

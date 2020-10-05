@@ -18,6 +18,8 @@
 #include <scenario_runner/syntax/relative_target_speed.hpp>
 #include <scenario_runner/syntax/absolute_target_speed.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -35,19 +37,18 @@ inline namespace syntax
 struct SpeedActionTarget
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit SpeedActionTarget(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "RelativeTargetSpeed", 0, 1, [&](auto && node)
-      {
-        return rebind<RelativeTargetSpeed>(node, scope);
-      });
-
-    callWithElements(node, "AbsoluteTargetSpeed", 0, 1, [&](auto && node)
-      {
-        return rebind<AbsoluteTargetSpeed>(node, scope);
-      });
-  }
+  template<typename Node, typename ... Ts>
+  explicit SpeedActionTarget(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("RelativeTargetSpeed", [&](auto && node) {
+          return make<RelativeTargetSpeed>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("AbsoluteTargetSpeed", [&](auto && node) {
+          return make<AbsoluteTargetSpeed>(node, std::forward<decltype(xs)>(xs)...);
+        })))
+  {}
 };
 }
 }  // namespace scenario_runner

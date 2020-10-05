@@ -54,56 +54,35 @@ struct EntityCondition
 {
   template<typename Node, typename ... Ts>
   explicit EntityCondition(const Node & node, Ts && ... xs)
-  {
-    callWithElements(node, "EndOfRoadCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "CollisionCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<CollisionCondition>(node, std::forward<decltype(xs)>(xs)...);
-      });
-
-    callWithElements(node, "OffroadCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "TimeHeadwayCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<TimeHeadwayCondition>(node, std::forward<decltype(xs)>(xs)...);
-      });
-
-    callWithElements(node, "TimeToCollisionCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "AccelerationCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<AccelerationCondition>(node, std::forward<decltype(xs)>(xs)...);
-      });
-
-    callWithElements(node, "StandStillCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "SpeedCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<SpeedCondition>(node, std::forward<decltype(xs)>(xs)...);
-      });
-
-    callWithElements(node, "RelativeSpeedCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "TraveledDistanceCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "ReachPositionCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<ReachPositionCondition>(node, std::forward<decltype(xs)>(xs)...);
-      });
-
-    callWithElements(node, "DistanceCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "RelativeDistanceCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<RelativeDistanceCondition>(node, std::forward<decltype(xs)>(xs)...);
-      });
-  }
+  : Element(
+      choice(
+        node,
+        std::make_pair("EndOfRoadCondition", UNSUPPORTED()),
+        std::make_pair("CollisionCondition", [&](auto && node) {
+          return make<CollisionCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("OffroadCondition", UNSUPPORTED()),
+        std::make_pair("TimeHeadwayCondition", [&](auto && node) {
+          return make<TimeHeadwayCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("TimeToCollisionCondition", UNSUPPORTED()),
+        std::make_pair("AccelerationCondition", [&](auto && node) {
+          return make<AccelerationCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("StandStillCondition", UNSUPPORTED()),
+        std::make_pair("SpeedCondition", [&](auto && node) {
+          return make<SpeedCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("RelativeSpeedCondition", UNSUPPORTED()),
+        std::make_pair("TraveledDistanceCondition", UNSUPPORTED()),
+        std::make_pair("ReachPositionCondition", [&](auto && node) {
+          return make<ReachPositionCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("DistanceCondition", UNSUPPORTED()),
+        std::make_pair("RelativeDistanceCondition", [&](auto && node) {
+          return make<RelativeDistanceCondition>(node, std::forward<decltype(xs)>(xs)...);
+        })))
+  {}
 };
 }
 }  // namespace scenario_runner

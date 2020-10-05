@@ -72,17 +72,17 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTarg
 
   is >> buffer;
 
-  #define SUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     type.value = SpeedTargetValueType::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
-  SUPPORTED(delta);
+  BOILERPLATE(delta);
 
-  #undef SUPPORTED
+  #undef BOILERPLATE
 
-  #define UNSUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     std::stringstream ss { \
     }; \
@@ -92,9 +92,9 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTarg
     throw ImplementationFault {ss.str()}; \
   } static_assert(true, "")
 
-  UNSUPPORTED(factor);
+  BOILERPLATE(factor);
 
-  #undef UNSUPPORTED
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type SpeedTargetValueType";

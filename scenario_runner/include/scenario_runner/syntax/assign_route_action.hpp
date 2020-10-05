@@ -17,6 +17,8 @@
 
 #include <scenario_runner/syntax/route.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -34,18 +36,16 @@ inline namespace syntax
 struct AssignRouteAction
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit AssignRouteAction(const Node & node, Scope & scope)
-  {
-    callWithElements(
-      node, "Route", 0, 1, [&](auto && node)
-      {
-        return rebind<Route>(node, scope);
-      });
-
-    callWithElements(
-      node, "CatalogReference", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  template<typename Node, typename ... Ts>
+  explicit AssignRouteAction(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("Route", [&](auto && node) {
+          return make<Route>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("CatalogReference", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

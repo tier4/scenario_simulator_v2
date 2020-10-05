@@ -19,6 +19,8 @@
 #include <scenario_runner/syntax/storyboard_element_state_condition.hpp>
 #include <scenario_runner/syntax/traffic_signal_condition.hpp>
 
+#include <utility>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -41,35 +43,25 @@ inline namespace syntax
 struct ByValueCondition
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit ByValueCondition(const Node & node, Scope & scope)
-  {
-    callWithElements(node, "ParameterCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(node, "TimeOfDayCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "SimulationTimeCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<SimulationTimeCondition>(node, scope);
-      });
-
-    callWithElements(
-      node, "StoryboardElementStateCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<StoryboardElementStateCondition>(node, scope);
-      });
-
-    callWithElements(node, "UserDefinedValueCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-
-    callWithElements(
-      node, "TrafficSignalCondition", 0, 1, [&](auto && node)
-      {
-        return rebind<TrafficSignalCondition>(node, scope);
-      });
-
-    callWithElements(node, "TrafficSignalControllerCondition", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  template<typename Node, typename ... Ts>
+  explicit ByValueCondition(const Node & node, Ts && ... xs)
+  : Element(
+      choice(
+        node,
+        std::make_pair("ParameterCondition", UNSUPPORTED()),
+        std::make_pair("TimeOfDayCondition", UNSUPPORTED()),
+        std::make_pair("SimulationTimeCondition", [&](auto && node) {
+          return make<SimulationTimeCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("StoryboardElementStateCondition", [&](auto && node) {
+          return make<StoryboardElementStateCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("UserDefinedValueCondition", UNSUPPORTED()),
+        std::make_pair("TrafficSignalCondition", [&](auto && node) {
+          return make<TrafficSignalCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+        std::make_pair("TrafficSignalControllerCondition", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

@@ -80,21 +80,21 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Parameter
 
   is >> buffer;
 
-  #define SUPPORTED(NAME, IDENTIFIER) \
+  #define BOILERPLATE(NAME, IDENTIFIER) \
   if (buffer == NAME) { \
     type.value = ParameterType::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
-  SUPPORTED("integer", INTEGER);
-  SUPPORTED("double", DOUBLE);
-  SUPPORTED("string", STRING);
-  SUPPORTED("unsignedInt", UNSIGNED_INT);
-  SUPPORTED("unsignedShort", UNSIGNED_SHORT);
-  SUPPORTED("boolean", BOOLEAN);
-  SUPPORTED("dateTime", DATE_TIME);
+  BOILERPLATE("integer", INTEGER);
+  BOILERPLATE("double", DOUBLE);
+  BOILERPLATE("string", STRING);
+  BOILERPLATE("unsignedInt", UNSIGNED_INT);
+  BOILERPLATE("unsignedShort", UNSIGNED_SHORT);
+  BOILERPLATE("boolean", BOOLEAN);
+  BOILERPLATE("dateTime", DATE_TIME);
 
-  #undef SUPPORTED
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type ParameterType";

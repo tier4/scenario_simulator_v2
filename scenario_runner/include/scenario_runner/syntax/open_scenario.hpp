@@ -165,7 +165,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Sce
  * </xsd:group>
  *
  * ======================================================================== */
-struct OpenSCENARIO
+struct OpenScenario
   : public pugi::xml_document
 {
   Element category;
@@ -188,9 +188,8 @@ struct OpenSCENARIO
   }
 
   template<typename ... Ts>
-  explicit OpenSCENARIO(const std::string & scenario, Ts && ... xs)
-  : pugi::xml_document{},
-      global{std::forward<decltype(xs)>(xs)...}
+  explicit OpenScenario(const std::string & scenario, Ts && ... xs)
+  : pugi::xml_document(), global{std::forward<decltype(xs)>(xs)...}
   {
     if (load(scenario).child("OpenSCENARIO").child("Catalog")) {
       THROW_IMPLEMENTATION_FAULT();
@@ -224,10 +223,16 @@ struct OpenSCENARIO
   {
     return category.evaluate(std::forward<decltype(xs)>(xs)...);
   }
+
+  template<typename ... Ts>
+  decltype(auto) operator()(Ts && ... xs)
+  {
+    return evaluate(std::forward<decltype(xs)>(xs)...);
+  }
 };
 
 template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const OpenSCENARIO & osc)
+std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const OpenScenario &)
 {
   return os << unspecified;
 }

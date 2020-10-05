@@ -43,7 +43,6 @@ class Launcher:
         self.log_path, self.scenario_list, self.map_dict \
             = DatabaseHandler.read_database()
         self.lifecycle_controller = LifecycleController()
-        self.lifecycle_controller.configure_node()
         self.run_all_scenarios()
 
     def launcher_monitoring(self):
@@ -72,11 +71,15 @@ class Launcher:
         Manager.mkdir(self.log_path)
         for index, scenario in enumerate(self.scenario_list):
             print(str(index+1), scenario)
-        # Manager.ask_continuation()
         for index, scenario in enumerate(self.scenario_list):
             Logger.print_separator("scenario launch " + str(index+1))
-            Logger.print_process("running scenario " + scenario)
+            self.lifecycle_controller.configure_node()
+            if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
+                Logger.print_warning(
+                    "skip this scenario because of activation failure")
+                continue
             self.run_scenario(scenario)
+            self.lifecycle_controller.cleanup_node()
         self.lifecycle_controller.shutdown()
 
     def __del__(self):
@@ -88,7 +91,7 @@ def main():
 
     parser.add_argument('--timeout',
                         type=int,
-                        default=4,
+                        default=20,
                         help='Specify simulation time limit in seconds. \
                   The default is 180 seconds.')
 

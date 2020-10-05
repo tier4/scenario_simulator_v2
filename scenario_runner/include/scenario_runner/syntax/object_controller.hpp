@@ -36,12 +36,14 @@ inline namespace syntax
 struct ObjectController
   : public Element
 {
-  template<typename Node, typename Scope>
-  explicit ObjectController(const Node & node, Scope &)
-  {
-    callWithElements(node, "CatalogReference", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-    callWithElements(node, "Controller", 0, 1, THROW_UNSUPPORTED_ERROR(node));
-  }
+  template<typename Node, typename ... Ts>
+  explicit ObjectController(const Node & node, Ts && ...)
+  : Element(
+      choice(
+        node,
+        std::make_pair("CatalogReference", UNSUPPORTED()),
+        std::make_pair("Controller", UNSUPPORTED())))
+  {}
 };
 }
 }  // namespace scenario_runner

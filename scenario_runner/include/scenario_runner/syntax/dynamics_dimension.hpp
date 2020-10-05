@@ -74,19 +74,19 @@ std::basic_istream<Ts...> & operator>>(
 
   is >> buffer;
 
-  #define SUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     dimension = DynamicsDimension::IDENTIFIER; \
     return is; \
   } static_assert(true, "")
 
-  SUPPORTED(rate);
-  SUPPORTED(time);
-  SUPPORTED(distance);
+  BOILERPLATE(rate);
+  BOILERPLATE(time);
+  BOILERPLATE(distance);
 
-  #undef SUPPORTED
+  #undef BOILERPLATE
 
-  #define UNSUPPORTED(IDENTIFIER) \
+  #define BOILERPLATE(IDENTIFIER) \
   if (buffer == #IDENTIFIER) { \
     std::stringstream ss { \
     }; \
@@ -95,7 +95,7 @@ std::basic_istream<Ts...> & operator>>(
     throw ImplementationFault {ss.str()}; \
   } static_assert(true, "")
 
-  #undef UNSUPPORTED
+  #undef BOILERPLATE
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type DynamicsDimension";
