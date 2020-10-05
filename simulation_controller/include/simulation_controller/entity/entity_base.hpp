@@ -63,7 +63,7 @@ public:
     hdmap_utils_ptr_ = ptr;
   }
   virtual void onUpdate(double current_time, double step_time) = 0;
-  bool statusSetted()
+  bool statusSetted() const
   {
     if (status_) {
       return true;

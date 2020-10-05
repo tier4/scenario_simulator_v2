@@ -76,6 +76,8 @@ ament_target_dependencies(lanelet2_extension_lib
   geometry_msgs
   visualization_msgs
 )
+ament_export_interfaces(export_lanelet2_extension_lib HAS_LIBRARY_TARGET)
+ament_export_libraries(lanelet2_extension_lib)
 
 ament_auto_add_executable(sample_code
   src/sample_code.cpp
@@ -193,5 +195,4 @@ if(BUILD_TESTING)
 endif()
 
 ament_export_include_directories(include)
-ament_export_interfaces(export_lanelet2_extension_lib HAS_LIBRARY_TARGET)
 ament_package()

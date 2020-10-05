@@ -105,7 +105,6 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   if (!status_) {
     return;
   }
-  following_trajectory_.clear();
   tree_ptr_->setValueToBlackBoard("entity_status", status_.get());
   action_status_ = tree_ptr_->tick(current_time, step_time);
   auto status_updated = tree_ptr_->getUpdatedStatus();
@@ -116,7 +115,6 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     }
   }
   setStatus(status_updated);
-  following_trajectory_ = tree_ptr_->getTrajectory();
   updateStandStillDuration(step_time);
 }
 
@@ -227,25 +225,6 @@ const
   ret.markers.push_back(text_action);
 
   if (verbose_) {
-    visualization_msgs::msg::Marker trajectory_marker;
-    trajectory_marker.header.frame_id = "map";
-    trajectory_marker.ns = name;
-    trajectory_marker.id = 4;
-    trajectory_marker.action = trajectory_marker.ADD;
-    trajectory_marker.type = trajectory_marker.LINE_STRIP;
-    trajectory_marker.scale.x = 0.3;
-    trajectory_marker.scale.y = 0.3;
-    trajectory_marker.scale.z = 0.3;
-    trajectory_marker.color = color;
-    trajectory_marker.points = following_trajectory_;
-    trajectory_marker.lifetime = rclcpp::Duration(0.1);
-    for (auto itr = trajectory_marker.points.begin(); itr != trajectory_marker.points.end();
-      itr++)
-    {
-      trajectory_marker.colors.push_back(color);
-    }
-    ret.markers.push_back(trajectory_marker);
-
     visualization_msgs::msg::Marker text_position;
     text_position.header.frame_id = name;
     text_position.header.stamp = stamp;

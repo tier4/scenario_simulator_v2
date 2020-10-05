@@ -51,7 +51,6 @@ public:
         BT::InputPort<boost::optional<double>>("target_speed"),
         BT::InputPort<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>(
           "pedestrian_parameters"),
-        BT::OutputPort<std::vector<geometry_msgs::msg::Point>>("trajectory"),
         BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
         BT::OutputPort<std::string>("request"),
 
@@ -61,7 +60,6 @@ public:
 
 private:
   boost::optional<simulation_controller::entity::EntityStatus> target_status_;
-  std::vector<geometry_msgs::msg::Point> following_trajectory_;
   boost::optional<std::vector<int>> route_;
 };
 }      // namespace pedestrian

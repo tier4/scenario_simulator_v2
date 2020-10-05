@@ -37,7 +37,6 @@ BT::NodeStatus AcquirePositionAction::tick()
     throw BehaviorTreeRuntimeError("failed to get input request in AcquirePositionAction");
   }
   if (request != "acquire_position") {
-    following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
     target_status_ = boost::none;
     route_ = boost::none;
     return BT::NodeStatus::FAILURE;
@@ -61,21 +60,18 @@ BT::NodeStatus AcquirePositionAction::tick()
   simulation_controller::entity::EntityStatus target_status;
   if (!getInput<simulation_controller::entity::EntityStatus>("target_status", target_status)) {
     target_status_ = boost::none;
-    following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
     route_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   if (entity_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD) {
     target_status_ = boost::none;
-    following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
     route_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   if (target_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD) {
     target_status_ = boost::none;
-    following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
     route_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
@@ -145,7 +141,6 @@ BT::NodeStatus AcquirePositionAction::tick()
       simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time,
         entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
       setOutput("updated_status", entity_status_updated);
-      following_trajectory_ = std::vector<geometry_msgs::msg::Point>(0);
       target_status_ = boost::none;
       route_ = boost::none;
       return BT::NodeStatus::SUCCESS;
@@ -170,7 +165,6 @@ BT::NodeStatus AcquirePositionAction::tick()
       simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time,
         next_lanelet_id.get(), new_s, entity_status.offset, rpy, twist_new, accel_new);
       setOutput("updated_status", entity_status_updated);
-      setOutput("trajectory", following_trajectory_);
       return BT::NodeStatus::RUNNING;
     } else {
       throw BehaviorTreeRuntimeError("failed to find next lanelet id");
@@ -180,10 +174,8 @@ BT::NodeStatus AcquirePositionAction::tick()
     simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time,
       entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
     setOutput("updated_status", entity_status_updated);
-    setOutput("trajectory", following_trajectory_);
     return BT::NodeStatus::RUNNING;
   }
-  setOutput("trajectory", following_trajectory_);
   return BT::NodeStatus::RUNNING;
 }
 }      // namespace vehicle
