@@ -17,10 +17,7 @@
 
 import os
 import pathlib
-import subprocess
-from subprocess import PIPE
 from scenario_common.logger import Logger
-from scenario_common.manager import Manager
 from scenario_converter.scenario_coverter import ScenarioConverter
 
 
@@ -65,8 +62,7 @@ def main():
         "/path/to/scenario1.yaml",
         "/path/to/scenario2.yaml"]
     launcher_path = "/path/to/scenario_launcher"
-    xosc_scenario_path = ConverterHandler.convert_all_scenarios(
-        yaml_scenario_path, launcher_path)
+    ConverterHandler.convert_all_scenarios(yaml_scenario_path, launcher_path)
 
 
 if __name__ == "__main__":
