@@ -66,8 +66,7 @@ public:
 private:
   void update()
   {
-    if (api_.entity->reachPosition("ego", 34462, 10, 0, 5))
-    {
+    if (api_.entity->reachPosition("ego", 34462, 10, 0, 5)) {
       api_.entity->requestLaneChange("ego", simulation_controller::entity::Direction::LEFT);
     }
     /*

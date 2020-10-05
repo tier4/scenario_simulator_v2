@@ -14,6 +14,10 @@
 
 #include <simulation_controller/entity/entity_manager.hpp>
 
+#include <vector>
+#include <string>
+#include <unordered_map>
+
 namespace simulation_controller
 {
 namespace entity
@@ -468,5 +472,5 @@ const std::unordered_map<std::string, EntityType> EntityManager::getEntityTypeLi
   }
   return ret;
 }
-}
-}
+}  // namespace entity
+}  // namespace simulation_controller

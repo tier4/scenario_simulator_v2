@@ -36,14 +36,14 @@
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
-
+#include <visualization_msgs/msg/marker_array.hpp>
 #include <boost/optional.hpp>
+
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
-#include <autoware_auto_msgs/msg/had_map_bin.hpp>
+
 
 namespace hdmap_utils
 {

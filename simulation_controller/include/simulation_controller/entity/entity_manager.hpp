@@ -81,6 +81,7 @@ private:
     }
     lanelet_marker_pub_ptr_->publish(markers);
   }
+
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node)
@@ -111,8 +112,9 @@ public:
     visualization_msgs::msg::MarkerArray markers;
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
 
-    using namespace std::chrono_literals;
-    hdmap_marker_timer_ = node->create_wall_timer(1s, std::bind(&EntityManager::updateHdmapMarker, this));
+    hdmap_marker_timer_ =
+      node->create_wall_timer(std::chrono_literals::1s,
+      std::bind(&EntityManager::updateHdmapMarker, this));
   }
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
@@ -174,7 +176,6 @@ public:
     entities_.erase(name);
     return true;
   }
-
 };
 }  // namespace entity
 }  // namespace simulation_controller
