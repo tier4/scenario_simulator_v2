@@ -55,12 +55,6 @@ public:
     tree_.rootBlackboard()->get("updated_status", status);
     return status;
   }
-  std::vector<geometry_msgs::msg::Point> getTrajectory()
-  {
-    std::vector<geometry_msgs::msg::Point> ret;
-    tree_.rootBlackboard()->get("trajectory", ret);
-    return ret;
-  }
   void setRequest(std::string request);
 
 private:

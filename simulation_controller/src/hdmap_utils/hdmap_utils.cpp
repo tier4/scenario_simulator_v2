@@ -139,7 +139,6 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
   int lanelet_id, double s,
   std::vector<int> lanelet_ids, double foward_distance)
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::vector<geometry_msgs::msg::Point> ret;
   bool on_traj = false;
   double rest_distance = foward_distance;
@@ -778,6 +777,9 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
   insertMarkerArray(
     markers,
     lanelet::visualization::generateLaneletIdMarker(road_lanelets, cl_lanelet_id));
+  insertMarkerArray(
+    markers,
+    lanelet::visualization::generateLaneletIdMarker(crosswalk_lanelets, cl_lanelet_id));
   return markers;
 }
 

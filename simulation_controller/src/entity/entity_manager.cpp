@@ -324,6 +324,7 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
+  setVerbose(verbose_);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, EntityStatus> all_status;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {

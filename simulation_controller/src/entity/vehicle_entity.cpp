@@ -157,7 +157,7 @@ const
   text.pose.position.x = parameters.bounding_box.center.x;
   text.pose.position.y = parameters.bounding_box.center.y;
   text.pose.position.z = parameters.bounding_box.center.z +
-    parameters.bounding_box.dimensions.height * 0.5 + 0.8;
+    parameters.bounding_box.dimensions.height * 0.5 + 2.0;
   text.pose.orientation.x = 0.0;
   text.pose.orientation.y = 0.0;
   text.pose.orientation.z = 0.0;

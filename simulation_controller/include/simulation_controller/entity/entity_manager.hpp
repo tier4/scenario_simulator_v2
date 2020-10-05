@@ -64,6 +64,7 @@ public:
 class EntityManager
 {
 private:
+  bool verbose_;
   std::map<std::string, boost::any> entities_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   rclcpp::Clock::SharedPtr clock_ptr_;
