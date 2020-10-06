@@ -17,7 +17,7 @@
 
 #include <simulation_controller/entity/pedestrian_parameter.hpp>
 #include <simulation_controller/entity/entity_status.hpp>
-#include <simulation_controller/behavior/action_node.hpp>
+#include <simulation_controller/behavior/pedestrian/pedestrian_action_node.hpp>
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
@@ -34,28 +34,22 @@ namespace entity_behavior
 {
 namespace pedestrian
 {
-class AcquirePositionAction : public entity_behavior::ActionNode
+class AcquirePositionAction : public entity_behavior::PedestrianActionNode
 {
 public:
   AcquirePositionAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
+  void getBlackBoardValues();
   static BT::PortsList providedPorts()
   {
-    return
-      {
-        BT::InputPort<std::string>("request"),
-        BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-        BT::InputPort<simulation_controller::entity::EntityStatus>("entity_status"),
-        BT::InputPort<double>("current_time"),
-        BT::InputPort<double>("step_time"),
-        BT::InputPort<boost::optional<double>>("target_speed"),
-        BT::InputPort<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>(
-          "pedestrian_parameters"),
-        BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
-        BT::OutputPort<std::string>("request"),
-
-        BT::InputPort<simulation_controller::entity::EntityStatus>("target_status")
-      };
+    BT::PortsList ports = {
+      BT::InputPort<simulation_controller::entity::EntityStatus>("target_status")
+    };
+    BT::PortsList parent_ports = entity_behavior::PedestrianActionNode::providedPorts();
+    for (const auto & parent_port : parent_ports) {
+      ports.emplace(parent_port.first, parent_port.second);
+    }
+    return ports;
   }
 
 private:

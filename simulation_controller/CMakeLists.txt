@@ -57,10 +57,11 @@ add_library(entity_manager SHARED
   src/behavior/vehicle/follow_lane_action.cpp
   src/behavior/vehicle/lane_change_action.cpp
   src/behavior/vehicle/acquire_position_action.cpp
+  src/behavior/vehicle/vehicle_action_node.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
   src/behavior/pedestrian/acquire_position_action.cpp
-  src/behavior/pedestrian/lane_change_action.cpp
+  src/behavior/pedestrian/pedestrian_action_node.cpp
   src/color_utils/color_utils.cpp
 )
 ament_target_dependencies(entity_manager

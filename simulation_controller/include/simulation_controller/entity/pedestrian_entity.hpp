@@ -19,7 +19,6 @@
 #include <simulation_controller/entity/pedestrian_parameter.hpp>
 #include <simulation_controller/color_utils/color_utils.hpp>
 
-#include <simulation_controller/behavior/pedestrian/lane_change_action.hpp>
 #include <simulation_controller/behavior/pedestrian/behavior_tree.hpp>
 
 // headers in pugixml

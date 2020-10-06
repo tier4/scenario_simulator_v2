@@ -19,7 +19,6 @@
 #include <simulation_controller/entity/entity_status.hpp>
 #include <simulation_controller/behavior/pedestrian/follow_lane_action.hpp>
 #include <simulation_controller/behavior/pedestrian/acquire_position_action.hpp>
-#include <simulation_controller/behavior/pedestrian/lane_change_action.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/bt_factory.h>

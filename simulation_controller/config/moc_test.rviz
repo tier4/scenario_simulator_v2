@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /Simulation1/Lanelet1/Namespaces1
         - /Simulation1/Grid1/Line Style1
       Splitter Ratio: 0.5
     Tree Height: 796
@@ -44,6 +45,7 @@ Visualization Manager:
           Enabled: true
           Name: Entity
           Namespaces:
+            bob: true
             ego: true
           Queue Size: 10
           Topic: /entity/marker
@@ -56,7 +58,7 @@ Visualization Manager:
             center_lane_line: true
             crosswalk_lanelets: true
             lanelet direction: true
-            lanelet_id: true
+            lanelet_id: false
             left_lane_bound: true
             parking_lots: true
             parking_space: true
