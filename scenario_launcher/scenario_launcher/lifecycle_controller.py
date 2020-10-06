@@ -37,12 +37,12 @@ class LifecycleController(Node):
         self.state = None
         self.node_logger = self.get_logger()
         self.client_get_state = self.create_client(
-            GetState, LifecycleController.NODE_NAME+"/get_state")
+            GetState, LifecycleController.NODE_NAME + "/get_state")
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_get_state.srv_name + ' service not available')
         self.client_change_state = self.create_client(
-            ChangeState, LifecycleController.NODE_NAME+"/change_state")
+            ChangeState, LifecycleController.NODE_NAME + "/change_state")
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_change_state.srv_name + ' service not available')
@@ -51,16 +51,16 @@ class LifecycleController(Node):
         self.current_scenario = ""
 
     def send_scenario_service(self, request, response):
-        Logger.print_info("runner request: "+request)
+        Logger.print_info("runner request: " + request.scenario)
         response.launcher_msg = self.current_scenario
         return response
 
     def configure_node(self, scenario):
         self.node_logger.info(self.get_lifecycle_state())
-        self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         self.node_logger.info(scenario)
-        Logger.print_process("serv scenario: "+scenario)
+        Logger.print_process("serving scenario: " + scenario)
         self.current_scenario = scenario
+        self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         Logger.print_info("Configure -> scenario runner state is " +
                           self.get_lifecycle_state())
         self.node_logger.info(self.get_lifecycle_state())
