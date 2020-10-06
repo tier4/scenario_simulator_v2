@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'scenario_coverter = scenario_converter.scenario_coverter:main'
+            'scenario_converter = scenario_converter.scenario_converter:main'
         ],
     },
 )
