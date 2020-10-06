@@ -33,6 +33,7 @@ namespace vehicle
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
+
 void FollowLaneAction::decelerateInFrontOfConflictingEntity(
   const std::vector<int> & following_lanelets)
 {

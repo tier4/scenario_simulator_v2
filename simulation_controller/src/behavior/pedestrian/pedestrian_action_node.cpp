@@ -14,6 +14,9 @@
 
 #include <simulation_controller/behavior/pedestrian/pedestrian_action_node.hpp>
 
+#include <memory>
+#include <string>
+
 namespace entity_behavior
 {
 PedestrianActionNode::PedestrianActionNode(
