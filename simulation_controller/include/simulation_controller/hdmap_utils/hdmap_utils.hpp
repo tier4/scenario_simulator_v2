@@ -21,6 +21,7 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <autoware_auto_msgs/msg/had_map_bin.hpp>
 #include <geometry_msgs/msg/vector3.h>
+#include <geographic_msgs/msg/geo_point.hpp>
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Matrix3x3.h>
@@ -35,12 +36,14 @@
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
-
+#include <visualization_msgs/msg/marker_array.hpp>
 #include <boost/optional.hpp>
+
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+
 
 namespace hdmap_utils
 {
@@ -54,7 +57,11 @@ public:
 class HdMapUtils
 {
 public:
-  explicit HdMapUtils(std::string lanelet_path);
+  explicit HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin);
+  const autoware_auto_msgs::msg::HADMapBin toMapBin();
+  void insertMarkerArray(
+    visualization_msgs::msg::MarkerArray & a1,
+    const visualization_msgs::msg::MarkerArray & a2) const;
   std::vector<geometry_msgs::msg::Point> toMapPoints(int lanelet_id, std::vector<double> s);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
     int lanelet_id, double s,
@@ -96,6 +103,7 @@ public:
   boost::optional<double> getCollisionPointInLaneCoordinate(
     int lanelet_id,
     int crossing_lanelet_id);
+  const visualization_msgs::msg::MarkerArray generateMarker() const;
 
 private:
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
@@ -110,6 +118,15 @@ private:
   std::vector<double> calcEuclidDist(
     const std::vector<double> & x, const std::vector<double> & y,
     const std::vector<double> & z);
+  void overwriteLaneletsCenterline();
+  lanelet::LineString3d generateFineCenterline(
+    const lanelet::ConstLanelet & lanelet_obj, const double resolution);
+  std::vector<lanelet::BasicPoint3d> resamplePoints(
+    const lanelet::ConstLineString3d & line_string, const int32_t num_segments);
+  std::pair<size_t, size_t> findNearestIndexPair(
+    const std::vector<double> & accumulated_lengths, const double target_length);
+  std::vector<double> calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string);
+  std::vector<double> calculateSegmentDistances(const lanelet::ConstLineString3d & line_string);
 };
 }  // namespace hdmap_utils
 

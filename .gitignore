@@ -1,4 +1,6 @@
-external/*
+external/autoware_auto_msgs
+external/document_generator
+external/quaternion_operation
 .vscode
 *.pyc
 *.log

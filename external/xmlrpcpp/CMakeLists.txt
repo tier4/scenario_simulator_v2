@@ -16,7 +16,7 @@ if(WIN32)
   add_definitions(-D_WINDOWS)
 endif()
 
-add_library(xmlrpcpp
+add_library(xmlrpcpp SHARED
   src/XmlRpcClient.cpp
   src/XmlRpcDispatch.cpp
   src/XmlRpcServer.cpp
@@ -40,5 +40,7 @@ install(TARGETS xmlrpcpp
   RUNTIME DESTINATION bin)
 
 ament_export_include_directories(include)
+
 ament_export_interfaces(export_xmlrpcpp HAS_LIBRARY_TARGET)
+ament_export_libraries(xmlrpcpp)
 ament_package()

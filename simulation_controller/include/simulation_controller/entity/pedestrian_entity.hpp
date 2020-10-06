@@ -63,7 +63,6 @@ public:
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;
   BT::NodeStatus action_status_;
-  std::vector<geometry_msgs::msg::Point> following_trajectory_;
   // entity_behavior::pedestrian::LaneChangeParameter lane_change_params_;
   boost::optional<double> target_speed_;
 };

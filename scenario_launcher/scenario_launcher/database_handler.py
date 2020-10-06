@@ -49,7 +49,7 @@ class DatabaseHandler():
             map = str(launcher_package_path / map)
             Manager.path_checker(map)
             map_path[key] = map
-        return log_path, scenario_path, map_path
+        return launcher_package_path, log_path, scenario_path, map_path
 
 
 def main():

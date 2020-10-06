@@ -48,25 +48,24 @@ class LifecycleController(Node):
                 self.client_change_state.srv_name + ' service not available')
         self.launcher_server = self.create_service(
             LauncherMsg, 'launcher_msg', self.send_scenario_service)
-        self.send_scenario = ""
+        self.current_scenario = ""
 
     def send_scenario_service(self, request, response):
         Logger.print_info("runner request: "+request)
-        response.launcher_msg = self.send_scenario
+        response.launcher_msg = self.current_scenario
         return response
 
-    def configure_node(self):
-        self.send_scenario = "RESPONSE!"
+    def configure_node(self, scenario):
         self.node_logger.info(self.get_lifecycle_state())
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
+        self.node_logger.info(scenario)
+        Logger.print_process("serv scenario: "+scenario)
+        self.current_scenario = scenario
         Logger.print_info("Configure -> scenario runner state is " +
                           self.get_lifecycle_state())
         self.node_logger.info(self.get_lifecycle_state())
 
-    def activate_node(self, scenario):
-        self.node_logger.info(scenario)
-        self.send_scenario = scenario
-        Logger.print_process("serv scenario: "+scenario)
+    def activate_node(self):
         self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
         Logger.print_info("Activate -> scenario runner state is " +
                           self.get_lifecycle_state())
@@ -106,8 +105,8 @@ class LifecycleController(Node):
 
 def main(args=None):
     lifecycle_controller = LifecycleController()
-    lifecycle_controller.configure_node()
-    lifecycle_controller.activate_node("scenario1")
+    lifecycle_controller.configure_node("scenario1")
+    lifecycle_controller.activate_node()
     lifecycle_controller.deactivate_node()
     lifecycle_controller.cleanup_node()
     lifecycle_controller.destroy_node()
