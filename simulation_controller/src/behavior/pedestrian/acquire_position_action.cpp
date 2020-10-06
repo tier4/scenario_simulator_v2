@@ -27,37 +27,24 @@ namespace pedestrian
 AcquirePositionAction::AcquirePositionAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
-: entity_behavior::ActionNode(name, config) {}
+: entity_behavior::PedestrianActionNode(name, config) {}
+
+void AcquirePositionAction::getBlackBoardValues()
+{
+  simulation_controller::entity::EntityStatus target_status;
+  PedestrianActionNode::getBlackBoardValues();
+  if (!getInput<simulation_controller::entity::EntityStatus>("target_status", target_status)) {
+    target_status_ = boost::none;
+    route_ = boost::none;
+  } else {
+    target_status_ = target_status;
+  }
+}
 
 BT::NodeStatus AcquirePositionAction::tick()
 {
-  std::string request;
-  if (!getInput("request", request)) {
-    throw BehaviorTreeRuntimeError("failed to get input request in AcquirePositionAction");
-  }
+  getBlackBoardValues();
   if (request != "acquire_position") {
-    target_status_ = boost::none;
-    route_ = boost::none;
-    return BT::NodeStatus::FAILURE;
-  }
-  double step_time, current_time;
-  if (!getInput<double>("step_time", step_time)) {
-    throw BehaviorTreeRuntimeError("failed to get input step_time in FollowLaneAction");
-  }
-  if (!getInput<double>("current_time", current_time)) {
-    throw BehaviorTreeRuntimeError("failed to get input current_time in FollowLaneAction");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
-  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils_ptr)) {
-    throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in FollowLaneAction");
-  }
-
-  simulation_controller::entity::EntityStatus entity_status;
-  if (!getInput<simulation_controller::entity::EntityStatus>("entity_status", entity_status)) {
-    throw BehaviorTreeRuntimeError("failed to get input entity_status in FollowLaneAction");
-  }
-  simulation_controller::entity::EntityStatus target_status;
-  if (!getInput<simulation_controller::entity::EntityStatus>("target_status", target_status)) {
     target_status_ = boost::none;
     route_ = boost::none;
     return BT::NodeStatus::FAILURE;
@@ -69,20 +56,14 @@ BT::NodeStatus AcquirePositionAction::tick()
     return BT::NodeStatus::FAILURE;
   }
 
-  if (target_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD) {
+  if (target_status_->coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD) {
     target_status_ = boost::none;
     route_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   if (!target_status_) {
-    target_status_ = target_status;
-    route_ = hdmap_utils_ptr->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
-  }
-
-  boost::optional<double> target_speed;
-  if (!getInput<boost::optional<double>>("target_speed", target_speed)) {
-    target_speed = boost::none;
+    route_ = hdmap_utils->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
   }
 
   if (!target_speed) {
@@ -101,7 +82,7 @@ BT::NodeStatus AcquirePositionAction::tick()
       }
     }
     if (following_lanelets.size() != 0) {
-      target_speed = hdmap_utils_ptr->getSpeedLimit(following_lanelets);
+      target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
   }
 
@@ -134,8 +115,8 @@ BT::NodeStatus AcquirePositionAction::tick()
   double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
     step_time;
 
-  if (target_status.lanelet_id == entity_status.lanelet_id) {
-    if (target_status.s < entity_status.s) {
+  if (target_status_->lanelet_id == entity_status.lanelet_id) {
+    if (target_status_->s < entity_status.s) {
       geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
       simulation_controller::entity::EntityStatus entity_status_updated(current_time + step_time,
         entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
@@ -146,8 +127,8 @@ BT::NodeStatus AcquirePositionAction::tick()
     }
   }
 
-  if (new_s > hdmap_utils_ptr->getLaneletLength(entity_status.lanelet_id)) {
-    new_s = new_s - hdmap_utils_ptr->getLaneletLength(entity_status.lanelet_id);
+  if (new_s > hdmap_utils->getLaneletLength(entity_status.lanelet_id)) {
+    new_s = new_s - hdmap_utils->getLaneletLength(entity_status.lanelet_id);
     boost::optional<int> next_lanelet_id;
     bool is_finded = false;
     for (size_t i = 0; i != route_.get().size(); i++) {

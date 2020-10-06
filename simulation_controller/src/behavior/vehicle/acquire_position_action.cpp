@@ -36,6 +36,7 @@ void AcquirePositionAction::getBlackBoardValues()
   VehicleActionNode::getBlackBoardValues();
   if (!getInput<simulation_controller::entity::EntityStatus>("target_status", target_status)) {
     target_status_ = boost::none;
+    route_ = boost::none;
   } else {
     target_status_ = target_status;
   }
