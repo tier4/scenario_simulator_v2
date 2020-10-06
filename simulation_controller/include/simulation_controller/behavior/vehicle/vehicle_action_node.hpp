@@ -16,6 +16,7 @@
 #define SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
+#include <simulation_controller/entity/vehicle_parameter.hpp>
 #include <simulation_controller/behavior/action_node.hpp>
 #include <string>
 
@@ -26,6 +27,20 @@ class VehicleActionNode : public ActionNode
 public:
   VehicleActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~VehicleActionNode() override = default;
+  void getBlackBoardValues();
+  static BT::PortsList providedPorts()
+  {
+    BT::PortsList ports = {
+      BT::InputPort<std::shared_ptr<simulation_controller::entity::VehicleParameters>>(
+        "vehicle_parameters")
+    };
+    BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
+    for (const auto & parent_port : parent_ports) {
+      ports.emplace(parent_port.first, parent_port.second);
+    }
+    return ports;
+  }
+  std::shared_ptr<simulation_controller::entity::VehicleParameters> vehicle_parameters;
 };
 }  // namespace entity_behavior
 

@@ -16,7 +16,11 @@
 #define SIMULATION_CONTROLLER__BEHAVIOR__ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
+#include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_controller/entity/entity_base.hpp>
+
 #include <string>
+#include <unordered_map>
 
 namespace entity_behavior
 {
@@ -41,6 +45,35 @@ public:
   {
     setStatus(BT::NodeStatus::IDLE);
   }
+
+  static BT::PortsList providedPorts()
+  {
+    return
+      {
+        BT::InputPort<std::string>("request"),
+        BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
+        BT::InputPort<simulation_controller::entity::EntityStatus>("entity_status"),
+        BT::InputPort<double>("current_time"),
+        BT::InputPort<double>("step_time"),
+        BT::InputPort<boost::optional<double>>("target_speed"),
+        BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
+        BT::OutputPort<std::string>("request"),
+        BT::InputPort<std::unordered_map<std::string, simulation_controller::entity::EntityStatus>>(
+          "other_entity_status"),
+        BT::InputPort<std::unordered_map<std::string, simulation_controller::entity::EntityType>>(
+          "entity_type_list")
+      };
+  }
+  void getBlackBoardValues();
+  std::string request;
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  simulation_controller::entity::EntityStatus entity_status;
+  double current_time;
+  double step_time;
+  boost::optional<double> target_speed;
+  simulation_controller::entity::EntityStatus updated_status;
+  std::unordered_map<std::string, simulation_controller::entity::EntityStatus> other_entity_status;
+  std::unordered_map<std::string, simulation_controller::entity::EntityType> entity_type_list;
 };
 }  // namespace entity_behavior
 

@@ -21,4 +21,14 @@ VehicleActionNode::VehicleActionNode(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : ActionNode(name, config) {}
+
+void VehicleActionNode::getBlackBoardValues()
+{
+  ActionNode::getBlackBoardValues();
+  if (!getInput<std::shared_ptr<simulation_controller::entity::VehicleParameters>>(
+      "vehicle_parameters", vehicle_parameters))
+  {
+    throw BehaviorTreeRuntimeError("failed to get input vehicle_parameters in VehicleActionNode");
+  }
+}
 }

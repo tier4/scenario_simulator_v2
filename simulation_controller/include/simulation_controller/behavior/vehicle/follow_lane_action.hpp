@@ -16,7 +16,7 @@
 #define SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__FOLLOW_LANE_ACTION_HPP_
 
 #include <simulation_controller/entity/entity_base.hpp>
-#include <simulation_controller/behavior/action_node.hpp>
+#include <simulation_controller/behavior/vehicle/vehicle_action_node.hpp>
 #include <simulation_controller/entity/entity_status.hpp>
 #include <simulation_controller/entity/vehicle_parameter.hpp>
 #include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
@@ -33,37 +33,22 @@ namespace entity_behavior
 {
 namespace vehicle
 {
-class FollowLaneAction : public entity_behavior::ActionNode
+class FollowLaneAction : public entity_behavior::VehicleActionNode
 {
 private:
-  const boost::optional<double> getTargetSpeedFromConflictingEntityStatus(
-    const std::vector<int> & following_lanelets,
-    const std::vector<simulation_controller::entity::EntityStatus> & other_entity_status,
-    const boost::optional<double> & target_speed,
-    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+  void decelerateInFrontOfConflictingEntity(const std::vector<int> & following_lanelets);
 
 public:
   FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
-    return
-      {
-        BT::InputPort<std::string>("request"),
-        BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-        BT::InputPort<simulation_controller::entity::EntityStatus>("entity_status"),
-        BT::InputPort<double>("current_time"),
-        BT::InputPort<double>("step_time"),
-        BT::InputPort<boost::optional<double>>("target_speed"),
-        BT::InputPort<std::shared_ptr<simulation_controller::entity::VehicleParameters>>(
-          "vehicle_parameters"),
-        BT::OutputPort<simulation_controller::entity::EntityStatus>("updated_status"),
-        BT::OutputPort<std::string>("request"),
-        BT::InputPort<std::unordered_map<std::string, simulation_controller::entity::EntityStatus>>(
-          "other_entity_status"),
-        BT::InputPort<std::unordered_map<std::string, simulation_controller::entity::EntityType>>(
-          "entity_type_list")
-      };
+    BT::PortsList ports = {};
+    BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
+    for (const auto & parent_port : parent_ports) {
+      ports.emplace(parent_port.first, parent_port.second);
+    }
+    return ports;
   }
 };
 }  // namespace vehicle
