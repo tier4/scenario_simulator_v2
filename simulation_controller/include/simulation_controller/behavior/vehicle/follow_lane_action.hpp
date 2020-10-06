@@ -41,6 +41,7 @@ private:
     const std::vector<simulation_controller::entity::EntityStatus> & other_entity_status,
     const boost::optional<double> & target_speed,
     std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+
 public:
   FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
