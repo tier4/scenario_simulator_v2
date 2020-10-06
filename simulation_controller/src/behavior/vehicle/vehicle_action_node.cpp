@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include <simulation_controller/behavior/vehicle/vehicle_action_node.hpp>
+
 #include <string>
+#include <memory>
 
 namespace entity_behavior
 {
@@ -31,4 +33,4 @@ void VehicleActionNode::getBlackBoardValues()
     throw BehaviorTreeRuntimeError("failed to get input vehicle_parameters in VehicleActionNode");
   }
 }
-}
+}  // namespace entity_behavior

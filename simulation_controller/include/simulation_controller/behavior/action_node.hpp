@@ -20,6 +20,7 @@
 #include <simulation_controller/entity/entity_base.hpp>
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 namespace entity_behavior

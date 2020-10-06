@@ -19,6 +19,8 @@
             vehicle_parameters="{vehicle_parameters}"
             updated_status="{updated_status}"
             target_speed="{target_speed}"
+            other_entity_status="{other_entity_status}"
+            entity_type_list="{entity_type_list}"
             target_status="{target_status}"/>
         <FollowLane name="follow_lane"
             request="{request}"

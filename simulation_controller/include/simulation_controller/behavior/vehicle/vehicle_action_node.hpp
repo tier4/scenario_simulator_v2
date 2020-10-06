@@ -18,7 +18,9 @@
 #include <behaviortree_cpp_v3/action_node.h>
 #include <simulation_controller/entity/vehicle_parameter.hpp>
 #include <simulation_controller/behavior/action_node.hpp>
+
 #include <string>
+#include <memory>
 
 namespace entity_behavior
 {

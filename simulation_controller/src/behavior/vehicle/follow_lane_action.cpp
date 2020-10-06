@@ -33,7 +33,8 @@ namespace vehicle
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-void FollowLaneAction::decelerateInFrontOfConflictingEntity(const std::vector<int> & following_lanelets)
+void FollowLaneAction::decelerateInFrontOfConflictingEntity(
+  const std::vector<int> & following_lanelets)
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   std::vector<simulation_controller::entity::EntityStatus> conflicting_entity_status;

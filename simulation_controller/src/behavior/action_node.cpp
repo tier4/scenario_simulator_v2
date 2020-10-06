@@ -15,6 +15,8 @@
 #include <simulation_controller/behavior/action_node.hpp>
 
 #include <string>
+#include <memory>
+#include <unordered_map>
 
 namespace entity_behavior
 {
