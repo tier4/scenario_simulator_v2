@@ -34,6 +34,7 @@ struct Command
   {
     exitFailure,
     exitSuccess,
+    nop,
     print,
   }
   value;
@@ -69,6 +70,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command &
 
   BOILERPLATE(exitFailure);
   BOILERPLATE(exitSuccess);
+  BOILERPLATE(nop);
   BOILERPLATE(print);
 
   #undef BOILERPLATE
@@ -86,6 +88,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Com
 
     BOILERPLATE(exitFailure);
     BOILERPLATE(exitSuccess);
+    BOILERPLATE(nop);
     BOILERPLATE(print);
 
     #undef BOILERPLATE

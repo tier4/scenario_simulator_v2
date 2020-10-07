@@ -14,7 +14,7 @@
     <Init>
       <Actions>
         <UserDefinedAction>
-          <CustomCommandAction type="print"> OpenSCENARIO.Storyboard.Init.Actions.UserDefinedAction.CustomCommandAction </CustomCommandAction>
+          <CustomCommandAction type="nop"/>
         </UserDefinedAction>
       </Actions>
     </Init>
@@ -28,7 +28,7 @@
             <Event name="event" priority="overwrite">
               <Action name="action">
                 <UserDefinedAction>
-                  <CustomCommandAction type="print"> OpenSCENARIO.Storyboard.Story.Act.ManeuverGroup.Maneuver.Event.Action.UserDefinedAction.CustomCommandAction </CustomCommandAction>
+                  <CustomCommandAction type="nop"/>
                 </UserDefinedAction>
               </Action>
               <StartTrigger>
