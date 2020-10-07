@@ -23,18 +23,6 @@ namespace scenario_runner
 ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("scenario_runner", options),
 
-  // callback_group
-  // {
-  //   create_callback_group(
-  //     rclcpp::callback_group::CallbackGroupType::MutuallyExclusive)
-  // },
-  //
-  // service_client
-  // {
-  //   create_client<GetScenario>(
-  //     "launcher_msg", rmw_qos_profile_default, callback_group)
-  // },
-
   port
   {
     8080
@@ -46,15 +34,6 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
   }
 {
   declare_parameter<decltype(scenario)>("scenario", scenario);
-
-  // while (!(*service_client).wait_for_service(std::chrono::seconds(1))) {
-  //   if (!rclcpp::ok()) {
-  //     RCLCPP_ERROR(get_logger(), "Interrupted while waiting for service.");
-  //     rclcpp::shutdown();
-  //   } else {
-  //     RCLCPP_INFO(get_logger(), "Waiting for service...");
-  //   }
-  // }
 }
 
 ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
@@ -62,28 +41,6 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
   using scenario_runner::ScenarioRunner;
 
   get_parameter("scenario", scenario);
-
-  // auto request {std::make_shared<GetScenario::Request>()};
-  //
-  // (*request).scenario = "REQUEST!";
-  //
-  // std::string scenario;
-  //
-  // auto result {
-  //   service_client->async_send_request(
-  //     request,
-  //     [&](rclcpp::Client<GetScenario>::SharedFuture result) -> void
-  //     {
-  //       scenario = result.get()->launcher_msg;
-  //       RCLCPP_INFO(get_logger(), "Served: '%s'", scenario.c_str());
-  //     })
-  // };
-  //
-  // while (scenario.empty() && rclcpp::ok()) {
-  //   std::this_thread::sleep_for(std::chrono::seconds(1));
-  // }
-  //
-  // RCLCPP_INFO(get_logger(), "Received scenario path: '%s'", result.get()->launcher_msg.c_str());
 
   try {
     RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
@@ -109,7 +66,10 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
         if (!evaluate.as<OpenScenario>().complete()) {
           const auto result {evaluate.as<OpenScenario>()()};
 
-          RCLCPP_INFO(get_logger(), "[Storyboard: %s]", boost::lexical_cast<std::string>(result).c_str());
+          RCLCPP_INFO(
+            get_logger(),
+            "[Storyboard: %s]",
+            boost::lexical_cast<std::string>(result).c_str());
 
           RCLCPP_INFO(
             get_logger(),
