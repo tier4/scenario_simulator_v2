@@ -34,7 +34,7 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
     if (value.empty()) {
       #ifndef SCENARIO_RUNNER_ALLOW_ATTRIBUTES_TO_BE_BLANK
       std::stringstream ss {};
-      ss << "blank is not allowed for the value of attribute \'" << name << "\' of class \'" <<
+      ss << "Blank is not allowed for the value of attribute \'" << name << "\' of class \'" <<
         node.name() << "\'";
       throw SyntaxError {ss.str()};
       #else
@@ -47,7 +47,7 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
         return boost::lexical_cast<T>(boost::lexical_cast<String>(cdr(*iter)));
       } else {
         std::stringstream ss {};
-        ss << "there is no parameter named '" << value.substr(1) << "' (attribute \'" << name <<
+        ss << "There is no parameter named '" << value.substr(1) << "' (Attribute \'" << name <<
           "\' of class \'" << node.name() << "\' references this parameter)";
         throw SyntaxError {ss.str()};
       }
@@ -56,14 +56,14 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
         return boost::lexical_cast<T>(value);
       } catch (const boost::bad_lexical_cast &) {
         std::stringstream ss {};
-        ss << "value \"" << value << "\" specified for attribute \'" << name <<
-          "\' is invalid (not value of type " << typeid(T).name() << ")";
+        ss << "Value \"" << value << "\" specified for attribute \'" << name <<
+          "\' is invalid (Is not value of type " << typeid(T).name() << ")";
         throw SyntaxError {ss.str()};
       }
     }
   } else {
     std::stringstream ss {};
-    ss << "required attribute \'" << name << "\' not specified for class \'" << node.name() << "\'";
+    ss << "Required attribute \'" << name << "\' not specified for class \'" << node.name() << "\'";
     throw SyntaxError {ss.str()};
   }
 }

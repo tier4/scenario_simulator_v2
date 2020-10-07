@@ -22,12 +22,10 @@ namespace scenario_runner
 {
 ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("scenario_runner", options),
-
   port
   {
     8080
   },
-
   scenario
   {
     ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc"

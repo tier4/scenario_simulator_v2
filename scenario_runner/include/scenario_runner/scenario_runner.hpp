@@ -20,7 +20,6 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_runner/syntax/open_scenario.hpp>
-#include <scenario_simulator_msgs/srv/launcher_msg.hpp>
 
 #include <memory>
 #include <string>

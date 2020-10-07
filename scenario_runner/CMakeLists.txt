@@ -23,14 +23,13 @@ execute_process(
   COMMAND tr -d "\n"
   OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
 
-find_package(ament_index_cpp         REQUIRED)
-find_package(geometry_msgs           REQUIRED)
-find_package(lifecycle_msgs          REQUIRED)
-find_package(rclcpp_components       REQUIRED)
-find_package(rclcpp_lifecycle        REQUIRED)
-find_package(rclcpp                  REQUIRED)
-find_package(scenario_simulator_msgs REQUIRED)
-find_package(std_msgs                REQUIRED)
+find_package(ament_index_cpp   REQUIRED)
+find_package(geometry_msgs     REQUIRED)
+find_package(lifecycle_msgs    REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(rclcpp_lifecycle  REQUIRED)
+find_package(rclcpp            REQUIRED)
+find_package(std_msgs          REQUIRED)
 
 # ------------------------------------------------------------------------------
 #  libscenario_runner
