@@ -28,10 +28,10 @@ class Manager():
 
     @staticmethod
     def ask_continuation():
-        Logger.print_process("continue ? \n [y/n]:")
+        Logger.print_process("Continue? \n [y/N]:")
         answer = input()
         if (answer is not "y"):
-            Logger.print_info("abort creating files")
+            Logger.print_info("Abort to make files.")
             sys.exit()
 
     @staticmethod
@@ -40,7 +40,7 @@ class Manager():
         try:
             with open(path, mode) as file:
                 file_type = pathlib.Path(path).suffix
-                if(file_type == ".yaml"):
+                if (file_type == ".yaml"):
                     data = yaml.safe_load(file)
                 else:
                     data = file.read()
@@ -49,13 +49,14 @@ class Manager():
         return data
 
     @staticmethod
-    def path_checker(path):
+    def check_existence(path, verbose=False):
         path = str(path)
         is_path = os.path.exists(path)
-        if(is_path):
-            Logger.print_process("path: " + path + " exists")
-        else:
-            Logger.print_warning("path: " + path + " not exists")
+        if verbose:
+            if(is_path):
+                Logger.print_process("path: " + path + " exists")
+            else:
+                Logger.print_warning("path: " + path + " not exists")
         return is_path
 
     @staticmethod
@@ -73,21 +74,23 @@ class Manager():
                 else:
                     file.write(data)
         except IOError:
-            Logger.print_warning("unable to fopen: " + str(path))
+            Logger.print_warning("Failed to open: " + str(path))
         return data
 
     @staticmethod
-    def mkdir(path):
-        message = "Try mkdir: " + os.path.abspath(path)
+    def mkdir(path, verbose=False):
+        if verbose:
+            message = "Try mkdir: " + os.path.abspath(path)
         try:
             os.makedirs(path)
         except FileExistsError:
-            message = message+"\n       But cancelled making directory"
-            if (os.path.exists(path)):
-                message = message+" -> Because folder already exist"
-            else:
-                message = message+" -> Because of unkown failure"
-        Logger.print_info(message)
+            if verbose:
+                message = message + "\n       But cancelled making directory."
+                if (os.path.exists(path)):
+                    message = message + " -> Because folder already exist"
+                else:
+                    message = message + " -> Because of unkown failure"
+                Logger.print_info(message)
 
     @staticmethod
     def get_file_dir(file_path, target_file_name):

@@ -21,11 +21,7 @@ import rcl_interfaces
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from lifecycle_msgs.srv import GetState
-# from rcl_interfaces.msg import ParameterType
-# from rcl_interfaces.msg import ParameterValue
-# from rcl_interfaces.srv import SetParameters
 from rclpy.node import Node
-from rclpy.parameter import Parameter
 from scenario_common.logger import Logger
 
 

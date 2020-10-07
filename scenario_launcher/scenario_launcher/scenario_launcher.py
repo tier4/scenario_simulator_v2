@@ -59,12 +59,12 @@ class Launcher:
                 Logger.print_process("    end of running")
                 return
             time.sleep(self.SLEEP_RATE)
-        Logger.print_warning("Reached to Maximum Simulation Time")
+        Logger.print_warning("Reached to maximum simulation time")
         self.lifecycle_controller.deactivate_node()
 
     def run_scenario(self):
         Logger.print_process(
-            "Set Maximum Simulation Time: " + str(self.timeout))
+            "Set maximum simulation time: " + str(self.timeout))
         time.sleep(self.SLEEP_RATE)
         self.lifecycle_controller.activate_node()
         self.monitor_state()
@@ -80,7 +80,7 @@ class Launcher:
             self.lifecycle_controller.configure_node(scenario)
             if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
                 Logger.print_warning(
-                    "skip this scenario because of activation failure")
+                    "Skip this scenario because of activation failure")
                 continue
             self.run_scenario()
             self.lifecycle_controller.cleanup_node()

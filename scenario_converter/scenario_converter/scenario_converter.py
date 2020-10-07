@@ -52,14 +52,12 @@ class ScenarioConverter:
         xosc_text = ScenarioConverter.convert_dict2xosc(xosc_dict, xosc_dir)
         Manager.mkdir(pathlib.Path(log_path).parent)
         Manager.mkdir(xosc_dir)
-        Logger.print_separator("Start Conversion")
         ScenarioConverter.apply_parameter_distribution(modifier, xosc_text,
                                                        xosc_dir, yaml_path,
                                                        log_path)
         print("")
-        Logger.print_separator("Conversion Done")
-        Logger.print_process("input: " + yaml_path)
-        Logger.print_process("output: " + xosc_dir)
+        Logger.print_process("<= " + yaml_path)
+        Logger.print_process("=> " + xosc_dir + "/")
         Logger.print_process("log: " + os.path.abspath(log_path))
 
     @staticmethod
@@ -72,7 +70,7 @@ class ScenarioConverter:
             if "ScenarioModifier" in scenario_modifiers:
                 scenario_modifier = scenario_modifiers["ScenarioModifier"]
         if scenario_modifier is None:
-            Logger.print_info("No Scenario Modifiers Detected")
+            Logger.print_info("No ScenarioModifiers specified.")
         return length, scenario_modifier
 
     @staticmethod
@@ -117,7 +115,7 @@ class ScenarioConverter:
 
     @staticmethod
     def convert_yaml2dict(yaml_scenario_path):
-        Manager.path_checker(yaml_scenario_path)
+        Manager.check_existence(yaml_scenario_path)
         with open(yaml_scenario_path, "r") as file:
             root = xmlplain.obj_from_yaml(file)
         return root
