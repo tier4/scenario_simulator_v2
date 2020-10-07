@@ -17,12 +17,16 @@
 
 
 import rclpy
+import rcl_interfaces
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from lifecycle_msgs.srv import GetState
+# from rcl_interfaces.msg import ParameterType
+# from rcl_interfaces.msg import ParameterValue
+# from rcl_interfaces.srv import SetParameters
 from rclpy.node import Node
+from rclpy.parameter import Parameter
 from scenario_common.logger import Logger
-from scenario_simulator_msgs.srv import LauncherMsg
 
 
 class LifecycleController(Node):
@@ -34,35 +38,64 @@ class LifecycleController(Node):
     def __init__(self):
         rclpy.init(args=self.NODE_NAME)
         super().__init__(LifecycleController.NODE_NAME)
+
         self.state = None
         self.node_logger = self.get_logger()
+
         self.client_get_state = self.create_client(
             GetState, LifecycleController.NODE_NAME + "/get_state")
+
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_get_state.srv_name + ' service not available')
+
         self.client_change_state = self.create_client(
             ChangeState, LifecycleController.NODE_NAME + "/change_state")
+
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_change_state.srv_name + ' service not available')
-        self.launcher_server = self.create_service(
-            LauncherMsg, 'launcher_msg', self.send_scenario_service)
-        self.current_scenario = ""
 
-    def send_scenario_service(self, request, response):
-        Logger.print_info("runner request: " + request.scenario)
-        response.launcher_msg = self.current_scenario
-        return response
+        self.current_scenario = ""
+        self.client_set_parameters = self.create_client(
+                rcl_interfaces.srv.SetParameters,
+                LifecycleController.NODE_NAME + '/set_parameters')
+
+    def send_request_to_change_parameters(self, scenario):
+        request = rcl_interfaces.srv.SetParameters.Request()
+        request.parameters = [
+                rcl_interfaces.msg.Parameter(
+                    name=LifecycleController.PARAMETER_NAME,
+                    value=rcl_interfaces.msg.ParameterValue(
+                        type=rcl_interfaces.msg.ParameterType.PARAMETER_STRING,
+                        string_value=scenario
+                        )
+                    )
+                ]
+        future = self.client_set_parameters.call_async(request)
+        if future.done():
+            try:
+                future.result()
+            except Exception as e:
+                self.get_logger().info('Service call failed %r' % (e,))
 
     def configure_node(self, scenario):
         self.node_logger.info(self.get_lifecycle_state())
-        self.node_logger.info(scenario)
-        Logger.print_process("serving scenario: " + scenario)
+
         self.current_scenario = scenario
+        Logger.print_process(
+                "Set value '" +
+                self.current_scenario +
+                "' to " +
+                LifecycleController.NODE_NAME +
+                "'s parameter 'scenario'")
+
+        self.send_request_to_change_parameters(self.current_scenario)
+
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         Logger.print_info("Configure -> scenario runner state is " +
                           self.get_lifecycle_state())
+
         self.node_logger.info(self.get_lifecycle_state())
 
     def activate_node(self):
