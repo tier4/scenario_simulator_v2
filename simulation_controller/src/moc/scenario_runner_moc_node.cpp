@@ -42,6 +42,7 @@ public:
     simulation_controller::entity::VehicleParameters params(catalog_xml_doc);
     api_.entity->spawn(true, "ego", params);
     api_.entity->setEntityStatus("ego", getEgoInitialStatus());
+    api_.entity->setTargetSpeed("ego", 10, true);
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_controller::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);

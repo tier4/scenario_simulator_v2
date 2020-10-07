@@ -12,42 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
-#define SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
+#ifndef SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
+#define SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
 
-#include <simulation_controller/behavior/pedestrian/pedestrian_action_node.hpp>
-#include <simulation_controller/entity/entity_status.hpp>
+#include <behaviortree_cpp_v3/action_node.h>
 #include <simulation_controller/entity/pedestrian_parameter.hpp>
-#include <simulation_controller/hdmap_utils/hdmap_utils.hpp>
-
-#include <behaviortree_cpp_v3/behavior_tree.h>
-#include <behaviortree_cpp_v3/bt_factory.h>
+#include <simulation_controller/behavior/action_node.hpp>
 
 #include <string>
 #include <memory>
-#include <vector>
 
 namespace entity_behavior
 {
-namespace pedestrian
-{
-class FollowLaneAction : public entity_behavior::PedestrianActionNode
+class PedestrianActionNode : public ActionNode
 {
 public:
-  FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  PedestrianActionNode(const std::string & name, const BT::NodeConfiguration & config);
   void getBlackBoardValues();
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {};
-    BT::PortsList parent_ports = entity_behavior::PedestrianActionNode::providedPorts();
+    BT::PortsList ports = {
+      BT::InputPort<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>(
+        "pedestrian_parameters")
+    };
+    BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
     }
     return ports;
   }
+  std::shared_ptr<simulation_controller::entity::PedestrianParameters> pedestrian_parameters;
 };
-}  // namespace pedestrian
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
+#endif  // SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_

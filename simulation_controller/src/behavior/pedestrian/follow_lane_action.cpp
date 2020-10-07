@@ -27,44 +27,18 @@ namespace entity_behavior
 namespace pedestrian
 {
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
-: entity_behavior::ActionNode(name, config) {}
+: entity_behavior::PedestrianActionNode(name, config) {}
+
+void FollowLaneAction::getBlackBoardValues()
+{
+  PedestrianActionNode::getBlackBoardValues();
+}
 
 BT::NodeStatus FollowLaneAction::tick()
 {
-  std::string request;
-  if (!getInput("request", request)) {
-    throw BehaviorTreeRuntimeError("failed to get input request in FollowLaneAction");
-  }
+  getBlackBoardValues();
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
-  }
-  double step_time, current_time;
-  if (!getInput<double>("step_time", step_time)) {
-    throw BehaviorTreeRuntimeError("failed to get input step_time in FollowLaneAction");
-  }
-  if (!getInput<double>("current_time", current_time)) {
-    throw BehaviorTreeRuntimeError("failed to get input current_time in FollowLaneAction");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
-  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils_ptr)) {
-    throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in FollowLaneAction");
-  }
-
-  simulation_controller::entity::EntityStatus entity_status;
-  if (!getInput<simulation_controller::entity::EntityStatus>("entity_status", entity_status)) {
-    throw BehaviorTreeRuntimeError("failed to get input entity_status in FollowLaneAction");
-  }
-
-  boost::optional<double> target_speed;
-  if (!getInput<boost::optional<double>>("target_speed", target_speed)) {
-    target_speed = boost::none;
-  }
-
-  std::shared_ptr<simulation_controller::entity::PedestrianParameters> pedestrian_param_ptr;
-  if (!getInput<std::shared_ptr<simulation_controller::entity::PedestrianParameters>>(
-      "pedestrian_parameters", pedestrian_param_ptr))
-  {
-    throw BehaviorTreeRuntimeError("failed to get input pedestrian_parameters in FollowLaneAction");
   }
 
   if (entity_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::WORLD) {
@@ -103,9 +77,9 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (entity_status.coordinate == simulation_controller::entity::CoordinateFrameTypes::LANE) {
-    auto following_lanelets = hdmap_utils_ptr->getFollowingLanelets(entity_status.lanelet_id);
+    auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id);
     if (!target_speed) {
-      target_speed = hdmap_utils_ptr->getSpeedLimit(following_lanelets);
+      target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
     geometry_msgs::msg::Accel accel_new;
     accel_new = entity_status.accel;
