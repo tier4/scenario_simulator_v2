@@ -18,7 +18,7 @@
 import os
 import pathlib
 from scenario_common.logger import Logger
-from scenario_converter.scenario_coverter import ScenarioConverter
+from scenario_converter.scenario_converter import ScenarioConverter
 
 
 class ConverterHandler():

@@ -29,7 +29,7 @@ class Logger:
 
     @staticmethod
     def print_process(message):
-        logger.process("\x1b[1;36m{0}\x1b[0m".format(message))
+        logger.process("\x1b[36m{0}\x1b[0m".format(message))
 
     @staticmethod
     def print_success(message):

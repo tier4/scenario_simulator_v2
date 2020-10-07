@@ -30,10 +30,10 @@ class DatabaseHandler():
         Logger.print_separator("scenario database")
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         database_path = launcher_package_path / "config" / DatabaseHandler.DATABASE_FILE
-        if (not Manager.path_checker(database_path)):
+        if (not Manager.check_existence(database_path)):
             launcher_package_path = pathlib.Path(
                 Manager.get_file_dir(__file__, DatabaseHandler.DATABASE_FILE)).parent
-            Manager.path_checker(database_path)
+            Manager.check_existence(database_path)
         Logger.print_info("package path: " + str(launcher_package_path))
         Logger.print_info(launcher_package_path)
         database = Manager.read_data(database_path)
@@ -41,13 +41,13 @@ class DatabaseHandler():
         scenario_path = []
         for scenario in database["Scenario"]:
             scenario = str(launcher_package_path / scenario)
-            Manager.path_checker(scenario)
+            Manager.check_existence(scenario)
             scenario_path.append(scenario)
         map_path = dict()
         map_database = database["Map"][0]
         for key, map in map_database.items():
             map = str(launcher_package_path / map)
-            Manager.path_checker(map)
+            Manager.check_existence(map)
             map_path[key] = map
         return launcher_package_path, log_path, scenario_path, map_path
 

@@ -15,7 +15,6 @@
 #define SCENARIO_RUNNER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 // #define SCENARIO_RUNNER_NO_EXTENSION
 
-#include <rclcpp/rclcpp.hpp>
 #include <scenario_runner/scenario_runner.hpp>
 
 #include <cstdlib>
@@ -25,14 +24,15 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
 
-  rclcpp::executors::SingleThreadedExecutor executor {};
+  rclcpp::executors::MultiThreadedExecutor executor {};
 
-  const auto node {std::make_shared<scenario_runner::ScenarioRunner>()};
+  rclcpp::NodeOptions options {};
+
+  auto node {
+    std::make_shared<scenario_runner::ScenarioRunner>(options)
+  };
 
   executor.add_node((*node).get_node_base_interface());
-
-  // (*node).configure();
-  // (*node).activate();
 
   executor.spin();
 

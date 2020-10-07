@@ -18,25 +18,60 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_runner/syntax/open_scenario.hpp>
-#include <scenario_simulator_msgs/srv/launcher_msg.hpp>
 
 #include <memory>
 #include <string>
 
-#define READ_PARAMETER(NAME) \
-  declare_parameter<decltype(NAME)>(#NAME, NAME); \
-  get_parameter(#NAME, NAME)
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
+//     https://gcc.gnu.org/wiki/Visibility
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef __GNUC__
+    #define SCENARIO_RUNNER_EXPORT __attribute__ ((dllexport))
+    #define SCENARIO_RUNNER_IMPORT __attribute__ ((dllimport))
+  #else
+    #define SCENARIO_RUNNER_EXPORT __declspec(dllexport)
+    #define SCENARIO_RUNNER_IMPORT __declspec(dllimport)
+  #endif
+
+  #ifdef SCENARIO_RUNNER_BUILDING_DLL
+    #define SCENARIO_RUNNER_PUBLIC SCENARIO_RUNNER_EXPORT
+  #else
+    #define SCENARIO_RUNNER_PUBLIC SCENARIO_RUNNER_IMPORT
+  #endif
+
+  #define SCENARIO_RUNNER_PUBLIC_TYPE SCENARIO_RUNNER_PUBLIC
+  #define SCENARIO_RUNNER_LOCAL
+#else
+  #define SCENARIO_RUNNER_EXPORT __attribute__ ((visibility("default")))
+  #define SCENARIO_RUNNER_IMPORT
+
+  #if __GNUC__ >= 4
+    #define SCENARIO_RUNNER_PUBLIC __attribute__ ((visibility("default")))
+    #define SCENARIO_RUNNER_LOCAL  __attribute__ ((visibility("hidden")))
+  #else
+    #define SCENARIO_RUNNER_PUBLIC
+    #define SCENARIO_RUNNER_LOCAL
+  #endif
+
+  #define SCENARIO_RUNNER_PUBLIC_TYPE
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 namespace scenario_runner
 {
 class ScenarioRunner
   : public rclcpp_lifecycle::LifecycleNode
 {
-  // using GetScenario = scenario_simulator_msgs::srv::LauncherMsg;
-  //
-  // const rclcpp::Client<GetScenario>::SharedPtr service_client;
-
   int port;
 
   std::string scenario;
@@ -48,138 +83,22 @@ class ScenarioRunner
   std::shared_ptr<rclcpp::TimerBase> timer;
 
 public:
-  explicit ScenarioRunner(const std::string & name = "scenario_runner")
-  : rclcpp_lifecycle::LifecycleNode(
-      name,
-      rclcpp::NodeOptions().use_intra_process_comms(false)),
-    // service_client{create_client<GetScenario>("launcher_msg")},
-    port{8080},
-    scenario{
-      ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc"}
-  {
-    READ_PARAMETER(port);
-    // READ_PARAMETER(scenario);
-
-    // using std::chrono_literals::operator"" s;
-    //
-    // while (!(*service_client).wait_for_service(1s)) {
-    //   if (!rclcpp::ok()) {
-    //     RCLCPP_ERROR(get_logger(), "Interrupted while waiting for service.");
-    //     rclcpp::shutdown();
-    //   }
-    //   RCLCPP_INFO(get_logger(), "Waiting for service...");
-    // }
-  }
+  SCENARIO_RUNNER_PUBLIC
+  explicit ScenarioRunner(const rclcpp::NodeOptions &);
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
-  Result on_configure(const rclcpp_lifecycle::State &) override
-  {
-    // set rosparam map path
+  Result on_configure(const rclcpp_lifecycle::State &) override;
 
-    using scenario_runner::ScenarioRunner;
+  Result on_activate(const rclcpp_lifecycle::State &) override;
 
-    // auto request {std::make_shared<GetScenario::Request>()};
-    //
-    // (*request).scenario = "hoge";  // request
-    //
-    // auto result {(*service_client).async_send_request(request)};
-    //
-    // if (rclcpp::spin_until_future_complete(shared_from_this(), result) ==
-    //   rclcpp::executor::FutureReturnCode::SUCCESS)
-    // {
-    //   RCLCPP_INFO(
-    //     get_logger(),
-    //     "Received scenario path: '%s'",
-    //     result.get()->launcher_msg.c_str());
-    // } else {
-    //   RCLCPP_ERROR(get_logger(), "Problem while waiting for response.");
-    // }
+  Result on_deactivate(const rclcpp_lifecycle::State &) override;
 
-    try {
-      RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
-      evaluate.rebind<OpenScenario>(scenario, address, port);
-    } catch (const scenario_runner::SyntaxError & error) {
-      RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
-      return Result::FAILURE;
-    }
+  Result on_cleanup(const rclcpp_lifecycle::State &) override;
 
-    RCLCPP_INFO(get_logger(), "Connecting simulator via %s:%d", address.c_str(), port);
-    evaluate.as<OpenScenario>().init();
+  Result on_shutdown(const rclcpp_lifecycle::State &) override;
 
-    return Result::SUCCESS;
-  }
-
-  Result on_activate(const rclcpp_lifecycle::State &) override
-  {
-    using std::literals::chrono_literals::operator"" ms;
-
-    timer = create_wall_timer(
-      50ms,
-      [&]()
-      {
-        try {
-          if (!evaluate.as<OpenScenario>().complete()) {
-            const auto result {evaluate.as<OpenScenario>()()};
-
-            RCLCPP_INFO(get_logger(), "[Storyboard: %s]", boost::lexical_cast<std::string>(result));
-
-            RCLCPP_INFO(
-              get_logger(),
-              "[%d standby (=> %d) => %d running (=> %d) => %d complete]",
-              scenario_runner::standby_state.use_count() - 1,
-              scenario_runner::start_transition.use_count() - 1,
-              scenario_runner::running_state.use_count() - 1,
-              scenario_runner::stop_transition.use_count() - 1,
-              scenario_runner::complete_state.use_count() - 1);
-          } else {
-            deactivate();
-          }
-        } catch (const scenario_runner::Command & command) {
-          switch (command) {
-            case scenario_runner::Command::exitSuccess:
-              RCLCPP_INFO(get_logger(), "\x1b[1;32mSimulation succeeded.\x1b[0m");
-              deactivate();
-              break;
-
-            default:
-            case scenario_runner::Command::exitFailure:
-              RCLCPP_INFO(get_logger(), "\x1b[1;31mSimulation failed.\x1b[0m");
-              deactivate();
-          }
-        } catch (const scenario_runner::ImplementationFault & error) {
-          RCLCPP_ERROR(get_logger(), "%s.", error.what());
-          deactivate();
-        } catch (const std::exception & error) {
-          RCLCPP_ERROR(get_logger(), "%s.", error.what());
-          deactivate();
-        }
-      });
-
-    return Result::SUCCESS;
-  }
-
-  Result on_deactivate(const rclcpp_lifecycle::State &) override
-  {
-    timer.reset();
-    return Result::SUCCESS;
-  }
-
-  Result on_cleanup(const rclcpp_lifecycle::State &) override
-  {
-    evaluate = unspecified;
-    return Result::SUCCESS;
-  }
-
-  Result on_shutdown(const rclcpp_lifecycle::State &) override
-  {
-    return Result::SUCCESS;
-  }
-
-  Result on_error(const rclcpp_lifecycle::State &) override
-  {
-    return Result::SUCCESS;
-  }
+  Result on_error(const rclcpp_lifecycle::State &) override;
 };
 }  // namespace scenario_runner
 
