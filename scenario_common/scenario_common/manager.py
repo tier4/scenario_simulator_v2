@@ -54,9 +54,9 @@ class Manager():
         is_path = os.path.exists(path)
         if verbose:
             if(is_path):
-                Logger.print_process("path: " + path + " exists")
+                Logger.print_process("Path " + path + " is exists.")
             else:
-                Logger.print_warning("path: " + path + " not exists")
+                Logger.print_warning("Path " + path + " is not exists.")
         return is_path
 
     @staticmethod
@@ -74,7 +74,7 @@ class Manager():
                 else:
                     file.write(data)
         except IOError:
-            Logger.print_warning("Failed to open: " + str(path))
+            Logger.print_warning("Failed to open " + str(path))
         return data
 
     @staticmethod
