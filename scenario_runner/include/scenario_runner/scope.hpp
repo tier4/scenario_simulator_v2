@@ -16,7 +16,7 @@
 #define SCENARIO_RUNNER__SCOPE_HPP_
 
 #include <scenario_runner/syntax/entity_ref.hpp>
-// #include <simulation_controller/api/api.hpp>
+// #include <simulation_api/api/api.hpp>
 
 #include <unordered_map>
 #include <vector>
@@ -51,7 +51,7 @@ public:
   // {
   //   return connection->entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
   // }
-  // catch (const simulation_controller::SimulationRuntimeError& error)
+  // catch (const simulation_api::SimulationRuntimeError& error)
   // {
   //   std::stringstream ss {};
   //   ss << error.what() << ".\n"
