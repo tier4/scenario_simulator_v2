@@ -24,8 +24,10 @@ class Regressor():
     ARRANGE_EMPTY_PATTERN = re.compile(r"<([a-zA-Z]*)></\1>")
     ARRANGE_EMPTY_PATTERN2 = re.compile(r"<([a-zA-Z]*)(.*)></\1>")
     ARRANGE_DOUBLE_PATTERN = re.compile(r"(\s*)<(.[a-zA-Z]*)>\s*<\2>")
-    UPSIDE_REPEAT_PATTERN = re.compile(r"<([a-zA-Z]*)( .*)>(\s+)</\1>")
-    DOWNSIDE_REPEAT_PATTERN = re.compile(r"<([a-zA-Z]*)>(\s+)<\1( .*)>")
+
+    UPSIDE_REPEAT_PATTERN = re.compile(r"<(\w*)>\s*<\1( .*[^/])>")
+    DOWNSIDE_REPEAT_PATTERN = re.compile(r"</(\w+)>(\s*)</\1>")
+
     UPPER_TRUE_PATTERN = re.compile(r"(True|\"True\")")
     UPPER_FALSE_PATTERN = re.compile(r"(False|\"False\")")
 
@@ -64,10 +66,14 @@ class Regressor():
     @staticmethod
     def replace_repeat_case(phase):
         pattern = Regressor.UPSIDE_REPEAT_PATTERN
-        repl = r"<\1\3>"
-        phase = re.sub(pattern, repl, phase)
-        pattern = Regressor.DOWNSIDE_REPEAT_PATTERN
         repl = r"<\1\2>"
+        phase = re.sub(pattern, repl, phase)
+
+        pattern = re.compile(r"<(\w+)>((\s*<\1\s(.*)/>)+)\s*</\1>")
+        phase = re.sub(pattern, r"\2", phase)
+
+        pattern = Regressor.DOWNSIDE_REPEAT_PATTERN
+        repl = r"</\1>"
         return re.sub(pattern, repl, phase)
 
     @staticmethod

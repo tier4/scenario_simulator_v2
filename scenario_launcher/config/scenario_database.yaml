@@ -3,5 +3,5 @@ Map:
   - kashiwanoha: "map/kashiwanoha/kashiwanoha.osm"
   - map2: "map/somewhere/somewhere.osm"
 Scenario:
-  - "yaml_scenario/scenario1.yaml"
-  - "yaml_scenario/scenario2.yaml"
+  # - /home/yamasa/Downloads/t4v2.yaml
+  - test/success.yaml
