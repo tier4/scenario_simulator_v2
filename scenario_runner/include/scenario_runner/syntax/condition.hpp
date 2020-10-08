@@ -65,8 +65,6 @@ struct Condition
   {}
 
   #ifndef NDEBUG
-  using Element::evaluate;
-  #else
   decltype(auto) evaluate() const
   {
     std::cout << (indent++) << "Condition " << cyan << "\"" << name << "\"" << console::reset <<
@@ -79,6 +77,8 @@ struct Condition
 
     return Element::evaluate();
   }
+  #else
+  using Element::evaluate;
   #endif
 };
 }
