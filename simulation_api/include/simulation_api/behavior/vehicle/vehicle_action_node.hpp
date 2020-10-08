@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_
-#define SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_
+#ifndef SIMULATION_API__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_
+#define SIMULATION_API__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
 #include <simulation_api/entity/vehicle_parameter.hpp>
@@ -46,4 +46,4 @@ public:
 };
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_
+#endif  // SIMULATION_API__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_

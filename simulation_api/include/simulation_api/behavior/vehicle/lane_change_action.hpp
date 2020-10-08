@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
-#define SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
+#ifndef SIMULATION_API__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
+#define SIMULATION_API__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
 
 #include <simulation_api/math/hermite_curve.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
@@ -68,4 +68,4 @@ private:
 }      // namespace vehicle
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_CONTROLLER__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
+#endif  // SIMULATION_API__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_

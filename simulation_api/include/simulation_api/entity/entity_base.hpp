@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__ENTITY__ENTITY_BASE_HPP_
-#define SIMULATION_CONTROLLER__ENTITY__ENTITY_BASE_HPP_
+#ifndef SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
+#define SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
 
 #include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
@@ -94,4 +94,4 @@ protected:
 }  // namespace entity
 }  // namespace simulation_api
 
-#endif  // SIMULATION_CONTROLLER__ENTITY__ENTITY_BASE_HPP_
+#endif  // SIMULATION_API__ENTITY__ENTITY_BASE_HPP_

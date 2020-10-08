@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__ENTITY__VEHICLE_PARAMETER_HPP_
-#define SIMULATION_CONTROLLER__ENTITY__VEHICLE_PARAMETER_HPP_
+#ifndef SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
+#define SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
 
 // headers in pugixml
 #include <pugixml.hpp>
@@ -197,4 +197,4 @@ struct VehicleParameters
 }  // namespace entity
 }  // namespace simulation_api
 
-#endif  // SIMULATION_CONTROLLER__ENTITY__VEHICLE_PARAMETER_HPP_
+#endif  // SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__HDMAP_UTILS__HDMAP_UTILS_HPP_
-#define SIMULATION_CONTROLLER__HDMAP_UTILS__HDMAP_UTILS_HPP_
+#ifndef SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
+#define SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
 
 #include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
@@ -130,4 +130,4 @@ private:
 };
 }  // namespace hdmap_utils
 
-#endif  // SIMULATION_CONTROLLER__HDMAP_UTILS__HDMAP_UTILS_HPP_
+#endif  // SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_

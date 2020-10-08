@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__ENTITY__EXCEPTION_HPP_
-#define SIMULATION_CONTROLLER__ENTITY__EXCEPTION_HPP_
+#ifndef SIMULATION_API__ENTITY__EXCEPTION_HPP_
+#define SIMULATION_API__ENTITY__EXCEPTION_HPP_
 
 #include <string>
 #include <exception>
@@ -38,4 +38,4 @@ public:
 }  // namespace simulation_api
 
 
-#endif  // SIMULATION_CONTROLLER__ENTITY__EXCEPTION_HPP_
+#endif  // SIMULATION_API__ENTITY__EXCEPTION_HPP_

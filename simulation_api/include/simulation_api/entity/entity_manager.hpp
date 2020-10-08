@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef  SIMULATION_CONTROLLER__ENTITY__ENTITY_MANAGER_HPP_
-#define  SIMULATION_CONTROLLER__ENTITY__ENTITY_MANAGER_HPP_
+#ifndef  SIMULATION_API__ENTITY__ENTITY_MANAGER_HPP_
+#define  SIMULATION_API__ENTITY__ENTITY_MANAGER_HPP_
 
 #include <simulation_api/entity/ego_entity.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
@@ -180,4 +180,4 @@ public:
 }  // namespace entity
 }  // namespace simulation_api
 
-#endif   // SIMULATION_CONTROLLER__ENTITY__ENTITY_MANAGER_HPP_
+#endif   // SIMULATION_API__ENTITY__ENTITY_MANAGER_HPP_

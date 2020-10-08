@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP_
-#define SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP_
+#ifndef SIMULATION_API__MATH__HERMITE_CURVE_HPP_
+#define SIMULATION_API__MATH__HERMITE_CURVE_HPP_
 
 #include <quaternion_operation/quaternion_operation.h>
 
@@ -53,4 +53,4 @@ public:
 }  // namespace math
 }  // namespace simulation_api
 
-#endif  // SIMULATION_CONTROLLER__MATH__HERMITE_CURVE_HPP_
+#endif  // SIMULATION_API__MATH__HERMITE_CURVE_HPP_

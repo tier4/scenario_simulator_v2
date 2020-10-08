@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
-#define SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
+#ifndef SIMULATION_API__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
+#define SIMULATION_API__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
 
 #include <simulation_api/behavior/pedestrian/pedestrian_action_node.hpp>
 #include <simulation_api/entity/entity_status.hpp>
@@ -50,4 +50,4 @@ public:
 }  // namespace pedestrian
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_CONTROLLER__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
+#endif  // SIMULATION_API__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_

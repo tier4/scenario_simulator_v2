@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__API__SIMULATION_API_IMPL_HPP_
-#define SIMULATION_CONTROLLER__API__SIMULATION_API_IMPL_HPP_
+#ifndef SIMULATION_API__API__SIMULATION_API_IMPL_HPP_
+#define SIMULATION_API__API__SIMULATION_API_IMPL_HPP_
 
 #include <simulation_api/api/api_impl_base.hpp>
 #include <simulation_api/entity/entity_manager.hpp>
@@ -103,4 +103,4 @@ private:
 };
 }  // namespace scenario_simulator
 
-#endif  // SIMULATION_CONTROLLER__API__SIMULATION_API_IMPL_HPP_
+#endif  // SIMULATION_API__API__SIMULATION_API_IMPL_HPP_

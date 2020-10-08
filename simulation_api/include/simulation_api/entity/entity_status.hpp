@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_CONTROLLER__ENTITY__ENTITY_STATUS_HPP_
-#define SIMULATION_CONTROLLER__ENTITY__ENTITY_STATUS_HPP_
+#ifndef SIMULATION_API__ENTITY__ENTITY_STATUS_HPP_
+#define SIMULATION_API__ENTITY__ENTITY_STATUS_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -73,4 +73,4 @@ public:
 }  // namespace entity
 }  // namespace simulation_api
 
-#endif  // SIMULATION_CONTROLLER__ENTITY__ENTITY_STATUS_HPP_
+#endif  // SIMULATION_API__ENTITY__ENTITY_STATUS_HPP_
