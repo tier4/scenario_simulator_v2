@@ -3,7 +3,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <simulation_controller/entity/vehicle_parameter.hpp>
+#include <simulation_api/entity/vehicle_parameter.hpp>
 #include <pugixml.hpp>
 
 #include <geometry_msgs/msg/pose_stamped.hpp>

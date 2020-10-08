@@ -59,7 +59,7 @@ struct TeleportAction
       //   THROW(ImplementationFault);
       // }
       //
-      // const simulation_controller::entity::EntityStatus status {
+      // const simulation_api::entity::EntityStatus status {
       //   inner_scope.connection->simulation->getCurrentTime(),
       //   Integer(position.as<LanePosition>().lane_id),
       //   position.as<LanePosition>().s,

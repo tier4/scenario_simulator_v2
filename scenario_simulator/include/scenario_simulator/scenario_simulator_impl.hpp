@@ -1,7 +1,7 @@
 #ifndef  SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_IMPL_HPP_
 #define  SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_IMPL_HPP_
 
-#include <simulation_controller/entity/entity_manager.hpp>
+#include <simulation_api/entity/entity_manager.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>

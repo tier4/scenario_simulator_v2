@@ -21,7 +21,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(xmlrpcpp REQUIRED)
-find_package(simulation_controller REQUIRED)
+find_package(simulation_api REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(autoware_auto_msgs REQUIRED)
 find_package(lanelet2_core REQUIRED)
@@ -45,7 +45,7 @@ add_library(scenario_simulator SHARED
 ament_target_dependencies(scenario_simulator
   rclcpp
   xmlrpcpp
-  simulation_controller
+  simulation_api
   quaternion_operation
   autoware_auto_msgs
   lanelet2_core
