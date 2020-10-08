@@ -1,7 +1,11 @@
-# ScenarioModifiers:
-#   ScenarioModifier:
-#     - name: EVENT-START-TIME
-#       list: [3, 5, 7]
+ScenarioModifiers:
+  ScenarioModifier:
+    - name: EVENT-START-TIME
+      list: [3, 5, 7]
+    - name: HOGE
+      start: 0
+      step: 10
+      stop: 20
 
 OpenSCENARIO:
   FileHeader:
