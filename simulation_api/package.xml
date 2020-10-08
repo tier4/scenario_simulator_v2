@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>simulation_api</name>
+  <version>0.0.0</version>
+  <description>The simulation_api package</description>
+
+  <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
+
+  <license>Apach 2</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+
+  <build_depend>rclcpp</build_depend>
+  <build_export_depend>rclcpp</build_export_depend>
+  <exec_depend>rclcpp</exec_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <build_depend>autoware_auto_msgs</build_depend>
+  <build_export_depend>autoware_auto_msgs</build_export_depend>
+  <exec_depend>autoware_auto_msgs</exec_depend>
+  <depend>rclcpp_components</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>xmlrpcpp</depend>
+  <depend>pugixml-dev</depend>
+  <depend>roslib</depend>
+  <depend>visualization_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>lanelet2_core</depend>
+  <depend>lanelet2_extension</depend>
+  <depend>lanelet2_routing</depend>
+  <depend>lanelet2_io</depend>
+  <depend>lanelet2_projection</depend>
+  <depend>spline_interpolation</depend>
+  <depend>quaternion_operation</depend>
+  <depend>geographic_msgs</depend>
+  <depend>behaviortree_cpp_v3</depend>
+  <depend>ament_index_cpp</depend>
+  <depend>rviz2</depend>
+  <exec_depend>kashiwanoha_map</exec_depend>
+  
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
