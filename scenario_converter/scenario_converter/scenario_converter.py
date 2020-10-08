@@ -52,9 +52,8 @@ class ScenarioConverter:
         xosc_text = ScenarioConverter.convert_dict2xosc(xosc_dict, xosc_dir)
         Manager.mkdir(pathlib.Path(log_path).parent)
         Manager.mkdir(xosc_dir)
-        ScenarioConverter.apply_parameter_distribution(modifier, xosc_text,
-                                                       xosc_dir, yaml_path,
-                                                       log_path)
+        ScenarioConverter.distribute(
+                modifier, xosc_text, xosc_dir, yaml_path, log_path)
         print("")
         Logger.print_process("<= " + yaml_path)
         Logger.print_process("=> " + xosc_dir + "/")
@@ -64,14 +63,13 @@ class ScenarioConverter:
     def check_modifier_dict(root_data):
         scenario_modifiers = None
         scenario_modifier = None
-        length = len(root_data)
         if "ScenarioModifiers" in root_data:
             scenario_modifiers = dict(root_data["ScenarioModifiers"])
             if "ScenarioModifier" in scenario_modifiers:
                 scenario_modifier = scenario_modifiers["ScenarioModifier"]
         if scenario_modifier is None:
             Logger.print_info("No ScenarioModifiers specified.")
-        return length, scenario_modifier
+        return len(root_data), scenario_modifier
 
     @staticmethod
     def extract_open_scenario(open_scenario):
@@ -131,19 +129,18 @@ class ScenarioConverter:
         return xosc_text
 
     @staticmethod
-    def apply_parameter_distribution(modifier_dict, xosc_text, xosc_dir,
-                                     yaml_path, log_path):
-        bind = ParameterSweeper.get_modifier_bindings(modifier_dict)
+    def distribute(
+            modifier_dict, xosc_text, xosc_dir, yaml_path, log_path):
+        bindings = ParameterSweeper.make_modifier_bindings(modifier_dict)
         xosc_name = pathlib.Path(yaml_path).stem
         id = 1
 
         def ret_path(xosc_dir, xosc_name, id):
-            return xosc_dir + "/" + xosc_name + "-" + str(
-                id) + ".xosc"  # .zfill(5)
+            return xosc_dir + "/" + xosc_name + "-" + str(id) + ".xosc"  # .zfill(5)
 
         num_files = 0
-        if (bind is not None):
-            for item in itertools.product(*bind):
+        if (bindings is not None):
+            for item in itertools.product(*bindings):
                 num_files = num_files + 1
                 print("\r" + "\x1b[36m" +
                       "...caliculating the number of files" + "\x1b[0m",
@@ -153,7 +150,7 @@ class ScenarioConverter:
         print("")
         Logger.print_process(str(num_files) + " files will be created")
         # Manager.ask_continuation()
-        if (bind is None):
+        if (bindings is None):
             xosc_path = ret_path(xosc_dir, xosc_name, id)
             Logger.print_progress_bar(1, 1)
             print("\n")
@@ -161,7 +158,7 @@ class ScenarioConverter:
                                                   xosc_path, yaml_path)
             ScenarioConverter.write_converted_xosc(xosc_text, xosc_path)
             return
-        for item in itertools.product(*bind):
+        for item in itertools.product(*bindings):
             xosc_path = ret_path(xosc_dir, xosc_name, id)
             converted_xosc_text = copy.deepcopy(xosc_text)
             Logger.print_progress_bar(id, num_files)

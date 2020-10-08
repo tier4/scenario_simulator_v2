@@ -60,6 +60,9 @@ struct CustomCommandAction
         std::cout << content << std::endl;
         return unspecified;
 
+      case Command::nop:
+        return unspecified;
+
       default:
         throw command;
     }

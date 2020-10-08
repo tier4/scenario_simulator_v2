@@ -27,7 +27,7 @@ class DatabaseHandler():
 
     @staticmethod
     def read_database():
-        Logger.print_separator("scenario database")
+        Logger.print_separator("Reading workflow")
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         database_path = launcher_package_path / "config" / DatabaseHandler.DATABASE_FILE
         if (not Manager.check_existence(database_path)):
