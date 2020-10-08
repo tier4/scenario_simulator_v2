@@ -14,21 +14,19 @@
 
 #include <gtest/gtest.h>
 
-#include <simulation_api/math/hermite_curve.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <string>
 
-TEST(Math, HermiteCurve1)
+TEST(HdMapUtils, HdMapUtils1)
 {
-  geometry_msgs::msg::Pose start_pose, goal_pose;
-  geometry_msgs::msg::Vector3 start_vec, goal_vec;
-  goal_pose.position.x = 1;
-  start_vec.x = 1;
-  goal_vec.x = 1;
-  simulation_api::math::HermiteCurve curve
-    (start_pose, goal_pose, start_vec, goal_vec);
-  EXPECT_DOUBLE_EQ(curve.getLength(), 1);
-  EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
-  EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
-  EXPECT_DOUBLE_EQ(curve.getMaximu2DCurvature(), 0);
+  std::string path = ament_index_cpp::get_package_share_directory("simulation_api") +
+    "/map/lanelet2_map.osm";
+  geographic_msgs::msg::GeoPoint origin;
+  origin.latitude = 35.61836750154;
+  origin.longitude = 139.78066608243;
+  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  ASSERT_NO_THROW(hdmap_utils.toMapBin());
 }
 
 int main(int argc, char ** argv)
