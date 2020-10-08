@@ -1,3 +1,0 @@
-<launch>
-  <test test-name="test-simulation_api" pkg="simulation_api" type="test-simulation_api" name="test"/>
-</launch>

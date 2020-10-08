@@ -210,6 +210,7 @@ BT::NodeStatus FollowLaneAction::tick()
     setOutput("updated_status", entity_status_updated);
     return BT::NodeStatus::RUNNING;
   }
+  return BT::NodeStatus::FAILURE;
 }
 }  // namespace vehicle
 }  // namespace entity_behavior
