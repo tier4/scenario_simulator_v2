@@ -69,14 +69,15 @@ struct Condition
   #else
   decltype(auto) evaluate() const
   {
-    std::cout << (indent++) << "Condition " << cyan << "\"" << name << "\"" << reset << std::endl;
+    std::cout << (indent++) << "Condition " << cyan << "\"" << name << "\"" << console::reset <<
+      std::endl;
 
     BOOST_SCOPE_EXIT_ALL()
     {
       --indent;
     };
 
-    return Elememt::evaluate();
+    return Element::evaluate();
   }
   #endif
 };
