@@ -18,7 +18,7 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <string>
 
-TEST(HdMapUtils, HdMapUtils1)
+TEST(hd_map_utils, HdMapUtils1)
 {
   std::string path = ament_index_cpp::get_package_share_directory("simulation_api") +
     "/map/lanelet2_map.osm";

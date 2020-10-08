@@ -1,3 +1,4 @@
+"""Test settings for ament_copyright."""
 # Copyright 2015 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,5 +20,6 @@ import pytest
 @pytest.mark.copyright
 @pytest.mark.linter
 def test_copyright():
+    """Test settings for ament_copyright."""
     rc = main(argv=['.', 'test'])
     assert rc == 0, 'Found errors'

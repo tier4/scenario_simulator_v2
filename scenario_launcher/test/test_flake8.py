@@ -1,3 +1,5 @@
+"""Test settings for flake8."""
+
 # Copyright 2017 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,5 +21,6 @@ import pytest
 @pytest.mark.flake8
 @pytest.mark.linter
 def test_flake8():
+    """Test settings for flake8."""
     rc = main(argv=[])
     assert rc == 0, 'Found errors'

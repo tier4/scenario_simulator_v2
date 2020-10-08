@@ -1,3 +1,4 @@
+"""setup.py for scenario_launcher package."""
 import os
 from glob import glob
 from setuptools import setup

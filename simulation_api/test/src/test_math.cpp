@@ -16,7 +16,7 @@
 
 #include <simulation_api/math/hermite_curve.hpp>
 
-TEST(Math, HermiteCurve1)
+TEST(math, HermiteCurve1)
 {
   geometry_msgs::msg::Pose start_pose, goal_pose;
   geometry_msgs::msg::Vector3 start_vec, goal_vec;

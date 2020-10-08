@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <thread>
 
-TEST(Syntax, LexicalScope)
+TEST(syntax, LexicalScope)
 {
   scenario_runner::OpenScenario interperter {
     ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/lexical-scope.xosc",
@@ -30,7 +30,7 @@ TEST(Syntax, LexicalScope)
   };
 }
 
-TEST(Error, Success)
+TEST(error, Success)
 {
   scenario_runner::OpenScenario evaluate {
     ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc",
