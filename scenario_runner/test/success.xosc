@@ -14,7 +14,7 @@
     <Init>
       <Actions>
         <UserDefinedAction>
-          <CustomCommandAction type="nop"/>
+          <CustomCommandAction type="echo"> "hello, world!" </CustomCommandAction>
         </UserDefinedAction>
       </Actions>
     </Init>
@@ -28,7 +28,7 @@
             <Event name="event" priority="overwrite">
               <Action name="action">
                 <UserDefinedAction>
-                  <CustomCommandAction type="nop"/>
+                  <CustomCommandAction type="ls"/>
                 </UserDefinedAction>
               </Action>
               <StartTrigger>
