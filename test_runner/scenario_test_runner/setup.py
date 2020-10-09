@@ -25,10 +25,7 @@ setup(
         'console_scripts': [
             'scenario_test_runner = scenario_test_runner.scenario_test_runner:main',
             'database_handler = scenario_test_runner.database_handler:main',
-            'result_reporter = scenario_test_runner.result_reporter:main',
-            'test_runner = scenario_test_runner.test_runner.test_client:main',
-            'lifecycle_controller = scenario_test_runner.lifecycle_controller:main',
-            'dummy_runner = scenario_test_runner.test_runner.dummy_runner:main'
+            'lifecycle_controller = scenario_test_runner.lifecycle_controller:main'
         ],
     },
 )
