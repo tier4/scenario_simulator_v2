@@ -33,8 +33,10 @@ class DatabaseHandler():
         database_path = launcher_package_path / "config" / DatabaseHandler.DATABASE_FILE
         if (not Manager.check_existence(database_path)):
             launcher_package_path = pathlib.Path(
-                Manager.get_file_dir(__file__, DatabaseHandler.DATABASE_FILE)).parent
+                Manager.get_file_dir(
+                    __file__, DatabaseHandler.DATABASE_FILE)).parent
             Manager.check_existence(database_path)
+            database_path = launcher_package_path / "config" / DatabaseHandler.DATABASE_FILE
         Logger.print_info("package path: " + str(launcher_package_path))
         database = Manager.read_data(database_path)
         log_path = str(launcher_package_path / database["Log"])
