@@ -63,7 +63,7 @@ class ParameterSweeper:
     @staticmethod
     def test(modifier_dict, xosc_text):
         print(xosc_text)
-        bind = ParameterSweeper.get_modifier_bindings(modifier_dict)
+        bind = ParameterSweeper.make_modifier_bindings(modifier_dict)
         for item in itertools.product(*bind):
             xosc_text = "CAR SPEED"
             Logger.print_process(
