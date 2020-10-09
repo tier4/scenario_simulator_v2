@@ -40,8 +40,8 @@ class ConverterHandler():
     def convert_scenario(index, yaml_scenario_path, launcher_path):
         folder_name = pathlib.Path(yaml_scenario_path).stem
         file_name = folder_name + "-" + str(index)
-        output_dir = str(launcher_path) + "/" + "converted_xosc" + \
-            "/" + folder_name + "/" + file_name
+        output_dir = str(launcher_path) + "/test/scenario/converted/" + \
+            folder_name + "/" + file_name
         log_dir = str(pathlib.Path(output_dir).parent)+"/converted.log"
         ScenarioConverter.main(yaml_scenario_path, output_dir, log_dir)
         return output_dir
