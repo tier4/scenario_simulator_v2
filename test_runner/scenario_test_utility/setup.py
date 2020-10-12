@@ -8,9 +8,7 @@ setup(
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
-        ('share/ament_index/resource_index/packages',
-            ['resource/OpenSCENARIO.xsd']),
+            ['resource/' + package_name + '/OpenSCENARIO.xsd']),
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],
