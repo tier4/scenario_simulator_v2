@@ -16,6 +16,8 @@
 #define SCENARIO_RUNNER__SYNTAX__PARAMETER_ACTION_HPP_
 
 #include <scenario_runner/reader/attribute.hpp>
+#include <scenario_runner/reader/element.hpp>
+#include <scenario_runner/syntax/set_action.hpp>
 
 #include <utility>
 
@@ -47,8 +49,7 @@ struct ParameterAction
 
         std::make_pair("SetAction", [&](auto && node)
         {
-          return unspecified;
-          // return make<SetAction>(node, scope);
+          return make<SetAction>(node, scope);
         }),
 
         std::make_pair("ModifyAction", [&](auto && node)
