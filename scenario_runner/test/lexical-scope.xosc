@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
-  <FileHeader revMajor="0" revMinor="1" date="" description="lexical-scope" author="Tatsuya Yamasaki"/>
+  <FileHeader revMajor="0" revMinor="1" date="2020-08-06T12:00:00" description="lexical-scope" author="Tatsuya Yamasaki"/>
 
   <ParameterDeclarations>
     <ParameterDeclaration name="x" parameterType="double" value="1"/>
@@ -28,8 +28,8 @@
       </ParameterDeclarations>
 
       <Act name="A">
-        <ManeuverGroup name="A">
-          <Actors>
+        <ManeuverGroup name="A" maximumExecutionCount="1">
+          <Actors selectTriggeringEntities="false">
             <EntityRef entityRef="A"/>
           </Actors>
           <Maneuver name="A">
@@ -50,8 +50,8 @@
       </Act>
 
       <Act name="B">
-        <ManeuverGroup name="A">
-          <Actors>
+        <ManeuverGroup name="A" maximumExecutionCount="1">
+          <Actors selectTriggeringEntities="false">
             <EntityRef entityRef="A"/>
           </Actors>
           <Maneuver name="A">
@@ -74,7 +74,7 @@
 
     <StopTrigger>
       <ConditionGroup>
-        <Condition name="A" conditionEdge="none">
+        <Condition name="A" conditionEdge="none" delay="0">
           <ByValueCondition>
             <SimulationTimeCondition value="3" rule="greaterThan"/>
           </ByValueCondition>
