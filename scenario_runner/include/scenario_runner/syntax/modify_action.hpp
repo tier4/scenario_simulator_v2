@@ -45,13 +45,17 @@ struct ModifyAction
     modify(readElement<ModifyRule>("Rule", node, inner_scope))
   {}
 
-  auto start()
+  auto evaluate()
   {
-    std::cout << "ModifyAction::start()" << std::endl;
+    std::cout << "parameterRef: " << parameter_ref << std::endl;
+    std::cout << "value: " << inner_scope.parameters.at(parameter_ref) << std::endl;
     return unspecified;
   }
 
-  static constexpr std::true_type accomplished {};
+  static constexpr auto accomplished() noexcept
+  {
+    return true;
+  }
 };
 }  // inline namespace syntax
 }  // namespace scenario_runner

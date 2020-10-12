@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__SYNTAX__SET_ACTION_HPP_
-#define SCENARIO_RUNNER__SYNTAX__SET_ACTION_HPP_
+#ifndef SCENARIO_RUNNER__SYNTAX__PARAMETER_SET_ACTION_HPP_
+#define SCENARIO_RUNNER__SYNTAX__PARAMETER_SET_ACTION_HPP_
 
 #include <scenario_runner/reader/attribute.hpp>
 
@@ -30,7 +30,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SetAction
+struct ParameterSetAction
 {
   Scope inner_scope;
 
@@ -39,20 +39,26 @@ struct SetAction
   const String value;
 
   template<typename Node, typename Scope>
-  explicit SetAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
+  explicit ParameterSetAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
   : inner_scope(outer_scope),
     parameter_ref(parameter_ref),
     value(readAttribute<String>("value", node, inner_scope))
   {}
 
-  auto start()
+  auto evaluate()
   {
+    std::cout << "SetAction!" << std::endl;
+    std::cout << "parameterRef: " << parameter_ref << std::endl;
+    std::cout << "value: " << inner_scope.parameters.at(parameter_ref) << std::endl;
     return unspecified;
   }
 
-  static constexpr std::true_type accomplished {};
+  static constexpr auto accomplished() noexcept
+  {
+    return true;
+  }
 };
 }  // inline namespace syntax
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__SYNTAX__SET_ACTION_HPP_
+#endif  // SCENARIO_RUNNER__SYNTAX__PARAMETER_SET_ACTION_HPP_

@@ -1,6 +1,6 @@
 ScenarioModifiers:
   ScenarioModifier:
-    - name: EVENT-START-TIME
+    - name: INITIAL-VALUE
       list: [3, 5, 7]
 
 OpenSCENARIO:
@@ -11,7 +11,7 @@ OpenSCENARIO:
     author: yamacir-kit
   ParameterDeclarations:
     ParameterDeclaration:
-      - name: x
+      - name: value
         parameterType: double
         value: 0
   RoadNetwork:
@@ -24,9 +24,11 @@ OpenSCENARIO:
   Storyboard:
     Init:
       Actions:
-        UserDefinedAction:
-          CustomCommandAction:
-            type: true
+        GlobalAction:
+          ParameterAction:
+            parameterRef: value
+            SetAction:
+              value: INITIAL-VALUE
     Story:
       - name: story
         Act:
@@ -54,15 +56,12 @@ OpenSCENARIO:
                                 ByValueCondition:
                                   SimulationTimeCondition:
                                     rule: greaterThan
-                                    value: 3 # EVENT-START-TIME
+                                    value: 3
                         Action:
                           - name: action
-                            # UserDefinedAction:
-                            #   CustomCommandAction:
-                            #     type: true
                             GlobalAction:
                               ParameterAction:
-                                parameterRef: x
+                                parameterRef: value
                                 ModifyAction:
                                   Rule:
                                     AddValue:
