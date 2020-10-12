@@ -80,17 +80,19 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
         } else {
           deactivate();
         }
-      } catch (const scenario_runner::Command & command) {
+      } catch (const int command) {
         switch (command) {
-          case scenario_runner::Command::exitSuccess:
+          case EXIT_SUCCESS:
             RCLCPP_INFO(get_logger(), "\x1b[1;32mSimulation succeeded.\x1b[0m");
             deactivate();
             break;
 
-          default:
-          case scenario_runner::Command::exitFailure:
+          case EXIT_FAILURE:
             RCLCPP_INFO(get_logger(), "\x1b[1;31mSimulation failed.\x1b[0m");
             deactivate();
+
+          default:
+            break;
         }
       } catch (const scenario_runner::ImplementationFault & error) {
         RCLCPP_ERROR(get_logger(), "%s.", error.what());

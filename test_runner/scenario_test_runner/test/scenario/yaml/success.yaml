@@ -2,10 +2,6 @@ ScenarioModifiers:
   ScenarioModifier:
     - name: EVENT-START-TIME
       list: [3, 5, 7]
-    - name: HOGE
-      start: 0
-      step: 10
-      stop: 20
 
 OpenSCENARIO:
   FileHeader:
@@ -26,7 +22,7 @@ OpenSCENARIO:
       Actions:
         UserDefinedAction:
           CustomCommandAction:
-            type: nop
+            type: true
     Story:
       - name: story
         Act:
@@ -59,7 +55,7 @@ OpenSCENARIO:
                           - name: action
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: nop
+                                type: true
             StartTrigger:
               ConditionGroup:
                 - Condition:
