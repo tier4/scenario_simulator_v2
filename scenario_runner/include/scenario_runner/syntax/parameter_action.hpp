@@ -17,6 +17,7 @@
 
 #include <scenario_runner/reader/attribute.hpp>
 #include <scenario_runner/reader/element.hpp>
+#include <scenario_runner/syntax/modify_action.hpp>
 #include <scenario_runner/syntax/set_action.hpp>
 
 #include <utility>
@@ -54,8 +55,7 @@ struct ParameterAction
 
         std::make_pair("ModifyAction", [&](auto && node)
         {
-          return unspecified;
-          // return make<ModifyAction>(node, scope);
+          return make<ModifyAction>(node, scope);
         }))),
 
     parameter_ref(

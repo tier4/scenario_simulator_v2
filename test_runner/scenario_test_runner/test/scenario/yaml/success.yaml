@@ -53,9 +53,16 @@ OpenSCENARIO:
                                     value: 3 # EVENT-START-TIME
                         Action:
                           - name: action
-                            UserDefinedAction:
-                              CustomCommandAction:
-                                type: true
+                            # UserDefinedAction:
+                            #   CustomCommandAction:
+                            #     type: true
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: x
+                                ParameterModifyAction:
+                                  Rule:
+                                    AddValue:
+                                      value: 1
             StartTrigger:
               ConditionGroup:
                 - Condition:
