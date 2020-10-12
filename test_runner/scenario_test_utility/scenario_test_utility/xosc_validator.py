@@ -21,18 +21,21 @@ from ament_index_python.packages import get_package_share_directory
 import xmlschema
 import termcolor
 
+
 class XoscValidator():
     def __init__(self):
         share_directory_path = os.path.join(get_package_share_directory('scenario_test_utility'))
         xsd_path = os.path.join(share_directory_path,
-        '../' ,'ament_index', 'resource_index', 'packages', 'OpenSCENARIO.xsd')
+            '../', 'ament_index', 'resource_index', 'packages', 'OpenSCENARIO.xsd')
         self.openscenario_schema = xmlschema.XMLSchema(xsd_path)
+
     def validate_xosc_file(self, xosc_path):
         if self.openscenario_schema.is_valid(xosc_path):
             print(termcolor.colored('scenario ' + xosc_path + 'is valid', 'green'))
         else:
             print(termcolor.colored('scenario ' + xosc_path + 'is not valid', 'red'))
             print(self.openscenario_schema.validate(xosc_path))
+
 
 def main():
     parser = argparse.ArgumentParser(description='Validator for OpenSCENARIO .xosc file')
