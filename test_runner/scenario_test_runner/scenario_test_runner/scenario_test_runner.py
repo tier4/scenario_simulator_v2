@@ -23,6 +23,7 @@ from scenario_test_utility.manager import Manager
 from scenario_test_runner.converter_handler import ConverterHandler
 from scenario_test_runner.database_handler import DatabaseHandler
 from scenario_test_runner.lifecycle_controller import LifecycleController
+from scenario_test_utility.xosc_validator import XoscValidator
 
 
 class Launcher:
@@ -46,8 +47,15 @@ class Launcher:
             = DatabaseHandler.read_database()
         self.xosc_scenarios = ConverterHandler.convert_all_scenarios(
             self.yaml_scenarios, self.launcher_path)
+        self.validate_all_scenarios()
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
+
+    def validate_all_scenarios(self):
+        validator = XoscValidator()
+        Logger.print_separator("validating scenarios")
+        for scenario in self.xosc_scenarios:
+            validator.validate_xosc_file(scenario)
 
     def monitor_state(self):
         start = time.time()
