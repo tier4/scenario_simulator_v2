@@ -8,7 +8,7 @@ setup(
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
+            ['resource/' + package_name + '/OpenSCENARIO.xsd']),
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],
@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'scenario_converter = scenario_test_utility.scenario_converter:main'
+            'scenario_converter = scenario_test_utility.scenario_converter:main',
+            'xosc_validator = scenario_test_utility.xosc_validator:main'
         ],
     },
 )
