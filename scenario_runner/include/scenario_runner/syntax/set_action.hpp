@@ -32,12 +32,25 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct SetAction
 {
+  Scope inner_scope;
+
+  const String parameter_ref;
+
   const String value;
 
   template<typename Node, typename Scope>
-  explicit SetAction(const Node & node, Scope & scope)
-  : value(readAttribute<String>("value", node, scope))
+  explicit SetAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
+  : inner_scope(outer_scope),
+    parameter_ref(parameter_ref),
+    value(readAttribute<String>("value", node, inner_scope))
   {}
+
+  auto start()
+  {
+    return unspecified;
+  }
+
+  static constexpr std::true_type accomplished {};
 };
 }  // inline namespace syntax
 }  // namespace scenario_runner

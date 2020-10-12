@@ -50,8 +50,8 @@ struct StoryboardElement
   #define BOILERPLATE(NAME, STATE) \
   constexpr auto NAME() const noexcept \
   { \
-    return state().template as<StoryboardElementState>(__FILE__, \
-             __LINE__) == StoryboardElementState::STATE; \
+    return state().template as<StoryboardElementState>( \
+      __FILE__, __LINE__) == StoryboardElementState::STATE; \
   } static_assert(true, "")
 
   BOILERPLATE(standby, standbyState);

@@ -40,26 +40,23 @@ inline namespace syntax
 struct ParameterAction
   : public Element
 {
-  const String parameter_ref;
-
   template<typename Node, typename Scope>
-  explicit ParameterAction(const Node & node, Scope & scope)
+  explicit ParameterAction(const Node & parent, Scope & scope)
   : Element(
       choice(
-        node,
+        parent,
 
-        std::make_pair("SetAction", [&](auto && node)
+        std::make_pair("SetAction", [&](auto && child)
         {
-          return make<SetAction>(node, scope);
+          return make<SetAction>(
+            child, scope, readAttribute<String>("parameterRef", parent, scope));
         }),
 
-        std::make_pair("ModifyAction", [&](auto && node)
+        std::make_pair("ModifyAction", [&](auto && child)
         {
-          return make<ModifyAction>(node, scope);
-        }))),
-
-    parameter_ref(
-      readAttribute<String>("parameterRef", node, scope))
+          return make<ModifyAction>(
+            child, scope, readAttribute<String>("parameterRef", parent, scope));
+        })))
   {}
 };
 }  // inline namespace syntax

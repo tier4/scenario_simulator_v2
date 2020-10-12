@@ -9,7 +9,11 @@ OpenSCENARIO:
     revMinor: 0
     date: Currently, value of attribute date will be ignored.
     author: yamacir-kit
-  ParameterDeclarations: []
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: x
+        parameterType: double
+        value: 0
   RoadNetwork:
     LogicFile:
       filepath: DOLLER(find-pkg-share kashiwanoha)/map/lanelet2_map.osm
@@ -59,7 +63,7 @@ OpenSCENARIO:
                             GlobalAction:
                               ParameterAction:
                                 parameterRef: x
-                                ParameterModifyAction:
+                                ModifyAction:
                                   Rule:
                                     AddValue:
                                       value: 1

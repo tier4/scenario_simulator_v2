@@ -34,13 +34,24 @@ struct ModifyAction
 {
   Scope inner_scope;
 
+  const String parameter_ref;
+
   const ModifyRule modify;
 
   template<typename Node>
-  explicit ModifyAction(const Node & node, Scope & outer_scope)
+  explicit ModifyAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
   : inner_scope(outer_scope),
+    parameter_ref(parameter_ref),
     modify(readElement<ModifyRule>("Rule", node, inner_scope))
   {}
+
+  auto start()
+  {
+    std::cout << "ModifyAction::start()" << std::endl;
+    return unspecified;
+  }
+
+  static constexpr std::true_type accomplished {};
 };
 }  // inline namespace syntax
 }  // namespace scenario_runner
