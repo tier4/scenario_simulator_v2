@@ -44,7 +44,7 @@
 
     <TrafficSignals>
       <TrafficSignalController name="signal-1">
-        <Phase name="phase-1">
+        <Phase name="phase-1" duration="INF">
           <TrafficSignalState trafficSignalId="1" state=""/>
           <TrafficSignalState trafficSignalId="1" state=""/>
           <TrafficSignalState trafficSignalId="1" state=""/>
@@ -52,7 +52,7 @@
       </TrafficSignalController>
 
       <TrafficSignalController name="signal-2">
-        <Phase name="phase-1">
+        <Phase name="phase-1" duration="INF">
           <TrafficSignalState trafficSignalId="2" state=""/>
           <TrafficSignalState trafficSignalId="2" state=""/>
           <TrafficSignalState trafficSignalId="2" state=""/>
