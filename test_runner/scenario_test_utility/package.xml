@@ -15,7 +15,8 @@
   <depend>python-xmlschema</depend>
   <depend>python-xmltodict</depend> 
   <depend>python-bs4</depend>
-  <depend>python-argparse</depend> 
+  <depend>python-argparse</depend>
+  <depend>ament_index_python</depend>
   <export>
     <build_type>ament_python</build_type>
   </export>
