@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""Xosc validator."""
+
 # Copyright 2020 Tier IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,18 +17,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
 import os
+import termcolor
+import argparse
 from ament_index_python.packages import get_package_share_directory
 import xmlschema
-import termcolor
 
 
 class XoscValidator():
     def __init__(self):
         share_directory_path = os.path.join(get_package_share_directory('scenario_test_utility'))
-        xsd_path = os.path.join(share_directory_path,
-            '../', 'ament_index', 'resource_index', 'packages', 'OpenSCENARIO.xsd')
+        xsd_path = os.path.join(share_directory_path, '../', 'ament_index', 'resource_index',
+                                                      'packages', 'OpenSCENARIO.xsd')
         self.openscenario_schema = xmlschema.XMLSchema(xsd_path)
 
     def validate_xosc_file(self, xosc_path):
@@ -44,5 +46,7 @@ def main():
     validator = XoscValidator()
     validator.validate_xosc_file(args.xosc)
 
-if __name__ == "__main__":
-    pass
+
+if __name__ == '__main__':
+    """Entrypoint."""
+    main()
