@@ -23,7 +23,7 @@ from launch_ros.actions import LifecycleNode
 def generate_launch_description():
     scenario_test_runner = Node(
         package='scenario_test_runner',
-        node_executable='scenario_test_runner_node',
+        node_executable='scenario_test_runner',
         output={
                 'stdout': 'log',
                 'stderr': 'screen',
