@@ -7,9 +7,11 @@ OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: Currently, value of attribute date will be ignored.
+    date: "2020-03-20T12:00:00"
     author: yamacir-kit
+    description: set
   ParameterDeclarations: []
+  CatalogLocations: []
   RoadNetwork:
     LogicFile:
       filepath: DOLLER(find-pkg-share kashiwanoha)/map/lanelet2_map.osm
@@ -41,6 +43,11 @@ OpenSCENARIO:
                     Event:
                       - name: event
                         priority: overwrite
+                        Action:
+                          - name: action
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: true
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -51,11 +58,6 @@ OpenSCENARIO:
                                   SimulationTimeCondition:
                                     rule: greaterThan
                                     value: 3 # EVENT-START-TIME
-                        Action:
-                          - name: action
-                            UserDefinedAction:
-                              CustomCommandAction:
-                                type: true
             StartTrigger:
               ConditionGroup:
                 - Condition:
