@@ -71,7 +71,7 @@
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <LanePosition laneId="$initial-lane-id" s="0"/>
+                <LanePosition roadId="0" laneId="$initial-lane-id" s="0"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
@@ -92,7 +92,7 @@
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <LanePosition laneId="$initial-lane-id" s="10"/>
+                <LanePosition roadId="0" laneId="$initial-lane-id" s="10"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
@@ -112,7 +112,7 @@
             <RoutingAction>
               <AcquirePositionAction>
                 <Position>
-                  <LanePosition laneId="180" s="0"/>
+                  <LanePosition roadId="0" laneId="180" s="0"/>
                 </Position>
               </AcquirePositionAction>
             </RoutingAction>
@@ -126,7 +126,7 @@
 
       <Act name="act-1">
         <ManeuverGroup name="overtake" maximumExecutionCount="1">
-          <Actors>
+          <Actors selectTriggeringEntities="false">
             <EntityRef entityRef="ego"/>
           </Actors>
 
@@ -150,7 +150,7 @@
               </Action>
               <StartTrigger>
                 <ConditionGroup>
-                  <Condition name="when-approaching-vehicle-ahead" conditionEdge="none">
+                  <Condition name="when-approaching-vehicle-ahead" conditionEdge="none" delay="0">
                     <ByEntityCondition>
                       <TriggeringEntities triggeringEntitiesRule="any">
                         <EntityRef entityRef="ego"/>
@@ -179,7 +179,7 @@
               </Action>
               <StartTrigger>
                 <ConditionGroup>
-                  <Condition name="after-sequence-1-of-3" conditionEdge="none">
+                  <Condition name="after-sequence-1-of-3" conditionEdge="none" delay="0">
                     <ByValueCondition>
                       <StoryboardElementStateCondition storyboardElementRef="sequence-1-of-3" storyboardElementType="event" state="endTransition"/>
                     </ByValueCondition>
@@ -203,7 +203,7 @@
               </Action>
               <StartTrigger>
                 <ConditionGroup>
-                  <Condition name="the-time-headway-greater-than-1" conditionEdge="none">
+                  <Condition name="the-time-headway-greater-than-1" conditionEdge="none" delay="0">
                     <ByEntityCondition>
                       <TriggeringEntities triggeringEntitiesRule="any">
                         <EntityRef entityRef="ego"/>
@@ -220,7 +220,7 @@
         </ManeuverGroup>
 
         <ManeuverGroup name="pedestrian-crossing" maximumExecutionCount="1">
-          <Actors>
+          <Actors selectTriggeringEntities="false">
             <EntityRef entityRef="Tatsuya Yamasaki"/>
           </Actors>
           <Maneuver name="pedestrian-crossing">
@@ -230,7 +230,7 @@
                 <PrivateAction>
                   <TeleportAction>
                     <Position>
-                      <LanePosition laneId="879" s="0"/>
+                      <LanePosition roadId="0" laneId="879" s="0"/>
                     </Position>
                   </TeleportAction>
                 </PrivateAction>
@@ -249,7 +249,7 @@
               </Action>
               <StartTrigger>
                 <ConditionGroup>
-                  <Condition name="after-overtake" conditionEdge="none">
+                  <Condition name="after-overtake" conditionEdge="none" delay="0">
                     <ByValueCondition>
                       <StoryboardElementStateCondition storyboardElementRef="overtake" storyboardElementType="maneuverGroup" state="endTransition"/>
                     </ByValueCondition>
@@ -261,7 +261,7 @@
         </ManeuverGroup>
 
         <ManeuverGroup name="aori" maximumExecutionCount="1">
-          <Actors>
+          <Actors selectTriggeringEntities="false">
             <EntityRef entityRef="npc"/>
           </Actors>
           <Maneuver name="speed-up">
@@ -281,7 +281,7 @@
               </Action>
               <StartTrigger>
                 <ConditionGroup>
-                  <Condition name="after-overtake" conditionEdge="none">
+                  <Condition name="after-overtake" conditionEdge="none" delay="0">
                     <ByValueCondition>
                       <StoryboardElementStateCondition storyboardElementRef="overtake" storyboardElementType="maneuverGroup" state="endTransition"/>
                     </ByValueCondition>
@@ -294,7 +294,7 @@
 
         <StartTrigger>
           <ConditionGroup>
-            <Condition name="start-immediately" conditionEdge="none">
+            <Condition name="start-immediately" conditionEdge="none" delay="0">
               <ByValueCondition>
                 <SimulationTimeCondition value="0" rule="greaterThan"/>
               </ByValueCondition>
@@ -306,7 +306,7 @@
 
     <StopTrigger>
       <ConditionGroup>
-        <Condition name="this-scenario-must-be-completed-within-40-seconds" conditionEdge="none">
+        <Condition name="this-scenario-must-be-completed-within-40-seconds" conditionEdge="none" delay="0">
           <ByValueCondition>
             <SimulationTimeCondition value="40" rule="greaterThan"/>
           </ByValueCondition>
