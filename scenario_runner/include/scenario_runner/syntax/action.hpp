@@ -15,6 +15,7 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__ACTION_HPP_
 #define SCENARIO_RUNNER__SYNTAX__ACTION_HPP_
 
+#include <c++/7/bits/c++config.h>
 #include <scenario_runner/syntax/global_action.hpp>
 #include <scenario_runner/syntax/private_action.hpp>
 #include <scenario_runner/syntax/storyboard_element.hpp>
@@ -44,8 +45,9 @@ struct Action
   const String name;
 
   template<typename Node, typename Scope>
-  explicit Action(const Node & node, Scope & scope)
-  : name{readAttribute<String>("name", node, scope)}
+  explicit Action(const Node & node, Scope & scope, std::size_t maximum_execution_count)
+  : StoryboardElement(maximum_execution_count),
+    name(readAttribute<String>("name", node, scope))
   {
     choice(node,
       std::make_pair("GlobalAction", [&](auto && node) {

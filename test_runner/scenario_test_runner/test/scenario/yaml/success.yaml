@@ -1,11 +1,9 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: INITIAL-VALUE
-      list: [1, 2, 3]
-    # - name: STEP
-    #   start: 1
-    #   step:  1
-    #   stop: 10
+      list: [0, 50, 100]
+    - name: STEP
+      list: [1, 2]
 
 OpenSCENARIO:
   FileHeader:
@@ -41,7 +39,7 @@ OpenSCENARIO:
           - name: act
             ManeuverGroup:
               - name: maneuver-group
-                maximumExecutionCount: 100
+                maximumExecutionCount: 1
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
@@ -53,6 +51,7 @@ OpenSCENARIO:
                     Event:
                       - name: event
                         priority: overwrite
+                        maximumExecutionCount: 100
                         Action:
                           - name: action
                             GlobalAction:

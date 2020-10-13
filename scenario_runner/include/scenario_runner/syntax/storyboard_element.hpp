@@ -134,15 +134,17 @@ protected:
     return cdr(names.emplace(name));
   }
 
-  template<typename U, typename Node, typename Scope>
-  decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope)
+  template<typename U, typename Node, typename Scope, typename ... Ts>
+  decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope, Ts && ... xs)
   {
     const auto name {
       rename(readAttribute<String>("name", node, inner_scope))
     };
 
     if (unique(name)) {
-      return inner_scope.storyboard_elements[name] = make<U>(node, inner_scope);
+      return
+        inner_scope.storyboard_elements[name] =
+          make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
     } else {
       std::stringstream ss {};
       ss << "detected redefinition of StoryboardElement named \'" << name << "\' (class " <<
