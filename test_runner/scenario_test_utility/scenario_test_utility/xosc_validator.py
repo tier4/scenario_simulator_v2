@@ -3,7 +3,7 @@
 
 """Xosc validator."""
 
-# Copyright 2020 Tier IV, Inc. All rights reserved.
+# Copyright 2020 Autoware Foundation. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 # limitations under the License.
 
 import os
-import termcolor
 import argparse
 from ament_index_python.packages import get_package_share_directory
 import xmlschema
+from scenario_test_utility.logger import Logger
 
 
 class XoscValidator():
@@ -33,10 +33,10 @@ class XoscValidator():
 
     def validate_xosc_file(self, xosc_path):
         if self.openscenario_schema.is_valid(xosc_path):
-            print(termcolor.colored('scenario ' + xosc_path + 'is valid', 'green'))
+            Logger.print_info('scenario ' + xosc_path + ' is valid')
         else:
-            print(termcolor.colored('scenario ' + xosc_path + 'is not valid', 'red'))
-            print(self.openscenario_schema.validate(xosc_path))
+            Logger.print_error('scenario ' + xosc_path + ' is not valid')
+            Logger.print_info(self.openscenario_schema.validate(xosc_path))
 
 
 def main():
