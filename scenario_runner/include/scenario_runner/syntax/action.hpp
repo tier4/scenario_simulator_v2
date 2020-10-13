@@ -15,7 +15,6 @@
 #ifndef SCENARIO_RUNNER__SYNTAX__ACTION_HPP_
 #define SCENARIO_RUNNER__SYNTAX__ACTION_HPP_
 
-#include <c++/7/bits/c++config.h>
 #include <scenario_runner/syntax/global_action.hpp>
 #include <scenario_runner/syntax/private_action.hpp>
 #include <scenario_runner/syntax/storyboard_element.hpp>
