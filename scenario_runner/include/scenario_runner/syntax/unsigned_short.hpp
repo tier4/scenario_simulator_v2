@@ -53,6 +53,12 @@ struct UnsignedShort
     ++data;
     return *this;
   }
+
+  auto & operator+=(const double & rhs)
+  {
+    data += rhs;
+    return *this;
+  }
 };
 
 template<typename ... Ts>

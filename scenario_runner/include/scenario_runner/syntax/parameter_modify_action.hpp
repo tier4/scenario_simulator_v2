@@ -36,20 +36,30 @@ struct ParameterModifyAction
 
   const String parameter_ref;
 
-  const ModifyRule modify;
+  const ModifyRule rule;
 
   template<typename Node>
   explicit ParameterModifyAction(
     const Node & node, Scope & outer_scope, const String & parameter_ref)
   : inner_scope(outer_scope),
     parameter_ref(parameter_ref),
-    modify(readElement<ModifyRule>("Rule", node, inner_scope))
+    rule(readElement<ModifyRule>("Rule", node, inner_scope))
   {}
 
   auto evaluate()
   {
-    std::cout << "parameterRef: " << parameter_ref << std::endl;
-    std::cout << "value: " << inner_scope.parameters.at(parameter_ref) << std::endl;
+    const auto target {
+      inner_scope.parameters.at(parameter_ref)
+    };
+
+    if (rule.is<ParameterAddValueRule>()) {
+      return rule.as<ParameterAddValueRule>()(target);
+    } else if (rule.is<ParameterMultiplyByValueRule>()) {
+      std::cout << "ParameterMultiplyByValueRule!!!" << std::endl;
+    } else {
+      THROW_IMPLEMENTATION_FAULT();
+    }
+
     return unspecified;
   }
 
