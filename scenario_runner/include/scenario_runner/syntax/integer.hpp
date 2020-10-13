@@ -53,6 +53,12 @@ struct Integer
     data += rhs;
     return *this;
   }
+
+  auto & operator*=(const double & rhs)
+  {
+    data *= rhs;
+    return *this;
+  }
 };
 
 std::ostream & operator<<(std::ostream & os, const Integer & rhs)

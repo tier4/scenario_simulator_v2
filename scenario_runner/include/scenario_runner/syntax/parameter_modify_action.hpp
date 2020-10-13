@@ -55,7 +55,7 @@ struct ParameterModifyAction
     if (rule.is<ParameterAddValueRule>()) {
       return rule.as<ParameterAddValueRule>()(target);
     } else if (rule.is<ParameterMultiplyByValueRule>()) {
-      std::cout << "ParameterMultiplyByValueRule!!!" << std::endl;
+      return rule.as<ParameterMultiplyByValueRule>()(target);
     } else {
       THROW_IMPLEMENTATION_FAULT();
     }
