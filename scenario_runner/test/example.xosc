@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
   <FileHeader revMajor="1" revMinor="42" date="2020-08-06T12:00:00" description="test" author="Tatsuya Yamasaki"/>
-
+  
   <ParameterDeclarations>
     <ParameterDeclaration name="hoge" parameterType="string" value="Hello, world!"/>
     <ParameterDeclaration name="fuga" parameterType="double" value="42"/>
-  </ParameterDeclarations>
-
-  <ParameterDeclarations>
     <ParameterDeclaration name="piyo" parameterType="string" value="$hoge"/>
   </ParameterDeclarations>
 
@@ -44,7 +41,7 @@
 
     <TrafficSignals>
       <TrafficSignalController name="signal-1">
-        <Phase name="phase-1">
+        <Phase name="phase-1" duration="INF">
           <TrafficSignalState trafficSignalId="1" state=""/>
           <TrafficSignalState trafficSignalId="1" state=""/>
           <TrafficSignalState trafficSignalId="1" state=""/>
@@ -52,7 +49,7 @@
       </TrafficSignalController>
 
       <TrafficSignalController name="signal-2">
-        <Phase name="phase-1">
+        <Phase name="phase-1" duration="INF">
           <TrafficSignalState trafficSignalId="2" state=""/>
           <TrafficSignalState trafficSignalId="2" state=""/>
           <TrafficSignalState trafficSignalId="2" state=""/>
@@ -71,7 +68,12 @@
           <Center x="0" y="0" z="0"/>
           <Dimensions width="0" length="0" height="0"/>
         </BoundingBox>
+        <Axles>
+          <FrontAxle maxSteering="0.5" wheelDiameter="0.6" trackWidth="1.8" positionX="3.1" positionZ="0.3"/>
+          <RearAxle maxSteering="0.0" wheelDiameter="0.6" trackWidth="1.8" positionX="0.0" positionZ="0.3"/>
+        </Axles>
         <Performance maxSpeed="9999" maxAcceleration="9999" maxDeceleration="9999"/>
+        <Properties/>
       </Vehicle>
     </ScenarioObject>
 
@@ -84,6 +86,7 @@
           <Center x="0" y="0" z="0"/>
           <Dimensions width="0" length="0" height="0"/>
         </BoundingBox>
+        <Properties/>
       </Pedestrian>
     </ScenarioObject>
   </Entities>
@@ -117,7 +120,7 @@
               <SpeedAction>
                 <SpeedActionDynamics dynamicsShape="linear" value="10" dynamicsDimension="rate"/>
                 <SpeedActionTarget>
-                  <RelativeTargetSpeed entityRef="" value="10"/>
+                  <RelativeTargetSpeed entityRef="scenario-object-2" value="10" continuous="true" speedTargetValueType="delta"/>
                 </SpeedActionTarget>
               </SpeedAction>
             </LongitudinalAction>
@@ -148,7 +151,7 @@
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <LanePosition laneId="42" s="0"/>
+                <LanePosition roadId="0" laneId="42" s="0"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
@@ -156,7 +159,7 @@
           <PrivateAction>
             <RoutingAction>
               <AssignRouteAction>
-                <Route name="">
+                <Route name="" closed="false">
                   <Waypoint routeStrategy="shortest">
                     <Position>
                       <WorldPosition x="0" y="0" z="0" h="0" p="0" r="0"/>
@@ -192,8 +195,8 @@
       </ParameterDeclarations>
 
       <Act name="">
-        <ManeuverGroup name="">
-          <Actors>
+        <ManeuverGroup name="" maximumExecutionCount="1">
+          <Actors selectTriggeringEntities="false">
             <EntityRef entityRef=""/>
             <EntityRef entityRef=""/>
             <EntityRef entityRef=""/>
@@ -229,7 +232,7 @@
       <ConditionGroup>
         <!-- UNSUPPORTED EndofRoadCondition -->
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>
             <TriggeringEntities triggeringEntitiesRule="any">
               <EntityRef entityRef=""/>
@@ -249,7 +252,7 @@
         <!-- UNSUPPORTED TimeHeadwayCondition -->
         <!-- UNSUPPORTED TimeToCollisionCondition -->
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>
             <TriggeringEntities triggeringEntitiesRule="any">
               <EntityRef entityRef=""/>
@@ -265,7 +268,7 @@
 
         <!-- UNSUPPORTED StandStillCondition -->
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>
             <TriggeringEntities triggeringEntitiesRule="any">
               <EntityRef entityRef=""/>
@@ -282,7 +285,7 @@
         <!-- UNSUPPORTED RelativeSpeedCondition -->
         <!-- UNSUPPORTED TraveledDistanceCondition -->
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>
             <TriggeringEntities triggeringEntitiesRule="any">
               <EntityRef entityRef=""/>
@@ -300,7 +303,7 @@
           </ByEntityCondition>
         </Condition>
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>
             <TriggeringEntities triggeringEntitiesRule="any">
               <EntityRef entityRef=""/>
@@ -311,7 +314,7 @@
             <EntityCondition>
               <ReachPositionCondition tolerance="42">
                 <Position>
-                  <LanePosition laneId="42" offset="0" s="0">
+                  <LanePosition roadId="0" laneId="42" offset="0" s="0">
                     <Orientation type="relative" h="0" p="0" r="0"/>
                   </LanePosition>
                 </Position>
@@ -322,7 +325,7 @@
 
         <!-- UNSUPPORTED DistanceCondition -->
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>
             <TriggeringEntities triggeringEntitiesRule="any">
               <EntityRef entityRef=""/>
@@ -341,7 +344,7 @@
         <!-- UNSUPPORTED ParameterCondition -->
         <!-- UNSUPPORTED TimeOfDayCondition -->
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByValueCondition>
             <SimulationTimeCondition value="10" rule="greaterThan"/>
           </ByValueCondition>
@@ -350,7 +353,7 @@
         <!-- UNSUPPORTED StoryboardElementStateCondition -->
         <!-- UNSUPPORTED UserDefinedValueCondition -->
 
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByValueCondition>
             <TrafficSignalCondition name="" state=""/>
           </ByValueCondition>
@@ -360,7 +363,7 @@
       </ConditionGroup>
 
       <ConditionGroup>
-        <Condition name="" conditionEdge="none">
+        <Condition name="" conditionEdge="none" delay="0">
           <ByValueCondition>
             <SimulationTimeCondition value="10" rule="greaterThan"/>
           </ByValueCondition>

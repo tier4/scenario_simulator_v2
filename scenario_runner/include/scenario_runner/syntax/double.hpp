@@ -68,7 +68,7 @@ std::istream & operator>>(std::istream & is, Double & rhs)
 
   is >> token;
 
-  static const std::regex infinity {R"([+-]?inf(inity)?)"};
+  static const std::regex infinity {R"([+-]?INF)"};
 
   std::smatch result {};
 

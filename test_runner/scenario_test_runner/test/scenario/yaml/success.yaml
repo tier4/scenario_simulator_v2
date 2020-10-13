@@ -7,18 +7,20 @@ OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: Currently, value of attribute date will be ignored.
+    date: "2020-03-20T12:00:00"
     author: yamacir-kit
+    description: set
   ParameterDeclarations:
     ParameterDeclaration:
       - name: value
         parameterType: double
         value: 0
+  CatalogLocations: []
   RoadNetwork:
     LogicFile:
-      filepath: DOLLER(find-pkg-share kashiwanoha)/map/lanelet2_map.osm
+      filepath: "DOLLER(find-pkg-share kashiwanoha)/map/lanelet2_map.osm"
     SceneGraphFile:
-      filepath: ./
+      filepath: "./"
     TrafficSignals: []
   Entities: []
   Storyboard:
@@ -47,6 +49,15 @@ OpenSCENARIO:
                     Event:
                       - name: event
                         priority: overwrite
+                        Action:
+                          - name: action
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: value
+                                ModifyAction:
+                                  Rule:
+                                    AddValue:
+                                      value: 1
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -57,15 +68,6 @@ OpenSCENARIO:
                                   SimulationTimeCondition:
                                     rule: greaterThan
                                     value: 3
-                        Action:
-                          - name: action
-                            GlobalAction:
-                              ParameterAction:
-                                parameterRef: value
-                                ModifyAction:
-                                  Rule:
-                                    AddValue:
-                                      value: 1
             StartTrigger:
               ConditionGroup:
                 - Condition:
