@@ -71,7 +71,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
 
           RCLCPP_INFO(
             get_logger(),
-            "[%d standby (=> %d) => %d running (=> %d) => %d complete]",
+            "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
             scenario_runner::standby_state.use_count() - 1,
             scenario_runner::start_transition.use_count() - 1,
             scenario_runner::running_state.use_count() - 1,

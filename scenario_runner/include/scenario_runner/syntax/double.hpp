@@ -54,10 +54,21 @@ struct Double
   {
     return static_cast<Double>(std::numeric_limits<value_type>::infinity());
   }
+
+  auto & operator+=(const double & rhs)
+  {
+    data += rhs;
+    return *this;
+  }
+
+  auto & operator*=(const double & rhs)
+  {
+    data *= rhs;
+    return *this;
+  }
 };
 
-template<typename ... Ts>
-decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const Double & rhs)
+std::ostream & operator<<(std::ostream & os, const Double & rhs)
 {
   return os << std::fixed << rhs.data;
 }

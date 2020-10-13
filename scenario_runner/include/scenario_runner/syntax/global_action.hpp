@@ -16,6 +16,7 @@
 #define SCENARIO_RUNNER__SYNTAX__GLOBAL_ACTION_HPP_
 
 #include <scenario_runner/syntax/infrastructure_action.hpp>
+#include <scenario_runner/syntax/parameter_action.hpp>
 
 #include <utility>
 
@@ -23,7 +24,7 @@ namespace scenario_runner
 {
 inline namespace syntax
 {
-/* ==== GlobalAction =========================================================
+/* ---- GlobalAction -----------------------------------------------------------
  *
  * <xsd:complexType name="GlobalAction">
  *   <xsd:choice>
@@ -35,18 +36,23 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct GlobalAction
   : public Element
 {
   template<typename Node, typename ... Ts>
-  explicit GlobalAction(const Node & node, Ts && ...)
+  explicit GlobalAction(const Node & node, Ts && ... xs)
   : Element(
       choice(
         node,
         std::make_pair("EnvironmentAction", UNSUPPORTED()),
         std::make_pair("EntityAction", UNSUPPORTED()),
-        std::make_pair("ParameterAction", UNSUPPORTED()),
+
+        std::make_pair("ParameterAction", [&](auto && node)
+        {
+          return make<ParameterAction>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+
         std::make_pair("InfrastructureAction", UNSUPPORTED()),
         std::make_pair("TrafficAction", UNSUPPORTED())))
   {}
