@@ -17,6 +17,8 @@
 
 #include <scenario_runner/reader/attribute.hpp>
 
+#include <typeindex>
+#include <unordered_map>
 #include <utility>
 
 namespace scenario_runner
@@ -45,12 +47,74 @@ struct ParameterSetAction
     value(readAttribute<String>("value", node, inner_scope))
   {}
 
-  auto evaluate()
+  auto evaluate() const noexcept(false)
   {
-    std::cout << "SetAction!" << std::endl;
-    std::cout << "parameterRef: " << parameter_ref << std::endl;
-    std::cout << "value: " << inner_scope.parameters.at(parameter_ref) << std::endl;
-    return unspecified;
+    static const std::unordered_map<
+      std::type_index,
+      std::function<Element(const Element &, const String &)>
+    >
+    overloads
+    {
+      {
+        typeid(Integer), [](auto && target, auto && value)
+        {
+          target.template as<Integer>() = boost::lexical_cast<Integer>(value);
+          return target;
+        }
+      },
+
+      {
+        typeid(Double), [](auto && target, auto && value)
+        {
+          target.template as<Double>() = boost::lexical_cast<Double>(value);
+          return target;
+        }
+      },
+
+      {
+        typeid(String), [](auto && target, auto && value)
+        {
+          target.template as<String>() = value;
+          return target;
+        }
+      },
+
+      {
+        typeid(UnsignedInteger), [](auto && target, auto && value)
+        {
+          target.template as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value);
+          return target;
+        }
+      },
+
+      {
+        typeid(UnsignedShort), [](auto && target, auto && value)
+        {
+          target.template as<UnsignedShort>() = boost::lexical_cast<UnsignedShort>(value);
+          return target;
+        }
+      },
+
+      {
+        typeid(Boolean), [](auto && target, auto && value)
+        {
+          target.template as<Boolean>() = boost::lexical_cast<Boolean>(value);
+          return target;
+        }
+      },
+    };
+
+    const auto target {
+      inner_scope.parameters.at(parameter_ref)
+    };
+
+    const auto iter {overloads.find(target.type())};
+
+    if (iter != std::end(overloads)) {
+      return std::get<1>(* iter)(target, value);
+    } else {
+      THROW_IMPLEMENTATION_FAULT();
+    }
   }
 
   static constexpr auto accomplished() noexcept
