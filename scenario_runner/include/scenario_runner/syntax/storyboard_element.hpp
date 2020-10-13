@@ -97,6 +97,7 @@ struct StoryboardElement
 
   Element override ()
   {
+    std::cout << state() << std::endl;
     if (!complete() && !stopping()) {
       return current_state = stop_transition;
     } else {

@@ -1,7 +1,7 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: INITIAL-VALUE
-      list: [0, 50, 100]
+      list: [1, 50, 100]
     - name: STEP
       list: [1, 2]
 
@@ -60,7 +60,7 @@ OpenSCENARIO:
                                 ModifyAction:
                                   Rule:
                                     AddValue:
-                                      value: 1
+                                      value: STEP
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
