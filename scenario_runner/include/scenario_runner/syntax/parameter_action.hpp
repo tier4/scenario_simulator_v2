@@ -17,7 +17,7 @@
 
 #include <scenario_runner/reader/attribute.hpp>
 #include <scenario_runner/reader/element.hpp>
-#include <scenario_runner/syntax/modify_action.hpp>
+#include <scenario_runner/syntax/parameter_modify_action.hpp>
 #include <scenario_runner/syntax/parameter_set_action.hpp>
 
 #include <utility>
@@ -54,7 +54,7 @@ struct ParameterAction
 
         std::make_pair("ModifyAction", [&](auto && child)
         {
-          return make<ModifyAction>(
+          return make<ParameterModifyAction>(
             child, scope, readAttribute<String>("parameterRef", parent, scope));
         })))
   {}

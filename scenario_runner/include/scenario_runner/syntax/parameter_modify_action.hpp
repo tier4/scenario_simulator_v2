@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_RUNNER__SYNTAX__MODIFY_ACTION_HPP_
-#define SCENARIO_RUNNER__SYNTAX__MODIFY_ACTION_HPP_
+#ifndef SCENARIO_RUNNER__SYNTAX__PARAMETER_MODIFY_ACTION_HPP_
+#define SCENARIO_RUNNER__SYNTAX__PARAMETER_MODIFY_ACTION_HPP_
 
 #include <scenario_runner/syntax/modify_rule.hpp>
 
@@ -30,7 +30,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ModifyAction
+struct ParameterModifyAction
 {
   Scope inner_scope;
 
@@ -39,7 +39,8 @@ struct ModifyAction
   const ModifyRule modify;
 
   template<typename Node>
-  explicit ModifyAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
+  explicit ParameterModifyAction(
+    const Node & node, Scope & outer_scope, const String & parameter_ref)
   : inner_scope(outer_scope),
     parameter_ref(parameter_ref),
     modify(readElement<ModifyRule>("Rule", node, inner_scope))
@@ -60,4 +61,4 @@ struct ModifyAction
 }  // inline namespace syntax
 }  // namespace scenario_runner
 
-#endif  // SCENARIO_RUNNER__SYNTAX__MODIFY_ACTION_HPP_
+#endif  // SCENARIO_RUNNER__SYNTAX__PARAMETER_MODIFY_ACTION_HPP_
