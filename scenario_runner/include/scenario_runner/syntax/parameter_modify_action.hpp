@@ -53,7 +53,10 @@ struct ParameterModifyAction
     };
 
     if (rule.is<ParameterAddValueRule>()) {
-      return rule.as<ParameterAddValueRule>()(target);
+      std::cout << "ParameterAddValueRule " << target << " => ";
+      const auto result = rule.as<ParameterAddValueRule>()(target);
+      std::cout << result;
+      return result;
     } else if (rule.is<ParameterMultiplyByValueRule>()) {
       return rule.as<ParameterMultiplyByValueRule>()(target);
     } else {

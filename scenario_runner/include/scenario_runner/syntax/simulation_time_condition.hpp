@@ -17,6 +17,8 @@
 
 #include <scenario_runner/syntax/rule.hpp>
 
+#include <chrono>
+
 namespace scenario_runner
 {
 inline namespace syntax
@@ -35,25 +37,20 @@ struct SimulationTimeCondition
 
   const Rule compare;
 
-  auto begin() const
-  {
-    static const auto time {std::chrono::high_resolution_clock::now()};
-    return time;
-  }
+  std::chrono::high_resolution_clock::time_point begin;
 
   template<typename Node, typename Scope>
   explicit SimulationTimeCondition(const Node & node, Scope & scope)
-  : value{readAttribute<Double>("value", node, scope)},
-    compare{readAttribute<Rule>("rule", node, scope)}
-  {
-    begin();
-  }
+  : value(readAttribute<Double>("value", node, scope)),
+    compare(readAttribute<Rule>("rule", node, scope)),
+    begin(std::chrono::high_resolution_clock::now())  // XXX TEMPORARY TOY IMPLEMENTATION
+  {}
 
   auto evaluate() const
   {
     const auto simulation_time {
       std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - begin()
+        std::chrono::high_resolution_clock::now() - begin
       ).count()
     };
 

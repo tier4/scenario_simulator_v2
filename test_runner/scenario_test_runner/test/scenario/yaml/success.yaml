@@ -1,7 +1,11 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: INITIAL-VALUE
-      list: [3, 5, 7]
+      list: [1, 2, 3]
+    # - name: STEP
+    #   start: 1
+    #   step:  1
+    #   stop: 10
 
 OpenSCENARIO:
   FileHeader:
@@ -37,7 +41,7 @@ OpenSCENARIO:
           - name: act
             ManeuverGroup:
               - name: maneuver-group
-                maximumExecutionCount: 1
+                maximumExecutionCount: 100
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
@@ -65,9 +69,10 @@ OpenSCENARIO:
                                 delay: 0
                                 conditionEdge: none
                                 ByValueCondition:
-                                  SimulationTimeCondition:
+                                  ParameterCondition:
+                                    parameterRef: value
                                     rule: greaterThan
-                                    value: 3
+                                    value: 0
             StartTrigger:
               ConditionGroup:
                 - Condition:
@@ -75,9 +80,10 @@ OpenSCENARIO:
                     delay: 0
                     conditionEdge: none
                     ByValueCondition:
-                      SimulationTimeCondition:
-                        rule: greaterThan
-                        value: 0
+                      ParameterCondition:
+                        parameterRef: value
+                        rule: equalTo
+                        value: INITIAL-VALUE
     StopTrigger:
       ConditionGroup:
         - Condition:
@@ -85,6 +91,7 @@ OpenSCENARIO:
             delay: 0
             conditionEdge: none
             ByValueCondition:
-              SimulationTimeCondition:
+              ParameterCondition:
+                parameterRef: value
                 rule: greaterThan
-                value: 10
+                value: 100
