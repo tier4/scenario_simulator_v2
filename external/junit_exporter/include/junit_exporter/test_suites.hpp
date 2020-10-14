@@ -74,7 +74,11 @@ public:
   double getTime() const;
   std::vector<std::string> getTestSuites() const;
   std::vector<TestCase> getTestSuite(const std::string & test_suite);
-
+  bool testCaseExists(
+    const std::string & name,
+    const std::string & test_suite
+  );
+  
 private:
   std::vector<TestCase> test_cases_;
 };

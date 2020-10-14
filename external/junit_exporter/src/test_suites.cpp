@@ -57,4 +57,17 @@ std::vector<TestCase> TestSuites::getTestSuite(const std::string & test_suite)
   }
   return ret;
 }
+
+bool TestSuites::testCaseExists(
+  const std::string & name,
+  const std::string & test_suite
+)
+{
+  for (const auto & test_case : test_cases_) {
+    if (test_case.test_suite == test_suite && test_case.name == name) {
+      return true;
+    }
+  }
+  return false;
+}
 }  // namespace junit_exporter
