@@ -23,20 +23,18 @@ from scenario_test_utility.manager import Manager
 
 class DatabaseHandler():
 
-    DATABASE_FILE = "workflow_example.yaml"
-
     @staticmethod
-    def read_database():
+    def read_database(workflow_file="workflow_example.yaml"):
         Logger.print_separator("Reading workflow")
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         Logger.print_info("package path: " + str(launcher_package_path))
-        database_path = launcher_package_path / "config" / DatabaseHandler.DATABASE_FILE
+        database_path = launcher_package_path / "config" / workflow_file
         if (not Manager.check_existence(database_path)):
             launcher_package_path = pathlib.Path(
                 Manager.get_file_dir(
-                    __file__, DatabaseHandler.DATABASE_FILE)).parent
+                    __file__, workflow_file)).parent
             Manager.check_existence(database_path)
-            database_path = launcher_package_path / "config" / DatabaseHandler.DATABASE_FILE
+            database_path = launcher_package_path / "config" / workflow_file
         Logger.print_info("package path: " + str(launcher_package_path))
         database = Manager.read_data(database_path)
         log_path = str(launcher_package_path / database["Log"])
