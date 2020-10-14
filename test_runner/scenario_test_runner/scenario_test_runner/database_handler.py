@@ -24,7 +24,7 @@ from scenario_test_utility.manager import Manager
 class DatabaseHandler():
 
     @staticmethod
-    def read_database(workflow_file="workflow_example.yaml"):
+    def read_database(workflow_file):
         Logger.print_separator("Reading workflow")
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         Logger.print_info("package path: " + str(launcher_package_path))
