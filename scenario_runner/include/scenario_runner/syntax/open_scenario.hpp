@@ -191,6 +191,8 @@ struct OpenScenario
   explicit OpenScenario(const std::string & scenario, Ts && ... xs)
   : pugi::xml_document(), global{std::forward<decltype(xs)>(xs)...}
   {
+    global.scenario = scenario;
+
     if (load(scenario).child("OpenSCENARIO").child("Catalog")) {
       THROW_IMPLEMENTATION_FAULT();
     } else {

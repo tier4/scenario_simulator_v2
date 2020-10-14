@@ -15,6 +15,7 @@
 #ifndef SCENARIO_RUNNER__SCOPE_HPP_
 #define SCENARIO_RUNNER__SCOPE_HPP_
 
+#include <boost/filesystem.hpp>
 #include <scenario_runner/syntax/entity_ref.hpp>
 // #include <simulation_api/api/api.hpp>
 
@@ -28,6 +29,8 @@ struct Scope
   std::unordered_map<String, Element> parameters, entities, storyboard_elements;
 
   std::vector<EntityRef> actors;
+
+  boost::filesystem::path scenario;
 
   // std::shared_ptr<scenario_simulator::API> connection;
 
