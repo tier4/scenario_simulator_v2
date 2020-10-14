@@ -15,7 +15,6 @@
 #ifndef SCENARIO_RUNNER__SCENARIO_RUNNER_HPP_
 #define SCENARIO_RUNNER__SCENARIO_RUNNER_HPP_
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/rclcpp.hpp>

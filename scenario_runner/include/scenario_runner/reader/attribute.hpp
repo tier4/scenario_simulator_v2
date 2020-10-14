@@ -15,21 +15,97 @@
 #ifndef SCENARIO_RUNNER__READER__ATTRIBUTE_HPP_
 #define SCENARIO_RUNNER__READER__ATTRIBUTE_HPP_
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <scenario_runner/syntax/parameter_type.hpp>
 #include <scenario_runner/utility/highlighter.hpp>
 #include <scenario_runner/utility/pugi_extension.hpp>
 
+#include <functional>
+#include <regex>
 #include <string>
+#include <unordered_map>
 
 namespace scenario_runner
 {
 inline namespace reader
 {
+/* ---- Dynamic Configuration --------------------------------------------------
+ *
+ * See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
+ *
+ * -------------------------------------------------------------------------- */
+template<typename Scope>
+auto substitute(std::string attribute, Scope & scope)
+{
+  static const std::regex substitution_syntax {
+    R"((.*)\$\((([\w-]+)\s([^\)]*))\)(.*))"
+  };
+
+  std::smatch match {};
+
+  while (std::regex_match(attribute, match, substitution_syntax)) {
+    // std::cout << "match 1: " << match.str(1) << std::endl;
+    // std::cout << "match 2: " << match.str(2) << std::endl;
+    // std::cout << "match 3: " << match.str(3) << std::endl;
+    // std::cout << "match 4: " << match.str(4) << std::endl;
+    // std::cout << "match 5: " << match.str(5) << std::endl;
+
+    static const std::unordered_map<
+      std::string,
+      std::function<std::string(const std::string &, Scope &)>
+    >
+    substitutions
+    {
+      {
+        "find-pkg-share", [](auto && package_name, auto &&)
+        {
+          return ament_index_cpp::get_package_share_directory(package_name);
+        }
+      },
+
+      {
+        "var", [](auto && name, auto && scope) -> String
+        {
+          const auto iter {
+            scope.parameters.find(name)
+          };
+
+          if (iter != std::end(scope.parameters)) {
+            return boost::lexical_cast<String>(std::get<1>(*iter));
+          } else {
+            return "";
+          }
+        }
+      }
+    };
+
+    // std::cout << "Substitute: " << cyan << attribute << reset << " => ";
+
+    const auto iter {
+      substitutions.find(match.str(3))
+    };
+
+    if (iter != std::end(substitutions)) {
+      attribute = match.str(1) + std::get<1>(* iter)(match.str(4), scope) + match.str(5);
+    } else {
+      std::stringstream ss {};
+      ss << "Unknown substitution '" << match.str(3) << "' specified.";
+      throw SyntaxError(ss.str());
+    }
+
+    // std::cout << cyan << attribute << reset << std::endl;
+  }
+
+  return attribute;
+}
+
 template<typename T, typename Node, typename Scope>
 T readAttribute(const std::string & name, const Node & node, const Scope & scope)
 {
   if (const auto & attribute {node.attribute(name.c_str())}) {
-    const std::string value {attribute.value()};
+    std::string value {
+      substitute(attribute.value(), scope)
+    };
 
     if (value.empty()) {
       #ifndef SCENARIO_RUNNER_ALLOW_ATTRIBUTES_TO_BE_BLANK
@@ -41,24 +117,26 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
       return T {};
       #endif
     } else if (value.front() == '$') {
-      const auto iter {scope.parameters.find(value.substr(1))};
+      const auto iter {
+        scope.parameters.find(value.substr(1))
+      };
 
       if (iter != std::end(scope.parameters)) {
         return boost::lexical_cast<T>(boost::lexical_cast<String>(cdr(*iter)));
       } else {
         std::stringstream ss {};
-        ss << "There is no parameter named '" << value.substr(1) << "' (Attribute \'" << name <<
-          "\' of class \'" << node.name() << "\' references this parameter)";
-        throw SyntaxError {ss.str()};
+        ss << "There is no parameter named '" << value.substr(1) << "' (Attribute \'" << name;
+        ss << "\' of class \'" << node.name() << "\' references this parameter)";
+        throw SyntaxError(ss.str());
       }
     } else {
       try {
         return boost::lexical_cast<T>(value);
       } catch (const boost::bad_lexical_cast &) {
         std::stringstream ss {};
-        ss << "Value \"" << value << "\" specified for attribute \'" << name <<
-          "\' is invalid (Is not value of type " << typeid(T).name() << ")";
-        throw SyntaxError {ss.str()};
+        ss << "Value \"" << value << "\" specified for attribute \'" << name;
+        ss << "\' is invalid (Is not value of type " << typeid(T).name() << ")";
+        throw SyntaxError(ss.str());
       }
     }
   } else {

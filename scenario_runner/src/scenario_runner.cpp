@@ -25,10 +25,6 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
   port
   {
     8080
-  },
-  scenario
-  {
-    ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc"
   }
 {
   declare_parameter<decltype(scenario)>("scenario", scenario);
