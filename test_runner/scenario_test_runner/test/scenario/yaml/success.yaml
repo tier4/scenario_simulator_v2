@@ -17,15 +17,15 @@ OpenSCENARIO:
       - name: value
         parameterType: double
         value: 0
-      - name: map-file-name
+      - name: extension
         parameterType: string
-        value: lanelet2_map.osm
+        value: osm
   CatalogLocations: []
   RoadNetwork:
     LogicFile:
-      filepath: "$(find-pkg-share kashiwanoha_map)/map/$(var map-file-name)"
+      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.$(var extension)"
     SceneGraphFile:
-      filepath: "./"
+      filepath: "$(dirname)/hoge.txt"
     TrafficSignals: []
   Entities: []
   Storyboard:

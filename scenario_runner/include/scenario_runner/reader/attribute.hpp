@@ -38,7 +38,7 @@ template<typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
   static const std::regex substitution_syntax {
-    R"((.*)\$\((([\w-]+)\s([^\)]*))\)(.*))"
+    R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))"
   };
 
   std::smatch match {};
@@ -76,10 +76,17 @@ auto substitute(std::string attribute, Scope & scope)
             return "";
           }
         }
+      },
+
+      {
+        "dirname", [](auto &&, auto && scope)
+        {
+          return scope.scenario.parent_path().string();
+        }
       }
     };
 
-    // std::cout << "Substitute: " << cyan << attribute << reset << " => ";
+    std::cout << "Substitute: " << cyan << attribute << reset << " => ";
 
     const auto iter {
       substitutions.find(match.str(3))
@@ -93,7 +100,7 @@ auto substitute(std::string attribute, Scope & scope)
       throw SyntaxError(ss.str());
     }
 
-    // std::cout << cyan << attribute << reset << std::endl;
+    std::cout << cyan << attribute << reset << std::endl;
   }
 
   return attribute;

@@ -24,6 +24,7 @@ execute_process(
   OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
 
 find_package(ament_index_cpp   REQUIRED)
+find_package(Boost             REQUIRED COMPONENTS filesystem)
 find_package(geometry_msgs     REQUIRED)
 find_package(lifecycle_msgs    REQUIRED)
 find_package(rclcpp_components REQUIRED)
@@ -47,7 +48,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
 
-target_link_libraries(${PROJECT_NAME} pugixml)
+target_link_libraries(${PROJECT_NAME} pugixml Boost::filesystem)
 
 # ------------------------------------------------------------------------------
 #  scenario_runner_node
