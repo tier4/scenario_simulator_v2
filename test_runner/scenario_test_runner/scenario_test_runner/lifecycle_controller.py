@@ -27,7 +27,7 @@ from scenario_test_utility.logger import Logger
 
 class LifecycleController(Node):
 
-    NODE_NAME = "scenario_runner_node"
+    NODE_NAME = "open_scenario_interpreter_node"
     PARAMETER_XOSC_PATH = "scenario"
     PARAMETER_EXPECT = "expect"
     STATES = {}
