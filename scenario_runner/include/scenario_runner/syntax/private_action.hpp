@@ -26,7 +26,7 @@ namespace scenario_runner
 {
 inline namespace syntax
 {
-/* ==== PrivateAction ========================================================
+/* ---- PrivateAction ----------------------------------------------------------
  *
  * <xsd:complexType name="PrivateAction">
  *   <xsd:choice>
@@ -41,7 +41,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct PrivateAction
   : public Element
 {

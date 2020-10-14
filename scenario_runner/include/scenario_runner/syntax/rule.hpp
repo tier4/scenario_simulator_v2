@@ -20,6 +20,7 @@
 #include <functional>
 #include <limits>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace scenario_runner
@@ -32,7 +33,7 @@ struct equal_to
 {};
 
 template<typename T>
-struct equal_to<T, typename std::enable_if<not std::numeric_limits<T>::is_integer>::type>
+struct equal_to<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
 {
   constexpr auto operator()(const T & lhs, const T & rhs) const noexcept
   {
@@ -75,7 +76,7 @@ struct Rule
   }
 
   template<typename T, typename U = T>
-  constexpr decltype(auto) operator()(T && lhs, U && rhs) const noexcept
+  constexpr decltype(auto) operator()(const T & lhs, const U & rhs) const noexcept
   {
     switch (value) {
       case greaterThan:

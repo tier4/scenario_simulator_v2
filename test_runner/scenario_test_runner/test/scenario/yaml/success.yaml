@@ -1,7 +1,9 @@
 ScenarioModifiers:
   ScenarioModifier:
-    - name: EVENT-START-TIME
-      list: [3, 5, 7]
+    - name: INITIAL-VALUE
+      list: [1, 50, 100]
+    - name: STEP
+      list: [1, 2]
 
 OpenSCENARIO:
   FileHeader:
@@ -10,21 +12,27 @@ OpenSCENARIO:
     date: "2020-03-20T12:00:00"
     author: yamacir-kit
     description: set
-  ParameterDeclarations: []
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: value
+        parameterType: double
+        value: 0
   CatalogLocations: []
   RoadNetwork:
     LogicFile:
-      filepath: DOLLER(find-pkg-share kashiwanoha)/map/lanelet2_map.osm
+      filepath: "DOLLER(find-pkg-share kashiwanoha)/map/lanelet2_map.osm"
     SceneGraphFile:
-      filepath: ./
+      filepath: "./"
     TrafficSignals: []
   Entities: []
   Storyboard:
     Init:
       Actions:
-        UserDefinedAction:
-          CustomCommandAction:
-            type: true
+        GlobalAction:
+          ParameterAction:
+            parameterRef: value
+            SetAction:
+              value: INITIAL-VALUE
     Story:
       - name: story
         Act:
@@ -43,11 +51,16 @@ OpenSCENARIO:
                     Event:
                       - name: event
                         priority: overwrite
+                        maximumExecutionCount: 100
                         Action:
                           - name: action
-                            UserDefinedAction:
-                              CustomCommandAction:
-                                type: true
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: value
+                                ModifyAction:
+                                  Rule:
+                                    AddValue:
+                                      value: STEP
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -55,9 +68,10 @@ OpenSCENARIO:
                                 delay: 0
                                 conditionEdge: none
                                 ByValueCondition:
-                                  SimulationTimeCondition:
+                                  ParameterCondition:
+                                    parameterRef: value
                                     rule: greaterThan
-                                    value: 3 # EVENT-START-TIME
+                                    value: 0
             StartTrigger:
               ConditionGroup:
                 - Condition:
@@ -65,9 +79,10 @@ OpenSCENARIO:
                     delay: 0
                     conditionEdge: none
                     ByValueCondition:
-                      SimulationTimeCondition:
-                        rule: greaterThan
-                        value: 0
+                      ParameterCondition:
+                        parameterRef: value
+                        rule: equalTo
+                        value: INITIAL-VALUE
     StopTrigger:
       ConditionGroup:
         - Condition:
@@ -75,6 +90,7 @@ OpenSCENARIO:
             delay: 0
             conditionEdge: none
             ByValueCondition:
-              SimulationTimeCondition:
+              ParameterCondition:
+                parameterRef: value
                 rule: greaterThan
-                value: 10
+                value: 100

@@ -77,6 +77,7 @@ struct Storyboard
   {
     for (auto && each : *this) {
       each.as<Story>().override ();
+      each.evaluate();
     }
   }
 

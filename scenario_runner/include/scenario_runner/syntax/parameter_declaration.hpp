@@ -110,10 +110,7 @@ struct ParameterDeclaration
   }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const ParameterDeclaration & declaration)
+std::ostream & operator<<(std::ostream & os, const ParameterDeclaration & declaration)
 {
   return os << indent <<
          blue << "<ParameterDeclaration" <<

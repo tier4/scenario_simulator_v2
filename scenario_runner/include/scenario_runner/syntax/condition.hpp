@@ -58,10 +58,12 @@ struct Condition
         std::make_pair("ByValueCondition", [&](auto && node) {
           return make<ByValueCondition>(node, scope);
         }))),
-    name{readAttribute<String>("name", node, scope)},
-  // NOTE This broken indentation was forced by ament_uncrustify.
-  delay{readAttribute<Double>("delay", node, scope, Double())},
-  condition_edge{readAttribute<ConditionEdge>("conditionEdge", node, scope)}
+    name(
+      readAttribute<String>("name", node, scope)),
+    delay(
+      readAttribute<Double>("delay", node, scope, Double())),
+    condition_edge(
+      readAttribute<ConditionEdge>("conditionEdge", node, scope))
   {}
 
   #ifndef NDEBUG

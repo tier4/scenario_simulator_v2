@@ -44,8 +44,9 @@ struct Action
   const String name;
 
   template<typename Node, typename Scope>
-  explicit Action(const Node & node, Scope & scope)
-  : name{readAttribute<String>("name", node, scope)}
+  explicit Action(const Node & node, Scope & scope, std::size_t maximum_execution_count)
+  : StoryboardElement(maximum_execution_count),
+    name(readAttribute<String>("name", node, scope))
   {
     choice(node,
       std::make_pair("GlobalAction", [&](auto && node) {

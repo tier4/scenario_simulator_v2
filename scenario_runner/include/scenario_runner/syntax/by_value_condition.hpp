@@ -18,6 +18,7 @@
 #include <scenario_runner/syntax/simulation_time_condition.hpp>
 #include <scenario_runner/syntax/storyboard_element_state_condition.hpp>
 #include <scenario_runner/syntax/traffic_signal_condition.hpp>
+#include <scenario_runner/syntax/parameter_condition.hpp>
 
 #include <utility>
 
@@ -48,18 +49,31 @@ struct ByValueCondition
   : Element(
       choice(
         node,
-        std::make_pair("ParameterCondition", UNSUPPORTED()),
+
+        std::make_pair("ParameterCondition", [&](auto && node)
+        {
+          return make<ParameterCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
+
         std::make_pair("TimeOfDayCondition", UNSUPPORTED()),
-        std::make_pair("SimulationTimeCondition", [&](auto && node) {
+
+        std::make_pair("SimulationTimeCondition", [&](auto && node)
+        {
           return make<SimulationTimeCondition>(node, std::forward<decltype(xs)>(xs)...);
         }),
-        std::make_pair("StoryboardElementStateCondition", [&](auto && node) {
+
+        std::make_pair("StoryboardElementStateCondition", [&](auto && node)
+        {
           return make<StoryboardElementStateCondition>(node, std::forward<decltype(xs)>(xs)...);
         }),
+
         std::make_pair("UserDefinedValueCondition", UNSUPPORTED()),
-        std::make_pair("TrafficSignalCondition", [&](auto && node) {
+
+        std::make_pair("TrafficSignalCondition", [&](auto && node)
+        {
           return make<TrafficSignalCondition>(node, std::forward<decltype(xs)>(xs)...);
         }),
+
         std::make_pair("TrafficSignalControllerCondition", UNSUPPORTED())))
   {}
 };

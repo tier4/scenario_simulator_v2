@@ -29,8 +29,7 @@ struct Integer
 {
   using value_type = decltype(std_msgs::msg::Int32::data);
 
-  template<typename T>
-  explicit constexpr Integer(T && value)
+  explicit Integer(value_type value = {})
   {
     data = value;
   }
@@ -48,12 +47,34 @@ struct Integer
   {
     return data;
   }
+
+  auto & operator+=(const double & rhs)
+  {
+    data += rhs;
+    return *this;
+  }
+
+  auto & operator*=(const double & rhs)
+  {
+    data *= rhs;
+    return *this;
+  }
 };
 
-template<typename ... Ts>
-decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const Integer & rhs)
+std::ostream & operator<<(std::ostream & os, const Integer & rhs)
 {
   return os << rhs.data;
+}
+
+std::istream & operator>>(std::istream & is, Integer & rhs)
+{
+  std::string token {};
+
+  is >> token;
+
+  rhs.data = boost::lexical_cast<Integer::value_type>(token);
+
+  return is;
 }
 }
 }  // namespace scenario_runner
