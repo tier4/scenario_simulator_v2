@@ -29,7 +29,8 @@ def generate_launch_description():
                 'stdout': 'log',
                 'stderr': 'screen',
         },
-        on_exit=launch.actions.Shutdown()
+        on_exit=launch.actions.Shutdown(),
+        arguments=["--workflow", "workflow_example.yaml"]
     )
     open_scenario_interpreter = LifecycleNode(
         node_name='open_scenario_interpreter_node',
@@ -38,4 +39,8 @@ def generate_launch_description():
         output='screen'
     )
     return LaunchDescription(
-        [scenario_test_runner, open_scenario_interpreter])
+        [scenario_test_runner, open_scenario_interpreter],
+        launch_arguments = {
+            'workflow' : "workflow_example.yaml"
+            }.items()
+        )

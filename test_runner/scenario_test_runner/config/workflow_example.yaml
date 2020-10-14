@@ -1,3 +1,4 @@
+AbortWhenFail: true
 Log: "log/log1/"
 Scenario:
   - {path : test/scenario/yaml/failure.yaml, expect: failure}
