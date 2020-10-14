@@ -18,6 +18,7 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <junit_exporter/junit_exporter.hpp>
 #include <scenario_runner/syntax/open_scenario.hpp>
 
 #include <memory>
@@ -74,12 +75,18 @@ class ScenarioRunner
   int port;
 
   std::string scenario;
+  
+  std::string expect;
+
+  std::string log_path;
 
   std::string address {"127.0.0.1"};
 
   Element evaluate;
 
   std::shared_ptr<rclcpp::TimerBase> timer;
+
+  junit_exporter::JunitExporter exporter;
 
 public:
   SCENARIO_RUNNER_PUBLIC
