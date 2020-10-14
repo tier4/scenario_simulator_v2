@@ -62,7 +62,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
     [&]()
     {
       try {
-        if (!evaluate.as<OpenScenario>().complete()) {
+        if (evaluate && !evaluate.as<OpenScenario>().complete()) {
           const auto result {evaluate.as<OpenScenario>()()};
 
           RCLCPP_INFO(
@@ -78,7 +78,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             open_scenario_interpreter::running_state.use_count() - 1,
             open_scenario_interpreter::stop_transition.use_count() - 1,
             open_scenario_interpreter::complete_state.use_count() - 1);
-        } else {
+        } else if (evaluate) {
           if (expect == "success") {
             std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
             exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
@@ -91,6 +91,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             "testcase : " + testcase + " should end with " + expect);
             exporter.write(log_path);
           }
+          evaluate.reset();
           deactivate();
         }
       } catch (const int command) {
@@ -109,6 +110,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
               exporter.write(log_path);
             }
             RCLCPP_INFO(get_logger(), "\x1b[1;32mSimulation succeeded.\x1b[0m");
+            evaluate.reset();
             deactivate();
             break;
 
@@ -125,6 +127,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
               exporter.write(log_path);
             }
             RCLCPP_INFO(get_logger(), "\x1b[1;31mSimulation failed.\x1b[0m");
+            evaluate.reset();
             deactivate();
 
           default:
@@ -142,6 +145,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
           exporter.write(log_path);
         }
         RCLCPP_ERROR(get_logger(), "%s.", error.what());
+        evaluate.reset();
         deactivate();
       } catch (const std::exception & error) {
         std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
@@ -155,6 +159,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
           exporter.write(log_path);
         }
         RCLCPP_ERROR(get_logger(), "%s.", error.what());
+        evaluate.reset();
         deactivate();
       }
     });
@@ -170,7 +175,6 @@ ScenarioRunner::Result ScenarioRunner::on_deactivate(const rclcpp_lifecycle::Sta
 
 ScenarioRunner::Result ScenarioRunner::on_cleanup(const rclcpp_lifecycle::State &)
 {
-  evaluate = unspecified;
   return ScenarioRunner::Result::SUCCESS;
 }
 
