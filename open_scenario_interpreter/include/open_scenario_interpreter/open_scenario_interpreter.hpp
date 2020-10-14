@@ -15,10 +15,11 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__OPEN_SCENARIO_INTERPRETER_HPP_
 #define OPEN_SCENARIO_INTERPRETER__OPEN_SCENARIO_INTERPRETER_HPP_
 
+#include <junit_exporter/junit_exporter.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
+#include <open_scenario_interpreter/syntax/open_scenario.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <open_scenario_interpreter/syntax/open_scenario.hpp>
 
 #include <memory>
 #include <string>
@@ -75,11 +76,17 @@ class ScenarioRunner
 
   std::string scenario;
 
+  std::string expect;
+
+  std::string log_path;
+
   std::string address {"127.0.0.1"};
 
   Element evaluate;
 
   std::shared_ptr<rclcpp::TimerBase> timer;
+
+  junit_exporter::JunitExporter exporter;
 
 public:
   OPEN_SCENARIO_INTERPRETER_PUBLIC

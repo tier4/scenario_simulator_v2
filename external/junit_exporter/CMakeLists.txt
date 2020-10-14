@@ -23,7 +23,7 @@ include_directories(
   include
 )
 
-add_library(junit_exporter
+add_library(junit_exporter SHARED
   src/junit_exporter.cpp
   src/test_suites.cpp
 )
@@ -57,4 +57,5 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+ament_export_include_directories(include)
 ament_package()

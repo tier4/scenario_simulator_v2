@@ -89,7 +89,7 @@ class Launcher:
         for index, scenario in enumerate(self.xosc_scenarios):
             Logger.print_separator(
                 "Test case " + str(index+1) + " of " + str(len(self.xosc_scenarios)))
-            self.lifecycle_controller.configure_node(scenario, self.xosc_expects[index])
+            self.lifecycle_controller.configure_node(scenario, self.xosc_expects[index], self.log_path)
             if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
                 Logger.print_warning(
                     "Skip this scenario because of activation failure")

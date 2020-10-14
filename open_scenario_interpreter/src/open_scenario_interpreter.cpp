@@ -28,6 +28,8 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
   }
 {
   declare_parameter<decltype(scenario)>("scenario", scenario);
+  declare_parameter<decltype(expect)>("expect", expect);
+  declare_parameter<decltype(log_path)>("log_path", log_path);
 }
 
 ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
@@ -35,6 +37,9 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
   using open_scenario_interpreter::ScenarioRunner;
 
   get_parameter("scenario", scenario);
+  get_parameter("expect", expect);
+  get_parameter("log_path", log_path);
+  log_path = log_path + "/result.junit.xml";
 
   try {
     RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
@@ -74,16 +79,51 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             open_scenario_interpreter::stop_transition.use_count() - 1,
             open_scenario_interpreter::complete_state.use_count() - 1);
         } else {
+          if (expect == "success") {
+            std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+            exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+            exporter.write(log_path);
+          } else {
+            RCLCPP_ERROR(get_logger(), "\x1b[1;32mFailure.\x1b[0m");
+            std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+            exporter.addTestCase(testcase, testcase, 0,
+            junit_exporter::TestResult::FAILURE, "unexpected result",
+            "testcase : " + testcase + " should end with " + expect);
+            exporter.write(log_path);
+          }
           deactivate();
         }
       } catch (const int command) {
         switch (command) {
           case EXIT_SUCCESS:
+            if (expect == "success") {
+              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              exporter.addTestCase(testcase, testcase, 0,
+              junit_exporter::TestResult::SUCCESS);
+              exporter.write(log_path);
+            } else {
+              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              exporter.addTestCase(testcase, testcase, 0,
+              junit_exporter::TestResult::FAILURE, "unexpected result",
+              "testcase : " + testcase + " should end with " + expect);
+              exporter.write(log_path);
+            }
             RCLCPP_INFO(get_logger(), "\x1b[1;32mSimulation succeeded.\x1b[0m");
             deactivate();
             break;
 
           case EXIT_FAILURE:
+            if (expect == "failure") {
+              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+              exporter.write(log_path);
+            } else {
+              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              exporter.addTestCase(testcase, testcase, 0,
+              junit_exporter::TestResult::FAILURE, "unexpected result",
+              "testcase : " + testcase + " should end with " + expect);
+              exporter.write(log_path);
+            }
             RCLCPP_INFO(get_logger(), "\x1b[1;31mSimulation failed.\x1b[0m");
             deactivate();
 
@@ -91,9 +131,29 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             break;
         }
       } catch (const open_scenario_interpreter::ImplementationFault & error) {
+        std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+        if (expect == "error") {
+          exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+          exporter.write(log_path);
+        } else {
+          std::string type = "scenario_runner::ImplementationFault";
+          exporter.addTestCase(
+            testcase, testcase, 0, junit_exporter::TestResult::ERROR, type, error.what());
+          exporter.write(log_path);
+        }
         RCLCPP_ERROR(get_logger(), "%s.", error.what());
         deactivate();
       } catch (const std::exception & error) {
+        std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+        if (expect == "error") {
+          exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+          exporter.write(log_path);
+        } else {
+          std::string type = "std::exception";
+          exporter.addTestCase(testcase, testcase, 0,
+          junit_exporter::TestResult::ERROR, type, error.what());
+          exporter.write(log_path);
+        }
         RCLCPP_ERROR(get_logger(), "%s.", error.what());
         deactivate();
       }
