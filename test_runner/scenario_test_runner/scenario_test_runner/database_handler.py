@@ -40,22 +40,17 @@ class DatabaseHandler():
         Logger.print_info("package path: " + str(launcher_package_path))
         database = Manager.read_data(database_path)
         log_path = str(launcher_package_path / database["Log"])
-        scenario_path = []
+        scenarios = []
         for scenario in database["Scenario"]:
-            scenario = str(launcher_package_path / scenario)
-            Manager.check_existence(scenario)
-            scenario_path.append(scenario)
-        map_path = dict()
-        map_database = database["Map"][0]
-        for key, map in map_database.items():
-            map = str(launcher_package_path / map)
-            Manager.check_existence(map)
-            map_path[key] = map
-        return launcher_package_path, log_path, scenario_path, map_path
+            scenario_path = str(launcher_package_path / scenario["path"])
+            Manager.check_existence(scenario_path)
+            scenario["path"] = scenario_path
+            scenarios.append(scenario)
+        return launcher_package_path, log_path, scenarios
 
 
 def main():
-    log_path, scenario_path, map_path = DatabaseHandler.read_database()
+    log_path, scenarios = DatabaseHandler.read_database()
 
 
 if __name__ == "__main__":

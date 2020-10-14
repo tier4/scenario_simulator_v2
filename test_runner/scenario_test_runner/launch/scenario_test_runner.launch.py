@@ -18,6 +18,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch_ros.actions import LifecycleNode
+import launch
 
 
 def generate_launch_description():
@@ -27,7 +28,8 @@ def generate_launch_description():
         output={
                 'stdout': 'log',
                 'stderr': 'screen',
-        }
+        },
+        on_exit=launch.actions.Shutdown()
     )
     scenario_runner = LifecycleNode(
         node_name='scenario_runner_node',
@@ -35,4 +37,5 @@ def generate_launch_description():
         node_executable='scenario_runner_node',
         output='screen'
     )
-    return LaunchDescription([scenario_test_runner, scenario_runner])
+    return LaunchDescription(
+        [scenario_test_runner, scenario_runner])

@@ -1,6 +1,3 @@
 Log: "log/log1/"
-Map:
-  - kashiwanoha: "map/kashiwanoha/kashiwanoha.osm"
-  - map2: "map/somewhere/somewhere.osm"
 Scenario:
-  - test/scenario/yaml/success.yaml
+  - {path : test/scenario/yaml/success.yaml, expect: success}
