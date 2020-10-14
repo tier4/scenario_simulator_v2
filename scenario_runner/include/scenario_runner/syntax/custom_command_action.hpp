@@ -49,21 +49,40 @@ struct CustomCommandAction
 
   const String content;
 
-  const std::unordered_map<std::string, std::function<int(void)>> builtins
+  const std::unordered_map<
+    std::string,
+    std::function<int(void)>
+  >
+  builtins
   {
-    std::make_pair(
-      "exitSuccess",
-      []() -> int
+    {
+      "error", []() -> int
+      {
+        struct UnexpectedException {} it;
+        throw it;
+      }
+    },
+
+    {
+      "sigsegv", []()
+      {
+        return *reinterpret_cast<std::add_pointer<int>::type>(0);
+      }
+    },
+
+    {
+      "exitSuccess", []() -> int
       {
         throw EXIT_SUCCESS;
-      }),
+      }
+    },
 
-    std::make_pair(
-      "exitFailure",
-      []() -> int
+    {
+      "exitFailure", []() -> int
       {
         throw EXIT_FAILURE;
-      }),
+      }
+    },
   };
 
   static auto split(const std::string & target)
