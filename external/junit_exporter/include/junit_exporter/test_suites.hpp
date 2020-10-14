@@ -78,7 +78,7 @@ public:
     const std::string & name,
     const std::string & test_suite
   );
-  
+
 private:
   std::vector<TestCase> test_cases_;
 };

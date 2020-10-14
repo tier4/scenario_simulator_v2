@@ -15,10 +15,10 @@
 #include <junit_exporter/junit_exporter.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <string>
-
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+
+#include <string>
 
 namespace junit_exporter
 {
@@ -34,13 +34,12 @@ void JunitExporter::write(const std::string & path)
   const fs::path junit_path(path);
   boost::system::error_code error;
   const bool result = fs::exists(junit_path, error);
-  if (result)
-  {
+  if (result) {
     fs::remove(junit_path);
   }
   pugi::xml_document doc;
   pugi::xml_node node = doc.append_child("testsuites");
-  
+
   node.append_attribute("timestamp") = timestamp_.c_str();
   doc.child("testsuites").append_attribute("time") = test_suites_.getTime();
   doc.child("testsuites").append_attribute("tests") = test_suites_.getTestSuites().size();
@@ -86,8 +85,7 @@ void JunitExporter::addTestCase(
   const double & time,
   const TestResult & result)
 {
-  if(test_suites_.testCaseExists(name, test_suite))
-  {
+  if (test_suites_.testCaseExists(name, test_suite)) {
     return;
   }
   auto test_case = TestCase(name, test_suite, test_suite, time, result);
@@ -102,8 +100,7 @@ void JunitExporter::addTestCase(
   const std::string & type,
   const std::string & description)
 {
-  if(test_suites_.testCaseExists(name, test_suite))
-  {
+  if (test_suites_.testCaseExists(name, test_suite)) {
     return;
   }
   auto test_case = TestCase(name, test_suite, test_suite, time, result, type, description);
