@@ -1,3 +1,4 @@
 Log: "log/log1/"
 Scenario:
+  - {path : test/scenario/yaml/failure.yaml, expect: success}
   - {path : test/scenario/yaml/success.yaml, expect: success}
