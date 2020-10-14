@@ -17,7 +17,7 @@
 
 #include <boost/filesystem.hpp>
 #include <open_scenario_interpreter/syntax/entity_ref.hpp>
-// #include <simulation_api/api/api.hpp>
+#include <simulation_api/api/api.hpp>
 
 #include <unordered_map>
 #include <vector>

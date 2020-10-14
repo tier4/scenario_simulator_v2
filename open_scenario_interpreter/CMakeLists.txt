@@ -23,15 +23,26 @@ execute_process(
   COMMAND tr -d "\n"
   OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
 
-find_package(ament_index_cpp   REQUIRED)
-find_package(Boost             REQUIRED COMPONENTS filesystem)
-find_package(geometry_msgs     REQUIRED)
-find_package(junit_exporter    REQUIRED)
-find_package(lifecycle_msgs    REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(rclcpp_lifecycle  REQUIRED)
-find_package(rclcpp            REQUIRED)
-find_package(std_msgs          REQUIRED)
+find_package(ament_index_cpp      REQUIRED)
+find_package(autoware_auto_msgs   REQUIRED)
+find_package(behaviortree_cpp_v3  REQUIRED)
+find_package(Boost                REQUIRED COMPONENTS filesystem)
+find_package(Eigen3               REQUIRED)
+find_package(geometry_msgs        REQUIRED)
+find_package(junit_exporter       REQUIRED)
+find_package(lanelet2_core        REQUIRED)
+find_package(lanelet2_extension   REQUIRED)
+find_package(lanelet2_io          REQUIRED)
+find_package(lanelet2_projection  REQUIRED)
+find_package(lanelet2_routing     REQUIRED)
+find_package(lifecycle_msgs       REQUIRED)
+find_package(quaternion_operation REQUIRED)
+find_package(rclcpp_components    REQUIRED)
+find_package(rclcpp_lifecycle     REQUIRED)
+find_package(rclcpp               REQUIRED)
+find_package(simulation_api       REQUIRED)
+find_package(std_msgs             REQUIRED)
+find_package(xmlrpcpp             REQUIRED)
 
 # ------------------------------------------------------------------------------
 #  libopen_scenario_interpreter
@@ -49,7 +60,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
 
-target_link_libraries(${PROJECT_NAME} pugixml Boost::filesystem)
+target_link_libraries(${PROJECT_NAME}
+  Boost::filesystem
+  Eigen3::Eigen
+  pugixml)
 
 # ------------------------------------------------------------------------------
 #  open_scenario_interpreter_node
