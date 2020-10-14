@@ -42,7 +42,7 @@ public:
     const std::string & description);
 
 private:
-  pugi::xml_document doc_;
+  std::string timestamp_;
   TestSuites test_suites_;
 };
 }  // namespace junit_exporter
