@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(scenario_runner)
+project(open_scenario_interpreter)
 
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -34,14 +34,14 @@ find_package(rclcpp            REQUIRED)
 find_package(std_msgs          REQUIRED)
 
 # ------------------------------------------------------------------------------
-#  libscenario_runner
+#  libopen_scenario_interpreter
 # ------------------------------------------------------------------------------
 
 add_library(${PROJECT_NAME} SHARED
   src/object.cpp
-  src/scenario_runner.cpp)
+  src/open_scenario_interpreter.cpp)
 
-rclcpp_components_register_nodes(${PROJECT_NAME} "scenario_runner::ScenarioRunner")
+rclcpp_components_register_nodes(${PROJECT_NAME} "open_scenario_interpreter::ScenarioRunner")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -52,7 +52,7 @@ ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
 target_link_libraries(${PROJECT_NAME} pugixml Boost::filesystem)
 
 # ------------------------------------------------------------------------------
-#  scenario_runner_node
+#  open_scenario_interpreter_node
 # ------------------------------------------------------------------------------
 
 add_executable(${PROJECT_NAME}_node

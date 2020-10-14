@@ -38,7 +38,7 @@ Visualization Manager:
   Displays:
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /scenario_runner_node/marker
+      Marker Topic: /open_scenario_interpreter_node/marker
       Name: Entity
       Namespaces:
         ego: true

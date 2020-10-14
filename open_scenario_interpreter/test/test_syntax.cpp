@@ -14,8 +14,8 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <gtest/gtest.h>
+#include <open_scenario_interpreter/syntax/open_scenario.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <scenario_runner/syntax/open_scenario.hpp>
 
 #include <chrono>
 #include <cstdlib>
@@ -23,8 +23,10 @@
 
 TEST(Syntax, LexicalScope)
 {
-  scenario_runner::OpenScenario interperter {
-    ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/lexical-scope.xosc",
+  using ament_index_cpp::get_package_share_directory;
+
+  open_scenario_interpreter::OpenScenario interperter {
+    get_package_share_directory("open_scenario_interpreter") + "/test/lexical-scope.xosc",
     "127.0.0.1",
     8080
   };
@@ -32,8 +34,10 @@ TEST(Syntax, LexicalScope)
 
 TEST(Error, Success)
 {
-  scenario_runner::OpenScenario evaluate {
-    ament_index_cpp::get_package_share_directory("scenario_runner") + "/test/success.xosc",
+  using ament_index_cpp::get_package_share_directory;
+
+  open_scenario_interpreter::OpenScenario evaluate {
+    get_package_share_directory("open_scenario_interpreter") + "/test/success.xosc",
     "127.0.0.1",
     8080
   };
@@ -46,7 +50,7 @@ TEST(Error, Success)
 
   rclcpp::WallRate rate {50ms};
 
-  using scenario_runner::complete_state;
+  using open_scenario_interpreter::complete_state;
 
   for (evaluate.init(); evaluate() != complete_state; rate.sleep()) {
     ASSERT_LT(
@@ -60,15 +64,15 @@ TEST(Error, Success)
 // {
 //   auto f = []()
 //   {
-//     scenario_runner::OpenSCENARIO osc { XOSC("invalid-1.xosc") };
+//     open_scenario_interpreter::OpenSCENARIO osc { XOSC("invalid-1.xosc") };
 //   };
 //
-//   EXPECT_THROW({ f(); }, scenario_runner::SyntaxError);
+//   EXPECT_THROW({ f(); }, open_scenario_interpreter::SyntaxError);
 // }
 
 // TEST(Syntax, scenarioDefinition)
 // {
-//   using namespace scenario_runner;
+//   using namespace open_scenario_interpreter;
 //
 //   OpenSCENARIO osc { XOSC("example.xosc"), "127.0.0.1", 8080 };
 //
@@ -87,7 +91,7 @@ TEST(Error, Success)
 
 // TEST(Core, objectBinder)
 // {
-//   using scenario_runner::make;
+//   using open_scenario_interpreter::make;
 //
 //   const auto hoge {make<Double>(3.14)};
 //
@@ -99,7 +103,7 @@ TEST(Error, Success)
 
 // TEST(Scenario, LaneChange)
 // {
-//   using namespace scenario_runner;
+//   using namespace open_scenario_interpreter;
 //
 //   OpenSCENARIO osc { XOSC("lane_change.xosc"), "127.0.0.1", 8080 };
 // }

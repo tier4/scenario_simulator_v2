@@ -17,7 +17,7 @@ Place this repository in the ROS workspace with Autoware and build it in [the wa
 The following commands can be used to start all the ROS nodes needed to run the scenario.
 
 ```
-$ roslaunch scenario_runner scenario_runner.launch
+$ roslaunch open_scenario_interpreter open_scenario_interpreter.launch
 ```
 
 You need to pass the following arguments to the above commands, depending on the scenario you want to run.
@@ -33,7 +33,7 @@ Specify the path to the OpenSCENARIO file (.xosc) you want to run.
 
 example:
 ``` bash
-$ roslaunch scenario_runner scenario_runner.launch map_path:=/path/to/map/directory scenario:=/path/to/scenario.xosc
+$ roslaunch open_scenario_interpreter open_scenario_interpreter.launch map_path:=/path/to/map/directory scenario:=/path/to/scenario.xosc
 ```
 
 ## Errors

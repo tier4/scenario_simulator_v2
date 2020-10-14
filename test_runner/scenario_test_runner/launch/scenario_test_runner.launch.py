@@ -31,11 +31,11 @@ def generate_launch_description():
         },
         on_exit=launch.actions.Shutdown()
     )
-    scenario_runner = LifecycleNode(
-        node_name='scenario_runner_node',
-        package='scenario_runner',
-        node_executable='scenario_runner_node',
+    open_scenario_interpreter = LifecycleNode(
+        node_name='open_scenario_interpreter_node',
+        package='open_scenario_interpreter',
+        node_executable='open_scenario_interpreter_node',
         output='screen'
     )
     return LaunchDescription(
-        [scenario_test_runner, scenario_runner])
+        [scenario_test_runner, open_scenario_interpreter])

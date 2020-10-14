@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <scenario_runner/object.hpp>
+#include <open_scenario_interpreter/object.hpp>
 
-namespace scenario_runner
+namespace open_scenario_interpreter
 {
 const Element unspecified {
   make<Unspecified>()
@@ -24,4 +24,4 @@ std::ostream & operator<<(std::ostream & os, const Unspecified &)
 {
   return os << "<!-- Unspecified -->";
 }
-}  // namespace scenario_runner
+}  // namespace open_scenario_interpreter
