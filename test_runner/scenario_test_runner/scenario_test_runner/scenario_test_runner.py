@@ -38,15 +38,19 @@ class Launcher:
         self.lifecycle_controller = None
         self.launcher_path = ""
         self.log_path = ""
-        self.yaml_scenarios = []
+        self.scenarios = []
         self.xosc_scenarios = []
-        self.map_dict = dict()
 
     def main(self):
-        self.launcher_path, self.log_path, self.yaml_scenarios, self.map_dict \
+        self.launcher_path, self.log_path, self.scenarios \
             = DatabaseHandler.read_database()
-        self.xosc_scenarios = ConverterHandler.convert_all_scenarios(
-            self.yaml_scenarios, self.launcher_path)
+        self.yaml_scenarios = []
+        expects = []
+        for scenario in self.scenarios:
+            self.yaml_scenarios.append(scenario["path"])
+            expects.append(scenario["expect"])
+        self.xosc_scenarios, self.xosc_expects = ConverterHandler.convert_all_scenarios(
+            self.yaml_scenarios, expects, self.launcher_path)
         self.validate_all_scenarios()
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
@@ -85,7 +89,7 @@ class Launcher:
         for index, scenario in enumerate(self.xosc_scenarios):
             Logger.print_separator(
                 "Test case " + str(index+1) + " of " + str(len(self.xosc_scenarios)))
-            self.lifecycle_controller.configure_node(scenario)
+            self.lifecycle_controller.configure_node(scenario, self.xosc_expects[index])
             if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
                 Logger.print_warning(
                     "Skip this scenario because of activation failure")

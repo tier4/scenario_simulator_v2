@@ -26,6 +26,7 @@ execute_process(
 find_package(ament_index_cpp   REQUIRED)
 find_package(Boost             REQUIRED COMPONENTS filesystem)
 find_package(geometry_msgs     REQUIRED)
+find_package(junit_exporter    REQUIRED)
 find_package(lifecycle_msgs    REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_lifecycle  REQUIRED)

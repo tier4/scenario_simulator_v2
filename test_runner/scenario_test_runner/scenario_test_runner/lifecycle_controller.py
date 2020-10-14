@@ -28,7 +28,8 @@ from scenario_test_utility.logger import Logger
 class LifecycleController(Node):
 
     NODE_NAME = "scenario_runner_node"
-    PARAMETER_NAME = "scenario"
+    PARAMETER_XOSC_PATH = "scenario"
+    PARAMETER_EXPECT = "expect"
     STATES = {}
 
     def __init__(self):
@@ -57,14 +58,21 @@ class LifecycleController(Node):
             rcl_interfaces.srv.SetParameters,
             LifecycleController.NODE_NAME + '/set_parameters')
 
-    def send_request_to_change_parameters(self, scenario):
+    def send_request_to_change_parameters(self, scenario, expect):
         request = rcl_interfaces.srv.SetParameters.Request()
         request.parameters = [
             rcl_interfaces.msg.Parameter(
-                name=LifecycleController.PARAMETER_NAME,
+                name=LifecycleController.PARAMETER_XOSC_PATH,
                 value=rcl_interfaces.msg.ParameterValue(
                     type=rcl_interfaces.msg.ParameterType.PARAMETER_STRING,
                     string_value=scenario
+                )
+            ),
+            rcl_interfaces.msg.Parameter(
+                name=LifecycleController.PARAMETER_EXPECT,
+                value=rcl_interfaces.msg.ParameterValue(
+                    type=rcl_interfaces.msg.ParameterType.PARAMETER_STRING,
+                    string_value=expect
                 )
             )
         ]
@@ -75,7 +83,7 @@ class LifecycleController(Node):
             except Exception as e:
                 self.get_logger().info('Service call failed %r' % (e,))
 
-    def configure_node(self, scenario):
+    def configure_node(self, scenario, expect):
         self.node_logger.info(self.get_lifecycle_state())
 
         self.current_scenario = scenario
@@ -86,7 +94,7 @@ class LifecycleController(Node):
             LifecycleController.NODE_NAME +
             "'s parameter 'scenario'")
 
-        self.send_request_to_change_parameters(self.current_scenario)
+        self.send_request_to_change_parameters(self.current_scenario, expect)
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         Logger.print_info("Configure -> scenario runner state is " +
