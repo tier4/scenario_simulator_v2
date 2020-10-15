@@ -26,11 +26,9 @@ from scenario_test_runner.lifecycle_controller import LifecycleController
 from scenario_test_utility.xosc_validator import XoscValidator
 
 
-class Launcher:
+class ScenarioTestRunner:
 
-    SERVER_URI = 'http://0.0.0.0:10000'
     SLEEP_RATE = 1
-    PKILLER = "kill -9 `lsof -w -n -i tcp:10000| awk '{print $2}'|awk 'END{print}'`;"
 
     def __init__(self, timeout):
         self.timeout = timeout
@@ -41,9 +39,9 @@ class Launcher:
         self.scenarios = []
         self.xosc_scenarios = []
 
-    def main(self):
+    def run_workflow(self, workflow):
         self.launcher_path, self.log_path, self.scenarios \
-            = DatabaseHandler.read_database()
+            = DatabaseHandler.read_database(workflow)
         self.yaml_scenarios = []
         expects = []
         for scenario in self.scenarios:
@@ -119,9 +117,12 @@ def main():
     parser.add_argument('--scenario',
                         help='Specify the scenario you want to execute.')
 
+    parser.add_argument('--workflow',
+                        help='Specify workflow you want to execute')
+
     args = parser.parse_args()
-    launcher = Launcher(args.timeout)
-    launcher.main()
+    runner = ScenarioTestRunner(args.timeout)
+    runner.run_workflow(args.workflow)
 
 
 if __name__ == '__main__':
