@@ -16,7 +16,9 @@
 # limitations under the License.
 
 import pathlib
+import re
 
+from ament_index_python.packages import get_package_share_directory
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 
@@ -27,16 +29,18 @@ class DatabaseHandler():
     def read_database(workflow_file):
         Logger.print_separator("Reading workflow")
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
-        Logger.print_info("package path: " + str(launcher_package_path))
-        database_path = launcher_package_path / "config" / workflow_file
-        if (not Manager.check_existence(database_path)):
-            launcher_package_path = pathlib.Path(
-                Manager.get_file_dir(
-                    __file__, workflow_file)).parent
-            Manager.check_existence(database_path)
-            database_path = launcher_package_path / "config" / workflow_file
-        Logger.print_info("package path: " + str(launcher_package_path))
-        database = Manager.read_data(database_path)
+        workflow_path = ""
+        Logger.print_separator(workflow_file)
+        if pathlib.Path(workflow_file).is_absolute():
+            workflow_path = workflow_file
+        else:
+            match_find_pkg_share = re.match('\$\(find-pkg-share\s+([^\)]+)\).*', workflow_file)
+            if match_find_pkg_share != None:
+                workflow_path = re.sub('\$\(find-pkg-share\s+([^\)]+)\)',
+                get_package_share_directory(match_find_pkg_share.group(1)),
+                workflow_file)
+                Logger.print_separator(workflow_path)#workflow_path)
+        database = Manager.read_data(workflow_path)
         log_path = str(launcher_package_path / database["Log"])
         scenarios = []
         for scenario in database["Scenario"]:
