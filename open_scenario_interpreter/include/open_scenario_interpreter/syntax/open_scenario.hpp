@@ -105,15 +105,6 @@ struct ScenarioDefinition
   template<typename ... Ts>
   auto init(Ts && ... xs)  // RENAME TO 'start'
   {
-    // if (inner_scope.connection and inner_scope.connection->simulation)
-    // {
-    //   inner_scope.connection->simulation->initialize(1.0, 0.02);
-    // }
-    // else
-    // {
-    //   THROW(ConnectionError);
-    // }
-
     for (const auto & each : inner_scope.entities) {
       std::cout << std::get<1>(each).evaluate() << std::endl;
     }
@@ -170,33 +161,36 @@ struct OpenScenario
 {
   Element category;
 
-  Scope global;
+  Scope scope;
 
-  decltype(auto) load(const std::string & scenario)
+  const auto & load(const std::string & scenario)
   {
-    // std::cout << "\x1b[32mLoading scenario \x1b[36m\"" << scenario << "\"\x1b[32m => \x1b[0m";
-
-    const auto result {load_file(scenario.c_str())};
+    const auto result {
+      load_file(scenario.c_str())
+    };
 
     if (!result) {
       std::stringstream ss {};
       ss << "while loading scenario \"" << scenario << "\" => " << result.description();
-      throw SyntaxError {ss.str()};
+      throw SyntaxError(ss.str());
     } else {
       return *this;
     }
   }
 
-  template<typename ... Ts>
-  explicit OpenScenario(const std::string & scenario, Ts && ... xs)
-  : pugi::xml_document(), global{std::forward<decltype(xs)>(xs)...}
+  decltype(auto) load(const boost::filesystem::path & scenario)
   {
-    global.scenario = scenario;
+    return load(scenario.string());
+  }
 
-    if (load(scenario).child("OpenSCENARIO").child("Catalog")) {
+  template<typename ... Ts>
+  explicit OpenScenario(Ts && ... xs)
+  : scope(std::forward<decltype(xs)>(xs)...)
+  {
+    if (load(scope.scenario).child("OpenSCENARIO").child("Catalog")) {
       THROW_IMPLEMENTATION_FAULT();
     } else {
-      category = make<ScenarioDefinition>(child("OpenSCENARIO"), global);
+      category = make<ScenarioDefinition>(child("OpenSCENARIO"), scope);
     }
   }
 

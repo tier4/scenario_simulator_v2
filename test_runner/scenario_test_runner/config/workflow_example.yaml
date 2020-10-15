@@ -1,3 +1,4 @@
 Log: "log/log1/"
 Scenario:
-  - {path : test/scenario/yaml/success.yaml, expect: success}
+  # - {path : test/scenario/yaml/success.yaml, expect: success}
+  - {path: /home/yamasa/Documents/colcon_workspace/src/scenario_simulator.auto/open_scenario_interpreter/example/lane_change.xosc, expect: failure}

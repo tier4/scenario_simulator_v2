@@ -72,15 +72,11 @@ namespace open_scenario_interpreter
 class ScenarioRunner
   : public rclcpp_lifecycle::LifecycleNode
 {
-  int port;
-
   std::string scenario;
 
   std::string expect;
 
   std::string log_path;
-
-  std::string address {"127.0.0.1"};
 
   Element evaluate;
 

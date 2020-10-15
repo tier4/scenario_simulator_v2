@@ -19,7 +19,10 @@
 #include <open_scenario_interpreter/syntax/entity_ref.hpp>
 #include <simulation_api/api/api.hpp>
 
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace open_scenario_interpreter
@@ -30,9 +33,10 @@ struct Scope
 
   std::vector<EntityRef> actors;
 
-  boost::filesystem::path scenario;
+  // for substituation syntax '$(dirname)'
+  const boost::filesystem::path scenario;
 
-  // std::shared_ptr<scenario_simulator::API> connection;
+  const std::shared_ptr<scenario_simulator::API> connection;
 
   Scope() = delete;
 
@@ -40,13 +44,17 @@ struct Scope
   explicit Scope(const Scope &) = default;
 
   template<typename ... Ts>
-  explicit Scope(Ts && ...)
-  {}
-
-  // template <typename... Ts>
-  // explicit Scope(Ts&&... xs)
-  //   : connection { std::make_shared<scenario_simulator::API>(std::forward<decltype(xs)>(xs)...) }
-  // {}
+  explicit Scope(const std::string & scenario, Ts && ... xs)
+  : scenario(scenario),
+    connection(
+      std::make_shared<scenario_simulator::API>(std::forward<decltype(xs)>(xs)...))
+  {
+    if (connection && connection->simulation) {
+      connection->simulation->initialize(1.0, 0.02);
+    } else {
+      THROW(ConnectionError);
+    }
+  }
 
 public:
   // template <typename... Ts>
