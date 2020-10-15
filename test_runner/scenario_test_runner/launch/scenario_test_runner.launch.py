@@ -30,6 +30,11 @@ def generate_launch_description():
                 'workflow',
                 default_value=workflow,
                 description='workflow files for scenario testing')
+    log_directory = LaunchConfiguration('log_directory', default="/tmp")
+    declare_log_directory = DeclareLaunchArgument(
+                'log_directory',
+                default_value=log_directory,
+                description='log_directory files for scenario testing')
     scenario_test_runner = Node(
         package='scenario_test_runner',
         node_executable='scenario_test_runner',
@@ -38,7 +43,7 @@ def generate_launch_description():
                 'stderr': 'screen',
         },
         on_exit=launch.actions.Shutdown(),
-        arguments=["--workflow", workflow]
+        arguments=["--workflow", workflow, "--log_directory", log_directory]
     )
     open_scenario_interpreter = LifecycleNode(
         node_name='open_scenario_interpreter_node',

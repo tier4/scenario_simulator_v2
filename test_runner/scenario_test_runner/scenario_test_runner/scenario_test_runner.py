@@ -39,9 +39,9 @@ class ScenarioTestRunner:
         self.scenarios = []
         self.xosc_scenarios = []
 
-    def run_workflow(self, workflow):
+    def run_workflow(self, workflow, log_directory):
         self.launcher_path, self.log_path, self.scenarios \
-            = DatabaseHandler.read_database(workflow)
+            = DatabaseHandler.read_database(workflow, log_directory)
         self.yaml_scenarios = []
         expects = []
         for scenario in self.scenarios:
@@ -120,9 +120,13 @@ def main():
     parser.add_argument('--workflow',
                         help='Specify workflow you want to execute')
 
+    parser.add_argument('--log_directory',
+                        help='Specify log_directory you want to execute',
+                        default='/tmp')
+
     args = parser.parse_args()
     runner = ScenarioTestRunner(args.timeout)
-    runner.run_workflow(args.workflow)
+    runner.run_workflow(args.workflow, args.log_directory)
 
 
 if __name__ == '__main__':

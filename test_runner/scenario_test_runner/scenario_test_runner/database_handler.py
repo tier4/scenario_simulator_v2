@@ -21,12 +21,13 @@ import re
 from ament_index_python.packages import get_package_share_directory
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
+from scenario_test_utility.regex import resolve_ros_package
 
 
 class DatabaseHandler():
 
     @staticmethod
-    def read_database(workflow_file):
+    def read_database(workflow_file, log_directory):
         Logger.print_separator('Reading workflow')
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         workflow_path = ''
@@ -34,13 +35,12 @@ class DatabaseHandler():
         if pathlib.Path(workflow_file).is_absolute():
             workflow_path = workflow_file
         else:
-            match_find_pkg_share = re.match('\$\(find-pkg-share\s+([^\)]+)\).*', workflow_file)
-            if match_find_pkg_share is not None:
-                workflow_path = re.sub('\$\(find-pkg-share\s+([^\)]+)\)',
-                                       get_package_share_directory(match_find_pkg_share.group(1)),
-                                       workflow_file)
+            workflow_path = resolve_ros_package(workflow_file)
         database = Manager.read_data(workflow_path)
-        log_path = str(launcher_package_path) + 'log/log1'
+        if pathlib.Path(log_directory).is_absolute():
+            log_path = log_directory
+        else:
+            log_path = resolve_ros_package(log_directory)
         scenarios = []
         for scenario in database["Scenario"]:
             scenario_path = str(launcher_package_path / scenario['path'])
@@ -50,9 +50,5 @@ class DatabaseHandler():
         return launcher_package_path, log_path, scenarios
 
 
-def main():
-    log_path, scenarios = DatabaseHandler.read_database()
-
-
 if __name__ == '__main__':
-    main()
+    pass
