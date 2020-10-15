@@ -17,7 +17,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-find_package(Boost COMPONENTS date_time)
+find_package(Boost COMPONENTS date_time filesystem)
 
 include_directories(
   include
@@ -30,6 +30,7 @@ add_library(junit_exporter SHARED
 target_link_libraries(junit_exporter
   pugixml
   Boost::date_time
+  Boost::filesystem
 )
 
 install(TARGETS junit_exporter

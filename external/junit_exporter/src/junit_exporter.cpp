@@ -14,23 +14,37 @@
 
 #include <junit_exporter/junit_exporter.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+
 #include <string>
 
 namespace junit_exporter
 {
 JunitExporter::JunitExporter()
 {
-  pugi::xml_node node = doc_.append_child("testsuites");
   boost::posix_time::ptime t = boost::posix_time::microsec_clock::universal_time();
-  node.append_attribute("timestamp") = boost::posix_time::to_iso_extended_string(t).c_str();
+  timestamp_ = boost::posix_time::to_iso_extended_string(t);
 }
 
 void JunitExporter::write(const std::string & path)
 {
-  doc_.child("testsuites").append_attribute("time") = test_suites_.getTime();
-  doc_.child("testsuites").append_attribute("tests") = test_suites_.getTestSuites().size();
+  namespace fs = boost::filesystem;
+  const fs::path junit_path(path);
+  boost::system::error_code error;
+  const bool result = fs::exists(junit_path, error);
+  if (result) {
+    fs::remove(junit_path);
+  }
+  pugi::xml_document doc;
+  pugi::xml_node node = doc.append_child("testsuites");
+
+  node.append_attribute("timestamp") = timestamp_.c_str();
+  doc.child("testsuites").append_attribute("time") = test_suites_.getTime();
+  doc.child("testsuites").append_attribute("tests") = test_suites_.getTestSuites().size();
   for (const auto & test_suite : test_suites_.getTestSuites()) {
-    pugi::xml_node testsuite_node = doc_.child("testsuites").append_child("testsuite");
+    pugi::xml_node testsuite_node = doc.child("testsuites").append_child("testsuite");
     testsuite_node.append_attribute("name") = test_suite.c_str();
     testsuite_node.append_attribute("tests") = test_suites_.getTestSuite(test_suite).size();
     for (const auto & test_case : test_suites_.getTestSuite(test_suite)) {
@@ -62,7 +76,7 @@ void JunitExporter::write(const std::string & path)
       }
     }
   }
-  doc_.save_file(path.c_str());
+  doc.save_file(path.c_str());
 }
 
 void JunitExporter::addTestCase(
@@ -71,6 +85,9 @@ void JunitExporter::addTestCase(
   const double & time,
   const TestResult & result)
 {
+  if (test_suites_.testCaseExists(name, test_suite)) {
+    return;
+  }
   auto test_case = TestCase(name, test_suite, test_suite, time, result);
   test_suites_.addTestCase(test_case);
 }
@@ -83,6 +100,9 @@ void JunitExporter::addTestCase(
   const std::string & type,
   const std::string & description)
 {
+  if (test_suites_.testCaseExists(name, test_suite)) {
+    return;
+  }
   auto test_case = TestCase(name, test_suite, test_suite, time, result, type, description);
   test_suites_.addTestCase(test_case);
 }

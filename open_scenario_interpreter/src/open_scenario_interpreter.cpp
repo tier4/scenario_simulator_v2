@@ -77,12 +77,13 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
         } else if (evaluate) {
           if (expect == "success") {
             std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
-            exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+            exporter.addTestCase(testcase, "scenario_testing", 0,
+            junit_exporter::TestResult::SUCCESS);
             exporter.write(log_path);
           } else {
             RCLCPP_ERROR(get_logger(), "\x1b[1;32mFailure.\x1b[0m");
             std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
-            exporter.addTestCase(testcase, testcase, 0,
+            exporter.addTestCase(testcase, "scenario_testing", 0,
             junit_exporter::TestResult::FAILURE, "unexpected result",
             "testcase : " + testcase + " should end with " + expect);
             exporter.write(log_path);
@@ -95,12 +96,12 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
           case EXIT_SUCCESS:
             if (expect == "success") {
               std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
-              exporter.addTestCase(testcase, testcase, 0,
+              exporter.addTestCase(testcase, "scenario_testing", 0,
               junit_exporter::TestResult::SUCCESS);
               exporter.write(log_path);
             } else {
               std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
-              exporter.addTestCase(testcase, testcase, 0,
+              exporter.addTestCase(testcase, "scenario_testing", 0,
               junit_exporter::TestResult::FAILURE, "unexpected result",
               "testcase : " + testcase + " should end with " + expect);
               exporter.write(log_path);
@@ -113,11 +114,12 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
           case EXIT_FAILURE:
             if (expect == "failure") {
               std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
-              exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+              exporter.addTestCase(testcase, "scenario_testing", 0,
+              junit_exporter::TestResult::SUCCESS);
               exporter.write(log_path);
             } else {
               std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
-              exporter.addTestCase(testcase, testcase, 0,
+              exporter.addTestCase(testcase, "scenario_testing", 0,
               junit_exporter::TestResult::FAILURE, "unexpected result",
               "testcase : " + testcase + " should end with " + expect);
               exporter.write(log_path);
@@ -132,12 +134,13 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
       } catch (const open_scenario_interpreter::ImplementationFault & error) {
         std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
         if (expect == "error") {
-          exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+          exporter.addTestCase(testcase, "scenario_testing", 0,
+          junit_exporter::TestResult::SUCCESS);
           exporter.write(log_path);
         } else {
           std::string type = "scenario_runner::ImplementationFault";
           exporter.addTestCase(
-            testcase, testcase, 0, junit_exporter::TestResult::ERROR, type, error.what());
+            testcase, "scenario_testing", 0, junit_exporter::TestResult::ERROR, type, error.what());
           exporter.write(log_path);
         }
         RCLCPP_ERROR(get_logger(), "%s.", error.what());
@@ -146,11 +149,12 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
       } catch (const std::exception & error) {
         std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
         if (expect == "error") {
-          exporter.addTestCase(testcase, testcase, 0, junit_exporter::TestResult::SUCCESS);
+          exporter.addTestCase(testcase, "scenario_testing", 0,
+          junit_exporter::TestResult::SUCCESS);
           exporter.write(log_path);
         } else {
           std::string type = "std::exception";
-          exporter.addTestCase(testcase, testcase, 0,
+          exporter.addTestCase(testcase, "scenario_testing", 0,
           junit_exporter::TestResult::ERROR, type, error.what());
           exporter.write(log_path);
         }
