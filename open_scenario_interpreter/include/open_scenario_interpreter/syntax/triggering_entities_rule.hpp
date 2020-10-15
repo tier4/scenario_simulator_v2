@@ -70,6 +70,9 @@ struct TriggeringEntitiesRule
 
       case none:
         return std::none_of(std::forward<decltype(xs)>(xs)...);
+
+      default:
+        return false;
     }
   }
 };
