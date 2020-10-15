@@ -20,8 +20,16 @@ from launch_ros.actions import Node
 from launch_ros.actions import LifecycleNode
 import launch
 
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+
 
 def generate_launch_description():
+    workflow = LaunchConfiguration('workflow')
+    declare_workflow = DeclareLaunchArgument(
+                'workflow',
+                default_value=workflow,
+                description='workflow files for scenario testing')
     scenario_test_runner = Node(
         package='scenario_test_runner',
         node_executable='scenario_test_runner',
@@ -29,7 +37,8 @@ def generate_launch_description():
                 'stdout': 'log',
                 'stderr': 'screen',
         },
-        on_exit=launch.actions.Shutdown()
+        on_exit=launch.actions.Shutdown(),
+        arguments=["--workflow", workflow]
     )
     open_scenario_interpreter = LifecycleNode(
         node_name='open_scenario_interpreter_node',
@@ -37,5 +46,8 @@ def generate_launch_description():
         node_executable='open_scenario_interpreter_node',
         output='screen'
     )
-    return LaunchDescription(
-        [scenario_test_runner, open_scenario_interpreter])
+    description = LaunchDescription()
+    description.add_action(declare_workflow)
+    description.add_action(scenario_test_runner)
+    description.add_action(open_scenario_interpreter)
+    return description
