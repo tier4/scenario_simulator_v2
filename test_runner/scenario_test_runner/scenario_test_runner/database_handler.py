@@ -27,26 +27,25 @@ class DatabaseHandler():
 
     @staticmethod
     def read_database(workflow_file):
-        Logger.print_separator("Reading workflow")
+        Logger.print_separator('Reading workflow')
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
-        workflow_path = ""
+        workflow_path = ''
         Logger.print_separator(workflow_file)
         if pathlib.Path(workflow_file).is_absolute():
             workflow_path = workflow_file
         else:
             match_find_pkg_share = re.match('\$\(find-pkg-share\s+([^\)]+)\).*', workflow_file)
-            if match_find_pkg_share != None:
+            if match_find_pkg_share is not None:
                 workflow_path = re.sub('\$\(find-pkg-share\s+([^\)]+)\)',
-                get_package_share_directory(match_find_pkg_share.group(1)),
-                workflow_file)
-                Logger.print_separator(workflow_path)#workflow_path)
+                                       get_package_share_directory(match_find_pkg_share.group(1)),
+                                       workflow_file)
         database = Manager.read_data(workflow_path)
-        log_path = str(launcher_package_path / database["Log"])
+        log_path = str(launcher_package_path) + 'log/log1'
         scenarios = []
         for scenario in database["Scenario"]:
-            scenario_path = str(launcher_package_path / scenario["path"])
+            scenario_path = str(launcher_package_path / scenario['path'])
             Manager.check_existence(scenario_path)
-            scenario["path"] = scenario_path
+            scenario['path'] = scenario_path
             scenarios.append(scenario)
         return launcher_package_path, log_path, scenarios
 
@@ -55,5 +54,5 @@ def main():
     log_path, scenarios = DatabaseHandler.read_database()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
