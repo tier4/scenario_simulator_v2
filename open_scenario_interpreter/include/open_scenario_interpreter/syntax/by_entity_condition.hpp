@@ -23,7 +23,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ByEntityCondition ====================================================
+/* ---- ByEntityCondition ------------------------------------------------------
  *
  * <xsd:complexType name="ByEntityCondition">
  *   <xsd:all>
@@ -32,7 +32,7 @@ inline namespace syntax
  *   </xsd:all>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ByEntityCondition
 {
   Scope inner_scope;
@@ -41,11 +41,11 @@ struct ByEntityCondition
 
   template<typename Node>
   explicit ByEntityCondition(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope},
-    entity_condition{
-      readElement<EntityCondition>("EntityCondition", node, inner_scope,
-        readElement<TriggeringEntities>("TriggeringEntities", node, inner_scope))
-    }
+  : inner_scope(outer_scope),
+    entity_condition(
+      readElement<EntityCondition>(
+        "EntityCondition", node, inner_scope,
+        readElement<TriggeringEntities>("TriggeringEntities", node, inner_scope)))
   {}
 
   template<typename ... Ts>

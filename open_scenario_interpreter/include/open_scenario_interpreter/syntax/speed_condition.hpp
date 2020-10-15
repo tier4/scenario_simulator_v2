@@ -22,14 +22,14 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== SpeedCondition =======================================================
+/* ---- SpeedCondition ---------------------------------------------------------
  *
  * <xsd:complexType name="SpeedCondition">
  *   <xsd:attribute name="value" type="Double" use="required"/>
  *   <xsd:attribute name="rule" type="Rule" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct SpeedCondition
 {
   const Double value;
@@ -42,24 +42,20 @@ struct SpeedCondition
 
   template<typename Node>
   explicit SpeedCondition(
-    const Node & node, Scope & outer_scope,
-    const TriggeringEntities & trigger)
-  : value{readAttribute<Double>("value", node, outer_scope)},
-    compare{readAttribute<Rule>("rule", node, outer_scope)},
-    inner_scope{outer_scope},
-    trigger{trigger}
+    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+  : value(readAttribute<Double>("value", node, outer_scope)),
+    compare(readAttribute<Rule>("rule", node, outer_scope)),
+    inner_scope(outer_scope),
+    trigger(trigger)
   {}
 
   auto evaluate()
   {
-    // return
-    //   asBoolean(
-    //     trigger([&](auto&& entity)
-    //     {
-    //       return compare(inner_scope.getEntityStatus(entity).twist.linear.x, value);
-    //     }));
-
-    return false_v;
+    return asBoolean(
+      trigger([&](auto && entity)
+      {
+        return compare(inner_scope.getEntityStatus(entity).twist.linear.x, value);
+      }));
   }
 };
 }

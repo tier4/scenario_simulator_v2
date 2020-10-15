@@ -22,7 +22,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== RelativeDistanceCondition ============================================
+/* ---- RelativeDistanceCondition ----------------------------------------------
  *
  * <xsd:complexType name="RelativeDistanceCondition">
  *   <xsd:attribute name="entityRef" type="String" use="required"/>
@@ -32,7 +32,7 @@ inline namespace syntax
  *   <xsd:attribute name="rule" type="Rule" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct RelativeDistanceCondition
 {
   const String entity_ref;
@@ -51,66 +51,63 @@ struct RelativeDistanceCondition
 
   template<typename Node, typename Scope>
   explicit RelativeDistanceCondition(
-    const Node & node, Scope & outer_scope,
-    const TriggeringEntities & triggering_entities)
-  : entity_ref{readAttribute<String>("entityRef", node, outer_scope)},
-    relative_distance_type{
-      readAttribute<RelativeDistanceType>("relativeDistanceType", node, outer_scope)},
-    value{readAttribute<Double>("value", node, outer_scope)},
-    freespace{readAttribute<Boolean>("freespace", node, outer_scope)},
-    compare{readAttribute<Rule>("rule", node, outer_scope)},
-    inner_scope{outer_scope},
-    verify{triggering_entities}
+    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
+  : entity_ref(readAttribute<String>("entityRef", node, outer_scope)),
+    relative_distance_type(
+      readAttribute<RelativeDistanceType>("relativeDistanceType", node, outer_scope)),
+    value(readAttribute<Double>("value", node, outer_scope)),
+    freespace(readAttribute<Boolean>("freespace", node, outer_scope)),
+    compare(readAttribute<Rule>("rule", node, outer_scope)),
+    inner_scope(outer_scope),
+    verify(triggering_entities)
   {}
 
   auto evaluate()
   {
-    // switch (relative_distance_type)
-    // {
-    // case RelativeDistanceType::longitudinal:
-    //
-    //   return
-    //     asBoolean(
-    //       verify([&](auto&& subject)
-    //       {
-    //         const auto distance { std::fabs(inner_scope.connection->entity->getRelativePose(
-    //         subject, entity_ref).position.x) };
-    //         std::cout << "DISTANCE: " << distance << std::endl;
-    //         return compare(distance, value);
-    //       }));
-    //
-    // case RelativeDistanceType::lateral:
-    //
-    //   return
-    //     asBoolean(
-    //       verify([&](auto&& subject)
-    //       {
-    //         const auto distance { std::fabs(inner_scope.connection->entity->getRelativePose(
-    //         subject, entity_ref).position.y) };
-    //         std::cout << "DISTANCE: " << distance << std::endl;
-    //         return compare(distance, value);
-    //       }));
-    //
-    // case RelativeDistanceType::cartesianDistance:
-    //
-    //   return
-    //     asBoolean(
-    //       verify([&](auto&& subject)
-    //       {
-    //         const auto distance {
-    //           std::hypot(
-    //             inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.x,
-    //             inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.y)
-    //         };
-    //         std::cout << "DISTANCE: " << distance << std::endl;
-    //         return compare(distance, value);
-    //       }));
-    //
-    // default:
-    //   THROW(ImplementationFault);
-    // }
+    switch (relative_distance_type) {
+      case RelativeDistanceType::longitudinal:
 
-    return false_v;
+        return asBoolean(
+          verify([&](auto && subject)
+          {
+            const auto distance {
+              std::fabs(inner_scope.connection->entity->getRelativePose(
+                subject, entity_ref).position.x)
+            };
+            std::cout << "DISTANCE: " << distance << std::endl;
+            return compare(distance, value);
+          }));
+
+      case RelativeDistanceType::lateral:
+
+        return asBoolean(
+          verify([&](auto && subject)
+          {
+            const auto distance {
+              std::fabs(inner_scope.connection->entity->getRelativePose(
+                subject, entity_ref).position.y)
+            };
+            std::cout << "DISTANCE: " << distance << std::endl;
+            return compare(distance, value);
+          }));
+
+      case RelativeDistanceType::cartesianDistance:
+
+        return asBoolean(
+          verify([&](auto && subject)
+          {
+            const auto distance {
+              std::hypot(
+                inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.x,
+                inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.y)
+            };
+            std::cout << "DISTANCE: " << distance << std::endl;
+            return compare(distance, value);
+          }));
+
+      default:
+        THROW(ImplementationFault);
+    }
   }
 };
 }

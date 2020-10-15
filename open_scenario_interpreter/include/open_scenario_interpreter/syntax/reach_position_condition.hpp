@@ -22,7 +22,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ReachPositionCondition ===============================================
+/* ---- ReachPositionCondition -------------------------------------------------
  *
  * <xsd:complexType name="ReachPositionCondition">
  *   <xsd:all>
@@ -31,7 +31,7 @@ inline namespace syntax
  *   <xsd:attribute name="tolerance" type="Double" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ReachPositionCondition
 {
   const Double tolerance;
@@ -44,48 +44,38 @@ struct ReachPositionCondition
 
   template<typename Node>
   explicit ReachPositionCondition(
-    const Node & node, Scope & outer_scope,
-    const TriggeringEntities & trigger)
-  : tolerance{readAttribute<Double>("tolerance", node, outer_scope)},
-    inner_scope{outer_scope},
-    position{readElement<Position>("Position", node, inner_scope)},
-    trigger{trigger}
+    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+  : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
+    inner_scope(outer_scope),
+    position(readElement<Position>("Position", node, inner_scope)),
+    trigger(trigger)
   {}
 
   auto evaluate()
   {
-    return false_v;
-
-    // if (position.is<WorldPosition>())
-    // {
-    //   return
-    //     asBoolean(
-    //       trigger([&](auto&& entity)
-    //       {
-    //         return inner_scope.connection->entity->reachPosition(
-    //                  entity,
-    //                  position.as<WorldPosition>(),
-    //                  tolerance);
-    //       }));
-    // }
-    // else if (position.is<LanePosition>())
-    // {
-    //   return
-    //     asBoolean(
-    //       trigger([&](auto&& entity)
-    //       {
-    //         return inner_scope.connection->entity->reachPosition(
-    //                  entity,
-    //                  Integer(position.as<LanePosition>().lane_id),
-    //                  position.as<LanePosition>().s,
-    //                  position.as<LanePosition>().offset,
-    //                  tolerance);
-    //       }));
-    // }
-    // else
-    // {
-    //   THROW(ImplementationFault);
-    // }
+    if (position.is<WorldPosition>()) {
+      return asBoolean(
+        trigger([&](auto && entity)
+        {
+          return inner_scope.connection->entity->reachPosition(
+            entity,
+            position.as<WorldPosition>(),
+            tolerance);
+        }));
+    } else if (position.is<LanePosition>()) {
+      return asBoolean(
+        trigger([&](auto && entity)
+        {
+          return inner_scope.connection->entity->reachPosition(
+            entity,
+            Integer(position.as<LanePosition>().lane_id),
+            position.as<LanePosition>().s,
+            position.as<LanePosition>().offset,
+            tolerance);
+        }));
+    } else {
+      THROW(ImplementationFault);
+    }
   }
 };
 }

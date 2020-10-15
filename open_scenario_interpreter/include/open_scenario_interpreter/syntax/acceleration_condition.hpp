@@ -22,14 +22,14 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== AccelerationCondition ================================================
+/* ---- AccelerationCondition --------------------------------------------------
  *
  * <xsd:complexType name="AccelerationCondition">
  *   <xsd:attribute name="value" type="Double" use="required"/>
  *   <xsd:attribute name="rule" type="Rule" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct AccelerationCondition
 {
   const Double value;
@@ -42,24 +42,20 @@ struct AccelerationCondition
 
   template<typename Node>
   explicit AccelerationCondition(
-    const Node & node, Scope & outer_scope,
-    const TriggeringEntities & trigger)
-  : value{readAttribute<Double>("value", node, outer_scope)},
-    compare{readAttribute<Rule>("rule", node, outer_scope)},
-    inner_scope{outer_scope},
-    trigger{trigger}
+    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+  : value(readAttribute<Double>("value", node, outer_scope)),
+    compare(readAttribute<Rule>("rule", node, outer_scope)),
+    inner_scope(outer_scope),
+    trigger(trigger)
   {}
 
-  auto evaluate()
+  auto evaluate() const
   {
-    // return
-    //   asBoolean(
-    //     trigger([&](auto&& entity)
-    //     {
-    //       return compare(inner_scope.getEntityStatus(entity).accel.linear.x, value);
-    //     }));
-
-    return false_v;
+    return asBoolean(
+      trigger([&](auto && entity)
+      {
+        return compare(inner_scope.getEntityStatus(entity).accel.linear.x, value);
+      }));
   }
 };
 }

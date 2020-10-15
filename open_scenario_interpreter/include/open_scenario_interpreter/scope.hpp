@@ -19,6 +19,7 @@
 #include <open_scenario_interpreter/syntax/entity_ref.hpp>
 #include <simulation_api/api/api.hpp>
 
+#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -58,7 +59,7 @@ struct Scope
 
 public:
   template<typename ... Ts>
-  decltype(auto) getEntityStatus(Ts && ... xs) try {
+  decltype(auto) getEntityStatus(Ts && ... xs) const try {
     return connection->entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
   } catch (const simulation_api::SimulationRuntimeError & error) {
     std::stringstream ss {};
@@ -82,21 +83,21 @@ public:
   //     return std::numeric_limits<value_type>::infinity();
   //   }
   // }
-  //
-  // template <typename... Ts>
-  // auto getTimeHeadway(Ts&&... xs) const
-  // {
-  //   if (const auto result {
-  //   connection->entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...) })
-  //   {
-  //     return *result;
-  //   }
-  //   else
-  //   {
-  //     using value_type = typename std::decay<decltype(result)>::type::value_type;
-  //     return std::numeric_limits<value_type>::quiet_NaN();
-  //   }
-  // }
+
+  template<typename ... Ts>
+  auto getTimeHeadway(Ts && ... xs) const
+  {
+    const auto result {
+      connection->entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...)
+    };
+
+    if (result) {
+      return *result;
+    } else {
+      using value_type = typename std::decay<decltype(result)>::type::value_type;
+      return std::numeric_limits<value_type>::quiet_NaN();
+    }
+  }
 };
 }  // namespace open_scenario_interpreter
 
