@@ -26,7 +26,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== LaneChangeAction =====================================================
+/* ---- LaneChangeAction -------------------------------------------------------
  *
  * <xsd:complexType name="LaneChangeAction">
  *   <xsd:all>
@@ -36,7 +36,7 @@ inline namespace syntax
  *   <xsd:attribute name="targetLaneOffset" type="Double" use="optional"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct LaneChangeAction
 {
   const Double target_lane_offset;
@@ -49,11 +49,13 @@ struct LaneChangeAction
 
   template<typename Node>
   explicit LaneChangeAction(const Node & node, Scope & outer_scope)
-  : target_lane_offset{readAttribute<Double>("targetLaneOffset", node, outer_scope, Double())},
-    inner_scope{outer_scope},
-    lane_change_action_dynamics{readElement<TransitionDynamics>("LaneChangeActionDynamics", node,
-        inner_scope)},
-    lane_change_target{readElement<LaneChangeTarget>("LaneChangeTarget", node, inner_scope)}
+  : target_lane_offset(
+      readAttribute<Double>("targetLaneOffset", node, outer_scope, Double())),
+    inner_scope(outer_scope),
+    lane_change_action_dynamics(
+      readElement<TransitionDynamics>("LaneChangeActionDynamics", node, inner_scope)),
+    lane_change_target(
+      readElement<LaneChangeTarget>("LaneChangeTarget", node, inner_scope))
   {}
 
   std::unordered_map<std::string, Boolean> accomplishments;
@@ -66,9 +68,9 @@ struct LaneChangeAction
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
 
-        // inner_scope.connection->entity->requestLaneChange(
-        //   actor,
-        //   Integer(lane_change_target.as<AbsoluteTargetLane>().value));
+        inner_scope.connection->entity->requestLaneChange(
+          actor,
+          Integer(lane_change_target.as<AbsoluteTargetLane>().value));
       }
     } else {
       THROW(ImplementationFault);
@@ -80,10 +82,9 @@ struct LaneChangeAction
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          // cdr(each) =
-          //   inner_scope.connection->entity->isInLanelet(
-          //     car(each),
-          //     Integer(lane_change_target.as<AbsoluteTargetLane>().value));
+          cdr(each) = inner_scope.connection->entity->isInLanelet(
+            car(each),
+            Integer(lane_change_target.as<AbsoluteTargetLane>().value));
         }
       }
 

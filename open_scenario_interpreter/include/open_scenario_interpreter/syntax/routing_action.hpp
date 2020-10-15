@@ -24,7 +24,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== RoutingAction ========================================================
+/* ---- RoutingAction ----------------------------------------------------------
  *
  * <xsd:complexType name="RoutingAction">
  *   <xsd:choice>
@@ -34,7 +34,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct RoutingAction
   : public Element
 {
@@ -43,11 +43,16 @@ struct RoutingAction
   : Element(
       choice(
         node,
-        std::make_pair("AssignRouteAction", [&](auto && node) {
+
+        std::make_pair("AssignRouteAction", [&](auto && node)
+        {
           return make<AssignRouteAction>(node, std::forward<decltype(xs)>(xs)...);
         }),
+
         std::make_pair("FollowTrajectoryAction", UNSUPPORTED()),
-        std::make_pair("AcquirePositionAction", [&](auto && node) {
+
+        std::make_pair("AcquirePositionAction", [&](auto && node)
+        {
           return make<AcquirePositionAction>(node, std::forward<decltype(xs)>(xs)...);
         })))
   {}

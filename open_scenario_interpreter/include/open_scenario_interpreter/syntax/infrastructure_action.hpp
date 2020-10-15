@@ -23,7 +23,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== InfrastructureAction =================================================
+/* ---- InfrastructureAction ---------------------------------------------------
  *
  * <xsd:complexType name="InfrastructureAction">
  *   <xsd:all>
@@ -31,20 +31,15 @@ inline namespace syntax
  *   </xsd:all>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct InfrastructureAction
   : public Element
 {
   template<typename Node, typename Scope>
   explicit InfrastructureAction(const Node & node, Scope & outer_scope)
-  {
-    callWithElements(
-      node, "TrafficSignalAction", 1, 1,
-      [&](auto)
-      {
-        return rebind<TrafficSignalAction>(node, outer_scope);
-      });
-  }
+  : Element(
+      readElement<TrafficSignalAction>("TrafficSignalAction", node, outer_scope))
+  {}
 };
 }  // inline namespace syntax
 }  // namespace open_scenario_interpreter

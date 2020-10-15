@@ -24,7 +24,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== AcquirePositionAction ================================================
+/* ---- AcquirePositionAction --------------------------------------------------
  *
  * <xsd:complexType name="AcquirePositionAction">
  *   <xsd:all>
@@ -32,7 +32,9 @@ inline namespace syntax
  *   </xsd:all>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * TODO REMOVE EXTENSION
+ *
+ * -------------------------------------------------------------------------- */
 struct AcquirePositionAction
 {
   Scope inner_scope;
@@ -55,11 +57,11 @@ struct AcquirePositionAction
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
 
-        // inner_scope.connection->entity->requestAcquirePosition(
-        //   actor,
-        //   Integer(position.as<LanePosition>().lane_id),
-        //   position.as<LanePosition>().s,
-        //   position.as<LanePosition>().offset);
+        inner_scope.connection->entity->requestAcquirePosition(
+          actor,
+          Integer(position.as<LanePosition>().lane_id),
+          position.as<LanePosition>().s,
+          position.as<LanePosition>().offset);
       }
     } else {
       THROW(ImplementationFault);
@@ -72,13 +74,12 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          // cdr(each) =
-          //   inner_scope.connection->entity->reachPosition(
-          //     car(each),
-          //     Integer(position.as<LanePosition>().lane_id),
-          //     position.as<LanePosition>().s,
-          //     position.as<LanePosition>().offset,
-          //     5.0);
+          cdr(each) = inner_scope.connection->entity->reachPosition(
+            car(each),
+            Integer(position.as<LanePosition>().lane_id),
+            position.as<LanePosition>().s,
+            position.as<LanePosition>().offset,
+            5.0);
         }
       }
 

@@ -57,20 +57,17 @@ struct Scope
   }
 
 public:
-  // template <typename... Ts>
-  // decltype(auto) getEntityStatus(Ts&&... xs) try
-  // {
-  //   return connection->entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
-  // }
-  // catch (const simulation_api::SimulationRuntimeError& error)
-  // {
-  //   std::stringstream ss {};
-  //   ss << error.what() << ".\n"
-  //      << "Possible causes:\n"
-  //      << "  (1) The position of the corresponding entity is not specified by Teleport Action";
-  //   throw SemanticError { ss.str() };
-  // }
-  //
+  template<typename ... Ts>
+  decltype(auto) getEntityStatus(Ts && ... xs) try {
+    return connection->entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
+  } catch (const simulation_api::SimulationRuntimeError & error) {
+    std::stringstream ss {};
+    ss << error.what() << ".\n";
+    ss << "Possible causes:\n";
+    ss << "  (1) The position of the corresponding entity is not specified by Teleport Action";
+    throw SemanticError(ss.str());
+  }
+
   // template <typename... Ts>
   // auto getDistanceAlongRoute(Ts&&... xs) const
   // {
