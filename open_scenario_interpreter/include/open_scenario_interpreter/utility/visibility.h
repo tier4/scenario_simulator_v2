@@ -45,7 +45,7 @@ extern "C"
 
 #  if __GNUC__ >= 4
 #    define OPEN_SCENARIO_INTERPRETER_PUBLIC __attribute__ ((visibility("default")))
-#    define OPEN_SCENARIO_INTERPRETER_LOCAL  __attribute__ ((visibility("hidden")))
+#    define OPEN_SCENARIO_INTERPRETER_LOCAL __attribute__ ((visibility("hidden")))
 #  else
 #    define OPEN_SCENARIO_INTERPRETER_PUBLIC
 #    define OPEN_SCENARIO_INTERPRETER_LOCAL
