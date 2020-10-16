@@ -68,7 +68,7 @@ struct ReachPositionCondition
         {
           return inner_scope.connection->entity->reachPosition(
             entity,
-            Integer(position.as<LanePosition>().lane_id),
+            static_cast<Integer>(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,
             position.as<LanePosition>().offset,
             tolerance);

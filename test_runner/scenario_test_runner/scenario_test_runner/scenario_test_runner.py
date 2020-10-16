@@ -106,7 +106,7 @@ def main():
 
     parser.add_argument('--timeout',
                         type=int,
-                        default=20,
+                        default=180,
                         help='Specify simulation time limit in seconds. \
                   The default is 180 seconds.')
 

@@ -50,7 +50,7 @@
               <SpeedAction>
                 <SpeedActionDynamics dynamicsShape="step" value="0" dynamicsDimension="time"/>
                 <SpeedActionTarget>
-                  <AbsoluteTargetSpeed value="10"/>
+                  <AbsoluteTargetSpeed value="20"/>
                 </SpeedActionTarget>
               </SpeedAction>
             </LongitudinalAction>
@@ -89,14 +89,22 @@
             <Event name="event" priority="overwrite">
               <Action name="action">
                 <PrivateAction>
-                  <LongitudinalAction>
-                    <SpeedAction>
-                      <SpeedActionDynamics dynamicsShape="step" value="0" dynamicsDimension="time"/>
-                      <SpeedActionTarget>
-                        <AbsoluteTargetSpeed value="100"/>
-                      </SpeedActionTarget>
-                    </SpeedAction>
-                  </LongitudinalAction>
+                  <!-- <LongitudinalAction>                                                               -->
+                  <!--   <SpeedAction>                                                                    -->
+                  <!--     <SpeedActionDynamics dynamicsShape="step" value="0" dynamicsDimension="time"/> -->
+                  <!--     <SpeedActionTarget>                                                            -->
+                  <!--       <AbsoluteTargetSpeed value="100"/>                                           -->
+                  <!--     </SpeedActionTarget>                                                           -->
+                  <!--   </SpeedAction>                                                                   -->
+                  <!-- </LongitudinalAction>                                                              -->
+                  <LateralAction>
+                    <LaneChangeAction>
+                      <LaneChangeActionDynamics dynamicsShape="linear" value="10" dynamicsDimension="time"/>
+                      <LaneChangeTarget>
+                        <AbsoluteTargetLane value="34462"/>
+                      </LaneChangeTarget>
+                    </LaneChangeAction>
+                  </LateralAction>
                 </PrivateAction>
               </Action>
               <StartTrigger>
@@ -109,7 +117,7 @@
                       <EntityCondition>
                         <ReachPositionCondition tolerance="5">
                           <Position>
-                            <LanePosition roadId="none" laneId="34462" s="10" offset="0"/>
+                            <LanePosition roadId="none" laneId="34513" s="10" offset="0"/>
                           </Position>
                         </ReachPositionCondition>
                       </EntityCondition>
@@ -135,7 +143,7 @@
       <ConditionGroup>
         <Condition name="condition" conditionEdge="none" delay="0">
           <ByValueCondition>
-            <SimulationTimeCondition value="30" rule="greaterThan"/>
+            <SimulationTimeCondition value="180" rule="greaterThan"/>
           </ByValueCondition>
         </Condition>
       </ConditionGroup>
