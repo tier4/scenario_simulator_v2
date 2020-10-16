@@ -15,21 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from launch import LaunchDescription
-from launch_ros.actions import Node
-from launch_ros.actions import LifecycleNode
-import launch
+import os
 
+from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
+from launch.actions import Shutdown
+from launch import LaunchDescription
+from launch_ros.actions import LifecycleNode
+from launch_ros.actions import Node
 from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
     workflow = LaunchConfiguration('workflow')
+
     declare_workflow = DeclareLaunchArgument(
-                'workflow',
-                default_value=workflow,
-                description='workflow files for scenario testing')
+        'workflow',
+        default_value=workflow,
+        description='workflow files for scenario testing')
+
     scenario_test_runner = Node(
         package='scenario_test_runner',
         node_executable='scenario_test_runner',
@@ -37,17 +41,53 @@ def generate_launch_description():
                 'stdout': 'log',
                 'stderr': 'screen',
         },
-        on_exit=launch.actions.Shutdown(),
+        on_exit=Shutdown(),
         arguments=["--workflow", workflow]
     )
+
+    port = 8080
+
+    scenario_simulator = Node(
+        package='scenario_simulator',
+        node_executable='scenario_simulator_node',
+        node_name='scenario_simulator_node',
+        output='log',
+        parameters=[{
+            'port': port,
+        }],
+        arguments=[('__log_level:=warn')],
+    )
+
     open_scenario_interpreter = LifecycleNode(
-        node_name='open_scenario_interpreter_node',
         package='open_scenario_interpreter',
         node_executable='open_scenario_interpreter_node',
-        output='screen'
+        node_name='open_scenario_interpreter_node',
+        output='screen',
+        parameters=[{
+            'map_path': os.path.join(
+                get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
+            'origin_latitude': 34.903555800615614,
+            'origin_longitude': 139.93339979022568,
+            'port': port,
+        }]
     )
+
+    rviz2 = Node(
+        package='rviz2',
+        node_executable='rviz2',
+        node_name='rviz2',
+        arguments=[
+            '-d', os.path.join(
+                get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
+            ],
+        output='log'
+    )
+
     description = LaunchDescription()
     description.add_action(declare_workflow)
     description.add_action(scenario_test_runner)
+    description.add_action(scenario_simulator)
     description.add_action(open_scenario_interpreter)
+    description.add_action(rviz2)
+
     return description

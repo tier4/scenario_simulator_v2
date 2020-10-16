@@ -78,6 +78,8 @@ class ScenarioRunner
 
   std::string log_path;
 
+  std::string map_path;
+
   Element evaluate;
 
   std::shared_ptr<rclcpp::TimerBase> timer;

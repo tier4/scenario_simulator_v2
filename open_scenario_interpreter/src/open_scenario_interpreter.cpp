@@ -23,9 +23,10 @@ namespace open_scenario_interpreter
 ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("open_scenario_interpreter", options)
 {
-  declare_parameter<decltype(scenario)>("scenario", scenario);
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
+  declare_parameter<decltype(map_path)>("map_path", map_path);
+  declare_parameter<decltype(scenario)>("scenario", scenario);
 }
 
 ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
