@@ -34,20 +34,25 @@ def generate_launch_description():
         default_value=workflow,
         description='workflow files for scenario testing')
 
+    log_directory = LaunchConfiguration('log_directory', default="/tmp")
+
     declare_log_directory = DeclareLaunchArgument(
         'log_directory',
-        default_value=LaunchConfiguration('log_directory', default="/tmp"),
+        default_value=log_directory,
         description='log_directory files for scenario testing')
 
     scenario_test_runner = Node(
         package='scenario_test_runner',
         node_executable='scenario_test_runner',
         output={
-                'stdout': 'log',
-                'stderr': 'screen',
+            'stdout': 'log',
+            'stderr': 'screen',
         },
         on_exit=Shutdown(),
-        arguments=["--workflow", workflow, "--log_directory", log_directory]
+        arguments=[
+            "--workflow", workflow,
+            "--log_directory", log_directory
+        ]
     )
 
     port = 8080

@@ -25,7 +25,7 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
 {
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
-  declare_parameter<decltype(map_path)>("map_path", map_path);
+  // declare_parameter<decltype(map_path)>("map_path", map_path);
   declare_parameter<decltype(scenario)>("scenario", scenario);
 }
 

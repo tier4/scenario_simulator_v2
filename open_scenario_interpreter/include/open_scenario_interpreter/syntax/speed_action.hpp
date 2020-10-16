@@ -26,7 +26,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== SpeedAction ==========================================================
+/* ---- SpeedAction ------------------------------------------------------------
  *
  * <xsd:complexType name="SpeedAction">
  *   <xsd:all>
@@ -35,7 +35,7 @@ inline namespace syntax
  *   </xsd:all>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct SpeedAction
 {
   Scope inner_scope;
@@ -49,13 +49,12 @@ struct SpeedAction
   : inner_scope(outer_scope),
     speed_action_dynamics(
       readElement<TransitionDynamics>("SpeedActionDynamics", node, inner_scope)),
-    speed_action_target(
-      readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
+    speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
   {}
 
   std::unordered_map<std::string, Boolean> accomplishments;
 
-  auto start()   // XXX UGLY CODE
+  auto start()  // XXX UGLY CODE
   {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       for (const auto & each : inner_scope.actors) {

@@ -40,8 +40,8 @@ struct Entities
     callWithElements(
       node, "ScenarioObject", 0, unbounded, [&](auto && node)
       {
-        scope.entities.emplace(readAttribute<String>("name", node, scope),
-        make<ScenarioObject>(node, scope));
+        scope.entities.emplace(
+          readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
       });
 
     callWithElements(node, "EntitySelection", 0, unbounded, UNSUPPORTED());

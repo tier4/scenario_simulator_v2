@@ -105,9 +105,12 @@ struct ScenarioDefinition
   template<typename ... Ts>
   auto init(Ts && ... xs)  // RENAME TO 'start'
   {
+    // Spawn entities
     for (const auto & each : inner_scope.entities) {
       std::cout << std::get<1>(each).evaluate() << std::endl;
     }
+
+    storyboard.start();
   }
 
   template<typename ... Ts>
@@ -121,7 +124,7 @@ struct ScenarioDefinition
   {
     const auto result {storyboard.evaluate()};
 
-    // inner_scope.connection->simulation->updateFrame();
+    inner_scope.connection->simulation->updateFrame();
 
     return result;
   }

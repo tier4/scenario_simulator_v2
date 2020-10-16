@@ -38,8 +38,8 @@ struct TeleportAction
 
   template<typename Node>
   explicit TeleportAction(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope},
-    position{readElement<Position>("Position", node, inner_scope)}
+  : inner_scope(outer_scope),
+    position(readElement<Position>("Position", node, inner_scope))
   {}
 
   void start() const

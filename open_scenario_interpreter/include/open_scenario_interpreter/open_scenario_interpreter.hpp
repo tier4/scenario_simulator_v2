@@ -78,7 +78,7 @@ class ScenarioRunner
 
   std::string log_path;
 
-  std::string map_path;
+  // std::string map_path;
 
   Element evaluate;
 
