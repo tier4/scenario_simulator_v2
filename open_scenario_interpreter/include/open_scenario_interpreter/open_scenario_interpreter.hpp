@@ -18,54 +18,12 @@
 #include <junit_exporter/junit_exporter.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <open_scenario_interpreter/syntax/open_scenario.hpp>
+#include <open_scenario_interpreter/utility/visibility.h>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
 #include <string>
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
-//     https://gcc.gnu.org/wiki/Visibility
-#if defined _WIN32 || defined __CYGWIN__
-  #ifdef __GNUC__
-    #define OPEN_SCENARIO_INTERPRETER_EXPORT __attribute__ ((dllexport))
-    #define OPEN_SCENARIO_INTERPRETER_IMPORT __attribute__ ((dllimport))
-  #else
-    #define OPEN_SCENARIO_INTERPRETER_EXPORT __declspec(dllexport)
-    #define OPEN_SCENARIO_INTERPRETER_IMPORT __declspec(dllimport)
-  #endif
-
-  #ifdef OPEN_SCENARIO_INTERPRETER_BUILDING_DLL
-    #define OPEN_SCENARIO_INTERPRETER_PUBLIC OPEN_SCENARIO_INTERPRETER_EXPORT
-  #else
-    #define OPEN_SCENARIO_INTERPRETER_PUBLIC OPEN_SCENARIO_INTERPRETER_IMPORT
-  #endif
-
-  #define OPEN_SCENARIO_INTERPRETER_PUBLIC_TYPE OPEN_SCENARIO_INTERPRETER_PUBLIC
-  #define OPEN_SCENARIO_INTERPRETER_LOCAL
-#else
-  #define OPEN_SCENARIO_INTERPRETER_EXPORT __attribute__ ((visibility("default")))
-  #define OPEN_SCENARIO_INTERPRETER_IMPORT
-
-  #if __GNUC__ >= 4
-    #define OPEN_SCENARIO_INTERPRETER_PUBLIC __attribute__ ((visibility("default")))
-    #define OPEN_SCENARIO_INTERPRETER_LOCAL  __attribute__ ((visibility("hidden")))
-  #else
-    #define OPEN_SCENARIO_INTERPRETER_PUBLIC
-    #define OPEN_SCENARIO_INTERPRETER_LOCAL
-  #endif
-
-  #define OPEN_SCENARIO_INTERPRETER_PUBLIC_TYPE
-#endif
-
-#ifdef __cplusplus
-}
-#endif
 
 namespace open_scenario_interpreter
 {
