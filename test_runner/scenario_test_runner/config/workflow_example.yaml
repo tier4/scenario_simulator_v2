@@ -1,3 +1,3 @@
 Scenario:
-  - {path : test/scenario/yaml/failure.yaml, expect: failure}
-  - {path : test/scenario/yaml/success.yaml, expect: success}
+  - {path : $(find-pkg-share scenario_test_runner)/failure.yaml, expect: failure}
+  - {path : $(find-pkg-share scenario_test_runner)/success.yaml, expect: success}
