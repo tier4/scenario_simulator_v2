@@ -53,6 +53,7 @@ def generate_launch_description():
     )
     description = LaunchDescription()
     description.add_action(declare_workflow)
+    description.add_action(declare_log_directory)
     description.add_action(scenario_test_runner)
     description.add_action(open_scenario_interpreter)
     return description

@@ -18,7 +18,6 @@
 import pathlib
 import sys
 
-from ament_index_python.packages import get_package_share_directory
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.regex import resolve_ros_package
