@@ -16,7 +16,7 @@
 # limitations under the License.
 
 import pathlib
-import re
+import sys
 
 from ament_index_python.packages import get_package_share_directory
 from scenario_test_utility.logger import Logger
@@ -40,8 +40,9 @@ class DatabaseHandler():
             validator.validate_workflow_file(workflow_path)
         except:
             import traceback
-            Logger.print_error("workflow file is not valid")
+            Logger.print_error("workflow file is not valid, shuttind donw")
             Logger.print_error(traceback.format_exc())
+            sys.exit(1)
         database = Manager.read_data(workflow_path)
         if pathlib.Path(log_directory).is_absolute():
             log_path = log_directory
