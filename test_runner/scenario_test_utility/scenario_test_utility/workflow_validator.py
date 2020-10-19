@@ -15,20 +15,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import argparse
-from ament_index_python.packages import get_package_share_directory
+import os
 import yamale
 
+from ament_index_python.packages import get_package_share_directory
+
+
 class WorkflowValidator():
+
     def __init__(self):
         share_directory_path = os.path.join(get_package_share_directory('scenario_test_utility'))
-        schema_path = share_directory_path +\
-                      '/../ament_index/resource_index/packages/workflow_schema.yaml'
+        relative_path = '/../ament_index/resource_index/packages/workflow_schema.yaml'
+        schema_path = share_directory_path + relative_path
         self.workflow_schema = yamale.make_schema(schema_path)
+
     def validate_workflow_file(self, workflow):
         data = yamale.make_data(workflow)
         yamale.validate(self.workflow_schema, data)
+
 
 def main():
     parser = argparse.ArgumentParser(description='Validator for workflow .yaml file')

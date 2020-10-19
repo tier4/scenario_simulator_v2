@@ -22,6 +22,8 @@ from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.regex import resolve_ros_package
 from scenario_test_utility.workflow_validator import WorkflowValidator
+import yamale
+
 
 class DatabaseHandler():
 
@@ -37,7 +39,7 @@ class DatabaseHandler():
         try:
             validator = WorkflowValidator()
             validator.validate_workflow_file(workflow_path)
-        except:
+        except yamale.yamale_error.YamaleError:
             import traceback
             Logger.print_error("workflow file is not valid, shuttind donw")
             Logger.print_error(traceback.format_exc())
