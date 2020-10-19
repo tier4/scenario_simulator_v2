@@ -22,7 +22,7 @@ from ament_index_python.packages import get_package_share_directory
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.regex import resolve_ros_package
-
+from scenario_test_utility.workflow_validator import WorkflowValidator
 
 class DatabaseHandler():
 
@@ -35,6 +35,13 @@ class DatabaseHandler():
             workflow_path = workflow_file
         else:
             workflow_path = resolve_ros_package(workflow_file)
+        try:
+            validator = WorkflowValidator()
+            validator.validate_workflow_file(workflow_path)
+        except:
+            import traceback
+            Logger.print_error("workflow file is not valid")
+            Logger.print_error(traceback.format_exc())
         database = Manager.read_data(workflow_path)
         if pathlib.Path(log_directory).is_absolute():
             log_path = log_directory
