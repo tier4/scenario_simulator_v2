@@ -23,12 +23,12 @@ import yamale
 class WorkflowValidator():
     def __init__(self):
         share_directory_path = os.path.join(get_package_share_directory('scenario_test_utility'))
-        schema_path = share_directory_path + 
+        schema_path = share_directory_path +\
                       '/../ament_index/resource_index/packages/workflow_schema.yaml'
-        print(schema_path)
         self.workflow_schema = yamale.make_schema(schema_path)
-    def validate_workflow_file(self):
-        pass
+    def validate_workflow_file(self, workflow):
+        data = yamale.make_data(workflow)
+        yamale.validate(self.workflow_schema, data)
 
 def main():
     parser = argparse.ArgumentParser(description='Validator for workflow .yaml file')

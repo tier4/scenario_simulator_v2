@@ -31,7 +31,6 @@ class DatabaseHandler():
         Logger.print_separator('Reading workflow')
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         workflow_path = ''
-        Logger.print_separator(workflow_file)
         if pathlib.Path(workflow_file).is_absolute():
             workflow_path = workflow_file
         else:

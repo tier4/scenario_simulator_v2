@@ -1,4 +1,3 @@
-AbortWhenFail: true
 Scenario:
   - {path : test/scenario/yaml/failure.yaml, expect: failure}
   - {path : test/scenario/yaml/success.yaml, expect: success}
