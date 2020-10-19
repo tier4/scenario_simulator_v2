@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
 import argparse
+import sys
 import xml.etree.ElementTree as ET
 
 
 class ResultChecker:
-    
+
     def __init__(self):
         pass
 
@@ -37,6 +37,7 @@ class ResultChecker:
                         sys.exit(1)
         sys.exit(0)
 
+
 def main():
     parser = argparse.ArgumentParser(description='check scenario testing result is good or not')
     parser.add_argument('xml', help='path to result xml file')
@@ -45,5 +46,5 @@ def main():
     checker.check(args.xml)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pass
