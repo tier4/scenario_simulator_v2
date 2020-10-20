@@ -16,10 +16,13 @@
 # limitations under the License.
 
 import pathlib
+import sys
 
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.regex import resolve_ros_package
+from scenario_test_utility.workflow_validator import WorkflowValidator
+import yamale
 
 
 class DatabaseHandler():
@@ -29,11 +32,18 @@ class DatabaseHandler():
         Logger.print_separator('Reading workflow')
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         workflow_path = ''
-        Logger.print_separator(workflow_file)
         if pathlib.Path(workflow_file).is_absolute():
             workflow_path = workflow_file
         else:
             workflow_path = resolve_ros_package(workflow_file)
+        try:
+            validator = WorkflowValidator()
+            validator.validate_workflow_file(workflow_path)
+        except yamale.yamale_error.YamaleError:
+            import traceback
+            Logger.print_error("workflow file is not valid, shuttind donw")
+            Logger.print_error(traceback.format_exc())
+            sys.exit(1)
         database = Manager.read_data(workflow_path)
         if pathlib.Path(log_directory).is_absolute():
             log_path = log_directory

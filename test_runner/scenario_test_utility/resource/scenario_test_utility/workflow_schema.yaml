@@ -1,0 +1,3 @@
+Scenario: list(include('scenario'))
+---
+scenario: {path: str(), expect: str()}
