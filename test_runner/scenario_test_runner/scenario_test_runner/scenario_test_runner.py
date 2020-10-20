@@ -18,11 +18,11 @@
 import argparse
 import time
 
-from scenario_test_utility.logger import Logger
-from scenario_test_utility.manager import Manager
 from scenario_test_runner.converter_handler import ConverterHandler
 from scenario_test_runner.database_handler import DatabaseHandler
 from scenario_test_runner.lifecycle_controller import LifecycleController
+from scenario_test_utility.logger import Logger
+from scenario_test_utility.manager import Manager
 from scenario_test_utility.xosc_validator import XoscValidator
 
 

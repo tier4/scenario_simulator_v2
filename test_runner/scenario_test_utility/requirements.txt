@@ -1,2 +1,3 @@
 xmlplain
 xmlschema
+xmltodict

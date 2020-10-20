@@ -9,6 +9,8 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name + '/OpenSCENARIO.xsd']),
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name + '/workflow_schema.yaml']),
         ('share/' + package_name, ['package.xml']),
     ],
     install_requires=['setuptools'],
@@ -20,8 +22,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'result_checker = scenario_test_utility.result_checker:main',
             'scenario_converter = scenario_test_utility.scenario_converter:main',
-            'xosc_validator = scenario_test_utility.xosc_validator:main'
+            'xosc_validator = scenario_test_utility.xosc_validator:main',
+            'workflow_validator = scenario_test_utility.workflow_validator:main'
         ],
     },
 )

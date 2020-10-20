@@ -55,6 +55,12 @@ jobs:
                   cd ~/ros2_ws
                   colcon test
                   colcon test-result --verbose
+            - name: Scenario test
+              run: |
+                  source ~/ros2_ws/install/setup.bash
+                  ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
+                  ros2 run scenario_test_utility result_checker /tmp/result.junit.xml
+
             - name: Slack Notification
               uses: 8398a7/action-slack@v2
               if: failure()
