@@ -30,7 +30,6 @@ class DatabaseHandler():
     @staticmethod
     def read_database(workflow_file, log_directory):
         Logger.print_separator('Reading workflow')
-        launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         workflow_path = ''
         if pathlib.Path(workflow_file).is_absolute():
             workflow_path = workflow_file
@@ -41,7 +40,7 @@ class DatabaseHandler():
             validator.validate_workflow_file(workflow_path)
         except yamale.yamale_error.YamaleError:
             import traceback
-            Logger.print_error("workflow file is not valid, shuttind donw")
+            Logger.print_error('workflow file is not valid, shutting down')
             Logger.print_error(traceback.format_exc())
             sys.exit(1)
         database = Manager.read_data(workflow_path)
@@ -50,11 +49,16 @@ class DatabaseHandler():
         else:
             log_path = resolve_ros_package(log_directory)
         scenarios = []
-        for scenario in database["Scenario"]:
-            scenario_path = str(launcher_package_path / scenario['path'])
+        for scenario in database['Scenario']:
+            scenario_path = ''
+            if pathlib.Path(scenario['path']).is_absolute():
+                scenario_path = scenario['path']
+            else:
+                scenario_path = resolve_ros_package(scenario['path'])
             Manager.check_existence(scenario_path)
             scenario['path'] = scenario_path
             scenarios.append(scenario)
+        launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         return launcher_package_path, log_path, scenarios
 
 
