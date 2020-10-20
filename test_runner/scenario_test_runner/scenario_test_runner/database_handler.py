@@ -40,7 +40,7 @@ class DatabaseHandler():
             validator.validate_workflow_file(workflow_path)
         except yamale.yamale_error.YamaleError:
             import traceback
-            Logger.print_error('workflow file is not valid, shuttind donw')
+            Logger.print_error('workflow file is not valid, shutting down')
             Logger.print_error(traceback.format_exc())
             sys.exit(1)
         database = Manager.read_data(workflow_path)
