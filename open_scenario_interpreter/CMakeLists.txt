@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(open_scenario_interpreter)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
