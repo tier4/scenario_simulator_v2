@@ -10,6 +10,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
+#include <utility>
 
 namespace scenario_simulator
 {
@@ -22,8 +23,8 @@ ScenarioSimulatorImpl::ScenarioSimulatorImpl()
 void ScenarioSimulatorImpl::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   if (initialized_) {
-    result["message"] = "failed to initialize simulation simulation is already initialized";
-    return;
+    ScenarioSimulatorImpl other {};
+    std::swap(*this, other);
   }
   initialized_ = true;
   realtime_factor_ = param["sim/realtime_factor"];
