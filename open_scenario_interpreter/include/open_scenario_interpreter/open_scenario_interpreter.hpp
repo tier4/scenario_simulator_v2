@@ -72,13 +72,11 @@ namespace open_scenario_interpreter
 class ScenarioRunner
   : public rclcpp_lifecycle::LifecycleNode
 {
-  std::string scenario;
-
   std::string expect;
 
-  std::string log_path;
+  std::string osc_path;
 
-  // std::string map_path;
+  std::string log_path;
 
   Element evaluate;
 

@@ -25,8 +25,7 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
 {
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
-  // declare_parameter<decltype(map_path)>("map_path", map_path);
-  declare_parameter<decltype(scenario)>("scenario", scenario);
+  declare_parameter<decltype(osc_path)>("osc_path", osc_path);
 }
 
 ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
@@ -35,15 +34,15 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  get_parameter("scenario", scenario);
   get_parameter("expect", expect);
   get_parameter("log_path", log_path);
+  get_parameter("osc_path", osc_path);
 
   log_path = log_path + "/result.junit.xml";
 
   try {
-    RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
-    evaluate.rebind<OpenScenario>(scenario, shared_from_this());
+    RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", osc_path.c_str());
+    evaluate.rebind<OpenScenario>(osc_path, shared_from_this());
   } catch (const open_scenario_interpreter::SyntaxError & error) {
     RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
     return ScenarioRunner::Result::FAILURE;
