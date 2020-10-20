@@ -35,18 +35,24 @@ class API
 
 public:
   template<class NodeT>
-  explicit API(NodeT && node)
+  explicit API(NodeT && node, const std::string & map_path = "")
   {
     std::string address = "127.0.0.1";
-    int port = 8080;
-    node->declare_parameter("port", 8080);
-    node->get_parameter("port", port);
 
-    auto entity_manager_ptr = std::shared_ptr<EntityManager>(new EntityManager(node));
+    int port = 8080;
+
+    node->declare_parameter("port", port);
+    node->get_parameter("port", port);
+    node->undeclare_parameter("port");
+
+    auto entity_manager_ptr = std::make_shared<EntityManager>(node, map_path);
+
     auto client_ptr =
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
+
     simulation =
       std::shared_ptr<SimulationAPIImpl>(new SimulationAPIImpl(client_ptr, entity_manager_ptr));
+
     entity = std::shared_ptr<EntityAPIImpl>(new EntityAPIImpl(client_ptr, entity_manager_ptr));
   }
   std::shared_ptr<SimulationAPIImpl> simulation;
