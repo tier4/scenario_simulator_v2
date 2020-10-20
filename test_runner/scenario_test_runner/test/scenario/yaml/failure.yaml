@@ -16,7 +16,7 @@ OpenSCENARIO:
     ParameterDeclaration:
       - name: value
         parameterType: double
-        value: 0
+        value: INITIAL-VALUE
       - name: extension
         parameterType: string
         value: osm
@@ -33,7 +33,8 @@ OpenSCENARIO:
       Actions:
         UserDefinedAction:
           CustomCommandAction:
-            type: exitFailure
+            # type: exitFailure
+            type: echo
     Story:
       - name: story
         Act:

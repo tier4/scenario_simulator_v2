@@ -33,6 +33,8 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 {
   using open_scenario_interpreter::ScenarioRunner;
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
   get_parameter("scenario", scenario);
   get_parameter("expect", expect);
   get_parameter("log_path", log_path);

@@ -13,8 +13,8 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name), glob('launch/*.launch.py')),
         ('share/' + package_name, ['config/workflow_example.yaml']),
-        ('share/' + package_name, ['test/scenario/yaml/failure.yaml']),
-        ('share/' + package_name, ['test/scenario/yaml/success.yaml'])
+        ('share/' + package_name + '/test/scenario/xosc', glob('test/scenario/xosc/*.xosc')),
+        ('share/' + package_name + '/test/scenario/yaml', glob('test/scenario/yaml/*.yaml'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
