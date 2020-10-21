@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
+#include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_action.hpp>
 #include <simulation_api/behavior/vehicle/acquire_position_action.hpp>
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
@@ -32,9 +33,10 @@ BehaviorTree::BehaviorTree()
 {
   std::string path = ament_index_cpp::get_package_share_directory("simulation_api") +
     "/resource/vehicle_entity_behavior.xml";
-  factory_.registerNodeType<entity_behavior::vehicle::FollowLaneAction>("FollowLane");
-  factory_.registerNodeType<entity_behavior::vehicle::AcquirePositionAction>("AcquirePosition");
-  factory_.registerNodeType<entity_behavior::vehicle::LaneChangeAction>("LaneChange");
+  factory_.registerNodeType<FollowLaneAction>("FollowLane");
+  factory_.registerNodeType<follow_lane_sequence::FollowFrontEntityAction>("FollowFrontEntity");
+  factory_.registerNodeType<AcquirePositionAction>("AcquirePosition");
+  factory_.registerNodeType<LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
   // logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);

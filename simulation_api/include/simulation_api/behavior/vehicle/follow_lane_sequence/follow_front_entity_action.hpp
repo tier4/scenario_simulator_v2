@@ -18,13 +18,15 @@
 #include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
 
+#include <string>
+
 namespace entity_behavior
 {
 namespace vehicle
 {
 namespace follow_lane_sequence
 {
-class FollowFrontEntityAction: public entity_behavior::VehicleActionNode
+class FollowFrontEntityAction : public entity_behavior::VehicleActionNode
 {
 public:
   FollowFrontEntityAction(const std::string & name, const BT::NodeConfiguration & config);

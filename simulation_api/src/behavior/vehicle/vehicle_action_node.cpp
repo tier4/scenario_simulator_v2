@@ -33,4 +33,33 @@ void VehicleActionNode::getBlackBoardValues()
     throw BehaviorTreeRuntimeError("failed to get input vehicle_parameters in VehicleActionNode");
   }
 }
+
+simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
+  double target_speed) const
+{
+  geometry_msgs::msg::Accel accel_new;
+  double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
+  if (entity_status.twist.linear.x > target_speed) {
+    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+  } else {
+    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+  }
+  accel_new.linear.x = target_accel;
+  geometry_msgs::msg::Twist twist_new;
+  twist_new.linear.x = boost::algorithm::clamp(
+    entity_status.twist.linear.x + accel_new.linear.x * step_time,
+    0, vehicle_parameters->performance.max_speed);
+  twist_new.linear.y = 0.0;
+  twist_new.linear.z = 0.0;
+  twist_new.angular.x = 0.0;
+  twist_new.angular.y = 0.0;
+  twist_new.angular.z = 0.0;
+
+  double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
+    step_time;
+  geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
+  simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+    entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
+  return entity_status_updated;
+}
 }  // namespace entity_behavior
