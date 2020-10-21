@@ -44,11 +44,14 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
   try {
     RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", osc_path.c_str());
-    evaluate.rebind<OpenScenario>(osc_path, shared_from_this(), map_path);
+    evaluate.rebind<OpenScenario>(osc_path);
   } catch (const open_scenario_interpreter::SyntaxError & error) {
     RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
     return ScenarioRunner::Result::FAILURE;
   }
+
+  Accessor::connect(shared_from_this(), map_path);
+  Accessor::initialize(1.0, 0.02);
 
   evaluate.as<OpenScenario>().init();
 

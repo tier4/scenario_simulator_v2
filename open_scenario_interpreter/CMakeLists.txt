@@ -52,6 +52,7 @@ find_package(xmlrpcpp             REQUIRED)
 # ------------------------------------------------------------------------------
 
 add_library(${PROJECT_NAME} SHARED
+  src/accessor.cpp
   src/object.cpp
   src/open_scenario_interpreter.cpp)
 

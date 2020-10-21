@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 
+#include <open_scenario_interpreter/accessor.hpp>
 #include <open_scenario_interpreter/syntax/init.hpp>
 #include <open_scenario_interpreter/syntax/story.hpp>
 
@@ -34,10 +35,8 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Storyboard
-  : public StoryboardElement<Storyboard>, public Elements
+  : public StoryboardElement<Storyboard>, public Elements, private Accessor
 {
-  Scope inner_scope;
-
   Init init;
 
   Trigger stop_trigger;
@@ -46,21 +45,19 @@ struct Storyboard
 
   template<typename Node, typename Scope>
   explicit Storyboard(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope},
-    init{readElement<Init>("Init", node, inner_scope)},
-    stop_trigger{readElement<Trigger>("StopTrigger", node, inner_scope)}
+  : init(readElement<Init>("Init", node, outer_scope)),
+    stop_trigger(readElement<Trigger>("StopTrigger", node, outer_scope))
   {
     callWithElements(
       node, "Story", 1, unbounded, [&](auto && node)
       {
-        return push_back(readStoryboardElement<Story>(node, inner_scope));
+        return push_back(readStoryboardElement<Story>(node, outer_scope));
       });
   }
 
   auto ready() const noexcept
   {
-    // return static_cast<bool>(inner_scope.connection);
-    return true;
+    return Accessor::ready();
   }
 
   void start()

@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 
+#include <open_scenario_interpreter/accessor.hpp>
 #include <open_scenario_interpreter/syntax/catalog_locations.hpp>
 #include <open_scenario_interpreter/syntax/entities.hpp>
 #include <open_scenario_interpreter/syntax/file_header.hpp>
@@ -29,7 +30,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ScenarioDefinition ===================================================
+/* ---- ScenarioDefinition -----------------------------------------------------
  *
  * <xsd:group name="ScenarioDefinition">
  *   <xsd:sequence>
@@ -41,8 +42,9 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:group>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ScenarioDefinition
+  : private Accessor
 {
   Element storyboard;
 
@@ -109,7 +111,6 @@ struct ScenarioDefinition
     for (const auto & each : inner_scope.entities) {
       std::cout << std::get<1>(each).evaluate() << std::endl;
     }
-
     storyboard.start();
   }
 
@@ -124,7 +125,7 @@ struct ScenarioDefinition
   {
     const auto result {storyboard.evaluate()};
 
-    inner_scope.connection->simulation->updateFrame();
+    updateFrame();
 
     return result;
   }

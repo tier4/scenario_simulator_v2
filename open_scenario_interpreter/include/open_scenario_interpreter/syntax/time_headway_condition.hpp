@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__TIME_HEADWAY_CONDITION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__TIME_HEADWAY_CONDITION_HPP_
 
+#include <open_scenario_interpreter/accessor.hpp>
 #include <open_scenario_interpreter/syntax/rule.hpp>
 #include <open_scenario_interpreter/syntax/triggering_entities.hpp>
 
@@ -34,6 +35,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct TimeHeadwayCondition
+  : private Accessor
 {
   const String entity_ref;
 
@@ -45,22 +47,17 @@ struct TimeHeadwayCondition
 
   const Rule compare;
 
-  Scope inner_scope;
-
   const TriggeringEntities trigger;
 
   template<typename Node>
   explicit TimeHeadwayCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
-  : entity_ref(
-      readAttribute<String>("entityRef", node, outer_scope)),
-    value(
-      readAttribute<Double>("value", node, outer_scope)),
-    freespace{readAttribute<Boolean>("freespace", node, outer_scope)},
-    along_route{readAttribute<Boolean>("alongRoute", node, outer_scope)},
-    compare{readAttribute<Rule>("rule", node, outer_scope)},
-    inner_scope{outer_scope},
-    trigger{trigger}
+  : entity_ref(readAttribute<String>("entityRef", node, outer_scope)),
+    value(readAttribute<Double>("value", node, outer_scope)),
+    freespace(readAttribute<Boolean>("freespace", node, outer_scope)),
+    along_route(readAttribute<Boolean>("alongRoute", node, outer_scope)),
+    compare(readAttribute<Rule>("rule", node, outer_scope)),
+    trigger(trigger)
   {}
 
   auto evaluate()
@@ -68,7 +65,7 @@ struct TimeHeadwayCondition
     return asBoolean(
       trigger([&](auto && entity)
       {
-        return compare(inner_scope.getTimeHeadway(entity, entity_ref), value);
+        return compare(getTimeHeadway(entity, entity_ref), value);
       }));
   }
 };

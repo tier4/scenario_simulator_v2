@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 
+#include <open_scenario_interpreter/accessor.hpp>
 #include <open_scenario_interpreter/syntax/lane_change_target.hpp>
 #include <open_scenario_interpreter/syntax/transition_dynamics.hpp>
 
@@ -38,6 +39,7 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct LaneChangeAction
+  : public Accessor
 {
   const Double target_lane_offset;
 
@@ -54,8 +56,7 @@ struct LaneChangeAction
     inner_scope(outer_scope),
     lane_change_action_dynamics(
       readElement<TransitionDynamics>("LaneChangeActionDynamics", node, inner_scope)),
-    lane_change_target(
-      readElement<LaneChangeTarget>("LaneChangeTarget", node, inner_scope))
+    lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, inner_scope))
   {}
 
   std::unordered_map<std::string, Boolean> accomplishments;
@@ -67,10 +68,8 @@ struct LaneChangeAction
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
-
-        inner_scope.connection->entity->requestLaneChange(
-          actor,
-          Integer(lane_change_target.as<AbsoluteTargetLane>().value));
+        requestLaneChange(
+          actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
       }
     } else {
       THROW(ImplementationFault);
@@ -82,12 +81,10 @@ struct LaneChangeAction
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          cdr(each) = inner_scope.connection->entity->isInLanelet(
-            car(each),
-            Integer(lane_change_target.as<AbsoluteTargetLane>().value));
+          cdr(each) = isInLanelet(
+            car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value));
         }
       }
-
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
     } else {
       THROW(ImplementationFault);
