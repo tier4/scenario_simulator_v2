@@ -24,14 +24,16 @@ from scenario_test_utility.scenario_converter import ScenarioConverter
 class ConverterHandler():
 
     @staticmethod
-    def convert_all_scenarios(all_scenarios, expects, launcher_path):
+    def convert_all_scenarios(all_scenarios, expects, step_times_ms, launcher_path):
         assert len(all_scenarios) == len(expects)
         sweeped_xosc_scenarios = []
         xosc_expects = []
+        xosc_step_time_ms = []
         for index, scenario in enumerate(all_scenarios):
             if (pathlib.Path(scenario).suffix == ".xosc"):
                 sweeped_xosc_scenarios.append(scenario)
                 xosc_expects.append(expects[index])
+                xosc_step_time_ms.append(step_times_ms[index])
             else:
                 output_dir = ConverterHandler.convert_scenario(
                     index, scenario, launcher_path)
@@ -39,7 +41,8 @@ class ConverterHandler():
                 sweeped_xosc_scenarios.extend(xosc_scenarios)
                 for each in xosc_scenarios:
                     xosc_expects.append(expects[index])
-        return sweeped_xosc_scenarios, xosc_expects
+                    xosc_step_time_ms.append(step_times_ms[index])
+        return sweeped_xosc_scenarios, xosc_expects, xosc_step_time_ms
 
     @staticmethod
     def convert_scenario(index, yaml_scenario_path, launcher_path):
@@ -63,11 +66,7 @@ class ConverterHandler():
 
 
 def main():
-    yaml_scenario_path = [
-        "/path/to/scenario1.yaml",
-        "/path/to/scenario2.yaml"]
-    launcher_path = "/path/to/scenario_test_runner"
-    ConverterHandler.convert_all_scenarios(yaml_scenario_path, launcher_path)
+    pass
 
 
 if __name__ == "__main__":

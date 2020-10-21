@@ -38,20 +38,26 @@ class ScenarioTestRunner:
         self.log_path = ""
         self.scenarios = []
         self.xosc_scenarios = []
+        self.xosc_step_time_ms = []
 
     def run_workflow(self, workflow, log_directory):
         self.launcher_path, self.log_path, self.scenarios \
             = DatabaseHandler.read_database(workflow, log_directory)
         self.yaml_scenarios = []
         expects = []
+        step_times_ms = []
         for scenario in self.scenarios:
             self.yaml_scenarios.append(scenario["path"])
             if "expect" not in scenario:
                 expects.append("success")
             else:
                 expects.append(scenario["expect"])
-        self.xosc_scenarios, self.xosc_expects = ConverterHandler.convert_all_scenarios(
-            self.yaml_scenarios, expects, self.launcher_path)
+            if "step_time_ms" not in scenario:
+                step_times_ms.append(2)
+            else:
+                step_times_ms.append(scenario["step_time_ms"])
+        self.xosc_scenarios, self.xosc_expects, self.xosc_step_time_ms \
+            = ConverterHandler.convert_all_scenarios(self.yaml_scenarios, expects, step_times_ms, self.launcher_path)
         self.validate_all_scenarios()
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
@@ -91,7 +97,10 @@ class ScenarioTestRunner:
             Logger.print_separator(
                 "Test case " + str(index+1) + " of " + str(len(self.xosc_scenarios)))
             self.lifecycle_controller.configure_node(
-                    scenario, self.xosc_expects[index], self.log_path)
+                scenario,
+                self.xosc_expects[index],
+                self.xosc_step_time_ms[index],
+                self.log_path)
             if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
                 Logger.print_warning(
                     "Skip this scenario because of activation failure")

@@ -1,3 +1,8 @@
 Scenario: list(include('scenario'))
 ---
-scenario: {path: str(), expect: str(required=False)}
+scenario: 
+    {
+        path: str(),
+        expect: str(required=False),
+        step_time_ms: int(required=False)
+    }
