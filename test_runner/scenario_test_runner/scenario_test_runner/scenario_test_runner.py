@@ -46,7 +46,10 @@ class ScenarioTestRunner:
         expects = []
         for scenario in self.scenarios:
             self.yaml_scenarios.append(scenario["path"])
-            expects.append(scenario["expect"])
+            if "expect" not in scenario:
+                expects.append("success")
+            else:
+                expects.append(scenario["expect"])
         self.xosc_scenarios, self.xosc_expects = ConverterHandler.convert_all_scenarios(
             self.yaml_scenarios, expects, self.launcher_path)
         self.validate_all_scenarios()
