@@ -26,7 +26,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ByValueCondition =====================================================
+/* ---- ByValueCondition -------------------------------------------------------
  *
  * <xsd:complexType name="ByValueCondition">
  *   <xsd:choice>
@@ -40,7 +40,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ByValueCondition
   : public Element
 {

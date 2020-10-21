@@ -28,7 +28,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== EntityCondition ======================================================
+/* ---- EntityCondition --------------------------------------------------------
  *
  * <xsd:complexType name="EntityCondition">
  *   <xsd:choice>
@@ -48,7 +48,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct EntityCondition
   : public Element
 {

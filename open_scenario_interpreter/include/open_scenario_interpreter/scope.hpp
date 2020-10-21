@@ -17,9 +17,13 @@
 
 #include <boost/filesystem.hpp>
 #include <open_scenario_interpreter/syntax/entity_ref.hpp>
-// #include <simulation_api/api/api.hpp>
+#include <simulation_api/api/api.hpp>
 
+#include <limits>
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace open_scenario_interpreter
@@ -30,9 +34,10 @@ struct Scope
 
   std::vector<EntityRef> actors;
 
-  boost::filesystem::path scenario;
+  // for substituation syntax '$(dirname)'
+  const boost::filesystem::path scenario;
 
-  // std::shared_ptr<scenario_simulator::API> connection;
+  const std::shared_ptr<scenario_simulator::API> connection;
 
   Scope() = delete;
 
@@ -40,29 +45,30 @@ struct Scope
   explicit Scope(const Scope &) = default;
 
   template<typename ... Ts>
-  explicit Scope(Ts && ...)
-  {}
-
-  // template <typename... Ts>
-  // explicit Scope(Ts&&... xs)
-  //   : connection { std::make_shared<scenario_simulator::API>(std::forward<decltype(xs)>(xs)...) }
-  // {}
+  explicit Scope(const std::string & scenario, Ts && ... xs)
+  : scenario(scenario),
+    connection(
+      std::make_shared<scenario_simulator::API>(std::forward<decltype(xs)>(xs)...))
+  {
+    if (connection && connection->simulation) {
+      connection->simulation->initialize(1.0, 0.02);
+    } else {
+      THROW(ConnectionError);
+    }
+  }
 
 public:
-  // template <typename... Ts>
-  // decltype(auto) getEntityStatus(Ts&&... xs) try
-  // {
-  //   return connection->entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
-  // }
-  // catch (const simulation_api::SimulationRuntimeError& error)
-  // {
-  //   std::stringstream ss {};
-  //   ss << error.what() << ".\n"
-  //      << "Possible causes:\n"
-  //      << "  (1) The position of the corresponding entity is not specified by Teleport Action";
-  //   throw SemanticError { ss.str() };
-  // }
-  //
+  template<typename ... Ts>
+  decltype(auto) getEntityStatus(Ts && ... xs) const try {
+    return connection->entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
+  } catch (const simulation_api::SimulationRuntimeError & error) {
+    std::stringstream ss {};
+    ss << error.what() << ".\n";
+    ss << "Possible causes:\n";
+    ss << "  (1) The position of the corresponding entity is not specified by Teleport Action";
+    throw SemanticError(ss.str());
+  }
+
   // template <typename... Ts>
   // auto getDistanceAlongRoute(Ts&&... xs) const
   // {
@@ -77,21 +83,21 @@ public:
   //     return std::numeric_limits<value_type>::infinity();
   //   }
   // }
-  //
-  // template <typename... Ts>
-  // auto getTimeHeadway(Ts&&... xs) const
-  // {
-  //   if (const auto result {
-  //   connection->entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...) })
-  //   {
-  //     return *result;
-  //   }
-  //   else
-  //   {
-  //     using value_type = typename std::decay<decltype(result)>::type::value_type;
-  //     return std::numeric_limits<value_type>::quiet_NaN();
-  //   }
-  // }
+
+  template<typename ... Ts>
+  auto getTimeHeadway(Ts && ... xs) const
+  {
+    const auto result {
+      connection->entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...)
+    };
+
+    if (result) {
+      return *result;
+    } else {
+      using value_type = typename std::decay<decltype(result)>::type::value_type;
+      return std::numeric_limits<value_type>::quiet_NaN();
+    }
+  }
 };
 }  // namespace open_scenario_interpreter
 

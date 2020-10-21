@@ -21,35 +21,35 @@
 namespace open_scenario_interpreter
 {
 ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
-: rclcpp_lifecycle::LifecycleNode("open_scenario_interpreter", options),
-  port
-  {
-    8080
-  }
+: rclcpp_lifecycle::LifecycleNode("open_scenario_interpreter", options)
 {
-  declare_parameter<decltype(scenario)>("scenario", scenario);
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
+  declare_parameter<decltype(osc_path)>("map_path", map_path);
+  declare_parameter<decltype(osc_path)>("osc_path", osc_path);
 }
 
 ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
 {
   using open_scenario_interpreter::ScenarioRunner;
 
-  get_parameter("scenario", scenario);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
   get_parameter("expect", expect);
   get_parameter("log_path", log_path);
+  get_parameter("map_path", map_path);
+  get_parameter("osc_path", osc_path);
+
   log_path = log_path + "/result.junit.xml";
 
   try {
-    RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", scenario.c_str());
-    evaluate.rebind<OpenScenario>(scenario, address, port);
+    RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", osc_path.c_str());
+    evaluate.rebind<OpenScenario>(osc_path, shared_from_this(), map_path);
   } catch (const open_scenario_interpreter::SyntaxError & error) {
     RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
     return ScenarioRunner::Result::FAILURE;
   }
 
-  RCLCPP_INFO(get_logger(), "Connecting simulator via %s:%d", address.c_str(), port);
   evaluate.as<OpenScenario>().init();
 
   return ScenarioRunner::Result::SUCCESS;
@@ -59,7 +59,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
 {
   timer = create_wall_timer(
     std::chrono::milliseconds(50),
-    [&]()
+    [this]()
     {
       try {
         if (evaluate && !evaluate.as<OpenScenario>().complete()) {
@@ -80,13 +80,13 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             open_scenario_interpreter::complete_state.use_count() - 1);
         } else if (evaluate) {
           if (expect == "success") {
-            std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+            std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
             exporter.addTestCase(testcase, "scenario_testing", 0,
             junit_exporter::TestResult::SUCCESS);
             exporter.write(log_path);
           } else {
             RCLCPP_ERROR(get_logger(), "\x1b[1;32mFailure.\x1b[0m");
-            std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+            std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
             exporter.addTestCase(testcase, "scenario_testing", 0,
             junit_exporter::TestResult::FAILURE, "unexpected result",
             "testcase : " + testcase + " should end with " + expect);
@@ -99,12 +99,12 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
         switch (command) {
           case EXIT_SUCCESS:
             if (expect == "success") {
-              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
               exporter.addTestCase(testcase, "scenario_testing", 0,
               junit_exporter::TestResult::SUCCESS);
               exporter.write(log_path);
             } else {
-              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
               exporter.addTestCase(testcase, "scenario_testing", 0,
               junit_exporter::TestResult::FAILURE, "unexpected result",
               "testcase : " + testcase + " should end with " + expect);
@@ -117,12 +117,12 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
 
           case EXIT_FAILURE:
             if (expect == "failure") {
-              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
               exporter.addTestCase(testcase, "scenario_testing", 0,
               junit_exporter::TestResult::SUCCESS);
               exporter.write(log_path);
             } else {
-              std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+              std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
               exporter.addTestCase(testcase, "scenario_testing", 0,
               junit_exporter::TestResult::FAILURE, "unexpected result",
               "testcase : " + testcase + " should end with " + expect);
@@ -136,7 +136,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             break;
         }
       } catch (const open_scenario_interpreter::ImplementationFault & error) {
-        std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+        std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
         if (expect == "error") {
           exporter.addTestCase(testcase, "scenario_testing", 0,
           junit_exporter::TestResult::SUCCESS);
@@ -151,7 +151,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
         evaluate.reset();
         deactivate();
       } catch (const std::exception & error) {
-        std::string testcase = evaluate.as<OpenScenario>().global.scenario.string();
+        std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
         if (expect == "error") {
           exporter.addTestCase(testcase, "scenario_testing", 0,
           junit_exporter::TestResult::SUCCESS);

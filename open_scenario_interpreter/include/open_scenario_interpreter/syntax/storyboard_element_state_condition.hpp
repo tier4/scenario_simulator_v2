@@ -43,10 +43,10 @@ struct StoryboardElementStateCondition
 
   template<typename Node, typename Scope>
   explicit StoryboardElementStateCondition(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("storyboardElementRef", node, outer_scope)},
-    type{readAttribute<StoryboardElementType>("storyboardElementType", node, outer_scope)},
-    state{readAttribute<StoryboardElementState>("state", node, outer_scope)},
-    inner_scope{outer_scope}
+  : name(readAttribute<String>("storyboardElementRef", node, outer_scope)),
+    type(readAttribute<StoryboardElementType>("storyboardElementType", node, outer_scope)),
+    state(readAttribute<StoryboardElementState>("state", node, outer_scope)),
+    inner_scope(outer_scope)
   {}
 
   auto compare(const Element & lhs, StoryboardElementState rhs) const

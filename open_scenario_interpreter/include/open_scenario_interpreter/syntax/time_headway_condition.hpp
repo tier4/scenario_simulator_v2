@@ -51,10 +51,11 @@ struct TimeHeadwayCondition
 
   template<typename Node>
   explicit TimeHeadwayCondition(
-    const Node & node, Scope & outer_scope,
-    const TriggeringEntities & trigger)
-  : entity_ref{readAttribute<String>("entityRef", node, outer_scope)},
-    value{readAttribute<Double>("value", node, outer_scope)},
+    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+  : entity_ref(
+      readAttribute<String>("entityRef", node, outer_scope)),
+    value(
+      readAttribute<Double>("value", node, outer_scope)),
     freespace{readAttribute<Boolean>("freespace", node, outer_scope)},
     along_route{readAttribute<Boolean>("alongRoute", node, outer_scope)},
     compare{readAttribute<Rule>("rule", node, outer_scope)},
@@ -64,14 +65,11 @@ struct TimeHeadwayCondition
 
   auto evaluate()
   {
-    // return
-    //   asBoolean(
-    //     trigger([&](auto&& entity)
-    //     {
-    //       return compare(inner_scope.getTimeHeadway(entity, entity_ref), value);
-    //     }));
-
-    return false_v;
+    return asBoolean(
+      trigger([&](auto && entity)
+      {
+        return compare(inner_scope.getTimeHeadway(entity, entity_ref), value);
+      }));
   }
 };
 }

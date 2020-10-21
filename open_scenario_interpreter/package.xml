@@ -10,14 +10,27 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>ament_index_cpp</depend>
+  <depend>autoware_auto_msgs</depend>
+  <depend>behaviortree_cpp_v3</depend>
   <depend>geometry_msgs</depend>
   <depend>junit_exporter</depend>
+  <depend>lanelet2_core</depend>
+  <depend>lanelet2_extension</depend>
+  <depend>lanelet2_io</depend>
+  <depend>lanelet2_projection</depend>
+  <depend>lanelet2_routing</depend>
   <depend>lifecycle_msgs</depend>
   <depend>pugixml-dev</depend>
+  <depend>quaternion_operation</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
+  <depend>simulation_api</depend>
   <depend>std_msgs</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>visualization_msgs</depend>
+  <depend>xmlrpcpp</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

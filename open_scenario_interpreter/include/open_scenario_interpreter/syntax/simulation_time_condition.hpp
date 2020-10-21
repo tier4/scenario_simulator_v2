@@ -23,14 +23,14 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== SimulationTimeCondition ==============================================
+/* ---- SimulationTimeCondition ------------------------------------------------
  *
  * <xsd:complexType name="SimulationTimeCondition">
  *   <xsd:attribute name="value" type="Double" use="required"/>
  *   <xsd:attribute name="rule" type="Rule" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct SimulationTimeCondition
 {
   const Double value;

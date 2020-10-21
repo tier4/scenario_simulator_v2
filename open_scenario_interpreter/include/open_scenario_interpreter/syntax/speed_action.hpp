@@ -26,7 +26,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== SpeedAction ==========================================================
+/* ---- SpeedAction ------------------------------------------------------------
  *
  * <xsd:complexType name="SpeedAction">
  *   <xsd:all>
@@ -35,7 +35,7 @@ inline namespace syntax
  *   </xsd:all>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct SpeedAction
 {
   Scope inner_scope;
@@ -46,15 +46,15 @@ struct SpeedAction
 
   template<typename Node>
   explicit SpeedAction(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope},
-    speed_action_dynamics{readElement<TransitionDynamics>("SpeedActionDynamics", node,
-        inner_scope)},
-    speed_action_target{readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope)}
+  : inner_scope(outer_scope),
+    speed_action_dynamics(
+      readElement<TransitionDynamics>("SpeedActionDynamics", node, inner_scope)),
+    speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
   {}
 
   std::unordered_map<std::string, Boolean> accomplishments;
 
-  auto start()   // XXX UGLY CODE
+  auto start()  // XXX UGLY CODE
   {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       for (const auto & each : inner_scope.actors) {
@@ -62,18 +62,21 @@ struct SpeedAction
 
         switch (speed_action_dynamics.dynamics_shape) {
           case DynamicsShape::linear:
-            // inner_scope.connection->entity->setTargetSpeed(
-            // each, speed_action_target.as<AbsoluteTargetSpeed>().value, true);
+            inner_scope.connection->entity->setTargetSpeed(
+              each, speed_action_target.as<AbsoluteTargetSpeed>().value, true);
             break;
 
           case DynamicsShape::step:
-            // {
-            //   auto status { inner_scope.getEntityStatus(each) };
-            //   status.twist.linear.x = speed_action_target.as<AbsoluteTargetSpeed>().value;
-            //
-            //   inner_scope.connection->entity->setEntityStatus(each, status);
-            //   inner_scope.connection->entity->setTargetSpeed(each, status.twist.linear.x, true);
-            // }
+            // XXX UGLY CODE
+            {
+              auto status {
+                inner_scope.getEntityStatus(each)
+              };
+              status.twist.linear.x = speed_action_target.as<AbsoluteTargetSpeed>().value;
+
+              inner_scope.connection->entity->setEntityStatus(each, status);
+              inner_scope.connection->entity->setTargetSpeed(each, status.twist.linear.x, true);
+            }
             break;
 
           default:
@@ -93,10 +96,9 @@ struct SpeedAction
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
           try {
-            // cdr(each) =
-            //   Rule(Rule::equalTo)(
-            //     inner_scope.getEntityStatus(car(each)).twist.linear.x,
-            //     speed_action_target.as<AbsoluteTargetSpeed>().value);
+            cdr(each) = Rule(Rule::equalTo)(
+              inner_scope.getEntityStatus(car(each)).twist.linear.x,
+              speed_action_target.as<AbsoluteTargetSpeed>().value);
           } catch (const SemanticError &) {  // XXX DIRTY HACK!!!
             // NOTE maybe lane-changing
             cdr(each) = false;

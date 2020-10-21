@@ -62,10 +62,9 @@ struct ScenarioObject
 
   auto evaluate()
   {
-    std::cout << indent << "spawn(false, " << name << ", ...)\n" << entity_object << std::endl;
-    // return asBoolean(inner_scope.connection->entity->spawn(
-    // false, name, boost::lexical_cast<String>(entity_object)));
-    return unspecified;
+    return asBoolean(
+      inner_scope.connection->entity->spawn(
+        false, name, boost::lexical_cast<String>(entity_object)));
   }
 };
 
