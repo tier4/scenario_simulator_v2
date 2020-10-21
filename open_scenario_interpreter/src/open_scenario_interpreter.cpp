@@ -27,6 +27,7 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
   declare_parameter<decltype(log_path)>("log_path", log_path);
   declare_parameter<decltype(osc_path)>("map_path", map_path);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
+  declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
 }
 
 ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
@@ -39,6 +40,7 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
   get_parameter("log_path", log_path);
   get_parameter("map_path", map_path);
   get_parameter("osc_path", osc_path);
+  get_parameter("step_time_ms", step_time_ms);
 
   log_path = log_path + "/result.junit.xml";
 
@@ -61,7 +63,7 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State &)
 {
   timer = create_wall_timer(
-    std::chrono::milliseconds(50),
+    std::chrono::milliseconds(step_time_ms),
     [this]()
     {
       try {

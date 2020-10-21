@@ -50,7 +50,7 @@
               <SpeedAction>
                 <SpeedActionDynamics dynamicsShape="step" value="0" dynamicsDimension="time"/>
                 <SpeedActionTarget>
-                  <AbsoluteTargetSpeed value="20"/>
+                  <AbsoluteTargetSpeed value="10"/>
                 </SpeedActionTarget>
               </SpeedAction>
             </LongitudinalAction>
