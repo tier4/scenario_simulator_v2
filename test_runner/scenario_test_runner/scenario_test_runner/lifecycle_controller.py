@@ -58,9 +58,16 @@ class LifecycleController(Node):
             rcl_interfaces.srv.SetParameters,
             LifecycleController.NODE_NAME + '/set_parameters')
 
-    def send_request_to_change_parameters(self, scenario, expect, log_path):
+    def send_request_to_change_parameters(self, scenario, expect, step_time_ms, log_path):
         request = rcl_interfaces.srv.SetParameters.Request()
         request.parameters = [
+            rcl_interfaces.msg.Parameter(
+                name='step_time_ms',
+                value=rcl_interfaces.msg.ParameterValue(
+                    type=rcl_interfaces.msg.ParameterType.PARAMETER_INTEGER,
+                    integer_value=step_time_ms
+                )
+            ),
             rcl_interfaces.msg.Parameter(
                 name=LifecycleController.PARAMETER_XOSC_PATH,
                 value=rcl_interfaces.msg.ParameterValue(
@@ -90,7 +97,7 @@ class LifecycleController(Node):
             except Exception as e:
                 self.get_logger().info('Service call failed %r' % (e,))
 
-    def configure_node(self, scenario, expect, log_path):
+    def configure_node(self, scenario, expect, step_time_ms, log_path):
         self.node_logger.info(self.get_lifecycle_state())
 
         self.current_scenario = scenario
@@ -101,7 +108,11 @@ class LifecycleController(Node):
             LifecycleController.NODE_NAME +
             "'s parameter 'scenario'")
 
-        self.send_request_to_change_parameters(self.current_scenario, expect, log_path)
+        self.send_request_to_change_parameters(
+            self.current_scenario,
+            expect,
+            step_time_ms,
+            log_path)
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         Logger.print_info("Configure -> scenario runner state is " +
