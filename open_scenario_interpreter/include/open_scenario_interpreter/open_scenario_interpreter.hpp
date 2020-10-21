@@ -86,6 +86,8 @@ class ScenarioRunner
 
   junit_exporter::JunitExporter exporter;
 
+  int step_time_ms;
+
 public:
   OPEN_SCENARIO_INTERPRETER_PUBLIC
   explicit ScenarioRunner(const rclcpp::NodeOptions &);
