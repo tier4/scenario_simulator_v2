@@ -22,7 +22,8 @@
             other_entity_status="{other_entity_status}"
             entity_type_list="{entity_type_list}"
             target_status="{target_status}"/>
-        <FollowLane name="follow_lane"
+        <Fallback name="follow_lane">
+            <FollowLane name="follow_lane"
             request="{request}"
             hdmap_utils="{hdmap_utils}"
             current_time="{current_time}"
@@ -33,6 +34,7 @@
             target_speed="{target_speed}"
             other_entity_status="{other_entity_status}"
             entity_type_list="{entity_type_list}"/>
+        </Fallback>>
     </Fallback>
     </BehaviorTree>
 </root>
