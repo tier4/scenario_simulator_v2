@@ -3,14 +3,14 @@
 
 # Copyright 2020 Autoware Foundation. All rights reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+# distributed under the License is distributed on an 'AS IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -34,8 +34,8 @@ class ScenarioTestRunner:
         self.timeout = timeout
         self.database_path = None
         self.lifecycle_controller = None
-        self.launcher_path = ""
-        self.log_path = ""
+        self.launcher_path = ''
+        self.log_path = ''
         self.scenarios = []
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
@@ -47,47 +47,49 @@ class ScenarioTestRunner:
         expects = []
         step_times_ms = []
         for scenario in self.scenarios:
-            self.yaml_scenarios.append(scenario["path"])
-            if "expect" not in scenario:
-                expects.append("success")
+            self.yaml_scenarios.append(scenario['path'])
+            if 'expect' not in scenario:
+                expects.append('success')
             else:
-                expects.append(scenario["expect"])
-            if "step_time_ms" not in scenario:
+                expects.append(scenario['expect'])
+            if 'step_time_ms' not in scenario:
                 step_times_ms.append(2)
             else:
-                step_times_ms.append(scenario["step_time_ms"])
+                step_times_ms.append(scenario['step_time_ms'])
         self.xosc_scenarios, self.xosc_expects, self.xosc_step_time_ms \
-            = ConverterHandler.convert_all_scenarios(self.yaml_scenarios, expects, step_times_ms, self.launcher_path)
+            = ConverterHandler.convert_all_scenarios(self.yaml_scenarios,
+                                                     expects, step_times_ms,
+                                                     self.launcher_path)
         self.validate_all_scenarios()
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
 
     def validate_all_scenarios(self):
         validator = XoscValidator()
-        Logger.print_separator("validating scenarios")
+        Logger.print_separator('validating scenarios')
         for scenario in self.xosc_scenarios:
             validator.validate_xosc_file(scenario)
 
     def monitor_state(self):
         start = time.time()
         while (time.time() - start) < self.timeout:
-            Logger.print_info("    Monitoring in Launcher")
+            Logger.print_info('    Monitoring in Launcher')
             current_state = self.lifecycle_controller.get_lifecycle_state()
-            Logger.print_info("    scenario runner state is " + current_state)
-            if(current_state == "inactive"):
-                Logger.print_process("    end of running")
+            Logger.print_info('    scenario runner state is ' + current_state)
+            if(current_state == 'inactive'):
+                Logger.print_process('    end of running')
                 return
             time.sleep(self.SLEEP_RATE)
-        Logger.print_warning("Reached to maximum simulation time")
+        Logger.print_warning('Reached to maximum simulation time')
         self.lifecycle_controller.deactivate_node()
 
     def run_scenario(self):
         Logger.print_process(
-            "Set maximum simulation time: " + str(self.timeout))
+            'Set maximum simulation time: ' + str(self.timeout))
         time.sleep(self.SLEEP_RATE)
         self.lifecycle_controller.activate_node()
         self.monitor_state()
-        print("")
+        print('')
 
     def run_all_scenarios(self):
         Manager.mkdir(self.log_path)
@@ -95,15 +97,15 @@ class ScenarioTestRunner:
             print(str(index+1), scenario)
         for index, scenario in enumerate(self.xosc_scenarios):
             Logger.print_separator(
-                "Test case " + str(index+1) + " of " + str(len(self.xosc_scenarios)))
+                'Test case ' + str(index+1) + ' of ' + str(len(self.xosc_scenarios)))
             self.lifecycle_controller.configure_node(
                 scenario,
                 self.xosc_expects[index],
                 self.xosc_step_time_ms[index],
                 self.log_path)
-            if (self.lifecycle_controller.get_lifecycle_state() == "unconfigured"):
+            if (self.lifecycle_controller.get_lifecycle_state() == 'unconfigured'):
                 Logger.print_warning(
-                    "Skip this scenario because of activation failure")
+                    'Skip this scenario because of activation failure')
                 continue
             self.run_scenario()
             self.lifecycle_controller.cleanup_node()
