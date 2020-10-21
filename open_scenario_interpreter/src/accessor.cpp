@@ -14,6 +14,8 @@
 
 #include <open_scenario_interpreter/accessor.hpp>
 
+#include <memory>
+
 namespace open_scenario_interpreter
 {
 std::unique_ptr<scenario_simulator::API> Accessor::connection {};

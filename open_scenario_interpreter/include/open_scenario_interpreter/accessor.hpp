@@ -18,6 +18,7 @@
 #include <simulation_api/api/api.hpp>
 #include <open_scenario_interpreter/error.hpp>
 
+#include <limits>
 #include <memory>
 #include <utility>
 
