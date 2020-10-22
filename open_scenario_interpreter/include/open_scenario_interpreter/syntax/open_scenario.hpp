@@ -51,9 +51,9 @@ struct ScenarioDefinition
 
   template<typename Node, typename Scope>
   explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope}
+  : inner_scope(outer_scope)
   {
-    std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
+    // std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
 
     callWithElements(
       node, "ParameterDeclarations", 0, unbounded, [&](auto && each)
@@ -61,12 +61,12 @@ struct ScenarioDefinition
         return make<ParameterDeclarations>(each, inner_scope);
       });
 
-    for (const auto & each : inner_scope.parameters) {
-      std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
-        reset << " of type " << green << std::get<1>(each).type().name() << reset <<
-        " declared as value " << cyan << "\"" << std::get<1>(each) << cyan << "\"" << reset <<
-        " -->" << std::endl;
-    }
+    // for (const auto & each : inner_scope.parameters) {
+    //   std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
+    //     reset << " of type " << green << std::get<1>(each).type().name() << reset <<
+    //     " declared as value " << cyan << "\"" << std::get<1>(each) << cyan << "\"" << reset <<
+    //     " -->" << std::endl;
+    // }
 
     callWithElements(
       node, "CatalogLocations", 0, 1, [&](auto && node)
@@ -86,13 +86,13 @@ struct ScenarioDefinition
         return make<Entities>(node, inner_scope);
       });
 
-    std::cout << (indent++) << "<Entities>" << std::endl;
-
-    for (const auto & each : inner_scope.entities) {
-      std::cout << std::get<1>(each) << std::endl;
-    }
-
-    std::cout << (--indent) << "</Entities>" << std::endl;
+    // std::cout << (indent++) << "<Entities>" << std::endl;
+    //
+    // for (const auto & each : inner_scope.entities) {
+    //   std::cout << std::get<1>(each) << std::endl;
+    // }
+    //
+    // std::cout << (--indent) << "</Entities>" << std::endl;
 
     callWithElement(
       node, "Storyboard", [&](auto && node)
@@ -100,7 +100,7 @@ struct ScenarioDefinition
         return storyboard = make<Storyboard>(node, inner_scope);
       });
 
-    std::cout << (--indent) << "</OpenSCENARIO>" << std::endl;
+    // std::cout << (--indent) << "</OpenSCENARIO>" << std::endl;
   }
 
   template<typename ... Ts>

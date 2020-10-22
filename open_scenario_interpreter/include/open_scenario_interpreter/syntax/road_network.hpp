@@ -22,7 +22,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== RoadNetwork ==========================================================
+/* ---- RoadNetwork ------------------------------------------------------------
  *
  * <xsd:complexType name="RoadNetwork">
  *   <xsd:sequence>
@@ -32,7 +32,7 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct RoadNetwork
 {
   const File logic_file;
@@ -43,11 +43,17 @@ struct RoadNetwork
 
   template<typename Node, typename Scope>
   explicit RoadNetwork(const Node & node, Scope & outer_scope)
-  : logic_file{readElement<File>("LogicFile", node, outer_scope)},
-    scene_graph_file{readElement<File>("SceneGraphFile", node, outer_scope)},
-    traffic_signals{readElement<TrafficSignals>("TrafficSignals", node, outer_scope)}
-  {}
+  : logic_file(readElement<File>("LogicFile", node, outer_scope)),
+    scene_graph_file(readElement<File>("SceneGraphFile", node, outer_scope)),
+    traffic_signals(readElement<TrafficSignals>("TrafficSignals", node, outer_scope))
+  {
+    outer_scope.logic_file = logic_file;
+    outer_scope.scene_graph_file = scene_graph_file;
+  }
 };
+
+static_assert(std::is_default_constructible<File>::value);
+static_assert(std::is_default_constructible<TrafficSignals>::value);
 }
 }  // namespace open_scenario_interpreter
 

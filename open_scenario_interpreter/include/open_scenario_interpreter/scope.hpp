@@ -29,9 +29,14 @@ namespace open_scenario_interpreter
 {
 struct Scope
 {
-  std::unordered_map<String, Element> parameters, entities, storyboard_elements;
+  std::unordered_map<String, Element> parameters;
+  std::unordered_map<String, Element> entities;
+  std::unordered_map<String, Element> storyboard_elements;
 
   std::vector<EntityRef> actors;
+
+  boost::filesystem::path logic_file;
+  boost::filesystem::path scene_graph_file;
 
   // for substituation syntax '$(dirname)'
   const boost::filesystem::path scenario;
