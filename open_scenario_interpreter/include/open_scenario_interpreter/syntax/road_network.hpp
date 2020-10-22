@@ -17,6 +17,7 @@
 
 #include <open_scenario_interpreter/syntax/file.hpp>
 #include <open_scenario_interpreter/syntax/traffic_signals.hpp>
+#include <open_scenario_interpreter/utility/assertion_auxiliary.hpp>
 
 namespace open_scenario_interpreter
 {
@@ -33,6 +34,9 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+ASSERT_DEFAULT_CONSTRUCTIBLE(File);
+ASSERT_DEFAULT_CONSTRUCTIBLE(TrafficSignals);
+
 struct RoadNetwork
 {
   const File logic_file;
@@ -51,9 +55,6 @@ struct RoadNetwork
     outer_scope.scene_graph_file = scene_graph_file;
   }
 };
-
-static_assert(std::is_default_constructible<File>::value);
-static_assert(std::is_default_constructible<TrafficSignals>::value);
 }
 }  // namespace open_scenario_interpreter
 

@@ -130,13 +130,12 @@ struct ScenarioDefinition
   }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ScenarioDefinition &)
+auto operator<<(std::ostream & os, const ScenarioDefinition &)->decltype(auto)
 {
   return os << unspecified;
 }
 
-/* ==== OpenScenario =========================================================
+/* ---- OpenScenario -----------------------------------------------------------
  *
  * <xsd:complexType name="OpenScenario">
  *   <xsd:sequence>
@@ -158,7 +157,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Sce
  *   </xsd:sequence>
  * </xsd:group>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct OpenScenario
   : public pugi::xml_document
 {

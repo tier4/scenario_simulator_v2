@@ -25,15 +25,13 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
 {
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
-  declare_parameter<decltype(osc_path)>("map_path", map_path);
+  declare_parameter<decltype(map_path)>("map_path", map_path);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
   declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
 }
 
 ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
 {
-  using open_scenario_interpreter::ScenarioRunner;
-
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   get_parameter("expect", expect);
@@ -54,7 +52,10 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
   static constexpr auto real_time_factor = 10.0;
 
-  connect(shared_from_this(), map_path);
+  connect(
+    shared_from_this(),
+    // XXX DIRTY HACK!!!  INNER_SCOPE MUST BE PRIVATE
+    evaluate.as<OpenScenario>().category.as<ScenarioDefinition>().inner_scope.logic_file.string());
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
 
