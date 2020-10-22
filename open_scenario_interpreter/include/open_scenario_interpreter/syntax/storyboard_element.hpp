@@ -71,8 +71,10 @@ struct StoryboardElement
     Boolean && test, const Element & consequent_state, const Element & alternate_state)
   {
     if (test) {
+      #ifndef NDEBUG
       std::cout << indent << typeid(T).name() << "::evaluate [" << current_state << " => " <<
         consequent_state << "]" << std::endl;
+      #endif
       return current_state = consequent_state;
     } else {
       return current_state = alternate_state;
@@ -97,7 +99,9 @@ struct StoryboardElement
 
   Element override ()
   {
+    #ifndef NDEBUG
     std::cout << state() << std::endl;
+    #endif
     if (!complete() && !stopping()) {
       return current_state = stop_transition;
     } else {
@@ -166,9 +170,11 @@ public:
       override ();
     }
 
+    #ifndef NDEBUG
     std::cout << (indent++) << "Evaluating " << cyan << "\"" <<
       static_cast<const T &>(*this).name << "\"" << reset << " [" << current_state << "] " <<
       std::endl;
+    #endif
 
     BOOST_SCOPE_EXIT_ALL()
     {
@@ -323,10 +329,12 @@ public:
 
           return current_state;
         } else {
+          #ifndef NDEBUG
           std::cout << indent <<
             typeid(T).name() <<
             "::stop [" << current_state << " => " << complete_state << "]" <<
             std::endl;
+          #endif
 
           return current_state = complete_state;
         }

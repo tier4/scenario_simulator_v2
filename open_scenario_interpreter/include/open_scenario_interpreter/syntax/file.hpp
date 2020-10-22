@@ -21,25 +21,30 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== File =================================================================
+/* ---- File -------------------------------------------------------------------
  *
  * <xsd:complexType name="File">
  *   <xsd:attribute name="filepath" type="String" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct File
 {
   const String filepath;
 
   File()
-  : filepath{"./"}
+  : filepath("./")
   {}
 
   template<typename Node, typename Scope>
   explicit File(const Node & node, Scope & outer_scope)
-  : filepath{readAttribute<String>("filepath", node, outer_scope)}
+  : filepath(readAttribute<String>("filepath", node, outer_scope))
   {}
+
+  operator String() const noexcept
+  {
+    return filepath;
+  }
 };
 }
 }  // namespace open_scenario_interpreter

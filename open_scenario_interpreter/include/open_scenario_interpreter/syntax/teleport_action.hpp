@@ -15,13 +15,14 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/position.hpp>
 
 namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== TeleportAction =======================================================
+/* ---- TeleportAction ---------------------------------------------------------
  *
  * <xsd:complexType name="TeleportAction">
  *   <xsd:sequence>
@@ -29,7 +30,7 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct TeleportAction
 {
   Scope inner_scope;
@@ -59,7 +60,7 @@ struct TeleportAction
       }
 
       const simulation_api::entity::EntityStatus status {
-        inner_scope.connection->simulation->getCurrentTime(),
+        getCurrentTime(),
         Integer(position.as<LanePosition>().lane_id),
         position.as<LanePosition>().s,
         position.as<LanePosition>().offset,
@@ -69,7 +70,7 @@ struct TeleportAction
       };
 
       for (const auto & each : inner_scope.actors) {
-        inner_scope.connection->entity->setEntityStatus(each, status);
+        setEntityStatus(each, status);
       }
     } else {
       THROW(ImplementationFault);

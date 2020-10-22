@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/entity_object.hpp>
 #include <open_scenario_interpreter/syntax/entity_ref.hpp>
 #include <open_scenario_interpreter/syntax/object_controller.hpp>
@@ -23,7 +24,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ScenarioObject =======================================================
+/* ---- ScenarioObject ---------------------------------------------------------
  *
  * <xsd:complexType name="ScenarioObject">
  *   <xsd:sequence>
@@ -33,25 +34,22 @@ inline namespace syntax
  *   <xsd:attribute name="name" type="String" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ScenarioObject
 {
   const String name;
-
-  Scope inner_scope;
 
   Element entity_object, object_controller;
 
   template<typename Node>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    inner_scope{outer_scope},
-    entity_object{make<EntityObject>(node, inner_scope)}
+  : name(readAttribute<String>("name", node, outer_scope)),
+    entity_object(make<EntityObject>(node, outer_scope))
   {
     callWithElements(
       node, "ObjectController", 0, 1, [&](auto && node)
       {
-        return object_controller.rebind<ObjectController>(node, inner_scope);
+        return object_controller.rebind<ObjectController>(node, outer_scope);
       });
   }
 
@@ -62,9 +60,7 @@ struct ScenarioObject
 
   auto evaluate()
   {
-    return asBoolean(
-      inner_scope.connection->entity->spawn(
-        false, name, boost::lexical_cast<String>(entity_object)));
+    return asBoolean(spawn(false, name, boost::lexical_cast<String>(entity_object)));
   }
 };
 

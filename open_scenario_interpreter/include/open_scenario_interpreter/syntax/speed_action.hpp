@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/rule.hpp>
 #include <open_scenario_interpreter/syntax/speed_action_target.hpp>
 #include <open_scenario_interpreter/syntax/transition_dynamics.hpp>
@@ -59,23 +60,20 @@ struct SpeedAction
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       for (const auto & each : inner_scope.actors) {
         accomplishments.emplace(each, false);
-
         switch (speed_action_dynamics.dynamics_shape) {
           case DynamicsShape::linear:
-            inner_scope.connection->entity->setTargetSpeed(
-              each, speed_action_target.as<AbsoluteTargetSpeed>().value, true);
+            setTargetSpeed(each, speed_action_target.as<AbsoluteTargetSpeed>().value, true);
             break;
 
           case DynamicsShape::step:
             // XXX UGLY CODE
             {
               auto status {
-                inner_scope.getEntityStatus(each)
+                getEntityStatus(each)
               };
               status.twist.linear.x = speed_action_target.as<AbsoluteTargetSpeed>().value;
-
-              inner_scope.connection->entity->setEntityStatus(each, status);
-              inner_scope.connection->entity->setTargetSpeed(each, status.twist.linear.x, true);
+              setEntityStatus(each, status);
+              setTargetSpeed(each, status.twist.linear.x, true);
             }
             break;
 
@@ -83,7 +81,6 @@ struct SpeedAction
             THROW(ImplementationFault);
         }
       }
-
       return unspecified;
     } else {
       THROW(ImplementationFault);
@@ -97,15 +94,14 @@ struct SpeedAction
         if (!cdr(each)) {
           try {
             cdr(each) = Rule(Rule::equalTo)(
-              inner_scope.getEntityStatus(car(each)).twist.linear.x,
-              speed_action_target.as<AbsoluteTargetSpeed>().value);
+              getEntityStatus(
+                car(each)).twist.linear.x, speed_action_target.as<AbsoluteTargetSpeed>().value);
           } catch (const SemanticError &) {  // XXX DIRTY HACK!!!
             // NOTE maybe lane-changing
             cdr(each) = false;
           }
         }
       }
-
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
     } else {
       THROW(ImplementationFault);

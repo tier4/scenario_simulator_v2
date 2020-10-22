@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__REACH_POSITION_CONDITION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__REACH_POSITION_CONDITION_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/position.hpp>
 #include <open_scenario_interpreter/syntax/triggering_entities.hpp>
 
@@ -36,8 +37,6 @@ struct ReachPositionCondition
 {
   const Double tolerance;
 
-  Scope inner_scope;
-
   const Position position;
 
   const TriggeringEntities trigger;
@@ -46,8 +45,7 @@ struct ReachPositionCondition
   explicit ReachPositionCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
   : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
-    inner_scope(outer_scope),
-    position(readElement<Position>("Position", node, inner_scope)),
+    position(readElement<Position>("Position", node, outer_scope)),
     trigger(trigger)
   {}
 
@@ -57,16 +55,13 @@ struct ReachPositionCondition
       return asBoolean(
         trigger([&](auto && entity)
         {
-          return inner_scope.connection->entity->reachPosition(
-            entity,
-            position.as<WorldPosition>(),
-            tolerance);
+          return isReachedPosition(entity, position.as<WorldPosition>(), tolerance);
         }));
     } else if (position.is<LanePosition>()) {
       return asBoolean(
         trigger([&](auto && entity)
         {
-          return inner_scope.connection->entity->reachPosition(
+          return isReachedPosition(
             entity,
             static_cast<Integer>(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,

@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/relative_distance_type.hpp>
 #include <open_scenario_interpreter/syntax/triggering_entities.hpp>
 
@@ -45,8 +46,6 @@ struct RelativeDistanceCondition
 
   const Rule compare;
 
-  Scope inner_scope;
-
   const TriggeringEntities verify;
 
   template<typename Node, typename Scope>
@@ -58,7 +57,6 @@ struct RelativeDistanceCondition
     value(readAttribute<Double>("value", node, outer_scope)),
     freespace(readAttribute<Boolean>("freespace", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
-    inner_scope(outer_scope),
     verify(triggering_entities)
   {}
 
@@ -71,10 +69,11 @@ struct RelativeDistanceCondition
           verify([&](auto && subject)
           {
             const auto distance {
-              std::fabs(inner_scope.connection->entity->getRelativePose(
-                subject, entity_ref).position.x)
+              std::fabs(getRelativePose(subject, entity_ref).position.x)
             };
+            #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
+            #endif
             return compare(distance, value);
           }));
 
@@ -84,10 +83,11 @@ struct RelativeDistanceCondition
           verify([&](auto && subject)
           {
             const auto distance {
-              std::fabs(inner_scope.connection->entity->getRelativePose(
-                subject, entity_ref).position.y)
+              std::fabs(getRelativePose(subject, entity_ref).position.y)
             };
+            #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
+            #endif
             return compare(distance, value);
           }));
 
@@ -98,10 +98,12 @@ struct RelativeDistanceCondition
           {
             const auto distance {
               std::hypot(
-                inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.x,
-                inner_scope.connection->entity->getRelativePose(subject, entity_ref).position.y)
+                getRelativePose(subject, entity_ref).position.x,
+                getRelativePose(subject, entity_ref).position.y)
             };
+            #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
+            #endif
             return compare(distance, value);
           }));
 

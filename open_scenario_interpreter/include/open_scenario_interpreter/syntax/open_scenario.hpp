@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/catalog_locations.hpp>
 #include <open_scenario_interpreter/syntax/entities.hpp>
 #include <open_scenario_interpreter/syntax/file_header.hpp>
@@ -29,7 +30,7 @@ namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ScenarioDefinition ===================================================
+/* ---- ScenarioDefinition -----------------------------------------------------
  *
  * <xsd:group name="ScenarioDefinition">
  *   <xsd:sequence>
@@ -41,7 +42,7 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:group>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ScenarioDefinition
 {
   Element storyboard;
@@ -50,9 +51,9 @@ struct ScenarioDefinition
 
   template<typename Node, typename Scope>
   explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope}
+  : inner_scope(outer_scope)
   {
-    std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
+    // std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
 
     callWithElements(
       node, "ParameterDeclarations", 0, unbounded, [&](auto && each)
@@ -60,12 +61,12 @@ struct ScenarioDefinition
         return make<ParameterDeclarations>(each, inner_scope);
       });
 
-    for (const auto & each : inner_scope.parameters) {
-      std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
-        reset << " of type " << green << std::get<1>(each).type().name() << reset <<
-        " declared as value " << cyan << "\"" << std::get<1>(each) << cyan << "\"" << reset <<
-        " -->" << std::endl;
-    }
+    // for (const auto & each : inner_scope.parameters) {
+    //   std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
+    //     reset << " of type " << green << std::get<1>(each).type().name() << reset <<
+    //     " declared as value " << cyan << "\"" << std::get<1>(each) << cyan << "\"" << reset <<
+    //     " -->" << std::endl;
+    // }
 
     callWithElements(
       node, "CatalogLocations", 0, 1, [&](auto && node)
@@ -85,13 +86,13 @@ struct ScenarioDefinition
         return make<Entities>(node, inner_scope);
       });
 
-    std::cout << (indent++) << "<Entities>" << std::endl;
-
-    for (const auto & each : inner_scope.entities) {
-      std::cout << std::get<1>(each) << std::endl;
-    }
-
-    std::cout << (--indent) << "</Entities>" << std::endl;
+    // std::cout << (indent++) << "<Entities>" << std::endl;
+    //
+    // for (const auto & each : inner_scope.entities) {
+    //   std::cout << std::get<1>(each) << std::endl;
+    // }
+    //
+    // std::cout << (--indent) << "</Entities>" << std::endl;
 
     callWithElement(
       node, "Storyboard", [&](auto && node)
@@ -99,7 +100,7 @@ struct ScenarioDefinition
         return storyboard = make<Storyboard>(node, inner_scope);
       });
 
-    std::cout << (--indent) << "</OpenSCENARIO>" << std::endl;
+    // std::cout << (--indent) << "</OpenSCENARIO>" << std::endl;
   }
 
   template<typename ... Ts>
@@ -107,9 +108,8 @@ struct ScenarioDefinition
   {
     // Spawn entities
     for (const auto & each : inner_scope.entities) {
-      std::cout << std::get<1>(each).evaluate() << std::endl;
+      std::get<1>(each).evaluate();
     }
-
     storyboard.start();
   }
 
@@ -124,19 +124,18 @@ struct ScenarioDefinition
   {
     const auto result {storyboard.evaluate()};
 
-    inner_scope.connection->simulation->updateFrame();
+    updateFrame();
 
     return result;
   }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ScenarioDefinition &)
+auto operator<<(std::ostream & os, const ScenarioDefinition &)->decltype(auto)
 {
   return os << unspecified;
 }
 
-/* ==== OpenScenario =========================================================
+/* ---- OpenScenario -----------------------------------------------------------
  *
  * <xsd:complexType name="OpenScenario">
  *   <xsd:sequence>
@@ -158,7 +157,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Sce
  *   </xsd:sequence>
  * </xsd:group>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct OpenScenario
   : public pugi::xml_document
 {

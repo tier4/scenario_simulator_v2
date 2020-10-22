@@ -58,7 +58,6 @@ void callWithElements(
   Callee && call_with)
 {
   const auto children {parent.children(name.c_str())};
-
   if (const auto size {iterator::size(children)}) {
     if (min_occurs != 0 && size < min_occurs) {
       std::stringstream ss {};

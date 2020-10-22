@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/rule.hpp>
 #include <open_scenario_interpreter/syntax/triggering_entities.hpp>
 
@@ -36,8 +37,6 @@ struct SpeedCondition
 
   const Rule compare;
 
-  Scope inner_scope;
-
   const TriggeringEntities trigger;
 
   template<typename Node>
@@ -45,7 +44,6 @@ struct SpeedCondition
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
   : value(readAttribute<Double>("value", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
-    inner_scope(outer_scope),
     trigger(trigger)
   {}
 
@@ -54,7 +52,7 @@ struct SpeedCondition
     return asBoolean(
       trigger([&](auto && entity)
       {
-        return compare(inner_scope.getEntityStatus(entity).twist.linear.x, value);
+        return compare(getEntityStatus(entity).twist.linear.x, value);
       }));
   }
 };

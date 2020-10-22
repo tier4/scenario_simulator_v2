@@ -113,9 +113,13 @@ struct ParameterCondition
     };
 
     if (iter != std::end(overloads)) {
+      #ifndef NDEBUG
       std::cout << "ParameterCondition: " << target << " " << compare << " " << value << " => ";
+      #endif
       const auto result = std::get<1>(* iter)(compare, target, value) ? true_v : false_v;
+      #ifndef NDEBUG
       std::cout << result << std::endl;
+      #endif
       return result;
     } else {
       THROW_IMPLEMENTATION_FAULT();
