@@ -15,9 +15,8 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/rule.hpp>
-
-#include <chrono>
 
 namespace open_scenario_interpreter
 {
@@ -37,33 +36,20 @@ struct SimulationTimeCondition
 
   const Rule compare;
 
-  std::chrono::high_resolution_clock::time_point begin;
-
   template<typename Node, typename Scope>
   explicit SimulationTimeCondition(const Node & node, Scope & scope)
   : value(readAttribute<Double>("value", node, scope)),
-    compare(readAttribute<Rule>("rule", node, scope)),
-    begin(std::chrono::high_resolution_clock::now())  // XXX TEMPORARY TOY IMPLEMENTATION
+    compare(readAttribute<Rule>("rule", node, scope))
   {}
 
   auto evaluate() const
   {
-    const auto simulation_time {
-      std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::high_resolution_clock::now() - begin
-      ).count()
-    };
+    const auto result {asBoolean(compare(getCurrentTime(), value))};
 
-    const auto specified_time {
-      std::chrono::duration_cast<std::chrono::nanoseconds>(
-        std::chrono::seconds(value)
-      ).count()
-    };
-
-    const auto result {compare(simulation_time, specified_time) ? true_v : false_v};
-
-    std::cout << indent << "SimulationTime [" << simulation_time << " is " << compare << " " <<
-      specified_time << "? => " << result << "]" << std::endl;
+    #ifndef NDEBUG
+    std::cout << indent << "SimulationTime [" << getCurrentTime() << " is " << compare << " " <<
+      value << "? => " << result << "]" << std::endl;
+    #endif
 
     return result;
   }

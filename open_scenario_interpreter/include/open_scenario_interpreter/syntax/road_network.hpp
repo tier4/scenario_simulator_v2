@@ -17,12 +17,13 @@
 
 #include <open_scenario_interpreter/syntax/file.hpp>
 #include <open_scenario_interpreter/syntax/traffic_signals.hpp>
+#include <open_scenario_interpreter/utility/assertion_auxiliary.hpp>
 
 namespace open_scenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== RoadNetwork ==========================================================
+/* ---- RoadNetwork ------------------------------------------------------------
  *
  * <xsd:complexType name="RoadNetwork">
  *   <xsd:sequence>
@@ -32,7 +33,10 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
+ASSERT_DEFAULT_CONSTRUCTIBLE(File);
+ASSERT_DEFAULT_CONSTRUCTIBLE(TrafficSignals);
+
 struct RoadNetwork
 {
   const File logic_file;
@@ -43,10 +47,13 @@ struct RoadNetwork
 
   template<typename Node, typename Scope>
   explicit RoadNetwork(const Node & node, Scope & outer_scope)
-  : logic_file{readElement<File>("LogicFile", node, outer_scope)},
-    scene_graph_file{readElement<File>("SceneGraphFile", node, outer_scope)},
-    traffic_signals{readElement<TrafficSignals>("TrafficSignals", node, outer_scope)}
-  {}
+  : logic_file(readElement<File>("LogicFile", node, outer_scope)),
+    scene_graph_file(readElement<File>("SceneGraphFile", node, outer_scope)),
+    traffic_signals(readElement<TrafficSignals>("TrafficSignals", node, outer_scope))
+  {
+    outer_scope.logic_file = logic_file;
+    outer_scope.scene_graph_file = scene_graph_file;
+  }
 };
 }
 }  // namespace open_scenario_interpreter

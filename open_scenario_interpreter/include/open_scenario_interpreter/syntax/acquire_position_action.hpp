@@ -15,6 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__ACQUIRE_POSITION_ACTION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__ACQUIRE_POSITION_ACTION_HPP_
 
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/position.hpp>
 
 #include <string>
@@ -43,8 +44,8 @@ struct AcquirePositionAction
 
   template<typename Node>
   explicit AcquirePositionAction(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope},
-    position{readElement<Position>("Position", node, inner_scope)}
+  : inner_scope(outer_scope),
+    position(readElement<Position>("Position", node, inner_scope))
   {}
 
   std::unordered_map<std::string, Boolean> accomplishments;
@@ -57,7 +58,7 @@ struct AcquirePositionAction
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
 
-        inner_scope.connection->entity->requestAcquirePosition(
+        requestAcquirePosition(
           actor,
           Integer(position.as<LanePosition>().lane_id),
           position.as<LanePosition>().s,
@@ -74,7 +75,7 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          cdr(each) = inner_scope.connection->entity->reachPosition(
+          cdr(each) = isReachedPosition(
             car(each),
             Integer(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,
@@ -82,7 +83,6 @@ struct AcquirePositionAction
             5.0);
         }
       }
-
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
     } else {
       THROW(ImplementationFault);

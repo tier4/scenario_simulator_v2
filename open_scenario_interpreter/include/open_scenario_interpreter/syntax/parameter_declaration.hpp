@@ -48,7 +48,6 @@ struct ParameterDeclaration
         return true;
       }
     }
-
     return false;
   }
 
