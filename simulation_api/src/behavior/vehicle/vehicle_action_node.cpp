@@ -169,6 +169,11 @@ bool VehicleActionNode::foundConflictingEntity(const std::vector<int> & followin
   return false;
 }
 
+double VehicleActionNode::calculateStopDistance() const
+{
+  return std::pow(entity_status.twist.linear.x, 2) / (2 * 5);
+}
+
 simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed) const
 {

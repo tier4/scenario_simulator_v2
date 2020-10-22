@@ -102,16 +102,14 @@ BT::NodeStatus FollowLaneAction::tick()
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
     if (distance_to_conflicting_entity) {
       if (distance_to_conflicting_entity.get() <
-        (vehicle_parameters->bounding_box.dimensions.length + 5))
+        (vehicle_parameters->bounding_box.dimensions.length + calculateStopDistance() + 10))
       {
-        std::cout << __FILE__ << "," << __LINE__ << std::endl;
         return BT::NodeStatus::FAILURE;
       }
     }
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     return BT::NodeStatus::RUNNING;
   }

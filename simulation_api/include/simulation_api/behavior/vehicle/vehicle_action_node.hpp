@@ -51,6 +51,7 @@ public:
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<int> & following_lanelets) const;
   boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
+  double calculateStopDistance() const;
 };
 }  // namespace entity_behavior
 
