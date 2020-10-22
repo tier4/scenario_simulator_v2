@@ -33,57 +33,17 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
   const std::vector<int> & following_lanelets)
 {
-  auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
-  std::vector<simulation_api::entity::EntityStatus> conflicting_entity_status;
-  for (const auto & status : other_entity_status) {
-    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_id) >= 1)
-      {
-        conflicting_entity_status.push_back(status.second);
-      }
-    }
+  auto distance_to_stop_target = getDistanceToConflictingEntity(following_lanelets);
+  if (!distance_to_stop_target) {
+    return boost::none;
   }
-  std::vector<double> dists;
-  std::vector<std::pair<int, double>> collision_points;
-  for (const auto & status : conflicting_entity_status) {
-    for (const auto & lanelet_id : following_lanelets) {
-      auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id,
-          status.lanelet_id);
-      if (stop_position_s) {
-        auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-            entity_status.s,
-            lanelet_id, stop_position_s.get());
-        if (dist) {
-          dists.push_back(dist.get());
-          collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
-        }
-      }
-    }
-  }
-  if (dists.size() != 0) {
-    auto iter = std::max_element(dists.begin(), dists.end());
-    size_t index = std::distance(dists.begin(), iter);
-    double stop_s = collision_points[index].second;
-    int stop_lanelet_id = collision_points[index].first;
-    geometry_msgs::msg::Vector3 rpy;
-    geometry_msgs::msg::Twist twist;
-    geometry_msgs::msg::Accel accel;
-    simulation_api::entity::EntityStatus stop_target_status(0.0, stop_lanelet_id,
-      stop_s, 0, rpy, twist, accel);
-    auto dist_to_stop_target = hdmap_utils->getLongitudinalDistance(
-      entity_status.lanelet_id, entity_status.s,
-      stop_target_status.lanelet_id, stop_target_status.s);
-    if (dist_to_stop_target) {
-      double rest_distance = dist_to_stop_target.get() -
-        (vehicle_parameters->bounding_box.dimensions.length + 5);
-      if (rest_distance < std::pow(entity_status.twist.linear.x, 2) / (2 * 5)) {
-        if (rest_distance > 0) {
-          return std::sqrt(2 * 5 * rest_distance);
-        } else {
-          return 0;
-        }
-      }
+  double rest_distance = distance_to_stop_target.get() -
+    (vehicle_parameters->bounding_box.dimensions.length + 5);
+  if (rest_distance < std::pow(entity_status.twist.linear.x, 2) / (2 * 5)) {
+    if (rest_distance > 0) {
+      return std::sqrt(2 * 5 * rest_distance);
+    } else {
+      return 0;
     }
   }
   return boost::none;
@@ -91,19 +51,25 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
 
 BT::NodeStatus StopAtCrossingEntityAction::tick()
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   getBlackBoardValues();
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     return BT::NodeStatus::FAILURE;
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
     auto target_linear_speed = calculateTargetSpeed(following_lanelets);
     if (!target_linear_speed) {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
       return BT::NodeStatus::SUCCESS;
     }
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     if (target_speed) {
       if (target_speed.get() > target_linear_speed.get()) {
         target_speed = target_linear_speed.get();
@@ -111,8 +77,8 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     } else {
       target_speed = target_linear_speed.get();
     }
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-    return BT::NodeStatus::RUNNING;
     return BT::NodeStatus::RUNNING;
   }
   return BT::NodeStatus::FAILURE;

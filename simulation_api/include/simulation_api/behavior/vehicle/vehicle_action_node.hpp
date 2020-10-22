@@ -48,6 +48,9 @@ public:
   bool foundConflictingEntity(const std::vector<int> & following_lanelets) const;
   boost::optional<simulation_api::entity::EntityStatus> getConflictingEntityStatus(
     const std::vector<int> & following_lanelets) const;
+  boost::optional<double> getDistanceToConflictingEntity(
+    const std::vector<int> & following_lanelets) const;
+  boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
 };
 }  // namespace entity_behavior
 

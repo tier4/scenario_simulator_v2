@@ -38,32 +38,12 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    boost::optional<double> front_entity_distance, front_entity_speed;
-    for (const auto & each : other_entity_status) {
-      if (each.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-        auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-            entity_status.s,
-            each.second.lanelet_id,
-            each.second.s);
-        if (distance) {
-          if (distance.get() < 40) {
-            if (!front_entity_distance && !front_entity_speed) {
-              front_entity_speed = each.second.twist.linear.x;
-              front_entity_distance = distance.get();
-            } else {
-              if (front_entity_distance.get() < distance.get()) {
-                front_entity_speed = each.second.twist.linear.x;
-                front_entity_distance = distance.get();
-              }
-            }
-          }
-        }
-      }
+    auto front_entity_status = getFrontEntityStatus();
+    if (!front_entity_status) {
+      return BT::NodeStatus::FAILURE;
     }
-    if (!front_entity_distance && !front_entity_speed) {
-      return BT::NodeStatus::SUCCESS;
-    }
-    auto entity_status_updated = calculateEntityStatusUpdated(front_entity_speed.get());
+    auto entity_status_updated = calculateEntityStatusUpdated(
+      front_entity_status.get().twist.linear.x);
     setOutput("updated_status", entity_status_updated);
     return BT::NodeStatus::RUNNING;
   }
