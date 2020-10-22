@@ -18,5 +18,26 @@
 
 namespace open_scenario_interpreter
 {
-std::unique_ptr<scenario_simulator::API> Accessor::connection {};
+static typename std::aligned_storage<sizeof(connection), alignof(connection)>::type memory;
+
+scenario_simulator::API& connection { reinterpret_cast<scenario_simulator::API&>(memory) };
+
+// static int schwarz_counter { 0 };
+//
+// Connector::Connector()
+// {
+//   if (schwarz_counter++ == 0)
+//   {
+//     new (&connection) scenario_simulator::API();
+//   }
+// }
+//
+// Connector::~Connector()
+// {
+//   if (--schwarz_counter == 0)
+//   {
+//     connection.~API();
+//   }
+// }
+
 }  // namespace open_scenario_interpreter

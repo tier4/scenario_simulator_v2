@@ -57,7 +57,7 @@ struct Storyboard
 
   auto ready() const noexcept
   {
-    return Accessor::ready();
+    return true;
   }
 
   void start()

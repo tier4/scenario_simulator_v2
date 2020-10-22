@@ -24,66 +24,57 @@
 
 namespace open_scenario_interpreter
 {
+extern scenario_simulator::API& connection;
+
+// static struct Connector
+// {
+//   Connector();
+//   ~Connector();
+// } connector;
+
 class Accessor
 {
-  static std::unique_ptr<scenario_simulator::API> connection;
-
-  static const auto & access()
-  {
-    if (connection) {
-      return *connection;
-    } else {
-      throw std::runtime_error("connection-error");
-    }
-  }
-
-public:
-  static auto ready() noexcept
-  {
-    return static_cast<bool>(connection);
-  }
-
   template<typename ... Ts>
   static decltype(auto) connect(Ts && ... xs)
   {
-    connection.reset(new scenario_simulator::API(std::forward<decltype(xs)>(xs)...));
-    return ready();
+    new (&connection) scenario_simulator::API(std::forward<decltype(xs)>(xs)...);
+    return connection;
   }
 
   template<typename ... Ts>
   static decltype(auto) initialize(Ts && ... xs)
   {
-    return access().simulation->initialize(std::forward<decltype(xs)>(xs)...);
+    return connection.simulation->initialize(std::forward<decltype(xs)>(xs)...);
   }
 
 protected:
   template<typename ... Ts>
   decltype(auto) spawn(Ts && ... xs) const
   {
-    return access().entity->spawn(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->spawn(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>
   decltype(auto) requestLaneChange(Ts && ... xs) const
   {
-    return access().entity->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->requestLaneChange(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>
   decltype(auto) isInLanelet(Ts && ... xs) const
   {
-    return access().entity->isInLanelet(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->isInLanelet(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>
   decltype(auto) setTargetSpeed(Ts && ... xs) const
   {
-    return access().entity->setTargetSpeed(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->setTargetSpeed(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>
   decltype(auto) getEntityStatus(Ts && ... xs) const try {
-    return access().entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
   } catch (const simulation_api::SimulationRuntimeError & error) {
     std::stringstream ss {};
     ss << error.what() << ".\n";
@@ -95,37 +86,37 @@ protected:
   template<typename ... Ts>
   decltype(auto) setEntityStatus(Ts && ... xs) const
   {
-    return access().entity->setEntityStatus(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->setEntityStatus(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>
   decltype(auto) getCurrentTime(Ts && ... xs) const
   {
-    return access().simulation->getCurrentTime(std::forward<decltype(xs)>(xs)...);
+    return connection.simulation->getCurrentTime(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>
   decltype(auto) isReachedPosition(Ts && ... xs) const
   {
-    return access().entity->reachPosition(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->reachPosition(std::forward<decltype(xs)>(xs)...);
   }
 
   // template<typename ... Ts>
   // decltype(auto) getRelativeDistance(Ts && ... xs) const
   // {
-  //   return access().entity->getRelativeDistance(std::forward<decltype(xs)>(xs)...);
+  //   return connection.entity->getRelativeDistance(std::forward<decltype(xs)>(xs)...);
   // }
 
   template<typename ... Ts>
   decltype(auto) getRelativePose(Ts && ... xs) const
   {
-    return access().entity->getRelativePose(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->getRelativePose(std::forward<decltype(xs)>(xs)...);
   }
 
   template<typename ... Ts>
   decltype(auto) updateFrame(Ts && ... xs) const
   {
-    return access().simulation->updateFrame(std::forward<decltype(xs)>(xs)...);
+    return connection.simulation->updateFrame(std::forward<decltype(xs)>(xs)...);
   }
 
   // template <typename... Ts>
@@ -147,7 +138,7 @@ protected:
   auto getTimeHeadway(Ts && ... xs) const
   {
     const auto result {
-      access().entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...)
+      connection.entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...)
     };
     if (result) {
       return *result;
@@ -160,7 +151,7 @@ protected:
   template<typename ... Ts>
   decltype(auto) requestAcquirePosition(Ts && ... xs) const
   {
-    return access().entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+    return connection.entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace open_scenario_interpreter
