@@ -37,7 +37,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct AcquirePositionAction
-  : private Accessor
 {
   Scope inner_scope;
 

@@ -31,7 +31,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct SimulationTimeCondition
-  : private Accessor
 {
   const Double value;
 

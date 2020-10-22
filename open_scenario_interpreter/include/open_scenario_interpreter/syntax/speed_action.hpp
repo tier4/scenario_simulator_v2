@@ -38,7 +38,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct SpeedAction
-  : private Accessor
 {
   Scope inner_scope;
 

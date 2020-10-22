@@ -32,7 +32,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct SpeedCondition
-  : private Accessor
 {
   const Double value;
 

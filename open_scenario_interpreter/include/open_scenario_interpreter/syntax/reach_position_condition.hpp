@@ -34,7 +34,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct ReachPositionCondition
-  : private Accessor
 {
   const Double tolerance;
 

@@ -39,7 +39,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct LaneChangeAction
-  : public Accessor
 {
   const Double target_lane_offset;
 

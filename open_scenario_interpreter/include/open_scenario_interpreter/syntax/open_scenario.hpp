@@ -44,7 +44,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct ScenarioDefinition
-  : private Accessor
 {
   Element storyboard;
 

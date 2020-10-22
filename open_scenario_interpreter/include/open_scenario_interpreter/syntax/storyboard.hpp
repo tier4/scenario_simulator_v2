@@ -35,7 +35,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct Storyboard
-  : public StoryboardElement<Storyboard>, public Elements, private Accessor
+  : public StoryboardElement<Storyboard>, public Elements
 {
   Init init;
 

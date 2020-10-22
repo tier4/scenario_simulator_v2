@@ -20,7 +20,9 @@ namespace open_scenario_interpreter
 {
 static typename std::aligned_storage<sizeof(connection), alignof(connection)>::type memory;
 
-scenario_simulator::API& connection { reinterpret_cast<scenario_simulator::API&>(memory) };
+scenario_simulator::API & connection {
+  reinterpret_cast<scenario_simulator::API &>(memory)
+};
 
 // static int schwarz_counter { 0 };
 //

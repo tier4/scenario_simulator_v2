@@ -36,7 +36,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct ScenarioObject
-  : private Accessor
 {
   const String name;
 

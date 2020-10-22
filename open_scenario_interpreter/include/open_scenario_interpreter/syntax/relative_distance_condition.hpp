@@ -35,7 +35,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct RelativeDistanceCondition
-  : private Accessor
 {
   const String entity_ref;
 

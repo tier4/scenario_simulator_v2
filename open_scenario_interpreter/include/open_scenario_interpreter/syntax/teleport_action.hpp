@@ -32,7 +32,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct TeleportAction
-  : private Accessor
 {
   Scope inner_scope;
 

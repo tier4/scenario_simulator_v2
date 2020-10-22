@@ -35,7 +35,6 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct TimeHeadwayCondition
-  : private Accessor
 {
   const String entity_ref;
 
