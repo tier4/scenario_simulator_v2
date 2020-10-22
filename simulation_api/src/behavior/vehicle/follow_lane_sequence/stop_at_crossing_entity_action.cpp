@@ -60,7 +60,8 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
-    auto target_linear_speed = calculateTargetSpeed(following_lanelets,entity_status.twist.linear.x);
+    auto target_linear_speed =
+      calculateTargetSpeed(following_lanelets, entity_status.twist.linear.x);
     if (!target_linear_speed) {
       return BT::NodeStatus::SUCCESS;
     }
