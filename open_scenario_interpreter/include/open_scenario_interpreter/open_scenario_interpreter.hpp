@@ -24,6 +24,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace open_scenario_interpreter
 {
@@ -45,6 +46,26 @@ class ScenarioRunner
   junit_exporter::JunitExporter exporter;
 
   int step_time_ms;
+
+  template<typename ... Ts>
+  decltype(auto) hoge(junit_exporter::TestResult result, Ts && ... xs)
+  {
+    exporter.addTestCase(
+      evaluate.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
+      "scenario_testing",
+      0,
+      result,
+      std::forward<decltype(xs)>(xs)...);
+
+    // switch (result)
+    // {
+    // case junit_exporter::TestResult::ERROR:
+    // case junit_exporter::TestResult::FAILURE:
+    // case junit_exporter::TestResult::SUCCESS:
+    // }
+
+    exporter.write(log_path);
+  }
 
 public:
   OPEN_SCENARIO_INTERPRETER_PUBLIC
