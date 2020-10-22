@@ -13,84 +13,21 @@
 // limitations under the License.
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
-#include <simulation_api/behavior/vehicle/follow_lane_action.hpp>
-#include <quaternion_operation/quaternion_operation.h>
+#include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_lane_action.hpp>
 
-#include <boost/algorithm/clamp.hpp>
-
-#include <iostream>
-#include <algorithm>
 #include <string>
-#include <memory>
-#include <unordered_map>
-#include <utility>
-#include <vector>
+
 
 namespace entity_behavior
 {
 namespace vehicle
 {
-FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
-: entity_behavior::VehicleActionNode(name, config) {}
-
-
-void FollowLaneAction::decelerateInFrontOfConflictingEntity(
-  const std::vector<int> & following_lanelets)
+namespace follow_lane_sequence
 {
-  auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
-  std::vector<simulation_api::entity::EntityStatus> conflicting_entity_status;
-  for (const auto & status : other_entity_status) {
-    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_id) >= 1)
-      {
-        conflicting_entity_status.push_back(status.second);
-      }
-    }
-  }
-  std::vector<double> dists;
-  std::vector<std::pair<int, double>> collision_points;
-  for (const auto & status : conflicting_entity_status) {
-    for (const auto & lanelet_id : following_lanelets) {
-      auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id,
-          status.lanelet_id);
-      if (stop_position_s) {
-        auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-            entity_status.s,
-            lanelet_id, stop_position_s.get());
-        if (dist) {
-          dists.push_back(dist.get());
-          collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
-        }
-      }
-    }
-  }
-  if (dists.size() != 0) {
-    auto iter = std::max_element(dists.begin(), dists.end());
-    size_t index = std::distance(dists.begin(), iter);
-    double stop_s = collision_points[index].second;
-    int stop_lanelet_id = collision_points[index].first;
-    geometry_msgs::msg::Vector3 rpy;
-    geometry_msgs::msg::Twist twist;
-    geometry_msgs::msg::Accel accel;
-    simulation_api::entity::EntityStatus stop_target_status(0.0, stop_lanelet_id,
-      stop_s, 0, rpy, twist, accel);
-    auto dist_to_stop_target = hdmap_utils->getLongitudinalDistance(
-      entity_status.lanelet_id, entity_status.s,
-      stop_target_status.lanelet_id, stop_target_status.s);
-    if (dist_to_stop_target) {
-      double rest_distance = dist_to_stop_target.get() -
-        (vehicle_parameters->bounding_box.dimensions.length + 5);
-      if (rest_distance < std::pow(entity_status.twist.linear.x, 2) / (2 * 5)) {
-        if (rest_distance > 0) {
-          target_speed = std::sqrt(2 * 5 * rest_distance);
-        } else {
-          target_speed = 0;
-        }
-      }
-    }
-  }
-}
+FollowLaneAction::FollowLaneAction(
+  const std::string & name,
+  const BT::NodeConfiguration & config)
+: entity_behavior::VehicleActionNode(name, config) {}
 
 BT::NodeStatus FollowLaneAction::tick()
 {
@@ -98,7 +35,6 @@ BT::NodeStatus FollowLaneAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
-
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     if (target_speed) {
       if (target_speed.get() > vehicle_parameters->performance.max_speed) {
@@ -157,45 +93,23 @@ BT::NodeStatus FollowLaneAction::tick()
             each.second.s);
         if (distance) {
           if (distance.get() < 40) {
-            target_speed = each.second.twist.linear.x;
+            return BT::NodeStatus::FAILURE;
           }
         }
       }
     }
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
-    decelerateInFrontOfConflictingEntity(following_lanelets);
+    if (foundConflictingEntity(following_lanelets)) {
+      return BT::NodeStatus::FAILURE;
+    }
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
-    geometry_msgs::msg::Accel accel_new;
-    accel_new = entity_status.accel;
-
-    double target_accel = (target_speed.get() - entity_status.twist.linear.x) / step_time;
-    if (entity_status.twist.linear.x > target_speed.get()) {
-      target_accel = boost::algorithm::clamp(target_accel, -5, 0);
-    } else {
-      target_accel = boost::algorithm::clamp(target_accel, 0, 3);
-    }
-    accel_new.linear.x = target_accel;
-    geometry_msgs::msg::Twist twist_new;
-    twist_new.linear.x = boost::algorithm::clamp(
-      entity_status.twist.linear.x + accel_new.linear.x * step_time,
-      0, vehicle_parameters->performance.max_speed);
-    twist_new.linear.y = 0.0;
-    twist_new.linear.z = 0.0;
-    twist_new.angular.x = 0.0;
-    twist_new.angular.y = 0.0;
-    twist_new.angular.z = 0.0;
-
-    double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
-      step_time;
-    geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
-    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-      entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
-    setOutput("updated_status", entity_status_updated);
+    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     return BT::NodeStatus::RUNNING;
   }
   return BT::NodeStatus::FAILURE;
 }
+}  // namespace follow_lane_sequence
 }  // namespace vehicle
 }  // namespace entity_behavior

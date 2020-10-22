@@ -36,7 +36,7 @@ public:
   : Node("scenario_runner", option), api_(this)
   {
     api_.entity->setVerbose(false);
-    api_.simulation->initialize(1.0, 0.02);
+    api_.simulation->initialize(0.1, 0.02);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
