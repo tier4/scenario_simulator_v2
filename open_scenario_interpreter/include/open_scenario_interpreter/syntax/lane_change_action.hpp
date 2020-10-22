@@ -15,7 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_
 
-#include <open_scenario_interpreter/accessor.hpp>
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/lane_change_target.hpp>
 #include <open_scenario_interpreter/syntax/transition_dynamics.hpp>
 

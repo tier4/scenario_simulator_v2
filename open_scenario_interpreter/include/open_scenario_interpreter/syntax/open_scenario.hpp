@@ -15,7 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 
-#include <open_scenario_interpreter/accessor.hpp>
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/catalog_locations.hpp>
 #include <open_scenario_interpreter/syntax/entities.hpp>
 #include <open_scenario_interpreter/syntax/file_header.hpp>

@@ -15,7 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 
-#include <open_scenario_interpreter/accessor.hpp>
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/relative_distance_type.hpp>
 #include <open_scenario_interpreter/syntax/triggering_entities.hpp>
 

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPEN_SCENARIO_INTERPRETER__ACCESSOR_HPP_
-#define OPEN_SCENARIO_INTERPRETER__ACCESSOR_HPP_
+#ifndef OPEN_SCENARIO_INTERPRETER__PROCEDURE_HPP_
+#define OPEN_SCENARIO_INTERPRETER__PROCEDURE_HPP_
 
 #include <simulation_api/api/api.hpp>
 #include <open_scenario_interpreter/error.hpp>
@@ -152,4 +152,4 @@ decltype(auto) requestAcquirePosition(Ts && ... xs)
 }
 }  // namespace open_scenario_interpreter
 
-#endif  // OPEN_SCENARIO_INTERPRETER__ACCESSOR_HPP_
+#endif  // OPEN_SCENARIO_INTERPRETER__PROCEDURE_HPP_

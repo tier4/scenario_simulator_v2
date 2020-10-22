@@ -15,7 +15,7 @@
 #ifndef OPEN_SCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 #define OPEN_SCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 
-#include <open_scenario_interpreter/accessor.hpp>
+#include <open_scenario_interpreter/procedure.hpp>
 #include <open_scenario_interpreter/syntax/entity_object.hpp>
 #include <open_scenario_interpreter/syntax/entity_ref.hpp>
 #include <open_scenario_interpreter/syntax/object_controller.hpp>

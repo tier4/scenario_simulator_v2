@@ -52,9 +52,9 @@ find_package(xmlrpcpp             REQUIRED)
 # ------------------------------------------------------------------------------
 
 add_library(${PROJECT_NAME} SHARED
-  src/accessor.cpp
   src/object.cpp
-  src/open_scenario_interpreter.cpp)
+  src/open_scenario_interpreter.cpp
+  src/procedure.cpp)
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "open_scenario_interpreter::ScenarioRunner")
 
