@@ -71,7 +71,9 @@ struct RelativeDistanceCondition
             const auto distance {
               std::fabs(getRelativePose(subject, entity_ref).position.x)
             };
+            #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
+            #endif
             return compare(distance, value);
           }));
 
@@ -83,7 +85,9 @@ struct RelativeDistanceCondition
             const auto distance {
               std::fabs(getRelativePose(subject, entity_ref).position.y)
             };
+            #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
+            #endif
             return compare(distance, value);
           }));
 
@@ -97,7 +101,9 @@ struct RelativeDistanceCondition
                 getRelativePose(subject, entity_ref).position.x,
                 getRelativePose(subject, entity_ref).position.y)
             };
+            #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
+            #endif
             return compare(distance, value);
           }));
 

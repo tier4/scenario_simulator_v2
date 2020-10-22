@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define NDEBUG
 #include <open_scenario_interpreter/open_scenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -43,10 +44,14 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
   log_path = log_path + "/result.junit.xml";
 
   try {
+    #ifndef NDEBUG
     RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", osc_path.c_str());
+    #endif
     evaluate.rebind<OpenScenario>(osc_path);
   } catch (const open_scenario_interpreter::SyntaxError & error) {
+    #ifndef NDEBUG
     RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
+    #endif
     return ScenarioRunner::Result::FAILURE;
   }
 
@@ -74,11 +79,14 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
         if (evaluate && !evaluate.as<OpenScenario>().complete()) {
           const auto result {evaluate.as<OpenScenario>()()};
 
+          #ifndef NDEBUG
           RCLCPP_INFO(
             get_logger(),
             "[Storyboard: %s]",
             boost::lexical_cast<std::string>(result).c_str());
+          #endif
 
+          #ifndef NDEBUG
           RCLCPP_INFO(
             get_logger(),
             "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
@@ -87,6 +95,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             open_scenario_interpreter::running_state.use_count() - 1,
             open_scenario_interpreter::stop_transition.use_count() - 1,
             open_scenario_interpreter::complete_state.use_count() - 1);
+          #endif
         } else if (evaluate) {
           if (expect == "success") {
             std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
@@ -94,7 +103,9 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             junit_exporter::TestResult::SUCCESS);
             exporter.write(log_path);
           } else {
+            #ifndef NDEBUG
             RCLCPP_ERROR(get_logger(), "\x1b[1;32mFailure.\x1b[0m");
+            #endif
             std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
             exporter.addTestCase(testcase, "scenario_testing", 0,
             junit_exporter::TestResult::FAILURE, "unexpected result",
@@ -119,7 +130,9 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
               "testcase : " + testcase + " should end with " + expect);
               exporter.write(log_path);
             }
+            #ifndef NDEBUG
             RCLCPP_INFO(get_logger(), "\x1b[1;32mSimulation succeeded.\x1b[0m");
+            #endif
             evaluate.reset();
             deactivate();
             break;
@@ -137,7 +150,9 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
               "testcase : " + testcase + " should end with " + expect);
               exporter.write(log_path);
             }
+            #ifndef NDEBUG
             RCLCPP_INFO(get_logger(), "\x1b[1;31mSimulation failed.\x1b[0m");
+            #endif
             evaluate.reset();
             deactivate();
 
@@ -156,7 +171,9 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             testcase, "scenario_testing", 0, junit_exporter::TestResult::ERROR, type, error.what());
           exporter.write(log_path);
         }
+        #ifndef NDEBUG
         RCLCPP_ERROR(get_logger(), "%s.", error.what());
+        #endif
         evaluate.reset();
         deactivate();
       } catch (const std::exception & error) {
@@ -171,7 +188,9 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
           junit_exporter::TestResult::ERROR, type, error.what());
           exporter.write(log_path);
         }
+        #ifndef NDEBUG
         RCLCPP_ERROR(get_logger(), "%s.", error.what());
+        #endif
         evaluate.reset();
         deactivate();
       }

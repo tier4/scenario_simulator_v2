@@ -58,8 +58,10 @@ struct StoryboardElementStateCondition
   {
     const auto result {compare(inner_scope.storyboard_elements.at(name).state(), state)};
 
+    #ifndef NDEBUG
     std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" <<
       reset << " in " << state << "? => " << result << "]" << std::endl;
+    #endif
 
     return result;
   }

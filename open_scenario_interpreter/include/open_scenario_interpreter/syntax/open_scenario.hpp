@@ -108,7 +108,7 @@ struct ScenarioDefinition
   {
     // Spawn entities
     for (const auto & each : inner_scope.entities) {
-      std::cout << std::get<1>(each).evaluate() << std::endl;
+      std::get<1>(each).evaluate();
     }
     storyboard.start();
   }

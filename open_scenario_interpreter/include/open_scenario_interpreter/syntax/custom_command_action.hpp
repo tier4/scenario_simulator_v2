@@ -122,7 +122,9 @@ struct CustomCommandAction
     argv.reserve(args.size());
 
     for (const auto & each : args) {
+      #ifndef NDEBUG
       std::cout << std::quoted(each) << std::endl;
+      #endif
       buffer.emplace_back(std::begin(each), std::end(each));
       buffer.back().push_back('\0');
 

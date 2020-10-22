@@ -46,8 +46,10 @@ struct SimulationTimeCondition
   {
     const auto result {asBoolean(compare(getCurrentTime(), value))};
 
+    #ifndef NDEBUG
     std::cout << indent << "SimulationTime [" << getCurrentTime() << " is " << compare << " " <<
       value << "? => " << result << "]" << std::endl;
+    #endif
 
     return result;
   }
