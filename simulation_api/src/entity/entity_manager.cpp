@@ -22,6 +22,11 @@ namespace simulation_api
 {
 namespace entity
 {
+EntityManager::~EntityManager()
+{
+  entity_marker_pub_ptr_->publish(generateDeleteMarker());
+}
+
 void EntityManager::setVerbose(bool verbose)
 {
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
@@ -215,6 +220,16 @@ const std::vector<std::string> EntityManager::getEntityNames() const
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     ret.push_back(it->first);
   }
+  return ret;
+}
+
+const visualization_msgs::msg::MarkerArray EntityManager::generateDeleteMarker() const
+{
+  visualization_msgs::msg::MarkerArray ret;
+  ret.markers.clear();
+  visualization_msgs::msg::Marker marker;
+  marker.action = marker.DELETEALL;
+  ret.markers.push_back(marker);
   return ret;
 }
 

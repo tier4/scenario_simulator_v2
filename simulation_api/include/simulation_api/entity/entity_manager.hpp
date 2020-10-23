@@ -23,7 +23,7 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
-#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <rclcpp/rclcpp.hpp>
@@ -116,6 +116,7 @@ public:
       node->create_wall_timer(std::chrono::seconds(1),
         std::bind(&EntityManager::updateHdmapMarker, this));
   }
+  ~EntityManager();
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
   void requestLaneChange(std::string name, int to_lanelet_id);
@@ -132,6 +133,7 @@ public:
   const boost::optional<VehicleParameters> getVehicleParameters(std::string name) const;
   const std::vector<std::string> getEntityNames() const;
   const visualization_msgs::msg::MarkerArray generateMarker() const;
+  const visualization_msgs::msg::MarkerArray generateDeleteMarker() const;
   bool setEntityStatus(std::string name, EntityStatus status);
   const CoordinateFrameTypes & getEntityStatusCoordinate(std::string name) const;
   const boost::optional<EntityStatus> getEntityStatus(
@@ -151,7 +153,7 @@ public:
   void broadcastEntityTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
   const std::unordered_map<std::string, EntityType> getEntityTypeList() const;
-  tf2_ros::TransformBroadcaster broadcaster_;
+  tf2_ros::StaticTransformBroadcaster broadcaster_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr entity_marker_pub_ptr_;
   template<typename T>
