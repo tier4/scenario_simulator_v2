@@ -70,7 +70,7 @@ public:
   geometry_msgs::msg::Vector3 rpy;
   /* Field for world pose */
   geometry_msgs::msg::Pose pose;
-  const openscenario_msgs::msg::EntityStatus toRosMsg() const;
+  openscenario_msgs::msg::EntityStatus toRosMsg() const;
 };
 }  // namespace entity
 }  // namespace simulation_api

@@ -96,6 +96,7 @@ add_library(api SHARED
 )
 ament_target_dependencies(api
   xmlrpcpp
+  openscenario_msgs
 )
 target_link_libraries(api
   entity_manager

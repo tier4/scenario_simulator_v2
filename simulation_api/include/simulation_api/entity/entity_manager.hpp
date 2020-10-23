@@ -19,8 +19,9 @@
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/entity/pedestrian_entity.hpp>
 #include <simulation_api/entity/exception.hpp>
-
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+
+#include <openscenario_msgs/msg/entity_status_array.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -106,8 +107,9 @@ public:
         "lanelet/marker", qos,
         options);
     const rclcpp::QoS & entity_marker_qos = EntityMarkerQos();
-    entity_marker_pub_ptr_ = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(node,
-        "entity/marker", entity_marker_qos,
+    entity_status_array_pub_ptr_ =
+      rclcpp::create_publisher<openscenario_msgs::msg::EntityStatusArray>(node,
+        "entity/status", entity_marker_qos,
         options);
     visualization_msgs::msg::MarkerArray markers;
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
@@ -116,7 +118,7 @@ public:
       node->create_wall_timer(std::chrono::seconds(1),
         std::bind(&EntityManager::updateHdmapMarker, this));
   }
-  ~EntityManager(){}
+  ~EntityManager() {}
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
   void requestLaneChange(std::string name, int to_lanelet_id);
@@ -132,8 +134,6 @@ public:
     geometry_msgs::msg::Pose to) const;
   const boost::optional<VehicleParameters> getVehicleParameters(std::string name) const;
   const std::vector<std::string> getEntityNames() const;
-  // const visualization_msgs::msg::MarkerArray generateMarker();
-  const visualization_msgs::msg::MarkerArray generateDeleteMarker() const;
   bool setEntityStatus(std::string name, EntityStatus status);
   const CoordinateFrameTypes & getEntityStatusCoordinate(std::string name) const;
   const boost::optional<EntityStatus> getEntityStatus(
@@ -155,7 +155,8 @@ public:
   const std::unordered_map<std::string, EntityType> getEntityTypeList() const;
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr entity_marker_pub_ptr_;
+  rclcpp::Publisher<openscenario_msgs::msg::EntityStatusArray>::SharedPtr
+    entity_status_array_pub_ptr_;
   template<typename T>
   bool spawnEntity(T & entity)
   {

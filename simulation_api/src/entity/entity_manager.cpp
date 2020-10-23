@@ -218,16 +218,6 @@ const std::vector<std::string> EntityManager::getEntityNames() const
   return ret;
 }
 
-const visualization_msgs::msg::MarkerArray EntityManager::generateDeleteMarker() const
-{
-  visualization_msgs::msg::MarkerArray ret;
-  ret.markers.clear();
-  visualization_msgs::msg::Marker marker;
-  marker.action = marker.DELETEALL;
-  ret.markers.push_back(marker);
-  return ret;
-}
-
 /*
 const visualization_msgs::msg::MarkerArray EntityManager::generateMarker()
 {
@@ -382,6 +372,12 @@ void EntityManager::update(double current_time, double step_time)
     if (it->second.type() == typeid(PedestrianEntity)) {
       boost::any_cast<PedestrianEntity &>(it->second).setOtherStatus(all_status);
     }
+  }
+  openscenario_msgs::msg::EntityStatusArray status_array_msg;
+  for (const auto & status : all_status) {
+    auto status_msg = status.second.toRosMsg();
+    status_msg.name = status.first;
+    status_array_msg.status.emplace_back(status_msg);
   }
   // entity_marker_pub_ptr_->publish(generateMarker());
 }

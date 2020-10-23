@@ -48,16 +48,14 @@ EntityStatus::EntityStatus(
   coordinate = LANE;
 }
 
-const openscenario_msgs::msg::EntityStatus EntityStatus::toRosMsg() const
+openscenario_msgs::msg::EntityStatus EntityStatus::toRosMsg() const
 {
   openscenario_msgs::msg::EntityStatus ret;
   ret.time = time;
-  if(coordinate == CoordinateFrameTypes::WORLD)
-  {
+  if (coordinate == CoordinateFrameTypes::WORLD) {
     ret.coordinate = ret.WORLD;
   }
-  if(coordinate == CoordinateFrameTypes::LANE)
-  {
+  if (coordinate == CoordinateFrameTypes::LANE) {
     ret.coordinate = ret.LANE;
   }
   ret.twist = twist;

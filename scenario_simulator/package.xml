@@ -36,6 +36,7 @@
   <depend>eigen</depend>
   <depend>quaternion_operation</depend>
   <depend>xmlrpcpp</depend>
+  <depend>openscenario_msgs</depend>
   <exec_depend>rviz2</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>

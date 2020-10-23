@@ -29,6 +29,7 @@ find_package(lanelet2_routing REQUIRED)
 find_package(lanelet2_extension REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(openscenario_msgs REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
@@ -53,6 +54,7 @@ ament_target_dependencies(scenario_simulator
   lanelet2_extension
   visualization_msgs
   behaviortree_cpp_v3
+  openscenario_msgs
 )
 
 add_executable(scenario_simulator_node
@@ -60,6 +62,7 @@ add_executable(scenario_simulator_node
 )
 ament_target_dependencies(scenario_simulator_node
   rclcpp
+  openscenario_msgs
 )
 target_link_libraries(scenario_simulator_node
   scenario_simulator

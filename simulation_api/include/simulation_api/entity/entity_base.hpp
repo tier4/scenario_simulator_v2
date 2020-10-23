@@ -81,8 +81,6 @@ public:
   void setOtherStatus(const std::unordered_map<std::string, EntityStatus> & status);
   void updateStandStillDuration(double step_time);
   boost::optional<double> getStandStillDuration() const;
-  const visualization_msgs::msg::MarkerArray generateDeleteMarker() const;
-  void updateMarkerIdList();
 
 protected:
   bool visibility_;
@@ -93,7 +91,6 @@ protected:
   std::unordered_map<std::string, EntityType> entity_type_list_;
   boost::optional<double> stand_still_duration_;
   visualization_msgs::msg::MarkerArray current_marker_;
-  std::list<int> marker_id_lists_;
 };
 }  // namespace entity
 }  // namespace simulation_api
