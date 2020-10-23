@@ -30,6 +30,7 @@ EntityStatus::EntityStatus(
 {
   coordinate = WORLD;
 }
+
 EntityStatus::EntityStatus(
   double t,
   int lanelet_id, double s, double offset,
@@ -45,6 +46,28 @@ EntityStatus::EntityStatus(
   rpy(rpy)
 {
   coordinate = LANE;
+}
+
+const openscenario_msgs::msg::EntityStatus EntityStatus::toRosMsg() const
+{
+  openscenario_msgs::msg::EntityStatus ret;
+  ret.time = time;
+  if(coordinate == CoordinateFrameTypes::WORLD)
+  {
+    ret.coordinate = ret.WORLD;
+  }
+  if(coordinate == CoordinateFrameTypes::LANE)
+  {
+    ret.coordinate = ret.LANE;
+  }
+  ret.twist = twist;
+  ret.accel = accel;
+  ret.lanelet_id = lanelet_id;
+  ret.offset = offset;
+  ret.s = s;
+  ret.rpy = rpy;
+  ret.pose = pose;
+  return ret;
 }
 }      // namespace entity
 }  // namespace simulation_api

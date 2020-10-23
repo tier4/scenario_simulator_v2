@@ -16,6 +16,7 @@
 #define SIMULATION_API__ENTITY__ENTITY_STATUS_HPP_
 
 #include <rclcpp/rclcpp.hpp>
+#include <openscenario_msgs/msg/entity_status.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -69,6 +70,7 @@ public:
   geometry_msgs::msg::Vector3 rpy;
   /* Field for world pose */
   geometry_msgs::msg::Pose pose;
+  const openscenario_msgs::msg::EntityStatus toRosMsg() const;
 };
 }  // namespace entity
 }  // namespace simulation_api

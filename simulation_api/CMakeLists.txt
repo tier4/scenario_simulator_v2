@@ -35,6 +35,7 @@ find_package(quaternion_operation REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(xmlrpcpp REQUIRED)
 find_package(geographic_msgs REQUIRED)
+find_package(openscenario_msgs REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
@@ -83,6 +84,7 @@ ament_target_dependencies(entity_manager
   tf2_geometry_msgs
   tf2_ros
   xmlrpcpp
+  openscenario_msgs
 )
 target_link_libraries(entity_manager
   pugixml
@@ -119,6 +121,7 @@ ament_target_dependencies(scenario_runner_moc_node
   ament_index_cpp
   behaviortree_cpp_v3
   xmlrpcpp
+  openscenario_msgs
 )
 target_link_libraries(scenario_runner_moc_node
   api
