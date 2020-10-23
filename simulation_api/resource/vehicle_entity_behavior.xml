@@ -22,17 +22,41 @@
             other_entity_status="{other_entity_status}"
             entity_type_list="{entity_type_list}"
             target_status="{target_status}"/>
-        <FollowLane name="follow_lane"
-            request="{request}"
-            hdmap_utils="{hdmap_utils}"
-            current_time="{current_time}"
-            step_time="{step_time}"
-            entity_status="{entity_status}"
-            vehicle_parameters="{vehicle_parameters}"
-            updated_status="{updated_status}"
-            target_speed="{target_speed}"
-            other_entity_status="{other_entity_status}"
-            entity_type_list="{entity_type_list}"/>
+        <Fallback name="follow_lane_sequence">
+            <FollowLane name="follow_lane"
+                request="{request}"
+                hdmap_utils="{hdmap_utils}"
+                current_time="{current_time}"
+                step_time="{step_time}"
+                entity_status="{entity_status}"
+                vehicle_parameters="{vehicle_parameters}"
+                updated_status="{updated_status}"
+                target_speed="{target_speed}"
+                other_entity_status="{other_entity_status}"
+                entity_type_list="{entity_type_list}"/>
+            <FollowFrontEntity name="follow_front_entity"
+                request="{request}"
+                hdmap_utils="{hdmap_utils}"
+                current_time="{current_time}"
+                step_time="{step_time}"
+                entity_status="{entity_status}"
+                vehicle_parameters="{vehicle_parameters}"
+                updated_status="{updated_status}"
+                target_speed="{target_speed}"
+                other_entity_status="{other_entity_status}"
+                entity_type_list="{entity_type_list}"/>
+            <StopAtCrossingEntity name="stop_at_crossing_entity"
+                request="{request}"
+                hdmap_utils="{hdmap_utils}"
+                current_time="{current_time}"
+                step_time="{step_time}"
+                entity_status="{entity_status}"
+                vehicle_parameters="{vehicle_parameters}"
+                updated_status="{updated_status}"
+                target_speed="{target_speed}"
+                other_entity_status="{other_entity_status}"
+                entity_type_list="{entity_type_list}"/>
+        </Fallback>
     </Fallback>
     </BehaviorTree>
 </root>

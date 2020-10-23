@@ -19,6 +19,8 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_api/entity/entity_base.hpp>
 
+#include <boost/algorithm/clamp.hpp>
+
 #include <string>
 #include <memory>
 #include <unordered_map>

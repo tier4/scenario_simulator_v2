@@ -55,7 +55,7 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
     return ScenarioRunner::Result::FAILURE;
   }
 
-  static constexpr auto real_time_factor = 10.0;
+  static constexpr auto real_time_factor = 3.0;
 
   connect(
     shared_from_this(),
