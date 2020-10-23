@@ -118,15 +118,17 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   updateStandStillDuration(step_time);
 }
 
+/*
 visualization_msgs::msg::MarkerArray VehicleEntity::generateMarker(
   rclcpp::Time stamp,
   std_msgs::msg::ColorRGBA color)
-const
 {
-  visualization_msgs::msg::MarkerArray ret;
   if (!status_) {
-    return ret;
+    current_marker_ = visualization_msgs::msg::MarkerArray();
+    updateMarkerIdList();
+    return generateDeleteMarker();
   }
+  visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker bbox;
   bbox.header.frame_id = name;
   bbox.header.stamp = stamp;
@@ -231,7 +233,7 @@ const
     text_position.header.frame_id = name;
     text_position.header.stamp = stamp;
     text_position.ns = name;
-    text_position.id = 5;
+    text_position.id = 4;
     text_position.action = text_position.ADD;
     text_position.pose.position.x = parameters.bounding_box.center.x;
     text_position.pose.position.y = parameters.bounding_box.center.y;
@@ -256,7 +258,10 @@ const
     text_position.lifetime = rclcpp::Duration(0.1);
     ret.markers.push_back(text_position);
   }
+  current_marker_ = ret;
+  updateMarkerIdList();
   return ret;
 }
+*/
 }  // namespace entity
 }  // namespace simulation_api

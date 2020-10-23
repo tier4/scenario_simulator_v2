@@ -44,9 +44,10 @@ public:
     PedestrianParameters parameters);
   PedestrianEntity(std::string name, const pugi::xml_node & xml);
   PedestrianEntity(std::string name, PedestrianParameters parameters);
+  /*
   visualization_msgs::msg::MarkerArray generateMarker(
     rclcpp::Time stamp,
-    std_msgs::msg::ColorRGBA color = color_utils::makeColorMsg("forestgreen", 0.8)) const;
+    std_msgs::msg::ColorRGBA color = color_utils::makeColorMsg("forestgreen", 0.8));*/
   const PedestrianParameters parameters;
   void onUpdate(double current_time, double step_time) override;
   void requestAcquirePosition(int lanelet_id, double s, double offset);

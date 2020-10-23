@@ -116,7 +116,7 @@ public:
       node->create_wall_timer(std::chrono::seconds(1),
         std::bind(&EntityManager::updateHdmapMarker, this));
   }
-  ~EntityManager();
+  ~EntityManager(){}
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
   void requestLaneChange(std::string name, int to_lanelet_id);
@@ -132,7 +132,7 @@ public:
     geometry_msgs::msg::Pose to) const;
   const boost::optional<VehicleParameters> getVehicleParameters(std::string name) const;
   const std::vector<std::string> getEntityNames() const;
-  const visualization_msgs::msg::MarkerArray generateMarker() const;
+  // const visualization_msgs::msg::MarkerArray generateMarker();
   const visualization_msgs::msg::MarkerArray generateDeleteMarker() const;
   bool setEntityStatus(std::string name, EntityStatus status);
   const CoordinateFrameTypes & getEntityStatusCoordinate(std::string name) const;

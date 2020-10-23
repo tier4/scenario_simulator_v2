@@ -40,6 +40,29 @@ EntityBase::EntityBase(std::string type, std::string name)
   verbose_ = true;
 }
 
+void EntityBase::updateMarkerIdList()
+{
+  for(const auto & marker : current_marker_.markers)
+  {
+    marker_id_lists_.emplace_back(marker.id);
+  }
+}
+
+const visualization_msgs::msg::MarkerArray EntityBase::generateDeleteMarker() const
+{
+  visualization_msgs::msg::MarkerArray ret;
+  ret.markers.clear();
+  for(const auto & id : marker_id_lists_)
+  {
+    visualization_msgs::msg::Marker marker;
+    marker.action = marker.DELETE;
+    marker.ns = name;
+    marker.id = id;
+    ret.markers.push_back(marker);
+  }
+  return ret;
+}
+
 boost::optional<double> EntityBase::getStandStillDuration() const
 {
   return stand_still_duration_;
