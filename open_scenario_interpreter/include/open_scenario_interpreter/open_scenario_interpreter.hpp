@@ -47,22 +47,31 @@ class ScenarioRunner
 
   int step_time_ms;
 
-  template<typename ... Ts>
-  decltype(auto) hoge(junit_exporter::TestResult result, Ts && ... xs)
+  decltype(auto) report(
+    junit_exporter::TestResult result,
+    const std::string & type = "",
+    const std::string & what = "")
   {
     exporter.addTestCase(
       evaluate.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
-      "scenario_testing",
-      0,
-      result,
-      std::forward<decltype(xs)>(xs)...);
+      "scenario_testing", 0, result, type, what);
 
-    // switch (result)
-    // {
-    // case junit_exporter::TestResult::ERROR:
-    // case junit_exporter::TestResult::FAILURE:
-    // case junit_exporter::TestResult::SUCCESS:
-    // }
+    #ifndef NDEBUG
+    switch (result) {
+      case junit_exporter::TestResult::ERROR:
+        RCLCPP_ERROR(get_logger(), "\x1b[1;31mERROR: %s: %s", type.c_str(), what.c_str());
+        break;
+
+      case junit_exporter::TestResult::FAILURE:
+        RCLCPP_INFO(get_logger(), "\x1b[1;31mFAILURE\x1b[0m");
+        break;
+
+      case junit_exporter::TestResult::SUCCESS:
+        RCLCPP_INFO(get_logger(), "\x1b[1;32mSUCCESS\x1b[0m");
+        break;
+    }
+    std::cout << std::flush;
+    #endif
 
     exporter.write(log_path);
   }

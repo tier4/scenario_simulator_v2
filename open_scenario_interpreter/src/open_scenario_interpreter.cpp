@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define NDEBUG
+// #define NDEBUG
+#undef NDEBUG
 #include <open_scenario_interpreter/open_scenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -87,83 +88,72 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
       constexpr auto SUCCESS = junit_exporter::TestResult::SUCCESS;
 
       try {
-        if (evaluate && !evaluate.as<OpenScenario>().complete()) {
-          const auto result {evaluate.as<OpenScenario>()()};
+        if (evaluate) {
+          if (!evaluate.as<OpenScenario>().complete()) {
+            const auto result {evaluate.as<OpenScenario>()()};
 
-          #ifndef NDEBUG
-          RCLCPP_INFO(
-            get_logger(),
-            "[Storyboard: %s]",
-            boost::lexical_cast<std::string>(result).c_str());
-          #endif
+            #ifndef NDEBUG
+            RCLCPP_INFO(
+              get_logger(),
+              "[Storyboard: %s]",
+              boost::lexical_cast<std::string>(result).c_str());
+            #endif
 
-          #ifndef NDEBUG
-          RCLCPP_INFO(
-            get_logger(),
-            "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
-            open_scenario_interpreter::standby_state.use_count() - 1,
-            open_scenario_interpreter::start_transition.use_count() - 1,
-            open_scenario_interpreter::running_state.use_count() - 1,
-            open_scenario_interpreter::stop_transition.use_count() - 1,
-            open_scenario_interpreter::complete_state.use_count() - 1);
-          #endif
-        } else if (evaluate) {
-          if (expect == "success") {
-            hoge(SUCCESS);
+            #ifndef NDEBUG
+            RCLCPP_INFO(
+              get_logger(),
+              "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
+              open_scenario_interpreter::standby_state.use_count() - 1,
+              open_scenario_interpreter::start_transition.use_count() - 1,
+              open_scenario_interpreter::running_state.use_count() - 1,
+              open_scenario_interpreter::stop_transition.use_count() - 1,
+              open_scenario_interpreter::complete_state.use_count() - 1);
+            #endif
           } else {
-            hoge(FAILURE, "unexpected result", "expected " + expect);
+            if (expect == "success") {
+              report(SUCCESS);
+            } else {
+              report(FAILURE, "unexpected-result", "expected " + expect);
+            }
+            stop();
           }
-          stop();
         }
       } catch (const int command) {
         switch (command) {
           case EXIT_SUCCESS:
             if (expect == "success") {
-              hoge(SUCCESS);
+              report(SUCCESS);
             } else {
-              hoge(FAILURE, "unexpected result", "expected " + expect);
+              report(FAILURE, "unexpected-result", "expected " + expect);
             }
-            #ifndef NDEBUG
-            RCLCPP_INFO(get_logger(), "\x1b[1;32mSimulation succeeded.\x1b[0m");
-            #endif
             stop();
             break;
 
           case EXIT_FAILURE:
             if (expect == "failure") {
-              hoge(SUCCESS);
+              report(SUCCESS);
             } else {
-              hoge(FAILURE, "unexpected result", "expected " + expect);
+              report(FAILURE, "unexpected-result", "expected " + expect);
             }
-            #ifndef NDEBUG
-            RCLCPP_INFO(get_logger(), "\x1b[1;31mSimulation failed.\x1b[0m");
-            #endif
             stop();
+            break;
 
           default:
             break;
         }
       } catch (const open_scenario_interpreter::ImplementationFault & error) {
-        std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
         if (expect == "error") {
-          hoge(SUCCESS);
+          report(SUCCESS);
         } else {
-          hoge(ERROR, "open_scenario_interpreter::ImplementationFault", error.what());
+          report(ERROR, "implementation-fault", error.what());
         }
-        #ifndef NDEBUG
-        RCLCPP_ERROR(get_logger(), "%s.", error.what());
-        #endif
         stop();
       } catch (const std::exception & error) {
-        std::string testcase = evaluate.as<OpenScenario>().scope.scenario.string();
         if (expect == "error") {
-          hoge(SUCCESS);
+          report(SUCCESS);
         } else {
-          hoge(ERROR, "std::exception", error.what());
+          report(ERROR, "unexpected-exception", error.what());
         }
-        #ifndef NDEBUG
-        RCLCPP_ERROR(get_logger(), "%s.", error.what());
-        #endif
         stop();
       }
     });
@@ -174,6 +164,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
 ScenarioRunner::Result ScenarioRunner::on_deactivate(const rclcpp_lifecycle::State &)
 {
   timer.reset();
+  connection.~API();
   return ScenarioRunner::Result::SUCCESS;
 }
 
