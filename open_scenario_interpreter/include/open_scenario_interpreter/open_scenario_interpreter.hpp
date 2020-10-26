@@ -53,7 +53,7 @@ class ScenarioRunner
 
   decltype(auto) report(
     junit_exporter::TestResult result,
-    const std::string & type = "",
+    const std::string & type,
     const std::string & what = "")
   {
     exporter.addTestCase(
@@ -63,15 +63,17 @@ class ScenarioRunner
     #ifndef NDEBUG
     switch (result) {
       case junit_exporter::TestResult::ERROR:
-        RCLCPP_ERROR(get_logger(), "\x1b[1;31mERROR: %s: %s", type.c_str(), what.c_str());
+        RCLCPP_ERROR(get_logger(),
+          "\x1b[1;31mYield %s (%s): %s\x1b[0m", type.c_str(), what.c_str());
         break;
 
       case junit_exporter::TestResult::FAILURE:
-        RCLCPP_INFO(get_logger(), "\x1b[1;31mFAILURE\x1b[0m");
+        RCLCPP_ERROR(get_logger(),
+          "\x1b[1;31mYield %s (%s): %s\x1b[0m", type.c_str(), what.c_str());
         break;
 
       case junit_exporter::TestResult::SUCCESS:
-        RCLCPP_INFO(get_logger(), "\x1b[1;32mSUCCESS\x1b[0m");
+        RCLCPP_INFO(get_logger(), "\x1b[32mYield the %s\x1b[0m", type.c_str());
         break;
     }
     std::cout << std::flush;
@@ -91,17 +93,17 @@ class ScenarioRunner
     switch (command) {
       case EXIT_SUCCESS:
         if (expect == "success") {
-          report(SUCCESS);
+          report(SUCCESS, "intended-success");
         } else {
-          report(FAILURE, "unexpected-result", "expected " + expect);
+          report(FAILURE, "unintended-failure", "expected " + expect);
         }
         break;
 
       case EXIT_FAILURE:
         if (expect == "failure") {
-          report(SUCCESS);
+          report(SUCCESS, "intended-failure");
         } else {
-          report(FAILURE, "unexpected-result", "expected " + expect);
+          report(FAILURE, "unintended-success", "expected " + expect);
         }
         break;
 
@@ -110,13 +112,13 @@ class ScenarioRunner
     }
   } catch (const open_scenario_interpreter::ImplementationFault & error) {
     if (expect == "error") {
-      report(SUCCESS);
+      report(SUCCESS, "intended-error");
     } else {
       report(ERROR, "implementation-fault", error.what());
     }
   } catch (const std::exception & error) {
     if (expect == "error") {
-      report(SUCCESS);
+      report(SUCCESS, "intended-error");
     } else {
       report(ERROR, "unexpected-standard-exception", error.what());
     }

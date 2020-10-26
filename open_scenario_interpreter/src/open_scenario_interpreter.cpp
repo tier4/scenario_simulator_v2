@@ -105,9 +105,9 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             #endif
           } else {
             if (expect == "success") {
-              report(SUCCESS);
+              report(SUCCESS, "intended-success");
             } else {
-              report(FAILURE, "unexpected-result", "expected " + expect);
+              report(FAILURE, "unintended-failure", "expected " + expect);
             }
           }
         }
