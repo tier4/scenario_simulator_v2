@@ -20,6 +20,7 @@
 #include <open_scenario_interpreter/syntax/open_scenario.hpp>
 #include <open_scenario_interpreter/utility/visibility.h>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
+#include <lifecycle_msgs/msg/state.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
@@ -82,6 +83,20 @@ class ScenarioRunner
     exporter.write(log_path);
 
     evaluate.reset();
+
+    /* -------------------------------------------------------------------------
+     *
+     *  If invoked CustomCommandAction 'exitSuccess' or 'exitFailure' in
+     *  Storyboard.Init, might to call 'deactivate()' even if LifecycleNode's
+     *  state while 'activating'. Thus, we wait transition 'activate'
+     *  (OpenScenarioInterpreter::on_activate) will be completed.
+     *
+     * ---------------------------------------------------------------------- */
+    while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
     deactivate();
   }
 

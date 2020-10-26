@@ -60,8 +60,7 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
   connect(
     shared_from_this(),
-    // XXX DIRTY HACK!!!  INNER_SCOPE MUST BE PRIVATE
-    evaluate.as<OpenScenario>().category.as<ScenarioDefinition>().inner_scope.logic_file.string());
+    evaluate.as<OpenScenario>().scope.logic_file.string());
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
 
@@ -70,12 +69,6 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
 ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State &)
 {
-  guard(
-    [this]()
-    {
-      return evaluate.as<OpenScenario>().init();
-    });
-
   timer = create_wall_timer(
     std::chrono::milliseconds(step_time_ms),
     [this]()

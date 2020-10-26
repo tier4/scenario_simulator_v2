@@ -37,21 +37,26 @@ inline namespace syntax
 struct Storyboard
   : public StoryboardElement<Storyboard>, public Elements
 {
+  Scope inner_scope;
+
   Init init;
 
   Trigger stop_trigger;
 
-  const String name {"Storyboard"};  // XXX DIRTY HACK!!!
+  const String name {  // XXX DIRTY HACK!!!
+    "Storyboard"
+  };
 
   template<typename Node, typename Scope>
   explicit Storyboard(const Node & node, Scope & outer_scope)
-  : init(readElement<Init>("Init", node, outer_scope)),
-    stop_trigger(readElement<Trigger>("StopTrigger", node, outer_scope))
+  : inner_scope(outer_scope),
+    init(readElement<Init>("Init", node, inner_scope)),
+    stop_trigger(readElement<Trigger>("StopTrigger", node, inner_scope))
   {
     callWithElements(
       node, "Story", 1, unbounded, [&](auto && node)
       {
-        return push_back(readStoryboardElement<Story>(node, outer_scope));
+        return push_back(readStoryboardElement<Story>(node, inner_scope));
       });
   }
 
@@ -62,6 +67,10 @@ struct Storyboard
 
   void start()
   {
+    for (const auto & each : inner_scope.entities) {
+      std::get<1>(each).evaluate();
+    }
+
     init.evaluate();   // NOTE RENAME TO 'start'?
   }
 
