@@ -22,7 +22,7 @@
 
 namespace open_scenario_interpreter
 {
-ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
+Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("open_scenario_interpreter", options)
 {
   declare_parameter<decltype(expect)>("expect", expect);
@@ -32,7 +32,7 @@ ScenarioRunner::ScenarioRunner(const rclcpp::NodeOptions & options)
   declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
 }
 
-ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::State &)
+Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -48,26 +48,26 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
     #ifndef NDEBUG
     RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", osc_path.c_str());
     #endif
-    evaluate.rebind<OpenScenario>(osc_path);
+    script.rebind<OpenScenario>(osc_path);
   } catch (const open_scenario_interpreter::SyntaxError & error) {
     #ifndef NDEBUG
     RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
     #endif
-    return ScenarioRunner::Result::FAILURE;
+    return Interpreter::Result::FAILURE;
   }
 
   static constexpr auto real_time_factor = 3.0;
 
   connect(
     shared_from_this(),
-    evaluate.as<OpenScenario>().scope.logic_file.string());
+    script.as<OpenScenario>().scope.logic_file.string());
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
 
-  return ScenarioRunner::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;
 }
 
-ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State &)
+Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
   timer = create_wall_timer(
     std::chrono::milliseconds(step_time_ms),
@@ -75,10 +75,10 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
     {
       guard([this]()
       {
-        if (evaluate) {
-          if (!evaluate.as<OpenScenario>().complete()) {
+        if (script) {
+          if (!script.as<OpenScenario>().complete()) {
             const auto result {
-              evaluate.as<OpenScenario>()()
+              script.as<OpenScenario>().evaluate()
             };
 
             #ifndef NDEBUG
@@ -107,30 +107,33 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
       });
     });
 
-  return ScenarioRunner::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;
 }
 
-ScenarioRunner::Result ScenarioRunner::on_deactivate(const rclcpp_lifecycle::State &)
+Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
+{
+  timer.reset();
+  return Interpreter::Result::SUCCESS;
+}
+
+Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
   timer.reset();
   connection.~API();
-  return ScenarioRunner::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;
 }
 
-ScenarioRunner::Result ScenarioRunner::on_cleanup(const rclcpp_lifecycle::State &)
+Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
 {
-  return ScenarioRunner::Result::SUCCESS;
+  timer.reset();
+  return Interpreter::Result::SUCCESS;
 }
 
-ScenarioRunner::Result ScenarioRunner::on_shutdown(const rclcpp_lifecycle::State &)
+Interpreter::Result Interpreter::on_error(const rclcpp_lifecycle::State &)
 {
-  return ScenarioRunner::Result::SUCCESS;
-}
-
-ScenarioRunner::Result ScenarioRunner::on_error(const rclcpp_lifecycle::State &)
-{
-  return ScenarioRunner::Result::SUCCESS;
+  timer.reset();
+  return Interpreter::Result::SUCCESS;
 }
 }  // namespace open_scenario_interpreter
 
-RCLCPP_COMPONENTS_REGISTER_NODE(open_scenario_interpreter::ScenarioRunner)
+RCLCPP_COMPONENTS_REGISTER_NODE(open_scenario_interpreter::Interpreter)

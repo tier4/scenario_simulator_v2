@@ -29,7 +29,7 @@ int main(int argc, char ** argv)
   rclcpp::NodeOptions options {};
 
   auto node {
-    std::make_shared<open_scenario_interpreter::ScenarioRunner>(options)
+    std::make_shared<open_scenario_interpreter::Interpreter>(options)
   };
 
   executor.add_node((*node).get_node_base_interface());

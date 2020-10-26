@@ -16,11 +16,11 @@
 #define OPEN_SCENARIO_INTERPRETER__OPEN_SCENARIO_INTERPRETER_HPP_
 
 #include <junit_exporter/junit_exporter.hpp>
+#include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <open_scenario_interpreter/syntax/open_scenario.hpp>
 #include <open_scenario_interpreter/utility/visibility.h>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
-#include <lifecycle_msgs/msg/state.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <memory>
@@ -29,7 +29,7 @@
 
 namespace open_scenario_interpreter
 {
-class ScenarioRunner
+class Interpreter
   : public rclcpp_lifecycle::LifecycleNode
 {
   std::string expect;
@@ -40,7 +40,7 @@ class ScenarioRunner
 
   std::string log_path;
 
-  Element evaluate;
+  Element script;
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
@@ -58,7 +58,7 @@ class ScenarioRunner
     const std::string & what = "")
   {
     exporter.addTestCase(
-      evaluate.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
+      script.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
       "scenario_testing", 0, result, type, what);
 
     #ifndef NDEBUG
@@ -82,20 +82,7 @@ class ScenarioRunner
 
     exporter.write(log_path);
 
-    evaluate.reset();
-
-    /* -------------------------------------------------------------------------
-     *
-     *  If invoked CustomCommandAction 'exitSuccess' or 'exitFailure' in
-     *  Storyboard.Init, might to call 'deactivate()' even if LifecycleNode's
-     *  state while 'activating'. Thus, we wait transition 'activate'
-     *  (OpenScenarioInterpreter::on_activate) will be completed.
-     *
-     * ---------------------------------------------------------------------- */
-    while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE)
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
+    script.reset();
 
     deactivate();
   }
@@ -143,7 +130,7 @@ class ScenarioRunner
 
 public:
   OPEN_SCENARIO_INTERPRETER_PUBLIC
-  explicit ScenarioRunner(const rclcpp::NodeOptions &);
+  explicit Interpreter(const rclcpp::NodeOptions &);
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
