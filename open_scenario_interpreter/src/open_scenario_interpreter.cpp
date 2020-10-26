@@ -70,7 +70,11 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
 ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State &)
 {
-  evaluate.as<OpenScenario>().init();
+  guard(
+    [this]()
+    {
+      return evaluate.as<OpenScenario>().init();
+    });
 
   timer = create_wall_timer(
     std::chrono::milliseconds(step_time_ms),
@@ -80,7 +84,9 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
       {
         if (evaluate) {
           if (!evaluate.as<OpenScenario>().complete()) {
-            const auto result {evaluate.as<OpenScenario>()()};
+            const auto result {
+              evaluate.as<OpenScenario>()()
+            };
 
             #ifndef NDEBUG
             RCLCPP_INFO(
@@ -103,7 +109,6 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             } else {
               report(FAILURE, "unexpected-result", "expected " + expect);
             }
-            // stop();
           }
         }
       });

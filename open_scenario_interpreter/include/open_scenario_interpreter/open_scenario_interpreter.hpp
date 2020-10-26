@@ -95,7 +95,6 @@ class ScenarioRunner
         } else {
           report(FAILURE, "unexpected-result", "expected " + expect);
         }
-        // stop();
         break;
 
       case EXIT_FAILURE:
@@ -104,7 +103,6 @@ class ScenarioRunner
         } else {
           report(FAILURE, "unexpected-result", "expected " + expect);
         }
-        // stop();
         break;
 
       default:
@@ -116,14 +114,14 @@ class ScenarioRunner
     } else {
       report(ERROR, "implementation-fault", error.what());
     }
-    // stop();
   } catch (const std::exception & error) {
     if (expect == "error") {
       report(SUCCESS);
     } else {
-      report(ERROR, "unexpected-exception", error.what());
+      report(ERROR, "unexpected-standard-exception", error.what());
     }
-    // stop();
+  } catch (...) {
+    report(ERROR, "unexpected-unknown-exception");
   }
 
 public:
