@@ -65,38 +65,26 @@ ScenarioRunner::Result ScenarioRunner::on_configure(const rclcpp_lifecycle::Stat
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
 
-  evaluate.as<OpenScenario>().init();
-
   return ScenarioRunner::Result::SUCCESS;
 }
 
 ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State &)
 {
+  evaluate.as<OpenScenario>().init();
+
   timer = create_wall_timer(
     std::chrono::milliseconds(step_time_ms),
     [this]()
     {
-      auto stop =
-      [&]()
+      guard([this]()
       {
-        evaluate.reset();
-        deactivate();
-      };
-
-      constexpr auto ERROR = junit_exporter::TestResult::ERROR;
-      constexpr auto FAILURE = junit_exporter::TestResult::FAILURE;
-      constexpr auto SUCCESS = junit_exporter::TestResult::SUCCESS;
-
-      try {
         if (evaluate) {
           if (!evaluate.as<OpenScenario>().complete()) {
             const auto result {evaluate.as<OpenScenario>()()};
 
             #ifndef NDEBUG
             RCLCPP_INFO(
-              get_logger(),
-              "[Storyboard: %s]",
-              boost::lexical_cast<std::string>(result).c_str());
+              get_logger(), "[Storyboard: %s]", boost::lexical_cast<std::string>(result).c_str());
             #endif
 
             #ifndef NDEBUG
@@ -115,47 +103,10 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
             } else {
               report(FAILURE, "unexpected-result", "expected " + expect);
             }
-            stop();
+            // stop();
           }
         }
-      } catch (const int command) {
-        switch (command) {
-          case EXIT_SUCCESS:
-            if (expect == "success") {
-              report(SUCCESS);
-            } else {
-              report(FAILURE, "unexpected-result", "expected " + expect);
-            }
-            stop();
-            break;
-
-          case EXIT_FAILURE:
-            if (expect == "failure") {
-              report(SUCCESS);
-            } else {
-              report(FAILURE, "unexpected-result", "expected " + expect);
-            }
-            stop();
-            break;
-
-          default:
-            break;
-        }
-      } catch (const open_scenario_interpreter::ImplementationFault & error) {
-        if (expect == "error") {
-          report(SUCCESS);
-        } else {
-          report(ERROR, "implementation-fault", error.what());
-        }
-        stop();
-      } catch (const std::exception & error) {
-        if (expect == "error") {
-          report(SUCCESS);
-        } else {
-          report(ERROR, "unexpected-exception", error.what());
-        }
-        stop();
-      }
+      });
     });
 
   return ScenarioRunner::Result::SUCCESS;

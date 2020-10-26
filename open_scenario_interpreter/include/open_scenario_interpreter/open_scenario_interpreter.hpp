@@ -47,6 +47,10 @@ class ScenarioRunner
 
   int step_time_ms;
 
+  const junit_exporter::TestResult ERROR = junit_exporter::TestResult::ERROR;
+  const junit_exporter::TestResult FAILURE = junit_exporter::TestResult::FAILURE;
+  const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
+
   decltype(auto) report(
     junit_exporter::TestResult result,
     const std::string & type = "",
@@ -74,6 +78,52 @@ class ScenarioRunner
     #endif
 
     exporter.write(log_path);
+
+    evaluate.reset();
+    deactivate();
+  }
+
+  template<typename Thunk>
+  void guard(Thunk && thunk) try
+  {
+    return thunk();
+  } catch (const int command) {
+    switch (command) {
+      case EXIT_SUCCESS:
+        if (expect == "success") {
+          report(SUCCESS);
+        } else {
+          report(FAILURE, "unexpected-result", "expected " + expect);
+        }
+        // stop();
+        break;
+
+      case EXIT_FAILURE:
+        if (expect == "failure") {
+          report(SUCCESS);
+        } else {
+          report(FAILURE, "unexpected-result", "expected " + expect);
+        }
+        // stop();
+        break;
+
+      default:
+        break;
+    }
+  } catch (const open_scenario_interpreter::ImplementationFault & error) {
+    if (expect == "error") {
+      report(SUCCESS);
+    } else {
+      report(ERROR, "implementation-fault", error.what());
+    }
+    // stop();
+  } catch (const std::exception & error) {
+    if (expect == "error") {
+      report(SUCCESS);
+    } else {
+      report(ERROR, "unexpected-exception", error.what());
+    }
+    // stop();
   }
 
 public:
