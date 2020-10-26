@@ -21,6 +21,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -43,6 +44,14 @@ public:
     return ports;
   }
   std::shared_ptr<simulation_api::entity::VehicleParameters> vehicle_parameters;
+  simulation_api::entity::EntityStatus calculateEntityStatusUpdated(double target_speed) const;
+  bool foundConflictingEntity(const std::vector<int> & following_lanelets) const;
+  boost::optional<simulation_api::entity::EntityStatus> getConflictingEntityStatus(
+    const std::vector<int> & following_lanelets) const;
+  boost::optional<double> getDistanceToConflictingEntity(
+    const std::vector<int> & following_lanelets) const;
+  boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
+  double calculateStopDistance() const;
 };
 }  // namespace entity_behavior
 
