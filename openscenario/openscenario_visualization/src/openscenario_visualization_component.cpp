@@ -36,14 +36,19 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
   for (const auto & status : msg->status) {
     entity_name_lists.emplace_back(status.name);
   }
+  std::vector<std::string> erase_names;
   for (const auto & marker : markers_) {
     auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), marker.first);
     if (itr == entity_name_lists.end()) {
       auto delete_marker = generateDeleteMarker(marker.first);
       std::copy(delete_marker.markers.begin(), delete_marker.markers.end(),
         std::back_inserter(current_marker.markers));
-      markers_.erase(marker.first);
+      erase_names.emplace_back(marker.first);
     }
+  }
+  for (const auto & name : erase_names)
+  {
+    markers_.erase(markers_.find(name));
   }
   for (const auto & status : msg->status) {
     auto marker_array = generateMarker(status);
