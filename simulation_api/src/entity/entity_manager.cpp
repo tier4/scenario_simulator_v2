@@ -379,6 +379,7 @@ void EntityManager::update(double current_time, double step_time)
     status_msg.name = status.first;
     status_array_msg.status.emplace_back(status_msg);
   }
+  entity_status_array_pub_ptr_->publish(status_array_msg);
   // entity_marker_pub_ptr_->publish(generateMarker());
 }
 
