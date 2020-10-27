@@ -21,6 +21,26 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(const rcl
 : LifecycleNode("openscenario_visualization", options)
 {
 }
+
+using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+Result OpenscenarioVisualizationComponent::on_configure(const rclcpp_lifecycle::State &)
+{
+}
+Result OpenscenarioVisualizationComponent::on_activate(const rclcpp_lifecycle::State &)
+{
+}
+Result OpenscenarioVisualizationComponent::on_deactivate(const rclcpp_lifecycle::State &)
+{
+}
+Result OpenscenarioVisualizationComponent::on_cleanup(const rclcpp_lifecycle::State &)
+{
+}
+Result OpenscenarioVisualizationComponent::on_shutdown(const rclcpp_lifecycle::State &)
+{
+}
+Result OpenscenarioVisualizationComponent::on_error(const rclcpp_lifecycle::State &)
+{
+}
 }  // namespace openscenario_visualization
 
 RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_visualization::OpenscenarioVisualizationComponent)
