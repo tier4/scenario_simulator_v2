@@ -17,7 +17,6 @@
 
 #include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
-#include <simulation_api/color_utils/color_utils.hpp>
 
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
@@ -43,10 +42,6 @@ public:
   VehicleEntity(std::string name, const EntityStatus & initial_state, VehicleParameters parameters);
   VehicleEntity(std::string name, const pugi::xml_node & xml);
   VehicleEntity(std::string name, VehicleParameters parameters);
-  /*
-  visualization_msgs::msg::MarkerArray generateMarker(
-    rclcpp::Time stamp,
-    std_msgs::msg::ColorRGBA color = color_utils::makeColorMsg("forestgreen", 0.8));*/
   const VehicleParameters parameters;
   void onUpdate(double current_time, double step_time) override;
   void requestAcquirePosition(int lanelet_id, double s, double offset);

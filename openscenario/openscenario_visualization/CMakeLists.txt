@@ -21,6 +21,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(simulation_api REQUIRED)
 find_package(openscenario_msgs REQUIRED)
 
 include_directories(
@@ -34,6 +35,8 @@ ament_target_dependencies(openscenario_visualization_component
   rclcpp
   rclcpp_components
   rclcpp_lifecycle
+  simulation_api
+  visualization_msgs
   openscenario_msgs
 )
 add_executable(openscenario_visualization_node
@@ -44,6 +47,8 @@ ament_target_dependencies(openscenario_visualization_node
   rclcpp
   rclcpp_components
   rclcpp_lifecycle
+  simulation_api
+  visualization_msgs
   openscenario_msgs
 )
 
