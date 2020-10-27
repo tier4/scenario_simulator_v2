@@ -18,7 +18,7 @@ from __future__ import print_function
 import os
 import sys
 import subprocess
-import platform
+from rospkg.os_detect import OsDetect
 import yaml
 from catkin_pkg.packages import find_packages
 from string import Template
@@ -143,18 +143,14 @@ def readPackageCMakeData(rosDebYamlFileName):
     # dictionary for storing cmake dependencies
     # e.g. { "<package name 1>" -> PackageCMakeData, "<package name 2>" -> PackageCMakeData ... }
     data = {}
-    distro = platform.dist()[2]
-    if 'ROS_OS_OVERRIDE' in os.environ:
-        ros_os_override = os.environ['ROS_OS_OVERRIDE'].split(':')
-        if len(ros_os_override) == 2:
-            distro = ros_os_override[1]
+    distribution = OsDetect().detect_os()[2]
 
     for packageName, packageCMakeData in rosDebYamlData.items():
         # find out which distribution
         if "name" in packageCMakeData:
             data[packageName] = PackageCMakeData(packageCMakeData)
-        elif distro in packageCMakeData:
-            data[packageName] = PackageCMakeData(packageCMakeData[distro])
+        elif distribution in packageCMakeData:
+            data[packageName] = PackageCMakeData(packageCMakeData[distribution])
         elif not packageCMakeData:
             data[packageName] = PackageCMakeData()  # placeholder
     return data
@@ -257,7 +253,7 @@ def getCatkinPackages(workspaceRoot):
             workspaces.append(path)
             return
         markerfile = os.path.join(path, catkin_marker)
-        if os.path.isfile(markerfile):
+        if not os.path.isfile(markerfile):
             return
         with open(markerfile) as f:
             data = f.read()

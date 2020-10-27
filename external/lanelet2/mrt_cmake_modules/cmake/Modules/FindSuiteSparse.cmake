@@ -484,8 +484,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND SUITESPARSE_VERSION VERSION_EQUAL 3.4.0
         # Any even moderately recent Ubuntu release (likely to be affected by
         # this bug) should have lsb_release, if it isn't present we are likely
         # on a different Linux distribution (should be fine).
-        execute_process(COMMAND ${LSB_RELEASE_EXECUTABLE} -si OUTPUT_VARIABLE LSB_DISTRIBUTOR_ID
-                                                                              OUTPUT_STRIP_TRAILING_WHITESPACE)
+        execute_process(
+            COMMAND ${LSB_RELEASE_EXECUTABLE} -si
+            OUTPUT_VARIABLE LSB_DISTRIBUTOR_ID
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
 
         if(LSB_DISTRIBUTOR_ID MATCHES "Ubuntu" AND SUITESPARSE_LIBRARIES MATCHES "/usr/lib/libamd")
             # We are on Ubuntu, and the SuiteSparse version matches the broken

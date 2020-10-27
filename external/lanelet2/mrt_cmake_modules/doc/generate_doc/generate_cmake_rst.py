@@ -49,7 +49,7 @@ def crawl_for_cmake(path):
     cmake_files = []
     for (parentdir, _, files) in os.walk(path):
         for filename in files:
-            if not filename.endswith('.cmake'):
+            if not filename.endswith('.cmake') or filename.startswith("Find"):
                 continue
             fullpath = os.path.join(parentdir, filename)
             relpath = os.path.relpath(fullpath, path)

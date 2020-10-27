@@ -90,15 +90,24 @@ if(jsoncpp_FOUND)
             TARGET ${target}
             APPEND
             PROPERTY MAP_IMPORTED_CONFIG_RELEASE RELEASE RELWITHDEBINFO MINSIZEREL NONE ${_jsoncpp_debug_fallback})
-        set_property(TARGET ${target} APPEND PROPERTY MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELWITHDEBINFO RELEASE
-                                                      MINSIZEREL NONE ${_jsoncpp_debug_fallback})
-        set_property(TARGET ${target} APPEND PROPERTY MAP_IMPORTED_CONFIG_MINSIZEREL MINSIZEREL RELEASE RELWITHDEBINFO
-                                                      NONE ${_jsoncpp_debug_fallback})
-        set_property(TARGET ${target} APPEND PROPERTY MAP_IMPORTED_CONFIG_NONE NONE RELEASE RELWITHDEBINFO MINSIZEREL
-                                                      ${_jsoncpp_debug_fallback})
+        set_property(
+            TARGET ${target}
+            APPEND
+            PROPERTY MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELWITHDEBINFO RELEASE MINSIZEREL NONE
+                     ${_jsoncpp_debug_fallback})
+        set_property(
+            TARGET ${target}
+            APPEND
+            PROPERTY MAP_IMPORTED_CONFIG_MINSIZEREL MINSIZEREL RELEASE RELWITHDEBINFO NONE ${_jsoncpp_debug_fallback})
+        set_property(
+            TARGET ${target}
+            APPEND
+            PROPERTY MAP_IMPORTED_CONFIG_NONE NONE RELEASE RELWITHDEBINFO MINSIZEREL ${_jsoncpp_debug_fallback})
         if(NOT MSVC)
-            set_property(TARGET ${target} APPEND PROPERTY MAP_IMPORTED_CONFIG_DEBUG DEBUG RELWITHDEBINFO RELEASE
-                                                          MINSIZEREL NONE)
+            set_property(
+                TARGET ${target}
+                APPEND
+                PROPERTY MAP_IMPORTED_CONFIG_DEBUG DEBUG RELWITHDEBINFO RELEASE MINSIZEREL NONE)
         endif()
     endmacro()
     if(__jsoncpp_have_jsoncpplib)
