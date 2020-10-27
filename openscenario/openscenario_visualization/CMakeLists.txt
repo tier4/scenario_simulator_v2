@@ -36,14 +36,27 @@ ament_target_dependencies(openscenario_visualization_component
   rclcpp_lifecycle
   openscenario_msgs
 )
+add_executable(openscenario_visualization_node
+  src/openscenario_visualization_node.cpp
+)
+target_link_libraries(openscenario_visualization_node openscenario_visualization_component)
+ament_target_dependencies(openscenario_visualization_node
+  rclcpp
+  rclcpp_components
+  rclcpp_lifecycle
+  openscenario_msgs
+)
 
+install(TARGETS
+  openscenario_visualization_node 
+  DESTINATION lib/openscenario_visualization
+)
 install(TARGETS
   openscenario_visualization_component
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
-ament_export_libraries(
-  openscenario_visualization_component)
+ament_export_libraries(openscenario_visualization_component)
 rclcpp_components_register_nodes(openscenario_visualization_component
   "openscenario_visualization::OpenscenarioVisualizationComponent")
 
