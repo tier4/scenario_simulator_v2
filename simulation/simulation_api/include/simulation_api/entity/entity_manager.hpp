@@ -22,6 +22,7 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
 #include <openscenario_msgs/msg/entity_status_array.hpp>
+#include <openscenario_msgs/msg/bounding_box.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -82,6 +83,7 @@ private:
     }
     lanelet_marker_pub_ptr_->publish(markers);
   }
+  const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>

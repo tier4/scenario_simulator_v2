@@ -15,6 +15,7 @@
 #ifndef SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
 #define SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
 
+#include <openscenario_msgs/msg/bounding_box.hpp>
 #include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
@@ -81,6 +82,7 @@ public:
   void setOtherStatus(const std::unordered_map<std::string, EntityStatus> & status);
   void updateStandStillDuration(double step_time);
   boost::optional<double> getStandStillDuration() const;
+  virtual const openscenario_msgs::msg::BoundingBox getBoundingBox() const = 0;
 
 protected:
   bool visibility_;

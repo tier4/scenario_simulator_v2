@@ -296,6 +296,25 @@ const boost::optional<EntityStatus> EntityManager::getEntityStatus(
   return boost::none;
 }
 
+const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::string name) const
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw simulation_api::SimulationRuntimeError(
+            "error occurs while getting bounding box : " + name);
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<const VehicleEntity &>(it->second).getBoundingBox();
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return boost::any_cast<const EgoEntity &>(it->second).getBoundingBox();
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    return boost::any_cast<const PedestrianEntity &>(it->second).getBoundingBox();
+  }
+  throw simulation_api::SimulationRuntimeError("error occurs while getting bounding box : " + name);
+}
+
 bool EntityManager::entityStatusSetted(std::string name) const
 {
   auto it = entities_.find(name);
@@ -377,6 +396,7 @@ void EntityManager::update(double current_time, double step_time)
   for (const auto & status : all_status) {
     auto status_msg = status.second.toRosMsg();
     status_msg.name = status.first;
+    status_msg.bounding_box = getBoundingBox(status.first);
     status_array_msg.status.emplace_back(status_msg);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);

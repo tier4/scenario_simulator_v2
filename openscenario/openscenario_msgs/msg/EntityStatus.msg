@@ -11,6 +11,8 @@ float64 time
 
 string name
 
+openscenario_msgs/BoundingBox bounding_box
+
 # fields for world frame
 geometry_msgs/Pose pose
 

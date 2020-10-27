@@ -59,6 +59,10 @@ public:
     tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
   void setTargetSpeed(double target_speed, bool continuous);
+  const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
+  {
+    return parameters.bounding_box.toRosMsg();
+  }
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;

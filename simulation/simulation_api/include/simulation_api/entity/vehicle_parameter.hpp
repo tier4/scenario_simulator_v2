@@ -16,6 +16,8 @@
 #define SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
 
 // headers in pugixml
+#include <openscenario_msgs/msg/bounding_box.hpp>
+
 #include <pugixml.hpp>
 
 #include <rclcpp/rclcpp.hpp>
@@ -88,6 +90,17 @@ struct BoundingBox
   {}
   const Center center;
   const Dimensions dimensions;
+  const openscenario_msgs::msg::BoundingBox toRosMsg() const
+  {
+    openscenario_msgs::msg::BoundingBox ret;
+    ret.center.x = center.x;
+    ret.center.y = center.y;
+    ret.center.z = center.z;
+    ret.dimensions.x = dimensions.length;
+    ret.dimensions.y = dimensions.width;
+    ret.dimensions.z = dimensions.height;
+    return ret;
+  }
 };
 
 struct Axle
