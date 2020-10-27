@@ -19,8 +19,31 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(openscenario_msgs REQUIRED)
+
+include_directories(
+  include
+)
+
+add_library(openscenario_visualization_component SHARED
+  src/openscenario_visualization_component.cpp
+)
+ament_target_dependencies(openscenario_visualization_component
+  rclcpp
+  rclcpp_components
+  rclcpp_lifecycle
+  openscenario_msgs
+)
+
+install(TARGETS
+  openscenario_visualization_component
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+ament_export_libraries(
+  openscenario_visualization_component)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
