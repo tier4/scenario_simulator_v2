@@ -63,7 +63,7 @@ extern "C" {
 
 #include <openscenario_msgs/msg/entity_status_array.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <simulation_api/color_utils/color_utils.hpp>
 
 #include <unordered_map>
@@ -71,20 +71,13 @@ extern "C" {
 
 namespace openscenario_visualization
 {
-class OpenscenarioVisualizationComponent : public rclcpp_lifecycle::LifecycleNode
+class OpenscenarioVisualizationComponent : public rclcpp::Node
 {
 public:
   OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_PUBLIC
   explicit OpenscenarioVisualizationComponent(const rclcpp::NodeOptions &);
 
 private:
-  using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-  Result on_configure(const rclcpp_lifecycle::State &) override;
-  Result on_activate(const rclcpp_lifecycle::State &) override;
-  Result on_deactivate(const rclcpp_lifecycle::State &) override;
-  Result on_cleanup(const rclcpp_lifecycle::State &) override;
-  Result on_shutdown(const rclcpp_lifecycle::State &) override;
-  Result on_error(const rclcpp_lifecycle::State &) override;
   void entityStatusCallback(const openscenario_msgs::msg::EntityStatusArray::SharedPtr msg);
   const visualization_msgs::msg::MarkerArray generateDeleteMarker(std::string ns);
   const visualization_msgs::msg::MarkerArray generateDeleteMarker() const;

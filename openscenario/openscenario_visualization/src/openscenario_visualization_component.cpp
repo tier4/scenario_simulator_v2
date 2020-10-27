@@ -19,41 +19,47 @@ namespace openscenario_visualization
 {
 OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
   const rclcpp::NodeOptions & options)
-: LifecycleNode("openscenario_visualization", options) {}
+: Node("openscenario_visualization", options)
+{
+  marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/entity/marker", 1);
+  entity_status_sub_ = this->create_subscription<openscenario_msgs::msg::EntityStatusArray>(
+    "/entity/status", 1,
+    std::bind(&OpenscenarioVisualizationComponent::entityStatusCallback, this,
+    std::placeholders::_1));
+}
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
   const openscenario_msgs::msg::EntityStatusArray::SharedPtr msg)
 {
   visualization_msgs::msg::MarkerArray current_marker;
   std::vector<std::string> entity_name_lists;
-  for(const auto & status : msg->status)
-  {
+  for (const auto & status : msg->status) {
     entity_name_lists.emplace_back(status.name);
   }
-  for(const auto & marker : markers_)
-  {
+  for (const auto & marker : markers_) {
     auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), marker.first);
-    if (itr == entity_name_lists.end())
-    {
+    if (itr == entity_name_lists.end()) {
       auto delete_marker = generateDeleteMarker(marker.first);
-      std::copy(delete_marker.markers.begin(),delete_marker.markers.end(),std::back_inserter(current_marker.markers));
+      std::copy(delete_marker.markers.begin(), delete_marker.markers.end(),
+        std::back_inserter(current_marker.markers));
       markers_.erase(marker.first);
     }
   }
-  for(const auto & status : msg->status)
-  {
+  for (const auto & status : msg->status) {
     auto marker_array = generateMarker(status);
-    std::copy(marker_array.markers.begin(),marker_array.markers.end(),std::back_inserter(current_marker.markers));
+    std::copy(marker_array.markers.begin(), marker_array.markers.end(),
+      std::back_inserter(current_marker.markers));
     markers_[status.name] = marker_array;
   }
+  marker_pub_->publish(current_marker);
 }
 
-const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateDeleteMarker(std::string ns)
+const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateDeleteMarker(
+  std::string ns)
 {
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
-  for(const auto & marker : markers_[ns].markers)
-  {
+  for (const auto & marker : markers_[ns].markers) {
     visualization_msgs::msg::Marker marker_msg;
     marker_msg.action = marker_msg.DELETE;
     marker_msg.header.frame_id = ns;
@@ -128,56 +134,14 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   return ret;
 }
 
-const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateDeleteMarker() const
+const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateDeleteMarker()
+const
 {
   visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker marker;
   marker.action = marker.DELETEALL;
   ret.markers.push_back(marker);
   return ret;
-}
-
-using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-Result OpenscenarioVisualizationComponent::on_configure(const rclcpp_lifecycle::State &)
-{
-  marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/entity/marker", 1);
-  entity_status_sub_ = this->create_subscription<openscenario_msgs::msg::EntityStatusArray>(
-    "/entity/status", 1,
-    std::bind(&OpenscenarioVisualizationComponent::entityStatusCallback, this,
-    std::placeholders::_1));
-  return Result::SUCCESS;
-}
-Result OpenscenarioVisualizationComponent::on_activate(const rclcpp_lifecycle::State &)
-{
-  return Result::SUCCESS;
-}
-Result OpenscenarioVisualizationComponent::on_deactivate(const rclcpp_lifecycle::State &)
-{
-  marker_pub_->publish(generateDeleteMarker());
-  marker_pub_.reset();
-  entity_status_sub_.reset();
-  return Result::SUCCESS;
-}
-Result OpenscenarioVisualizationComponent::on_cleanup(const rclcpp_lifecycle::State &)
-{
-  marker_pub_->publish(generateDeleteMarker());
-  marker_pub_.reset();
-  entity_status_sub_.reset();
-  return Result::SUCCESS;
-}
-Result OpenscenarioVisualizationComponent::on_shutdown(const rclcpp_lifecycle::State &)
-{
-  marker_pub_->publish(generateDeleteMarker());
-  marker_pub_.reset();
-  entity_status_sub_.reset();
-  return Result::SUCCESS;
-}
-Result OpenscenarioVisualizationComponent::on_error(const rclcpp_lifecycle::State &)
-{
-  marker_pub_->publish(generateDeleteMarker());
-  marker_pub_.reset();
-  entity_status_sub_.reset();
-  return Result::SUCCESS;
 }
 }  // status.ns openscenario_visualization
 
