@@ -65,11 +65,11 @@ extern "C" {
 
 namespace openscenario_visualization
 {
-class OpenscenarioVisualization : public rclcpp_lifecycle::LifecycleNode
+class OpenscenarioVisualizationComponent : public rclcpp_lifecycle::LifecycleNode
 {
 public:
   OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_PUBLIC
-  explicit OpenscenarioVisualization(const rclcpp::NodeOptions &);
+  explicit OpenscenarioVisualizationComponent(const rclcpp::NodeOptions &);
 };
 }  // namespace openscenario_visualization
 

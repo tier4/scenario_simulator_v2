@@ -44,6 +44,8 @@ install(TARGETS
   RUNTIME DESTINATION bin)
 ament_export_libraries(
   openscenario_visualization_component)
+rclcpp_components_register_nodes(openscenario_visualization_component
+  "openscenario_visualization::OpenscenarioVisualizationComponent")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
