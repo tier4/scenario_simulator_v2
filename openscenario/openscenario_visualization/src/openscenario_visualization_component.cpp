@@ -82,7 +82,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       color = color_utils::makeColorMsg("forestgreen", 0.9);
       break;
     case status.PEDESTRIAN:
-      color = color_utils::makeColorMsg("forestgreen", 0.9);
+      color = color_utils::makeColorMsg("orange", 0.9);
       break;
     case status.VEHICLE:
       color = color_utils::makeColorMsg("steelblue", 0.9);

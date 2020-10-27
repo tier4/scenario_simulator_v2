@@ -392,11 +392,24 @@ void EntityManager::update(double current_time, double step_time)
       boost::any_cast<PedestrianEntity &>(it->second).setOtherStatus(all_status);
     }
   }
+  auto entity_type_list = getEntityTypeList();
   openscenario_msgs::msg::EntityStatusArray status_array_msg;
   for (const auto & status : all_status) {
     auto status_msg = status.second.toRosMsg();
     status_msg.name = status.first;
     status_msg.bounding_box = getBoundingBox(status.first);
+    switch(getEntityType(status.first))
+    {
+      case EntityType::EGO:
+        status_msg.type = status_msg.EGO;
+        break;
+      case EntityType::VEHICLE:
+        status_msg.type = status_msg.VEHICLE;
+        break;
+      case EntityType::PEDESTRIAN:
+        status_msg.type = status_msg.PEDESTRIAN;
+        break;
+    }
     status_array_msg.status.emplace_back(status_msg);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
@@ -481,6 +494,21 @@ const boost::optional<double> EntityManager::getStandStillDuration(std::string n
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
     return boost::any_cast<const PedestrianEntity &>(it->second).getStandStillDuration();
+  }
+  throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
+}
+
+const EntityType EntityManager::getEntityType(std::string name) const
+{
+  auto it = entities_.find(name);
+  if (it->second.type() == typeid(VehicleEntity)) {
+    return EntityType::VEHICLE;
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return EntityType::EGO;
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    return EntityType::PEDESTRIAN;
   }
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }
