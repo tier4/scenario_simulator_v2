@@ -59,6 +59,7 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
     }
     throw HdMapError("failed to load lanelet map");
   }
+  overwriteLaneletsCenterline();
   traffic_rules_vehicle_ptr_ =
     lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany,
       lanelet::Participants::Vehicle);
