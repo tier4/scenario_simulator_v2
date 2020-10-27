@@ -1,6 +1,6 @@
 #author: Johannes Beck, Fabian Poggenhans
 #email: Johannes.Beck@kit.edu
-#license: GPLv3
+#license: BSD
 #This package automatically find_package catkin and non-catkin packages.
 #It has to be used together with GatherDeps.cmake.
 #

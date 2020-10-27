@@ -67,21 +67,29 @@ if(NOT EXISTS ${CATKIN_DEVEL_PREFIX}/include)
     file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 endif()
 
+# set the ros version
+if(DEFINED ENV{ROS_VERSION})
+    set(ROS_VERSION $ENV{ROS_VERSION})
+endif()
+
 # make sure catkin/ament are found so that PYTHON_EXECUTABLE (and CATKIN_ENV) is set.
 if(NOT PYTHON_VERSION AND DEFINED $ENV{ROS_PYTHON_VERSION})
     set(PYTHON_VERSION
         $ENV{ROS_PYTHON_VERSION}
         CACHE STRING "Python version to use ('major.minor' or 'major')")
 endif()
-if($ENV{ROS_VERSION} EQUAL 1)
+
+if(ROS_VERSION EQUAL 1)
     find_package(catkin REQUIRED)
     set(MRT_CMAKE_ENV sh ${CATKIN_ENV})
-else()
+elseif(ROS_VERSION EQUAL 2)
     find_package(ament_cmake_core REQUIRED)
     if(NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
         # our cmake template still relies on CATKIN_ENABLE_TESTING
         set(CATKIN_ENABLE_TESTING TRUE)
     endif()
+else()
+    set(CATKIN_ENABLE_TESTING TRUE)
 endif()
 # would be nicer to put this in a function, but cmake requires this at global scope
 if(CATKIN_ENABLE_TESTING)
@@ -191,14 +199,14 @@ endmacro()
 #
 macro(mrt_parse_package_xml)
     # TODO: replace this by our own stuff.
-    if(NOT COMMAND catkin_package_xml AND $ENV{ROS_VERSION} EQUAL 1)
+    if(NOT COMMAND catkin_package_xml AND ROS_VERSION EQUAL 1)
         find_package(catkin REQUIRED)
-    elseif(NOT COMMAND ament_package_xml AND $ENV{ROS_VERSION} EQUAL 2)
+    elseif(NOT COMMAND ament_package_xml AND ROS_VERSION EQUAL 2)
         find_package(ament_cmake_core REQUIRED)
     endif()
-    if($ENV{ROS_VERSION} EQUAL 1)
+    if(ROS_VERSION EQUAL 1)
         catkin_package_xml()
-    else()
+    elseif(ROS_VERSION EQUAL 2)
         ament_package_xml()
     endif()
 endmacro()
@@ -340,7 +348,7 @@ function(_mrt_get_python_destination output_var)
         find_package(Python3 REQUIRED)
     endif()
     # seems ros2 found an even more complex way to determine the install location...
-    if($ENV{ROS_VERSION} EQUAL 2 OR CONAN_PACKAGE_NAME)
+    if(NOT ROS_VERSION EQUAL 1)
         set(_python_code
             "from distutils.sysconfig import get_python_lib"
             "import os"
@@ -537,7 +545,7 @@ function(mrt_python_module_setup)
     set(${PROJECT_NAME}_PYTHON_MODULE
         ${PROJECT_NAME}
         PARENT_SCOPE)
-    if($ENV{ROS_VERSION} EQUAL 1)
+    if(ROS_VERSION EQUAL 1)
         if(NOT catkin_FOUND)
             find_package(catkin REQUIRED)
         endif()
@@ -560,7 +568,9 @@ function(mrt_python_module_setup)
              \"${PYTHON_EXECUTABLE}\" \"-m\" \"compileall\"
              \"${CMAKE_INSTALL_PREFIX}/${python_destination}/${PROJECT_NAME}\"
              )")
-        _mrt_register_ament_python_hook()
+        if(ROS_VERSION EQUAL 2)
+            _mrt_register_ament_python_hook()
+        endif()
     endif()
 endfunction()
 
@@ -598,12 +608,6 @@ function(mrt_add_python_api modulename)
 
     #set and check target name
     set(PYTHON_API_MODULE_NAME ${modulename})
-    if("${${PROJECT_NAME}_PYTHON_MODULE}" STREQUAL "${PYTHON_API_MODULE_NAME}")
-        message(
-            FATAL_ERROR
-                "The name of the python_api module conflicts with the name of the python module. Please choose a different name"
-        )
-    endif()
 
     if("${PYTHON_API_MODULE_NAME}" STREQUAL "${PROJECT_NAME}")
         # mark that catkin_python_setup() was called and the setup.py file contains a package with the same name as the current project
@@ -622,7 +626,7 @@ function(mrt_add_python_api modulename)
     if(NOT pybind11_FOUND AND NOT BoostPython_FOUND)
         message(
             FATAL_ERROR
-                "Missing dependency to pybind11 or boost python. Add either '<depend>pybind11-dev</depend>' or '<depend>libboost-python</depend>' to 'package.xml'"
+                "Missing dependency to pybind11 or boost python. Add either '<depend>pybind11-dev</depend>' or '<depend>libboost-python-dev</depend>' to 'package.xml'"
         )
     endif()
 
@@ -672,13 +676,11 @@ function(mrt_add_python_api modulename)
         endif()
     endif()
 
-    configure_file(${MCM_TEMPLATE_DIR}/__init__.py.in ${PYTHON_MODULE_DIR}/__init__.py)
-
     # append to list of all targets in this project
     set(${PROJECT_NAME}_PYTHON_API_TARGET
         ${GENERATED_TARGETS}
         PARENT_SCOPE)
-    if($ENV{ROS_VERSION} EQUAL 1)
+    if(ROS_VERSION EQUAL 1)
         # configure setup.py for install
         set(PKG_PYTHON_MODULE ${PYTHON_API_MODULE_NAME})
         set(PACKAGE_DIR ${DEVEL_PREFIX}/${python_destination})
@@ -688,7 +690,9 @@ function(mrt_add_python_api modulename)
                        @ONLY)
         install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/python_api_install.py)")
     else()
-        _mrt_register_ament_python_hook()
+        if(ROS_VERSION EQUAL 2)
+            _mrt_register_ament_python_hook()
+        endif()
         set(install_destination ${python_destination}/${PYTHON_API_MODULE_NAME})
         install(FILES ${PYTHON_MODULE_DIR}/__init__.py DESTINATION ${install_destination})
         install(TARGETS ${GENERATED_TARGETS} DESTINATION ${install_destination})
@@ -768,10 +772,15 @@ function(mrt_add_library libname)
         set_property(TARGET ${LIBRARY_TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
         # extract the major version
-        string(REPLACE "." ";" versions ${${PROJECT_NAME}_VERSION})
-        list(GET versions 0 version_major)
-        set_target_properties(${LIBRARY_TARGET_NAME} PROPERTIES OUTPUT_NAME ${LIBRARY_NAME} SOVERSION ${version_major}
-                                                                VERSION ${${PROJECT_NAME}_VERSION})
+        if(${PROJECT_NAME}_VERSION)
+            string(REPLACE "." ";" versions ${${PROJECT_NAME}_VERSION})
+            list(GET versions 0 version_major)
+            set_target_properties(
+                ${LIBRARY_TARGET_NAME}
+                PROPERTIES OUTPUT_NAME ${LIBRARY_NAME}
+                           SOVERSION ${version_major}
+                           VERSION ${${PROJECT_NAME}_VERSION})
+        endif()
         target_compile_options(${LIBRARY_TARGET_NAME} PRIVATE ${MRT_SANITIZER_CXX_FLAGS})
         if(MRT_ADD_LIBRARY_LIBRARIES)
             target_link_libraries(${LIBRARY_TARGET_NAME} PRIVATE ${MRT_ADD_LIBRARY_LIBRARIES})
@@ -1009,8 +1018,9 @@ function(mrt_add_nodelet nodeletname)
 
     # get the files
     mrt_glob_files(NODELET_SOURCE_FILES_INC "${MRT_ADD_NODELET_FOLDER}/*.h" "${MRT_ADD_NODELET_FOLDER}/*.hpp"
-                   "${MRT_ADD_EXECUTABLE_FOLDER}/*.hh")
-    mrt_glob_files(NODELET_SOURCE_FILES_SRC "${MRT_ADD_NODELET_FOLDER}/*.cpp" "${MRT_ADD_EXECUTABLE_FOLDER}/*.cc")
+                   "${MRT_ADD_EXECUTABLE_FOLDER}/*.hh" "${MRT_ADD_EXECUTABLE_FOLDER}/*.cuh")
+    mrt_glob_files(NODELET_SOURCE_FILES_SRC "${MRT_ADD_NODELET_FOLDER}/*.cpp" "${MRT_ADD_EXECUTABLE_FOLDER}/*.cc"
+                   "${MRT_ADD_EXECUTABLE_FOLDER}/*.cu")
 
     # Find nodelet
     mrt_glob_files(NODELET_CPP "${MRT_ADD_NODELET_FOLDER}/*_nodelet.cpp" "${MRT_ADD_NODELET_FOLDER}/*_nodelet.cc")
@@ -1060,7 +1070,7 @@ endfunction()
 #
 # Adds a node and a corresponding nodelet.
 #
-# This command ensures the node/nodelet are compiled with all necessary dependencies. Make sure to add lib{NAME}_nodelet to the ``nodelet_plugins.xml`` file.
+# This command ensures the node/nodelet are compiled with all necessary dependencies. Make sure to add lib<package_name>-<basename>-nodelet to the ``nodelet_plugins.xml`` file.
 #
 # .. note:: Make sure to call this after all messages and parameter generation CMAKE-Commands so that all dependencies are visible.
 #
@@ -1086,7 +1096,7 @@ endfunction()
 #       FOLDER src/example_package
 #       )
 #
-# The resulting entry in the ``nodelet_plugins.xml`` is thus: <library path="lib/libexample_package_nodelet">
+# The resulting entry in the ``nodelet_plugins.xml`` is thus (for a package named example_package): <library path="lib/libexample_package-example_package-nodelet">
 #
 # @public
 #
@@ -1115,13 +1125,14 @@ function(mrt_add_node_and_nodelet basename)
     # search the files we have to build with
     if(NOT TARGET ${NODELET_TARGET_NAME})
         unset(NODELET_TARGET_NAME)
-        mrt_glob_files(NODE_CPP "${MRT_ADD_NN_FOLDER}/*.cpp" "${MRT_ADD_NN_FOLDER}/*.cc")
+        mrt_glob_files(NODE_CPP "${MRT_ADD_NN_FOLDER}/*.cpp" "${MRT_ADD_NN_FOLDER}/*.cc" "${MRT_ADD_NN_FOLDER}/*.cu")
     else()
         mrt_glob_files(NODE_CPP "${MRT_ADD_NN_FOLDER}/*_node.cpp" "${MRT_ADD_NN_FOLDER}/*_node.cc")
     endif()
 
     # find *_node file containing the main() and add the executable
-    mrt_glob_files(NODE_H "${MRT_ADD_NN_FOLDER}/*.h" "${MRT_ADD_NN_FOLDER}/*.hpp" "${MRT_ADD_NN_FOLDER}/*.hh")
+    mrt_glob_files(NODE_H "${MRT_ADD_NN_FOLDER}/*.h" "${MRT_ADD_NN_FOLDER}/*.hpp" "${MRT_ADD_NN_FOLDER}/*.hh"
+                   "${MRT_ADD_NN_FOLDER}/*.cuh")
     mrt_glob_files(NODE_MAIN "${MRT_ADD_NN_FOLDER}/*_node.cpp" "${MRT_ADD_NN_FOLDER}/*_node.cc")
     if(NODE_MAIN)
         mrt_add_executable(
@@ -1283,19 +1294,18 @@ function(mrt_add_nosetests folder)
         return()
     endif()
 
-    message(STATUS "Adding nosetests in folder ${TEST_FOLDER}")
+    message(STATUS "Adding nosetests in folder ${PROJECT_SOURCE_DIR}/${TEST_FOLDER}")
     _mrt_add_nosetests_impl(${TEST_FOLDER} DEPENDS ${ARG_DEPENDS} ${ARG_DEPENDENCIES})
 endfunction()
 
 function(_mrt_install_python source_file destination)
-    if($ENV{ROS_VERSION} EQUAL 1)
+    if(ROS_VERSION EQUAL 1)
         # we can just use catkin
         catkin_install_python(PROGRAMS ${file} DESTINATION ${destination})
         return()
     endif()
     # for ament, we have to fix the shebang before we can install (ament does not provide this feature)
 
-    stamp(${source_file})
     # read file and check shebang line
     file(READ ${source_file} data)
     set(regex "^#![ \t]*/([^\r\n]+)/env[ \t]+python([\r\n])")
@@ -1468,7 +1478,7 @@ function(mrt_install)
     endif()
 
     # generate environment files for ros2
-    if($ENV{ROS_VERSION} EQUAL 2)
+    if(ROS_VERSION EQUAL 2)
         find_package(ament_cmake_core REQUIRED)
         ament_execute_extensions(ament_package)
     endif()

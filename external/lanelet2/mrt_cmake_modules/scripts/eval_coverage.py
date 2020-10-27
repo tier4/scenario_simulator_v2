@@ -98,7 +98,7 @@ def build_coverage(args):
     # build html coverage
     html_dir = os.path.join(args.coverage_dir, "coverage")
     cmd = ["genhtml", "-o", html_dir, lcov_project, "-s"]
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(cmd, universal_newlines=True, stdout=subprocess.PIPE)
     out, err = proc.communicate()
     if proc.returncode:
         print("No C++ coverage was generated")

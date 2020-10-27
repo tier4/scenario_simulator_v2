@@ -2,7 +2,7 @@
 find_package(PkgConfig)
 find_path(TENSORFLOW_C_INCLUDE_DIR tensorflow/tensorflow/c/c_api.h PATH_SUFFIXES tensorflow)
 
-set(TENSORFLOW_C_INCLUDE_DIR ${TENSORFLOW_C_INCLUDE_DIR})
+set(TENSORFLOW_C_INCLUDE_DIR ${TENSORFLOW_C_INCLUDE_DIR} ${TENSORFLOW_C_INCLUDE_DIR}/tensorflow)
 
 find_library(TENSORFLOW_C_LIBRARY NAMES tensorflow)
 find_library(TENSORFLOW_FRAMEWORK_LIBRARY NAMES tensorflow_framework)
@@ -14,7 +14,7 @@ else()
 endif(TENSORFLOW_FRAMEWORK_LIBRARY)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(MrtCTensorflow DEFAULT_MSG TENSORFLOW_LIBRARY TENSORFLOW_C_INCLUDE_DIR)
+find_package_handle_standard_args(CTensorflow DEFAULT_MSG TENSORFLOW_LIBRARY TENSORFLOW_C_INCLUDE_DIR)
 
 mark_as_advanced(TENSORFLOW_LIBRARY TENSORFLOW_C_INCLUDE_DIR)
 set(TENSORFLOW_LIBRARIES ${TENSORFLOW_LIBRARY})
