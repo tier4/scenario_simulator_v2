@@ -27,36 +27,52 @@ from scenario_test_utility.logger import Logger
 
 class LifecycleController(Node):
 
-    NODE_NAME = "open_scenario_interpreter_node"
+    OPENSCENARIO_INTERPRETER_NODE_NAME = "/open_scenario_interpreter_node"
+    VISUALIZATION_NODE_NAME = "/openscenario_visualization_node"
+    NODE_NAME = "lifecycle_controller_node"
     PARAMETER_XOSC_PATH = "osc_path"
     PARAMETER_EXPECT = "expect"
     STATES = {}
 
     def __init__(self):
-        rclpy.init(args=self.NODE_NAME)
+        rclpy.init(args=LifecycleController.NODE_NAME)
         super().__init__(LifecycleController.NODE_NAME)
 
         self.state = None
         self.node_logger = self.get_logger()
 
         self.client_get_state = self.create_client(
-            GetState, LifecycleController.NODE_NAME + "/get_state")
+            GetState, LifecycleController.OPENSCENARIO_INTERPRETER_NODE_NAME + "/get_state")
 
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_get_state.srv_name + ' service not available')
 
+        self.client_get_state_viz = self.create_client(
+            GetState, LifecycleController.VISUALIZATION_NODE_NAME + "/get_state")
+
+        while not self.client_get_state_viz.wait_for_service(timeout_sec=1.0):
+            self.node_logger.warn(
+                self.client_get_state_viz.srv_name + ' service not available')
+
         self.client_change_state = self.create_client(
-            ChangeState, LifecycleController.NODE_NAME + "/change_state")
+            ChangeState, LifecycleController.OPENSCENARIO_INTERPRETER_NODE_NAME + "/change_state")
 
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
             self.node_logger.warn(
                 self.client_change_state.srv_name + ' service not available')
 
+        self.client_change_state_viz = self.create_client(
+            ChangeState, LifecycleController.VISUALIZATION_NODE_NAME + "/change_state")
+        
+        while not self.client_change_state_viz.wait_for_service(timeout_sec=1.0):
+            self.node_logger.warn(
+                self.client_change_state_viz.srv_name + ' service not available')
+
         self.current_scenario = ""
         self.client_set_parameters = self.create_client(
             rcl_interfaces.srv.SetParameters,
-            LifecycleController.NODE_NAME + '/set_parameters')
+            LifecycleController.OPENSCENARIO_INTERPRETER_NODE_NAME + '/set_parameters')
 
     def send_request_to_change_parameters(self, scenario, expect, step_time_ms, log_path):
         request = rcl_interfaces.srv.SetParameters.Request()
@@ -105,7 +121,7 @@ class LifecycleController(Node):
             "Set value '" +
             self.current_scenario +
             "' to " +
-            LifecycleController.NODE_NAME +
+            LifecycleController.OPENSCENARIO_INTERPRETER_NODE_NAME +
             "'s parameter 'scenario'")
 
         self.send_request_to_change_parameters(
@@ -143,6 +159,9 @@ class LifecycleController(Node):
         reqest.transition.id = transition_id
         future = self.client_change_state.call_async(reqest)
         executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
+        rclpy.spin_until_future_complete(self, future, executor=executor)
+
+        future_viz = self.client_change_state_viz.call_async(reqest)
         rclpy.spin_until_future_complete(self, future, executor=executor)
         return future.result().success
 
