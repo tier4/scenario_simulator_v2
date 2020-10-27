@@ -70,6 +70,7 @@ class OpenscenarioVisualizationComponent : public rclcpp_lifecycle::LifecycleNod
 public:
   OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_PUBLIC
   explicit OpenscenarioVisualizationComponent(const rclcpp::NodeOptions &);
+
 private:
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
   Result on_configure(const rclcpp_lifecycle::State &) override;

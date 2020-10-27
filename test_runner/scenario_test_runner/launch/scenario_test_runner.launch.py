@@ -93,6 +93,13 @@ def generate_launch_description():
         output='log'
     )
 
+    openscenario_visualization = LifecycleNode(
+        package='openscenario_visualization',
+        node_executable='openscenario_visualization_node',
+        node_name='openscenario_visualization_node',
+        output='log'
+    )
+
     description = LaunchDescription()
     description.add_action(declare_workflow)
     description.add_action(declare_log_directory)
@@ -100,5 +107,6 @@ def generate_launch_description():
     description.add_action(scenario_simulator)
     description.add_action(open_scenario_interpreter)
     description.add_action(rviz2)
+    description.add_action(openscenario_visualization)
 
     return description

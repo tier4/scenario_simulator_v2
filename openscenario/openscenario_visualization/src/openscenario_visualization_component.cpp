@@ -17,7 +17,8 @@
 
 namespace openscenario_visualization
 {
-OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(const rclcpp::NodeOptions & options)
+OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
+  const rclcpp::NodeOptions & options)
 : LifecycleNode("openscenario_visualization", options)
 {
 }
