@@ -108,7 +108,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   bbox.pose.orientation.w = 1.0;
   bbox.type = bbox.LINE_LIST;
   bbox.lifetime = rclcpp::Duration(0.1);
-  geometry_msgs::msg::Point p0,p1,p2,p3,p4,p5,p6,p7;
+  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
 
   p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
   p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
