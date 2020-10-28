@@ -80,6 +80,9 @@ public:
   std::vector<int> getNextLaneletIds(int lanelet_id) const;
   std::vector<int> getPreviousLaneletIds(int lanelet_id) const;
   boost::optional<int> getLaneChangeableLenletId(int lanlet_id, std::string direction);
+  boost::optional<double> getDistanceToStopLine(
+    std::vector<int> following_lanelets, int lanelet_id,
+    double s);
   double getLaneletLength(int lanelet_id) const;
   bool isInLanelet(int lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(

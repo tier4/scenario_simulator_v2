@@ -822,6 +822,24 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
   throw HdMapError("findNearestIndexPair(): No nearest point found.");
 }
 
+boost::optional<double> HdMapUtils::getDistanceToStopLine(
+  std::vector<int> following_lanelets,
+  int lanelet_id, double s)
+{
+  for (const auto & lanelet_id : following_lanelets) {
+    const auto stop_lines = lanelet::utils::query::stopLinesLanelets(
+      {lanelet_map_ptr_->laneletLayer.get(lanelet_id)});
+    if (stop_lines.size() != 0) {
+      for (const auto & stop_line : stop_lines) {
+        auto stop_position_in_lane_coordinate =
+          getCollisionPointInLaneCoordinate(lanelet_map_ptr_->laneletLayer.get(lanelet_id),
+            static_cast<int>(stop_line.id()));
+      }
+    }
+  }
+  return boost::none;
+}
+
 std::vector<double> HdMapUtils::calculateSegmentDistances(
   const lanelet::ConstLineString3d & line_string)
 {
