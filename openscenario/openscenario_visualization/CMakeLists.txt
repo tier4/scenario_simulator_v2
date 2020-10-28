@@ -53,7 +53,7 @@ ament_target_dependencies(openscenario_visualization_node
 )
 
 install(TARGETS
-  openscenario_visualization_node 
+  openscenario_visualization_node
   DESTINATION lib/openscenario_visualization
 )
 install(TARGETS

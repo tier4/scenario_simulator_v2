@@ -139,6 +139,29 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.text = status.name;
   text.color = color;
   ret.markers.push_back(text);
+
+  /*
+  visualization_msgs::msg::Marker arrow;
+  arrow.header.frame_id = status.name;
+  arrow.header.stamp = stamp;
+  arrow.ns = status.name;
+  arrow.id = 2;
+  arrow.action = arrow.ADD;
+  arrow.pose.position.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 0.3;
+  arrow.pose.position.y = status.bounding_box.center.y;
+  arrow.pose.position.z = status.bounding_box.center.z;
+  arrow.pose.orientation.x = 0.0;
+  arrow.pose.orientation.y = 0.0;
+  arrow.pose.orientation.z = 0.0;
+  arrow.pose.orientation.w = 1.0;
+  arrow.type = arrow.ARROW;
+  arrow.scale.x = 1.5;
+  arrow.scale.y = 0.3;
+  arrow.scale.z = 0.3;
+  arrow.lifetime = rclcpp::Duration(0.1);
+  arrow.color = color_utils::makeColorMsg("red", 0.99);
+  ret.markers.push_back(arrow);
+  */
   return ret;
 }
 
