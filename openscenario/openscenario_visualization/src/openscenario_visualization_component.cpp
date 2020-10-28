@@ -46,8 +46,7 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
       erase_names.emplace_back(marker.first);
     }
   }
-  for (const auto & name : erase_names)
-  {
+  for (const auto & name : erase_names) {
     markers_.erase(markers_.find(name));
   }
   for (const auto & status : msg->status) {
