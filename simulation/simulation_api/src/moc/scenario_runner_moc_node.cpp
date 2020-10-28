@@ -14,6 +14,7 @@
 
 #include <simulation_api/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
@@ -33,7 +34,9 @@ class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
-  : Node("scenario_runner", option), api_(this)
+  : Node("scenario_runner", option),
+    api_(this, ament_index_cpp::get_package_share_directory(
+        "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
     api_.entity->setVerbose(false);
     api_.simulation->initialize(1.0, 0.02);
