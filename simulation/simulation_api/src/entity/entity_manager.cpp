@@ -398,6 +398,7 @@ void EntityManager::update(double current_time, double step_time)
     auto status_msg = status.second.toRosMsg();
     status_msg.name = status.first;
     status_msg.bounding_box = getBoundingBox(status.first);
+    status_msg.current_action = getCurrentAction(status.first);
     switch (getEntityType(status.first)) {
       case EntityType::EGO:
         status_msg.type = status_msg.EGO;

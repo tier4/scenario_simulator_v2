@@ -13,6 +13,8 @@ string name
 
 openscenario_msgs/BoundingBox bounding_box
 
+string current_action
+
 # fields for world frame
 geometry_msgs/Pose pose
 

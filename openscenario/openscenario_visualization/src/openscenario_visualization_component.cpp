@@ -213,7 +213,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.type = text.TEXT_VIEW_FACING;
   text.scale.x = 0.0;
   text.scale.y = 0.0;
-  text.scale.z = 1.0;
+  text.scale.z = 0.6;
   text.lifetime = rclcpp::Duration(0.1);
   text.text = status.name;
   text.color = color;
@@ -239,6 +239,30 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   arrow.lifetime = rclcpp::Duration(0.1);
   arrow.color = color_utils::makeColorMsg("red", 0.99);
   ret.markers.push_back(arrow);
+
+  visualization_msgs::msg::Marker text_action;
+  text_action.header.frame_id = status.name;
+  text_action.header.stamp = stamp;
+  text_action.ns = status.name;
+  text_action.id = 3;
+  text_action.action = text_action.ADD;
+  text_action.pose.position.x = status.bounding_box.center.x;
+  text_action.pose.position.y = status.bounding_box.center.y;
+  text_action.pose.position.z = status.bounding_box.center.z +
+    status.bounding_box.dimensions.z * 0.5 + 0.5;
+  text_action.pose.orientation.x = 0.0;
+  text_action.pose.orientation.y = 0.0;
+  text_action.pose.orientation.z = 0.0;
+  text_action.pose.orientation.w = 1.0;
+  text_action.type = text_action.TEXT_VIEW_FACING;
+  text_action.scale.x = 0.0;
+  text_action.scale.y = 0.0;
+  text_action.scale.z = 0.4;
+  text_action.lifetime = rclcpp::Duration(0.1);
+  text_action.text = status.current_action;
+  text_action.color = color_utils::makeColorMsg("white", 0.99);
+  ret.markers.push_back(text_action);
+
   return ret;
 }
 
