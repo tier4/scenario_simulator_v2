@@ -82,12 +82,16 @@ void ScenarioSimulatorImpl::getEntityStatus(
   result["success"] = true;
 }
 
-void ScenarioSimulatorImpl::spawnEntity([[maybe_unused]] XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulatorImpl::spawnEntity(
+  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
 {
   result["success"] = true;
 }
 
-void ScenarioSimulatorImpl::despawnEntity([[maybe_unused]] XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulatorImpl::despawnEntity(
+  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
 {
   result["success"] = true;
 }
