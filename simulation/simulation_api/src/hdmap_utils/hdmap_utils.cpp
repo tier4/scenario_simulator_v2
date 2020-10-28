@@ -833,6 +833,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
       {lanelet_map_ptr_->laneletLayer.get(lanelet_id)});
     if (stop_lines.size() != 0) {
       for (const auto & stop_line : stop_lines) {
+        /* no such primitive error
         auto stop_position_in_lane_coordinate =
           getCollisionPointInLaneCoordinate(static_cast<int>(lanelet_map_ptr_->laneletLayer.get(
               lanelet_id).id()),
@@ -841,20 +842,19 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
           lanelet_ids.emplace_back(lanelet_id);
           s_values.emplace_back(stop_position_in_lane_coordinate.get());
         }
+        */
       }
     }
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::set<double> dists;
-  for(size_t i=0; i<lanelet_ids.size(); i++)
-  {
+  for (size_t i = 0; i < lanelet_ids.size(); i++) {
     auto d = getLongitudinalDistance(lanelet_id, s, lanelet_ids[i], s_values[i]);
-    if(d)
-    {
+    if (d) {
       dists.insert(d.get());
     }
   }
-  if(dists.size() != 0)
-  {
+  if (dists.size() != 0) {
     return *dists.begin();
   }
   return boost::none;

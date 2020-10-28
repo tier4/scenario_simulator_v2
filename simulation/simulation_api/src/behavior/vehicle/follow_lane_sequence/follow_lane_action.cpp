@@ -99,6 +99,13 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
+    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(following_lanelets,
+        entity_status.lanelet_id,
+        entity_status.s);
+    if(distance_to_stopline)
+    {
+      std::cout << "distance to stop line : " << distance_to_stopline.get() << std::endl;
+    }
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
     if (distance_to_conflicting_entity) {
       if (distance_to_conflicting_entity.get() <
