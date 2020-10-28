@@ -69,25 +69,25 @@ void ScenarioSimulatorImpl::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::Xml
 }
 
 void ScenarioSimulatorImpl::setEntityStatus(
-  XmlRpc::XmlRpcValue & param,
+  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
   result["success"] = true;
 }
 
 void ScenarioSimulatorImpl::getEntityStatus(
-  XmlRpc::XmlRpcValue & param,
+  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
   result["success"] = true;
 }
 
-void ScenarioSimulatorImpl::spawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulatorImpl::spawnEntity([[maybe_unused]] XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   result["success"] = true;
 }
 
-void ScenarioSimulatorImpl::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulatorImpl::despawnEntity([[maybe_unused]] XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   result["success"] = true;
 }

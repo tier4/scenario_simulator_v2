@@ -87,13 +87,13 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   std_msgs::msg::ColorRGBA color;
   switch (status.type) {
     case status.EGO:
-      color = color_utils::makeColorMsg("forestgreen", 0.9);
+      color = color_utils::makeColorMsg("forestgreen", 0.99);
       break;
     case status.PEDESTRIAN:
-      color = color_utils::makeColorMsg("orange", 0.9);
+      color = color_utils::makeColorMsg("orange", 0.99);
       break;
     case status.VEHICLE:
-      color = color_utils::makeColorMsg("steelblue", 0.9);
+      color = color_utils::makeColorMsg("steelblue", 0.99);
       break;
   }
   visualization_msgs::msg::Marker bbox;
