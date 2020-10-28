@@ -497,7 +497,22 @@ const boost::optional<double> EntityManager::getStandStillDuration(std::string n
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }
 
-const EntityType EntityManager::getEntityType(std::string name) const
+const std::string EntityManager::getCurrentAction(std::string name) const
+{
+  auto it = entities_.find(name);
+  if (it->second.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<const VehicleEntity &>(it->second).getCurrentAction();
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return boost::any_cast<const EgoEntity &>(it->second).getCurrentAction();
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    return boost::any_cast<const PedestrianEntity &>(it->second).getCurrentAction();
+  }
+  throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
+}
+
+EntityType EntityManager::getEntityType(std::string name) const
 {
   auto it = entities_.find(name);
   if (it->second.type() == typeid(VehicleEntity)) {

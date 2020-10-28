@@ -58,6 +58,10 @@ public:
   {
     return parameters.bounding_box.toRosMsg();
   }
+  const std::string getCurrentAction() const
+  {
+    return tree_ptr_->getCurrentAction();
+  }
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;

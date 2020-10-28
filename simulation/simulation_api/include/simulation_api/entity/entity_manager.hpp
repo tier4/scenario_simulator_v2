@@ -155,7 +155,8 @@ public:
   void broadcastEntityTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
   const std::unordered_map<std::string, EntityType> getEntityTypeList() const;
-  const EntityType getEntityType(std::string name) const;
+  EntityType getEntityType(std::string name) const;
+  const std::string getCurrentAction(std::string name) const;
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
   rclcpp::Publisher<openscenario_msgs::msg::EntityStatusArray>::SharedPtr

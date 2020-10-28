@@ -83,6 +83,7 @@ public:
   void updateStandStillDuration(double step_time);
   boost::optional<double> getStandStillDuration() const;
   virtual const openscenario_msgs::msg::BoundingBox getBoundingBox() const = 0;
+  virtual const std::string getCurrentAction() const = 0;
 
 protected:
   bool visibility_;

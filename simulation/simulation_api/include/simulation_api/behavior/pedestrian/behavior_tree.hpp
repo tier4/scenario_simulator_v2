@@ -39,7 +39,7 @@ class BehaviorTree
 public:
   BehaviorTree();
   BT::NodeStatus tick(double current_time, double step_time);
-  std::string getCurrentAction() const
+  const std::string getCurrentAction() const
   {
     return current_action_;
   }
