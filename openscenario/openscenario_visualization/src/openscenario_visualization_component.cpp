@@ -102,19 +102,98 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   bbox.ns = status.name;
   bbox.id = 0;
   bbox.action = bbox.ADD;
-  bbox.pose.position.x = status.bounding_box.center.x;
-  bbox.pose.position.y = status.bounding_box.center.y;
-  bbox.pose.position.z = status.bounding_box.center.z;
   bbox.pose.orientation.x = 0.0;
   bbox.pose.orientation.y = 0.0;
   bbox.pose.orientation.z = 0.0;
   bbox.pose.orientation.w = 1.0;
-  bbox.type = bbox.CUBE;
+  bbox.type = bbox.LINE_LIST;
   bbox.lifetime = rclcpp::Duration(0.1);
-  bbox.scale.x = status.bounding_box.dimensions.x;
-  bbox.scale.y = status.bounding_box.dimensions.y;
-  bbox.scale.z = status.bounding_box.dimensions.z;
+  geometry_msgs::msg::Point p0,p1,p2,p3,p4,p5,p6,p7;
+
+  p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+
+  p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+
+  p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+
+  p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+
+  p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+
+  p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
+  p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+
+  p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+
+  p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
+  p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
+  p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+
+  bbox.points.emplace_back(p0);
+  bbox.points.emplace_back(p3);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p3);
+  bbox.points.emplace_back(p6);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p6);
+  bbox.points.emplace_back(p2);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p2);
+  bbox.points.emplace_back(p0);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p0);
+  bbox.points.emplace_back(p1);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p3);
+  bbox.points.emplace_back(p5);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p6);
+  bbox.points.emplace_back(p7);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p2);
+  bbox.points.emplace_back(p4);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p1);
+  bbox.points.emplace_back(p5);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p5);
+  bbox.points.emplace_back(p7);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p7);
+  bbox.points.emplace_back(p4);
+  bbox.colors.emplace_back(color);
+
+  bbox.points.emplace_back(p4);
+  bbox.points.emplace_back(p1);
+  bbox.colors.emplace_back(color);
+
   bbox.color = color;
+  bbox.scale.x = 0.1;
+  bbox.scale.y = 0.1;
+  bbox.scale.z = 0.1;
   ret.markers.push_back(bbox);
 
   visualization_msgs::msg::Marker text;
@@ -126,7 +205,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.pose.position.x = status.bounding_box.center.x;
   text.pose.position.y = status.bounding_box.center.y;
   text.pose.position.z = status.bounding_box.center.z +
-    status.bounding_box.dimensions.z * 0.5 + 0.8;
+    status.bounding_box.dimensions.z * 0.5 + 1.0;
   text.pose.orientation.x = 0.0;
   text.pose.orientation.y = 0.0;
   text.pose.orientation.z = 0.0;
@@ -140,14 +219,13 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.color = color;
   ret.markers.push_back(text);
 
-  /*
   visualization_msgs::msg::Marker arrow;
   arrow.header.frame_id = status.name;
   arrow.header.stamp = stamp;
   arrow.ns = status.name;
   arrow.id = 2;
   arrow.action = arrow.ADD;
-  arrow.pose.position.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 0.3;
+  arrow.pose.position.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
   arrow.pose.position.y = status.bounding_box.center.y;
   arrow.pose.position.z = status.bounding_box.center.z;
   arrow.pose.orientation.x = 0.0;
@@ -156,12 +234,11 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   arrow.pose.orientation.w = 1.0;
   arrow.type = arrow.ARROW;
   arrow.scale.x = 1.5;
-  arrow.scale.y = 0.3;
-  arrow.scale.z = 0.3;
+  arrow.scale.y = 0.1;
+  arrow.scale.z = 0.1;
   arrow.lifetime = rclcpp::Duration(0.1);
   arrow.color = color_utils::makeColorMsg("red", 0.99);
   ret.markers.push_back(arrow);
-  */
   return ret;
 }
 
