@@ -15,6 +15,10 @@
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
+#include <string>
+#include <vector>
+#include <algorithm>
+
 namespace openscenario_visualization
 {
 OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
@@ -138,8 +142,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   return ret;
 }
 
-const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateDeleteMarker()
-const
+const visualization_msgs::msg::MarkerArray
+OpenscenarioVisualizationComponent::generateDeleteMarker() const
 {
   visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker marker;
@@ -147,6 +151,6 @@ const
   ret.markers.push_back(marker);
   return ret;
 }
-}  // status.ns openscenario_visualization
+}  // namespace openscenario_visualization
 
 RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_visualization::OpenscenarioVisualizationComponent)
