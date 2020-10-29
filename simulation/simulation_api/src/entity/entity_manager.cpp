@@ -37,6 +37,17 @@ void EntityManager::setVerbose(bool verbose)
   }
 }
 
+int EntityManager::getNumberOfEgo() const
+{
+  int count = 0;
+  for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    if (it->second.type() == typeid(EgoEntity)) {
+      count = count + 1;
+    }
+  }
+  return count;
+}
+
 void EntityManager::requestAcquirePosition(
   std::string name, int lanelet_id, double s,
   double offset)
@@ -323,6 +334,9 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
+  if (getNumberOfEgo() >= 2) {
+    throw SimulationRuntimeError("multi ego simulation does not support yet.");
+  }
   setVerbose(verbose_);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, EntityStatus> all_status;
@@ -478,6 +492,7 @@ void EntityManager::broadcastEntityTransform()
       }
     }
   }
+  broadcastBaseLinkTransform();
 }
 
 const boost::optional<double> EntityManager::getStandStillDuration(std::string name) const

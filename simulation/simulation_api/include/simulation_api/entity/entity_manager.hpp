@@ -85,6 +85,7 @@ private:
     lanelet_marker_pub_ptr_->publish(markers);
   }
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
+  int getNumberOfEgo() const;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
