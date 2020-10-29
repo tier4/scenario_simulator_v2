@@ -103,7 +103,9 @@ BT::NodeStatus FollowLaneAction::tick()
         entity_status.lanelet_id,
         entity_status.s);
     if (distance_to_stopline) {
-      std::cout << "distance to stop line : " << distance_to_stopline.get() << std::endl;
+      if (distance_to_stopline.get() >= calculateStopDistance() + 5) {
+        return BT::NodeStatus::FAILURE;
+      }
     }
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
     if (distance_to_conflicting_entity) {

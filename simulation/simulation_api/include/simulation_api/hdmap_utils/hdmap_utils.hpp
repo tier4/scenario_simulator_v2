@@ -44,6 +44,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
 
 
 namespace hdmap_utils
@@ -110,7 +111,9 @@ public:
   const visualization_msgs::msg::MarkerArray generateMarker() const;
 
 private:
-  std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignOnPath(std::vector<int> lanelet_ids);
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
+    std::vector<int> lanelet_ids);
+  std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<int> lanelet_ids);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
   void mapCallback(const autoware_auto_msgs::msg::HADMapBin & msg);
   lanelet::LaneletMapPtr lanelet_map_ptr_;
