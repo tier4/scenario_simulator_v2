@@ -64,6 +64,6 @@ def generate_launch_description():
             package='openscenario_visualization',
             node_executable='openscenario_visualization_node',
             node_name='openscenario_visualization_node',
-            output='log'
+            output='screen'
             )
     ])

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
 #include <rclcpp_components/register_node_macro.hpp>
 
 #include <string>
@@ -262,7 +264,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.ns = status.name;
   text_action.id = 3;
   text_action.action = text_action.ADD;
-  text_action.pose.position.x = status.bounding_box.center.x;
+  text_action.pose.position.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 - 0.1;
   text_action.pose.position.y = status.bounding_box.center.y;
   text_action.pose.position.z = status.bounding_box.center.z +
     status.bounding_box.dimensions.z * 0.5 + 0.5;
