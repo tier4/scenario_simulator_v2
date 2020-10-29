@@ -28,6 +28,7 @@
 
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
 #include <lanelet2_extension/utility/message_conversion.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
@@ -109,6 +110,7 @@ public:
   const visualization_msgs::msg::MarkerArray generateMarker() const;
 
 private:
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignOnPath(std::vector<int> lanelet_ids);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
   void mapCallback(const autoware_auto_msgs::msg::HADMapBin & msg);
   lanelet::LaneletMapPtr lanelet_map_ptr_;

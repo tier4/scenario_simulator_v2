@@ -84,20 +84,15 @@ boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
   using Point = bg::model::d2::point_xy<double>;
   using Line = bg::model::linestring<Point>;
   using Polygon = bg::model::polygon<Point, false>;
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   auto center_points = getCenterPoints(lanelet_id);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::vector<Point> path_collision_points;
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  std::cout << crossing_lanelet_id << std::endl;
+  lanelet_map_ptr_->laneletLayer.get(crossing_lanelet_id);
   lanelet::CompoundPolygon3d lanelet_polygon =
     lanelet_map_ptr_->laneletLayer.get(crossing_lanelet_id).polygon3d();
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   Polygon crosswalk_polygon;
   for (const auto & lanelet_point : lanelet_polygon) {
     crosswalk_polygon.outer().push_back(bg::make<Point>(lanelet_point.x(), lanelet_point.y()));
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   crosswalk_polygon.outer().push_back(crosswalk_polygon.outer().front());
   double s_in_lanelet = 0;
   for (size_t i = 0; i < center_points.size() - 1; ++i) {
@@ -828,21 +823,34 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
   throw HdMapError("findNearestIndexPair(): No nearest point found.");
 }
 
+std::vector<std::shared_ptr<const lanelet::TrafficSign>> HdMapUtils::getTrafficSignOnPath(std::vector<int> lanelet_ids)
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for(const auto & lanelet_id : lanelet_ids)
+  {
+    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for(const auto traffic_sign : traffic_signs)
+    {
+      ret.push_back(traffic_sign);
+    }
+  }
+  return ret;
+}
+
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<int> following_lanelets,
   int lanelet_id, double s)
 {
   std::vector<int> lanelet_ids;
   std::vector<double> s_values;
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
+  lanelet::ConstLanelets road_lanelets = lanelet::utils::query::roadLanelets(all_lanelets);
+  const auto stop_lines = lanelet::utils::query::stopLinesLanelets(road_lanelets);
   for (const auto & lanelet_id : following_lanelets) {
-    const auto stop_lines = lanelet::utils::query::stopLinesLanelets(
-      {lanelet_map_ptr_->laneletLayer.get(lanelet_id)});
+    /*
     if (stop_lines.size() != 0) {
       for (const auto & stop_line : stop_lines) {
-        /*
-        getCollisionPointInLaneCoordinate(static_cast<int>(lanelet_map_ptr_->laneletLayer.get(
-            lanelet_id).id()), static_cast<int>(stop_line.id()));*/
-        /* no such primitive error
         auto stop_position_in_lane_coordinate =
           getCollisionPointInLaneCoordinate(static_cast<int>(lanelet_map_ptr_->laneletLayer.get(
               lanelet_id).id()),
@@ -851,11 +859,9 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
           lanelet_ids.emplace_back(lanelet_id);
           s_values.emplace_back(stop_position_in_lane_coordinate.get());
         }
-        */
       }
-    }
+    }*/
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::set<double> dists;
   for (size_t i = 0; i < lanelet_ids.size(); i++) {
     auto d = getLongitudinalDistance(lanelet_id, s, lanelet_ids[i], s_values[i]);
