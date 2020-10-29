@@ -128,7 +128,7 @@ boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
 std::vector<int> HdMapUtils::getConflictingCrosswalkIds(std::vector<int> lanlet_ids) const
 {
   std::vector<int> ret;
-  for (const auto & lanelet_id : lanlet_ids) {StopAtStopLine
+  for (const auto & lanelet_id : lanlet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
     const auto conflicting_crosswalks = overall_graphs_ptr_->conflictingInGraph(lanelet, 1);
     for (const auto & crosswalk : conflicting_crosswalks) {
