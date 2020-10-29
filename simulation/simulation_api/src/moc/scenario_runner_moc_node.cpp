@@ -206,7 +206,7 @@ private:
             <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
             <BoundingBox>
                 <Center x='1.5' y='0.0' z='0.9'/>
-                <Dimensions width='2.1' length='4.5' height='1.8'/>
+                <Dimensions width='2.3' length='5.0' height='1.8'/>
             </BoundingBox>
             <Axles>
                 <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>

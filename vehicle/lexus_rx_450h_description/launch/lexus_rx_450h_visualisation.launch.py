@@ -15,10 +15,5 @@ def generate_launch_description():
             package='robot_state_publisher',
             node_executable='robot_state_publisher',
             node_name='robot_state_publisher',
-            arguments=[str(urdf_path)]),
-        launch_ros.actions.Node(
-            package='rviz2',
-            node_executable='rviz2',
-            node_name='rviz2',
-            arguments=['-d', str(rviz_cfg_path)])
+            arguments=[str(urdf_path)])
     ])

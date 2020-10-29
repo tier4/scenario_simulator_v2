@@ -22,6 +22,8 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
@@ -32,6 +34,8 @@ def generate_launch_description():
             get_package_share_directory('simulation_api'),
             'config',
             'moc_test.rviz')
+    lexus_package_path = get_package_share_directory('lexus_rx_450h_description')
+    description_launch_dir = os.path.join(lexus_package_path, 'launch')
     return LaunchDescription([
         Node(
             package='simulation_api',
@@ -65,5 +69,8 @@ def generate_launch_description():
             node_executable='openscenario_visualization_node',
             node_name='openscenario_visualization_node',
             output='screen'
-            )
+            ),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([description_launch_dir, '/lexus_rx_450h_visualisation.launch.py']),
+        )
     ])

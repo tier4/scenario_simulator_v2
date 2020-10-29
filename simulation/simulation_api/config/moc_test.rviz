@@ -7,8 +7,9 @@ Panels:
         - /Global Options1
         - /Simulation1/Lanelet1/Namespaces1
         - /Simulation1/Grid1/Line Style1
+        - /RobotModel1/Status1
       Splitter Ratio: 0.5
-    Tree Height: 363
+    Tree Height: 796
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -92,6 +93,52 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: Simulation
+    - Alpha: 0.25
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic: /robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        gnss:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        lidar_front:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        lidar_rear:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        nav_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+      Name: RobotModel
+      TF Prefix: ""
+      Unreliable: false
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -127,7 +174,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 30.088825225830078
+      Scale: 32.0902099609375
       Target Frame: ego
       Value: TopDownOrtho (rviz_default_plugins)
       X: 0
