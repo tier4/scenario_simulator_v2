@@ -33,10 +33,12 @@ StopAtStopLineAction::StopAtStopLineAction(
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
   const std::vector<int> & following_lanelets, double current_velocity)
 {
-  if(entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD){
+  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     return boost::none;
   }
-  auto distance_to_stop_target = hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id, entity_status.s);
+  auto distance_to_stop_target = hdmap_utils->getDistanceToStopLine(following_lanelets,
+      entity_status.lanelet_id,
+      entity_status.s);
   if (!distance_to_stop_target) {
     return boost::none;
   }
