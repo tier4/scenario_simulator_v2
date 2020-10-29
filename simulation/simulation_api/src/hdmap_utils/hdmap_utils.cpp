@@ -825,7 +825,7 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
 }
 
 std::vector<std::shared_ptr<const lanelet::TrafficSign>>
-  HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<int> lanelet_ids)
+HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<int> lanelet_ids)
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
   for (const auto & lanelet_id : lanelet_ids) {

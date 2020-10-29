@@ -237,11 +237,13 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   pf.y = status.bounding_box.center.y;
   pf.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
 
-  pl.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size * arrow_ratio;
+  pl.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size *
+    arrow_ratio;
   pl.y = status.bounding_box.center.y + arrow_size;
   pl.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
 
-  pr.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size * arrow_ratio;
+  pr.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size *
+    arrow_ratio;
   pr.y = status.bounding_box.center.y - arrow_size;
   pr.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
   arrow.points = {pf, pl, pr};
@@ -264,7 +266,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.ns = status.name;
   text_action.id = 3;
   text_action.action = text_action.ADD;
-  text_action.pose.position.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  text_action.pose.position.x = status.bounding_box.center.x + status.bounding_box.dimensions.x *
+    0.5;
   text_action.pose.position.y = status.bounding_box.center.y;
   text_action.pose.position.z = status.bounding_box.center.z +
     status.bounding_box.dimensions.z * 0.5 + 0.5;
