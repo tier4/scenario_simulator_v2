@@ -51,8 +51,8 @@ public:
     api_.entity->spawn(false, "bob", pedestrian_params, getBobInitialStatus());
     api_.entity->setTargetSpeed("bob", 1, true);
     lanechange_excuted_ = false;
-    // api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
-    // api_.entity->setTargetSpeed("npc1", 5, true);
+    api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
+    api_.entity->setTargetSpeed("npc1", 5, true);
     /*
     current_time_ = 0.0;
     target_speed_setted_ = false;
