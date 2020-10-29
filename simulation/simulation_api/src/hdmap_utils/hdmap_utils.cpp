@@ -84,14 +84,20 @@ boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
   using Point = bg::model::d2::point_xy<double>;
   using Line = bg::model::linestring<Point>;
   using Polygon = bg::model::polygon<Point, false>;
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   auto center_points = getCenterPoints(lanelet_id);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::vector<Point> path_collision_points;
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  std::cout << crossing_lanelet_id << std::endl;
   lanelet::CompoundPolygon3d lanelet_polygon =
     lanelet_map_ptr_->laneletLayer.get(crossing_lanelet_id).polygon3d();
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   Polygon crosswalk_polygon;
   for (const auto & lanelet_point : lanelet_polygon) {
     crosswalk_polygon.outer().push_back(bg::make<Point>(lanelet_point.x(), lanelet_point.y()));
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   crosswalk_polygon.outer().push_back(crosswalk_polygon.outer().front());
   double s_in_lanelet = 0;
   for (size_t i = 0; i < center_points.size() - 1; ++i) {
@@ -833,6 +839,9 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
       {lanelet_map_ptr_->laneletLayer.get(lanelet_id)});
     if (stop_lines.size() != 0) {
       for (const auto & stop_line : stop_lines) {
+        /*
+        getCollisionPointInLaneCoordinate(static_cast<int>(lanelet_map_ptr_->laneletLayer.get(
+            lanelet_id).id()), static_cast<int>(stop_line.id()));*/
         /* no such primitive error
         auto stop_position_in_lane_coordinate =
           getCollisionPointInLaneCoordinate(static_cast<int>(lanelet_map_ptr_->laneletLayer.get(

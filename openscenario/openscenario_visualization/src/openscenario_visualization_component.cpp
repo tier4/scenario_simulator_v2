@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 namespace openscenario_visualization
 {
@@ -225,17 +226,32 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   arrow.ns = status.name;
   arrow.id = 2;
   arrow.action = arrow.ADD;
-  arrow.pose.position.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  arrow.pose.position.y = status.bounding_box.center.y;
-  arrow.pose.position.z = status.bounding_box.center.z;
+
+  // constexpr double arrow_size = 0.3;
+  double arrow_size = 0.4 * status.bounding_box.dimensions.y;
+  constexpr double arrow_ratio = 1.0;
+  geometry_msgs::msg::Point pf, pl, pr;
+  pf.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 - 0.1;
+  pf.y = status.bounding_box.center.y;
+  pf.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+
+  pl.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 - 0.1 - arrow_size * arrow_ratio;
+  pl.y = status.bounding_box.center.y + arrow_size;
+  pl.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+
+  pr.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 - 0.1 - arrow_size * arrow_ratio;
+  pr.y = status.bounding_box.center.y - arrow_size;
+  pr.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  arrow.points = {pf, pl, pr};
+  arrow.colors = {color};
   arrow.pose.orientation.x = 0.0;
   arrow.pose.orientation.y = 0.0;
   arrow.pose.orientation.z = 0.0;
   arrow.pose.orientation.w = 1.0;
-  arrow.type = arrow.ARROW;
-  arrow.scale.x = 1.5;
-  arrow.scale.y = 0.1;
-  arrow.scale.z = 0.1;
+  arrow.type = arrow.TRIANGLE_LIST;
+  arrow.scale.x = 1.0;
+  arrow.scale.y = 1.0;
+  arrow.scale.z = 1.0;
   arrow.lifetime = rclcpp::Duration(0.1);
   arrow.color = color_utils::makeColorMsg("red", 0.99);
   ret.markers.push_back(arrow);

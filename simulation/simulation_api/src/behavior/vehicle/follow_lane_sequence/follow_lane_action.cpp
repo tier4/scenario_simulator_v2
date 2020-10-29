@@ -102,8 +102,7 @@ BT::NodeStatus FollowLaneAction::tick()
     auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(following_lanelets,
         entity_status.lanelet_id,
         entity_status.s);
-    if(distance_to_stopline)
-    {
+    if (distance_to_stopline) {
       std::cout << "distance to stop line : " << distance_to_stopline.get() << std::endl;
     }
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);

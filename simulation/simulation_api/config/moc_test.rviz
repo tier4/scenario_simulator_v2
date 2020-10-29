@@ -8,7 +8,7 @@ Panels:
         - /Simulation1/Lanelet1/Namespaces1
         - /Simulation1/Grid1/Line Style1
       Splitter Ratio: 0.5
-    Tree Height: 796
+    Tree Height: 363
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -47,6 +47,7 @@ Visualization Manager:
           Namespaces:
             bob: true
             ego: true
+            npc1: true
           Queue Size: 10
           Topic: /entity/marker
           Unreliable: false
@@ -116,26 +117,21 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 10.879762649536133
+      Angle: 0
+      Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
-      Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
-      Focal Shape Fixed Size: false
-      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3653984069824219
+      Scale: 30.088825225830078
       Target Frame: ego
-      Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 3.1303951740264893
+      Value: TopDownOrtho (rviz_default_plugins)
+      X: 0
+      Y: 0
     Saved: ~
 Window Geometry:
   Displays:
