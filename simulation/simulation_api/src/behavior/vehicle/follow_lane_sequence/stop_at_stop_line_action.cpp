@@ -66,8 +66,8 @@ BT::NodeStatus StopAtStopLineAction::tick()
     auto target_linear_speed =
       calculateTargetSpeed(following_lanelets, entity_status.twist.linear.x);
     if (!target_linear_speed) {
-      setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-      return BT::NodeStatus::SUCCESS;
+      // setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+      return BT::NodeStatus::FAILURE;
     }
     if (target_speed) {
       if (target_speed.get() > target_linear_speed.get()) {

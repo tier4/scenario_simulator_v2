@@ -59,10 +59,13 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
     auto target_linear_speed =
       calculateTargetSpeed(following_lanelets, entity_status.twist.linear.x);
     if (!target_linear_speed) {
+      std::cout << __FILE__ << "," << __LINE__ << std::endl;
+      setOutput("updated_status", calculateEntityStatusUpdated(0));
       return BT::NodeStatus::SUCCESS;
     }
     if (target_speed) {
