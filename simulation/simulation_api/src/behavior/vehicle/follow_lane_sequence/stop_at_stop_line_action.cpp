@@ -77,9 +77,10 @@ BT::NodeStatus StopAtStopLineAction::tick()
       if (!target_speed) {
         target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
       }
-      if (hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id,
+      if (!hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id,
         entity_status.s))
       {
+        stopped_ = false;
         setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
         return BT::NodeStatus::SUCCESS;
       }

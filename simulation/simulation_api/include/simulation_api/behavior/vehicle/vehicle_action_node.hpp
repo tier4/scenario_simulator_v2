@@ -53,6 +53,7 @@ public:
   boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
   double calculateStopDistance() const;
   boost::optional<double> getDistanceToFrontEntity();
+  boost::optional<double> getDistanceToStopLine(const std::vector<int> & following_lanelets);
 };
 }  // namespace entity_behavior
 

@@ -36,6 +36,13 @@ void VehicleActionNode::getBlackBoardValues()
   }
 }
 
+boost::optional<double> VehicleActionNode::getDistanceToStopLine(
+  const std::vector<int> & following_lanelets)
+{
+  return hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id,
+           entity_status.s);
+}
+
 boost::optional<double> VehicleActionNode::getDistanceToFrontEntity()
 {
   if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
