@@ -71,6 +71,7 @@ def generate_launch_description():
             output='screen'
             ),
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([description_launch_dir, '/lexus_rx_450h_visualisation.launch.py']),
+            PythonLaunchDescriptionSource(
+                [description_launch_dir, '/lexus_rx_450h_visualisation.launch.py']),
         )
     ])
