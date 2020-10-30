@@ -38,6 +38,26 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+    auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
+    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(following_lanelets,
+        entity_status.lanelet_id,
+        entity_status.s);
+    auto distance_to_crossing_entity = getDistanceToConflictingEntity(following_lanelets);
+    auto distance_to_front_entity = getDistanceToFrontEntity();
+    if(!distance_to_front_entity)
+    {
+      return BT::NodeStatus::FAILURE;
+    }
+    if(distance_to_crossing_entity){
+      if(distance_to_front_entity.get() > distance_to_crossing_entity.get()){
+        return BT::NodeStatus::FAILURE;
+      }
+    }
+    if(distance_to_stopline){
+      if(distance_to_front_entity.get() > distance_to_stopline.get()){
+        return BT::NodeStatus::FAILURE;
+      }
+    }
     auto front_entity_status = getFrontEntityStatus();
     if (!front_entity_status) {
       return BT::NodeStatus::FAILURE;

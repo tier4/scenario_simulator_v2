@@ -36,6 +36,22 @@ void VehicleActionNode::getBlackBoardValues()
   }
 }
 
+boost::optional<double> VehicleActionNode::getDistanceToFrontEntity()
+{
+  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
+    return boost::none;
+  }
+  auto status = getFrontEntityStatus();
+  if (!status) {
+    return boost::none;
+  }
+  if (status->coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
+    return boost::none;
+  }
+  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id, entity_status.s,
+           status->lanelet_id, status->s);
+}
+
 boost::optional<simulation_api::entity::EntityStatus> VehicleActionNode::getFrontEntityStatus()
 {
   boost::optional<double> front_entity_distance, front_entity_speed;
