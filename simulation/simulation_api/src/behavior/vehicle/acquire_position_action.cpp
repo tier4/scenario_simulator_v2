@@ -64,6 +64,7 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
 
   route_ = hdmap_utils->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
+
   if (!target_speed) {
     std::vector<int> following_lanelets;
     bool is_finded = false;
@@ -81,6 +82,18 @@ BT::NodeStatus AcquirePositionAction::tick()
     }
     if (following_lanelets.size() != 0) {
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    }
+  }
+  auto distance_to_front_entity = getDistanceToFrontEntity();
+  if (distance_to_front_entity) {
+    if (distance_to_front_entity.get() <=
+      calculateStopDistance() +
+      vehicle_parameters->bounding_box.dimensions.length + 5)
+    {
+      auto front_entity_status = getFrontEntityStatus();
+      if (front_entity_status) {
+        target_speed = front_entity_status->twist.linear.x;
+      }
     }
   }
   auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_.get());
