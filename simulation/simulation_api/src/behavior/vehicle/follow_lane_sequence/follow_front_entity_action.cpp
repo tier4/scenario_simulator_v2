@@ -44,17 +44,16 @@ BT::NodeStatus FollowFrontEntityAction::tick()
         entity_status.s);
     auto distance_to_crossing_entity = getDistanceToConflictingEntity(following_lanelets);
     auto distance_to_front_entity = getDistanceToFrontEntity();
-    if(!distance_to_front_entity)
-    {
+    if (!distance_to_front_entity) {
       return BT::NodeStatus::FAILURE;
     }
-    if(distance_to_crossing_entity){
-      if(distance_to_front_entity.get() > distance_to_crossing_entity.get()){
+    if (distance_to_crossing_entity) {
+      if (distance_to_front_entity.get() > distance_to_crossing_entity.get()) {
         return BT::NodeStatus::FAILURE;
       }
     }
-    if(distance_to_stopline){
-      if(distance_to_front_entity.get() > distance_to_stopline.get()){
+    if (distance_to_stopline) {
+      if (distance_to_front_entity.get() > distance_to_stopline.get()) {
         return BT::NodeStatus::FAILURE;
       }
     }
