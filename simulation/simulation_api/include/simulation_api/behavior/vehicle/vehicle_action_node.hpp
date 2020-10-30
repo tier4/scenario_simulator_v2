@@ -45,6 +45,10 @@ public:
   }
   std::shared_ptr<simulation_api::entity::VehicleParameters> vehicle_parameters;
   simulation_api::entity::EntityStatus calculateEntityStatusUpdated(double target_speed) const;
+  simulation_api::entity::EntityStatus calculateEntityStatusUpdated(
+    double target_speed,
+    const std::vector<int> & following_lanelets)
+  const;
   bool foundConflictingEntity(const std::vector<int> & following_lanelets) const;
   boost::optional<simulation_api::entity::EntityStatus> getConflictingEntityStatus(
     const std::vector<int> & following_lanelets) const;
