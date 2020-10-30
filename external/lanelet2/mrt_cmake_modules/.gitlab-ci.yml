@@ -17,7 +17,7 @@ cmake_format:
     GIT_STRATEGY: fetch
   before_script: []
   script:
-    - pip install --user cmake_format pyyaml
+    - sudo apt update && sudo apt install -y python3-pip && pip3 install --user cmake_format pyyaml
     - env PATH=~/.local/bin:$PATH find . -name "*.cmake" -exec cmake-format -i {} +
     - git diff --exit-code || (echo "CMake formatting issues found. Please fix them first!"; $(exit 1))
 

@@ -202,6 +202,7 @@ ScenarioRunner::Result ScenarioRunner::on_activate(const rclcpp_lifecycle::State
 ScenarioRunner::Result ScenarioRunner::on_deactivate(const rclcpp_lifecycle::State &)
 {
   timer.reset();
+  connection.~API();
   return ScenarioRunner::Result::SUCCESS;
 }
 

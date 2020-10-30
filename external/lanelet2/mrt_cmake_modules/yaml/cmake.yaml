@@ -19,7 +19,7 @@ benchmark:
   targets: ['benchmark::benchmark']
 boost:
   components: [wserialization thread random serialization log_setup prg_exec_monitor
-      wave system signals chrono filesystem locale timer date_time regex graph program_options
+      wave system chrono filesystem locale timer date_time regex graph program_options
       unit_test_framework log atomic]
   include_dirs: [Boost_INCLUDE_DIRS]
   libraries: [Boost_LIBRARIES]
@@ -121,10 +121,6 @@ libgoogle-glog-dev:
   libraries: [GLOG_LIBRARY]
   library_dirs: []
   name: Glog
-libgps:
-  include_dirs: [LIBGPS_INCLUDE_DIR]
-  libraries: [LIBGPS_LIBRARY]
-  name: libgps
 libgsl:
   components: []
   include_dirs: [GSL_INCLUDE_DIRS]
@@ -268,7 +264,7 @@ mrt_protobuf:
     instead!
 mrt_qt-dev:
   components: [Core Gui DBus Network OpenGL OpenGLExtensions Sql Test Xml Widgets
-      Concurrent Svg]
+      Concurrent Svg Script]
   include_dirs: [QT_INCLUDES]
   libraries: [QT_LIBRARIES]
   name: MrtQt5
@@ -282,7 +278,7 @@ mrt_qt4-dev:
   warning: Usage of mrt_qt4-dev in package.xml is deprecated. Use 'mrt_qt-dev' instead!
 mrt_qt5-dev:
   components: [Core Gui DBus Network OpenGL OpenGLExtensions Sql Test Xml Widgets
-      Concurrent Svg]
+      Concurrent Svg Script]
   include_dirs: [QT_INCLUDES]
   libraries: [QT_LIBRARIES]
   name: MrtQt5
@@ -366,6 +362,11 @@ pybind11-dev:
   libraries: []
   library_dirs: []
   name: pybind11
+qtbase5-dev:
+  components: [Core Gui Network]
+  include_dirs: [QT_INCLUDES]
+  libraries: [QT_LIBRARIES]
+  name: MrtQt5
 range_v3:
   name: range-v3
   targets: [range-v3]
