@@ -232,8 +232,8 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   for (size_t i = 0; i < following_lanelets.size(); i++) {
     if (following_lanelets[i] == entity_status.lanelet_id) {
       double length = hdmap_utils->getLaneletLength(entity_status.lanelet_id);
+      calculation_success = true;
       if (length < new_s) {
-        calculation_success = true;
         if (i != (following_lanelets.size() - 1)) {
           new_s = new_s - length;
           new_lanelet_id = following_lanelets[i + 1];
