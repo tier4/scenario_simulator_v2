@@ -204,7 +204,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
 {
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     throw BehaviorTreeRuntimeError(
-            "entity status must be lane when we call calculateEntityStatusUpdated function in VehicleActionNode");
+            "entity status must be lane when we call calculateEntityStatusUpdated");
   }
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.accel;
@@ -243,7 +243,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
           auto next_ids = hdmap_utils->getNextLaneletIds(following_lanelets[i]);
           if (next_ids.size() == 0) {
             throw BehaviorTreeRuntimeError(
-                    "failed to get next lane in calculateEntityStatusUpdated function in VehicleActionNode");
+                    "failed to get next lane in calculateEntityStatusUpdated function");
           }
           new_lanelet_id = next_ids[0];
           break;
@@ -253,7 +253,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   }
   if (!calculation_success) {
     throw BehaviorTreeRuntimeError(
-            "failed to calculate next status calculateEntityStatusUpdated function in VehicleActionNode");
+            "failed to calculate next status calculateEntityStatusUpdated function");
   }
   simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
     new_lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);

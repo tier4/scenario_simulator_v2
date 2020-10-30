@@ -64,9 +64,9 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
 
   route_ = hdmap_utils->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
+  std::vector<int> following_lanelets;
 
   if (!target_speed) {
-    std::vector<int> following_lanelets;
     bool is_finded = false;
     for (auto itr = route_->begin(); itr != route_->end(); itr++) {
       if (is_finded) {
@@ -94,6 +94,15 @@ BT::NodeStatus AcquirePositionAction::tick()
       if (front_entity_status) {
         target_speed = front_entity_status->twist.linear.x;
       }
+    }
+  }
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
+  if (distance_to_conflicting_entity) {
+    if (distance_to_conflicting_entity.get() <=
+      calculateStopDistance() +
+      vehicle_parameters->bounding_box.dimensions.length + 5)
+    {
+      target_speed = 0;
     }
   }
   auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_.get());
