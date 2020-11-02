@@ -824,6 +824,29 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
   throw HdMapError("findNearestIndexPair(): No nearest point found.");
 }
 
+const std::unordered_map<int,std::vector<int>> HdMapUtils::getRightOfWayLaneletIds(std::vector<int> lanelet_ids) const
+{
+  std::unordered_map<int,std::vector<int>> ret;
+  for(const auto & lanelet_id : lanelet_ids){
+    ret.emplace(lanelet_id, getRightOfWayLaneletIds(lanelet_id));
+  }
+  return ret;
+}
+
+const std::vector<int> HdMapUtils::getRightOfWayLaneletIds(int lanelet_id) const
+{
+  std::vector<int> ret;
+  const auto & assigned_lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  const auto right_of_ways = assigned_lanelet.regulatoryElementsAs<lanelet::RightOfWay>();
+  for (const auto & right_of_way : right_of_ways) {
+    const auto right_of_Way_lanelets = right_of_way->rightOfWayLanelets();
+    for(const auto & ll : right_of_Way_lanelets){
+      ret.emplace_back(ll.id());
+    }
+  }
+  return ret;
+}
+
 std::vector<std::shared_ptr<const lanelet::TrafficSign>>
 HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<int> lanelet_ids)
 {

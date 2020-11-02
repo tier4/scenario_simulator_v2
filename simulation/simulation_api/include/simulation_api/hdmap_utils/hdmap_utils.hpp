@@ -41,6 +41,7 @@
 #include <boost/optional.hpp>
 
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <utility>
 #include <vector>
@@ -109,6 +110,8 @@ public:
     int lanelet_id,
     int crossing_lanelet_id);
   const visualization_msgs::msg::MarkerArray generateMarker() const;
+  const std::vector<int> getRightOfWayLaneletIds(int lanelet_id) const;
+  const std::unordered_map<int,std::vector<int>> getRightOfWayLaneletIds(std::vector<int> lanelet_ids) const;
 
 private:
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
