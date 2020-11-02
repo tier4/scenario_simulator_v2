@@ -23,6 +23,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include <unordered_map>
 
 namespace entity_behavior
@@ -48,6 +49,7 @@ public:
   double calculateStopDistance() const;
   boost::optional<double> getDistanceToFrontEntity();
   boost::optional<double> getDistanceToStopLine(const std::vector<int> & following_lanelets);
+  std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities();
 
   /// throws if the derived class return RUNNING.
   BT::NodeStatus executeTick() override;

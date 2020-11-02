@@ -17,6 +17,8 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <vector>
+#include <utility>
 
 namespace entity_behavior
 {
@@ -63,6 +65,25 @@ void ActionNode::getBlackBoardValues()
   {
     throw BehaviorTreeRuntimeError("failed to get input entity_type_list in ActionNode");
   }
+}
+
+std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntities()
+{
+  std::vector<simulation_api::entity::EntityStatus> ret;
+  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
+    return ret;
+  }
+  const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_id);
+  for (const auto & status : other_entity_status) {
+    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+      for(const int & lanelet_id : lanelet_ids) {
+        if(lanelet_id == status.second.lanelet_id){
+          ret.emplace_back(status.second);
+        }
+      }
+    }
+  }
+  return ret;
 }
 
 boost::optional<double> ActionNode::getDistanceToStopLine(
