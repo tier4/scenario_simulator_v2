@@ -85,6 +85,10 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+    if(getRightOfWayEntities().size() != 0)
+    {
+      return BT::NodeStatus::FAILURE;
+    }
     auto distance_to_front_entity = getDistanceToFrontEntity();
     if (distance_to_front_entity) {
       if (distance_to_front_entity.get() <=

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
+#include <simulation_api/behavior/vehicle/follow_lane_sequence/yield_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_lane_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
@@ -43,6 +44,8 @@ BehaviorTree::BehaviorTree()
   <follow_lane_sequence::StopAtCrossingEntityAction>("StopAtCrossingEntity");
   factory_.registerNodeType
   <follow_lane_sequence::StopAtStopLineAction>("StopAtStopLine");
+  factory_.registerNodeType
+  <follow_lane_sequence::YieldAction>("Yield");
   factory_.registerNodeType<AcquirePositionAction>("AcquirePosition");
   factory_.registerNodeType<LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);

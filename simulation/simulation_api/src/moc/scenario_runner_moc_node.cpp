@@ -53,6 +53,8 @@ public:
     lanechange_excuted_ = false;
     api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
     api_.entity->setTargetSpeed("npc1", 5, true);
+    api_.entity->spawn(false, "npc2", params, getNpc2InitialStatus());
+    api_.entity->setTargetSpeed("npc2", 6, true);
     /*
     current_time_ = 0.0;
     target_speed_setted_ = false;
@@ -139,6 +141,35 @@ private:
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
       api_.simulation->getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
+    return ret;
+  }
+
+  simulation_api::entity::EntityStatus getNpc2InitialStatus()
+  {
+    geometry_msgs::msg::Pose pose;
+    pose.position.x = 0.0;
+    pose.position.y = 0.0;
+    pose.position.z = 0.0;
+    geometry_msgs::msg::Twist twist;
+    twist.linear.x = 5.0;
+    twist.linear.y = 0.0;
+    twist.linear.z = 0.0;
+    twist.angular.x = 0.0;
+    twist.angular.y = 0.0;
+    twist.angular.z = 0.0;
+    geometry_msgs::msg::Accel accel;
+    accel.linear.x = 0.0;
+    accel.linear.y = 0.0;
+    accel.linear.z = 0.0;
+    accel.angular.x = 0.0;
+    accel.angular.y = 0.0;
+    accel.angular.z = 0.0;
+    geometry_msgs::msg::Vector3 rpy;
+    rpy.x = 0.0;
+    rpy.y = 0.0;
+    rpy.z = 0.0;
+    simulation_api::entity::EntityStatus ret(
+      api_.simulation->getCurrentTime(), 34507, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
