@@ -19,7 +19,7 @@ string current_action
 geometry_msgs/Pose pose
 
 # fields for lane frame
-int32 lanelet_id
+int64 lanelet_id
 float64 s
 float64 offset
 geometry_msgs/Vector3 rpy

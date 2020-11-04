@@ -76,7 +76,7 @@ std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntit
   const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_id);
   for (const auto & status : other_entity_status) {
     if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      for (const int & lanelet_id : lanelet_ids) {
+      for (const std::int64_t& lanelet_id : lanelet_ids) {
         if (lanelet_id == status.second.lanelet_id) {
           ret.emplace_back(status.second);
         }
@@ -87,7 +87,7 @@ std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntit
 }
 
 boost::optional<double> ActionNode::getDistanceToStopLine(
-  const std::vector<int> & following_lanelets)
+  const std::vector<std::int64_t> & following_lanelets)
 {
   return hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id,
            entity_status.s);
@@ -143,7 +143,7 @@ boost::optional<simulation_api::entity::EntityStatus> ActionNode::getFrontEntity
 }
 
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
-  const std::vector<int> & following_lanelets) const
+  const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_entity_status = getConflictingEntityStatus(following_lanelets);
   if (!conflicting_entity_status) {
@@ -168,7 +168,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     auto iter = std::max_element(dists.begin(), dists.end());
     size_t index = std::distance(dists.begin(), iter);
     double stop_s = collision_points[index].second;
-    int stop_lanelet_id = collision_points[index].first;
+    std::int64_t stop_lanelet_id = collision_points[index].first;
     geometry_msgs::msg::Vector3 rpy;
     geometry_msgs::msg::Twist twist;
     geometry_msgs::msg::Accel accel;
@@ -183,7 +183,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
 }
 
 boost::optional<simulation_api::entity::EntityStatus> ActionNode::getConflictingEntityStatus(
-  const std::vector<int> & following_lanelets) const
+  const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   std::vector<simulation_api::entity::EntityStatus> conflicting_entity_status;
@@ -217,7 +217,7 @@ boost::optional<simulation_api::entity::EntityStatus> ActionNode::getConflicting
     auto iter = std::max_element(dists.begin(), dists.end());
     size_t index = std::distance(dists.begin(), iter);
     double stop_s = collision_points[index].second;
-    int stop_lanelet_id = collision_points[index].first;
+    std::int64_t stop_lanelet_id = collision_points[index].first;
     geometry_msgs::msg::Vector3 rpy;
     geometry_msgs::msg::Twist twist;
     geometry_msgs::msg::Accel accel;
@@ -228,7 +228,7 @@ boost::optional<simulation_api::entity::EntityStatus> ActionNode::getConflicting
   return boost::none;
 }
 
-bool ActionNode::foundConflictingEntity(const std::vector<int> & following_lanelets) const
+bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   for (const auto & status : other_entity_status) {

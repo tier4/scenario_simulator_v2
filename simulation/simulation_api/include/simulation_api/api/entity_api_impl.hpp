@@ -370,7 +370,7 @@ public:
       XmlRpc::XmlRpcValue param;
       param["entity/name"] = name;
       param["coordinate"] = "lane";
-      param["lanelet_id"] = status.lanelet_id;
+      param["lanelet_id"] = std::to_string(status.lanelet_id);
       param["s"] = status.s;
       param["offset"] = status.offset;
       param["roll"] = status.rpy.x;

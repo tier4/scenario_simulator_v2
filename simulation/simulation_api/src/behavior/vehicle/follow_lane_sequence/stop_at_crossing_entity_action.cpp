@@ -31,7 +31,7 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 : entity_behavior::VehicleActionNode(name, config) {}
 
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
-  const std::vector<int> & following_lanelets, double current_velocity)
+  const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {
   auto distance_to_stop_target = getDistanceToConflictingEntity(following_lanelets);
   if (!distance_to_stop_target) {

@@ -47,7 +47,7 @@ public:
   simulation_api::entity::EntityStatus calculateEntityStatusUpdated(double target_speed) const;
   simulation_api::entity::EntityStatus calculateEntityStatusUpdated(
     double target_speed,
-    const std::vector<int> & following_lanelets)
+    const std::vector<std::int64_t> & following_lanelets)
   const;
 };
 }  // namespace entity_behavior

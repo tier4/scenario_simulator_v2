@@ -52,7 +52,7 @@ public:
   void getBlackBoardValues();
 
 private:
-  boost::optional<std::vector<int>> route_;
+  std::vector<std::int64_t> route_;
   boost::optional<simulation_api::entity::EntityStatus> target_status_;
 };
 }  // namespace vehicle

@@ -38,7 +38,7 @@ void VehicleActionNode::getBlackBoardValues()
 
 simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed,
-  const std::vector<int> & following_lanelets) const
+  const std::vector<std::int64_t> & following_lanelets) const
 {
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     throw BehaviorTreeRuntimeError(
@@ -62,7 +62,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   twist_new.angular.x = 0.0;
   twist_new.angular.y = 0.0;
   twist_new.angular.z = 0.0;
-  int new_lanelet_id = entity_status.lanelet_id;
+  std::int64_t new_lanelet_id = entity_status.lanelet_id;
   double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
     step_time;
 
