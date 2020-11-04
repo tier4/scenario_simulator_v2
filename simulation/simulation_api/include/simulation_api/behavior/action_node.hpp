@@ -48,7 +48,8 @@ public:
   boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
   double calculateStopDistance() const;
   boost::optional<double> getDistanceToFrontEntity();
-  boost::optional<double> getDistanceToStopLine(const std::vector<std::int64_t> & following_lanelets);
+  boost::optional<double> getDistanceToStopLine(
+    const std::vector<std::int64_t> & following_lanelets);
   std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities();
 
   /// throws if the derived class return RUNNING.

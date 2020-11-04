@@ -76,7 +76,7 @@ std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntit
   const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_id);
   for (const auto & status : other_entity_status) {
     if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      for (const std::int64_t& lanelet_id : lanelet_ids) {
+      for (const std::int64_t & lanelet_id : lanelet_ids) {
         if (lanelet_id == status.second.lanelet_id) {
           ret.emplace_back(status.second);
         }

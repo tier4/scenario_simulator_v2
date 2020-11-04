@@ -252,7 +252,9 @@ public:
     }
     return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
   }
-  bool reachPosition(std::string name, std::int64_t lanelet_id, double s, double offset, double tolerance)
+  bool reachPosition(
+    std::string name, std::int64_t lanelet_id, double s, double offset,
+    double tolerance)
   {
     if (!entity_manager_ptr_->entityStatusSetted(name)) {
       return false;

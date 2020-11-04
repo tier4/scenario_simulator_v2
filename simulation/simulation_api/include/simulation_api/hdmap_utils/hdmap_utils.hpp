@@ -65,7 +65,9 @@ public:
   void insertMarkerArray(
     visualization_msgs::msg::MarkerArray & a1,
     const visualization_msgs::msg::MarkerArray & a2) const;
-  std::vector<geometry_msgs::msg::Point> toMapPoints(std::int64_t lanelet_id, std::vector<double> s);
+  std::vector<geometry_msgs::msg::Point> toMapPoints(
+    std::int64_t lanelet_id,
+    std::vector<double> s);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
     std::int64_t lanelet_id, double s,
     double offset,
@@ -99,7 +101,9 @@ public:
     std::vector<std::int64_t> lanelet_ids, double foward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
   boost::optional<std::pair<simulation_api::math::HermiteCurve,
-    double>> getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id);
+    double>> getLaneChangeTrajectory(
+    geometry_msgs::msg::Pose from_pose,
+    std::int64_t to_lanelet_id);
   boost::optional<simulation_api::math::HermiteCurve> getLaneChangeTrajectory(
     geometry_msgs::msg::Pose from_pose,
     std::int64_t to_lanelet_id, double to_s, double tangent_vector_size = 100);
