@@ -36,7 +36,7 @@ public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
   : Node("scenario_runner", option),
     api_(this, ament_index_cpp::get_package_share_directory(
-        "kashiwanoha_map") + "/map/lanelet2_map.osm")
+        "lanelet2_maps") + "/res/mapping_example.osm")
   {
     api_.simulation->initialize(1.0, 0.02);
     pugi::xml_document catalog_xml_doc;
@@ -45,6 +45,7 @@ public:
     api_.entity->spawn(true, "ego", params);
     api_.entity->setEntityStatus("ego", getEgoInitialStatus());
     api_.entity->setTargetSpeed("ego", 15, true);
+    /*
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
@@ -55,7 +56,6 @@ public:
     api_.entity->setTargetSpeed("npc1", 5, true);
     api_.entity->spawn(false, "npc2", params, getNpc2InitialStatus());
     api_.entity->setTargetSpeed("npc2", 6, true);
-    /*
     current_time_ = 0.0;
     target_speed_setted_ = false;
     lanechange_excuted_ = false;
@@ -63,6 +63,7 @@ public:
     api_.entity->setTargetSpeed("npc1", 10, true);
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
     */
+    api_.entity->requestAcquirePosition("ego", 7634496477757533080, 0, 0);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -70,10 +71,10 @@ public:
 private:
   void update()
   {
-    if (api_.entity->reachPosition("ego", 34615, 0, 0, 5)) {
-      api_.entity->requestAcquirePosition("ego", 120545, 0, 0);
-    }
     /*
+    if (api_.entity->reachPosition("ego", 34615, 0, 0, 5)) {
+      api_.entity->requestAcquirePosition("ego", 7634496477757533080, 0, 0);
+    }
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");
     if (stand_still_duration) {
       if (stand_still_duration.get() > 0.1) {
@@ -140,7 +141,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
+      api_.simulation->getCurrentTime(), 8319424567269301985, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
 

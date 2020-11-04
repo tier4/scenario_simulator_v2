@@ -27,6 +27,7 @@
 #include <xmlrpcpp/XmlRpcValue.h>
 #include <xmlrpcpp/XmlRpcException.h>
 #include <boost/optional.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <memory>
 #include <limits>
@@ -194,11 +195,11 @@ public:
     }
     return ret;
   }
-  void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset)
+  void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset)
   {
     entity_manager_ptr_->requestAcquirePosition(name, lanelet_id, s, offset);
   }
-  void requestLaneChange(std::string name, int to_lanelet_id)
+  void requestLaneChange(std::string name, std::int64_t to_lanelet_id)
   {
     entity_manager_ptr_->requestLaneChange(name, to_lanelet_id);
   }
@@ -206,7 +207,7 @@ public:
   {
     entity_manager_ptr_->requestLaneChange(name, direction);
   }
-  bool isInLanelet(std::string name, int lanelet_id)
+  bool isInLanelet(std::string name, std::int64_t lanelet_id)
   {
     if (!entity_manager_ptr_->entityStatusSetted(name)) {
       return false;
@@ -251,7 +252,7 @@ public:
     }
     return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
   }
-  bool reachPosition(std::string name, int lanelet_id, double s, double offset, double tolerance)
+  bool reachPosition(std::string name, std::int64_t lanelet_id, double s, double offset, double tolerance)
   {
     if (!entity_manager_ptr_->entityStatusSetted(name)) {
       return false;
@@ -272,7 +273,8 @@ public:
     std::string name = param["entity/name"];
     geometry_msgs::msg::Pose pose;
     if (coordinate == "lane") {
-      int lanelet_id = param["lanelet_id"];
+      std::string lanelet_id_str = param["lanelet_id"];
+      std::int64_t lanelet_id = boost::lexical_cast<std::int64_t>(lanelet_id_str);
       double s = param["s"];
       double offset = param["offset"];
       geometry_msgs::msg::Vector3 rpy;

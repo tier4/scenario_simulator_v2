@@ -49,7 +49,7 @@ int EntityManager::getNumberOfEgo() const
 }
 
 void EntityManager::requestAcquirePosition(
-  std::string name, int lanelet_id, double s,
+  std::string name, std::int64_t lanelet_id, double s,
   double offset)
 {
   auto it = entities_.find(name);
@@ -67,7 +67,7 @@ void EntityManager::requestAcquirePosition(
   }
 }
 
-void EntityManager::requestLaneChange(std::string name, int to_lanelet_id)
+void EntityManager::requestLaneChange(std::string name, std::int64_t to_lanelet_id)
 {
   if (getEntityStatusCoordinate(name) == CoordinateFrameTypes::WORLD) {
     return;
@@ -442,7 +442,7 @@ bool EntityManager::reachPosition(
 }
 
 bool EntityManager::reachPosition(
-  std::string name, int lanelet_id, double s, double offset,
+  std::string name, std::int64_t lanelet_id, double s, double offset,
   double tolerance) const
 {
   geometry_msgs::msg::Vector3 rpy;

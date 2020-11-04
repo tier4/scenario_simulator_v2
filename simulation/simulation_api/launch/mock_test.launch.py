@@ -44,8 +44,8 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'map_path': lanlet_path,
-                'origin_latitude': 35.903555800615614,
-                'origin_longitude': 139.93339979022568,
+                'origin_latitude': 49.00345654351,
+                'origin_longitude': 8.42427590707,
                 'port': 8080}],
             arguments=[('__log_level:=info')]),
         Node(
