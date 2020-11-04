@@ -58,6 +58,7 @@ add_library(entity_manager SHARED
   src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
   src/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
+  src/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
   src/behavior/vehicle/lane_change_action.cpp
   src/behavior/vehicle/acquire_position_action.cpp
   src/behavior/vehicle/vehicle_action_node.cpp

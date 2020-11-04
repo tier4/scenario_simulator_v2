@@ -28,6 +28,7 @@
 
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
 #include <lanelet2_extension/utility/message_conversion.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
@@ -43,6 +44,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
 
 
 namespace hdmap_utils
@@ -80,6 +82,9 @@ public:
   std::vector<int> getNextLaneletIds(int lanelet_id) const;
   std::vector<int> getPreviousLaneletIds(int lanelet_id) const;
   boost::optional<int> getLaneChangeableLenletId(int lanlet_id, std::string direction);
+  boost::optional<double> getDistanceToStopLine(
+    std::vector<int> following_lanelets, int lanelet_id,
+    double s);
   double getLaneletLength(int lanelet_id) const;
   bool isInLanelet(int lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
@@ -106,6 +111,9 @@ public:
   const visualization_msgs::msg::MarkerArray generateMarker() const;
 
 private:
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
+    std::vector<int> lanelet_ids);
+  std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<int> lanelet_ids);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
   void mapCallback(const autoware_auto_msgs::msg::HADMapBin & msg);
   lanelet::LaneletMapPtr lanelet_map_ptr_;

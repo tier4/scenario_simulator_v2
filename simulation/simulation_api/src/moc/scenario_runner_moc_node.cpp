@@ -14,6 +14,7 @@
 
 #include <simulation_api/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
@@ -33,26 +34,26 @@ class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
-  : Node("scenario_runner", option), api_(this)
+  : Node("scenario_runner", option),
+    api_(this, ament_index_cpp::get_package_share_directory(
+        "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
-    api_.entity->setVerbose(false);
     api_.simulation->initialize(1.0, 0.02);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
     api_.entity->spawn(true, "ego", params);
     api_.entity->setEntityStatus("ego", getEgoInitialStatus());
-    api_.entity->setTargetSpeed("ego", 10, true);
+    api_.entity->setTargetSpeed("ego", 15, true);
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
     api_.entity->spawn(false, "bob", pedestrian_params, getBobInitialStatus());
     api_.entity->setTargetSpeed("bob", 1, true);
-    /*
     lanechange_excuted_ = false;
     api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
-    api_.entity->requestAcquirePosition("npc1", 180, 0, 0);
-    api_.entity->setVerbose(false);
+    api_.entity->setTargetSpeed("npc1", 5, true);
+    /*
     current_time_ = 0.0;
     target_speed_setted_ = false;
     lanechange_excuted_ = false;
@@ -166,7 +167,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 178, 20.0, 0.0, rpy, twist, accel);
+      api_.simulation->getCurrentTime(), 34579, 20.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
@@ -205,7 +206,7 @@ private:
             <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
             <BoundingBox>
                 <Center x='1.5' y='0.0' z='0.9'/>
-                <Dimensions width='2.1' length='4.5' height='1.8'/>
+                <Dimensions width='2.3' length='5.0' height='1.8'/>
             </BoundingBox>
             <Axles>
                 <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>

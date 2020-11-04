@@ -45,6 +45,17 @@
                 target_speed="{target_speed}"
                 other_entity_status="{other_entity_status}"
                 entity_type_list="{entity_type_list}"/>
+            <StopAtStopLine name="stop_at_stop_line"
+                request="{request}"
+                hdmap_utils="{hdmap_utils}"
+                current_time="{current_time}"
+                step_time="{step_time}"
+                entity_status="{entity_status}"
+                vehicle_parameters="{vehicle_parameters}"
+                updated_status="{updated_status}"
+                target_speed="{target_speed}"
+                other_entity_status="{other_entity_status}"
+                entity_type_list="{entity_type_list}"/>
             <StopAtCrossingEntity name="stop_at_crossing_entity"
                 request="{request}"
                 hdmap_utils="{hdmap_utils}"

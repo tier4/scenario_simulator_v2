@@ -99,7 +99,15 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
+    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(following_lanelets,
+        entity_status.lanelet_id,
+        entity_status.s);
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
+    if (distance_to_stopline) {
+      if (distance_to_stopline.get() <= calculateStopDistance() + 5) {
+        return BT::NodeStatus::FAILURE;
+      }
+    }
     if (distance_to_conflicting_entity) {
       if (distance_to_conflicting_entity.get() <
         (vehicle_parameters->bounding_box.dimensions.length + calculateStopDistance() + 10))

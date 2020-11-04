@@ -23,9 +23,12 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(simulation_api REQUIRED)
 find_package(openscenario_msgs REQUIRED)
+find_package(quaternion_operation REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 include_directories(
   include
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 add_library(openscenario_visualization_component SHARED
@@ -38,6 +41,7 @@ ament_target_dependencies(openscenario_visualization_component
   simulation_api
   visualization_msgs
   openscenario_msgs
+  quaternion_operation
 )
 add_executable(openscenario_visualization_node
   src/openscenario_visualization_node.cpp
@@ -50,6 +54,7 @@ ament_target_dependencies(openscenario_visualization_node
   simulation_api
   visualization_msgs
   openscenario_msgs
+  quaternion_operation
 )
 
 install(TARGETS

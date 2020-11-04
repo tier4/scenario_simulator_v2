@@ -26,6 +26,7 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <rclcpp/rclcpp.hpp>
@@ -84,11 +85,12 @@ private:
     lanelet_marker_pub_ptr_->publish(markers);
   }
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
+  int getNumberOfEgo() const;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path = "")
-  : broadcaster_(node)
+  : broadcaster_(node), base_link_broadcaster_(node)
   {
     clock_ptr_ = node->get_clock();
     geographic_msgs::msg::GeoPoint origin;
@@ -145,7 +147,7 @@ public:
   bool entityStatusSetted(std::string name) const;
   void setTargetSpeed(std::string name, double target_speed, bool continuous);
   void update(double current_time, double step_time);
-  void broadcastTransform(geometry_msgs::msg::PoseStamped pose);
+  void broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform = true);
   bool reachPosition(
     std::string name, geometry_msgs::msg::Pose target_pose,
     double tolerance) const;
@@ -153,11 +155,13 @@ public:
     std::string name, int lanelet_id, double s, double offset,
     double tolerance) const;
   void broadcastEntityTransform();
+  void broadcastBaseLinkTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
   const std::unordered_map<std::string, EntityType> getEntityTypeList() const;
   EntityType getEntityType(std::string name) const;
   const std::string getCurrentAction(std::string name) const;
   tf2_ros::StaticTransformBroadcaster broadcaster_;
+  tf2_ros::TransformBroadcaster base_link_broadcaster_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
   rclcpp::Publisher<openscenario_msgs::msg::EntityStatusArray>::SharedPtr
     entity_status_array_pub_ptr_;

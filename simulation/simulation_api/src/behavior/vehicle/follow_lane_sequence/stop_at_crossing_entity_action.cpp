@@ -63,6 +63,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     auto target_linear_speed =
       calculateTargetSpeed(following_lanelets, entity_status.twist.linear.x);
     if (!target_linear_speed) {
+      setOutput("updated_status", calculateEntityStatusUpdated(0));
       return BT::NodeStatus::SUCCESS;
     }
     if (target_speed) {

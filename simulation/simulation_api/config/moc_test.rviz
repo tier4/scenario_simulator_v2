@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Simulation1/Lanelet1/Namespaces1
         - /Simulation1/Grid1/Line Style1
+        - /RobotModel1/Status1
       Splitter Ratio: 0.5
     Tree Height: 796
   - Class: rviz_common/Selection
@@ -47,6 +48,7 @@ Visualization Manager:
           Namespaces:
             bob: true
             ego: true
+            npc1: true
           Queue Size: 10
           Topic: /entity/marker
           Unreliable: false
@@ -91,6 +93,52 @@ Visualization Manager:
           Value: true
       Enabled: true
       Name: Simulation
+    - Alpha: 0.25
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic: /robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        gnss:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        lidar_front:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        lidar_rear:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        nav_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+      Name: RobotModel
+      TF Prefix: ""
+      Unreliable: false
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -116,26 +164,21 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 10.879762649536133
+      Angle: 0
+      Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
-      Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
-      Focal Shape Fixed Size: false
-      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3653984069824219
+      Scale: 32.0902099609375
       Target Frame: ego
-      Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 3.1303951740264893
+      Value: TopDownOrtho (rviz_default_plugins)
+      X: 0
+      Y: 0
     Saved: ~
 Window Geometry:
   Displays:

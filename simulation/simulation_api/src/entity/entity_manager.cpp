@@ -37,6 +37,17 @@ void EntityManager::setVerbose(bool verbose)
   }
 }
 
+int EntityManager::getNumberOfEgo() const
+{
+  int count = 0;
+  for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    if (it->second.type() == typeid(EgoEntity)) {
+      count = count + 1;
+    }
+  }
+  return count;
+}
+
 void EntityManager::requestAcquirePosition(
   std::string name, int lanelet_id, double s,
   double offset)
@@ -218,32 +229,6 @@ const std::vector<std::string> EntityManager::getEntityNames() const
   return ret;
 }
 
-/*
-const visualization_msgs::msg::MarkerArray EntityManager::generateMarker()
-{
-  visualization_msgs::msg::MarkerArray ret;
-  rclcpp::Time now = clock_ptr_->now();
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (it->second.type() == typeid(VehicleEntity)) {
-      auto marker = boost::any_cast<VehicleEntity &>(it->second).generateMarker(
-        now, color_utils::makeColorMsg("steelblue", 0.9));
-      ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
-    }
-    if (it->second.type() == typeid(EgoEntity)) {
-      auto marker = boost::any_cast<EgoEntity &>(it->second).generateMarker(
-        now, color_utils::makeColorMsg("forestgreen", 0.9));
-      ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
-    }
-    if (it->second.type() == typeid(PedestrianEntity)) {
-      auto marker = boost::any_cast<PedestrianEntity &>(it->second).generateMarker(
-        now, color_utils::makeColorMsg("orange", 0.9));
-      ret.markers.insert(ret.markers.end(), marker.markers.begin(), marker.markers.end());
-    }
-  }
-  return ret;
-}
-*/
-
 bool EntityManager::setEntityStatus(std::string name, EntityStatus status)
 {
   auto it = entities_.find(name);
@@ -349,6 +334,9 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
+  if (getNumberOfEgo() >= 2) {
+    throw SimulationRuntimeError("multi ego simulation does not support yet.");
+  }
   setVerbose(verbose_);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, EntityStatus> all_status;
@@ -416,7 +404,7 @@ void EntityManager::update(double current_time, double step_time)
   // entity_marker_pub_ptr_->publish(generateMarker());
 }
 
-void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose)
+void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform)
 {
   geometry_msgs::msg::TransformStamped transform_stamped;
   transform_stamped.header.stamp = pose.header.stamp;
@@ -426,7 +414,11 @@ void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose)
   transform_stamped.transform.translation.y = pose.pose.position.y;
   transform_stamped.transform.translation.z = pose.pose.position.z;
   transform_stamped.transform.rotation = pose.pose.orientation;
-  broadcaster_.sendTransform(transform_stamped);
+  if (static_transform) {
+    broadcaster_.sendTransform(transform_stamped);
+  } else {
+    base_link_broadcaster_.sendTransform(transform_stamped);
+  }
 }
 
 bool EntityManager::reachPosition(
@@ -465,6 +457,25 @@ bool EntityManager::reachPosition(
   return reachPosition(name, target_pose->pose, tolerance);
 }
 
+void EntityManager::broadcastBaseLinkTransform()
+{
+  std::vector<std::string> names = getEntityNames();
+  for (const auto & name : names) {
+    if (getEntityType(name) == EntityType::EGO) {
+      auto status = getEntityStatus(name);
+      if (status) {
+        auto pose = hdmap_utils_ptr_->toMapPose(status.get());
+        if (pose) {
+          pose->header.stamp = clock_ptr_->now();
+          pose->header.frame_id = "base_link";
+          broadcastTransform(pose.get());
+        }
+      }
+      return;
+    }
+  }
+}
+
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
@@ -481,6 +492,7 @@ void EntityManager::broadcastEntityTransform()
       }
     }
   }
+  broadcastBaseLinkTransform();
 }
 
 const boost::optional<double> EntityManager::getStandStillDuration(std::string name) const
