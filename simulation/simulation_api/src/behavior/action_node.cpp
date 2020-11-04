@@ -74,6 +74,9 @@ std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntit
     return ret;
   }
   const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_id);
+  if(lanelet_ids.size() == 0){
+    return ret;
+  }
   for (const auto & status : other_entity_status) {
     if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
       for (const std::int64_t & lanelet_id : lanelet_ids) {

@@ -55,6 +55,9 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
+  if (getRightOfWayEntities().size() != 0) {
+    return BT::NodeStatus::FAILURE;
+  }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     return BT::NodeStatus::FAILURE;
   }

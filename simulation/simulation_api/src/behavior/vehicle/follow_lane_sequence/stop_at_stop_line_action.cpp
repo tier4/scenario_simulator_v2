@@ -68,6 +68,9 @@ BT::NodeStatus StopAtStopLineAction::tick()
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
+  if (getRightOfWayEntities().size() != 0) {
+    return BT::NodeStatus::FAILURE;
+  }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
     auto dist_to_stopline = getDistanceToStopLine(following_lanelets);
