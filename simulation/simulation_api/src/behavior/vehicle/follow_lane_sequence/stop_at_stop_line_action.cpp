@@ -61,7 +61,6 @@ BT::NodeStatus StopAtStopLineAction::tick()
 {
   getBlackBoardValues();
   if (request != "none" && request != "follow_lane") {
-
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
