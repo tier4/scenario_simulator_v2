@@ -44,6 +44,9 @@ public:
   boost::optional<double> calculateTargetSpeed(
     const std::vector<int> & following_lanelets,
     double current_velocity);
+
+private:
+  bool stopped_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
