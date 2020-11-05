@@ -4,8 +4,8 @@
   <name>junit_exporter</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="ms.kataoka@gmail.com">masaya-autoware-auto</maintainer>
-  <license>TODO: License declaration</license>
+  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

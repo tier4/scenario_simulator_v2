@@ -4,8 +4,8 @@ function(mrt_init_testing)
         return() # mrt_init_testing was already called
     endif()
     if(NOT TARGET tests)
-        if($ENV{ROS_VERSION} EQUAL 2)
-            # for ros2 tests are always built by default, so we add it to the all target
+        if(NOT ROS_VERSION EQUAL 1)
+            # out of ros1 tests are always built by default, so we add it to the all target
             set(all ALL)
         endif()
         add_custom_target(tests ${all})
@@ -44,8 +44,14 @@ function(mrt_init_testing)
         message(STATUS "Outputting coverage to ${coverage_dir}")
     endif()
     if(NOT TARGET init_tests)
-        set(pre_test_cmd "${MRT_CMAKE_MODULES_ROOT_PATH}/scripts/init_coverage.py" ${PROJECT_NAME} ${CMAKE_BINARY_DIR}
-                         ${CMAKE_CURRENT_LIST_DIR} ${MRT_TEST_RESULTS_DIR}/${PROJECT_NAME} ${coverage_dir})
+        set(pre_test_cmd
+            ${PYTHON_EXECUTABLE}
+            ${MRT_CMAKE_MODULES_ROOT_PATH}/scripts/init_coverage.py
+            ${PROJECT_NAME}
+            ${CMAKE_BINARY_DIR}
+            ${CMAKE_CURRENT_LIST_DIR}
+            ${MRT_TEST_RESULTS_DIR}/${PROJECT_NAME}
+            ${coverage_dir})
         add_custom_target(
             init_tests
             COMMAND ${pre_test_cmd}
@@ -54,8 +60,14 @@ function(mrt_init_testing)
         if(MRT_ENABLE_COVERAGE AND MRT_ENABLE_COVERAGE GREATER 1)
             set(show_result "--show")
         endif()
-        set(post_test_cmd "${MRT_CMAKE_MODULES_ROOT_PATH}/scripts/eval_coverage.py" ${CMAKE_SOURCE_DIR}
-                          ${CMAKE_BINARY_DIR} ${MRT_TEST_RESULTS_DIR} ${coverage_dir} ${show_result})
+        set(post_test_cmd
+            ${PYTHON_EXECUTABLE}
+            ${MRT_CMAKE_MODULES_ROOT_PATH}/scripts/eval_coverage.py
+            ${CMAKE_SOURCE_DIR}
+            ${CMAKE_BINARY_DIR}
+            ${MRT_TEST_RESULTS_DIR}
+            ${coverage_dir}
+            ${show_result})
         if(NOT MRT_NO_FAIL_ON_TESTS)
             set(fail_on_test --fail_on_test)
         endif()
@@ -70,7 +82,7 @@ function(mrt_init_testing)
 
         if(CMAKE_VERSION VERSION_GREATER "3.12")
             include(ProcessorCount)
-            processorcount(cores)
+            ProcessorCount(cores)
             set(make_jobs "--parallel ${cores}")
         endif()
 
@@ -128,19 +140,38 @@ endfunction()
 
 function(_mrt_create_executable_gtest target file)
     if(NOT TARGET gtest_main)
+        # gtest_vendor is used on ros2 and should be preferred if available
+        find_package(gtest_vendor QUIET)
         # add googletest as subdir to this project
-        find_file(gtest_sources "gtest.cc" PATH_SUFFIXES "../src/googletest/googletest/src")
+        find_file(
+            gtest_sources "gtest.cc"
+            PATH_SUFFIXES "../src/googletest/googletest/src" "googletest/googletest/src" "src"
+            HINTS ${CMAKE_CURRENT_LIST_DIR} ${MRT_GTEST_DIR} ${gtest_vendor_BASE_DIR})
         if(NOT gtest_sources)
             message(FATAL_ERROR "Failed to find the source files of googletest!")
         endif()
         get_filename_component(gtest_src ${gtest_sources} PATH)
         get_filename_component(gtest_base ${gtest_src} PATH)
+        if(NOT gtest_vendor_BASE_DIR)
+            get_filename_component(gtest_base ${gtest_base} PATH)
+        endif()
         if(NOT EXISTS ${gtest_base}/CMakeLists.txt)
             message(FATAL_ERROR "Failed to find googletest base directory at: ${gtest_base}!")
         endif()
-        add_subdirectory(${gtest_base} ${CMAKE_CURRENT_BINARY_DIR}/gtest EXCLUDE_FROM_ALL)
+        if(NOT ROS_VERSION EQUAL 2)
+            set(exclude EXCLUDE_FROM_ALL) # ament has trouble if library targets are not built in the all target
+        endif()
+        # by default, googletest installs itself too. We have to disable this behaviour.
+        set(INSTALL_GTEST
+            OFF
+            CACHE BOOL "Enable installation of googletest")
+        add_subdirectory(${gtest_base} ${CMAKE_CURRENT_BINARY_DIR}/gtest ${exclude})
         if(NOT TARGET gtest_main)
             message(FATAL_ERROR "Gtest seems not to build gtest_main!")
+        endif()
+        if(gtest_vendor_BASE_DIR)
+            # no, gtest_vendor doesn't set its own include dir *sigh*
+            target_include_directories(gtest_main BEFORE PUBLIC "${gtest_vendor_BASE_DIR}/include")
         endif()
     endif()
     message(STATUS "Creating gtest '${target}' from ${file}")
@@ -159,7 +190,10 @@ function(mrt_add_gtest target file)
     if(MRT_ENABLE_COVERAGE)
         set(coverage_arg COVERAGE_DIR ${MRT_COVERAGE_DIR}/${target})
     endif()
-    _mrt_run_test(${target} ${ARG_WORKING_DIRECTORY} ${result_xml_path} ${coverage_arg} COMMAND ${cmd})
+    _mrt_run_test(
+        ${target} ${ARG_WORKING_DIRECTORY} ${result_xml_path}
+        ${coverage_arg}
+        COMMAND ${cmd})
 endfunction()
 
 function(mrt_add_rostest target launch_file)
@@ -173,22 +207,24 @@ function(mrt_add_rostest target launch_file)
     set(cmd
         "${PYTHON_EXECUTABLE} ${ROSTEST_EXE} --pkgdir=${PROJECT_SOURCE_DIR} --package=${PROJECT_NAME} --results-filename ${test_name}.xml --results-base-dir \"${MRT_TEST_RESULTS_DIR}\" ${CMAKE_CURRENT_LIST_DIR}/${launch_file}"
     )
+    if(MRT_ENABLE_COVERAGE)
+        set(coverage_arg COVERAGE_DIR ${MRT_COVERAGE_DIR}/${target})
+    endif()
 
     get_filename_component(test_name ${launch_file} NAME_WE)
     # rostest appends "rostest-" to the file name. This behaviour is apparently undocumented...
     set(result_xml_path "${MRT_TEST_RESULTS_DIR}/${PROJECT_NAME}/rostest-${test_name}.xml")
-    _mrt_run_test(${target} ${CMAKE_CURRENT_BINARY_DIR} ${result_xml_path} ${ARGN} COMMAND ${cmd})
+    _mrt_run_test(
+        ${target} ${CMAKE_CURRENT_BINARY_DIR} ${result_xml_path}
+        ${coverage_arg}
+        COMMAND ${cmd})
 endfunction()
 
 function(mrt_add_rostest_gtest target launch_file cpp_file)
     mrt_init_testing()
     _mrt_create_executable_gtest(${target} ${cpp_file})
     add_dependencies(tests_${PROJECT_NAME} ${target})
-    if(MRT_ENABLE_COVERAGE)
-        mrt_add_rostest(${target} ${launch_file} COVERAGE_DIR ${MRT_COVERAGE_DIR}/${target})
-    else()
-        mrt_add_rostest(${target} ${launch_file})
-    endif()
+    mrt_add_rostest(${target} ${launch_file})
 endfunction()
 
 function(_mrt_add_nosetests_impl folder)
@@ -224,6 +260,7 @@ function(_mrt_add_nosetests_impl folder)
     string(REPLACE ":" "." output_file_name ${output_file_name})
 
     set(test_name nosetests-${PROJECT_NAME}-${output_file_name})
+    message(STATUS "Adding nosetest ${test_name}")
     # check if coverage reports are being requested
     if(MRT_ENABLE_COVERAGE)
         # we dont want to enable coverage when there are only python rostests around (ie executable python files)
@@ -251,8 +288,11 @@ function(_mrt_add_nosetests_impl folder)
     set(cmd
         "${NOSETESTS} -P --process-timeout=${_nose_TIMEOUT} ${tests} --with-xunit --xunit-file=\"${result_xml_path}\" ${covarg}"
     )
-    _mrt_run_test(${test_name} ${CMAKE_CURRENT_LIST_DIR} ${result_xml_path} ${coverage_arg}
-                  COMMAND ${cmd} ${cover_dir_arg} REDIRECT_STDERR)
+    _mrt_run_test(
+        ${test_name} ${CMAKE_CURRENT_LIST_DIR} ${result_xml_path}
+        ${coverage_arg}
+        COMMAND ${cmd} ${cover_dir_arg}
+        REDIRECT_STDERR)
     if(ARG_DEPENDS)
         add_dependencies(tests_{PROJECT_NAME} ${ARG_DEPENDS})
     endif()

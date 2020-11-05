@@ -3,7 +3,7 @@
 Maintainer status: maintained
 - Maintainer: Johannes Beck <johannes.beck@kit.edu>, Fabian Poggenhans <fabian.poggenhans@kit.edu>
 - Author: Johannes Beck <johannes.beck@kit.edu>, Claudio Bandera claudio.bandera@kit.edu, Fabian Poggenhans <fabian.poggenhans@kit.edu>
-- License: GPL
+- License: BSD, some files MIT
 - Bug / feature tracker: https://gitlab.mrt.uni-karlsruhe.de/MRT/mrt_cmake_modules/issues
 - Source: git https://gitlab.mrt.uni-karlsruhe.de/MRT/mrt_cmake_modules.git (branch: master)
 
@@ -26,6 +26,7 @@ On the other hand, you get a lot of things for free:
 - Support for [sanitizers](#sanitizing-your-code)
 - Support for [running clang-tidy](#using-clang-tidy)
 - Automated install of your scripts/launchfiles/executables/libraries... to the correct location
+- experimental support for **ROS2** and Conan builds
 
 *) Actually MRT stands for *Institut für Mess- und Regelungstechnik*, the institute that develops this package.
 
@@ -60,18 +61,19 @@ Here is the structure of a package called `example_package`. It works out of the
 │   └── a_message.msg                 # Messages files that will be automatically generated (only available for --ros)
 ├── package.xml                       # You should know that. Should contain at least pybind11-dev for the bindings
 ├── python_api                        # Folder for python bindings. Every file here becoms a module
-│   ├── python_bindings.cpp           # Will be available as "import example_package.python_bindings
+│   ├── python_bindings.cpp           # Will be available as "import example_package.python_bindings"
 │   └── more_python_bindings.cpp      # Refer to the pybind11 doc for the content of this file
 ├── README.md                         # The readme
 ├── src                               # Every cpp file in this filder will become part of libexample_package.so
 │   ├── examplefile.cpp
 │   ├── onemorefile.cpp
-│   └── example_package               # Python modules have to go to src/<package_name>.
+│   └── example_package               # Python modules have to go to src/<package_name>
 │       ├── pythonmodule.py           # Will be available as "import example_package.pythonmodule"
 │       └── __init__.py
 └── test                              # Contains the unittests. Will be executed when running the test or run_tests target
     ├── test_example_package.cpp      # Every file here will be a separate unittest executable
-    └── test_pyapi.py                 # Every py file here will be executed using nosetest. Should not be executable!
+    └── test_pyapi.py                 # Every py file that matches the testMatch regular expression will be executed
+                                      # using nosetest. Executables are ignored. See https://nose.readthedocs.io/
 ```
 
 Note that everything in this structure is optional and can be left away if you don't need it (except for the CMakeLists.txt of course).
@@ -93,7 +95,7 @@ It works out of the box with a *CMakeLists.txt* created with `generate_cmakelist
 │   └── params                            # Contains parameter files that will be installed
 │       ├── some_parameters.yaml
 │       └── some_python_parameters.yaml
-├── nodelet_plugins.xml                   # Should reference the nodelet library at lib/libnodename_nodelet
+├── nodelet_plugins.xml                   # Should reference the nodelet library at lib/lib<package_name>-<nodename>-nodelet
 ├── package.xml                           # The manifest. It should reference the nodelet_plugins.xml
 ├── README.md
 ├── scripts                               # Executable scripts that will be installed. These can be python nodes as well

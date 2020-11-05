@@ -20,6 +20,7 @@
   <depend>lanelet2_projection</depend>
   <depend>lanelet2_routing</depend>
   <depend>lifecycle_msgs</depend>
+  <depend>openscenario_msgs</depend>
   <depend>pugixml-dev</depend>
   <depend>quaternion_operation</depend>
   <depend>rclcpp_components</depend>
