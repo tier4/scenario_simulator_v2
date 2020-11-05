@@ -20,6 +20,12 @@
 #include <memory>
 #include <string>
 
+#ifndef NDEBUG
+#define VERBOSE(...) std::cout << __VA_ARGS__ << std::endl
+#else
+#define VERBOSE(...)
+#endif
+
 namespace open_scenario_interpreter
 {
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
@@ -32,43 +38,67 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
 }
 
+#define GET_PARAMETER(NAME) \
+  do { \
+    static auto previous { \
+      NAME \
+    }; \
+    do { \
+      get_parameter(#NAME, NAME); \
+    } while (previous == NAME); \
+    previous = NAME; \
+  } while (false)
+
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 {
+  VERBOSE(">>> Configure");
+
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   get_parameter("expect", expect);
-  get_parameter("log_path", log_path);
-  get_parameter("map_path", map_path);
-  get_parameter("osc_path", osc_path);
-  get_parameter("step_time_ms", step_time_ms);
+  VERBOSE("  expect: " << expect);
 
+  get_parameter("log_path", log_path);
   log_path = log_path + "/result.junit.xml";
+  VERBOSE("  log_path: " << log_path);
+
+  get_parameter("map_path", map_path);
+  VERBOSE("  map_path: " << map_path);
+
+  GET_PARAMETER(osc_path);
+  VERBOSE("  osc_path: " << osc_path);
+
+  get_parameter("step_time_ms", step_time_ms);
+  VERBOSE("  step_time_ms: " << step_time_ms);
 
   try {
-    #ifndef NDEBUG
-    RCLCPP_INFO(get_logger(), "Loading scenario \"%s\"", osc_path.c_str());
-    #endif
+    VERBOSE("  Loading scenario " << osc_path);
     script.rebind<OpenScenario>(osc_path);
   } catch (const open_scenario_interpreter::SyntaxError & error) {
-    #ifndef NDEBUG
-    RCLCPP_ERROR(get_logger(), "\x1b[1;31m%s.\x1b[0m", error.what());
-    #endif
+    std::cerr << "\x1b[1;31m" << error.what() << std::endl;
     return Interpreter::Result::FAILURE;
   }
 
-  static constexpr auto real_time_factor = 3.0;
+  static constexpr auto real_time_factor = 10.0;
+  VERBOSE("  real_time_factor: " << real_time_factor);
 
   connect(
     shared_from_this(),
     script.as<OpenScenario>().scope.logic_file.string());
+  VERBOSE("  connection established");
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
+  VERBOSE("  simulator initialized");
+
+  VERBOSE("<<< Configure");
 
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
+  VERBOSE(">>> Activate");
+
   timer = create_wall_timer(
     std::chrono::milliseconds(step_time_ms),
     [this]()
@@ -77,14 +107,13 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
       {
         if (script) {
           if (!script.as<OpenScenario>().complete()) {
+            VERBOSE(">>> Evaluate");
             const auto result {
               script.as<OpenScenario>().evaluate()
             };
+            VERBOSE("<<< Evaluate");
 
-            #ifndef NDEBUG
-            RCLCPP_INFO(
-              get_logger(), "[Storyboard: %s]", boost::lexical_cast<std::string>(result).c_str());
-            #endif
+            VERBOSE("[Storyboard: " << boost::lexical_cast<std::string>(result) << "]");
 
             #ifndef NDEBUG
             RCLCPP_INFO(
@@ -107,31 +136,40 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
       });
     });
 
+  VERBOSE("<<< Activate");
+
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 {
+  VERBOSE(">>> Deactivate");
   timer.reset();
+  VERBOSE("<<< Deactivate");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
-  timer.reset();
+  VERBOSE(">>> Cleanup");
   connection.~API();
+  VERBOSE("<<< Cleanup");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
 {
+  VERBOSE(">>> Shutdown");
   timer.reset();
+  VERBOSE("<<< Shutdown");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_error(const rclcpp_lifecycle::State &)
 {
+  VERBOSE(">>> Error");
   timer.reset();
+  VERBOSE("<<< Error");
   return Interpreter::Result::SUCCESS;
 }
 }  // namespace open_scenario_interpreter
