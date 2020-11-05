@@ -33,6 +33,31 @@ from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 
 
+def tag_of(x):
+    return x[0]
+
+
+def value_of(x):
+    return x[1]
+
+
+def read_as_yaml(path):
+    if os.path.exists(path):
+        with open(path, "r") as file:
+            return xmlplain.obj_from_yaml(file)
+    else:
+        Logger.print_error("No such file or directory: " + path)
+
+
+def find_modifiers(directory):
+    for each in directory.items():
+        if tag_of(each) == "ScenarioModifiers" and value_of(each) is not None:
+            for each in value_of(each).items():
+                if tag_of(each) == "ScenarioModifier":
+                    return value_of(each)
+    return None
+
+
 class ScenarioConverter:
 
     OPEN_SCENARIO_TAG = "OpenSCENARIO"
@@ -41,35 +66,31 @@ class ScenarioConverter:
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
         Logger.print_separator("Scenario Preprocess")
-        xosc_dict = None
-        root_data = ScenarioConverter.convert_yaml2dict(yaml_path)
-        length, modifier = ScenarioConverter.check_modifier_dict(root_data)
-        if length == 1:
-            xosc_dict = root_data
-        else:
-            xosc_dict = dict(list(root_data.items())[1:])
-        xosc_dict = ScenarioConverter.extract_open_scenario(xosc_dict)
+        root_data = read_as_yaml(yaml_path)
+        modifiers = find_modifiers(root_data)
+        root_data.pop("ScenarioModifiers", None)
+        xosc_dict = ScenarioConverter.extract_open_scenario(root_data)
         xosc_text = ScenarioConverter.convert_dict2xosc(xosc_dict, xosc_dir)
         Manager.mkdir(pathlib.Path(log_path).parent)
         Manager.mkdir(xosc_dir)
         ScenarioConverter.distribute(
-            modifier, xosc_text, xosc_dir, yaml_path, log_path)
+            modifiers, xosc_text, xosc_dir, yaml_path, log_path)
         print("")
         Logger.print_process("<= " + yaml_path)
         Logger.print_process("=> " + xosc_dir + "/")
         Logger.print_process("log: " + os.path.abspath(log_path))
 
-    @staticmethod
-    def check_modifier_dict(root_data):
-        scenario_modifiers = None
-        scenario_modifier = None
-        if "ScenarioModifiers" in root_data:
-            scenario_modifiers = dict(root_data["ScenarioModifiers"])
-            if "ScenarioModifier" in scenario_modifiers:
-                scenario_modifier = scenario_modifiers["ScenarioModifier"]
-        if scenario_modifier is None:
-            Logger.print_info("No ScenarioModifiers specified.")
-        return len(root_data), scenario_modifier
+    # @staticmethod
+    # def check_modifier_dict(root_data):
+    #     scenario_modifiers = None
+    #     scenario_modifier = None
+    #     if "ScenarioModifiers" in root_data:
+    #         scenario_modifiers = dict(root_data["ScenarioModifiers"])
+    #         if "ScenarioModifier" in scenario_modifiers:
+    #             scenario_modifier = scenario_modifiers["ScenarioModifier"]
+    #     if scenario_modifier is None:
+    #         Logger.print_info("No ScenarioModifiers specified.")
+    #     return len(root_data), scenario_modifier
 
     @staticmethod
     def extract_open_scenario(open_scenario):
@@ -112,13 +133,6 @@ class ScenarioConverter:
         return keyword, o_dict
 
     @staticmethod
-    def convert_yaml2dict(yaml_scenario_path):
-        Manager.check_existence(yaml_scenario_path)
-        with open(yaml_scenario_path, "r") as file:
-            root = xmlplain.obj_from_yaml(file)
-        return root
-
-    @staticmethod
     def convert_dict2xosc(xosc_dict, xosc_path):
         xosc_text = xmltodict.unparse(xosc_dict,
                                       encoding='utf-8',
@@ -129,8 +143,7 @@ class ScenarioConverter:
         return xosc_text
 
     @staticmethod
-    def distribute(
-            modifier_dict, xosc_text, xosc_dir, yaml_path, log_path):
+    def distribute(modifier_dict, xosc_text, xosc_dir, yaml_path, log_path):
         bindings = ParameterSweeper.make_modifier_bindings(modifier_dict)
         xosc_name = pathlib.Path(yaml_path).stem
         id = 1

@@ -21,9 +21,9 @@ from ament_index_python.packages import get_package_share_directory
 
 
 def resolve_ros_package(sentence):
-    match_find_pkg_share = re.match('\$\(find-pkg-share\s+([^\)]+)\).*', sentence)
+    match_find_pkg_share = re.match("\\$\\(find-pkg-share\\s+([^\\)]+)\\).*", sentence)
     if match_find_pkg_share is not None:
-        sentence = re.sub('\$\(find-pkg-share\s+([^\)]+)\)',
+        sentence = re.sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)",
                           get_package_share_directory(match_find_pkg_share.group(1)),
                           sentence)
     return sentence

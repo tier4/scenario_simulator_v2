@@ -1,0 +1,63 @@
+ScenarioModifiers:
+  []
+  # ScenarioModifier:
+
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 0
+    revMinor: 0
+    date: "2020-03-20T12:00:00"
+    author: yamacir-kit
+    description: Minimal scenario
+  ParameterDeclarations:
+    []
+    # ParameterDeclaration:
+  # CatalogLocations:
+  #   []
+  RoadNetwork:
+    LogicFile:
+      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
+  Entities:
+    []
+  Storyboard:
+    Init:
+      Actions:
+    Story:
+      - name: story
+        Act:
+          - name: act
+            ManeuverGroup:
+              - name: maneuver-group
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ""
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: overwrite
+                        maximumExecutionCount: 100
+                        Action:
+                          - name: ""
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: value
+                                ModifyAction:
+                                  Rule:
+                                    AddValue:
+                                      value: 0
+                        StartTrigger:
+            StartTrigger:
+    StopTrigger:
+      ConditionGroup:
+        - Condition:
+          - name: condition
+            delay: 0
+            conditionEdge: none
+            ByValueCondition:
+              ParameterCondition:
+                parameterRef: value
+                rule: greaterThan
+                value: 0
