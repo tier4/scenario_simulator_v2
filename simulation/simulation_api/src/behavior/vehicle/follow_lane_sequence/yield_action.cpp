@@ -32,15 +32,13 @@ YieldAction::YieldAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-boost::optional<double> YieldAction::calculateTargetSpeed()
+boost::optional<double> YieldAction::calculateTargetSpeed(
+  std::vector<std::int64_t> following_lanelets)
 {
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     return boost::none;
   }
-  double l = hdmap_utils->getLaneletLength(entity_status.lanelet_id);
-  auto distance_to_stop_target = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-      entity_status.s,
-      entity_status.lanelet_id, l);
+  auto distance_to_stop_target = getYieldStopDistance(following_lanelets);
   if (!distance_to_stop_target) {
     return boost::none;
   }
@@ -62,7 +60,6 @@ BT::NodeStatus YieldAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
-
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     return BT::NodeStatus::FAILURE;
   }
@@ -75,7 +72,7 @@ BT::NodeStatus YieldAction::tick()
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     return BT::NodeStatus::SUCCESS;
   }
-  target_speed = calculateTargetSpeed();
+  target_speed = calculateTargetSpeed(following_lanelets);
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }

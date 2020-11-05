@@ -41,7 +41,7 @@ public:
     }
     return ports;
   }
-  boost::optional<double> calculateTargetSpeed();
+  boost::optional<double> calculateTargetSpeed(std::vector<std::int64_t> following_lanelets);
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

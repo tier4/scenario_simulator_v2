@@ -53,6 +53,8 @@ public:
   std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities();
   std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities(
     const std::vector<std::int64_t> & following_lanelets);
+  boost::optional<double> getYieldStopDistance(
+    const std::vector<std::int64_t> & following_lanelets);
 
   /// throws if the derived class return RUNNING.
   BT::NodeStatus executeTick() override;

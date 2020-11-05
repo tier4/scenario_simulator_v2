@@ -72,9 +72,10 @@ private:
   {
     if (api_.entity->reachPosition("ego", 34615, 10, 0, 5)) {
       api_.entity->requestAcquirePosition("ego", 35026, 0, 0);
+      api_.entity->setTargetSpeed("npc2", 13, true);
     }
     if (api_.entity->reachPosition("ego", 34579, 0, 0, 5)) {
-      api_.entity->setTargetSpeed("npc2", 6, true);
+      api_.entity->setTargetSpeed("npc2", 3, true);
     }
     /*
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");
@@ -201,7 +202,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 34606, 15.0, 0.0, rpy, twist, accel);
+      api_.simulation->getCurrentTime(), 34606, 20.0, 0.0, rpy, twist, accel);
     return ret;
   }
 

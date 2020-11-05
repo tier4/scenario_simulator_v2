@@ -67,6 +67,35 @@ void ActionNode::getBlackBoardValues()
   }
 }
 
+boost::optional<double> ActionNode::getYieldStopDistance(
+  const std::vector<std::int64_t> & following_lanelets)
+{
+  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
+    return boost::none;
+  }
+  std::set<double> dists;
+  const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
+  for (const auto & status : other_entity_status) {
+    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+      for (const auto & following_lanelet : following_lanelets) {
+        for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
+          if (lanelet_id == status.second.lanelet_id) {
+            auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
+                entity_status.s, following_lanelet, 0);
+            if (distance) {
+              dists.insert(distance.get());
+            }
+          }
+        }
+      }
+    }
+  }
+  if (dists.size() == 0) {
+    return boost::none;
+  }
+  return *dists.begin();
+}
+
 std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntities(
   const std::vector<std::int64_t> & following_lanelets)
 {
@@ -78,8 +107,7 @@ std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntit
   for (const auto & status : other_entity_status) {
     if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
       for (const auto & following_lanelet : following_lanelets) {
-        for(const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet))
-        {
+        for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
           if (lanelet_id == status.second.lanelet_id) {
             ret.emplace_back(status.second);
           }

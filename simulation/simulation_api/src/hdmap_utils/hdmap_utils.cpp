@@ -835,7 +835,8 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
   throw HdMapError("findNearestIndexPair(): No nearest point found.");
 }
 
-const std::unordered_map<std::int64_t, std::vector<std::int64_t>> HdMapUtils::getRightOfWayLaneletIds(
+const std::unordered_map<std::int64_t,
+  std::vector<std::int64_t>> HdMapUtils::getRightOfWayLaneletIds(
   std::vector<std::int64_t> lanelet_ids) const
 {
   std::unordered_map<std::int64_t, std::vector<std::int64_t>> ret;
