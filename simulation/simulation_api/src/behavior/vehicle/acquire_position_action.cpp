@@ -64,9 +64,9 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
 
   route_ = hdmap_utils->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
+  std::vector<int> following_lanelets;
 
   if (!target_speed) {
-    std::vector<int> following_lanelets;
     bool is_finded = false;
     for (auto itr = route_->begin(); itr != route_->end(); itr++) {
       if (is_finded) {
@@ -84,69 +84,35 @@ BT::NodeStatus AcquirePositionAction::tick()
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
   }
-
-  geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.accel;
-  double target_accel = (target_speed.get() - entity_status.twist.linear.x) / step_time;
-  if (entity_status.twist.linear.x > target_speed.get()) {
-    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
-  } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+  auto distance_to_front_entity = getDistanceToFrontEntity();
+  if (distance_to_front_entity) {
+    if (distance_to_front_entity.get() <=
+      calculateStopDistance() +
+      vehicle_parameters->bounding_box.dimensions.length + 5)
+    {
+      auto front_entity_status = getFrontEntityStatus();
+      if (front_entity_status) {
+        target_speed = front_entity_status->twist.linear.x;
+      }
+    }
   }
-
-  accel_new.linear.x = target_accel;
-  geometry_msgs::msg::Twist twist_new;
-  twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.twist.linear.x + accel_new.linear.x * step_time,
-    0, vehicle_parameters->performance.max_speed);
-  twist_new.linear.y = 0.0;
-  twist_new.linear.z = 0.0;
-  twist_new.angular.x = 0.0;
-  twist_new.angular.y = 0.0;
-  twist_new.angular.z = 0.0;
-  double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
-    step_time;
-
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
+  if (distance_to_conflicting_entity) {
+    if (distance_to_conflicting_entity.get() <=
+      calculateStopDistance() +
+      vehicle_parameters->bounding_box.dimensions.length + 5)
+    {
+      target_speed = 0;
+    }
+  }
+  auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_.get());
+  setOutput("updated_status", entity_status_updated);
   if (target_status_->lanelet_id == entity_status.lanelet_id) {
     if (target_status_->s < entity_status.s) {
-      geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
-      simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-        entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
-      setOutput("updated_status", entity_status_updated);
       route_ = boost::none;
       target_status_ = boost::none;
       return BT::NodeStatus::SUCCESS;
     }
-  }
-
-  if (new_s > hdmap_utils->getLaneletLength(entity_status.lanelet_id)) {
-    new_s = new_s - hdmap_utils->getLaneletLength(entity_status.lanelet_id);
-    boost::optional<int> next_lanelet_id;
-    bool is_finded = false;
-    for (size_t i = 0; i != route_.get().size(); i++) {
-      if (route_.get()[i] == entity_status.lanelet_id) {
-        is_finded = true;
-        continue;
-      }
-      if (is_finded && !next_lanelet_id) {
-        next_lanelet_id = route_.get()[i];
-      }
-    }
-    if (is_finded && next_lanelet_id) {
-      geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
-      simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-        next_lanelet_id.get(), new_s, entity_status.offset, rpy, twist_new, accel_new);
-      setOutput("updated_status", entity_status_updated);
-      return BT::NodeStatus::RUNNING;
-    } else {
-      throw BehaviorTreeRuntimeError("failed to find next lanelet id");
-    }
-  } else {
-    geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
-    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-      entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
-    setOutput("updated_status", entity_status_updated);
-    return BT::NodeStatus::RUNNING;
   }
   return BT::NodeStatus::RUNNING;
 }

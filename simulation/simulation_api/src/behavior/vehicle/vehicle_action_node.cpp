@@ -36,6 +36,13 @@ void VehicleActionNode::getBlackBoardValues()
   }
 }
 
+boost::optional<double> VehicleActionNode::getDistanceToStopLine(
+  const std::vector<int> & following_lanelets)
+{
+  return hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id,
+           entity_status.s);
+}
+
 boost::optional<double> VehicleActionNode::getDistanceToFrontEntity()
 {
   if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
@@ -192,6 +199,68 @@ double VehicleActionNode::calculateStopDistance() const
 }
 
 simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
+  double target_speed,
+  const std::vector<int> & following_lanelets) const
+{
+  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
+    throw BehaviorTreeRuntimeError(
+            "entity status must be lane when we call calculateEntityStatusUpdated");
+  }
+  geometry_msgs::msg::Accel accel_new;
+  accel_new = entity_status.accel;
+  double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
+  if (entity_status.twist.linear.x > target_speed) {
+    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+  } else {
+    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+  }
+  accel_new.linear.x = target_accel;
+  geometry_msgs::msg::Twist twist_new;
+  twist_new.linear.x = boost::algorithm::clamp(
+    entity_status.twist.linear.x + accel_new.linear.x * step_time,
+    0, vehicle_parameters->performance.max_speed);
+  twist_new.linear.y = 0.0;
+  twist_new.linear.z = 0.0;
+  twist_new.angular.x = 0.0;
+  twist_new.angular.y = 0.0;
+  twist_new.angular.z = 0.0;
+  int new_lanelet_id = entity_status.lanelet_id;
+  double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
+    step_time;
+
+  bool calculation_success = false;
+  for (size_t i = 0; i < following_lanelets.size(); i++) {
+    if (following_lanelets[i] == entity_status.lanelet_id) {
+      double length = hdmap_utils->getLaneletLength(entity_status.lanelet_id);
+      calculation_success = true;
+      if (length < new_s) {
+        if (i != (following_lanelets.size() - 1)) {
+          new_s = new_s - length;
+          new_lanelet_id = following_lanelets[i + 1];
+          break;
+        } else {
+          new_s = new_s - length;
+          auto next_ids = hdmap_utils->getNextLaneletIds(following_lanelets[i]);
+          if (next_ids.size() == 0) {
+            throw BehaviorTreeRuntimeError(
+                    "failed to get next lane in calculateEntityStatusUpdated function");
+          }
+          new_lanelet_id = next_ids[0];
+          break;
+        }
+      }
+    }
+  }
+  if (!calculation_success) {
+    throw BehaviorTreeRuntimeError(
+            "failed to calculate next status calculateEntityStatusUpdated function");
+  }
+  simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+    new_lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
+  return entity_status_updated;
+}
+
+simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed) const
 {
   geometry_msgs::msg::Accel accel_new;
@@ -214,9 +283,8 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
 
   double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
     step_time;
-  geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
   simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-    entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
+    entity_status.lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
   return entity_status_updated;
 }
 }  // namespace entity_behavior

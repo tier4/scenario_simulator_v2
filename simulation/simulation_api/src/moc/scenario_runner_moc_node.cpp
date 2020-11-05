@@ -68,8 +68,8 @@ public:
 private:
   void update()
   {
-    if (api_.entity->reachPosition("ego", 34462, 10, 0, 5)) {
-      api_.entity->requestLaneChange("ego", simulation_api::entity::Direction::LEFT);
+    if (api_.entity->reachPosition("ego", 34615, 0, 0, 5)) {
+      api_.entity->requestAcquirePosition("ego", 120545, 0, 0);
     }
     /*
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");

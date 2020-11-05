@@ -85,26 +85,23 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    for (const auto & each : other_entity_status) {
-      if (each.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-        auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-            entity_status.s,
-            each.second.lanelet_id,
-            each.second.s);
-        if (distance) {
-          if (distance.get() < 40) {
-            return BT::NodeStatus::FAILURE;
-          }
-        }
+    auto distance_to_front_entity = getDistanceToFrontEntity();
+    if (distance_to_front_entity) {
+      if (distance_to_front_entity.get() <=
+        calculateStopDistance() +
+        vehicle_parameters->bounding_box.dimensions.length + 5)
+      {
+        return BT::NodeStatus::FAILURE;
       }
     }
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
-    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(following_lanelets,
-        entity_status.lanelet_id,
-        entity_status.s);
+    auto distance_to_stopline = getDistanceToStopLine(following_lanelets);
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
     if (distance_to_stopline) {
-      if (distance_to_stopline.get() <= calculateStopDistance() + 5) {
+      if (distance_to_stopline.get() <=
+        calculateStopDistance() +
+        vehicle_parameters->bounding_box.dimensions.length * 0.5 + 5)
+      {
         return BT::NodeStatus::FAILURE;
       }
     }

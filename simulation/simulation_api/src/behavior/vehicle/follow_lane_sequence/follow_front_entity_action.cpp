@@ -61,10 +61,25 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     if (!front_entity_status) {
       return BT::NodeStatus::FAILURE;
     }
-    auto entity_status_updated = calculateEntityStatusUpdated(
-      front_entity_status.get().twist.linear.x);
-    setOutput("updated_status", entity_status_updated);
-    return BT::NodeStatus::RUNNING;
+    if (distance_to_front_entity.get() >=
+      (calculateStopDistance() +
+      vehicle_parameters->bounding_box.dimensions.length + 5))
+    {
+      auto entity_status_updated = calculateEntityStatusUpdated(
+        front_entity_status.get().twist.linear.x + 2);
+      setOutput("updated_status", entity_status_updated);
+      return BT::NodeStatus::RUNNING;
+    } else if (distance_to_front_entity.get() <= calculateStopDistance()) {
+      auto entity_status_updated = calculateEntityStatusUpdated(
+        front_entity_status.get().twist.linear.x - 2);
+      setOutput("updated_status", entity_status_updated);
+      return BT::NodeStatus::RUNNING;
+    } else {
+      auto entity_status_updated = calculateEntityStatusUpdated(
+        front_entity_status.get().twist.linear.x);
+      setOutput("updated_status", entity_status_updated);
+      return BT::NodeStatus::RUNNING;
+    }
   }
   return BT::NodeStatus::FAILURE;
 }
