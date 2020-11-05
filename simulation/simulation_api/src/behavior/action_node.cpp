@@ -152,7 +152,7 @@ boost::optional<simulation_api::entity::EntityStatus> ActionNode::getFrontEntity
             front_entity_distance = distance.get();
             front_entity_name = each.first;
           } else {
-            if (front_entity_distance.get() < distance.get()) {
+            if (front_entity_distance.get() > distance.get()) {
               front_entity_speed = each.second.twist.linear.x;
               front_entity_distance = distance.get();
               front_entity_name = each.first;
