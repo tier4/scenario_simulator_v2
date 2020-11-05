@@ -67,6 +67,29 @@ void ActionNode::getBlackBoardValues()
   }
 }
 
+std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntities(
+  const std::vector<std::int64_t> & following_lanelets)
+{
+  std::vector<simulation_api::entity::EntityStatus> ret;
+  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
+    return ret;
+  }
+  const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
+  for (const auto & status : other_entity_status) {
+    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+      for (const auto & following_lanelet : following_lanelets) {
+        for(const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet))
+        {
+          if (lanelet_id == status.second.lanelet_id) {
+            ret.emplace_back(status.second);
+          }
+        }
+      }
+    }
+  }
+  return ret;
+}
+
 std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntities()
 {
   std::vector<simulation_api::entity::EntityStatus> ret;
@@ -74,7 +97,7 @@ std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntit
     return ret;
   }
   const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_id);
-  if(lanelet_ids.size() == 0){
+  if (lanelet_ids.size() == 0) {
     return ret;
   }
   for (const auto & status : other_entity_status) {

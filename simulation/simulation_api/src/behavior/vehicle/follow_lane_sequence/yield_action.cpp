@@ -67,7 +67,7 @@ BT::NodeStatus YieldAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
-  const auto right_of_way_entities = getRightOfWayEntities();
+  const auto right_of_way_entities = getRightOfWayEntities(following_lanelets);
   if (right_of_way_entities.size() == 0) {
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);

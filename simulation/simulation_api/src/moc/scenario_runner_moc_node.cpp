@@ -71,7 +71,7 @@ private:
   void update()
   {
     if (api_.entity->reachPosition("ego", 34615, 10, 0, 5)) {
-      api_.entity->requestAcquirePosition("ego", 35026, 0,0);
+      api_.entity->requestAcquirePosition("ego", 35026, 0, 0);
     }
     if (api_.entity->reachPosition("ego", 34579, 0, 0, 5)) {
       api_.entity->setTargetSpeed("npc2", 6, true);

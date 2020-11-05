@@ -115,7 +115,7 @@ public:
     int crossing_lanelet_id);
   const visualization_msgs::msg::MarkerArray generateMarker() const;
   const std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
-  const std::unordered_map<int, std::vector<std::int64_t>> getRightOfWayLaneletIds(
+  const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     std::vector<std::int64_t> lanelet_ids) const;
 
 private:
