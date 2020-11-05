@@ -46,7 +46,7 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
     return boost::none;
   }
   double rest_distance = distance_to_stop_target.get() -
-    (vehicle_parameters->bounding_box.dimensions.length + 10);
+    (vehicle_parameters->bounding_box.dimensions.length);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
       return std::sqrt(2 * 5 * rest_distance);
@@ -70,16 +70,20 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
+    auto dist_to_stopline = getDistanceToStopLine(following_lanelets);
     if (std::fabs(entity_status.twist.linear.x) < 0.001) {
-      stopped_ = true;
+      if (dist_to_stopline) {
+        if (dist_to_stopline.get() <= vehicle_parameters->bounding_box.dimensions.length + 5) {
+          stopped_ = true;
+        }
+      }
     }
     if (stopped_) {
       if (!target_speed) {
         target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
       }
-      if (hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id,
-        entity_status.s))
-      {
+      if (!dist_to_stopline) {
+        stopped_ = false;
         setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
         return BT::NodeStatus::SUCCESS;
       }

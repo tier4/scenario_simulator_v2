@@ -99,7 +99,9 @@ void BehaviorTree::callback(
     toStr(prev_status, true).c_str(),
     toStr(status, true).c_str() );
   std::cout << std::endl;
-  current_action_ = node.name();
+  if (status != BT::NodeStatus::SUCCESS) {
+    current_action_ = node.name();
+  }
   if (status == BT::NodeStatus::SUCCESS || status == BT::NodeStatus::FAILURE) {
     if (request_ == current_action_) {
       setRequest("none");
