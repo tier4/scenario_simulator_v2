@@ -19,6 +19,7 @@
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <open_scenario_interpreter/syntax/open_scenario.hpp>
+#include <open_scenario_interpreter/utility/verbose.hpp>
 #include <open_scenario_interpreter/utility/visibility.h>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -57,32 +58,34 @@ class Interpreter
     const std::string & type,
     const std::string & what = "")
   {
+    VERBOSE("  appending current test case result");
     exporter.addTestCase(
       script.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
       "scenario_testing", 0, result, type, what);
 
-    #ifndef NDEBUG
     switch (result) {
       case junit_exporter::TestResult::ERROR:
-        RCLCPP_ERROR(get_logger(),
-          "\x1b[1;31mYield %s (%s): %s\x1b[0m", type.c_str(), what.c_str());
+        VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")");
         break;
 
       case junit_exporter::TestResult::FAILURE:
-        RCLCPP_ERROR(get_logger(),
-          "\x1b[1;31mYield %s (%s): %s\x1b[0m", type.c_str(), what.c_str());
+        VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")");
         break;
 
       case junit_exporter::TestResult::SUCCESS:
-        RCLCPP_INFO(get_logger(), "\x1b[32mYield the %s\x1b[0m", type.c_str());
+        VERBOSE("\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")");
         break;
     }
-    std::cout << std::flush;
-    #endif
+    VERBOSE("");
 
     exporter.write(log_path);
 
     script.reset();
+
+    while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
+      VERBOSE("  waiting for change current state " << get_current_state().id() << " to active");
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 
     deactivate();
   }
@@ -113,18 +116,21 @@ class Interpreter
         break;
     }
   } catch (const open_scenario_interpreter::ImplementationFault & error) {
+    VERBOSE("  caught implementation-fault");
     if (expect == "error") {
       report(SUCCESS, "intended-error");
     } else {
       report(ERROR, "implementation-fault", error.what());
     }
   } catch (const std::exception & error) {
+    VERBOSE(" caught standard exception");
     if (expect == "error") {
       report(SUCCESS, "intended-error");
     } else {
       report(ERROR, "unexpected-standard-exception", error.what());
     }
   } catch (...) {
+    VERBOSE(" caught unknown exception");
     report(ERROR, "unexpected-unknown-exception");
   }
 

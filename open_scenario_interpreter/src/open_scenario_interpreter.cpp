@@ -20,12 +20,6 @@
 #include <memory>
 #include <string>
 
-#ifndef NDEBUG
-#define VERBOSE(...) std::cout << __VA_ARGS__ << std::endl
-#else
-#define VERBOSE(...)
-#endif
-
 namespace open_scenario_interpreter
 {
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
@@ -37,17 +31,6 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
   declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
 }
-
-#define GET_PARAMETER(NAME) \
-  do { \
-    static auto previous { \
-      NAME \
-    }; \
-    do { \
-      get_parameter(#NAME, NAME); \
-    } while (previous == NAME); \
-    previous = NAME; \
-  } while (false)
 
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 {
@@ -65,7 +48,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("map_path", map_path);
   VERBOSE("  map_path: " << map_path);
 
-  GET_PARAMETER(osc_path);
+  get_parameter("osc_path", osc_path);
   VERBOSE("  osc_path: " << osc_path);
 
   get_parameter("step_time_ms", step_time_ms);
@@ -112,9 +95,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
               script.as<OpenScenario>().evaluate()
             };
             VERBOSE("<<< Evaluate");
-
             VERBOSE("[Storyboard: " << boost::lexical_cast<std::string>(result) << "]");
-
             #ifndef NDEBUG
             RCLCPP_INFO(
               get_logger(),
