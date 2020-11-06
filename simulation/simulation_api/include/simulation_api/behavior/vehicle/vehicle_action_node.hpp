@@ -47,17 +47,8 @@ public:
   simulation_api::entity::EntityStatus calculateEntityStatusUpdated(double target_speed) const;
   simulation_api::entity::EntityStatus calculateEntityStatusUpdated(
     double target_speed,
-    const std::vector<int> & following_lanelets)
+    const std::vector<std::int64_t> & following_lanelets)
   const;
-  bool foundConflictingEntity(const std::vector<int> & following_lanelets) const;
-  boost::optional<simulation_api::entity::EntityStatus> getConflictingEntityStatus(
-    const std::vector<int> & following_lanelets) const;
-  boost::optional<double> getDistanceToConflictingEntity(
-    const std::vector<int> & following_lanelets) const;
-  boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
-  double calculateStopDistance() const;
-  boost::optional<double> getDistanceToFrontEntity();
-  boost::optional<double> getDistanceToStopLine(const std::vector<int> & following_lanelets);
 };
 }  // namespace entity_behavior
 

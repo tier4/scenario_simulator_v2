@@ -66,7 +66,7 @@ PedestrianEntity::PedestrianEntity(std::string name, PedestrianParameters params
     std::make_shared<simulation_api::entity::PedestrianParameters>(parameters));
 }
 
-void PedestrianEntity::requestAcquirePosition(int lanelet_id, double s, double offset)
+void PedestrianEntity::requestAcquirePosition(std::int64_t lanelet_id, double s, double offset)
 {
   tree_ptr_->setRequest("acquire_position");
   geometry_msgs::msg::Vector3 rpy;
@@ -78,7 +78,7 @@ void PedestrianEntity::requestAcquirePosition(int lanelet_id, double s, double o
 }
 
 /*
-void PedestrianEntity::requestLaneChange(int to_lanelet_id)
+void PedestrianEntity::requestLaneChange(std::int64_t to_lanelet_id)
 {
     tree_ptr_->setRequest("lane_change");
     lane_change_params_.to_lanelet_id = to_lanelet_id;

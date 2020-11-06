@@ -23,6 +23,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include <unordered_map>
 
 namespace entity_behavior
@@ -39,6 +40,21 @@ class ActionNode : public BT::ActionNodeBase
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
+  bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
+  boost::optional<simulation_api::entity::EntityStatus> getConflictingEntityStatus(
+    const std::vector<std::int64_t> & following_lanelets) const;
+  boost::optional<double> getDistanceToConflictingEntity(
+    const std::vector<std::int64_t> & following_lanelets) const;
+  boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
+  double calculateStopDistance() const;
+  boost::optional<double> getDistanceToFrontEntity();
+  boost::optional<double> getDistanceToStopLine(
+    const std::vector<std::int64_t> & following_lanelets);
+  std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities();
+  std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities(
+    const std::vector<std::int64_t> & following_lanelets);
+  boost::optional<double> getYieldStopDistance(
+    const std::vector<std::int64_t> & following_lanelets);
 
   /// throws if the derived class return RUNNING.
   BT::NodeStatus executeTick() override;

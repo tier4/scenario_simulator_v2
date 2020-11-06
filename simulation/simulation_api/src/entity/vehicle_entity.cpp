@@ -66,7 +66,7 @@ VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
-void VehicleEntity::requestAcquirePosition(int lanelet_id, double s, double offset)
+void VehicleEntity::requestAcquirePosition(std::int64_t lanelet_id, double s, double offset)
 {
   tree_ptr_->setRequest("acquire_position");
   geometry_msgs::msg::Vector3 rpy;
@@ -77,7 +77,7 @@ void VehicleEntity::requestAcquirePosition(int lanelet_id, double s, double offs
   tree_ptr_->setValueToBlackBoard("target_status", target_status);
 }
 
-void VehicleEntity::requestLaneChange(int to_lanelet_id)
+void VehicleEntity::requestLaneChange(std::int64_t to_lanelet_id)
 {
   tree_ptr_->setRequest("lane_change");
   lane_change_params_.to_lanelet_id = to_lanelet_id;

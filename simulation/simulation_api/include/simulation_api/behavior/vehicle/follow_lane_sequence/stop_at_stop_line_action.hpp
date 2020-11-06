@@ -42,7 +42,7 @@ public:
     return ports;
   }
   boost::optional<double> calculateTargetSpeed(
-    const std::vector<int> & following_lanelets,
+    const std::vector<std::int64_t> & following_lanelets,
     double current_velocity);
 
 private:

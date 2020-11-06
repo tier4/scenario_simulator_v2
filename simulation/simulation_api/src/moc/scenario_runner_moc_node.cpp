@@ -53,6 +53,8 @@ public:
     lanechange_excuted_ = false;
     api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
     api_.entity->setTargetSpeed("npc1", 5, true);
+    api_.entity->spawn(false, "npc2", params, getNpc2InitialStatus());
+    api_.entity->setTargetSpeed("npc2", 0, true);
     /*
     current_time_ = 0.0;
     target_speed_setted_ = false;
@@ -68,8 +70,12 @@ public:
 private:
   void update()
   {
-    if (api_.entity->reachPosition("ego", 34615, 0, 0, 5)) {
-      api_.entity->requestAcquirePosition("ego", 120545, 0, 0);
+    if (api_.entity->reachPosition("ego", 34615, 10, 0, 5)) {
+      api_.entity->requestAcquirePosition("ego", 35026, 0, 0);
+      api_.entity->setTargetSpeed("npc2", 13, true);
+    }
+    if (api_.entity->reachPosition("ego", 34579, 0, 0, 5)) {
+      api_.entity->setTargetSpeed("npc2", 3, true);
     }
     /*
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");
@@ -78,7 +84,7 @@ private:
         std::cout << "ego is stopping " << stand_still_duration.get() << " seconds" << std::endl;
       }
     }
-    XmlRpc::XmlRpcValue result;462
+    XmlRpc::XmlRpcValue result;
       }
     }
     auto dist = api_.entity->getLongitudinalDistance("ego", "npc1");
@@ -171,6 +177,36 @@ private:
     return ret;
   }
 
+  simulation_api::entity::EntityStatus getNpc2InitialStatus()
+  {
+    geometry_msgs::msg::Pose pose;
+    pose.position.x = 0.0;
+    pose.position.y = 0.0;
+    pose.position.z = 0.0;
+    geometry_msgs::msg::Twist twist;
+    twist.linear.x = 5.0;
+    twist.linear.y = 0.0;
+    twist.linear.z = 0.0;
+    twist.angular.x = 0.0;
+    twist.angular.y = 0.0;
+    twist.angular.z = 0.0;
+    geometry_msgs::msg::Accel accel;
+    accel.linear.x = 0.0;
+    accel.linear.y = 0.0;
+    accel.linear.z = 0.0;
+    accel.angular.x = 0.0;
+    accel.angular.y = 0.0;
+    accel.angular.z = 0.0;
+    geometry_msgs::msg::Vector3 rpy;
+    rpy.x = 0.0;
+    rpy.y = 0.0;
+    rpy.z = 0.0;
+    simulation_api::entity::EntityStatus ret(
+      api_.simulation->getCurrentTime(), 34606, 20.0, 0.0, rpy, twist, accel);
+    return ret;
+  }
+
+
   simulation_api::entity::EntityStatus getBobInitialStatus()
   {
     geometry_msgs::msg::Pose pose;
@@ -206,7 +242,7 @@ private:
             <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
             <BoundingBox>
                 <Center x='1.5' y='0.0' z='0.9'/>
-                <Dimensions width='2.3' length='5.0' height='1.8'/>
+                <Dimensions width='2.1' length='4.5' height='1.8'/>
             </BoundingBox>
             <Axles>
                 <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>

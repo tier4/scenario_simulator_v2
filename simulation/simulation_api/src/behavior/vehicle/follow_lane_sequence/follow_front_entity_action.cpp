@@ -39,6 +39,9 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
+    if (getRightOfWayEntities(following_lanelets).size() != 0) {
+      return BT::NodeStatus::FAILURE;
+    }
     auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(following_lanelets,
         entity_status.lanelet_id,
         entity_status.s);
