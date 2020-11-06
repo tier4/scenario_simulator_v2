@@ -33,8 +33,7 @@ OpenSCENARIO:
       Actions:
         UserDefinedAction:
           CustomCommandAction:
-            # type: exitFailure
-            type: echo
+            type: exitFailure
     Story:
       - name: story
         Act:

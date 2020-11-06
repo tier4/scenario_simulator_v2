@@ -47,21 +47,18 @@ struct ScenarioDefinition
 {
   Element storyboard;
 
-  Scope inner_scope;
-
   template<typename Node, typename Scope>
   explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope)
   {
     // std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
 
     callWithElements(
       node, "ParameterDeclarations", 0, unbounded, [&](auto && each)
       {
-        return make<ParameterDeclarations>(each, inner_scope);
+        return make<ParameterDeclarations>(each, outer_scope);
       });
 
-    // for (const auto & each : inner_scope.parameters) {
+    // for (const auto & each : outer_scope.parameters) {
     //   std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
     //     reset << " of type " << green << std::get<1>(each).type().name() << reset <<
     //     " declared as value " << cyan << "\"" << std::get<1>(each) << cyan << "\"" << reset <<
@@ -71,24 +68,24 @@ struct ScenarioDefinition
     callWithElements(
       node, "CatalogLocations", 0, 1, [&](auto && node)
       {
-        return make<CatalogLocations>(node, inner_scope);
+        return make<CatalogLocations>(node, outer_scope);
       });
 
     callWithElements(
       node, "RoadNetwork", 1, 1, [&](auto && node)
       {
-        return make<RoadNetwork>(node, inner_scope);
+        return make<RoadNetwork>(node, outer_scope);
       });
 
     callWithElement(
       node, "Entities", [&](auto && node)
       {
-        return make<Entities>(node, inner_scope);
+        return make<Entities>(node, outer_scope);
       });
 
     // std::cout << (indent++) << "<Entities>" << std::endl;
     //
-    // for (const auto & each : inner_scope.entities) {
+    // for (const auto & each : outer_scope.entities) {
     //   std::cout << std::get<1>(each) << std::endl;
     // }
     //
@@ -97,20 +94,10 @@ struct ScenarioDefinition
     callWithElement(
       node, "Storyboard", [&](auto && node)
       {
-        return storyboard = make<Storyboard>(node, inner_scope);
+        return storyboard = make<Storyboard>(node, outer_scope);
       });
 
     // std::cout << (--indent) << "</OpenSCENARIO>" << std::endl;
-  }
-
-  template<typename ... Ts>
-  auto init(Ts && ... xs)  // RENAME TO 'start'
-  {
-    // Spawn entities
-    for (const auto & each : inner_scope.entities) {
-      std::get<1>(each).evaluate();
-    }
-    storyboard.start();
   }
 
   template<typename ... Ts>
@@ -122,7 +109,9 @@ struct ScenarioDefinition
   template<typename ... Ts>
   auto evaluate(Ts && ... xs)
   {
-    const auto result {storyboard.evaluate()};
+    const auto result {
+      storyboard.evaluate()
+    };
 
     updateFrame();
 
@@ -130,7 +119,7 @@ struct ScenarioDefinition
   }
 };
 
-auto operator<<(std::ostream & os, const ScenarioDefinition &)->decltype(auto)
+std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
 {
   return os << unspecified;
 }
@@ -193,16 +182,6 @@ struct OpenScenario
       THROW_IMPLEMENTATION_FAULT();
     } else {
       category = make<ScenarioDefinition>(child("OpenSCENARIO"), scope);
-    }
-  }
-
-  template<typename ... Ts>
-  decltype(auto) init(Ts && ... xs)
-  {
-    if (category.is<ScenarioDefinition>()) {
-      return category.as<ScenarioDefinition>().init(std::forward<decltype(xs)>(xs)...);
-    } else {
-      THROW_IMPLEMENTATION_FAULT();
     }
   }
 
