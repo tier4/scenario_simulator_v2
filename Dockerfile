@@ -1,16 +1,15 @@
 FROM osrf/ros:dashing-desktop
 SHELL ["/bin/bash", "-c"]
 
-RUN mkdir -p /root/scenario_simulator_ws/src \
-    && git clone  git@github.com:tier4/scenario_simulator.auto.git /root/scenario_simulator_ws/src/scenario_simulator
-
 WORKDIR /root/scenario_simulator_ws/src/scenario_simulator
+COPY . $WORKDIR
 
-RUN apt-get update
-RUN apt-get install -y python3-rosdep python3-vcstool python3-colcon-common-extensions python3-pip
-RUN rm /etc/ros/rosdep/sources.list.d/20-default.list
-RUN rosdep init
-RUN rosdep update
+RUN apt-get update \
+    && apt-get install -y python3-rosdep python3-vcstool python3-colcon-common-extensions python3-pip \
+    && rm /etc/ros/rosdep/sources.list.d/20-default.list
+
+RUN rosdep init \
+    && rosdep update
 WORKDIR /root/scenario_simulator_ws/
 RUN vcs import src < src/scenario_simulator/dependency.repos
 WORKDIR /root/scenario_simulator_ws/src
