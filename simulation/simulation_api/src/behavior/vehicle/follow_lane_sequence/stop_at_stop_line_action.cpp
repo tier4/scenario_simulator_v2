@@ -34,7 +34,7 @@ StopAtStopLineAction::StopAtStopLineAction(
 }
 
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
-  const std::vector<int> & following_lanelets, double current_velocity)
+  const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     return boost::none;
@@ -70,6 +70,9 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
     auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
+    if (getRightOfWayEntities(following_lanelets).size() != 0) {
+      return BT::NodeStatus::FAILURE;
+    }
     auto dist_to_stopline = getDistanceToStopLine(following_lanelets);
     if (std::fabs(entity_status.twist.linear.x) < 0.001) {
       if (dist_to_stopline) {

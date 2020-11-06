@@ -54,7 +54,7 @@ public:
 
 private:
   boost::optional<simulation_api::entity::EntityStatus> target_status_;
-  boost::optional<std::vector<int>> route_;
+  std::vector<std::int64_t> route_;
 };
 }      // namespace pedestrian
 }  // namespace entity_behavior
