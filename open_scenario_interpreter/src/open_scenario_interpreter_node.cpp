@@ -15,6 +15,7 @@
 #define OPEN_SCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 // #define OPEN_SCENARIO_INTERPRETER_NO_EXTENSION
 
+#include <glog/logging.h>
 #include <open_scenario_interpreter/open_scenario_interpreter.hpp>
 
 #include <cstdlib>
@@ -22,14 +23,18 @@
 
 int main(int argc, char ** argv)
 {
+  google::InitGoogleLogging(argv[0]);
+  google::InstallFailureSignalHandler();
+
   rclcpp::init(argc, argv);
 
-  rclcpp::executors::MultiThreadedExecutor executor {};
+  // rclcpp::executors::MultiThreadedExecutor executor {};
+  rclcpp::executors::SingleThreadedExecutor executor {};
 
   rclcpp::NodeOptions options {};
 
   auto node {
-    std::make_shared<open_scenario_interpreter::ScenarioRunner>(options)
+    std::make_shared<open_scenario_interpreter::Interpreter>(options)
   };
 
   executor.add_node((*node).get_node_base_interface());
