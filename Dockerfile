@@ -1,11 +1,9 @@
 FROM osrf/ros:dashing-desktop
 SHELL ["/bin/bash", "-c"]
-ARG GITHUB_USER
-ARG GITHUB_TOKEN
 
 RUN mkdir -p /root/scenario_simulator_ws/src
 
-RUN git clone https://$GITHUB_USER:$GITHUB_TOKEN@github.com/tier4/scenario_simulator.auto.git /root/scenario_simulator_ws/src/scenario_simulator
+RUN git clone  git@github.com:tier4/scenario_simulator.auto.git /root/scenario_simulator_ws/src/scenario_simulator
 
 WORKDIR /root/scenario_simulator_ws/src/scenario_simulator
 
