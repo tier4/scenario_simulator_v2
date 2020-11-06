@@ -124,8 +124,8 @@ public:
   }
   ~EntityManager() {}
   void setVerbose(bool verbose);
-  void requestAcquirePosition(std::string name, int lanelet_id, double s, double offset);
-  void requestLaneChange(std::string name, int to_lanelet_id);
+  void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
+  void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, Direction direction);
   boost::optional<double> getLongitudinalDistance(
     std::string from, std::string to,
@@ -152,7 +152,7 @@ public:
     std::string name, geometry_msgs::msg::Pose target_pose,
     double tolerance) const;
   bool reachPosition(
-    std::string name, int lanelet_id, double s, double offset,
+    std::string name, std::int64_t lanelet_id, double s, double offset,
     double tolerance) const;
   void broadcastEntityTransform();
   void broadcastBaseLinkTransform();

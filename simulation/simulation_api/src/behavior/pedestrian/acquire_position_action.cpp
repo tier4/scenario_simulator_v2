@@ -35,7 +35,6 @@ void AcquirePositionAction::getBlackBoardValues()
   PedestrianActionNode::getBlackBoardValues();
   if (!getInput<simulation_api::entity::EntityStatus>("target_status", target_status)) {
     target_status_ = boost::none;
-    route_ = boost::none;
   } else {
     target_status_ = target_status;
   }
@@ -46,19 +45,16 @@ BT::NodeStatus AcquirePositionAction::tick()
   getBlackBoardValues();
   if (request != "acquire_position") {
     target_status_ = boost::none;
-    route_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     target_status_ = boost::none;
-    route_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   if (target_status_->coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     target_status_ = boost::none;
-    route_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
@@ -67,9 +63,9 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
 
   if (!target_speed) {
-    std::vector<int> following_lanelets;
+    std::vector<std::int64_t> following_lanelets;
     bool is_finded = false;
-    for (auto itr = route_->begin(); itr != route_->end(); itr++) {
+    for (auto itr = route_.begin(); itr != route_.end(); itr++) {
       if (is_finded) {
         if (following_lanelets.size() <= 3) {
           following_lanelets.push_back(*itr);
@@ -122,22 +118,21 @@ BT::NodeStatus AcquirePositionAction::tick()
         entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
       setOutput("updated_status", entity_status_updated);
       target_status_ = boost::none;
-      route_ = boost::none;
       return BT::NodeStatus::SUCCESS;
     }
   }
 
   if (new_s > hdmap_utils->getLaneletLength(entity_status.lanelet_id)) {
     new_s = new_s - hdmap_utils->getLaneletLength(entity_status.lanelet_id);
-    boost::optional<int> next_lanelet_id;
+    boost::optional<std::int64_t> next_lanelet_id;
     bool is_finded = false;
-    for (size_t i = 0; i != route_.get().size(); i++) {
-      if (route_.get()[i] == entity_status.lanelet_id) {
+    for (size_t i = 0; i != route_.size(); i++) {
+      if (route_[i] == entity_status.lanelet_id) {
         is_finded = true;
         continue;
       }
       if (is_finded && !next_lanelet_id) {
-        next_lanelet_id = route_.get()[i];
+        next_lanelet_id = route_[i];
       }
     }
     if (is_finded && next_lanelet_id) {

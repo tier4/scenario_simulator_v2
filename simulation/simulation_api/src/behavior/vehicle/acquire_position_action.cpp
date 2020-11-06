@@ -36,7 +36,6 @@ void AcquirePositionAction::getBlackBoardValues()
   VehicleActionNode::getBlackBoardValues();
   if (!getInput<simulation_api::entity::EntityStatus>("target_status", target_status)) {
     target_status_ = boost::none;
-    route_ = boost::none;
   } else {
     target_status_ = target_status;
   }
@@ -46,29 +45,26 @@ BT::NodeStatus AcquirePositionAction::tick()
 {
   getBlackBoardValues();
   if (request != "acquire_position") {
-    route_ = boost::none;
     target_status_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    route_ = boost::none;
     target_status_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   if (target_status_->coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    route_ = boost::none;
     target_status_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
   route_ = hdmap_utils->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
-  std::vector<int> following_lanelets;
+  std::vector<std::int64_t> following_lanelets;
 
   if (!target_speed) {
     bool is_finded = false;
-    for (auto itr = route_->begin(); itr != route_->end(); itr++) {
+    for (auto itr = route_.begin(); itr != route_.end(); itr++) {
       if (is_finded) {
         if (following_lanelets.size() <= 3) {
           following_lanelets.push_back(*itr);
@@ -105,11 +101,10 @@ BT::NodeStatus AcquirePositionAction::tick()
       target_speed = 0;
     }
   }
-  auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_.get());
+  auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_);
   setOutput("updated_status", entity_status_updated);
   if (target_status_->lanelet_id == entity_status.lanelet_id) {
     if (target_status_->s < entity_status.s) {
-      route_ = boost::none;
       target_status_ = boost::none;
       return BT::NodeStatus::SUCCESS;
     }
