@@ -68,6 +68,7 @@ ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
 target_link_libraries(${PROJECT_NAME}
   Boost::filesystem
   Eigen3::Eigen
+  glog
   pugixml)
 
 # ------------------------------------------------------------------------------
