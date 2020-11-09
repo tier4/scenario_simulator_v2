@@ -65,15 +65,27 @@ class Interpreter
 
     switch (result) {
       case junit_exporter::TestResult::ERROR:
-        VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")");
+        if (what.empty()) {
+          VERBOSE("\x1b[1;31mYield " << type.c_str() << "\x1b[0m");
+        } else {
+          VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m");
+        }
         break;
 
       case junit_exporter::TestResult::FAILURE:
-        VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")");
+        if (what.empty()) {
+          VERBOSE("\x1b[1;31mYield " << type.c_str() << "\x1b[0m");
+        } else {
+          VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m");
+        }
         break;
 
       case junit_exporter::TestResult::SUCCESS:
-        VERBOSE("\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")");
+        if (what.empty()) {
+          VERBOSE("\x1b[32mYield " << type.c_str() << "\x1b[0m");
+        } else {
+          VERBOSE("\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m");
+        }
         break;
     }
     VERBOSE("");

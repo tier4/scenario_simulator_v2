@@ -1,6 +1,5 @@
 ScenarioModifiers:
-  []
-  # ScenarioModifier:
+  ScenarioModifier: []
 
 OpenSCENARIO:
   FileHeader:
@@ -10,15 +9,12 @@ OpenSCENARIO:
     author: yamacir-kit
     description: Minimal scenario
   ParameterDeclarations:
-    []
-    # ParameterDeclaration:
-  # CatalogLocations:
-  #   []
+    ParameterDeclaration: []
+  CatalogLocations:
   RoadNetwork:
     LogicFile:
       filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
   Entities:
-    []
   Storyboard:
     Init:
       Actions:
@@ -32,13 +28,13 @@ OpenSCENARIO:
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
-                    - entityRef: ""
+                    - entityRef: "hoge"
                 Maneuver:
                   - name: ""
                     Event:
                       - name: ""
                         priority: overwrite
-                        maximumExecutionCount: 100
+                        maximumExecutionCount: 1
                         Action:
                           - name: ""
                             GlobalAction:
