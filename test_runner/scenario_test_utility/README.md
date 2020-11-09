@@ -33,12 +33,7 @@ To convert open scenario, use these arguments
 - log (optinal):
  path to converted log file default is under current directory log/converted.txt
 
-execution using python or rosrun
+execution using ros2 command
 ```
-python3 scenario_test_utility.py --input="input yaml file" --output="output directory" --log="converted log file" 
-
-or 
-
 ros2 run scenario_test_utility.py --input="path to input yaml file" --output="path to output directory" --log="path to converted log file"
-
 ```
