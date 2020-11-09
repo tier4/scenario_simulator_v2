@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define OPEN_SCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
-// #define OPEN_SCENARIO_INTERPRETER_NO_EXTENSION
-
 #include <glog/logging.h>
 #include <open_scenario_interpreter/open_scenario_interpreter.hpp>
 

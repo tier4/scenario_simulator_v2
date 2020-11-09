@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #define NDEBUG
 #undef NDEBUG
+#define OPEN_SCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
+// #define OPEN_SCENARIO_INTERPRETER_NO_EXTENSION
+
 #include <open_scenario_interpreter/open_scenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 

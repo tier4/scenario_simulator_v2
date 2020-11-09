@@ -1,5 +1,5 @@
-ScenarioModifiers:
-  ScenarioModifier: []
+# ScenarioModifiers:
+#   ScenarioModifier: []
 
 OpenSCENARIO:
   FileHeader:
@@ -28,7 +28,7 @@ OpenSCENARIO:
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
-                    - entityRef: "hoge"
+                    - entityRef: hoge
                 Maneuver:
                   - name: ""
                     Event:

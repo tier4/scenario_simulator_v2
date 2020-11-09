@@ -42,12 +42,6 @@ class XmlRegex():
         text = XmlRegex.replace_true_false_pattern(text)
         return text
 
-    # @staticmethod
-    # def replace_lower_case(phase):
-    #     pattern = XmlRegex.REPLACE_LOWER_PATTERN
-    #     repl = r"@\1"
-    #     return re.sub(pattern, repl, phase)
-
     @staticmethod
     def replace_empty_case(phase):
         pattern = XmlRegex.ARRANGE_EMPTY_PATTERN

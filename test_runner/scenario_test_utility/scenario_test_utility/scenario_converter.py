@@ -33,14 +33,6 @@ from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 
 
-def tag_of(x):
-    return x[0]
-
-
-def value_of(x):
-    return x[1]
-
-
 def read_as_yaml(path):
     if os.path.exists(path):
         with open(path, "r") as file:
@@ -145,18 +137,6 @@ class ScenarioConverter:
         Logger.print_process("<= " + yaml_path)
         Logger.print_process("=> " + xosc_dir + "/")
         Logger.print_process("log: " + os.path.abspath(log_path))
-
-    # @staticmethod
-    # def check_modifier_dict(root_data):
-    #     scenario_modifiers = None
-    #     scenario_modifier = None
-    #     if "ScenarioModifiers" in root_data:
-    #         scenario_modifiers = dict(root_data["ScenarioModifiers"])
-    #         if "ScenarioModifier" in scenario_modifiers:
-    #             scenario_modifier = scenario_modifiers["ScenarioModifier"]
-    #     if scenario_modifier is None:
-    #         Logger.print_info("No ScenarioModifiers specified.")
-    #     return len(root_data), scenario_modifier
 
     @staticmethod
     def extract_open_scenario(open_scenario):
