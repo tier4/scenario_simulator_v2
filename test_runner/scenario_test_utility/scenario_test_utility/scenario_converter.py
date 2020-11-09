@@ -117,7 +117,7 @@ def mark_attributes(keyword, syntax_tree):
 
 class ScenarioConverter:
 
-    OPEN_SCENARIO_TAG = "OpenSCENARIO"
+    OPENSCENARIO_TAG = "OpenSCENARIO"
     IS_DEBUG_MODE = False
 
     @staticmethod
@@ -140,7 +140,7 @@ class ScenarioConverter:
 
     @staticmethod
     def extract_open_scenario(open_scenario):
-        key, value = mark_attributes(ScenarioConverter.OPEN_SCENARIO_TAG, open_scenario)
+        key, value = mark_attributes(ScenarioConverter.OPENSCENARIO_TAG, open_scenario)
         return value
 
     @staticmethod

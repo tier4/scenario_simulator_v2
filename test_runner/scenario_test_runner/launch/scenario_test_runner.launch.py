@@ -68,10 +68,10 @@ def generate_launch_description():
         arguments=[('__log_level:=warn')],
     )
 
-    open_scenario_interpreter = LifecycleNode(
-        package='open_scenario_interpreter',
-        node_executable='open_scenario_interpreter_node',
-        node_name='open_scenario_interpreter_node',
+    openscenario_interpreter = LifecycleNode(
+        package='openscenario_interpreter',
+        node_executable='openscenario_interpreter_node',
+        node_name='openscenario_interpreter_node',
         output='screen',
         parameters=[{
             'map_path': os.path.join(
@@ -105,7 +105,7 @@ def generate_launch_description():
     description.add_action(declare_log_directory)
     description.add_action(scenario_test_runner)
     description.add_action(scenario_simulator)
-    description.add_action(open_scenario_interpreter)
+    description.add_action(openscenario_interpreter)
     description.add_action(rviz2)
     description.add_action(openscenario_visualization)
 
