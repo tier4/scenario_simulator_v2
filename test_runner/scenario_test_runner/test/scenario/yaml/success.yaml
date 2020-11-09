@@ -4,7 +4,6 @@ ScenarioModifiers:
       list: [1, 50, 100]
     - name: STEP
       list: [1, 2]
-
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
