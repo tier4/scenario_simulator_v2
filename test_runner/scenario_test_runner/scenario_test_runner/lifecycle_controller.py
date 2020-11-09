@@ -106,7 +106,7 @@ class LifecycleController(Node):
             "'s parameter 'scenario'")
 
         while not self.send_request_to_change_parameters(
-            self.current_scenario, expect, step_time_ms, log_path).done():
+                self.current_scenario, expect, step_time_ms, log_path).done():
             Logger.print_info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
