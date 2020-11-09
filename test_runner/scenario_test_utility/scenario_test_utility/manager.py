@@ -30,7 +30,7 @@ class Manager():
     def ask_continuation():
         Logger.print_process("Continue? \n [y/N]:")
         answer = input()
-        if (answer is not "y"):
+        if (answer != "y"):
             Logger.print_info("Abort to make files.")
             sys.exit()
 

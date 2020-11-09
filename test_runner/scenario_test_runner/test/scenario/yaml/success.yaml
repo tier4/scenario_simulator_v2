@@ -20,14 +20,14 @@ OpenSCENARIO:
       - name: extension
         parameterType: string
         value: osm
-  CatalogLocations: []
+  CatalogLocations:
   RoadNetwork:
     LogicFile:
       filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.$(var extension)"
     SceneGraphFile:
       filepath: "$(dirname)/hoge.txt"
-    TrafficSignals: []
-  Entities: []
+    TrafficSignals:
+  Entities:
   Storyboard:
     Init:
       Actions:
