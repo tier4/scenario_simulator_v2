@@ -58,12 +58,6 @@ class DatabaseHandler():
             Manager.check_existence(scenario_path)
             scenario['path'] = scenario_path
             scenarios.append(scenario)
-        Logger.print_info('DEBUG!')
-        Logger.print_info(__file__)
-        Logger.print_info(pathlib.Path(__file__))
-        Logger.print_info(pathlib.Path(__file__).resolve())
-        Logger.print_info(pathlib.Path(__file__).resolve().parent)
-        Logger.print_info(pathlib.Path(__file__).resolve().parent.parent)
         launcher_package_path = pathlib.Path(__file__).resolve().parent.parent
         return launcher_package_path, log_path, scenarios
 
