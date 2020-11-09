@@ -1,22 +1,27 @@
 # scenario_test_runner package
 
 Scenario Test Runner is being developed to assist in the definitive planning
-simulation using concept of open scenario.
-
+simulation using concept of OpenSCENARIO.
 Simulations are described in a "YAML" based format called a "tier4 scenario format".
+Then convert scenario into a "XML" based format called a "OpenSCENARIO" The format has been found at [OpenSCENARIO](http://www.openscenario.org/)
 
-Then convert scenario into a "XML" based format called a "open scenario" The format has been found at [Open Scenario](http://www.openscenario.org/)
+
+# How to use
+```
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
+```
+
+# Build with docker image
+
+```
+docker build --build-arg GITHUB_USER=<github_username> --build-arg GITHUB_TOKEN=<github_token> -t scenario_simulator .
+```
 
 
-# Scenario Test Runner
-
-1. convert t4 scenarios into openscenario
-2. launch each scenarios via lifecycle process
-
-## Scenario Explanation
+# Tier4 Format V2 -> OpenSCENARIO Format
 
 ### Scenario Modifiers
-ScenarioModifiers and OpenScenario is defined structure below
+ScenarioModifiers and OpenSCENARIO is defined structure below
 ```
 ScenarioModifiers:
   ScenarioModifier:
@@ -43,15 +48,13 @@ See more details in test folder
 start,step stop express it's variable range.
 initial parameter distribution is from start to end while increasing a value.
 
-
 ### Scenario Tags
-CatalogLocations and other Tags inside OpenScenario is defined structure below
+CatalogLocations and other Tags inside OpenSCENARIO is defined structure below
 ```
 CatalogLocations:
 or
 CatalogLocations: {}
 ```
-
 
 ## Parameter Distribution Example
 ex)
@@ -89,28 +92,7 @@ ScenarioModifiers:
 ```
 
 
-### How To Build
-when building use these commands below
-```
-colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --catkin-skip-building-tests --cmake-clean-cache --cmake-clean-first --packages-select scenario_test_runner scenario_test_utility --symlink-install
-```
-
-
-### How To Run
-to run scenario test runner use these commands below
-```
-source /path/to/install/local_setup.bash
-ros2 launch scenario_test_runner scenario_test_runner.launch.py
-```
-
-
-### Tier4 Format V2 -> Open Scenario Format
-
-To convert open scenario, see scenario test utility packcage[Scenario Converter](https://github.com/tier4/scenario_simulator.auto/tree/master/scenario_test_utility)
-
-
-## workflow_exsample.yaml
-
+## Workflow Example
 requirement
 - path
 
@@ -134,3 +116,9 @@ Scenario:
       step_time_ms: 2
     }
 ```
+
+### Tier4 Format V2 -> OpenSCENARIO Format Separatory
+
+To convert OpenSCENARIO, see scenario test utility packcage[Scenario Converter](../scenario_test_utility)
+
+

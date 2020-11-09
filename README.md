@@ -12,3 +12,9 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 ```
 docker build --build-arg GITHUB_USER=<github_username> --build-arg GITHUB_TOKEN=<github_token> -t scenario_simulator .
 ```
+
+# How to use scenario editor
+see [Scenario Editor](doc/README.md)
+
+# How to use scenario test runner
+see [Scenario Test Runner](test_runner/scenario_test_runner)
