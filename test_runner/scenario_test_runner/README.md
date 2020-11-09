@@ -1,18 +1,27 @@
-# autoware.iv scenario_test_runner
+# scenario_test_runner package
 
-Scenario Launcher is being developed to assist in the definitive planning
-simulation using concept of open scenario.
-
+Scenario Test Runner is being developed to assist in the definitive planning
+simulation using concept of OpenSCENARIO.
 Simulations are described in a "YAML" based format called a "tier4 scenario format".
+Then convert scenario into a "XML" based format called a "OpenSCENARIO" The format has been found at [OpenSCENARIO](http://www.openscenario.org/)
 
-Then convert scenario into a "XML" based format called a "open scenario" The format has been found at [Open Scenario](http://www.openscenario.org/)
+
+# How to use
+```
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
+```
+
+# Build with docker image
+
+```
+docker build --build-arg GITHUB_USER=<github_username> --build-arg GITHUB_TOKEN=<github_token> -t scenario_simulator .
+```
 
 
-# Scenario Preprocessor
+# Tier4 Format V2 -> OpenSCENARIO Format
 
-## Scenario Explanation
-
-ScenarioModifiers and OpenScenario is defined structure below
+### Scenario Modifiers
+ScenarioModifiers and OpenSCENARIO is defined structure below
 ```
 ScenarioModifiers:
   ScenarioModifier:
@@ -34,11 +43,20 @@ OpenSCENARIO:
   .
 ```
 name express a variable It is not case sensitive, but attributes must be a lower snake case and it is converted to a variable in it's list during parameter distribution.
+See more details in test folder
 
 start,step stop express it's variable range.
 initial parameter distribution is from start to end while increasing a value.
 
-## Operation Example
+### Scenario Tags
+CatalogLocations and other Tags inside OpenSCENARIO is defined structure below
+```
+CatalogLocations:
+or
+CatalogLocations: {}
+```
+
+## Parameter Distribution Example
 ex)
 start: 10
 stop: 20
@@ -51,68 +69,56 @@ attension or int
 - if step is zero, it returns error
 - the number of simulation is factorial to number of  steps
 
-## Abbreviation
+## For None Value Expression
 
 ### OK
 Without modifier element case
 ```
 ScenarioModifiers:
-  ScenarioModifier:    
-```
-Without modifier case
-```
-ScenarioModifiers:
+or
+ScenarioModifiers:{}
 ```
 
 ### NG
-Without any replacement case
+Neither Lack of neccesary keys nor [] is invaild
 ```
 ScenarioModifiers:
   ScenarioModifier:
     - name: <String>
+or
+
+ScenarioModifiers:
+  ScenarioModifier:[]
 ```
 
 
-### How To Build
-when building use these commands below
-```
-colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --catkin-skip-building-tests --cmake-clean-cache --cmake-clean-first --packages-select scenario_test_runner scenario_test_utility scenario_runner_mock --symlink-install
-```
+## Workflow Example
+requirement
+- path
 
-### How To Test
-test by using scenario runner mock
-```
-colcon build --symlink-install --packages-select scenario_test_runner scenario_test_utility scenario_runner_mock
-source /path/to/install/local_setup.bash
-ros2 launch scenario_test_runner dummy_runner.launch.py
-```
+options
+- expectation
+- step_time_ms
 
-### How To Run
-to run scenario test runner use these commands below
-```
-source /path/to/install/local_setup.bash
-ros2 run scenario_test_runner scenario_test_runner
-```
-
-
-### Tier4 Format V2 -> Open Scenario Format
-
-To convert open scenario, see scenario test utility packcage[Scenario Converter](https://github.com/tier4/scenario_simulator.auto/tree/master/scenario_test_utility)
-
-
-### Requirements
-
-
-
-### add lines below to the scenario_database.yaml
 
 ```
-Launch: "path/to/scenario_test_runner.launch"
-Log: "path/to/log"
-Map:
-  - map1: "path/to/map1"
-  - map2: "path/to/map2"
 Scenario:
-  - "path/to/scenario1.yaml"
-  - "path/to/scenario2.yaml"
+  - {
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/xosc/simple.xosc
+    }
+  - {
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/failure.yaml,
+      expect: failure
+    }
+  - {
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/success.yaml,
+      expect: success,
+      step_time_ms: 2
+    }
 ```
+
+### Tier4 Format V2 -> OpenSCENARIO Format Separatory
+
+To convert OpenSCENARIO, see scenario test utility packcage[Scenario Converter](../scenario_test_utility)
+
+

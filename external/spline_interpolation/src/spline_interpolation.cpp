@@ -45,10 +45,7 @@ void SplineInterpolator::generateSpline(
   } else if (method_ == Method::SOR) {
     SOR_solver_.setCoefficients(h_, a_, 1000);
     c_ = SOR_solver_.solve();
-  } else {
-    std::cerr << "Unsupported method. Supported solver: Explicit, PCG, SOR" << std::endl;
   }
-
   for (size_t i = 0; i < N - 1; i++) {
     d_.push_back((c_[i + 1] - c_[i]) / (3.0 * h_[i]));
     b_.push_back((a_[i + 1] - a_[i]) / h_[i] - h_[i] * (2.0 * c_[i] + c_[i + 1]) / 3.0);
@@ -64,7 +61,7 @@ double SplineInterpolator::getValue(
   const double & query, const std::vector<double> & base_index) const
 {
   if (!initialized_) {
-    std::cerr << "[interpolate] spline is uninitialized" << std::endl;
+    // std::cerr << "[interpolate] spline is uninitialized" << std::endl;
     return 0.0;
   }
 
@@ -82,7 +79,7 @@ bool SplineInterpolator::interpolate(
   method_ = method;
 
   if (!isValidInput(base_index, base_value, return_index)) {
-    std::cerr << "[interpolate] invalid input. interpolation failed." << std::endl;
+    // std::cerr << "[interpolate] invalid input. interpolation failed." << std::endl;
     return false;
   }
 
