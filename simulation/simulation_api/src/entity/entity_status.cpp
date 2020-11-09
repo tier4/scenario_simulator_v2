@@ -33,7 +33,7 @@ EntityStatus::EntityStatus(
 
 EntityStatus::EntityStatus(
   double t,
-  int lanelet_id, double s, double offset,
+  std::int64_t lanelet_id, double s, double offset,
   geometry_msgs::msg::Vector3 rpy,
   geometry_msgs::msg::Twist twist,
   geometry_msgs::msg::Accel accel)

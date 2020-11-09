@@ -12,50 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__BEHAVIOR__VEHICLE__ACQUIRE_POSITION_ACTION_HPP_
-#define SIMULATION_API__BEHAVIOR__VEHICLE__ACQUIRE_POSITION_ACTION_HPP_
+#ifndef SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
+#define SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
 
-#include <simulation_api/entity/vehicle_parameter.hpp>
-#include <simulation_api/entity/entity_status.hpp>
+#include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
 
-#include <geometry_msgs/msg/point.hpp>
-#include <behaviortree_cpp_v3/behavior_tree.h>
-#include <behaviortree_cpp_v3/bt_factory.h>
-
-#include <boost/optional.hpp>
-
-#include <vector>
 #include <string>
-#include <memory>
+#include <vector>
 
 namespace entity_behavior
 {
 namespace vehicle
 {
-class AcquirePositionAction : public entity_behavior::VehicleActionNode
+namespace follow_lane_sequence
+{
+class YieldAction : public entity_behavior::VehicleActionNode
 {
 public:
-  AcquirePositionAction(const std::string & name, const BT::NodeConfiguration & config);
+  YieldAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {
-      BT::InputPort<simulation_api::entity::EntityStatus>("target_status")
-    };
+    BT::PortsList ports = {};
     BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
     }
     return ports;
   }
-  void getBlackBoardValues();
-
-private:
-  std::vector<std::int64_t> route_;
-  boost::optional<simulation_api::entity::EntityStatus> target_status_;
+  boost::optional<double> calculateTargetSpeed(std::vector<std::int64_t> following_lanelets);
 };
+}  // namespace follow_lane_sequence
 }  // namespace vehicle
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_API__BEHAVIOR__VEHICLE__ACQUIRE_POSITION_ACTION_HPP_
+#endif  // SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_

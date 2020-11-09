@@ -42,7 +42,7 @@ public:
     geometry_msgs::msg::Accel accel);
   EntityStatus(
     double t,
-    int lanelet_id, double s, double offset,
+    std::int64_t lanelet_id, double s, double offset,
     geometry_msgs::msg::Vector3 rpy,
     geometry_msgs::msg::Twist twist,
     geometry_msgs::msg::Accel accel);
@@ -64,7 +64,7 @@ public:
   geometry_msgs::msg::Twist twist;
   geometry_msgs::msg::Accel accel;
   /* Field for Lene Pose */
-  int lanelet_id;
+  std::int64_t lanelet_id;
   double offset;
   double s;
   geometry_msgs::msg::Vector3 rpy;
