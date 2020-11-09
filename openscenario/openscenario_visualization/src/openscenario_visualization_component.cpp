@@ -235,17 +235,17 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   geometry_msgs::msg::Point pf, pl, pr;
   pf.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0;
   pf.y = status.bounding_box.center.y;
-  pf.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  pf.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
 
   pl.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size *
     arrow_ratio;
   pl.y = status.bounding_box.center.y + arrow_size;
-  pl.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  pl.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
 
   pr.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size *
     arrow_ratio;
   pr.y = status.bounding_box.center.y - arrow_size;
-  pr.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  pr.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
   arrow.points = {pf, pl, pr};
   arrow.colors = {color};
   arrow.pose.orientation.x = 0.0;
