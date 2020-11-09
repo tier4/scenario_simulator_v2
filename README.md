@@ -27,6 +27,7 @@ useradd: user 'ubuntu' already exists
 ```
 
 press ctrl+c once to start VNC server
+then open http://localhost:6080/ in your browser.
 
 launch lx terminal
 
