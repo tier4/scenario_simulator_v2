@@ -13,16 +13,26 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 ```
 
 ## Run with docker image
+download docker image tar file form Google Drive. (https://drive.google.com/drive/folders/1Ep_CAytXa-wmIBz-_oh7hrV9UzOQTe9r?ths=true)
+```
+docker load -i scenario_simulator.tar
+docker run -it -p 6080:80 --shm-size=512m scenario_simulator .
+```
 
+when you show such kinds of lines
 ```
-docker pull tier4/scenario_simulator:latest
-docker run -p 6080:80 --shm-size=512m scenario_simulator
+* enable custom user: ubuntu
+useradd: user 'ubuntu' already exists
+  set default password to "ubuntu"
 ```
+
+press ctrl+c once to start VNC server
+then open http://localhost:6080/ in your browser.
 
 launch lx terminal
 
 ```
-docker build --build-arg GITHUB_USER=<github_username> --build-arg GITHUB_TOKEN=<github_token> -t scenario_simulator .
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
 ```
 
 ## How to use scenario editor

@@ -14,7 +14,8 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 # Build with docker image
 
 ```
-docker build --build-arg GITHUB_USER=<github_username> --build-arg GITHUB_TOKEN=<github_token> -t scenario_simulator .
+sh save_image.sh
+docker import 
 ```
 
 
