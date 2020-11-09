@@ -37,13 +37,9 @@ OpenSCENARIO:
                         maximumExecutionCount: 1
                         Action:
                           - name: action
-                            GlobalAction:
-                              ParameterAction:
-                                parameterRef: value
-                                ModifyAction:
-                                  Rule:
-                                    AddValue:
-                                      value: 0
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: ":" # nop
                         StartTrigger:
             StartTrigger:
     StopTrigger:
@@ -53,7 +49,6 @@ OpenSCENARIO:
             delay: 0
             conditionEdge: none
             ByValueCondition:
-              ParameterCondition:
-                parameterRef: value
+              SimulationTimeCondition:
                 rule: greaterThan
                 value: 0
