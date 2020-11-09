@@ -15,7 +15,7 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 ## Run with docker image
 download docker image tar file form Google Drive. (https://drive.google.com/drive/folders/1Ep_CAytXa-wmIBz-_oh7hrV9UzOQTe9r?ths=true)
 ```
-sh load_image.sh
+docker load -i scenario_simulator.tar
 docker run -it -p 6080:80 --shm-size=512m scenario_simulator .
 ```
 
