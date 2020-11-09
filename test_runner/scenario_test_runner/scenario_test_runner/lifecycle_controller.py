@@ -91,11 +91,8 @@ class LifecycleController(Node):
             )
         ]
         future = self.client_set_parameters.call_async(request)
-        if future.done():
-            try:
-                future.result()
-            except Exception as e:
-                self.get_logger().info('Service call failed %r' % (e,))
+        rclpy.spin_until_future_complete(self, future)
+        return future
 
     def configure_node(self, scenario, expect, step_time_ms, log_path):
         self.node_logger.info(self.get_lifecycle_state())
@@ -108,11 +105,9 @@ class LifecycleController(Node):
             LifecycleController.NODE_NAME +
             "'s parameter 'scenario'")
 
-        self.send_request_to_change_parameters(
-            self.current_scenario,
-            expect,
-            step_time_ms,
-            log_path)
+        while not self.send_request_to_change_parameters(
+            self.current_scenario, expect, step_time_ms, log_path).done():
+            Logger.print_info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         Logger.print_info("Configure -> scenario runner state is " +
