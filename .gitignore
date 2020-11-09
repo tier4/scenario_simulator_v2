@@ -4,3 +4,4 @@ external/quaternion_operation
 .vscode
 *.pyc
 *.log
+scenario_simulator.tar
