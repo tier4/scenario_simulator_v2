@@ -46,24 +46,21 @@ struct ParameterModifyAction
     rule(readElement<ModifyRule>("Rule", node, inner_scope))
   {}
 
-  auto evaluate()
+  auto evaluate() try
   {
     const auto target {
       inner_scope.parameters.at(parameter_ref)
     };
-
     if (rule.is<ParameterAddValueRule>()) {
-      // std::cout << "ParameterAddValueRule " << target << " => ";
-      const auto result = rule.as<ParameterAddValueRule>()(target);
-      // std::cout << result << std::endl;
-      return result;
+      return rule.as<ParameterAddValueRule>()(target);
     } else if (rule.is<ParameterMultiplyByValueRule>()) {
       return rule.as<ParameterMultiplyByValueRule>()(target);
     } else {
       THROW_IMPLEMENTATION_FAULT();
     }
-
     return unspecified;
+  } catch (const std::out_of_range &) {
+    throw SemanticError("No such parameter '" + parameter_ref + "'");
   }
 
   static constexpr auto accomplished() noexcept

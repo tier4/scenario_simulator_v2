@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#undef NDEBUG
+#define NDEBUG
 #define OPEN_SCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 // #define OPEN_SCENARIO_INTERPRETER_NO_EXTENSION
 
@@ -64,7 +64,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     return Interpreter::Result::FAILURE;
   }
 
-  static constexpr auto real_time_factor = 10.0;
+  static constexpr auto real_time_factor = 1.0;
   VERBOSE("  real_time_factor: " << real_time_factor);
 
   connect(

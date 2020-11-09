@@ -30,13 +30,13 @@ OpenSCENARIO:
                   EntityRef:
                     - entityRef: hoge
                 Maneuver:
-                  - name: ""
+                  - name: maneuver
                     Event:
-                      - name: ""
+                      - name: event
                         priority: overwrite
                         maximumExecutionCount: 1
                         Action:
-                          - name: ""
+                          - name: action
                             GlobalAction:
                               ParameterAction:
                                 parameterRef: value

@@ -17,6 +17,7 @@
 
 #include <open_scenario_interpreter/syntax/rule.hpp>
 
+#include <string>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
@@ -54,10 +55,6 @@ struct ParameterCondition
 
   auto evaluate() const
   {
-    const auto target {
-      inner_scope.parameters.at(parameter_ref)
-    };
-
     static const std::unordered_map<
       std::type_index,
       std::function<bool(const Rule, const Element &, const String &)>
@@ -108,21 +105,34 @@ struct ParameterCondition
       },
     };
 
-    const auto iter {
-      overloads.find(target.type())
+    const auto target {
+      inner_scope.parameters.find(parameter_ref)
     };
 
-    if (iter != std::end(overloads)) {
-      #ifndef NDEBUG
-      std::cout << "ParameterCondition: " << target << " " << compare << " " << value << " => ";
-      #endif
-      const auto result = std::get<1>(* iter)(compare, target, value) ? true_v : false_v;
-      #ifndef NDEBUG
-      std::cout << result << std::endl;
-      #endif
-      return result;
+    if (target != std::end(inner_scope.parameters)) {
+      const auto iter {
+        overloads.find(std::get<1>(*target).type())
+      };
+
+      if (iter != std::end(overloads)) {
+        #ifndef NDEBUG
+        std::cout << "ParameterCondition: " << std::get<1>(*target) << " " << compare << " " <<
+          value << " => ";
+        #endif
+        const auto result =
+          std::get<1>(* iter)(compare, std::get<1>(*target), value) ? true_v : false_v;
+        #ifndef NDEBUG
+        std::cout << result << std::endl;
+        #endif
+        return result;
+      } else {
+        throw SemanticError(
+                "No viable operation '" + boost::lexical_cast<std::string>(compare) +
+                "' with parameter '" + parameter_ref +
+                "' and value '" + boost::lexical_cast<std::string>(value) + "'");
+      }
     } else {
-      THROW_IMPLEMENTATION_FAULT();
+      throw SemanticError("No such parameter '" + parameter_ref + "'");
     }
   }
 };

@@ -66,25 +66,28 @@ class Interpreter
     switch (result) {
       case junit_exporter::TestResult::ERROR:
         if (what.empty()) {
-          VERBOSE("\x1b[1;31mYield " << type.c_str() << "\x1b[0m");
+          std::cout << "\x1b[1;31mYield " << type.c_str() << "\x1b[0m" << std::endl;
         } else {
-          VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m");
+          std::cout << "\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m" <<
+            std::endl;
         }
         break;
 
       case junit_exporter::TestResult::FAILURE:
         if (what.empty()) {
-          VERBOSE("\x1b[1;31mYield " << type.c_str() << "\x1b[0m");
+          std::cout << "\x1b[1;31mYield " << type.c_str() << "\x1b[0m" << std::endl;
         } else {
-          VERBOSE("\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m");
+          std::cout << "\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m" <<
+            std::endl;
         }
         break;
 
       case junit_exporter::TestResult::SUCCESS:
         if (what.empty()) {
-          VERBOSE("\x1b[32mYield " << type.c_str() << "\x1b[0m");
+          std::cout << "\x1b[32mYield " << type.c_str() << "\x1b[0m" << std::endl;
         } else {
-          VERBOSE("\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m");
+          std::cout << "\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m" <<
+            std::endl;
         }
         break;
     }
@@ -126,6 +129,13 @@ class Interpreter
 
       default:
         break;
+    }
+  } catch (const open_scenario_interpreter::SemanticError & error) {
+    VERBOSE("  caught semantic-error");
+    if (expect == "error") {
+      report(SUCCESS, "intended-error");
+    } else {
+      report(ERROR, "semantic-error", error.what());
     }
   } catch (const open_scenario_interpreter::ImplementationFault & error) {
     VERBOSE("  caught implementation-fault");
