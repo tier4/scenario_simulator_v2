@@ -29,7 +29,6 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 {
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
-  declare_parameter<decltype(map_path)>("map_path", map_path);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
   declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
 }
@@ -46,9 +45,6 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("log_path", log_path);
   log_path = log_path + "/result.junit.xml";
   VERBOSE("  log_path: " << log_path);
-
-  get_parameter("map_path", map_path);
-  VERBOSE("  map_path: " << map_path);
 
   get_parameter("osc_path", osc_path);
   VERBOSE("  osc_path: " << osc_path);

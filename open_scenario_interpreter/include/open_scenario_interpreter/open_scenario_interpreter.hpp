@@ -37,8 +37,6 @@ class Interpreter
 
   std::string osc_path;
 
-  std::string map_path;
-
   std::string log_path;
 
   Element script;
