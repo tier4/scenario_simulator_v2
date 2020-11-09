@@ -43,12 +43,6 @@ class XmlRegex():
         return text
 
     @staticmethod
-    def replace_lower_case(phase):
-        pattern = XmlRegex.REPLACE_LOWER_PATTERN
-        repl = r"@\1"
-        return re.sub(pattern, repl, phase)
-
-    @staticmethod
     def replace_empty_case(phase):
         pattern = XmlRegex.ARRANGE_EMPTY_PATTERN
         repl = r"<\1/>"
@@ -88,8 +82,6 @@ class XmlRegex():
 
 if __name__ == "__main__":
     empty_case_test = XmlRegex.replace_empty_case("<tag></tag>")
-    lower_case_test = XmlRegex.replace_lower_case("data")
     print("empty_case:", empty_case_test)
-    print("lower case:", lower_case_test)
     double_case_test = XmlRegex.replace_double_case("</tag>\n\t</tag>")
     print("double:", double_case_test)
