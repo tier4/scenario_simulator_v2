@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SIMULATION_API__BEHAVIOR__VEHICLE__BACK_RUN_ACTION_HPP_
+#define SIMULATION_API__BEHAVIOR__VEHICLE__BACK_RUN_ACTION_HPP_
+
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
+
+#include <string>
 
 namespace entity_behavior
 {
@@ -36,3 +41,5 @@ public:
 };
 }  // namespace vehicle
 }  // namespace entity_behavior
+
+#endif  // SIMULATION_API__BEHAVIOR__VEHICLE__BACK_RUN_ACTION_HPP_
