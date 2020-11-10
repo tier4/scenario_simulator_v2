@@ -222,10 +222,10 @@ const boost::optional<VehicleParameters> EntityManager::getVehicleParameters(std
 
 bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance)
 {
-  if(!entityStatusSetted(name)) {
+  if (!entityStatusSetted(name)) {
     return false;
   }
-  if(getEntityStatusCoordinate(name) == CoordinateFrameTypes::WORLD) {
+  if (getEntityStatusCoordinate(name) == CoordinateFrameTypes::WORLD) {
     return false;
   }
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
@@ -235,17 +235,18 @@ bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, doubl
   }
   if (status->lanelet_id == lanelet_id) {
     return true;
-  }
-  else {
-    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(lanelet_id, l, status->lanelet_id, status->s);
-    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(status->lanelet_id, status->s, lanelet_id, 0);
-    if(dist0) {
-      if(dist0.get() < tolerance) {
+  } else {
+    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(lanelet_id, l, status->lanelet_id,
+        status->s);
+    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(status->lanelet_id, status->s,
+        lanelet_id, 0);
+    if (dist0) {
+      if (dist0.get() < tolerance) {
         return true;
       }
     }
-    if(dist1) {
-      if(dist1.get() < tolerance) {
+    if (dist1) {
+      if (dist1.get() < tolerance) {
         return true;
       }
     }
