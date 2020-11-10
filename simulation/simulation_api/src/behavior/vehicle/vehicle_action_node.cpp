@@ -101,28 +101,78 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
 simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed) const
 {
-  geometry_msgs::msg::Accel accel_new;
-  double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
-  if (entity_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
-  } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
-  }
-  accel_new.linear.x = target_accel;
-  geometry_msgs::msg::Twist twist_new;
-  twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.twist.linear.x + accel_new.linear.x * step_time,
-    0, vehicle_parameters->performance.max_speed);
-  twist_new.linear.y = 0.0;
-  twist_new.linear.z = 0.0;
-  twist_new.angular.x = 0.0;
-  twist_new.angular.y = 0.0;
-  twist_new.angular.z = 0.0;
+  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
+    geometry_msgs::msg::Accel accel_new;
+    double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
+    if (entity_status.twist.linear.x > target_speed) {
+      target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+    } else {
+      target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+    }
+    accel_new.linear.x = target_accel;
+    geometry_msgs::msg::Twist twist_new;
+    twist_new.linear.x = boost::algorithm::clamp(
+      entity_status.twist.linear.x + accel_new.linear.x * step_time,
+      0, vehicle_parameters->performance.max_speed);
+    twist_new.linear.y = 0.0;
+    twist_new.linear.z = 0.0;
+    twist_new.angular.x = 0.0;
+    twist_new.angular.y = 0.0;
+    twist_new.angular.z = 0.0;
 
-  double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
-    step_time;
-  simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-    entity_status.lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
-  return entity_status_updated;
+    double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
+      step_time;
+    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+      entity_status.lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new,
+      accel_new);
+    return entity_status_updated;
+  }
+  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
+    if (target_speed > vehicle_parameters->performance.max_speed) {
+      target_speed = vehicle_parameters->performance.max_speed;
+    } else {
+      target_speed = entity_status.twist.linear.x;
+    }
+    double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
+    if (entity_status.twist.linear.x > target_speed) {
+      target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+    } else {
+      target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+    }
+    geometry_msgs::msg::Accel accel_new;
+    accel_new = entity_status.accel;
+    accel_new.linear.x = target_accel;
+
+    geometry_msgs::msg::Twist twist_new;
+    twist_new.linear.x = entity_status.twist.linear.x + entity_status.accel.linear.x * step_time;
+    twist_new.linear.y = entity_status.twist.linear.y + entity_status.accel.linear.y * step_time;
+    twist_new.linear.z = entity_status.twist.linear.z + entity_status.accel.linear.z * step_time;
+    twist_new.angular.x = entity_status.twist.angular.x + entity_status.accel.angular.x * step_time;
+    twist_new.angular.y = entity_status.twist.angular.y + entity_status.accel.angular.y * step_time;
+    twist_new.angular.z = entity_status.twist.angular.z + entity_status.accel.angular.z * step_time;
+
+    geometry_msgs::msg::Pose pose_new;
+    geometry_msgs::msg::Vector3 angular_trans_vec;
+    angular_trans_vec.z = twist_new.angular.z * step_time;
+    geometry_msgs::msg::Quaternion angular_trans_quat =
+      quaternion_operation::convertEulerAngleToQuaternion(angular_trans_vec);
+    pose_new.orientation =
+      quaternion_operation::rotation(entity_status.pose.orientation, angular_trans_quat);
+    Eigen::Vector3d trans_vec;
+    trans_vec(0) = twist_new.linear.x * step_time;
+    trans_vec(1) = twist_new.linear.y * step_time;
+    trans_vec(2) = 0;
+    Eigen::Matrix3d rotation_mat = quaternion_operation::getRotationMatrix(pose_new.orientation);
+    trans_vec = rotation_mat * trans_vec;
+    pose_new.position.x = trans_vec(0) + entity_status.pose.position.x;
+    pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
+    pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
+
+    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+      pose_new, twist_new,
+      accel_new);
+    return entity_status_updated;
+  }
+  throw BehaviorTreeRuntimeError("coordinate should be lane or world");
 }
 }  // namespace entity_behavior
