@@ -56,7 +56,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
     entity_status.twist.linear.x + accel_new.linear.x * step_time,
-    0, vehicle_parameters->performance.max_speed);
+    -10, vehicle_parameters->performance.max_speed);
   twist_new.linear.y = 0.0;
   twist_new.linear.z = 0.0;
   twist_new.angular.x = 0.0;
@@ -65,53 +65,47 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   std::int64_t new_lanelet_id = entity_status.lanelet_id;
   double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
     step_time;
-
-  bool calculation_success = false;
-  for (size_t i = 0; i < following_lanelets.size(); i++) {
-    if (following_lanelets[i] == entity_status.lanelet_id) {
-      double length = hdmap_utils->getLaneletLength(entity_status.lanelet_id);
-      calculation_success = true;
-      if (length < new_s) {
-        if (i != (following_lanelets.size() - 1)) {
-          new_s = new_s - length;
-          new_lanelet_id = following_lanelets[i + 1];
-          break;
-        } else if (new_s < 0) {
-          if (i == 0) {
-            const auto previous_lanelets =
-              hdmap_utils->getPreviousLaneletIds(following_lanelets[i]);
-            if (previous_lanelets.size() == 0) {
-              throw BehaviorTreeRuntimeError(
-                      "failed to get previous lane in calculateEntityStatusUpdated function");
-            }
-            new_lanelet_id = previous_lanelets[0];
-            new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id);
+  if (new_s < 0) {
+    auto previous_lanlet_ids = hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_id);
+    new_lanelet_id = previous_lanlet_ids[0];
+    new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id) - 0.01;
+    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+      new_lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
+    return entity_status_updated;
+  } else {
+    bool calculation_success = false;
+    for (size_t i = 0; i < following_lanelets.size(); i++) {
+      if (following_lanelets[i] == entity_status.lanelet_id) {
+        double length = hdmap_utils->getLaneletLength(entity_status.lanelet_id);
+        calculation_success = true;
+        if (length < new_s) {
+          if (i != (following_lanelets.size() - 1)) {
+            new_s = new_s - length;
+            new_lanelet_id = following_lanelets[i + 1];
             break;
           } else {
-            new_lanelet_id = following_lanelets[i - 1];
-            new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id);
+            new_s = new_s - length;
+            auto next_ids = hdmap_utils->getNextLaneletIds(following_lanelets[i]);
+            if (next_ids.size() == 0) {
+              throw BehaviorTreeRuntimeError(
+                      "failed to get next lane in calculateEntityStatusUpdated function");
+            }
+            new_lanelet_id = next_ids[0];
             break;
           }
-        } else {
-          new_s = new_s - length;
-          auto next_ids = hdmap_utils->getNextLaneletIds(following_lanelets[i]);
-          if (next_ids.size() == 0) {
-            throw BehaviorTreeRuntimeError(
-                    "failed to get next lane in calculateEntityStatusUpdated function");
-          }
-          new_lanelet_id = next_ids[0];
-          break;
         }
       }
     }
+    if (!calculation_success) {
+      throw BehaviorTreeRuntimeError(
+              "failed to calculate next status calculateEntityStatusUpdated function");
+    }
+    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+      new_lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
+    return entity_status_updated;
   }
-  if (!calculation_success) {
-    throw BehaviorTreeRuntimeError(
-            "failed to calculate next status calculateEntityStatusUpdated function");
-  }
-  simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-    new_lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
-  return entity_status_updated;
+  throw BehaviorTreeRuntimeError(
+          "failed to calculate next status calculateEntityStatusUpdated function");
 }
 
 simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(

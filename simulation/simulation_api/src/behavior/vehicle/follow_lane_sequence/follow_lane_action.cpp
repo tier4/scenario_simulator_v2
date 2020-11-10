@@ -80,7 +80,8 @@ BT::NodeStatus FollowLaneAction::tick()
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    auto updated_status = calculateEntityStatusUpdated(target_speed.get());
+    setOutput("updated_status", updated_status);
     return BT::NodeStatus::RUNNING;
   }
   return BT::NodeStatus::FAILURE;

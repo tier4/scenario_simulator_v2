@@ -340,8 +340,8 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet
 {
   std::vector<std::int64_t> ret;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  const auto following_lanelets = vehicle_routing_graph_ptr_->previous(lanelet);
-  for (const auto & llt : following_lanelets) {
+  const auto previous_lanelets = vehicle_routing_graph_ptr_->previous(lanelet);
+  for (const auto & llt : previous_lanelets) {
     ret.push_back(llt.id());
   }
   return ret;
