@@ -207,8 +207,10 @@ public:
   {
     entity_manager_ptr_->requestLaneChange(name, direction);
   }
-  bool isInLanelet(std::string name, std::int64_t lanelet_id)
+  bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance)
   {
+    return entity_manager_ptr_->isInLanelet(name, lanelet_id, tolerance);
+    /*
     if (!entity_manager_ptr_->entityStatusSetted(name)) {
       return false;
     }
@@ -222,6 +224,7 @@ public:
       return false;
     }
     return false;
+    */
   }
   void setTargetSpeed(std::string name, double target_speed, bool continuous)
   {

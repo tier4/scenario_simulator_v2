@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INTEGER_HPP_
 
 #include <boost/lexical_cast.hpp>
-#include <std_msgs/msg/int32.hpp>
+#include <std_msgs/msg/int64.hpp>
 
 #include <string>
 
@@ -25,9 +25,9 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 struct Integer
-  : public std_msgs::msg::Int32
+  : public std_msgs::msg::Int64
 {
-  using value_type = decltype(std_msgs::msg::Int32::data);
+  using value_type = decltype(std_msgs::msg::Int64::data);
 
   explicit Integer(value_type value = {})
   {

@@ -80,7 +80,7 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
 
 boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
   std::int64_t lanelet_id,
-  int crossing_lanelet_id)
+  std::int64_t crossing_lanelet_id)
 {
   namespace bg = boost::geometry;
   using Point = bg::model::d2::point_xy<double>;
@@ -470,9 +470,7 @@ geometry_msgs::msg::Vector3 HdMapUtils::getVectorFromPose(
 
 bool HdMapUtils::isInLanelet(std::int64_t lanelet_id, double s)
 {
-  geometry_msgs::msg::PoseStamped ret;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-
   const auto centerline = lanelet.centerline();
   std::vector<double> base_x = std::vector<double>(centerline.size());
   std::vector<double> base_y = std::vector<double>(centerline.size());
@@ -942,7 +940,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> lanelet_ids;
   std::vector<double> s_values;
   bool stop_lines_found = false;
-  int stop_lanelet_id;
+  std::int64_t stop_lanelet_id;
   std::vector<lanelet::ConstLineString3d> stop_lines;
   for (const auto & following_lanelet_id : following_lanelets) {
     stop_lines = getStopLinesOnPath({following_lanelet_id});
@@ -1094,7 +1092,7 @@ std::vector<double> HdMapUtils::calcEuclidDist(
 {
   std::vector<double> dist_v;
   dist_v.push_back(0.0);
-  for (unsigned int i = 0; i < x.size() - 1; ++i) {
+  for (size_t i = 0; i < x.size() - 1; ++i) {
     const double dx = x.at(i + 1) - x.at(i);
     const double dy = y.at(i + 1) - y.at(i);
     const double dz = z.at(i + 1) - z.at(i);
