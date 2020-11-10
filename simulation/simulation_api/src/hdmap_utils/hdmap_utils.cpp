@@ -228,6 +228,35 @@ boost::optional<int> HdMapUtils::getLaneChangeableLenletId(
   return boost::none;
 }
 
+std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(
+  std::int64_t lanelet_id,
+  double distance)
+{
+  std::vector<std::int64_t> ret;
+  double total_dist = 0.0;
+  ret.push_back(lanelet_id);
+  while (total_dist < distance) {
+    auto ids = getPreviousLaneletIds(lanelet_id, "straight");
+    if (ids.size() != 0) {
+      lanelet_id = ids[0];
+      total_dist = total_dist + getLaneletLength(lanelet_id);
+      ret.push_back(lanelet_id);
+      continue;
+    } else {
+      auto else_ids = getPreviousLaneletIds(lanelet_id);
+      if (else_ids.size() != 0) {
+        lanelet_id = else_ids[0];
+        total_dist = total_dist + getLaneletLength(lanelet_id);
+        ret.push_back(lanelet_id);
+        continue;
+      } else {
+        break;
+      }
+    }
+  }
+  return ret;
+}
+
 std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(std::int64_t lanelet_id, double distance)
 {
   std::vector<std::int64_t> ret;
@@ -314,6 +343,22 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet
   const auto following_lanelets = vehicle_routing_graph_ptr_->previous(lanelet);
   for (const auto & llt : following_lanelets) {
     ret.push_back(llt.id());
+  }
+  return ret;
+}
+
+std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(
+  std::int64_t lanelet_id,
+  std::string turn_direction)
+{
+  std::vector<std::int64_t> ret;
+  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  const auto previous_lanelets = vehicle_routing_graph_ptr_->previous(lanelet);
+  for (const auto & llt : previous_lanelets) {
+    const std::string turn_direction_llt = llt.attributeOr("turn_direction", "else");
+    if (turn_direction_llt == turn_direction) {
+      ret.push_back(llt.id());
+    }
   }
   return ret;
 }

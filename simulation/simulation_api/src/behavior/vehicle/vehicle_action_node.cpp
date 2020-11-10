@@ -76,6 +76,22 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
           new_s = new_s - length;
           new_lanelet_id = following_lanelets[i + 1];
           break;
+        } else if (new_s < 0) {
+          if (i == 0) {
+            const auto previous_lanelets =
+              hdmap_utils->getPreviousLaneletIds(following_lanelets[i]);
+            if (previous_lanelets.size() == 0) {
+              throw BehaviorTreeRuntimeError(
+                      "failed to get previous lane in calculateEntityStatusUpdated function");
+            }
+            new_lanelet_id = previous_lanelets[0];
+            new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id);
+            break;
+          } else {
+            new_lanelet_id = following_lanelets[i - 1];
+            new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id);
+            break;
+          }
         } else {
           new_s = new_s - length;
           auto next_ids = hdmap_utils->getNextLaneletIds(following_lanelets[i]);
@@ -102,30 +118,8 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   double target_speed) const
 {
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    geometry_msgs::msg::Accel accel_new;
-    double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
-    if (entity_status.twist.linear.x > target_speed) {
-      target_accel = boost::algorithm::clamp(target_accel, -5, 0);
-    } else {
-      target_accel = boost::algorithm::clamp(target_accel, 0, 3);
-    }
-    accel_new.linear.x = target_accel;
-    geometry_msgs::msg::Twist twist_new;
-    twist_new.linear.x = boost::algorithm::clamp(
-      entity_status.twist.linear.x + accel_new.linear.x * step_time,
-      0, vehicle_parameters->performance.max_speed);
-    twist_new.linear.y = 0.0;
-    twist_new.linear.z = 0.0;
-    twist_new.angular.x = 0.0;
-    twist_new.angular.y = 0.0;
-    twist_new.angular.z = 0.0;
-
-    double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
-      step_time;
-    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-      entity_status.lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new,
-      accel_new);
-    return entity_status_updated;
+    const auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id);
+    return calculateEntityStatusUpdated(target_speed, following_lanelets);
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
     if (target_speed > vehicle_parameters->performance.max_speed) {
