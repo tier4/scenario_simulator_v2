@@ -207,21 +207,9 @@ public:
   {
     entity_manager_ptr_->requestLaneChange(name, direction);
   }
-  bool isInLanelet(std::string name, std::int64_t lanelet_id)
+  bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance)
   {
-    if (!entity_manager_ptr_->entityStatusSetted(name)) {
-      return false;
-    }
-    try {
-      simulation_api::entity::EntityStatus status = getEntityStatus(name,
-          simulation_api::entity::CoordinateFrameTypes::LANE);
-      if (status.lanelet_id == lanelet_id) {
-        return true;
-      }
-    } catch (simulation_api::SimulationRuntimeError) {
-      return false;
-    }
-    return false;
+    return entity_manager_ptr_->isInLanelet(name, lanelet_id, tolerance);
   }
   void setTargetSpeed(std::string name, double target_speed, bool continuous)
   {

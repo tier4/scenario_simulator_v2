@@ -83,6 +83,9 @@ public:
     simulation_api::entity::EntityStatus status);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getPreviousLaneletIds(
+    std::int64_t lanelet_id,
+    std::string turn_direction);
   std::vector<std::int64_t> getPreviousLaneletIds(std::int64_t lanelet_id) const;
   boost::optional<int> getLaneChangeableLenletId(std::int64_t lanelet_id, std::string direction);
   boost::optional<double> getDistanceToStopLine(
@@ -95,6 +98,7 @@ public:
     std::int64_t to_lanelet_id, double to_s);
   double getSpeedLimit(std::vector<std::int64_t> lanelet_ids);
   std::vector<std::int64_t> getFollowingLanelets(std::int64_t lanelet_id, double distance = 100);
+  std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
     std::int64_t lanelet_id, double s,
@@ -112,7 +116,7 @@ public:
   std::vector<std::int64_t> getConflictingCrosswalkIds(std::vector<std::int64_t> lanelet_ids) const;
   boost::optional<double> getCollisionPointInLaneCoordinate(
     std::int64_t lanelet_id,
-    int crossing_lanelet_id);
+    std::int64_t crossing_lanelet_id);
   const visualization_msgs::msg::MarkerArray generateMarker() const;
   const std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
   const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(

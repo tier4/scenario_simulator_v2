@@ -35,7 +35,7 @@ namespace vehicle
 {
 struct LaneChangeParameter
 {
-  int to_lanelet_id;
+  std::int64_t to_lanelet_id;
 };
 
 class LaneChangeAction : public entity_behavior::ActionNode

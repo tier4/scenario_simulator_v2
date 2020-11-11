@@ -144,6 +144,7 @@ public:
     std::string name,
     CoordinateFrameTypes coordinate =
     CoordinateFrameTypes::WORLD) const;
+  bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance);
   bool entityStatusSetted(std::string name) const;
   void setTargetSpeed(std::string name, double target_speed, bool continuous);
   void update(double current_time, double step_time);

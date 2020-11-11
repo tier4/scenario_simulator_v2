@@ -43,45 +43,7 @@ BT::NodeStatus FollowLaneAction::tick()
     } else {
       target_speed = vehicle_parameters->performance.max_speed;
     }
-    double target_accel = (target_speed.get() - entity_status.twist.linear.x) / step_time;
-    if (entity_status.twist.linear.x > target_speed.get()) {
-      target_accel = boost::algorithm::clamp(target_accel, -5, 0);
-    } else {
-      target_accel = boost::algorithm::clamp(target_accel, 0, 3);
-    }
-    geometry_msgs::msg::Accel accel_new;
-    accel_new = entity_status.accel;
-    accel_new.linear.x = target_accel;
-
-    geometry_msgs::msg::Twist twist_new;
-    twist_new.linear.x = entity_status.twist.linear.x + entity_status.accel.linear.x * step_time;
-    twist_new.linear.y = entity_status.twist.linear.y + entity_status.accel.linear.y * step_time;
-    twist_new.linear.z = entity_status.twist.linear.z + entity_status.accel.linear.z * step_time;
-    twist_new.angular.x = entity_status.twist.angular.x + entity_status.accel.angular.x * step_time;
-    twist_new.angular.y = entity_status.twist.angular.y + entity_status.accel.angular.y * step_time;
-    twist_new.angular.z = entity_status.twist.angular.z + entity_status.accel.angular.z * step_time;
-
-    geometry_msgs::msg::Pose pose_new;
-    geometry_msgs::msg::Vector3 angular_trans_vec;
-    angular_trans_vec.z = twist_new.angular.z * step_time;
-    geometry_msgs::msg::Quaternion angular_trans_quat =
-      quaternion_operation::convertEulerAngleToQuaternion(angular_trans_vec);
-    pose_new.orientation =
-      quaternion_operation::rotation(entity_status.pose.orientation, angular_trans_quat);
-    Eigen::Vector3d trans_vec;
-    trans_vec(0) = twist_new.linear.x * step_time;
-    trans_vec(1) = twist_new.linear.y * step_time;
-    trans_vec(2) = 0;
-    Eigen::Matrix3d rotation_mat = quaternion_operation::getRotationMatrix(pose_new.orientation);
-    trans_vec = rotation_mat * trans_vec;
-    pose_new.position.x = trans_vec(0) + entity_status.pose.position.x;
-    pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
-    pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
-
-    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-      pose_new, twist_new,
-      accel_new);
-    setOutput("updated_status", entity_status_updated);
+    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     return BT::NodeStatus::RUNNING;
   }
   if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
@@ -118,7 +80,8 @@ BT::NodeStatus FollowLaneAction::tick()
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    auto updated_status = calculateEntityStatusUpdated(target_speed.get());
+    setOutput("updated_status", updated_status);
     return BT::NodeStatus::RUNNING;
   }
   return BT::NodeStatus::FAILURE;

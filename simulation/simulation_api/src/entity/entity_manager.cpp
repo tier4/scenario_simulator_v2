@@ -220,6 +220,41 @@ const boost::optional<VehicleParameters> EntityManager::getVehicleParameters(std
   return boost::none;
 }
 
+bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance)
+{
+  if (!entityStatusSetted(name)) {
+    return false;
+  }
+  if (getEntityStatusCoordinate(name) == CoordinateFrameTypes::WORLD) {
+    return false;
+  }
+  double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
+  auto status = getEntityStatus(name, CoordinateFrameTypes::LANE);
+  if (!status) {
+    return false;
+  }
+  if (status->lanelet_id == lanelet_id) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    return true;
+  } else {
+    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(lanelet_id, l, status->lanelet_id,
+        status->s);
+    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(status->lanelet_id, status->s,
+        lanelet_id, 0);
+    if (dist0) {
+      if (dist0.get() < tolerance) {
+        return true;
+      }
+    }
+    if (dist1) {
+      if (dist1.get() < tolerance) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 const std::vector<std::string> EntityManager::getEntityNames() const
 {
   std::vector<std::string> ret;

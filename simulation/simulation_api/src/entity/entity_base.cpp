@@ -108,19 +108,19 @@ bool EntityBase::setStatus(const EntityStatus & status)
       this->status_ = status;
       return true;
     } else {
-      auto ids = hdmap_utils_ptr_->getNextLaneletIds(this->status_->lanelet_id, "straight");
+      auto ids = hdmap_utils_ptr_->getNextLaneletIds(status.lanelet_id, "straight");
       if (ids.size() == 0) {
-        auto following_ids = hdmap_utils_ptr_->getNextLaneletIds(this->status_->lanelet_id);
+        auto following_ids = hdmap_utils_ptr_->getNextLaneletIds(status.lanelet_id);
         if (following_ids.size() == 0) {
-          if (this->status_->coordinate == CoordinateFrameTypes::LANE) {
+          if (status.coordinate == CoordinateFrameTypes::LANE) {
             this->status_ = boost::none;
             return true;
           } else {
             throw SimulationRuntimeError("failed to calculate map pose at the end of the lanelet");
           }
         }
-        if (this->status_->coordinate == CoordinateFrameTypes::LANE) {
-          double l = status.s - hdmap_utils_ptr_->getLaneletLength(this->status_->lanelet_id);
+        if (status.coordinate == CoordinateFrameTypes::LANE) {
+          double l = status.s - hdmap_utils_ptr_->getLaneletLength(status.lanelet_id);
           if (l < 0.0) {
             l = 0.0;
           }
@@ -131,7 +131,7 @@ bool EntityBase::setStatus(const EntityStatus & status)
         }
         throw SimulationRuntimeError("failed to calculate map pose at the end of the lanelet");
       }
-      double l = status.s - hdmap_utils_ptr_->getLaneletLength(this->status_->lanelet_id);
+      double l = status.s - hdmap_utils_ptr_->getLaneletLength(status.lanelet_id);
       if (l < 0.0) {
         l = 0.0;
       }

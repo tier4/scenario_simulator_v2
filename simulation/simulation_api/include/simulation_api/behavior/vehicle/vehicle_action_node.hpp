@@ -44,11 +44,12 @@ public:
     return ports;
   }
   std::shared_ptr<simulation_api::entity::VehicleParameters> vehicle_parameters;
-  simulation_api::entity::EntityStatus calculateEntityStatusUpdated(double target_speed) const;
+  simulation_api::entity::EntityStatus calculateEntityStatusUpdated(double target_speed);
   simulation_api::entity::EntityStatus calculateEntityStatusUpdated(
     double target_speed,
-    const std::vector<std::int64_t> & following_lanelets)
-  const;
+    const std::vector<std::int64_t> & following_lanelets);
+  simulation_api::entity::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
+    double target_speed);
 };
 }  // namespace entity_behavior
 
