@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/entity/entity_manager.hpp>
+#include <simulation_api/math/collision.hpp>
 
 #include <vector>
 #include <string>
@@ -340,7 +341,7 @@ bool EntityManager::getCollision(std::string name0, std::string name1)
   }
   auto bbox0 = getBoundingBox(name0);
   auto bbox1 = getBoundingBox(name1);
-  return true;
+  return simulation_api::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
 const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::string name) const
