@@ -317,7 +317,7 @@ const boost::optional<EntityStatus> EntityManager::getEntityStatus(
   return boost::none;
 }
 
-bool EntityManager::getCollision(std::string name0, std::string name1)
+bool EntityManager::checkCollision(std::string name0, std::string name1)
 {
   if (name0 == name1) {
     return false;

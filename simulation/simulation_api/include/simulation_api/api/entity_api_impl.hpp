@@ -257,6 +257,10 @@ public:
   {
     return entity_manager_ptr_->getStandStillDuration(name);
   }
+  bool checkCollision(std::string name0, std::string name1)
+  {
+    return entity_manager_ptr_->checkCollision(name0, name1);
+  }
   simulation_api::entity::EntityStatus toStatus(XmlRpc::XmlRpcValue param)
   {
     std::string coordinate = param["coordinate"];

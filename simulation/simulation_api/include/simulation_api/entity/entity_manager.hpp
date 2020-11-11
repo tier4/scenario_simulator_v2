@@ -123,7 +123,7 @@ public:
         std::bind(&EntityManager::updateHdmapMarker, this));
   }
   ~EntityManager() {}
-  bool getCollision(std::string name0, std::string name1);
+  bool checkCollision(std::string name0, std::string name1);
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
