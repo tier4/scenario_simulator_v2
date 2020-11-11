@@ -81,7 +81,7 @@ struct LaneChangeAction
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
           cdr(each) = isInLanelet(
-            car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 10);
+            car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 5);
         }
       }
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
