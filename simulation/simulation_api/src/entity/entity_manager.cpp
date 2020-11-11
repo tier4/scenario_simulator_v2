@@ -316,6 +316,33 @@ const boost::optional<EntityStatus> EntityManager::getEntityStatus(
   return boost::none;
 }
 
+bool EntityManager::getCollision(std::string name0, std::string name1)
+{
+  if (name0 == name1) {
+    return false;
+  }
+  if (!entityStatusSetted(name0)) {
+    return false;
+  }
+  if (!entityStatusSetted(name1)) {
+    return false;
+  }
+  auto status0 = getEntityStatus(name0);
+  if (!status0) {
+    throw simulation_api::SimulationRuntimeError(
+            "failed to calculate map pose : " + name0);
+    return false;
+  }
+  auto status1 = getEntityStatus(name1);
+  if (!status1) {
+    throw simulation_api::SimulationRuntimeError(
+            "failed to calculate map pose : " + name1);
+  }
+  auto bbox0 = getBoundingBox(name0);
+  auto bbox1 = getBoundingBox(name1);
+  return true;
+}
+
 const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::string name) const
 {
   auto it = entities_.find(name);
