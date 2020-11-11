@@ -22,7 +22,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/assign/list_of.hpp>
 
-//headers in Eigen
+// headers in Eigen
 #define EIGEN_MPL2_ONLY
 #include <Eigen/Core>
 
