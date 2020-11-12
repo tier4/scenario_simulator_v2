@@ -22,6 +22,8 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
+#include <cmath>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -102,7 +104,14 @@ struct DistanceCondition
 
   auto evaluate()
   {
-    return false_v;
+    return asBoolean(
+      for_each([&](auto && triggering_entity)
+      {
+        const auto pose {
+          getRelativePose(triggering_entity, position.toPose())
+        };
+        return compare(std::hypot(pose.position.x, pose.position.y), value);
+      }));
   }
 };
 }  // namespace syntax

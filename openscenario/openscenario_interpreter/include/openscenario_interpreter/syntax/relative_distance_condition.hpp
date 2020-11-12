@@ -46,7 +46,7 @@ struct RelativeDistanceCondition
 
   const Rule compare;
 
-  const TriggeringEntities verify;
+  const TriggeringEntities for_each;
 
   template<typename Node, typename Scope>
   explicit RelativeDistanceCondition(
@@ -57,7 +57,7 @@ struct RelativeDistanceCondition
     value(readAttribute<Double>("value", node, outer_scope)),
     freespace(readAttribute<Boolean>("freespace", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
-    verify(triggering_entities)
+    for_each(triggering_entities)
   {}
 
   auto evaluate()
@@ -66,10 +66,10 @@ struct RelativeDistanceCondition
       case RelativeDistanceType::longitudinal:
 
         return asBoolean(
-          verify([&](auto && subject)
+          for_each([&](auto && triggering_entity)
           {
             const auto distance {
-              std::fabs(getRelativePose(subject, entity_ref).position.x)
+              std::fabs(getRelativePose(triggering_entity, entity_ref).position.x)
             };
             #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
@@ -80,10 +80,10 @@ struct RelativeDistanceCondition
       case RelativeDistanceType::lateral:
 
         return asBoolean(
-          verify([&](auto && subject)
+          for_each([&](auto && triggering_entity)
           {
             const auto distance {
-              std::fabs(getRelativePose(subject, entity_ref).position.y)
+              std::fabs(getRelativePose(triggering_entity, entity_ref).position.y)
             };
             #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;
@@ -94,12 +94,12 @@ struct RelativeDistanceCondition
       case RelativeDistanceType::cartesianDistance:
 
         return asBoolean(
-          verify([&](auto && subject)
+          for_each([&](auto && triggering_entity)
           {
             const auto distance {
               std::hypot(
-                getRelativePose(subject, entity_ref).position.x,
-                getRelativePose(subject, entity_ref).position.y)
+                getRelativePose(triggering_entity, entity_ref).position.x,
+                getRelativePose(triggering_entity, entity_ref).position.y)
             };
             #ifndef NDEBUG
             std::cout << "DISTANCE: " << distance << std::endl;

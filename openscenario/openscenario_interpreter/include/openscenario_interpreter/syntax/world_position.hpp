@@ -17,36 +17,40 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-// #include <quaternion_operation/quaternion_operation.h>
+#include <quaternion_operation/quaternion_operation.h>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== WorldPosition ========================================================
+/* ---- WorldPosition ----------------------------------------------------------
  *
- * <xsd:complexType name="WorldPosition">
- *   <xsd:attribute name="x" type="Double" use="required"/>
- *   <xsd:attribute name="y" type="Double" use="required"/>
- *   <xsd:attribute name="z" type="Double" use="optional"/>
- *   <xsd:attribute name="h" type="Double" use="optional"/>
- *   <xsd:attribute name="p" type="Double" use="optional"/>
- *   <xsd:attribute name="r" type="Double" use="optional"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="WorldPosition">
+ *    <xsd:attribute name="x" type="Double" use="required"/>
+ *    <xsd:attribute name="y" type="Double" use="required"/>
+ *    <xsd:attribute name="z" type="Double" use="optional"/>
+ *    <xsd:attribute name="h" type="Double" use="optional"/>
+ *    <xsd:attribute name="p" type="Double" use="optional"/>
+ *    <xsd:attribute name="r" type="Double" use="optional"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct WorldPosition
 {
   const Double x, y, z, h, p, r;
 
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node,
+    typename Scope
+  >
   explicit WorldPosition(const Node & node, Scope & scope)
-  : x{readAttribute<Double>("x", node, scope)},
-    y{readAttribute<Double>("y", node, scope)},
-    z{readAttribute<Double>("z", node, scope, Double())},
-    h{readAttribute<Double>("h", node, scope, Double())},       // yaw
-    p{readAttribute<Double>("p", node, scope, Double())},
-    r{readAttribute<Double>("r", node, scope, Double())}
+  : x(readAttribute<Double>("x", node, scope)),
+    y(readAttribute<Double>("y", node, scope)),
+    z(readAttribute<Double>("z", node, scope, Double())),
+    h(readAttribute<Double>("h", node, scope, Double())),  // yaw
+    p(readAttribute<Double>("p", node, scope, Double())),
+    r(readAttribute<Double>("r", node, scope, Double()))
   {}
 
   operator geometry_msgs::msg::Pose() const
@@ -63,7 +67,7 @@ struct WorldPosition
 
     geometry_msgs::msg::Pose pose {};
     pose.position = point;
-    // pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
+    pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
 
     return pose;
   }
