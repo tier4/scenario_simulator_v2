@@ -77,6 +77,12 @@ private:
     if (api_.entity->reachPosition("ego", 34579, 0, 0, 5)) {
       api_.entity->setTargetSpeed("npc2", 3, true);
     }
+    if (api_.entity->checkCollision("ego", "npc1")) {
+      std::cout << "collision!" << std::endl;
+    }
+    if (api_.entity->checkCollision("ego", "npc2")) {
+      std::cout << "collision!" << std::endl;
+    }
     /*
     auto stand_still_duration = api_.entity->getStandStillDuration("ego");
     if (stand_still_duration) {
