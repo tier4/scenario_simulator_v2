@@ -20,6 +20,7 @@
 #include <openscenario_interpreter/syntax/reach_position_condition.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
+#include <openscenario_interpreter/syntax/stand_still_condition.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
 
 #include <utility>
@@ -69,7 +70,9 @@ struct EntityCondition
         std::make_pair("AccelerationCondition", [&](auto && node) {
           return make<AccelerationCondition>(node, std::forward<decltype(xs)>(xs)...);
         }),
-        std::make_pair("StandStillCondition", UNSUPPORTED()),
+        std::make_pair("StandStillCondition", [&](auto && node) {
+          return make<StandStillCondition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
         std::make_pair("SpeedCondition", [&](auto && node) {
           return make<SpeedCondition>(node, std::forward<decltype(xs)>(xs)...);
         }),

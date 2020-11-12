@@ -138,7 +138,7 @@ auto getTimeHeadway(Ts && ... xs)
     connection.entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...)
   };
   if (result) {
-    return *result;
+    return result.get();
   } else {
     using value_type = typename std::decay<decltype(result)>::type::value_type;
     return std::numeric_limits<value_type>::quiet_NaN();
@@ -149,6 +149,19 @@ template<typename ... Ts>
 decltype(auto) requestAcquirePosition(Ts && ... xs)
 {
   return connection.entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+}
+
+template<typename ... Ts>
+auto getStandStillDuration(Ts && ... xs)
+{
+  const auto result {
+    connection.entity->getStandStillDuration(std::forward<decltype(xs)>(xs)...)
+  };
+  if (result) {
+    return result.get();
+  } else {
+    return static_cast<typename std::decay<decltype(result.get())>::type>(0);
+  }
 }
 }  // namespace openscenario_interpreter
 

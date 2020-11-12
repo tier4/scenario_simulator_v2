@@ -80,15 +80,19 @@ struct Rule
   {
     switch (value) {
       case greaterThan:
-        return std::greater<void>()(std::forward<decltype(lhs)>(lhs),
-                 std::forward<decltype(rhs)>(rhs));
+        return std::greater<void>()(
+          std::forward<decltype(lhs)>(lhs),
+          std::forward<decltype(rhs)>(rhs));
 
       case lessThan:
-        return std::less<void>()(std::forward<decltype(lhs)>(lhs),
-                 std::forward<decltype(rhs)>(rhs));
+        return std::less<void>()(
+          std::forward<decltype(lhs)>(lhs),
+          std::forward<decltype(rhs)>(rhs));
 
       case equalTo:
-        return equal_to<T>()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
+        return equal_to<T>()(
+          std::forward<decltype(lhs)>(lhs),
+          std::forward<decltype(rhs)>(rhs));
 
       default:
         return false;

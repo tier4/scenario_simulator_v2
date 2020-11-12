@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== CollisionCondition ===================================================
+/* ---- CollisionCondition -----------------------------------------------------
  *
  * <xsd:complexType name="CollisionCondition">
  *   <xsd:choice>
@@ -33,7 +33,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct CollisionCondition
   : public Element
 {
