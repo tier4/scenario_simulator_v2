@@ -43,4 +43,4 @@ See [Scenario Test Runner](test_runner/scenario_test_runner)
 
 ## Architecture documentation
 
-See [Architecture Documentation](doc/architecture/system_architecture)
+See [Architecture Documentation](doc/architecture/system_architecture.md)
