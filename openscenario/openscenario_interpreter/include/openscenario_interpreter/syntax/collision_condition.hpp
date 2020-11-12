@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
@@ -26,31 +27,50 @@ inline namespace syntax
 {
 /* ---- CollisionCondition -----------------------------------------------------
  *
- * <xsd:complexType name="CollisionCondition">
- *   <xsd:choice>
- *     <xsd:element name="EntityRef" type="EntityRef"/>
- *     <xsd:element name="ByType" type="ByObjectType"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  Condition becomes true when the triggering entity/entities collide with
+ *  another given entity or any entity of a specific type.
+ *
+ *  <xsd:complexType name="CollisionCondition">
+ *    <xsd:choice>
+ *      <xsd:element name="EntityRef" type="EntityRef"/>
+ *      <xsd:element name="ByType" type="ByObjectType"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct CollisionCondition
-  : public Element
 {
-  template<typename Node, typename Scope>
-  explicit CollisionCondition(const Node & node, Scope & scope, const TriggeringEntities &)
-  : Element(
+  const Element given;
+
+  const TriggeringEntities for_each;
+
+  template
+  <
+    typename Node,
+    typename Scope
+  >
+  explicit CollisionCondition(
+    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
+  : given(
       choice(
         node,
         std::make_pair("EntityRef", [&](auto && node) {
           return make<EntityRef>(node, scope);
         }),
-        std::make_pair("ByType", UNSUPPORTED())))
+        std::make_pair("ByType", UNSUPPORTED()))),
+    for_each(triggering_entities)
   {}
 
   auto evaluate() const noexcept
   {
-    return false_v;
+    if (given.is<EntityRef>()) {
+      return asBoolean(
+        for_each([&](auto && triggering_entity) {
+          return checkCollision(triggering_entity, given.as<EntityRef>());
+        }));
+    } else {
+      return false_v;
+    }
   }
 };
 }

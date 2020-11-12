@@ -163,6 +163,15 @@ auto getStandStillDuration(Ts && ... xs)
     return static_cast<typename std::decay<decltype(result.get())>::type>(0);
   }
 }
+
+template
+<
+  typename ... Ts
+>
+decltype(auto) checkCollision(Ts && ... xs)
+{
+  return connection.entity->checkCollision(std::forward<decltype(xs)>(xs)...);
+}
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
