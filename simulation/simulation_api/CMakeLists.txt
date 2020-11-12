@@ -47,6 +47,7 @@ include_directories(
 add_library(entity_manager SHARED
   src/hdmap_utils/hdmap_utils.cpp
   src/math/hermite_curve.cpp
+  src/math/collision.cpp
   src/entity/entity_manager.cpp
   src/entity/entity_status.cpp
   src/entity/entity_base.cpp

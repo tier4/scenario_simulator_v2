@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/entity/entity_manager.hpp>
+#include <simulation_api/math/collision.hpp>
 
 #include <vector>
 #include <string>
@@ -314,6 +315,33 @@ const boost::optional<EntityStatus> EntityManager::getEntityStatus(
     return boost::any_cast<const PedestrianEntity &>(it->second).getStatus(coordinate);
   }
   return boost::none;
+}
+
+bool EntityManager::checkCollision(std::string name0, std::string name1)
+{
+  if (name0 == name1) {
+    return false;
+  }
+  if (!entityStatusSetted(name0)) {
+    return false;
+  }
+  if (!entityStatusSetted(name1)) {
+    return false;
+  }
+  auto status0 = getEntityStatus(name0);
+  if (!status0) {
+    throw simulation_api::SimulationRuntimeError(
+            "failed to calculate map pose : " + name0);
+    return false;
+  }
+  auto status1 = getEntityStatus(name1);
+  if (!status1) {
+    throw simulation_api::SimulationRuntimeError(
+            "failed to calculate map pose : " + name1);
+  }
+  auto bbox0 = getBoundingBox(name0);
+  auto bbox1 = getBoundingBox(name1);
+  return simulation_api::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
 const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::string name) const
