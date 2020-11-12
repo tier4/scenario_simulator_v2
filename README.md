@@ -39,7 +39,7 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 See [Scenario Editor](doc/how_to_use/README.md)
 
 ## How to use scenario test runner
-See [Scenario Test Runner](test_runner/scenario_test_runner)
+See [Scenario Test Runner](test_runner/scenario_test_runner/README.md)
 
 ## Architecture documentation
 
