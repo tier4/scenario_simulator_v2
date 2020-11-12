@@ -1,0 +1,42 @@
+@startuml
+allow_mixing
+title WholeArchitecture
+
+interface ros2lifecycle
+
+Node openscenario_interpreter_node {
+  class simulation_api
+}
+
+openscenario_interpreter_node -up-> ros2lifecycle
+
+ros2lifecycle -down-> openscenario_interpreter_node
+
+Node test_runner_node {
+}
+
+test_runner_node -down-> openscenario_interpreter_node
+test_runner_node -down-> ros2lifecycle
+ros2lifecycle -up-> test_runner_node
+
+Node Autoware {
+}
+
+interface ros2launch
+
+test_runner_node --down-> ros2launch
+ros2launch -down-> Autoware
+
+interface XMLRPCAPI
+
+simulation_api -down-> XMLRPCAPI
+XMLRPCAPI -up-> simulation_api
+
+Node Simulator {
+  class xmlrpc_server
+}
+
+XMLRPCAPI -down-> xmlrpc_server
+xmlrpc_server -up-> XMLRPCAPI
+
+@enduml

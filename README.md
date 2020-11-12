@@ -40,3 +40,7 @@ See [Scenario Editor](doc/how_to_use/README.md)
 
 ## How to use scenario test runner
 See [Scenario Test Runner](test_runner/scenario_test_runner)
+
+## Architecture documentation
+
+See [Architecture Documentation](doc/architecture/system_architecture)
