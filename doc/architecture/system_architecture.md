@@ -12,7 +12,7 @@ test runner communicate with openscenario interpretor with ros2 lifecycle.
 (https://design.ros2.org/articles/node_lifecycle.html)
 
 1. openscenario_interpretor  
-test runner communicate with openscenario interpretor with XMLRPC API.  
+test runner communicate with openscenario interpretor with rclcpp lifecycle.  
 openscenario interpretor is a rclcpp lifecycle component.  
 ![lifecycke](https://design.ros2.org/img/node_lifecycle/life_cycle_sm.png "lifecycle")
 When the openscenario_interpretor launched, the state of openscenario_interpretor is "Unconfigured".  
