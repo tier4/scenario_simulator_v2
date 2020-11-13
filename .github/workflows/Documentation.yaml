@@ -6,6 +6,7 @@ on:
   push:
     branches:
     - master
+  pull_request:
 
 jobs:
     job1:
@@ -26,8 +27,8 @@ jobs:
         - name: 'Upload Artifact'
           uses: actions/upload-artifact@v2
           with:
-            name: my-artifact
-            path: my_file.txt
+            name: site.zip
+            path: site.zip
             retention-days: 1
         - name: Slack Notification
           uses: 8398a7/action-slack@v2
