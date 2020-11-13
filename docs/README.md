@@ -1,11 +1,8 @@
 # ScenarioSimulator
 
-![ROS2-Dashing](https://github.com/tier4/scenario_simulator.auto/workflows/ROS2-Dashing/badge.svg)
-
 Open scenario interpreter and simple simulator for Autoware.auto 
 
 ![rviz](image/rviz.png "rviz")
-
 
 ## How to use
 ```
@@ -36,11 +33,11 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 ```
 
 ## How to use scenario editor
-See [Scenario Editor](doc/how_to_use/README.md)
+See [Scenario Editor](docs/how_to_use/README.md)
 
 ## How to use scenario test runner
 See [Scenario Test Runner](test_runner/scenario_test_runner/README.md)
 
 ## Architecture documentation
 
-See [Architecture Documentation](doc/architecture/system_architecture.md)
+See [Architecture Documentation](design/SystemArchitecture.md)

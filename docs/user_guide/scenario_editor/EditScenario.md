@@ -1,8 +1,8 @@
-### Edit a scenario
+# Edit a scenario
 
 Please go to following steps after completing [Create a simple scenario](simple_en.md 'simple_en.md').
 
-#### Load a scenario
+## Load a scenario
 
 You can load a scenario exported at [Create a simple scenario](simple_en.md 'simple_en.md') by following steps after launching scenario editor and opening a map.
 
@@ -12,7 +12,7 @@ You can load a scenario exported at [Create a simple scenario](simple_en.md 'sim
 
 After loading, the scenario contents are displayed.
 
-#### Add a Pedestrian
+## Add a Pedestrian
 
 You can add a Pedestrian in a scenario by following steps.
 
@@ -25,7 +25,7 @@ You can add a Pedestrian in a scenario by following steps.
 
 In the figure above, you can see that the pedestrian is placed in front of a crosswalk, faces toward the crosswalk and a pedestrian's target velocity is set as 0 m/s. 
 
-#### Add a Point
+## Add a Point
 
 You can add a Point (an object to indicate　a place on the map) used for a starting condition of Event by following steps.
 
@@ -35,7 +35,7 @@ You can add a Point (an object to indicate　a place on the map) used for a star
 A new object is placed on the place where you clicked.
 ![](screenshot05.png)
 
-#### Add an Act
+## Add an Act
 
 You can add an Act which describes a motion of the pedestrian by following steps.
 
@@ -51,7 +51,7 @@ A new act is added and "Act0" tab is displayed in the bottom left window.
 
 ![](screenshot06.png)
 
-#### Add an Event
+## Add an Event
 
 You can add an Event which describes a condition of the pedestrian's motion start by following steps.
 
@@ -65,7 +65,7 @@ You can add an Event which describes a condition of the pedestrian's motion star
 
 ![](screenshot07.png)
 
-#### Add an Action
+## Add an Action
 
 You can add an Action which changes the velocity of the pedestrian by following steps.
 
@@ -78,7 +78,7 @@ You can add an Action which changes the velocity of the pedestrian by following 
 
 ![](screenshot08.png)
 
-#### Export a scenario
+## Export a scenario
 
 You can export a scenario file by following steps.
 

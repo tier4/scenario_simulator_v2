@@ -1,0 +1,15 @@
+repo_url: https://github.com/tier4/scenario_simulator.auto
+site_name: scenario_simulator
+nav:
+    - Home: README.md
+    - User Guide:
+        - Scenario Editor:
+            - user_guide/scenario_editor/ScenarioEditorUserGuide.md
+            - user_guide/scenario_editor/ChangeCoordinate.md
+            - user_guide/scenario_editor/CreateSimpleScenario.md
+            - user_guide/scenario_editor/EditScenario.md
+        - Test Runner:
+            - user_guide/test_runner/ScenarioTestRunner.md
+            - user_guide/test_runner/ScenarioFormatConversion.md
+    - Design:
+        - design/SystemArchitecture.md
