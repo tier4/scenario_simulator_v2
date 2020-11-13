@@ -56,3 +56,5 @@ You can export a scenario file by following steps.
 3. Click "Export"　button.
 
 The scenario is exported as a file. You can execute a simulator using the file.
+
+<font color="Red">Do not forget!! : Please export scenario in Tier4 format V2.</font>

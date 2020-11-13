@@ -24,6 +24,7 @@ nav:
             - User Guide : user_guide/test_runner/ScenarioTestRunner.md
             - Details :
                 - user_guide/test_runner/ScenarioFormatConversion.md
+                - user_guide/test_runner/HowToWriteWorkflowFile.md
     - Design:
         - design/SystemArchitecture.md
         - design/Tier4ScenarioFormatVersion2.md

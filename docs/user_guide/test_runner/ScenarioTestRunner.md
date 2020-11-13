@@ -7,46 +7,14 @@ Then convert scenario into a "XML" based format called a "OpenSCENARIO" The form
 
 
 ## How to use
-```
+```bash
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
 ```
+Workflow file defines how to execute scenarios.  
+If you want to know how to write workflow file, read [here.](HowToWriteWorkflowFile.md)
 
-### Scenario Tags
-CatalogLocations and other Tags inside OpenSCENARIO is defined structure below
-```
-CatalogLocations:
-or
-CatalogLocations: {}
-```
+## Detailed Documentations
 
-## Workflow Example
+[HowToWriteWorkflowFile](HowToWriteWorkflowFile.md)
 
-parameters
-```
-requirement
-- path
-
-options
-- expect : success/failure/exception
-- step_time_ms : float value
-```
-
-```
-Scenario:
-  - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/xosc/simple.xosc
-    }
-  - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/failure.yaml,
-      expect: failure
-    }
-  - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/success.yaml,
-      expect: success,
-      step_time_ms: 2
-    }
-```
-
-### Tier4 Format V2 -> OpenSCENARIO Format Separatory
-
-To convert OpenSCENARIO, see scenario test utility packcage[Scenario Converter](ScenarioFormatConversion.md)
+[Scenario Conversion](ScenarioFormatConversion.md)
