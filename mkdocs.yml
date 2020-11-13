@@ -27,3 +27,4 @@ nav:
     - Design:
         - design/SystemArchitecture.md
         - design/Tier4ScenarioFormatVersion2.md
+        - design/Tier4ExtensionInOpenScenarioFormat.md
