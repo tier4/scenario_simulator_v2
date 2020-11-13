@@ -18,7 +18,7 @@ openscenario_interpretor is a rclcpp lifecycle component.
 When the openscenario_interpretor launched, the state of openscenario_interpretor is "Unconfigured".  
 When the test runner launched, ths test runner configures openscenario_interpretor and the state of the openscenario_interpretor becomes "Inactive".  
 After the, the test runner activates openscenario_interpretor and move the state into "Active".
-When the exception was thrown in openscenario interpretor, the openscenario interpretor moves into "Activate" state.
+When the exception was thrown in openscenario interpretor, the openscenario interpretor moves into "Inactive" state.
 
 1. simulator  
 simulator communicates with openscenario_interpretor by using XMLRPC API.  
