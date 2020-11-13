@@ -1,15 +1,19 @@
 repo_url: https://github.com/tier4/scenario_simulator.auto
-site_name: scenario_simulator
+site_name: Scenario Simulator package for Autoware
 nav:
-    - Home: README.md
+    - Home: 
+        - README.md
     - User Guide:
-        - Scenario Editor:
-            - user_guide/scenario_editor/ScenarioEditorUserGuide.md
-            - user_guide/scenario_editor/ChangeCoordinate.md
-            - user_guide/scenario_editor/CreateSimpleScenario.md
-            - user_guide/scenario_editor/EditScenario.md
+        - Scenario Editor :
+            - User Guide : user_guide/scenario_editor/ScenarioEditorUserGuide.md
+            - Details :
+                - user_guide/scenario_editor/ChangeCoordinate.md
+                - user_guide/scenario_editor/CreateSimpleScenario.md
+                - user_guide/scenario_editor/EditScenario.md
+
         - Test Runner:
-            - user_guide/test_runner/ScenarioTestRunner.md
-            - user_guide/test_runner/ScenarioFormatConversion.md
+            - User Guide : user_guide/test_runner/ScenarioTestRunner.md
+            - Details :
+                - user_guide/test_runner/ScenarioFormatConversion.md
     - Design:
         - design/SystemArchitecture.md

@@ -1,4 +1,4 @@
-# Scenario Editor user guide
+# Scenario Editor User Guide
 Described in here.
 docker image includes Google Chrome, so you can connect to scenario editor by clicking google chrome icon in the start menu.
 
