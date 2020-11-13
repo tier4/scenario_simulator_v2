@@ -71,6 +71,9 @@ extern "C" {
 
 namespace openscenario_visualization
 {
+/**
+ * @brief ROS2 component for visualizing simulation result.
+ */
 class OpenscenarioVisualizationComponent : public rclcpp::Node
 {
 public:
