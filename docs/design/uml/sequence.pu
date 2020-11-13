@@ -1,0 +1,34 @@
+@startuml{sequence.png}
+title sequence of scenario test runner
+
+actor scenario_writer
+
+scenario_writer -> ros2launch : write workflow yaml\nfile and describe test.
+ros2launch -> scenario_test_runner : launch test runner
+ros2launch -> openscenario_interpretor_node : launch openscenario interpretor
+ros2launch -> simulator : launch simulator
+
+scenario_test_runner -> scenario_test_runner : load and validate\nworkflow yaml file
+scenario_test_runner -> Autoware : launch autoware.
+loop run single test case
+    scenario_test_runner -> scenario_test_runner : resolve path in workflow file\nand generate/validate .xosc files.
+
+    openscenario_interpretor_node -> scenario_test_runner: become uncofigured status
+    scenario_test_runner -> openscenario_interpretor_node:configure
+
+    openscenario_interpretor_node -> openscenario_interpretor_node: resolve path of the\nlanlet2 map and load it.
+    openscenario_interpretor_node -> Autoware : send lanlet2 map via ROS2 topic.
+
+    openscenario_interpretor_node -> simulator: initialize via XMLRPC API
+    simulator -> openscenario_interpretor_node: response to initialize\nvia XMLRPC API
+
+    loop until the simulation was finished
+        openscenario_interpretor_node -> simulator: update simulation frame\nvia XMLRPC API
+        simulator -> Autoware: send sensor data via ROS2 topic.
+        Autoware -> simulator: send vehicle command via ROS2 topic.
+        openscenario_interpretor_node <-- simulator: response to update simulation\nframe via XMLRPC API
+    end
+    openscenario_interpretor_node -> scenario_writer : output test result as junit file
+end
+
+@enduml
