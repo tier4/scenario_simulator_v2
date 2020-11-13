@@ -1,6 +1,6 @@
-### Change a coordinate
+# Change a coordinate in scenario editor
 
-#### Displayed coordinate change
+## Displayed coordinate change
 
 You can change a coordinate of the displayed object position by following steps.
 
@@ -14,7 +14,7 @@ When changing to the coordinate of the lane:
 
 The position of the displayed object in "Position" on the right side of the screen will be changed to one corresponding to the selected coordinate.
 
-#### Lane select when lanes overlap
+## Lane select when lanes overlap
 
 When you placed an object on a place where the lanes overlap on the lane coordinate, you can select an appropriate lane by following steps.
 

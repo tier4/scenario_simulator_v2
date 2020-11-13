@@ -1,6 +1,6 @@
-### Create a simple scenario
+# Create a simple scenario
 
-#### Launch a scenario editor and open a map
+## Launch a scenario editor and open a map
 
 You can launch a scenario editor and open a map by following steps.
 
@@ -13,7 +13,7 @@ The map opens and you can see a screen like a following figure.
 
 You can zoom in/out with mouse wheel on the map, move the map by dragging with right mouse button, and rotate the map by dragging with left mouse button. 
 
-#### Place Ego car
+## Place Ego car
 
 You can place Ego car and set the destination on the map by following steps.
 
@@ -27,7 +27,7 @@ Objects which show Ego car and the destination are displayed on the map like a f
 
 You can see that a condition to judge if Ego car arrived at the destination as a success criteria is added in "Success" window on the bottom of the screen.
 
-#### Velocity designation of Ego car
+## Velocity designation of Ego car
 
 You can designate the target velocity of Ego car by following steps.
 
@@ -37,7 +37,7 @@ You can designate the target velocity of Ego car by following steps.
 
 ![](screenshot02.png)
 
-#### Display a scenario
+## Display a scenario
 
 You can see a scenario under editing as a text by following steps.
 
@@ -47,7 +47,7 @@ A window like a following figure is shown and the scenario is displayed as a tex
 
 ![](screenshot03.png)
 
-#### Export a scenario
+## Export a scenario
 
 You can export a scenario file by following steps.
 
@@ -56,3 +56,5 @@ You can export a scenario file by following steps.
 3. Click "Export"　button.
 
 The scenario is exported as a file. You can execute a simulator using the file.
+
+<font color="Red">Do not forget!! : Please export scenario in Tier4 format V2.</font>
