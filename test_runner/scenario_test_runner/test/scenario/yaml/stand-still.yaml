@@ -1,0 +1,117 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader: { revMajor: 1, revMinor: 0, date: '1970-01-01T09:00:00+09:00', description: 'test', author: 'yamacir-kit' }
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+  RoadNetwork:
+    LogicFile: { filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm" }
+    TrafficSignals:
+  Entities:
+    ScenarioObject:
+      - name: ego
+        Vehicle: &default-vehicle
+          name: default-vehicle
+          vehicleCategory: car
+          BoundingBox:
+            Center: { x: 0, y: 0, z: 0 }
+            Dimensions: { width: 2, length: 4, height: 2.5 }
+          Performance: { maxSpeed: 30, maxAcceleration: INF, maxDeceleration: INF }
+          Axles:
+            FrontAxle: { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX:  1, positionZ: 0.3 }
+            RearAxle:  { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX: -1, positionZ: 0.3 }
+          Properties:
+            Property:
+              - { name: isEgo, value: true }
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition: &ego-position
+                      roadId: ''
+                      laneId: '34513'
+                      s: 10
+                      offset: 0
+                      Orientation: &orientation-zero { type: relative, h: 0, p: 0, r: 0 }
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics: { dynamicsShape: step, dynamicsDimension: time, value: 0 }
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed: { value: 0 }
+    Story:
+      - name: story
+        Act:
+          - name: then
+            ManeuverGroup:
+              - name: maneuver-group
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: [ entityRef: ego ]
+                Maneuver:
+                  - name: maneuver
+                    Event:
+                      - name: event
+                        priority: overwrite
+                        Action:
+                          - name: (exit-success)
+                            UserDefinedAction:
+                              CustomCommandAction: { type: "exitSuccess" }
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: (when (stand-still? 5) ...)
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: ego ]
+                                    EntityCondition:
+                                      StandStillCondition: { duration: 5 }
+            StartTrigger: &always-true
+              ConditionGroup:
+                - Condition:
+                    - name: "always-true"
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition: { rule: greaterThan, value: 0 }
+          - name: else
+            ManeuverGroup:
+              - name: maneuver-group
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: [ entityRef: ego ]
+                Maneuver:
+                  - name: maneuver
+                    Event:
+                      - name: event
+                        priority: overwrite
+                        Action:
+                          - name: (exit-success)
+                            UserDefinedAction:
+                              CustomCommandAction: { type: "exitFailure" }
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: time-up?
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition: { rule: greaterThan, value: 6 }
+            StartTrigger: *always-true
+    StopTrigger:
+      ConditionGroup:
+        - Condition:
+            - name: "always-false"
+              delay: 0
+              conditionEdge: none
+              ByValueCondition:
+                SimulationTimeCondition: { rule: lessThan, value: 0 }

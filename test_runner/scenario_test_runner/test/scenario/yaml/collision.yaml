@@ -28,7 +28,7 @@ OpenSCENARIO:
             Property: []
       - name: ego
         Vehicle:
-          << : *default-vehicle
+          <<: *default-vehicle
           # BoundingBox:
           #   Center: { x: 0, y: 0, z: 0 }
           #   Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
@@ -54,7 +54,7 @@ OpenSCENARIO:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      << : *ego-position
+                      <<: *ego-position
                       s: NPC-S
     Story:
       - name: story
