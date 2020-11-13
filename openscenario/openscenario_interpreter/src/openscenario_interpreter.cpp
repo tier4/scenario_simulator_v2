@@ -108,7 +108,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
             if (expect == "success") {
               report(SUCCESS, "intended-success");
             } else {
-              report(FAILURE, "unintended-failure", "expected " + expect);
+              report(FAILURE, "unintended-success", "expected " + expect);
             }
           }
         }
