@@ -23,3 +23,7 @@ When the exception was thrown in openscenario interpretor, the openscenario inte
 1. simulator  
 simulator communicates with openscenario_interpretor by using XMLRPC API.  
 You can use any times of simulator by adapting this API.  
+
+# Execution sequence of scenario testing.
+
+![sequence](uml/sequence.png "sequence")
