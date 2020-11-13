@@ -36,17 +36,25 @@ struct AttributeHighlighter
   }
 };
 
-template<typename ... Ts>
+template
+<
+  typename ... Ts
+>
 decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const AttributeHighlighter & highlight)
 {
   return highlight(os);
 }
 
-template<typename T,
-  typename = typename std::enable_if<HasStreamOutputOperator<T>::value>::type>
+template
+<
+  typename T,
+  typename = typename std::enable_if<HasStreamOutputOperator<T>::value>::type
+>
 auto highlight(const std::string & name, const T & value)
 {
-  return AttributeHighlighter {name, boost::lexical_cast<std::string>(value)};
+  return AttributeHighlighter {
+    name, boost::lexical_cast<std::string>(value)
+  };
 }
 }
 }  // namespace openscenario_interpreter

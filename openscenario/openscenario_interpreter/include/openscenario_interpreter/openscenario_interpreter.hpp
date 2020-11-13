@@ -113,7 +113,7 @@ class Interpreter
         if (expect == "success") {
           report(SUCCESS, "intended-success");
         } else {
-          report(FAILURE, "unintended-failure", "expected " + expect);
+          report(FAILURE, "unintended-success", "expected " + expect);
         }
         break;
 
@@ -121,7 +121,7 @@ class Interpreter
         if (expect == "failure") {
           report(SUCCESS, "intended-failure");
         } else {
-          report(FAILURE, "unintended-success", "expected " + expect);
+          report(FAILURE, "unintended-failure", "expected " + expect);
         }
         break;
 

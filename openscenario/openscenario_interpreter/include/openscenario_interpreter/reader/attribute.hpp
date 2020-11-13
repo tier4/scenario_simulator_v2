@@ -106,10 +106,18 @@ auto substitute(std::string attribute, Scope & scope)
   return attribute;
 }
 
-template<typename T, typename Node, typename Scope>
+template
+<
+  typename T,
+  typename Node,
+  typename Scope
+>
 T readAttribute(const std::string & name, const Node & node, const Scope & scope)
 {
-  if (const auto & attribute {node.attribute(name.c_str())}) {
+  if (const auto & attribute {
+        node.attribute(name.c_str())
+      })
+  {
     std::string value {
       substitute(attribute.value(), scope)
     };
@@ -127,7 +135,6 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
       const auto iter {
         scope.parameters.find(value.substr(1))
       };
-
       if (iter != std::end(scope.parameters)) {
         return boost::lexical_cast<T>(boost::lexical_cast<String>(cdr(*iter)));
       } else {
@@ -153,7 +160,12 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
   }
 }
 
-template<typename T, typename Node, typename Scope>
+template
+<
+  typename T,
+  typename Node,
+  typename Scope
+>
 T readAttribute(const std::string & name, const Node & node, const Scope & scope, T && value)
 {
   if (node.attribute(name.c_str())) {
