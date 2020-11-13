@@ -1,8 +1,6 @@
 # Scenario Editor User Guide
-Described in here.
-docker image includes Google Chrome, so you can connect to scenario editor by clicking google chrome icon in the start menu.
-
-![](screenshot_google_chrome.png)
+You can access via this [URL](https://scenario.tier4.jp/scenario_editor/restricted/).  
+<font color="Red">Note! Scenario editor only supports Google Chrome.</font>
 
 [CreateSimpleScenario](CreateSimpleScenario.md)  
 [EditScenario](EditScenario.md)  
