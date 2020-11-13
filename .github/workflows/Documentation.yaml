@@ -22,8 +22,6 @@ jobs:
           run: pip3 install mkdocs mkdocs-material
         - name: Generate documentation
           run: mkdocs build
-        - name: zip documentation
-          run: zip -r site.zip site/
         - name: 'Upload Artifact'
           uses: actions/upload-artifact@v2
           with:
