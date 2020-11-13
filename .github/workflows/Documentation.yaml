@@ -16,7 +16,7 @@ jobs:
         - name: Set up Python
           uses: actions/setup-python@v1
           with:
-            python-version: '3.6.9'
+            python-version: '3.6.12'
         - name: Install 
           run: pip3 install mkdocs mkdocs-material
         - name: Generate documentation
