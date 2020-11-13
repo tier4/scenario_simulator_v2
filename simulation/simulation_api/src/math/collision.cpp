@@ -21,6 +21,7 @@
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/geometry/algorithms/disjoint.hpp>
 
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
@@ -61,10 +62,7 @@ bool checkCollision2D(
   if (bg::intersects(poly1, poly0)) {
     return true;
   }
-  if (bg::within(poly0, poly1) || bg::within(poly1, poly0)) {
-    return true;
-  }
-  return false;
+  return bg::disjoint(poly0, poly1);
 }
 
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
