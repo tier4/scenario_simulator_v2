@@ -105,9 +105,18 @@ decltype(auto) isReachedPosition(Ts && ... xs)
 // }
 
 template<typename ... Ts>
-decltype(auto) getRelativePose(Ts && ... xs)
-{
+decltype(auto) getRelativePose(Ts && ... xs) try {
   return connection.entity->getRelativePose(std::forward<decltype(xs)>(xs)...);
+} catch (const simulation_api::SimulationRuntimeError &) {
+  geometry_msgs::msg::Pose result {};
+  result.position.x = std::numeric_limits<double>::quiet_NaN();
+  result.position.y = std::numeric_limits<double>::quiet_NaN();
+  result.position.z = std::numeric_limits<double>::quiet_NaN();
+  result.orientation.x = 0;
+  result.orientation.y = 0;
+  result.orientation.z = 0;
+  result.orientation.w = 1;
+  return result;
 }
 
 template<typename ... Ts>
