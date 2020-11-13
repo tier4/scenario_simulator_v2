@@ -13,14 +13,13 @@ jobs:
         name: Generate Documentation
         runs-on: ubuntu-18.04
         steps:
+        - uses: actions/checkout@v2-beta
         - name: Set up Python
           uses: actions/setup-python@v1
           with:
             python-version: '3.6.12'
         - name: Install 
           run: pip3 install mkdocs mkdocs-material
-        - name: Setup tmate session
-          uses: mxschmitt/action-tmate@v1
         - name: Generate documentation
           run: mkdocs build
         - name: zip documentation
