@@ -55,7 +55,7 @@ bool checkCollision2D(
   if (bg::intersects(poly0, poly1)) {
     return true;
   }
-  if (bg::within(poly0, poly1) || bg::within(poly0, poly1)) {
+  if (bg::within(poly0, poly1) || bg::within(poly1, poly0)) {
     return true;
   }
   return false;

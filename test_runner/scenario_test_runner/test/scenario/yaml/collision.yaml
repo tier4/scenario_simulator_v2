@@ -1,0 +1,107 @@
+ScenarioModifiers:
+    ScenarioModifier:
+      - { name: NPC-S, start: 18, step: 1, stop: 22 }
+  OpenSCENARIO:
+    FileHeader: { revMajor: 1, revMinor: 0, date: '2020-11-13T02:01:39.376Z', description: '', author: 'yamacir-kit' }
+    ParameterDeclarations:
+      ParameterDeclaration: []
+    CatalogLocations:
+    RoadNetwork:
+      LogicFile: { filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm" }
+      SceneGraphFile: { filepath: lanelet2_map.pcd }
+      TrafficSignals:
+        TrafficSignalController: []
+    Entities:
+      ScenarioObject:
+        - name: npc
+          Vehicle: &default-vehicle
+            name: default-vehicle
+            vehicleCategory: car
+            BoundingBox:
+              Center: { x: 0, y: 0, z: 0 }
+              Dimensions: { width: 1.8, length: 4, height: 2.5 }
+            Performance: { maxSpeed: 30, maxAcceleration: INF, maxDeceleration: INF }
+            Axles:
+              FrontAxle: { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX:  1, positionZ: 0.3 }
+              RearAxle:  { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX: -1, positionZ: 0.3 }
+            Properties:
+              Property: []
+        - name: ego
+          Vehicle:
+            << : *default-vehicle
+            BoundingBox:
+              Center: { x: 0, y: 0, z: 0 }
+              Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
+            Properties:
+              Property:
+                - { name: isEgo, value: true }
+    Storyboard:
+      Init:
+        Actions:
+          Private:
+            - entityRef: ego
+              PrivateAction:
+                - TeleportAction:
+                    Position:
+                      LanePosition: &ego-position
+                        roadId: ''
+                        laneId: '34513'
+                        s: 20
+                        offset: 0
+                        Orientation: &orientation-zero { type: relative, h: 0, p: 0, r: 0 }
+            - entityRef: npc
+              PrivateAction:
+                - TeleportAction:
+                    Position:
+                      LanePosition:
+                        << : *ego-position
+                        s: NPC-S
+      Story:
+        - name: story
+          Act:
+            - name: act
+              ManeuverGroup:
+                - name: maneuver-group
+                  maximumExecutionCount: 1
+                  Actors:
+                    selectTriggeringEntities: false
+                    EntityRef: [ entityRef: ego ]
+                  Maneuver:
+                    - name: maneuver
+                      Event:
+                        - name: event
+                          priority: overwrite
+                          Action:
+                            - name: (exit-failure)
+                              UserDefinedAction:
+                                CustomCommandAction: { type: exitFailure }
+                          StartTrigger:
+                            ConditionGroup:
+                              - Condition:
+                                  - name: (when (< 10 simulation-time) ...)
+                                    delay: 0
+                                    conditionEdge: none
+                                    ByValueCondition:
+                                      SimulationTimeCondition: { rule: greaterThan, value: 10 }
+              StartTrigger:
+                ConditionGroup:
+                  - Condition: &always-true
+                      - name: "always-true"
+                        delay: 0
+                        conditionEdge: none
+                        ByValueCondition:
+                          SimulationTimeCondition: { rule: greaterThan, value: 0 }
+      StopTrigger:
+        ConditionGroup:
+          - Condition:
+              - name: (when (collide? ego npc) ...)
+                delay: 0
+                conditionEdge: none
+                ByEntityCondition:
+                  TriggeringEntities:
+                    triggeringEntitiesRule: any
+                    EntityRef: [ entityRef: ego ]
+                  EntityCondition:
+                    CollisionCondition:
+                      EntityRef: { entityRef: npc }
+  
