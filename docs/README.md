@@ -1,6 +1,6 @@
 # ScenarioSimulator
 
-Open scenario interpreter and simple simulator for Autoware.auto 
+Open scenario interpreter and simple simulator for Autoware
 
 ![rviz](image/rviz.png "rviz")
 
@@ -41,3 +41,15 @@ See [Scenario Test Runner](user_guide/test_runner/ScenarioTestRunner.md)
 ## Architecture documentation
 
 See [Architecture Documentation](design/SystemArchitecture.md)
+
+## Contact us
+
+If you have some question about this package, please pose issue or contact us!
+
+Masaya Kataoka  
+[email](mailto:masaya.kataoka@tier4.jp)  
+[github](https://github.com/hakuturu583)  
+
+Tatsuya Yamasaki  
+[email](mailto:tatsuya.yamasaki@tier4.jp)  
+[github](https://github.com/yamacir-kit)  

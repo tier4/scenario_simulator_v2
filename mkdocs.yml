@@ -26,6 +26,9 @@ nav:
                 - user_guide/test_runner/HowToWriteWorkflowFile.md
                 - user_guide/test_runner/Tips.md
     - Design:
-        - design/SystemArchitecture.md
-        - design/Tier4ScenarioFormatVersion2.md
-        - design/Tier4ExtensionInOpenScenarioFormat.md
+        - About : design/About.md
+        - Details :
+            - design/SystemArchitecture.md
+            - design/Tier4ScenarioFormatVersion2.md
+            - design/Tier4ExtensionInOpenScenarioFormat.md
+            - design/SimulationAPI.md
