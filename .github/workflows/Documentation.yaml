@@ -1,0 +1,38 @@
+name: Documentation
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+    job1:
+        name: Generate Documentation
+        runs-on: ubuntu-18.04
+        - name: Set up Python
+          uses: actions/setup-python@v1
+          with:
+            python-version: '3.6.9'
+        - name: Install 
+          run: pip3 install mkdocs mkdocs-material
+        - name: Generate documentation
+          run: mkdocs build
+        - name: zip documentation
+          run: zip -r site.zip site/
+        #- name: 'Upload Artifact'
+        #  uses: actions/upload-artifact@v2
+        #  with:
+        #    name: my-artifact
+        #    path: my_file.txt
+        #    retention-days: 1
+        - name: Slack Notification
+          uses: 8398a7/action-slack@v2
+          if: failure()
+          with:
+            status: ${{ job.status }}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
