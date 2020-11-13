@@ -27,7 +27,7 @@ jobs:
         - name: 'Upload Artifact'
           uses: actions/upload-artifact@v2
           with:
-            name: site.zip
+            name: site
             path: site.zip
             retention-days: 1
         - name: Slack Notification
