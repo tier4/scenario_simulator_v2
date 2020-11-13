@@ -27,6 +27,7 @@
 #include <Eigen/Core>
 
 #include <vector>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -53,6 +54,9 @@ bool checkCollision2D(
     boost::assign::list_of<bg_point>(points1[0].x, points1[0].y)(points1[1].x,
       points1[1].y)(points1[2].x, points1[2].y)(points1[3].x, points1[3].y);
   if (bg::intersects(poly0, poly1)) {
+    return true;
+  }
+  if (bg::intersects(poly1, poly0)) {
     return true;
   }
   if (bg::within(poly0, poly1) || bg::within(poly1, poly0)) {
