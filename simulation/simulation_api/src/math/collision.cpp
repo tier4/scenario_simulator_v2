@@ -21,12 +21,14 @@
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/geometry/algorithms/disjoint.hpp>
 
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
 #include <Eigen/Core>
 
 #include <vector>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -48,17 +50,19 @@ bool checkCollision2D(
   typedef bg::model::d2::point_xy<double> bg_point;
   const bg::model::linestring<bg_point> poly0 =
     boost::assign::list_of<bg_point>(points0[0].x, points0[0].y)(points0[1].x,
-      points0[1].y)(points0[2].x, points0[2].y)(points0[3].x, points0[3].y);
+      points0[1].y)(points0[2].x, points0[2].y)(points0[3].x, points0[3].y)(points0[0].x,
+      points0[0].y);
   const bg::model::linestring<bg_point> poly1 =
     boost::assign::list_of<bg_point>(points1[0].x, points1[0].y)(points1[1].x,
-      points1[1].y)(points1[2].x, points1[2].y)(points1[3].x, points1[3].y);
+      points1[1].y)(points1[2].x, points1[2].y)(points1[3].x, points1[3].y)(points1[0].x,
+      points1[0].y);
   if (bg::intersects(poly0, poly1)) {
     return true;
   }
-  if (bg::within(poly0, poly1) || bg::within(poly0, poly1)) {
+  if (bg::intersects(poly1, poly0)) {
     return true;
   }
-  return false;
+  return bg::disjoint(poly0, poly1);
 }
 
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(

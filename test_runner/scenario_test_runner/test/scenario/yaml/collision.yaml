@@ -29,9 +29,9 @@ OpenSCENARIO:
       - name: ego
         Vehicle:
           <<: *default-vehicle
-          # BoundingBox:
-          #   Center: { x: 0, y: 0, z: 0 }
-          #   Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
+          BoundingBox:
+            Center: { x: 0, y: 0, z: 0 }
+            Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
           Properties:
             Property:
               - { name: isEgo, value: true }
