@@ -235,7 +235,6 @@ bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, doubl
     return false;
   }
   if (status->lanelet_id == lanelet_id) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return true;
   } else {
     auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(lanelet_id, l, status->lanelet_id,

@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== LanePosition =========================================================
+/* ---- LanePosition -----------------------------------------------------------
  *
  * <xsd:complexType name="LanePosition">
  *   <xsd:all>
@@ -33,7 +33,7 @@ inline namespace syntax
  *   <xsd:attribute name="s" type="Double" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct LanePosition
 {
   const String road_id, lane_id;
@@ -50,6 +50,12 @@ struct LanePosition
     s(readAttribute<Double>("s", node, scope)),
     orientation(readElement<Orientation>("Orientation", node, scope))
   {}
+
+  operator geometry_msgs::msg::Pose() const
+  {
+    const geometry_msgs::msg::Pose result {};
+    return result;
+  }
 };
 }
 }  // namespace openscenario_interpreter
