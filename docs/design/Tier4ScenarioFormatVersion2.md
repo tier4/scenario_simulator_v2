@@ -32,11 +32,11 @@ See more details in test folder in scenario_test_runner package.
 start,step stop express it's variable range.
 initial parameter distribution is from start to end while increasing a value.
 
-We can define parameter destributions like below
+We can define parameter distributions like below
 ```yaml
 ScenarioModifiers:
   ScenarioModifier:
-    - name: "destribution"
+    - name: "distributions"
       start: 10
       stop: 20
       step: 3
@@ -46,7 +46,7 @@ if step value is 1 then distributed parameter is [10]
 if step is value 2 distributed parameter is [10, 20]  
 if step is value 3 distributed parameter is [10, 15, 20]  
 
-attension or int
+attention
 - if step is one, only parameter of start is used
 - if step is zero, it returns error
 - the number of simulation is factorial to number of  steps
