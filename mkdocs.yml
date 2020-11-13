@@ -1,5 +1,14 @@
 repo_url: https://github.com/tier4/scenario_simulator.auto
 site_name: Scenario Simulator package for Autoware
+theme: material
+extra:
+    font:
+        text: "Noto Sans JP"
+        code: "Consolas"
+
+markdown_extensions:
+    - pymdownx.highlight
+    - pymdownx.superfences
 nav:
     - Home: 
         - README.md
@@ -17,3 +26,4 @@ nav:
                 - user_guide/test_runner/ScenarioFormatConversion.md
     - Design:
         - design/SystemArchitecture.md
+        - design/Tier4ScenarioFormatVersion2.md

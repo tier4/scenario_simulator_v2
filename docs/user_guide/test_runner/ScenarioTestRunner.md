@@ -11,14 +11,6 @@ Then convert scenario into a "XML" based format called a "OpenSCENARIO" The form
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
 ```
 
-## Build with docker image
-
-```
-sh save_image.sh
-docker import 
-```
-
-
 ## Tier4 Format V2 -> OpenSCENARIO Format
 
 ### Scenario Modifiers

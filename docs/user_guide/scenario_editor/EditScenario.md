@@ -1,10 +1,10 @@
 # Edit a scenario
 
-Please go to following steps after completing [Create a simple scenario](simple_en.md 'simple_en.md').
+Please go to following steps after completing [Create a simple scenario](CreateSimpleScenario.md 'CreateSimpleScenario.md').
 
 ## Load a scenario
 
-You can load a scenario exported at [Create a simple scenario](simple_en.md 'simple_en.md') by following steps after launching scenario editor and opening a map.
+You can load a scenario exported at [Create a simple scenario](CreateSimpleScenario.md 'CreateSimpleScenario.md') by following steps after launching scenario editor and opening a map.
 
 1. "SCENARIO" on the menu -> Select "Import yaml"
 2. Select a scenario file from a displayed dialog.
@@ -19,7 +19,7 @@ You can add a Pedestrian in a scenario by following steps.
 1. "EDIT" on the menu -> "Pedestrian" -> Select "Add pedestrian"
 2. Click where you would like to add a pedestrian on the map.
 3. Adjust the pedestrian direction by dragging an arrow of the pedestrian object on the map.
-4. As same as "Velocity designation of Ego car" in [Create a simple map](simple_en.md 'simple_en.md'), designate the velocity of the pedestrian. As an example, set 0 m/s not to walk at an initial state.
+4. As same as "Velocity designation of Ego car" in [Create a simple map](CreateSimpleScenario.md 'CreateSimpleScenario.md'), designate the velocity of the pedestrian. As an example, set 0 m/s not to walk at an initial state.
 
 ![](screenshot04.png)
 
