@@ -10,8 +10,7 @@ markdown_extensions:
     - pymdownx.highlight
     - pymdownx.superfences
 nav:
-    - Home: 
-        - README.md
+    - Home: README.md
     - User Guide:
         - Scenario Editor :
             - User Guide : user_guide/scenario_editor/ScenarioEditorUserGuide.md
@@ -25,6 +24,7 @@ nav:
             - Details :
                 - user_guide/test_runner/ScenarioFormatConversion.md
                 - user_guide/test_runner/HowToWriteWorkflowFile.md
+                - user_guide/test_runner/Tips.md
     - Design:
         - design/SystemArchitecture.md
         - design/Tier4ScenarioFormatVersion2.md

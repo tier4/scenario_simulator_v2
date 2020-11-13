@@ -18,3 +18,5 @@ If you want to know how to write workflow file, read [here.](HowToWriteWorkflowF
 [HowToWriteWorkflowFile](HowToWriteWorkflowFile.md)
 
 [Scenario Conversion](ScenarioFormatConversion.md)
+
+[Tips](Tips.md)
