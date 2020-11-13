@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Position =============================================================
+/* ---- Position ---------------------------------------------------------------
  *
  * <xsd:complexType name="Position">
  *   <xsd:choice>
@@ -39,7 +39,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Position
   : public Element
 {
@@ -61,6 +61,18 @@ struct Position
         std::make_pair("RelativeLanePosition", UNSUPPORTED()),
         std::make_pair("RoutePosition", UNSUPPORTED())))
   {}
+
+  geometry_msgs::msg::Pose toPose() const
+  {
+    if ((*this).is<WorldPosition>()) {
+      return (*this).as<WorldPosition>();
+    } else if ((*this).is<LanePosition>()) {
+      return (*this).as<LanePosition>();
+    } else {
+      const geometry_msgs::msg::Pose result {};
+      return result;
+    }
+  }
 };
 }
 }  // namespace openscenario_interpreter

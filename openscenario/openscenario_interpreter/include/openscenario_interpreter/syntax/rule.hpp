@@ -15,33 +15,18 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RULE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RULE_HPP_
 
+#include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 
 #include <functional>
-#include <limits>
 #include <string>
-#include <type_traits>
 #include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-template<typename T, typename = void>
-struct equal_to
-  : public std::equal_to<T>
-{};
-
-template<typename T>
-struct equal_to<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
-{
-  constexpr auto operator()(const T & lhs, const T & rhs) const noexcept
-  {
-    return std::abs(lhs - rhs) < std::numeric_limits<typename std::decay<T>::type>::epsilon();
-  }
-};
-
-/* ==== Rule =================================================================
+/* ---- Rule -------------------------------------------------------------------
  *
  * <xsd:simpleType name="Rule">
  *   <xsd:union>
@@ -58,7 +43,7 @@ struct equal_to<T, typename std::enable_if<std::is_floating_point<T>::value>::ty
  *   </xsd:union>
  * </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Rule
 {
   enum value_type
@@ -80,15 +65,19 @@ struct Rule
   {
     switch (value) {
       case greaterThan:
-        return std::greater<void>()(std::forward<decltype(lhs)>(lhs),
-                 std::forward<decltype(rhs)>(rhs));
+        return std::greater<void>()(
+          std::forward<decltype(lhs)>(lhs),
+          std::forward<decltype(rhs)>(rhs));
 
       case lessThan:
-        return std::less<void>()(std::forward<decltype(lhs)>(lhs),
-                 std::forward<decltype(rhs)>(rhs));
+        return std::less<void>()(
+          std::forward<decltype(lhs)>(lhs),
+          std::forward<decltype(rhs)>(rhs));
 
       case equalTo:
-        return equal_to<T>()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
+        return equal_to<T>()(
+          std::forward<decltype(lhs)>(lhs),
+          std::forward<decltype(rhs)>(rhs));
 
       default:
         return false;

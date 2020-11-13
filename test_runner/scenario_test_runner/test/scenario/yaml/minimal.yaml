@@ -1,19 +1,9 @@
-# ScenarioModifiers:
-#   ScenarioModifier: []
-
 OpenSCENARIO:
-  FileHeader:
-    revMajor: 0
-    revMinor: 0
-    date: "2020-03-20T12:00:00"
-    author: yamacir-kit
-    description: Minimal scenario
+  FileHeader: { revMajor: 0, revMinor: 0, date: "2020-03-20T12:00:00", author: yamacir-kit, description: Minimal scenario }
   ParameterDeclarations:
-    ParameterDeclaration: []
   CatalogLocations:
   RoadNetwork:
-    LogicFile:
-      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
+    LogicFile: { filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm" }
   Entities:
   Storyboard:
     Init:
@@ -27,8 +17,7 @@ OpenSCENARIO:
                 maximumExecutionCount: 1
                 Actors:
                   selectTriggeringEntities: false
-                  EntityRef:
-                    - entityRef: hoge
+                  EntityRef: [ entityRef: hoge ]
                 Maneuver:
                   - name: maneuver
                     Event:
@@ -38,8 +27,7 @@ OpenSCENARIO:
                         Action:
                           - name: action
                             UserDefinedAction:
-                              CustomCommandAction:
-                                type: ":" # nop
+                              CustomCommandAction: { type: ":" } # nop
                         StartTrigger:
             StartTrigger:
     StopTrigger:
@@ -49,6 +37,4 @@ OpenSCENARIO:
             delay: 0
             conditionEdge: none
             ByValueCondition:
-              SimulationTimeCondition:
-                rule: greaterThan
-                value: 0
+              SimulationTimeCondition: { rule: greaterThan, value: 0 }
