@@ -1,4 +1,6 @@
 # Scenario Editor User Guide
+![](screenshot02.png)
+
 You can access via this [URL](https://scenario.tier4.jp/scenario_editor/restricted/).  
 <font color="Red">Note! Scenario editor only supports Google Chrome.</font>
 
