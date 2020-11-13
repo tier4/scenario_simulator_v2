@@ -12,6 +12,7 @@ jobs:
     job1:
         name: Generate Documentation
         runs-on: ubuntu-18.04
+        steps:
         - name: Set up Python
           uses: actions/setup-python@v1
           with:
@@ -22,12 +23,12 @@ jobs:
           run: mkdocs build
         - name: zip documentation
           run: zip -r site.zip site/
-        #- name: 'Upload Artifact'
-        #  uses: actions/upload-artifact@v2
-        #  with:
-        #    name: my-artifact
-        #    path: my_file.txt
-        #    retention-days: 1
+        - name: 'Upload Artifact'
+          uses: actions/upload-artifact@v2
+          with:
+            name: my-artifact
+            path: my_file.txt
+            retention-days: 1
         - name: Slack Notification
           uses: 8398a7/action-slack@v2
           if: failure()
