@@ -19,6 +19,7 @@ execute_process(
   COMMAND tr -d "\n"
   OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
 
+find_package(autoware_api_msgs REQUIRED)
 find_package(geometry_msgs     REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp            REQUIRED)

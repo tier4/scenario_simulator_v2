@@ -19,7 +19,14 @@ namespace autoware_api
 {
 
 Accessor::Accessor(const rclcpp::NodeOptions & options)
-: rclcpp::Node("autoware_api_accessor", options)
+: rclcpp::Node("autoware_api_accessor", options),
+  subscription_of_vehicle_get_status_(
+    create_subscription<decltype(vehicle_get_status_)>(
+      "/awapi/vehicle/get/status", 1,
+      [this](const decltype(vehicle_get_status_)::SharedPtr message)
+      {
+        vehicle_get_status_ = *message;
+      }))
 {}
 
 }  // namespace autoware_api

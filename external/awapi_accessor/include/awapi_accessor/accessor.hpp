@@ -15,6 +15,7 @@
 #ifndef AWAPI_ACCESSOR__ACCESSOR_HPP_
 #define AWAPI_ACCESSOR__ACCESSOR_HPP_
 
+#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <rclcpp/rclcpp.hpp>
 
@@ -24,6 +25,12 @@ namespace autoware_api
 class Accessor
   : public rclcpp::Node
 {
+  autoware_api_msgs::msg::AwapiVehicleStatus vehicle_get_status_;
+
+  rclcpp::Subscription<
+    decltype(vehicle_get_status_)
+  >::SharedPtr subscription_of_vehicle_get_status_;
+
 public:
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(const rclcpp::NodeOptions &);
