@@ -18,16 +18,22 @@
 namespace autoware_api
 {
 
+#define MAKE_SUBSCRIPTION(TOPIC, MESSAGE) \
+  subscription_of_ ## MESSAGE( \
+    create_subscription<decltype(MESSAGE)>( \
+      TOPIC, 1, \
+      [this](const decltype(MESSAGE)::SharedPtr message) \
+      { \
+        MESSAGE = *message; \
+      }))
+
 Accessor::Accessor(const rclcpp::NodeOptions & options)
 : rclcpp::Node("autoware_api_accessor", options),
-  subscription_of_vehicle_get_status_(
-    create_subscription<decltype(vehicle_get_status_)>(
-      "/awapi/vehicle/get/status", 1,
-      [this](const decltype(vehicle_get_status_)::SharedPtr message)
-      {
-        vehicle_get_status_ = *message;
-      }))
+  MAKE_SUBSCRIPTION("/awapi/vehicle/get/status", vehicle_get_status_),
+  MAKE_SUBSCRIPTION("/awapi/autoware/get/status", autoware_get_status_)
 {}
+
+#undef MAKE_SUBSCRIPTION
 
 }  // namespace autoware_api
 

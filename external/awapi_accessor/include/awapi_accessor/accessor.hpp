@@ -16,25 +16,29 @@
 #define AWAPI_ACCESSOR__ACCESSOR_HPP_
 
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <rclcpp/rclcpp.hpp>
 
 namespace autoware_api
 {
 
+#define DEFINE_SUBSCRIPTION(TYPE, NAME) \
+  TYPE NAME; \
+  rclcpp::Subscription<decltype(NAME)>::SharedPtr subscription_of_ ## NAME
+
 class Accessor
   : public rclcpp::Node
 {
-  autoware_api_msgs::msg::AwapiVehicleStatus vehicle_get_status_;
-
-  rclcpp::Subscription<
-    decltype(vehicle_get_status_)
-  >::SharedPtr subscription_of_vehicle_get_status_;
+  DEFINE_SUBSCRIPTION(autoware_api_msgs::msg::AwapiVehicleStatus, vehicle_get_status_);
+  DEFINE_SUBSCRIPTION(autoware_api_msgs::msg::AwapiAutowareStatus, autoware_get_status_);
 
 public:
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(const rclcpp::NodeOptions &);
 };
+
+#undef DEFINE_SUBSCRIPTION
 
 }  // namespace autoware_api
 
