@@ -24,4 +24,9 @@ RUN chown -R ubuntu:ubuntu /home/ubuntu/Desktop
 USER ubuntu
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
 RUN source /opt/ros/dashing/setup.bash && colcon build --symlink-install
+
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN dpkg -i ./google-chrome-stable_current_amd64.deb
+RUN rm google-chrome-stable_current_amd64.deb
+
 USER root
