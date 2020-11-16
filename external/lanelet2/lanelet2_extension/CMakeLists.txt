@@ -51,17 +51,17 @@ include_directories(
 add_definitions(${GeographicLib_DEFINITIONS})
 
 add_library(lanelet2_extension_lib SHARED
-  lib/autoware_osm_parser.cpp
-  lib/autoware_traffic_light.cpp
-  lib/detection_area.cpp
-  lib/road_marking.cpp
-  lib/mgrs_projector.cpp
-  lib/message_conversion.cpp
-  lib/query.cpp
-  lib/road_marking.cpp
-  lib/utilities.cpp
-  lib/visualization.cpp
-  lib/validation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/autoware_osm_parser.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/autoware_traffic_light.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/detection_area.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/road_marking.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/mgrs_projector.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/message_conversion.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/query.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/road_marking.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/utilities.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/visualization.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/validation.cpp
 )
 ament_target_dependencies(lanelet2_extension_lib
   rclcpp
