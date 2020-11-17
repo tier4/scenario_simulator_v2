@@ -94,8 +94,9 @@ ament_target_dependencies(entity_manager
   visualization_msgs
 )
 
+ament_export_include_directories(include)
 ament_export_libraries(entity_manager)
-ament_export_interfaces(export_entity_manager HAS_LIBRARY_TARGET)
+ament_export_interfaces(export_entity_manager)
 ament_export_dependencies(
   ament_index_cpp
   autoware_auto_msgs
@@ -123,27 +124,26 @@ install(
   RUNTIME DESTINATION bin)
 
 # ------------------------------------------------------------------------------
-#  api
+#  simulation_api
 # ------------------------------------------------------------------------------
 
-add_library(api SHARED
+add_library(simulation_api SHARED
   src/api/api.cpp
   src/api/entity_api_impl.cpp)
 
-target_include_directories(api PUBLIC
+target_include_directories(simulation_api PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(api entity_manager)
+target_link_libraries(simulation_api entity_manager)
 
-ament_target_dependencies(api entity_manager)
-
-ament_export_libraries(api)
-ament_export_interfaces(export_api HAS_LIBRARY_TARGET)
+ament_export_include_directories(include)
+ament_export_libraries(simulation_api)
+ament_export_interfaces(export_simulation_api HAS_LIBRARY_TARGET)
 
 install(
-  TARGETS api
-  EXPORT export_api
+  TARGETS simulation_api
+  EXPORT export_simulation_api
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
@@ -152,30 +152,24 @@ install(
 #  scenario_runner_moc_node
 # ------------------------------------------------------------------------------
 
-add_executable(scenario_runner_moc_node
-  src/moc/scenario_runner_moc_node.cpp
-)
+add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 
 target_include_directories(scenario_runner_moc_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-target_link_libraries(scenario_runner_moc_node api)
+target_link_libraries(scenario_runner_moc_node simulation_api)
 
-ament_target_dependencies(scenario_runner_moc_node api)
+install(
+  TARGETS scenario_runner_moc_node
+  DESTINATION lib/simulation_api)
 
 # ------------------------------------------------------------------------------
 #  installation
 # ------------------------------------------------------------------------------
 
 install(
-  TARGETS scenario_runner_moc_node
-  DESTINATION lib/simulation_api)
-
-ament_export_include_directories(include)
-
-install(
-  DIRECTORY include
+  DIRECTORY include/
   DESTINATION include)
 
 install(
@@ -192,10 +186,10 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
   ament_add_gtest(test_math test/src/test_math.cpp)
-  target_link_libraries(test_math api)
+  target_link_libraries(test_math simulation_api)
 
   ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
-  target_link_libraries(test_hdmap_utils api)
+  target_link_libraries(test_hdmap_utils simulation_api)
 endif()
 
 ament_package()

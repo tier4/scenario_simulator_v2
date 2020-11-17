@@ -36,11 +36,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-# target_link_libraries(${PROJECT_NAME}
-#   )
-
 ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
 
+ament_export_include_directories(include)
 ament_export_libraries(${PROJECT_NAME})
 ament_export_interfaces(export_${PROJECT_NAME})
 
@@ -50,10 +48,8 @@ rclcpp_components_register_nodes(${PROJECT_NAME} "autoware_api::Accessor")
 #  make install
 # ------------------------------------------------------------------------------
 
-ament_export_include_directories(include)
-
 install(
-  DIRECTORY include
+  DIRECTORY include/
   DESTINATION include)
 
 install(
