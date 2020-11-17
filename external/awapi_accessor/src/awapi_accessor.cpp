@@ -37,10 +37,14 @@ Accessor::Accessor(const rclcpp::NodeOptions & options)
   MAKE_PUBLICATION(AutowareRoute, "/awapi/autoware/put/route"),
   MAKE_PUBLICATION(LaneChangeApproval, "/awapi/lane_change/put/approval"),
   MAKE_PUBLICATION(LaneChangeForce, "/awapi/lane_change/put/force"),
-  MAKE_PUBLICATION(TrafficLightStates, "/awapi/traffic_light/put/traffic_light"),
+  MAKE_PUBLICATION(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
   MAKE_PUBLICATION(VehicleVelocity, "/awapi/vehicle/put/velocity"),
   MAKE_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
-  MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status")
+  MAKE_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
+  MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
+  // Debug
+  MAKE_PUBLICATION(DebugString, "debug/string"),
+  MAKE_SUBSCRIPTION(DebugString, "debug/string")
 {}
 
 #undef MAKE_SUBSCRIPTION

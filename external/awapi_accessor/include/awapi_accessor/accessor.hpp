@@ -23,6 +23,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/string.hpp>
 
 #include <utility>
 
@@ -99,14 +100,16 @@ class Accessor
 
   DEFINE_PUBLICATION(LaneChangeForce);
 
-  /** ---- TrafficLight --------------------------------------------------------
+  /** ---- TrafficLightStateArray ----------------------------------------------
+   *
+   *  Overwrite the recognition result of traffic light.
    *
    *  Topic: /awapi/traffic_light/put/traffic_light
    *
    * ------------------------------------------------------------------------ */
-  using TrafficLightStates = autoware_perception_msgs::msg::TrafficLightStateArray;
+  using TrafficLightStateArray = autoware_perception_msgs::msg::TrafficLightStateArray;
 
-  DEFINE_PUBLICATION(TrafficLightStates);
+  DEFINE_PUBLICATION(TrafficLightStateArray);
 
   /** ---- VehicleVelocity -----------------------------------------------------
    *
@@ -128,6 +131,15 @@ class Accessor
 
   DEFINE_SUBSCRIPTION(AutowareStatus);
 
+  /** ---- TrafficLightStatus --------------------------------------------------
+   *
+   *  Topic: /awapi/traffic_light/get/status
+   *
+   * ------------------------------------------------------------------------ */
+  using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
+
+  DEFINE_SUBSCRIPTION(TrafficLightStatus);
+
   /** ---- VehicleStatus -------------------------------------------------------
    *
    *  Topic: /awapi/vehicle/get/status
@@ -140,6 +152,16 @@ class Accessor
 public:
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(const rclcpp::NodeOptions &);
+
+  /** ---- DummyData -----------------------------------------------------------
+   *
+   *  Topic: ~/dummy
+   *
+   * ------------------------------------------------------------------------ */
+  using DebugString = std_msgs::msg::String;
+
+  DEFINE_PUBLICATION(DebugString);
+  DEFINE_SUBSCRIPTION(DebugString);
 };
 
 #undef DEFINE_SUBSCRIPTION
