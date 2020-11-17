@@ -18,22 +18,29 @@
 namespace autoware_api
 {
 
-#define MAKE_SUBSCRIPTION(TOPIC, MESSAGE) \
-  subscription_of_ ## MESSAGE( \
-    create_subscription<decltype(MESSAGE)>( \
+#define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
+  subscription_of_ ## TYPE( \
+    create_subscription<TYPE>( \
       TOPIC, 1, \
-      [this](const decltype(MESSAGE)::SharedPtr message) \
+      [this](const TYPE::SharedPtr message) \
       { \
-        MESSAGE = *message; \
+        current_value_of_ ## TYPE = *message; \
       }))
+
+#define MAKE_PUBLICATION(TYPE, TOPIC) \
+  publisher_of_ ## TYPE( \
+    create_publisher<TYPE>(TOPIC, 10))
 
 Accessor::Accessor(const rclcpp::NodeOptions & options)
 : rclcpp::Node("autoware_api_accessor", options),
-  MAKE_SUBSCRIPTION("/awapi/autoware/get/status", autoware_get_status_),
-  MAKE_SUBSCRIPTION("/awapi/vehicle/get/status", vehicle_get_status_)
+  MAKE_PUBLICATION(AutowareEngage, "/awapi/autoware/put/engage"),
+  MAKE_PUBLICATION(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+  MAKE_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
+  MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status")
 {}
 
 #undef MAKE_SUBSCRIPTION
+#undef MAKE_PUBLICATION
 
 }  // namespace autoware_api
 

@@ -19,19 +19,85 @@
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/float32.hpp>
+
+#include <utility>
 
 namespace autoware_api
 {
 
-#define DEFINE_SUBSCRIPTION(TYPE, NAME) \
-  TYPE NAME; \
-  rclcpp::Subscription<decltype(NAME)>::SharedPtr subscription_of_ ## NAME
+#define DEFINE_SUBSCRIPTION(TYPE) \
+protected: \
+  TYPE current_value_of_ ## TYPE; \
+ \
+private: \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_ ## TYPE; \
+ \
+public: \
+  const auto & get ## TYPE() const noexcept \
+  { \
+    return current_value_of_ ## TYPE; \
+  } \
+  static_assert(true, "")
+
+
+#define DEFINE_PUBLICATION(TYPE) \
+private: \
+  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_ ## TYPE; \
+ \
+public: \
+  template \
+  < \
+    typename ... Ts \
+  > \
+  decltype(auto) set ## TYPE(Ts && ... xs) const \
+  { \
+    return (*publisher_of_ ## TYPE).publish(std::forward<decltype(xs)>(xs)...); \
+  } \
+  static_assert(true, "")
+
 
 class Accessor
   : public rclcpp::Node
 {
-  DEFINE_SUBSCRIPTION(autoware_api_msgs::msg::AwapiAutowareStatus, autoware_get_status_);
-  DEFINE_SUBSCRIPTION(autoware_api_msgs::msg::AwapiVehicleStatus, vehicle_get_status_);
+  /** ---- AutowareEngage ------------------------------------------------------
+   *
+   *  Topic: /awapi/autoware/put/engage
+   *
+   * ------------------------------------------------------------------------ */
+  using AutowareEngage = std_msgs::msg::Bool;
+
+  DEFINE_PUBLICATION(AutowareEngage);
+
+  /** ---- VehicleVelocity -----------------------------------------------------
+   *
+   *  Set upper bound of velocity.
+   *
+   *  Topic: /awapi/vehicle/put/velocity
+   *
+   * ------------------------------------------------------------------------ */
+  using VehicleVelocity = std_msgs::msg::Float32;
+
+  DEFINE_PUBLICATION(VehicleVelocity);
+
+  /** ---- AutowareStatus ------------------------------------------------------
+   *
+   *  Topic: /awapi/autoware/get/status
+   *
+   * ------------------------------------------------------------------------ */
+  using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
+
+  DEFINE_SUBSCRIPTION(AutowareStatus);
+
+  /** ---- VehicleStatus -------------------------------------------------------
+   *
+   *  Topic: /awapi/vehicle/get/status
+   *
+   * ------------------------------------------------------------------------ */
+  using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
+
+  DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
   AWAPI_ACCESSOR_PUBLIC
@@ -39,6 +105,7 @@ public:
 };
 
 #undef DEFINE_SUBSCRIPTION
+#undef DEFINE_PUBLICATION
 
 }  // namespace autoware_api
 
