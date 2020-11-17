@@ -3,13 +3,18 @@
 If you have some question about this package, please post issue or contact us!
 
 ## Maintainers
-<div class="github-card" data-github="hakuturu583" data-width="400" data-height="" data-theme="default"></div>
-<script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
+
+### Masaya Kataoka
+[:fa-github: hakuturu583](https://github.com/hakuturu583)  
 Software Engineer @ [Tier IV.inc](https://tier4.jp/en/)  
 [:fa-envelope: masaya.kataoka@tier4.jp](mailto:masaya.kataoka@tier4.jp)  
 
-
-<div class="github-card" data-github="yamacir-kit" data-width="400" data-height="150" data-theme="default"></div>
-<script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
+### Tatsuya Yamasaki
+[:fa-github: yamacir-kit](https://github.com/yamacir-kit)  
 Software Engineer @ [Tier IV.inc](https://tier4.jp/en/)  
 [:fa-envelope: tatsuya.yamasaki@tier4.jp](mailto:tatsuya.yamasaki@tier4.jp)  
+
+### Taiki Tanaka
+[:fa-github: taikitanaka3](https://github.com/taikitanaka3)  
+Software Engineer @ [Tier IV.inc](https://tier4.jp/en/)  
+[:fa-envelope: taiki.tanaka@tier4.jp](mailto:taiki.tanaka@tier4.jp)  
