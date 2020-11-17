@@ -29,8 +29,8 @@ namespace autoware_api
 
 Accessor::Accessor(const rclcpp::NodeOptions & options)
 : rclcpp::Node("autoware_api_accessor", options),
-  MAKE_SUBSCRIPTION("/awapi/vehicle/get/status", vehicle_get_status_),
-  MAKE_SUBSCRIPTION("/awapi/autoware/get/status", autoware_get_status_)
+  MAKE_SUBSCRIPTION("/awapi/autoware/get/status", autoware_get_status_),
+  MAKE_SUBSCRIPTION("/awapi/vehicle/get/status", vehicle_get_status_)
 {}
 
 #undef MAKE_SUBSCRIPTION
