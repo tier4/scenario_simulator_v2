@@ -1,0 +1,6 @@
+mkdocs
+mkdocs-material
+pymdown-extensions
+mdx_unimoji
+fontawesome_markdown
+markdown

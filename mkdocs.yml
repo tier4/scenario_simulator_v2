@@ -1,6 +1,12 @@
 repo_url: https://github.com/tier4/scenario_simulator.auto
 site_name: Scenario Simulator package for Autoware
-theme: material
+theme: 
+  name: material
+  feature:
+    tabs: true
+  icon:
+    logo: material/school
+    repo: fontawesome/brands/github
 extra:
     font:
         text: "Noto Sans JP"
@@ -9,6 +15,18 @@ extra:
 markdown_extensions:
     - pymdownx.highlight
     - pymdownx.superfences
+    - mdx_unimoji
+    - fontawesome_markdown
+    - pymdownx.emoji :
+        emoji_generator: !!python/name:pymdownx.emoji.to_svg
+    - codehilite:
+        use_pygments: true
+        noclasses: true
+        pygments_style: monokai
+
+extra_css:
+    - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
+    
 nav:
     - Home: README.md
     - User Guide:
@@ -33,3 +51,4 @@ nav:
             - design/Tier4ExtensionInOpenScenarioFormat.md
             - design/SimulationAPI.md
             - design/XMLRPCAPI.md
+    - Contact Infomation: etc/ContactUs.md

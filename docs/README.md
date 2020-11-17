@@ -5,11 +5,13 @@ Open scenario interpreter and simple simulator for Autoware
 ![rviz](image/rviz.png "rviz")
 
 ## How to use
+
+### Run with ros2 launch 
 ```bash
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
 ```
 
-## Run with docker image
+### Run with docker image
 download docker image tar file form Google Drive. (https://drive.google.com/drive/folders/1Ep_CAytXa-wmIBz-_oh7hrV9UzOQTe9r?ths=true)
 ```bash
 docker load -i scenario_simulator.tar
@@ -32,24 +34,16 @@ launch lx terminal
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
 ```
 
-## How to use scenario editor
-See [Scenario Editor](docs/user_guide/README.md)
+## Detailed Documentations
+### How to use scenario editor
+See [Scenario Editor](user_guide/scenario_editor/ScenarioEditorUserGuide.md)
 
-## How to use scenario test runner
+### How to use scenario test runner
 See [Scenario Test Runner](user_guide/test_runner/ScenarioTestRunner.md)
 
-## Architecture documentation
+### Architecture documentation
 
 See [Architecture Documentation](design/SystemArchitecture.md)
 
-## Contact us
-
-If you have some question about this package, please pose issue or contact us!
-
-Masaya Kataoka  
-[email](mailto:masaya.kataoka@tier4.jp)  
-[github](https://github.com/hakuturu583)  
-
-Tatsuya Yamasaki  
-[email](mailto:tatsuya.yamasaki@tier4.jp)  
-[github](https://github.com/yamacir-kit)  
+## Contact Infomation
+See [Contact Infomation](etc/ContactUs.md)
