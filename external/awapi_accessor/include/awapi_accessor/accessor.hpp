@@ -17,6 +17,7 @@
 
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <rclcpp/rclcpp.hpp>
@@ -97,6 +98,15 @@ class Accessor
   using LaneChangeForce = std_msgs::msg::Bool;
 
   DEFINE_PUBLICATION(LaneChangeForce);
+
+  /** ---- TrafficLight --------------------------------------------------------
+   *
+   *  Topic: /awapi/traffic_light/put/traffic_light
+   *
+   * ------------------------------------------------------------------------ */
+  using TrafficLightStates = autoware_perception_msgs::msg::TrafficLightStateArray;
+
+  DEFINE_PUBLICATION(TrafficLightStates);
 
   /** ---- VehicleVelocity -----------------------------------------------------
    *
