@@ -40,9 +40,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 #   )
 
 ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
-ament_export_dependencies(${PROJECT_NAME})
-ament_export_include_directories(include)
+
 ament_export_libraries(${PROJECT_NAME})
+ament_export_interfaces(export_${PROJECT_NAME})
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "autoware_api::Accessor")
 
@@ -50,13 +50,15 @@ rclcpp_components_register_nodes(${PROJECT_NAME} "autoware_api::Accessor")
 #  make install
 # ------------------------------------------------------------------------------
 
+ament_export_include_directories(include)
+
 install(
   DIRECTORY include
-  DESTINATION share/${PROJECT_NAME})
+  DESTINATION include)
 
 install(
   TARGETS ${PROJECT_NAME}
-  EXPORT  ${PROJECT_NAME}
+  EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
