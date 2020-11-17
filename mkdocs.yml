@@ -1,5 +1,5 @@
 repo_url: https://github.com/tier4/scenario_simulator.auto
-site_name: Scenario Simulator package for Autoware
+site_name: Scenario testing tools for Autoware
 theme: 
   name: material
   feature:
@@ -9,21 +9,26 @@ theme:
     logo: material/car
     repo: fontawesome/brands/github
 extra:
-    font:
-        text: "Noto Sans JP"
-        code: "Consolas"
+  font:
+    text: "Noto Sans JP"
+    code: "Consolas"
+  search:
+    language: en
+plugins:
+    - search
+
+copyright: 'Copyright &copy; 2020- TierIV.inc'
 
 markdown_extensions:
     - pymdownx.highlight
     - pymdownx.superfences
     - mdx_unimoji
     - fontawesome_markdown
+    - pymdownx.arithmatex
     - pymdownx.emoji :
         emoji_generator: !!python/name:pymdownx.emoji.to_svg
     - codehilite:
-        use_pygments: true
-        noclasses: true
-        pygments_style: monokai
+        guess_lang: false
 
 extra_css:
     - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"

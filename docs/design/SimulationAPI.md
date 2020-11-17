@@ -114,3 +114,6 @@ int main(int argc, char * argv[])
   return 0;
 }
 ```
+
+## API Documentation
+See DOXYGEN documentation.
