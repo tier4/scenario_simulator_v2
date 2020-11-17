@@ -4,8 +4,9 @@ theme:
   name: material
   feature:
     tabs: true
+  favicon: image/icon.png
   icon:
-    logo: material/school
+    logo: material/car
     repo: fontawesome/brands/github
 extra:
     font:
@@ -26,7 +27,7 @@ markdown_extensions:
 
 extra_css:
     - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
-    
+
 nav:
     - Home: README.md
     - User Guide:
@@ -52,3 +53,4 @@ nav:
             - design/SimulationAPI.md
             - design/XMLRPCAPI.md
     - Contact Infomation: etc/ContactUs.md
+    - LICENSE : LICENSE.md
