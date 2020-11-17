@@ -17,6 +17,7 @@
 
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_planning_msgs/msg/route.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
@@ -69,6 +70,33 @@ class Accessor
   using AutowareEngage = std_msgs::msg::Bool;
 
   DEFINE_PUBLICATION(AutowareEngage);
+
+  /** ---- AutowareRoute -------------------------------------------------------
+   *
+   *  Topic: /awapi/autoware/put/route
+   *
+   * ------------------------------------------------------------------------ */
+  using AutowareRoute = autoware_planning_msgs::msg::Route;
+
+  DEFINE_PUBLICATION(AutowareRoute);
+
+  /** ---- LaneChangeApproval --------------------------------------------------
+   *
+   *  Topic: /awapi/lane_change/put/approval
+   *
+   * ------------------------------------------------------------------------ */
+  using LaneChangeApproval = std_msgs::msg::Bool;
+
+  DEFINE_PUBLICATION(LaneChangeApproval);
+
+  /** ---- LaneChangeForce -----------------------------------------------------
+   *
+   *  Topic: /awapi/lane_change/put/force
+   *
+   * ------------------------------------------------------------------------ */
+  using LaneChangeForce = std_msgs::msg::Bool;
+
+  DEFINE_PUBLICATION(LaneChangeForce);
 
   /** ---- VehicleVelocity -----------------------------------------------------
    *
