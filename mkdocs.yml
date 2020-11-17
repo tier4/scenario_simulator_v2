@@ -33,9 +33,9 @@ nav:
         - Scenario Editor :
             - User Guide : user_guide/scenario_editor/ScenarioEditorUserGuide.md
             - Details :
-                - user_guide/scenario_editor/ChangeCoordinate.md
                 - user_guide/scenario_editor/CreateSimpleScenario.md
-                - user_guide/scenario_editor/EditScenario.md
+                - user_guide/scenario_editor/EditExistingScenario.md
+                - user_guide/scenario_editor/ChangeCoordinate.md
 
         - Test Runner:
             - User Guide : user_guide/test_runner/ScenarioTestRunner.md

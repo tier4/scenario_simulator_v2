@@ -4,6 +4,12 @@ Open scenario interpreter and simple simulator for Autoware
 
 ![rviz](image/rviz.png "rviz")
 
+## Purpose of this package
+Currently, various kinds of simulators and scenario formats are developed all over the world.  
+We need open-source frameworkd for integrating those testing tools with Autoware easilly and quickly.  
+So, we developed this package.    
+<font color="Coral">__This package is designed to easily accommodate multiple simulators and scenario description formats.__</font>  
+
 ## How to use
 
 ### Run with ros2 launch 
