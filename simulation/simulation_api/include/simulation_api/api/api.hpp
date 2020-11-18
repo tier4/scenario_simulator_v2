@@ -19,6 +19,7 @@
 #include <simulation_api/api/entity_api_impl.hpp>
 #include <simulation_api/entity/entity_manager.hpp>
 
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <xmlrpcpp/XmlRpcClient.h>
 #include <xmlrpcpp/XmlRpcValue.h>
