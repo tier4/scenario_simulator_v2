@@ -3,7 +3,7 @@
 <package format="3">
   <name>scenario_test_utility</name>
   <version>0.0.0</version>
-  <description>scenario test utility package for autoware.auto</description>
+  <description>scenario test utility package for autoware</description>
   <maintainer email="ttatcoder@outlook.jp">tanaka-car</maintainer>
   <license>Apache License 2.0</license>
 

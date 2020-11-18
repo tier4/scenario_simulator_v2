@@ -1,4 +1,4 @@
-# Edit a scenario
+# Edit an existing scenario
 
 Please go to following steps after completing [Create a simple scenario](CreateSimpleScenario.md 'CreateSimpleScenario.md').
 

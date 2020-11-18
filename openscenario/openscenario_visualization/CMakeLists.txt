@@ -25,6 +25,9 @@ find_package(simulation_api REQUIRED)
 find_package(openscenario_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(document_generator REQUIRED)
+
+include("${document_generator_DIR}/document_generator.cmake")
 
 include_directories(
   include
@@ -43,6 +46,7 @@ ament_target_dependencies(openscenario_visualization_component
   openscenario_msgs
   quaternion_operation
 )
+add_document(openscenario_visualization_component)
 add_executable(openscenario_visualization_node
   src/openscenario_visualization_node.cpp
 )
@@ -56,6 +60,7 @@ ament_target_dependencies(openscenario_visualization_node
   openscenario_msgs
   quaternion_operation
 )
+add_document(openscenario_visualization_node)
 
 install(TARGETS
   openscenario_visualization_node

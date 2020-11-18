@@ -18,7 +18,7 @@ jobs:
           with:
             python-version: '3.6.12'
         - name: Install 
-          run: pip3 install mkdocs mkdocs-material
+          run: pip3 install mkdocs　mkdocs-material　pymdown-extensions　mdx_unimoji　fontawesome_markdown　markdown　python-markdown-math
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'

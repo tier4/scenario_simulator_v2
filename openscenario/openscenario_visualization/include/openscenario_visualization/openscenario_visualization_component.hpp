@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @brief definition of visualizer component
+ */
+
 #ifndef OPENSCENARIO_VISUALIZATION__OPENSCENARIO_VISUALIZATION_COMPONENT_HPP_
 #define OPENSCENARIO_VISUALIZATION__OPENSCENARIO_VISUALIZATION_COMPONENT_HPP_
 
@@ -71,6 +75,9 @@ extern "C" {
 
 namespace openscenario_visualization
 {
+/**
+ * @brief ROS2 component for visualizing simulation result.
+ */
 class OpenscenarioVisualizationComponent : public rclcpp::Node
 {
 public:
@@ -78,13 +85,40 @@ public:
   explicit OpenscenarioVisualizationComponent(const rclcpp::NodeOptions &);
 
 private:
+  /**
+   * @brief callback function when subscribe entity status array.
+   * @param msg entity status array message from openscenario interpretor.
+   */
   void entityStatusCallback(const openscenario_msgs::msg::EntityStatusArray::SharedPtr msg);
+  /**
+   * @brief generate delete marker for target namespace.
+   * @param ns namespace of the marker which you want to delete.
+   * @return const visualization_msgs::msg::MarkerArray delete marker messages.
+   */
   const visualization_msgs::msg::MarkerArray generateDeleteMarker(std::string ns);
+  /**
+   * @brief generate delete marker for all namespace.
+   * @return const visualization_msgs::msg::MarkerArray delete marker messages. (action is DELETE_ALL)
+   */
   const visualization_msgs::msg::MarkerArray generateDeleteMarker() const;
+  /**
+   * @brief generate marker from entity status
+   * @param status entity status message
+   * @return const visualization_msgs::msg::MarkerArray markers which describes entity bounding box and it's status.
+   */
   const visualization_msgs::msg::MarkerArray generateMarker(
     const openscenario_msgs::msg::EntityStatus & status);
+  /**
+   * @brief publisher of marker topic.
+   */
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+  /**
+   * @brief subscriber of entity status array topic.
+   */
   rclcpp::Subscription<openscenario_msgs::msg::EntityStatusArray>::SharedPtr entity_status_sub_;
+  /**
+   * @brief buffers for generated markers.
+   */
   std::unordered_map<std::string, visualization_msgs::msg::MarkerArray> markers_;
 };
 }  // namespace openscenario_visualization
