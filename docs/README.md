@@ -50,7 +50,6 @@ See [Scenario Editor](user_guide/scenario_editor/ScenarioEditorUserGuide.md)
 See [Scenario Test Runner](user_guide/test_runner/ScenarioTestRunner.md)
 
 ### Architecture documentation
-
 See [Architecture Documentation](design/SystemArchitecture.md)
 
 ## Contact Infomation
