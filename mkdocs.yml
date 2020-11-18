@@ -29,9 +29,12 @@ markdown_extensions:
         emoji_generator: !!python/name:pymdownx.emoji.to_svg
     - codehilite:
         guess_lang: false
+    - mdx_math
 
 extra_css:
     - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
+extra_javascript: 
+  - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
 
 nav:
     - Home: README.md

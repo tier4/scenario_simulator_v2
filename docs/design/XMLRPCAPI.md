@@ -12,12 +12,24 @@ All return values of the methods contains "[result/description]" and "[result/re
 ##### parameters
 ```
 "[sim/realtime_factor]" : Realtime factor of the simulator
-"[sim/step_time]" : Step time of the simulation
+"[sim/step_time]" : Step time of the simulation (seconds)
 ```
 
+If you define these values linke below,
+$$
+r = realtime\_factor
+$$
 
+$$
+\delta t = step\_time
+$$
 
-##### return
+One loop of the simulation should be finished in this duration.
+$$
+r * \delta t
+$$
+
+##### return values
 ```
 "[sim/initialized]" : If True, the simulator is initialized
 ```
@@ -32,7 +44,7 @@ initialize function calls once before you start simulation.
 If the timestamp does not match, the frame does not update.
 ```
 
-##### return
+##### return values
 ```
 "[sim/current_time]" : current simulation time in simulator
 ```
