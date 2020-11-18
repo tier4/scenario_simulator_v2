@@ -32,20 +32,25 @@ find_package(tf2_ros           REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
   src/awapi_awauto_adapter.cpp)
-# ament_export_libraries(${PROJECT_NAME})
-
-rclcpp_components_register_nodes(${PROJECT_NAME} "autoware_api::AutowareAutoAdapter")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-# ament_export_include_directories(include)
 
 ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
-# ament_export_dependencies(${PROJECT_NAME})
 
-# target_link_libraries(${PROJECT_NAME}
-#   )
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
+ament_export_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
+
+rclcpp_components_register_nodes(${PROJECT_NAME} "autoware_api::AutowareAutoAdapter")
+
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT  ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 # ------------------------------------------------------------------------------
 #  awapi_awauto_adapter_node
@@ -55,24 +60,17 @@ add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
+install(
+  TARGETS ${PROJECT_NAME}_node
+  DESTINATION lib/${PROJECT_NAME})
+
 # ------------------------------------------------------------------------------
 #  make install
 # ------------------------------------------------------------------------------
 
 install(
-  TARGETS ${PROJECT_NAME}_node
-  DESTINATION lib/${PROJECT_NAME})
-
-install(
-  DIRECTORY include
-  DESTINATION share/${PROJECT_NAME})
-
-install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT  ${PROJECT_NAME}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  DIRECTORY include/
+  DESTINATION include)
 
 # ------------------------------------------------------------------------------
 #  test
