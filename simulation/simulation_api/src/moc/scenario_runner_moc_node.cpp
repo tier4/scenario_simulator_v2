@@ -17,10 +17,6 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
-#include <xmlrpcpp/XmlRpcClient.h>
-#include <xmlrpcpp/XmlRpcValue.h>
-#include <xmlrpcpp/XmlRpcException.h>
 
 // headers in STL
 #include <memory>
@@ -55,14 +51,6 @@ public:
     api_.entity->setTargetSpeed("npc1", 5, true);
     api_.entity->spawn(false, "npc2", params, getNpc2InitialStatus());
     api_.entity->setTargetSpeed("npc2", 0, true);
-    /*
-    current_time_ = 0.0;
-    target_speed_setted_ = false;
-    lanechange_excuted_ = false;
-    bob_spawned_ = false;
-    api_.entity->setTargetSpeed("npc1", 10, true);
-    update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
-    */
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -83,37 +71,6 @@ private:
     if (api_.entity->checkCollision("ego", "npc2")) {
       std::cout << "collision!" << std::endl;
     }
-    /*
-    auto stand_still_duration = api_.entity->getStandStillDuration("ego");
-    if (stand_still_duration) {
-      if (stand_still_duration.get() > 0.1) {
-        std::cout << "ego is stopping " << stand_still_duration.get() << " seconds" << std::endl;
-      }
-    }
-    XmlRpc::XmlRpcValue result;
-      }
-    }
-    auto dist = api_.entity->getLongitudinalDistance("ego", "npc1");
-    if (dist) {
-      if (dist.get() < 25 && api_.entity->isInLanelet("ego", 178)) {
-        api_.entity->requestLaneChange("ego", 179);
-        lanechange_excuted_ = true;
-      }
-    }
-    if (api_.entity->isInLanelet("ego", 179) && lanechange_excuted_ && !target_speed_setted_) {
-      api_.entity->setTargetSpeed("ego", 25, true);
-      target_speed_setted_ = true;
-    }
-    auto time_headway = api_.entity->getTimeHeadway("ego", "npc1");
-    if (time_headway) {
-      if (time_headway.get() > 1 && api_.entity->isInLanelet("ego", 179)) {
-        api_.entity->setVerbose(true);
-        api_.entity->setTargetSpeed("npc1", 20, true);
-        api_.entity->requestLaneChange("ego", simulation_api::entity::Direction::LEFT);
-      }
-    }
-    */
-    // RCLCPP_INFO(get_logger(), "current time : " + std::to_string(current_time_) + " [sec]");
     api_.simulation->updateFrame();
     current_time_ = current_time_ + 0.02;
   }

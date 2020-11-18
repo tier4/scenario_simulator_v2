@@ -15,6 +15,7 @@
   <depend>openscenario_msgs</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>simulation_api</depend>
+  <depend>document_generator</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -1,4 +1,4 @@
-# Change a coordinate in scenario editor
+# Change the coordinate in scenario editor
 
 ## Displayed coordinate change
 
