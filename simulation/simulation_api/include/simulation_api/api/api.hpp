@@ -18,6 +18,7 @@
 #include <simulation_api/entity/entity_manager.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <xmlrpcpp/XmlRpcClient.h>
 #include <xmlrpcpp/XmlRpcValue.h>
@@ -69,12 +70,18 @@ public:
     auto cmd_cb = std::bind(&API::vehicleControlCommandCallback, this, std::placeholders::_1);
     cmd_sub_ = rclcpp::create_subscription<autoware_auto_msgs::msg::VehicleControlCommand>(
       node,
-      "/vehicle_cmd",
+      "input/vehicle_control_command",
       rclcpp::QoS(10),
       std::move(cmd_cb),
       options);
+    auto state_cmd_cb = std::bind(&API::vehicleStateCommandCallback, this, std::placeholders::_1);
+    state_cmd_sub_ = rclcpp::create_subscription<autoware_auto_msgs::msg::VehicleStateCommand>(
+      node,
+      "input/vehicle_state_command",
+      rclcpp::QoS(10),
+      std::move(state_cmd_cb),
+      options);
     entity_manager_ptr_ = std::make_shared<EntityManager>(node, map_path);
-
     client_ptr_ =
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
   }
@@ -139,6 +146,9 @@ private:
   void vehicleControlCommandCallback(autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> current_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_sub_;
+  void vehicleStateCommandCallback(autoware_auto_msgs::msg::VehicleStateCommand::SharedPtr msg);
+  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> current_state_cmd_;
+  rclcpp::Subscription<autoware_auto_msgs::msg::VehicleStateCommand>::SharedPtr state_cmd_sub_;
 };
 }  // namespace scenario_simulator
 
