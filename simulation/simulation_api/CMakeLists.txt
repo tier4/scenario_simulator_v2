@@ -17,7 +17,6 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -36,13 +35,11 @@ find_package(ament_index_cpp REQUIRED)
 find_package(xmlrpcpp REQUIRED)
 find_package(geographic_msgs REQUIRED)
 find_package(openscenario_msgs REQUIRED)
-
 find_package(Eigen3 REQUIRED)
 
-include_directories(
-  include
-  ${EIGEN3_INCLUDE_DIR}
-)
+# ------------------------------------------------------------------------------
+#  entity_manager
+# ------------------------------------------------------------------------------
 
 add_library(entity_manager SHARED
   src/hdmap_utils/hdmap_utils.cpp
@@ -70,9 +67,15 @@ add_library(entity_manager SHARED
   src/behavior/pedestrian/pedestrian_action_node.cpp
   src/color_utils/color_utils.cpp
 )
+
+target_include_directories(entity_manager PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(entity_manager pugixml)
+
 ament_target_dependencies(entity_manager
   rclcpp
-  rclcpp_lifecycle
   geometry_msgs
   quaternion_operation
   autoware_auto_msgs
@@ -88,72 +91,94 @@ ament_target_dependencies(entity_manager
   tf2_ros
   xmlrpcpp
   openscenario_msgs
-)
-target_link_libraries(entity_manager
-  pugixml
-)
-
-add_library(api SHARED
-  src/api/api.cpp
-  src/api/entity_api_impl.cpp
-)
-ament_target_dependencies(api
-  xmlrpcpp
-  openscenario_msgs
-)
-target_link_libraries(api
-  entity_manager
-  pugixml
-)
-
-add_executable(scenario_runner_moc_node
-  src/moc/scenario_runner_moc_node.cpp
-)
-ament_target_dependencies(scenario_runner_moc_node
-  rclcpp
-  rclcpp_lifecycle
-  geometry_msgs
   visualization_msgs
-  quaternion_operation
-  autoware_auto_msgs
-  lanelet2_core
-  lanelet2_io
-  lanelet2_routing
-  lanelet2_projection
-  lanelet2_extension
-  spline_interpolation
-  ament_index_cpp
-  behaviortree_cpp_v3
-  xmlrpcpp
-  openscenario_msgs
-)
-target_link_libraries(scenario_runner_moc_node
-  api
 )
 
-install(TARGETS entity_manager api
-  EXPORT export_api
+ament_export_include_directories(include)
+ament_export_libraries(entity_manager)
+ament_export_interfaces(export_entity_manager)
+ament_export_dependencies(
+  ament_index_cpp
+  autoware_auto_msgs
+  behaviortree_cpp_v3
+  geometry_msgs
+  lanelet2_core
+  lanelet2_extension
+  lanelet2_io
+  lanelet2_projection
+  lanelet2_routing
+  openscenario_msgs
+  quaternion_operation
+  rclcpp
+  spline_interpolation
+  tf2_geometry_msgs
+  tf2_ros
+  visualization_msgs
+  xmlrpcpp)
+
+install(
+  TARGETS entity_manager
+  EXPORT export_entity_manager
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
-ament_export_libraries(entity_manager)
-ament_export_interfaces(export_api HAS_LIBRARY_TARGET)
-ament_export_libraries(api)
 
+# ------------------------------------------------------------------------------
+#  simulation_api
+# ------------------------------------------------------------------------------
 
-install(TARGETS
-  scenario_runner_moc_node
-  DESTINATION lib/simulation_api
-)
+add_library(simulation_api SHARED
+  src/api/api.cpp
+  src/api/entity_api_impl.cpp)
+
+target_include_directories(simulation_api PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(simulation_api entity_manager)
+
+ament_export_include_directories(include)
+ament_export_libraries(simulation_api)
+ament_export_interfaces(export_simulation_api HAS_LIBRARY_TARGET)
 
 install(
-  DIRECTORY "include/"
-  DESTINATION include
-)
+  TARGETS simulation_api
+  EXPORT export_simulation_api
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
-install(DIRECTORY resource launch config test/catalog test/map
-  DESTINATION share/${PROJECT_NAME}
-)
+# ------------------------------------------------------------------------------
+#  scenario_runner_moc_node
+# ------------------------------------------------------------------------------
+
+add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
+
+target_include_directories(scenario_runner_moc_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(scenario_runner_moc_node simulation_api)
+
+install(
+  TARGETS scenario_runner_moc_node
+  DESTINATION lib/simulation_api)
+
+# ------------------------------------------------------------------------------
+#  installation
+# ------------------------------------------------------------------------------
+
+install(
+  DIRECTORY include/
+  DESTINATION include)
+
+install(
+  DIRECTORY resource launch config test/catalog test/map
+  DESTINATION share/${PROJECT_NAME})
+
+# ------------------------------------------------------------------------------
+#  test
+# ------------------------------------------------------------------------------
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -161,11 +186,10 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
   ament_add_gtest(test_math test/src/test_math.cpp)
-  target_link_libraries(test_math api)
+  target_link_libraries(test_math simulation_api)
 
   ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
-  target_link_libraries(test_hdmap_utils api)
+  target_link_libraries(test_hdmap_utils simulation_api)
 endif()
 
-ament_export_include_directories(include)
 ament_package()
