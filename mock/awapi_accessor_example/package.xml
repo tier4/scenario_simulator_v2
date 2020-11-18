@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>openscenario_interpreter</name>
+  <name>awapi_accessor_example</name>
   <version>0.0.0</version>
   <description>TODO</description>
   <maintainer email="httperror@404-notfound.jp">Yamasaki Tatsuya</maintainer>
@@ -10,16 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>awapi_accessor</depend>
-  <depend>geometry_msgs</depend>
-  <depend>junit_exporter</depend>
-  <depend>libgoogle-glog-dev</depend>
-  <depend>lifecycle_msgs</depend>
-  <depend>pugixml-dev</depend>
-  <depend>rclcpp_components</depend>
   <depend>rclcpp</depend>
-  <depend>rclcpp_lifecycle</depend>
-  <depend>simulation_api</depend>
-  <depend>std_msgs</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
@@ -29,3 +20,4 @@
     <build_type>ament_cmake</build_type>
   </export>
 </package>
+
