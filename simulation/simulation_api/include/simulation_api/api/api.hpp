@@ -25,6 +25,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace scenario_simulator
 {
@@ -52,8 +53,11 @@ class API
   using EntityManager = simulation_api::entity::EntityManager;
 
 public:
-  template<class NodeT>
-  explicit API(NodeT && node, const std::string & map_path = "")
+  template<class NodeT, class AllocatorT = std::allocator<void>>
+  explicit API(
+    NodeT && node, const std::string & map_path = "",
+    const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
+    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   {
     std::string address = "127.0.0.1";
 
@@ -62,7 +66,13 @@ public:
     node->declare_parameter("port", port);
     node->get_parameter("port", port);
     node->undeclare_parameter("port");
-
+    auto cmd_cb = std::bind(&API::vehicleControlCommandCallback, this, std::placeholders::_1);
+    cmd_sub_ = rclcpp::create_subscription<autoware_auto_msgs::msg::VehicleControlCommand>(
+      node,
+      "/vehicle_cmd",
+      rclcpp::QoS(10),
+      std::move(cmd_cb),
+      options);
     entity_manager_ptr_ = std::make_shared<EntityManager>(node, map_path);
 
     client_ptr_ =
@@ -126,6 +136,9 @@ private:
   double current_time_;
   simulation_api::entity::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
   XmlRpc::XmlRpcValue toValue(std::string name, simulation_api::entity::EntityStatus status);
+  void vehicleControlCommandCallback(autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg);
+  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> current_cmd_;
+  rclcpp::Subscription<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_sub_;
 };
 }  // namespace scenario_simulator
 

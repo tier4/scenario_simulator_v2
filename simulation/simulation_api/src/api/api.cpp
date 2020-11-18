@@ -376,6 +376,7 @@ XmlRpc::XmlRpcValue API::initialize(
   double realtime_factor, double step_time, int times_try,
   int duration_try_in_msec)
 {
+  current_cmd_ = boost::none;
   step_time_ = step_time;
   current_time_ = 0.0;
   XmlRpc::XmlRpcValue value;
@@ -419,5 +420,10 @@ XmlRpc::XmlRpcValue API::updateFrame()
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;
   return result[0][0];
+}
+void API::vehicleControlCommandCallback(
+  autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg)
+{
+  current_cmd_ = *msg;
 }
 }  // namespace scenario_simulator
