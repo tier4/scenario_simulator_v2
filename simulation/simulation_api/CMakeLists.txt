@@ -128,8 +128,7 @@ install(
 # ------------------------------------------------------------------------------
 
 add_library(simulation_api SHARED
-  src/api/api.cpp
-  src/api/entity_api_impl.cpp)
+  src/api/api.cpp)
 
 target_include_directories(simulation_api PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
