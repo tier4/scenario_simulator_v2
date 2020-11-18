@@ -1,6 +1,6 @@
 # ScenarioSimulator
 
-Open scenario interpreter and simple simulator for Autoware
+OpenSENARIO interpreter and simple simulator for Autoware
 
 ![rviz](image/rviz.png "rviz")
 
