@@ -31,7 +31,7 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
   marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/entity/marker", 1);
   entity_status_sub_ = this->create_subscription<openscenario_msgs::msg::EntityStatusArray>(
     "/entity/status", 1,
-    std::bind(&API::vehicleControlCommandCallback, this,
+    std::bind(&OpenscenarioVisualizationComponent::entityStatusCallback, this,
     std::placeholders::_1));
 }
 
