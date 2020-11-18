@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(awapi_accessor)
+project(awapi_accessor_example)
 
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -13,52 +13,28 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-execute_process(
-  COMMAND grep -e "<depend>" ${CMAKE_CURRENT_SOURCE_DIR}/package.xml
-  COMMAND sed -E "s/(.*)<(.*)>(.*)<\\/\\2>/\\3;/g"
-  COMMAND tr -d "\n"
-  OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
-
-foreach(PACKAGE IN LISTS ${PROJECT_NAME}_DEPENDENCIES)
-  if(PACKAGE)
-    find_package(${PACKAGE} REQUIRED)
-  endif()
-endforeach()
+find_package(awapi_accessor REQUIRED)
+find_package(rclcpp         REQUIRED)
 
 # ------------------------------------------------------------------------------
-#  libawapi_accessor
+#  awapi_accessor_example_node
 # ------------------------------------------------------------------------------
 
-add_library(${PROJECT_NAME} SHARED
-  src/awapi_accessor.cpp)
+add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(${PROJECT_NAME}_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-ament_target_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_DEPENDENCIES})
-
-ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
-ament_export_interfaces(${PROJECT_NAME}-config)
-ament_export_dependencies(${${PROJECT_NAME}_DEPENDENCIES})
-
-rclcpp_components_register_nodes(${PROJECT_NAME} "autoware_api::Accessor")
+ament_target_dependencies(${PROJECT_NAME}_node awapi_accessor rclcpp)
 
 # ------------------------------------------------------------------------------
 #  make install
 # ------------------------------------------------------------------------------
 
 install(
-  DIRECTORY include/
-  DESTINATION include)
-
-install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT ${PROJECT_NAME}-config
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  TARGETS ${PROJECT_NAME}_node
+  DESTINATION lib/${PROJECT_NAME})
 
 # ------------------------------------------------------------------------------
 #  test
@@ -70,3 +46,4 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+
