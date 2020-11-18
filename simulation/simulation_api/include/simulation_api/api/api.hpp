@@ -25,6 +25,7 @@
 
 #include <memory>
 #include <string>
+#include <limits>
 
 namespace scenario_simulator
 {
@@ -478,8 +479,6 @@ private:
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;
   double current_time_;
-  //std::shared_ptr<SimulationAPIImpl> simulation;
-  //std::shared_ptr<EntityAPIImpl> entity;
 };
 }  // namespace scenario_simulator
 
