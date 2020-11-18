@@ -6,3 +6,6 @@ external/quaternion_operation
 *.log
 scenario_simulator.tar
 site
+*.bak
+html
+latex

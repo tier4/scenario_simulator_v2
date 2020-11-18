@@ -17,7 +17,7 @@ setup(
     zip_safe=True,
     maintainer='tanaka-car',
     maintainer_email='ttatcoder@outlook.jp',
-    description='scenario test utility package for autoware.auto',
+    description='scenario test utility package for autoware',
     license='Apache License 2.0',
     tests_require=['pytest'],
     entry_points={
