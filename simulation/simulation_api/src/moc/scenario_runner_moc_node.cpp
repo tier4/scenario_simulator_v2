@@ -66,10 +66,10 @@ private:
       api_.setTargetSpeed("npc2", 3, true);
     }
     if (api_.checkCollision("ego", "npc1")) {
-      std::cout << "collision!" << std::endl;
+      std::cout << "npc1 collision!" << std::endl;
     }
     if (api_.checkCollision("ego", "npc2")) {
-      std::cout << "collision!" << std::endl;
+      std::cout << "npc2 collision!" << std::endl;
     }
     api_.updateFrame();
     current_time_ = current_time_ + 0.02;
