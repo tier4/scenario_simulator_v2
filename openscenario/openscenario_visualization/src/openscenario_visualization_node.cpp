@@ -12,6 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @mainpage ROS2 visualization node for OpenSCENARIO entities
+ * @image html images/rviz.png width=1280px height=540px
+ * @author Masaya Kataoka
+ * @date 2020-11-19
+ * @section interface
+  <table>
+    <caption id="multi_row">ROS2 Topic interface</caption>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Pub/Sub</th>
+      <th>description</th>
+    </tr>
+    <tr>
+      <td>/entity/marker</td>
+      <td>visualization_msgs/msg/MarkerArray</td>
+      <td>Publish</td>
+      <td>Visualization results of the marker.</td>
+    </tr>
+    <tr>
+      <td>/entity/status</td>
+      <td>openscenario_msgs/msg/EntityStatusArray</td>
+      <td>Subscribe</td>
+      <td>Topics for publishing entity status in simulation.</td>
+    </tr>
+  </table>
+ */
+
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <memory>

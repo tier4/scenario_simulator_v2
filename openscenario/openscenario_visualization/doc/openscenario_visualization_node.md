@@ -1,1 +1,0 @@
-# OpenSCENARIO Visualization Node
