@@ -403,6 +403,7 @@ XmlRpc::XmlRpcValue API::initialize(
 XmlRpc::XmlRpcValue API::updateFrame()
 {
   entity_manager_ptr_->update(current_time_, step_time_);
+  entity_manager_ptr_->setVehicleCommands(current_cmd_, current_state_cmd_);
   XmlRpc::XmlRpcValue value;
   value[0][0]["methodName"] = "update_frame";
   value[0][0]["params"]["runner/current_time"] = current_time_;

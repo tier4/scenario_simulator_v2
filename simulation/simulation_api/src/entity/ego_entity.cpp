@@ -32,5 +32,14 @@ EgoEntity::EgoEntity(std::string name, const pugi::xml_node & xml)
 : VehicleEntity(name, xml) {}
 EgoEntity::EgoEntity(std::string name, VehicleParameters parameters)
 : VehicleEntity(name, parameters) {}
+void EgoEntity::onUpdate(double current_time, double step_time)
+{}
+void EgoEntity::setVehicleCommands(
+  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
+  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd)
+{
+  control_cmd_ = control_cmd;
+  state_cmd_ = state_cmd;
+}
 }  // namespace entity
 }  // namespace simulation_api

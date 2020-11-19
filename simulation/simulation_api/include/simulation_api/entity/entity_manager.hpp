@@ -23,6 +23,10 @@
 
 #include <openscenario_msgs/msg/entity_status_array.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -86,6 +90,8 @@ private:
   }
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
   int getNumberOfEgo() const;
+  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
+  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
@@ -124,6 +130,9 @@ public:
   }
   ~EntityManager() {}
   bool checkCollision(std::string name0, std::string name1);
+  void setVehicleCommands(
+    boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
+    boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd);
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
