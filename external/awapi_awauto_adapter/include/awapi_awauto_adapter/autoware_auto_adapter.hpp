@@ -45,24 +45,27 @@ private:
    * ------------------------------------------------------------------------ */
   using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
   rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
-  void vehicle_status_publisher();
+  VehicleStatus vehicle_status_;
   rclcpp::TimerBase::SharedPtr timer_vehicle_status_;
+  void vehicle_status_publisher();
 
   /** ---- LaneChangeStatus ------------------------------------------------------
    *  Topic: /awapi/lane_change/get/status
    * ------------------------------------------------------------------------ */
   using LaneChangeStatus = autoware_api_msgs::msg::LaneChangeStatus;
   rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
-  void lane_change_status_publisher();
+  LaneChangeStatus lane_change_status_;
   rclcpp::TimerBase::SharedPtr timer_lane_change_status_;
+  void lane_change_status_publisher();
 
   /** ---- TrafficLightStatus --------------------------------------------------
    *  Topic: /awapi/traffic_light/get/status
    * ------------------------------------------------------------------------ */
   using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
   rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
-  void traffic_light_status_publisher();
+  TrafficLightStatus traffic_lights_;
   rclcpp::TimerBase::SharedPtr timer_traffic_light_status_;
+  void traffic_light_status_publisher();
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
