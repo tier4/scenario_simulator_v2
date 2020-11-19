@@ -17,6 +17,7 @@
 #include <awapi_awauto_adapter/utility/visibility.h>
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_api_msgs/msg/lane_change_status.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -30,29 +31,38 @@ namespace autoware_api
 class AutowareAutoAdapter : public rclcpp::Node
 {
 private:
-  rclcpp::TimerBase::SharedPtr timer_;
-  void global_timer();
-
-  /** ---- AutowareEngage ------------------------------------------------------
-   *  Topic: /awapi/autoware/put/engage
-   * ------------------------------------------------------------------------ */
-  using AutowareEngage = std_msgs::msg::Bool;
-  rclcpp::Publisher<AutowareEngage>::SharedPtr pub_autoware_enage_;
-  rclcpp::TimerBase::SharedPtr timer_engage_;
-  void dummy_engage_autoware();
-
-  /** ---- AutowareRoute -------------------------------------------------------
-   *  Topic: /awapi/autoware/put/route
-   * ------------------------------------------------------------------------ */
-  using AutowareRoute = autoware_planning_msgs::msg::Route;
-  rclcpp::Subscription<autoware_planning_msgs::msg::Route>::SharedPtr sub_route_;
-
   /** ---- AutowareStatus ------------------------------------------------------
    *  Topic: /awapi/autoware/get/status
    * ------------------------------------------------------------------------ */
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   AutowareStatus autoware_status_;
+  rclcpp::TimerBase::SharedPtr timer_autoware_staus_;
+  void autoware_status_publisher();
+
+  /** ---- VehicleStatus -------------------------------------------------------
+   *  Topic: /awapi/vehicle/get/status
+   * ------------------------------------------------------------------------ */
+  using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
+  rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
+  void vehicle_status_publisher();
+  rclcpp::TimerBase::SharedPtr timer_vehicle_status_;
+
+  /** ---- LaneChangeStatus ------------------------------------------------------
+   *  Topic: /awapi/lane_change/get/status
+   * ------------------------------------------------------------------------ */
+  using LaneChangeStatus = autoware_api_msgs::msg::LaneChangeStatus;
+  rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
+  void lane_change_status_publisher();
+  rclcpp::TimerBase::SharedPtr timer_lane_change_status_;
+
+  /** ---- TrafficLightStatus --------------------------------------------------
+   *  Topic: /awapi/traffic_light/get/status
+   * ------------------------------------------------------------------------ */
+  using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
+  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
+  void traffic_light_status_publisher();
+  rclcpp::TimerBase::SharedPtr timer_traffic_light_status_;
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
