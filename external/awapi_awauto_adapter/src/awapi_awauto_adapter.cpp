@@ -20,10 +20,22 @@ namespace autoware_api
 AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
 : rclcpp::Node("autoware_auto_adapter", options)
 {
+  pub_autoware_status_ = this->create_publisher<AutowareStatus>("/awapi/autoware/get/status", 1);
   pub_autoware_enage_ = this->create_publisher<AutowareEngage>("/awapi/autoware/put/engage", 1);
-  timer_engage_ =
-    this->create_wall_timer(500ms, std::bind(&AutowareAutoAdapter::dummy_engage_autoware, this));
+  timer_ = this->create_wall_timer(
+    500ms, std::bind(&AutowareAutoAdapter::global_timer, this));
+  timer_engage_ = this->create_wall_timer(
+    500ms, std::bind(&AutowareAutoAdapter::dummy_engage_autoware, this));
 }
+
+void AutowareAutoAdapter::global_timer()
+{
+  autoware_status_ = AutowareStatus();
+  autoware_status_.autoware_state = "test";
+  RCLCPP_INFO(this->get_logger(), "state: %s", autoware_status_.autoware_state);
+  pub_autoware_status_->publish(autoware_status_);
+}
+
 void AutowareAutoAdapter::dummy_engage_autoware()
 {
   AutowareEngage engage;

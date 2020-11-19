@@ -28,23 +28,29 @@ namespace autoware_api
 class AutowareAutoAdapter : public rclcpp::Node
 {
 private:
+  rclcpp::TimerBase::SharedPtr timer_;
+  void global_timer();
+
   /** ---- AutowareEngage ------------------------------------------------------
    *  Topic: /awapi/autoware/put/engage
    * ------------------------------------------------------------------------ */
   using AutowareEngage = std_msgs::msg::Bool;
-  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pub_autoware_enage_;
+  rclcpp::Publisher<AutowareEngage>::SharedPtr pub_autoware_enage_;
   rclcpp::TimerBase::SharedPtr timer_engage_;
   void dummy_engage_autoware();
+
   /** ---- AutowareRoute -------------------------------------------------------
    *  Topic: /awapi/autoware/put/route
    * ------------------------------------------------------------------------ */
   using AutowareRoute = autoware_planning_msgs::msg::Route;
   rclcpp::Subscription<autoware_planning_msgs::msg::Route>::SharedPtr sub_route_;
+
   /** ---- AutowareStatus ------------------------------------------------------
    *  Topic: /awapi/autoware/get/status
    * ------------------------------------------------------------------------ */
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
-  rclcpp::Subscription<AutowareStatus>::SharedPtr sub_autoware_state_;
+  rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
+  AutowareStatus autoware_status_;
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
