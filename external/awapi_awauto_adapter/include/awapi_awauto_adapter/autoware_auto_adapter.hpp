@@ -14,21 +14,41 @@
 
 #ifndef AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
 #define AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
-
 #include <awapi_awauto_adapter/utility/visibility.h>
+#include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
+#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
+#include <autoware_planning_msgs/msg/route.hpp>
 #include <rclcpp/rclcpp.hpp>
-
+#include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/float32.hpp>
+#include <std_msgs/msg/string.hpp>
 namespace autoware_api
 {
-
-class AutowareAutoAdapter
-  : public rclcpp::Node
+class AutowareAutoAdapter : public rclcpp::Node
 {
+private:
+  /** ---- AutowareEngage ------------------------------------------------------
+   *  Topic: /awapi/autoware/put/engage
+   * ------------------------------------------------------------------------ */
+  using AutowareEngage = std_msgs::msg::Bool;
+  rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr pub_autoware_enage_;
+  rclcpp::TimerBase::SharedPtr timer_engage_;
+  void dummy_engage_autoware();
+  /** ---- AutowareRoute -------------------------------------------------------
+   *  Topic: /awapi/autoware/put/route
+   * ------------------------------------------------------------------------ */
+  using AutowareRoute = autoware_planning_msgs::msg::Route;
+  rclcpp::Subscription<autoware_planning_msgs::msg::Route>::SharedPtr sub_route_;
+  /** ---- AutowareStatus ------------------------------------------------------
+   *  Topic: /awapi/autoware/get/status
+   * ------------------------------------------------------------------------ */
+  using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
+  rclcpp::Subscription<AutowareStatus>::SharedPtr sub_autoware_state_;
+
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
   explicit AutowareAutoAdapter(const rclcpp::NodeOptions &);
 };
-
 }  // namespace autoware_api
-
 #endif  // AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
