@@ -16,6 +16,7 @@
 #define SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 
 #include <simulation_api/entity/vehicle_entity.hpp>
+#include <simulation_api/vehicle_model/sim_model.hpp>
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 
@@ -48,6 +49,7 @@ public:
 private:
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
+  std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 };
 }      // namespace entity
 }  // namespace simulation_api
