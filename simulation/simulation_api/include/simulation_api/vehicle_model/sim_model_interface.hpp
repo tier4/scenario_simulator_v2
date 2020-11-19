@@ -18,7 +18,7 @@
 #include <eigen3/Eigen/Core>
 
 /**
- * @class simple_simple_planning_simulator vehicle model class
+ * @class simple_simulation_api vehicle model class
  * @brief calculate vehicle dynamics
  */
 class SimModelInterface

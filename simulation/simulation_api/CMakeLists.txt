@@ -66,6 +66,11 @@ add_library(entity_manager SHARED
   src/behavior/pedestrian/acquire_position_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp
   src/color_utils/color_utils.cpp
+  src/vehicle_model/sim_model_delay_steer_acc.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_ideal_steer_vel.cpp
+  src/vehicle_model/sim_model_interface.cpp
 )
 
 target_include_directories(entity_manager PUBLIC

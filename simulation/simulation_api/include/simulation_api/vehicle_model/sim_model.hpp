@@ -15,10 +15,10 @@
 #ifndef SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_HPP_
 #define SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_HPP_
 
-#include "simple_planning_simulator/vehicle_model/sim_model_interface.hpp"
-#include "simple_planning_simulator/vehicle_model/sim_model_ideal_steer_acc.hpp"
-#include "simple_planning_simulator/vehicle_model/sim_model_ideal_steer_acc_geared.hpp"
-#include "simple_planning_simulator/vehicle_model/sim_model_delay_steer_acc.hpp"
-#include "simple_planning_simulator/vehicle_model/sim_model_ideal_steer_vel.hpp"
+#include "simulation_api/vehicle_model/sim_model_interface.hpp"
+#include "simulation_api/vehicle_model/sim_model_ideal_steer_acc.hpp"
+#include "simulation_api/vehicle_model/sim_model_ideal_steer_acc_geared.hpp"
+#include "simulation_api/vehicle_model/sim_model_delay_steer_acc.hpp"
+#include "simulation_api/vehicle_model/sim_model_ideal_steer_vel.hpp"
 
 #endif  // SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_HPP_

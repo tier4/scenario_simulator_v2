@@ -15,7 +15,7 @@
 #ifndef SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_
 #define SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_
 
-#include "simple_planning_simulator/vehicle_model/sim_model_interface.hpp"
+#include "simulation_api/vehicle_model/sim_model_interface.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>

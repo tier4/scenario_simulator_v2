@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "simple_planning_simulator/vehicle_model/sim_model_ideal_steer_vel.hpp"
+#include "simulation_api/vehicle_model/sim_model_ideal_steer_vel.hpp"
 
 
 SimModelIdealSteerVel::SimModelIdealSteerVel(double wheelbase)
