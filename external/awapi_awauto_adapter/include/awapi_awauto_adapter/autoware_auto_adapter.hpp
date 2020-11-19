@@ -23,6 +23,8 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <chrono>
+
 namespace autoware_api
 {
 class AutowareAutoAdapter : public rclcpp::Node
