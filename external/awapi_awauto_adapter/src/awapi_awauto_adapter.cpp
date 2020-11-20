@@ -14,7 +14,7 @@
 
 #include <awapi_awauto_adapter/autoware_auto_adapter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-using namespace std::chrono_literals;
+
 namespace autoware_api
 {
 AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
