@@ -24,6 +24,7 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
+
 #include <chrono>
 
 namespace autoware_api
@@ -36,6 +37,7 @@ class AutowareAutoStatusPublisher : public rclcpp::Node
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   AutowareStatus autoware_status_;
+  void get_autoware_state_info();
 
 public:
   void publish_autoware_status();

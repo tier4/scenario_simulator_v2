@@ -25,9 +25,9 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
+
 #include <chrono>
 #include <memory>
-#include <type_traits>
 
 namespace autoware_api
 {
