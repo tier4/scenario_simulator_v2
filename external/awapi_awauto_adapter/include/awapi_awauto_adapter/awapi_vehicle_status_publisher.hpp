@@ -21,8 +21,10 @@
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
 #include <chrono>
 
 namespace autoware_api
@@ -40,6 +42,10 @@ class AutowareVehicleStatusPublisher : public rclcpp::Node
   void get_pose_info(VehicleStatus * status);
   void get_steer_info(VehicleStatus * status);
   void get_vehicle_cmd_info(VehicleStatus * status);
+  void get_turn_signal_info(VehicleStatus * status);
+  void get_twist_info(VehicleStatus * status);
+  void get_gear_info(VehicleStatus * status);
+  void get_battery_info(VehicleStatus * status);
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC

@@ -37,6 +37,7 @@ void AutowareVehicleStatusPublisher::publish_vehicle_status()
   get_steer_info(&vehicle_status);
   get_steer_info(&vehicle_status);
   get_vehicle_cmd_info(&vehicle_status);
+  get_twist_info(&vehicle_status);
   pub_vehicle_status_->publish(vehicle_status);
   RCLCPP_INFO(this->get_logger(), " VehicleStatus %i",
     vehicle_status.header.stamp);
@@ -86,5 +87,19 @@ void AutowareVehicleStatusPublisher::get_vehicle_cmd_info(
   status->target_velocity = velocity;
   status->target_steering = steering_angle;
   status->target_steering_velocity = steering_angle_velocity;
+}
+void AutowareVehicleStatusPublisher::get_turn_signal_info(VehicleStatus * status)
+{
+  int turn_signal = 1;
+  // get turn signal
+  status->turn_signal = turn_signal;
+}
+void AutowareVehicleStatusPublisher::get_twist_info(VehicleStatus * status)
+{
+  geometry_msgs::msg::TwistStamped twist;
+  const geometry_msgs::msg::TwistStamped::ConstSharedPtr twist_ptr = twist;
+  // get turn signal
+  status->velocity = twist_ptr->twist.linear.x;
+  status->angular_velocity = twist_ptr->twist.angular.z;
 }
 }  // namespace autoware_api
