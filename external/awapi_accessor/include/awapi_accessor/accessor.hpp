@@ -62,7 +62,6 @@ public: \
 
 
 class Accessor
-  : public rclcpp::Node
 {
   /** ---- AutowareEngage ------------------------------------------------------
    *
@@ -151,7 +150,7 @@ class Accessor
 
 public:
   AWAPI_ACCESSOR_PUBLIC
-  explicit Accessor(const rclcpp::NodeOptions &);
+  explicit Accessor(rclcpp::Node &);
 
   /** ---- DummyData -----------------------------------------------------------
    *
