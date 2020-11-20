@@ -25,6 +25,10 @@
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <chrono>
+#include <type_traits>
+#include "rclcpp/logger.hpp"
+#include "rcutils/logging_macros.h"
+#include "rclcpp/utilities.hpp"
 
 namespace autoware_api
 {

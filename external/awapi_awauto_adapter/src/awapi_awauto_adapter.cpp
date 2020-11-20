@@ -44,29 +44,34 @@ void AutowareAutoAdapter::publish_autoware_status()
 {
   autoware_status_ = AutowareStatus();
   autoware_status_.header.frame_id = "base_link";
+  autoware_status_.header.stamp = get_clock()->now();
   autoware_status_.control_mode = 1;
   autoware_status_.gate_mode = 2;
-  RCLCPP_INFO(this->get_logger(), "[awapi_adapter]:publish_autoware_status");
+  RCLCPP_INFO(
+    this->get_logger(), "[awapi_adapter]:AutowareStatus %i",
+    autoware_status_.header.stamp);
   pub_autoware_status_->publish(autoware_status_);
 }
 void AutowareAutoAdapter::publish_vehicle_status()
 {
   vehicle_status_ = VehicleStatus();
   vehicle_status_.header.frame_id = "base_link";
+  vehicle_status_.header.stamp = get_clock()->now();
   vehicle_status_.velocity = 0.1;
   pub_vehicle_status_->publish(vehicle_status_);
-  RCLCPP_INFO(this->get_logger(), "[awapi_adapter]: %s", vehicle_status_.header.frame_id.c_str());
+  RCLCPP_INFO(this->get_logger(), "[awapi_adapter]: VehicleStatus %i",
+    vehicle_status_.header.stamp);
 }
 
 void AutowareAutoAdapter::publish_lane_change_status()
 {
   lane_change_status_ = LaneChangeStatus();
   lane_change_status_.header.frame_id = "map";
+  lane_change_status_.header.stamp = get_clock()->now();
   lane_change_status_.force_lane_change_available = true;
   lane_change_status_.lane_change_ready = true;
   RCLCPP_INFO(
-    this->get_logger(), "[awapi_adapter]: %s",
-    lane_change_status_.header.frame_id.c_str());
+    this->get_logger(), "[awapi_adapter]:LaneChangeStatus %i", lane_change_status_.header.stamp);
   pub_lane_change_status_->publish(lane_change_status_);
 }
 
@@ -74,7 +79,9 @@ void AutowareAutoAdapter::publish_traffic_light_status()
 {
   traffic_lights_ = TrafficLightStatus();
   traffic_lights_.header.frame_id = "map";
-  RCLCPP_INFO(this->get_logger(), "[awapi_adapter]: %s", traffic_lights_.header.frame_id.c_str());
+  traffic_lights_.header.stamp = get_clock()->now();
+  RCLCPP_INFO(
+    this->get_logger(), "[awapi_adapter]:TrafficLightStatus %i", traffic_lights_.header.stamp);
   pub_traffic_light_status_->publish(traffic_lights_);
 }
 }  // namespace autoware_api
