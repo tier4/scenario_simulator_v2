@@ -66,6 +66,11 @@ add_library(entity_manager SHARED
   src/behavior/pedestrian/acquire_position_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp
   src/color_utils/color_utils.cpp
+  src/vehicle_model/sim_model_delay_steer_acc.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
+  src/vehicle_model/sim_model_ideal_steer_vel.cpp
+  src/vehicle_model/sim_model_interface.cpp
 )
 
 target_include_directories(entity_manager PUBLIC
@@ -128,8 +133,7 @@ install(
 # ------------------------------------------------------------------------------
 
 add_library(simulation_api SHARED
-  src/api/api.cpp
-  src/api/entity_api_impl.cpp)
+  src/api/api.cpp)
 
 target_include_directories(simulation_api PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

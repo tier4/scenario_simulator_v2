@@ -23,6 +23,14 @@ namespace simulation_api
 {
 namespace entity
 {
+void EntityManager::setVehicleCommands(
+  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
+  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd)
+{
+  control_cmd_ = control_cmd;
+  state_cmd_ = state_cmd;
+}
+
 void EntityManager::setVerbose(bool verbose)
 {
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
@@ -400,6 +408,7 @@ void EntityManager::update(double current_time, double step_time)
     throw SimulationRuntimeError("multi ego simulation does not support yet.");
   }
   setVerbose(verbose_);
+
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, EntityStatus> all_status;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
@@ -414,6 +423,16 @@ void EntityManager::update(double current_time, double step_time)
     }
     if (it->second.type() == typeid(EgoEntity)) {
       boost::any_cast<EgoEntity &>(it->second).setEntityTypeList(type_list);
+      boost::any_cast<EgoEntity &>(it->second).setVehicleCommands(control_cmd_, state_cmd_);
+      auto kinematic_state =
+        boost::any_cast<EgoEntity &>(it->second).getCurrentKinematicState();
+      if (kinematic_state) {
+        autoware_auto_msgs::msg::VehicleKinematicState msg;
+        msg = kinematic_state.get();
+        msg.header.frame_id = "map";
+        msg.header.stamp = clock_ptr_->now();
+        kinematic_state_pub_ptr_->publish(msg);
+      }
       boost::any_cast<EgoEntity &>(it->second).onUpdate(current_time, step_time);
       if (boost::any_cast<EgoEntity &>(it->second).statusSetted()) {
         auto status = boost::any_cast<EgoEntity &>(it->second).getStatus(

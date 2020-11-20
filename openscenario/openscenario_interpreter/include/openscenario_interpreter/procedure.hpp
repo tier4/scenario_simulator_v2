@@ -42,36 +42,36 @@ decltype(auto) connect(Ts && ... xs)
 template<typename ... Ts>
 decltype(auto) initialize(Ts && ... xs)
 {
-  return connection.simulation->initialize(std::forward<decltype(xs)>(xs)...);
+  return connection.initialize(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) spawn(Ts && ... xs)
 {
-  return connection.entity->spawn(std::forward<decltype(xs)>(xs)...);
+  return connection.spawn(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) requestLaneChange(Ts && ... xs)
 {
-  return connection.entity->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+  return connection.requestLaneChange(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) isInLanelet(Ts && ... xs)
 {
-  return connection.entity->isInLanelet(std::forward<decltype(xs)>(xs)...);
+  return connection.isInLanelet(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) setTargetSpeed(Ts && ... xs)
 {
-  return connection.entity->setTargetSpeed(std::forward<decltype(xs)>(xs)...);
+  return connection.setTargetSpeed(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) getEntityStatus(Ts && ... xs) try {
-  return connection.entity->getEntityStatus(std::forward<decltype(xs)>(xs)...);
+  return connection.getEntityStatus(std::forward<decltype(xs)>(xs)...);
 } catch (const simulation_api::SimulationRuntimeError & error) {
   std::stringstream ss {};
   ss << error.what() << ".\n";
@@ -83,30 +83,30 @@ decltype(auto) getEntityStatus(Ts && ... xs) try {
 template<typename ... Ts>
 decltype(auto) setEntityStatus(Ts && ... xs)
 {
-  return connection.entity->setEntityStatus(std::forward<decltype(xs)>(xs)...);
+  return connection.setEntityStatus(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) getCurrentTime(Ts && ... xs)
 {
-  return connection.simulation->getCurrentTime(std::forward<decltype(xs)>(xs)...);
+  return connection.getCurrentTime(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) isReachedPosition(Ts && ... xs)
 {
-  return connection.entity->reachPosition(std::forward<decltype(xs)>(xs)...);
+  return connection.reachPosition(std::forward<decltype(xs)>(xs)...);
 }
 
 // template<typename ... Ts>
 // decltype(auto) getRelativeDistance(Ts && ... xs)
 // {
-//   return connection.entity->getRelativeDistance(std::forward<decltype(xs)>(xs)...);
+//   return connection.getRelativeDistance(std::forward<decltype(xs)>(xs)...);
 // }
 
 template<typename ... Ts>
 decltype(auto) getRelativePose(Ts && ... xs) try {
-  return connection.entity->getRelativePose(std::forward<decltype(xs)>(xs)...);
+  return connection.getRelativePose(std::forward<decltype(xs)>(xs)...);
 } catch (const simulation_api::SimulationRuntimeError &) {
   geometry_msgs::msg::Pose result {};
   result.position.x = std::numeric_limits<double>::quiet_NaN();
@@ -122,7 +122,7 @@ decltype(auto) getRelativePose(Ts && ... xs) try {
 template<typename ... Ts>
 decltype(auto) updateFrame(Ts && ... xs)
 {
-  return connection.simulation->updateFrame(std::forward<decltype(xs)>(xs)...);
+  return connection.updateFrame(std::forward<decltype(xs)>(xs)...);
 }
 
 // template <typename... Ts>
@@ -144,7 +144,7 @@ template<typename ... Ts>
 auto getTimeHeadway(Ts && ... xs)
 {
   const auto result {
-    connection.entity->getTimeHeadway(std::forward<decltype(xs)>(xs)...)
+    connection.getTimeHeadway(std::forward<decltype(xs)>(xs)...)
   };
   if (result) {
     return result.get();
@@ -157,14 +157,14 @@ auto getTimeHeadway(Ts && ... xs)
 template<typename ... Ts>
 decltype(auto) requestAcquirePosition(Ts && ... xs)
 {
-  return connection.entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+  return connection.requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 auto getStandStillDuration(Ts && ... xs)
 {
   const auto result {
-    connection.entity->getStandStillDuration(std::forward<decltype(xs)>(xs)...)
+    connection.getStandStillDuration(std::forward<decltype(xs)>(xs)...)
   };
   if (result) {
     return result.get();
@@ -179,7 +179,7 @@ template
 >
 decltype(auto) checkCollision(Ts && ... xs)
 {
-  return connection.entity->checkCollision(std::forward<decltype(xs)>(xs)...);
+  return connection.checkCollision(std::forward<decltype(xs)>(xs)...);
 }
 }  // namespace openscenario_interpreter
 

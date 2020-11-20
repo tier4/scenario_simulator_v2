@@ -28,15 +28,15 @@ public:
         "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
     // initialize simulator
-    api_.simulation->initialize(1.0, 0.02);
+    api_.initialize(1.0, 0.02);
     pugi::xml_document catalog_xml_doc;
     // set ego vehicle parameter by XML
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
     // spawn ego vehicle 
-    api_.entity->spawn(true, "ego", params);
+    api_.spawn(true, "ego", params);
     // set ego vehicle status (initial position/velocity/acceleration)
-    api_.entity->setEntityStatus("ego", getEgoInitialStatus());
+    api_.setEntityStatus("ego", getEgoInitialStatus());
     // setup timer for updating simulation frame
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
@@ -46,7 +46,7 @@ private:
   void update()
   {
     // call update frame API
-    api_.simulation->updateFrame();
+    api_.updateFrame();
     current_time_ = current_time_ + 0.02;
   }
   double current_time_;
@@ -80,7 +80,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
+      api_.getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
   
