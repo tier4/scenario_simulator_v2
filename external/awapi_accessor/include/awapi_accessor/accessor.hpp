@@ -30,6 +30,8 @@
 namespace autoware_api
 {
 
+class Accessor
+{
 #define DEFINE_SUBSCRIPTION(TYPE) \
 protected: \
   TYPE current_value_of_ ## TYPE; \
@@ -60,9 +62,6 @@ public: \
   } \
   static_assert(true, "")
 
-
-class Accessor
-{
   /** ---- AutowareEngage ------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage
@@ -148,10 +147,6 @@ class Accessor
 
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
-public:
-  AWAPI_ACCESSOR_PUBLIC
-  explicit Accessor(rclcpp::Node &);
-
   /** ---- DummyData -----------------------------------------------------------
    *
    *  Topic: ~/dummy
@@ -161,10 +156,47 @@ public:
 
   DEFINE_PUBLICATION(DebugString);
   DEFINE_SUBSCRIPTION(DebugString);
-};
 
 #undef DEFINE_SUBSCRIPTION
 #undef DEFINE_PUBLICATION
+
+public:
+#define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
+  subscription_of_ ## TYPE( \
+    (*node).template create_subscription<TYPE>( \
+      TOPIC, 1, \
+      [this](const TYPE::SharedPtr message) \
+      { \
+        current_value_of_ ## TYPE = *message; \
+      }))
+
+#define MAKE_PUBLICATION(TYPE, TOPIC) \
+  publisher_of_ ## TYPE( \
+    (*node).template create_publisher<TYPE>(TOPIC, 10))
+
+  template
+  <
+    typename Node
+  >
+  AWAPI_ACCESSOR_PUBLIC
+  explicit Accessor(Node * const node)
+  : MAKE_PUBLICATION(AutowareEngage, "/awapi/autoware/put/engage"),
+    MAKE_PUBLICATION(AutowareRoute, "/awapi/autoware/put/route"),
+    MAKE_PUBLICATION(LaneChangeApproval, "/awapi/lane_change/put/approval"),
+    MAKE_PUBLICATION(LaneChangeForce, "/awapi/lane_change/put/force"),
+    MAKE_PUBLICATION(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    MAKE_PUBLICATION(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    MAKE_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
+    MAKE_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
+    MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
+    // Debug
+    MAKE_PUBLICATION(DebugString, "debug/string"),
+    MAKE_SUBSCRIPTION(DebugString, "debug/string")
+  {}
+
+#undef MAKE_SUBSCRIPTION
+#undef MAKE_PUBLICATION
+};
 
 }  // namespace autoware_api
 
