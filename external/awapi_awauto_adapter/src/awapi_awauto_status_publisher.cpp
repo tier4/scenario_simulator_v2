@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <awapi_awauto_adapter/awapi_awauto_status_publisher.hpp>
 

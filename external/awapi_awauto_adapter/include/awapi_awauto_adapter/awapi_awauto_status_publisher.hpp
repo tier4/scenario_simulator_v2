@@ -14,8 +14,8 @@
 
 #ifndef AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATUS_PUBLISHER_HPP_
 #define AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATUS_PUBLISHER_HPP_
-#include <awapi_awauto_adapter/utility/visibility.h>
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
+#include <awapi_awauto_adapter/utility/visibility.h>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
@@ -33,10 +33,10 @@ class AutowareAutoStatusPublisher : public rclcpp::Node
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   AutowareStatus autoware_status_;
-  void get_autoware_state_info(AutowareStatus * status);
-  void get_control_mode_info(AutowareStatus * status);
-  void get_gate_mode_info(AutowareStatus * status);
-  void get_emergency_info(AutowareStatus * status);
+  void get_autoware_state_info(AutowareStatus *status);
+  void get_control_mode_info(AutowareStatus *status);
+  void get_gate_mode_info(AutowareStatus *status);
+  void get_emergency_info(AutowareStatus *status);
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
