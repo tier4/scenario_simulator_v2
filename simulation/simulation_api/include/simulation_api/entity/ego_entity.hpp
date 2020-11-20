@@ -27,6 +27,7 @@
 #include <boost/optional.hpp>
 
 #include <string>
+#include <memory>
 
 namespace simulation_api
 {
