@@ -89,6 +89,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   if (!status_ || !control_cmd_) {
     return;
   }
+  if (!current_kinematic_state_) {
+    return;
+  }
   Eigen::VectorXd input(2);
   auto steer = control_cmd_->front_wheel_angle_rad;
   auto acc = control_cmd_->velocity_mps;

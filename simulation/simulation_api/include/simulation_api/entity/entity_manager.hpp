@@ -26,6 +26,7 @@
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 
@@ -113,8 +114,13 @@ public:
     const rclcpp::QoS & qos = LaneletMarkerQos();
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
-    lanelet_marker_pub_ptr_ = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(node,
+    lanelet_marker_pub_ptr_ = rclcpp::create_publisher
+      <visualization_msgs::msg::MarkerArray>(node,
         "lanelet/marker", qos,
+        options);
+    kinematic_state_pub_ptr_ = rclcpp::create_publisher
+      <autoware_auto_msgs::msg::VehicleKinematicState>(node,
+        "output/kinematic_state", qos,
         options);
     const rclcpp::QoS & entity_marker_qos = EntityMarkerQos();
     entity_status_array_pub_ptr_ =
@@ -176,6 +182,8 @@ public:
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
   rclcpp::Publisher<openscenario_msgs::msg::EntityStatusArray>::SharedPtr
     entity_status_array_pub_ptr_;
+  rclcpp::Publisher<autoware_auto_msgs::msg::VehicleKinematicState>::SharedPtr
+    kinematic_state_pub_ptr_;
   template<typename T>
   bool spawnEntity(T & entity)
   {

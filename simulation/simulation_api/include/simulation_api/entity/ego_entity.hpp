@@ -48,6 +48,11 @@ public:
   }
   void onUpdate(double current_time, double step_time) override;
   bool setStatus(const EntityStatus & status);
+  boost::optional<autoware_auto_msgs::msg::VehicleKinematicState>
+  getCurrentKinematicState() const
+  {
+    return current_kinematic_state_;
+  }
 
 private:
   autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
