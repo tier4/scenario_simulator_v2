@@ -20,6 +20,8 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <tf2>
 
 #include <chrono>
 
@@ -34,6 +36,8 @@ class AutowareVehicleStatusPublisher : public rclcpp::Node
   rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
   VehicleStatus vehicle_status_;
   rclcpp::TimerBase::SharedPtr timer_vehicle_status_;
+  VehicleStatus init_vehicle_status();
+  void get_pose_info(VehicleStatus * status);
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC

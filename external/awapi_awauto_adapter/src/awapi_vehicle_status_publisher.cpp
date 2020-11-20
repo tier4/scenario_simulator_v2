@@ -16,6 +16,8 @@
 #include <awapi_awauto_adapter/awapi_vehicle_status_publisher.hpp>
 
 #include <string>
+#include <limits>
+using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
 
 namespace autoware_api
 {
@@ -26,10 +28,9 @@ AutowareVehicleStatusPublisher::AutowareVehicleStatusPublisher(
   // publisher
   pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/vehicle/get/status", 1);
 }
-
 void AutowareVehicleStatusPublisher::publish_vehicle_status()
 {
-  VehicleStatus vehicle_status;
+  VehicleStatus vehicle_status = init_vehicle_status();
   vehicle_status.header.frame_id = "base_link";
   vehicle_status.header.stamp = get_clock()->now();
   vehicle_status.velocity = 0.1;
@@ -37,4 +38,33 @@ void AutowareVehicleStatusPublisher::publish_vehicle_status()
   RCLCPP_INFO(this->get_logger(), " VehicleStatus %i",
     vehicle_status.header.stamp);
 }
+VehicleStatus AutowareVehicleStatusPublisher::init_vehicle_status()
+{
+  VehicleStatus status;
+  // set default value
+  if (std::numeric_limits<float>::has_quiet_NaN) {
+    status.energy_level = std::numeric_limits<float>::quiet_NaN();
+  }
+  return status;
+}
+void AutowareVehicleStatusPublisher::get_pose_info(VehicleStatus * status)
+{
+  geometry_msgs::msg::Pose pose;
+  status->pose = pose;
+  tf2::Quaternion q(
+    status->pose.orientation.x,
+    status->pose.orientation.y,
+    status->pose.orientation.z,
+    status->pose.orientation.w);
+  tf2::getEulerYPR(pose_ptr->pose.orientation, yaw, pitch, roll);
+
+  // convert quaternion to euler
+  double roll, pitch, yaw;
+  tf2::Matrix3x3 m(q);
+  m.getRPY(roll, pitch, yaw);
+  status->eulerangle.yaw = yaw;
+  status->eulerangle.pitch = pitch;
+  status->eulerangle.roll = roll;
+}
+
 }  // namespace autoware_api
