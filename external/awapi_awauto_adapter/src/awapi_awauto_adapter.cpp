@@ -14,7 +14,7 @@
 
 #include <awapi_awauto_adapter/autoware_auto_adapter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-using namespace std::chrono_literals;
+
 namespace autoware_api
 {
 AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
@@ -28,40 +28,40 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
     "/awapi/traffic_light/get/status", 1);
   timer_autoware_staus_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::autoware_status_publisher, this));
+      std::bind(&AutowareAutoAdapter::publish_autoware_status, this));
   timer_vehicle_status_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::vehicle_status_publisher, this));
+      std::bind(&AutowareAutoAdapter::publish_vehicle_status, this));
   timer_lane_change_status_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::lane_change_status_publisher, this));
+      std::bind(&AutowareAutoAdapter::publish_lane_change_status, this));
   timer_traffic_light_status_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::traffic_light_status_publisher, this));
+      std::bind(&AutowareAutoAdapter::publish_traffic_light_status, this));
 }
 
-void AutowareAutoAdapter::autoware_status_publisher()
+void AutowareAutoAdapter::publish_autoware_status()
 {
   autoware_status_ = AutowareStatus();
-  autoware_status_.header.frame_id = "autoware_status";
+  autoware_status_.header.frame_id = "base_link";
   autoware_status_.control_mode = 1;
   autoware_status_.gate_mode = 2;
-  RCLCPP_INFO(this->get_logger(), "[awapi_adapter]: %s", autoware_status_.header.frame_id.c_str());
+  RCLCPP_INFO(this->get_logger(), "[awapi_adapter]:publish_autoware_status");
   pub_autoware_status_->publish(autoware_status_);
 }
-void AutowareAutoAdapter::vehicle_status_publisher()
+void AutowareAutoAdapter::publish_vehicle_status()
 {
   vehicle_status_ = VehicleStatus();
-  vehicle_status_.header.frame_id = "vehicle_status";
+  vehicle_status_.header.frame_id = "base_link";
   vehicle_status_.velocity = 0.1;
   pub_vehicle_status_->publish(vehicle_status_);
   RCLCPP_INFO(this->get_logger(), "[awapi_adapter]: %s", vehicle_status_.header.frame_id.c_str());
 }
 
-void AutowareAutoAdapter::lane_change_status_publisher()
+void AutowareAutoAdapter::publish_lane_change_status()
 {
   lane_change_status_ = LaneChangeStatus();
-  lane_change_status_.header.frame_id = "lane_change_status";
+  lane_change_status_.header.frame_id = "map";
   lane_change_status_.force_lane_change_available = true;
   lane_change_status_.lane_change_ready = true;
   RCLCPP_INFO(
@@ -70,10 +70,10 @@ void AutowareAutoAdapter::lane_change_status_publisher()
   pub_lane_change_status_->publish(lane_change_status_);
 }
 
-void AutowareAutoAdapter::traffic_light_status_publisher()
+void AutowareAutoAdapter::publish_traffic_light_status()
 {
   traffic_lights_ = TrafficLightStatus();
-  traffic_lights_.header.frame_id = "traffic_lights";
+  traffic_lights_.header.frame_id = "map";
   RCLCPP_INFO(this->get_logger(), "[awapi_adapter]: %s", traffic_lights_.header.frame_id.c_str());
   pub_traffic_light_status_->publish(traffic_lights_);
 }
