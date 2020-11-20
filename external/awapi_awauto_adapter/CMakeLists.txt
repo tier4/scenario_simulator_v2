@@ -19,12 +19,11 @@ execute_process(
   COMMAND tr -d "\n"
   OUTPUT_VARIABLE ${PROJECT_NAME}_DEPENDENCIES)
 
-find_package(geometry_msgs     REQUIRED)
-find_package(rclcpp_components REQUIRED)
-find_package(rclcpp            REQUIRED)
-find_package(std_msgs          REQUIRED)
-find_package(tf2_geometry_msgs REQUIRED)
-find_package(tf2_ros           REQUIRED)
+foreach(PACKAGE IN LISTS ${PROJECT_NAME}_DEPENDENCIES)
+  if(PACKAGE)
+    find_package(${PACKAGE} REQUIRED)
+  endif()
+endforeach()
 
 # ------------------------------------------------------------------------------
 #  libawapi_awauto_adapter
