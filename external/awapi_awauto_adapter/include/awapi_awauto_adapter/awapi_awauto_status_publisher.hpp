@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATE_PUBLISHER_HPP_
-#define AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATE_PUBLISHER_HPP_
+#ifndef AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATUS_PUBLISHER_HPP_
+#define AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATUS_PUBLISHER_HPP_
 #include <awapi_awauto_adapter/utility/visibility.h>
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
@@ -28,21 +28,21 @@
 
 namespace autoware_api
 {
-class AutowareAutoStatePublisher : public rclcpp::Node
+class AutowareAutoStatusPublisher : public rclcpp::Node
 {
-private:
   /** ---- AutowareStatus ------------------------------------------------------
    *  Topic: /awapi/autoware/get/status
    * ------------------------------------------------------------------------ */
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   AutowareStatus autoware_status_;
-  rclcpp::TimerBase::SharedPtr timer_autoware_staus_;
-  void autoware_status_publisher();
-  void getAutowareStateInfo();
+
 public:
-  AWAPI_AWAUTO_STATE_PUBLISHER_PUBLIC
-  explicit AutowareAutoStatePublisher(const rclcpp::NodeOptions &);
+  void publish_autoware_status();
+
+public:
+  AWAPI_AWAUTO_ADAPTER_PUBLIC
+  explicit AutowareAutoStatusPublisher(const rclcpp::NodeOptions &);
 };
 }  // namespace autoware_api
-#endif  // AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATE_PUBLISHER_HPP_
+#endif  // AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATUS_PUBLISHER_HPP_

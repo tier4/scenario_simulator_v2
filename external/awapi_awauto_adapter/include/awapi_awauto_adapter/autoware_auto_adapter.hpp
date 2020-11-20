@@ -15,6 +15,7 @@
 #ifndef AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
 #define AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
 #include <awapi_awauto_adapter/utility/visibility.h>
+#include <awapi_awauto_adapter/awapi_awauto_status_publisher.hpp>
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/lane_change_status.hpp>
@@ -25,16 +26,17 @@
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <chrono>
+#include <memory>
 #include <type_traits>
-#include "rclcpp/logger.hpp"
-#include "rcutils/logging_macros.h"
-#include "rclcpp/utilities.hpp"
 
 namespace autoware_api
 {
 class AutowareAutoAdapter : public rclcpp::Node
 {
 private:
+  rclcpp::TimerBase::SharedPtr timer_callback_;
+  void timer_callback();
+
   /** ---- AutowareStatus ------------------------------------------------------
    *  Topic: /awapi/autoware/get/status
    * ------------------------------------------------------------------------ */
@@ -43,6 +45,8 @@ private:
   AutowareStatus autoware_status_;
   rclcpp::TimerBase::SharedPtr timer_autoware_staus_;
   void publish_autoware_status();
+  std::unique_ptr<AutowareAutoStatusPublisher> autoware_state_publisher_;
+
 
   /** ---- VehicleStatus -------------------------------------------------------
    *  Topic: /awapi/vehicle/get/status
