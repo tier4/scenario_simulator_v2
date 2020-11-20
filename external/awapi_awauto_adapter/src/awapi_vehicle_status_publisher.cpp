@@ -56,7 +56,6 @@ void AutowareVehicleStatusPublisher::get_pose_info(VehicleStatus * status)
     status->pose.orientation.y,
     status->pose.orientation.z,
     status->pose.orientation.w);
-  tf2::getEulerYPR(pose_ptr->pose.orientation, yaw, pitch, roll);
 
   // convert quaternion to euler
   double roll, pitch, yaw;
@@ -65,6 +64,25 @@ void AutowareVehicleStatusPublisher::get_pose_info(VehicleStatus * status)
   status->eulerangle.yaw = yaw;
   status->eulerangle.pitch = pitch;
   status->eulerangle.roll = roll;
+}
+void AutowareVehicleStatusPublisher::get_steer_info(VehicleStatus * status)
+{
+  const double steering = 0.2;
+  status->steering = steering;
+  const double steer_vel = 0.1;
+  status->steering_velocity = steer_vel;
+}
+void AutowareVehicleStatusPublisher::get_vehicle_cmd_info(
+  VehicleStatus * status)
+{
+  const double acceleration = 0.1;
+  const double velocity = 0.2;
+  const double steering_angle = 0.3;
+  const double steering_angle_velocity = 0.4;
+  status->target_acceleration = acceleration;
+  status->target_velocity = velocity;
+  status->target_steering = steering_angle;
+  status->target_steering_velocity = steering_angle_velocity;
 }
 
 }  // namespace autoware_api
