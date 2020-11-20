@@ -34,23 +34,23 @@ public:
     api_(this, ament_index_cpp::get_package_share_directory(
         "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
-    api_.simulation->initialize(1.0, 0.02);
+    api_.initialize(1.0, 0.02);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
-    api_.entity->spawn(true, "ego", params);
-    api_.entity->setEntityStatus("ego", getEgoInitialStatus());
-    api_.entity->setTargetSpeed("ego", 15, true);
+    api_.spawn(true, "ego", params);
+    api_.setEntityStatus("ego", getEgoInitialStatus());
+    api_.setTargetSpeed("ego", 15, true);
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
-    api_.entity->spawn(false, "bob", pedestrian_params, getBobInitialStatus());
-    api_.entity->setTargetSpeed("bob", 1, true);
+    api_.spawn(false, "bob", pedestrian_params, getBobInitialStatus());
+    api_.setTargetSpeed("bob", 1, true);
     lanechange_excuted_ = false;
-    api_.entity->spawn(false, "npc1", params, getNpcInitialStatus());
-    api_.entity->setTargetSpeed("npc1", 5, true);
-    api_.entity->spawn(false, "npc2", params, getNpc2InitialStatus());
-    api_.entity->setTargetSpeed("npc2", 0, true);
+    api_.spawn(false, "npc1", params, getNpcInitialStatus());
+    api_.setTargetSpeed("npc1", 5, true);
+    api_.spawn(false, "npc2", params, getNpc2InitialStatus());
+    api_.setTargetSpeed("npc2", 0, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -58,20 +58,20 @@ public:
 private:
   void update()
   {
-    if (api_.entity->reachPosition("ego", 34615, 10, 0, 5)) {
-      api_.entity->requestAcquirePosition("ego", 35026, 0, 0);
-      api_.entity->setTargetSpeed("npc2", 13, true);
+    if (api_.reachPosition("ego", 34615, 10, 0, 5)) {
+      api_.requestAcquirePosition("ego", 35026, 0, 0);
+      api_.setTargetSpeed("npc2", 13, true);
     }
-    if (api_.entity->reachPosition("ego", 34579, 0, 0, 5)) {
-      api_.entity->setTargetSpeed("npc2", 3, true);
+    if (api_.reachPosition("ego", 34579, 0, 0, 5)) {
+      api_.setTargetSpeed("npc2", 3, true);
     }
-    if (api_.entity->checkCollision("ego", "npc1")) {
-      std::cout << "collision!" << std::endl;
+    if (api_.checkCollision("ego", "npc1")) {
+      std::cout << "npc1 collision!" << std::endl;
     }
-    if (api_.entity->checkCollision("ego", "npc2")) {
-      std::cout << "collision!" << std::endl;
+    if (api_.checkCollision("ego", "npc2")) {
+      std::cout << "npc2 collision!" << std::endl;
     }
-    api_.simulation->updateFrame();
+    api_.updateFrame();
     current_time_ = current_time_ + 0.02;
   }
   bool lanechange_excuted_;
@@ -107,7 +107,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
+      api_.getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
@@ -136,7 +136,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 34579, 20.0, 0.0, rpy, twist, accel);
+      api_.getCurrentTime(), 34579, 20.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
@@ -165,7 +165,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 34606, 20.0, 0.0, rpy, twist, accel);
+      api_.getCurrentTime(), 34606, 20.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
@@ -195,7 +195,7 @@ private:
     rpy.y = 0.0;
     rpy.z = 0.0;
     simulation_api::entity::EntityStatus ret(
-      api_.simulation->getCurrentTime(), 34378, 0.0, 0.0, rpy, twist, accel);
+      api_.getCurrentTime(), 34378, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
 

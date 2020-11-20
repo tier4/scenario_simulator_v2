@@ -54,7 +54,7 @@ void AutowareAutoAdapter::publish_vehicle_status()
   vehicle_status_.header.stamp = get_clock()->now();
   vehicle_status_.velocity = 0.1;
   pub_vehicle_status_->publish(vehicle_status_);
-  RCLCPP_INFO(this->get_logger(), "[awapi_adapter]: VehicleStatus %i",
+  RCLCPP_INFO(this->get_logger(), " VehicleStatus %i",
     vehicle_status_.header.stamp);
 }
 
@@ -66,7 +66,7 @@ void AutowareAutoAdapter::publish_lane_change_status()
   lane_change_status_.force_lane_change_available = true;
   lane_change_status_.lane_change_ready = true;
   RCLCPP_INFO(
-    this->get_logger(), "[awapi_adapter]:LaneChangeStatus %i", lane_change_status_.header.stamp);
+    this->get_logger(), "LaneChangeStatus %i", lane_change_status_.header.stamp);
   pub_lane_change_status_->publish(lane_change_status_);
 }
 
@@ -76,7 +76,7 @@ void AutowareAutoAdapter::publish_traffic_light_status()
   traffic_lights_.header.frame_id = "map";
   traffic_lights_.header.stamp = get_clock()->now();
   RCLCPP_INFO(
-    this->get_logger(), "[awapi_adapter]:TrafficLightStatus %i", traffic_lights_.header.stamp);
+    this->get_logger(), "TrafficLightStatus %i", traffic_lights_.header.stamp);
   pub_traffic_light_status_->publish(traffic_lights_);
 }
 }  // namespace autoware_api

@@ -23,6 +23,11 @@
 
 #include <openscenario_msgs/msg/entity_status_array.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
+
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -86,6 +91,8 @@ private:
   }
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
   int getNumberOfEgo() const;
+  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
+  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
@@ -107,8 +114,13 @@ public:
     const rclcpp::QoS & qos = LaneletMarkerQos();
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
-    lanelet_marker_pub_ptr_ = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(node,
+    lanelet_marker_pub_ptr_ = rclcpp::create_publisher
+      <visualization_msgs::msg::MarkerArray>(node,
         "lanelet/marker", qos,
+        options);
+    kinematic_state_pub_ptr_ = rclcpp::create_publisher
+      <autoware_auto_msgs::msg::VehicleKinematicState>(node,
+        "output/kinematic_state", qos,
         options);
     const rclcpp::QoS & entity_marker_qos = EntityMarkerQos();
     entity_status_array_pub_ptr_ =
@@ -124,6 +136,9 @@ public:
   }
   ~EntityManager() {}
   bool checkCollision(std::string name0, std::string name1);
+  void setVehicleCommands(
+    boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
+    boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd);
   void setVerbose(bool verbose);
   void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
@@ -167,6 +182,8 @@ public:
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
   rclcpp::Publisher<openscenario_msgs::msg::EntityStatusArray>::SharedPtr
     entity_status_array_pub_ptr_;
+  rclcpp::Publisher<autoware_auto_msgs::msg::VehicleKinematicState>::SharedPtr
+    kinematic_state_pub_ptr_;
   template<typename T>
   bool spawnEntity(T & entity)
   {
