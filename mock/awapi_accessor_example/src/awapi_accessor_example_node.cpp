@@ -18,13 +18,14 @@
 #include <memory>
 
 class Example
-  : public autoware_api::Accessor
+  : public rclcpp::Node, private autoware_api::Accessor
 {
   std::shared_ptr<rclcpp::TimerBase> timer;
 
 public:
   explicit Example(const rclcpp::NodeOptions & options)
-  : autoware_api::Accessor(options),
+  : rclcpp::Node("awapi_accessor_example", options),
+    autoware_api::Accessor(this),
     timer(
       create_wall_timer(
         std::chrono::seconds(1),

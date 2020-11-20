@@ -43,8 +43,6 @@ ament_export_libraries(${PROJECT_NAME})
 ament_export_interfaces(${PROJECT_NAME}-config)
 ament_export_dependencies(${${PROJECT_NAME}_DEPENDENCIES})
 
-rclcpp_components_register_nodes(${PROJECT_NAME} "autoware_api::Accessor")
-
 # ------------------------------------------------------------------------------
 #  make install
 # ------------------------------------------------------------------------------
