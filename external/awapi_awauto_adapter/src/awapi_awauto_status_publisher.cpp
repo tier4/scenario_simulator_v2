@@ -11,8 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+#include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <awapi_awauto_adapter/awapi_awauto_status_publisher.hpp>
+
+#include <string>
 
 namespace autoware_api
 {
@@ -26,14 +28,25 @@ AutowareAutoStatusPublisher::AutowareAutoStatusPublisher(
 
 void AutowareAutoStatusPublisher::publish_autoware_status()
 {
-  autoware_status_ = AutowareStatus();
-  autoware_status_.header.frame_id = "base_link";
-  autoware_status_.header.stamp = get_clock()->now();
-  autoware_status_.control_mode = 1;
-  autoware_status_.gate_mode = 2;
+  AutowareStatus autoware_status;
+  autoware_status.header.frame_id = "base_link";
+  autoware_status.header.stamp = get_clock()->now();
+  get_autoware_state_info(&autoware_status);
+  get_control_mode_info(&autoware_status);
+  autoware_status.gate_mode = 2;
   RCLCPP_INFO(
     this->get_logger(), "[awapi_adapter]:AutowareStatus %i",
-    autoware_status_.header.stamp);
-  pub_autoware_status_->publish(autoware_status_);
+    autoware_status.header.stamp);
+  pub_autoware_status_->publish(autoware_status);
+}
+void AutowareAutoStatusPublisher::get_autoware_state_info(AutowareStatus * status)
+{
+  std::string autoware_state = "test";
+  status->autoware_state = "test";
+}
+void AutowareAutoStatusPublisher::get_control_mode_info(AutowareStatus * status)
+{
+  int32_t control_mode = 3;
+  status->control_mode = control_mode;
 }
 }  // namespace autoware_api

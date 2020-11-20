@@ -22,7 +22,7 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
 : rclcpp::Node("autoware_auto_adapter", options)
 {
   pub_autoware_status_ = this->create_publisher<AutowareStatus>("/awapi/autoware/get/status", 1);
-  pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/autoware/get/status", 1);
+  pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/vehicle/get/status", 1);
   pub_lane_change_status_ = this->create_publisher<LaneChangeStatus>(
     "/awapi/lane_change/get/status", 1);
   pub_traffic_light_status_ = this->create_publisher<TrafficLightStatus>(

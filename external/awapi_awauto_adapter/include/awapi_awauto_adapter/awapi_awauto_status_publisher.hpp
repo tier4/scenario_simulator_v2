@@ -16,10 +16,6 @@
 #define AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATUS_PUBLISHER_HPP_
 #include <awapi_awauto_adapter/utility/visibility.h>
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
-#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
-#include <autoware_api_msgs/msg/lane_change_status.hpp>
-#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
-#include <autoware_planning_msgs/msg/route.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
@@ -37,14 +33,13 @@ class AutowareAutoStatusPublisher : public rclcpp::Node
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   AutowareStatus autoware_status_;
-  void get_autoware_state_info();
-
-public:
-  void publish_autoware_status();
+  void get_autoware_state_info(AutowareStatus * status);
+  void get_control_mode_info(AutowareStatus * status);
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
   explicit AutowareAutoStatusPublisher(const rclcpp::NodeOptions &);
+  void publish_autoware_status();
 };
 }  // namespace autoware_api
 #endif  // AWAPI_AWAUTO_ADAPTER__AWAPI_AWAUTO_STATUS_PUBLISHER_HPP_
