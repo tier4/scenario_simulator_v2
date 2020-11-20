@@ -20,7 +20,7 @@ namespace autoware_api
 
 #define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
   subscription_of_ ## TYPE( \
-    create_subscription<TYPE>( \
+    node.create_subscription<TYPE>( \
       TOPIC, 1, \
       [this](const TYPE::SharedPtr message) \
       { \
@@ -29,11 +29,10 @@ namespace autoware_api
 
 #define MAKE_PUBLICATION(TYPE, TOPIC) \
   publisher_of_ ## TYPE( \
-    create_publisher<TYPE>(TOPIC, 10))
+    node.create_publisher<TYPE>(TOPIC, 10))
 
-Accessor::Accessor(const rclcpp::NodeOptions & options)
-: rclcpp::Node("autoware_api_accessor", options),
-  MAKE_PUBLICATION(AutowareEngage, "/awapi/autoware/put/engage"),
+Accessor::Accessor(rclcpp::Node & node)
+: MAKE_PUBLICATION(AutowareEngage, "/awapi/autoware/put/engage"),
   MAKE_PUBLICATION(AutowareRoute, "/awapi/autoware/put/route"),
   MAKE_PUBLICATION(LaneChangeApproval, "/awapi/lane_change/put/approval"),
   MAKE_PUBLICATION(LaneChangeForce, "/awapi/lane_change/put/force"),
@@ -51,5 +50,3 @@ Accessor::Accessor(const rclcpp::NodeOptions & options)
 #undef MAKE_PUBLICATION
 
 }  // namespace autoware_api
-
-RCLCPP_COMPONENTS_REGISTER_NODE(autoware_api::Accessor)
