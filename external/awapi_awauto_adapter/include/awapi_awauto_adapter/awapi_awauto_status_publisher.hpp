@@ -35,6 +35,8 @@ class AutowareAutoStatusPublisher : public rclcpp::Node
   AutowareStatus autoware_status_;
   void get_autoware_state_info(AutowareStatus * status);
   void get_control_mode_info(AutowareStatus * status);
+  void get_gate_mode_info(AutowareStatus * status);
+  void get_emergency_info(AutowareStatus * status);
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC

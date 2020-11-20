@@ -33,7 +33,8 @@ void AutowareAutoStatusPublisher::publish_autoware_status()
   autoware_status.header.stamp = get_clock()->now();
   get_autoware_state_info(&autoware_status);
   get_control_mode_info(&autoware_status);
-  autoware_status.gate_mode = 2;
+  get_gate_mode_info(&autoware_status);
+  get_emergency_info(&autoware_status);
   RCLCPP_INFO(
     this->get_logger(), "[awapi_adapter]:AutowareStatus %i",
     autoware_status.header.stamp);
@@ -48,5 +49,16 @@ void AutowareAutoStatusPublisher::get_control_mode_info(AutowareStatus * status)
 {
   int32_t control_mode = 3;
   status->control_mode = control_mode;
+}
+void AutowareAutoStatusPublisher::get_gate_mode_info(AutowareStatus * status)
+{
+  int32_t gate_mode = 2;
+  status->gate_mode = gate_mode;
+}
+void AutowareAutoStatusPublisher::get_emergency_info(AutowareStatus * status)
+{
+  std_msgs::msg::Bool is_emergency;
+  is_emergency.data = true;
+  status->emergency_stopped = is_emergency.data;
 }
 }  // namespace autoware_api
