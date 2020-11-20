@@ -30,32 +30,14 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
   timer_callback_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
       std::bind(&AutowareAutoAdapter::timer_callback, this));
-  timer_vehicle_status_ =
-    this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::publish_vehicle_status, this));
-  timer_lane_change_status_ =
-    this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::publish_lane_change_status, this));
-  timer_traffic_light_status_ =
-    this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::publish_traffic_light_status, this));
   autoware_state_publisher_ = std::make_unique<AutowareAutoStatusPublisher>(options);
+  vehicle_state_publisher_ = std::make_unique<AutowareVehicleStatusPublisher>(options);
 }
 
 void AutowareAutoAdapter::timer_callback()
 {
   autoware_state_publisher_->publish_autoware_status();
-}
-
-void AutowareAutoAdapter::publish_vehicle_status()
-{
-  vehicle_status_ = VehicleStatus();
-  vehicle_status_.header.frame_id = "base_link";
-  vehicle_status_.header.stamp = get_clock()->now();
-  vehicle_status_.velocity = 0.1;
-  pub_vehicle_status_->publish(vehicle_status_);
-  RCLCPP_INFO(this->get_logger(), " VehicleStatus %i",
-    vehicle_status_.header.stamp);
+  vehicle_state_publisher_->publish_vehicle_status();
 }
 
 void AutowareAutoAdapter::publish_lane_change_status()

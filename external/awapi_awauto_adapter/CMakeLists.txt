@@ -58,6 +58,7 @@ install(
 add_executable(${PROJECT_NAME}_node
   src/${PROJECT_NAME}_node.cpp
   src/awapi_awauto_status_publisher.cpp
+  src/awapi_vehicle_status_publisher.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})

@@ -16,6 +16,7 @@
 #define AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
 #include <awapi_awauto_adapter/utility/visibility.h>
 #include <awapi_awauto_adapter/awapi_awauto_status_publisher.hpp>
+#include <awapi_awauto_adapter/awapi_vehicle_status_publisher.hpp>
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/lane_change_status.hpp>
@@ -42,9 +43,7 @@ private:
    * ------------------------------------------------------------------------ */
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
-  AutowareStatus autoware_status_;
   rclcpp::TimerBase::SharedPtr timer_autoware_staus_;
-  void publish_autoware_status();
   std::unique_ptr<AutowareAutoStatusPublisher> autoware_state_publisher_;
 
 
@@ -53,9 +52,8 @@ private:
    * ------------------------------------------------------------------------ */
   using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
   rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
-  VehicleStatus vehicle_status_;
   rclcpp::TimerBase::SharedPtr timer_vehicle_status_;
-  void publish_vehicle_status();
+  std::unique_ptr<AutowareVehicleStatusPublisher> vehicle_state_publisher_;
 
   /** ---- LaneChangeStatus ------------------------------------------------------
    *  Topic: /awapi/lane_change/get/status

@@ -33,10 +33,10 @@ class AutowareAutoStatusPublisher : public rclcpp::Node
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   AutowareStatus autoware_status_;
-  void get_autoware_state_info(AutowareStatus *status);
-  void get_control_mode_info(AutowareStatus *status);
-  void get_gate_mode_info(AutowareStatus *status);
-  void get_emergency_info(AutowareStatus *status);
+  void get_autoware_state_info(AutowareStatus * status);
+  void get_control_mode_info(AutowareStatus * status);
+  void get_gate_mode_info(AutowareStatus * status);
+  void get_emergency_info(AutowareStatus * status);
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
