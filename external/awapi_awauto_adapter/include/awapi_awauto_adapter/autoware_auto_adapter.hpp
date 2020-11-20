@@ -25,6 +25,10 @@
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <chrono>
+#include <type_traits>
+#include "rclcpp/logger.hpp"
+#include "rcutils/logging_macros.h"
+#include "rclcpp/utilities.hpp"
 
 namespace autoware_api
 {
@@ -38,7 +42,7 @@ private:
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   AutowareStatus autoware_status_;
   rclcpp::TimerBase::SharedPtr timer_autoware_staus_;
-  void autoware_status_publisher();
+  void publish_autoware_status();
 
   /** ---- VehicleStatus -------------------------------------------------------
    *  Topic: /awapi/vehicle/get/status
@@ -47,7 +51,7 @@ private:
   rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
   VehicleStatus vehicle_status_;
   rclcpp::TimerBase::SharedPtr timer_vehicle_status_;
-  void vehicle_status_publisher();
+  void publish_vehicle_status();
 
   /** ---- LaneChangeStatus ------------------------------------------------------
    *  Topic: /awapi/lane_change/get/status
@@ -56,7 +60,7 @@ private:
   rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
   LaneChangeStatus lane_change_status_;
   rclcpp::TimerBase::SharedPtr timer_lane_change_status_;
-  void lane_change_status_publisher();
+  void publish_lane_change_status();
 
   /** ---- TrafficLightStatus --------------------------------------------------
    *  Topic: /awapi/traffic_light/get/status
@@ -65,7 +69,7 @@ private:
   rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
   TrafficLightStatus traffic_lights_;
   rclcpp::TimerBase::SharedPtr timer_traffic_light_status_;
-  void traffic_light_status_publisher();
+  void publish_traffic_light_status();
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
