@@ -33,7 +33,10 @@ void AutowareVehicleStatusPublisher::publish_vehicle_status()
   VehicleStatus vehicle_status = init_vehicle_status();
   vehicle_status.header.frame_id = "base_link";
   vehicle_status.header.stamp = get_clock()->now();
-  vehicle_status.velocity = 0.1;
+  get_pose_info(&vehicle_status);
+  get_steer_info(&vehicle_status);
+  get_steer_info(&vehicle_status);
+  get_vehicle_cmd_info(&vehicle_status);
   pub_vehicle_status_->publish(vehicle_status);
   RCLCPP_INFO(this->get_logger(), " VehicleStatus %i",
     vehicle_status.header.stamp);
@@ -84,5 +87,4 @@ void AutowareVehicleStatusPublisher::get_vehicle_cmd_info(
   status->target_steering = steering_angle;
   status->target_steering_velocity = steering_angle_velocity;
 }
-
 }  // namespace autoware_api
