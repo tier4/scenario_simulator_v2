@@ -14,6 +14,7 @@
 
 #include <awapi_awauto_adapter/autoware_auto_adapter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#include <memory>
 
 namespace autoware_api
 {
@@ -21,14 +22,14 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
 : rclcpp::Node("autoware_auto_adapter", options)
 {
   pub_autoware_status_ = this->create_publisher<AutowareStatus>("/awapi/autoware/get/status", 1);
-  pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/autoware/get/status", 1);
+  pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/vehicle/get/status", 1);
   pub_lane_change_status_ = this->create_publisher<LaneChangeStatus>(
     "/awapi/lane_change/get/status", 1);
   pub_traffic_light_status_ = this->create_publisher<TrafficLightStatus>(
     "/awapi/traffic_light/get/status", 1);
-  timer_autoware_staus_ =
+  timer_callback_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::publish_autoware_status, this));
+      std::bind(&AutowareAutoAdapter::timer_callback, this));
   timer_vehicle_status_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
       std::bind(&AutowareAutoAdapter::publish_vehicle_status, this));
@@ -38,20 +39,14 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
   timer_traffic_light_status_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
       std::bind(&AutowareAutoAdapter::publish_traffic_light_status, this));
+  autoware_state_publisher_ = std::make_unique<AutowareAutoStatusPublisher>(options);
 }
 
-void AutowareAutoAdapter::publish_autoware_status()
+void AutowareAutoAdapter::timer_callback()
 {
-  autoware_status_ = AutowareStatus();
-  autoware_status_.header.frame_id = "base_link";
-  autoware_status_.header.stamp = get_clock()->now();
-  autoware_status_.control_mode = 1;
-  autoware_status_.gate_mode = 2;
-  RCLCPP_INFO(
-    this->get_logger(), "AutowareStatus %i",
-    autoware_status_.header.stamp);
-  pub_autoware_status_->publish(autoware_status_);
+  autoware_state_publisher_->publish_autoware_status();
 }
+
 void AutowareAutoAdapter::publish_vehicle_status()
 {
   vehicle_status_ = VehicleStatus();
