@@ -25,7 +25,7 @@ class Example
 public:
   explicit Example(const rclcpp::NodeOptions & options)
   : rclcpp::Node("awapi_accessor_example", options),
-    autoware_api::Accessor(static_cast<rclcpp::Node &>(*this)),
+    autoware_api::Accessor(this),
     timer(
       create_wall_timer(
         std::chrono::seconds(1),
