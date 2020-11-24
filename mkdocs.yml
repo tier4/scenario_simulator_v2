@@ -30,6 +30,8 @@ markdown_extensions:
     - codehilite:
         guess_lang: false
     - mdx_math
+    - plantuml_markdown:
+        server: http://www.plantuml.com/plantuml
 
 extra_css:
     - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
@@ -60,5 +62,6 @@ nav:
             - design/Tier4ExtensionInOpenScenarioFormat.md
             - design/SimulationAPI.md
             - design/XMLRPCAPI.md
+            - design/AutowareAPI.md
     - Contact Infomation: etc/ContactUs.md
     - LICENSE : LICENSE.md

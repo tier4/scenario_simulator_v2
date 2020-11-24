@@ -14,3 +14,6 @@ If you want to know how to develop original scenario format, please read this do
 
 IF you want to know how to integrate your simulator with this package, please read this documentation.  
 [XMLRPCAPI](XMLRPCAPI.md)
+
+If you want to know how to control Autoware via Autoware API, please read this documentation.
+[AutowareAPI](AutowareAPI.md)

@@ -1,5 +1,6 @@
 # System Architecture
-![architecture](uml/WholeArchitecture.png "architecture")
+```plantuml source="docs/design/uml/whole_architecture.pu"
+```
 
 This tool are consists of 3 components.
 test runner, oepnscenario_interpretor, simulator.
@@ -26,4 +27,5 @@ You can use any times of simulator by adapting this API.
 
 # Execution sequence of scenario testing.
 
-![sequence](uml/sequence.png "sequence")
+```plantuml source="docs/design/uml/sequence.pu"
+```
