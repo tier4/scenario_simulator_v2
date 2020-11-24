@@ -37,7 +37,7 @@ void AutowareAutoStatusPublisher::publish_autoware_status()
   get_gate_mode_info(&autoware_status);
   get_emergency_info(&autoware_status);
   RCLCPP_INFO(
-    this->get_logger(), "[awapi_adapter]:AutowareStatus %i",
+    this->get_logger(), "AutowareStatus %i",
     autoware_status.header.stamp);
   pub_autoware_status_->publish(autoware_status);
 }
