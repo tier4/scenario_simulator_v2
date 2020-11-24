@@ -4,7 +4,7 @@
   <name>scenario_test_utility</name>
   <version>0.0.0</version>
   <description>scenario test utility package for autoware</description>
-  <maintainer email="ttatcoder@outlook.jp">tanaka-car</maintainer>
+  <maintainer email="taiki.tanaka@tier4.jp">Taiki Tanaka</maintainer>
   <license>Apache License 2.0</license>
 
   <test_depend>ament_copyright</test_depend>
