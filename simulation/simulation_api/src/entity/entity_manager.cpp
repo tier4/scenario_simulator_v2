@@ -46,6 +46,14 @@ void EntityManager::setVerbose(bool verbose)
   }
 }
 
+bool EntityManager::isEgo(std::string name) const
+{
+  if (getEntityType(name) == EntityType::EGO) {
+    return true;
+  }
+  return false;
+}
+
 int EntityManager::getNumberOfEgo() const
 {
   int count = 0;

@@ -175,6 +175,7 @@ public:
   void broadcastBaseLinkTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
   const std::unordered_map<std::string, EntityType> getEntityTypeList() const;
+  bool isEgo(std::string name) const;
   EntityType getEntityType(std::string name) const;
   const std::string getCurrentAction(std::string name) const;
   tf2_ros::StaticTransformBroadcaster broadcaster_;
