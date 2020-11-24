@@ -4,7 +4,7 @@
   <name>awapi_accessor_example</name>
   <version>0.0.0</version>
   <description>TODO</description>
-  <maintainer email="httperror@404-notfound.jp">Yamasaki Tatsuya</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
