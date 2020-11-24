@@ -21,7 +21,7 @@ namespace autoware_api
 {
 AutowareAutoStatusPublisher::AutowareAutoStatusPublisher(
   const rclcpp::NodeOptions & options)
-: rclcpp::Node("awapi_awauto_state_publisher", options)
+: rclcpp::Node("awapi_awauto_state_pubrlisher", options)
 {
   // publisher
   pub_autoware_status_ = this->create_publisher<AutowareStatus>("/awapi/autoware/get/status", 1);
