@@ -96,9 +96,6 @@ void EntityManager::requestLaneChange(std::string name, std::int64_t to_lanelet_
   if (it->second.type() == typeid(VehicleEntity)) {
     boost::any_cast<VehicleEntity &>(it->second).requestLaneChange(to_lanelet_id);
   }
-  if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).requestLaneChange(to_lanelet_id);
-  }
 }
 
 void EntityManager::requestLaneChange(std::string name, Direction direction)
