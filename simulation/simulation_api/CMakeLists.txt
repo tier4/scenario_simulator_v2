@@ -20,6 +20,9 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
+find_package(geographic_msgs REQUIRED)
+find_package(openscenario_msgs REQUIRED)
+find_package(autoware_auto_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(lanelet2_core REQUIRED)
@@ -27,14 +30,12 @@ find_package(lanelet2_routing REQUIRED)
 find_package(lanelet2_io REQUIRED)
 find_package(lanelet2_extension REQUIRED)
 find_package(lanelet2_projection REQUIRED)
-find_package(autoware_auto_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(awapi_accessor REQUIRED)
 find_package(spline_interpolation REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(xmlrpcpp REQUIRED)
-find_package(geographic_msgs REQUIRED)
-find_package(openscenario_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 # ------------------------------------------------------------------------------
@@ -97,6 +98,7 @@ ament_target_dependencies(entity_manager
   xmlrpcpp
   openscenario_msgs
   visualization_msgs
+  awapi_accessor
 )
 
 ament_export_include_directories(include)
@@ -119,7 +121,8 @@ ament_export_dependencies(
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
-  xmlrpcpp)
+  xmlrpcpp
+  awapi_accessor)
 
 install(
   TARGETS entity_manager

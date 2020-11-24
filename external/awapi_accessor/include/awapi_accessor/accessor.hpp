@@ -179,7 +179,7 @@ public:
     typename Node
   >
   AWAPI_ACCESSOR_PUBLIC
-  explicit Accessor(Node * const node)
+  explicit Accessor(Node && node)
   : MAKE_PUBLICATION(AutowareEngage, "/awapi/autoware/put/engage"),
     MAKE_PUBLICATION(AutowareRoute, "/awapi/autoware/put/route"),
     MAKE_PUBLICATION(LaneChangeApproval, "/awapi/lane_change/put/approval"),
