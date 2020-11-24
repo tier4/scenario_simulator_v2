@@ -29,6 +29,7 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <tf2_ros/transform_listener.h>
 
 #include <chrono>
 #include <memory>
@@ -38,9 +39,24 @@ namespace autoware_api
 class AutowareAutoAdapter : public rclcpp::Node
 {
 private:
-  rclcpp::TimerBase::SharedPtr timer_callback_;
-  void timer_callback();
+  using TwistStamped = geometry_msgs::msg::TwistStamped;
+  using Float32 = std_msgs::msg::Float32;
+  using Bool = std_msgs::msg::Bool;
+  TwistStamped::SharedPtr twist_ptr_;
+  Float32::SharedPtr steer_ptr_;
+  Bool::ConstSharedPtr lane_change_available_ptr;
+  Bool::ConstSharedPtr lane_change_ready_ptr;
+  Bool::ConstSharedPtr obstacle_avoid_ready_ptr;
+  // subscriber
+  rclcpp::Subscription<TwistStamped>::SharedPtr sub_twist_;
+  rclcpp::Subscription<Float32>::SharedPtr sub_steer_;
+  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_available_;
+  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_ready_;
+  rclcpp::Subscription<Bool>::SharedPtr sub_obstacle_avoid_ready_;
 
+  // publish
+  void timer_callback();
+  rclcpp::TimerBase::SharedPtr timer_callback_;
   /** ---- AutowareStatus ------------------------------------------------------
    *  Topic: /awapi/autoware/get/status
    * ------------------------------------------------------------------------ */
@@ -77,6 +93,11 @@ private:
   using ObstacleAvoidanceStatus = autoware_api_msgs::msg::ObstacleAvoidanceStatus;
   rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_obstacle_avoidance_status_;
   std::unique_ptr<AutowareObstacleAvoidanceStatusPublisher> obstacle_avoidance_status_publisher_;
+  void get_current_pose();
+
+  // tf
+  tf2_ros::Buffer tf_buffer_;
+  tf2_ros::TransformListener tf_listener_;
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC

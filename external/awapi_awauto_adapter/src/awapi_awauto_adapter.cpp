@@ -19,8 +19,13 @@
 namespace autoware_api
 {
 AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
-: rclcpp::Node("autoware_auto_adapter", options)
+: rclcpp::Node("autoware_auto_adapter", options), tf_buffer_(get_clock()), tf_listener_(tf_buffer_)
 {
+  sub_twist_ = create_subscription<TwistStamped>("/localization/twist",
+      10, [&](const TwistStamped::SharedPtr msg_ptr) {twist_ptr_ = msg_ptr;});
+  sub_steer_ = create_subscription<Float32>("input/steering",
+      10, [&](const Float32::SharedPtr msg_ptr) {steer_ptr_ = msg_ptr;});
+
   pub_traffic_light_status_ = this->create_publisher<TrafficLightStatus>(
     "/awapi/traffic_light/get/status", 1);
   timer_callback_ =
@@ -34,10 +39,28 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
 }
 void AutowareAutoAdapter::timer_callback()
 {
+  get_current_pose();
   autoware_status_publisher_->publish_autoware_status();
   vehicle_status_publisher_->publish_vehicle_status();
   lane_change_status_publisher_->publish_lane_change_status();
   obstacle_avoidance_status_publisher_->publish_obstacle_avoidance_status();
+}
+
+void AutowareAutoAdapter::get_current_pose()
+{
+  try {
+    tf2::TimePoint time_point = tf2::TimePoint(std::chrono::seconds(0));
+    geometry_msgs::msg::TransformStamped transform =
+      tf_buffer_.lookupTransform("map", "base_link", time_point);
+    geometry_msgs::msg::PoseStamped ps;
+    ps.header = transform.header;
+    ps.pose.position.x = transform.transform.translation.x;
+    ps.pose.position.y = transform.transform.translation.y;
+    ps.pose.position.z = transform.transform.translation.z;
+    ps.pose.orientation = transform.transform.rotation;
+  } catch (tf2::TransformException & ex) {
+    RCLCPP_INFO(get_logger(), "cannot get self pose");
+  }
 }
 }  // namespace autoware_api
 RCLCPP_COMPONENTS_REGISTER_NODE(autoware_api::AutowareAutoAdapter)
