@@ -21,45 +21,23 @@ namespace autoware_api
 AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
 : rclcpp::Node("autoware_auto_adapter", options)
 {
-  pub_autoware_status_ = this->create_publisher<AutowareStatus>("/awapi/autoware/get/status", 1);
-  pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/vehicle/get/status", 1);
-  pub_lane_change_status_ = this->create_publisher<LaneChangeStatus>(
-    "/awapi/lane_change/get/status", 1);
   pub_traffic_light_status_ = this->create_publisher<TrafficLightStatus>(
     "/awapi/traffic_light/get/status", 1);
   timer_callback_ =
     this->create_wall_timer(std::chrono::milliseconds(500),
       std::bind(&AutowareAutoAdapter::timer_callback, this));
-  autoware_state_publisher_ = std::make_unique<AutowareAutoStatusPublisher>(options);
-  vehicle_state_publisher_ = std::make_unique<AutowareVehicleStatusPublisher>(options);
+  autoware_status_publisher_ = std::make_unique<AutowareAutoStatusPublisher>(options);
+  vehicle_status_publisher_ = std::make_unique<AutowareVehicleStatusPublisher>(options);
+  lane_change_status_publisher_ = std::make_unique<AutowareLaneChangeStatusPublisher>(options);
+  obstacle_avoidance_status_publisher_ = std::make_unique<AutowareObstacleAvoidanceStatusPublisher>(
+    options);
 }
-
 void AutowareAutoAdapter::timer_callback()
 {
-  autoware_state_publisher_->publish_autoware_status();
-  vehicle_state_publisher_->publish_vehicle_status();
-}
-
-void AutowareAutoAdapter::publish_lane_change_status()
-{
-  lane_change_status_ = LaneChangeStatus();
-  lane_change_status_.header.frame_id = "map";
-  lane_change_status_.header.stamp = get_clock()->now();
-  lane_change_status_.force_lane_change_available = true;
-  lane_change_status_.lane_change_ready = true;
-  RCLCPP_INFO(
-    this->get_logger(), "LaneChangeStatus %i", lane_change_status_.header.stamp);
-  pub_lane_change_status_->publish(lane_change_status_);
-}
-
-void AutowareAutoAdapter::publish_traffic_light_status()
-{
-  traffic_lights_ = TrafficLightStatus();
-  traffic_lights_.header.frame_id = "map";
-  traffic_lights_.header.stamp = get_clock()->now();
-  RCLCPP_INFO(
-    this->get_logger(), "TrafficLightStatus %i", traffic_lights_.header.stamp);
-  pub_traffic_light_status_->publish(traffic_lights_);
+  autoware_status_publisher_->publish_autoware_status();
+  vehicle_status_publisher_->publish_vehicle_status();
+  lane_change_status_publisher_->publish_lane_change_status();
+  obstacle_avoidance_status_publisher_->publish_obstacle_avoidance_status();
 }
 }  // namespace autoware_api
 RCLCPP_COMPONENTS_REGISTER_NODE(autoware_api::AutowareAutoAdapter)
