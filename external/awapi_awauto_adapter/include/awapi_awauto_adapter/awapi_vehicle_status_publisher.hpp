@@ -14,14 +14,14 @@
 
 #ifndef AWAPI_AWAUTO_ADAPTER__AWAPI_VEHICLE_STATUS_PUBLISHER_HPP_
 #define AWAPI_AWAUTO_ADAPTER__AWAPI_VEHICLE_STATUS_PUBLISHER_HPP_
-#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <awapi_awauto_adapter/utility/visibility.h>
+#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
@@ -32,8 +32,8 @@ namespace autoware_api
 class AutowareVehicleStatusPublisher : public rclcpp::Node
 {
   /** ---- VehicleStatus -------------------------------------------------------
-  *  Topic: /awapi/vehicle/get/status
-  * ------------------------------------------------------------------------ */
+   *  Topic: /awapi/vehicle/get/status
+   * ------------------------------------------------------------------------ */
   using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
   rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
   VehicleStatus vehicle_status_;

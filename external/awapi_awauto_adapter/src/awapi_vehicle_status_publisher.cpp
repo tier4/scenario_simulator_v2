@@ -23,7 +23,7 @@ namespace autoware_api
 {
 AutowareVehicleStatusPublisher::AutowareVehicleStatusPublisher(
   const rclcpp::NodeOptions & options)
-: rclcpp::Node("awapi_vehicle_state_publisher", options)
+: rclcpp::Node("awapi_vehicle_status_publisher", options)
 {
   // publisher
   pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/vehicle/get/status", 1);
