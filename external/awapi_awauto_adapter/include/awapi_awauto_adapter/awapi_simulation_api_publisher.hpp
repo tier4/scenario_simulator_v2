@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Autoware Foundation. All rights reserved.
+// Copyright 2015-2020 TierIV.inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #ifndef AWAPI_AWAUTO_ADAPTER__AWAPI_SIMULATION_API_PUBLISHER_HPP_
 #define AWAPI_AWAUTO_ADAPTER__AWAPI_SIMULATION_API_PUBLISHER_HPP_
 #include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include <chrono>
 #include <memory>
@@ -24,8 +25,22 @@ namespace autoware_api
 class AutowareSimulationAPIPublisher : public rclcpp::Node
 {
 private:
+  using PoseStamped = geometry_msgs::msg::PoseStamped;
+  // subscriber
+  rclcpp::Subscription<PoseStamped>::SharedPtr sub_initial_pose_ptr_;
+  rclcpp::Subscription<PoseStamped>::SharedPtr sub_goal_pose_ptr_;
+  // publisher
+  rclcpp::Publisher<PoseStamped>::SharedPtr pub_initial_pose_ptr_;
+  rclcpp::Publisher<PoseStamped>::SharedPtr pub_goal_pose_ptr_;
+  PoseStamped::SharedPtr initial_pose_ptr_;
+  PoseStamped::SharedPtr goal_pose_ptr_;
+  void send_initail_pose();
+  void send_goal_pose();
+  void load_map();
+  void publish_simulation_api();
+
 public:
-  AWAPI_AWAUTO_ADAPTER_PUBLIC
+  explicit AutowareSimulationAPIPublisher(const rclcpp::NodeOptions &);
 };
 }  // namespace autoware_api
 #endif  // AWAPI_AWAUTO_ADAPTER__AWAPI_SIMULATION_API_PUBLISHER_HPP_

@@ -61,6 +61,7 @@ add_executable(${PROJECT_NAME}_node
   src/awapi_vehicle_status_publisher.cpp
   src/awapi_lane_change_status_publisher.cpp
   src/awapi_obstacle_avoidance_status_publisher.cpp
+  src/awapi_simulation_api_publisher.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
