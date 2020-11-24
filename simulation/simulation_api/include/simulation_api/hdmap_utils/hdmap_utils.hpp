@@ -121,8 +121,11 @@ public:
   const std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
   const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     std::vector<std::int64_t> lanelet_ids) const;
+  int64_t getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh = 10.0);
 
 private:
+  std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
+    const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
     std::vector<std::int64_t> lanelet_ids);
   std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<std::int64_t> lanelet_ids);
