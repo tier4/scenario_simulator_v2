@@ -96,10 +96,9 @@ void AutowareVehicleStatusPublisher::get_turn_signal_info(VehicleStatus * status
 }
 void AutowareVehicleStatusPublisher::get_twist_info(VehicleStatus * status)
 {
-  geometry_msgs::msg::TwistStamped twist;
-  const geometry_msgs::msg::TwistStamped::ConstSharedPtr twist_ptr = twist;
-  // get turn signal
-  status->velocity = twist_ptr->twist.linear.x;
-  status->angular_velocity = twist_ptr->twist.angular.z;
+  geometry_msgs::msg::TwistStamped twist_gen;
+  twist_gen.twist.linear.x = 1.0;
+  status->velocity = twist_gen.twist.linear.x;
+  status->angular_velocity = twist_gen.twist.angular.z;
 }
 }  // namespace autoware_api
