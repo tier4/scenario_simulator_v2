@@ -39,13 +39,13 @@ class AutowareVehicleStatusPublisher : public rclcpp::Node
   VehicleStatus vehicle_status_;
   rclcpp::TimerBase::SharedPtr timer_vehicle_status_;
   VehicleStatus init_vehicle_status();
-  void get_pose_info(VehicleStatus *status);
-  void get_steer_info(VehicleStatus *status);
-  void get_vehicle_cmd_info(VehicleStatus *status);
-  void get_turn_signal_info(VehicleStatus *status);
-  void get_twist_info(VehicleStatus *status);
-  void get_gear_info(VehicleStatus *status);
-  void get_battery_info(VehicleStatus *status);
+  void get_pose_info(VehicleStatus * status);
+  void get_steer_info(VehicleStatus * status);
+  void get_vehicle_cmd_info(VehicleStatus * status);
+  void get_turn_signal_info(VehicleStatus * status);
+  void get_twist_info(VehicleStatus * status);
+  void get_gear_info(VehicleStatus * status);
+  void get_battery_info(VehicleStatus * status);
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
