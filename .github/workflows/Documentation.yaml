@@ -33,8 +33,7 @@ jobs:
             doxygen Doxyfile
         - name: Generate markdown
           run: |
-            ls ~/doxybook2/bin
-            echo "~/doxybook2/bin" >> $GITHUB_PATH
+            export PATH="$PATH:~/doxybook2/bin"
             cd docs/doxygen
             doxybook2 --input ./build/ --output ./markdown -c config.json
         - name: Generate documentation
