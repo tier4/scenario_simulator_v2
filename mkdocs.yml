@@ -63,5 +63,14 @@ nav:
             - design/SimulationAPI.md
             - design/XMLRPCAPI.md
             - design/AutowareAPI.md
+    - Package Documentation:
+        - SimulationAPI:
+          - Classes: doxygen/markdown/Classes/index.md
+          - Namespaces: doxygen/markdown/Namespaces/index.md
+          - Modules: doxygen/markdown/Modules/index.md
+          - Files: doxygen/markdown/Files/index.md
+          - Related Pages: doxygen/markdown/Pages/index.md
+          - Examples: doxygen/markdown/Examples/index.md
+
     - Contact Infomation: etc/ContactUs.md
     - LICENSE : LICENSE.md
