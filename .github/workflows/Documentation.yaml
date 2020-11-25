@@ -35,6 +35,7 @@ jobs:
           run: |
             export PATH="$PATH:~/doxybook2/bin"
             cd docs/doxygen
+            mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
         - name: Generate documentation
           run: mkdocs build
