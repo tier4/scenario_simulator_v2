@@ -21,14 +21,14 @@ jobs:
           run: sudo apt install -y doxygen argagg-dev wget
         - name: Wget package
           run: |
-          wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
-          unzip doxybook2-linux-amd64-v1.2.3.zip
+            wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
+            unzip doxybook2-linux-amd64-v1.2.3.zip
         - name: Generate doxygen
           run: |
-          export PATH="$PATH:$GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin"
-          cd docs/doxygen
-          doxygen Doxyfile
-          doxybook2 --input ./build/ --output ./markdown -c config.json
+            export PATH="$PATH:$GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin"
+            cd docs/doxygen
+            doxygen Doxyfile
+            doxybook2 --input ./build/ --output ./markdown -c config.json
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'
