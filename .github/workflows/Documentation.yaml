@@ -22,15 +22,19 @@ jobs:
         - name: Wget package
           run: |
             wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
+            mkdir -p ~/doxybook2
+            cp -rf . ~/doxybook2
+            cd ~/doxybook2
             unzip doxybook2-linux-amd64-v1.2.3.zip
+
         - name: Generate doxygen
           run: |
             cd docs/doxygen
             doxygen Doxyfile
         - name: Generate markdown
           run: |
-            ls $GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin
-            echo "$GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin" >> $GITHUB_PATH
+            ls ~/doxybook2/doxybook2-linux-amd64-v1.2.3/bin
+            echo "~/doxybook2/doxybook2-linux-amd64-v1.2.3/bin" >> $GITHUB_PATH
             cd docs/doxygen
             doxybook2 --input ./build/ --output ./markdown -c config.json
         - name: Generate documentation
