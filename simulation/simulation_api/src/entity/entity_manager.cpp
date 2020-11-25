@@ -46,6 +46,14 @@ void EntityManager::setVerbose(bool verbose)
   }
 }
 
+bool EntityManager::isEgo(std::string name) const
+{
+  if (getEntityType(name) == EntityType::EGO) {
+    return true;
+  }
+  return false;
+}
+
 int EntityManager::getNumberOfEgo() const
 {
   int count = 0;
@@ -87,9 +95,6 @@ void EntityManager::requestLaneChange(std::string name, std::int64_t to_lanelet_
   }
   if (it->second.type() == typeid(VehicleEntity)) {
     boost::any_cast<VehicleEntity &>(it->second).requestLaneChange(to_lanelet_id);
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).requestLaneChange(to_lanelet_id);
   }
 }
 

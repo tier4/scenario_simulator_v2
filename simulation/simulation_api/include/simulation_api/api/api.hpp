@@ -15,6 +15,7 @@
 #ifndef SIMULATION_API__API__API_HPP_
 #define SIMULATION_API__API__API_HPP_
 
+#include <awapi_accessor/accessor.hpp>
 #include <simulation_api/entity/entity_manager.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
@@ -49,7 +50,7 @@ public:
   : runtime_error(message) {}
 };
 
-class API
+class API : private autoware_api::Accessor
 {
   using EntityManager = simulation_api::entity::EntityManager;
 
@@ -59,6 +60,7 @@ public:
     NodeT && node, const std::string & map_path = "",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
+  : autoware_api::Accessor(node)
   {
     std::string address = "127.0.0.1";
 

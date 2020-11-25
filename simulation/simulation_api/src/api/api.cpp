@@ -165,12 +165,21 @@ void API::requestAcquirePosition(std::string name, std::int64_t lanelet_id, doub
 
 void API::requestLaneChange(std::string name, std::int64_t to_lanelet_id)
 {
-  entity_manager_ptr_->requestLaneChange(name, to_lanelet_id);
+  if (entity_manager_ptr_->isEgo(name)) {
+    std_msgs::msg::Bool msg;
+    msg.data = true;
+    setLaneChangeApproval(msg);
+    // setLaneChangeForce(msg);
+  } else {
+    entity_manager_ptr_->requestLaneChange(name, to_lanelet_id);
+  }
 }
 
 void API::requestLaneChange(std::string name, simulation_api::entity::Direction direction)
 {
-  entity_manager_ptr_->requestLaneChange(name, direction);
+  if (!entity_manager_ptr_->isEgo(name)) {
+    entity_manager_ptr_->requestLaneChange(name, direction);
+  }
 }
 
 bool API::isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance)
@@ -180,7 +189,13 @@ bool API::isInLanelet(std::string name, std::int64_t lanelet_id, double toleranc
 
 void API::setTargetSpeed(std::string name, double target_speed, bool continuous)
 {
-  entity_manager_ptr_->setTargetSpeed(name, target_speed, continuous);
+  if (entity_manager_ptr_->isEgo(name)) {
+    std_msgs::msg::Float32 msg;
+    msg.data = target_speed;
+    setVehicleVelocity(msg);
+  } else {
+    entity_manager_ptr_->setTargetSpeed(name, target_speed, continuous);
+  }
 }
 
 boost::optional<double> API::getTimeHeadway(std::string from, std::string to)
