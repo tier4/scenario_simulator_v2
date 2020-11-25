@@ -22,6 +22,7 @@
   <build_export_depend>autoware_auto_msgs</build_export_depend>
   <exec_depend>autoware_auto_msgs</exec_depend>
   <depend>rclcpp_components</depend>
+  <depend>awapi_accessor</depend>
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
   <depend>xmlrpcpp</depend>
