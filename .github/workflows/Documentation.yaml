@@ -47,8 +47,6 @@ jobs:
             cmake .
             make -j2
             sudo make install
-        - name: Setup tmate session
-          uses: mxschmitt/action-tmate@v1
         - name : Build doxybook2
           run: | 
             git clone https://github.com/matusnovak/doxybook2.git
