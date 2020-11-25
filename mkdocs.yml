@@ -71,6 +71,13 @@ nav:
           - Files: package/simulation_api/markdown/Files/index.md
           - Related Pages: package/simulation_api/markdown/Pages/index.md
           - Examples: package/simulation_api/markdown/Examples/index.md
+        - ScenarioSimulator:
+          - Classes: package/scenario_simulator/markdown/Classes/index.md
+          - Namespaces: package/scenario_simulator/markdown/Namespaces/index.md
+          - Modules: package/scenario_simulator/markdown/Modules/index.md
+          - Files: package/scenario_simulator/markdown/Files/index.md
+          - Related Pages: package/scenario_simulator/markdown/Pages/index.md
+          - Examples: package/scenario_simulator/markdown/Examples/index.md
 
     - Contact Infomation: etc/ContactUs.md
     - LICENSE : LICENSE.md

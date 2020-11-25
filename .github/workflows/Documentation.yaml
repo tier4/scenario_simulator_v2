@@ -27,16 +27,30 @@ jobs:
             cd ~/doxybook2
             unzip doxybook2-linux-amd64-v1.2.3.zip
 
-        - name: Generate doxygen
+        # generating simulation_api package documentation
+        - name: Generate doxygen for simulation_api package
           run: |
             cd docs/package/simulation_api
             doxygen Doxyfile
-        - name: Generate markdown
+        - name: Generate markdown for simulation_api package
           run: |
             export PATH="$PATH:~/doxybook2/bin"
             cd docs/package/simulation_api
             mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
+
+        # generating scenario_simulator package documentation
+        - name: Generate doxygen for scenario_simulator package
+          run: |
+            cd docs/package/scenario_simulator
+            doxygen Doxyfile
+        - name: Generate markdown for scenario_simulator package
+          run: |
+            export PATH="$PATH:~/doxybook2/bin"
+            cd docs/package/scenario_simulator
+            mkdir -p ./markdown/Classes
+            doxybook2 --input ./build/ --output ./markdown -c config.json
+
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'
