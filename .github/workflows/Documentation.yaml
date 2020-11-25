@@ -42,7 +42,7 @@ jobs:
             sudo make install
         - name : Build rang
           run: | 
-            git clone https://github.com/nlohmann/rang.git
+            git clone https://github.com/agauniyal/rang.git
             cd rang
             cmake .
             make -j2
