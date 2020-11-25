@@ -23,6 +23,8 @@ jobs:
           run: |
             wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
             unzip doxybook2-linux-amd64-v1.2.3.zip
+        - name: Setup tmate session
+          uses: mxschmitt/action-tmate@v1
         - name: Generate doxygen
           run: |
             export PATH="$PATH:$GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin"
