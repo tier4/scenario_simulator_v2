@@ -18,42 +18,17 @@ jobs:
         - name: Install 
           run: pip3 install mkdocs mkdocs-material pymdown-extensions mdx_unimoji fontawesome_markdown markdown python-markdown-math plantuml-markdown
         - name: Install doxygen/depends of doxybook
-          run: sudo apt install -y doxygen argagg-dev git cmake gcc g++
-        - name: Build inja
-          run: | 
-            git clone https://github.com/pantor/inja.git
-            cd inja
-            cmake .
-            make -j2
-            sudo make install
-        - name : Build fmt
-          run: | 
-            git clone https://github.com/fmtlib/fmt.git
-            cd fmt
-            cmake .
-            make -j2
-            sudo make install
-        - name : Build json
-          run: | 
-            git clone https://github.com/nlohmann/json.git
-            cd json
-            cmake .
-            make -j2
-            sudo make install
-        - name : Build rang
-          run: | 
-            git clone https://github.com/agauniyal/rang.git
-            cd rang
-            cmake .
-            make -j2
-            sudo make install
-        - name : Build doxybook2
-          run: | 
-            git clone https://github.com/matusnovak/doxybook2.git
-            cd doxybook2
-            cmake .
-            make -j2
-            sudo make install
+          run: sudo apt install -y doxygen argagg-dev wget
+        - name: Wget package
+          run: |
+          wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
+          unzip doxybook2-linux-amd64-v1.2.3.zip
+        - name: Generate doxygen
+          run: |
+          export PATH="$PATH:$GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin"
+          cd docs/doxygen
+          doxygen Doxyfile
+          doxybook2 --input ./build/ --output ./markdown -c config.json
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'
