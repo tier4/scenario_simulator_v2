@@ -25,9 +25,12 @@ jobs:
             unzip doxybook2-linux-amd64-v1.2.3.zip
         - name: Generate doxygen
           run: |
-            export PATH="$PATH:$GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin"
             cd docs/doxygen
             doxygen Doxyfile
+        - name: Generate markdown
+          run: |
+            export PATH="$PATH:$GITHUB_WORKSPACE/doxybook2-linux-amd64-v1.2.3/bin"
+            cd docs/doxygen
             doxybook2 --input ./build/ --output ./markdown -c config.json
         - name: Generate documentation
           run: mkdocs build
