@@ -25,9 +25,6 @@ find_package(simulation_api REQUIRED)
 find_package(openscenario_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(document_generator REQUIRED)
-
-include("${document_generator_DIR}/document_generator.cmake")
 
 include_directories(
   include
