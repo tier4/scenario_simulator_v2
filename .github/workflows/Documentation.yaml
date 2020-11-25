@@ -51,6 +51,30 @@ jobs:
             mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
 
+        # generating openscenario_interpreter package documentation
+        - name: Generate doxygen for openscenario_interpreter package
+          run: |
+            cd docs/package/openscenario_interpreter
+            doxygen Doxyfile
+        - name: Generate markdown for openscenario_interpreter package
+          run: |
+            export PATH="$PATH:~/doxybook2/bin"
+            cd docs/package/openscenario_interpreter
+            mkdir -p ./markdown/Classes
+            doxybook2 --input ./build/ --output ./markdown -c config.json
+
+        # generating openscenario_visualization package documentation
+        - name: Generate doxygen for openscenario_visualization package
+          run: |
+            cd docs/package/openscenario_visualization
+            doxygen Doxyfile
+        - name: Generate markdown for openscenario_visualization package
+          run: |
+            export PATH="$PATH:~/doxybook2/bin"
+            cd docs/package/openscenario_visualization
+            mkdir -p ./markdown/Classes
+            doxybook2 --input ./build/ --output ./markdown -c config.json
+
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'
