@@ -19,6 +19,34 @@ jobs:
           run: pip3 install mkdocs mkdocs-material pymdown-extensions mdx_unimoji fontawesome_markdown markdown python-markdown-math plantuml-markdown
         - name: Install doxygen/depends of doxybook
           run: sudo apt install -y doxygen argagg-dev git cmake gcc g++
+        - name: Build inja
+          run: | 
+            git clone https://github.com/pantor/inja.git
+            cd inja
+            cmake .
+            make -j2
+            sudo make install
+        - name : Build fmt
+          run: | 
+            git clone https://github.com/fmtlib/fmt.git
+            cd fmt
+            cmake .
+            make -j2
+            sudo make install
+        - name : Build json
+          run: | 
+            git clone https://github.com/nlohmann/json.git
+            cd json
+            cmake .
+            make -j2
+            sudo make install
+        - name : Build rang
+          run: | 
+            git clone https://github.com/nlohmann/rang.git
+            cd rang
+            cmake .
+            make -j2
+            sudo make install
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'
