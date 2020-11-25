@@ -47,6 +47,13 @@ jobs:
             cmake .
             make -j2
             sudo make install
+        - name : Build doxybook2
+          run: | 
+            git clone https://github.com/matusnovak/doxybook2.git
+            cd doxybook2
+            cmake .
+            make -j2
+            sudo make install
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'
