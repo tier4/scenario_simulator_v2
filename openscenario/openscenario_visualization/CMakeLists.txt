@@ -43,7 +43,6 @@ ament_target_dependencies(openscenario_visualization_component
   openscenario_msgs
   quaternion_operation
 )
-add_document(openscenario_visualization_component)
 add_executable(openscenario_visualization_node
   src/openscenario_visualization_node.cpp
 )
@@ -57,7 +56,6 @@ ament_target_dependencies(openscenario_visualization_node
   openscenario_msgs
   quaternion_operation
 )
-add_document(openscenario_visualization_node)
 
 install(TARGETS
   openscenario_visualization_node
