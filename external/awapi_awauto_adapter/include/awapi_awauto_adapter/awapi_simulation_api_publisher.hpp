@@ -34,10 +34,16 @@ private:
   rclcpp::Publisher<PoseStamped>::SharedPtr pub_goal_pose_ptr_;
   PoseStamped::SharedPtr initial_pose_ptr_;
   PoseStamped::SharedPtr goal_pose_ptr_;
+  /**
+   * @brief send initial pose
+   * @return none
+   */
   void send_initail_pose();
+  /**
+   * @brief send goal pose
+   * @return none
+   */
   void send_goal_pose();
-  void load_map();
-  void publish_simulation_api();
 
 public:
   explicit AutowareSimulationAPIPublisher(const rclcpp::NodeOptions &);

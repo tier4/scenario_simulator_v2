@@ -28,5 +28,4 @@ AutowareSimulationAPIPublisher::AutowareSimulationAPIPublisher(
   sub_goal_pose_ptr_ = create_subscription<PoseStamped>("/move_base_simple/goal",
       1, [&](const PoseStamped::SharedPtr msg_ptr) {goal_pose_ptr_ = msg_ptr;});
 }
-void AutowareSimulationAPIPublisher::publish_simulation_api() {}
 }  // namespace autoware_api

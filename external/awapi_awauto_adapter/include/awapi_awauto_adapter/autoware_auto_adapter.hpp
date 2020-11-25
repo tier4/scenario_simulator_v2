@@ -15,6 +15,7 @@
 #ifndef AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
 #define AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
 #include <awapi_awauto_adapter/utility/visibility.h>
+#include <tf2_ros/transform_listener.h>
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/lane_change_status.hpp>
@@ -25,11 +26,11 @@
 #include <awapi_awauto_adapter/awapi_lane_change_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_obstacle_avoidance_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_vehicle_status_publisher.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <tf2_ros/transform_listener.h>
 
 #include <chrono>
 #include <memory>
@@ -42,6 +43,7 @@ private:
   using TwistStamped = geometry_msgs::msg::TwistStamped;
   using Float32 = std_msgs::msg::Float32;
   using Bool = std_msgs::msg::Bool;
+  using PoseStamped = geometry_msgs::msg::PoseStamped;
   TwistStamped::SharedPtr twist_ptr_;
   Float32::SharedPtr steer_ptr_;
   Bool::ConstSharedPtr lane_change_available_ptr;
@@ -57,42 +59,44 @@ private:
   // publish
   void timer_callback();
   rclcpp::TimerBase::SharedPtr timer_callback_;
-  /** ---- AutowareStatus ------------------------------------------------------
-   *  Topic: /awapi/autoware/get/status
-   * ------------------------------------------------------------------------ */
+  /** @def
+   *  AutowareStatus　Topic: /awapi/autoware/get/status
+   */
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
   rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   std::unique_ptr<AutowareAutoStatusPublisher> autoware_status_publisher_;
-
-  /** ---- VehicleStatus -------------------------------------------------------
-   *  Topic: /awapi/vehicle/get/status
-   * ------------------------------------------------------------------------ */
+  /** @def
+   * VehicleStatus Topic: /awapi/vehicle/get/status
+   */
   using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
   rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
   std::unique_ptr<AutowareVehicleStatusPublisher> vehicle_status_publisher_;
-
-  /** ---- LaneChangeStatus ------------------------------------------------------
-   *  Topic: /awapi/lane_change/get/status
-   * ------------------------------------------------------------------------ */
+  /** @def
+   *  LaneChangeStatus Topic: /awapi/lane_change/get/status
+   */
   using LaneChangeStatus = autoware_api_msgs::msg::LaneChangeStatus;
   rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
   std::unique_ptr<AutowareLaneChangeStatusPublisher> lane_change_status_publisher_;
 
-  /** ---- TrafficLightStatus --------------------------------------------------
-   *  Topic: /awapi/traffic_light/get/status
-   * ------------------------------------------------------------------------ */
+  /** @def
+   * TrafficLightStatus Topic: /awapi/traffic_light/get/status
+   */
   using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
   rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
   TrafficLightStatus traffic_lights_;
   rclcpp::TimerBase::SharedPtr timer_traffic_light_status_;
   void publish_traffic_light_status();
-
-  /** ---- ObstacleAvoidanceStatus --------------------------------------------------
-   *  Topic: /awapi/traffic_light/get/status
-   * ------------------------------------------------------------------------ */
+  /**
+   *  ObstacleAvoidanceStatus Topic: /awapi/traffic_light/get/status
+   */
   using ObstacleAvoidanceStatus = autoware_api_msgs::msg::ObstacleAvoidanceStatus;
   rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_obstacle_avoidance_status_;
   std::unique_ptr<AutowareObstacleAvoidanceStatusPublisher> obstacle_avoidance_status_publisher_;
+  /**
+   * @fn get current pose
+   * @brief function to get current pose
+   * @return geometry_msgs::msg::PoseStamped
+   */
   void get_current_pose();
 
   // tf

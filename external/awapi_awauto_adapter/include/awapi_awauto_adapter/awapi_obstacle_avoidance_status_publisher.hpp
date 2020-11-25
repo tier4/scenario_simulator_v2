@@ -29,15 +29,19 @@ namespace autoware_api
 class AutowareObstacleAvoidanceStatusPublisher : public rclcpp::Node
 {
 private:
-  /** ---- ObstacleAvoidanceStatus ------------------------------------------------------
-   *  Topic: /awapi/obstacle_avoidance/get/status
-   * ------------------------------------------------------------------------ */
+  /**
+   *  ObstacleAvoidanceStatus Topic: /awapi/obstacle_avoidance/get/status
+   */
   using ObstacleAvoidanceStatus = autoware_api_msgs::msg::ObstacleAvoidanceStatus;
   rclcpp::Publisher<ObstacleAvoidanceStatus>::SharedPtr pub_obstacle_avoidance_status_;
   rclcpp::TimerBase::SharedPtr timer_obstacle_avoidance_status_;
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
+  /**
+   * @brief publish obstacle avoidance
+   * @return none
+   */
   void publish_obstacle_avoidance_status();
   explicit AutowareObstacleAvoidanceStatusPublisher(const rclcpp::NodeOptions &);
 };
