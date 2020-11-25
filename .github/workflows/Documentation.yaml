@@ -29,12 +29,12 @@ jobs:
 
         - name: Generate doxygen
           run: |
-            cd docs/doxygen
+            cd docs/package/simulation_api
             doxygen Doxyfile
         - name: Generate markdown
           run: |
             export PATH="$PATH:~/doxybook2/bin"
-            cd docs/doxygen
+            cd docs/package/simulation_api
             mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
         - name: Generate documentation
