@@ -4,8 +4,6 @@ on:
   schedule:
     - cron: 0 0 * * *
   push:
-    branches:
-    - master
 
 jobs:
     job1:
@@ -19,6 +17,8 @@ jobs:
             python-version: '3.6.12'
         - name: Install 
           run: pip3 install mkdocs mkdocs-material pymdown-extensions mdx_unimoji fontawesome_markdown markdown python-markdown-math plantuml-markdown
+        - name: Install doxygen/depends of doxybook
+          run: apt install -y doxygen argagg-dev
         - name: Generate documentation
           run: mkdocs build
         - name: 'Upload Artifact'
