@@ -47,6 +47,7 @@ class AutowareVehicleStatusPublisher : public rclcpp::Node
   /**
    * @brief get turn signal info
    * @return int32_t
+   * @todo make turn signal info
    */
   int32_t get_turn_signal_info();
 

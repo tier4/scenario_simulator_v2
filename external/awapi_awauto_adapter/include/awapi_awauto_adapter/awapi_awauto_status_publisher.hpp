@@ -38,24 +38,28 @@ class AutowareAutoStatusPublisher : public rclcpp::Node
    * @brief get autoware state info
    * @param none
    * @return int32_t
+   * @todo make autoware state info
    */
   std::string get_autoware_state_info();
   /**
    * @brief get control mode info
    * @param none
    * @return int32_t
+   * @todo make control mode info
    */
   int32_t get_control_mode_info();
   /**
    * @brief get gate mode info
    * @param none
    * @return int32_t
+   * @todo make gate mode info
    */
   int32_t get_gate_mode_info();
   /**
    * @brief get emergency info
    * @param none
    * @return bool
+   * @todo make emergency info
    */
   bool get_emergency_info();
 
