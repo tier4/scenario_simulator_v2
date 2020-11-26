@@ -10,7 +10,7 @@ We need open-source frameworkd for integrating those testing tools with Autoware
 So, we developed this package.    
 <font color="Coral">__This package is designed to easily accommodate multiple simulators and scenario description formats.__</font>  
 This package provides under Apache License Version 2.0.  
-See also [LICENSE](LICENSE.md).
+See also [LICENSE](LICENSE).
 
 ## How to use
 
@@ -44,13 +44,13 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 
 ## Detailed Documentations
 ### How to use scenario editor
-See [Scenario Editor](user_guide/scenario_editor/ScenarioEditorUserGuide.md)
+See [Scenario Editor](user_guide/scenario_editor/ScenarioEditorUserGuide)
 
 ### How to use scenario test runner
-See [Scenario Test Runner](user_guide/test_runner/ScenarioTestRunner.md)
+See [Scenario Test Runner](user_guide/test_runner/ScenarioTestRunner)
 
 ### Architecture documentation
-See [Architecture Documentation](design/SystemArchitecture.md)
+See [Architecture Documentation](design/SystemArchitecture)
 
 ## Contact Infomation
-See [Contact Infomation](etc/ContactUs.md)
+See [Contact Infomation](etc/ContactUs)

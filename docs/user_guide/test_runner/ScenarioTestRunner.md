@@ -11,12 +11,12 @@ Then convert scenario into a "XML" based format called a "OpenSCENARIO" The form
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
 ```
 Workflow file defines how to execute scenarios.  
-If you want to know how to write workflow file, read [here.](HowToWriteWorkflowFile.md)
+If you want to know how to write workflow file, read [here.](HowToWriteWorkflowFile)
 
 ## Detailed Documentations
 
-[HowToWriteWorkflowFile](HowToWriteWorkflowFile.md)
+[HowToWriteWorkflowFile](HowToWriteWorkflowFile)
 
-[Scenario Conversion](ScenarioFormatConversion.md)
+[Scenario Conversion](ScenarioFormatConversion)
 
-[Tips](Tips.md)
+[Tips](Tips)
