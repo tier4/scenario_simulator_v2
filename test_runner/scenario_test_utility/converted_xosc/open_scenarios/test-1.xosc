@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OpenSCENARIO>
+ <UpperCamelCase integerValue="0" stringValue="string"/>
+ <EmptyCase/>
+ <UpperCamelCase2>
+  <UpperCamelCase attributeTag="attr">
+   <UpperCamelCase atrtribute="attr">
+    <UpperCamelCase>
+     <Pos listx="0" listy="0" listz="1.25"/>
+     <Dim listx="0" listy="0" listz="1.25"/>
+    </UpperCamelCase>
+   </UpperCamelCase>
+  </UpperCamelCase>
+ </UpperCamelCase2>
+</OpenSCENARIO>
