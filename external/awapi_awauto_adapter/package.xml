@@ -12,7 +12,9 @@
   <depend>autoware_api_msgs</depend>
   <depend>autoware_perception_msgs</depend>
   <depend>autoware_planning_msgs</depend>
+  <depend>lanelet2_extension</depend>
   <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp</depend>
   <depend>quaternion_operation</depend>
