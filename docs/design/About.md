@@ -7,13 +7,13 @@ This package is designed for executing scenario test with Autoware.
 ## Detailed Documentation
 
 If you want to know whole architecture of this package, please read this documentation.  
-[System Architecture](SystemArchitecture)  
+[System Architecture](/design/SystemArchitecture)  
 
 If you want to know how to develop original scenario format, please read this documentation.  
-[Simulation API](SimulationAPI)
+[Simulation API](/design/SimulationAPI)
 
 IF you want to know how to integrate your simulator with this package, please read this documentation.  
-[XMLRPCAPI](XMLRPCAPI)
+[XMLRPCAPI](/design/XMLRPCAPI)
 
 If you want to know how to control Autoware via Autoware API, please read this documentation.
-[AutowareAPI](AutowareAPI)
+[AutowareAPI](/design/AutowareAPI)
