@@ -43,6 +43,17 @@ namespace autoware_api
 class AutowareAutoAdapter : public rclcpp::Node
 {
 private:
+  using Twist = geometry_msgs::msg::Twist;
+  using TwistStamped = geometry_msgs::msg::TwistStamped;
+  using Float32 = std_msgs::msg::Float32;
+  using Bool = std_msgs::msg::Bool;
+  using String = std_msgs::msg::Bool;
+  using PoseStamped = geometry_msgs::msg::PoseStamped;
+  using Pose = geometry_msgs::msg::Pose;
+  using Route = autoware_planning_msgs::msg::Route;
+  using Objects = autoware_perception_msgs::msg::DynamicObjectArray;
+  using MapBin = std_msgs::msg::String;
+  using PointXYZ = std_msgs::msg::String;
   /** @def
    *  AutowareStatus　Topic: /awapi/autoware/get/status
    */
@@ -63,14 +74,6 @@ private:
    *  ObstacleAvoidanceStatus Topic: /awapi/traffic_light/get/status
    */
   using ObstacleAvoidanceStatus = autoware_api_msgs::msg::ObstacleAvoidanceStatus;
-  using Twist = geometry_msgs::msg::Twist;
-  using TwistStamped = geometry_msgs::msg::TwistStamped;
-  using Float32 = std_msgs::msg::Float32;
-  using Bool = std_msgs::msg::Bool;
-  using PoseStamped = geometry_msgs::msg::PoseStamped;
-  using Pose = geometry_msgs::msg::Pose;
-  using Route = autoware_planning_msgs::msg::Route;
-  using Objects = autoware_perception_msgs::msg::DynamicObjectArray;
 
   // subscriber
   rclcpp::Subscription<PoseStamped>::SharedPtr sub_initial_pose_;
@@ -104,10 +107,27 @@ private:
   /// @todo make traffic light message
   rclcpp::Subscription<TrafficLightStatus>::SharedPtr sub_traffic_light_;
   rclcpp::Subscription<Bool>::SharedPtr sub_obstacle_avoid_ready_;
+  /// @todo make ros2 ll2 map type
+  rclcpp::Subscription<MapBin>::SharedPtr sub_lanelet2_map_;
+  /// @todo make ros2 pcl lib
+  rclcpp::Subscription<PointXYZ>::SharedPtr sub_no_ground_pointcloud_;
   // publisher
+  //! /awapi/vehicle/put/engage
   rclcpp::Publisher<Bool>::SharedPtr pub_engage_;
-  void engageCallback(const Bool::SharedPtr msg_ptr);
-  void routeCallback(const Route::SharedPtr msg_ptr);
+  //! /awapi/vehicle/put/limit_velocity
+  rclcpp::Publisher<Float32>::SharedPtr pub_limit_velocity_;
+  //! /awapi/autoware/put/route
+  rclcpp::Publisher<Route>::SharedPtr pub_route_;
+  //! /awapi/autoware/get/status
+  rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
+  //! /awapi/vehicle/get/status
+  rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
+  //! /awapi/lane_change/get/status
+  rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
+  //! /awapi/obstacle_avoidance/get/status
+  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_obstacle_avoidance_status_;
+  //! /awapi/traffic_light/get/status
+  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
 
   PoseStamped::SharedPtr pose_ptr_;
   TwistStamped::SharedPtr twist_ptr_;
@@ -127,21 +147,19 @@ private:
   Objects::SharedPtr detection_object_ptr_;
   TrafficLightStatus::SharedPtr traffic_light_status_ptr_;
   Bool::SharedPtr obstacle_avoid_ready_ptr_;
-  Bool::SharedPtr map_ptr_;
-  void timer_callback();
+  MapBin::SharedPtr lanelet2_map_ptr_;
+  PointXYZ::SharedPtr point_cloud_ptr_;
+
   rclcpp::TimerBase::SharedPtr timer_callback_;
-  rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
   std::unique_ptr<AutowareAutoStatusPublisher> autoware_status_publisher_;
-  rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
   std::unique_ptr<AutowareVehicleStatusPublisher> vehicle_status_publisher_;
-  rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
   std::unique_ptr<AutowareLaneChangeStatusPublisher> lane_change_status_publisher_;
-  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
-  TrafficLightStatus traffic_lights_;
-  rclcpp::TimerBase::SharedPtr timer_traffic_light_status_;
-  void publish_traffic_light_status();
-  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_obstacle_avoidance_status_;
   std::unique_ptr<AutowareObstacleAvoidanceStatusPublisher> obstacle_avoidance_status_publisher_;
+  /**
+   * @fn timer for each pulisher
+   * @brief function to callback
+   */
+  void timer_callback();
   /**
    * @fn get current pose
    * @brief function to get current pose
