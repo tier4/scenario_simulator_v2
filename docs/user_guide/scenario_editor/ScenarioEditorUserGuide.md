@@ -7,8 +7,8 @@ Latest version of Google Chrome (Currently, [google chrome 86](https://developer
 
 ## Detailed Documentations
 
-[Create a simple scenario](CreateSimpleScenario.md)  
+[Create a simple scenario](CreateSimpleScenario)  
 
-[Edit an existing scenario](EditExistingScenario.md)  
+[Edit an existing scenario](EditExistingScenario)  
 
-[Change the coordinate in scenario editor](ChangeCoordinate.md)  
+[Change the coordinate in scenario editor](ChangeCoordinate)  
