@@ -20,12 +20,15 @@
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/lane_change_status.hpp>
 #include <autoware_api_msgs/msg/obstacle_avoidance_status.hpp>
+#include <autoware_perception_msgs/msg/dynamic_object_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <awapi_awauto_adapter/awapi_awauto_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_lane_change_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_obstacle_avoidance_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_vehicle_status_publisher.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
@@ -40,56 +43,103 @@ namespace autoware_api
 class AutowareAutoAdapter : public rclcpp::Node
 {
 private:
-  using TwistStamped = geometry_msgs::msg::TwistStamped;
-  using Float32 = std_msgs::msg::Float32;
-  using Bool = std_msgs::msg::Bool;
-  using PoseStamped = geometry_msgs::msg::PoseStamped;
-  TwistStamped::SharedPtr twist_ptr_;
-  Float32::SharedPtr steer_ptr_;
-  Bool::ConstSharedPtr lane_change_available_ptr;
-  Bool::ConstSharedPtr lane_change_ready_ptr;
-  Bool::ConstSharedPtr obstacle_avoid_ready_ptr;
-  // subscriber
-  rclcpp::Subscription<TwistStamped>::SharedPtr sub_twist_;
-  rclcpp::Subscription<Float32>::SharedPtr sub_steer_;
-  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_available_;
-  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_ready_;
-  rclcpp::Subscription<Bool>::SharedPtr sub_obstacle_avoid_ready_;
-
-  // publish
-  void timer_callback();
-  rclcpp::TimerBase::SharedPtr timer_callback_;
   /** @def
    *  AutowareStatus　Topic: /awapi/autoware/get/status
    */
   using AutowareStatus = autoware_api_msgs::msg::AwapiAutowareStatus;
-  rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
-  std::unique_ptr<AutowareAutoStatusPublisher> autoware_status_publisher_;
   /** @def
    * VehicleStatus Topic: /awapi/vehicle/get/status
    */
   using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
-  rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
-  std::unique_ptr<AutowareVehicleStatusPublisher> vehicle_status_publisher_;
   /** @def
    *  LaneChangeStatus Topic: /awapi/lane_change/get/status
    */
   using LaneChangeStatus = autoware_api_msgs::msg::LaneChangeStatus;
-  rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
-  std::unique_ptr<AutowareLaneChangeStatusPublisher> lane_change_status_publisher_;
-
   /** @def
    * TrafficLightStatus Topic: /awapi/traffic_light/get/status
    */
   using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
-  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
-  TrafficLightStatus traffic_lights_;
-  rclcpp::TimerBase::SharedPtr timer_traffic_light_status_;
-  void publish_traffic_light_status();
   /**
    *  ObstacleAvoidanceStatus Topic: /awapi/traffic_light/get/status
    */
   using ObstacleAvoidanceStatus = autoware_api_msgs::msg::ObstacleAvoidanceStatus;
+  using Twist = geometry_msgs::msg::Twist;
+  using TwistStamped = geometry_msgs::msg::TwistStamped;
+  using Float32 = std_msgs::msg::Float32;
+  using Bool = std_msgs::msg::Bool;
+  using PoseStamped = geometry_msgs::msg::PoseStamped;
+  using Pose = geometry_msgs::msg::Pose;
+  using Route = autoware_planning_msgs::msg::Route;
+  using Objects = autoware_perception_msgs::msg::DynamicObjectArray;
+
+  // subscriber
+  rclcpp::Subscription<PoseStamped>::SharedPtr sub_initial_pose_;
+  rclcpp::Subscription<Objects>::SharedPtr sub_detection_objects_;
+  /// @todo make engage message
+  rclcpp::Subscription<Bool>::SharedPtr sub_engage_;
+  /// @todo make route message
+  rclcpp::Subscription<Route>::SharedPtr sub_route_;
+  /// @todo make twist message
+  rclcpp::Subscription<TwistStamped>::SharedPtr sub_twist_;
+  /// @todo make steer message
+  rclcpp::Subscription<Float32>::SharedPtr sub_steer_;
+  /// @todo make steer message
+  rclcpp::Subscription<Float32>::SharedPtr sub_steer_velocity_;
+  /// @todo make limit velocity message
+  rclcpp::Subscription<Float32>::SharedPtr sub_limit_velocity_;
+  /// @todo make lane change approve message
+  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_approve_;
+  /// @todo make lane change force message message
+  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_force_;
+  /// @todo make lane change available message message
+  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_available_;
+  /// @todo make lane change ready message message
+  rclcpp::Subscription<Bool>::SharedPtr sub_lane_change_ready_;
+  /// @todo make initial twist message message
+  rclcpp::Subscription<TwistStamped>::SharedPtr sub_initial_twist_ptr_;
+  /// @todo make checkpoint message
+  rclcpp::Subscription<PoseStamped>::SharedPtr sub_checkpoint_;
+  /// @todo make goal message
+  rclcpp::Subscription<Pose>::SharedPtr sub_goal_;
+  /// @todo make traffic light message
+  rclcpp::Subscription<TrafficLightStatus>::SharedPtr sub_traffic_light_;
+  rclcpp::Subscription<Bool>::SharedPtr sub_obstacle_avoid_ready_;
+  // publisher
+  rclcpp::Publisher<Bool>::SharedPtr pub_engage_;
+  void engageCallback(const Bool::SharedPtr msg_ptr);
+  void routeCallback(const Route::SharedPtr msg_ptr);
+
+  PoseStamped::SharedPtr pose_ptr_;
+  TwistStamped::SharedPtr twist_ptr_;
+  Float32::SharedPtr steer_ptr_;
+  Float32::SharedPtr steer_velocity_ptr_;
+  Float32::SharedPtr limit_velocity_ptr_;
+  Bool::SharedPtr engage_ptr_;
+  Route::SharedPtr route_ptr_;
+  Bool::SharedPtr lane_change_approve_ptr_;
+  Bool::SharedPtr lane_change_force_ptr_;
+  Bool::SharedPtr lane_change_available_ptr_;
+  Bool::SharedPtr lane_change_ready_ptr_;
+  PoseStamped::SharedPtr initial_pose_ptr_;
+  TwistStamped::SharedPtr initial_twist_ptr_;
+  PoseStamped::SharedPtr checkpoint_ptr_;
+  Pose::SharedPtr goal_ptr_;
+  Objects::SharedPtr detection_object_ptr_;
+  TrafficLightStatus::SharedPtr traffic_light_status_ptr_;
+  Bool::SharedPtr obstacle_avoid_ready_ptr_;
+  Bool::SharedPtr map_ptr_;
+  void timer_callback();
+  rclcpp::TimerBase::SharedPtr timer_callback_;
+  rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
+  std::unique_ptr<AutowareAutoStatusPublisher> autoware_status_publisher_;
+  rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
+  std::unique_ptr<AutowareVehicleStatusPublisher> vehicle_status_publisher_;
+  rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
+  std::unique_ptr<AutowareLaneChangeStatusPublisher> lane_change_status_publisher_;
+  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
+  TrafficLightStatus traffic_lights_;
+  rclcpp::TimerBase::SharedPtr timer_traffic_light_status_;
+  void publish_traffic_light_status();
   rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_obstacle_avoidance_status_;
   std::unique_ptr<AutowareObstacleAvoidanceStatusPublisher> obstacle_avoidance_status_publisher_;
   /**
