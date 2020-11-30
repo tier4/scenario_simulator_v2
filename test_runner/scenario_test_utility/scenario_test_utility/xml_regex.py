@@ -20,7 +20,7 @@ import re
 
 class XmlRegex():
     """
-    xml converter class
+    Xml converter class
 
     **Attributes**
     * REPLACE_LOWER_PATTERN (`str`): regex for convert lower case pattern

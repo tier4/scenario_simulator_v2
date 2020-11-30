@@ -25,9 +25,7 @@ from scenario_test_utility.logger import Logger
 
 
 class XoscValidator():
-    """
-    xosc validation class
-    """
+    """ Xosc validation class. """
     def __init__(self):
         share_directory_path = os.path.join(get_package_share_directory('scenario_test_utility'))
         xsd_path = os.path.join(share_directory_path, '../', 'ament_index', 'resource_index',

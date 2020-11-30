@@ -25,9 +25,7 @@ from scenario_test_utility.logger import Logger
 
 
 class Manager():
-    """
-    class to handle simple repeated tasks 
-    """
+    """ Class to handle simple repeated tasks. """
 
     @staticmethod
     def ask_continuation():

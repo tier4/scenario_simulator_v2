@@ -27,13 +27,14 @@ from scenario_test_utility.logger import Logger
 
 class LifecycleController(Node):
     """
-    class to control lifecycle
+    class to control lifecycle.
 
     **Attributes**
     * NODE_NAME (`str`): node name to control lifecycle
     * PARAMETER_XOSC_PATH (`str`): parameter for xosc path
     * PARAMETER_EXPECT (`str`): expectation parameter name
     """
+
     NODE_NAME = "openscenario_interpreter_node"
     PARAMETER_XOSC_PATH = "osc_path"
     PARAMETER_EXPECT = "expect"
