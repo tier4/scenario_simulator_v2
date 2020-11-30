@@ -63,4 +63,5 @@ class DatabaseHandler():
 
 
 if __name__ == '__main__':
+    """Entrypoint."""
     pass

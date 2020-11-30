@@ -28,7 +28,12 @@ from scenario_test_utility.xosc_validator import XoscValidator
 
 
 class ScenarioTestRunner:
+    """
+    class to test scenarios
 
+    **Attributes**
+    * SLEEP_RATE (`int`): time to sleep before next scenario
+    """
     SLEEP_RATE = 1
 
     def __init__(self, timeout):
@@ -42,6 +47,18 @@ class ScenarioTestRunner:
         self.xosc_step_time_ms = []
 
     def run_workflow(self, workflow, log_directory):
+        """
+        main function for test runner
+
+        **Args**
+
+        * workflow,log_directory (`str`)
+
+        **Returns**
+
+        *None
+
+        """
         self.launcher_path, self.log_path, self.scenarios \
             = DatabaseHandler.read_database(workflow, log_directory)
         self.yaml_scenarios = []
@@ -66,6 +83,9 @@ class ScenarioTestRunner:
         self.run_all_scenarios()
 
     def validate_all_scenarios(self):
+        """
+        function to validate all scenarios
+        """
         validator = XoscValidator()
         Logger.print_separator('validating scenarios')
         for scenario in self.xosc_scenarios:
@@ -85,6 +105,9 @@ class ScenarioTestRunner:
         self.lifecycle_controller.deactivate_node()
 
     def run_scenario(self):
+        """
+        function to run scenario
+        """
         Logger.print_process(
             'Set maximum simulation time: ' + str(self.timeout))
         time.sleep(self.SLEEP_RATE)
@@ -93,6 +116,18 @@ class ScenarioTestRunner:
         print('')
 
     def run_all_scenarios(self):
+        """
+        function to run all scenarios
+
+        **Args**
+
+        * workflow,log_directory (`str`)
+
+        **Returns**
+
+        *None
+
+        """
         Manager.mkdir(self.log_path)
         for index, scenario in enumerate(self.xosc_scenarios):
             print(str(index+1), scenario)
@@ -145,4 +180,5 @@ def main():
 
 
 if __name__ == '__main__':
+    """Entrypoint."""
     main()

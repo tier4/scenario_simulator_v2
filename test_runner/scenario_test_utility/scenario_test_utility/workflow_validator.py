@@ -39,6 +39,7 @@ class WorkflowValidator():
 
 
 def main():
+    """Main Function."""
     parser = argparse.ArgumentParser(description='Validator for workflow .yaml file')
     parser.add_argument('workflow', help='path to workflow .yaml file')
     args = parser.parse_args()

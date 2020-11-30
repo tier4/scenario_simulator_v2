@@ -92,6 +92,7 @@ class XmlRegex():
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     empty_case_test = XmlRegex.replace_empty_case("<tag></tag>")
     print("empty_case:", empty_case_test)
     double_case_test = XmlRegex.replace_double_case("</tag>\n\t</tag>")

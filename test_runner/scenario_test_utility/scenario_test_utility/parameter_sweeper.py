@@ -109,6 +109,7 @@ class ParameterSweeper:
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     od = [
         OrderedDict([('name', 'CAR'), ('list', ["car0", "car1"])]),
         OrderedDict([('name', 'WALKER'), ('list', ["walker0", "walker1"])]),
