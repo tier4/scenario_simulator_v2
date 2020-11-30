@@ -17,7 +17,7 @@ extra:
 plugins:
     - search
 
-copyright: 'Copyright &copy; 2020- TierIV.inc'
+copyright: 'Copyright &copy; 2020- Tier IV, Inc'
 
 markdown_extensions:
     - pymdownx.highlight
