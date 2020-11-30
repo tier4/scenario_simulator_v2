@@ -112,21 +112,13 @@ private:
   /// @todo make ros2 pcl lib
   rclcpp::Subscription<PointXYZ>::SharedPtr sub_no_ground_pointcloud_;
   // publisher
-  //! /awapi/vehicle/put/engage
+  /// @todo make autoware status monitor
   rclcpp::Publisher<Bool>::SharedPtr pub_engage_;
-  //! /awapi/vehicle/put/limit_velocity
+  /// @todo make velocity controller
   rclcpp::Publisher<Float32>::SharedPtr pub_limit_velocity_;
-  //! /awapi/autoware/put/route
+  /// @todo make behavior planner
   rclcpp::Publisher<Route>::SharedPtr pub_route_;
-  //! /awapi/autoware/get/status
-  rclcpp::Publisher<AutowareStatus>::SharedPtr pub_autoware_status_;
-  //! /awapi/vehicle/get/status
-  rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
-  //! /awapi/lane_change/get/status
-  rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
-  //! /awapi/obstacle_avoidance/get/status
-  rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_obstacle_avoidance_status_;
-  //! /awapi/traffic_light/get/status
+  /// @todo make traffic light handler
   rclcpp::Publisher<TrafficLightStatus>::SharedPtr pub_traffic_light_status_;
 
   PoseStamped::SharedPtr pose_ptr_;
@@ -151,9 +143,13 @@ private:
   PointXYZ::SharedPtr point_cloud_ptr_;
 
   rclcpp::TimerBase::SharedPtr timer_callback_;
+  /// @todo collect all necessary topic from AutowareAuto
   std::unique_ptr<AutowareAutoStatusPublisher> autoware_status_publisher_;
+  /// @todo collect all necessary topic from AutowareAuto
   std::unique_ptr<AutowareVehicleStatusPublisher> vehicle_status_publisher_;
+  /// @todo collect all necessary topic from AutowareAuto
   std::unique_ptr<AutowareLaneChangeStatusPublisher> lane_change_status_publisher_;
+  /// @todo collect all necessary topic from AutowareAuto
   std::unique_ptr<AutowareObstacleAvoidanceStatusPublisher> obstacle_avoidance_status_publisher_;
   /**
    * @fn timer for each pulisher

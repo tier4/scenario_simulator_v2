@@ -25,6 +25,7 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
   // publisher
   pub_engage_ = create_publisher<Bool>("/awapi/vehicle/put/engage", 1);
   pub_limit_velocity_ = create_publisher<Float32>("/awapi/vehicle/put/limit_velocity", 1);
+  pub_route_ = create_publisher<Route>("/awapi/autoware/put/route", 1);
   pub_traffic_light_status_ = create_publisher<TrafficLightStatus>("output/traffic_light", 1);
   // subscriber
   sub_twist_ = create_subscription<TwistStamped>("/localization/twist",
