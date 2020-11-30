@@ -71,6 +71,11 @@ private:
     if (api_.checkCollision("ego", "npc2")) {
       std::cout << "npc2 collision!" << std::endl;
     }
+    auto status = api_.getEntityStatus(
+      "ego", simulation_api::entity::CoordinateFrameTypes::LANE);
+    std::cout << "ego " << std::endl;
+    std::cout << "lanlet id : " << status.lanelet_id << std::endl;
+    std::cout << "s : " << status.s << std::endl;
     api_.updateFrame();
     current_time_ = current_time_ + 0.02;
   }
