@@ -1,0 +1,14 @@
+{
+    "baseUrl": "/package/simulation_api/markdown/",
+    "indexInFolders": true,
+    "indexClassesName": "index",
+    "indexFilesName": "index",
+    "indexGroupsName": "index",
+    "indexNamespacesName": "index",
+    "indexRelatedPagesName": "index",
+    "indexExamplesName": "index",
+    "mainPageInRoot": false,
+    "mainPageName": "index",
+    "sort": true,
+    "linkSuffix" : ""
+}

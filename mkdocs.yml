@@ -63,5 +63,8 @@ nav:
             - design/SimulationAPI.md
             - design/XMLRPCAPI.md
             - design/AutowareAPI.md
+    - Package Documentation:
+      - About : package/About.md
+
     - Contact Infomation: etc/ContactUs.md
     - LICENSE : LICENSE.md

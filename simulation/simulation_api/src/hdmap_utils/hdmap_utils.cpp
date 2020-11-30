@@ -194,6 +194,39 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
   return ret;
 }
 
+std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLaneletsWithDistance(
+  const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[])
+{
+  std::vector<std::pair<double, lanelet::Lanelet>> exclude_subtype_lanelets;
+  for (const auto & ll : lls) {
+    if (ll.second.hasAttribute(lanelet::AttributeName::Subtype)) {
+      lanelet::Attribute attr = ll.second.attribute(lanelet::AttributeName::Subtype);
+      if (attr.value() != subtype) {
+        exclude_subtype_lanelets.push_back(ll);
+      }
+    }
+  }
+  return exclude_subtype_lanelets;
+}
+
+int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
+{
+  lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 1);
+  const auto nearest_road_lanelet =
+    excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
+  if (nearest_road_lanelet.empty()) {
+    throw HdMapError("failed to calculate closest lanlet id");
+  }
+  if (nearest_road_lanelet.front().first > distance_thresh) {
+    throw HdMapError("closest lane is too far away!");
+  }
+  lanelet::Lanelet closest_lanelet;
+  closest_lanelet = nearest_road_lanelet.front().second;
+  return closest_lanelet.id();
+}
+
 double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<double> limits;

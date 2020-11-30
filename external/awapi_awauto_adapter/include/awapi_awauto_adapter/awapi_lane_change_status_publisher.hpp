@@ -29,15 +29,19 @@ namespace autoware_api
 class AutowareLaneChangeStatusPublisher : public rclcpp::Node
 {
 private:
-  /** ---- LaneChangeStatus ------------------------------------------------------
-   *  Topic: /awapi/lane_change/get/status
-   * ------------------------------------------------------------------------ */
+  /**
+   *  LaneChangeStatus Topic: /awapi/lane_change/get/status
+   */
   using LaneChangeStatus = autoware_api_msgs::msg::LaneChangeStatus;
   rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
   rclcpp::TimerBase::SharedPtr timer_lane_change_status_;
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
+  /**
+   * @brief publish lane change status
+   * @return none
+   */
   void publish_lane_change_status();
   explicit AutowareLaneChangeStatusPublisher(const rclcpp::NodeOptions &);
 };
