@@ -38,6 +38,7 @@
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/assign/list_of.hpp>
 
+#include <deque>
 #include <algorithm>
 #include <vector>
 #include <utility>
