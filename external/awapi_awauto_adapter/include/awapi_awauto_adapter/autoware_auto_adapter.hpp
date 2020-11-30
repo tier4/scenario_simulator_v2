@@ -32,6 +32,7 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/empty.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 
@@ -52,8 +53,8 @@ private:
   using Pose = geometry_msgs::msg::Pose;
   using Route = autoware_planning_msgs::msg::Route;
   using Objects = autoware_perception_msgs::msg::DynamicObjectArray;
-  using MapBin = std_msgs::msg::String;
-  using PointXYZ = std_msgs::msg::String;
+  using MapBin = std_msgs::msg::Empty;
+  using PointXYZ = std_msgs::msg::Empty;
   /** @def
    *  AutowareStatus　Topic: /awapi/autoware/get/status
    */
