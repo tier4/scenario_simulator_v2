@@ -33,13 +33,25 @@ from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 
 
-
 def generate_dict_from_yaml(path):
+    """
+    generate dictionary from yaml data
+
+    **Args**
+
+    * path (`str`): yaml path.
+
+    **Returns**
+
+    * `dict`: value or None.
+
+    """
     if os.path.exists(path):
         with open(path, "r") as file:
             return xmlplain.obj_from_yaml(file)
     else:
         Logger.print_error("No such file or directory: " + path)
+
 
 def find_modifiers(directory):
     """
@@ -139,12 +151,30 @@ def mark_attributes(keyword, syntax_tree):
 
 
 class ScenarioConverter:
+    """
+    tier4 scenario converter class
 
+    **Attributes**
+    * OPENSCENARIO_TAG (`str`): tag for specify open scenario
+    * IS_DEBUG_MODE (`bool`): change logger mode
+    """
     OPENSCENARIO_TAG = "OpenSCENARIO"
     IS_DEBUG_MODE = False
 
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
+        """
+        main function for scenario converter
+
+        **Args**
+
+        * yaml_path,xosc_dir,log_path (`str`)
+
+        **Returns**
+
+        *None
+
+        """
         Logger.print_separator("Scenario Preprocess")
         root_data = generate_dict_from_yaml(yaml_path)
         modifiers = find_modifiers(root_data)
@@ -175,7 +205,8 @@ class ScenarioConverter:
         * `dict`: value
 
         """
-        key, value = mark_attributes(ScenarioConverter.OPENSCENARIO_TAG, open_scenario)
+        key, value = mark_attributes(
+            ScenarioConverter.OPENSCENARIO_TAG, open_scenario)
         return value
 
     @staticmethod

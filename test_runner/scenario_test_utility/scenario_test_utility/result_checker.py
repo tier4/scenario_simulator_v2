@@ -21,7 +21,9 @@ import xml.etree.ElementTree as ET
 
 
 class ResultChecker:
-
+    """
+    class to check scenario testing result is good or not
+    """
     def __init__(self):
         pass
 
