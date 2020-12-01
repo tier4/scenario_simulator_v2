@@ -165,11 +165,19 @@ add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 target_include_directories(scenario_runner_moc_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-
 target_link_libraries(scenario_runner_moc_node simulation_api)
 
+# ------------------------------------------------------------------------------
+#  math example
+# ------------------------------------------------------------------------------
+add_executable(math src/math/math.cpp)
+target_include_directories(math PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_link_libraries(math simulation_api)
+
 install(
-  TARGETS scenario_runner_moc_node
+  TARGETS scenario_runner_moc_node math
   DESTINATION lib/simulation_api)
 
 # ------------------------------------------------------------------------------

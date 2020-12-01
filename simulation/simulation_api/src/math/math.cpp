@@ -12,27 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
 
-TEST(Math, HermiteCurve1)
-{
-  geometry_msgs::msg::Pose start_pose, goal_pose;
-  geometry_msgs::msg::Vector3 start_vec, goal_vec;
-  goal_pose.position.x = 1;
-  start_vec.x = 1;
-  goal_vec.x = 1;
-  simulation_api::math::HermiteCurve curve
-    (start_pose, goal_pose, start_vec, goal_vec);
-  EXPECT_DOUBLE_EQ(curve.getLength(), 1);
-  EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
-  EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
-  EXPECT_DOUBLE_EQ(curve.getMaximu2DCurvature(), 0);
-}
-
-TEST(Math, CatmullROmSpline1)
+int main()
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -41,11 +24,4 @@ TEST(Math, CatmullROmSpline1)
   p2.x = 2;
   auto points = {p0, p1, p2};
   auto spline = simulation_api::math::CatmullRomSpline(points);
-  EXPECT_DOUBLE_EQ(spline.getLength(), 2);
-}
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

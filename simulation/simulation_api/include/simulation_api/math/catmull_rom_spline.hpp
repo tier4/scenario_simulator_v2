@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <exception>
+#include <string>
 
 namespace simulation_api
 {

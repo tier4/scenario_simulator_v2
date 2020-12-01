@@ -13,7 +13,10 @@
 // limitations under the License.
 
 #include <simulation_api/math/catmull_rom_spline.hpp>
+
 #include <vector>
+#include <string>
+#include <limits>
 
 namespace simulation_api
 {
@@ -84,6 +87,7 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
   for (const auto & length : length_list_) {
     total_length_ = total_length_ + length;
   }
+  checkConnection();
 }
 
 bool CatmullRomSpline::checkConnection() const
