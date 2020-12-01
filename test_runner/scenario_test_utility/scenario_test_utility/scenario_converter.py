@@ -158,14 +158,14 @@ class ScenarioConverter:
     * OPENSCENARIO_TAG (`str`): tag for specify open scenario
     * IS_DEBUG_MODE (`bool`): change logger mode
     """
-    
+
     OPENSCENARIO_TAG = "OpenSCENARIO"
     IS_DEBUG_MODE = False
 
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
         """
-        Function for scenario converter.
+        Run scenario converter.
 
         **Args**
 

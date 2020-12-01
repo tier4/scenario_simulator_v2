@@ -84,7 +84,7 @@ class ScenarioTestRunner:
         self.run_all_scenarios()
 
     def validate_all_scenarios(self):
-        """ Validate all scenarios. """
+        """Validate all scenarios."""
         validator = XoscValidator()
         Logger.print_separator('validating scenarios')
         for scenario in self.xosc_scenarios:
