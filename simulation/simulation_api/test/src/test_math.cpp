@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
 
 TEST(Math, HermiteCurve1)

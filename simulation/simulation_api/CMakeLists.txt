@@ -44,6 +44,7 @@ find_package(Eigen3 REQUIRED)
 
 add_library(entity_manager SHARED
   src/hdmap_utils/hdmap_utils.cpp
+  src/math/catmull_rom_spline.cpp
   src/math/hermite_curve.cpp
   src/math/collision.cpp
   src/entity/entity_manager.cpp
