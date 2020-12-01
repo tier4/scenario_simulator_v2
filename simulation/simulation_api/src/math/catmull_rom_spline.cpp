@@ -97,7 +97,7 @@ bool CatmullRomSpline::checkConnection() const
     const auto p0 = curves_[i].getPoint(0, false);
     const auto p1 = curves_[i].getPoint(1, false);
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
-      return true;
+      continue;
     } else if (!equals(control_point0, p0)) {
       throw SplineInterpolationError("start point of the curve number " + std::to_string(
                 i) + " does not match.");
@@ -106,7 +106,10 @@ bool CatmullRomSpline::checkConnection() const
                 i) + " does not match.");
     }
   }
-  return false;
+  if (curves_.size() == 0) {
+    throw SplineInterpolationError("curve size should not be zero.");
+  }
+  return true;
 }
 
 bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const
