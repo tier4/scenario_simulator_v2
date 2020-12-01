@@ -20,6 +20,7 @@ namespace simulation_api
 namespace math
 {
 CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points)
+: control_points(control_points)
 {
   size_t n = control_points.size() - 1;
   if (n <= 1) {
@@ -79,6 +80,48 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
   for (const auto & curve : curves_) {
     length_list_.emplace_back(curve.getLength());
   }
+  total_length_ = 0;
+  for (const auto & length : length_list_) {
+    total_length_ = total_length_ + length;
+  }
+}
+
+bool CatmullRomSpline::checkConnection() const
+{
+  if (control_points.size() != (curves_.size() + 1)) {
+    throw SplineInterpolationError("number of control points and curves does not match.");
+  }
+  for (size_t i = 0; i < curves_.size(); i++) {
+    const auto control_point0 = control_points[i];
+    const auto control_point1 = control_points[i + 1];
+    const auto p0 = curves_[i].getPoint(0, false);
+    const auto p1 = curves_[i].getPoint(1, false);
+    if (equals(control_point0, p0) && equals(control_point1, p1)) {
+      return true;
+    } else if (!equals(control_point0, p0)) {
+      throw SplineInterpolationError("start point of the curve number " + std::to_string(
+                i) + " does not match.");
+    } else if (!equals(control_point1, p1)) {
+      throw SplineInterpolationError("end point of the curve number " + std::to_string(
+                i) + " does not match.");
+    }
+  }
+  return false;
+}
+
+bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const
+{
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if (std::abs(p0.x - p1.x) > e) {
+    return false;
+  }
+  if (std::abs(p0.y - p1.y) > e) {
+    return false;
+  }
+  if (std::abs(p0.z - p1.z) > e) {
+    return false;
+  }
+  return true;
 }
 }  // namespace math
 }  // namespace simulation_api

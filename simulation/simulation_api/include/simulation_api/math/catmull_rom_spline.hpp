@@ -29,16 +29,23 @@ class SplineInterpolationError : public std::runtime_error
 public:
   explicit SplineInterpolationError(const char * message)
   : runtime_error(message) {}
+  explicit SplineInterpolationError(std::string message)
+  : runtime_error(message.c_str()) {}
 };
 
 class CatmullRomSpline
 {
 public:
   explicit CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points);
+  double getLength() const {return total_length_;}
 
 private:
+  bool checkConnection() const;
+  bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
+  double total_length_;
+  const std::vector<geometry_msgs::msg::Point> control_points;
 };
 }  // namespace math
 }  // namespace simulation_api
