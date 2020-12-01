@@ -125,7 +125,6 @@ class ScenarioTestRunner:
         *None
 
         """
-
         Manager.mkdir(self.log_path)
         for index, scenario in enumerate(self.xosc_scenarios):
             print(str(index+1), scenario)
