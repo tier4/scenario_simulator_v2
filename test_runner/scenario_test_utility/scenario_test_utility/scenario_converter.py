@@ -33,7 +33,19 @@ from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 
 
-def read_as_yaml(path):
+def generate_dict_from_yaml(path):
+    """
+    Generate dictionary from yaml data.
+
+    **Args**
+
+    * path (`str`): yaml path.
+
+    **Returns**
+
+    * `dict`: value or None.
+
+    """
     if os.path.exists(path):
         with open(path, "r") as file:
             return xmlplain.obj_from_yaml(file)
@@ -42,6 +54,18 @@ def read_as_yaml(path):
 
 
 def find_modifiers(directory):
+    """
+    Find modifiers.
+
+    **Args**
+
+    * directory (`directory`): modifiers.
+
+    **Returns**
+
+    * `dict`: value or None.
+
+    """
     for tag, value in directory.items():
         if tag == "ScenarioModifiers" and value is not None:
             for tag, value in value.items():
@@ -51,8 +75,19 @@ def find_modifiers(directory):
 
 
 def mark_attributes(keyword, syntax_tree):
-    result = OrderedDict()
+    """
+    Add attributes to tags.
 
+    **Args**
+
+    * keyword (`str`),syntax_tree (`dict`)
+
+    **Returns**
+
+    * `str`: keyword , `result`: dict.
+
+    """
+    result = OrderedDict()
     if isinstance(syntax_tree, OrderedDict) or isinstance(syntax_tree, dict):
         #
         # ???: { ... }
@@ -116,14 +151,33 @@ def mark_attributes(keyword, syntax_tree):
 
 
 class ScenarioConverter:
+    """
+    Tier4 scenario converter class.
+
+    **Attributes**
+    * OPENSCENARIO_TAG (`str`): tag for specify open scenario
+    * IS_DEBUG_MODE (`bool`): change logger mode
+    """
 
     OPENSCENARIO_TAG = "OpenSCENARIO"
     IS_DEBUG_MODE = False
 
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
+        """
+        Run scenario converter.
+
+        **Args**
+
+        * yaml_path,xosc_dir,log_path (`str`)
+
+        **Returns**
+
+        *None
+
+        """
         Logger.print_separator("Scenario Preprocess")
-        root_data = read_as_yaml(yaml_path)
+        root_data = generate_dict_from_yaml(yaml_path)
         modifiers = find_modifiers(root_data)
         root_data.pop("ScenarioModifiers", None)
         xosc_dict = ScenarioConverter.extract_open_scenario(root_data)
@@ -140,11 +194,36 @@ class ScenarioConverter:
 
     @staticmethod
     def extract_open_scenario(open_scenario):
-        key, value = mark_attributes(ScenarioConverter.OPENSCENARIO_TAG, open_scenario)
+        """
+        Extract open scenario tree.
+
+        **Args**
+
+        * open_scenario (`dict`)
+
+        **Returns**
+
+        * `dict`: value
+
+        """
+        key, value = mark_attributes(
+            ScenarioConverter.OPENSCENARIO_TAG, open_scenario)
         return value
 
     @staticmethod
     def convert_dict2xosc(xosc_dict, xosc_path):
+        """
+        Convert dictionary to xosc.
+
+        **Args**
+
+        * xosc_dict (`dict`),xosc_path (`str`)
+
+        **Returns**
+
+        * `str`: xosc_text
+
+        """
         xosc_text = xmltodict.unparse(xosc_dict,
                                       encoding='utf-8',
                                       full_document=True,
@@ -155,6 +234,14 @@ class ScenarioConverter:
 
     @staticmethod
     def distribute(modifier_dict, xosc_text, xosc_dir, yaml_path, log_path):
+        """
+        Distribute parameters.
+
+        **Args**
+
+        * modifier_dict (`dict`), xosc_text, xosc_dir, yaml_path, log_path (`str`)
+
+        """
         bindings = ParameterSweeper.make_modifier_bindings(modifier_dict)
         xosc_name = pathlib.Path(yaml_path).stem
         id = 1
@@ -239,4 +326,5 @@ def main():
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     main()

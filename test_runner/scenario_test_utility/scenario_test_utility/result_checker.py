@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 
 
 class ResultChecker:
+    """Class to check scenario testing result is good or not."""
 
     def __init__(self):
         pass
@@ -47,4 +48,5 @@ def main():
 
 
 if __name__ == '__main__':
+    """Entrypoint."""
     pass

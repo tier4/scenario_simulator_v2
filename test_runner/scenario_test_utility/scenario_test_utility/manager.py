@@ -25,6 +25,7 @@ from scenario_test_utility.logger import Logger
 
 
 class Manager():
+    """Class to handle simple repeated tasks."""
 
     @staticmethod
     def ask_continuation():
@@ -108,4 +109,5 @@ def main():
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     main()
