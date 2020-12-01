@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -82,8 +82,13 @@ const EntityStatus EntityBase::getStatus(CoordinateFrameTypes coordinate) const
   }
   if (coordinate == CoordinateFrameTypes::LANE) {
     if (this->status_->coordinate == CoordinateFrameTypes::WORLD) {
-      throw SimulationRuntimeError(
-              "currentry, projecting world frame into lane frame does not support");
+      auto lane_pose = hdmap_utils_ptr_->toLanePose(this->status_->pose);
+      if (lane_pose) {
+        throw SimulationRuntimeError("Failed to calculate pose from world to lane");
+      }
+      return EntityStatus(this->status_->time, lane_pose->lanelet_id, lane_pose->s,
+               lane_pose->offset, lane_pose->rpy, this->status_->twist,
+               this->status_->accel);
     }
   }
   if (coordinate == CoordinateFrameTypes::WORLD) {

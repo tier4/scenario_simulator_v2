@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
+
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <autoware_auto_msgs/msg/had_map_bin.hpp>
@@ -68,6 +69,7 @@ public:
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id,
     std::vector<double> s);
+  boost::optional<simulation_api::entity::EntityStatus> toLanePose(geometry_msgs::msg::Pose pose);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
     std::int64_t lanelet_id, double s,
     double offset,
