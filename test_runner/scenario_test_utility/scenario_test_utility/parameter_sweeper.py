@@ -25,11 +25,12 @@ from scenario_test_utility.logger import Logger
 
 
 class ParameterSweeper:
-    """ Parameter Sweeper Class. """
+    """Parameter Sweeper Class."""
+
     @staticmethod
     def iota(start, step, stop):
         """
-        calculate steps
+        Calculate steps.
 
         **Args**
 
@@ -50,7 +51,7 @@ class ParameterSweeper:
     @staticmethod
     def make_modifier_bindings(modifier_dict):
         """
-        make modifier bindings
+        Make modifier bindings.
 
         **Args**
 
@@ -87,7 +88,7 @@ class ParameterSweeper:
 
     @staticmethod
     def test(modifier_dict, xosc_text):
-        """ Test method """
+        """Test method."""
         print(xosc_text)
         bind = ParameterSweeper.make_modifier_bindings(modifier_dict)
         for item in itertools.product(*bind):

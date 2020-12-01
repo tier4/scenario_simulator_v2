@@ -22,7 +22,7 @@ from logging import getLogger, StreamHandler, Formatter, FileHandler, DEBUG
 
 
 class Logger:
-    """ Class to get logging info. """
+    """Class to get logging info."""
 
     @staticmethod
     def print_info(message):

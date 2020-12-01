@@ -35,7 +35,7 @@ from scenario_test_utility.manager import Manager
 
 def generate_dict_from_yaml(path):
     """
-    generate dictionary from yaml data
+    Generate dictionary from yaml data.
 
     **Args**
 
@@ -55,7 +55,7 @@ def generate_dict_from_yaml(path):
 
 def find_modifiers(directory):
     """
-    find modifiers
+    Find modifiers.
 
     **Args**
 
@@ -76,7 +76,7 @@ def find_modifiers(directory):
 
 def mark_attributes(keyword, syntax_tree):
     """
-    add attributes to tags
+    Add attributes to tags.
 
     **Args**
 
@@ -152,19 +152,20 @@ def mark_attributes(keyword, syntax_tree):
 
 class ScenarioConverter:
     """
-    tier4 scenario converter class
+    Tier4 scenario converter class.
 
     **Attributes**
     * OPENSCENARIO_TAG (`str`): tag for specify open scenario
     * IS_DEBUG_MODE (`bool`): change logger mode
     """
+    
     OPENSCENARIO_TAG = "OpenSCENARIO"
     IS_DEBUG_MODE = False
 
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
         """
-        main function for scenario converter
+        Function for scenario converter.
 
         **Args**
 
@@ -194,7 +195,7 @@ class ScenarioConverter:
     @staticmethod
     def extract_open_scenario(open_scenario):
         """
-        extract open scenario tree
+        Extract open scenario tree.
 
         **Args**
 
@@ -212,7 +213,7 @@ class ScenarioConverter:
     @staticmethod
     def convert_dict2xosc(xosc_dict, xosc_path):
         """
-        convert dictionary to xosc
+        Convert dictionary to xosc.
 
         **Args**
 
@@ -234,7 +235,7 @@ class ScenarioConverter:
     @staticmethod
     def distribute(modifier_dict, xosc_text, xosc_dir, yaml_path, log_path):
         """
-        distribute parameters
+        Distribute parameters.
 
         **Args**
 

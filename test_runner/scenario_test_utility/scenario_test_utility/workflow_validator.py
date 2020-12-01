@@ -23,7 +23,7 @@ from ament_index_python.packages import get_package_share_directory
 
 
 class WorkflowValidator():
-    """ Workflow validation class. """
+    """Workflow validation class."""
 
     def __init__(self):
         share_directory_path = os.path.join(get_package_share_directory('scenario_test_utility'))

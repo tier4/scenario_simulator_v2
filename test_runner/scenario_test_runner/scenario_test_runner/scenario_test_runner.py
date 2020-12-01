@@ -60,7 +60,6 @@ class ScenarioTestRunner:
         *None
 
         """
-
         self.launcher_path, self.log_path, self.scenarios \
             = DatabaseHandler.read_database(workflow, log_directory)
         self.yaml_scenarios = []
@@ -86,7 +85,6 @@ class ScenarioTestRunner:
 
     def validate_all_scenarios(self):
         """ Validate all scenarios. """
-
         validator = XoscValidator()
         Logger.print_separator('validating scenarios')
         for scenario in self.xosc_scenarios:
@@ -106,8 +104,7 @@ class ScenarioTestRunner:
         self.lifecycle_controller.deactivate_node()
 
     def run_scenario(self):
-        """ Run scenario. """
-
+        """Run scenario."""
         Logger.print_process(
             'Set maximum simulation time: ' + str(self.timeout))
         time.sleep(self.SLEEP_RATE)

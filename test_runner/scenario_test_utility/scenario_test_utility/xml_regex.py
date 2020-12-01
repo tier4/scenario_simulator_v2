@@ -20,7 +20,7 @@ import re
 
 class XmlRegex():
     """
-    Xml converter class
+    Xml converter class.
 
     **Attributes**
     * REPLACE_LOWER_PATTERN (`str`): regex for convert lower case pattern
@@ -31,6 +31,7 @@ class XmlRegex():
     * UPPER_TRUE_PATTERN (`str`): True -> "True"
     * UPPER_FALSE_PATTERN (`str`): False -> "False"
     """
+
     REPLACE_LOWER_PATTERN = re.compile(r"(^\w.*)")
     ARRANGE_EMPTY_PATTERN = re.compile(r"<([a-zA-Z]*)></\1>")
     ARRANGE_EMPTY_PATTERN2 = re.compile(r"<([a-zA-Z]*)(.*)></\1>")
