@@ -1,6 +1,6 @@
 repo_url: https://github.com/tier4/scenario_simulator.auto
 site_name: Scenario testing tools for Autoware
-theme: 
+theme:
   name: material
   feature:
     tabs: true
@@ -15,54 +15,54 @@ extra:
   search:
     language: en
 plugins:
-    - search
+  - search
 
-copyright: 'Copyright &copy; 2020- Tier IV, Inc'
+copyright: 'Copyright &copy; 2020- Tier IV, Inc.'
 
 markdown_extensions:
-    - pymdownx.highlight
-    - pymdownx.superfences
-    - mdx_unimoji
-    - fontawesome_markdown
-    - pymdownx.arithmatex
-    - pymdownx.emoji :
-        emoji_generator: !!python/name:pymdownx.emoji.to_svg
-    - codehilite:
-        guess_lang: false
-    - mdx_math
-    - plantuml_markdown:
-        server: http://www.plantuml.com/plantuml
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - mdx_unimoji
+  - fontawesome_markdown
+  - pymdownx.arithmatex
+  - pymdownx.emoji :
+    emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - codehilite:
+    guess_lang: false
+  - mdx_math
+  - plantuml_markdown:
+    server: http://www.plantuml.com/plantuml
 
 extra_css:
-    - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
-extra_javascript: 
+  - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
+extra_javascript:
   - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
 
 nav:
-    - Home: README.md
-    - User Guide:
-        - Scenario Editor :
-            - User Guide : user_guide/scenario_editor/ScenarioEditorUserGuide.md
-            - Details :
-                - user_guide/scenario_editor/CreateSimpleScenario.md
-                - user_guide/scenario_editor/EditExistingScenario.md
-                - user_guide/scenario_editor/ChangeCoordinate.md
+  - Home: README.md
+  - User Guide:
+    - Scenario Editor :
+      - User Guide : user_guide/scenario_editor/ScenarioEditorUserGuide.md
+      - Details :
+        - user_guide/scenario_editor/CreateSimpleScenario.md
+        - user_guide/scenario_editor/EditExistingScenario.md
+        - user_guide/scenario_editor/ChangeCoordinate.md
 
         - Test Runner:
-            - User Guide : user_guide/test_runner/ScenarioTestRunner.md
-            - Details :
-                - user_guide/test_runner/ScenarioFormatConversion.md
-                - user_guide/test_runner/HowToWriteWorkflowFile.md
-                - user_guide/test_runner/Tips.md
+          - User Guide : user_guide/test_runner/ScenarioTestRunner.md
+          - Details :
+            - user_guide/test_runner/ScenarioFormatConversion.md
+            - user_guide/test_runner/HowToWriteWorkflowFile.md
+            - user_guide/test_runner/Tips.md
     - Design:
-        - About : design/About.md
-        - Details :
-            - design/SystemArchitecture.md
-            - design/Tier4ScenarioFormatVersion2.md
-            - design/Tier4ExtensionInOpenScenarioFormat.md
-            - design/SimulationAPI.md
-            - design/XMLRPCAPI.md
-            - design/AutowareAPI.md
+      - About : design/About.md
+      - Details :
+        - design/SystemArchitecture.md
+        - design/Tier4ScenarioFormatVersion2.md
+        - design/Tier4ExtensionInOpenScenarioFormat.md
+        - design/SimulationAPI.md
+        - design/XMLRPCAPI.md
+        - design/AutowareAPI.md
     - Package Documentation:
       - About : package/About.md
 
