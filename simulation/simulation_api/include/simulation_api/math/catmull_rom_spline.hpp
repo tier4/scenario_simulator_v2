@@ -38,6 +38,7 @@ public:
 
 private:
   std::vector<HermiteCurve> curves_;
+  std::vector<double> length_list_;
 };
 }  // namespace math
 }  // namespace simulation_api

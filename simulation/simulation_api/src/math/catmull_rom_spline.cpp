@@ -76,6 +76,9 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
       curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
     }
   }
+  for (const auto & curve : curves_) {
+    length_list_.emplace_back(curve.getLength());
+  }
 }
 }  // namespace math
 }  // namespace simulation_api
