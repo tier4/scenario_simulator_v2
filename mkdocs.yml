@@ -58,7 +58,7 @@ nav:
       - Details:
         - design/SystemArchitecture.md
         - design/Tier4ScenarioFormatVersion2.md
-        - design/Tier4ExtensionInOpenScenarioFormat.md
+        - design/OpenSCENARIOSupport.md
         - design/SimulationAPI.md
         - design/XMLRPCAPI.md
         - design/AutowareAPI.md
