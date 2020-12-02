@@ -36,12 +36,17 @@ def generate_launch_description():
 
     log_directory = LaunchConfiguration('log_directory', default="/tmp")
 
-    use_validation = LaunchConfiguration('use_validation', default=True)
-
     declare_log_directory = DeclareLaunchArgument(
         'log_directory',
         default_value=log_directory,
         description='log_directory files for scenario testing')
+
+    use_validation = LaunchConfiguration('use_validation', default=True)
+
+    declare_use_validation = DeclareLaunchArgument(
+        'use_validation',
+        default_value=use_validation
+        )
 
     scenario_test_runner = Node(
         package='scenario_test_runner',
@@ -52,9 +57,9 @@ def generate_launch_description():
         },
         on_exit=Shutdown(),
         arguments=[
-            "--workflow", workflow,
             "--log_directory", log_directory,
-            "--use_validation", use_validation
+            "--use_validation", use_validation,
+            "--workflow", workflow,
         ]
     )
 
@@ -104,12 +109,13 @@ def generate_launch_description():
     )
 
     description = LaunchDescription()
-    description.add_action(declare_workflow)
     description.add_action(declare_log_directory)
-    description.add_action(scenario_test_runner)
-    description.add_action(scenario_simulator)
+    description.add_action(declare_use_validation)
+    description.add_action(declare_workflow)
     description.add_action(openscenario_interpreter)
-    description.add_action(rviz2)
     description.add_action(openscenario_visualization)
+    description.add_action(rviz2)
+    description.add_action(scenario_simulator)
+    description.add_action(scenario_test_runner)
 
     return description

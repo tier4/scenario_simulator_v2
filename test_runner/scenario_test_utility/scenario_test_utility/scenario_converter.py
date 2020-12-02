@@ -181,7 +181,6 @@ class ScenarioConverter:
         modifiers = find_modifiers(root_data)
         root_data.pop("ScenarioModifiers", None)
         xosc_dict = ScenarioConverter.extract_open_scenario(root_data)
-        Logger.print_info(xosc_dict)
         xosc_text = ScenarioConverter.convert_dict2xosc(xosc_dict, xosc_dir)
         Manager.mkdir(pathlib.Path(log_path).parent)
         Manager.mkdir(xosc_dir)

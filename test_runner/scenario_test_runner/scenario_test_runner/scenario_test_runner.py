@@ -79,7 +79,8 @@ class ScenarioTestRunner:
             = ConverterHandler.convert_all_scenarios(self.yaml_scenarios,
                                                      expects, step_times_ms,
                                                      self.launcher_path)
-        if(use_validation):
+
+        if use_validation.lower() in ["true", "t", "yes", "1"]:
             self.validate_all_scenarios()
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
@@ -152,11 +153,9 @@ class ScenarioTestRunner:
 def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
-    parser.add_argument('--timeout',
-                        type=int,
-                        default=180,
-                        help='Specify simulation time limit in seconds. \
-                  The default is 180 seconds.')
+    parser.add_argument(
+        '--timeout', type=int, default=180,
+        help='Specify simulation time limit in seconds.  The default is 180 seconds.')
 
     parser.add_argument('--log',
                         default='screen',
