@@ -86,7 +86,7 @@ auto substitute(std::string attribute, Scope & scope)
       }
     };
 
-    // std::cout << "Substitute: " << cyan << attribute << reset << " => ";
+    std::cout << "Substitute: " << cyan << attribute << reset << " => ";
 
     const auto iter {
       substitutions.find(match.str(3))
@@ -100,7 +100,7 @@ auto substitute(std::string attribute, Scope & scope)
       throw SyntaxError(ss.str());
     }
 
-    // std::cout << cyan << attribute << reset << std::endl;
+    std::cout << cyan << attribute << reset << std::endl;
   }
 
   return attribute;
