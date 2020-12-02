@@ -41,11 +41,11 @@ def generate_launch_description():
         default_value=log_directory,
         description='log_directory files for scenario testing')
 
-    use_validation = LaunchConfiguration('use_validation', default=True)
+    no_validation = LaunchConfiguration('no_validation', default=False)
 
-    declare_use_validation = DeclareLaunchArgument(
-        'use_validation',
-        default_value=use_validation
+    declare_no_validation = DeclareLaunchArgument(
+        'no_validation',
+        default_value=no_validation
         )
 
     scenario_test_runner = Node(
@@ -58,7 +58,7 @@ def generate_launch_description():
         on_exit=Shutdown(),
         arguments=[
             "--log_directory", log_directory,
-            "--use_validation", use_validation,
+            "--no_validation", no_validation,
             "--workflow", workflow,
         ]
     )
@@ -110,7 +110,7 @@ def generate_launch_description():
 
     description = LaunchDescription()
     description.add_action(declare_log_directory)
-    description.add_action(declare_use_validation)
+    description.add_action(declare_no_validation)
     description.add_action(declare_workflow)
     description.add_action(openscenario_interpreter)
     description.add_action(openscenario_visualization)
