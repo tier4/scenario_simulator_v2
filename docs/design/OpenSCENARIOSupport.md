@@ -5,6 +5,10 @@ The ROS2 package `openscenario_interpreter` provides scenario-based simulation o
 This section describes the differences between our OpenSCENARIO Interpreter and
 the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by
 other companies and organizations.
+If you want to know about OpenSCENARIO itself, refer to the link below.
+
+- [ASAM OpenSCENARIO: User Guide](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html)
+- [OpenSCENARIO 1.0.0 XSD documentation](https://releases.asam.net/OpenSCENARIO/1.0.0/Model-Documentation/index.html)
 
 ## Specific Features
 ---
@@ -68,6 +72,26 @@ An example is shown below.
 OpenSCENARIO has the function that the detailed behavior is left to the decision
 of the implementation side, which is defined as "subject of a contract between
 simulation environment provider and scenario author".
+
+### Scoping
+
+The OpenSCENARIO standard does not define what to do if the name cannot be
+resolved, as quoted below.
+
+> If a reference cannot be resolved uniquely, for example if too few name
+> prefixes have been specified to disambiguate fully, the result of the lookup
+> is undefined.
+
+In our interpreter, the names of Element and Parameter are lexically scoped.
+
+- If you refer to an identifier that does not exist, the simulation will stop as
+  an error.
+- If multiple identifiers with the same name are defined, the identifier
+  reference is chosen that is closest to the lexical position where the
+  reference occurred.
+- Defining a StoryboardElement with the same name at the same level is treated
+  as a syntax error (In normal lexical scoping, this should be handled by
+  shadowing, but in scenario languages it is likely a copy-and-paste mistake).
 
 ### CustomCommandAction
 
@@ -219,66 +243,90 @@ OpenSCENARIO standards.
 | ByEntityCondition.EntityCondition.**AccelerationCondition**             | ✔           | No
 | ByEntityCondition.EntityCondition.**StandStillCondition**               | ✔           | No
 | ByEntityCondition.EntityCondition.**SpeedCondition**                    | ✔           | No
-| ByEntityCondition.EntityCondition.**RelativeDistanceCondition**         | Unsupported |
+| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**            | Unsupported |
 | ByEntityCondition.EntityCondition.**TraveledDistanceCondition**         | Unsupported |
 | ByEntityCondition.EntityCondition.**ReachPositionCondition**            | ✔           | See [here](#reachpositioncondition)
-| ByEntityCondition.EntityCondition.**DistanceCondition**                 | ✔           |
-| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**            | ✔           |
-| ByEntityCondition.ByValueCondition.**ParameterCondition**               | ✔           |
-| ByEntityCondition.ByValueCondition.**TimeOfDayCondition**               | Unsupported |
-| ByEntityCondition.ByValueCondition.**SimulationTimeCondition**          | ✔           |
-| ByEntityCondition.ByValueCondition.**StoryboardElementStateCondition**  | ✔           |
-| ByEntityCondition.ByValueCondition.**UserDefinedValueCondition**        | Unsupported |
-| ByEntityCondition.ByValueCondition.**TrafficSignalCondition**           | Unsupported |
-| ByEntityCondition.ByValueCondition.**TrafficSignalControllerCondition** | Unsupported |
+| ByEntityCondition.EntityCondition.**DistanceCondition**                 | ✔           | See [here](#distancecondition)
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition**         | ✔           | See [here](#relativedistancecondition)
+| ByEntityCondition.**ParameterCondition**                                | ✔           |
+| ByEntityCondition.**TimeOfDayCondition**                                | Unsupported |
+| ByEntityCondition.**SimulationTimeCondition**                           | ✔           | No
+| ByEntityCondition.**StoryboardElementStateCondition**                   | ✔           | See [here](#storyboardelementstatecondition)
+| ByEntityCondition.**UserDefinedValueCondition**                         | Unsupported |
+| ByEntityCondition.**TrafficSignalCondition**                            | Unsupported |
+| ByEntityCondition.**TrafficSignalControllerCondition**                  | Unsupported |
 
 ## Limitations
 
 ### ParameterSetAction
 
-Currently, ParameterSetAction cannot handle `dateTime` type parameters.
+- Currently, ParameterSetAction cannot handle `dateTime` type parameters.
 
 ### SpeedAction
 
-The implementation of type [TransitionDynamics](#transitiondynamics) for element
-`SpeedActionDynamics` is incomplete and **SpeedActionDynamics.dynamicsDimention
-is ignored**.
+- The implementation of type [TransitionDynamics](#transitiondynamics) for
+  element `SpeedActionDynamics` is incomplete and
+  **SpeedActionDynamics.dynamicsDimention is ignored**.
 
 ### LaneChangeAction
 
-The implementation of type [TransitionDynamics](#transitiondynamics) for element
-`LaneChangeActionDynamics` and type [LaneChangeTarget](#lanechangetarget) for
-element `LaneChangeTarget` are incomplete.
+- The implementation of type [TransitionDynamics](#transitiondynamics) for
+  element `LaneChangeActionDynamics` and type
+  [LaneChangeTarget](#lanechangetarget) for element `LaneChangeTarget` are
+  incomplete.
 
 ### TeleportAction
 
-Currently, **only LanePosition** can be specified for element of TeleportAction.
+- Currently, **only LanePosition** can be specified for element of
+  TeleportAction.
 
 ### AcquirePositionAction
 
-Currently, **only LanePosition** can be specified for element of
-AcquirePositionAction.
+- Currently, **only LanePosition** can be specified for element of
+  AcquirePositionAction.
 
 ### CollisionCondition
 
-Currently, **only EntityRef** can be specified for element of
-CollisionCondition.
+- Currently, **only EntityRef** can be specified for element of
+  CollisionCondition.
 
 ### TimeHeadwayCondition
 
-Currently, the values of attribute "freespace" and "alongRoute" are ignored and
-always behave as if freespace="false" and alongRoute="true" were specified.
+- Currently, the values of attribute "freespace" and "alongRoute" are ignored
+  and always behave as if freespace="false" and alongRoute="true" were
+  specified.
 
 ### ReachPositionCondition
 
-Currently, **only LanePosition and WorldPosition** can be specified for element
-of ReachPositionCondition.
+- Currently, **only LanePosition and WorldPosition** can be specified for element
+  of ReachPositionCondition.
 
+### DistanceCondition
+
+- Currently, the values of attribute "freespace" and "alongRoute" are ignored
+  and always behave as if freespace="false" and alongRoute="false" were
+  specified.
+- Currently, **only LanePosition and WorldPosition** can be specified for
+  element of Position of DistanceCondition.
+
+### RelativeDistanceCondition
+
+- Currently, the values of attribute "freespace" is ignored and always behave as
+  if freespace="false" was specified.
+
+### StoryboardElementStateCondition
+
+- Currently, a feature called "name prefix"
+  (in [OpenSCENARIO User Guide 3.1.2. Naming](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_general_concepts))
+  is unsupported.
+
+Instead, our interpreter implements lexical scoping.
+See also section [Scoping](#scoping).
 
 ### TransitionDynamics
 
-The implementation of type [DynamicsShape](#dynamicsshape) for attribute
-`dynamicsShape` is incomplete.
+- The implementation of type [DynamicsShape](#dynamicsshape) for attribute
+  dynamicsShape is incomplete.
 
 | Name              | Type                            | Status
 |:------------------|:--------------------------------|:------:
@@ -288,9 +336,9 @@ The implementation of type [DynamicsShape](#dynamicsshape) for attribute
 
 ### DynamicsShape
 
-Currently, only `linear` and `step` are implemented for values of this
-enumeration.
-If you specify `cubic` and `sinusoidal`, you will get an `ImplementationFault`.
+- Currently, only `linear` and `step` are implemented for values of this
+  enumeration.
+  If you specify `cubic` and `sinusoidal`, you will get an ImplementationFault.
 
 | Value      | Status      |
 |:-----------|:-----------:|
@@ -301,8 +349,8 @@ If you specify `cubic` and `sinusoidal`, you will get an `ImplementationFault`.
 
 ### LaneChangeTarget
 
-Currently, only `AbsoluteTargetLane` is implemented for element of this type.
-If you specify `RelativeTargetLane`, you will get an `SyntaxError`.
+- Currently, only AbsoluteTargetLane is implemented for element of this type.
+  If you specify RelativeTargetLane, you will get an SyntaxError.
 
 | Element            | Status      |
 |:-------------------|:-----------:|
@@ -311,5 +359,16 @@ If you specify `RelativeTargetLane`, you will get an `SyntaxError`.
 
 ### Position
 
-Currently, only `WorldPosition` and `LanePosition` are implemented for element
-of this type.
+- Currently, only WorldPosition and LanePosition are implemented for element of
+  this type.
+
+| Element                | Status      |
+|:-----------------------|:-----------:|
+| WorldPosition          | ✔           |
+| RelativeWorldPosition  | Unsupported |
+| RelativeObjectPosition | Unsupported |
+| RoadPosition           | Unsupported |
+| RelativeRoadPosition   | Unsupported |
+| LanePosition           | ✔           |
+| RelativeLanePosition   | Unsupported |
+| RoutePosition          | Unsupported |
