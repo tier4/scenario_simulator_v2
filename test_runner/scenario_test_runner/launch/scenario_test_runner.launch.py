@@ -41,7 +41,7 @@ def generate_launch_description():
         default_value=log_directory,
         description='log_directory files for scenario testing')
 
-    use_validation = LaunchConfiguration('use_validation', default=False)
+    use_validation = LaunchConfiguration('use_validation', default=True)
 
     declare_use_validation = DeclareLaunchArgument(
         'use_validation',
