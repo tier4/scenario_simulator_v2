@@ -1,6 +1,6 @@
 # Simulation API
 
-Simulation API provides C++ API to control NPC behavior in simulation.  
+Simulation API provides C++ API to control NPC behavior in simulation.
 Sample code is below.
 
 ## minimal example
@@ -33,7 +33,7 @@ public:
     // set ego vehicle parameter by XML
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
-    // spawn ego vehicle 
+    // spawn ego vehicle
     api_.spawn(true, "ego", params);
     // set ego vehicle status (initial position/velocity/acceleration)
     api_.setEntityStatus("ego", getEgoInitialStatus());
@@ -83,7 +83,7 @@ private:
       api_.getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
-  
+
   // parameter definition of ego vehicle.
   std::string catalog_xml =
     R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
@@ -116,4 +116,5 @@ int main(int argc, char * argv[])
 ```
 
 ## API Documentation
-See DOXYGEN documentation.
+
+See [package details](../package/About.md).

@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== DynamicsDimension ====================================================
+/* ---- DynamicsDimension ------------------------------------------------------
  *
  * <xsd:simpleType name="DynamicsDimension">
  *   <xsd:union>
@@ -40,7 +40,7 @@ inline namespace syntax
  *   </xsd:union>
  * </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct DynamicsDimension
 {
   enum value_type
