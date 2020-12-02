@@ -5,16 +5,16 @@ OpenSENARIO interpreter and simple simulator for Autoware
 ![rviz](image/rviz.png "rviz")
 
 ## Purpose of this package
-Currently, various kinds of simulators and scenario formats are developed all over the world.  
-We need open-source framework for integrating those testing tools with Autoware easilly and quickly.  
-So, we developed this package.    
-<font color="Coral">__This package is designed to easily accommodate multiple simulators and scenario description formats.__</font>  
-This package provides under Apache License Version 2.0.  
+Currently, various kinds of simulators and scenario formats are developed all over the world.
+We need open-source framework for integrating those testing tools with Autoware easilly and quickly.
+So, we developed this package.
+<font color="Coral">__This package is designed to easily accommodate multiple simulators and scenario description formats.__</font>
+This package provides under Apache License Version 2.0.
 See also [LICENSE](LICENSE).
 
 ## How to use
 
-### Running example scenario 
+### Running example scenario
 ```bash
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
 ```
@@ -39,7 +39,7 @@ then open http://localhost:6080/ in your browser.
 launch lx terminal in VNC, and run an example by:
 
 ```
-ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp' no_validation:=True
 ```
 
 ## Creating & Running Your Own Simulation Scenarios
@@ -59,7 +59,7 @@ Scenario:
   - { path: /full/path/to/your/scenario_file.yaml }
 ```
 
-4. Run the scenario:  
+4. Run the scenario:
 ```
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='path/to/your/workflow_config.yaml' log_directory:='/tmp'
 ```
