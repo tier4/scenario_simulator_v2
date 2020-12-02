@@ -22,6 +22,7 @@ from logging import getLogger, StreamHandler, Formatter, FileHandler, DEBUG
 
 
 class Logger:
+    """Class to get logging info."""
 
     @staticmethod
     def print_info(message):
@@ -109,4 +110,5 @@ def main():
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     main()

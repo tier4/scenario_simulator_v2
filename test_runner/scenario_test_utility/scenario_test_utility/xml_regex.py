@@ -19,6 +19,18 @@ import re
 
 
 class XmlRegex():
+    """
+    Xml converter class.
+
+    **Attributes**
+    * REPLACE_LOWER_PATTERN (`str`): regex for convert lower case pattern
+    * ARRANGE_EMPTY_PATTERN (`str`): regex for convert empty value pattern
+    * REPLACE_LOWER_PATTERN (`str`): regex for convert empty value pattern
+    * ARRANGE_DOUBLE_PATTERN (`str`): regex for convert same value pattern
+    * UPSIDE_REPEAT_PATTERN (`str`): regex for convert repeat same tag pattern
+    * UPPER_TRUE_PATTERN (`str`): True -> "True"
+    * UPPER_FALSE_PATTERN (`str`): False -> "False"
+    """
 
     REPLACE_LOWER_PATTERN = re.compile(r"(^\w.*)")
     ARRANGE_EMPTY_PATTERN = re.compile(r"<([a-zA-Z]*)></\1>")
@@ -81,6 +93,7 @@ class XmlRegex():
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     empty_case_test = XmlRegex.replace_empty_case("<tag></tag>")
     print("empty_case:", empty_case_test)
     double_case_test = XmlRegex.replace_double_case("</tag>\n\t</tag>")

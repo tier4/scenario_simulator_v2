@@ -25,8 +25,22 @@ from scenario_test_utility.logger import Logger
 
 
 class ParameterSweeper:
+    """Parameter Sweeper Class."""
+
     @staticmethod
     def iota(start, step, stop):
+        """
+        Calculate steps.
+
+        **Args**
+
+        * start, step, stop(`int`)
+
+        **Returns**
+
+        * `ndarray`
+
+        """
         num = 1
         if (step == 0):
             print(ZeroDivisionError)
@@ -36,6 +50,18 @@ class ParameterSweeper:
 
     @staticmethod
     def make_modifier_bindings(modifier_dict):
+        """
+        Make modifier bindings.
+
+        **Args**
+
+        * modifier dict(`dictionary`)
+
+        **Returns**
+
+        * `list`
+
+        """
         list_bindings = []
         if (modifier_dict is None):
             return None
@@ -62,6 +88,7 @@ class ParameterSweeper:
 
     @staticmethod
     def test(modifier_dict, xosc_text):
+        """Test method."""
         print(xosc_text)
         bind = ParameterSweeper.make_modifier_bindings(modifier_dict)
         for item in itertools.product(*bind):
@@ -79,6 +106,7 @@ class ParameterSweeper:
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     od = [
         OrderedDict([('name', 'CAR'), ('list', ["car0", "car1"])]),
         OrderedDict([('name', 'WALKER'), ('list', ["walker0", "walker1"])]),
