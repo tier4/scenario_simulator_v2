@@ -20,18 +20,16 @@ plugins:
 copyright: 'Copyright &copy; 2020- Tier IV, Inc.'
 
 markdown_extensions:
+  - codehilite: { guess_lang: false }
+  - fontawesome_markdown
+  - mdx_math
+  - mdx_unimoji
+  - plantuml_markdown: { server: http://www.plantuml.com/plantuml }
+  - pymdownx.arithmatex
+  - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg }
   - pymdownx.highlight
   - pymdownx.superfences
-  - mdx_unimoji
-  - fontawesome_markdown
-  - pymdownx.arithmatex
-  - pymdownx.emoji:
-      emoji_generator: !!python/name:pymdownx.emoji.to_svg
-  - codehilite:
-      guess_lang: false
-  - mdx_math
-  - plantuml_markdown:
-      server: http://www.plantuml.com/plantuml
+  - toc: { permalink: "#" }
 
 extra_css:
   - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"

@@ -6,9 +6,6 @@ This section describes the differences between our OpenSCENARIO Interpreter and
 the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by
 other companies and organizations.
 
-Our OpenSCENARIO Interpreter does not currently support the full range of
-OpenSCENARIO standards.
-
 ## Specific Features
 ---
 
@@ -162,18 +159,143 @@ It is unlikely that you will need these commands for normal scenario creation.
 ## Non-Standard Extensions
 ---
 
-### Supports Lanelet2 instead of OpenDRIVE.
-
-TODO
-
 ### Success/failure judgment
 
-我々のインタプリタは自動運転システムの CI/CD パイプラインに組み込まれることを念頭に開発されています。
-そのため、シナリオの実行には成功・失敗・エラーのいずれかの結果が伴います。
-
-ここで、「エラー」は文法エラー等のシナリオそのものの不備を意味し、「シミュレーション内で車両が事故を起こした」といった「自動運転システムのエラー」を意味しないことに注意してください。
-そのような場合には、「失敗」が通知されます。
+Our interpreters have been developed with the intention of incorporating them
+into the CI / CD pipeline of autonomous driving systems.
+Therefore, executing a scenario can result in success, failure, or error.
+Note that "error" means a flaw in the scenario itself, such as a syntax error,
+or an internal error, not an "error in an automated driving system" such as "a
+vehicle accident occurred in a simulation".
+In such cases, you will be notified of a "failure".
 
 ## Supporting Status
+---
 
-TODO
+Our OpenSCENARIO Interpreter does not currently support the full range of
+OpenSCENARIO standards.
+
+### Actions
+
+| Name                                                                                    | Status      | Limitations
+|:----------------------------------------------------------------------------------------|:-----------:|:------------
+| GlobalAction.**EnvironmentAction**                                                      | Unsupported |
+| GlobalAction.EntityAction.**AddEntityAction**                                           | Unsupported |
+| GlobalAction.EntityAction.**DeleteEntityAction**                                        | Unsupported |
+| GlobalAction.ParameterAction.**ParameterSetAction**                                     | ✔           | See [here](#parametersetaction)
+| GlobalAction.ParameterAction.**ParameterModifyAction**                                  | ✔           |
+| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalControllerAction** | Unsupported |
+| GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalStateAction**      | Unsupported |
+| GlobalAction.TrafficAction.**TrafficSourceAction**                                      | Unsupported |
+| GlobalAction.TrafficAction.**TrafficSinkAction**                                        | Unsupported |
+| GlobalAction.TrafficAction.**TrafficSwarmAction**                                       | Unsupported |
+| UserDefinedAction.**CustomCommandAction**                                               | ✔           |
+| PrivateAction.LongitudinalAction.**SpeedAction**                                        | ✔           | See [here](#speedaction)
+| PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         | Unsupported |
+| PrivateAction.LateralAction.**LaneChangeAction**                                        | ✔           | See [here](#lanechangeaction)
+| PrivateAction.LateralAction.**LaneOffsetAction**                                        | Unsupported |
+| PrivateAction.LateralAction.**LateralDistanceAction**                                   | Unsupported |
+| PrivateAction.**VisibilityAction**                                                      | Unsupported |
+| PrivateAction.**SynchronizeAction**                                                     | Unsupported |
+| PrivateAction.**ActivateControllerAction**                                              | Unsupported |
+| PrivateAction.ControllerAction.**AssignControllerAction**                               | Unsupported |
+| PrivateAction.ControllerAction.**OverrideControllerAction**                             | Unsupported |
+| PrivateAction.**TeleportAction**                                                        | ✔           | See [here](#teleportaction)
+| PrivateAction.RoutingAction.**AssignRouteAction**                                       | Unsupported |
+| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  | Unsupported |
+| PrivateAction.RoutingAction.**AcquirePositionAction**                                   | ✔           | See [here](#acquirepositionaction)
+
+### Conditions
+
+| Name                                                                    | Status |
+|:------------------------------------------------------------------------|:------:|
+| ByEntityCondition.EntityCondition.**EndOfRoadCondition**                |
+| ByEntityCondition.EntityCondition.**CollisionCondition**                |
+| ByEntityCondition.EntityCondition.**OffroadCondition**                  |
+| ByEntityCondition.EntityCondition.**TimeHeadwayCondition**              |
+| ByEntityCondition.EntityCondition.**TimeToCollisionCondition**          |
+| ByEntityCondition.EntityCondition.**AccelerationCondition**             |
+| ByEntityCondition.EntityCondition.**StandStillCondition**               |
+| ByEntityCondition.EntityCondition.**SpeedCondition**                    |
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition**         |
+| ByEntityCondition.EntityCondition.**TraveledDistanceCondition**         |
+| ByEntityCondition.EntityCondition.**ReachPositionCondition**            |
+| ByEntityCondition.EntityCondition.**DistanceCondition**                 |
+| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**            |
+| ByEntityCondition.ByValueCondition.**ParameterCondition**               |
+| ByEntityCondition.ByValueCondition.**TimeOfDayCondition**               |
+| ByEntityCondition.ByValueCondition.**SimulationTimeCondition**          |
+| ByEntityCondition.ByValueCondition.**StoryboardElementStateCondition**  |
+| ByEntityCondition.ByValueCondition.**UserDefinedValueCondition**        |
+| ByEntityCondition.ByValueCondition.**TrafficSignalCondition**           |
+| ByEntityCondition.ByValueCondition.**TrafficSignalControllerCondition** |
+
+## Limitations
+
+### ParameterSetAction
+
+Currently, ParameterSetAction cannot handle `dateTime` type parameters.
+
+### SpeedAction
+
+The implementation of type [TransitionDynamics](#transitiondynamics) for element
+`SpeedActionDynamics` is incomplete and **SpeedActionDynamics.dynamicsDimention
+is ignored**.
+
+### LaneChangeAction
+
+The implementation of type [TransitionDynamics](#transitiondynamics) for element
+`LaneChangeActionDynamics` and type [LaneChangeTarget](#lanechangetarget) for
+element `LaneChangeTarget` are incomplete.
+
+### TeleportAction
+
+Currently, **only LanePosition** can be specified for TeleportAction.
+
+### AcquirePositionAction
+
+Currently, **only LanePosition** can be specified for AcquirePositionAction.
+
+
+
+
+
+
+### TransitionDynamics
+
+The implementation of type [DynamicsShape](#dynamicsshape) for attribute
+`dynamicsShape` is incomplete.
+
+| Name              | Type                            | Status
+|:------------------|:--------------------------------|:------:
+| dynamicsShape     | [DynamicsShape](#dynamicsshape) | Incomplete
+| value             | Double                          | ✔
+| dynamicsDimention | DynamicsDimension               | ✔
+
+### DynamicsShape
+
+Currently, only `linear` and `step` are implemented for values of this
+enumeration.
+If you specify `cubic` and `sinusoidal`, you will get an `ImplementationFault`.
+
+| Value      | Status      |
+|:-----------|:-----------:|
+| linear     | ✔           |
+| cubic      | Unsupported |
+| sinusoidal | Unsupported |
+| step       | ✔           |
+
+### LaneChangeTarget
+
+Currently, only `AbsoluteTargetLane` is implemented for element of this type.
+If you specify `RelativeTargetLane`, you will get an `SyntaxError`.
+
+| Element            | Status      |
+|:-------------------|:-----------:|
+| AbsoluteTargetLane | ✔           |
+| RelativeTargetLane | Unsupported |
+
+### Position
+
+Currently, only `WorldPosition` and `LanePosition` are implemented for element
+of this type.
