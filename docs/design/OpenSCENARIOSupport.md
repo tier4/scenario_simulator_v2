@@ -145,10 +145,12 @@ collating the called command with the expected simulation result specified in
 [workflow file](../user_guide/scenario_test_runner/HowToWriteWorkflowFile.md)
 .
 
-**Currently, simulation results are notified by simply writing to standard output as text.**
-**This notification method is temporary and will change in the near future.**
+**Currently, simulation results are notified by simply writing to standard
+output as text. This notification method is temporary and will change in the
+near future.**
 
-The following built-in commands are debug commands for interpreter developers, not scenario creators.
+The following built-in commands are debug commands for interpreter developers,
+not scenario creators.
 It is unlikely that you will need these commands for normal scenario creation.
 
 | Name    | Effect |
@@ -183,13 +185,13 @@ OpenSCENARIO standards.
 | GlobalAction.EntityAction.**AddEntityAction**                                           | Unsupported |
 | GlobalAction.EntityAction.**DeleteEntityAction**                                        | Unsupported |
 | GlobalAction.ParameterAction.**ParameterSetAction**                                     | ✔           | See [here](#parametersetaction)
-| GlobalAction.ParameterAction.**ParameterModifyAction**                                  | ✔           |
+| GlobalAction.ParameterAction.**ParameterModifyAction**                                  | ✔           | No
 | GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalControllerAction** | Unsupported |
 | GlobalAction.InfrastructureAction.TrafficSignalAction.**TrafficSignalStateAction**      | Unsupported |
 | GlobalAction.TrafficAction.**TrafficSourceAction**                                      | Unsupported |
 | GlobalAction.TrafficAction.**TrafficSinkAction**                                        | Unsupported |
 | GlobalAction.TrafficAction.**TrafficSwarmAction**                                       | Unsupported |
-| UserDefinedAction.**CustomCommandAction**                                               | ✔           |
+| UserDefinedAction.**CustomCommandAction**                                               | ✔           | No
 | PrivateAction.LongitudinalAction.**SpeedAction**                                        | ✔           | See [here](#speedaction)
 | PrivateAction.LongitudinalAction.**LongitudinalDistanceAction**                         | Unsupported |
 | PrivateAction.LateralAction.**LaneChangeAction**                                        | ✔           | See [here](#lanechangeaction)
@@ -207,28 +209,28 @@ OpenSCENARIO standards.
 
 ### Conditions
 
-| Name                                                                    | Status |
-|:------------------------------------------------------------------------|:------:|
-| ByEntityCondition.EntityCondition.**EndOfRoadCondition**                |
-| ByEntityCondition.EntityCondition.**CollisionCondition**                |
-| ByEntityCondition.EntityCondition.**OffroadCondition**                  |
-| ByEntityCondition.EntityCondition.**TimeHeadwayCondition**              |
-| ByEntityCondition.EntityCondition.**TimeToCollisionCondition**          |
-| ByEntityCondition.EntityCondition.**AccelerationCondition**             |
-| ByEntityCondition.EntityCondition.**StandStillCondition**               |
-| ByEntityCondition.EntityCondition.**SpeedCondition**                    |
-| ByEntityCondition.EntityCondition.**RelativeDistanceCondition**         |
-| ByEntityCondition.EntityCondition.**TraveledDistanceCondition**         |
-| ByEntityCondition.EntityCondition.**ReachPositionCondition**            |
-| ByEntityCondition.EntityCondition.**DistanceCondition**                 |
-| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**            |
-| ByEntityCondition.ByValueCondition.**ParameterCondition**               |
-| ByEntityCondition.ByValueCondition.**TimeOfDayCondition**               |
-| ByEntityCondition.ByValueCondition.**SimulationTimeCondition**          |
-| ByEntityCondition.ByValueCondition.**StoryboardElementStateCondition**  |
-| ByEntityCondition.ByValueCondition.**UserDefinedValueCondition**        |
-| ByEntityCondition.ByValueCondition.**TrafficSignalCondition**           |
-| ByEntityCondition.ByValueCondition.**TrafficSignalControllerCondition** |
+| Name                                                                    | Status      | Limitations
+|:------------------------------------------------------------------------|:-----------:|:------------
+| ByEntityCondition.EntityCondition.**EndOfRoadCondition**                | Unsupported |
+| ByEntityCondition.EntityCondition.**CollisionCondition**                | ✔           | See [here](#collisioncondition)
+| ByEntityCondition.EntityCondition.**OffroadCondition**                  | Unsupported |
+| ByEntityCondition.EntityCondition.**TimeHeadwayCondition**              | ✔           | See [here](#timeheadwaycondition)
+| ByEntityCondition.EntityCondition.**TimeToCollisionCondition**          | Unsupported |
+| ByEntityCondition.EntityCondition.**AccelerationCondition**             | ✔           | No
+| ByEntityCondition.EntityCondition.**StandStillCondition**               | ✔           | No
+| ByEntityCondition.EntityCondition.**SpeedCondition**                    | ✔           | No
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition**         | Unsupported |
+| ByEntityCondition.EntityCondition.**TraveledDistanceCondition**         | Unsupported |
+| ByEntityCondition.EntityCondition.**ReachPositionCondition**            | ✔           | See [here](#reachpositioncondition)
+| ByEntityCondition.EntityCondition.**DistanceCondition**                 | ✔           |
+| ByEntityCondition.EntityCondition.**RelativeSpeedCondition**            | ✔           |
+| ByEntityCondition.ByValueCondition.**ParameterCondition**               | ✔           |
+| ByEntityCondition.ByValueCondition.**TimeOfDayCondition**               | Unsupported |
+| ByEntityCondition.ByValueCondition.**SimulationTimeCondition**          | ✔           |
+| ByEntityCondition.ByValueCondition.**StoryboardElementStateCondition**  | ✔           |
+| ByEntityCondition.ByValueCondition.**UserDefinedValueCondition**        | Unsupported |
+| ByEntityCondition.ByValueCondition.**TrafficSignalCondition**           | Unsupported |
+| ByEntityCondition.ByValueCondition.**TrafficSignalControllerCondition** | Unsupported |
 
 ## Limitations
 
@@ -250,15 +252,27 @@ element `LaneChangeTarget` are incomplete.
 
 ### TeleportAction
 
-Currently, **only LanePosition** can be specified for TeleportAction.
+Currently, **only LanePosition** can be specified for element of TeleportAction.
 
 ### AcquirePositionAction
 
-Currently, **only LanePosition** can be specified for AcquirePositionAction.
+Currently, **only LanePosition** can be specified for element of
+AcquirePositionAction.
 
+### CollisionCondition
 
+Currently, **only EntityRef** can be specified for element of
+CollisionCondition.
 
+### TimeHeadwayCondition
 
+Currently, the values of attribute "freespace" and "alongRoute" are ignored and
+always behave as if freespace="false" and alongRoute="true" were specified.
+
+### ReachPositionCondition
+
+Currently, **only LanePosition and WorldPosition** can be specified for element
+of ReachPositionCondition.
 
 
 ### TransitionDynamics
