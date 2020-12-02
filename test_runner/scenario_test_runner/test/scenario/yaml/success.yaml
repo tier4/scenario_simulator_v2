@@ -54,6 +54,15 @@ OpenSCENARIO:
                       - name: event
                         priority: overwrite
                         maximumExecutionCount: 100
+                        Action:
+                          - name: action
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: value
+                                ModifyAction:
+                                  Rule:
+                                    AddValue:
+                                      value: STEP
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -65,15 +74,6 @@ OpenSCENARIO:
                                     parameterRef: value
                                     rule: greaterThan
                                     value: 0
-                        Action:
-                          - name: action
-                            GlobalAction:
-                              ParameterAction:
-                                parameterRef: value
-                                ModifyAction:
-                                  Rule:
-                                    AddValue:
-                                      value: STEP
             StartTrigger:
               ConditionGroup:
                 - Condition:
