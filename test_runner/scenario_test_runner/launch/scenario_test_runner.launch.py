@@ -36,6 +36,8 @@ def generate_launch_description():
 
     log_directory = LaunchConfiguration('log_directory', default="/tmp")
 
+    use_validation = LaunchConfiguration('use_validation', default=True)
+
     declare_log_directory = DeclareLaunchArgument(
         'log_directory',
         default_value=log_directory,
@@ -51,7 +53,8 @@ def generate_launch_description():
         on_exit=Shutdown(),
         arguments=[
             "--workflow", workflow,
-            "--log_directory", log_directory
+            "--log_directory", log_directory,
+            "--use_validation", use_validation
         ]
     )
 
