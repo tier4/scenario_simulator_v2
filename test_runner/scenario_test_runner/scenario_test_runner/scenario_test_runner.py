@@ -47,7 +47,7 @@ class ScenarioTestRunner:
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
 
-    def run_workflow(self, workflow, log_directory, use_validation):
+    def run_workflow(self, workflow, log_directory, no_validation):
         """
         Run workflow.
 
@@ -80,7 +80,7 @@ class ScenarioTestRunner:
                                                      expects, step_times_ms,
                                                      self.launcher_path)
 
-        if use_validation.lower() in ["true", "t", "yes", "1"]:
+        if not no_validation.lower() in ["true", "t", "yes", "1"]:
             self.validate_all_scenarios()
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
@@ -165,19 +165,19 @@ def main():
                         help='Specify the scenario you want to execute.')
 
     parser.add_argument('--workflow',
-                        help='Specify workflow you want to execute')
+                        help='Specify workflow you want to execute.')
 
     parser.add_argument('--log_directory',
-                        help='Specify log_directory you want to execute',
+                        help='Specify log_directory you want to execute.',
                         default='/tmp')
 
-    parser.add_argument('--use_validation',
-                        help='use validation or not',
-                        default=True)
+    parser.add_argument(
+        '--no_validation', default=False,
+        help='Disable validation to generated scenarios.')
 
     args = parser.parse_args()
     runner = ScenarioTestRunner(args.timeout)
-    runner.run_workflow(args.workflow, args.log_directory, args.use_validation)
+    runner.run_workflow(args.workflow, args.log_directory, args.no_validation)
 
 
 if __name__ == '__main__':
