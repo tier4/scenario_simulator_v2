@@ -47,7 +47,7 @@ class ScenarioTestRunner:
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
 
-    def run_workflow(self, workflow, log_directory):
+    def run_workflow(self, workflow, log_directory, use_validation):
         """
         Run workflow.
 
@@ -79,7 +79,9 @@ class ScenarioTestRunner:
             = ConverterHandler.convert_all_scenarios(self.yaml_scenarios,
                                                      expects, step_times_ms,
                                                      self.launcher_path)
-        self.validate_all_scenarios()
+
+        if use_validation.lower() in ["true", "t", "yes", "1"]:
+            self.validate_all_scenarios()
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
 
@@ -151,11 +153,9 @@ class ScenarioTestRunner:
 def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
-    parser.add_argument('--timeout',
-                        type=int,
-                        default=180,
-                        help='Specify simulation time limit in seconds. \
-                  The default is 180 seconds.')
+    parser.add_argument(
+        '--timeout', type=int, default=180,
+        help='Specify simulation time limit in seconds.  The default is 180 seconds.')
 
     parser.add_argument('--log',
                         default='screen',
@@ -171,9 +171,13 @@ def main():
                         help='Specify log_directory you want to execute',
                         default='/tmp')
 
+    parser.add_argument('--use_validation',
+                        help='use validation or not',
+                        default=True)
+
     args = parser.parse_args()
     runner = ScenarioTestRunner(args.timeout)
-    runner.run_workflow(args.workflow, args.log_directory)
+    runner.run_workflow(args.workflow, args.log_directory, args.use_validation)
 
 
 if __name__ == '__main__':
