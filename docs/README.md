@@ -16,7 +16,7 @@ See also [LICENSE](LICENSE).
 
 ### Running example scenario
 ```bash
-ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp' no_validation:=True
 ```
 
 ### Running with docker image
@@ -61,7 +61,7 @@ Scenario:
 
 4. Run the scenario:
 ```
-ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='path/to/your/workflow_config.yaml' log_directory:='/tmp'
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='path/to/your/workflow_config.yaml' log_directory:='/tmp' no_validation:=True
 ```
 
 ## Detailed Documentations
