@@ -1,3 +1,2 @@
 xmlschema
 xmltodict
-beautifulsoup4
