@@ -92,6 +92,26 @@ TEST(Math, CatmullRomSpline4)
   EXPECT_NO_THROW(auto spline = simulation_api::math::CatmullRomSpline(points));
 }
 
+TEST(Math, CatmullRomSpline5)
+{
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  p1.x = 1;
+  geometry_msgs::msg::Point p2;
+  p2.x = 2;
+  geometry_msgs::msg::Point p3;
+  p3.x = 3;
+  geometry_msgs::msg::Point p4;
+  p4.x = 4;
+  auto points = {p0, p1, p2, p3, p4};
+  auto spline = simulation_api::math::CatmullRomSpline(points);
+  EXPECT_DOUBLE_EQ(spline.getLength(), 4);
+  auto point = spline.getPoint(3);
+  EXPECT_DOUBLE_EQ(point.x, 3);
+  EXPECT_DOUBLE_EQ(point.y, 0);
+  EXPECT_DOUBLE_EQ(point.z, 0);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

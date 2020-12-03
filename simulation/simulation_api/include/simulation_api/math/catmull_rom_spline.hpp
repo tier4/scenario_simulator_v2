@@ -20,6 +20,7 @@
 #include <vector>
 #include <exception>
 #include <string>
+#include <utility>
 
 namespace simulation_api
 {
@@ -39,12 +40,16 @@ class CatmullRomSpline
 public:
   explicit CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points);
   double getLength() const {return total_length_;}
+  double getMaximum2DCurventure() const;
+  const geometry_msgs::msg::Point getPoint(double s) const;
 
 private:
+  std::pair<size_t, double> getCurveIndexAndS(double s) const;
   bool checkConnection() const;
   bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
+  std::vector<double> maximum_2d_curvatures_;
   double total_length_;
   const std::vector<geometry_msgs::msg::Point> control_points;
 };

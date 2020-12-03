@@ -17,7 +17,7 @@
 #include <vector>
 #include <string>
 #include <limits>
-#include <iostream>
+#include <utility>
 
 namespace simulation_api
 {
@@ -119,12 +119,46 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
   }
   for (const auto & curve : curves_) {
     length_list_.emplace_back(curve.getLength());
+    maximum_2d_curvatures_.emplace_back(curve.getMaximu2DCurvature());
   }
   total_length_ = 0;
   for (const auto & length : length_list_) {
     total_length_ = total_length_ + length;
   }
   checkConnection();
+}
+
+std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
+{
+  if (s < 0) {
+    return std::make_pair(0, s);
+  }
+  if (s > total_length_) {
+    return std::make_pair(curves_.size() - 1, s - total_length_);
+  }
+  double current_s = 0;
+  for (size_t i = 0; i < curves_.size(); i++) {
+    double prev_s = current_s;
+    current_s = current_s + length_list_[i];
+    if (prev_s <= s && s < current_s) {
+      return std::make_pair(i, s - prev_s);
+    }
+  }
+  throw SplineInterpolationError("failed to calculate curve index");
+}
+
+const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
+{
+  const auto index_and_s = getCurveIndexAndS(s);
+  return curves_[index_and_s.first].getPoint(index_and_s.second);
+}
+
+double CatmullRomSpline::getMaximum2DCurventure() const
+{
+  if (maximum_2d_curvatures_.size() == 0) {
+    throw SplineInterpolationError("maximum 2D curventure vector size is 0.");
+  }
+  return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }
 
 bool CatmullRomSpline::checkConnection() const
