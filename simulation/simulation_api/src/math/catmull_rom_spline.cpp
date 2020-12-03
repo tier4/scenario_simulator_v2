@@ -161,6 +161,18 @@ double CatmullRomSpline::getMaximum2DCurventure() const
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }
 
+const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) const
+{
+  const auto index_and_s = getCurveIndexAndS(s);
+  return curves_[index_and_s.first].getTangentVector(index_and_s.second);
+}
+
+const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
+{
+  const auto index_and_s = getCurveIndexAndS(s);
+  return curves_[index_and_s.first].getPose(index_and_s.second);
+}
+
 bool CatmullRomSpline::checkConnection() const
 {
   if (control_points.size() != (curves_.size() + 1)) {

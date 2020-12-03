@@ -42,6 +42,8 @@ public:
   double getLength() const {return total_length_;}
   double getMaximum2DCurventure() const;
   const geometry_msgs::msg::Point getPoint(double s) const;
+  const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
+  const geometry_msgs::msg::Pose getPose(double s) const;
 
 private:
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
