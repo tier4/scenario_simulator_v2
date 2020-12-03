@@ -20,8 +20,13 @@ int main()
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
   p1.x = 1;
+  p1.y = 3;
   geometry_msgs::msg::Point p2;
   p2.x = 2;
-  auto points = {p0, p1, p2};
+  p2.y = 5;
+  geometry_msgs::msg::Point p3;
+  p3.x = 4;
+  p3.y = 6;
+  auto points = {p0, p1, p2, p3};
   auto spline = simulation_api::math::CatmullRomSpline(points);
 }

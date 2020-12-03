@@ -89,19 +89,19 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
       double bx = 2 * control_points[i - 1].x - 5 * control_points[i].x + 4 *
         control_points[i + 1].x - control_points[i + 2].x;
       double cx = -control_points[i - 1].x + control_points[i + 1].x;
-      double dx = 2 * control_points[i + 1].x;
+      double dx = 2 * control_points[i].x;
       double ay = -1 * control_points[i - 1].y + 3 * control_points[i].y - 3 *
         control_points[i + 1].y + control_points[i + 2].y;
       double by = 2 * control_points[i - 1].y - 5 * control_points[i].y + 4 *
         control_points[i + 1].y - control_points[i + 2].y;
       double cy = -control_points[i - 1].y + control_points[i + 1].y;
-      double dy = 2 * control_points[i + 1].y;
+      double dy = 2 * control_points[i].y;
       double az = -1 * control_points[i - 1].z + 3 * control_points[i].z - 3 *
         control_points[i + 1].z + control_points[i + 2].z;
       double bz = 2 * control_points[i - 1].z - 5 * control_points[i].z + 4 *
         control_points[i + 1].z - control_points[i + 2].z;
       double cz = -control_points[i - 1].z + control_points[i + 1].z;
-      double dz = 2 * control_points[i + 1].z;
+      double dz = 2 * control_points[i].z;
       ax = ax * 0.5;
       bx = bx * 0.5;
       cx = cx * 0.5;
@@ -137,6 +137,16 @@ bool CatmullRomSpline::checkConnection() const
     const auto control_point1 = control_points[i + 1];
     const auto p0 = curves_[i].getPoint(0, false);
     const auto p1 = curves_[i].getPoint(1, false);
+    std::cout << "start point" << std::endl;
+    std::cout << "control point :" << control_point0.x << "," << control_point0.y << "," <<
+      control_point0.z << std::endl;
+    std::cout << "point : " << p0.x << "," << p0.y << "," << p0.z << std::endl;
+    std::cout << "end point" << std::endl;
+    std::cout << "control point :" << control_point1.x << "," << control_point1.y << "," <<
+      control_point1.z << std::endl;
+    std::cout << "point : " << p1.x << "," << p1.y << "," << p1.z << std::endl;
+    std::cout << std::endl;
+    /*
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
     } else if (!equals(control_point0, p0)) {
@@ -146,6 +156,7 @@ bool CatmullRomSpline::checkConnection() const
       throw SplineInterpolationError("end point of the curve number " + std::to_string(
                 i) + " does not match.");
     }
+    */
   }
   if (curves_.size() == 0) {
     throw SplineInterpolationError("curve size should not be zero.");
