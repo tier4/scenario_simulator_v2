@@ -171,16 +171,6 @@ bool CatmullRomSpline::checkConnection() const
     const auto control_point1 = control_points[i + 1];
     const auto p0 = curves_[i].getPoint(0, false);
     const auto p1 = curves_[i].getPoint(1, false);
-    std::cout << "start point" << std::endl;
-    std::cout << "control point :" << control_point0.x << "," << control_point0.y << "," <<
-      control_point0.z << std::endl;
-    std::cout << "point : " << p0.x << "," << p0.y << "," << p0.z << std::endl;
-    std::cout << "end point" << std::endl;
-    std::cout << "control point :" << control_point1.x << "," << control_point1.y << "," <<
-      control_point1.z << std::endl;
-    std::cout << "point : " << p1.x << "," << p1.y << "," << p1.z << std::endl;
-    std::cout << std::endl;
-    /*
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
     } else if (!equals(control_point0, p0)) {
@@ -190,7 +180,6 @@ bool CatmullRomSpline::checkConnection() const
       throw SplineInterpolationError("end point of the curve number " + std::to_string(
                 i) + " does not match.");
     }
-    */
   }
   if (curves_.size() == 0) {
     throw SplineInterpolationError("curve size should not be zero.");
