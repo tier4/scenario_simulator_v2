@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== LaneChangeTarget =====================================================
+/* ---- LaneChangeTarget -------------------------------------------------------
  *
  * <xsd:complexType name="LaneChangeTarget">
  *   <xsd:choice>
@@ -32,7 +32,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct LaneChangeTarget
   : public Element
 {

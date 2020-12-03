@@ -14,7 +14,8 @@
   <depend>python-xmlplain-pip</depend>
   <depend>python-xmlschema</depend>
   <depend>python-xmltodict</depend> 
-  <depend>python-bs4</depend>
+  <depend>python3-bs4</depend>
+  <depend>python3-xmltodict</depend>
   <depend>python-argparse</depend>
   <depend>python-yamale-pip</depend>
   <depend>ament_index_python</depend>

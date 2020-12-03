@@ -108,7 +108,9 @@ struct ParameterSetAction
       inner_scope.parameters.at(parameter_ref)
     };
 
-    const auto iter {overloads.find(target.type())};
+    const auto iter {
+      overloads.find(target.type())
+    };
 
     if (iter != std::end(overloads)) {
       return std::get<1>(* iter)(target, value);

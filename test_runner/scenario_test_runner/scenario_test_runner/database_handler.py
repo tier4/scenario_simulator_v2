@@ -26,9 +26,22 @@ import yamale
 
 
 class DatabaseHandler():
+    """class to handler database."""
 
     @staticmethod
     def read_database(workflow_file, log_directory):
+        """
+        Read database.
+
+        **Args**
+
+        * workflow_file,log_directory(`str`)
+
+        **Returns**
+
+        *launcher_package_path,log_path(`str`),scenarios(`list`)
+
+        """
         Logger.print_separator('Reading workflow')
         workflow_path = ''
         if pathlib.Path(workflow_file).is_absolute():
@@ -63,4 +76,5 @@ class DatabaseHandler():
 
 
 if __name__ == '__main__':
+    """Entrypoint."""
     pass
