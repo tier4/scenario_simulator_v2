@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <limits>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -43,6 +44,18 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
       double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
       double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
       double dz = 2 * control_points[0].z;
+      ax = ax * 0.5;
+      bx = bx * 0.5;
+      cx = cx * 0.5;
+      dx = dx * 0.5;
+      ay = ay * 0.5;
+      by = by * 0.5;
+      cy = cy * 0.5;
+      dy = dy * 0.5;
+      az = az * 0.5;
+      bz = bz * 0.5;
+      cz = cz * 0.5;
+      dz = dz * 0.5;
       curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
     } else if (i == (n - 1)) {
       double ax = 0;
@@ -57,6 +70,18 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
       double bz = control_points[i - 1].z - 2 * control_points[i].z + control_points[i + 1].z;
       double cz = -1 * control_points[i - 1].z + control_points[i + 1].z;
       double dz = 2 * control_points[i].z;
+      ax = ax * 0.5;
+      bx = bx * 0.5;
+      cx = cx * 0.5;
+      dx = dx * 0.5;
+      ay = ay * 0.5;
+      by = by * 0.5;
+      cy = cy * 0.5;
+      dy = dy * 0.5;
+      az = az * 0.5;
+      bz = bz * 0.5;
+      cz = cz * 0.5;
+      dz = dz * 0.5;
       curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
     } else {
       double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x - 3 *
@@ -77,6 +102,18 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
         control_points[i + 1].z - control_points[i + 2].z;
       double cz = -control_points[i - 1].z + control_points[i + 1].z;
       double dz = 2 * control_points[i + 1].z;
+      ax = ax * 0.5;
+      bx = bx * 0.5;
+      cx = cx * 0.5;
+      dx = dx * 0.5;
+      ay = ay * 0.5;
+      by = by * 0.5;
+      cy = cy * 0.5;
+      dy = dy * 0.5;
+      az = az * 0.5;
+      bz = bz * 0.5;
+      cz = cz * 0.5;
+      dz = dz * 0.5;
       curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
     }
   }
