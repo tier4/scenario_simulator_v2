@@ -44,6 +44,7 @@ nav:
       - user_guide/scenario_editor/CreateSimpleScenario.md
       - user_guide/scenario_editor/EditExistingScenario.md
       - user_guide/scenario_editor/ChangeCoordinate.md
+      - Place an entity to relative position: user_guide/scenario_editor/RelativePosition.md
     - Scenario Test Runner:
       - Overview: user_guide/scenario_test_runner/ScenarioTestRunner.md
       - user_guide/scenario_test_runner/ScenarioFormatConversion.md
