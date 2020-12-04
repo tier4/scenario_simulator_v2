@@ -288,10 +288,13 @@ class ScenarioConverter:
 
     @staticmethod
     def write_converted_log(id, item, log_path, xosc_path, yaml_path):
-        log_text = (" file name: " +
-                    str(Path(xosc_path).stem + ".xosc") +
-                    " parameter distribution case " + str(id) + "\033[1A")
-        Logger.print_process(log_text)
+        log_text = \
+            " file name: " + \
+            str(Path(xosc_path).stem + ".xosc") + \
+            " parameter distribution case " + str(id)
+
+        Logger.print_process(log_text + "\x1b[1A")
+
         with open(log_path, 'a') as f:
             f.write(log_text)
 
@@ -302,7 +305,6 @@ class ScenarioConverter:
         xosc_text = BeautifulSoup(xosc_text, 'xml')
         xosc_text = xosc_text.prettify()
         Manager.write_data(xosc_path, xosc_text.encode("utf-8"), "wb")
-        return
 
 
 def main():
