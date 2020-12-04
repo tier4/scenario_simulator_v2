@@ -15,8 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 
-#include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/point.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 
@@ -62,6 +61,17 @@ struct RelativeWorldPosition
     dz(
       readAttribute<Double>("dz", node, scope, Double()))
   {}
+
+  operator geometry_msgs::msg::Point() const
+  {
+    geometry_msgs::msg::Point result {};
+
+    result.x = dx;
+    result.y = dy;
+    result.z = dz;
+
+    return result;
+  }
 };
 }
 }  // namespace openscenario_interpreter

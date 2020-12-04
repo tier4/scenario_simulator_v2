@@ -62,6 +62,16 @@ struct TeleportAction
       for (const auto & each : inner_scope.actors) {
         setEntityStatus(each, status);
       }
+    } else if (position.is<RelativeWorldPosition>()) {
+      for (const auto & each : inner_scope.actors) {
+        setEntityStatus(
+          each,
+          position.as<RelativeWorldPosition>().reference,
+          position.as<RelativeWorldPosition>(),  // geometry_msgs::msg::Point
+          position.as<RelativeWorldPosition>().orientation,  // geometry_msgs::msg::Vector3
+          geometry_msgs::msg::Twist(),
+          geometry_msgs::msg::Accel());
+      }
     } else {
       THROW(ImplementationFault);
     }
