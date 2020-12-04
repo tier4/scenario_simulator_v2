@@ -34,12 +34,12 @@ You can place NPC on the map by following steps.
 You can set the position of the NPC relative to the Ego car by following steps.
 
 1. Click on the "frame" row of "Car1 (Npc1)" in "Position" on the right side of the screen
-2. Select "/Car/Car0/pose" from the drop-down list and click mark icon on the right side of the form
+2. Select "/Car/Car0/pose" from the drop-down list and click the check mark icon on the right side of the form
 
 ![](screenshot12.png)
 
 3. Click on the "position" row of "Car1 (Npc1)" in "Position" on the right side of the screen
-4. Enter a value of "-10" for "x" and "0" for "y" and click mark icon on the right side of the form
+4. Enter a value of "-10" for "x" and "0" for "y" and click the check mark icon on the right side of the form
 
 ![](screenshot13.png)
 
@@ -63,7 +63,7 @@ You can set the position of the NPC with a parameter by following steps.
 5. Click on the pencil icon to the right of the "x"
 6. Select the radio button on the top of the input component that appears
 7. Select "$Distance" from the drop-down list
-8. Click mark icon on the right side of the form
+8. Click check the check mark icon on the right side of the form
 
 ![](screenshot15.png)
 
