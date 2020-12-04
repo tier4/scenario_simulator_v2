@@ -160,15 +160,9 @@ bool API::setEntityStatus(
   const geometry_msgs::msg::Twist twist,
   const geometry_msgs::msg::Accel accel)
 {
-  /*
-  const auto ref_status = getEntityStatus(reference_entity_name,
-      simulation_api::entity::CoordinateFrameTypes::WORLD);
-  auto rotation_mat = quaternion_operation::getRotationMatrix(relative_pose.orientation);
-  geometry_msgs::msg::Pose pose;
-  pose.orientation = relative_pose.orientation * relative_pose.orientation;
-  geometry_msgs::msg::Point point;
-  Eigen::Vector3 Eigen::VectorXd v(3);
-  */
+  const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, name);
+  const auto status = simulation_api::entity::EntityStatus(current_time_, pose, twist, accel);
+  return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
 boost::optional<double> API::getLongitudinalDistance(std::string from, std::string to)
