@@ -153,6 +153,24 @@ boost::optional<double> EntityManager::getLongitudinalDistance(
   return boost::none;
 }
 
+geometry_msgs::msg::Pose EntityManager::getMapPose(
+  std::string reference_entity_name,
+  geometry_msgs::msg::Pose relative_pose)
+{
+  const auto ref_status = getEntityStatus(reference_entity_name,
+      simulation_api::entity::CoordinateFrameTypes::WORLD);
+  if (!ref_status) {
+    throw simulation_api::SimulationRuntimeError(
+            "failed to get status of " + reference_entity_name + " entity in getMapPose");
+  }
+  tf2::Transform ref_transfrom, relative_transform;
+  tf2::fromMsg(ref_status->pose, ref_transfrom);
+  tf2::fromMsg(relative_pose, relative_transform);
+  geometry_msgs::msg::Pose ret;
+  tf2::toMsg(ref_transfrom * relative_transform, ret);
+  return ret;
+}
+
 geometry_msgs::msg::Pose EntityManager::getRelativePose(std::string from, std::string to)
 {
   auto from_status = getEntityStatus(from);
