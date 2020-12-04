@@ -153,6 +153,13 @@ bool API::setEntityStatus(std::string name, const simulation_api::entity::Entity
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
+bool API::setEntityStatus(
+  std::string name, std::string reference_entity_name,
+  const geometry_msgs::msg::Pose relative_pose)
+{
+
+}
+
 boost::optional<double> API::getLongitudinalDistance(std::string from, std::string to)
 {
   return entity_manager_ptr_->getLongitudinalDistance(from, to);
