@@ -72,6 +72,7 @@ struct TeleportAction
       for (const auto & each : inner_scope.actors) {
         setEntityStatus(each, status);
       }
+    // } else if (position.is<RelativeWorldPosition>()) {
     } else {
       THROW(ImplementationFault);
     }
