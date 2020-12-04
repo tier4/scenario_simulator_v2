@@ -49,7 +49,7 @@ HermiteCurve::HermiteCurve(
   dz_ = start_pose.position.z;
 }
 
-std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
+std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory() const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (int i = 0; i <= 100; i++) {
@@ -60,7 +60,7 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
   return ret;
 }
 
-const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale)
+const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();
@@ -72,7 +72,7 @@ const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool 
   return vec;
 }
 
-const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale)
+const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();
@@ -88,7 +88,7 @@ const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale)
   return pose;
 }
 
-double HermiteCurve::get2DCurvature(double s, bool autoscale)
+double HermiteCurve::get2DCurvature(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();
@@ -101,7 +101,7 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale)
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
-double HermiteCurve::getMaximu2DCurvature()
+double HermiteCurve::getMaximu2DCurvature() const
 {
   std::vector<double> curvatures;
   for (double s = 0; s <= 1; s = s + 0.01) {
@@ -111,7 +111,7 @@ double HermiteCurve::getMaximu2DCurvature()
   return *std::max_element(curvatures.begin(), curvatures.end());
 }
 
-double HermiteCurve::getLength()
+double HermiteCurve::getLength() const
 {
   auto trajectory = getTrajectory();
   double ret = 0.0;
@@ -123,7 +123,7 @@ double HermiteCurve::getLength()
   return ret;
 }
 
-const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
+const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();

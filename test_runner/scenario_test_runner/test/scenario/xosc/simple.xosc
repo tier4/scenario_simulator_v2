@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
   <FileHeader revMajor="0" revMinor="0" date="2020-10-16T13:00:00" description="hoge" author="Tatsuya Yamasaki"/>
-  <ParameterDeclarations/>
+  <ParameterDeclarations>
+    <ParameterDeclaration name="map-name" parameterType="string" value="kashiwanoha"/>
+  </ParameterDeclarations>
   <CatalogLocations/>
   <RoadNetwork>
-    <LogicFile filepath="$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"/>
+    <LogicFile filepath="$(find-pkg-share $(var map-name)_map)/map/lanelet2_map.osm"/>
   </RoadNetwork>
   <Entities>
     <ScenarioObject name="ego">

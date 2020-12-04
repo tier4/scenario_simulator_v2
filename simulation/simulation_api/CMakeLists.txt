@@ -44,6 +44,7 @@ find_package(Eigen3 REQUIRED)
 
 add_library(entity_manager SHARED
   src/hdmap_utils/hdmap_utils.cpp
+  src/math/catmull_rom_spline.cpp
   src/math/hermite_curve.cpp
   src/math/collision.cpp
   src/entity/entity_manager.cpp
@@ -164,7 +165,6 @@ add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 target_include_directories(scenario_runner_moc_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-
 target_link_libraries(scenario_runner_moc_node simulation_api)
 
 install(
