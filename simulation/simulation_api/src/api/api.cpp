@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
+#include <tf2/LinearMath/Quaternion.h>
 
 #include <string>
 #include <limits>
@@ -155,9 +156,19 @@ bool API::setEntityStatus(std::string name, const simulation_api::entity::Entity
 
 bool API::setEntityStatus(
   std::string name, std::string reference_entity_name,
-  const geometry_msgs::msg::Pose relative_pose)
+  const geometry_msgs::msg::Pose relative_pose,
+  const geometry_msgs::msg::Twist twist,
+  const geometry_msgs::msg::Accel accel)
 {
-
+  /*
+  const auto ref_status = getEntityStatus(reference_entity_name,
+      simulation_api::entity::CoordinateFrameTypes::WORLD);
+  auto rotation_mat = quaternion_operation::getRotationMatrix(relative_pose.orientation);
+  geometry_msgs::msg::Pose pose;
+  pose.orientation = relative_pose.orientation * relative_pose.orientation;
+  geometry_msgs::msg::Point point;
+  Eigen::Vector3 Eigen::VectorXd v(3);
+  */
 }
 
 boost::optional<double> API::getLongitudinalDistance(std::string from, std::string to)
