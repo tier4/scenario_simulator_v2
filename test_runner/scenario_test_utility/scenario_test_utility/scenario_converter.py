@@ -25,6 +25,7 @@ import copy
 import itertools
 import os
 import re
+import sys
 import xmlplain
 import xmltodict
 
@@ -40,18 +41,19 @@ def load_yaml_as_dict(path):
 
     **Args**
 
-    * path (`str`): yaml path.
+    * path (`Path`): Path to yaml file.
 
     **Returns**
 
-    * `dict`: value or None.
+    * `dict`: value.
 
     """
-    if os.path.exists(path):
+    if Path(path).exists():
         with open(path, "r") as file:
             return xmlplain.obj_from_yaml(file)
     else:
         Logger.print_error("No such file or directory: " + path)
+        sys.exit()
 
 
 def find_modifiers(directory):
@@ -157,12 +159,12 @@ def convert_dict_to_xosc(xosc_dict, xosc_path):
 
     **Args**
 
-    - xosc_dict (`dict`)
-    - xosc_path (`str`)
+    * xosc_dict (`dict`)
+    * xosc_path (`str`)
 
     **Returns**
 
-    - `str`: xosc_text
+    * `str`: xosc_text
 
     """
     return XmlRegex.apply_regression(
@@ -175,9 +177,7 @@ def convert_dict_to_xosc(xosc_dict, xosc_path):
 
 
 class ScenarioConverter:
-    """
-    Tier IV scenario converter class.
-    """
+    """ Tier IV scenario converter class. """
 
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
@@ -192,7 +192,7 @@ class ScenarioConverter:
 
         **Returns**
 
-        *None
+        * None
 
         """
         Logger.print_separator("Scenario Preprocess")
@@ -233,15 +233,13 @@ class ScenarioConverter:
 
         def ret_path(xosc_dir, xosc_name, id):
             # .zfill(5)
-            return xosc_dir + "/" + xosc_name + "-" + str(id) + ".xosc"
+            return str(xosc_dir) + "/" + xosc_name + "-" + str(id) + ".xosc"
 
         num_files = 0
         if (bindings is not None):
             for item in itertools.product(*bindings):
                 num_files = num_files + 1
-                print("\r" + "\x1b[36m" +
-                      "...caliculating the number of files" + "\x1b[0m",
-                      end="")
+                print("\r\x1b[36m...caliculating the number of files\x1b[0m", end="")
         else:
             num_files = 1
         print("")
@@ -269,7 +267,6 @@ class ScenarioConverter:
             ScenarioConverter.write_converted_xosc(converted_xosc_text,
                                                    xosc_path)
             id = id + 1
-        return
 
     @staticmethod
     def write_converted_log(id, item, log_path, xosc_path, yaml_path):
@@ -287,8 +284,7 @@ class ScenarioConverter:
     def write_converted_xosc(xosc_text, xosc_path):
         converted_xosc_text = copy.deepcopy(xosc_text)
         xosc_text = converted_xosc_text.encode("utf-8")
-        xosc_text = BeautifulSoup(xosc_text, 'xml')
-        xosc_text = xosc_text.prettify()
+        xosc_text = BeautifulSoup(xosc_text, 'xml').prettify()
         Manager.write_data(xosc_path, xosc_text.encode("utf-8"), "wb")
 
 
