@@ -156,11 +156,24 @@ bool API::setEntityStatus(std::string name, const simulation_api::entity::Entity
 
 bool API::setEntityStatus(
   std::string name, std::string reference_entity_name,
+  const geometry_msgs::msg::Point relative_position,
+  const geometry_msgs::msg::Vector3 relative_rpy,
+  const geometry_msgs::msg::Twist twist,
+  const geometry_msgs::msg::Accel accel)
+{
+  geometry_msgs::msg::Pose relative_pose;
+  relative_pose.position = relative_position;
+  relative_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(relative_rpy);
+  return setEntityStatus(name, reference_entity_name, relative_pose, twist, accel);
+}
+
+bool API::setEntityStatus(
+  std::string name, std::string reference_entity_name,
   const geometry_msgs::msg::Pose relative_pose,
   const geometry_msgs::msg::Twist twist,
   const geometry_msgs::msg::Accel accel)
 {
-  const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, name);
+  const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
   const auto status = simulation_api::entity::EntityStatus(current_time_, pose, twist, accel);
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
