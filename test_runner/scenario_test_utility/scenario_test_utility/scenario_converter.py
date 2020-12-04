@@ -18,11 +18,12 @@
 
 from collections import OrderedDict, defaultdict
 from bs4 import BeautifulSoup
+from pathlib import Path
+
 import argparse
 import copy
 import itertools
 import os
-import pathlib
 import re
 import xmlplain
 import xmltodict
@@ -152,7 +153,7 @@ def mark_attributes(keyword, syntax_tree):
 
 class ScenarioConverter:
     """
-    Tier4 scenario converter class.
+    Tier IV scenario converter class.
 
     **Attributes**
     * OPENSCENARIO_TAG (`str`): tag for specify open scenario
@@ -182,7 +183,7 @@ class ScenarioConverter:
         root_data.pop("ScenarioModifiers", None)
         xosc_dict = ScenarioConverter.extract_open_scenario(root_data)
         xosc_text = ScenarioConverter.convert_dict2xosc(xosc_dict, xosc_dir)
-        Manager.mkdir(pathlib.Path(log_path).parent)
+        Manager.mkdir(Path(log_path).parent)
         Manager.mkdir(xosc_dir)
         ScenarioConverter.distribute(
             modifiers, xosc_text, xosc_dir, yaml_path, log_path)
@@ -242,7 +243,7 @@ class ScenarioConverter:
 
         """
         bindings = ParameterSweeper.make_modifier_bindings(modifier_dict)
-        xosc_name = pathlib.Path(yaml_path).stem
+        xosc_name = Path(yaml_path).stem
         id = 1
 
         def ret_path(xosc_dir, xosc_name, id):
@@ -288,7 +289,7 @@ class ScenarioConverter:
     @staticmethod
     def write_converted_log(id, item, log_path, xosc_path, yaml_path):
         log_text = (" file name: " +
-                    str(pathlib.Path(xosc_path).stem + ".xosc") +
+                    str(Path(xosc_path).stem + ".xosc") +
                     " parameter distribution case " + str(id) + "\033[1A")
         Logger.print_process(log_text)
         with open(log_path, 'a') as f:
@@ -307,21 +308,18 @@ class ScenarioConverter:
 def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
-    parser.add_argument('--input',
-                        type=str,
-                        help='absolute path to input yaml file',
-                        required=True)
+    parser.add_argument(
+        '--input', type=str, required=True,
+        help='absolute path to input yaml file')
 
-    parser.add_argument('--output',
-                        type=str,
-                        default=os.getcwd() + "/" + "converted_xosc/open_scenarios",
-                        help='absolute path to output converterd xosc file')
+    parser.add_argument(
+        '--output', type=str, default=os.getcwd() + "/" + "converted_xosc/open_scenarios",
+        help='absolute path to output converterd xosc file')
 
     args = parser.parse_args()
-    input_file_path = args.input
-    output_dir = args.output
-    log_dir = str(pathlib.Path(output_dir).parent)+"/converted.log"
-    ScenarioConverter.main(input_file_path, output_dir, log_dir)
+
+    ScenarioConverter.main(
+        args.input, args.output, Path(args.output).parent.joinpath("/converted.log"))
 
 
 if __name__ == "__main__":
