@@ -68,6 +68,9 @@ struct Orientation
         result.z = r;
         break;
 
+      case ReferenceContext::absolute:
+      // Jumps can never reach here (see ReferenceContext::operator >>).
+
       default:
         break;
     }
