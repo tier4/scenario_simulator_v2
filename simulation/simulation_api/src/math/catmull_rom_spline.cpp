@@ -18,6 +18,7 @@
 #include <string>
 #include <limits>
 #include <utility>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -133,8 +134,9 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
   if (s < 0) {
     return std::make_pair(0, s);
   }
-  if (s > total_length_) {
-    return std::make_pair(curves_.size() - 1, s - total_length_);
+  if (s >= total_length_) {
+    return std::make_pair(curves_.size() - 1,
+             s - (total_length_ - curves_[curves_.size() - 1].getLength()));
   }
   double current_s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {
@@ -147,10 +149,24 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
   throw SplineInterpolationError("failed to calculate curve index");
 }
 
+const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int num_points) const
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  if (num_points <= 1) {
+    throw SplineInterpolationError("trajectory points should be more than 2.");
+  }
+  double seg_size = total_length_ / (num_points - 1);
+  for (int i = 0; i < num_points; i++) {
+    double s = seg_size * static_cast<double>(i);
+    ret.emplace_back(getPoint(s));
+  }
+  return ret;
+}
+
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPoint(index_and_s.second);
+  return curves_[index_and_s.first].getPoint(index_and_s.second, true);
 }
 
 double CatmullRomSpline::getMaximum2DCurventure() const
@@ -164,13 +180,13 @@ double CatmullRomSpline::getMaximum2DCurventure() const
 const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getTangentVector(index_and_s.second);
+  return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
 }
 
 const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPose(index_and_s.second);
+  return curves_[index_and_s.first].getPose(index_and_s.second, true);
 }
 
 bool CatmullRomSpline::checkConnection() const
@@ -201,7 +217,7 @@ bool CatmullRomSpline::checkConnection() const
 
 bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const
 {
-  constexpr double e = std::numeric_limits<double>::epsilon();
+  constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::abs(p0.x - p1.x) > e) {
     return false;
   }
