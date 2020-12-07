@@ -16,6 +16,7 @@
   <depend>python-xmltodict</depend> 
   <depend>python3-bs4</depend>
   <depend>python3-xmltodict</depend>
+  <depend>python3-xmlschema</depend>
   <depend>python-argparse</depend>
   <depend>python-yamale-pip</depend>
   <depend>ament_index_python</depend>
