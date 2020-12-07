@@ -3,7 +3,8 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /Grid1
       Splitter Ratio: 0.5
     Tree Height: 1156
   - Class: rviz_common/Selection
@@ -29,7 +30,7 @@ Visualization Manager:
       Enabled: true
       Line Style:
         Line Width: 0.029999999329447746
-        Value: Billboards
+        Value: Lines
       Name: Grid
       Normal Cell Count: 0
       Offset:
@@ -74,26 +75,21 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz_default_plugins/Orbit
-      Distance: 10
+      Angle: 0
+      Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
-      Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
-      Focal Shape Fixed Size: true
-      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.4403977692127228
+      Scale: 68.66041564941406
       Target Frame: <Fixed Frame>
-      Value: Orbit (rviz)
-      Yaw: 0.17039862275123596
+      Value: TopDownOrtho (rviz_default_plugins)
+      X: 0
+      Y: 0
     Saved: ~
 Window Geometry:
   Displays:

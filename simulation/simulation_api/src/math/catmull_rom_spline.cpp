@@ -134,8 +134,9 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
   if (s < 0) {
     return std::make_pair(0, s);
   }
-  if (s > total_length_) {
-    return std::make_pair(curves_.size() - 1, s - total_length_);
+  if (s >= total_length_) {
+    return std::make_pair(curves_.size() - 1,
+             s - (total_length_ - curves_[curves_.size() - 1].getLength()));
   }
   double current_s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {
@@ -165,7 +166,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPoint(index_and_s.second);
+  return curves_[index_and_s.first].getPoint(index_and_s.second, true);
 }
 
 double CatmullRomSpline::getMaximum2DCurventure() const
@@ -179,13 +180,13 @@ double CatmullRomSpline::getMaximum2DCurventure() const
 const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getTangentVector(index_and_s.second);
+  return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
 }
 
 const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPose(index_and_s.second);
+  return curves_[index_and_s.first].getPose(index_and_s.second, true);
 }
 
 bool CatmullRomSpline::checkConnection() const
