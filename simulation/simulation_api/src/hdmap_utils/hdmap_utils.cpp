@@ -14,6 +14,7 @@
 
 #include <simulation_api/color_utils/color_utils.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
 
 #include <spline_interpolation/spline_interpolation.hpp>
@@ -413,6 +414,16 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   return ret;
 }
 
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::vector<std::int64_t> lanelet_ids)
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  for(const auto lanelet_id : lanelet_ids) {
+    const auto center_points = getCenterPoints(lanelet_id);
+    std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
+  }
+  return ret;
+}
+
 std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> ret;
@@ -673,72 +684,23 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
   geometry_msgs::msg::Quaternion quat)
 {
   geometry_msgs::msg::PoseStamped ret;
+  ret.header.frame_id = "map";
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
   const auto straight_lanelet_ids = getNextLaneletIds(lanelet.id(), "straight");
   boost::optional<lanelet::Lanelet> next_lanelet = boost::none;
-  if (straight_lanelet_ids.size() == 0) {
-    const auto following_lanelet_ids = getNextLaneletIds(lanelet.id());
-    if (following_lanelet_ids.size() != 0) {
-      next_lanelet = lanelet_map_ptr_->laneletLayer.get(following_lanelet_ids[0]);
-    }
-  } else {
-    next_lanelet = lanelet_map_ptr_->laneletLayer.get(straight_lanelet_ids[0]);
-  }
-
-  const auto centerline = lanelet.centerline();
-  std::vector<double> base_x;
-  std::vector<double> base_y;
-  std::vector<double> base_z;
-  for (const auto & pt : centerline) {
-    base_x.push_back(pt.x());
-    base_y.push_back(pt.y());
-    base_z.push_back(pt.z());
-  }
-  if (next_lanelet) {
-    const auto next_centerline = next_lanelet->centerline();
-    int count = 0;
-    for (const auto & pt : next_centerline) {
-      if (count != 0) {
-        base_x.push_back(pt.x());
-        base_y.push_back(pt.y());
-        base_z.push_back(pt.z());
-      }
-      count++;
-    }
-  }
-  spline_interpolation::SplineInterpolator spline;
-  std::vector<double> base_s = calcEuclidDist(base_x, base_y, base_z);
-  std::vector<double> resampled_x;
-  std::vector<double> resampled_y;
-  std::vector<double> resampled_z;
-  std::vector<double> resampled_s;
-  double diff = 0.01;
-  resampled_s.push_back(s);
-  resampled_s.push_back(s + diff);
-  if (
-    !spline.interpolate(
-      base_s, base_x, resampled_s, resampled_x, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_y, resampled_s, resampled_y, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_z, resampled_s, resampled_z, spline_interpolation::Method::SOR))
-  {
-    return boost::none;
-  }
-  geometry_msgs::msg::Vector3 tangent_vec;
-  tangent_vec.x = (resampled_x[1] - resampled_x[0]) / diff;
-  tangent_vec.y = (resampled_y[1] - resampled_y[0]) / diff;
-  tangent_vec.z = (resampled_z[1] - resampled_z[0]) / diff;
+  const auto center_points = getCenterPoints(lanelet.id());
+  simulation_api::math::CatmullRomSpline spline(center_points);
+  ret.pose = spline.getPose(s);
+  const auto tangent_vec = spline.getTangentVector(s);
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0.0;
   rpy.y = 0.0;
   rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-  ret.pose.position.x = resampled_x[0] - std::sin(rpy.z) * offset;
-  ret.pose.position.y = resampled_y[0] - std::cos(rpy.z) * offset;
-  ret.pose.position.z = (resampled_z[1] + resampled_z[0]) * 0.5;
+  ret.pose.position.x = ret.pose.position.x - std::sin(rpy.z) * offset;
+  ret.pose.position.y = ret.pose.position.y - std::cos(rpy.z) * offset;
+  ret.pose.position.z = ret.pose.position.z;
   ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
   ret.pose.orientation = ret.pose.orientation * quat;
-  ret.header.frame_id = "map";
   return ret;
 }
 
