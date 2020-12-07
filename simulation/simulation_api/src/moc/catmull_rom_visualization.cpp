@@ -19,6 +19,10 @@
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+#include <string>
+#include <vector>
+#include <memory>
+
 class CatmullRomSplineVisualization : public rclcpp::Node
 {
 public:
