@@ -13,9 +13,6 @@ RUN vcs import external < dependency.repos
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
 RUN source /opt/ros/dashing/setup.bash && rosdep install -r -y --from-paths . --ignore-src
 
-WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/test_runner/scenario_test_utility
-RUN pip3 install -r requirements.txt
-
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
 RUN echo "source /opt/ros/dashing/setup.bash" >> ~/.bashrc
 RUN echo "source /home/ubuntu/Desktop/scenario_simulator_ws/install/local_setup.bash" >> ~/.bashrc

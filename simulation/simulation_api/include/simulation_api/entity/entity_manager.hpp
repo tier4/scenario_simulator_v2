@@ -152,6 +152,9 @@ public:
   geometry_msgs::msg::Pose getRelativePose(
     geometry_msgs::msg::Pose from,
     geometry_msgs::msg::Pose to) const;
+  geometry_msgs::msg::Pose getMapPose(
+    std::string reference_entity_name,
+    geometry_msgs::msg::Pose relative_pose);
   const boost::optional<VehicleParameters> getVehicleParameters(std::string name) const;
   const std::vector<std::string> getEntityNames() const;
   bool setEntityStatus(std::string name, EntityStatus status);
