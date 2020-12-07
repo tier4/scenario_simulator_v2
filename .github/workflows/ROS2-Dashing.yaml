@@ -33,8 +33,6 @@ jobs:
                   sudo apt install -y python-rosdep python3-vcstool
                   sudo rosdep init
                   rosdep update
-                  cd ~/ros2_ws/src/scenario_simulator.auto/test_runner/scenario_test_utility
-                  pip3 install -r requirements.txt
                   cd ~/ros2_ws
                   vcs import src < src/scenario_simulator.auto/dependency.repos
                   cd ~/ros2_ws/src
