@@ -414,10 +414,11 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   return ret;
 }
 
-std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::vector<std::int64_t> lanelet_ids)
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
+  std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for(const auto lanelet_id : lanelet_ids) {
+  for (const auto lanelet_id : lanelet_ids) {
     const auto center_points = getCenterPoints(lanelet_id);
     std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
   }

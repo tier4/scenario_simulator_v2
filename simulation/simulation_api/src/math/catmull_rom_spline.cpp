@@ -18,6 +18,7 @@
 #include <string>
 #include <limits>
 #include <utility>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -31,6 +32,8 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
     throw SplineInterpolationError("numbers of control points are not enough.");
   }
   for (size_t i = 0; i < n; i++) {
+    std::cout << control_points[i].x << "," << control_points[i].y << "," << control_points[i].z <<
+      std::endl;
     if (i == 0) {
       double ax = 0;
       double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;

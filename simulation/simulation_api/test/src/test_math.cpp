@@ -112,6 +112,33 @@ TEST(Math, CatmullRomSpline5)
   EXPECT_DOUBLE_EQ(point.z, 0);
 }
 
+TEST(Math, CatmullRomSpline6)
+{
+  geometry_msgs::msg::Point p0;
+  p0.x = -30.9281;
+  p0.y = -23.1708;
+  p0.z = -0.132544;
+  geometry_msgs::msg::Point p1;
+  p1.x = -29.2938;
+  p1.y = -22.2938;
+  p1.z = -0.162124;
+  geometry_msgs::msg::Point p2;
+  p2.x = -27.6596;
+  p2.y = -21.4167;
+  p2.z = -0.191704;
+  geometry_msgs::msg::Point p3;
+  p3.x = -33.0324;
+  p3.y = -92.7566;
+  p3.z = 2.28524;
+  auto points = {p0, p1, p2, p3};
+  auto spline = simulation_api::math::CatmullRomSpline(points);
+  EXPECT_DOUBLE_EQ(spline.getLength(), 4);
+  auto point = spline.getPoint(3);
+  EXPECT_DOUBLE_EQ(point.x, 3);
+  EXPECT_DOUBLE_EQ(point.y, 0);
+  EXPECT_DOUBLE_EQ(point.z, 0);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
