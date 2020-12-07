@@ -37,40 +37,40 @@ struct TeleportAction
 
   const Position position;
 
-  template<typename Node>
+  template
+  <
+    typename Node
+  >
   explicit TeleportAction(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
-    position(readElement<Position>("Position", node, inner_scope))
+    position(
+      readElement<Position>("Position", node, inner_scope))
   {}
 
   void start() const
   {
     if (position.is<LanePosition>()) {
-      geometry_msgs::msg::Vector3 orientation {};
-
-      switch (position.as<LanePosition>().orientation.type) {
-        case ReferenceContext::relative:
-          orientation.x = position.as<LanePosition>().orientation.h;
-          orientation.y = position.as<LanePosition>().orientation.p;
-          orientation.z = position.as<LanePosition>().orientation.r;
-          break;
-
-        case ReferenceContext::absolute:
-          THROW(ImplementationFault);
-      }
-
       const simulation_api::entity::EntityStatus status {
         getCurrentTime(),
         Integer(position.as<LanePosition>().lane_id),
         position.as<LanePosition>().s,
         position.as<LanePosition>().offset,
-        orientation,
+        position.as<LanePosition>().orientation,
         geometry_msgs::msg::Twist(),
         geometry_msgs::msg::Accel()
       };
-
       for (const auto & each : inner_scope.actors) {
         setEntityStatus(each, status);
+      }
+    } else if (position.is<RelativeWorldPosition>()) {
+      for (const auto & each : inner_scope.actors) {
+        setEntityStatus(
+          each,
+          position.as<RelativeWorldPosition>().reference,
+          position.as<RelativeWorldPosition>(),  // geometry_msgs::msg::Point
+          position.as<RelativeWorldPosition>().orientation,  // geometry_msgs::msg::Vector3
+          geometry_msgs::msg::Twist(),
+          geometry_msgs::msg::Accel());
       }
     } else {
       THROW(ImplementationFault);

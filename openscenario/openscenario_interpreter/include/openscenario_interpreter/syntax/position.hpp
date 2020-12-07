@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 
 #include <openscenario_interpreter/syntax/lane_position.hpp>
+#include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
 
 #include <utility>
@@ -51,7 +52,10 @@ struct Position
         std::make_pair("WorldPosition", [&](auto && node) {
           return make<WorldPosition>(node, std::forward<decltype(xs)>(xs)...);
         }),
-        std::make_pair("RelativeWorldPosition", UNSUPPORTED()),
+        std::make_pair("RelativeWorldPosition", [&](auto && node)
+        {
+          return make<RelativeWorldPosition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
         std::make_pair("RelativeObjectPosition", UNSUPPORTED()),
         std::make_pair("RoadPosition", UNSUPPORTED()),
         std::make_pair("RelativeRoadPosition", UNSUPPORTED()),
