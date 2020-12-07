@@ -32,8 +32,10 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
     throw SplineInterpolationError("numbers of control points are not enough.");
   }
   for (size_t i = 0; i < n; i++) {
+    /*
     std::cout << control_points[i].x << "," << control_points[i].y << "," << control_points[i].z <<
       std::endl;
+    */
     if (i == 0) {
       double ax = 0;
       double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
@@ -186,6 +188,7 @@ bool CatmullRomSpline::checkConnection() const
     const auto control_point1 = control_points[i + 1];
     const auto p0 = curves_[i].getPoint(0, false);
     const auto p1 = curves_[i].getPoint(1, false);
+    std::cout << p1.x << "," << p1.y << "," << p1.z << std::endl;
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
     } else if (!equals(control_point0, p0)) {
