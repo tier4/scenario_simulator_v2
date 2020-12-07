@@ -132,11 +132,6 @@ TEST(Math, CatmullRomSpline6)
   p3.z = 2.28524;
   auto points = {p0, p1, p2, p3};
   auto spline = simulation_api::math::CatmullRomSpline(points);
-  EXPECT_DOUBLE_EQ(spline.getLength(), 4);
-  auto point = spline.getPoint(3);
-  EXPECT_DOUBLE_EQ(point.x, 3);
-  EXPECT_DOUBLE_EQ(point.y, 0);
-  EXPECT_DOUBLE_EQ(point.z, 0);
 }
 
 int main(int argc, char ** argv)

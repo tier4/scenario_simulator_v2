@@ -172,6 +172,21 @@ install(
   DESTINATION lib/simulation_api)
 
 # ------------------------------------------------------------------------------
+#  catmull_rom_visualization
+# ------------------------------------------------------------------------------
+
+add_executable(catmull_rom_visualization src/moc/catmull_rom_visualization.cpp)
+
+target_include_directories(catmull_rom_visualization PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_link_libraries(catmull_rom_visualization simulation_api)
+
+install(
+  TARGETS catmull_rom_visualization
+  DESTINATION lib/simulation_api)
+
+# ------------------------------------------------------------------------------
 #  installation
 # ------------------------------------------------------------------------------
 

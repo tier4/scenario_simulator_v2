@@ -32,10 +32,6 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
     throw SplineInterpolationError("numbers of control points are not enough.");
   }
   for (size_t i = 0; i < n; i++) {
-    /*
-    std::cout << control_points[i].x << "," << control_points[i].y << "," << control_points[i].z <<
-      std::endl;
-    */
     if (i == 0) {
       double ax = 0;
       double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
@@ -152,6 +148,20 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
   throw SplineInterpolationError("failed to calculate curve index");
 }
 
+const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int num_points) const
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  if (num_points <= 1) {
+    throw SplineInterpolationError("trajectory points should be more than 2.");
+  }
+  double seg_size = total_length_ / (num_points - 1);
+  for (int i = 0; i < num_points; i++) {
+    double s = seg_size * static_cast<double>(i);
+    ret.emplace_back(getPoint(s));
+  }
+  return ret;
+}
+
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
@@ -188,7 +198,6 @@ bool CatmullRomSpline::checkConnection() const
     const auto control_point1 = control_points[i + 1];
     const auto p0 = curves_[i].getPoint(0, false);
     const auto p1 = curves_[i].getPoint(1, false);
-    std::cout << p1.x << "," << p1.y << "," << p1.z << std::endl;
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
     } else if (!equals(control_point0, p0)) {
@@ -207,7 +216,7 @@ bool CatmullRomSpline::checkConnection() const
 
 bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const
 {
-  constexpr double e = std::numeric_limits<double>::epsilon();
+  constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::abs(p0.x - p1.x) > e) {
     return false;
   }

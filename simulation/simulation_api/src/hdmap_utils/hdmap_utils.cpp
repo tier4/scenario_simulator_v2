@@ -684,14 +684,18 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
   double offset,
   geometry_msgs::msg::Quaternion quat)
 {
+  std::cout << lanelet_id << "," << s << std::endl;
   geometry_msgs::msg::PoseStamped ret;
   ret.header.frame_id = "map";
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
   const auto straight_lanelet_ids = getNextLaneletIds(lanelet.id(), "straight");
-  boost::optional<lanelet::Lanelet> next_lanelet = boost::none;
   const auto center_points = getCenterPoints(lanelet.id());
+  for (const auto p : center_points) {
+    std::cout << p.x << "," << p.y << "," << p.z << std::endl;
+  }
   simulation_api::math::CatmullRomSpline spline(center_points);
   ret.pose = spline.getPose(s);
+  /*
   const auto tangent_vec = spline.getTangentVector(s);
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0.0;
@@ -702,6 +706,7 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
   ret.pose.position.z = ret.pose.position.z;
   ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
   ret.pose.orientation = ret.pose.orientation * quat;
+  */
   return ret;
 }
 
