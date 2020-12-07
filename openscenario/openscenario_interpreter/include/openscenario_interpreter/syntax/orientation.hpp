@@ -63,9 +63,9 @@ struct Orientation
 
     switch (type) {
       case ReferenceContext::relative:
-        result.x = h;
-        result.y = p;
-        result.z = r;
+        result.x = r;  // roll
+        result.y = p;  // pitch
+        result.z = h;  // yaw (heading)
         break;
 
       case ReferenceContext::absolute:
