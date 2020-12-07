@@ -32,7 +32,6 @@ find_package(lanelet2_extension REQUIRED)
 find_package(lanelet2_projection REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(awapi_accessor REQUIRED)
-find_package(spline_interpolation REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(xmlrpcpp REQUIRED)
@@ -91,7 +90,6 @@ ament_target_dependencies(entity_manager
   lanelet2_routing
   lanelet2_projection
   lanelet2_extension
-  spline_interpolation
   ament_index_cpp
   behaviortree_cpp_v3
   tf2_geometry_msgs
@@ -118,7 +116,6 @@ ament_export_dependencies(
   openscenario_msgs
   quaternion_operation
   rclcpp
-  spline_interpolation
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
