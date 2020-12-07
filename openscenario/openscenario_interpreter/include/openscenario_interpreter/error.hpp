@@ -19,6 +19,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace openscenario_interpreter
 {

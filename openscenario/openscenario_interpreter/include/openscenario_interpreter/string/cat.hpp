@@ -18,12 +18,13 @@
 #include <openscenario_interpreter/functional/fold.hpp>
 
 #include <sstream>
+#include <string>
+#include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace string
 {
-
 auto cat =
   [](auto && ... xs)
   {
@@ -40,7 +41,6 @@ auto cat =
 
     return ss.str();
   };
-
 }  // namespace string
 }  // namespace openscenario_interpreter
 

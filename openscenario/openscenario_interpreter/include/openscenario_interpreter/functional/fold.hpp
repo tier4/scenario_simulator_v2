@@ -22,7 +22,6 @@ namespace openscenario_interpreter
 {
 inline namespace functional
 {
-
 template
 <
   typename F,
@@ -68,7 +67,6 @@ constexpr decltype(auto) fold_right(F && f, T && x, Ts && ... xs)
 {
   return f(std::forward<decltype(x)>(x), fold_right(f, std::forward<decltype(xs)>(xs)...));
 }
-
 }  // namespace functional
 }  // namespace openscenario_interpreter
 
