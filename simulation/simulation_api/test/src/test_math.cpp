@@ -34,7 +34,9 @@ TEST(Math, HermiteCurve1)
   p.x = 0.1;
   p.y = 0;
   p.z = 0;
-  EXPECT_DOUBLE_EQ(curve.getSValue(p).get(), 0.1);
+  EXPECT_TRUE(curve.getSValue(p, true));
+  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) &&
+    (curve.getSValue(p, true).get() < 0.101));
 }
 
 TEST(Math, CatmullRomSpline1)
@@ -154,7 +156,9 @@ TEST(Math, CatmullRomSpline7)
   p.x = 0.1;
   p.y = 0;
   p.z = 0;
-  EXPECT_DOUBLE_EQ(spline.getSValue(p).get(), 0.1);
+  EXPECT_TRUE(spline.getSValue(p));
+  EXPECT_TRUE((spline.getSValue(p).get() > 0.099) &&
+    (spline.getSValue(p).get() < 0.101));
 }
 
 int main(int argc, char ** argv)

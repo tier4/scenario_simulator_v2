@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -54,13 +55,9 @@ double HermiteCurve::getSquaredDistanceIn2D(
   geometry_msgs::msg::Point point, double s,
   bool autoscale) const
 {
-  if (autoscale) {
-    s = s / getLength();
-  }
-  double s3 = std::pow(s, 3);
-  double s2 = std::pow(s, 2);
-  double x_term = std::pow(point.x - ax_ * s3 - bx_ * s2 - cx_ * s - dx_, 2);
-  double y_term = std::pow(point.y - ay_ * s3 - by_ * s2 - cy_ * s - dy_, 2);
+  const auto point_on_curve = getPoint(s, autoscale);
+  double x_term = std::pow(point.x - point_on_curve.x, 2);
+  double y_term = std::pow(point.y - point_on_curve.y, 2);
   double ret = x_term + y_term;
   return ret;
 }
@@ -72,15 +69,13 @@ double HermiteCurve::getNewtonMethodStepSize(
   if (autoscale) {
     s = s / getLength();
   }
-  double s3 = std::pow(s, 3);
+  const auto point_on_curve = getPoint(s, autoscale);
   double s2 = std::pow(s, 2);
-  double x_term = std::pow(point.x - ax_ * s3 - bx_ * s2 - cx_ * s - dx_, 2);
-  double y_term = std::pow(point.y - ay_ * s3 - by_ * s2 - cy_ * s - dy_, 2);
-  double x_term_diff = 2 * (point.x - ax_ * s3 - bx_ * s2 - cx_ * s - dx_) *
+  double x_term_diff = 2 * (point.x - point_on_curve.x) *
     (-3 * ax_ * s2 - 2 * bx_ * s - cx_);
-  double y_term_diff = 2 * (point.y - ay_ * s3 - by_ * s2 - cy_ * s - dy_) *
+  double y_term_diff = 2 * (point.y - point_on_curve.y) *
     (-3 * ay_ * s2 - 2 * by_ * s - cy_);
-  double ret = (x_term + y_term) / (x_term_diff + y_term_diff);
+  double ret = getSquaredDistanceIn2D(point, s, autoscale) / (x_term_diff + y_term_diff);
   return ret;
 }
 
@@ -92,6 +87,7 @@ boost::optional<double> HermiteCurve::getSValue(
   double torelance,
   bool autoscale) const
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
   double ret = 0.0;
   std::vector<double> initial_value_candidates(initial_resolution);
@@ -108,7 +104,7 @@ boost::optional<double> HermiteCurve::getSValue(
   std::vector<double> s_values;
   for (unsigned i = 0; i < max_iteration; i++) {
     double error = getSquaredDistanceIn2D(point, ret);
-    if (std::fabs(error) < torelance) {
+    if (std::fabs(error) < (torelance * torelance)) {
       return ret;
     }
     s_values.push_back(ret);
