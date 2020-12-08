@@ -34,7 +34,7 @@ TEST(Math, HermiteCurve1)
   p.x = 0.1;
   p.y = 0;
   p.z = 0;
-  curve.getSValue(p);
+  EXPECT_DOUBLE_EQ(curve.getSValue(p).get(), 0.1);
 }
 
 TEST(Math, CatmullRomSpline1)
