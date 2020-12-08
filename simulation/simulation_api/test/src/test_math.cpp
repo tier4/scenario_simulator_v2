@@ -139,6 +139,24 @@ TEST(Math, CatmullRomSpline6)
   auto spline = simulation_api::math::CatmullRomSpline(points);
 }
 
+TEST(Math, CatmullRomSpline7)
+{
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  p1.x = 1;
+  geometry_msgs::msg::Point p2;
+  p2.x = 2;
+  geometry_msgs::msg::Point p3;
+  p3.x = 4;
+  auto points = {p0, p1, p2, p3};
+  auto spline = simulation_api::math::CatmullRomSpline(points);
+  geometry_msgs::msg::Point p;
+  p.x = 0.1;
+  p.y = 0;
+  p.z = 0;
+  EXPECT_DOUBLE_EQ(spline.getSValue(p).get(), 0.1);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

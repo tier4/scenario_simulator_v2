@@ -45,6 +45,12 @@ public:
   const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
   const geometry_msgs::msg::Pose getPose(double s) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(int num_points) const;
+  boost::optional<double> getSValue(
+    geometry_msgs::msg::Point position,
+    double threadhold_distance = 3.0,
+    unsigned int initial_resolution = 30,
+    unsigned int max_iteration = 30,
+    double torelance = 0.001);
 
 private:
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
@@ -55,12 +61,6 @@ private:
   std::vector<double> maximum_2d_curvatures_;
   double total_length_;
   const std::vector<geometry_msgs::msg::Point> control_points;
-  boost::optional<double> getSValue(
-    geometry_msgs::msg::Point position,
-    double threadhold_distance = 3.0,
-    unsigned int initial_resolution = 30,
-    unsigned int max_iteration = 30,
-    double torelance = 0.001);
 };
 }  // namespace math
 }  // namespace simulation_api
