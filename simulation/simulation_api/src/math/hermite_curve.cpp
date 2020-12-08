@@ -85,6 +85,7 @@ double HermiteCurve::getNewtonMethodStepSize(
 
 boost::optional<double> HermiteCurve::getSValue(
   geometry_msgs::msg::Point point,
+  double threadhold_distance,
   unsigned int initial_resolution,
   unsigned int max_iteration,
   double torelance,
@@ -114,6 +115,10 @@ boost::optional<double> HermiteCurve::getSValue(
     ret = ret - getNewtonMethodStepSize(point, ret);
   }
   std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
+  double min_error = *std::min_element(errors.begin(), errors.end());
+  if (min_error > (threadhold_distance * threadhold_distance)) {
+    return boost::none;
+  }
   size_t value_index = std::distance(errors.begin(), min_iter);
   ret = s_values[value_index];
   if (ret < 0) {

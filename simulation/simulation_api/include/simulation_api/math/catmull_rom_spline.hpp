@@ -55,6 +55,7 @@ private:
   std::vector<double> maximum_2d_curvatures_;
   double total_length_;
   const std::vector<geometry_msgs::msg::Point> control_points;
+  // boost::optional<double> getSValue();
 };
 }  // namespace math
 }  // namespace simulation_api

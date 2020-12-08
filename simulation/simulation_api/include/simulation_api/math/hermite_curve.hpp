@@ -61,6 +61,7 @@ public:
   double getLength() const;
   boost::optional<double> getSValue(
     geometry_msgs::msg::Point position,
+    double threadhold_distance = 1.0,
     unsigned int initial_resolution = 30,
     unsigned int max_iteration = 30,
     double torelance = 0.001,
