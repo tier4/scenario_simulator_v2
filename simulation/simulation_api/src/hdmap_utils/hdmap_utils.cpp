@@ -14,9 +14,9 @@
 
 #include <simulation_api/color_utils/color_utils.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
 
-#include <spline_interpolation/spline_interpolation.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <lanelet2_core/utility/Units.h>
 
@@ -413,6 +413,17 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   return ret;
 }
 
+std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
+  std::vector<std::int64_t> lanelet_ids)
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  for (const auto lanelet_id : lanelet_ids) {
+    const auto center_points = getCenterPoints(lanelet_id);
+    std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
+  }
+  return ret;
+}
+
 std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> ret;
@@ -576,35 +587,12 @@ geometry_msgs::msg::Vector3 HdMapUtils::getVectorFromPose(
 
 bool HdMapUtils::isInLanelet(std::int64_t lanelet_id, double s)
 {
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  const auto centerline = lanelet.centerline();
-  std::vector<double> base_x = std::vector<double>(centerline.size());
-  std::vector<double> base_y = std::vector<double>(centerline.size());
-  std::vector<double> base_z = std::vector<double>(centerline.size());
-  int point_index = 0;
-  for (const auto & pt : centerline) {
-    base_x[point_index] = pt.x();
-    base_y[point_index] = pt.y();
-    base_z[point_index] = pt.z();
-    point_index++;
-  }
-  spline_interpolation::SplineInterpolator spline;
-  std::vector<double> base_s = calcEuclidDist(base_x, base_y, base_z);
-  std::vector<double> resampled_x;
-  std::vector<double> resampled_y;
-  std::vector<double> resampled_z;
-  std::vector<double> resampled_s;
-  double diff = 0.01;
-  resampled_s.push_back(s);
-  resampled_s.push_back(s + diff);
-  if (
-    !spline.interpolate(
-      base_s, base_x, resampled_s, resampled_x, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_y, resampled_s, resampled_y, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_z, resampled_s, resampled_z, spline_interpolation::Method::SOR))
-  {
+  const auto center_points = getCenterPoints(lanelet_id);
+  simulation_api::math::CatmullRomSpline spline(center_points);
+  double l = spline.getLength();
+  if (s > l) {
+    return false;
+  } else if (s < 0) {
     return false;
   }
   return true;
@@ -615,37 +603,10 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
   std::vector<double> s)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  const auto centerline = lanelet.centerline();
-  std::vector<double> base_x;
-  std::vector<double> base_y;
-  std::vector<double> base_z;
-  for (const auto & pt : centerline) {
-    base_x.push_back(pt.x());
-    base_y.push_back(pt.y());
-    base_z.push_back(pt.z());
-  }
-  std::vector<double> base_s = calcEuclidDist(base_x, base_y, base_z);
-  std::vector<double> resampled_x;
-  std::vector<double> resampled_y;
-  std::vector<double> resampled_z;
-  spline_interpolation::SplineInterpolator spline;
-  if (
-    !spline.interpolate(
-      base_s, base_x, s, resampled_x, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_y, s, resampled_y, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_z, s, resampled_z, spline_interpolation::Method::SOR))
-  {
-    return ret;
-  }
-  for (size_t i = 0; i < s.size(); i++) {
-    geometry_msgs::msg::Point p;
-    p.x = resampled_x[i];
-    p.y = resampled_y[i];
-    p.z = resampled_z[i];
-    ret.push_back(p);
+  const auto center_points = getCenterPoints(lanelet_id);
+  simulation_api::math::CatmullRomSpline spline(center_points);
+  for (const auto & s_value : s) {
+    ret.push_back(spline.getPoint(s_value));
   }
   return ret;
 }
@@ -673,72 +634,20 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
   geometry_msgs::msg::Quaternion quat)
 {
   geometry_msgs::msg::PoseStamped ret;
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  const auto straight_lanelet_ids = getNextLaneletIds(lanelet.id(), "straight");
-  boost::optional<lanelet::Lanelet> next_lanelet = boost::none;
-  if (straight_lanelet_ids.size() == 0) {
-    const auto following_lanelet_ids = getNextLaneletIds(lanelet.id());
-    if (following_lanelet_ids.size() != 0) {
-      next_lanelet = lanelet_map_ptr_->laneletLayer.get(following_lanelet_ids[0]);
-    }
-  } else {
-    next_lanelet = lanelet_map_ptr_->laneletLayer.get(straight_lanelet_ids[0]);
-  }
-
-  const auto centerline = lanelet.centerline();
-  std::vector<double> base_x;
-  std::vector<double> base_y;
-  std::vector<double> base_z;
-  for (const auto & pt : centerline) {
-    base_x.push_back(pt.x());
-    base_y.push_back(pt.y());
-    base_z.push_back(pt.z());
-  }
-  if (next_lanelet) {
-    const auto next_centerline = next_lanelet->centerline();
-    int count = 0;
-    for (const auto & pt : next_centerline) {
-      if (count != 0) {
-        base_x.push_back(pt.x());
-        base_y.push_back(pt.y());
-        base_z.push_back(pt.z());
-      }
-      count++;
-    }
-  }
-  spline_interpolation::SplineInterpolator spline;
-  std::vector<double> base_s = calcEuclidDist(base_x, base_y, base_z);
-  std::vector<double> resampled_x;
-  std::vector<double> resampled_y;
-  std::vector<double> resampled_z;
-  std::vector<double> resampled_s;
-  double diff = 0.01;
-  resampled_s.push_back(s);
-  resampled_s.push_back(s + diff);
-  if (
-    !spline.interpolate(
-      base_s, base_x, resampled_s, resampled_x, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_y, resampled_s, resampled_y, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_z, resampled_s, resampled_z, spline_interpolation::Method::SOR))
-  {
-    return boost::none;
-  }
-  geometry_msgs::msg::Vector3 tangent_vec;
-  tangent_vec.x = (resampled_x[1] - resampled_x[0]) / diff;
-  tangent_vec.y = (resampled_y[1] - resampled_y[0]) / diff;
-  tangent_vec.z = (resampled_z[1] - resampled_z[0]) / diff;
+  ret.header.frame_id = "map";
+  const auto center_points = getCenterPoints(lanelet_id);
+  simulation_api::math::CatmullRomSpline spline(center_points);
+  ret.pose = spline.getPose(s);
+  const auto tangent_vec = spline.getTangentVector(s);
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0.0;
   rpy.y = 0.0;
   rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-  ret.pose.position.x = resampled_x[0] - std::sin(rpy.z) * offset;
-  ret.pose.position.y = resampled_y[0] - std::cos(rpy.z) * offset;
-  ret.pose.position.z = (resampled_z[1] + resampled_z[0]) * 0.5;
+  ret.pose.position.x = ret.pose.position.x - std::sin(rpy.z) * offset;
+  ret.pose.position.y = ret.pose.position.y - std::cos(rpy.z) * offset;
+  ret.pose.position.z = ret.pose.position.z;
   ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
   ret.pose.orientation = ret.pose.orientation * quat;
-  ret.header.frame_id = "map";
   return ret;
 }
 
@@ -765,46 +674,9 @@ boost::optional<geometry_msgs::msg::Vector3> HdMapUtils::getTangentVector(
   std::int64_t lanelet_id,
   double s)
 {
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  std::vector<double> base_x;
-  std::vector<double> base_y;
-  std::vector<double> base_z;
-  const auto centerline = lanelet.centerline();
-  for (const auto & pt : centerline) {
-    base_x.push_back(pt.x());
-    base_y.push_back(pt.y());
-    base_z.push_back(pt.z());
-  }
-  spline_interpolation::SplineInterpolator spline;
-  std::vector<double> base_s = calcEuclidDist(base_x, base_y, base_z);
-  std::vector<double> resampled_x;
-  std::vector<double> resampled_y;
-  std::vector<double> resampled_z;
-  std::vector<double> resampled_s;
-  double diff = 0.01;
-  resampled_s.push_back(s);
-  resampled_s.push_back(s + diff);
-  if (
-    !spline.interpolate(
-      base_s, base_x, resampled_s, resampled_x, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_y, resampled_s, resampled_y, spline_interpolation::Method::SOR) ||
-    !spline.interpolate(
-      base_s, base_z, resampled_s, resampled_z, spline_interpolation::Method::SOR))
-  {
-    return boost::none;
-  }
-  geometry_msgs::msg::Vector3 tangent_vec;
-  tangent_vec.x = (resampled_x[1] - resampled_x[0]) / diff;
-  tangent_vec.y = (resampled_y[1] - resampled_y[0]) / diff;
-  tangent_vec.z = (resampled_z[1] - resampled_z[0]) / diff;
-  double vec_size = std::sqrt(
-    tangent_vec.x * tangent_vec.x + tangent_vec.y * tangent_vec.y + tangent_vec.z *
-    tangent_vec.z);
-  tangent_vec.x = tangent_vec.x / vec_size;
-  tangent_vec.y = tangent_vec.y / vec_size;
-  tangent_vec.z = tangent_vec.z / vec_size;
-  return tangent_vec;
+  const auto center_points = getCenterPoints(lanelet_id);
+  simulation_api::math::CatmullRomSpline spline(center_points);
+  return spline.getTangentVector(s);
 }
 
 bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id)

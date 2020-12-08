@@ -102,6 +102,7 @@ public:
   std::vector<std::int64_t> getFollowingLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
+  std::vector<geometry_msgs::msg::Point> getCenterPoints(std::vector<std::int64_t> lanelet_ids);
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
     std::int64_t lanelet_id, double s,
     std::vector<std::int64_t> lanelet_ids, double foward_distance = 20);
