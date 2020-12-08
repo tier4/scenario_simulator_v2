@@ -30,6 +30,11 @@ TEST(Math, HermiteCurve1)
   EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
   EXPECT_DOUBLE_EQ(curve.getMaximu2DCurvature(), 0);
+  geometry_msgs::msg::Point p;
+  p.x = 0.1;
+  p.y = 0;
+  p.z = 0;
+  curve.getSValue(p);
 }
 
 TEST(Math, CatmullRomSpline1)

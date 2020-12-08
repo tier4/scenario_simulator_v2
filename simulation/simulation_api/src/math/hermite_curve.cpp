@@ -15,6 +15,7 @@
 #include <simulation_api/math/hermite_curve.hpp>
 
 #include <vector>
+#include <algorithm>
 
 namespace simulation_api
 {
