@@ -116,6 +116,12 @@ boost::optional<double> HermiteCurve::getSValue(
   std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
   size_t value_index = std::distance(errors.begin(), min_iter);
   ret = s_values[value_index];
+  if (ret < 0) {
+    return boost::none;
+  }
+  if (ret > 1) {
+    return boost::none;
+  }
   if (autoscale) {
     ret = ret * getLength();
   }
