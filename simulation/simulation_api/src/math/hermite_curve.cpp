@@ -49,6 +49,79 @@ HermiteCurve::HermiteCurve(
   dz_ = start_pose.position.z;
 }
 
+double HermiteCurve::getSquaredDistanceIn2D(
+  geometry_msgs::msg::Point point, double s,
+  bool autoscale) const
+{
+  if (autoscale) {
+    s = s / getLength();
+  }
+  double s3 = std::pow(s, 3);
+  double s2 = std::pow(s, 2);
+  double x_term = std::pow(point.x - ax_ * s3 - bx_ * s2 - cx_ * s - dx_, 2);
+  double y_term = std::pow(point.y - ay_ * s3 - by_ * s2 - cy_ * s - dy_, 2);
+  double ret = x_term + y_term;
+  return ret;
+}
+
+double HermiteCurve::getNewtonMethodStepSize(
+  geometry_msgs::msg::Point point, double s,
+  bool autoscale) const
+{
+  if (autoscale) {
+    s = s / getLength();
+  }
+  double s3 = std::pow(s, 3);
+  double s2 = std::pow(s, 2);
+  double x_term = std::pow(point.x - ax_ * s3 - bx_ * s2 - cx_ * s - dx_, 2);
+  double y_term = std::pow(point.y - ay_ * s3 - by_ * s2 - cy_ * s - dy_, 2);
+  double x_term_diff = 2 * (point.x - ax_ * s3 - bx_ * s2 - cx_ * s - dx_) *
+    (-3 * ax_ * s2 - 2 * bx_ * s - cx_);
+  double y_term_diff = 2 * (point.y - ay_ * s3 - by_ * s2 - cy_ * s - dy_) *
+    (-3 * ay_ * s2 - 2 * by_ * s - cy_);
+  double ret = (x_term + y_term) / (x_term_diff + y_term_diff);
+  return ret;
+}
+
+boost::optional<double> HermiteCurve::getSValue(
+  geometry_msgs::msg::Point point,
+  unsigned int initial_resolution,
+  unsigned int max_iteration,
+  double torelance,
+  bool autoscale) const
+{
+  double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
+  double ret = 0.0;
+  std::vector<double> initial_value_candidates(initial_resolution);
+  std::vector<double> initial_errors(initial_resolution);
+  for (unsigned int i = 0; i < initial_resolution; i++) {
+    initial_value_candidates[i] = (0.5 + static_cast<double>(i)) * step_size;
+    initial_errors[i] = std::fabs(getSquaredDistanceIn2D(point, initial_value_candidates[i]));
+  }
+  std::vector<double>::iterator iter =
+    std::min_element(initial_errors.begin(), initial_errors.end());
+  size_t index = std::distance(initial_errors.begin(), iter);
+  ret = initial_value_candidates[index];
+  std::vector<double> errors;
+  std::vector<double> s_values;
+  for (unsigned i = 0; i < max_iteration; i++) {
+    double error = getSquaredDistanceIn2D(point, ret);
+    if (std::fabs(error) < torelance) {
+      return ret;
+    }
+    s_values.push_back(ret);
+    errors.push_back(error);
+    ret = ret - getNewtonMethodStepSize(point, ret);
+  }
+  std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
+  size_t value_index = std::distance(errors.begin(), min_iter);
+  ret = s_values[value_index];
+  if (autoscale) {
+    ret = ret * getLength();
+  }
+  return ret;
+}
+
 std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory() const
 {
   std::vector<geometry_msgs::msg::Point> ret;
