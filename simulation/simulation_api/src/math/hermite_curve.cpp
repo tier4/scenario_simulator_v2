@@ -87,7 +87,6 @@ boost::optional<double> HermiteCurve::getSValue(
   double torelance,
   bool autoscale) const
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
   double ret = 0.0;
   std::vector<double> initial_value_candidates(initial_resolution);
