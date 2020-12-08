@@ -55,7 +55,12 @@ private:
   std::vector<double> maximum_2d_curvatures_;
   double total_length_;
   const std::vector<geometry_msgs::msg::Point> control_points;
-  // boost::optional<double> getSValue();
+  boost::optional<double> getSValue(
+    geometry_msgs::msg::Point position,
+    double threadhold_distance = 3.0,
+    unsigned int initial_resolution = 30,
+    unsigned int max_iteration = 30,
+    double torelance = 0.001);
 };
 }  // namespace math
 }  // namespace simulation_api

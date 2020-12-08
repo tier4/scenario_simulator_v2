@@ -66,11 +66,11 @@ public:
     unsigned int max_iteration = 30,
     double torelance = 0.001,
     bool autoscale = false) const;
-
-private:
   double getSquaredDistanceIn2D(
     geometry_msgs::msg::Point point, double s,
     bool autoscale = false) const;
+
+private:
   double getNewtonMethodStepSize(
     geometry_msgs::msg::Point point, double s,
     bool autoscale = false) const;
