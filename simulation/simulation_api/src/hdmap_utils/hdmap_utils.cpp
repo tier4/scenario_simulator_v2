@@ -217,82 +217,17 @@ boost::optional<simulation_api::entity::EntityStatus> HdMapUtils::toLanePose(
   const auto center_points = getCenterPoints(lanelet_id);
   simulation_api::math::CatmullRomSpline spline(center_points);
   const auto s = spline.getSValue(pose.position);
-  if(!s) {
+  if (!s) {
     return boost::none;
   }
   auto pose_on_centerline = spline.getPose(s.get());
   auto rpy =
     quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
-      pose_on_centerline.orientation, pose.orientation));
-  /*
-  return simulation_api::entity::EntityStatus(0, lanelet_id, s,
-           *std::min_element(distances.begin(), distances.end()), rpy, twist, accel);
-  namespace bg = boost::geometry;
-  typedef bg::model::d2::point_xy<double> bg_point;
-  typedef bg::model::polygon<bg_point> bg_polygon;
-  std::vector<bg_point> points;
-  std::vector<double> distances(center_points.size() - 1);
-  for (size_t point_index = 0; point_index < (center_points.size() - 1); point_index++) {
-    bg_polygon poly;
-    bg::exterior_ring(poly) =
-      boost::assign::list_of<bg_point>(center_points[point_index].x,
-        center_points[point_index].y)(center_points[point_index + 1].x,
-        center_points[point_index + 1].y);
-    const bg_point p(pose.position.x, pose.position.y);
-    distances.push_back(bg::distance(p, poly));
-  }
-  std::vector<double>::iterator distances_itr =
-    std::min_element(distances.begin(), distances.end());
-  size_t index = std::distance(distances.begin(), distances_itr);
-  double s = 0;
-  for (size_t point_index = 0; point_index < (center_points.size() - 1); point_index++) {
-    geometry_msgs::msg::Point p0, p1;
-    if (point_index == index) {
-      p0 = center_points[index];
-      p1 = center_points[index + 1];
-      double l = std::hypot(p0.x - p1.x, p0.y - p1.y);
-      geometry_msgs::msg::Vector3 vec;
-      vec.x = (p1.x - p0.x) / l;
-      vec.y = (p1.y - p0.y) / l;
-      vec.z = (p1.z - p0.z) / l;
-      bg::model::linestring<bg_point> line0 =
-        boost::assign::list_of<bg_point>(pose.position.x - vec.y * 10,
-          pose.position.y - vec.x * 10)(pose.position.x + vec.y * 10, pose.position.y + vec.x * 10);
-      bg::model::linestring<bg_point> line1 =
-        boost::assign::list_of<bg_point>(center_points[point_index].x,
-          center_points[point_index].y)(center_points[point_index + 1].x,
-          center_points[point_index + 1].y);
-      std::deque<bg_point> out;
-      bg::intersection(line0, line1, out);
-      std::hypot(out[0].x() - p0.x, out[0].y() - p0.y);
-      break;
-    } else {
-      if (point_index == center_points.size() - 1) {
-        return boost::none;
-      }
-      p0 = center_points[index];
-      p1 = center_points[index + 1];
-      s = s + std::hypot(p0.x - p1.x, p0.y - p1.y);
-    }
-  }
-  geometry_msgs::msg::Vector3 rpy;
-  rpy.x = 0;
-  rpy.y = 0;
-  rpy.z = 0;
+        pose_on_centerline.orientation, pose.orientation));
+  double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
   geometry_msgs::msg::Twist twist;
   geometry_msgs::msg::Accel accel;
-  auto map_pose_on_lane =
-    toMapPose(simulation_api::entity::EntityStatus(0, lanelet_id, s, 0, rpy, twist, accel));
-  if (!map_pose_on_lane) {
-    return boost::none;
-  }
-  rpy =
-    quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
-        map_pose_on_lane
-        ->pose.orientation, pose.orientation));
-  return simulation_api::entity::EntityStatus(0, lanelet_id, s,
-           *std::min_element(distances.begin(), distances.end()), rpy, twist, accel);
-  */
+  return simulation_api::entity::EntityStatus(0, lanelet_id, s.get(), offset, rpy, twist, accel);
 }
 
 int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
