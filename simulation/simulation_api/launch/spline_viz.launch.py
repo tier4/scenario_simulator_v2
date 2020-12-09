@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""Launch description for spline visualization."""
+
 # Copyright (c) 2020 Tier IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +24,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    """Launch description for spline visualization."""
     rviz_config_dir = os.path.join(
             get_package_share_directory('simulation_api'),
             'config',

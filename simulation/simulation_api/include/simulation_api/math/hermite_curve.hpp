@@ -21,6 +21,8 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
+#include <boost/optional.hpp>
+
 #include <vector>
 
 namespace simulation_api
@@ -43,12 +45,35 @@ public:
     double ay, double by, double cy, double dy,
     double az, double bz, double cz, double dz);
   std::vector<geometry_msgs::msg::Point> getTrajectory() const;
-  const geometry_msgs::msg::Pose getPose(double s, bool autoscale = false) const;
-  const geometry_msgs::msg::Point getPoint(double s, bool autoscale = false) const;
-  const geometry_msgs::msg::Vector3 getTangentVector(double s, bool autoscale = false) const;
-  double get2DCurvature(double s, bool autoscale = false) const;
+  const geometry_msgs::msg::Pose getPose(
+    double s,
+    bool autoscale = false) const;
+  const geometry_msgs::msg::Point getPoint(
+    double s,
+    bool autoscale = false) const;
+  const geometry_msgs::msg::Vector3 getTangentVector(
+    double s,
+    bool autoscale = false) const;
+  double get2DCurvature(
+    double s,
+    bool autoscale = false) const;
   double getMaximu2DCurvature() const;
   double getLength() const;
+  boost::optional<double> getSValue(
+    geometry_msgs::msg::Point position,
+    double threadhold_distance = 1.0,
+    unsigned int initial_resolution = 30,
+    unsigned int max_iteration = 30,
+    double torelance = 0.001,
+    bool autoscale = false) const;
+  double getSquaredDistanceIn2D(
+    geometry_msgs::msg::Point point, double s,
+    bool autoscale = false) const;
+
+private:
+  double getNewtonMethodStepSize(
+    geometry_msgs::msg::Point point, double s,
+    bool autoscale = false) const;
 };
 }  // namespace math
 }  // namespace simulation_api

@@ -163,6 +163,50 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int
   return ret;
 }
 
+boost::optional<double> CatmullRomSpline::getSValue(
+  geometry_msgs::msg::Point position,
+  double threadhold_distance,
+  unsigned int initial_resolution,
+  unsigned int max_iteration,
+  double torelance)
+{
+  std::vector<double> s_values;
+  std::vector<double> error_values;
+  std::vector<size_t> curve_index;
+  for (size_t i = 0; i < curves_.size(); i++) {
+    auto s_value = curves_[i].getSValue(position, threadhold_distance, initial_resolution,
+        max_iteration, torelance, true);
+    if (s_value) {
+      if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
+        s_values.emplace_back(s_value.get());
+        error_values.emplace_back(curves_[i].getSquaredDistanceIn2D(position, s_value.get(), true));
+        curve_index.emplace_back(i);
+      }
+    }
+  }
+  if (s_values.size() != error_values.size()) {
+    throw SplineInterpolationError("s values and error values size are does not match.");
+  }
+  if (s_values.size() != curve_index.size()) {
+    throw SplineInterpolationError("s values and error values size are does not match.");
+  }
+  if (s_values.size() == 0) {
+    return boost::none;
+  }
+  double s = 0;
+  auto iter = std::max_element(error_values.begin(), error_values.end());
+  size_t min_error_index = std::distance(error_values.begin(), iter);
+  for (size_t i = 0; i <= curve_index[min_error_index]; i++) {
+    if (i == curve_index[min_error_index]) {
+      s = s + s_values[min_error_index];
+      break;
+    } else {
+      s = s + curves_[i].getLength();
+    }
+  }
+  return s;
+}
+
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
