@@ -91,50 +91,7 @@ def func(keyword, node):
         return result
 
     else:
-        return result
-
-
-# def convert(input, output):
-#     """
-#
-#     **Args**
-#
-#     * input  (`Path`)
-#     * output (`Path`)
-#     """
-#
-#     a = func('OpenSCENARIO', load(input))
-#     # print(a)
-#     # print()
-#
-#     a.pop('ScenarioModifiers', None)
-#     # print(a)
-#     b = xmltodict.unparse(a, pretty=False, short_empty_elements=True, indent='  ')
-#     print(b)
-#     # print()
-#     b = b.replace('True', 'true').replace('False', 'false')
-#
-#     share = get_package_share_directory('scenario_test_utility')
-#
-#     schema = xmlschema.XMLSchema(
-#         str(Path(share).joinpath('../ament_index/resource_index/packages/OpenSCENARIO.xsd')))
-#
-#     x = None
-#
-#     try:
-#         x = schema.decode(
-#             b, validation='skip', converter=xmlschema.converters.UnorderedConverter())
-#     except Exception as e:
-#         print(e)
-#
-#     # x = schema.encode(x, unordered=True)
-#     print(x)
-#
-#     # print(
-#     #     xmlschema.from_json(json.dumps(a), schema)
-#     #     )
-#
-#     print(output)
+        return None
 
 
 def convert(input, output):
@@ -145,6 +102,11 @@ def convert(input, output):
             ).replace('True', 'true').replace('False', 'false')
         )
 
+    # A = from_yaml('OpenSCENARIO', load(input)['OpenSCENARIO'])
+
+    # print(ElementTree.tostring(A))
+    # print()
+
     share = get_package_share_directory('scenario_test_utility')
 
     schema = xmlschema.XMLSchema(
@@ -154,28 +116,29 @@ def convert(input, output):
 
     # print(schema.validate(A))
 
-    B, _ = schema.decode(
+    B = schema.decode(
         A,
         preserve_root=True,
-        validation='lax',
-        unordered=True
+        unordered=True,
+        validation='skip',
         )
+
+    print(func('OpenSCENARIO', load(input)))
+    print()
 
     print(B)
     print()
 
     C = schema.encode(
-        B,
+        # B,
+        func('OpenSCENARIO', load(input)),
         preserve_root=True,
-        unordered=True
+        unordered=True,  # Reorder elements
         )
 
-    print(
-        xmlschema.etree_tostring(
-            C,
-            spaces_for_tab=2,
-            xml_declaration=True
-            ))
+    print(schema.is_valid(C))
+
+    print(xmlschema.XMLResource(C).tostring())
 
 
 def main():

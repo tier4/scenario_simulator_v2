@@ -177,7 +177,7 @@ def convert_dict_to_xosc(xosc_dict, xosc_path):
 
 
 class ScenarioConverter:
-    """ Tier IV scenario converter class. """
+    """Tier IV scenario converter class."""
 
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
