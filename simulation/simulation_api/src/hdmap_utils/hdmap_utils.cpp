@@ -214,7 +214,19 @@ boost::optional<simulation_api::entity::EntityStatus> HdMapUtils::toLanePose(
   geometry_msgs::msg::Pose pose)
 {
   int64_t lanelet_id = getClosetLanletId(pose);
-  auto center_points = getCenterPoints(lanelet_id);
+  const auto center_points = getCenterPoints(lanelet_id);
+  simulation_api::math::CatmullRomSpline spline(center_points);
+  const auto s = spline.getSValue(pose.position);
+  if(!s) {
+    return boost::none;
+  }
+  auto pose_on_centerline = spline.getPose(s.get());
+  auto rpy =
+    quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+      pose_on_centerline.orientation, pose.orientation));
+  /*
+  return simulation_api::entity::EntityStatus(0, lanelet_id, s,
+           *std::min_element(distances.begin(), distances.end()), rpy, twist, accel);
   namespace bg = boost::geometry;
   typedef bg::model::d2::point_xy<double> bg_point;
   typedef bg::model::polygon<bg_point> bg_polygon;
@@ -280,6 +292,7 @@ boost::optional<simulation_api::entity::EntityStatus> HdMapUtils::toLanePose(
         ->pose.orientation, pose.orientation));
   return simulation_api::entity::EntityStatus(0, lanelet_id, s,
            *std::min_element(distances.begin(), distances.end()), rpy, twist, accel);
+  */
 }
 
 int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
