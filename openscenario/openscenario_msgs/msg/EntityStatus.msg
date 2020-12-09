@@ -19,7 +19,3 @@ geometry_msgs/Pose pose
 
 # fields for lane frame
 openscenario_msgs/LaneletPose lanelet_pose
-
-# fields for each frame
-geometry_msgs/Twist twist
-geometry_msgs/Accel accel
