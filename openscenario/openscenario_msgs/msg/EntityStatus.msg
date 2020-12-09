@@ -19,10 +19,7 @@ string current_action
 geometry_msgs/Pose pose
 
 # fields for lane frame
-int64 lanelet_id
-float64 s
-float64 offset
-geometry_msgs/Vector3 rpy
+openscenario_msgs/LaneletPose lanelet_pose
 
 # fields for each frame
 geometry_msgs/Twist twist

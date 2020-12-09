@@ -9,6 +9,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/BoundingBox.msg
   msg/EntityStatus.msg
   msg/EntityStatusArray.msg
+  msg/LaneletPose.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 
