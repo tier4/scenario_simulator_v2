@@ -81,12 +81,14 @@ def from_yaml(keyword, node):
 
     elif isinstance(node, str):
 
-        if str.islower(keyword[0]):
-            result["@" + keyword] = node
-        else:
-            result[keyword] = node
+        # if str.islower(keyword[0]):
+        #     result["@" + keyword] = node
+        # else:
+        #     result[keyword] = node
+        #
+        # return result
 
-        return result
+        return node
 
     else:
         return None
@@ -100,20 +102,24 @@ def convert(input, output):
 
     schema = xmlschema.XMLSchema(str(path))
 
-    try:
-        C = schema.encode(
-            from_yaml('OpenSCENARIO', load(input)),
-            preserve_root=True,
-            unordered=True,  # Reorder elements
-            )
+    A = from_yaml('OpenSCENARIO', load(input))
 
-    except Exception as exception:
-        print(exception)
+    A.pop('ScenarioModifiers', None)
+
+    xosc, errors = schema.encode(
+        A,
+        indent=2,
+        preserve_root=True,
+        unordered=True,  # Reorder elements
+        validation='lax',  # The "strict" mode is too strict than we would like.
+        )
+
+    if not schema.is_valid(xosc):
+        print('Error: ' + str(errors[0]))
         sys.exit()
 
     else:
-        print(schema.is_valid(C))
-        print(xmlschema.XMLResource(C).tostring())
+        print(xmlschema.XMLResource(xosc).tostring())
 
 
 def main():
