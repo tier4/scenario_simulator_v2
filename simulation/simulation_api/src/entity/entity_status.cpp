@@ -58,12 +58,12 @@ openscenario_msgs::msg::EntityStatus EntityStatus::toRosMsg() const
   if (coordinate == CoordinateFrameTypes::LANE) {
     ret.coordinate = ret.LANE;
   }
-  ret.twist = twist;
-  ret.accel = accel;
-  ret.lanelet_id = lanelet_id;
-  ret.offset = offset;
-  ret.s = s;
-  ret.rpy = rpy;
+  ret.action_status.twist = twist;
+  ret.action_status.accel = accel;
+  ret.lanelet_pose.lanelet_id = lanelet_id;
+  ret.lanelet_pose.offset = offset;
+  ret.lanelet_pose.s = s;
+  ret.lanelet_pose.rpy = rpy;
   ret.pose = pose;
   return ret;
 }
