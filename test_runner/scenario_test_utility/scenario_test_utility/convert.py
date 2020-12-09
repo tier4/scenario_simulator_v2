@@ -18,24 +18,22 @@
 from ament_index_python.packages import get_package_share_directory
 from argparse import ArgumentParser
 from pathlib import Path
-from xml.etree import ElementTree
 
 import sys
 import xmlschema
-import xmltodict
 import yaml
 
 
 def load(path):
     if path.exists():
-        with open(path, 'r') as f:
-            return yaml.safe_load(f)
+        with path.open('r') as file:
+            return yaml.safe_load(file)
     else:
-        print('No such file or directory: ' + input)
+        print('No such file or directory: ' + path)
         sys.exit()
 
 
-def func(keyword, node):
+def from_yaml(keyword, node):
 
     result = {}
 
@@ -66,7 +64,7 @@ def func(keyword, node):
                 #
                 # => NO CHANGES
                 #
-                result[tag] = func(tag, value)
+                result[tag] = from_yaml(tag, value)
 
         return result
 
@@ -77,7 +75,7 @@ def func(keyword, node):
         result = []
 
         for index, item in enumerate(node):
-            result.append(func(keyword, item))
+            result.append(from_yaml(keyword, item))
 
         return result
 
@@ -96,53 +94,30 @@ def func(keyword, node):
 
 def convert(input, output):
 
-    A = ElementTree.fromstring(
-        xmltodict.unparse(
-            func('OpenSCENARIO', load(input))
-            ).replace('True', 'true').replace('False', 'false')
-        )
+    path = Path(
+        get_package_share_directory('scenario_test_utility')
+        ).joinpath('../ament_index/resource_index/packages/OpenSCENARIO.xsd')
 
-    # A = from_yaml('OpenSCENARIO', load(input)['OpenSCENARIO'])
+    schema = xmlschema.XMLSchema(str(path))
 
-    # print(ElementTree.tostring(A))
-    # print()
+    try:
+        C = schema.encode(
+            from_yaml('OpenSCENARIO', load(input)),
+            preserve_root=True,
+            unordered=True,  # Reorder elements
+            )
 
-    share = get_package_share_directory('scenario_test_utility')
+    except Exception as exception:
+        print(exception)
+        sys.exit()
 
-    schema = xmlschema.XMLSchema(
-        str(Path(share).joinpath('../ament_index/resource_index/packages/OpenSCENARIO.xsd')),
-        # converter=xmlschema.converters.UnorderedConverter()
-        )
-
-    # print(schema.validate(A))
-
-    B = schema.decode(
-        A,
-        preserve_root=True,
-        unordered=True,
-        validation='skip',
-        )
-
-    print(func('OpenSCENARIO', load(input)))
-    print()
-
-    print(B)
-    print()
-
-    C = schema.encode(
-        # B,
-        func('OpenSCENARIO', load(input)),
-        preserve_root=True,
-        unordered=True,  # Reorder elements
-        )
-
-    print(schema.is_valid(C))
-
-    print(xmlschema.XMLResource(C).tostring())
+    else:
+        print(schema.is_valid(C))
+        print(xmlschema.XMLResource(C).tostring())
 
 
 def main():
-    parser = ArgumentParser(description='convert T4v2 scenario into OpenSCENARIO')
+    parser = ArgumentParser(description='Convert OpenSCENARIO.yaml into .xosc')
 
     parser.add_argument('--input', type=str, required=True)
     parser.add_argument('--output', type=str, default=Path.cwd())
