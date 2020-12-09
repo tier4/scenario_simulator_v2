@@ -51,6 +51,8 @@ public:
     unsigned int initial_resolution = 30,
     unsigned int max_iteration = 30,
     double torelance = 0.001);
+  double getSquaredDistanceIn2D(
+    geometry_msgs::msg::Point point, double s) const;
 
 private:
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
