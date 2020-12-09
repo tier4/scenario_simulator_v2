@@ -12,8 +12,7 @@ float64 time
 string name
 
 openscenario_msgs/BoundingBox bounding_box
-
-string current_action
+openscenario_msgs/ActionStatus action_status
 
 # fields for world frame
 geometry_msgs/Pose pose

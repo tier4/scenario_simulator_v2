@@ -310,7 +310,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.y = 0.0;
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration(0.1);
-  text_action.text = status.current_action;
+  text_action.text = status.action_status.current_action;
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.push_back(text_action);
 
