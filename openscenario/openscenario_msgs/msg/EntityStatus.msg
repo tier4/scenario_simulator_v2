@@ -12,18 +12,10 @@ float64 time
 string name
 
 openscenario_msgs/BoundingBox bounding_box
-
-string current_action
+openscenario_msgs/ActionStatus action_status
 
 # fields for world frame
 geometry_msgs/Pose pose
 
 # fields for lane frame
-int64 lanelet_id
-float64 s
-float64 offset
-geometry_msgs/Vector3 rpy
-
-# fields for each frame
-geometry_msgs/Twist twist
-geometry_msgs/Accel accel
+openscenario_msgs/LaneletPose lanelet_pose

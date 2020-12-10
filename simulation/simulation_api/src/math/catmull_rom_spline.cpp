@@ -207,6 +207,13 @@ boost::optional<double> CatmullRomSpline::getSValue(
   return s;
 }
 
+double CatmullRomSpline::getSquaredDistanceIn2D(
+  geometry_msgs::msg::Point point, double s) const
+{
+  const auto index_and_s = getCurveIndexAndS(s);
+  return curves_[index_and_s.first].getSquaredDistanceIn2D(point, index_and_s.second, true);
+}
+
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 {
   const auto index_and_s = getCurveIndexAndS(s);
