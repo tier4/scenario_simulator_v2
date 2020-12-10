@@ -17,10 +17,13 @@
 
 from ament_index_python.packages import get_package_share_directory
 from argparse import ArgumentParser
+from copy import deepcopy
+from itertools import product
 from pathlib import Path
+from re import sub
+from sys import exit
 
 import numpy
-import sys
 import xmlschema
 import yaml
 
@@ -32,7 +35,7 @@ def iota(start: float, step: float, stop: float) -> numpy.ndarray:
 
     else:
         return numpy.linspace(
-            start, stop, int((stop - start) / float(step)) + 1)
+            start, stop, int((stop - start) // step) + 1)
 
 
 class MacroExpander:
@@ -40,23 +43,46 @@ class MacroExpander:
     def __init__(self, rules):
 
         self.rules = rules
-        # print(rules)
 
-        self.specs = {}
+        self.specs = []
 
         if rules is not None:
-
             for each in rules['ScenarioModifier']:
-
                 name = each['name']
-
                 if 'name' in each and 'list' in each:
-                    self.specs[name] = each['list']
-
+                    self.specs.append(list(map(
+                        lambda x: (name, x),
+                        each['list'])))
                 else:
-                    self.specs[name] = iota(each['start'], each['step'], each['stop']).tolist()
+                    self.specs.append(list(map(
+                        lambda x: (name, x),
+                        iota(each['start'], each['step'], each['stop']))))
 
-                print('define ' + name + ' as ' + str(self.specs[name]))
+    def __call__(self, xosc: str, output: Path, basename: str):
+
+        if self.specs is not None:
+            for bindings in product(*self.specs):
+
+                target = deepcopy(xosc)
+
+                target_name = deepcopy(basename)
+
+                for binding in bindings:
+
+                    print('- ' + str(binding[0]) + ' = ' + str(binding[1]))
+
+                    target_name += '__' + str(binding[0]) + '_' + str(binding[1])
+
+                    target = sub(
+                        str(binding[0]),
+                        str(binding[1]),
+                        target
+                        )
+
+                target_name += ".xosc"
+
+                print(str(output.joinpath(target_name)))
+                print()
 
 
 def load_yaml(path):
@@ -65,15 +91,15 @@ def load_yaml(path):
         with path.open('r') as file:
             return yaml.safe_load(file)
     else:
-        print('No such file or directory: ' + path)
-        sys.exit()
+        print("No such file or directory: " + path)
+        exit()
 
 
 def from_yaml(keyword, node):
 
-    result = {}
-
     if isinstance(node, dict):
+        result = {}
+
         #
         # ???: { ... }
         #
@@ -116,21 +142,15 @@ def from_yaml(keyword, node):
         return result
 
     elif isinstance(node, str):
-
-        # if str.islower(keyword[0]):
-        #     result["@" + keyword] = node
-        # else:
-        #     result[keyword] = node
-        #
-        # return result
-
         return node
 
     else:
         return None
 
 
-def convert(input, output):
+def convert(input: Path, output: Path):
+
+    output.mkdir(parents=True, exist_ok=True)
 
     path = Path(
         get_package_share_directory('scenario_test_utility')
@@ -152,19 +172,25 @@ def convert(input, output):
         )
 
     if not schema.is_valid(xosc) and len(errors) != 0:
-        print('Error: ' + str(errors[0]))
-        sys.exit()
+        print("Error: " + errors[0])
+        exit()
 
     else:
-        print()
-        print(xmlschema.XMLResource(xosc).tostring())
+        # print()
+        # print(xmlschema.XMLResource(xosc).tostring())
+
+        macroexpand(
+            xmlschema.XMLResource(xosc).tostring(),
+            output,
+            input.stem
+            )
 
 
 def main():
     parser = ArgumentParser(description='Convert OpenSCENARIO.yaml into .xosc')
 
     parser.add_argument('--input', type=str, required=True)
-    parser.add_argument('--output', type=str, default=Path.cwd())
+    parser.add_argument('--output', type=str, default=Path('/tmp').joinpath('xosc'))
 
     args = parser.parse_args()
 
