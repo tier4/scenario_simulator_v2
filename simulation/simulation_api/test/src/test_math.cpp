@@ -45,6 +45,7 @@ TEST(Math, HermiteCurve1)
   goal.y = -1.0;
   auto collision_s = curve.getCollisionPointIn2D(start, goal);
   EXPECT_TRUE(collision_s);
+  EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
 }
 
 TEST(Math, CatmullRomSpline1)

@@ -110,7 +110,15 @@ private:
     return a * t * t + b * t + c;
   }
   /**
-   * @brief solve quadratic equation a*x^2 + b*x + c
+   * @brief solve linear equation a*x + b = 0
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
+   */
+  std::vector<double> solveLinearEquation(double a, double b) const;
+  /**
+   * @brief solve quadratic equation a*x^2 + b*x + c = 0
    *
    * @param a
    * @param b
@@ -118,7 +126,7 @@ private:
    */
   std::vector<double> solveQuadraticEquation(double a, double b, double c) const;
   /**
-   * @brief solve cubic function a*t^3 + b*t^2 + c*t + d
+   * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
    *
    * @param a
    * @param b

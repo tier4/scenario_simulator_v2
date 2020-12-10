@@ -104,7 +104,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       }
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
-    auto solutions = solveCubicEquation(ax_, by_, cy_, dy_ - fy);
+    auto solutions = solveCubicEquation(ay_, by_, cy_, dy_ - fy);
     for (const auto solution : solutions) {
       if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_, solution) < e)) {
         s_values.emplace_back(solution);
@@ -129,17 +129,39 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   return *std::min_element(s_values.begin(), s_values.end());
 }
 
+/**
+  * @brief solve linear equation a*x + b = 0
+  *
+  * @param a
+  * @param b
+  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
+  */
+std::vector<double> HermiteCurve::solveLinearEquation(double a, double b) const
+{
+  constexpr double e = std::numeric_limits<float>::epsilon();
+  if (std::fabs(a) < e) {
+    if (std::fabs(b) < e) {
+      return {0};
+    }
+    return {};
+  }
+  return {-b / a};
+}
+
 std::vector<double> HermiteCurve::solveQuadraticEquation(double a, double b, double c) const
 {
   std::vector<double> candidates, ret;
   constexpr double e = std::numeric_limits<float>::epsilon();
+  if (std::fabs(a) < e) {
+    return solveLinearEquation(b, c);
+  }
   double root = b * b - 4 * a * c;
   if (std::fabs(root) < e) {
-    candidates = {-b / 2};
+    candidates = {-b / (2 * a)};
   } else if (root < 0) {
     candidates = {};
   } else {
-    candidates = {-b / 2 - root / 2, -b / 2 + root / 2};
+    candidates = {(-b - root) / (2 * a), (-b + root) / (2 * a)};
   }
   for (const auto candidate : candidates) {
     if (0 <= candidate && candidate <= 1) {
