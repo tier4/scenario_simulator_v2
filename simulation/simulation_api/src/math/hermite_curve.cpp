@@ -17,6 +17,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 namespace simulation_api
 {
@@ -79,74 +80,10 @@ double HermiteCurve::getNewtonMethodStepSize(
   return ret;
 }
 
-std::vector<double> HermiteCurve::solveQuadraticEquation(
-  double a, double b, double c,
-  double min_solution, double max_solution) const
-{
-  std::vector<double> real_solutions;
-  std::vector<double> ret;
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  double d = (b * b - 4 * a * c);
-  if (d < 0) {
-    return {};
-  } else if (d < e) {
-    real_solutions.emplace_back(-b / (2 * a));
-  } else {
-    real_solutions.emplace_back((-b - d) / (2 * a));
-    real_solutions.emplace_back((-b + d) / (2 * a));
-  }
-  for (const auto solution : real_solutions) {
-    if (min_solution <= solution && solution <= max_solution) {
-      ret.emplace_back(solution);
-    }
-  }
-  return ret;
-}
-
-double HermiteCurve::quadraticFunction(double a, double b, double c, double s) const
-{
-  return std::pow(s, 2) * a + s * b + c;
-}
-
-double HermiteCurve::cubicFunction(double a, double b, double c, double d, double s) const
-{
-  return std::pow(s, 3) * a + std::pow(s, 2) * b + s * c + d;
-}
-
-std::vector<double> HermiteCurve::solveTwoCubicEquations(
-  double a0, double b0, double c0, double d0,
-  double a1, double b1, double c1, double d1,
-  double min_solution,
-  double max_solution) const
-{
-  std::vector<double> ret;
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::fabs(a0) < e) {
-    auto solutions0 = solveQuadraticEquation(b0, c0, d0, min_solution, max_solution);
-    for (const auto solution : solutions0) {
-      if (std::fabs(cubicFunction(a1, b1, c1, d1, solution) < e)) {
-        ret.emplace_back(solution);
-      }
-    }
-    return ret;
-  }
-  if (std::fabs(a1) < e) {
-    auto solutions1 = solveQuadraticEquation(b1, c1, d1, min_solution, max_solution);
-    for (const auto solution : solutions1) {
-      if (std::fabs(cubicFunction(a0, b0, c0, d0, solution) < e)) {
-        ret.emplace_back(solution);
-      }
-    }
-  }
-  double ratio = a1 / a0;
-  return solveQuadraticEquation(ratio * b0 - b1, ratio * c0 - c1, ratio * d0 - d1, min_solution,
-           max_solution);
-}
-
 boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   geometry_msgs::msg::Point point0,
   geometry_msgs::msg::Point point1
-)
+) const
 {
   double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
   double ex = point0.x;
@@ -160,6 +97,48 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
 
+  }
+}
+
+int HermiteCurve::solveP3(std::vector<double> & x, double a, double b, double c)
+{
+  x = std::vector<double>(3);
+  const double eps = 1e-14;
+  double a2 = a * a;
+  double q = (a2 - 3 * b) / 9;
+  double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
+  // equation x^3 + q*x + r = 0
+  double r2 = r * r;
+  double q3 = q * q * q;
+  double A, B;
+  if (r2 <= (q3 + eps)) {      //<<-- FIXED!
+    double t = r / sqrt(q3);
+    if (t < -1) {t = -1;}
+    if (t > 1) {t = 1;}
+    t = acos(t);
+    a /= 3; q = -2 * sqrt(q);
+    x[0] = q * cos(t / 3) - a;
+    x[1] = q * cos((t + M_PI * 2) / 3) - a;
+    x[2] = q * cos((t - M_PI * 2) / 3) - a;
+    return 3;
+  } else {
+    //A =-pow(fabs(r)+sqrt(r2-q3),1./3);
+    A = -root3(fabs(r) + sqrt(r2 - q3));
+    if (r < 0) {A = -A;}
+    if (A == 0) {
+      B = 0;
+    } else {
+      B = q / A;
+    }
+    a /= 3;
+    x[0] = (A + B) - a;
+    x[1] = -0.5 * (A + B) - a;
+    x[2] = 0.5 * sqrt(3.) * (A - B);
+    if (fabs(x[2]) < eps) {
+      x[2] = x[1];
+      return 2;
+    }
+    return 1;
   }
 }
 
