@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <iostream>
 #include <cmath>
+#include <limits>
 
 namespace simulation_api
 {
@@ -193,7 +194,7 @@ int HermiteCurve::solveP3(std::vector<double> & x, double a, double b, double c)
     x[2] = q * cos((t - M_PI * 2) / 3) - a;
     return 3;
   } else {
-    //A =-pow(fabs(r)+sqrt(r2-q3),1./3);
+    // A =-pow(fabs(r)+sqrt(r2-q3),1./3);
     A = -root3(fabs(r) + sqrt(r2 - q3));
     if (r < 0) {A = -A;}
     if (A == 0) {

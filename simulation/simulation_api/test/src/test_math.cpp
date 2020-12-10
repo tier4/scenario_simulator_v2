@@ -37,6 +37,14 @@ TEST(Math, HermiteCurve1)
   EXPECT_TRUE(curve.getSValue(p, true));
   EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) &&
     (curve.getSValue(p, true).get() < 0.101));
+  geometry_msgs::msg::Point start;
+  start.x = 0.1;
+  start.y = 1.0;
+  geometry_msgs::msg::Point goal;
+  goal.x = 0.1;
+  goal.y = -1.0;
+  auto collision_s = curve.getCollisionPointIn2D(start, goal);
+  EXPECT_TRUE(collision_s);
 }
 
 TEST(Math, CatmullRomSpline1)

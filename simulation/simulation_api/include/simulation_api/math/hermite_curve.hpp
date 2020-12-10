@@ -167,7 +167,6 @@ private:
       return 0.;
     }
   }
-
 };
 }  // namespace math
 }  // namespace simulation_api
