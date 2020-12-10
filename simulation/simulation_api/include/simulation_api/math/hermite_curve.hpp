@@ -110,6 +110,24 @@ private:
     return a * t * t + b * t + c;
   }
   /**
+   * @brief solve quadratic equation a*x^2 + b*x + c
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
+   */
+  std::vector<double> solveQuadraticEquation(double a, double b, double c) const;
+  /**
+   * @brief solve cubic function a*t^3 + b*t^2 + c*t + d
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @return std::vector<double> real root of the cubic functions (from 0 to 1)
+   */
+  std::vector<double> solveCubicEquation(double a, double b, double c, double d) const;
+  /**
    * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0, this code is public domain
    * @sa http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html
    * @param x
@@ -121,8 +139,8 @@ private:
              if return value is 2, 2 real roots: x[0], x[1],
              if return value is 1, 1 real root : x[0], x[1] ± i*x[2],
    */
-  int solveP3(std::vector<double> & x, double a, double b, double c);
-  double _root3(double x)
+  int solveP3(std::vector<double> & x, double a, double b, double c) const;
+  double _root3(double x) const
   {
     double s = 1.;
     while (x < 1.) {
@@ -143,7 +161,7 @@ private:
     return r * s;
   }
 
-  double root3(double x)
+  double root3(double x) const
   {
     if (x > 0) {return _root3(x);} else if (x < 0) {return -_root3(-x);} else {
       return 0.;

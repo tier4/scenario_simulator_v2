@@ -85,22 +85,93 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   geometry_msgs::msg::Point point1
 ) const
 {
+  std::vector<double> s_values;
   double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
-  double ex = point0.x;
-  double fx = (point0.x - point1.x) / l;
-  double ey = point0.y;
-  double fy = (point0.y - point1.y) / l;
+  double fx = point0.x;
+  double ex = (point0.x - point1.x) / l;
+  double fy = point0.y;
+  double ey = (point0.y - point1.y) / l;
   constexpr double e = std::numeric_limits<double>::epsilon();
   if (std::abs(point0.x - point1.x) <= e) {
     if (std::abs(point0.y - point1.y) <= e) {
-
+      return boost::none;
+    }
+    auto solutions = solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
+    for (const auto solution : solutions) {
+      if (std::fabs(cubicFunction(ay_, by_, cy_, dy_, solution) < e)) {
+        s_values.emplace_back(solution);
+      }
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
-
+    auto solutions = solveCubicEquation(ax_, by_, cy_, dy_ - fy);
+    for (const auto solution : solutions) {
+      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_, solution) < e)) {
+        s_values.emplace_back(solution);
+      }
+    }
+  } else {
+    double ratio = ey / ex;
+    double a = ax_ * ratio - ay_;
+    double b = bx_ * ratio - by_;
+    double c = cx_ * ratio - cy_;
+    double d = (dx_ - fx) * ratio - (dy_ - fy);
+    auto solutions = solveCubicEquation(a, b, c, d);
+    for (const auto solution : solutions) {
+      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_, solution) < e)) {
+        s_values.emplace_back(solution);
+      }
+    }
   }
+  if (s_values.size() == 0) {
+    return boost::none;
+  }
+  return *std::min_element(s_values.begin(), s_values.end());
 }
 
-int HermiteCurve::solveP3(std::vector<double> & x, double a, double b, double c)
+std::vector<double> HermiteCurve::solveQuadraticEquation(double a, double b, double c) const
+{
+  std::vector<double> candidates, ret;
+  constexpr double e = std::numeric_limits<float>::epsilon();
+  double root = b * b - 4 * a * c;
+  if (std::fabs(root) < e) {
+    candidates = {-b / 2};
+  } else if (root < 0) {
+    candidates = {};
+  } else {
+    candidates = {-b / 2 - root / 2, -b / 2 + root / 2};
+  }
+  for (const auto candidate : candidates) {
+    if (0 <= candidate && candidate <= 1) {
+      ret.emplace_back(candidate);
+    }
+  }
+  return ret;
+}
+
+std::vector<double> HermiteCurve::solveCubicEquation(double a, double b, double c, double d) const
+{
+  constexpr double e = std::numeric_limits<float>::epsilon();
+  if (std::fabs(a) < e) {
+    return solveQuadraticEquation(b, c, d);
+  }
+  std::vector<double> solutions, candidates, ret;
+  auto result = solveP3(solutions, b / a, c / a, d / a);
+  if (result == 3) {
+    candidates = solutions;
+  } else if (result == 2) {
+    candidates = {solutions[0], solutions[1]};
+  } else if (result == 1) {
+    candidates = {solutions[0]};
+  }
+  for (const auto candidate : candidates) {
+    if (0 <= candidate && candidate <= 1) {
+      ret.emplace_back(candidate);
+    }
+  }
+  return ret;
+}
+
+int HermiteCurve::solveP3(std::vector<double> & x, double a, double b, double c) const
 {
   x = std::vector<double>(3);
   const double eps = 1e-14;
