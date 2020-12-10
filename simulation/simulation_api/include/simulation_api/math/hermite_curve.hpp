@@ -69,11 +69,35 @@ public:
   double getSquaredDistanceIn2D(
     geometry_msgs::msg::Point point, double s,
     bool autoscale = false) const;
+  boost::optional<double> getCollisionPointIn2D(
+    geometry_msgs::msg::Point point0,
+    geometry_msgs::msg::Point point1
+  );
 
 private:
   double getNewtonMethodStepSize(
     geometry_msgs::msg::Point point, double s,
     bool autoscale = false) const;
+  /**
+   * @brief slove quadratic equation 0 = a*x^2 + b*x + c
+   *
+   * @param a coefficients of quadratic equation
+   * @param b coefficients of quadratic equation
+   * @param c coefficients of quadratic equation
+   * @param min_solution minimum values of solutions
+   * @param max_solution maximum values of solutions
+   * @return std::vector<double> array of real solutions
+   */
+  std::vector<double> solveQuadraticEquation(
+    double a, double b, double c, double min_solution = 0,
+    double max_solution = 1) const;
+  std::vector<double> solveTwoCubicEquations(
+    double a0, double b0, double c0, double d0,
+    double a1, double b1, double c1, double d1,
+    double min_solution = 0,
+    double max_solution = 1) const;
+  double quadraticFunction(double a, double b, double c, double s) const;
+  double cubicFunction(double a, double b, double c, double d, double s) const;
 };
 }  // namespace math
 }  // namespace simulation_api

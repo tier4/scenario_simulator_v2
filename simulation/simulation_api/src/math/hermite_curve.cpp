@@ -79,6 +79,90 @@ double HermiteCurve::getNewtonMethodStepSize(
   return ret;
 }
 
+std::vector<double> HermiteCurve::solveQuadraticEquation(
+  double a, double b, double c,
+  double min_solution, double max_solution) const
+{
+  std::vector<double> real_solutions;
+  std::vector<double> ret;
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  double d = (b * b - 4 * a * c);
+  if (d < 0) {
+    return {};
+  } else if (d < e) {
+    real_solutions.emplace_back(-b / (2 * a));
+  } else {
+    real_solutions.emplace_back((-b - d) / (2 * a));
+    real_solutions.emplace_back((-b + d) / (2 * a));
+  }
+  for (const auto solution : real_solutions) {
+    if (min_solution <= solution && solution <= max_solution) {
+      ret.emplace_back(solution);
+    }
+  }
+  return ret;
+}
+
+double HermiteCurve::quadraticFunction(double a, double b, double c, double s) const
+{
+  return std::pow(s, 2) * a + s * b + c;
+}
+
+double HermiteCurve::cubicFunction(double a, double b, double c, double d, double s) const
+{
+  return std::pow(s, 3) * a + std::pow(s, 2) * b + s * c + d;
+}
+
+std::vector<double> HermiteCurve::solveTwoCubicEquations(
+  double a0, double b0, double c0, double d0,
+  double a1, double b1, double c1, double d1,
+  double min_solution,
+  double max_solution) const
+{
+  std::vector<double> ret;
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if (std::fabs(a0) < e) {
+    auto solutions0 = solveQuadraticEquation(b0, c0, d0, min_solution, max_solution);
+    for (const auto solution : solutions0) {
+      if (std::fabs(cubicFunction(a1, b1, c1, d1, solution) < e)) {
+        ret.emplace_back(solution);
+      }
+    }
+    return ret;
+  }
+  if (std::fabs(a1) < e) {
+    auto solutions1 = solveQuadraticEquation(b1, c1, d1, min_solution, max_solution);
+    for (const auto solution : solutions1) {
+      if (std::fabs(cubicFunction(a0, b0, c0, d0, solution) < e)) {
+        ret.emplace_back(solution);
+      }
+    }
+  }
+  double ratio = a1 / a0;
+  return solveQuadraticEquation(ratio * b0 - b1, ratio * c0 - c1, ratio * d0 - d1, min_solution,
+           max_solution);
+}
+
+boost::optional<double> HermiteCurve::getCollisionPointIn2D(
+  geometry_msgs::msg::Point point0,
+  geometry_msgs::msg::Point point1
+)
+{
+  double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
+  double ex = point0.x;
+  double fx = (point0.x - point1.x) / l;
+  double ey = point0.y;
+  double fy = (point0.y - point1.y) / l;
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if (std::abs(point0.x - point1.x) <= e) {
+    if (std::abs(point0.y - point1.y) <= e) {
+
+    }
+  } else if (std::abs(point0.y - point1.y) <= e) {
+
+  }
+}
+
 boost::optional<double> HermiteCurve::getSValue(
   geometry_msgs::msg::Point point,
   double threadhold_distance,
