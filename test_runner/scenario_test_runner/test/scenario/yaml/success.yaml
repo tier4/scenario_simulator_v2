@@ -1,7 +1,10 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: INITIAL-VALUE
-      list: [1, 50, 100]
+      # list: [1, 50, 100]
+      start: 0
+      stop: 100
+      step: 50
     - name: STEP
       list: [1, 2]
 OpenSCENARIO:
@@ -15,7 +18,7 @@ OpenSCENARIO:
     ParameterDeclaration:
       - name: value
         parameterType: double
-        value: 0
+        value: 0.0
       - name: extension
         parameterType: string
         value: osm

@@ -19,12 +19,48 @@ from ament_index_python.packages import get_package_share_directory
 from argparse import ArgumentParser
 from pathlib import Path
 
+import numpy
 import sys
 import xmlschema
 import yaml
 
 
-def load(path):
+def iota(start: float, step: float, stop: float) -> numpy.ndarray:
+
+    if step < 1:
+        return numpy.linspace(start, stop, 1, endpoint=True)
+
+    else:
+        return numpy.linspace(
+            start, stop, int((stop - start) / float(step)) + 1)
+
+
+class MacroExpander:
+
+    def __init__(self, rules):
+
+        self.rules = rules
+        # print(rules)
+
+        self.specs = {}
+
+        if rules is not None:
+
+            for each in rules['ScenarioModifier']:
+
+                name = each['name']
+
+                if 'name' in each and 'list' in each:
+                    self.specs[name] = each['list']
+
+                else:
+                    self.specs[name] = iota(each['start'], each['step'], each['stop']).tolist()
+
+                print('define ' + name + ' as ' + str(self.specs[name]))
+
+
+def load_yaml(path):
+
     if path.exists():
         with path.open('r') as file:
             return yaml.safe_load(file)
@@ -57,7 +93,7 @@ def from_yaml(keyword, node):
                 #
                 # => @tag: { ... }
                 #
-                result["@" + tag] = value
+                result["@" + tag] = str(value)
             else:
                 #
                 # Tag: { ... }
@@ -102,23 +138,25 @@ def convert(input, output):
 
     schema = xmlschema.XMLSchema(str(path))
 
-    A = from_yaml('OpenSCENARIO', load(input))
+    yaml = load_yaml(input)
 
-    A.pop('ScenarioModifiers', None)
+    macroexpand = MacroExpander(
+        yaml.pop('ScenarioModifiers', None))
 
     xosc, errors = schema.encode(
-        A,
+        from_yaml('OpenSCENARIO', yaml),
         indent=2,
         preserve_root=True,
         unordered=True,  # Reorder elements
         validation='lax',  # The "strict" mode is too strict than we would like.
         )
 
-    if not schema.is_valid(xosc):
+    if not schema.is_valid(xosc) and len(errors) != 0:
         print('Error: ' + str(errors[0]))
         sys.exit()
 
     else:
+        print()
         print(xmlschema.XMLResource(xosc).tostring())
 
 
