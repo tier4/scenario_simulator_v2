@@ -145,7 +145,11 @@ std::vector<double> HermiteCurve::solveLinearEquation(double a, double b) const
     }
     return {};
   }
-  return {-b / a};
+  double ret = -b / a;
+  if (0 <= ret && ret <= 1) {
+    return {-b / a};
+  }
+  return {};
 }
 
 std::vector<double> HermiteCurve::solveQuadraticEquation(double a, double b, double c) const
