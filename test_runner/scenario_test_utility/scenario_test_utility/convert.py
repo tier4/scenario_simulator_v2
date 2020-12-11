@@ -84,16 +84,23 @@ class MacroExpander:
                 paths.append(
                     output.joinpath(target_name + ".xosc"))
 
-                with paths[-1].open(mode='w') as f:
-                    f.write(target)
-                    # print(str(paths[-1]) + " => " + str(self.schema.validate(target)))
+                with paths[-1].open(mode='w') as file:
+                    file.write(target)
+
+                    try:
+                        self.schema.validate(target)
+
+                    except xmlschema.XMLSchemaValidationError as exception:
+                        print("File: " + str(paths[-1]))
+                        print()
+                        print("Error: " + str(exception))
+                        exit()
 
         else:
             paths.append(
                 output.joinpath(target_name + ".xosc"))
 
             with paths[-1].open(mode='w') as f:
-                print(paths[-1])
                 f.write(xosc)
 
         return paths
@@ -194,12 +201,15 @@ def convert(input: Path, output: Path):
         exit()
 
     else:
-        return macroexpand(
+        paths = macroexpand(
             xmlschema.XMLResource(xosc).tostring(
                 ).replace("True", "true").replace("False", "false"),
             output,
             input.stem
             )
+
+        for each in paths:
+            print(each)
 
 
 def main():
