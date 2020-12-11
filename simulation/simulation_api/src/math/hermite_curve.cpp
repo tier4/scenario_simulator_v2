@@ -99,14 +99,14 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
     auto solutions = solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
     for (const auto solution : solutions) {
-      if (std::fabs(cubicFunction(ay_, by_, cy_, dy_, solution) < e)) {
+      if (std::fabs(cubicFunction(ay_, by_, cy_, dy_ - fy, solution) < e)) {
         s_values.emplace_back(solution);
       }
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
     auto solutions = solveCubicEquation(ay_, by_, cy_, dy_ - fy);
     for (const auto solution : solutions) {
-      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_, solution) < e)) {
+      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
         s_values.emplace_back(solution);
       }
     }
@@ -118,7 +118,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double d = (dx_ - fx) * ratio - (dy_ - fy);
     auto solutions = solveCubicEquation(a, b, c, d);
     for (const auto solution : solutions) {
-      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_, solution) < e)) {
+      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
         s_values.emplace_back(solution);
       }
     }
@@ -147,7 +147,8 @@ std::vector<double> HermiteCurve::solveLinearEquation(double a, double b) const
   }
   double ret = -b / a;
   if (0 <= ret && ret <= 1) {
-    return {-b / a};
+    std::cout << "result = " << ret << std::endl;
+    return {ret};
   }
   return {};
 }
