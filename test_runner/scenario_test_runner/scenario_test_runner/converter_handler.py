@@ -19,6 +19,7 @@ import os
 import pathlib
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.scenario_converter import ScenarioConverter
+from scenario_test_utility.convert import convert
 
 
 class ConverterHandler():
@@ -53,8 +54,11 @@ class ConverterHandler():
         file_name = folder_name + "-" + str(index)
         output_dir = str(launcher_path) + "/test/scenario/converted/" + \
             folder_name + "/" + file_name
-        log_dir = str(pathlib.Path(output_dir).parent)+"/converted.log"
-        ScenarioConverter.main(yaml_scenario_path, output_dir, log_dir)
+        log_dir = str(pathlib.Path(output_dir).parent) + "/converted.log"
+        # ScenarioConverter.main(yaml_scenario_path, output_dir, log_dir)
+        convert(
+            pathlib.Path(yaml_scenario_path),
+            pathlib.Path(output_dir))
         return output_dir
 
     @staticmethod
