@@ -16,6 +16,31 @@
 
 #include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
+#include <simulation_api/math/polynomial_solver.hpp>
+
+TEST(Math, PolynomialSolver1)
+{
+  simulation_api::math::PolynomialSolver solver;
+  auto ret = solver.solveLinearEquation(-20, 3, 0, 1);
+  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
+  EXPECT_DOUBLE_EQ(ret[0], 0.15);
+}
+
+TEST(Math, PolynomialSolver2)
+{
+  simulation_api::math::PolynomialSolver solver;
+  auto ret = solver.solveQuadraticEquation(2, 3, -5, 0, 2);
+  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
+  EXPECT_DOUBLE_EQ(ret[0], 1);
+}
+
+TEST(Math, PolynomialSolver3)
+{
+  simulation_api::math::PolynomialSolver solver;
+  auto ret = solver.solveCubicEquation(1, -2, -11, 12, 0, 2);
+  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
+  EXPECT_DOUBLE_EQ(ret[0], 1);
+}
 
 TEST(Math, HermiteCurve1)
 {
@@ -93,6 +118,22 @@ TEST(Math, CatmullRomSpline1)
   auto points = {p0, p1, p2};
   auto spline = simulation_api::math::CatmullRomSpline(points);
   EXPECT_DOUBLE_EQ(spline.getLength(), 2);
+  geometry_msgs::msg::Point start;
+  start.x = 0.1;
+  start.y = 1.0;
+  geometry_msgs::msg::Point goal;
+  goal.x = 0.1;
+  goal.y = -1.0;
+  auto collision_s = spline.getCollisionPointIn2D(start, goal);
+  EXPECT_TRUE(collision_s);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
+  collision_s = spline.getCollisionPointIn2D(start, goal, false);
+  EXPECT_TRUE(collision_s);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
 }
 
 TEST(Math, CatmullRomSpline2)

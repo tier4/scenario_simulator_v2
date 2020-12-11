@@ -53,8 +53,18 @@ public:
     double torelance = 0.001);
   double getSquaredDistanceIn2D(
     geometry_msgs::msg::Point point, double s) const;
+  boost::optional<double> getCollisionPointIn2D(
+    geometry_msgs::msg::Point point0,
+    geometry_msgs::msg::Point point1,
+    bool search_backward = false
+  ) const;
+  boost::optional<double> getCollisionPointIn2D(
+    std::vector<geometry_msgs::msg::Point> polygon,
+    bool search_backward = false
+  ) const;
 
 private:
+  double getSInSplineCurve(size_t curve_index, double s) const;
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
   bool checkConnection() const;
   bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;

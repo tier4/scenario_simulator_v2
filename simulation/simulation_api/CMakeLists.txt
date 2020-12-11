@@ -42,6 +42,7 @@ find_package(Eigen3 REQUIRED)
 # ------------------------------------------------------------------------------
 
 add_library(entity_manager SHARED
+  src/math/polynomial_solver.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/math/catmull_rom_spline.cpp
   src/math/hermite_curve.cpp
