@@ -21,7 +21,7 @@ from copy import deepcopy
 from itertools import product
 from pathlib import Path
 from re import sub
-from sys import exit
+from sys import exit, stderr
 
 import numpy
 import xmlschema
@@ -71,15 +71,8 @@ class MacroExpander:
                 target_name = deepcopy(basename)
 
                 for binding in bindings:
-
-                    # print(str(binding[0]) + ' = ' + str(binding[1]))
-
                     target_name += '__' + str(binding[0]) + '_' + str(binding[1])
-
                     target = sub(str(binding[0]), str(binding[1]), target)
-
-                # print(str(output.joinpath(target_name + ".xosc")))
-                # print()
 
                 paths.append(
                     output.joinpath(target_name + ".xosc"))
@@ -91,9 +84,9 @@ class MacroExpander:
                         self.schema.validate(target)
 
                     except xmlschema.XMLSchemaValidationError as exception:
-                        print("File: " + str(paths[-1]))
-                        print()
-                        print("Error: " + str(exception))
+                        print("File: " + str(paths[-1]), file=stderr)
+                        print("", file=stderr)
+                        print("Error: " + str(exception), file=stderr)
                         exit()
 
         else:
@@ -112,18 +105,18 @@ def load_yaml(path):
         with path.open('r') as file:
             return yaml.safe_load(file)
     else:
-        print("No such file or directory: " + path)
+        print("No such file or directory: " + path, file=stderr)
         exit()
 
 
 def from_yaml(keyword, node):
 
     if isinstance(node, dict):
-        result = {}
-
         #
         # ???: { ... }
         #
+        result = {}
+
         for tag, value in node.items():
 
             if isinstance(value, list) and len(value) == 0:
@@ -197,7 +190,7 @@ def convert(input: Path, output: Path):
         )
 
     if not schema.is_valid(xosc) and len(errors) != 0:
-        print("Error: " + errors[0])  # Error other than the first is not important.
+        print("Error: " + errors[0], file=stderr)  # Error other than the first is not important.
         exit()
 
     else:
@@ -205,8 +198,7 @@ def convert(input: Path, output: Path):
             xmlschema.XMLResource(xosc).tostring(
                 ).replace("True", "true").replace("False", "false"),
             output,
-            input.stem
-            )
+            input.stem)
 
         for each in paths:
             print(each)
