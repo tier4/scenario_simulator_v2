@@ -31,7 +31,9 @@ public:
  * @param b
  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
  */
-  std::vector<double> solveLinearEquation(double a, double b) const;
+  std::vector<double> solveLinearEquation(
+    double a, double b, double min_value = 0,
+    double max_value = 1) const;
 /**
  * @brief solve quadratic equation a*x^2 + b*x + c = 0
  *
@@ -39,7 +41,9 @@ public:
  * @param b
  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
  */
-  std::vector<double> solveQuadraticEquation(double a, double b, double c) const;
+  std::vector<double> solveQuadraticEquation(
+    double a, double b, double c, double min_value = 0,
+    double max_value = 1) const;
 /**
  * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
  *
@@ -49,7 +53,9 @@ public:
  * @param d
  * @return std::vector<double> real root of the cubic functions (from 0 to 1)
  */
-  std::vector<double> solveCubicEquation(double a, double b, double c, double d) const;
+  std::vector<double> solveCubicEquation(
+    double a, double b, double c, double d,
+    double min_value = 0, double max_value = 1) const;
 /**
  * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
  *

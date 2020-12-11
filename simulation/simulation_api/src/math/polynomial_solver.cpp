@@ -28,26 +28,36 @@ double PolynomialSolver::cubicFunction(
 {
   return a * t * t * t + b * t * t + c * t + d;
 }
+
 double PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const
 {
   return a * t * t + b * t + c;
 }
-std::vector<double> PolynomialSolver::solveLinearEquation(double a, double b) const
+
+std::vector<double> PolynomialSolver::solveLinearEquation(
+  double a, double b, double min_value,
+  double max_value) const
 {
   constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::fabs(a) < e) {
     if (std::fabs(b) < e) {
-      return {0};
+      if (min_value <= 0 && 0 <= max_value) {
+        return {0};
+      }
     }
     return {};
   }
   double ret = -b / a;
-  if (0 <= ret && ret <= 1) {
+  if (min_value <= ret && ret <= max_value) {
     return {ret};
   }
   return {};
 }
-std::vector<double> PolynomialSolver::solveQuadraticEquation(double a, double b, double c) const
+
+std::vector<double> PolynomialSolver::solveQuadraticEquation(
+  double a, double b, double c,
+  double min_value,
+  double max_value) const
 {
   std::vector<double> candidates, ret;
   constexpr double e = std::numeric_limits<float>::epsilon();
@@ -63,14 +73,15 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(double a, double b,
     candidates = {(-b - root) / (2 * a), (-b + root) / (2 * a)};
   }
   for (const auto candidate : candidates) {
-    if (0 <= candidate && candidate <= 1) {
+    if (min_value <= candidate && candidate <= max_value) {
       ret.emplace_back(candidate);
     }
   }
   return ret;
 }
+
 std::vector<double> PolynomialSolver::solveCubicEquation(
-  double a, double b, double c, double d) const
+  double a, double b, double c, double d, double min_value, double max_value) const
 {
   constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::fabs(a) < e) {
@@ -86,14 +97,15 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
     candidates = {solutions[0]};
   }
   for (const auto candidate : candidates) {
-    if (0 <= candidate && candidate <= 1) {
+    if (min_value <= candidate && candidate <= max_value) {
       ret.emplace_back(candidate);
     }
   }
   return ret;
 }
 
-int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, double c) const
+int PolynomialSolver::solveP3(
+  std::vector<double> & x, double a, double b, double c) const
 {
   x = std::vector<double>(3);
   const double eps = 1e-14;
@@ -134,6 +146,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
     return 1;
   }
 }
+
 double PolynomialSolver::_root3(double x) const
 {
   double s = 1.;
