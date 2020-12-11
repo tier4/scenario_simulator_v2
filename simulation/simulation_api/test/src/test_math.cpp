@@ -16,6 +16,31 @@
 
 #include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
+#include <simulation_api/math/polynomial_solver.hpp>
+
+TEST(Math, PolynomialSolver1)
+{
+  simulation_api::math::PolynomialSolver solver;
+  auto ret = solver.solveLinearEquation(-20, 3, 0, 1);
+  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
+  EXPECT_DOUBLE_EQ(ret[0], 0.15);
+}
+
+TEST(Math, PolynomialSolver2)
+{
+  simulation_api::math::PolynomialSolver solver;
+  auto ret = solver.solveQuadraticEquation(2, 3, -5, 0, 2);
+  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
+  EXPECT_DOUBLE_EQ(ret[0], 1);
+}
+
+TEST(Math, PolynomialSolver3)
+{
+  simulation_api::math::PolynomialSolver solver;
+  auto ret = solver.solveCubicEquation(1, -2, 11, 12, 0, 2);
+  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
+  EXPECT_DOUBLE_EQ(ret[0], 1);
+}
 
 TEST(Math, HermiteCurve1)
 {

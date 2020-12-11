@@ -17,6 +17,7 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -70,7 +71,7 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   } else if (root < 0) {
     candidates = {};
   } else {
-    candidates = {(-b - root) / (2 * a), (-b + root) / (2 * a)};
+    candidates = {(-b - std::sqrt(root)) / (2 * a), (-b + std::sqrt(root)) / (2 * a)};
   }
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
@@ -90,13 +91,17 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
   std::vector<double> solutions, candidates, ret;
   auto result = solveP3(solutions, b / a, c / a, d / a);
   if (result == 3) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     candidates = solutions;
   } else if (result == 2) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     candidates = {solutions[0], solutions[1]};
   } else if (result == 1) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     candidates = {solutions[0]};
   }
   for (const auto candidate : candidates) {
+    std::cout << "candidate : " << candidate << std::endl;
     if (min_value <= candidate && candidate <= max_value) {
       ret.emplace_back(candidate);
     }
