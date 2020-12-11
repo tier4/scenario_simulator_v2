@@ -23,10 +23,6 @@
 
 #include <boost/optional.hpp>
 
-// headers in Eigen
-#define EIGEN_MPL2_ONLY
-#include <Eigen/Core>
-
 #include <vector>
 
 namespace simulation_api
