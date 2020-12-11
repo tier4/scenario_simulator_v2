@@ -37,7 +37,7 @@ TEST(Math, PolynomialSolver2)
 TEST(Math, PolynomialSolver3)
 {
   simulation_api::math::PolynomialSolver solver;
-  auto ret = solver.solveCubicEquation(1, -2, 11, 12, 0, 2);
+  auto ret = solver.solveCubicEquation(1, -2, -11, 12, 0, 2);
   EXPECT_EQ(ret.size(), static_cast<size_t>(1));
   EXPECT_DOUBLE_EQ(ret[0], 1);
 }
