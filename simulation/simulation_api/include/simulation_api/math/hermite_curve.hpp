@@ -75,10 +75,12 @@ public:
     bool autoscale = false) const;
   boost::optional<double> getCollisionPointIn2D(
     geometry_msgs::msg::Point point0,
-    geometry_msgs::msg::Point point1
+    geometry_msgs::msg::Point point1,
+    bool search_backward = false
   ) const;
   boost::optional<double> getCollisionPointIn2D(
-    std::vector<geometry_msgs::msg::Point> polygon
+    std::vector<geometry_msgs::msg::Point> polygon,
+    bool search_backward = false
   ) const;
 
 private:
