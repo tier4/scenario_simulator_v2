@@ -50,8 +50,6 @@ public:
  * @return std::vector<double> real root of the cubic functions (from 0 to 1)
  */
   std::vector<double> solveCubicEquation(double a, double b, double c, double d) const;
-
-private:
 /**
  * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
  *
@@ -73,6 +71,8 @@ private:
  * @return double result of quadratic function
  */
   double quadraticFunction(double a, double b, double c, double t) const;
+
+private:
 /**
  * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0, this code is public domain
  * @sa http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html
