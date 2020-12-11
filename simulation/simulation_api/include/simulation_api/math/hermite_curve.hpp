@@ -77,6 +77,9 @@ public:
     geometry_msgs::msg::Point point0,
     geometry_msgs::msg::Point point1
   ) const;
+  boost::optional<double> getCollisionPointIn2D(
+    std::vector<geometry_msgs::msg::Point> polygon
+  ) const;
 
 private:
   double getNewtonMethodStepSize(
