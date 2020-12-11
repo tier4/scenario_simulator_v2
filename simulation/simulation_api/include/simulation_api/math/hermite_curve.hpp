@@ -23,6 +23,10 @@
 
 #include <boost/optional.hpp>
 
+// headers in Eigen
+#define EIGEN_MPL2_ONLY
+#include <Eigen/Core>
+
 #include <vector>
 
 namespace simulation_api
@@ -69,11 +73,113 @@ public:
   double getSquaredDistanceIn2D(
     geometry_msgs::msg::Point point, double s,
     bool autoscale = false) const;
+  boost::optional<double> getCollisionPointIn2D(
+    geometry_msgs::msg::Point point0,
+    geometry_msgs::msg::Point point1,
+    bool search_backward = false
+  ) const;
+  boost::optional<double> getCollisionPointIn2D(
+    std::vector<geometry_msgs::msg::Point> polygon,
+    bool search_backward = false
+  ) const;
 
 private:
   double getNewtonMethodStepSize(
     geometry_msgs::msg::Point point, double s,
     bool autoscale = false) const;
+  /**
+   * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @param t
+   * @return double result of cubic function
+   */
+  inline double cubicFunction(double a, double b, double c, double d, double t) const
+  {
+    return a * t * t * t + b * t * t + c * t + d;
+  }
+  /**
+   * @brief calculate result of quadratic function a*t^2 + b*t + c
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param t
+   * @return double result of quadratic function
+   */
+  inline double quadraticFunction(double a, double b, double c, double t) const
+  {
+    return a * t * t + b * t + c;
+  }
+  /**
+   * @brief solve linear equation a*x + b = 0
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
+   */
+  std::vector<double> solveLinearEquation(double a, double b) const;
+  /**
+   * @brief solve quadratic equation a*x^2 + b*x + c = 0
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
+   */
+  std::vector<double> solveQuadraticEquation(double a, double b, double c) const;
+  /**
+   * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @return std::vector<double> real root of the cubic functions (from 0 to 1)
+   */
+  std::vector<double> solveCubicEquation(double a, double b, double c, double d) const;
+  /**
+   * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0, this code is public domain
+   * @sa http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html
+   * @param x
+   * @param a
+   * @param b
+   * @param c
+   * @return int
+             if return value is 3, 3 real roots: x[0], x[1], x[2],
+             if return value is 2, 2 real roots: x[0], x[1],
+             if return value is 1, 1 real root : x[0], x[1] ± i*x[2],
+   */
+  int solveP3(std::vector<double> & x, double a, double b, double c) const;
+  double _root3(double x) const
+  {
+    double s = 1.;
+    while (x < 1.) {
+      x *= 8.;
+      s *= 0.5;
+    }
+    while (x > 8.) {
+      x *= 0.125;
+      s *= 2.;
+    }
+    double r = 1.5;
+    r -= 1. / 3. * ( r - x / ( r * r ) );
+    r -= 1. / 3. * ( r - x / ( r * r ) );
+    r -= 1. / 3. * ( r - x / ( r * r ) );
+    r -= 1. / 3. * ( r - x / ( r * r ) );
+    r -= 1. / 3. * ( r - x / ( r * r ) );
+    r -= 1. / 3. * ( r - x / ( r * r ) );
+    return r * s;
+  }
+
+  double root3(double x) const
+  {
+    if (x > 0) {return _root3(x);} else if (x < 0) {return -_root3(-x);} else {
+      return 0.;
+    }
+  }
 };
 }  // namespace math
 }  // namespace simulation_api
