@@ -18,6 +18,7 @@
 from ament_index_python.packages import get_package_share_directory
 from argparse import ArgumentParser
 from copy import deepcopy
+# from importlib_resources import read_text
 from itertools import product
 from pathlib import Path
 from re import sub
@@ -175,6 +176,10 @@ def convert(input: Path, output: Path):
         ).joinpath('../ament_index/resource_index/packages/OpenSCENARIO.xsd')
 
     schema = xmlschema.XMLSchema(str(path))
+
+    # schema = xmlschema.XMLSchema(
+    #     read_text('scenario_test_utility', 'OpenSCENARIO.xsd')
+    #     )
 
     yaml = load_yaml(input)
 
