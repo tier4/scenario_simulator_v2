@@ -16,9 +16,10 @@
 # limitations under the License.
 
 import os
-import pathlib
-from scenario_test_utility.logger import Logger
-from scenario_test_utility.scenario_converter import ScenarioConverter
+
+from pathlib import Path
+from scenario_test_utility.convert import convert
+# from scenario_test_utility.scenario_converter import ScenarioConverter
 
 
 class ConverterHandler():
@@ -32,13 +33,12 @@ class ConverterHandler():
         xosc_expects = []
         xosc_step_time_ms = []
         for index, scenario in enumerate(all_scenarios):
-            if (pathlib.Path(scenario).suffix == ".xosc"):
+            if Path(scenario).suffix == ".xosc":
                 sweeped_xosc_scenarios.append(scenario)
                 xosc_expects.append(expects[index])
                 xosc_step_time_ms.append(step_times_ms[index])
             else:
-                output_dir = ConverterHandler.convert_scenario(
-                    index, scenario, launcher_path)
+                output_dir = ConverterHandler.convert_scenario(index, scenario, launcher_path)
                 xosc_scenarios = ConverterHandler.sweep_scenarios(output_dir)
                 sweeped_xosc_scenarios.extend(xosc_scenarios)
                 for each in xosc_scenarios:
@@ -47,14 +47,16 @@ class ConverterHandler():
         return sweeped_xosc_scenarios, xosc_expects, xosc_step_time_ms
 
     @staticmethod
-    def convert_scenario(index, yaml_scenario_path, launcher_path):
+    def convert_scenario(index, yaml_scenario_path: Path, launcher_path: Path):
         """Convert scenarios."""
-        folder_name = pathlib.Path(yaml_scenario_path).stem
+        folder_name = Path(yaml_scenario_path).stem
         file_name = folder_name + "-" + str(index)
-        output_dir = str(launcher_path) + "/test/scenario/converted/" + \
-            folder_name + "/" + file_name
-        log_dir = str(pathlib.Path(output_dir).parent)+"/converted.log"
-        ScenarioConverter.main(yaml_scenario_path, output_dir, log_dir)
+        output_dir = launcher_path.joinpath("test/scenario/converted", folder_name, file_name)
+        # log_dir = str(Path(output_dir).parent) + "/converted.log"
+        # ScenarioConverter.main(yaml_scenario_path, output_dir, log_dir)
+        convert(
+            Path(yaml_scenario_path),
+            Path(output_dir))
         return output_dir
 
     @staticmethod
@@ -64,7 +66,6 @@ class ConverterHandler():
         for root, dirname, filenames in os.walk(converted_dirs):
             for filename in filenames:
                 if (".xosc" in filename):
-                    Logger.print_info
                     converted_scenarios.append(root+"/"+filename)
         return converted_scenarios
 

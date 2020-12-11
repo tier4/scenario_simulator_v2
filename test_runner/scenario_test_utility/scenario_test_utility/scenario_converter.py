@@ -18,12 +18,14 @@
 
 from collections import OrderedDict, defaultdict
 from bs4 import BeautifulSoup
+from pathlib import Path
+
 import argparse
 import copy
 import itertools
 import os
-import pathlib
 import re
+import sys
 import xmlplain
 import xmltodict
 
@@ -33,24 +35,25 @@ from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 
 
-def generate_dict_from_yaml(path):
+def load_yaml_as_dict(path):
     """
     Generate dictionary from yaml data.
 
     **Args**
 
-    * path (`str`): yaml path.
+    * path (`Path`): Path to yaml file.
 
     **Returns**
 
-    * `dict`: value or None.
+    * `dict`: value.
 
     """
-    if os.path.exists(path):
+    if Path(path).exists():
         with open(path, "r") as file:
             return xmlplain.obj_from_yaml(file)
     else:
         Logger.print_error("No such file or directory: " + path)
+        sys.exit()
 
 
 def find_modifiers(directory):
@@ -150,17 +153,31 @@ def mark_attributes(keyword, syntax_tree):
     return keyword, result
 
 
+def convert_dict_to_xosc(xosc_dict, xosc_path):
+    """
+    Convert dictionary to xosc.
+
+    **Args**
+
+    * xosc_dict (`dict`)
+    * xosc_path (`str`)
+
+    **Returns**
+
+    * `str`: xosc_text
+
+    """
+    return XmlRegex.apply_regression(
+        xmltodict.unparse(
+            xosc_dict,
+            encoding='utf-8',
+            full_document=True,
+            short_empty_elements=False,
+            pretty=True))
+
+
 class ScenarioConverter:
-    """
-    Tier4 scenario converter class.
-
-    **Attributes**
-    * OPENSCENARIO_TAG (`str`): tag for specify open scenario
-    * IS_DEBUG_MODE (`bool`): change logger mode
-    """
-
-    OPENSCENARIO_TAG = "OpenSCENARIO"
-    IS_DEBUG_MODE = False
+    """Tier IV scenario converter class."""
 
     @staticmethod
     def main(yaml_path, xosc_dir, log_path):
@@ -169,67 +186,36 @@ class ScenarioConverter:
 
         **Args**
 
-        * yaml_path,xosc_dir,log_path (`str`)
+        * yaml_path (`str`)
+        * xosc_dir (`str`)
+        * log_path (`str`)
 
         **Returns**
 
-        *None
+        * None
 
         """
         Logger.print_separator("Scenario Preprocess")
-        root_data = generate_dict_from_yaml(yaml_path)
-        modifiers = find_modifiers(root_data)
-        root_data.pop("ScenarioModifiers", None)
-        xosc_dict = ScenarioConverter.extract_open_scenario(root_data)
-        xosc_text = ScenarioConverter.convert_dict2xosc(xosc_dict, xosc_dir)
-        Manager.mkdir(pathlib.Path(log_path).parent)
+
+        t4v2_dict = load_yaml_as_dict(yaml_path)
+
+        modifiers = find_modifiers(t4v2_dict)
+        t4v2_dict.pop("ScenarioModifiers", None)
+
+        xosc_dict = mark_attributes("OpenSCENARIO", t4v2_dict)[1]
+
+        xosc_text = convert_dict_to_xosc(xosc_dict, xosc_dir)
+
+        Manager.mkdir(Path(log_path).parent)
         Manager.mkdir(xosc_dir)
+
         ScenarioConverter.distribute(
             modifiers, xosc_text, xosc_dir, yaml_path, log_path)
+
         print("")
         Logger.print_process("<= " + yaml_path)
         Logger.print_process("=> " + xosc_dir + "/")
         Logger.print_process("log: " + os.path.abspath(log_path))
-
-    @staticmethod
-    def extract_open_scenario(open_scenario):
-        """
-        Extract open scenario tree.
-
-        **Args**
-
-        * open_scenario (`dict`)
-
-        **Returns**
-
-        * `dict`: value
-
-        """
-        key, value = mark_attributes(
-            ScenarioConverter.OPENSCENARIO_TAG, open_scenario)
-        return value
-
-    @staticmethod
-    def convert_dict2xosc(xosc_dict, xosc_path):
-        """
-        Convert dictionary to xosc.
-
-        **Args**
-
-        * xosc_dict (`dict`),xosc_path (`str`)
-
-        **Returns**
-
-        * `str`: xosc_text
-
-        """
-        xosc_text = xmltodict.unparse(xosc_dict,
-                                      encoding='utf-8',
-                                      full_document=True,
-                                      short_empty_elements=False,
-                                      pretty=True)
-        xosc_text = XmlRegex.apply_regression(xosc_text)
-        return xosc_text
 
     @staticmethod
     def distribute(modifier_dict, xosc_text, xosc_dir, yaml_path, log_path):
@@ -242,20 +228,18 @@ class ScenarioConverter:
 
         """
         bindings = ParameterSweeper.make_modifier_bindings(modifier_dict)
-        xosc_name = pathlib.Path(yaml_path).stem
+        xosc_name = Path(yaml_path).stem
         id = 1
 
         def ret_path(xosc_dir, xosc_name, id):
             # .zfill(5)
-            return xosc_dir + "/" + xosc_name + "-" + str(id) + ".xosc"
+            return str(xosc_dir) + "/" + xosc_name + "-" + str(id) + ".xosc"
 
         num_files = 0
         if (bindings is not None):
             for item in itertools.product(*bindings):
                 num_files = num_files + 1
-                print("\r" + "\x1b[36m" +
-                      "...caliculating the number of files" + "\x1b[0m",
-                      end="")
+                print("\r\x1b[36m...caliculating the number of files\x1b[0m", end="")
         else:
             num_files = 1
         print("")
@@ -283,14 +267,16 @@ class ScenarioConverter:
             ScenarioConverter.write_converted_xosc(converted_xosc_text,
                                                    xosc_path)
             id = id + 1
-        return
 
     @staticmethod
     def write_converted_log(id, item, log_path, xosc_path, yaml_path):
-        log_text = (" file name: " +
-                    str(pathlib.Path(xosc_path).stem + ".xosc") +
-                    " parameter distribution case " + str(id) + "\033[1A")
-        Logger.print_process(log_text)
+        log_text = \
+            " file name: " + \
+            str(Path(xosc_path).stem + ".xosc") + \
+            " parameter distribution case " + str(id)
+
+        Logger.print_process(log_text + "\x1b[1A")
+
         with open(log_path, 'a') as f:
             f.write(log_text)
 
@@ -298,30 +284,25 @@ class ScenarioConverter:
     def write_converted_xosc(xosc_text, xosc_path):
         converted_xosc_text = copy.deepcopy(xosc_text)
         xosc_text = converted_xosc_text.encode("utf-8")
-        xosc_text = BeautifulSoup(xosc_text, 'xml')
-        xosc_text = xosc_text.prettify()
+        xosc_text = BeautifulSoup(xosc_text, 'xml').prettify()
         Manager.write_data(xosc_path, xosc_text.encode("utf-8"), "wb")
-        return
 
 
 def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
-    parser.add_argument('--input',
-                        type=str,
-                        help='absolute path to input yaml file',
-                        required=True)
+    parser.add_argument(
+        '--input', type=str, required=True,
+        help='absolute path to input yaml file')
 
-    parser.add_argument('--output',
-                        type=str,
-                        default=os.getcwd() + "/" + "converted_xosc/open_scenarios",
-                        help='absolute path to output converterd xosc file')
+    parser.add_argument(
+        '--output', type=str, default=Path.cwd().joinpath("converted_xosc/open_scenarios"),
+        help='absolute path to output converterd xosc file')
 
     args = parser.parse_args()
-    input_file_path = args.input
-    output_dir = args.output
-    log_dir = str(pathlib.Path(output_dir).parent)+"/converted.log"
-    ScenarioConverter.main(input_file_path, output_dir, log_dir)
+
+    ScenarioConverter.main(
+        args.input, args.output, Path(args.output).parent.joinpath("/converted.log"))
 
 
 if __name__ == "__main__":

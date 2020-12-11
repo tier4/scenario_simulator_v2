@@ -23,8 +23,14 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 download docker image tar file form
 [here](https://drive.google.com/drive/folders/1Ep_CAytXa-wmIBz-_oh7hrV9UzOQTe9r?ths=true).
 ``` bash
+# loading docker
 docker load -i scenario_simulator.tar
-docker run -it -p 6080:80 --shm-size=512m scenario_simulator .
+
+# create sharing directory
+mkdir ${HOME}/scenarios
+
+# running docker
+docker run -it -p 6080:80 -v ${HOME}/scenarios:/home/ubuntu/Desktop/scenarios --shm-size=512m scenario_simulator .
 ```
 
 when you see following message in the terminal
