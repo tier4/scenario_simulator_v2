@@ -93,6 +93,17 @@ TEST(Math, CatmullRomSpline1)
   auto points = {p0, p1, p2};
   auto spline = simulation_api::math::CatmullRomSpline(points);
   EXPECT_DOUBLE_EQ(spline.getLength(), 2);
+  geometry_msgs::msg::Point start;
+  start.x = 0.1;
+  start.y = 1.0;
+  geometry_msgs::msg::Point goal;
+  goal.x = 0.1;
+  goal.y = -1.0;
+  auto collision_s = spline.getCollisionPointIn2D(start, goal);
+  EXPECT_TRUE(collision_s);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
 }
 
 TEST(Math, CatmullRomSpline2)
