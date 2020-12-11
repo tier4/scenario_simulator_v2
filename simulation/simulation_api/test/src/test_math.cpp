@@ -104,6 +104,11 @@ TEST(Math, CatmullRomSpline1)
   if (collision_s) {
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
   }
+  collision_s = spline.getCollisionPointIn2D(start, goal, false);
+  EXPECT_TRUE(collision_s);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
 }
 
 TEST(Math, CatmullRomSpline2)
