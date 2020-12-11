@@ -40,25 +40,28 @@ def iota(start: float, step: float, stop: float) -> numpy.ndarray:
 
 class MacroExpander:
 
-    def __init__(self, rules):
+    def __init__(self, rules, schema):
 
         self.rules = rules
+
+        self.schema = schema
 
         self.specs = []
 
         if rules is not None:
             for each in rules['ScenarioModifier']:
                 name = each['name']
-                if 'name' in each and 'list' in each:
+                if 'list' in each:
                     self.specs.append(list(map(
-                        lambda x: (name, x),
-                        each['list'])))
+                        lambda x: (name, x), each['list'])))
                 else:
                     self.specs.append(list(map(
                         lambda x: (name, x),
                         iota(each['start'], each['step'], each['stop']))))
 
     def __call__(self, xosc: str, output: Path, basename: str):
+
+        paths = []
 
         if self.specs is not None:
             for bindings in product(*self.specs):
@@ -69,20 +72,31 @@ class MacroExpander:
 
                 for binding in bindings:
 
-                    print('- ' + str(binding[0]) + ' = ' + str(binding[1]))
+                    # print(str(binding[0]) + ' = ' + str(binding[1]))
 
                     target_name += '__' + str(binding[0]) + '_' + str(binding[1])
 
-                    target = sub(
-                        str(binding[0]),
-                        str(binding[1]),
-                        target
-                        )
+                    target = sub(str(binding[0]), str(binding[1]), target)
 
-                target_name += ".xosc"
+                # print(str(output.joinpath(target_name + ".xosc")))
+                # print()
 
-                print(str(output.joinpath(target_name)))
-                print()
+                paths.append(
+                    output.joinpath(target_name + ".xosc"))
+
+                with paths[-1].open(mode='w') as f:
+                    f.write(target)
+                    # print(str(paths[-1]) + " => " + str(self.schema.validate(target)))
+
+        else:
+            paths.append(
+                output.joinpath(target_name + ".xosc"))
+
+            with paths[-1].open(mode='w') as f:
+                print(paths[-1])
+                f.write(xosc)
+
+        return paths
 
 
 def load_yaml(path):
@@ -150,7 +164,11 @@ def from_yaml(keyword, node):
 
 def convert(input: Path, output: Path):
 
-    output.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        for each in output.iterdir():
+            each.resolve().unlink()
+    else:
+        output.mkdir(parents=True, exist_ok=True)
 
     path = Path(
         get_package_share_directory('scenario_test_utility')
@@ -161,7 +179,7 @@ def convert(input: Path, output: Path):
     yaml = load_yaml(input)
 
     macroexpand = MacroExpander(
-        yaml.pop('ScenarioModifiers', None))
+        yaml.pop('ScenarioModifiers', None), schema)
 
     xosc, errors = schema.encode(
         from_yaml('OpenSCENARIO', yaml),
@@ -172,15 +190,13 @@ def convert(input: Path, output: Path):
         )
 
     if not schema.is_valid(xosc) and len(errors) != 0:
-        print("Error: " + errors[0])
+        print("Error: " + errors[0])  # Error other than the first is not important.
         exit()
 
     else:
-        # print()
-        # print(xmlschema.XMLResource(xosc).tostring())
-
-        macroexpand(
-            xmlschema.XMLResource(xosc).tostring(),
+        return macroexpand(
+            xmlschema.XMLResource(xosc).tostring(
+                ).replace("True", "true").replace("False", "false"),
             output,
             input.stem
             )
