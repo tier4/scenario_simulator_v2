@@ -96,7 +96,7 @@ private:
   scenario_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 
-  simulation_api::entity::EntityStatus getEgoInitialStatus()
+  openscenario_msgs::msg::EntityStatus getEgoInitialStatus()
   {
     geometry_msgs::msg::Pose pose;
     pose.position.x = 0.0;
@@ -120,12 +120,12 @@ private:
     rpy.x = 0.0;
     rpy.y = 0.0;
     rpy.z = 0.0;
-    simulation_api::entity::EntityStatus ret(
+    openscenario_msgs::msg::EntityStatus ret(
       api_.getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
-  simulation_api::entity::EntityStatus getNpcInitialStatus()
+  openscenario_msgs::msg::EntityStatus getNpcInitialStatus()
   {
     geometry_msgs::msg::Pose pose;
     pose.position.x = 0.0;
@@ -149,12 +149,12 @@ private:
     rpy.x = 0.0;
     rpy.y = 0.0;
     rpy.z = 0.0;
-    simulation_api::entity::EntityStatus ret(
+    openscenario_msgs::msg::EntityStatus ret(
       api_.getCurrentTime(), 34579, 20.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
-  simulation_api::entity::EntityStatus getNpc2InitialStatus()
+  openscenario_msgs::msg::EntityStatus getNpc2InitialStatus()
   {
     geometry_msgs::msg::Pose pose;
     pose.position.x = 0.0;
@@ -178,13 +178,13 @@ private:
     rpy.x = 0.0;
     rpy.y = 0.0;
     rpy.z = 0.0;
-    simulation_api::entity::EntityStatus ret(
+    openscenario_msgs::msg::EntityStatus ret(
       api_.getCurrentTime(), 34606, 20.0, 0.0, rpy, twist, accel);
     return ret;
   }
 
 
-  simulation_api::entity::EntityStatus getBobInitialStatus()
+  openscenario_msgs::msg::EntityStatus getBobInitialStatus()
   {
     geometry_msgs::msg::Pose pose;
     pose.position.x = 0.0;
@@ -208,7 +208,7 @@ private:
     rpy.x = 0.0;
     rpy.y = 0.0;
     rpy.z = 0.0;
-    simulation_api::entity::EntityStatus ret(
+    openscenario_msgs::msg::EntityStatus ret(
       api_.getCurrentTime(), 34378, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }

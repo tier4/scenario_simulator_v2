@@ -55,7 +55,7 @@ private:
   rclcpp::TimerBase::SharedPtr update_timer_;
 
   // functions to get ego initial entity status.
-  simulation_api::entity::EntityStatus getEgoInitialStatus()
+  openscenario_msgs::msg::EntityStatus getEgoInitialStatus()
   {
     geometry_msgs::msg::Pose pose;
     pose.position.x = 0.0;
@@ -79,8 +79,10 @@ private:
     rpy.x = 0.0;
     rpy.y = 0.0;
     rpy.z = 0.0;
+    /*
     simulation_api::entity::EntityStatus ret(
       api_.getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
+    */
     return ret;
   }
 

@@ -210,7 +210,7 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
   return exclude_subtype_lanelets;
 }
 
-boost::optional<simulation_api::entity::EntityStatus> HdMapUtils::toLanePose(
+boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose)
 {
   int64_t lanelet_id = getClosetLanletId(pose);
@@ -225,9 +225,12 @@ boost::optional<simulation_api::entity::EntityStatus> HdMapUtils::toLanePose(
     quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
         pose_on_centerline.orientation, pose.orientation));
   double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
-  geometry_msgs::msg::Twist twist;
-  geometry_msgs::msg::Accel accel;
-  return simulation_api::entity::EntityStatus(0, lanelet_id, s.get(), offset, rpy, twist, accel);
+  openscenario_msgs::msg::LaneletPose lanlet_pose;
+  lanelet_pose.lanlelet_id = lanelet_id;
+  lanelet_pose.s = s.get();
+  lanlet_pose.offset = offset;
+  lanlet_pose.rpy = rpy;
+  return lanlet_pose;
 }
 
 int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
@@ -560,7 +563,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
 }
 
 boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
-  simulation_api::entity::EntityStatus status)
+  openscenario_msgs::msg::EntityStatus status)
 {
   if (status.coordinate == simulation_api::entity::WORLD) {
     geometry_msgs::msg::PoseStamped ret;
@@ -570,7 +573,7 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
   }
   if (status.coordinate == simulation_api::entity::LANE) {
     boost::optional<geometry_msgs::msg::PoseStamped> ret;
-    ret = toMapPose(status.lanelet_id, status.s, status.offset, status.rpy);
+    ret = toMapPose(status.lanelet_pose);
     return ret;
   }
   return boost::none;
@@ -600,11 +603,10 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
 }
 
 boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
-  std::int64_t lanelet_id, double s,
-  double offset,
-  geometry_msgs::msg::Vector3 rpy)
+  openscenario_msgs::msg::LaneletPose lanlet_pose)
 {
-  return toMapPose(lanelet_id, s, offset, quaternion_operation::convertEulerAngleToQuaternion(rpy));
+  return toMapPose(lanlet_pose.lanelet_id, lanlet_pose.s, lanlet_pose.offset,
+           quaternion_operation::convertEulerAngleToQuaternion(lanlet_pose.rpy));
 }
 
 boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(

@@ -48,7 +48,7 @@ void ActionNode::getBlackBoardValues()
     throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in ActionNode");
   }
 
-  if (!getInput<simulation_api::entity::EntityStatus>("entity_status", entity_status)) {
+  if (!getInput<openscenario_msgs::msg::EntityStatus>("entity_status", entity_status)) {
     throw BehaviorTreeRuntimeError("failed to get input entity_status in ActionNode");
   }
 
@@ -57,12 +57,12 @@ void ActionNode::getBlackBoardValues()
   }
 
   if (!getInput<std::unordered_map<std::string,
-    simulation_api::entity::EntityStatus>>("other_entity_status", other_entity_status))
+    openscenario_msgs::msg::EntityStatus>>("other_entity_status", other_entity_status))
   {
     throw BehaviorTreeRuntimeError("failed to get input other_entity_status in ActionNode");
   }
   if (!getInput<std::unordered_map<std::string,
-    simulation_api::entity::EntityType>>("entity_type_list", entity_type_list))
+    openscenario_msgs::msg::EntityType>>("entity_type_list", entity_type_list))
   {
     throw BehaviorTreeRuntimeError("failed to get input entity_type_list in ActionNode");
   }
@@ -71,21 +71,16 @@ void ActionNode::getBlackBoardValues()
 boost::optional<double> ActionNode::getYieldStopDistance(
   const std::vector<std::int64_t> & following_lanelets)
 {
-  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
-    return boost::none;
-  }
   std::set<double> dists;
   const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
   for (const auto & status : other_entity_status) {
-    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      for (const auto & following_lanelet : following_lanelets) {
-        for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
-          if (lanelet_id == status.second.lanelet_id) {
-            auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-                entity_status.s, following_lanelet, 0);
-            if (distance) {
-              dists.insert(distance.get());
-            }
+    for (const auto & following_lanelet : following_lanelets) {
+      for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
+        if (lanelet_id == status.second.lanelet_id) {
+          auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
+              entity_status.s, following_lanelet, 0);
+          if (distance) {
+            dists.insert(distance.get());
           }
         }
       }
@@ -97,21 +92,16 @@ boost::optional<double> ActionNode::getYieldStopDistance(
   return *dists.begin();
 }
 
-std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntities(
+std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntities(
   const std::vector<std::int64_t> & following_lanelets)
 {
-  std::vector<simulation_api::entity::EntityStatus> ret;
-  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
-    return ret;
-  }
+  std::vector<openscenario_msgs::msg::EntityStatus> ret;
   const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
   for (const auto & status : other_entity_status) {
-    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      for (const auto & following_lanelet : following_lanelets) {
-        for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
-          if (lanelet_id == status.second.lanelet_id) {
-            ret.emplace_back(status.second);
-          }
+    for (const auto & following_lanelet : following_lanelets) {
+      for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
+        if (lanelet_id == status.second.lanelet_id) {
+          ret.emplace_back(status.second);
         }
       }
     }
@@ -119,22 +109,17 @@ std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntit
   return ret;
 }
 
-std::vector<simulation_api::entity::EntityStatus> ActionNode::getRightOfWayEntities()
+std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntities()
 {
-  std::vector<simulation_api::entity::EntityStatus> ret;
-  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
-    return ret;
-  }
+  std::vector<openscenario_msgs::msg::EntityStatus> ret;
   const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_id);
   if (lanelet_ids.size() == 0) {
     return ret;
   }
   for (const auto & status : other_entity_status) {
-    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      for (const std::int64_t & lanelet_id : lanelet_ids) {
-        if (lanelet_id == status.second.lanelet_id) {
-          ret.emplace_back(status.second);
-        }
+    for (const std::int64_t & lanelet_id : lanelet_ids) {
+      if (lanelet_id == status.second.lanelet_id) {
+        ret.emplace_back(status.second);
       }
     }
   }
@@ -150,42 +135,34 @@ boost::optional<double> ActionNode::getDistanceToStopLine(
 
 boost::optional<double> ActionNode::getDistanceToFrontEntity()
 {
-  if (entity_status.coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
-    return boost::none;
-  }
   auto status = getFrontEntityStatus();
   if (!status) {
-    return boost::none;
-  }
-  if (status->coordinate != simulation_api::entity::CoordinateFrameTypes::LANE) {
     return boost::none;
   }
   return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id, entity_status.s,
            status->lanelet_id, status->s);
 }
 
-boost::optional<simulation_api::entity::EntityStatus> ActionNode::getFrontEntityStatus()
+boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
 {
   boost::optional<double> front_entity_distance, front_entity_speed;
   std::string front_entity_name = "";
   for (const auto & each : other_entity_status) {
-    if (each.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-          entity_status.s,
-          each.second.lanelet_id,
-          each.second.s);
-      if (distance) {
-        if (distance.get() < 40) {
-          if (!front_entity_distance && !front_entity_speed) {
+    auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
+        entity_status.s,
+        each.second.lanelet_id,
+        each.second.s);
+    if (distance) {
+      if (distance.get() < 40) {
+        if (!front_entity_distance && !front_entity_speed) {
+          front_entity_speed = each.second.twist.linear.x;
+          front_entity_distance = distance.get();
+          front_entity_name = each.first;
+        } else {
+          if (front_entity_distance.get() > distance.get()) {
             front_entity_speed = each.second.twist.linear.x;
             front_entity_distance = distance.get();
             front_entity_name = each.first;
-          } else {
-            if (front_entity_distance.get() > distance.get()) {
-              front_entity_speed = each.second.twist.linear.x;
-              front_entity_distance = distance.get();
-              front_entity_name = each.first;
-            }
           }
         }
       }
@@ -227,7 +204,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     geometry_msgs::msg::Vector3 rpy;
     geometry_msgs::msg::Twist twist;
     geometry_msgs::msg::Accel accel;
-    simulation_api::entity::EntityStatus stop_target_status(0.0, stop_lanelet_id,
+    openscenario_msgs::msg::EntityStatus stop_target_status(0.0, stop_lanelet_id,
       stop_s, 0, rpy, twist, accel);
     auto dist_to_stop_target = hdmap_utils->getLongitudinalDistance(
       entity_status.lanelet_id, entity_status.s,
@@ -237,18 +214,16 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   return boost::none;
 }
 
-boost::optional<simulation_api::entity::EntityStatus> ActionNode::getConflictingEntityStatus(
+boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatus(
   const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
-  std::vector<simulation_api::entity::EntityStatus> conflicting_entity_status;
+  std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
   for (const auto & status : other_entity_status) {
-    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_id) >= 1)
-      {
-        conflicting_entity_status.push_back(status.second);
-      }
+    if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+      status.second.lanelet_id) >= 1)
+    {
+      conflicting_entity_status.push_back(status.second);
     }
   }
   std::vector<double> dists;
@@ -276,7 +251,7 @@ boost::optional<simulation_api::entity::EntityStatus> ActionNode::getConflicting
     geometry_msgs::msg::Vector3 rpy;
     geometry_msgs::msg::Twist twist;
     geometry_msgs::msg::Accel accel;
-    simulation_api::entity::EntityStatus conflicting_entity_status(0.0, stop_lanelet_id,
+    openscenario_msgs::msg::EntityStatus conflicting_entity_status(0.0, stop_lanelet_id,
       stop_s, 0, rpy, twist, accel);
     return conflicting_entity_status;
   }
@@ -287,12 +262,10 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   for (const auto & status : other_entity_status) {
-    if (status.second.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-      if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_id) >= 1)
-      {
-        return true;
-      }
+    if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+      status.second.lanelet_id) >= 1)
+    {
+      return true;
     }
   }
   return false;

@@ -36,8 +36,12 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
 public:
-  EgoEntity(std::string name, const EntityStatus & initial_state, const pugi::xml_node & xml);
-  EgoEntity(std::string name, const EntityStatus & initial_state, VehicleParameters parameters);
+  EgoEntity(
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    const pugi::xml_node & xml);
+  EgoEntity(
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    VehicleParameters parameters);
   EgoEntity(std::string name, const pugi::xml_node & xml);
   EgoEntity(std::string name, VehicleParameters parameters);
   void setVehicleCommands(
@@ -48,7 +52,7 @@ public:
     return "none";
   }
   void onUpdate(double current_time, double step_time) override;
-  bool setStatus(const EntityStatus & status);
+  bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
   boost::optional<autoware_auto_msgs::msg::VehicleKinematicState>
   getCurrentKinematicState() const
   {
@@ -57,7 +61,7 @@ public:
 
 private:
   autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
-  const EntityStatus getEntityStatus(double time) const;
+  const openscenario_msgs::msg::EntityStatus getEntityStatus(double time) const;
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleKinematicState> current_kinematic_state_;

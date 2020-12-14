@@ -36,14 +36,10 @@ void VehicleActionNode::getBlackBoardValues()
   }
 }
 
-simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
+openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed,
   const std::vector<std::int64_t> & following_lanelets)
 {
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    throw BehaviorTreeRuntimeError(
-            "entity status must be lane when we call calculateEntityStatusUpdated");
-  }
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.accel;
   double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
@@ -69,7 +65,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
     auto previous_lanlet_ids = hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_id);
     new_lanelet_id = previous_lanlet_ids[0];
     new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id) - 0.01;
-    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+    openscenario_msgs::msg::EntityStatus entity_status_updated(current_time + step_time,
       new_lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
     return entity_status_updated;
   } else {
@@ -95,7 +91,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
                   in calculateEntityStatusUpdated function)";
                 throw BehaviorTreeRuntimeError(msg.c_str());
               }
-              auto status_in_world_frame = simulation_api::entity::EntityStatus(
+              auto status_in_world_frame = openscenario_msgs::msg::EntityStatus(
                 entity_status.time,
                 entity_status.pose,
                 entity_status.twist,
@@ -113,7 +109,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
       throw BehaviorTreeRuntimeError(
               "failed to calculate next status calculateEntityStatusUpdated function");
     }
-    simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+    openscenario_msgs::msg::EntityStatus entity_status_updated(current_time + step_time,
       new_lanelet_id, new_s, entity_status.offset, entity_status.rpy, twist_new, accel_new);
     return entity_status_updated;
   }
@@ -121,7 +117,7 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
           "failed to calculate next status calculateEntityStatusUpdated function");
 }
 
-simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(
+openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(
   double target_speed)
 {
   if (target_speed > vehicle_parameters->performance.max_speed) {
@@ -164,22 +160,15 @@ simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
   pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
 
-  simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
+  openscenario_msgs::msg::EntityStatus entity_status_updated(current_time + step_time,
     pose_new, twist_new,
     accel_new);
   return entity_status_updated;
 }
 
-simulation_api::entity::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
+openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed)
 {
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    const auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id);
-    return calculateEntityStatusUpdated(target_speed, following_lanelets);
-  }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    return calculateEntityStatusUpdatedInWorldFrame(target_speed);
-  }
-  throw BehaviorTreeRuntimeError("coordinate should be lane or world");
+  return calculateEntityStatusUpdated(target_speed, following_lanelets);
 }
 }  // namespace entity_behavior

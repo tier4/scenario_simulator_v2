@@ -27,7 +27,7 @@ namespace simulation_api
 namespace entity
 {
 VehicleEntity::VehicleEntity(
-  std::string name, const EntityStatus & initial_state,
+  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
   const pugi::xml_node & xml)
 : EntityBase(xml.child("Vehicle").attribute("name").as_string(), name, initial_state),
   parameters(xml)
@@ -38,7 +38,7 @@ VehicleEntity::VehicleEntity(
 }
 
 VehicleEntity::VehicleEntity(
-  std::string name, const EntityStatus & initial_state,
+  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
   VehicleParameters params)
 : EntityBase(params.name, name, initial_state),
   parameters(params)
@@ -69,12 +69,11 @@ VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
 void VehicleEntity::requestAcquirePosition(std::int64_t lanelet_id, double s, double offset)
 {
   tree_ptr_->setRequest("acquire_position");
-  geometry_msgs::msg::Vector3 rpy;
-  geometry_msgs::msg::Twist twist;
-  geometry_msgs::msg::Accel accel;
-  auto target_status = simulation_api::entity::EntityStatus(0, lanelet_id, s, offset, rpy,
-      twist, accel);
-  tree_ptr_->setValueToBlackBoard("target_status", target_status);
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.s = s;
+  lanelet_pose.offset = offset;
+  tree_ptr_->setValueToBlackBoard("target_lanelet_pose", lanelet_pose);
 }
 
 void VehicleEntity::requestLaneChange(std::int64_t to_lanelet_id)
@@ -109,7 +108,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   action_status_ = tree_ptr_->tick(current_time, step_time);
   auto status_updated = tree_ptr_->getUpdatedStatus();
   if (target_speed_) {
-    if (status_updated.twist.linear.x >= target_speed_.get()) {
+    if (status_updated.action_status.twist.linear.x >= target_speed_.get()) {
       target_speed_ = boost::none;
       tree_ptr_->setValueToBlackBoard("target_speed", target_speed_);
     }

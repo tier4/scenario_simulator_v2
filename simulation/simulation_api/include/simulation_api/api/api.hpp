@@ -91,15 +91,15 @@ public:
   bool spawn(
     bool is_ego, std::string name,
     std::string catalog_xml,
-    simulation_api::entity::EntityStatus status);
+    openscenario_msgs::msg::EntityStatus status);
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::VehicleParameters params,
-    simulation_api::entity::EntityStatus status);
+    openscenario_msgs::msg::EntityStatus status);
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::PedestrianParameters params,
-    simulation_api::entity::EntityStatus status);
+    openscenario_msgs::msg::EntityStatus status);
   bool spawn(
     bool is_ego, std::string name,
     std::string catalog_xml);
@@ -109,11 +109,9 @@ public:
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::PedestrianParameters params);
-  simulation_api::entity::EntityStatus getEntityStatus(
-    std::string name,
-    simulation_api::entity::CoordinateFrameTypes corrdinate =
-    simulation_api::entity::CoordinateFrameTypes::LANE);
-  bool setEntityStatus(std::string name, const simulation_api::entity::EntityStatus & status);
+  openscenario_msgs::msg::EntityStatus getEntityStatus(
+    std::string name);
+  bool setEntityStatus(std::string name, const openscenario_msgs::msg::EntityStatus & status);
   bool setEntityStatus(
     std::string name, std::string reference_entity_name,
     const geometry_msgs::msg::Pose relative_pose,
@@ -154,8 +152,8 @@ private:
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;
   double current_time_;
-  simulation_api::entity::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
-  XmlRpc::XmlRpcValue toValue(std::string name, simulation_api::entity::EntityStatus status);
+  openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
+  XmlRpc::XmlRpcValue toValue(std::string name, openscenario_msgs::msg::EntityStatus status);
   void vehicleControlCommandCallback(autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> current_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_sub_;

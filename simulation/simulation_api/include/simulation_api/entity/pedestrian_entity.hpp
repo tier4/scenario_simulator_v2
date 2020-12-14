@@ -36,10 +36,10 @@ class PedestrianEntity : public EntityBase
 {
 public:
   PedestrianEntity(
-    std::string name, const EntityStatus & initial_state,
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
     const pugi::xml_node & xml);
   PedestrianEntity(
-    std::string name, const EntityStatus & initial_state,
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
     PedestrianParameters parameters);
   PedestrianEntity(std::string name, const pugi::xml_node & xml);
   PedestrianEntity(std::string name, PedestrianParameters parameters);

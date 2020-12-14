@@ -48,7 +48,6 @@ add_library(entity_manager SHARED
   src/math/hermite_curve.cpp
   src/math/collision.cpp
   src/entity/entity_manager.cpp
-  src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/entity/vehicle_entity.cpp
   src/entity/ego_entity.cpp
@@ -158,16 +157,16 @@ install(
 #  scenario_runner_moc_node
 # ------------------------------------------------------------------------------
 
-add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
+#add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 
-target_include_directories(scenario_runner_moc_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_link_libraries(scenario_runner_moc_node simulation_api)
+#target_include_directories(scenario_runner_moc_node PUBLIC
+#  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+#  $<INSTALL_INTERFACE:include>)
+#target_link_libraries(scenario_runner_moc_node simulation_api)
 
-install(
-  TARGETS scenario_runner_moc_node
-  DESTINATION lib/simulation_api)
+#install(
+#  TARGETS scenario_runner_moc_node
+#  DESTINATION lib/simulation_api)
 
 # ------------------------------------------------------------------------------
 #  catmull_rom_visualization

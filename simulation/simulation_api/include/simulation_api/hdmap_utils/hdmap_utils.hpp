@@ -15,10 +15,10 @@
 #ifndef SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
 #define SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
 
-#include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
 
 #include <rclcpp/rclcpp.hpp>
+#include <openscenario_msgs/msg/entity_status.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <autoware_auto_msgs/msg/had_map_bin.hpp>
 #include <geometry_msgs/msg/vector3.h>
@@ -69,20 +69,18 @@ public:
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id,
     std::vector<double> s);
-  boost::optional<simulation_api::entity::EntityStatus> toLanePose(geometry_msgs::msg::Pose pose);
+  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(geometry_msgs::msg::Pose pose);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
     std::int64_t lanelet_id, double s,
     double offset,
     geometry_msgs::msg::Quaternion quat);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
-    std::int64_t lanelet_id, double s,
-    double offset,
-    geometry_msgs::msg::Vector3 rpy);
+    openscenario_msgs::msg::LaneletPose lanlet_pose);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
     std::int64_t lanelet_id, double s,
     double offset);
   boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
-    simulation_api::entity::EntityStatus status);
+    openscenario_msgs::msg::EntityStatus status);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(

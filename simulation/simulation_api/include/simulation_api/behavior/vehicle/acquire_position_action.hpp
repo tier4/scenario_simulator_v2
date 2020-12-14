@@ -16,8 +16,9 @@
 #define SIMULATION_API__BEHAVIOR__VEHICLE__ACQUIRE_POSITION_ACTION_HPP_
 
 #include <simulation_api/entity/vehicle_parameter.hpp>
-#include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
+
+#include <openscenario_msgs/msg/entity_status.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/behavior_tree.h>
@@ -41,7 +42,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<simulation_api::entity::EntityStatus>("target_status")
+      BT::InputPort<openscenario_msgs::msg::EntityStatus>("target_lanelet_pose")
     };
     BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -53,7 +54,7 @@ public:
 
 private:
   std::vector<std::int64_t> route_;
-  boost::optional<simulation_api::entity::EntityStatus> target_status_;
+  boost::optional<openscenario_msgs::msg::LaneletPose> target_lanelet_pose_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior

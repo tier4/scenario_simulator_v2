@@ -23,7 +23,7 @@ namespace scenario_simulator
 bool API::spawn(
   bool is_ego, std::string name,
   std::string catalog_xml,
-  simulation_api::entity::EntityStatus status)
+  openscenario_msgs::msg::EntityStatus status)
 {
   XmlRpc::XmlRpcValue value, status_value;
   status_value = toValue(name, status);
@@ -117,7 +117,7 @@ bool API::spawn(
 bool API::spawn(
   bool is_ego, std::string name,
   simulation_api::entity::VehicleParameters params,
-  simulation_api::entity::EntityStatus status)
+  openscenario_msgs::msg::EntityStatus status)
 {
   return spawn(is_ego, name, params.toXml(), status);
 }
@@ -125,7 +125,7 @@ bool API::spawn(
 bool API::spawn(
   bool is_ego, std::string name,
   simulation_api::entity::PedestrianParameters params,
-  simulation_api::entity::EntityStatus status)
+  openscenario_msgs::msg::EntityStatus status)
 {
   return spawn(is_ego, name, params.toXml(), status);
 }
@@ -137,11 +137,10 @@ bool API::spawn(
   return spawn(is_ego, name, params.toXml());
 }
 
-simulation_api::entity::EntityStatus API::getEntityStatus(
-  std::string name,
-  simulation_api::entity::CoordinateFrameTypes corrdinate)
+openscenario_msgs::msg::EntityStatus API::getEntityStatus(
+  std::string name)
 {
-  auto status = entity_manager_ptr_->getEntityStatus(name, corrdinate);
+  auto status = entity_manager_ptr_->getEntityStatus(name);
   if (!status) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting entity stauts, target entity : " + name);
@@ -149,7 +148,7 @@ simulation_api::entity::EntityStatus API::getEntityStatus(
   return status.get();
 }
 
-bool API::setEntityStatus(std::string name, const simulation_api::entity::EntityStatus & status)
+bool API::setEntityStatus(std::string name, const openscenario_msgs::msg::EntityStatus & status)
 {
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
@@ -174,7 +173,7 @@ bool API::setEntityStatus(
   const geometry_msgs::msg::Accel accel)
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
-  const auto status = simulation_api::entity::EntityStatus(current_time_, pose, twist, accel);
+  const auto status = openscenario_msgs::msg::EntityStatus(current_time_, pose, twist, accel);
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
@@ -234,7 +233,7 @@ boost::optional<double> API::getTimeHeadway(std::string from, std::string to)
   if (pose.position.x > 0) {
     return boost::none;
   }
-  simulation_api::entity::EntityStatus to_status = getEntityStatus(to);
+  openscenario_msgs::msg::EntityStatus to_status = getEntityStatus(to);
   double ret = (pose.position.x * -1) / (to_status.twist.linear.x);
   if (std::isnan(ret)) {
     return std::numeric_limits<double>::infinity();
@@ -284,7 +283,7 @@ bool API::checkCollision(std::string name0, std::string name1)
   return entity_manager_ptr_->checkCollision(name0, name1);
 }
 
-simulation_api::entity::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
+openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
 {
   std::string coordinate = param["coordinate"];
   std::string name = param["entity/name"];
@@ -313,7 +312,7 @@ simulation_api::entity::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
     accel.angular.y = param["accel/angular/y"];
     accel.angular.z = param["accel/angular/z"];
     double time = param["time"];
-    simulation_api::entity::EntityStatus status(time, lanelet_id, s, offset, rpy, twist,
+    openscenario_msgs::msg::EntityStatus status(time, lanelet_id, s, offset, rpy, twist,
       accel);
     return status;
   }
@@ -351,66 +350,45 @@ simulation_api::entity::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
     accel.angular.y = param["accel/angular/y"];
     accel.angular.z = param["accel/angular/z"];
     double time = param["time"];
-    simulation_api::entity::EntityStatus status(time, pose, twist, accel);
+    openscenario_msgs::msg::EntityStatus status(time, pose, twist, accel);
     return status;
   }
   throw(scenario_simulator::ExecutionFailedError("coordinate does not match, coordinate : " +
         coordinate));
 }
-XmlRpc::XmlRpcValue API::toValue(std::string name, simulation_api::entity::EntityStatus status)
+XmlRpc::XmlRpcValue API::toValue(std::string name, openscenario_msgs::msg::EntityStatus status)
 {
-  if (status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    XmlRpc::XmlRpcValue param;
-    param["entity/name"] = name;
-    param["coordinate"] = "world";
-    param["pose/position/x"] = status.pose.position.x;
-    param["pose/position/y"] = status.pose.position.y;
-    param["pose/position/z"] = status.pose.position.z;
-    param["pose/orientation/x"] = status.pose.orientation.x;
-    param["pose/orientation/y"] = status.pose.orientation.y;
-    param["pose/orientation/z"] = status.pose.orientation.z;
-    param["pose/orientation/w"] = status.pose.orientation.w;
-    param["twist/linear/x"] = status.twist.linear.x;
-    param["twist/linear/y"] = status.twist.linear.y;
-    param["twist/linear/z"] = status.twist.linear.z;
-    param["twist/angular/x"] = status.twist.angular.x;
-    param["twist/angular/y"] = status.twist.angular.y;
-    param["twist/angular/z"] = status.twist.angular.z;
-    param["accel/linear/x"] = status.accel.linear.x;
-    param["accel/linear/y"] = status.accel.linear.y;
-    param["accel/linear/z"] = status.accel.linear.z;
-    param["accel/angular/x"] = status.accel.angular.x;
-    param["accel/angular/y"] = status.accel.angular.y;
-    param["accel/angular/z"] = status.accel.angular.z;
-    param["time"] = status.time;
-    return param;
-  }
-  if (status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    XmlRpc::XmlRpcValue param;
-    param["entity/name"] = name;
-    param["coordinate"] = "lane";
-    param["lanelet_id"] = std::to_string(status.lanelet_id);
-    param["s"] = status.s;
-    param["offset"] = status.offset;
-    param["roll"] = status.rpy.x;
-    param["pitch"] = status.rpy.y;
-    param["yaw"] = status.rpy.z;
-    param["twist/linear/x"] = status.twist.linear.x;
-    param["twist/linear/y"] = status.twist.linear.y;
-    param["twist/linear/z"] = status.twist.linear.z;
-    param["twist/angular/x"] = status.twist.angular.x;
-    param["twist/angular/y"] = status.twist.angular.y;
-    param["twist/angular/z"] = status.twist.angular.z;
-    param["accel/linear/x"] = status.accel.linear.x;
-    param["accel/linear/y"] = status.accel.linear.y;
-    param["accel/linear/z"] = status.accel.linear.z;
-    param["accel/angular/x"] = status.accel.angular.x;
-    param["accel/angular/y"] = status.accel.angular.y;
-    param["accel/angular/z"] = status.accel.angular.z;
-    param["time"] = status.time;
-    return param;
-  }
-  throw(scenario_simulator::ExecutionFailedError("coordinate does not match"));
+  XmlRpc::XmlRpcValue param;
+  param["entity/name"] = name;
+  param["pose/position/x"] = status.pose.position.x;
+  param["pose/position/y"] = status.pose.position.y;
+  param["pose/position/z"] = status.pose.position.z;
+  param["pose/orientation/x"] = status.pose.orientation.x;
+  param["pose/orientation/y"] = status.pose.orientation.y;
+  param["pose/orientation/z"] = status.pose.orientation.z;
+  param["pose/orientation/w"] = status.pose.orientation.w;
+  param["twist/linear/x"] = status.twist.linear.x;
+  param["twist/linear/y"] = status.twist.linear.y;
+  param["twist/linear/z"] = status.twist.linear.z;
+  param["twist/angular/x"] = status.twist.angular.x;
+  param["twist/angular/y"] = status.twist.angular.y;
+  param["twist/angular/z"] = status.twist.angular.z;
+  param["accel/linear/x"] = status.accel.linear.x;
+  param["accel/linear/y"] = status.accel.linear.y;
+  param["accel/linear/z"] = status.accel.linear.z;
+  param["accel/angular/x"] = status.accel.angular.x;
+  param["accel/angular/y"] = status.accel.angular.y;
+  param["accel/angular/z"] = status.accel.angular.z;
+
+  param["lanelet_id"] = std::to_string(status.lanelet_id);
+  param["s"] = status.s;
+  param["offset"] = status.offset;
+  param["roll"] = status.rpy.x;
+  param["pitch"] = status.rpy.y;
+  param["yaw"] = status.rpy.z;
+
+  param["time"] = status.time;
+  return param;
 }
 XmlRpc::XmlRpcValue API::initialize(
   double realtime_factor, double step_time, int times_try,

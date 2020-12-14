@@ -72,86 +72,21 @@ void EntityBase::setOtherStatus(const std::unordered_map<std::string, EntityStat
   other_status_ = other_status;
 }
 
-const EntityStatus EntityBase::getStatus(CoordinateFrameTypes coordinate) const
+const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
 {
   if (!status_) {
     throw SimulationRuntimeError("status is not set");
   }
+  return this->status_.get();
   if (coordinate == this->status_->coordinate) {
     return this->status_.get();
   }
-  if (coordinate == CoordinateFrameTypes::LANE) {
-    if (this->status_->coordinate == CoordinateFrameTypes::WORLD) {
-      auto lane_pose = hdmap_utils_ptr_->toLanePose(this->status_->pose);
-      if (lane_pose) {
-        throw SimulationRuntimeError("Failed to calculate pose from world to lane");
-      }
-      return EntityStatus(this->status_->time, lane_pose->lanelet_id, lane_pose->s,
-               lane_pose->offset, lane_pose->rpy, this->status_->twist,
-               this->status_->accel);
-    }
-  }
-  if (coordinate == CoordinateFrameTypes::WORLD) {
-    if (this->status_->coordinate == CoordinateFrameTypes::LANE) {
-      auto map_pose = hdmap_utils_ptr_->toMapPose(this->status_->lanelet_id, this->status_->s,
-          this->status_->offset, this->status_->rpy);
-      if (map_pose) {
-        return EntityStatus(this->status_->time, map_pose->pose, this->status_->twist,
-                 this->status_->accel);
-      } else {
-        throw SimulationRuntimeError("Failed to calculate pose from lane to world");
-      }
-    }
-  }
-  throw SimulationRuntimeError("CoordinateFrameTypes of the entity status does not match");
 }
 
-bool EntityBase::setStatus(const EntityStatus & status)
+bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  if (status.coordinate == CoordinateFrameTypes::LANE) {
-    if (hdmap_utils_ptr_->isInLanelet(status.lanelet_id, status.s)) {
-      this->status_ = status;
-      return true;
-    } else {
-      auto ids = hdmap_utils_ptr_->getNextLaneletIds(status.lanelet_id, "straight");
-      if (ids.size() == 0) {
-        auto following_ids = hdmap_utils_ptr_->getNextLaneletIds(status.lanelet_id);
-        if (following_ids.size() == 0) {
-          if (status.coordinate == CoordinateFrameTypes::LANE) {
-            this->status_ = boost::none;
-            return true;
-          } else {
-            throw SimulationRuntimeError("failed to calculate map pose at the end of the lanelet");
-          }
-        }
-        if (status.coordinate == CoordinateFrameTypes::LANE) {
-          double l = status.s - hdmap_utils_ptr_->getLaneletLength(status.lanelet_id);
-          if (l < 0.0) {
-            l = 0.0;
-          }
-          this->status_ = EntityStatus(this->status_->time, following_ids[0], l,
-              this->status_->offset, this->status_->rpy,
-              this->status_->twist, this->status_->accel);
-          return true;
-        }
-        throw SimulationRuntimeError("failed to calculate map pose at the end of the lanelet");
-      }
-      double l = status.s - hdmap_utils_ptr_->getLaneletLength(status.lanelet_id);
-      if (l < 0.0) {
-        l = 0.0;
-      }
-      this->status_ = EntityStatus(this->status_->time, ids[0], l, this->status_->offset,
-          this->status_->rpy, this->status_->twist, this->status_->accel);
-      return true;
-    }
-  }
   this->status_ = status;
   return true;
-}
-
-const CoordinateFrameTypes & EntityBase::getStatusCoordinateFrameType() const
-{
-  return this->status_->coordinate;
 }
 
 bool EntityBase::setVisibility(bool visibility)

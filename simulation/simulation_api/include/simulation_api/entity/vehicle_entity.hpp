@@ -38,8 +38,12 @@ namespace entity
 class VehicleEntity : public EntityBase
 {
 public:
-  VehicleEntity(std::string name, const EntityStatus & initial_state, const pugi::xml_node & xml);
-  VehicleEntity(std::string name, const EntityStatus & initial_state, VehicleParameters parameters);
+  VehicleEntity(
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    const pugi::xml_node & xml);
+  VehicleEntity(
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    VehicleParameters parameters);
   VehicleEntity(std::string name, const pugi::xml_node & xml);
   VehicleEntity(std::string name, VehicleParameters parameters);
   const VehicleParameters parameters;
