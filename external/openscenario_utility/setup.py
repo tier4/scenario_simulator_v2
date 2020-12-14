@@ -24,17 +24,21 @@ setup(
     maintainer_email="tatsuya.yamasaki@tier4.jp",
     description="Command-line tools for ASAM OpenSCENARIO 1.0.0",
     long_description=read_file("README.md"),
-    packages=find_packages("src"),
-    package_dir={
-        "": "src"
-        },
+    packages=find_packages(),
+    # packages=find_packages("src"),
+    # package_dir={
+    #     "": "src"
+    #     },
     install_requires=open(
         Path(__file__).resolve().parent.joinpath('requirements.txt')
         ).read().splitlines(),
-    py_modules=[
-        Path(each).stem for each in glob('src/*.py')
-        ],
+    # py_modules=[
+    #     Path(each).stem for each in glob('src/*.py')
+    #     ],
     include_package_data=True,
+    package_data={
+        '': ["resources/*.xsd"]
+        },
     zip_safe=False,
     entry_points={
         'console_scripts': [
