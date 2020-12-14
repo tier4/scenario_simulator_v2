@@ -281,7 +281,7 @@ const std::vector<std::string> EntityManager::getEntityNames() const
   return ret;
 }
 
-bool EntityManager::setEntityStatus(std::string name, EntityStatus status)
+bool EntityManager::setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -299,7 +299,7 @@ bool EntityManager::setEntityStatus(std::string name, EntityStatus status)
   return false;
 }
 
-const boost::optional<EntityStatus> EntityManager::getEntityStatus(
+const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEntityStatus(
   std::string name) const
 {
   auto it = entities_.find(name);
@@ -459,15 +459,15 @@ void EntityManager::update(double current_time, double step_time)
     status_msg.name = status.first;
     status_msg.bounding_box = getBoundingBox(status.first);
     status_msg.action_status.current_action = getCurrentAction(status.first);
-    switch (getEntityType(status)) {
+    switch (getEntityType(status).type) {
       case openscenario_msgs::msg::EntityType::EGO:
-        status_msg.type = status_msg.EGO;
+        status_msg.type.type = status_msg.type.EGO;
         break;
       case openscenario_msgs::msg::EntityType::VEHICLE:
-        status_msg.type = status_msg.VEHICLE;
+        status_msg.type.type = status_msg.type.VEHICLE;
         break;
       case openscenario_msgs::msg::EntityType::PEDESTRIAN:
-        status_msg.type = status_msg.PEDESTRIAN;
+        status_msg.type.type = status_msg.type.PEDESTRIAN;
         break;
     }
     status_array_msg.status.emplace_back(status_msg);
@@ -522,25 +522,21 @@ bool EntityManager::reachPosition(
   lanelet_pose.s = s;
   lanelet_pose.offset = offset;
   auto target_pose = hdmap_utils_ptr_->toMapPose(lanelet_pose);
-  if (!target_pose) {
-    throw simulation_api::SimulationRuntimeError("failed to transform into map frame");
-  }
-  return reachPosition(name, target_pose->pose, tolerance);
+  return reachPosition(name, target_pose.pose, tolerance);
 }
 
 void EntityManager::broadcastBaseLinkTransform()
 {
   std::vector<std::string> names = getEntityNames();
   for (const auto & name : names) {
-    if (getEntityType(name) == EntityType::EGO) {
+    if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
       auto status = getEntityStatus(name);
       if (status) {
-        auto pose = hdmap_utils_ptr_->toMapPose(status.get());
-        if (pose) {
-          pose->header.stamp = clock_ptr_->now();
-          pose->header.frame_id = "base_link";
-          broadcastTransform(pose.get());
-        }
+        geometry_msgs::msg::PoseStamped pose;
+        pose.pose = status->pose;
+        pose.header.stamp = clock_ptr_->now();
+        pose.header.frame_id = "base_link";
+        broadcastTransform(pose);
       }
       return;
     }
@@ -554,12 +550,11 @@ void EntityManager::broadcastEntityTransform()
     if (entityStatusSetted(*it)) {
       auto status = getEntityStatus(*it);
       if (status) {
-        auto pose = hdmap_utils_ptr_->toMapPose(status.get());
-        if (pose) {
-          pose->header.stamp = clock_ptr_->now();
-          pose->header.frame_id = *it;
-          broadcastTransform(pose.get());
-        }
+        geometry_msgs::msg::PoseStamped pose;
+        pose.pose = status->pose;
+        pose.header.stamp = clock_ptr_->now();
+        pose.header.frame_id = *it;
+        broadcastTransform(pose);
       }
     }
   }
@@ -600,13 +595,19 @@ openscenario_msgs::msg::EntityType EntityManager::getEntityType(std::string name
 {
   auto it = entities_.find(name);
   if (it->second.type() == typeid(VehicleEntity)) {
-    return openscenario_msgs::msg::EntityType::VEHICLE;
+    openscenario_msgs::msg::EntityType type;
+    type.type = openscenario_msgs::msg::EntityType::VEHICLE;
+    return type;
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    return openscenario_msgs::msg::EntityType::EGO;
+    openscenario_msgs::msg::EntityType type;
+    type.type = openscenario_msgs::msg::EntityType::EGO;
+    return type;
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    return openscenario_msgs::msg::EntityType::PEDESTRIAN;
+    openscenario_msgs::msg::EntityType type;
+    type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+    return type;
   }
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }

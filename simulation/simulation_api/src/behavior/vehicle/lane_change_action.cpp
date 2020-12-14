@@ -94,10 +94,10 @@ BT::NodeStatus LaneChangeAction::tick()
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
       openscenario_msgs::msg::EntityStatus entity_status_updated;
-      eneity_status_updated.pose = pose;
+      entity_status_updated.pose = pose;
       auto lanelet_pose = hdmap_utils_ptr->toLaneletPose(pose);
       if (lanelet_pose) {
-        eneity_status_updated.lanelet_pose = lanelet_pose.get();
+        entity_status_updated.lanelet_pose = lanelet_pose.get();
       } else {
         entity_status_updated.lanelet_pose_valid = false;
       }
@@ -112,8 +112,8 @@ BT::NodeStatus LaneChangeAction::tick()
       lanelet_pose.lanelet_id = params.to_lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
-      eneity_status_updated.pose = hdmap_utils_ptr->toMapPose(lanelet_pose);
-      eneity_status_updated.lanelet_pose = lanelet_pose;
+      entity_status_updated.pose = hdmap_utils_ptr->toMapPose(lanelet_pose);
+      entity_status_updated.lanelet_pose = lanelet_pose;
       setOutput("updated_status", entity_status_updated);
       return BT::NodeStatus::SUCCESS;
     }

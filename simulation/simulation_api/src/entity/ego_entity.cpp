@@ -76,9 +76,9 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     current_entity_status.pose.orientation);
   state.state.heading = toHeading(rpy.z);
-  state.state.longitudinal_velocity_mps = current_entity_status.twist.linear.x;
+  state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
   state.state.lateral_velocity_mps = 0;
-  state.state.heading_rate_rps = current_entity_status.twist.angular.z;
+  state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;
   state.state.front_wheel_angle_rad = 0;
   state.state.rear_wheel_angle_rad = 0;
   current_kinematic_state_ = state;

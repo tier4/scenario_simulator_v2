@@ -511,15 +511,12 @@ boost::optional<simulation_api::math::HermiteCurve> HdMapUtils::getLaneChangeTra
   std::vector<geometry_msgs::msg::Point> ret;
   auto to_vec = getTangentVector(to_lanelet_id, to_s);
   auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
-  if (!to_vec || !goal_pose) {
-    return boost::none;
-  }
   geometry_msgs::msg::Vector3 start_vec = getVectorFromPose(from_pose, tangent_vector_size);
   geometry_msgs::msg::Vector3 goal_vec = to_vec.get();
   goal_vec.x = goal_vec.x * tangent_vector_size;
   goal_vec.y = goal_vec.y * tangent_vector_size;
   goal_vec.z = goal_vec.z * tangent_vector_size;
-  simulation_api::math::HermiteCurve curve(from_pose, goal_pose->pose, start_vec, goal_vec);
+  simulation_api::math::HermiteCurve curve(from_pose, goal_pose.pose, start_vec, goal_vec);
   return curve;
 }
 
@@ -562,24 +559,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
   return ret;
 }
 
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
-  openscenario_msgs::msg::EntityStatus status)
-{
-  if (status.coordinate == simulation_api::entity::WORLD) {
-    geometry_msgs::msg::PoseStamped ret;
-    ret.header.frame_id = "map";
-    ret.pose = status.pose;
-    return ret;
-  }
-  if (status.coordinate == simulation_api::entity::LANE) {
-    boost::optional<geometry_msgs::msg::PoseStamped> ret;
-    ret = toMapPose(status.lanelet_pose);
-    return ret;
-  }
-  return boost::none;
-}
-
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
+geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   std::int64_t lanelet_id, double s,
   double offset,
   geometry_msgs::msg::Quaternion quat)
@@ -602,22 +582,22 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
   return ret;
 }
 
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
+geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   openscenario_msgs::msg::LaneletPose lanlet_pose)
 {
   return toMapPose(lanlet_pose.lanelet_id, lanlet_pose.s, lanlet_pose.offset,
            quaternion_operation::convertEulerAngleToQuaternion(lanlet_pose.rpy));
 }
 
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
+geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   std::int64_t lanelet_id, double s,
   double offset)
 {
-  geometry_msgs::msg::Vector3 rpy;
-  rpy.x = 0;
-  rpy.y = 0;
-  rpy.z = 0;
-  return toMapPose(lanelet_id, s, offset, rpy);
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.s = s;
+  lanelet_pose.offset = offset;
+  return toMapPose(lanelet_pose);
 }
 
 boost::optional<geometry_msgs::msg::Vector3> HdMapUtils::getTangentVector(
@@ -860,6 +840,12 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   }
   return ret;
 }
+
+boost::optional<double> HdMapUtils::getDistanceToStopLine(
+  std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose)
+  {
+    return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
+  }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> following_lanelets,

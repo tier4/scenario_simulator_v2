@@ -32,12 +32,12 @@ AcquirePositionAction::AcquirePositionAction(
 
 void AcquirePositionAction::getBlackBoardValues()
 {
-  openscenario_msgs::msg::EntityStatus target_status;
-  VehicleActionNode::getBlackBoardValues();
-  if (!getInput<openscenario_msgs::msg::EntityStatus>("target_status", target_status)) {
-    target_status_ = boost::none;
+  openscenario_msgs::msg::LaneletPose target_lanelet_pose;
+  PedestrianActionNode::getBlackBoardValues();
+  if (!getInput<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
+    target_lanelet_pose_ = boost::none;
   } else {
-    target_status_ = target_status;
+    target_lanelet_pose_ = target_lanelet_pose;
   }
 }
 
@@ -60,7 +60,7 @@ BT::NodeStatus AcquirePositionAction::tick()
           following_lanelets.push_back(*itr);
         }
       } else {
-        if (entity_status.lanelet_id == *itr) {
+        if (entity_status.lanelet_pose.lanelet_id == *itr) {
           following_lanelets.push_back(*itr);
           is_finded = true;
         }
@@ -78,7 +78,7 @@ BT::NodeStatus AcquirePositionAction::tick()
     {
       auto front_entity_status = getFrontEntityStatus();
       if (front_entity_status) {
-        target_speed = front_entity_status->twist.linear.x;
+        target_speed = front_entity_status->action_status.twist.linear.x;
       }
     }
   }

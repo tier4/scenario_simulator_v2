@@ -44,7 +44,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<openscenario_msgs::msg::EntityStatus>("target_lanelet_pose")
+      BT::InputPort<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose")
     };
     BT::PortsList parent_ports = entity_behavior::PedestrianActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -54,7 +54,7 @@ public:
   }
 
 private:
-  boost::optional<openscenario_msgs::msg::EntityStatus> target_lanelet_pose_;
+  boost::optional<openscenario_msgs::msg::LaneletPose> target_lanelet_pose_;
   std::vector<std::int64_t> route_;
 };
 }      // namespace pedestrian

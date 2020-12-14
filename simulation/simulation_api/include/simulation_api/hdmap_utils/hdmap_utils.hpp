@@ -70,17 +70,15 @@ public:
     std::int64_t lanelet_id,
     std::vector<double> s);
   boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(geometry_msgs::msg::Pose pose);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
+  geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s,
     double offset,
     geometry_msgs::msg::Quaternion quat);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
+  geometry_msgs::msg::PoseStamped toMapPose(
     openscenario_msgs::msg::LaneletPose lanlet_pose);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
+  geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s,
     double offset);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
-    openscenario_msgs::msg::EntityStatus status);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
@@ -91,6 +89,8 @@ public:
   boost::optional<double> getDistanceToStopLine(
     std::vector<std::int64_t> following_lanelets, std::int64_t lanelet_id,
     double s);
+  boost::optional<double> getDistanceToStopLine(
+    std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose);
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(

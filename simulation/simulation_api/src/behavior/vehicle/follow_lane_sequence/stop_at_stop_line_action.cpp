@@ -36,9 +36,7 @@ StopAtStopLineAction::StopAtStopLineAction(
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
   const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {
-  auto distance_to_stop_target = hdmap_utils->getDistanceToStopLine(following_lanelets,
-      entity_status.lanelet_id,
-      entity_status.s);
+  auto distance_to_stop_target = getDistanceToStopLine(following_lanelets);
   if (!distance_to_stop_target) {
     return boost::none;
   }
@@ -61,7 +59,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanlet_pose.lanelet_id,
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
       50);
   if (getRightOfWayEntities(following_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;

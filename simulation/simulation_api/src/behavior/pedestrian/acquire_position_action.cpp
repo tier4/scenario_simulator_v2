@@ -31,9 +31,9 @@ AcquirePositionAction::AcquirePositionAction(
 
 void AcquirePositionAction::getBlackBoardValues()
 {
-  openscenario_msgs::msg::EntityStatus target_lanelet_pose;
+  openscenario_msgs::msg::LaneletPose target_lanelet_pose;
   PedestrianActionNode::getBlackBoardValues();
-  if (!getInput<openscenario_msgs::msg::EntityStatus>("target_lanelet_pose", target_lanelet_pose)) {
+  if (!getInput<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
     target_lanelet_pose_ = boost::none;
   } else {
     target_lanelet_pose_ = target_lanelet_pose;
@@ -73,15 +73,14 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
 
   geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.accel;
+  accel_new = entity_status.action_status.accel;
   double target_accel = (target_speed.get() - entity_status.action_status.twist.linear.x) /
     step_time;
-  if (entity_status.twist.linear.x > target_speed.get()) {
+  if (entity_status.action_status.twist.linear.x > target_speed.get()) {
     target_accel = boost::algorithm::clamp(target_accel, -5, 0);
   } else {
     target_accel = boost::algorithm::clamp(target_accel, 0, 3);
   }
-
   std::shared_ptr<simulation_api::entity::PedestrianParameters> pedestrian_param_ptr;
   if (!getInput<std::shared_ptr<simulation_api::entity::PedestrianParameters>>(
       "pedestrian_parameters", pedestrian_param_ptr))
@@ -127,7 +126,7 @@ BT::NodeStatus AcquirePositionAction::tick()
       }
     }
     if (is_finded && next_lanelet_id) {
-      geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
+      geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;
       openscenario_msgs::msg::LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = next_lanelet_id.get();
       lanelet_pose.s = new_s;
@@ -145,11 +144,11 @@ BT::NodeStatus AcquirePositionAction::tick()
       throw BehaviorTreeRuntimeError("failed to find next lanelet id");
     }
   } else {
-    geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
+    geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;
     openscenario_msgs::msg::LaneletPose lanelet_pose;
     lanelet_pose.lanelet_id = entity_status.lanelet_pose.lanelet_id;
     lanelet_pose.s = new_s;
-    lanelet_pose.offset = entity_status.offset;
+    lanelet_pose.offset = entity_status.lanelet_pose.offset;
     lanelet_pose.rpy = rpy;
     openscenario_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
