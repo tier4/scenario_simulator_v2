@@ -18,7 +18,8 @@
 import os
 
 from pathlib import Path
-from scenario_test_utility.convert import convert
+from openscenario_utility.convert import convert
+# from scenario_test_utility.convert import convert
 # from scenario_test_utility.scenario_converter import ScenarioConverter
 
 
