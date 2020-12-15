@@ -38,7 +38,8 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            "convert-yaml2xosc = openscenario_utility.convert:main"
+            "yaml2xosc = openscenario_utility.convert:main",
+            "validate-xosc = openscenario_utility.validation:main",
             ],
         },
     )

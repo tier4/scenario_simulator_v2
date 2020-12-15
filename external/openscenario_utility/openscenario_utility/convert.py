@@ -187,7 +187,7 @@ def convert(input: Path, output: Path):
         )
 
     if not schema.is_valid(xosc) and len(errors) != 0:
-        print("Error: " + errors[0], file=stderr)  # Error other than the first is not important.
+        print("Error: " + str(errors[0]), file=stderr)  # Other than the first is not important.
         exit()
 
     else:
