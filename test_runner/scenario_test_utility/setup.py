@@ -22,7 +22,6 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'convert = scenario_test_utility.convert:main',
             'result_checker = scenario_test_utility.result_checker:main',
             'scenario_converter = scenario_test_utility.scenario_converter:main',
             'workflow_validator = scenario_test_utility.workflow_validator:main',
