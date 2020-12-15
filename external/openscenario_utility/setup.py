@@ -28,9 +28,6 @@ setup(
     install_requires=open(
         Path(__file__).resolve().parent.joinpath('requirements.txt')
         ).read().splitlines(),
-    # py_modules=[
-    #     Path(each).stem for each in glob('src/*.py')
-    #     ],
     include_package_data=True,
     package_data={
         '': ["resources/*.xsd"]
@@ -38,8 +35,8 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            "yaml2xosc = openscenario_utility.convert:main",
             "validate-xosc = openscenario_utility.validation:main",
+            "yaml2xosc     = openscenario_utility.conversion:main",
             ],
         },
     )

@@ -18,7 +18,7 @@
 import os
 
 from pathlib import Path
-from openscenario_utility.convert import convert
+from openscenario_utility.conversion import convert
 
 
 class ConverterHandler():
