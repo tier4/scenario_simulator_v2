@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>openscenario_utility</name>
+  <version>0.0.0</version>
+  <description>Utility tools for ASAM OpenSCENARIO 1.0.0</description>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
+  <license>Apache License 2.0</license>
+  <depend>ament_index_python</depend>
+  <depend>python3-xmlschema</depend> <!-- conversion.py -->
+  <depend>python-argparse</depend> <!-- common -->
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

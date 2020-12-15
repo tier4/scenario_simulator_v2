@@ -22,13 +22,9 @@ setup(
     author_email="tatsuya.yamasaki@tier4.jp",
     maintainer="Tatsuya Yamasaki",
     maintainer_email="tatsuya.yamasaki@tier4.jp",
-    description="Command-line tools for ASAM OpenSCENARIO 1.0.0",
+    description="Utility tools for ASAM OpenSCENARIO 1.0.0",
     long_description=read_file("README.md"),
     packages=find_packages(),
-    # packages=find_packages("src"),
-    # package_dir={
-    #     "": "src"
-    #     },
     install_requires=open(
         Path(__file__).resolve().parent.joinpath('requirements.txt')
         ).read().splitlines(),
