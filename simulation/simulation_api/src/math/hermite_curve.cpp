@@ -125,16 +125,16 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     if (std::abs(point0.y - point1.y) <= e) {
       return boost::none;
     }
-    auto solutions = solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
+    auto solutions = solver_.solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
     for (const auto solution : solutions) {
-      if (std::fabs(cubicFunction(ay_, by_, cy_, dy_ - fy, solution) < e)) {
+      if (std::fabs(solver_.cubicFunction(ay_, by_, cy_, dy_ - fy, solution) < e)) {
         s_values.emplace_back(solution);
       }
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
-    auto solutions = solveCubicEquation(ay_, by_, cy_, dy_ - fy);
+    auto solutions = solver_.solveCubicEquation(ay_, by_, cy_, dy_ - fy);
     for (const auto solution : solutions) {
-      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
+      if (std::fabs(solver_.cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
         s_values.emplace_back(solution);
       }
     }
@@ -144,9 +144,9 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double b = bx_ * ratio - by_;
     double c = cx_ * ratio - cy_;
     double d = (dx_ - fx) * ratio - (dy_ - fy);
-    auto solutions = solveCubicEquation(a, b, c, d);
+    auto solutions = solver_.solveCubicEquation(a, b, c, d);
     for (const auto solution : solutions) {
-      if (std::fabs(cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
+      if (std::fabs(solver_.cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
         s_values.emplace_back(solution);
       }
     }
@@ -158,118 +158,6 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     return *std::max_element(s_values.begin(), s_values.end());
   }
   return *std::min_element(s_values.begin(), s_values.end());
-}
-
-/**
-  * @brief solve linear equation a*x + b = 0
-  *
-  * @param a
-  * @param b
-  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
-  */
-std::vector<double> HermiteCurve::solveLinearEquation(double a, double b) const
-{
-  constexpr double e = std::numeric_limits<float>::epsilon();
-  if (std::fabs(a) < e) {
-    if (std::fabs(b) < e) {
-      return {0};
-    }
-    return {};
-  }
-  double ret = -b / a;
-  if (0 <= ret && ret <= 1) {
-    std::cout << "result = " << ret << std::endl;
-    return {ret};
-  }
-  return {};
-}
-
-std::vector<double> HermiteCurve::solveQuadraticEquation(double a, double b, double c) const
-{
-  std::vector<double> candidates, ret;
-  constexpr double e = std::numeric_limits<float>::epsilon();
-  if (std::fabs(a) < e) {
-    return solveLinearEquation(b, c);
-  }
-  double root = b * b - 4 * a * c;
-  if (std::fabs(root) < e) {
-    candidates = {-b / (2 * a)};
-  } else if (root < 0) {
-    candidates = {};
-  } else {
-    candidates = {(-b - root) / (2 * a), (-b + root) / (2 * a)};
-  }
-  for (const auto candidate : candidates) {
-    if (0 <= candidate && candidate <= 1) {
-      ret.emplace_back(candidate);
-    }
-  }
-  return ret;
-}
-
-std::vector<double> HermiteCurve::solveCubicEquation(double a, double b, double c, double d) const
-{
-  constexpr double e = std::numeric_limits<float>::epsilon();
-  if (std::fabs(a) < e) {
-    return solveQuadraticEquation(b, c, d);
-  }
-  std::vector<double> solutions, candidates, ret;
-  auto result = solveP3(solutions, b / a, c / a, d / a);
-  if (result == 3) {
-    candidates = solutions;
-  } else if (result == 2) {
-    candidates = {solutions[0], solutions[1]};
-  } else if (result == 1) {
-    candidates = {solutions[0]};
-  }
-  for (const auto candidate : candidates) {
-    if (0 <= candidate && candidate <= 1) {
-      ret.emplace_back(candidate);
-    }
-  }
-  return ret;
-}
-
-int HermiteCurve::solveP3(std::vector<double> & x, double a, double b, double c) const
-{
-  x = std::vector<double>(3);
-  const double eps = 1e-14;
-  double a2 = a * a;
-  double q = (a2 - 3 * b) / 9;
-  double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
-  // equation x^3 + q*x + r = 0
-  double r2 = r * r;
-  double q3 = q * q * q;
-  double A, B;
-  if (r2 <= (q3 + eps)) {      //<<-- FIXED!
-    double t = r / sqrt(q3);
-    if (t < -1) {t = -1;}
-    if (t > 1) {t = 1;}
-    t = acos(t);
-    a /= 3; q = -2 * sqrt(q);
-    x[0] = q * cos(t / 3) - a;
-    x[1] = q * cos((t + M_PI * 2) / 3) - a;
-    x[2] = q * cos((t - M_PI * 2) / 3) - a;
-    return 3;
-  } else {
-    // A =-pow(fabs(r)+sqrt(r2-q3),1./3);
-    A = -root3(fabs(r) + sqrt(r2 - q3));
-    if (r < 0) {A = -A;}
-    if (A == 0) {
-      B = 0;
-    } else {
-      B = q / A;
-    }
-    a /= 3;
-    x[0] = (A + B) - a;
-    x[1] = -0.5 * (A + B) - a;
-    x[2] = 0.5 * sqrt(3.) * (A - B);
-    if (fabs(x[2]) < eps) {
-      x[2] = x[1];
-      return 2;
-    }
-    return 1;
-  }
 }
 
 boost::optional<double> HermiteCurve::getSValue(
