@@ -25,7 +25,7 @@ import xmlschema
 
 class XOSCValidator():
 
-    def __init__(self, verbose: bool):
+    def __init__(self, verbose: bool = False):
 
         self.verbose = verbose
 
