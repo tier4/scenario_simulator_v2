@@ -225,12 +225,12 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
     quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
         pose_on_centerline.orientation, pose.orientation));
   double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
-  openscenario_msgs::msg::LaneletPose lanlet_pose;
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanlelet_id = lanelet_id;
   lanelet_pose.s = s.get();
   lanlet_pose.offset = offset;
   lanlet_pose.rpy = rpy;
-  return lanlet_pose;
+  return lanelet_pose;
 }
 
 int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
@@ -480,19 +480,17 @@ boost::optional<std::pair<simulation_api::math::HermiteCurve,
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
-    if (goal_pose) {
-      double start_to_goal_dist =
-        std::sqrt(std::pow(from_pose.position.x - goal_pose->pose.position.x, 2) +
-          std::pow(from_pose.position.y - goal_pose->pose.position.y, 2) +
-          std::pow(from_pose.position.z - goal_pose->pose.position.z, 2));
-      auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
-      if (traj) {
-        if (traj->getMaximu2DCurvature() < 1.0) {
-          double eval = std::fabs(40 - traj->getLength());
-          evaluation.push_back(eval);
-          curves.push_back(traj.get());
-          target_s.push_back(to_s);
-        }
+    double start_to_goal_dist =
+      std::sqrt(std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
+        std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
+        std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
+    auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
+    if (traj) {
+      if (traj->getMaximu2DCurvature() < 1.0) {
+        double eval = std::fabs(40 - traj->getLength());
+        evaluation.push_back(eval);
+        curves.push_back(traj.get());
+        target_s.push_back(to_s);
       }
     }
   }
@@ -843,9 +841,9 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose)
-  {
-    return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
-  }
+{
+  return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
+}
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> following_lanelets,

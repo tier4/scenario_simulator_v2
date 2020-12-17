@@ -89,7 +89,7 @@ BT::NodeStatus LaneChangeAction::tick()
     }
   }
   if (curve_) {
-    double current_linear_vel = entity_status.twist.linear.x;
+    double current_linear_vel = entity_status.action_status.twist.linear.x;
     current_s_ = current_s_ + current_linear_vel * step_time;
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
