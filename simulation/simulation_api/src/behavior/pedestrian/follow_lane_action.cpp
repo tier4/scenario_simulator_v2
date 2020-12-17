@@ -41,15 +41,17 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::FAILURE;
   }
 
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id);
+  auto following_lanelets =
+    hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id);
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
   geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.accel;
+  accel_new = entity_status.action_status.accel;
 
-  double target_accel = (target_speed.get() - entity_status.twist.linear.x) / step_time;
-  if (entity_status.twist.linear.x > target_speed.get()) {
+  double target_accel = (target_speed.get() - entity_status.action_status.twist.linear.x) /
+    step_time;
+  if (entity_status.action_status.twist.linear.x > target_speed.get()) {
     target_accel = boost::algorithm::clamp(target_accel, -5, 0);
     /*　target_accel = boost::algorithm::clamp(target_accel,
       -1*vehicle_param_ptr->performance.max_deceleration, vehicle_param_ptr->performance.max_acceleration);
@@ -62,7 +64,7 @@ BT::NodeStatus FollowLaneAction::tick()
   accel_new.linear.x = target_accel;
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.twist.linear.x + accel_new.linear.x * step_time,
+    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time,
     0, 5.0);
   twist_new.linear.y = 0.0;
   twist_new.linear.z = 0.0;
@@ -70,7 +72,7 @@ BT::NodeStatus FollowLaneAction::tick()
   twist_new.angular.y = 0.0;
   twist_new.angular.z = 0.0;
 
-  double new_s = entity_status.s +
+  double new_s = entity_status.lanelet_pose.s +
     (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 *
     step_time;
   geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;

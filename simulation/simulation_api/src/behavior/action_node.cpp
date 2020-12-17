@@ -77,8 +77,9 @@ boost::optional<double> ActionNode::getYieldStopDistance(
     for (const auto & following_lanelet : following_lanelets) {
       for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
         if (lanelet_id == status.second.lanelet_id) {
-          auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-              entity_status.s, following_lanelet, 0);
+          auto distance = hdmap_utils->getLongitudinalDistance(
+            entity_status.lanelet_pose.lanelet_id,
+            entity_status.lanelet_pose.s, following_lanelet, 0);
           if (distance) {
             dists.insert(distance.get());
           }
@@ -100,7 +101,7 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
   for (const auto & status : other_entity_status) {
     for (const auto & following_lanelet : following_lanelets) {
       for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
-        if (lanelet_id == status.second.lanelet_id) {
+        if (lanelet_id == status.second.lanelet_pose.lanelet_id) {
           ret.emplace_back(status.second);
         }
       }
@@ -112,13 +113,14 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
 std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntities()
 {
   std::vector<openscenario_msgs::msg::EntityStatus> ret;
-  const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_id);
+  const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(
+    entity_status.lanelet_pose.lanelet_id);
   if (lanelet_ids.size() == 0) {
     return ret;
   }
   for (const auto & status : other_entity_status) {
     for (const std::int64_t & lanelet_id : lanelet_ids) {
-      if (lanelet_id == status.second.lanelet_id) {
+      if (lanelet_id == status.second.lanelet_pose.lanelet_id) {
         ret.emplace_back(status.second);
       }
     }
@@ -129,8 +131,7 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
 boost::optional<double> ActionNode::getDistanceToStopLine(
   const std::vector<std::int64_t> & following_lanelets)
 {
-  return hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_id,
-           entity_status.s);
+  return hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_pose);
 }
 
 boost::optional<double> ActionNode::getDistanceToFrontEntity()
@@ -139,8 +140,7 @@ boost::optional<double> ActionNode::getDistanceToFrontEntity()
   if (!status) {
     return boost::none;
   }
-  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id, entity_status.s,
-           status->lanelet_id, status->s);
+  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
 }
 
 boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
@@ -148,19 +148,18 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
   boost::optional<double> front_entity_distance, front_entity_speed;
   std::string front_entity_name = "";
   for (const auto & each : other_entity_status) {
-    auto distance = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-        entity_status.s,
-        each.second.lanelet_id,
-        each.second.s);
+    auto distance = hdmap_utils->getLongitudinalDistance(
+      entity_status.lanelet_pose,
+      each.second.lanelet_pose);
     if (distance) {
       if (distance.get() < 40) {
         if (!front_entity_distance && !front_entity_speed) {
-          front_entity_speed = each.second.twist.linear.x;
+          front_entity_speed = each.second.action_status.twist.linear.x;
           front_entity_distance = distance.get();
           front_entity_name = each.first;
         } else {
           if (front_entity_distance.get() > distance.get()) {
-            front_entity_speed = each.second.twist.linear.x;
+            front_entity_speed = each.second.action_status.twist.linear.x;
             front_entity_distance = distance.get();
             front_entity_name = each.first;
           }
@@ -185,7 +184,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   std::vector<std::pair<int, double>> collision_points;
   for (const auto & lanelet_id : following_lanelets) {
     auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id,
-        conflicting_entity_status->lanlet_pose.lanelet_id);
+        conflicting_entity_status->lanelet_pose.lanelet_id);
     if (stop_position_s) {
       auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose.lanelet_id,
           entity_status.lanelet_pose.s,

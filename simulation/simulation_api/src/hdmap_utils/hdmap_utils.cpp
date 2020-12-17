@@ -607,6 +607,14 @@ bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lan
 }
 
 boost::optional<double> HdMapUtils::getLongitudinalDistance(
+  openscenario_msgs::msg::LaneletPose from,
+  openscenario_msgs::msg::LaneletPose to
+)
+{
+  return getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
+}
+
+boost::optional<double> HdMapUtils::getLongitudinalDistance(
   std::int64_t from_lanelet_id, double from_s,
   std::int64_t to_lanelet_id, double to_s)
 {
