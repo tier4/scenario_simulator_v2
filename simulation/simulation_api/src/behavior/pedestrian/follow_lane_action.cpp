@@ -70,11 +70,20 @@ BT::NodeStatus FollowLaneAction::tick()
   twist_new.angular.y = 0.0;
   twist_new.angular.z = 0.0;
 
-  double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
+  double new_s = entity_status.s +
+    (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 *
     step_time;
-  geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
-  openscenario_msgs::msg::EntityStatus entity_status_updated(current_time + step_time,
-    entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
+  geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;
+
+  openscenario_msgs::msg::EntityStatus entity_status_updated;
+  entity_status_updated.time = current_time + step_time;
+  entity_status.lanelet_pose.lanelet_id = entity_status.lanelet_pose.lanelet_id;
+  entity_status.lanelet_pose.s = new_s;
+  entity_status.lanelet_pose.offset = entity_status.lanelet_pose.offset;
+  entity_status.lanelet_pose.rpy = rpy;
+  entity_status.action_status.twist = twist_new;
+  entity_status.action_status.accel = accel_new;
+  entity_status.pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
   setOutput("updated_status", entity_status_updated);
   return BT::NodeStatus::RUNNING;
 }

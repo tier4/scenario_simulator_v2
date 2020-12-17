@@ -185,10 +185,10 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   std::vector<std::pair<int, double>> collision_points;
   for (const auto & lanelet_id : following_lanelets) {
     auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id,
-        conflicting_entity_status->lanelet_id);
+        conflicting_entity_status->lanlet_pose.lanelet_id);
     if (stop_position_s) {
-      auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-          entity_status.s,
+      auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose.lanelet_id,
+          entity_status.lanelet_pose.s,
           lanelet_id, stop_position_s.get());
       if (dist) {
         dists.push_back(dist.get());
@@ -204,11 +204,15 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     geometry_msgs::msg::Vector3 rpy;
     geometry_msgs::msg::Twist twist;
     geometry_msgs::msg::Accel accel;
-    openscenario_msgs::msg::EntityStatus stop_target_status(0.0, stop_lanelet_id,
-      stop_s, 0, rpy, twist, accel);
+    openscenario_msgs::msg::EntityStatus stop_target_status;
+    stop_target_status.lanelet_pose.lanelet_id = stop_lanelet_id;
+    stop_target_status.lanelet_pose.s = stop_s;
+    stop_target_status.lanelet_pose.rpy = rpy;
+    stop_target_status.action_status.twist = twist;
+    stop_target_status.action_status.accel = accel;
     auto dist_to_stop_target = hdmap_utils->getLongitudinalDistance(
-      entity_status.lanelet_id, entity_status.s,
-      stop_target_status.lanelet_id, stop_target_status.s);
+      entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s,
+      stop_target_status.lanelet_pose.lanelet_id, stop_target_status.lanelet_pose.s);
     return dist_to_stop_target;
   }
   return boost::none;
@@ -221,7 +225,7 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
   std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
   for (const auto & status : other_entity_status) {
     if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-      status.second.lanelet_id) >= 1)
+      status.second.lanelet_pose.lanelet_id) >= 1)
     {
       conflicting_entity_status.push_back(status.second);
     }
@@ -231,10 +235,10 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
   for (const auto & status : conflicting_entity_status) {
     for (const auto & lanelet_id : following_lanelets) {
       auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id,
-          status.lanelet_id);
+          status.lanelet_pose.lanelet_id);
       if (stop_position_s) {
-        auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_id,
-            entity_status.s,
+        auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose.lanelet_id,
+            entity_status.lanelet_pose.s,
             lanelet_id, stop_position_s.get());
         if (dist) {
           dists.push_back(dist.get());
@@ -251,8 +255,15 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
     geometry_msgs::msg::Vector3 rpy;
     geometry_msgs::msg::Twist twist;
     geometry_msgs::msg::Accel accel;
-    openscenario_msgs::msg::EntityStatus conflicting_entity_status(0.0, stop_lanelet_id,
-      stop_s, 0, rpy, twist, accel);
+    openscenario_msgs::msg::EntityStatus conflicting_entity_status;
+    conflicting_entity_status.lanelet_pose.lanelet_id = stop_lanelet_id;
+    conflicting_entity_status.lanelet_pose.s = stop_s;
+    conflicting_entity_status.lanelet_pose.offset = 0;
+    conflicting_entity_status.lanelet_pose.rpy = rpy;
+    conflicting_entity_status.action_status.twist = twist;
+    conflicting_entity_status.action_status.accel = accel;
+    conflicting_entity_status.pose =
+      hdmap_utils->toMapPose(conflicting_entity_status.lanelet_pose).pose;
     return conflicting_entity_status;
   }
   return boost::none;
@@ -263,7 +274,7 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-      status.second.lanelet_id) >= 1)
+      status.second.lanelet_pose.lanelet_id) >= 1)
     {
       return true;
     }
@@ -273,6 +284,6 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
 
 double ActionNode::calculateStopDistance() const
 {
-  return std::pow(entity_status.twist.linear.x, 2) / (2 * 5);
+  return std::pow(entity_status.action_status.twist.linear.x, 2) / (2 * 5);
 }
 }  // namespace entity_behavior
