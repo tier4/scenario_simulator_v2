@@ -17,12 +17,12 @@
 
 import pathlib
 import sys
+import yamale
 
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.regex import resolve_ros_package
 from scenario_test_utility.workflow_validator import WorkflowValidator
-import yamale
 
 
 class DatabaseHandler():
@@ -35,11 +35,14 @@ class DatabaseHandler():
 
         **Args**
 
-        * workflow_file,log_directory(`str`)
+        * workflow_file
+        * log_directory(`str`)
 
         **Returns**
 
-        *launcher_package_path,log_path(`str`),scenarios(`list`)
+        * launcher_package_path
+        * log_path (`str`)
+        * scenarios (`list`)
 
         """
         Logger.print_separator('Reading workflow')

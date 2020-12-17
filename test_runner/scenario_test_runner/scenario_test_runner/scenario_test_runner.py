@@ -54,18 +54,20 @@ class ScenarioTestRunner:
 
         **Args**
 
-        * workflow,log_directory (`str`)
+        * workflow
+        * log_directory (`str`)
 
         **Returns**
 
-        *None
+        * None
 
         """
-        self.launcher_path, self.log_path, self.scenarios \
-            = DatabaseHandler.read_database(workflow, log_directory)
+        self.launcher_path, self.log_path, self.scenarios = DatabaseHandler.read_database(
+            workflow, log_directory)
         self.yaml_scenarios = []
         expects = []
         step_times_ms = []
+
         for scenario in self.scenarios:
             self.yaml_scenarios.append(scenario['path'])
             if 'expect' not in scenario:
@@ -76,13 +78,14 @@ class ScenarioTestRunner:
                 step_times_ms.append(2)
             else:
                 step_times_ms.append(scenario['step_time_ms'])
+
         self.xosc_scenarios, self.xosc_expects, self.xosc_step_time_ms \
-            = ConverterHandler.convert_all_scenarios(self.yaml_scenarios,
-                                                     expects, step_times_ms,
-                                                     self.launcher_path)
+            = ConverterHandler.convert_all_scenarios(
+                self.yaml_scenarios, expects, step_times_ms, self.launcher_path)
 
         if not no_validation.lower() in ["true", "t", "yes", "1"]:
             self.validate_all_scenarios()
+
         self.lifecycle_controller = LifecycleController()
         self.run_all_scenarios()
 
@@ -96,14 +99,16 @@ class ScenarioTestRunner:
 
     def monitor_state(self):
         start = time.time()
+
         while (time.time() - start) < self.timeout:
-            Logger.print_info('    Monitoring in Launcher')
+            # Logger.print_info('    Monitoring in Launcher')
             current_state = self.lifecycle_controller.get_lifecycle_state()
-            Logger.print_info('    scenario runner state is ' + current_state)
-            if(current_state == 'inactive'):
+            # Logger.print_info('    scenario runner state is ' + current_state)
+            if current_state == 'inactive':
                 Logger.print_process('    end of running')
                 return
             time.sleep(self.SLEEP_RATE)
+
         Logger.print_warning('Reached to maximum simulation time')
         self.lifecycle_controller.deactivate_node()
 
@@ -156,30 +161,44 @@ def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
     parser.add_argument(
-        '--timeout', type=int, default=180,
-        help='Specify simulation time limit in seconds.  The default is 180 seconds.')
-
-    parser.add_argument('--log',
-                        default='screen',
-                        help='Specify the type of log output.')
-
-    parser.add_argument('--scenario',
-                        help='Specify the scenario you want to execute.')
-
-    parser.add_argument('--workflow',
-                        help='Specify workflow you want to execute.')
-
-    parser.add_argument('--log_directory',
-                        help='Specify log_directory you want to execute.',
-                        default='/tmp')
+        '--timeout',
+        type=int,
+        default=180,
+        help='Specify simulation time limit in seconds.  The default is 180 seconds.',
+        )
 
     parser.add_argument(
-        '--no_validation', default=False,
-        help='Disable validation to generated scenarios.')
+        '--log',
+        default='screen',
+        help='Specify the type of log output.',
+        )
+
+    parser.add_argument(
+        '--scenario',
+        help='Specify the scenario you want to execute.',
+        )
+
+    parser.add_argument(
+        '--workflow',
+        help='Specify workflow you want to execute.',
+        )
+
+    parser.add_argument(
+        '--log_directory',
+        default='/tmp',
+        help='Specify log_directory you want to execute.',
+        )
+
+    parser.add_argument(
+        '--no_validation',
+        default=False,
+        help='Disable validation to generated scenarios.',
+        )
 
     args = parser.parse_args()
-    runner = ScenarioTestRunner(args.timeout)
-    runner.run_workflow(args.workflow, args.log_directory, args.no_validation)
+
+    ScenarioTestRunner(args.timeout).run_workflow(
+        args.workflow, args.log_directory, args.no_validation)
 
 
 if __name__ == '__main__':
