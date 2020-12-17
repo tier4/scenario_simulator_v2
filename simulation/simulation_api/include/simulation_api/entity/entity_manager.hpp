@@ -135,6 +135,10 @@ public:
         std::bind(&EntityManager::updateHdmapMarker, this));
   }
   ~EntityManager() {}
+  const boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose) const;
+  const geometry_msgs::msg::Pose toMapPose(const openscenario_msgs::msg::LaneletPose lanelet_pose)
+  const;
   bool checkCollision(std::string name0, std::string name1);
   void setVehicleCommands(
     boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,

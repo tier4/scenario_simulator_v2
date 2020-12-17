@@ -31,6 +31,18 @@ void EntityManager::setVehicleCommands(
   state_cmd_ = state_cmd;
 }
 
+const boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::toLaneletPose(
+  geometry_msgs::msg::Pose pose) const
+{
+  return hdmap_utils_ptr_->toLaneletPose(pose);
+}
+
+const geometry_msgs::msg::Pose EntityManager::toMapPose(
+  const openscenario_msgs::msg::LaneletPose lanelet_pose) const
+{
+  return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
+}
+
 void EntityManager::setVerbose(bool verbose)
 {
   for (auto it = entities_.begin(); it != entities_.end(); it++) {

@@ -173,7 +173,18 @@ bool API::setEntityStatus(
   const geometry_msgs::msg::Accel accel)
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
-  const auto status = openscenario_msgs::msg::EntityStatus(current_time_, pose, twist, accel);
+  openscenario_msgs::msg::EntityStatus status;
+  status.time = current_time_;
+  status.pose = pose;
+  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
+  status.action_status.twist = twist;
+  status.action_status.accel = accel;
+  if (lanelet_pose) {
+    status.lanelet_pose_valid = true;
+    status.lanelet_pose = lanelet_pose.get();
+  } else {
+    status.lanelet_pose_valid = false;
+  }
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
@@ -234,7 +245,7 @@ boost::optional<double> API::getTimeHeadway(std::string from, std::string to)
     return boost::none;
   }
   openscenario_msgs::msg::EntityStatus to_status = getEntityStatus(to);
-  double ret = (pose.position.x * -1) / (to_status.twist.linear.x);
+  double ret = (pose.position.x * -1) / (to_status.action_status.twist.linear.x);
   if (std::isnan(ret)) {
     return std::numeric_limits<double>::infinity();
   }
@@ -312,8 +323,16 @@ openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
     accel.angular.y = param["accel/angular/y"];
     accel.angular.z = param["accel/angular/z"];
     double time = param["time"];
-    openscenario_msgs::msg::EntityStatus status(time, lanelet_id, s, offset, rpy, twist,
-      accel);
+    openscenario_msgs::msg::EntityStatus status;
+    status.name = name;
+    status.time = time;
+    status.lanelet_pose.lanelet_id = lanelet_id;
+    status.lanelet_pose.s = s;
+    status.lanelet_pose.offset = offset;
+    status.lanelet_pose.rpy = rpy;
+    status.action_status.twist = twist;
+    status.action_status.accel = accel;
+    status.pose = entity_manager_ptr_->toMapPose(status.lanelet_pose);
     return status;
   }
   if (coordinate == "world") {
@@ -350,7 +369,19 @@ openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
     accel.angular.y = param["accel/angular/y"];
     accel.angular.z = param["accel/angular/z"];
     double time = param["time"];
-    openscenario_msgs::msg::EntityStatus status(time, pose, twist, accel);
+    openscenario_msgs::msg::EntityStatus status;
+    status.name = name;
+    status.time = time;
+    status.action_status.twist = twist;
+    status.action_status.accel = accel;
+    status.pose = pose;
+    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
+    if (lanelet_pose) {
+      status.lanelet_pose_valid = true;
+      status.lanelet_pose = lanelet_pose.get();
+    } else {
+      status.lanelet_pose_valid = false;
+    }
     return status;
   }
   throw(scenario_simulator::ExecutionFailedError("coordinate does not match, coordinate : " +
@@ -367,25 +398,25 @@ XmlRpc::XmlRpcValue API::toValue(std::string name, openscenario_msgs::msg::Entit
   param["pose/orientation/y"] = status.pose.orientation.y;
   param["pose/orientation/z"] = status.pose.orientation.z;
   param["pose/orientation/w"] = status.pose.orientation.w;
-  param["twist/linear/x"] = status.twist.linear.x;
-  param["twist/linear/y"] = status.twist.linear.y;
-  param["twist/linear/z"] = status.twist.linear.z;
-  param["twist/angular/x"] = status.twist.angular.x;
-  param["twist/angular/y"] = status.twist.angular.y;
-  param["twist/angular/z"] = status.twist.angular.z;
-  param["accel/linear/x"] = status.accel.linear.x;
-  param["accel/linear/y"] = status.accel.linear.y;
-  param["accel/linear/z"] = status.accel.linear.z;
-  param["accel/angular/x"] = status.accel.angular.x;
-  param["accel/angular/y"] = status.accel.angular.y;
-  param["accel/angular/z"] = status.accel.angular.z;
+  param["twist/linear/x"] = status.action_status.twist.linear.x;
+  param["twist/linear/y"] = status.action_status.twist.linear.y;
+  param["twist/linear/z"] = status.action_status.twist.linear.z;
+  param["twist/angular/x"] = status.action_status.twist.angular.x;
+  param["twist/angular/y"] = status.action_status.twist.angular.y;
+  param["twist/angular/z"] = status.action_status.twist.angular.z;
+  param["accel/linear/x"] = status.action_status.accel.linear.x;
+  param["accel/linear/y"] = status.action_status.accel.linear.y;
+  param["accel/linear/z"] = status.action_status.accel.linear.z;
+  param["accel/angular/x"] = status.action_status.accel.angular.x;
+  param["accel/angular/y"] = status.action_status.accel.angular.y;
+  param["accel/angular/z"] = status.action_status.accel.angular.z;
 
-  param["lanelet_id"] = std::to_string(status.lanelet_id);
-  param["s"] = status.s;
-  param["offset"] = status.offset;
-  param["roll"] = status.rpy.x;
-  param["pitch"] = status.rpy.y;
-  param["yaw"] = status.rpy.z;
+  param["lanelet_id"] = std::to_string(status.lanelet_pose.lanelet_id);
+  param["s"] = status.lanelet_pose.s;
+  param["offset"] = status.lanelet_pose.offset;
+  param["roll"] = status.lanelet_pose.rpy.x;
+  param["pitch"] = status.lanelet_pose.rpy.y;
+  param["yaw"] = status.lanelet_pose.rpy.z;
 
   param["time"] = status.time;
   return param;

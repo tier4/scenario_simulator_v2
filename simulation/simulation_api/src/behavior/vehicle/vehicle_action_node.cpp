@@ -41,9 +41,9 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   const std::vector<std::int64_t> & following_lanelets)
 {
   geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.accel;
-  double target_accel = (target_speed - entity_status.twist.linear.x) / step_time;
-  if (entity_status.twist.linear.x > target_speed) {
+  accel_new = entity_status.action_status.accel;
+  double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
+  if (entity_status.action_status.twist.linear.x > target_speed) {
     target_accel = boost::algorithm::clamp(target_accel, -5, 0);
   } else {
     target_accel = boost::algorithm::clamp(target_accel, 0, 3);
@@ -51,14 +51,14 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   accel_new.linear.x = target_accel;
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.twist.linear.x + accel_new.linear.x * step_time,
+    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time,
     -10, vehicle_parameters->performance.max_speed);
   twist_new.linear.y = 0.0;
   twist_new.linear.z = 0.0;
   twist_new.angular.x = 0.0;
   twist_new.angular.y = 0.0;
   twist_new.angular.z = 0.0;
-  std::int64_t new_lanelet_id = entity_status.lanelet_id;
+  std::int64_t new_lanelet_id = entity_status.lanelet_pose.lanelet_id;
   double new_s = entity_status.lanelet_pose.s +
     (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 *
     step_time;

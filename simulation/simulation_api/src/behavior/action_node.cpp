@@ -76,7 +76,7 @@ boost::optional<double> ActionNode::getYieldStopDistance(
   for (const auto & status : other_entity_status) {
     for (const auto & following_lanelet : following_lanelets) {
       for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
-        if (lanelet_id == status.second.lanelet_id) {
+        if (lanelet_id == status.second.lanelet_pose.lanelet_id) {
           auto distance = hdmap_utils->getLongitudinalDistance(
             entity_status.lanelet_pose.lanelet_id,
             entity_status.lanelet_pose.s, following_lanelet, 0);
