@@ -33,7 +33,7 @@ AcquirePositionAction::AcquirePositionAction(
 void AcquirePositionAction::getBlackBoardValues()
 {
   openscenario_msgs::msg::LaneletPose target_lanelet_pose;
-  PedestrianActionNode::getBlackBoardValues();
+  VehicleActionNode::getBlackBoardValues();
   if (!getInput<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
     target_lanelet_pose_ = boost::none;
   } else {
@@ -45,11 +45,12 @@ BT::NodeStatus AcquirePositionAction::tick()
 {
   getBlackBoardValues();
   if (request != "acquire_position") {
-    target_status_ = boost::none;
+    target_lanelet_pose_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
-  route_ = hdmap_utils->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
+  route_ = hdmap_utils->getRoute(entity_status.lanelet_pose.lanelet_id,
+      target_lanelet_pose_->lanelet_id);
   std::vector<std::int64_t> following_lanelets;
 
   if (!target_speed) {
@@ -93,9 +94,9 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
   auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_);
   setOutput("updated_status", entity_status_updated);
-  if (target_status_->lanelet_id == entity_status.lanelet_pose.lanelet_id) {
-    if (target_status_->s < entity_status.lanelet_pose.s) {
-      target_status_ = boost::none;
+  if (target_lanelet_pose_->lanelet_id == entity_status.lanelet_pose.lanelet_id) {
+    if (target_lanelet_pose_->s < entity_status.lanelet_pose.s) {
+      target_lanelet_pose_ = boost::none;
       return BT::NodeStatus::SUCCESS;
     }
   }

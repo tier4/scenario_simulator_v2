@@ -169,6 +169,15 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
 openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed)
 {
-  return calculateEntityStatusUpdated(target_speed, following_lanelets);
+  if (!entity_status.lanelet_pose_valid) {
+    return calculateEntityStatusUpdated(target_speed);
+  }
+  const auto following_lanelets = hdmap_utils->getFollowingLanelets(
+    entity_status.lanelet_pose.lanelet_id);
+  if (following_lanelets.size() == 0) {
+    return calculateEntityStatusUpdated(target_speed);
+  } else {
+    return calculateEntityStatusUpdated(target_speed, following_lanelets);
+  }
 }
 }  // namespace entity_behavior

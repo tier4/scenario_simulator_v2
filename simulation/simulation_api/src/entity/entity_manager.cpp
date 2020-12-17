@@ -48,7 +48,7 @@ void EntityManager::setVerbose(bool verbose)
 
 bool EntityManager::isEgo(std::string name) const
 {
-  if (getEntityType(name) == openscenario_msgs::msg::EntityType::EGO) {
+  if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
     return true;
   }
   return false;
@@ -463,7 +463,7 @@ void EntityManager::update(double current_time, double step_time)
     status_msg.name = status.first;
     status_msg.bounding_box = getBoundingBox(status.first);
     status_msg.action_status.current_action = getCurrentAction(status.first);
-    switch (getEntityType(status).type) {
+    switch (getEntityType(status.first).type) {
       case openscenario_msgs::msg::EntityType::EGO:
         status_msg.type.type = status_msg.type.EGO;
         break;

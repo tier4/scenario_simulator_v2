@@ -75,11 +75,8 @@ BT::NodeStatus LaneChangeAction::tick()
       {
         return BT::NodeStatus::FAILURE;
       }
-      auto from_pose = hdmap_utils_ptr->toMapPose(entity_status);
-      if (!from_pose) {
-        return BT::NodeStatus::FAILURE;
-      }
-      auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose->pose, params.to_lanelet_id);
+      auto from_pose = hdmap_utils_ptr->toMapPose(entity_status).pose;
+      auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose, params.to_lanelet_id);
       if (ret) {
         curve_ = ret->first;
         target_s_ = ret->second;
@@ -112,7 +109,7 @@ BT::NodeStatus LaneChangeAction::tick()
       lanelet_pose.lanelet_id = params.to_lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
-      entity_status_updated.pose = hdmap_utils_ptr->toMapPose(lanelet_pose);
+      entity_status_updated.pose = hdmap_utils_ptr->toMapPose(lanelet_pose).pose;
       entity_status_updated.lanelet_pose = lanelet_pose;
       setOutput("updated_status", entity_status_updated);
       return BT::NodeStatus::SUCCESS;

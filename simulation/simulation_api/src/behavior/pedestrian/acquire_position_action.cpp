@@ -98,26 +98,28 @@ BT::NodeStatus AcquirePositionAction::tick()
   twist_new.angular.x = 0.0;
   twist_new.angular.y = 0.0;
   twist_new.angular.z = 0.0;
-  double new_s = entity_status.s + (twist_new.linear.x + entity_status.twist.linear.x) / 2.0 *
+  double new_s = entity_status.lanelet_pose.s +
+    (twist_new.linear.x + entity_status.lanelet_pose.twist.linear.x) / 2.0 *
     step_time;
 
-  if (target_lanelet_pose_->lanelet_id == entity_status.lanelet_id) {
-    if (target_lanelet_pose_->s < entity_status.s) {
-      geometry_msgs::msg::Vector3 rpy = entity_status.rpy;
+  if (target_lanelet_pose_->lanelet_id == entity_status.lanelet_pose.lanelet_id) {
+    if (target_lanelet_pose_->s < entity_status.lanelet_pose.s) {
+      geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;
       openscenario_msgs::msg::EntityStatus entity_status_updated(current_time + step_time,
-        entity_status.lanelet_id, new_s, entity_status.offset, rpy, twist_new, accel_new);
+        entity_status.lanelet_pose.lanelet_id, new_s, entity_status.lanelet_pose.offset, rpy,
+        twist_new, accel_new);
       setOutput("updated_status", entity_status_updated);
       target_lanelet_pose_ = boost::none;
       return BT::NodeStatus::SUCCESS;
     }
   }
 
-  if (new_s > hdmap_utils->getLaneletLength(entity_status.lanelet_id)) {
-    new_s = new_s - hdmap_utils->getLaneletLength(entity_status.lanelet_id);
+  if (new_s > hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id)) {
+    new_s = new_s - hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id);
     boost::optional<std::int64_t> next_lanelet_id;
     bool is_finded = false;
     for (size_t i = 0; i != route_.size(); i++) {
-      if (route_[i] == entity_status.lanelet_id) {
+      if (route_[i] == entity_status.lanelet_pose.lanelet_id) {
         is_finded = true;
         continue;
       }
@@ -130,12 +132,12 @@ BT::NodeStatus AcquirePositionAction::tick()
       openscenario_msgs::msg::LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = next_lanelet_id.get();
       lanelet_pose.s = new_s;
-      lanelet_pose.offset = entity_status.offset;
+      lanelet_pose.offset = entity_status.lanelet_pose.offset;
       lanelet_pose.rpy = rpy;
       openscenario_msgs::msg::EntityStatus entity_status_updated;
       entity_status_updated.time = current_time + step_time;
       entity_status_updated.lanelet_pose = lanelet_pose;
-      entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose);
+      entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;
       entity_status_updated.action_status.twist = twist_new;
       entity_status_updated.action_status.accel = accel_new;
       setOutput("updated_status", entity_status_updated);
@@ -153,7 +155,7 @@ BT::NodeStatus AcquirePositionAction::tick()
     openscenario_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
     entity_status_updated.lanelet_pose = lanelet_pose;
-    entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose);
+    entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;
     entity_status_updated.action_status.twist = twist_new;
     entity_status_updated.action_status.accel = accel_new;
     setOutput("updated_status", entity_status_updated);

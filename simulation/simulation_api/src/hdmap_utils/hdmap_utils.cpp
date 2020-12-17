@@ -154,18 +154,14 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
       if (rest_distance < l) {
         for (double s_val = 0; s_val < rest_distance; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(*id_itr, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         break;
       } else {
         rest_distance = rest_distance - l;
         for (double s_val = 0; s_val < l; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(*id_itr, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         continue;
       }
@@ -175,18 +171,14 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
       if ((s + foward_distance) < l) {
         for (double s_val = s; s_val < s + foward_distance; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(lanelet_id, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         break;
       } else {
         rest_distance = rest_distance - (l - s);
         for (double s_val = s; s_val < l; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(lanelet_id, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         continue;
       }
@@ -226,10 +218,10 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
         pose_on_centerline.orientation, pose.orientation));
   double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
   openscenario_msgs::msg::LaneletPose lanelet_pose;
-  lanelet_pose.lanlelet_id = lanelet_id;
+  lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s.get();
-  lanlet_pose.offset = offset;
-  lanlet_pose.rpy = rpy;
+  lanelet_pose.offset = offset;
+  lanelet_pose.rpy = rpy;
   return lanelet_pose;
 }
 
