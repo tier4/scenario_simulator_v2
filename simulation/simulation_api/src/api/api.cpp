@@ -64,6 +64,37 @@ bool API::spawn(
   }
   return result[0][0]["success"];
 }
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  std::string catalog_xml,
+  const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, catalog_xml)) {
+    return false;
+  }
+  if (!setEntityStatus(name, map_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  std::string catalog_xml,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, catalog_xml)) {
+    return false;
+  }
+  if (!setEntityStatus(name, lanelet_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
 bool API::spawn(
   bool is_ego, std::string name,
   std::string catalog_xml)
@@ -117,6 +148,36 @@ bool API::spawn(
 bool API::spawn(
   bool is_ego, std::string name,
   simulation_api::entity::VehicleParameters params,
+  const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, map_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  simulation_api::entity::VehicleParameters params,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, lanelet_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  simulation_api::entity::VehicleParameters params,
   openscenario_msgs::msg::EntityStatus status)
 {
   return spawn(is_ego, name, params.toXml(), status);
@@ -135,6 +196,36 @@ bool API::spawn(
   simulation_api::entity::PedestrianParameters params)
 {
   return spawn(is_ego, name, params.toXml());
+}
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  simulation_api::entity::PedestrianParameters params,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, lanelet_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  simulation_api::entity::PedestrianParameters params,
+  const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, map_pose, action_status)) {
+    return false;
+  }
+  return true;
 }
 
 openscenario_msgs::msg::EntityStatus API::getEntityStatus(
@@ -255,14 +346,17 @@ geometry_msgs::msg::Pose API::getRelativePose(std::string from, std::string to)
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 geometry_msgs::msg::Pose API::getRelativePose(geometry_msgs::msg::Pose from, std::string to)
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 geometry_msgs::msg::Pose API::getRelativePose(std::string from, geometry_msgs::msg::Pose to)
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 geometry_msgs::msg::Pose API::getRelativePose(
   geometry_msgs::msg::Pose from,
   geometry_msgs::msg::Pose to)
@@ -276,6 +370,7 @@ bool API::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, 
   }
   return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
 }
+
 bool API::reachPosition(
   std::string name, std::int64_t lanelet_id, double s, double offset,
   double tolerance)
@@ -285,13 +380,49 @@ bool API::reachPosition(
   }
   return entity_manager_ptr_->reachPosition(name, lanelet_id, s, offset, tolerance);
 }
+
 boost::optional<double> API::getStandStillDuration(std::string name) const
 {
   return entity_manager_ptr_->getStandStillDuration(name);
 }
+
 bool API::checkCollision(std::string name0, std::string name1)
 {
   return entity_manager_ptr_->checkCollision(name0, name1);
+}
+
+bool API::setEntityStatus(
+  std::string name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  openscenario_msgs::msg::EntityStatus status;
+  status.lanelet_pose = lanelet_pose;
+  status.lanelet_pose_valid = true;
+  status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
+  status.name = name;
+  status.time = getCurrentTime();
+  status.action_status = action_status;
+  return setEntityStatus(name, status);
+}
+
+bool API::setEntityStatus(
+  std::string name, const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(map_pose);
+  openscenario_msgs::msg::EntityStatus status;
+  if (lanelet_pose) {
+    status.lanelet_pose = lanelet_pose.get();
+  } else {
+    status.lanelet_pose_valid = false;
+  }
+  status.pose = map_pose;
+  status.name = name;
+  status.action_status = action_status;
+  status.time = getCurrentTime();
+  status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  return setEntityStatus(name, status);
 }
 
 openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)

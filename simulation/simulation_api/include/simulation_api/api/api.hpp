@@ -94,12 +94,42 @@ public:
     openscenario_msgs::msg::EntityStatus status);
   bool spawn(
     bool is_ego, std::string name,
+    std::string catalog_xml,
+    const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
+    std::string catalog_xml,
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
     simulation_api::entity::VehicleParameters params,
     openscenario_msgs::msg::EntityStatus status);
   bool spawn(
     bool is_ego, std::string name,
+    simulation_api::entity::VehicleParameters params,
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
+    simulation_api::entity::VehicleParameters params,
+    const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
     simulation_api::entity::PedestrianParameters params,
     openscenario_msgs::msg::EntityStatus status);
+  bool spawn(
+    bool is_ego, std::string name,
+    simulation_api::entity::PedestrianParameters params,
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
+    simulation_api::entity::PedestrianParameters params,
+    const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
     bool is_ego, std::string name,
     std::string catalog_xml);
@@ -111,6 +141,12 @@ public:
     simulation_api::entity::PedestrianParameters params);
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     std::string name);
+  bool setEntityStatus(
+    std::string name, const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool setEntityStatus(
+    std::string name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
   bool setEntityStatus(std::string name, const openscenario_msgs::msg::EntityStatus & status);
   bool setEntityStatus(
     std::string name, std::string reference_entity_name,
