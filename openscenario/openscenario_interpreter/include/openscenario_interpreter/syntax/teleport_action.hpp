@@ -18,6 +18,8 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 
+#include <simulation_api/helper/helper.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -50,17 +52,15 @@ struct TeleportAction
   void start() const
   {
     if (position.is<LanePosition>()) {
-      const simulation_api::entity::EntityStatus status {
-        getCurrentTime(),
+      geometry_msgs::msg::Vector3 rpy = position.as<LanePosition>().orientation;
+      const auto lanelet_pose = simulation_api::helper::constractLaneletPose(
         Integer(position.as<LanePosition>().lane_id),
         position.as<LanePosition>().s,
         position.as<LanePosition>().offset,
-        position.as<LanePosition>().orientation,
-        geometry_msgs::msg::Twist(),
-        geometry_msgs::msg::Accel()
-      };
+        rpy.x, rpy.y, rpy.z);
+      const auto action_status = simulation_api::helper::constractActionStatus();
       for (const auto & each : inner_scope.actors) {
-        setEntityStatus(each, status);
+        setEntityStatus(each, lanelet_pose, action_status);
       }
     } else if (position.is<RelativeWorldPosition>()) {
       for (const auto & each : inner_scope.actors) {
