@@ -144,7 +144,7 @@ public:
     boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
     boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd);
   void setVerbose(bool verbose);
-  void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
+  void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, Direction direction);
   boost::optional<double> getLongitudinalDistance(

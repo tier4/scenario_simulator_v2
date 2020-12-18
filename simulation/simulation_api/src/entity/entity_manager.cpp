@@ -79,21 +79,20 @@ int EntityManager::getNumberOfEgo() const
 }
 
 void EntityManager::requestAcquirePosition(
-  std::string name, std::int64_t lanelet_id, double s,
-  double offset)
+  std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return;
   }
   if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).requestAcquirePosition(lanelet_id, s, offset);
+    boost::any_cast<VehicleEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).requestAcquirePosition(lanelet_id, s, offset);
+    boost::any_cast<EgoEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_id, s, offset);
+    boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
 }
 

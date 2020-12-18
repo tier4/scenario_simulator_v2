@@ -48,7 +48,7 @@ public:
   VehicleEntity(std::string name, VehicleParameters parameters);
   const VehicleParameters parameters;
   void onUpdate(double current_time, double step_time) override;
-  void requestAcquirePosition(std::int64_t lanelet_id, double s, double offset);
+  void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)

@@ -286,9 +286,9 @@ boost::optional<double> API::getLongitudinalDistance(std::string from, std::stri
   return entity_manager_ptr_->getLongitudinalDistance(from, to);
 }
 
-void API::requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset)
+void API::requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
-  entity_manager_ptr_->requestAcquirePosition(name, lanelet_id, s, offset);
+  entity_manager_ptr_->requestAcquirePosition(name, lanelet_pose);
 }
 
 void API::requestLaneChange(std::string name, std::int64_t to_lanelet_id)

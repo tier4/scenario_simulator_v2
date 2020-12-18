@@ -150,7 +150,7 @@ public:
     const openscenario_msgs::msg::ActionStatus action_status);
   boost::optional<double> getLongitudinalDistance(std::string from, std::string to);
   boost::optional<double> getTimeHeadway(std::string from, std::string to);
-  void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
+  void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, simulation_api::entity::Direction direction);
   bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance);

@@ -74,7 +74,8 @@ private:
     if (api_.reachPosition("ego",
       simulation_api::helper::constractLaneletPose(34615, 10.0), 5))
     {
-      api_.requestAcquirePosition("ego", 35026, 0, 0);
+      api_.requestAcquirePosition("ego",
+        simulation_api::helper::constractLaneletPose(35026, 0.0) );
       api_.setTargetSpeed("npc2", 13, true);
     }
     if (api_.reachPosition("ego",

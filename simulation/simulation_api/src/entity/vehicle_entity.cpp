@@ -66,13 +66,9 @@ VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
-void VehicleEntity::requestAcquirePosition(std::int64_t lanelet_id, double s, double offset)
+void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
   tree_ptr_->setRequest("acquire_position");
-  openscenario_msgs::msg::LaneletPose lanelet_pose;
-  lanelet_pose.lanelet_id = lanelet_id;
-  lanelet_pose.s = s;
-  lanelet_pose.offset = offset;
   tree_ptr_->setValueToBlackBoard("target_lanelet_pose", lanelet_pose);
 }
 
