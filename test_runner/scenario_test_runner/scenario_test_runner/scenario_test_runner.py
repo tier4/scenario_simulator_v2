@@ -20,6 +20,7 @@ import argparse
 import time
 
 from openscenario_utility.validation import XOSCValidator
+from pathlib import Path
 from scenario_test_runner.converter_handler import ConverterHandler
 from scenario_test_runner.database_handler import DatabaseHandler
 from scenario_test_runner.lifecycle_controller import LifecycleController
@@ -42,7 +43,7 @@ class ScenarioTestRunner:
         self.timeout = timeout
         self.database_path = None
         self.lifecycle_controller = None
-        self.launcher_path = ''
+        self.launcher_path = Path(__file__).resolve().parent.parent
         self.log_path = ''
         self.scenarios = []
         self.xosc_scenarios = []
@@ -62,18 +63,20 @@ class ScenarioTestRunner:
         * None
 
         """
-        self.launcher_path, self.log_path, self.scenarios = DatabaseHandler.read_database(
-            workflow, log_directory)
+        self.log_path, self.scenarios = DatabaseHandler.read_database(workflow, log_directory)
+
         self.yaml_scenarios = []
         expects = []
         step_times_ms = []
 
         for scenario in self.scenarios:
             self.yaml_scenarios.append(scenario['path'])
+
             if 'expect' not in scenario:
                 expects.append('success')
             else:
                 expects.append(scenario['expect'])
+
             if 'step_time_ms' not in scenario:
                 step_times_ms.append(2)
             else:
@@ -91,8 +94,8 @@ class ScenarioTestRunner:
 
     def validate_all_scenarios(self):
         """Validate all scenarios."""
-        is_valid = XOSCValidator(True)
-        Logger.print_separator('validating scenarios')
+        is_valid = XOSCValidator(False)
+        # Logger.print_separator('validating scenarios')
         for scenario in self.xosc_scenarios:
             if not is_valid(scenario):
                 exit()
@@ -105,7 +108,7 @@ class ScenarioTestRunner:
             current_state = self.lifecycle_controller.get_lifecycle_state()
             # Logger.print_info('    scenario runner state is ' + current_state)
             if current_state == 'inactive':
-                Logger.print_process('    end of running')
+                Logger.print_process('end of running')
                 return
             time.sleep(self.SLEEP_RATE)
 
@@ -114,8 +117,7 @@ class ScenarioTestRunner:
 
     def run_scenario(self):
         """Run scenario."""
-        Logger.print_process(
-            'Set maximum simulation time: ' + str(self.timeout))
+        Logger.print_process('Set maximum simulation time: ' + str(self.timeout))
         time.sleep(self.SLEEP_RATE)
         self.lifecycle_controller.activate_node()
         self.monitor_state()
