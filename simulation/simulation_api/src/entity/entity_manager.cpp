@@ -45,6 +45,7 @@ const geometry_msgs::msg::Pose EntityManager::toMapPose(
 
 void EntityManager::setVerbose(bool verbose)
 {
+  verbose_ = verbose;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     if (it->second.type() == typeid(VehicleEntity)) {
       boost::any_cast<VehicleEntity &>(it->second).setVerbose(verbose);
@@ -414,6 +415,9 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
+  if(verbose_) {
+    std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
+  }
   if (getNumberOfEgo() >= 2) {
     throw SimulationRuntimeError("multi ego simulation does not support yet.");
   }
@@ -421,7 +425,9 @@ void EntityManager::update(double current_time, double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    std::cout << "update " << it->first << " behavior" << std::endl;
+    if(verbose_) {
+      std::cout << "update " << it->first << " behavior" << std::endl;
+    }
     if (it->second.type() == typeid(VehicleEntity)) {
       boost::any_cast<VehicleEntity &>(it->second).setEntityTypeList(type_list);
       boost::any_cast<VehicleEntity &>(it->second).onUpdate(current_time, step_time);

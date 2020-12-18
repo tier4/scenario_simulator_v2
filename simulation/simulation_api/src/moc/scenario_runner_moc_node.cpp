@@ -34,6 +34,7 @@ public:
     api_(this, ament_index_cpp::get_package_share_directory(
         "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
+    api_.setVerbose(true);
     api_.initialize(1.0, 0.02);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
@@ -72,7 +73,6 @@ public:
 private:
   void update()
   {
-    std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
     /*
     if (api_.reachPosition("ego", 34615, 10, 0, 5)) {
       api_.requestAcquirePosition("ego", 35026, 0, 0);

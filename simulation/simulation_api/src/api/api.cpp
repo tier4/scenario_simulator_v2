@@ -20,6 +20,11 @@
 
 namespace scenario_simulator
 {
+void API::setVerbose(bool verbose)
+{
+  entity_manager_ptr_->setVerbose(verbose);
+}
+
 bool API::spawn(
   bool is_ego,
   std::string catalog_xml,
