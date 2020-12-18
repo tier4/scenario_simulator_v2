@@ -55,9 +55,6 @@ public:
     api_.setEntityStatus("tom", "ego", relative_position, relative_rpy,
       simulation_api::helper::constractActionStatus());
     /*
-    geometry_msgs::msg::Twist twist;
-    geometry_msgs::msg::Accel accel;
-    api_.setEntityStatus("tom", "ego", relative_position, relative_rpy, twist, accel);
     api_.spawn(false, "bob", pedestrian_params, getBobInitialStatus());
     api_.setTargetSpeed("bob", 1, true);
     lanechange_excuted_ = false;

@@ -15,6 +15,8 @@
 #ifndef SIMULATION_API__HELPER__HELPER_HPP_
 #define SIMULATION_API__HELPER__HELPER_HPP_
 
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <openscenario_msgs/msg/action_status.hpp>
 
@@ -53,7 +55,38 @@ openscenario_msgs::msg::LaneletPose constractLaneletPose(
   double offset = 0, double roll = 0,
   double pitch = 0, double yaw = 0);
 
+/**
+ * @brief helper function for constracting rpy
+ *
+ * @param roll roll value of the orientation
+ * @param pitch pitch value of the orientation
+ * @param yaw yaw value of the orientation
+ * @return geometry_msgs::msg::Vector3 RPY values
+ */
 geometry_msgs::msg::Vector3 constractRPY(double roll = 0, double pitch = 0, double yaw = 0);
+
+/**
+ * @brief helper function for constracting rpy
+ *
+ * @param quaternion quaternion class
+ * @return geometry_msgs::msg::Vector3 RPY value
+ */
+geometry_msgs::msg::Vector3 constractRPYfronQuaternion(geometry_msgs::msg::Quaternion quaternion);
+
+/**
+ * @brief helper function for constracting pose
+ *
+ * @param x x value in position
+ * @param y y value in position
+ * @param z z value in position
+ * @param roll roll value in orientation
+ * @param pitch pitch value in orientation
+ * @param yaw yaw value in orientation
+ * @return geometry_msgs::msg::Pose
+ */
+geometry_msgs::msg::Pose constractPose(
+  double x, double y, double z, double roll, double pitch,
+  double yaw);
 }  // namespace helper
 }  // namespace simulation_api
 

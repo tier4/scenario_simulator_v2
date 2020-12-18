@@ -14,6 +14,8 @@
 
 #include <simulation_api/helper/helper.hpp>
 
+#include <quaternion_operation/quaternion_operation.h>
+
 namespace simulation_api
 {
 namespace helper
@@ -58,6 +60,24 @@ geometry_msgs::msg::Vector3 constractRPY(double roll, double pitch, double yaw)
   rpy.y = pitch;
   rpy.z = yaw;
   return rpy;
+}
+
+geometry_msgs::msg::Vector3 constractRPYfronQuaternion(geometry_msgs::msg::Quaternion quaternion)
+{
+  return quaternion_operation::convertQuaternionToEulerAngle(quaternion);
+}
+
+geometry_msgs::msg::Pose constractPose(
+  double x, double y, double z, double roll, double pitch,
+  double yaw)
+{
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = x;
+  pose.position.y = y;
+  pose.position.z = z;
+  pose.orientation =
+    quaternion_operation::convertEulerAngleToQuaternion(constractRPY(roll, pitch, yaw));
+  return pose;
 }
 }  // namespace helper
 }  // namespace simulation_api
