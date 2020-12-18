@@ -21,12 +21,12 @@
 namespace scenario_simulator
 {
 bool API::spawn(
-  bool is_ego, std::string name,
+  bool is_ego,
   std::string catalog_xml,
   openscenario_msgs::msg::EntityStatus status)
 {
   XmlRpc::XmlRpcValue value, status_value;
-  status_value = toValue(name, status);
+  status_value = toValue(status);
   value[0][0]["methodName"] = "spawn_entity";
   value[0][0]["params"] = status_value;
   value[0][0]["params"]["entity/is_ego"] = is_ego;
@@ -37,12 +37,12 @@ bool API::spawn(
   // catalog_xml_doc.has("Vehicle");
   if (vehicle_node != NULL) {
     if (is_ego) {
-      simulation_api::entity::EgoEntity ego(name, status, catalog_xml_doc);
+      simulation_api::entity::EgoEntity ego(status.name, status, catalog_xml_doc);
       if (!entity_manager_ptr_->spawnEntity(ego)) {
         return false;
       }
     } else {
-      simulation_api::entity::VehicleEntity npc(name, status, catalog_xml_doc);
+      simulation_api::entity::VehicleEntity npc(status.name, status, catalog_xml_doc);
       if (!entity_manager_ptr_->spawnEntity(npc)) {
         return false;
       }
@@ -50,7 +50,7 @@ bool API::spawn(
   }
   pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
   if (pedestrian_node != NULL) {
-    simulation_api::entity::PedestrianEntity pedestrian(name, status, catalog_xml_doc);
+    simulation_api::entity::PedestrianEntity pedestrian(status.name, status, catalog_xml_doc);
     if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
       return false;
     }
@@ -176,19 +176,19 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
+  bool is_ego,
   simulation_api::entity::VehicleParameters params,
   openscenario_msgs::msg::EntityStatus status)
 {
-  return spawn(is_ego, name, params.toXml(), status);
+  return spawn(is_ego, params.toXml(), status);
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
+  bool is_ego,
   simulation_api::entity::PedestrianParameters params,
   openscenario_msgs::msg::EntityStatus status)
 {
-  return spawn(is_ego, name, params.toXml(), status);
+  return spawn(is_ego, params.toXml(), status);
 }
 
 bool API::spawn(
@@ -518,10 +518,10 @@ openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
   throw(scenario_simulator::ExecutionFailedError("coordinate does not match, coordinate : " +
         coordinate));
 }
-XmlRpc::XmlRpcValue API::toValue(std::string name, openscenario_msgs::msg::EntityStatus status)
+XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
 {
   XmlRpc::XmlRpcValue param;
-  param["entity/name"] = name;
+  param["entity/name"] = status.name;
   param["pose/position/x"] = status.pose.position.x;
   param["pose/position/y"] = status.pose.position.y;
   param["pose/position/z"] = status.pose.position.z;

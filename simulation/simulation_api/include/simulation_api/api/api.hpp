@@ -91,10 +91,6 @@ public:
   bool spawn(
     bool is_ego, std::string name,
     std::string catalog_xml,
-    openscenario_msgs::msg::EntityStatus status);
-  bool spawn(
-    bool is_ego, std::string name,
-    std::string catalog_xml,
     const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
@@ -105,10 +101,6 @@ public:
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::VehicleParameters params,
-    openscenario_msgs::msg::EntityStatus status);
-  bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::VehicleParameters params,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
@@ -116,10 +108,6 @@ public:
     simulation_api::entity::VehicleParameters params,
     const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
-  bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::PedestrianParameters params,
-    openscenario_msgs::msg::EntityStatus status);
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::PedestrianParameters params,
@@ -184,12 +172,24 @@ public:
   double getCurrentTime() const {return current_time_;}
 
 private:
+  bool spawn(
+    bool is_ego,
+    std::string catalog_xml,
+    openscenario_msgs::msg::EntityStatus status);
+  bool spawn(
+    bool is_ego,
+    simulation_api::entity::PedestrianParameters params,
+    openscenario_msgs::msg::EntityStatus status);
+  bool spawn(
+    bool is_ego,
+    simulation_api::entity::VehicleParameters params,
+    openscenario_msgs::msg::EntityStatus status);
   std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;
   double current_time_;
   openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
-  XmlRpc::XmlRpcValue toValue(std::string name, openscenario_msgs::msg::EntityStatus status);
+  XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
   void vehicleControlCommandCallback(autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> current_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_sub_;
