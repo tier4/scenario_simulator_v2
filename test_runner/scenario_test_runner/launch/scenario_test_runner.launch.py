@@ -52,7 +52,7 @@ def generate_launch_description():
         package='scenario_test_runner',
         node_executable='scenario_test_runner',
         output={
-            'stdout': 'log',
+            'stdout': 'screen',
             'stderr': 'screen',
         },
         on_exit=Shutdown(),

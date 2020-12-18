@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ament_index_python.packages import get_package_share_directory
 from argparse import ArgumentParser
 from copy import deepcopy
 from itertools import product
 from pathlib import Path
 from re import sub
 from sys import exit, stderr
+from pkg_resources import resource_string
 
 import numpy
 import xmlschema
@@ -170,11 +170,8 @@ def convert(input: Path, output: Path):
     else:
         output.mkdir(parents=True, exist_ok=True)
 
-    path = Path(
-        get_package_share_directory('scenario_test_utility')
-        ).joinpath('../ament_index/resource_index/packages/OpenSCENARIO.xsd')
-
-    schema = xmlschema.XMLSchema(str(path))
+    schema = xmlschema.XMLSchema(
+        resource_string(__name__, 'resources/OpenSCENARIO.xsd').decode('utf-8'))
 
     yaml = load_yaml(input)
 
@@ -190,7 +187,7 @@ def convert(input: Path, output: Path):
         )
 
     if not schema.is_valid(xosc) and len(errors) != 0:
-        print("Error: " + errors[0], file=stderr)  # Error other than the first is not important.
+        print("Error: " + str(errors[0]), file=stderr)  # Other than the first is not important.
         exit()
 
     else:
