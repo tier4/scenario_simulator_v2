@@ -26,12 +26,12 @@ from scenario_test_utility.manager import Manager
 from scenario_test_utility.workflow_validator import WorkflowValidator
 
 
-def resolve_ros_package(sentence):
+def resolve_ros_package(pathname: str):
 
     def replace(match):
         return get_package_share_directory(match.group(1))
 
-    return re.sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, sentence)
+    return re.sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, pathname)
 
 
 class DatabaseHandler():

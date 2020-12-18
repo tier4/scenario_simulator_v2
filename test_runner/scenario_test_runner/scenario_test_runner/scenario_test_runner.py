@@ -25,7 +25,6 @@ from pathlib import Path
 from scenario_test_runner.converter_handler import ConverterHandler
 from scenario_test_runner.database_handler import DatabaseHandler, resolve_ros_package
 from scenario_test_runner.lifecycle_controller import LifecycleController
-from scenario_test_utility.manager import Manager
 from sys import exit
 
 
@@ -46,11 +45,7 @@ class ScenarioTestRunner(LifecycleController):
         self.scenarios = []
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
-
-        if Path(log_directory).is_absolute():
-            self.log_path = log_directory
-        else:
-            self.log_path = resolve_ros_package(log_directory)
+        self.log_path = Path(resolve_ros_package(str(log_directory)))
 
     def run_workflow(self, workflow, no_validation):
         """
@@ -64,7 +59,6 @@ class ScenarioTestRunner(LifecycleController):
         **Returns**
 
         * None
-
         """
 
         self.scenarios = DatabaseHandler.read_database(workflow)
@@ -135,7 +129,8 @@ class ScenarioTestRunner(LifecycleController):
         * None
 
         """
-        Manager.mkdir(self.log_path)
+        if not self.log_path.exists():
+            self.log_path.mkdir(parents=True, exist_ok=True)
 
         for index, scenario in enumerate(self.xosc_scenarios):
             self.get_logger().info(
@@ -145,7 +140,7 @@ class ScenarioTestRunner(LifecycleController):
                 scenario,
                 self.xosc_expects[index],
                 self.xosc_step_time_ms[index],
-                self.log_path)
+                str(self.log_path))
 
             if self.get_lifecycle_state() == 'unconfigured':
                 self.get_logger().error("Failed to configure interpreter")
@@ -170,11 +165,11 @@ def main():
         help='Specify simulation time limit in seconds.  The default is 180 seconds.',
         )
 
-    parser.add_argument(
-        '--log',
-        default='screen',
-        help='Specify the type of log output.',
-        )
+    # parser.add_argument(
+    #     '--log',
+    #     default='screen',
+    #     help='Specify the type of log output.',
+    #     )
 
     parser.add_argument(
         '--scenario',
@@ -188,7 +183,8 @@ def main():
 
     parser.add_argument(
         '--log_directory',
-        default='/tmp',
+        type=Path,
+        default=Path('/tmp'),
         help='Specify log_directory you want to execute.',
         )
 
