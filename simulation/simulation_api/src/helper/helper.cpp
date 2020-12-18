@@ -35,5 +35,5 @@ openscenario_msgs::msg::ActionStatus constractActionStatus(
   status.accel = accel;
   return status;
 }
-}
-}
+}  // namespace helper
+}  // namespace simulation_api

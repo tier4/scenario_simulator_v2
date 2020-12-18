@@ -15,8 +15,10 @@
 #ifndef SIMULATION_API__API__API_HPP_
 #define SIMULATION_API__API__API_HPP_
 
-#include <awapi_accessor/accessor.hpp>
 #include <simulation_api/entity/entity_manager.hpp>
+#include <simulation_api/helper/helper.hpp>
+
+#include <awapi_accessor/accessor.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
