@@ -24,7 +24,9 @@ namespace simulation_api
 {
 namespace entity
 {
-EntityBase::EntityBase(std::string type, std::string name, const EntityStatus & initial_state)
+EntityBase::EntityBase(
+  std::string type, std::string name,
+  const openscenario_msgs::msg::EntityStatus & initial_state)
 : type(type), name(name)
 {
   status_ = initial_state;
@@ -53,7 +55,9 @@ void EntityBase::updateStandStillDuration(double step_time)
     if (!stand_still_duration_) {
       stand_still_duration_ = 0;
     }
-    if (std::fabs(status_->twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    if (std::fabs(status_->action_status.twist.linear.x) <=
+      std::numeric_limits<double>::epsilon())
+    {
       stand_still_duration_ = step_time + stand_still_duration_.get();
     } else {
       stand_still_duration_ = 0;
@@ -61,9 +65,11 @@ void EntityBase::updateStandStillDuration(double step_time)
   }
 }
 
-void EntityBase::setOtherStatus(const std::unordered_map<std::string, EntityStatus> & status)
+void EntityBase::setOtherStatus(
+  const std::unordered_map<std::string,
+  openscenario_msgs::msg::EntityStatus> & status)
 {
-  std::unordered_map<std::string, EntityStatus> other_status;
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_status;
   for (const auto & each : status) {
     if (each.first != name) {
       other_status.insert(each);
@@ -78,9 +84,6 @@ const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
     throw SimulationRuntimeError("status is not set");
   }
   return this->status_.get();
-  if (coordinate == this->status_->coordinate) {
-    return this->status_.get();
-  }
 }
 
 bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)

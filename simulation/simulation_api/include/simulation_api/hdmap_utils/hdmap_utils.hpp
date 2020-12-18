@@ -94,6 +94,10 @@ public:
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
+    openscenario_msgs::msg::LaneletPose from,
+    openscenario_msgs::msg::LaneletPose to
+  );
+  boost::optional<double> getLongitudinalDistance(
     std::int64_t from_lanelet_id, double from_s,
     std::int64_t to_lanelet_id, double to_s);
   double getSpeedLimit(std::vector<std::int64_t> lanelet_ids);

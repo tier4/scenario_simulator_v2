@@ -89,7 +89,6 @@ private:
     }
     lanelet_marker_pub_ptr_->publish(markers);
   }
-  const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
   int getNumberOfEgo() const;
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
@@ -135,6 +134,11 @@ public:
         std::bind(&EntityManager::updateHdmapMarker, this));
   }
   ~EntityManager() {}
+  const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
+  const boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose) const;
+  const geometry_msgs::msg::Pose toMapPose(const openscenario_msgs::msg::LaneletPose lanelet_pose)
+  const;
   bool checkCollision(std::string name0, std::string name1);
   void setVehicleCommands(
     boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,

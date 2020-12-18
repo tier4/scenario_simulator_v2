@@ -1,6 +1,6 @@
 openscenario_msgs/EntityType type
 
-float64 time
+float64 time 0
 
 string name
 
