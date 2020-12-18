@@ -418,7 +418,6 @@ void EntityManager::update(double current_time, double step_time)
     throw SimulationRuntimeError("multi ego simulation does not support yet.");
   }
   setVerbose(verbose_);
-
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
@@ -489,7 +488,6 @@ void EntityManager::update(double current_time, double step_time)
     status_array_msg.status.emplace_back(status_msg);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
-  // entity_marker_pub_ptr_->publish(generateMarker());
 }
 
 void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform)

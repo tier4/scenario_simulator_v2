@@ -35,6 +35,11 @@ BT::NodeStatus FollowLaneAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
+  if (!entity_status.lanelet_pose_valid) {
+    setOutput("updated_status",
+      calculateEntityStatusUpdatedInWorldFrame(entity_status.action_status.twist.linear.x));
+    return BT::NodeStatus::RUNNING;
+  }
   auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
       50);
   if (getRightOfWayEntities(following_lanelets).size() != 0) {

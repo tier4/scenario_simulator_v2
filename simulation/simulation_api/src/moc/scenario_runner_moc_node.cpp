@@ -38,7 +38,7 @@ public:
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
-    api_.spawn(true, "ego", params);
+    api_.spawn(false, "ego", params);
     api_.setEntityStatus("ego",
       simulation_api::helper::constractLaneletPose(120545, 0),
       simulation_api::helper::constractActionStatus(10));
@@ -50,22 +50,23 @@ public:
     api_.setEntityStatus("tom", "ego",
       simulation_api::helper::constractPose(10, 3, 0, 0, 0, 1.57),
       simulation_api::helper::constractActionStatus());
+    /*
     api_.spawn(false, "bob", pedestrian_params,
-      simulation_api::helper::constractLaneletPose(34378, 0),
+      simulation_api::helper::constractLaneletPose(34378, 0.0),
       simulation_api::helper::constractActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     lanechange_excuted_ = false;
     api_.spawn(false, "npc1", params,
-      simulation_api::helper::constractLaneletPose(34579, 20),
+      simulation_api::helper::constractLaneletPose(34579, 20.0),
       simulation_api::helper::constractActionStatus(5));
-    /*
-    api_.spawn(false, "npc1", params, getNpcInitialStatus());
     api_.setTargetSpeed("npc1", 5, true);
-    api_.spawn(false, "npc2", params, getNpc2InitialStatus());
+    api_.spawn(false, "npc2", params,
+      simulation_api::helper::constractLaneletPose(34606, 20.0),
+      simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
+    */
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
-    */
   }
 
 private:
@@ -101,37 +102,6 @@ private:
   int port_;
   scenario_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
-
-  /*
-  openscenario_msgs::msg::EntityStatus getNpc2InitialStatus()
-  {
-    geometry_msgs::msg::Pose pose;
-    pose.position.x = 0.0;
-    pose.position.y = 0.0;
-    pose.position.z = 0.0;
-    geometry_msgs::msg::Twist twist;
-    twist.linear.x = 5.0;
-    twist.linear.y = 0.0;
-    twist.linear.z = 0.0;
-    twist.angular.x = 0.0;
-    twist.angular.y = 0.0;
-    twist.angular.z = 0.0;
-    geometry_msgs::msg::Accel accel;
-    accel.linear.x = 0.0;
-    accel.linear.y = 0.0;
-    accel.linear.z = 0.0;
-    accel.angular.x = 0.0;
-    accel.angular.y = 0.0;
-    accel.angular.z = 0.0;
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0.0;
-    rpy.y = 0.0;
-    rpy.z = 0.0;
-    openscenario_msgs::msg::EntityStatus ret(
-      api_.getCurrentTime(), 34606, 20.0, 0.0, rpy, twist, accel);
-    return ret;
-  }
-  */
 
   std::string catalog_xml =
     R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>

@@ -148,6 +148,9 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
   boost::optional<double> front_entity_distance, front_entity_speed;
   std::string front_entity_name = "";
   for (const auto & each : other_entity_status) {
+    if(entity_status.lanelet_pose_valid || each.second.lanelet_pose_valid) {
+      continue;
+    }
     auto distance = hdmap_utils->getLongitudinalDistance(
       entity_status.lanelet_pose,
       each.second.lanelet_pose);
