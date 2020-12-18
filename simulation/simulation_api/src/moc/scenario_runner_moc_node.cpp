@@ -47,14 +47,16 @@ public:
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
     api_.spawn(false, "tom", pedestrian_params);
-    /*
-    geometry_msgs::msg::Twist twist;
-    geometry_msgs::msg::Accel accel;
     geometry_msgs::msg::Point relative_position;
     relative_position.x = 10;
     relative_position.y = 3;
     geometry_msgs::msg::Vector3 relative_rpy;
     relative_rpy.z = 1.57;
+    api_.setEntityStatus("tom", "ego", relative_position, relative_rpy,
+      simulation_api::helper::constractActionStatus());
+    /*
+    geometry_msgs::msg::Twist twist;
+    geometry_msgs::msg::Accel accel;
     api_.setEntityStatus("tom", "ego", relative_position, relative_rpy, twist, accel);
     api_.spawn(false, "bob", pedestrian_params, getBobInitialStatus());
     api_.setTargetSpeed("bob", 1, true);

@@ -50,5 +50,14 @@ openscenario_msgs::msg::LaneletPose constractLaneletPose(
   lanelet_pose.rpy.z = yaw;
   return lanelet_pose;
 }
+
+geometry_msgs::msg::Vector3 constractRPY(double roll, double pitch, double yaw)
+{
+  geometry_msgs::msg::Vector3 rpy;
+  rpy.x = roll;
+  rpy.y = pitch;
+  rpy.z = yaw;
+  return rpy;
+}
 }  // namespace helper
 }  // namespace simulation_api

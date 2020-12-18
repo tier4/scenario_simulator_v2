@@ -52,6 +52,8 @@ openscenario_msgs::msg::LaneletPose constractLaneletPose(
   std::int64_t lanelet_id, double s,
   double offset = 0, double roll = 0,
   double pitch = 0, double yaw = 0);
+
+geometry_msgs::msg::Vector3 constractRPY(double roll = 0, double pitch = 0, double yaw = 0);
 }  // namespace helper
 }  // namespace simulation_api
 
