@@ -368,14 +368,15 @@ bool API::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, 
   return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
 }
 
-bool API::reachPosition(
-  std::string name, std::int64_t lanelet_id, double s, double offset,
+bool reachPosition(
+  std::string name, openscenario_msgs::msg::LaneletPose target_pose,
   double tolerance)
 {
   if (!entity_manager_ptr_->entityStatusSetted(name)) {
     return false;
   }
-  return entity_manager_ptr_->reachPosition(name, lanelet_id, s, offset, tolerance);
+  return entity_manager_ptr_->reachPosition(name,
+           target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
 }
 
 boost::optional<double> API::getStandStillDuration(std::string name) const

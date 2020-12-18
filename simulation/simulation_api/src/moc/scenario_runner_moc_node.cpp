@@ -47,15 +47,13 @@ public:
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
     api_.spawn(false, "tom", pedestrian_params);
-    geometry_msgs::msg::Point relative_position;
-    relative_position.x = 10;
-    relative_position.y = 3;
-    geometry_msgs::msg::Vector3 relative_rpy;
-    relative_rpy.z = 1.57;
-    api_.setEntityStatus("tom", "ego", relative_position, relative_rpy,
+    api_.setEntityStatus("tom", "ego",
+      simulation_api::helper::constractPose(10, 3, 0, 0, 0, 1.57),
       simulation_api::helper::constractActionStatus());
+    api_.spawn(false, "bob", pedestrian_params,
+      simulation_api::helper::constractLaneletPose(34378, 0),
+      simulation_api::helper::constractActionStatus(1));
     /*
-    api_.spawn(false, "bob", pedestrian_params, getBobInitialStatus());
     api_.setTargetSpeed("bob", 1, true);
     lanechange_excuted_ = false;
     api_.spawn(false, "npc1", params, getNpcInitialStatus());
@@ -158,36 +156,6 @@ private:
     rpy.z = 0.0;
     openscenario_msgs::msg::EntityStatus ret(
       api_.getCurrentTime(), 34606, 20.0, 0.0, rpy, twist, accel);
-    return ret;
-  }
-
-
-  openscenario_msgs::msg::EntityStatus getBobInitialStatus()
-  {
-    geometry_msgs::msg::Pose pose;
-    pose.position.x = 0.0;
-    pose.position.y = 0.0;
-    pose.position.z = 0.0;
-    geometry_msgs::msg::Twist twist;
-    twist.linear.x = 1.0;
-    twist.linear.y = 0.0;
-    twist.linear.z = 0.0;
-    twist.angular.x = 0.0;
-    twist.angular.y = 0.0;
-    twist.angular.z = 0.0;
-    geometry_msgs::msg::Accel accel;
-    accel.linear.x = 0.0;
-    accel.linear.y = 0.0;
-    accel.linear.z = 0.0;
-    accel.angular.x = 0.0;
-    accel.angular.y = 0.0;
-    accel.angular.z = 0.0;
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0.0;
-    rpy.y = 0.0;
-    rpy.z = 0.0;
-    openscenario_msgs::msg::EntityStatus ret(
-      api_.getCurrentTime(), 34378, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
   */

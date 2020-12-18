@@ -162,7 +162,8 @@ public:
     geometry_msgs::msg::Pose to);
   bool reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance);
   bool reachPosition(
-    std::string name, std::int64_t lanelet_id, double s, double offset, double tolerance);
+    std::string name, openscenario_msgs::msg::LaneletPose target_pose,
+    double tolerance);
   boost::optional<double> getStandStillDuration(std::string name) const;
   bool checkCollision(std::string name0, std::string name1);
   XmlRpc::XmlRpcValue initialize(
