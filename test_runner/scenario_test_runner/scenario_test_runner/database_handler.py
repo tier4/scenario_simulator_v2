@@ -21,7 +21,7 @@ import yamale
 
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
-from scenario_test_utility.logger import Logger
+# from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.workflow_validator import WorkflowValidator
 
@@ -38,23 +38,20 @@ class DatabaseHandler():
     """class to handler database."""
 
     @staticmethod
-    def read_database(workflow_file, log_directory):
+    def read_database(workflow_file):
         """
         Read database.
 
         **Args**
 
         * workflow_file
-        * log_directory(`str`)
 
         **Returns**
 
         * launcher_package_path
-        * log_path (`str`)
         * scenarios (`list`)
 
         """
-        Logger.print_separator('Reading workflow')
         workflow_path = ''
 
         if Path(workflow_file).is_absolute():
@@ -67,17 +64,12 @@ class DatabaseHandler():
             validator.validate_workflow_file(workflow_path)
 
         except yamale.yamale_error.YamaleError:
-            import traceback
-            Logger.print_error('workflow file is not valid, shutting down')
-            Logger.print_error(traceback.format_exc())
+            # import traceback
+            # Logger.print_error('workflow file is not valid, shutting down')
+            # Logger.print_error(traceback.format_exc())
             sys.exit(1)
 
         database = Manager.read_data(workflow_path)
-
-        if Path(log_directory).is_absolute():
-            log_path = log_directory
-        else:
-            log_path = resolve_ros_package(log_directory)
 
         scenarios = []
 
@@ -92,7 +84,7 @@ class DatabaseHandler():
             scenario['path'] = scenario_path
             scenarios.append(scenario)
 
-        return log_path, scenarios
+        return scenarios
 
 
 if __name__ == '__main__':

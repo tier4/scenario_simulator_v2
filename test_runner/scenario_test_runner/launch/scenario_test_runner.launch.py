@@ -53,7 +53,7 @@ def generate_launch_description():
         package='scenario_test_runner',
         node_executable='scenario_test_runner',
         output={
-            'stdout': 'screen',  # THIS OPTION NOT WORKS IF (< ROS2 FOXY)
+            'stdout': 'screen',  # THIS OPTION NOT WORKS IF (< ROS2 ELOQUENT)
             'stderr': 'screen',
         },
         on_exit=Shutdown(),

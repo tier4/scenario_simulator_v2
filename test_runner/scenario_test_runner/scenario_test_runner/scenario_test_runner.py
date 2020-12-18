@@ -23,7 +23,7 @@ import time
 from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
 from scenario_test_runner.converter_handler import ConverterHandler
-from scenario_test_runner.database_handler import DatabaseHandler
+from scenario_test_runner.database_handler import DatabaseHandler, resolve_ros_package
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from scenario_test_utility.manager import Manager
 from sys import exit
@@ -39,18 +39,20 @@ class ScenarioTestRunner(LifecycleController):
 
     SLEEP_RATE = 1
 
-    def __init__(self, timeout):
+    def __init__(self, timeout, log_directory: Path):
 
         self.timeout = timeout
-        self.database_path = None
-        # self.lifecycle_controller = None
         self.launcher_path = Path(__file__).resolve().parent.parent
-        self.log_path = ''
         self.scenarios = []
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
 
-    def run_workflow(self, workflow, log_directory, no_validation):
+        if Path(log_directory).is_absolute():
+            self.log_path = log_directory
+        else:
+            self.log_path = resolve_ros_package(log_directory)
+
+    def run_workflow(self, workflow, no_validation):
         """
         Run workflow.
 
@@ -64,7 +66,8 @@ class ScenarioTestRunner(LifecycleController):
         * None
 
         """
-        self.log_path, self.scenarios = DatabaseHandler.read_database(workflow, log_directory)
+
+        self.scenarios = DatabaseHandler.read_database(workflow)
 
         self.yaml_scenarios = []
         expects = []
@@ -90,7 +93,6 @@ class ScenarioTestRunner(LifecycleController):
         if not no_validation.lower() in ["true", "t", "yes", "1"]:
             self.validate_all_scenarios()
 
-        # self.lifecycle_controller = LifecycleController()
         super().__init__()
 
         self.run_all_scenarios()
@@ -98,7 +100,6 @@ class ScenarioTestRunner(LifecycleController):
     def validate_all_scenarios(self):
         """Validate all scenarios."""
         is_valid = XOSCValidator(False)
-        # Logger.print_separator('validating scenarios')
         for scenario in self.xosc_scenarios:
             if not is_valid(scenario):
                 exit()
@@ -107,38 +108,27 @@ class ScenarioTestRunner(LifecycleController):
         start = time.time()
 
         while (time.time() - start) < self.timeout:
-            # Logger.print_info('    Monitoring in Launcher')
             current_state = self.get_lifecycle_state()
-            # Logger.print_info('    scenario runner state is ' + current_state)
             if current_state == 'inactive':
-                # Logger.print_process('end of running')
                 self.get_logger().info(
                     "Simulator normally transitioned to the inactive state.")
                 return
 
             time.sleep(self.SLEEP_RATE)
 
-        self.get_logger().error(
-            "The simulation has timed out. Forcibly inactivate.")
+        self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
 
         self.deactivate_node()
 
     def run_scenario(self):
         """Run scenario."""
-        # Logger.print_process('Set maximum simulation time: ' + str(self.timeout))
         time.sleep(self.SLEEP_RATE)
         self.activate_node()
         self.monitor_state()
-        print('')
 
     def run_all_scenarios(self):
         """
         Run all scenarios.
-
-        **Args**
-
-        * workflow
-        * log_directory (`str`)
 
         **Returns**
 
@@ -146,11 +136,6 @@ class ScenarioTestRunner(LifecycleController):
 
         """
         Manager.mkdir(self.log_path)
-
-        # for index, scenario in enumerate(self.xosc_scenarios):
-        #     print(str(index+1), scenario)
-
-        # success = failure = error = 0
 
         for index, scenario in enumerate(self.xosc_scenarios):
             self.get_logger().info(
@@ -215,8 +200,10 @@ def main():
 
     args = parser.parse_args()
 
-    ScenarioTestRunner(args.timeout).run_workflow(
-        args.workflow, args.log_directory, args.no_validation)
+    ScenarioTestRunner(args.timeout,
+                       args.log_directory).run_workflow(
+        args.workflow,
+        args.no_validation)
 
     rclpy.shutdown()
 
