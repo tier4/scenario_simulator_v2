@@ -38,6 +38,7 @@ public:
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
+    /*
     api_.spawn(true, "ego", params);
     api_.setEntityStatus("ego", getEgoInitialStatus());
     api_.setTargetSpeed("ego", 15, true);
@@ -62,11 +63,13 @@ public:
     api_.setTargetSpeed("npc2", 0, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
+    */
   }
 
 private:
   void update()
   {
+    /*
     if (api_.reachPosition("ego", 34615, 10, 0, 5)) {
       api_.requestAcquirePosition("ego", 35026, 0, 0);
       api_.setTargetSpeed("npc2", 13, true);
@@ -85,6 +88,7 @@ private:
     std::cout << "ego " << std::endl;
     std::cout << "lanlet id : " << status.lanelet_id << std::endl;
     std::cout << "s : " << status.s << std::endl;
+    */
     api_.updateFrame();
     current_time_ = current_time_ + 0.02;
   }
@@ -96,6 +100,7 @@ private:
   scenario_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 
+  /*
   openscenario_msgs::msg::EntityStatus getEgoInitialStatus()
   {
     geometry_msgs::msg::Pose pose;
@@ -212,6 +217,7 @@ private:
       api_.getCurrentTime(), 34378, 0.0, 0.0, rpy, twist, accel);
     return ret;
   }
+  */
 
   std::string catalog_xml =
     R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
