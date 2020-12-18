@@ -24,12 +24,12 @@ namespace helper
 {
 /**
  * @brief helper function for constracting action status
- * 
+ *
  * @param linear_vel linear velocity
  * @param angular_vel angluar velocity
  * @param linear_accel linear acceleration
  * @param angular_accel angular acceleration
- * @return openscenario_msgs::msg::ActionStatus 
+ * @return openscenario_msgs::msg::ActionStatus
  */
 openscenario_msgs::msg::ActionStatus constractActionStatus(
   double linear_vel = 0,
@@ -39,14 +39,14 @@ openscenario_msgs::msg::ActionStatus constractActionStatus(
 
 /**
  * @brief helper function for constracting lanelet pose
- * 
+ *
  * @param lanelet_id lanelet id
  * @param s s value in lane coordinate
  * @param offset offset value in lane coordinate
  * @param roll roll value in the lane coordinate
  * @param pitch pitch value in the lane coordinate
  * @param yaw yaw value in the lane coordinate
- * @return openscenario_msgs::msg::LaneletPose 
+ * @return openscenario_msgs::msg::LaneletPose
  */
 openscenario_msgs::msg::LaneletPose constractLaneletPose(
   std::int64_t lanelet_id, double s,

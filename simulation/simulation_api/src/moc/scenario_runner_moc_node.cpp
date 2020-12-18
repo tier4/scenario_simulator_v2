@@ -39,13 +39,15 @@ public:
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
     api_.spawn(true, "ego", params);
-    /*
-    api_.setEntityStatus("ego", getEgoInitialStatus());
+    api_.setEntityStatus("ego",
+      simulation_api::helper::constractLaneletPose(120545, 0),
+      simulation_api::helper::constractActionStatus(10));
     api_.setTargetSpeed("ego", 15, true);
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
     api_.spawn(false, "tom", pedestrian_params);
+    /*
     geometry_msgs::msg::Twist twist;
     geometry_msgs::msg::Accel accel;
     geometry_msgs::msg::Point relative_position;
@@ -101,34 +103,6 @@ private:
   rclcpp::TimerBase::SharedPtr update_timer_;
 
   /*
-  openscenario_msgs::msg::EntityStatus getEgoInitialStatus()
-  {
-    geometry_msgs::msg::Pose pose;
-    pose.position.x = 0.0;
-    pose.position.y = 0.0;
-    pose.position.z = 0.0;
-    geometry_msgs::msg::Twist twist;
-    twist.linear.x = 10.0;
-    twist.linear.y = 0.0;
-    twist.linear.z = 0.0;
-    twist.angular.x = 0.0;
-    twist.angular.y = 0.0;
-    twist.angular.z = 0.0;
-    geometry_msgs::msg::Accel accel;
-    accel.linear.x = 0.0;
-    accel.linear.y = 0.0;
-    accel.linear.z = 0.0;
-    accel.angular.x = 0.0;
-    accel.angular.y = 0.0;
-    accel.angular.z = 0.0;
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0.0;
-    rpy.y = 0.0;
-    rpy.z = 0.0;
-    openscenario_msgs::msg::EntityStatus ret(
-      api_.getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
-    return ret;
-  }
 
   openscenario_msgs::msg::EntityStatus getNpcInitialStatus()
   {

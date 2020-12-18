@@ -141,14 +141,12 @@ public:
   bool setEntityStatus(
     std::string name, std::string reference_entity_name,
     const geometry_msgs::msg::Pose relative_pose,
-    const geometry_msgs::msg::Twist twist,
-    const geometry_msgs::msg::Accel accel);
+    const openscenario_msgs::msg::ActionStatus action_status);
   bool setEntityStatus(
     std::string name, std::string reference_entity_name,
     const geometry_msgs::msg::Point relative_position,
     const geometry_msgs::msg::Vector3 relative_rpy,
-    const geometry_msgs::msg::Twist twist,
-    const geometry_msgs::msg::Accel accel);
+    const openscenario_msgs::msg::ActionStatus action_status);
   boost::optional<double> getLongitudinalDistance(std::string from, std::string to);
   boost::optional<double> getTimeHeadway(std::string from, std::string to);
   void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);

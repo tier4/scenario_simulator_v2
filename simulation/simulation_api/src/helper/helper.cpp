@@ -38,10 +38,17 @@ openscenario_msgs::msg::ActionStatus constractActionStatus(
 
 openscenario_msgs::msg::LaneletPose constractLaneletPose(
   std::int64_t lanelet_id, double s,
-  double offset = 0, double roll = 0,
-  double pitch = 0, double yaw = 0)
+  double offset, double roll,
+  double pitch, double yaw)
 {
-
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.s = s;
+  lanelet_pose.offset = offset;
+  lanelet_pose.rpy.x = roll;
+  lanelet_pose.rpy.y = pitch;
+  lanelet_pose.rpy.z = yaw;
+  return lanelet_pose;
 }
 }  // namespace helper
 }  // namespace simulation_api

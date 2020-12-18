@@ -248,28 +248,25 @@ bool API::setEntityStatus(
   std::string name, std::string reference_entity_name,
   const geometry_msgs::msg::Point relative_position,
   const geometry_msgs::msg::Vector3 relative_rpy,
-  const geometry_msgs::msg::Twist twist,
-  const geometry_msgs::msg::Accel accel)
+  const openscenario_msgs::msg::ActionStatus action_status)
 {
   geometry_msgs::msg::Pose relative_pose;
   relative_pose.position = relative_position;
   relative_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(relative_rpy);
-  return setEntityStatus(name, reference_entity_name, relative_pose, twist, accel);
+  return setEntityStatus(name, reference_entity_name, relative_pose, action_status);
 }
 
 bool API::setEntityStatus(
   std::string name, std::string reference_entity_name,
   const geometry_msgs::msg::Pose relative_pose,
-  const geometry_msgs::msg::Twist twist,
-  const geometry_msgs::msg::Accel accel)
+  const openscenario_msgs::msg::ActionStatus action_status)
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
   openscenario_msgs::msg::EntityStatus status;
   status.time = current_time_;
   status.pose = pose;
   const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
-  status.action_status.twist = twist;
-  status.action_status.accel = accel;
+  status.action_status = action_status;
   if (lanelet_pose) {
     status.lanelet_pose_valid = true;
     status.lanelet_pose = lanelet_pose.get();
