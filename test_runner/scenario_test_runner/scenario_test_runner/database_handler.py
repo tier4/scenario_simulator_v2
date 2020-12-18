@@ -15,14 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 import sys
 import yamale
 
+from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
 from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
-from scenario_test_utility.regex import resolve_ros_package
 from scenario_test_utility.workflow_validator import WorkflowValidator
+
+
+def resolve_ros_package(sentence):
+
+    def replace(match):
+        return get_package_share_directory(match.group(1))
+
+    return re.sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, sentence)
 
 
 class DatabaseHandler():
