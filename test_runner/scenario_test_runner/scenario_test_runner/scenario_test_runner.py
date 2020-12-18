@@ -17,6 +17,7 @@
 
 
 import argparse
+import rclpy
 import time
 
 from openscenario_utility.validation import XOSCValidator
@@ -24,12 +25,11 @@ from pathlib import Path
 from scenario_test_runner.converter_handler import ConverterHandler
 from scenario_test_runner.database_handler import DatabaseHandler
 from scenario_test_runner.lifecycle_controller import LifecycleController
-from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from sys import exit
 
 
-class ScenarioTestRunner:
+class ScenarioTestRunner(LifecycleController):
     """
     class to test scenarios.
 
@@ -40,9 +40,10 @@ class ScenarioTestRunner:
     SLEEP_RATE = 1
 
     def __init__(self, timeout):
+
         self.timeout = timeout
         self.database_path = None
-        self.lifecycle_controller = None
+        # self.lifecycle_controller = None
         self.launcher_path = Path(__file__).resolve().parent.parent
         self.log_path = ''
         self.scenarios = []
@@ -89,7 +90,9 @@ class ScenarioTestRunner:
         if not no_validation.lower() in ["true", "t", "yes", "1"]:
             self.validate_all_scenarios()
 
-        self.lifecycle_controller = LifecycleController()
+        # self.lifecycle_controller = LifecycleController()
+        super().__init__()
+
         self.run_all_scenarios()
 
     def validate_all_scenarios(self):
@@ -105,21 +108,26 @@ class ScenarioTestRunner:
 
         while (time.time() - start) < self.timeout:
             # Logger.print_info('    Monitoring in Launcher')
-            current_state = self.lifecycle_controller.get_lifecycle_state()
+            current_state = self.get_lifecycle_state()
             # Logger.print_info('    scenario runner state is ' + current_state)
             if current_state == 'inactive':
-                Logger.print_process('end of running')
+                # Logger.print_process('end of running')
+                self.get_logger().info(
+                    "Simulator normally transitioned to the inactive state.")
                 return
+
             time.sleep(self.SLEEP_RATE)
 
-        Logger.print_warning('Reached to maximum simulation time')
-        self.lifecycle_controller.deactivate_node()
+        self.get_logger().error(
+            "The simulation has timed out. Forcibly inactivate.")
+
+        self.deactivate_node()
 
     def run_scenario(self):
         """Run scenario."""
-        Logger.print_process('Set maximum simulation time: ' + str(self.timeout))
+        # Logger.print_process('Set maximum simulation time: ' + str(self.timeout))
         time.sleep(self.SLEEP_RATE)
-        self.lifecycle_controller.activate_node()
+        self.activate_node()
         self.monitor_state()
         print('')
 
@@ -129,31 +137,39 @@ class ScenarioTestRunner:
 
         **Args**
 
-        * workflow,log_directory (`str`)
+        * workflow
+        * log_directory (`str`)
 
         **Returns**
 
-        *None
+        * None
 
         """
         Manager.mkdir(self.log_path)
+
+        # for index, scenario in enumerate(self.xosc_scenarios):
+        #     print(str(index+1), scenario)
+
+        # success = failure = error = 0
+
         for index, scenario in enumerate(self.xosc_scenarios):
-            print(str(index+1), scenario)
-        for index, scenario in enumerate(self.xosc_scenarios):
-            Logger.print_separator(
-                'Test case ' + str(index+1) + ' of ' + str(len(self.xosc_scenarios)))
-            self.lifecycle_controller.configure_node(
+            self.get_logger().info(
+                "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
+
+            self.configure_node(
                 scenario,
                 self.xosc_expects[index],
                 self.xosc_step_time_ms[index],
                 self.log_path)
-            if (self.lifecycle_controller.get_lifecycle_state() == 'unconfigured'):
-                Logger.print_warning(
-                    'Skip this scenario because of activation failure')
-                continue
-            self.run_scenario()
-            self.lifecycle_controller.cleanup_node()
-        self.lifecycle_controller.shutdown()
+
+            if self.get_lifecycle_state() == 'unconfigured':
+                self.get_logger().error("Failed to configure interpreter")
+
+            else:
+                self.run_scenario()
+                self.cleanup_node()
+
+        self.shutdown()
 
     def __del__(self):
         pass
@@ -201,6 +217,8 @@ def main():
 
     ScenarioTestRunner(args.timeout).run_workflow(
         args.workflow, args.log_directory, args.no_validation)
+
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
