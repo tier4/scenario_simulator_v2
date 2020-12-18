@@ -421,6 +421,7 @@ void EntityManager::update(double current_time, double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    std::cout << "update " << it->first << " behavior" << std::endl;
     if (it->second.type() == typeid(VehicleEntity)) {
       boost::any_cast<VehicleEntity &>(it->second).setEntityTypeList(type_list);
       boost::any_cast<VehicleEntity &>(it->second).onUpdate(current_time, step_time);

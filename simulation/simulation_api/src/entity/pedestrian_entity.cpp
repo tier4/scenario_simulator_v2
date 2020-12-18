@@ -100,6 +100,15 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   tree_ptr_->setValueToBlackBoard("entity_status", status_.get());
   action_status_ = tree_ptr_->tick(current_time, step_time);
   auto status_updated = tree_ptr_->getUpdatedStatus();
+  if (status_updated.lanelet_pose_valid) {
+    auto following_lanelets = hdmap_utils_ptr_->getFollowingLanelets(
+      status_updated.lanelet_pose.lanelet_id);
+    auto l = hdmap_utils_ptr_->getLaneletLength(status_updated.lanelet_pose.lanelet_id);
+    if (following_lanelets.size() == 1 && l <= status_updated.lanelet_pose.s) {
+      status_ = boost::none;
+      return;
+    }
+  }
   if (target_speed_) {
     if (status_updated.action_status.twist.linear.x >= target_speed_.get()) {
       target_speed_ = boost::none;
