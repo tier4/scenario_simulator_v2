@@ -415,7 +415,7 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
-  if(verbose_) {
+  if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
   }
   if (getNumberOfEgo() >= 2) {
@@ -425,7 +425,7 @@ void EntityManager::update(double current_time, double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if(verbose_) {
+    if (verbose_) {
       std::cout << "update " << it->first << " behavior" << std::endl;
     }
     if (it->second.type() == typeid(VehicleEntity)) {

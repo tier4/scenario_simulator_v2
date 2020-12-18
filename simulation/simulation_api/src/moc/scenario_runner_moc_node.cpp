@@ -59,13 +59,11 @@ public:
       simulation_api::helper::constractLaneletPose(34579, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
-    /*
-  lanechange_excuted_ = false;
-  api_.spawn(false, "npc2", params,
-    simulation_api::helper::constractLaneletPose(34606, 20.0),
-    simulation_api::helper::constractActionStatus(5));
-  api_.setTargetSpeed("npc2", 0, true);
-  */
+    lanechange_excuted_ = false;
+    api_.spawn(false, "npc2", params,
+      simulation_api::helper::constractLaneletPose(34606, 20.0),
+      simulation_api::helper::constractActionStatus(5));
+    api_.setTargetSpeed("npc2", 0, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -73,12 +71,15 @@ public:
 private:
   void update()
   {
-    /*
-    if (api_.reachPosition("ego", 34615, 10, 0, 5)) {
+    if (api_.reachPosition("ego",
+      simulation_api::helper::constractLaneletPose(34615, 10.0), 5))
+    {
       api_.requestAcquirePosition("ego", 35026, 0, 0);
       api_.setTargetSpeed("npc2", 13, true);
     }
-    if (api_.reachPosition("ego", 34579, 0, 0, 5)) {
+    if (api_.reachPosition("ego",
+      simulation_api::helper::constractLaneletPose(34579, 0.0), 5))
+    {
       api_.setTargetSpeed("npc2", 3, true);
     }
     if (api_.checkCollision("ego", "npc1")) {
@@ -87,12 +88,6 @@ private:
     if (api_.checkCollision("ego", "npc2")) {
       std::cout << "npc2 collision!" << std::endl;
     }
-    auto status = api_.getEntityStatus(
-      "ego", simulation_api::entity::CoordinateFrameTypes::LANE);
-    std::cout << "ego " << std::endl;
-    std::cout << "lanlet id : " << status.lanelet_id << std::endl;
-    std::cout << "s : " << status.s << std::endl;
-    */
     api_.updateFrame();
     current_time_ = current_time_ + 0.02;
   }
