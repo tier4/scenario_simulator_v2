@@ -135,7 +135,7 @@ bool API::spawn(
   } catch (XmlRpc::XmlRpcException e) {
     throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
   }
-  return result[0][0]["success"];
+  return true;
 }
 
 bool API::spawn(

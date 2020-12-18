@@ -50,7 +50,6 @@ public:
     api_.setEntityStatus("tom", "ego",
       simulation_api::helper::constractPose(10, 3, 0, 0, 0, 1.57),
       simulation_api::helper::constractActionStatus());
-    /*
     api_.spawn(false, "bob", pedestrian_params,
       simulation_api::helper::constractLaneletPose(34378, 0.0),
       simulation_api::helper::constractActionStatus(1));
@@ -64,7 +63,6 @@ public:
       simulation_api::helper::constractLaneletPose(34606, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
-    */
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
