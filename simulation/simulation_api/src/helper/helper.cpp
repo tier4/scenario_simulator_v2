@@ -19,10 +19,10 @@ namespace simulation_api
 namespace helper
 {
 openscenario_msgs::msg::ActionStatus constractActionStatus(
-  double linear_vel = 0,
-  double angular_vel = 0,
-  double linear_accel = 0,
-  double angular_accel = 0)
+  double linear_vel,
+  double angular_vel,
+  double linear_accel,
+  double angular_accel)
 {
   openscenario_msgs::msg::ActionStatus status;
   geometry_msgs::msg::Twist twist;
@@ -34,6 +34,14 @@ openscenario_msgs::msg::ActionStatus constractActionStatus(
   status.twist = twist;
   status.accel = accel;
   return status;
+}
+
+openscenario_msgs::msg::LaneletPose constractLaneletPose(
+  std::int64_t lanelet_id, double s,
+  double offset = 0, double roll = 0,
+  double pitch = 0, double yaw = 0)
+{
+
 }
 }  // namespace helper
 }  // namespace simulation_api

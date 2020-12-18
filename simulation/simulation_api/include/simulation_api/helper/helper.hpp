@@ -15,13 +15,43 @@
 #ifndef SIMULATION_API__HELPER__HELPER_HPP_
 #define SIMULATION_API__HELPER__HELPER_HPP_
 
+#include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <openscenario_msgs/msg/action_status.hpp>
 
 namespace simulation_api
 {
 namespace helper
 {
-openscenario_msgs::msg::ActionStatus constractActionStatus();
+/**
+ * @brief helper function for constracting action status
+ * 
+ * @param linear_vel linear velocity
+ * @param angular_vel angluar velocity
+ * @param linear_accel linear acceleration
+ * @param angular_accel angular acceleration
+ * @return openscenario_msgs::msg::ActionStatus 
+ */
+openscenario_msgs::msg::ActionStatus constractActionStatus(
+  double linear_vel = 0,
+  double angular_vel = 0,
+  double linear_accel = 0,
+  double angular_accel = 0);
+
+/**
+ * @brief helper function for constracting lanelet pose
+ * 
+ * @param lanelet_id lanelet id
+ * @param s s value in lane coordinate
+ * @param offset offset value in lane coordinate
+ * @param roll roll value in the lane coordinate
+ * @param pitch pitch value in the lane coordinate
+ * @param yaw yaw value in the lane coordinate
+ * @return openscenario_msgs::msg::LaneletPose 
+ */
+openscenario_msgs::msg::LaneletPose constractLaneletPose(
+  std::int64_t lanelet_id, double s,
+  double offset = 0, double roll = 0,
+  double pitch = 0, double yaw = 0);
 }  // namespace helper
 }  // namespace simulation_api
 
