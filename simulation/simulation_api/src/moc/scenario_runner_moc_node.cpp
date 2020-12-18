@@ -53,9 +53,12 @@ public:
     api_.spawn(false, "bob", pedestrian_params,
       simulation_api::helper::constractLaneletPose(34378, 0),
       simulation_api::helper::constractActionStatus(1));
-    /*
     api_.setTargetSpeed("bob", 1, true);
     lanechange_excuted_ = false;
+    api_.spawn(false, "npc1", params,
+      simulation_api::helper::constractLaneletPose(34579, 20),
+      simulation_api::helper::constractActionStatus(5));
+    /*
     api_.spawn(false, "npc1", params, getNpcInitialStatus());
     api_.setTargetSpeed("npc1", 5, true);
     api_.spawn(false, "npc2", params, getNpc2InitialStatus());
@@ -100,36 +103,6 @@ private:
   rclcpp::TimerBase::SharedPtr update_timer_;
 
   /*
-
-  openscenario_msgs::msg::EntityStatus getNpcInitialStatus()
-  {
-    geometry_msgs::msg::Pose pose;
-    pose.position.x = 0.0;
-    pose.position.y = 0.0;
-    pose.position.z = 0.0;
-    geometry_msgs::msg::Twist twist;
-    twist.linear.x = 5.0;
-    twist.linear.y = 0.0;
-    twist.linear.z = 0.0;
-    twist.angular.x = 0.0;
-    twist.angular.y = 0.0;
-    twist.angular.z = 0.0;
-    geometry_msgs::msg::Accel accel;
-    accel.linear.x = 0.0;
-    accel.linear.y = 0.0;
-    accel.linear.z = 0.0;
-    accel.angular.x = 0.0;
-    accel.angular.y = 0.0;
-    accel.angular.z = 0.0;
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0.0;
-    rpy.y = 0.0;
-    rpy.z = 0.0;
-    openscenario_msgs::msg::EntityStatus ret(
-      api_.getCurrentTime(), 34579, 20.0, 0.0, rpy, twist, accel);
-    return ret;
-  }
-
   openscenario_msgs::msg::EntityStatus getNpc2InitialStatus()
   {
     geometry_msgs::msg::Pose pose;

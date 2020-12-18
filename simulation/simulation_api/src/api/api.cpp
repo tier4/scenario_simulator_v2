@@ -368,7 +368,7 @@ bool API::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, 
   return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
 }
 
-bool reachPosition(
+bool API::reachPosition(
   std::string name, openscenario_msgs::msg::LaneletPose target_pose,
   double tolerance)
 {
