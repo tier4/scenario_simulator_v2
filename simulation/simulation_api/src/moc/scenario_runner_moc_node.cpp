@@ -54,12 +54,12 @@ public:
       simulation_api::helper::constractLaneletPose(34378, 0.0),
       simulation_api::helper::constractActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
+    api_.spawn(false, "npc1", params,
+      simulation_api::helper::constractLaneletPose(34579, 20.0),
+      simulation_api::helper::constractActionStatus(5));
+    api_.setTargetSpeed("npc1", 5, true);
     /*
   lanechange_excuted_ = false;
-  api_.spawn(false, "npc1", params,
-    simulation_api::helper::constractLaneletPose(34579, 20.0),
-    simulation_api::helper::constractActionStatus(5));
-  api_.setTargetSpeed("npc1", 5, true);
   api_.spawn(false, "npc2", params,
     simulation_api::helper::constractLaneletPose(34606, 20.0),
     simulation_api::helper::constractActionStatus(5));
