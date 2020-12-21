@@ -21,7 +21,6 @@ import yamale
 
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
-# from scenario_test_utility.logger import Logger
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.workflow_validator import WorkflowValidator
 
@@ -48,9 +47,7 @@ class DatabaseHandler():
 
         **Returns**
 
-        * launcher_package_path
         * scenarios (`list`)
-
         """
         workflow_path = ''
 
@@ -64,9 +61,6 @@ class DatabaseHandler():
             validator.validate_workflow_file(workflow_path)
 
         except yamale.yamale_error.YamaleError:
-            # import traceback
-            # Logger.print_error('workflow file is not valid, shutting down')
-            # Logger.print_error(traceback.format_exc())
             sys.exit(1)
 
         database = Manager.read_data(workflow_path)

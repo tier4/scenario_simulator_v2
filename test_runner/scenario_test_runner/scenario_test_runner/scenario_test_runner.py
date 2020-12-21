@@ -52,12 +52,10 @@ class ScenarioTestRunner(LifecycleController):
         Run workflow.
 
         **Args**
-
         * workflow
         * log_directory (`str`)
 
         **Returns**
-
         * None
         """
 
@@ -127,7 +125,6 @@ class ScenarioTestRunner(LifecycleController):
         **Returns**
 
         * None
-
         """
         if not self.log_path.exists():
             self.log_path.mkdir(parents=True, exist_ok=True)

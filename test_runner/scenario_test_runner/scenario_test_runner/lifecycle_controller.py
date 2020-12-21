@@ -156,7 +156,6 @@ class LifecycleController(Node):
         **Returns**
 
         * success (`bool`)
-
         """
         reqest = ChangeState.Request()
         reqest.transition.id = transition_id
@@ -176,7 +175,6 @@ class LifecycleController(Node):
         **Returns**
 
         * label (`int`)
-
         """
         future = self.client_get_state.call_async(GetState.Request())
         executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
