@@ -14,6 +14,7 @@
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/acquire_position_action.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <boost/algorithm/clamp.hpp>
 
@@ -36,6 +37,27 @@ const openscenario_msgs::msg::CatmullRomSpline AcquirePositionAction::calculateT
     throw BehaviorTreeRuntimeError("failed to assign lane");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
+    double horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
+    bool found = false;
+    std::vector<std::int64_t> ll_ids;
+    for (auto itr = route_.begin(); itr != route_.end(); itr++) {
+      if (entity_status.lanelet_pose.lanelet_id == *itr) {
+        found = true;
+        ll_ids.emplace_back(entity_status.lanelet_pose.lanelet_id);
+      }
+      if (found) {
+        ll_ids.emplace_back(entity_status.lanelet_pose.lanelet_id);
+      }
+    }
+    if (!found) {
+      throw BehaviorTreeRuntimeError("entity does not on the route.");
+    }
+    auto candidate_ids = hdmap_utils->getFollowingLanelets(*ll_ids.end(), horizon, false);
+    std::copy(candidate_ids.begin(), candidate_ids.end(), std::back_inserter(ll_ids));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ll_ids));
+    auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,
+        entity_status.lanelet_pose.s + horizon, 1.0);
+    return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
   } else {
     throw BehaviorTreeRuntimeError("linear velocity must over zero in this action.");
   }

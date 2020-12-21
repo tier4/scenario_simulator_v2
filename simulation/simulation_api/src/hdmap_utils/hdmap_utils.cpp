@@ -306,11 +306,15 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(
   return ret;
 }
 
-std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(std::int64_t lanelet_id, double distance)
+std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
+  std::int64_t lanelet_id, double distance,
+  bool include_self)
 {
   std::vector<std::int64_t> ret;
   double total_dist = 0.0;
-  ret.push_back(lanelet_id);
+  if (include_self) {
+    ret.push_back(lanelet_id);
+  }
   while (total_dist < distance) {
     auto ids = getNextLaneletIds(lanelet_id, "straight");
     if (ids.size() != 0) {
