@@ -20,6 +20,8 @@
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <openscenario_msgs/msg/action_status.hpp>
 
+#include <iostream>
+
 namespace simulation_api
 {
 namespace helper
@@ -87,6 +89,9 @@ geometry_msgs::msg::Vector3 constractRPYfronQuaternion(geometry_msgs::msg::Quate
 geometry_msgs::msg::Pose constractPose(
   double x, double y, double z, double roll, double pitch,
   double yaw);
+
+std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose);
+
 }  // namespace helper
 }  // namespace simulation_api
 

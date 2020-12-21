@@ -14,6 +14,7 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/math/collision.hpp>
+#include <simulation_api/helper/helper.hpp>
 
 #include <vector>
 #include <string>
@@ -263,6 +264,9 @@ bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, doubl
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
   auto status = getEntityStatus(name);
   if (!status) {
+    return false;
+  }
+  if (!status->lanelet_pose_valid) {
     return false;
   }
   if (status->lanelet_pose.lanelet_id == lanelet_id) {

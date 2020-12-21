@@ -60,6 +60,7 @@ public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node, const std::string & map_path = "",
+    bool verbose = false,
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   : autoware_api::Accessor(node)
@@ -88,6 +89,7 @@ public:
     entity_manager_ptr_ = std::make_shared<EntityManager>(node, map_path);
     client_ptr_ =
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
+    setVerbose(verbose);
   }
   void setVerbose(bool verbose);
   bool spawn(

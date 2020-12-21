@@ -79,5 +79,12 @@ geometry_msgs::msg::Pose constractPose(
     quaternion_operation::convertEulerAngleToQuaternion(constractRPY(roll, pitch, yaw));
   return pose;
 }
+
+std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose)
+{
+  os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
+  return os;
+}
+
 }  // namespace helper
 }  // namespace simulation_api
