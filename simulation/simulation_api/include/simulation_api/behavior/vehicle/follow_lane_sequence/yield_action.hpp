@@ -44,7 +44,7 @@ public:
     return ports;
   }
   boost::optional<double> calculateTargetSpeed(std::vector<std::int64_t> following_lanelets);
-  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() const override;
+  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() override;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

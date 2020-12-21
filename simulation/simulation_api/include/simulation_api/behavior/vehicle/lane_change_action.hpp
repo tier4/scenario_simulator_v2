@@ -56,7 +56,7 @@ public:
     }
     return ports;
   }
-  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() const override;
+  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() override;
 
 private:
   boost::optional<simulation_api::math::HermiteCurve> curve_;

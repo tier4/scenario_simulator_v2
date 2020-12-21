@@ -30,7 +30,7 @@ FollowLaneAction::FollowLaneAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const openscenario_msgs::msg::CatmullRomSpline FollowLaneAction::calculateTrajectory() const
+const openscenario_msgs::msg::CatmullRomSpline FollowLaneAction::calculateTrajectory()
 {
   if (!entity_status.lanelet_pose_valid) {
     throw BehaviorTreeRuntimeError("failed to assign lane");

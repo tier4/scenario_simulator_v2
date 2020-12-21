@@ -52,7 +52,7 @@ public:
     return ports;
   }
   void getBlackBoardValues();
-  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() const override;
+  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() override;
 
 private:
   std::vector<std::int64_t> route_;

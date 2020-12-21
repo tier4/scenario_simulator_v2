@@ -26,7 +26,7 @@ namespace vehicle
 LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const openscenario_msgs::msg::CatmullRomSpline LaneChangeAction::calculateTrajectory() const
+const openscenario_msgs::msg::CatmullRomSpline LaneChangeAction::calculateTrajectory()
 {
 
 }

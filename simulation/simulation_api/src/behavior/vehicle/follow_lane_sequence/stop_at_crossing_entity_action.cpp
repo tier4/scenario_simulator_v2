@@ -32,7 +32,6 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 : entity_behavior::VehicleActionNode(name, config) {}
 
 const openscenario_msgs::msg::CatmullRomSpline StopAtCrossingEntityAction::calculateTrajectory()
-const
 {
   if (!entity_status.lanelet_pose_valid) {
     throw BehaviorTreeRuntimeError("failed to assign lane");
@@ -48,12 +47,7 @@ const
         entity_status.lanelet_pose.s + horizon, 1.0);
     return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
   } else {
-    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, -5, 0);
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(
-        entity_status.lanelet_pose.lanelet_id));
-    auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,
-        entity_status.lanelet_pose.s - horizon, 1.0);
-    return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
+    throw BehaviorTreeRuntimeError("linear velocity must over zero in this action.");
   }
 }
 

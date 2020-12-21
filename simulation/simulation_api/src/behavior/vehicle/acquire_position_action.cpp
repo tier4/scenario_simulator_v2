@@ -30,7 +30,7 @@ AcquirePositionAction::AcquirePositionAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const openscenario_msgs::msg::CatmullRomSpline AcquirePositionAction::calculateTrajectory() const
+const openscenario_msgs::msg::CatmullRomSpline AcquirePositionAction::calculateTrajectory()
 {
 
 }
