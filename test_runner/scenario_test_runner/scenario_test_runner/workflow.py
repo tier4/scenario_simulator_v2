@@ -33,7 +33,7 @@ def resolve_ros_package(pathname: str):
     return sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, pathname)
 
 
-class DatabaseHandler():
+class Workflow():
     """class to handler database."""
 
     @staticmethod

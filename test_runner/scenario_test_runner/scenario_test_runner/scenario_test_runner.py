@@ -23,17 +23,17 @@ import time
 from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
 from scenario_test_runner.converter_handler import ConverterHandler
-from scenario_test_runner.database_handler import DatabaseHandler, resolve_ros_package
+from scenario_test_runner.workflow import Workflow, resolve_ros_package
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from sys import exit
 
 
 class ScenarioTestRunner(LifecycleController):
     """
-    class to test scenarios.
+    Class to test scenarios.
 
-    **Attributes**
-    * SLEEP_RATE (`int`): time to sleep before next scenario
+    Attributes:
+        SLEEP_RATE (int): Time to sleep before next scenario.
     """
 
     SLEEP_RATE = 1
@@ -58,7 +58,7 @@ class ScenarioTestRunner(LifecycleController):
         **Returns**
         * None
         """
-        self.scenarios = DatabaseHandler.read_database(workflow)
+        self.scenarios = Workflow.read_database(workflow)
 
         self.yaml_scenarios = []
         expects = []
