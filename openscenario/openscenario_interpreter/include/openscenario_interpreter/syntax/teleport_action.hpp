@@ -69,8 +69,7 @@ struct TeleportAction
           position.as<RelativeWorldPosition>().reference,
           position.as<RelativeWorldPosition>(),  // geometry_msgs::msg::Point
           position.as<RelativeWorldPosition>().orientation,  // geometry_msgs::msg::Vector3
-          geometry_msgs::msg::Twist(),
-          geometry_msgs::msg::Accel());
+          simulation_api::helper::constractActionStatus());
       }
     } else {
       THROW(ImplementationFault);

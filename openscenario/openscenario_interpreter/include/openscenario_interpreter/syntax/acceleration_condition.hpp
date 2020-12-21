@@ -52,7 +52,7 @@ struct AccelerationCondition
     return asBoolean(
       trigger([&](auto && entity)
       {
-        return compare(getEntityStatus(entity).accel.linear.x, value);
+        return compare(getEntityStatus(entity).action_status.accel.linear.x, value);
       }));
   }
 };

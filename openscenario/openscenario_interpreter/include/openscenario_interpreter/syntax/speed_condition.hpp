@@ -52,7 +52,7 @@ struct SpeedCondition
     return asBoolean(
       trigger([&](auto && entity)
       {
-        return compare(getEntityStatus(entity).twist.linear.x, value);
+        return compare(getEntityStatus(entity).action_status.twist.linear.x, value);
       }));
   }
 };
