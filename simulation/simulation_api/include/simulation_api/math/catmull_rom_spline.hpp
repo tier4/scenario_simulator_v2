@@ -50,6 +50,9 @@ public:
   const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
   const geometry_msgs::msg::Pose getPose(double s) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(int num_points) const;
+  const std::vector<geometry_msgs::msg::Point> getTrajectory(
+    double start_s, double end_s,
+    double resolution) const;
   boost::optional<double> getSValue(
     geometry_msgs::msg::Point position,
     double threadhold_distance = 3.0,

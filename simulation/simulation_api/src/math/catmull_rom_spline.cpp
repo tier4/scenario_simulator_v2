@@ -31,6 +31,31 @@ CatmullRomSpline::CatmullRomSpline(std::vector<openscenario_msgs::msg::HermiteCu
   }
 }
 
+const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
+  double start_s,
+  double end_s,
+  double resolution)
+const
+{
+  std::vector<geometry_msgs::msg::Point> traj;
+  resolution = std::fabs(resolution);
+  double s = start_s;
+  if (start_s < end_s) {
+    while (s < end_s) {
+      auto p = getPoint(s);
+      traj.emplace_back(p);
+      s = s + resolution;
+    }
+  } else {
+    while (s < end_s) {
+      auto p = getPoint(s);
+      traj.emplace_back(p);
+      s = s - resolution;
+    }
+  }
+  return traj;
+}
+
 CatmullRomSpline::CatmullRomSpline(openscenario_msgs::msg::CatmullRomSpline spline)
 {
   for (const auto & curve : spline.curves) {

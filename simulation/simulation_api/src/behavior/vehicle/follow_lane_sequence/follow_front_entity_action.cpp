@@ -14,6 +14,9 @@
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
+
+#include <boost/algorithm/clamp.hpp>
 
 #include <string>
 
@@ -30,6 +33,19 @@ FollowFrontEntityAction::FollowFrontEntityAction(
 
 const openscenario_msgs::msg::EntityTrajectory FollowFrontEntityAction::calculateTrajectory() const
 {
+  if (!entity_status.lanelet_pose_valid) {
+    throw BehaviorTreeRuntimeError("failed to assign lane");
+  }
+  double horizon = 0;
+  if (entity_status.action_status.twist.linear.x > 0) {
+    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
+  } else {
+    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, -50, 0);
+  }
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(
+    entity_status.lanelet_pose.lanelet_id,
+    horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
+  simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
 
 }
 
