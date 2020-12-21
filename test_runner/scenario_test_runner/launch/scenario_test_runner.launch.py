@@ -48,11 +48,12 @@ def generate_launch_description():
         default_value=no_validation
         )
 
+    # NOTE: https://answers.ros.org/question/332829/no-stdout-logging-output-in-ros2-using-launch/
     scenario_test_runner = Node(
         package='scenario_test_runner',
         node_executable='scenario_test_runner',
         output={
-            'stdout': 'screen',
+            'stdout': 'screen',  # THIS OPTION NOT WORKS IF (< ROS2 ELOQUENT)
             'stderr': 'screen',
         },
         on_exit=Shutdown(),
