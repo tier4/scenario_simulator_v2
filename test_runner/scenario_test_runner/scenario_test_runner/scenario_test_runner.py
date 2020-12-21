@@ -52,7 +52,7 @@ class ScenarioTestRunner(LifecycleController):
         Run workflow.
 
         **Args**
-        * workflow
+        * workflow: Path to workflow specification.
         * log_directory (`str`)
 
         **Returns**

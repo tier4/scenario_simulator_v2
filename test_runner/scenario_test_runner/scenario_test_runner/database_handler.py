@@ -15,15 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
 import yamale
-import yaml
 
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
-from scenario_test_utility.manager import Manager
+from re import sub
 from scenario_test_utility.workflow_validator import WorkflowValidator
 from sys import exit, stderr
+from yaml import safe_load
 
 
 def resolve_ros_package(pathname: str):
@@ -31,7 +30,7 @@ def resolve_ros_package(pathname: str):
     def replace(match):
         return get_package_share_directory(match.group(1))
 
-    return re.sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, pathname)
+    return sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, pathname)
 
 
 class DatabaseHandler():
@@ -59,26 +58,19 @@ class DatabaseHandler():
         if workflow_path.exists():
             with workflow_path.open('r') as file:
 
-                database = yaml.safe_load(file) \
+                database = safe_load(file) \
                     if workflow_path.suffix == ".yaml" else file.read()
 
                 scenarios = []
 
-                for scenario in database['Scenario']:
-                    scenario_path = ''
-                    if Path(scenario['path']).is_absolute():
-                        scenario_path = scenario['path']
-                    else:
-                        scenario_path = resolve_ros_package(scenario['path'])
-
-                    Manager.check_existence(scenario_path)
-                    scenario['path'] = scenario_path
-                    scenarios.append(scenario)
+                for each in database['Scenario']:
+                    each['path'] = str(Path(resolve_ros_package(each['path'])).resolve())
+                    scenarios.append(each)
 
                 return scenarios
 
         else:
-            print("No such file or directory: " + workflow_path, file=stderr)
+            print("No such file or directory: " + str(workflow_path), file=stderr)
             exit(1)
 
 
