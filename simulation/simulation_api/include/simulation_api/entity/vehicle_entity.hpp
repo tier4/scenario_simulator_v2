@@ -66,7 +66,7 @@ public:
   {
     return tree_ptr_->getCurrentAction();
   }
-  const openscenario_msgs::msg::EntityTrajectory getTrajectory()
+  const openscenario_msgs::msg::CatmullRomSpline getTrajectory()
   {
     return tree_ptr_->getTrajectory();
   }

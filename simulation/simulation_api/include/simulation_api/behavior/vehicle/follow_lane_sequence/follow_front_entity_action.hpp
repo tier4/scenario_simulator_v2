@@ -42,7 +42,7 @@ public:
     }
     return ports;
   }
-  const openscenario_msgs::msg::EntityTrajectory calculateTrajectory() const override;
+  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() const override;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

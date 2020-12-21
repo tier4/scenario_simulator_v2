@@ -14,6 +14,7 @@
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <string>
 #include <vector>
@@ -33,9 +34,29 @@ StopAtStopLineAction::StopAtStopLineAction(
   stopped_ = false;
 }
 
-const openscenario_msgs::msg::EntityTrajectory StopAtStopLineAction::calculateTrajectory() const
+const openscenario_msgs::msg::CatmullRomSpline StopAtStopLineAction::calculateTrajectory() const
 {
-
+  if (!entity_status.lanelet_pose_valid) {
+    throw BehaviorTreeRuntimeError("failed to assign lane");
+  }
+  double horizon = 0;
+  if (entity_status.action_status.twist.linear.x > 0) {
+    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
+    auto following_lanelets = hdmap_utils->getFollowingLanelets(
+      entity_status.lanelet_pose.lanelet_id,
+      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
+    auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,
+        entity_status.lanelet_pose.s + horizon, 1.0);
+    return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
+  } else {
+    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, -5, 0);
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(
+        entity_status.lanelet_pose.lanelet_id));
+    auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,
+        entity_status.lanelet_pose.s - horizon, 1.0);
+    return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
+  }
 }
 
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(

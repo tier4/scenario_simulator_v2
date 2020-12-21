@@ -54,9 +54,9 @@ public:
     tree_.rootBlackboard()->get("updated_status", status);
     return status;
   }
-  const openscenario_msgs::msg::EntityTrajectory getTrajectory()
+  const openscenario_msgs::msg::CatmullRomSpline getTrajectory()
   {
-    openscenario_msgs::msg::EntityTrajectory trajectory;
+    openscenario_msgs::msg::CatmullRomSpline trajectory;
     tree_.rootBlackboard()->get("trajectory", trajectory);
     return trajectory;
   }

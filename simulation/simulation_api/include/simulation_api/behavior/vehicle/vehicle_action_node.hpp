@@ -38,7 +38,7 @@ public:
     BT::PortsList ports = {
       BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
         "vehicle_parameters"),
-      BT::InputPort<openscenario_msgs::msg::EntityTrajectory>(
+      BT::InputPort<openscenario_msgs::msg::CatmullRomSpline>(
         "trajectory")
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
@@ -54,7 +54,7 @@ public:
     const std::vector<std::int64_t> & following_lanelets);
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
-  virtual const openscenario_msgs::msg::EntityTrajectory calculateTrajectory() const = 0;
+  virtual const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() const = 0;
 };
 }  // namespace entity_behavior
 
