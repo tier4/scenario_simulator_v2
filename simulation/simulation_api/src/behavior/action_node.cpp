@@ -151,7 +151,7 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
     if (!entity_status.lanelet_pose_valid || !each.second.lanelet_pose_valid) {
       continue;
     }
-    auto distance = hdmap_utils->getLongitudinalDistance(
+    boost::optional<double> distance = hdmap_utils->getLongitudinalDistance(
       entity_status.lanelet_pose,
       each.second.lanelet_pose);
     if (distance) {
