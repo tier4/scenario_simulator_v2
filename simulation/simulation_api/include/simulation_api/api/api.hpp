@@ -90,7 +90,6 @@ public:
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
   }
   void setVerbose(bool verbose);
-
   bool spawn(
     bool is_ego, std::string name,
     std::string catalog_xml,

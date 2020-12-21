@@ -98,6 +98,7 @@ BT::NodeStatus LaneChangeAction::tick()
       } else {
         entity_status_updated.lanelet_pose_valid = false;
       }
+      entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
       return BT::NodeStatus::RUNNING;
     } else {
@@ -111,6 +112,7 @@ BT::NodeStatus LaneChangeAction::tick()
       lanelet_pose.offset = 0;
       entity_status_updated.pose = hdmap_utils_ptr->toMapPose(lanelet_pose).pose;
       entity_status_updated.lanelet_pose = lanelet_pose;
+      entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
       return BT::NodeStatus::SUCCESS;
     }
