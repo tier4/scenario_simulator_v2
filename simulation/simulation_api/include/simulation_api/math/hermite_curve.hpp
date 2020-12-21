@@ -17,6 +17,8 @@
 
 #include <simulation_api/math/polynomial_solver.hpp>
 
+#include <openscenario_msgs/msg/hermite_curve.hpp>
+
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry_msgs/msg/point.hpp>
@@ -40,6 +42,9 @@ private:
   simulation_api::math::PolynomialSolver solver_;
 
 public:
+  explicit HermiteCurve(
+    const openscenario_msgs::msg::HermiteCurve & curve
+  );
   HermiteCurve(
     geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
     geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec);
@@ -81,6 +86,7 @@ public:
     std::vector<geometry_msgs::msg::Point> polygon,
     bool search_backward = false
   ) const;
+  const openscenario_msgs::msg::HermiteCurve toRosMsg() const;
 
 private:
   double getNewtonMethodStepSize(

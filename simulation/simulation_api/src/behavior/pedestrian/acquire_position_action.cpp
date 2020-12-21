@@ -141,7 +141,7 @@ BT::NodeStatus AcquirePositionAction::tick()
       entity_status_updated.lanelet_pose.s = new_s;
       entity_status_updated.lanelet_pose.offset = entity_status.lanelet_pose.offset;
       entity_status_updated.lanelet_pose.rpy = entity_status.lanelet_pose.rpy;
-      entity_status_updated.pose = 
+      entity_status_updated.pose =
         hdmap_utils->toMapPose(entity_status_updated.lanelet_pose).pose;
       entity_status_updated.action_status.twist = twist_new;
       entity_status_updated.action_status.accel = accel_new;
