@@ -23,7 +23,7 @@ namespace simulation_api
 namespace entity
 {
 EgoEntity::EgoEntity(
-  std::string name, const EntityStatus & initial_state,
+  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
   const pugi::xml_node & xml)
 : VehicleEntity(name, initial_state, xml)
 {
@@ -33,7 +33,7 @@ EgoEntity::EgoEntity(
   current_kinematic_state_ = boost::none;
 }
 EgoEntity::EgoEntity(
-  std::string name, const EntityStatus & initial_state,
+  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
   VehicleParameters parameters)
 : VehicleEntity(name, initial_state, parameters)
 {
@@ -66,7 +66,7 @@ autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
   return heading;
 }
 
-bool EgoEntity::setStatus(const EntityStatus & status)
+bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
   bool ret = VehicleEntity::setStatus(status);
   auto current_entity_status = getStatus();
@@ -76,9 +76,9 @@ bool EgoEntity::setStatus(const EntityStatus & status)
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     current_entity_status.pose.orientation);
   state.state.heading = toHeading(rpy.z);
-  state.state.longitudinal_velocity_mps = current_entity_status.twist.linear.x;
+  state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
   state.state.lateral_velocity_mps = 0;
-  state.state.heading_rate_rps = current_entity_status.twist.angular.z;
+  state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;
   state.state.front_wheel_angle_rad = 0;
   state.state.rear_wheel_angle_rad = 0;
   current_kinematic_state_ = state;
@@ -101,7 +101,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   vehicle_model_ptr_->update(step_time);
   status_ = getEntityStatus(current_time + step_time);
 }
-const EntityStatus EgoEntity::getEntityStatus(double time) const
+const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(double time) const
 {
   geometry_msgs::msg::Pose pose;
   pose.position.x = vehicle_model_ptr_->getX();
@@ -116,7 +116,20 @@ const EntityStatus EgoEntity::getEntityStatus(double time) const
   twist.linear.x = vehicle_model_ptr_->getVx();
   twist.angular.z = vehicle_model_ptr_->getWz();
   geometry_msgs::msg::Accel accel;
-  return EntityStatus(time, pose, twist, accel);
+  openscenario_msgs::msg::EntityStatus status;
+  status.time = time;
+  status.type.type = openscenario_msgs::msg::EntityType::EGO;
+  status.bounding_box = getBoundingBox();
+  status.action_status.twist = twist;
+  status.action_status.accel = accel;
+  status.pose = pose;
+  auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(pose);
+  if (lanelet_pose) {
+    status.lanelet_pose = lanelet_pose.get();
+  } else {
+    status.lanelet_pose_valid = false;
+  }
+  return status;
 }
 void EgoEntity::setVehicleCommands(
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,

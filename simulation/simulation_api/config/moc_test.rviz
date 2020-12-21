@@ -7,9 +7,8 @@ Panels:
         - /Global Options1
         - /Simulation1/Lanelet1/Namespaces1
         - /Simulation1/Grid1/Line Style1
-        - /RobotModel1/Status1
       Splitter Ratio: 0.5
-    Tree Height: 796
+    Tree Height: 363
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -48,7 +47,7 @@ Visualization Manager:
           Namespaces:
             bob: true
             ego: true
-            npc1: true
+            tom: true
           Queue Size: 10
           Topic: /entity/marker
           Unreliable: false
@@ -106,33 +105,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        gnss:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        imu:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        lidar_front:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        lidar_rear:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        nav_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: RobotModel
       TF Prefix: ""
       Unreliable: false

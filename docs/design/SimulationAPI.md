@@ -27,17 +27,36 @@ public:
     api_(this, ament_index_cpp::get_package_share_directory(
         "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
-    // initialize simulator
+    api_.setVerbose(true);
     api_.initialize(1.0, 0.02);
     pugi::xml_document catalog_xml_doc;
-    // set ego vehicle parameter by XML
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
-    // spawn ego vehicle
-    api_.spawn(true, "ego", params);
-    // set ego vehicle status (initial position/velocity/acceleration)
-    api_.setEntityStatus("ego", getEgoInitialStatus());
-    // setup timer for updating simulation frame
+    api_.spawn(false, "ego", params);
+    api_.setEntityStatus("ego",
+      simulation_api::helper::constractLaneletPose(120545, 0),
+      simulation_api::helper::constractActionStatus(10));
+    api_.setTargetSpeed("ego", 15, true);
+    pugi::xml_document pedestrian_xml_doc;
+    pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
+    simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
+    api_.spawn(false, "tom", pedestrian_params);
+    api_.setEntityStatus("tom", "ego",
+      simulation_api::helper::constractPose(10, 3, 0, 0, 0, 1.57),
+      simulation_api::helper::constractActionStatus());
+    api_.spawn(false, "bob", pedestrian_params,
+      simulation_api::helper::constractLaneletPose(34378, 0.0),
+      simulation_api::helper::constractActionStatus(1));
+    api_.setTargetSpeed("bob", 1, true);
+    api_.spawn(false, "npc1", params,
+      simulation_api::helper::constractLaneletPose(34579, 20.0),
+      simulation_api::helper::constractActionStatus(5));
+    api_.setTargetSpeed("npc1", 5, true);
+    lanechange_excuted_ = false;
+    api_.spawn(false, "npc2", params,
+      simulation_api::helper::constractLaneletPose(34606, 20.0),
+      simulation_api::helper::constractActionStatus(5));
+    api_.setTargetSpeed("npc2", 0, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -45,46 +64,35 @@ public:
 private:
   void update()
   {
-    // call update frame API
+    if (api_.reachPosition("ego",
+      simulation_api::helper::constractLaneletPose(34615, 10.0), 5))
+    {
+      api_.requestAcquirePosition("ego",
+        simulation_api::helper::constractLaneletPose(35026, 0.0) );
+      api_.setTargetSpeed("npc2", 13, true);
+    }
+    if (api_.reachPosition("ego",
+      simulation_api::helper::constractLaneletPose(34579, 0.0), 5))
+    {
+      api_.setTargetSpeed("npc2", 3, true);
+    }
+    if (api_.checkCollision("ego", "npc1")) {
+      std::cout << "npc1 collision!" << std::endl;
+    }
+    if (api_.checkCollision("ego", "npc2")) {
+      std::cout << "npc2 collision!" << std::endl;
+    }
     api_.updateFrame();
     current_time_ = current_time_ + 0.02;
   }
+  bool lanechange_excuted_;
+  bool target_speed_setted_;
+  bool bob_spawned_;
   double current_time_;
   int port_;
   scenario_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 
-  // functions to get ego initial entity status.
-  simulation_api::entity::EntityStatus getEgoInitialStatus()
-  {
-    geometry_msgs::msg::Pose pose;
-    pose.position.x = 0.0;
-    pose.position.y = 0.0;
-    pose.position.z = 0.0;
-    geometry_msgs::msg::Twist twist;
-    twist.linear.x = 10.0;
-    twist.linear.y = 0.0;
-    twist.linear.z = 0.0;
-    twist.angular.x = 0.0;
-    twist.angular.y = 0.0;
-    twist.angular.z = 0.0;
-    geometry_msgs::msg::Accel accel;
-    accel.linear.x = 0.0;
-    accel.linear.y = 0.0;
-    accel.linear.z = 0.0;
-    accel.angular.x = 0.0;
-    accel.angular.y = 0.0;
-    accel.angular.z = 0.0;
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0.0;
-    rpy.y = 0.0;
-    rpy.z = 0.0;
-    simulation_api::entity::EntityStatus ret(
-      api_.getCurrentTime(), 120545, 0.0, 0.0, rpy, twist, accel);
-    return ret;
-  }
-
-  // parameter definition of ego vehicle.
   std::string catalog_xml =
     R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
             <ParameterDeclarations/>
@@ -101,9 +109,18 @@ private:
                 <Property name='type' value='ego_vehicle'/>
             </Properties>
         </Vehicle>)";
+
+  std::string pedestrian_xml =
+    R"(
+    <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
+            <BoundingBox>
+                <Center x='0.0' y='0.0' z='0.5'/>
+                <Dimensions width='1.0' length='1.0' height='2.0'/>
+            </BoundingBox>
+            <Properties/>
+        </Pedestrian>)";
 };
 
-// entry point
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);

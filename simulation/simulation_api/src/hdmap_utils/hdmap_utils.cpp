@@ -154,18 +154,14 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
       if (rest_distance < l) {
         for (double s_val = 0; s_val < rest_distance; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(*id_itr, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         break;
       } else {
         rest_distance = rest_distance - l;
         for (double s_val = 0; s_val < l; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(*id_itr, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         continue;
       }
@@ -175,18 +171,14 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
       if ((s + foward_distance) < l) {
         for (double s_val = s; s_val < s + foward_distance; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(lanelet_id, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         break;
       } else {
         rest_distance = rest_distance - (l - s);
         for (double s_val = s; s_val < l; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(lanelet_id, s_val, 0);
-          if (map_pose) {
-            ret.emplace_back(map_pose->pose.position);
-          }
+          ret.emplace_back(map_pose.pose.position);
         }
         continue;
       }
@@ -210,7 +202,7 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
   return exclude_subtype_lanelets;
 }
 
-boost::optional<simulation_api::entity::EntityStatus> HdMapUtils::toLanePose(
+boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose)
 {
   int64_t lanelet_id = getClosetLanletId(pose);
@@ -225,9 +217,12 @@ boost::optional<simulation_api::entity::EntityStatus> HdMapUtils::toLanePose(
     quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
         pose_on_centerline.orientation, pose.orientation));
   double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
-  geometry_msgs::msg::Twist twist;
-  geometry_msgs::msg::Accel accel;
-  return simulation_api::entity::EntityStatus(0, lanelet_id, s.get(), offset, rpy, twist, accel);
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.s = s.get();
+  lanelet_pose.offset = offset;
+  lanelet_pose.rpy = rpy;
+  return lanelet_pose;
 }
 
 int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
@@ -477,19 +472,17 @@ boost::optional<std::pair<simulation_api::math::HermiteCurve,
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
-    if (goal_pose) {
-      double start_to_goal_dist =
-        std::sqrt(std::pow(from_pose.position.x - goal_pose->pose.position.x, 2) +
-          std::pow(from_pose.position.y - goal_pose->pose.position.y, 2) +
-          std::pow(from_pose.position.z - goal_pose->pose.position.z, 2));
-      auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
-      if (traj) {
-        if (traj->getMaximu2DCurvature() < 1.0) {
-          double eval = std::fabs(40 - traj->getLength());
-          evaluation.push_back(eval);
-          curves.push_back(traj.get());
-          target_s.push_back(to_s);
-        }
+    double start_to_goal_dist =
+      std::sqrt(std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
+        std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
+        std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
+    auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
+    if (traj) {
+      if (traj->getMaximu2DCurvature() < 1.0) {
+        double eval = std::fabs(40 - traj->getLength());
+        evaluation.push_back(eval);
+        curves.push_back(traj.get());
+        target_s.push_back(to_s);
       }
     }
   }
@@ -508,15 +501,12 @@ boost::optional<simulation_api::math::HermiteCurve> HdMapUtils::getLaneChangeTra
   std::vector<geometry_msgs::msg::Point> ret;
   auto to_vec = getTangentVector(to_lanelet_id, to_s);
   auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
-  if (!to_vec || !goal_pose) {
-    return boost::none;
-  }
   geometry_msgs::msg::Vector3 start_vec = getVectorFromPose(from_pose, tangent_vector_size);
   geometry_msgs::msg::Vector3 goal_vec = to_vec.get();
   goal_vec.x = goal_vec.x * tangent_vector_size;
   goal_vec.y = goal_vec.y * tangent_vector_size;
   goal_vec.z = goal_vec.z * tangent_vector_size;
-  simulation_api::math::HermiteCurve curve(from_pose, goal_pose->pose, start_vec, goal_vec);
+  simulation_api::math::HermiteCurve curve(from_pose, goal_pose.pose, start_vec, goal_vec);
   return curve;
 }
 
@@ -559,24 +549,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
   return ret;
 }
 
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
-  simulation_api::entity::EntityStatus status)
-{
-  if (status.coordinate == simulation_api::entity::WORLD) {
-    geometry_msgs::msg::PoseStamped ret;
-    ret.header.frame_id = "map";
-    ret.pose = status.pose;
-    return ret;
-  }
-  if (status.coordinate == simulation_api::entity::LANE) {
-    boost::optional<geometry_msgs::msg::PoseStamped> ret;
-    ret = toMapPose(status.lanelet_id, status.s, status.offset, status.rpy);
-    return ret;
-  }
-  return boost::none;
-}
-
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
+geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   std::int64_t lanelet_id, double s,
   double offset,
   geometry_msgs::msg::Quaternion quat)
@@ -599,23 +572,22 @@ boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
   return ret;
 }
 
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
-  std::int64_t lanelet_id, double s,
-  double offset,
-  geometry_msgs::msg::Vector3 rpy)
+geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
+  openscenario_msgs::msg::LaneletPose lanlet_pose)
 {
-  return toMapPose(lanelet_id, s, offset, quaternion_operation::convertEulerAngleToQuaternion(rpy));
+  return toMapPose(lanlet_pose.lanelet_id, lanlet_pose.s, lanlet_pose.offset,
+           quaternion_operation::convertEulerAngleToQuaternion(lanlet_pose.rpy));
 }
 
-boost::optional<geometry_msgs::msg::PoseStamped> HdMapUtils::toMapPose(
+geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   std::int64_t lanelet_id, double s,
   double offset)
 {
-  geometry_msgs::msg::Vector3 rpy;
-  rpy.x = 0;
-  rpy.y = 0;
-  rpy.z = 0;
-  return toMapPose(lanelet_id, s, offset, rpy);
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.s = s;
+  lanelet_pose.offset = offset;
+  return toMapPose(lanelet_pose);
 }
 
 boost::optional<geometry_msgs::msg::Vector3> HdMapUtils::getTangentVector(
@@ -632,6 +604,14 @@ bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lan
   const auto from_lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
   return traffic_rules_vehicle_ptr_->canChangeLane(from_lanelet, to_lanelet);
+}
+
+boost::optional<double> HdMapUtils::getLongitudinalDistance(
+  openscenario_msgs::msg::LaneletPose from,
+  openscenario_msgs::msg::LaneletPose to
+)
+{
+  return getLongitudinalDistance(from.lanelet_id, from.s, to.lanelet_id, to.s);
 }
 
 boost::optional<double> HdMapUtils::getLongitudinalDistance(
@@ -857,6 +837,12 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
     }
   }
   return ret;
+}
+
+boost::optional<double> HdMapUtils::getDistanceToStopLine(
+  std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose)
+{
+  return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(

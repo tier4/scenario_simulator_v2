@@ -36,16 +36,16 @@ class PedestrianEntity : public EntityBase
 {
 public:
   PedestrianEntity(
-    std::string name, const EntityStatus & initial_state,
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
     const pugi::xml_node & xml);
   PedestrianEntity(
-    std::string name, const EntityStatus & initial_state,
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
     PedestrianParameters parameters);
   PedestrianEntity(std::string name, const pugi::xml_node & xml);
   PedestrianEntity(std::string name, PedestrianParameters parameters);
   const PedestrianParameters parameters;
   void onUpdate(double current_time, double step_time) override;
-  void requestAcquirePosition(std::int64_t lanelet_id, double s, double offset);
+  void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   // void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
