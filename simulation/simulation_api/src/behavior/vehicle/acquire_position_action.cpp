@@ -32,7 +32,13 @@ AcquirePositionAction::AcquirePositionAction(
 
 const openscenario_msgs::msg::CatmullRomSpline AcquirePositionAction::calculateTrajectory()
 {
-
+  if (!entity_status.lanelet_pose_valid) {
+    throw BehaviorTreeRuntimeError("failed to assign lane");
+  }
+  if (entity_status.action_status.twist.linear.x >= 0) {
+  } else {
+    throw BehaviorTreeRuntimeError("linear velocity must over zero in this action.");
+  }
 }
 
 void AcquirePositionAction::getBlackBoardValues()
