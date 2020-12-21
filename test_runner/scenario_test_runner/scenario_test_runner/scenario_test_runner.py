@@ -58,7 +58,7 @@ class ScenarioTestRunner(LifecycleController):
         **Returns**
         * None
         """
-        self.scenarios = Workflow.read_database(workflow)
+        self.scenarios = Workflow.read(workflow)
 
         self.yaml_scenarios = []
         expects = []
@@ -174,6 +174,7 @@ def main():
 
     parser.add_argument(
         '--workflow',
+        type=str,
         help='Specify workflow you want to execute.',
         )
 
@@ -194,7 +195,7 @@ def main():
 
     ScenarioTestRunner(args.timeout,
                        args.log_directory).run_workflow(
-        args.workflow,
+        Path(resolve_ros_package(args.workflow)).resolve(),
         args.no_validation)
 
     rclpy.shutdown()

@@ -36,8 +36,7 @@ def resolve_ros_package(pathname: str):
 class Workflow():
     """class to handler database."""
 
-    @staticmethod
-    def read_database(workflow_file):
+    def read(workflow_path: Path):
         """
         Read database.
 
@@ -47,8 +46,6 @@ class Workflow():
         **Returns**
         * scenarios (`list`)
         """
-        workflow_path = Path(resolve_ros_package(workflow_file)).resolve()
-
         try:
             WorkflowValidator().validate_workflow_file(workflow_path)
 
