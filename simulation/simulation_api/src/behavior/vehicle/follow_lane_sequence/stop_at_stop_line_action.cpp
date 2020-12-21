@@ -33,6 +33,11 @@ StopAtStopLineAction::StopAtStopLineAction(
   stopped_ = false;
 }
 
+const openscenario_msgs::msg::EntityTrajectory StopAtStopLineAction::calculateTrajectory() const
+{
+
+}
+
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
   const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {

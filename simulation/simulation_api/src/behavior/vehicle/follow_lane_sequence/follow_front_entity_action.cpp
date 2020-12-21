@@ -28,6 +28,11 @@ FollowFrontEntityAction::FollowFrontEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
+const openscenario_msgs::msg::EntityTrajectory FollowFrontEntityAction::calculateTrajectory() const
+{
+
+}
+
 BT::NodeStatus FollowFrontEntityAction::tick()
 {
   getBlackBoardValues();

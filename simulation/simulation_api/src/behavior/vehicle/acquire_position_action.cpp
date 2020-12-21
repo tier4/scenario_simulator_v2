@@ -30,6 +30,11 @@ AcquirePositionAction::AcquirePositionAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
+const openscenario_msgs::msg::EntityTrajectory AcquirePositionAction::calculateTrajectory() const
+{
+
+}
+
 void AcquirePositionAction::getBlackBoardValues()
 {
   openscenario_msgs::msg::LaneletPose target_lanelet_pose;

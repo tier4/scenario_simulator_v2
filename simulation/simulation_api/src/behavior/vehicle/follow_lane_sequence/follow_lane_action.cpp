@@ -14,6 +14,7 @@
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <string>
 
@@ -28,6 +29,11 @@ FollowLaneAction::FollowLaneAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
+
+const openscenario_msgs::msg::EntityTrajectory FollowLaneAction::calculateTrajectory() const
+{
+
+}
 
 BT::NodeStatus FollowLaneAction::tick()
 {

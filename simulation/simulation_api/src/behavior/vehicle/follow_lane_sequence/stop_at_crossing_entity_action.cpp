@@ -30,6 +30,12 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
+const openscenario_msgs::msg::EntityTrajectory StopAtCrossingEntityAction::calculateTrajectory()
+const
+{
+
+}
+
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
   const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {

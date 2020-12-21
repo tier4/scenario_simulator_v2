@@ -17,10 +17,11 @@
 
 #include <simulation_api/math/hermite_curve.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
-#include <simulation_api/behavior/action_node.hpp>
+#include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
 #include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
 
 #include <behaviortree_cpp_v3/behavior_tree.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
@@ -39,27 +40,23 @@ struct LaneChangeParameter
   std::int64_t to_lanelet_id;
 };
 
-class LaneChangeAction : public entity_behavior::ActionNode
+class LaneChangeAction : public entity_behavior::VehicleActionNode
 {
 public:
   LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
-    return
-      {
-        BT::InputPort<std::string>("request"),
-        BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-        BT::InputPort<openscenario_msgs::msg::EntityStatus>("entity_status"),
-        BT::InputPort<double>("current_time"),
-        BT::InputPort<double>("step_time"),
-        BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
-          "vehicle_parameters"),
-        BT::OutputPort<openscenario_msgs::msg::EntityStatus>("updated_status"),
-
-        BT::InputPort<LaneChangeParameter>("lane_change_params")
-      };
+    BT::PortsList ports = {
+      BT::InputPort<LaneChangeParameter>("lane_change_params")
+    };
+    BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
+    for (const auto & parent_port : parent_ports) {
+      ports.emplace(parent_port.first, parent_port.second);
+    }
+    return ports;
   }
+  const openscenario_msgs::msg::EntityTrajectory calculateTrajectory() const override;
 
 private:
   boost::optional<simulation_api::math::HermiteCurve> curve_;

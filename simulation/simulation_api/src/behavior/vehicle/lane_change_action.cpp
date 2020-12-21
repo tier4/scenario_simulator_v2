@@ -24,7 +24,12 @@ namespace entity_behavior
 namespace vehicle
 {
 LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config)
-: entity_behavior::ActionNode(name, config) {}
+: entity_behavior::VehicleActionNode(name, config) {}
+
+const openscenario_msgs::msg::EntityTrajectory LaneChangeAction::calculateTrajectory() const
+{
+
+}
 
 BT::NodeStatus LaneChangeAction::tick()
 {
