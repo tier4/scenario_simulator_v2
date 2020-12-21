@@ -16,13 +16,14 @@
 # limitations under the License.
 
 import re
-import sys
 import yamale
+import yaml
 
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
 from scenario_test_utility.manager import Manager
 from scenario_test_utility.workflow_validator import WorkflowValidator
+from sys import exit, stderr
 
 
 def resolve_ros_package(pathname: str):
@@ -42,43 +43,43 @@ class DatabaseHandler():
         Read database.
 
         **Args**
-
         * workflow_file
 
         **Returns**
-
         * scenarios (`list`)
         """
-        workflow_path = ''
-
-        if Path(workflow_file).is_absolute():
-            workflow_path = workflow_file
-        else:
-            workflow_path = resolve_ros_package(workflow_file)
+        workflow_path = Path(resolve_ros_package(workflow_file)).resolve()
 
         try:
-            validator = WorkflowValidator()
-            validator.validate_workflow_file(workflow_path)
+            WorkflowValidator().validate_workflow_file(workflow_path)
 
         except yamale.yamale_error.YamaleError:
-            sys.exit(1)
+            exit(1)
 
-        database = Manager.read_data(workflow_path)
+        if workflow_path.exists():
+            with workflow_path.open('r') as file:
 
-        scenarios = []
+                database = yaml.safe_load(file) \
+                    if workflow_path.suffix == ".yaml" else file.read()
 
-        for scenario in database['Scenario']:
-            scenario_path = ''
-            if Path(scenario['path']).is_absolute():
-                scenario_path = scenario['path']
-            else:
-                scenario_path = resolve_ros_package(scenario['path'])
+                scenarios = []
 
-            Manager.check_existence(scenario_path)
-            scenario['path'] = scenario_path
-            scenarios.append(scenario)
+                for scenario in database['Scenario']:
+                    scenario_path = ''
+                    if Path(scenario['path']).is_absolute():
+                        scenario_path = scenario['path']
+                    else:
+                        scenario_path = resolve_ros_package(scenario['path'])
 
-        return scenarios
+                    Manager.check_existence(scenario_path)
+                    scenario['path'] = scenario_path
+                    scenarios.append(scenario)
+
+                return scenarios
+
+        else:
+            print("No such file or directory: " + workflow_path, file=stderr)
+            exit(1)
 
 
 if __name__ == '__main__':

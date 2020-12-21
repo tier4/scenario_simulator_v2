@@ -58,7 +58,6 @@ class ScenarioTestRunner(LifecycleController):
         **Returns**
         * None
         """
-
         self.scenarios = DatabaseHandler.read_database(workflow)
 
         self.yaml_scenarios = []

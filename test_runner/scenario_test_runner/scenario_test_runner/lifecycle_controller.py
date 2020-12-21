@@ -18,11 +18,11 @@
 
 import rclpy
 import rcl_interfaces
+
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from lifecycle_msgs.srv import GetState
 from rclpy.node import Node
-from scenario_test_utility.logger import Logger
 
 
 class LifecycleController(Node):
@@ -116,7 +116,7 @@ class LifecycleController(Node):
 
         while not self.send_request_to_change_parameters(
                 self.current_scenario, expect, step_time_ms, log_path).done():
-            Logger.print_info('Failed to set parameters. Resending...')
+            self.get_logger().info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
         # Logger.print_info(
