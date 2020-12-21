@@ -16,6 +16,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/ActionStatus.msg
   msg/HermiteCurve.msg
   msg/CatmullRomSpline.msg
+  msg/EntityTrajectory.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 
