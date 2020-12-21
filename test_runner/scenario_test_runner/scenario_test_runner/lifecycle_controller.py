@@ -18,16 +18,16 @@
 
 import rclpy
 import rcl_interfaces
+
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from lifecycle_msgs.srv import GetState
 from rclpy.node import Node
-from scenario_test_utility.logger import Logger
 
 
 class LifecycleController(Node):
     """
-    class to control lifecycle.
+    Class to control lifecycle.
 
     **Attributes**
     * NODE_NAME (`str`): node name to control lifecycle
@@ -104,46 +104,46 @@ class LifecycleController(Node):
 
     def configure_node(self, scenario, expect, step_time_ms, log_path):
         """Configure node to chagnge state from unconfigure to inactive."""
-        self.node_logger.info(self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
         self.current_scenario = scenario
-        Logger.print_process(
-            "Set value '" +
-            self.current_scenario +
-            "' to " +
-            LifecycleController.NODE_NAME +
-            "'s parameter 'scenario'")
+        # Logger.print_process(
+        #     "Set value '" +
+        #     self.current_scenario +
+        #     "' to " +
+        #     LifecycleController.NODE_NAME +
+        #     "'s parameter 'scenario'")
 
         while not self.send_request_to_change_parameters(
                 self.current_scenario, expect, step_time_ms, log_path).done():
-            Logger.print_info('Failed to set parameters. Resending...')
+            self.get_logger().info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
-        Logger.print_info("Configure -> scenario runner state is " +
-                          self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "Configure -> scenario runner state is " + self.get_lifecycle_state())
 
-        self.node_logger.info(self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def activate_node(self):
         """Activate node to chagnge state from inactive to activate."""
         self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
-        Logger.print_info("Activate -> scenario runner state is " +
-                          self.get_lifecycle_state())
-        self.node_logger.info(self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "Activate -> scenario runner state is " + self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def deactivate_node(self):
         """Dectivate node to chagnge state from active to inactive."""
         self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
-        Logger.print_info("Deactivate -> scenario runner state is " +
-                          self.get_lifecycle_state())
-        self.node_logger.info(self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "Deactivate -> scenario runner state is " + self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def cleanup_node(self):
         """Cleanup node to chagnge state from inactive to unconfigure."""
         self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
-        Logger.print_info("CleanUp -> scenario runner state is " +
-                          self.get_lifecycle_state())
-        self.node_logger.info(self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "CleanUp -> scenario runner state is " + self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def set_lifecycle_state(self, transition_id):
         """
@@ -155,8 +155,7 @@ class LifecycleController(Node):
 
         **Returns**
 
-        *success(`bool`)
-
+        * success (`bool`)
         """
         reqest = ChangeState.Request()
         reqest.transition.id = transition_id
@@ -175,8 +174,7 @@ class LifecycleController(Node):
 
         **Returns**
 
-        *label(`int`)
-
+        * label (`int`)
         """
         future = self.client_get_state.call_async(GetState.Request())
         executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
@@ -186,7 +184,7 @@ class LifecycleController(Node):
     def shutdown(self):
         """Shutdown lifecycle controller."""
         self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
-        Logger.print_info(self.get_lifecycle_state())
+        # Logger.print_info(self.get_lifecycle_state())
         self.destroy_node()
 
 
