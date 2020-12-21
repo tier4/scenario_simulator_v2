@@ -34,20 +34,34 @@ def resolve_ros_package(pathname: str):
 
 
 class Workflow():
-    """class to handler database."""
+    """
+    Manages a set of scenario test items given as workflow.yaml.
 
-    def read(workflow_path: Path):
+    Attributes:
+        path (Path): The path to the given workflow file.
+        scenarios (List[str]):
+    """
+
+    def __init__(self, path: Path):
+
+        self.path = path
+
+        self.validator = WorkflowValidator()
+
+        self.scenarios = self.read(self.path)
+
+    def read(self, workflow_path: Path):
         """
-        Read database.
+        Safely load workflow files.
 
-        **Args**
-        * workflow_file
+        Args:
+            path (Path): The path to the workflow file.
 
-        **Returns**
-        * scenarios (`list`)
+        Returns:
+            scenarios (List[str]):
         """
         try:
-            WorkflowValidator().validate_workflow_file(workflow_path)
+            self.validator.validate_workflow_file(workflow_path)
 
         except yamale.yamale_error.YamaleError:
             exit(1)

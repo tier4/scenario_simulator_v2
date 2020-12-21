@@ -47,18 +47,19 @@ class ScenarioTestRunner(LifecycleController):
         self.xosc_step_time_ms = []
         self.log_path = Path(resolve_ros_package(str(log_directory)))
 
-    def run_workflow(self, workflow, no_validation):
+    def run_workflow(self, path: Path, no_validation):
         """
         Run workflow.
 
-        **Args**
-        * workflow: Path to workflow specification.
-        * log_directory (`str`)
+        Args:
+            path (Path): The path to the workflow file.
 
-        **Returns**
-        * None
+        Returns:
+            None
         """
-        self.scenarios = Workflow.read(workflow)
+        workflow = Workflow(path)
+
+        self.scenarios = workflow.scenarios
 
         self.yaml_scenarios = []
         expects = []
