@@ -24,6 +24,20 @@ namespace simulation_api
 {
 namespace math
 {
+CatmullRomSpline::CatmullRomSpline(std::vector<openscenario_msgs::msg::HermiteCurve> hermite_curves)
+{
+  for (const auto & curve : hermite_curves) {
+    curves_.emplace_back(HermiteCurve(curve));
+  }
+}
+
+CatmullRomSpline::CatmullRomSpline(openscenario_msgs::msg::CatmullRomSpline spline)
+{
+  for (const auto & curve : spline.curves) {
+    curves_.emplace_back(HermiteCurve(curve));
+  }
+}
+
 CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points)
 : control_points(control_points)
 {
@@ -127,6 +141,15 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
     total_length_ = total_length_ + length;
   }
   checkConnection();
+}
+
+const openscenario_msgs::msg::CatmullRomSpline CatmullRomSpline::toRosMsg() const
+{
+  openscenario_msgs::msg::CatmullRomSpline spline;
+  for (const auto & curve : curves_) {
+    spline.curves.emplace_back(curve.toRosMsg());
+  }
+  return spline;
 }
 
 std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
