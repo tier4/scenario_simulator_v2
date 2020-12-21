@@ -19,6 +19,8 @@
 #include <simulation_api/entity/vehicle_parameter.hpp>
 #include <simulation_api/behavior/action_node.hpp>
 
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
+
 #include <string>
 #include <memory>
 #include <vector>
@@ -35,7 +37,9 @@ public:
   {
     BT::PortsList ports = {
       BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
-        "vehicle_parameters")
+        "vehicle_parameters"),
+      BT::InputPort<openscenario_msgs::msg::EntityTrajectory>(
+        "trajectory")
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {

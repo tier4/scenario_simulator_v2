@@ -17,9 +17,10 @@
 
 #include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
-
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
+
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -64,6 +65,10 @@ public:
   const std::string getCurrentAction() const
   {
     return tree_ptr_->getCurrentAction();
+  }
+  const openscenario_msgs::msg::EntityTrajectory getTrajectory()
+  {
+    return tree_ptr_->getTrajectory();
   }
 
 private:
