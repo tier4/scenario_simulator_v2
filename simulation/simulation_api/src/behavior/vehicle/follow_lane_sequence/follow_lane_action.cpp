@@ -35,9 +35,8 @@ const openscenario_msgs::msg::CatmullRomSpline FollowLaneAction::calculateTrajec
   if (!entity_status.lanelet_pose_valid) {
     throw BehaviorTreeRuntimeError("failed to assign lane");
   }
-  double horizon = 0;
-  if (entity_status.action_status.twist.linear.x > 0) {
-    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
+  if (entity_status.action_status.twist.linear.x >= 0) {
+    double horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
     auto following_lanelets = hdmap_utils->getFollowingLanelets(
       entity_status.lanelet_pose.lanelet_id,
       horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
@@ -46,7 +45,7 @@ const openscenario_msgs::msg::CatmullRomSpline FollowLaneAction::calculateTrajec
         entity_status.lanelet_pose.s + horizon, 1.0);
     return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
   } else {
-    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, -5, 0);
+    double horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, -5, 0);
     simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(
         entity_status.lanelet_pose.lanelet_id));
     auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,

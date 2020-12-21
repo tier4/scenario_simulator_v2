@@ -39,9 +39,14 @@ const openscenario_msgs::msg::CatmullRomSpline StopAtStopLineAction::calculateTr
   if (!entity_status.lanelet_pose_valid) {
     throw BehaviorTreeRuntimeError("failed to assign lane");
   }
-  double horizon = 0;
-  if (entity_status.action_status.twist.linear.x > 0) {
-    horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
+      50);
+  if (entity_status.action_status.twist.linear.x >= 0) {
+    auto distance_to_stop_target = getDistanceToStopLine(following_lanelets);
+    if (!distance_to_stop_target) {
+      throw BehaviorTreeRuntimeError("failed to calculate distance to stop line");
+    }
+    double horizon = distance_to_stop_target.get();
     auto following_lanelets = hdmap_utils->getFollowingLanelets(
       entity_status.lanelet_pose.lanelet_id,
       horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));

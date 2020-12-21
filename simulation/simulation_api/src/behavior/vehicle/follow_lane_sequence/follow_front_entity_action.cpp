@@ -40,9 +40,8 @@ const openscenario_msgs::msg::CatmullRomSpline FollowFrontEntityAction::calculat
   if (!distance_to_front_entity) {
     throw BehaviorTreeRuntimeError("failed to calculate distance between front entity");
   }
-  double horizon = 0;
-  if (entity_status.action_status.twist.linear.x > 0) {
-    horizon = distance_to_front_entity.get();
+  if (entity_status.action_status.twist.linear.x >= 0) {
+    double horizon = distance_to_front_entity.get();
     auto following_lanelets = hdmap_utils->getFollowingLanelets(
       entity_status.lanelet_pose.lanelet_id,
       horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
