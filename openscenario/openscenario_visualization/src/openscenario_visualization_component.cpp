@@ -59,7 +59,8 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
 : Node("openscenario_visualization", options)
 {
   marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/entity/marker", 1);
-  entity_status_sub_ = this->create_subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
+  entity_status_sub_ =
+    this->create_subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
     "/entity/status", 1,
     std::bind(&OpenscenarioVisualizationComponent::entityStatusCallback, this,
     std::placeholders::_1));
@@ -327,7 +328,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   waypoints_marker.points = waypoints.waypoints;
   waypoints_marker.color = color;
   waypoints_marker.type = waypoints_marker.SPHERE_LIST;
-  waypoints_marker.colors = std::vector<std_msgs::msg::ColorRGBA>(waypoints.waypoints.size(),color);
+  waypoints_marker.colors =
+    std::vector<std_msgs::msg::ColorRGBA>(waypoints.waypoints.size(), color);
   waypoints_marker.scale.x = 1;
   waypoints_marker.scale.y = 1;
   waypoints_marker.scale.z = 1;

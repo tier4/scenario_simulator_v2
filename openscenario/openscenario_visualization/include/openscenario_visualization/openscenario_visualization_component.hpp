@@ -89,7 +89,8 @@ private:
    * @brief callback function when subscribe entity status array.
    * @param msg entity status array message from openscenario interpretor.
    */
-  void entityStatusCallback(const openscenario_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);
+  void entityStatusCallback(
+    const openscenario_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);
   /**
    * @brief generate delete marker for target namespace.
    * @param ns namespace of the marker which you want to delete.
@@ -117,7 +118,8 @@ private:
   /**
    * @brief subscriber of entity status array topic.
    */
-  rclcpp::Subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>::SharedPtr entity_status_sub_;
+  rclcpp::Subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>::SharedPtr
+    entity_status_sub_;
   /**
    * @brief buffers for generated markers.
    */
