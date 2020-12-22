@@ -9,7 +9,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/BoundingBox.msg
   msg/EntityType.msg
   msg/EntityStatus.msg
-  msg/EntityStatusArray.msg
   msg/LaneletPose.msg
   msg/LaneletPoseAndStatus.msg
   msg/MapPoseAndStatus.msg

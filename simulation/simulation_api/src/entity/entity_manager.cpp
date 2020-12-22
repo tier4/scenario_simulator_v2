@@ -478,7 +478,7 @@ void EntityManager::update(double current_time, double step_time)
     }
   }
   auto entity_type_list = getEntityTypeList();
-  openscenario_msgs::msg::EntityStatusArray status_array_msg;
+  openscenario_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & status : all_status) {
     auto status_msg = status.second;
     status_msg.name = status.first;
@@ -495,7 +495,11 @@ void EntityManager::update(double current_time, double step_time)
         status_msg.type.type = status_msg.type.PEDESTRIAN;
         break;
     }
-    status_array_msg.status.emplace_back(status_msg);
+    openscenario_msgs::msg::EntityStatusWithTrajectory status_with_traj;
+    status_with_traj.status = status_msg;
+    status_with_traj.name = status.first;
+    status_with_traj.time = current_time + step_time;
+    // status_array_msg.status.emplace_back(status_msg);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
 }

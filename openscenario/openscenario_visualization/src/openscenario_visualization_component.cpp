@@ -35,7 +35,7 @@
     </tr>
     <tr>
       <td>/entity/status</td>
-      <td>openscenario_msgs/msg/EntityStatusArray</td>
+      <td>openscenario_msgs/msg/EntityStatusWithTrajectoryArray</td>
       <td>Subscribe</td>
       <td>Topics for publishing entity status in simulation.</td>
     </tr>
@@ -59,19 +59,19 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
 : Node("openscenario_visualization", options)
 {
   marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/entity/marker", 1);
-  entity_status_sub_ = this->create_subscription<openscenario_msgs::msg::EntityStatusArray>(
+  entity_status_sub_ = this->create_subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
     "/entity/status", 1,
     std::bind(&OpenscenarioVisualizationComponent::entityStatusCallback, this,
     std::placeholders::_1));
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
-  const openscenario_msgs::msg::EntityStatusArray::SharedPtr msg)
+  const openscenario_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg)
 {
   visualization_msgs::msg::MarkerArray current_marker;
   std::vector<std::string> entity_name_lists;
-  for (const auto & status : msg->status) {
-    entity_name_lists.emplace_back(status.name);
+  for (const auto & data : msg->data) {
+    entity_name_lists.emplace_back(data.status.name);
   }
   std::vector<std::string> erase_names;
   for (const auto & marker : markers_) {
@@ -86,11 +86,11 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
   for (const auto & name : erase_names) {
     markers_.erase(markers_.find(name));
   }
-  for (const auto & status : msg->status) {
-    auto marker_array = generateMarker(status);
+  for (const auto & data : msg->data) {
+    auto marker_array = generateMarker(data.status);
     std::copy(marker_array.markers.begin(), marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
-    markers_[status.name] = marker_array;
+    markers_[data.name] = marker_array;
   }
   marker_pub_->publish(current_marker);
 }

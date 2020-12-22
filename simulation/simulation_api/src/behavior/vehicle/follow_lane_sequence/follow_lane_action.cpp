@@ -45,8 +45,7 @@ const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoint
     waypoints.waypoints = spline.getTrajectory(entity_status.lanelet_pose.s,
         entity_status.lanelet_pose.s + horizon, 1.0);
     return waypoints;
-  }
-  else {
+  } else {
     return openscenario_msgs::msg::WaypointsArray();
   }
 }
