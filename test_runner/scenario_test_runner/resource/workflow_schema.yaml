@@ -1,6 +1,6 @@
 Scenario: list(include('scenario'))
 ---
-scenario: 
+scenario:
     {
         path: str(),
         expect: str(required=False),

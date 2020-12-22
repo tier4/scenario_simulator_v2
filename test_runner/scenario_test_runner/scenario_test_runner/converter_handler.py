@@ -51,8 +51,6 @@ class ConverterHandler():
         folder_name = Path(yaml_scenario_path).stem
         file_name = folder_name + "-" + str(index)
         output_dir = launcher_path.joinpath("test/scenario/converted", folder_name, file_name)
-        # log_dir = str(Path(output_dir).parent) + "/converted.log"
-        # ScenarioConverter.main(yaml_scenario_path, output_dir, log_dir)
         convert(Path(yaml_scenario_path), Path(output_dir))
         return output_dir
 

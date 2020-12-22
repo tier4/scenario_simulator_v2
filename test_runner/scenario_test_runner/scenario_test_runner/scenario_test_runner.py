@@ -23,48 +23,70 @@ import time
 from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
 from scenario_test_runner.converter_handler import ConverterHandler
-from scenario_test_runner.database_handler import DatabaseHandler, resolve_ros_package
+from scenario_test_runner.workflow import Workflow, resolve_ros_package
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from sys import exit
 
 
 class ScenarioTestRunner(LifecycleController):
     """
-    class to test scenarios.
+    Class to test scenarios.
 
-    **Attributes**
-    * SLEEP_RATE (`int`): time to sleep before next scenario
+    Attributes
+    ----------
+    SLEEP_RATE : int
+        Time to sleep before next scenario.
+
     """
 
     SLEEP_RATE = 1
 
-    def __init__(self, timeout, log_directory: Path):
+    def __init__(self, timeout: int, log_directory: Path):
+        """
+        Initialize the class ScenarioTestRunner.
 
+        Arguments
+        ---------
+        timeout : int
+            If the success or failure of the simulation is not determined even
+            after the specified time (seconds) has passed, the simulation is
+            forcibly terminated as a failure.
+
+        log_directory : Path
+            Deprecated.
+
+        Returns
+        -------
+        None
+
+        """
         self.timeout = timeout
         self.launcher_path = Path(__file__).resolve().parent.parent
-        self.scenarios = []
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
         self.log_path = Path(resolve_ros_package(str(log_directory)))
 
-    def run_workflow(self, workflow, no_validation):
+    def run_workflow(self, path: Path, no_validation):
         """
         Run workflow.
 
-        **Args**
-        * workflow: Path to workflow specification.
-        * log_directory (`str`)
+        Arguments
+        ---------
+        path : Path
+            The path to the workflow file.
 
-        **Returns**
-        * None
+        Returns
+        -------
+        None
+
         """
-        self.scenarios = DatabaseHandler.read_database(workflow)
+        workflow = Workflow(path)
 
         self.yaml_scenarios = []
         expects = []
         step_times_ms = []
 
-        for scenario in self.scenarios:
+        for scenario in workflow.scenarios:
             self.yaml_scenarios.append(scenario['path'])
 
             if 'expect' not in scenario:
@@ -121,9 +143,10 @@ class ScenarioTestRunner(LifecycleController):
         """
         Run all scenarios.
 
-        **Returns**
+        Returns
+        -------
+        None
 
-        * None
         """
         if not self.log_path.exists():
             self.log_path.mkdir(parents=True, exist_ok=True)
@@ -174,6 +197,7 @@ def main():
 
     parser.add_argument(
         '--workflow',
+        type=str,
         help='Specify workflow you want to execute.',
         )
 
@@ -194,7 +218,7 @@ def main():
 
     ScenarioTestRunner(args.timeout,
                        args.log_directory).run_workflow(
-        args.workflow,
+        Path(resolve_ros_package(args.workflow)).resolve(),
         args.no_validation)
 
     rclpy.shutdown()
