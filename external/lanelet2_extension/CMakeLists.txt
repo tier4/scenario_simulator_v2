@@ -36,67 +36,33 @@ find_path(PUGIXML_INCLUDE_DIRS
   PATH_SUFFIXES pugixml
 )
 
-add_compile_options(-std=c++14)
-
 find_package(ament_cmake_auto REQUIRED)
-find_package(rclcpp REQUIRED)
+
 ament_auto_find_build_dependencies()
 
-include_directories(
-  include
-  ${GeographicLib_INCLUDE_DIRS}
-  ${PUGIXML_INCLUDE_DIRS}
-)
-
-add_definitions(${GeographicLib_DEFINITIONS})
-
-add_library(lanelet2_extension_lib SHARED
+ament_auto_add_library(lanelet2_extension_lib SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/autoware_osm_parser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/autoware_traffic_light.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/detection_area.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/road_marking.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/mgrs_projector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/message_conversion.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/mgrs_projector.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/query.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/road_marking.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/road_marking.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/utilities.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/lib/visualization.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/validation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/visualization.cpp
 )
-ament_target_dependencies(lanelet2_extension_lib
-  rclcpp
-  lanelet2_core
-  lanelet2_io
-  lanelet2_maps
-  lanelet2_projection
-  lanelet2_routing
-  lanelet2_traffic_rules
-  lanelet2_validation
-  autoware_auto_msgs
-  geometry_msgs
-  visualization_msgs
-)
-ament_export_interfaces(export_lanelet2_extension_lib HAS_LIBRARY_TARGET)
-ament_export_libraries(lanelet2_extension_lib)
+
+target_include_directories(lanelet2_extension_lib PRIVATE
+  ${GeographicLib_INCLUDE_DIRS}
+  ${PUGIXML_INCLUDE_DIRS})
 
 ament_auto_add_executable(sample_code
   src/sample_code.cpp
 )
-target_link_libraries(sample_code lanelet2_extension_lib)
 
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
-install(TARGETS
-  sample_code
-  DESTINATION lib/lanelet2_extension
-)
-install(TARGETS lanelet2_extension_lib
-  EXPORT export_lanelet2_extension_lib
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+target_link_libraries(sample_code lanelet2_extension_lib)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -191,8 +157,6 @@ if(BUILD_TESTING)
     )
     target_link_libraries(test_utilities lanelet2_extension_lib)
   endif()
-
 endif()
 
-ament_export_include_directories(include)
-ament_package()
+ament_auto_package()
