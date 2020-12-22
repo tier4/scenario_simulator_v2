@@ -34,17 +34,34 @@ class ScenarioTestRunner(LifecycleController):
 
     Attributes
     ----------
-        SLEEP_RATE (int): Time to sleep before next scenario.
+    SLEEP_RATE : int
+        Time to sleep before next scenario.
 
     """
 
     SLEEP_RATE = 1
 
-    def __init__(self, timeout, log_directory: Path):
+    def __init__(self, timeout: int, log_directory: Path):
+        """
+        Initialize the class ScenarioTestRunner.
 
+        Arguments
+        ---------
+        timeout : int
+            If the success or failure of the simulation is not determined even
+            after the specified time (seconds) has passed, the simulation is
+            forcibly terminated as a failure.
+
+        log_directory : Path
+            Deprecated.
+
+        Returns
+        -------
+        None
+
+        """
         self.timeout = timeout
         self.launcher_path = Path(__file__).resolve().parent.parent
-        self.scenarios = []
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
         self.log_path = Path(resolve_ros_package(str(log_directory)))
@@ -55,22 +72,21 @@ class ScenarioTestRunner(LifecycleController):
 
         Arguments
         ---------
-            path (Path): The path to the workflow file.
+        path : Path
+            The path to the workflow file.
 
         Returns
         -------
-            None
+        None
 
         """
         workflow = Workflow(path)
-
-        self.scenarios = workflow.scenarios
 
         self.yaml_scenarios = []
         expects = []
         step_times_ms = []
 
-        for scenario in self.scenarios:
+        for scenario in workflow.scenarios:
             self.yaml_scenarios.append(scenario['path'])
 
             if 'expect' not in scenario:
@@ -127,9 +143,10 @@ class ScenarioTestRunner(LifecycleController):
         """
         Run all scenarios.
 
-        **Returns**
+        Returns
+        -------
+        None
 
-        * None
         """
         if not self.log_path.exists():
             self.log_path.mkdir(parents=True, exist_ok=True)
