@@ -11,13 +11,15 @@
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
-  <depend>python-xmlplain</depend>
-  <depend>python-xmlschema</depend>
-  <depend>python-xmltodict</depend> 
-  <depend>python-bs4</depend>
-  <depend>python-argparse</depend>
-  <depend>python-yamale-pip</depend>
   <depend>ament_index_python</depend>
+  <depend>openscenario_utility</depend>
+  <depend>python3-bs4</depend>
+  <depend>python3-xmlschema</depend>
+  <depend>python3-xmltodict</depend>
+  <depend>python-argparse</depend>
+  <depend>python-xmlplain-pip</depend>
+  <depend>python-yamale-pip</depend>
+
   <export>
     <build_type>ament_python</build_type>
   </export>

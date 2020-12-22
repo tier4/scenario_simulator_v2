@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2020 TierIV.inc. All rights reserved.
+# Copyright 2020 Tier IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from logging import getLogger, StreamHandler, Formatter, FileHandler, DEBUG
 
 
 class Logger:
+    """Class to get logging info."""
 
     @staticmethod
     def print_info(message):
@@ -109,4 +110,5 @@ def main():
 
 
 if __name__ == "__main__":
+    """Entrypoint."""
     main()

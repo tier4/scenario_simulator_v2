@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ const std_msgs::msg::ColorRGBA fromRgba(double r, double g, double b, double alp
  * @brief generate std_msgs::msg::ColorRGBA message from hsv values
  * @param h hue
  * @param s saturation
- * @param v value別で map->odom のTFを出力するやつがいれば大丈夫かと思います。
+ * @param v value
  */
 const std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alpha)
 {

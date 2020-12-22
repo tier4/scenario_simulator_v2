@@ -32,7 +32,6 @@ find_package(lanelet2_extension REQUIRED)
 find_package(lanelet2_projection REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(awapi_accessor REQUIRED)
-find_package(spline_interpolation REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(ament_index_cpp REQUIRED)
 find_package(xmlrpcpp REQUIRED)
@@ -43,11 +42,13 @@ find_package(Eigen3 REQUIRED)
 # ------------------------------------------------------------------------------
 
 add_library(entity_manager SHARED
+  src/helper/helper.cpp
+  src/math/polynomial_solver.cpp
   src/hdmap_utils/hdmap_utils.cpp
+  src/math/catmull_rom_spline.cpp
   src/math/hermite_curve.cpp
   src/math/collision.cpp
   src/entity/entity_manager.cpp
-  src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/entity/vehicle_entity.cpp
   src/entity/ego_entity.cpp
@@ -90,7 +91,6 @@ ament_target_dependencies(entity_manager
   lanelet2_routing
   lanelet2_projection
   lanelet2_extension
-  spline_interpolation
   ament_index_cpp
   behaviortree_cpp_v3
   tf2_geometry_msgs
@@ -117,7 +117,6 @@ ament_export_dependencies(
   openscenario_msgs
   quaternion_operation
   rclcpp
-  spline_interpolation
   tf2_geometry_msgs
   tf2_ros
   visualization_msgs
@@ -164,11 +163,25 @@ add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 target_include_directories(scenario_runner_moc_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-
 target_link_libraries(scenario_runner_moc_node simulation_api)
 
 install(
   TARGETS scenario_runner_moc_node
+  DESTINATION lib/simulation_api)
+
+# ------------------------------------------------------------------------------
+#  catmull_rom_visualization
+# ------------------------------------------------------------------------------
+
+add_executable(catmull_rom_visualization src/moc/catmull_rom_visualization.cpp)
+
+target_include_directories(catmull_rom_visualization PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_link_libraries(catmull_rom_visualization simulation_api)
+
+install(
+  TARGETS catmull_rom_visualization
   DESTINATION lib/simulation_api)
 
 # ------------------------------------------------------------------------------

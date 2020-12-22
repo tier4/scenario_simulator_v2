@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,12 +36,7 @@ StopAtStopLineAction::StopAtStopLineAction(
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
   const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    return boost::none;
-  }
-  auto distance_to_stop_target = hdmap_utils->getDistanceToStopLine(following_lanelets,
-      entity_status.lanelet_id,
-      entity_status.s);
+  auto distance_to_stop_target = getDistanceToStopLine(following_lanelets);
   if (!distance_to_stop_target) {
     return boost::none;
   }
@@ -64,54 +59,47 @@ BT::NodeStatus StopAtStopLineAction::tick()
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
+      50);
+  if (getRightOfWayEntities(following_lanelets).size() != 0) {
+    return BT::NodeStatus::FAILURE;
+  }
+  auto dist_to_stopline = getDistanceToStopLine(following_lanelets);
+  if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
+    if (dist_to_stopline) {
+      if (dist_to_stopline.get() <= vehicle_parameters->bounding_box.dimensions.length + 5) {
+        stopped_ = true;
+      }
+    }
+  }
+  if (stopped_) {
+    if (!target_speed) {
+      target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    }
+    if (!dist_to_stopline) {
+      stopped_ = false;
+      setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+      return BT::NodeStatus::SUCCESS;
+    }
+    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    return BT::NodeStatus::RUNNING;
+  }
+  auto target_linear_speed =
+    calculateTargetSpeed(following_lanelets, entity_status.action_status.twist.linear.x);
+  if (!target_linear_speed) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
-    if (getRightOfWayEntities(following_lanelets).size() != 0) {
-      return BT::NodeStatus::FAILURE;
-    }
-    auto dist_to_stopline = getDistanceToStopLine(following_lanelets);
-    if (std::fabs(entity_status.twist.linear.x) < 0.001) {
-      if (dist_to_stopline) {
-        if (dist_to_stopline.get() <= vehicle_parameters->bounding_box.dimensions.length + 5) {
-          stopped_ = true;
-        }
-      }
-    }
-    if (stopped_) {
-      if (!target_speed) {
-        target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
-      }
-      if (!dist_to_stopline) {
-        stopped_ = false;
-        setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-        return BT::NodeStatus::SUCCESS;
-      }
-      setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-      return BT::NodeStatus::RUNNING;
-    }
-    auto target_linear_speed =
-      calculateTargetSpeed(following_lanelets, entity_status.twist.linear.x);
-    if (!target_linear_speed) {
-      stopped_ = false;
-      return BT::NodeStatus::FAILURE;
-    }
-    if (target_speed) {
-      if (target_speed.get() > target_linear_speed.get()) {
-        target_speed = target_linear_speed.get();
-      }
-    } else {
+  if (target_speed) {
+    if (target_speed.get() > target_linear_speed.get()) {
       target_speed = target_linear_speed.get();
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-    stopped_ = false;
-    return BT::NodeStatus::RUNNING;
+  } else {
+    target_speed = target_linear_speed.get();
   }
+  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   stopped_ = false;
-  return BT::NodeStatus::FAILURE;
+  return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

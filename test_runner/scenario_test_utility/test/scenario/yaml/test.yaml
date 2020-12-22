@@ -1,9 +1,9 @@
-ScenarioModifiers: []
+ScenarioModifiers: {}
 OpenSCENARIO:
   UpperCamelCase:
     integerValue: 0
     stringValue: 'string'
-  EmptyCase: []
+  EmptyCase: {}
   UpperCamelCase2:
     UpperCamelCase:
       - attributeTag: attr

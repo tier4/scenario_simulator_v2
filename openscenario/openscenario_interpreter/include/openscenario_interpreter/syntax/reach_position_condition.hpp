@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+
+#include <simulation_api/helper/helper.hpp>
 
 namespace openscenario_interpreter
 {
@@ -61,11 +63,14 @@ struct ReachPositionCondition
       return asBoolean(
         trigger([&](auto && entity)
         {
-          return isReachedPosition(
-            entity,
+          const auto lanelet_pose = simulation_api::helper::constractLaneletPose(
             static_cast<Integer>(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,
-            position.as<LanePosition>().offset,
+            position.as<LanePosition>().offset
+          );
+          return isReachedPosition(
+            entity,
+            lanelet_pose,
             tolerance);
         }));
     } else {

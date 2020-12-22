@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,56 +35,48 @@ BT::NodeStatus FollowLaneAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    if (target_speed) {
-      if (target_speed.get() > vehicle_parameters->performance.max_speed) {
-        target_speed = vehicle_parameters->performance.max_speed;
-      }
-    } else {
-      target_speed = vehicle_parameters->performance.max_speed;
-    }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  if (!entity_status.lanelet_pose_valid) {
+    setOutput("updated_status",
+      calculateEntityStatusUpdatedInWorldFrame(entity_status.action_status.twist.linear.x));
     return BT::NodeStatus::RUNNING;
   }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
-    if (getRightOfWayEntities(following_lanelets).size() != 0) {
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
+      50);
+  if (getRightOfWayEntities(following_lanelets).size() != 0) {
+    return BT::NodeStatus::FAILURE;
+  }
+  auto distance_to_front_entity = getDistanceToFrontEntity();
+  if (distance_to_front_entity) {
+    if (distance_to_front_entity.get() <=
+      calculateStopDistance() +
+      vehicle_parameters->bounding_box.dimensions.length + 5)
+    {
       return BT::NodeStatus::FAILURE;
     }
-    auto distance_to_front_entity = getDistanceToFrontEntity();
-    if (distance_to_front_entity) {
-      if (distance_to_front_entity.get() <=
-        calculateStopDistance() +
-        vehicle_parameters->bounding_box.dimensions.length + 5)
-      {
-        return BT::NodeStatus::FAILURE;
-      }
-    }
-    auto distance_to_stopline = getDistanceToStopLine(following_lanelets);
-    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
-    if (distance_to_stopline) {
-      if (distance_to_stopline.get() <=
-        calculateStopDistance() +
-        vehicle_parameters->bounding_box.dimensions.length * 0.5 + 5)
-      {
-        return BT::NodeStatus::FAILURE;
-      }
-    }
-    if (distance_to_conflicting_entity) {
-      if (distance_to_conflicting_entity.get() <
-        (vehicle_parameters->bounding_box.dimensions.length + calculateStopDistance() + 10))
-      {
-        return BT::NodeStatus::FAILURE;
-      }
-    }
-    if (!target_speed) {
-      target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
-    }
-    auto updated_status = calculateEntityStatusUpdated(target_speed.get());
-    setOutput("updated_status", updated_status);
-    return BT::NodeStatus::RUNNING;
   }
-  return BT::NodeStatus::FAILURE;
+  auto distance_to_stopline = getDistanceToStopLine(following_lanelets);
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
+  if (distance_to_stopline) {
+    if (distance_to_stopline.get() <=
+      calculateStopDistance() +
+      vehicle_parameters->bounding_box.dimensions.length * 0.5 + 5)
+    {
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+  if (distance_to_conflicting_entity) {
+    if (distance_to_conflicting_entity.get() <
+      (vehicle_parameters->bounding_box.dimensions.length + calculateStopDistance() + 10))
+    {
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+  if (!target_speed) {
+    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+  }
+  auto updated_status = calculateEntityStatusUpdated(target_speed.get());
+  setOutput("updated_status", updated_status);
+  return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

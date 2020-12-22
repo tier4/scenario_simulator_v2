@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define NDEBUG
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 // #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
@@ -65,7 +64,8 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 
   connect(
     shared_from_this(),
-    script.as<OpenScenario>().scope.logic_file.string());
+    script.as<OpenScenario>().scope.logic_file.string(),
+    false);
   VERBOSE("  connection established");
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);

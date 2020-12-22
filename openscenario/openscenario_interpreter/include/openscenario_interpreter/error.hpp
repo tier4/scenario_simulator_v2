@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,56 +15,81 @@
 #ifndef OPENSCENARIO_INTERPRETER__ERROR_HPP_
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
-#include <sstream>
+#include <openscenario_interpreter/string/cat.hpp>
+
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace openscenario_interpreter
 {
-/* ==== Error ================================================================
+/* ---- Error ------------------------------------------------------------------
  *
- * -- Error
- *     |-- SyntaxError
- *     |-- ConnectionError
- *     |-- SemanticError
- *     `-- ImplementationFault
+ *  -- Error
+ *      |-- SyntaxError
+ *      |-- ConnectionError
+ *      |-- SemanticError
+ *      `-- ImplementationFault
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Error
   : public std::runtime_error
 {
-  using std::runtime_error::runtime_error;
+  template
+  <
+    typename ... Ts
+  >
+  explicit Error(Ts && ... xs)
+  : std::runtime_error(
+      cat(std::forward<decltype(xs)>(xs)...))
+  {}
 };
 
 struct SyntaxError
   : public Error
 {
-  explicit SyntaxError(const std::string & s)
-  : Error{"syntax-error: " + s}
+  template
+  <
+    typename ... Ts
+  >
+  explicit SyntaxError(Ts && ... xs)
+  : Error("syntax-error: ", std::forward<decltype(xs)>(xs)...)
   {}
 };
 
 struct SemanticError
   : public Error
 {
-  explicit SemanticError(const std::string & s)
-  : Error{"semantic-error: " + s}
+  template
+  <
+    typename ... Ts
+  >
+  explicit SemanticError(Ts && ... xs)
+  : Error("semantic-error: ", std::forward<decltype(xs)>(xs)...)
   {}
 };
 
 struct ConnectionError
   : public Error
 {
-  explicit ConnectionError(const std::string & s)
-  : Error{"connection-error: " + s}
+  template
+  <
+    typename ... Ts
+  >
+  explicit ConnectionError(Ts && ... xs)
+  : Error("connection-error: ", std::forward<decltype(xs)>(xs)...)
   {}
 };
 
 struct ImplementationFault
   : public Error
 {
-  explicit ImplementationFault(const std::string & s)
-  : Error{"implementation-fault: " + s}
+  template
+  <
+    typename ... Ts
+  >
+  explicit ImplementationFault(Ts && ... xs)
+  : Error("implementation-fault: ", std::forward<decltype(xs)>(xs)...)
   {}
 };
 

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== LaneChangeTarget =====================================================
+/* ---- LaneChangeTarget -------------------------------------------------------
  *
  * <xsd:complexType name="LaneChangeTarget">
  *   <xsd:choice>
@@ -32,7 +32,7 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct LaneChangeTarget
   : public Element
 {

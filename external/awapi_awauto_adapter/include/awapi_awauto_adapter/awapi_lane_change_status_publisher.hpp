@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,15 +29,19 @@ namespace autoware_api
 class AutowareLaneChangeStatusPublisher : public rclcpp::Node
 {
 private:
-  /** ---- LaneChangeStatus ------------------------------------------------------
-   *  Topic: /awapi/lane_change/get/status
-   * ------------------------------------------------------------------------ */
+  /**
+   *  LaneChangeStatus Topic: /awapi/lane_change/get/status
+   */
   using LaneChangeStatus = autoware_api_msgs::msg::LaneChangeStatus;
   rclcpp::Publisher<LaneChangeStatus>::SharedPtr pub_lane_change_status_;
   rclcpp::TimerBase::SharedPtr timer_lane_change_status_;
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
+  /**
+   * @brief publish lane change status
+   * @return none
+   */
   void publish_lane_change_status();
   explicit AutowareLaneChangeStatusPublisher(const rclcpp::NodeOptions &);
 };

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== TransitionDynamics ===================================================
+/* ---- TransitionDynamics -----------------------------------------------------
  *
  * <xsd:complexType name="TransitionDynamics">
  *   <xsd:attribute name="dynamicsShape" type="DynamicsShape" use="required"/>
@@ -30,7 +30,7 @@ inline namespace syntax
  *   <xsd:attribute name="dynamicsDimension" type="DynamicsDimension" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct TransitionDynamics
 {
   const DynamicsShape dynamics_shape;
@@ -41,9 +41,9 @@ struct TransitionDynamics
 
   template<typename Node, typename Scope>
   explicit TransitionDynamics(const Node & node, Scope & scope)
-  : dynamics_shape{readAttribute<DynamicsShape>("dynamicsShape", node, scope)},
-    value{readAttribute<Double>("value", node, scope)},
-    dynamics_dimension{readAttribute<DynamicsDimension>("dynamicsDimension", node, scope)}
+  : dynamics_shape(readAttribute<DynamicsShape>("dynamicsShape", node, scope)),
+    value(readAttribute<Double>("value", node, scope)),
+    dynamics_dimension(readAttribute<DynamicsDimension>("dynamicsDimension", node, scope))
   {}
 };
 }

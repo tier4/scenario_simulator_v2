@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 #define SIMULATION_API__BEHAVIOR__PEDESTRIAN__ACQUIRE_POSITION_ACTION_HPP_
 
 #include <simulation_api/entity/pedestrian_parameter.hpp>
-#include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/behavior/pedestrian/pedestrian_action_node.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+
+#include <openscenario_msgs/msg/entity_status.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/behavior_tree.h>
@@ -43,7 +44,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<simulation_api::entity::EntityStatus>("target_status")
+      BT::InputPort<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose")
     };
     BT::PortsList parent_ports = entity_behavior::PedestrianActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -53,7 +54,7 @@ public:
   }
 
 private:
-  boost::optional<simulation_api::entity::EntityStatus> target_status_;
+  boost::optional<openscenario_msgs::msg::LaneletPose> target_lanelet_pose_;
   std::vector<std::int64_t> route_;
 };
 }      // namespace pedestrian

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@
 #include <simulation_api/math/hermite_curve.hpp>
 
 #include <vector>
+#include <algorithm>
+#include <iostream>
+#include <cmath>
+#include <limits>
 
 namespace simulation_api
 {
@@ -49,7 +53,174 @@ HermiteCurve::HermiteCurve(
   dz_ = start_pose.position.z;
 }
 
-std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
+double HermiteCurve::getSquaredDistanceIn2D(
+  geometry_msgs::msg::Point point, double s,
+  bool autoscale) const
+{
+  const auto point_on_curve = getPoint(s, autoscale);
+  double x_term = std::pow(point.x - point_on_curve.x, 2);
+  double y_term = std::pow(point.y - point_on_curve.y, 2);
+  double ret = x_term + y_term;
+  return ret;
+}
+
+double HermiteCurve::getNewtonMethodStepSize(
+  geometry_msgs::msg::Point point, double s,
+  bool autoscale) const
+{
+  if (autoscale) {
+    s = s / getLength();
+  }
+  const auto point_on_curve = getPoint(s, autoscale);
+  double s2 = std::pow(s, 2);
+  double x_term_diff = 2 * (point.x - point_on_curve.x) *
+    (-3 * ax_ * s2 - 2 * bx_ * s - cx_);
+  double y_term_diff = 2 * (point.y - point_on_curve.y) *
+    (-3 * ay_ * s2 - 2 * by_ * s - cy_);
+  double ret = getSquaredDistanceIn2D(point, s, autoscale) / (x_term_diff + y_term_diff);
+  return ret;
+}
+
+boost::optional<double> HermiteCurve::getCollisionPointIn2D(
+  std::vector<geometry_msgs::msg::Point> polygon,
+  bool search_backward
+) const
+{
+  size_t n = polygon.size();
+  if (n <= 1) {
+    return boost::none;
+  }
+  std::vector<double> s_values;
+  for (size_t i = 0; i < (n - 1); i++) {
+    const auto p0 = polygon[i];
+    const auto p1 = polygon[i + 1];
+    auto s = getCollisionPointIn2D(p0, p1, search_backward);
+    if (s) {
+      s_values.emplace_back(s.get());
+    }
+  }
+  if (s_values.size() == 0) {
+    return boost::none;
+  }
+  if (search_backward) {
+    return *std::max_element(s_values.begin(), s_values.end());
+  }
+  return *std::min_element(s_values.begin(), s_values.end());
+}
+
+boost::optional<double> HermiteCurve::getCollisionPointIn2D(
+  geometry_msgs::msg::Point point0,
+  geometry_msgs::msg::Point point1,
+  bool search_backward
+) const
+{
+  std::vector<double> s_values;
+  double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
+  double fx = point0.x;
+  double ex = (point0.x - point1.x) / l;
+  double fy = point0.y;
+  double ey = (point0.y - point1.y) / l;
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if (std::abs(point0.x - point1.x) <= e) {
+    if (std::abs(point0.y - point1.y) <= e) {
+      return boost::none;
+    }
+    auto solutions = solver_.solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
+    for (const auto solution : solutions) {
+      if (std::fabs(solver_.cubicFunction(ay_, by_, cy_, dy_ - fy, solution) < e)) {
+        s_values.emplace_back(solution);
+      }
+    }
+  } else if (std::abs(point0.y - point1.y) <= e) {
+    auto solutions = solver_.solveCubicEquation(ay_, by_, cy_, dy_ - fy);
+    for (const auto solution : solutions) {
+      if (std::fabs(solver_.cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
+        s_values.emplace_back(solution);
+      }
+    }
+  } else {
+    double ratio = ey / ex;
+    double a = ax_ * ratio - ay_;
+    double b = bx_ * ratio - by_;
+    double c = cx_ * ratio - cy_;
+    double d = (dx_ - fx) * ratio - (dy_ - fy);
+    auto solutions = solver_.solveCubicEquation(a, b, c, d);
+    for (const auto solution : solutions) {
+      if (std::fabs(solver_.cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
+        s_values.emplace_back(solution);
+      }
+    }
+  }
+  if (s_values.size() == 0) {
+    return boost::none;
+  }
+  if (search_backward) {
+    return *std::max_element(s_values.begin(), s_values.end());
+  }
+  return *std::min_element(s_values.begin(), s_values.end());
+}
+
+boost::optional<double> HermiteCurve::getSValue(
+  geometry_msgs::msg::Point point,
+  double threadhold_distance,
+  unsigned int initial_resolution,
+  unsigned int max_iteration,
+  double torelance,
+  bool autoscale) const
+{
+  double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
+  double ret = 0.0;
+  std::vector<double> initial_value_candidates(initial_resolution);
+  std::vector<double> initial_errors(initial_resolution);
+  for (unsigned int i = 0; i < initial_resolution; i++) {
+    initial_value_candidates[i] = (0.5 + static_cast<double>(i)) * step_size;
+    initial_errors[i] = std::fabs(getSquaredDistanceIn2D(point, initial_value_candidates[i]));
+  }
+  std::vector<double>::iterator iter =
+    std::min_element(initial_errors.begin(), initial_errors.end());
+  size_t index = std::distance(initial_errors.begin(), iter);
+  ret = initial_value_candidates[index];
+  std::vector<double> errors;
+  std::vector<double> s_values;
+  for (unsigned i = 0; i < max_iteration; i++) {
+    double error = getSquaredDistanceIn2D(point, ret);
+    if (std::fabs(error) < (torelance * torelance)) {
+      return ret;
+    }
+    s_values.push_back(ret);
+    errors.push_back(error);
+    ret = ret - getNewtonMethodStepSize(point, ret);
+  }
+  std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
+  double min_error = *std::min_element(errors.begin(), errors.end());
+  if (min_error > (threadhold_distance * threadhold_distance)) {
+    return boost::none;
+  }
+  size_t value_index = std::distance(errors.begin(), min_iter);
+  ret = s_values[value_index];
+  if (ret < 0) {
+    double error = getSquaredDistanceIn2D(point, 0, false);
+    if (error < (threadhold_distance * threadhold_distance)) {
+      ret = 0;
+    } else {
+      return boost::none;
+    }
+  }
+  if (ret > 1) {
+    double error = getSquaredDistanceIn2D(point, 0, false);
+    if (error < (threadhold_distance * threadhold_distance)) {
+      ret = 1;
+    } else {
+      return boost::none;
+    }
+  }
+  if (autoscale) {
+    ret = ret * getLength();
+  }
+  return ret;
+}
+
+std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory() const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   for (int i = 0; i <= 100; i++) {
@@ -60,7 +231,7 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory()
   return ret;
 }
 
-const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale)
+const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();
@@ -72,7 +243,7 @@ const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool 
   return vec;
 }
 
-const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale)
+const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();
@@ -88,7 +259,7 @@ const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale)
   return pose;
 }
 
-double HermiteCurve::get2DCurvature(double s, bool autoscale)
+double HermiteCurve::get2DCurvature(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();
@@ -101,7 +272,7 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale)
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
-double HermiteCurve::getMaximu2DCurvature()
+double HermiteCurve::getMaximu2DCurvature() const
 {
   std::vector<double> curvatures;
   for (double s = 0; s <= 1; s = s + 0.01) {
@@ -111,7 +282,7 @@ double HermiteCurve::getMaximu2DCurvature()
   return *std::max_element(curvatures.begin(), curvatures.end());
 }
 
-double HermiteCurve::getLength()
+double HermiteCurve::getLength() const
 {
   auto trajectory = getTrajectory();
   double ret = 0.0;
@@ -123,7 +294,7 @@ double HermiteCurve::getLength()
   return ret;
 }
 
-const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale)
+const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale) const
 {
   if (autoscale) {
     s = s / getLength();

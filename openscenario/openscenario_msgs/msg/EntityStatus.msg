@@ -1,29 +1,15 @@
-uint8 EGO = 0
-uint8 VEHICLE = 1
-uint8 PEDESTRIAN = 2
-uint8 type
+openscenario_msgs/EntityType type
 
-uint8 WORLD = 0
-uint8 LANE = 1
-uint8 coordinate
-
-float64 time
+float64 time 0
 
 string name
 
 openscenario_msgs/BoundingBox bounding_box
-
-string current_action
+openscenario_msgs/ActionStatus action_status
 
 # fields for world frame
 geometry_msgs/Pose pose
 
 # fields for lane frame
-int64 lanelet_id
-float64 s
-float64 offset
-geometry_msgs/Vector3 rpy
-
-# fields for each frame
-geometry_msgs/Twist twist
-geometry_msgs/Accel accel
+openscenario_msgs/LaneletPose lanelet_pose
+bool lanelet_pose_valid true

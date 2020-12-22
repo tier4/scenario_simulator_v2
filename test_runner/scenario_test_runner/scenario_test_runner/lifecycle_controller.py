@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2020 TierIV.inc. All rights reserved.
+# Copyright 2020 Tier IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,19 +18,26 @@
 
 import rclpy
 import rcl_interfaces
+
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState
 from lifecycle_msgs.srv import GetState
 from rclpy.node import Node
-from scenario_test_utility.logger import Logger
 
 
 class LifecycleController(Node):
+    """
+    Class to control lifecycle.
+
+    **Attributes**
+    * NODE_NAME (`str`): node name to control lifecycle
+    * PARAMETER_XOSC_PATH (`str`): parameter for xosc path
+    * PARAMETER_EXPECT (`str`): expectation parameter name
+    """
 
     NODE_NAME = "openscenario_interpreter_node"
     PARAMETER_XOSC_PATH = "osc_path"
     PARAMETER_EXPECT = "expect"
-    STATES = {}
 
     def __init__(self):
         rclpy.init(args=self.NODE_NAME)
@@ -59,6 +66,7 @@ class LifecycleController(Node):
             LifecycleController.NODE_NAME + '/set_parameters')
 
     def send_request_to_change_parameters(self, scenario, expect, step_time_ms, log_path):
+        """Send request to change scenario interperter's parameters."""
         request = rcl_interfaces.srv.SetParameters.Request()
         request.parameters = [
             rcl_interfaces.msg.Parameter(
@@ -95,45 +103,60 @@ class LifecycleController(Node):
         return future
 
     def configure_node(self, scenario, expect, step_time_ms, log_path):
-        self.node_logger.info(self.get_lifecycle_state())
+        """Configure node to chagnge state from unconfigure to inactive."""
+        # self.node_logger.info(self.get_lifecycle_state())
 
         self.current_scenario = scenario
-        Logger.print_process(
-            "Set value '" +
-            self.current_scenario +
-            "' to " +
-            LifecycleController.NODE_NAME +
-            "'s parameter 'scenario'")
+        # Logger.print_process(
+        #     "Set value '" +
+        #     self.current_scenario +
+        #     "' to " +
+        #     LifecycleController.NODE_NAME +
+        #     "'s parameter 'scenario'")
 
         while not self.send_request_to_change_parameters(
                 self.current_scenario, expect, step_time_ms, log_path).done():
-            Logger.print_info('Failed to set parameters. Resending...')
+            self.get_logger().info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
-        Logger.print_info("Configure -> scenario runner state is " +
-                          self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "Configure -> scenario runner state is " + self.get_lifecycle_state())
 
-        self.node_logger.info(self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def activate_node(self):
+        """Activate node to chagnge state from inactive to activate."""
         self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
-        Logger.print_info("Activate -> scenario runner state is " +
-                          self.get_lifecycle_state())
-        self.node_logger.info(self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "Activate -> scenario runner state is " + self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def deactivate_node(self):
+        """Dectivate node to chagnge state from active to inactive."""
         self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
-        Logger.print_info("Deactivate -> scenario runner state is " +
-                          self.get_lifecycle_state())
-        self.node_logger.info(self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "Deactivate -> scenario runner state is " + self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def cleanup_node(self):
+        """Cleanup node to chagnge state from inactive to unconfigure."""
         self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
-        Logger.print_info("CleanUp -> scenario runner state is " +
-                          self.get_lifecycle_state())
-        self.node_logger.info(self.get_lifecycle_state())
+        # Logger.print_info(
+        #     "CleanUp -> scenario runner state is " + self.get_lifecycle_state())
+        # self.node_logger.info(self.get_lifecycle_state())
 
     def set_lifecycle_state(self, transition_id):
+        """
+        Set lifecycle state.
+
+        **Args**
+
+        * transition_id (`int`)
+
+        **Returns**
+
+        * success (`bool`)
+        """
         reqest = ChangeState.Request()
         reqest.transition.id = transition_id
         future = self.client_change_state.call_async(reqest)
@@ -142,14 +165,26 @@ class LifecycleController(Node):
         return future.result().success
 
     def get_lifecycle_state(self):
+        """
+        Get lifecycle state.
+
+        **Args**
+
+        * None
+
+        **Returns**
+
+        * label (`int`)
+        """
         future = self.client_get_state.call_async(GetState.Request())
         executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
         rclpy.spin_until_future_complete(self, future, executor=executor)
         return future.result().current_state.label
 
     def shutdown(self):
+        """Shutdown lifecycle controller."""
         self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
-        Logger.print_info(self.get_lifecycle_state())
+        # Logger.print_info(self.get_lifecycle_state())
         self.destroy_node()
 
 
@@ -164,4 +199,5 @@ def main(args=None):
 
 
 if __name__ == '__main__':
+    """Entrypoint."""
     main()

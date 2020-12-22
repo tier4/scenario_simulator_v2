@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 #define SIMULATION_API__BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_HPP_
 
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
-#include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/behavior/pedestrian/follow_lane_action.hpp>
 #include <simulation_api/behavior/pedestrian/acquire_position_action.hpp>
+
+#include <openscenario_msgs/msg/entity_status.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/bt_factory.h>
@@ -48,9 +49,9 @@ public:
   {
     tree_.rootBlackboard()->set(key, value);
   }
-  simulation_api::entity::EntityStatus getUpdatedStatus()
+  openscenario_msgs::msg::EntityStatus getUpdatedStatus()
   {
-    simulation_api::entity::EntityStatus status;
+    openscenario_msgs::msg::EntityStatus status;
     tree_.rootBlackboard()->get("updated_status", status);
     return status;
   }

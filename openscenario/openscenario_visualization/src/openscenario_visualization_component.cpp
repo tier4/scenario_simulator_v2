@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -118,14 +118,14 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
   std_msgs::msg::ColorRGBA color;
-  switch (status.type) {
-    case status.EGO:
+  switch (status.type.type) {
+    case status.type.EGO:
       color = color_utils::makeColorMsg("limegreen", 0.99);
       break;
-    case status.PEDESTRIAN:
+    case status.type.PEDESTRIAN:
       color = color_utils::makeColorMsg("orange", 0.99);
       break;
-    case status.VEHICLE:
+    case status.type.VEHICLE:
       color = color_utils::makeColorMsg("lightskyblue", 0.99);
       break;
   }
@@ -310,7 +310,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.y = 0.0;
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration(0.1);
-  text_action.text = status.current_action;
+  text_action.text = status.action_status.current_action;
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.push_back(text_action);
 

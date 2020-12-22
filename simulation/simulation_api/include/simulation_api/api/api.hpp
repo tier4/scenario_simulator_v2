@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
 #ifndef SIMULATION_API__API__API_HPP_
 #define SIMULATION_API__API__API_HPP_
 
-#include <awapi_accessor/accessor.hpp>
 #include <simulation_api/entity/entity_manager.hpp>
+#include <simulation_api/helper/helper.hpp>
+
+#include <awapi_accessor/accessor.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
@@ -58,6 +60,7 @@ public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node, const std::string & map_path = "",
+    bool verbose = false,
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   : autoware_api::Accessor(node)
@@ -86,20 +89,39 @@ public:
     entity_manager_ptr_ = std::make_shared<EntityManager>(node, map_path);
     client_ptr_ =
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
+    setVerbose(verbose);
   }
-
+  void setVerbose(bool verbose);
   bool spawn(
     bool is_ego, std::string name,
     std::string catalog_xml,
-    simulation_api::entity::EntityStatus status);
+    const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
+    std::string catalog_xml,
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::VehicleParameters params,
-    simulation_api::entity::EntityStatus status);
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
+    simulation_api::entity::VehicleParameters params,
+    const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::PedestrianParameters params,
-    simulation_api::entity::EntityStatus status);
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool spawn(
+    bool is_ego, std::string name,
+    simulation_api::entity::PedestrianParameters params,
+    const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
     bool is_ego, std::string name,
     std::string catalog_xml);
@@ -109,14 +131,27 @@ public:
   bool spawn(
     bool is_ego, std::string name,
     simulation_api::entity::PedestrianParameters params);
-  simulation_api::entity::EntityStatus getEntityStatus(
-    std::string name,
-    simulation_api::entity::CoordinateFrameTypes corrdinate =
-    simulation_api::entity::CoordinateFrameTypes::LANE);
-  bool setEntityStatus(std::string name, const simulation_api::entity::EntityStatus & status);
+  openscenario_msgs::msg::EntityStatus getEntityStatus(
+    std::string name);
+  bool setEntityStatus(
+    std::string name, const geometry_msgs::msg::Pose & map_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool setEntityStatus(
+    std::string name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
+  bool setEntityStatus(std::string name, const openscenario_msgs::msg::EntityStatus & status);
+  bool setEntityStatus(
+    std::string name, std::string reference_entity_name,
+    const geometry_msgs::msg::Pose relative_pose,
+    const openscenario_msgs::msg::ActionStatus action_status);
+  bool setEntityStatus(
+    std::string name, std::string reference_entity_name,
+    const geometry_msgs::msg::Point relative_position,
+    const geometry_msgs::msg::Vector3 relative_rpy,
+    const openscenario_msgs::msg::ActionStatus action_status);
   boost::optional<double> getLongitudinalDistance(std::string from, std::string to);
   boost::optional<double> getTimeHeadway(std::string from, std::string to);
-  void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
+  void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, simulation_api::entity::Direction direction);
   bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance);
@@ -129,7 +164,8 @@ public:
     geometry_msgs::msg::Pose to);
   bool reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance);
   bool reachPosition(
-    std::string name, std::int64_t lanelet_id, double s, double offset, double tolerance);
+    std::string name, openscenario_msgs::msg::LaneletPose target_pose,
+    double tolerance);
   boost::optional<double> getStandStillDuration(std::string name) const;
   bool checkCollision(std::string name0, std::string name1);
   XmlRpc::XmlRpcValue initialize(
@@ -139,12 +175,24 @@ public:
   double getCurrentTime() const {return current_time_;}
 
 private:
+  bool spawn(
+    bool is_ego,
+    std::string catalog_xml,
+    openscenario_msgs::msg::EntityStatus status);
+  bool spawn(
+    bool is_ego,
+    simulation_api::entity::PedestrianParameters params,
+    openscenario_msgs::msg::EntityStatus status);
+  bool spawn(
+    bool is_ego,
+    simulation_api::entity::VehicleParameters params,
+    openscenario_msgs::msg::EntityStatus status);
   std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;
   double current_time_;
-  simulation_api::entity::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
-  XmlRpc::XmlRpcValue toValue(std::string name, simulation_api::entity::EntityStatus status);
+  openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
+  XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
   void vehicleControlCommandCallback(autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> current_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_sub_;

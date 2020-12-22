@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ struct LaneChangeAction
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
           cdr(each) = isInLanelet(
-            car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 5);
+            car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 0.1);
         }
       }
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);

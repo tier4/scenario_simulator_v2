@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/math/collision.hpp>
+#include <simulation_api/helper/helper.hpp>
 
 #include <vector>
 #include <string>
@@ -31,8 +32,21 @@ void EntityManager::setVehicleCommands(
   state_cmd_ = state_cmd;
 }
 
+const boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::toLaneletPose(
+  geometry_msgs::msg::Pose pose) const
+{
+  return hdmap_utils_ptr_->toLaneletPose(pose);
+}
+
+const geometry_msgs::msg::Pose EntityManager::toMapPose(
+  const openscenario_msgs::msg::LaneletPose lanelet_pose) const
+{
+  return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
+}
+
 void EntityManager::setVerbose(bool verbose)
 {
+  verbose_ = verbose;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     if (it->second.type() == typeid(VehicleEntity)) {
       boost::any_cast<VehicleEntity &>(it->second).setVerbose(verbose);
@@ -48,7 +62,7 @@ void EntityManager::setVerbose(bool verbose)
 
 bool EntityManager::isEgo(std::string name) const
 {
-  if (getEntityType(name) == EntityType::EGO) {
+  if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
     return true;
   }
   return false;
@@ -66,29 +80,25 @@ int EntityManager::getNumberOfEgo() const
 }
 
 void EntityManager::requestAcquirePosition(
-  std::string name, std::int64_t lanelet_id, double s,
-  double offset)
+  std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return;
   }
   if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).requestAcquirePosition(lanelet_id, s, offset);
+    boost::any_cast<VehicleEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).requestAcquirePosition(lanelet_id, s, offset);
+    boost::any_cast<EgoEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_id, s, offset);
+    boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
 }
 
 void EntityManager::requestLaneChange(std::string name, std::int64_t to_lanelet_id)
 {
-  if (getEntityStatusCoordinate(name) == CoordinateFrameTypes::WORLD) {
-    return;
-  }
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return;
@@ -100,15 +110,13 @@ void EntityManager::requestLaneChange(std::string name, std::int64_t to_lanelet_
 
 void EntityManager::requestLaneChange(std::string name, Direction direction)
 {
-  if (getEntityStatusCoordinate(name) == CoordinateFrameTypes::WORLD) {
-    return;
-  }
-  auto status = getEntityStatus(name, CoordinateFrameTypes::LANE);
+  auto status = getEntityStatus(name);
   if (!status) {
     return;
   }
   if (direction == Direction::LEFT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_id, "left");
+    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_pose.lanelet_id,
+        "left");
     if (target) {
       requestLaneChange(name, target.get());
       return;
@@ -116,7 +124,8 @@ void EntityManager::requestLaneChange(std::string name, Direction direction)
     return;
   }
   if (direction == Direction::RIGHT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_id, "right");
+    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_pose.lanelet_id,
+        "right");
     if (target) {
       requestLaneChange(name, target.get());
       return;
@@ -131,26 +140,39 @@ boost::optional<double> EntityManager::getLongitudinalDistance(
   if (!entityStatusSetted(from) || !entityStatusSetted(to)) {
     return boost::none;
   }
-  if (getEntityStatusCoordinate(from) == CoordinateFrameTypes::LANE &&
-    getEntityStatusCoordinate(to) == CoordinateFrameTypes::LANE)
-  {
-    auto from_status = getEntityStatus(from, CoordinateFrameTypes::LANE);
-    auto to_status = getEntityStatus(to, CoordinateFrameTypes::LANE);
-    if (from_status && to_status) {
-      auto dist = hdmap_utils_ptr_->getLongitudinalDistance(from_status->lanelet_id,
-          from_status->s,
-          to_status->lanelet_id, to_status->s);
-      if (!dist) {
-        return boost::none;
-      } else {
-        if (dist <= max_distance) {
-          return dist.get();
-        }
-        return boost::none;
+  auto from_status = getEntityStatus(from);
+  auto to_status = getEntityStatus(to);
+  if (from_status && to_status) {
+    auto dist = hdmap_utils_ptr_->getLongitudinalDistance(from_status->lanelet_pose.lanelet_id,
+        from_status->lanelet_pose.s,
+        to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s);
+    if (!dist) {
+      return boost::none;
+    } else {
+      if (dist <= max_distance) {
+        return dist.get();
       }
+      return boost::none;
     }
   }
   return boost::none;
+}
+
+geometry_msgs::msg::Pose EntityManager::getMapPose(
+  std::string reference_entity_name,
+  geometry_msgs::msg::Pose relative_pose)
+{
+  const auto ref_status = getEntityStatus(reference_entity_name);
+  if (!ref_status) {
+    throw simulation_api::SimulationRuntimeError(
+            "failed to get status of " + reference_entity_name + " entity in getMapPose");
+  }
+  tf2::Transform ref_transfrom, relative_transform;
+  tf2::fromMsg(ref_status->pose, ref_transfrom);
+  tf2::fromMsg(relative_pose, relative_transform);
+  geometry_msgs::msg::Pose ret;
+  tf2::toMsg(ref_transfrom * relative_transform, ret);
+  return ret;
 }
 
 geometry_msgs::msg::Pose EntityManager::getRelativePose(std::string from, std::string to)
@@ -239,20 +261,22 @@ bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, doubl
   if (!entityStatusSetted(name)) {
     return false;
   }
-  if (getEntityStatusCoordinate(name) == CoordinateFrameTypes::WORLD) {
-    return false;
-  }
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
-  auto status = getEntityStatus(name, CoordinateFrameTypes::LANE);
+  auto status = getEntityStatus(name);
   if (!status) {
     return false;
   }
-  if (status->lanelet_id == lanelet_id) {
+  if (!status->lanelet_pose_valid) {
+    return false;
+  }
+  if (status->lanelet_pose.lanelet_id == lanelet_id) {
     return true;
   } else {
-    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(lanelet_id, l, status->lanelet_id,
-        status->s);
-    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(status->lanelet_id, status->s,
+    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(lanelet_id, l,
+        status->lanelet_pose.lanelet_id,
+        status->lanelet_pose.s);
+    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(status->lanelet_pose.lanelet_id,
+        status->lanelet_pose.s,
         lanelet_id, 0);
     if (dist0) {
       if (dist0.get() < tolerance) {
@@ -277,7 +301,7 @@ const std::vector<std::string> EntityManager::getEntityNames() const
   return ret;
 }
 
-bool EntityManager::setEntityStatus(std::string name, EntityStatus status)
+bool EntityManager::setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -295,36 +319,21 @@ bool EntityManager::setEntityStatus(std::string name, EntityStatus status)
   return false;
 }
 
-const CoordinateFrameTypes & EntityManager::getEntityStatusCoordinate(std::string name) const
-{
-  auto it = entities_.find(name);
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).getStatusCoordinateFrameType();
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).getStatusCoordinateFrameType();
-  }
-  throw simulation_api::SimulationRuntimeError(
-          "failed to get entity status coordinate, entity name does not match, entity_name : " +
-          name);
-}
-
-const boost::optional<EntityStatus> EntityManager::getEntityStatus(
-  std::string name,
-  CoordinateFrameTypes coordinate) const
+const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEntityStatus(
+  std::string name) const
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
   if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).getStatus(coordinate);
+    return boost::any_cast<const VehicleEntity &>(it->second).getStatus();
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).getStatus(coordinate);
+    return boost::any_cast<const EgoEntity &>(it->second).getStatus();
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<const PedestrianEntity &>(it->second).getStatus(coordinate);
+    return boost::any_cast<const PedestrianEntity &>(it->second).getStatus();
   }
   return boost::none;
 }
@@ -409,20 +418,24 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
+  if (verbose_) {
+    std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
+  }
   if (getNumberOfEgo() >= 2) {
     throw SimulationRuntimeError("multi ego simulation does not support yet.");
   }
   setVerbose(verbose_);
-
   auto type_list = getEntityTypeList();
-  std::unordered_map<std::string, EntityStatus> all_status;
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    if (verbose_) {
+      std::cout << "update " << it->first << " behavior" << std::endl;
+    }
     if (it->second.type() == typeid(VehicleEntity)) {
       boost::any_cast<VehicleEntity &>(it->second).setEntityTypeList(type_list);
       boost::any_cast<VehicleEntity &>(it->second).onUpdate(current_time, step_time);
       if (boost::any_cast<VehicleEntity &>(it->second).statusSetted()) {
-        auto status = boost::any_cast<VehicleEntity &>(it->second).getStatus(
-          boost::any_cast<VehicleEntity &>(it->second).getStatusCoordinateFrameType());
+        auto status = boost::any_cast<VehicleEntity &>(it->second).getStatus();
         all_status[boost::any_cast<VehicleEntity &>(it->second).name] = status;
       }
     }
@@ -440,8 +453,7 @@ void EntityManager::update(double current_time, double step_time)
       }
       boost::any_cast<EgoEntity &>(it->second).onUpdate(current_time, step_time);
       if (boost::any_cast<EgoEntity &>(it->second).statusSetted()) {
-        auto status = boost::any_cast<EgoEntity &>(it->second).getStatus(
-          boost::any_cast<EgoEntity &>(it->second).getStatusCoordinateFrameType());
+        auto status = boost::any_cast<EgoEntity &>(it->second).getStatus();
         all_status[boost::any_cast<EgoEntity &>(it->second).name] = status;
       }
     }
@@ -449,8 +461,7 @@ void EntityManager::update(double current_time, double step_time)
       boost::any_cast<PedestrianEntity &>(it->second).setEntityTypeList(type_list);
       boost::any_cast<PedestrianEntity &>(it->second).onUpdate(current_time, step_time);
       if (boost::any_cast<PedestrianEntity &>(it->second).statusSetted()) {
-        auto status = boost::any_cast<PedestrianEntity &>(it->second).getStatus(
-          boost::any_cast<PedestrianEntity &>(it->second).getStatusCoordinateFrameType());
+        auto status = boost::any_cast<PedestrianEntity &>(it->second).getStatus();
         all_status[boost::any_cast<PedestrianEntity &>(it->second).name] = status;
       }
     }
@@ -469,25 +480,24 @@ void EntityManager::update(double current_time, double step_time)
   auto entity_type_list = getEntityTypeList();
   openscenario_msgs::msg::EntityStatusArray status_array_msg;
   for (const auto & status : all_status) {
-    auto status_msg = status.second.toRosMsg();
+    auto status_msg = status.second;
     status_msg.name = status.first;
     status_msg.bounding_box = getBoundingBox(status.first);
-    status_msg.current_action = getCurrentAction(status.first);
-    switch (getEntityType(status.first)) {
-      case EntityType::EGO:
-        status_msg.type = status_msg.EGO;
+    status_msg.action_status.current_action = getCurrentAction(status.first);
+    switch (getEntityType(status.first).type) {
+      case openscenario_msgs::msg::EntityType::EGO:
+        status_msg.type.type = status_msg.type.EGO;
         break;
-      case EntityType::VEHICLE:
-        status_msg.type = status_msg.VEHICLE;
+      case openscenario_msgs::msg::EntityType::VEHICLE:
+        status_msg.type.type = status_msg.type.VEHICLE;
         break;
-      case EntityType::PEDESTRIAN:
-        status_msg.type = status_msg.PEDESTRIAN;
+      case openscenario_msgs::msg::EntityType::PEDESTRIAN:
+        status_msg.type.type = status_msg.type.PEDESTRIAN;
         break;
     }
     status_array_msg.status.emplace_back(status_msg);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
-  // entity_marker_pub_ptr_->publish(generateMarker());
 }
 
 void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform)
@@ -531,31 +541,26 @@ bool EntityManager::reachPosition(
   std::string name, std::int64_t lanelet_id, double s, double offset,
   double tolerance) const
 {
-  geometry_msgs::msg::Vector3 rpy;
-  geometry_msgs::msg::Twist twist;
-  geometry_msgs::msg::Accel accel;
-  auto target_status = simulation_api::entity::EntityStatus(0, lanelet_id, s, offset, rpy,
-      twist, accel);
-  auto target_pose = hdmap_utils_ptr_->toMapPose(target_status);
-  if (!target_pose) {
-    throw simulation_api::SimulationRuntimeError("failed to transform into map frame");
-  }
-  return reachPosition(name, target_pose->pose, tolerance);
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.s = s;
+  lanelet_pose.offset = offset;
+  auto target_pose = hdmap_utils_ptr_->toMapPose(lanelet_pose);
+  return reachPosition(name, target_pose.pose, tolerance);
 }
 
 void EntityManager::broadcastBaseLinkTransform()
 {
   std::vector<std::string> names = getEntityNames();
   for (const auto & name : names) {
-    if (getEntityType(name) == EntityType::EGO) {
+    if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
       auto status = getEntityStatus(name);
       if (status) {
-        auto pose = hdmap_utils_ptr_->toMapPose(status.get());
-        if (pose) {
-          pose->header.stamp = clock_ptr_->now();
-          pose->header.frame_id = "base_link";
-          broadcastTransform(pose.get());
-        }
+        geometry_msgs::msg::PoseStamped pose;
+        pose.pose = status->pose;
+        pose.header.stamp = clock_ptr_->now();
+        pose.header.frame_id = "base_link";
+        broadcastTransform(pose);
       }
       return;
     }
@@ -569,12 +574,11 @@ void EntityManager::broadcastEntityTransform()
     if (entityStatusSetted(*it)) {
       auto status = getEntityStatus(*it);
       if (status) {
-        auto pose = hdmap_utils_ptr_->toMapPose(status.get());
-        if (pose) {
-          pose->header.stamp = clock_ptr_->now();
-          pose->header.frame_id = *it;
-          broadcastTransform(pose.get());
-        }
+        geometry_msgs::msg::PoseStamped pose;
+        pose.pose = status->pose;
+        pose.header.stamp = clock_ptr_->now();
+        pose.header.frame_id = *it;
+        broadcastTransform(pose);
       }
     }
   }
@@ -611,33 +615,46 @@ const std::string EntityManager::getCurrentAction(std::string name) const
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }
 
-EntityType EntityManager::getEntityType(std::string name) const
+openscenario_msgs::msg::EntityType EntityManager::getEntityType(std::string name) const
 {
   auto it = entities_.find(name);
   if (it->second.type() == typeid(VehicleEntity)) {
-    return EntityType::VEHICLE;
+    openscenario_msgs::msg::EntityType type;
+    type.type = openscenario_msgs::msg::EntityType::VEHICLE;
+    return type;
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    return EntityType::EGO;
+    openscenario_msgs::msg::EntityType type;
+    type.type = openscenario_msgs::msg::EntityType::EGO;
+    return type;
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    return EntityType::PEDESTRIAN;
+    openscenario_msgs::msg::EntityType type;
+    type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+    return type;
   }
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }
 
-const std::unordered_map<std::string, EntityType> EntityManager::getEntityTypeList() const
+const std::unordered_map<std::string,
+  openscenario_msgs::msg::EntityType> EntityManager::getEntityTypeList() const
 {
-  std::unordered_map<std::string, EntityType> ret;
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityType> ret;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     if (it->second.type() == typeid(VehicleEntity)) {
-      ret[it->first] = EntityType::VEHICLE;
+      openscenario_msgs::msg::EntityType type;
+      type.type = openscenario_msgs::msg::EntityType::VEHICLE;
+      ret[it->first] = type;
     }
     if (it->second.type() == typeid(EgoEntity)) {
-      ret[it->first] = EntityType::EGO;
+      openscenario_msgs::msg::EntityType type;
+      type.type = openscenario_msgs::msg::EntityType::EGO;
+      ret[it->first] = type;
     }
     if (it->second.type() == typeid(PedestrianEntity)) {
-      ret[it->first] = EntityType::PEDESTRIAN;
+      openscenario_msgs::msg::EntityType type;
+      type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+      ret[it->first] = type;
     }
   }
   return ret;

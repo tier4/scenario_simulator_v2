@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -63,23 +63,20 @@ BT::NodeStatus LaneChangeAction::tick()
     throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in LaneChangeAction");
   }
 
-  simulation_api::entity::EntityStatus entity_status;
-  if (!getInput<simulation_api::entity::EntityStatus>("entity_status", entity_status)) {
+  openscenario_msgs::msg::EntityStatus entity_status;
+  if (!getInput<openscenario_msgs::msg::EntityStatus>("entity_status", entity_status)) {
     throw BehaviorTreeRuntimeError("failed to get input entity_status in LaneChangeAction");
   }
 
   if (!curve_) {
     if (request == "lane_change") {
-      if (entity_status.coordinate == simulation_api::entity::LANE) {
-        if (!hdmap_utils_ptr->canChangeLane(entity_status.lanelet_id, params.to_lanelet_id)) {
-          return BT::NodeStatus::FAILURE;
-        }
-      }
-      auto from_pose = hdmap_utils_ptr->toMapPose(entity_status);
-      if (!from_pose) {
+      if (!hdmap_utils_ptr->canChangeLane(entity_status.lanelet_pose.lanelet_id,
+        params.to_lanelet_id))
+      {
         return BT::NodeStatus::FAILURE;
       }
-      auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose->pose, params.to_lanelet_id);
+      auto from_pose = hdmap_utils_ptr->toMapPose(entity_status.lanelet_pose).pose;
+      auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose, params.to_lanelet_id);
       if (ret) {
         curve_ = ret->first;
         target_s_ = ret->second;
@@ -89,27 +86,33 @@ BT::NodeStatus LaneChangeAction::tick()
     }
   }
   if (curve_) {
-    double current_linear_vel = entity_status.twist.linear.x;
+    double current_linear_vel = entity_status.action_status.twist.linear.x;
     current_s_ = current_s_ + current_linear_vel * step_time;
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
-      simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-        pose, entity_status.twist,
-        entity_status.accel);
+      openscenario_msgs::msg::EntityStatus entity_status_updated;
+      entity_status_updated.pose = pose;
+      auto lanelet_pose = hdmap_utils_ptr->toLaneletPose(pose);
+      if (lanelet_pose) {
+        entity_status_updated.lanelet_pose = lanelet_pose.get();
+      } else {
+        entity_status_updated.lanelet_pose_valid = false;
+      }
+      entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
       return BT::NodeStatus::RUNNING;
     } else {
       double s = (current_s_ - curve_->getLength()) + target_s_;
       curve_ = boost::none;
       current_s_ = 0;
-      geometry_msgs::msg::Vector3 rpy;
-      rpy.x = 0;
-      rpy.y = 0;
-      rpy.z = 0;
-      simulation_api::entity::EntityStatus entity_status_updated(current_time + step_time,
-        params.to_lanelet_id, s, 0,
-        rpy, entity_status.twist,
-        entity_status.accel);
+      openscenario_msgs::msg::EntityStatus entity_status_updated;
+      openscenario_msgs::msg::LaneletPose lanelet_pose;
+      lanelet_pose.lanelet_id = params.to_lanelet_id;
+      lanelet_pose.s = s;
+      lanelet_pose.offset = 0;
+      entity_status_updated.pose = hdmap_utils_ptr->toMapPose(lanelet_pose).pose;
+      entity_status_updated.lanelet_pose = lanelet_pose;
+      entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
       return BT::NodeStatus::SUCCESS;
     }

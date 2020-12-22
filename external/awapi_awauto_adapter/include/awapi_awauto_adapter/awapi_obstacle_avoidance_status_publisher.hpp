@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,15 +29,19 @@ namespace autoware_api
 class AutowareObstacleAvoidanceStatusPublisher : public rclcpp::Node
 {
 private:
-  /** ---- ObstacleAvoidanceStatus ------------------------------------------------------
-   *  Topic: /awapi/obstacle_avoidance/get/status
-   * ------------------------------------------------------------------------ */
+  /**
+   *  ObstacleAvoidanceStatus Topic: /awapi/obstacle_avoidance/get/status
+   */
   using ObstacleAvoidanceStatus = autoware_api_msgs::msg::ObstacleAvoidanceStatus;
   rclcpp::Publisher<ObstacleAvoidanceStatus>::SharedPtr pub_obstacle_avoidance_status_;
   rclcpp::TimerBase::SharedPtr timer_obstacle_avoidance_status_;
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
+  /**
+   * @brief publish obstacle avoidance
+   * @return none
+   */
   void publish_obstacle_avoidance_status();
   explicit AutowareObstacleAvoidanceStatusPublisher(const rclcpp::NodeOptions &);
 };

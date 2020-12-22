@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2020 TierIV.inc. All rights reserved.
+# Copyright 2020 Tier IV, Inc. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from ament_index_python.packages import get_package_share_directory
 
 
 class WorkflowValidator():
+    """Workflow validation class."""
 
     def __init__(self):
         share_directory_path = os.path.join(get_package_share_directory('scenario_test_utility'))
@@ -36,6 +37,7 @@ class WorkflowValidator():
 
 
 def main():
+    """Run Validation."""
     parser = argparse.ArgumentParser(description='Validator for workflow .yaml file')
     parser.add_argument('workflow', help='path to workflow .yaml file')
     args = parser.parse_args()

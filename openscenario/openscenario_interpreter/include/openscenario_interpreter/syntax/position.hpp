@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 
 #include <openscenario_interpreter/syntax/lane_position.hpp>
+#include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
 
 #include <utility>
@@ -51,7 +52,10 @@ struct Position
         std::make_pair("WorldPosition", [&](auto && node) {
           return make<WorldPosition>(node, std::forward<decltype(xs)>(xs)...);
         }),
-        std::make_pair("RelativeWorldPosition", UNSUPPORTED()),
+        std::make_pair("RelativeWorldPosition", [&](auto && node)
+        {
+          return make<RelativeWorldPosition>(node, std::forward<decltype(xs)>(xs)...);
+        }),
         std::make_pair("RelativeObjectPosition", UNSUPPORTED()),
         std::make_pair("RoadPosition", UNSUPPORTED()),
         std::make_pair("RelativeRoadPosition", UNSUPPORTED()),

@@ -7,8 +7,13 @@ find_package(geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   msg/BoundingBox.msg
+  msg/EntityType.msg
   msg/EntityStatus.msg
   msg/EntityStatusArray.msg
+  msg/LaneletPose.msg
+  msg/LaneletPoseAndStatus.msg
+  msg/MapPoseAndStatus.msg
+  msg/ActionStatus.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 

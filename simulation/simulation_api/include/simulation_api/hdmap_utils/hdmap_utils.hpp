@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@
 #ifndef SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
 #define SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
 
-#include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
+
 #include <rclcpp/rclcpp.hpp>
+#include <openscenario_msgs/msg/entity_status.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <autoware_auto_msgs/msg/had_map_bin.hpp>
 #include <geometry_msgs/msg/vector3.h>
@@ -68,19 +69,16 @@ public:
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id,
     std::vector<double> s);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
+  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(geometry_msgs::msg::Pose pose);
+  geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s,
     double offset,
     geometry_msgs::msg::Quaternion quat);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
-    std::int64_t lanelet_id, double s,
-    double offset,
-    geometry_msgs::msg::Vector3 rpy);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
+  geometry_msgs::msg::PoseStamped toMapPose(
+    openscenario_msgs::msg::LaneletPose lanlet_pose);
+  geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s,
     double offset);
-  boost::optional<geometry_msgs::msg::PoseStamped> toMapPose(
-    simulation_api::entity::EntityStatus status);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
@@ -91,8 +89,14 @@ public:
   boost::optional<double> getDistanceToStopLine(
     std::vector<std::int64_t> following_lanelets, std::int64_t lanelet_id,
     double s);
+  boost::optional<double> getDistanceToStopLine(
+    std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose);
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s);
+  boost::optional<double> getLongitudinalDistance(
+    openscenario_msgs::msg::LaneletPose from,
+    openscenario_msgs::msg::LaneletPose to
+  );
   boost::optional<double> getLongitudinalDistance(
     std::int64_t from_lanelet_id, double from_s,
     std::int64_t to_lanelet_id, double to_s);
@@ -100,6 +104,7 @@ public:
   std::vector<std::int64_t> getFollowingLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
+  std::vector<geometry_msgs::msg::Point> getCenterPoints(std::vector<std::int64_t> lanelet_ids);
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
     std::int64_t lanelet_id, double s,
     std::vector<std::int64_t> lanelet_ids, double foward_distance = 20);
@@ -121,8 +126,11 @@ public:
   const std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
   const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     std::vector<std::int64_t> lanelet_ids) const;
+  int64_t getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh = 10.0);
 
 private:
+  std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
+    const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
     std::vector<std::int64_t> lanelet_ids);
   std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<std::int64_t> lanelet_ids);

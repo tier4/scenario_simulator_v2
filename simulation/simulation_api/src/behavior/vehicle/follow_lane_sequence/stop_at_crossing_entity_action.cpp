@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,31 +55,26 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
+      50);
+  if (getRightOfWayEntities(following_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
-    if (getRightOfWayEntities(following_lanelets).size() != 0) {
-      return BT::NodeStatus::FAILURE;
-    }
-    auto target_linear_speed =
-      calculateTargetSpeed(following_lanelets, entity_status.twist.linear.x);
-    if (!target_linear_speed) {
-      setOutput("updated_status", calculateEntityStatusUpdated(0));
-      return BT::NodeStatus::SUCCESS;
-    }
-    if (target_speed) {
-      if (target_speed.get() > target_linear_speed.get()) {
-        target_speed = target_linear_speed.get();
-      }
-    } else {
+  auto target_linear_speed =
+    calculateTargetSpeed(following_lanelets, entity_status.action_status.twist.linear.x);
+  if (!target_linear_speed) {
+    setOutput("updated_status", calculateEntityStatusUpdated(0));
+    return BT::NodeStatus::SUCCESS;
+  }
+  if (target_speed) {
+    if (target_speed.get() > target_linear_speed.get()) {
       target_speed = target_linear_speed.get();
     }
-    setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-    return BT::NodeStatus::RUNNING;
+  } else {
+    target_speed = target_linear_speed.get();
   }
-  return BT::NodeStatus::FAILURE;
+  setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

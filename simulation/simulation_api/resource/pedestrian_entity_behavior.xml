@@ -10,7 +10,7 @@
             pedestrian_parameters="{pedestrian_parameters}"
             updated_status="{updated_status}"
             target_speed="{target_speed}"
-            target_status="{target_status}"
+            target_lanelet_pose="{target_lanelet_pose}"
             other_entity_status="{other_entity_status}"
             entity_type_list="{entity_type_list}"/>
         <FollowLane name="follow_lane"

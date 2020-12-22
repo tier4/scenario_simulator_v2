@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <chrono>
 
@@ -31,25 +29,35 @@ namespace autoware_api
 {
 class AutowareVehicleStatusPublisher : public rclcpp::Node
 {
-  /** ---- VehicleStatus -------------------------------------------------------
-   *  Topic: /awapi/vehicle/get/status
-   * ------------------------------------------------------------------------ */
+  /**
+   *  VehicleStatus Topic: /awapi/vehicle/get/status
+   */
   using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
+  using TwistStamped = geometry_msgs::msg::TwistStamped;
   rclcpp::Publisher<VehicleStatus>::SharedPtr pub_vehicle_status_;
   VehicleStatus vehicle_status_;
   rclcpp::TimerBase::SharedPtr timer_vehicle_status_;
+  rclcpp::Subscription<TwistStamped>::SharedPtr sub_twist_;
+  TwistStamped::SharedPtr twist_ptr_;
+  /**
+   * @brief initialize vehicle status
+   * @return VehicleStatus
+   */
   VehicleStatus init_vehicle_status();
-  void get_pose_info(VehicleStatus * status);
-  void get_steer_info(VehicleStatus * status);
-  void get_vehicle_cmd_info(VehicleStatus * status);
-  void get_turn_signal_info(VehicleStatus * status);
-  void get_twist_info(VehicleStatus * status);
-  void get_gear_info(VehicleStatus * status);
-  void get_battery_info(VehicleStatus * status);
+  /**
+   * @brief get turn signal info
+   * @return int32_t
+   * @todo make turn signal info
+   */
+  int32_t get_turn_signal_info();
 
 public:
   AWAPI_AWAUTO_ADAPTER_PUBLIC
   explicit AutowareVehicleStatusPublisher(const rclcpp::NodeOptions &);
+  /**
+   * @brief publish vehicle status
+   * @return none
+   */
   void publish_vehicle_status();
 };
 }  // namespace autoware_api

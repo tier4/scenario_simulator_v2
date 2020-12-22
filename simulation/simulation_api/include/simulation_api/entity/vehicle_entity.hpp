@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,13 +38,17 @@ namespace entity
 class VehicleEntity : public EntityBase
 {
 public:
-  VehicleEntity(std::string name, const EntityStatus & initial_state, const pugi::xml_node & xml);
-  VehicleEntity(std::string name, const EntityStatus & initial_state, VehicleParameters parameters);
+  VehicleEntity(
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    const pugi::xml_node & xml);
+  VehicleEntity(
+    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    VehicleParameters parameters);
   VehicleEntity(std::string name, const pugi::xml_node & xml);
   VehicleEntity(std::string name, VehicleParameters parameters);
   const VehicleParameters parameters;
   void onUpdate(double current_time, double step_time) override;
-  void requestAcquirePosition(std::int64_t lanelet_id, double s, double offset);
+  void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)

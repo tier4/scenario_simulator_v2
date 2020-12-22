@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -108,7 +108,9 @@ struct ParameterSetAction
       inner_scope.parameters.at(parameter_ref)
     };
 
-    const auto iter {overloads.find(target.type())};
+    const auto iter {
+      overloads.find(target.type())
+    };
 
     if (iter != std::end(overloads)) {
       return std::get<1>(* iter)(target, value);

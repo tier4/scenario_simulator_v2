@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 #define SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
 
 #include <openscenario_msgs/msg/bounding_box.hpp>
-#include <simulation_api/entity/entity_status.hpp>
+#include <openscenario_msgs/msg/entity_status.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
@@ -39,24 +39,18 @@ enum class Direction
   RIGHT = 2
 };
 
-enum class EntityType
-{
-  EGO = 0,
-  VEHICLE = 1,
-  PEDESTRIAN = 2
-};
-
 class EntityBase
 {
 public:
-  EntityBase(std::string type, std::string name, const EntityStatus & initial_state);
+  EntityBase(
+    std::string type, std::string name,
+    const openscenario_msgs::msg::EntityStatus & initial_state);
   EntityBase(std::string type, std::string name);
   virtual ~EntityBase() = default;
   const std::string type;
   const std::string name;
-  const CoordinateFrameTypes & getStatusCoordinateFrameType() const;
-  const EntityStatus getStatus(CoordinateFrameTypes coordinate = CoordinateFrameTypes::WORLD) const;
-  bool setStatus(const EntityStatus & status);
+  const openscenario_msgs::msg::EntityStatus getStatus() const;
+  bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
   bool setVisibility(bool visibility);
   bool getVisibility();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
@@ -75,11 +69,15 @@ public:
   {
     verbose_ = verbose;
   }
-  void setEntityTypeList(const std::unordered_map<std::string, EntityType> & entity_type_list)
+  void setEntityTypeList(
+    const std::unordered_map<std::string,
+    openscenario_msgs::msg::EntityType> & entity_type_list)
   {
     entity_type_list_ = entity_type_list;
   }
-  void setOtherStatus(const std::unordered_map<std::string, EntityStatus> & status);
+  void setOtherStatus(
+    const std::unordered_map<std::string,
+    openscenario_msgs::msg::EntityStatus> & status);
   void updateStandStillDuration(double step_time);
   boost::optional<double> getStandStillDuration() const;
   virtual const openscenario_msgs::msg::BoundingBox getBoundingBox() const = 0;
@@ -87,11 +85,11 @@ public:
 
 protected:
   bool visibility_;
-  boost::optional<EntityStatus> status_;
+  boost::optional<openscenario_msgs::msg::EntityStatus> status_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   bool verbose_;
-  std::unordered_map<std::string, EntityStatus> other_status_;
-  std::unordered_map<std::string, EntityType> entity_type_list_;
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_status_;
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;
   boost::optional<double> stand_still_duration_;
   visualization_msgs::msg::MarkerArray current_marker_;
 };

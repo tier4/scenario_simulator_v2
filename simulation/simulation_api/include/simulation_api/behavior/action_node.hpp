@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,17 +41,17 @@ public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
   bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
-  boost::optional<simulation_api::entity::EntityStatus> getConflictingEntityStatus(
+  boost::optional<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatus(
     const std::vector<std::int64_t> & following_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & following_lanelets) const;
-  boost::optional<simulation_api::entity::EntityStatus> getFrontEntityStatus();
+  boost::optional<openscenario_msgs::msg::EntityStatus> getFrontEntityStatus();
   double calculateStopDistance() const;
   boost::optional<double> getDistanceToFrontEntity();
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & following_lanelets);
-  std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities();
-  std::vector<simulation_api::entity::EntityStatus> getRightOfWayEntities(
+  std::vector<openscenario_msgs::msg::EntityStatus> getRightOfWayEntities();
+  std::vector<openscenario_msgs::msg::EntityStatus> getRightOfWayEntities(
     const std::vector<std::int64_t> & following_lanelets);
   boost::optional<double> getYieldStopDistance(
     const std::vector<std::int64_t> & following_lanelets);
@@ -71,28 +71,28 @@ public:
       {
         BT::InputPort<std::string>("request"),
         BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-        BT::InputPort<simulation_api::entity::EntityStatus>("entity_status"),
+        BT::InputPort<openscenario_msgs::msg::EntityStatus>("entity_status"),
         BT::InputPort<double>("current_time"),
         BT::InputPort<double>("step_time"),
         BT::InputPort<boost::optional<double>>("target_speed"),
-        BT::OutputPort<simulation_api::entity::EntityStatus>("updated_status"),
+        BT::OutputPort<openscenario_msgs::msg::EntityStatus>("updated_status"),
         BT::OutputPort<std::string>("request"),
-        BT::InputPort<std::unordered_map<std::string, simulation_api::entity::EntityStatus>>(
+        BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus>>(
           "other_entity_status"),
-        BT::InputPort<std::unordered_map<std::string, simulation_api::entity::EntityType>>(
+        BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
           "entity_type_list")
       };
   }
   void getBlackBoardValues();
   std::string request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  simulation_api::entity::EntityStatus entity_status;
+  openscenario_msgs::msg::EntityStatus entity_status;
   double current_time;
   double step_time;
   boost::optional<double> target_speed;
-  simulation_api::entity::EntityStatus updated_status;
-  std::unordered_map<std::string, simulation_api::entity::EntityStatus> other_entity_status;
-  std::unordered_map<std::string, simulation_api::entity::EntityType> entity_type_list;
+  openscenario_msgs::msg::EntityStatus updated_status;
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_entity_status;
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list;
 };
 }  // namespace entity_behavior
 

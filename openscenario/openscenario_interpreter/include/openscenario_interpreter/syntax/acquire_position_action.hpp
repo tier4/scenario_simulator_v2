@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+
+#include <simulation_api/helper/helper.hpp>
 
 #include <string>
 #include <unordered_map>
@@ -57,12 +59,11 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
-
-        requestAcquirePosition(
-          actor,
+        auto lanelet_pose = simulation_api::helper::constractLaneletPose(
           Integer(position.as<LanePosition>().lane_id),
           position.as<LanePosition>().s,
           position.as<LanePosition>().offset);
+        requestAcquirePosition(actor, lanelet_pose);
       }
     } else {
       THROW(ImplementationFault);
@@ -75,11 +76,13 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          cdr(each) = isReachedPosition(
-            car(each),
+          auto lanelet_pose = simulation_api::helper::constractLaneletPose(
             Integer(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,
-            position.as<LanePosition>().offset,
+            position.as<LanePosition>().offset);
+          cdr(each) = isReachedPosition(
+            car(each),
+            lanelet_pose,
             5.0);
         }
       }

@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 #define SIMULATION_API__BEHAVIOR__PEDESTRIAN__FOLLOW_LANE_ACTION_HPP_
 
 #include <simulation_api/behavior/pedestrian/pedestrian_action_node.hpp>
-#include <simulation_api/entity/entity_status.hpp>
 #include <simulation_api/entity/pedestrian_parameter.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+
+#include <openscenario_msgs/msg/entity_status.hpp>
 
 #include <behaviortree_cpp_v3/behavior_tree.h>
 #include <behaviortree_cpp_v3/bt_factory.h>

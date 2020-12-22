@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -71,9 +71,10 @@ struct SpeedAction
               auto status {
                 getEntityStatus(each)
               };
-              status.twist.linear.x = speed_action_target.as<AbsoluteTargetSpeed>().value;
+              status.action_status.twist.linear.x =
+                speed_action_target.as<AbsoluteTargetSpeed>().value;
               setEntityStatus(each, status);
-              setTargetSpeed(each, status.twist.linear.x, true);
+              setTargetSpeed(each, status.action_status.twist.linear.x, true);
             }
             break;
 
@@ -95,7 +96,8 @@ struct SpeedAction
           try {
             cdr(each) = Rule(Rule::equalTo)(
               getEntityStatus(
-                car(each)).twist.linear.x, speed_action_target.as<AbsoluteTargetSpeed>().value);
+                car(each)).action_status.twist.linear.x,
+              speed_action_target.as<AbsoluteTargetSpeed>().value);
           } catch (const SemanticError &) {  // XXX DIRTY HACK!!!
             // NOTE maybe lane-changing
             cdr(each) = false;

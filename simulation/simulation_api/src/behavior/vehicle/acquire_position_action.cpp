@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,12 +32,12 @@ AcquirePositionAction::AcquirePositionAction(
 
 void AcquirePositionAction::getBlackBoardValues()
 {
-  simulation_api::entity::EntityStatus target_status;
+  openscenario_msgs::msg::LaneletPose target_lanelet_pose;
   VehicleActionNode::getBlackBoardValues();
-  if (!getInput<simulation_api::entity::EntityStatus>("target_status", target_status)) {
-    target_status_ = boost::none;
+  if (!getInput<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
+    target_lanelet_pose_ = boost::none;
   } else {
-    target_status_ = target_status;
+    target_lanelet_pose_ = target_lanelet_pose;
   }
 }
 
@@ -45,21 +45,12 @@ BT::NodeStatus AcquirePositionAction::tick()
 {
   getBlackBoardValues();
   if (request != "acquire_position") {
-    target_status_ = boost::none;
+    target_lanelet_pose_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
 
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    target_status_ = boost::none;
-    return BT::NodeStatus::FAILURE;
-  }
-
-  if (target_status_->coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    target_status_ = boost::none;
-    return BT::NodeStatus::FAILURE;
-  }
-
-  route_ = hdmap_utils->getRoute(entity_status.lanelet_id, target_status_->lanelet_id);
+  route_ = hdmap_utils->getRoute(entity_status.lanelet_pose.lanelet_id,
+      target_lanelet_pose_->lanelet_id);
   std::vector<std::int64_t> following_lanelets;
 
   if (!target_speed) {
@@ -70,7 +61,7 @@ BT::NodeStatus AcquirePositionAction::tick()
           following_lanelets.push_back(*itr);
         }
       } else {
-        if (entity_status.lanelet_id == *itr) {
+        if (entity_status.lanelet_pose.lanelet_id == *itr) {
           following_lanelets.push_back(*itr);
           is_finded = true;
         }
@@ -88,7 +79,7 @@ BT::NodeStatus AcquirePositionAction::tick()
     {
       auto front_entity_status = getFrontEntityStatus();
       if (front_entity_status) {
-        target_speed = front_entity_status->twist.linear.x;
+        target_speed = front_entity_status->action_status.twist.linear.x;
       }
     }
   }
@@ -103,9 +94,9 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
   auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_);
   setOutput("updated_status", entity_status_updated);
-  if (target_status_->lanelet_id == entity_status.lanelet_id) {
-    if (target_status_->s < entity_status.s) {
-      target_status_ = boost::none;
+  if (target_lanelet_pose_->lanelet_id == entity_status.lanelet_pose.lanelet_id) {
+    if (target_lanelet_pose_->s < entity_status.lanelet_pose.s) {
+      target_lanelet_pose_ = boost::none;
       return BT::NodeStatus::SUCCESS;
     }
   }

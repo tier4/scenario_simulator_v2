@@ -1,0 +1,3 @@
+numpy==1.19.4
+PyYAML==5.3.1
+xmlschema==1.3.1

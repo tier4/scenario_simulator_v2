@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ORIENTATION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ORIENTATION_HPP_
 
+#include <geometry_msgs/msg/vector3.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/reference_context.hpp>
 
@@ -22,16 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Orientation ==========================================================
+/* ---- Orientation ----------------------------------------------------------
  *
- * <xsd:complexType name="Orientation">
- *   <xsd:attribute name="type" type="ReferenceContext" use="optional"/>
- *   <xsd:attribute name="h" type="Double" use="optional"/>
- *   <xsd:attribute name="p" type="Double" use="optional"/>
- *   <xsd:attribute name="r" type="Double" use="optional"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Orientation">
+ *    <xsd:attribute name="type" type="ReferenceContext" use="optional"/>
+ *    <xsd:attribute name="h" type="Double" use="optional"/>
+ *    <xsd:attribute name="p" type="Double" use="optional"/>
+ *    <xsd:attribute name="r" type="Double" use="optional"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Orientation
 {
   const ReferenceContext type;
@@ -40,13 +41,42 @@ struct Orientation
 
   Orientation() = default;
 
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node,
+    typename Scope
+  >
   explicit Orientation(const Node & node, Scope & scope)
-  : type{readAttribute<ReferenceContext>("type", node, scope, ReferenceContext::relative)},
-    h{readAttribute<Double>("h", node, scope, Double())},
-    p{readAttribute<Double>("p", node, scope, Double())},
-    r{readAttribute<Double>("r", node, scope, Double())}
+  : type(
+      readAttribute<ReferenceContext>("type", node, scope, ReferenceContext::relative)),
+    h(
+      readAttribute<Double>("h", node, scope, Double())),
+    p(
+      readAttribute<Double>("p", node, scope, Double())),
+    r(
+      readAttribute<Double>("r", node, scope, Double()))
   {}
+
+  operator geometry_msgs::msg::Vector3() const
+  {
+    geometry_msgs::msg::Vector3 result {};
+
+    switch (type) {
+      case ReferenceContext::relative:
+        result.x = r;  // roll
+        result.y = p;  // pitch
+        result.z = h;  // yaw (heading)
+        break;
+
+      case ReferenceContext::absolute:
+      // Jumps can never reach here (see ReferenceContext::operator >>).
+
+      default:
+        break;
+    }
+
+    return result;
+  }
 };
 }
 }  // namespace openscenario_interpreter

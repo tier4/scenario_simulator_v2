@@ -1,4 +1,4 @@
-// Copyright 2015-2020 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,9 +35,6 @@ YieldAction::YieldAction(
 boost::optional<double> YieldAction::calculateTargetSpeed(
   std::vector<std::int64_t> following_lanelets)
 {
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    return boost::none;
-  }
   auto distance_to_stop_target = getYieldStopDistance(following_lanelets);
   if (!distance_to_stop_target) {
     return boost::none;
@@ -51,7 +48,7 @@ boost::optional<double> YieldAction::calculateTargetSpeed(
       return 0;
     }
   }
-  return entity_status.twist.linear.x;
+  return entity_status.action_status.twist.linear.x;
 }
 
 BT::NodeStatus YieldAction::tick()
@@ -60,10 +57,8 @@ BT::NodeStatus YieldAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
-  if (entity_status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    return BT::NodeStatus::FAILURE;
-  }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_id, 50);
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
+      50);
   const auto right_of_way_entities = getRightOfWayEntities(following_lanelets);
   if (right_of_way_entities.size() == 0) {
     if (!target_speed) {
