@@ -66,7 +66,7 @@ public:
   {
     return tree_ptr_->getCurrentAction();
   }
-  const openscenario_msgs::msg::WaypointsArray getWaypoints()
+  openscenario_msgs::msg::WaypointsArray getWaypoints()
   {
     return tree_ptr_->getWaypoints();
   }

@@ -87,7 +87,7 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     markers_.erase(markers_.find(name));
   }
   for (const auto & data : msg->data) {
-    auto marker_array = generateMarker(data.status);
+    auto marker_array = generateMarker(data.status, data.waypoint);
     std::copy(marker_array.markers.begin(), marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
     markers_[data.name] = marker_array;
@@ -113,7 +113,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
 }
 
 const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
-  const openscenario_msgs::msg::EntityStatus & status)
+  const openscenario_msgs::msg::EntityStatus & status,
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
@@ -313,6 +314,24 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.text = status.action_status.current_action;
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.push_back(text_action);
+
+  /**
+   * @brief generate marker for waypoints
+   */
+  visualization_msgs::msg::Marker waypoints_marker;
+  waypoints_marker.header.frame_id = "map";
+  waypoints_marker.header.stamp = stamp;
+  waypoints_marker.ns = status.name;
+  waypoints_marker.id = 4;
+  waypoints_marker.action = waypoints_marker.ADD;
+  waypoints_marker.points = waypoints.waypoints;
+  waypoints_marker.color = color;
+  waypoints_marker.type = waypoints_marker.POINTS;
+  waypoints_marker.colors = std::vector<std_msgs::msg::ColorRGBA>(waypoints.waypoints.size(),color);
+  waypoints_marker.scale.x = 1;
+  waypoints_marker.scale.y = 1;
+  waypoints_marker.scale.z = 1;
+  ret.markers.push_back(waypoints_marker);
 
   return ret;
 }

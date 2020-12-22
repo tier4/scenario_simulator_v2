@@ -392,8 +392,7 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string n
             "error occurs while getting trajectory : " + name);
   }
   if (it->second.type() == typeid(VehicleEntity)) {
-    return openscenario_msgs::msg::WaypointsArray();
-    // return boost::any_cast<const VehicleEntity &>(it->second).getWaypoints();
+    return boost::any_cast<VehicleEntity &>(it->second).getWaypoints();
   }
   if (it->second.type() == typeid(EgoEntity)) {
     return openscenario_msgs::msg::WaypointsArray();
@@ -516,6 +515,7 @@ void EntityManager::update(double current_time, double step_time)
         status_msg.type.type = status_msg.type.PEDESTRIAN;
         break;
     }
+    status_with_traj.waypoint = getWaypoints(status.first);
     status_with_traj.status = status_msg;
     status_with_traj.name = status.first;
     status_with_traj.time = current_time + step_time;
