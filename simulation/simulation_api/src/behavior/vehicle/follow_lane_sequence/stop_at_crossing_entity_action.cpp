@@ -38,7 +38,7 @@ const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calcula
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     openscenario_msgs::msg::WaypointsArray waypoints;
-    double horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
+    double horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 10, 50);
     auto following_lanelets = hdmap_utils->getFollowingLanelets(
       entity_status.lanelet_pose.lanelet_id,
       horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
