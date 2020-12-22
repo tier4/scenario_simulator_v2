@@ -37,9 +37,13 @@ class Workflow():
     """
     Manages a set of scenario test items given as workflow.yaml.
 
-    Attributes:
-        path (Path): The path to the given workflow file.
-        scenarios (List[str]):
+    Attributes
+    ----------
+    path : Path
+        The path to the given workflow file.
+
+    scenarios : List[str]
+
     """
 
     def __init__(self, path: Path):
@@ -54,11 +58,15 @@ class Workflow():
         """
         Safely load workflow files.
 
-        Args:
-            path (Path): The path to the workflow file.
+        Arguments
+        ---------
+        path : Path
+            The path to the workflow file.
 
-        Returns:
-            scenarios (List[str]):
+        Returns
+        -------
+        scenarios : List[str]
+
         """
         try:
             self.validator.validate_workflow_file(workflow_path)

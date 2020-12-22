@@ -32,8 +32,10 @@ class ScenarioTestRunner(LifecycleController):
     """
     Class to test scenarios.
 
-    Attributes:
+    Attributes
+    ----------
         SLEEP_RATE (int): Time to sleep before next scenario.
+
     """
 
     SLEEP_RATE = 1
@@ -51,11 +53,14 @@ class ScenarioTestRunner(LifecycleController):
         """
         Run workflow.
 
-        Args:
+        Arguments
+        ---------
             path (Path): The path to the workflow file.
 
-        Returns:
+        Returns
+        -------
             None
+
         """
         workflow = Workflow(path)
 

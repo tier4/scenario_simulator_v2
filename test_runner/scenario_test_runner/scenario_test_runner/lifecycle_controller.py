@@ -28,8 +28,10 @@ class LifecycleController(Node):
     """
     Class to control lifecycle.
 
-    Attributes:
+    Attributes
+    ----------
         NODE_NAME (str): Node name to control lifecycle.
+
     """
 
     NODE_NAME = "openscenario_interpreter_node"
