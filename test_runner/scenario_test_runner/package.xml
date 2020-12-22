@@ -6,9 +6,11 @@
   <description>scenario test runner pakcage</description>
   <maintainer email="taiki.tanaka@tier4.jp">Taiki Tanaka</maintainer>
   <license>Apache License 2.0</license>
+
   <depend>openscenario_visualization</depend>
+  <depend>python-yamale-pip</depend>
   <depend>rclpy</depend>
-  <depend>yamale</depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
