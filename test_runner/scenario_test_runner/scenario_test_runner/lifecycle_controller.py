@@ -30,7 +30,8 @@ class LifecycleController(Node):
 
     Attributes
     ----------
-        NODE_NAME (str): Node name to control lifecycle.
+    NODE_NAME : str
+        Node name to control lifecycle.
 
     """
 
@@ -143,13 +144,14 @@ class LifecycleController(Node):
         """
         Set lifecycle state.
 
-        **Args**
+        Arguments
+        ---------
+        transition_id : int
 
-        * transition_id (`int`)
+        Returns
+        -------
+        success : bool
 
-        **Returns**
-
-        * success (`bool`)
         """
         reqest = ChangeState.Request()
         reqest.transition.id = transition_id
@@ -162,13 +164,14 @@ class LifecycleController(Node):
         """
         Get lifecycle state.
 
-        **Args**
+        Arguments
+        ---------
+        None
 
-        * None
+        Returns
+        -------
+        label : int
 
-        **Returns**
-
-        * label (`int`)
         """
         future = self.client_get_state.call_async(GetState.Request())
         executor = rclpy.executors.SingleThreadedExecutor(context=self.context)

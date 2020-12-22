@@ -50,7 +50,7 @@ class Workflow():
         self.path = path
 
         self.schema = yamale.make_schema(
-            Path(get_package_share_directory('scenario_test_utility')).parent.joinpath(
+            Path(get_package_share_directory('scenario_test_runner')).parent.joinpath(
                 'ament_index', 'resource_index', 'packages', 'workflow_schema.yaml'))
 
         self.scenarios = self.read(self.path)
