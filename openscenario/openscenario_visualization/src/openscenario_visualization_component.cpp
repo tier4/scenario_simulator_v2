@@ -326,7 +326,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   waypoints_marker.action = waypoints_marker.ADD;
   waypoints_marker.points = waypoints.waypoints;
   waypoints_marker.color = color;
-  waypoints_marker.type = waypoints_marker.POINTS;
+  waypoints_marker.type = waypoints_marker.SPHERE_LIST;
   waypoints_marker.colors = std::vector<std_msgs::msg::ColorRGBA>(waypoints.waypoints.size(),color);
   waypoints_marker.scale.x = 1;
   waypoints_marker.scale.y = 1;

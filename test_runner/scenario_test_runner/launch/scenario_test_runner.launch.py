@@ -85,7 +85,7 @@ def generate_launch_description():
         parameters=[{
             'map_path': os.path.join(
                 get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
-            'origin_latitude': 34.903555800615614,
+            'origin_latitude': 35.90355580061561,
             'origin_longitude': 139.93339979022568,
             'port': port,
         }]
@@ -106,7 +106,7 @@ def generate_launch_description():
         package='openscenario_visualization',
         node_executable='openscenario_visualization_node',
         node_name='openscenario_visualization_node',
-        output='log'
+        output='screen'
     )
 
     description = LaunchDescription()
