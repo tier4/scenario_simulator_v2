@@ -71,6 +71,7 @@ BT::NodeStatus YieldAction::tick()
       target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    setOutput("waypoints", calculateWaypoints());
     return BT::NodeStatus::SUCCESS;
   }
   target_speed = calculateTargetSpeed(following_lanelets);
@@ -78,6 +79,7 @@ BT::NodeStatus YieldAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  setOutput("waypoints", calculateWaypoints());
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

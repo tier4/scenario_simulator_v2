@@ -105,6 +105,7 @@ BT::NodeStatus LaneChangeAction::tick()
       }
       entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
+      setOutput("waypoints", calculateWaypoints());
       return BT::NodeStatus::RUNNING;
     } else {
       double s = (current_s_ - curve_->getLength()) + target_s_;
@@ -119,6 +120,7 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.lanelet_pose = lanelet_pose;
       entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
+      setOutput("waypoints", calculateWaypoints());
       return BT::NodeStatus::SUCCESS;
     }
   }

@@ -97,6 +97,7 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   auto updated_status = calculateEntityStatusUpdated(target_speed.get());
   setOutput("updated_status", updated_status);
+  setOutput("waypoints", calculateWaypoints());
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

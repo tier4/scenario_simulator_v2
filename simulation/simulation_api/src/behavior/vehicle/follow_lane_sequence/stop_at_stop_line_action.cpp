@@ -85,9 +85,11 @@ BT::NodeStatus StopAtStopLineAction::tick()
     if (!dist_to_stopline) {
       stopped_ = false;
       setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+      setOutput("waypoints", calculateWaypoints());
       return BT::NodeStatus::SUCCESS;
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    setOutput("waypoints", calculateWaypoints());
     return BT::NodeStatus::RUNNING;
   }
   auto target_linear_speed =
@@ -105,6 +107,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   stopped_ = false;
+  setOutput("waypoints", calculateWaypoints());
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

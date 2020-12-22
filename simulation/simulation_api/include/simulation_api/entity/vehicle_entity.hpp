@@ -20,7 +20,7 @@
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 
-#include <openscenario_msgs/msg/entity_trajectory.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -66,9 +66,9 @@ public:
   {
     return tree_ptr_->getCurrentAction();
   }
-  const openscenario_msgs::msg::CatmullRomSpline getTrajectory()
+  const openscenario_msgs::msg::WaypointsArray getWaypoints()
   {
-    return tree_ptr_->getTrajectory();
+    return tree_ptr_->getWaypoints();
   }
 
 private:

@@ -147,6 +147,7 @@ public:
   void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, Direction direction);
+  openscenario_msgs::msg::WaypointsArray getWaypoints(std::string name);
   boost::optional<double> getLongitudinalDistance(
     std::string from, std::string to,
     double max_distance = 100);
