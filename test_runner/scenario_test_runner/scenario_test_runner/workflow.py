@@ -20,7 +20,6 @@ import yamale
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
 from re import sub
-from scenario_test_utility.workflow_validator import WorkflowValidator
 from sys import exit, stderr
 from yaml import safe_load
 
@@ -33,27 +32,64 @@ def resolve_ros_package(pathname: str):
     return sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, pathname)
 
 
-class DatabaseHandler():
-    """class to handler database."""
+class Workflow():
+    """
+    Manages a set of scenario test items given as workflow.yaml.
 
-    @staticmethod
-    def read_database(workflow_file):
+    Attributes
+    ----------
+    path : Path
+        The path to the given workflow file.
+
+    scenarios : List[str]
+
+    """
+
+    def __init__(self, path: Path):
+
+        self.path = path
+
+        self.schema = yamale.make_schema(
+            Path(get_package_share_directory('scenario_test_runner')).parent.joinpath(
+                'ament_index', 'resource_index', 'packages', 'workflow_schema.yaml'))
+
+        self.scenarios = self.read(self.path)
+
+    def validate(self, path: Path):
         """
-        Read database.
+        Validate workflow file.
 
-        **Args**
-        * workflow_file
+        Arguments
+        ---------
+        path : Path
+            Path to the workflow file.
 
-        **Returns**
-        * scenarios (`list`)
+        Returns
+        -------
+        None
+
         """
-        workflow_path = Path(resolve_ros_package(workflow_file)).resolve()
-
         try:
-            WorkflowValidator().validate_workflow_file(workflow_path)
+            yamale.validate(self.schema, yamale.make_data(path))
 
         except yamale.yamale_error.YamaleError:
             exit(1)
+
+    def read(self, workflow_path: Path):
+        """
+        Safely load workflow files.
+
+        Arguments
+        ---------
+        workflow_path : Path
+            Path to the workflow file.
+
+        Returns
+        -------
+        scenarios : List[str]
+
+        """
+        self.validate(workflow_path)
 
         if workflow_path.exists():
             with workflow_path.open('r') as file:
