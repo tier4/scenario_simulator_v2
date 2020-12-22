@@ -8,6 +8,7 @@
   <license>Apache License 2.0</license>
 
   <depend>openscenario_visualization</depend>
+  <depend>python3-xmlschema</depend>
   <depend>python-yamale-pip</depend>
   <depend>rclpy</depend>
 
