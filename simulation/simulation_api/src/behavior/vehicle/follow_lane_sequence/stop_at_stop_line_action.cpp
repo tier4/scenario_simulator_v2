@@ -36,6 +36,7 @@ StopAtStopLineAction::StopAtStopLineAction(
 
 const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
 {
+  return openscenario_msgs::msg::WaypointsArray();
 }
 
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(

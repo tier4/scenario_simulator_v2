@@ -17,8 +17,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/HermiteCurve.msg
   msg/CatmullRomSpline.msg
   msg/EntityTrajectory.msg
-  msg/Waypoint.msg
   msg/WaypointsArray.msg
+  msg/EntityStatusWithTrajectory.msg
+  msg/EntityStatusWithTrajectoryArray.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 

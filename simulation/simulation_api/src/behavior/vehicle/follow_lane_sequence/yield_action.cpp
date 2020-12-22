@@ -35,6 +35,7 @@ YieldAction::YieldAction(
 
 const openscenario_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
 {
+  return openscenario_msgs::msg::WaypointsArray();
 }
 
 boost::optional<double> YieldAction::calculateTargetSpeed(

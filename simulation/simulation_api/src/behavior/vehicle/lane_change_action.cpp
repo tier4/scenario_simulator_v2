@@ -29,6 +29,7 @@ LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfi
 
 const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
+  return openscenario_msgs::msg::WaypointsArray();
 }
 
 BT::NodeStatus LaneChangeAction::tick()

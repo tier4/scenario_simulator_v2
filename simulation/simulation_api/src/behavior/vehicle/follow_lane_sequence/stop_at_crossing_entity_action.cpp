@@ -33,6 +33,7 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 
 const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
+  return openscenario_msgs::msg::WaypointsArray();
 }
 
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(

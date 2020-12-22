@@ -33,6 +33,7 @@ FollowFrontEntityAction::FollowFrontEntityAction(
 
 const openscenario_msgs::msg::WaypointsArray FollowFrontEntityAction::calculateWaypoints()
 {
+  return openscenario_msgs::msg::WaypointsArray();
 }
 
 BT::NodeStatus FollowFrontEntityAction::tick()

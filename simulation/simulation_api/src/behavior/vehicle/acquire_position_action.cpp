@@ -35,6 +35,7 @@ AcquirePositionAction::AcquirePositionAction(
 
 const openscenario_msgs::msg::WaypointsArray AcquirePositionAction::calculateWaypoints()
 {
+  return openscenario_msgs::msg::WaypointsArray();
 }
 
 void AcquirePositionAction::getBlackBoardValues()
