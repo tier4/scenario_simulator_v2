@@ -20,7 +20,6 @@ import yamale
 from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
 from re import sub
-from scenario_test_utility.workflow_validator import WorkflowValidator
 from sys import exit, stderr
 from yaml import safe_load
 
@@ -50,9 +49,31 @@ class Workflow():
 
         self.path = path
 
-        self.validator = WorkflowValidator()
+        self.schema = yamale.make_schema(
+            Path(get_package_share_directory('scenario_test_utility')).parent.joinpath(
+                'ament_index', 'resource_index', 'packages', 'workflow_schema.yaml'))
 
         self.scenarios = self.read(self.path)
+
+    def validate(self, path: Path):
+        """
+        Validate workflow file.
+
+        Arguments
+        ---------
+        path : Path
+            Path to the workflow file.
+
+        Returns
+        -------
+        None
+
+        """
+        try:
+            yamale.validate(self.schema, yamale.make_data(path))
+
+        except yamale.yamale_error.YamaleError:
+            exit(1)
 
     def read(self, workflow_path: Path):
         """
@@ -60,19 +81,15 @@ class Workflow():
 
         Arguments
         ---------
-        path : Path
-            The path to the workflow file.
+        workflow_path : Path
+            Path to the workflow file.
 
         Returns
         -------
         scenarios : List[str]
 
         """
-        try:
-            self.validator.validate_workflow_file(workflow_path)
-
-        except yamale.yamale_error.YamaleError:
-            exit(1)
+        self.validate(workflow_path)
 
         if workflow_path.exists():
             with workflow_path.open('r') as file:
