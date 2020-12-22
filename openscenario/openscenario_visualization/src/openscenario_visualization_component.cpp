@@ -325,14 +325,22 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   waypoints_marker.ns = status.name;
   waypoints_marker.id = 4;
   waypoints_marker.action = waypoints_marker.ADD;
-  waypoints_marker.points = waypoints.waypoints;
+  // waypoints_marker.points = waypoints.waypoints;
+  for (const auto waypoint : waypoints.waypoints) {
+    geometry_msgs::msg::Point p;
+    p.x = -waypoint.x;
+    p.y = -waypoint.y;
+    p.z = -waypoint.z;
+    waypoints_marker.points.emplace_back(p);
+  }
   waypoints_marker.color = color;
   waypoints_marker.type = waypoints_marker.SPHERE_LIST;
   waypoints_marker.colors =
     std::vector<std_msgs::msg::ColorRGBA>(waypoints.waypoints.size(), color);
-  waypoints_marker.scale.x = 1;
-  waypoints_marker.scale.y = 1;
-  waypoints_marker.scale.z = 1;
+  waypoints_marker.colors = std::vector<std_msgs::msg::ColorRGBA>(1, color);
+  waypoints_marker.scale.x = 0.3;
+  waypoints_marker.scale.y = 0.3;
+  waypoints_marker.scale.z = 0.3;
   ret.markers.push_back(waypoints_marker);
 
   return ret;
