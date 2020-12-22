@@ -118,14 +118,14 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
   std_msgs::msg::ColorRGBA color;
-  switch (status.type) {
-    case status.EGO:
+  switch (status.type.type) {
+    case status.type.EGO:
       color = color_utils::makeColorMsg("limegreen", 0.99);
       break;
-    case status.PEDESTRIAN:
+    case status.type.PEDESTRIAN:
       color = color_utils::makeColorMsg("orange", 0.99);
       break;
-    case status.VEHICLE:
+    case status.type.VEHICLE:
       color = color_utils::makeColorMsg("lightskyblue", 0.99);
       break;
   }

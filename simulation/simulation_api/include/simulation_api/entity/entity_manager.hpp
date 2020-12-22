@@ -89,7 +89,6 @@ private:
     }
     lanelet_marker_pub_ptr_->publish(markers);
   }
-  const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
   int getNumberOfEgo() const;
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
@@ -135,12 +134,17 @@ public:
         std::bind(&EntityManager::updateHdmapMarker, this));
   }
   ~EntityManager() {}
+  const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
+  const boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose) const;
+  const geometry_msgs::msg::Pose toMapPose(const openscenario_msgs::msg::LaneletPose lanelet_pose)
+  const;
   bool checkCollision(std::string name0, std::string name1);
   void setVehicleCommands(
     boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
     boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd);
   void setVerbose(bool verbose);
-  void requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset);
+  void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, Direction direction);
   boost::optional<double> getLongitudinalDistance(
@@ -157,12 +161,9 @@ public:
     geometry_msgs::msg::Pose relative_pose);
   const boost::optional<VehicleParameters> getVehicleParameters(std::string name) const;
   const std::vector<std::string> getEntityNames() const;
-  bool setEntityStatus(std::string name, EntityStatus status);
-  const CoordinateFrameTypes & getEntityStatusCoordinate(std::string name) const;
-  const boost::optional<EntityStatus> getEntityStatus(
-    std::string name,
-    CoordinateFrameTypes coordinate =
-    CoordinateFrameTypes::WORLD) const;
+  bool setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status);
+  const boost::optional<openscenario_msgs::msg::EntityStatus> getEntityStatus(
+    std::string name) const;
   bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance);
   bool entityStatusSetted(std::string name) const;
   void setTargetSpeed(std::string name, double target_speed, bool continuous);
@@ -177,9 +178,10 @@ public:
   void broadcastEntityTransform();
   void broadcastBaseLinkTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
-  const std::unordered_map<std::string, EntityType> getEntityTypeList() const;
+  const std::unordered_map<std::string,
+    openscenario_msgs::msg::EntityType> getEntityTypeList() const;
   bool isEgo(std::string name) const;
-  EntityType getEntityType(std::string name) const;
+  openscenario_msgs::msg::EntityType getEntityType(std::string name) const;
   const std::string getCurrentAction(std::string name) const;
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;

@@ -42,13 +42,13 @@ find_package(Eigen3 REQUIRED)
 # ------------------------------------------------------------------------------
 
 add_library(entity_manager SHARED
+  src/helper/helper.cpp
   src/math/polynomial_solver.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/math/catmull_rom_spline.cpp
   src/math/hermite_curve.cpp
   src/math/collision.cpp
   src/entity/entity_manager.cpp
-  src/entity/entity_status.cpp
   src/entity/entity_base.cpp
   src/entity/vehicle_entity.cpp
   src/entity/ego_entity.cpp

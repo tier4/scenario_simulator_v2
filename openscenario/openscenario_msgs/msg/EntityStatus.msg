@@ -1,13 +1,6 @@
-uint8 EGO = 0
-uint8 VEHICLE = 1
-uint8 PEDESTRIAN = 2
-uint8 type
+openscenario_msgs/EntityType type
 
-uint8 WORLD = 0
-uint8 LANE = 1
-uint8 coordinate
-
-float64 time
+float64 time 0
 
 string name
 
@@ -19,3 +12,4 @@ geometry_msgs/Pose pose
 
 # fields for lane frame
 openscenario_msgs/LaneletPose lanelet_pose
+bool lanelet_pose_valid true

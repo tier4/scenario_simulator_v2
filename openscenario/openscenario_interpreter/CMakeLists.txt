@@ -28,6 +28,7 @@ find_package(rclcpp_lifecycle  REQUIRED)
 find_package(rclcpp            REQUIRED)
 find_package(simulation_api    REQUIRED)
 find_package(std_msgs          REQUIRED)
+find_package(openscenario_msgs REQUIRED)
 
 # ------------------------------------------------------------------------------
 #  libopenscenario_interpreter

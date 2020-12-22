@@ -19,6 +19,8 @@
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
+#include <simulation_api/helper/helper.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -61,11 +63,14 @@ struct ReachPositionCondition
       return asBoolean(
         trigger([&](auto && entity)
         {
-          return isReachedPosition(
-            entity,
+          const auto lanelet_pose = simulation_api::helper::constractLaneletPose(
             static_cast<Integer>(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,
-            position.as<LanePosition>().offset,
+            position.as<LanePosition>().offset
+          );
+          return isReachedPosition(
+            entity,
+            lanelet_pose,
             tolerance);
         }));
     } else {

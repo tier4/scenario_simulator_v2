@@ -20,13 +20,18 @@
 
 namespace scenario_simulator
 {
+void API::setVerbose(bool verbose)
+{
+  entity_manager_ptr_->setVerbose(verbose);
+}
+
 bool API::spawn(
-  bool is_ego, std::string name,
+  bool is_ego,
   std::string catalog_xml,
-  simulation_api::entity::EntityStatus status)
+  openscenario_msgs::msg::EntityStatus status)
 {
   XmlRpc::XmlRpcValue value, status_value;
-  status_value = toValue(name, status);
+  status_value = toValue(status);
   value[0][0]["methodName"] = "spawn_entity";
   value[0][0]["params"] = status_value;
   value[0][0]["params"]["entity/is_ego"] = is_ego;
@@ -37,12 +42,12 @@ bool API::spawn(
   // catalog_xml_doc.has("Vehicle");
   if (vehicle_node != NULL) {
     if (is_ego) {
-      simulation_api::entity::EgoEntity ego(name, status, catalog_xml_doc);
+      simulation_api::entity::EgoEntity ego(status.name, status, catalog_xml_doc);
       if (!entity_manager_ptr_->spawnEntity(ego)) {
         return false;
       }
     } else {
-      simulation_api::entity::VehicleEntity npc(name, status, catalog_xml_doc);
+      simulation_api::entity::VehicleEntity npc(status.name, status, catalog_xml_doc);
       if (!entity_manager_ptr_->spawnEntity(npc)) {
         return false;
       }
@@ -50,7 +55,7 @@ bool API::spawn(
   }
   pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
   if (pedestrian_node != NULL) {
-    simulation_api::entity::PedestrianEntity pedestrian(name, status, catalog_xml_doc);
+    simulation_api::entity::PedestrianEntity pedestrian(status.name, status, catalog_xml_doc);
     if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
       return false;
     }
@@ -64,6 +69,37 @@ bool API::spawn(
   }
   return result[0][0]["success"];
 }
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  std::string catalog_xml,
+  const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, catalog_xml)) {
+    return false;
+  }
+  if (!setEntityStatus(name, map_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  std::string catalog_xml,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, catalog_xml)) {
+    return false;
+  }
+  if (!setEntityStatus(name, lanelet_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
 bool API::spawn(
   bool is_ego, std::string name,
   std::string catalog_xml)
@@ -104,7 +140,7 @@ bool API::spawn(
   } catch (XmlRpc::XmlRpcException e) {
     throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
   }
-  return result[0][0]["success"];
+  return true;
 }
 
 bool API::spawn(
@@ -117,17 +153,47 @@ bool API::spawn(
 bool API::spawn(
   bool is_ego, std::string name,
   simulation_api::entity::VehicleParameters params,
-  simulation_api::entity::EntityStatus status)
+  const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  return spawn(is_ego, name, params.toXml(), status);
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, map_pose, action_status)) {
+    return false;
+  }
+  return true;
 }
 
 bool API::spawn(
   bool is_ego, std::string name,
-  simulation_api::entity::PedestrianParameters params,
-  simulation_api::entity::EntityStatus status)
+  simulation_api::entity::VehicleParameters params,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  return spawn(is_ego, name, params.toXml(), status);
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, lanelet_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+bool API::spawn(
+  bool is_ego,
+  simulation_api::entity::VehicleParameters params,
+  openscenario_msgs::msg::EntityStatus status)
+{
+  return spawn(is_ego, params.toXml(), status);
+}
+
+bool API::spawn(
+  bool is_ego,
+  simulation_api::entity::PedestrianParameters params,
+  openscenario_msgs::msg::EntityStatus status)
+{
+  return spawn(is_ego, params.toXml(), status);
 }
 
 bool API::spawn(
@@ -137,11 +203,40 @@ bool API::spawn(
   return spawn(is_ego, name, params.toXml());
 }
 
-simulation_api::entity::EntityStatus API::getEntityStatus(
-  std::string name,
-  simulation_api::entity::CoordinateFrameTypes corrdinate)
+bool API::spawn(
+  bool is_ego, std::string name,
+  simulation_api::entity::PedestrianParameters params,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  auto status = entity_manager_ptr_->getEntityStatus(name, corrdinate);
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, lanelet_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+bool API::spawn(
+  bool is_ego, std::string name,
+  simulation_api::entity::PedestrianParameters params,
+  const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  if (!spawn(is_ego, name, params)) {
+    return false;
+  }
+  if (!setEntityStatus(name, map_pose, action_status)) {
+    return false;
+  }
+  return true;
+}
+
+openscenario_msgs::msg::EntityStatus API::getEntityStatus(
+  std::string name)
+{
+  auto status = entity_manager_ptr_->getEntityStatus(name);
   if (!status) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting entity stauts, target entity : " + name);
@@ -149,7 +244,7 @@ simulation_api::entity::EntityStatus API::getEntityStatus(
   return status.get();
 }
 
-bool API::setEntityStatus(std::string name, const simulation_api::entity::EntityStatus & status)
+bool API::setEntityStatus(std::string name, const openscenario_msgs::msg::EntityStatus & status)
 {
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
@@ -158,23 +253,31 @@ bool API::setEntityStatus(
   std::string name, std::string reference_entity_name,
   const geometry_msgs::msg::Point relative_position,
   const geometry_msgs::msg::Vector3 relative_rpy,
-  const geometry_msgs::msg::Twist twist,
-  const geometry_msgs::msg::Accel accel)
+  const openscenario_msgs::msg::ActionStatus action_status)
 {
   geometry_msgs::msg::Pose relative_pose;
   relative_pose.position = relative_position;
   relative_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(relative_rpy);
-  return setEntityStatus(name, reference_entity_name, relative_pose, twist, accel);
+  return setEntityStatus(name, reference_entity_name, relative_pose, action_status);
 }
 
 bool API::setEntityStatus(
   std::string name, std::string reference_entity_name,
   const geometry_msgs::msg::Pose relative_pose,
-  const geometry_msgs::msg::Twist twist,
-  const geometry_msgs::msg::Accel accel)
+  const openscenario_msgs::msg::ActionStatus action_status)
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
-  const auto status = simulation_api::entity::EntityStatus(current_time_, pose, twist, accel);
+  openscenario_msgs::msg::EntityStatus status;
+  status.time = current_time_;
+  status.pose = pose;
+  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
+  status.action_status = action_status;
+  if (lanelet_pose) {
+    status.lanelet_pose_valid = true;
+    status.lanelet_pose = lanelet_pose.get();
+  } else {
+    status.lanelet_pose_valid = false;
+  }
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
@@ -183,9 +286,9 @@ boost::optional<double> API::getLongitudinalDistance(std::string from, std::stri
   return entity_manager_ptr_->getLongitudinalDistance(from, to);
 }
 
-void API::requestAcquirePosition(std::string name, std::int64_t lanelet_id, double s, double offset)
+void API::requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
-  entity_manager_ptr_->requestAcquirePosition(name, lanelet_id, s, offset);
+  entity_manager_ptr_->requestAcquirePosition(name, lanelet_pose);
 }
 
 void API::requestLaneChange(std::string name, std::int64_t to_lanelet_id)
@@ -234,8 +337,8 @@ boost::optional<double> API::getTimeHeadway(std::string from, std::string to)
   if (pose.position.x > 0) {
     return boost::none;
   }
-  simulation_api::entity::EntityStatus to_status = getEntityStatus(to);
-  double ret = (pose.position.x * -1) / (to_status.twist.linear.x);
+  openscenario_msgs::msg::EntityStatus to_status = getEntityStatus(to);
+  double ret = (pose.position.x * -1) / (to_status.action_status.twist.linear.x);
   if (std::isnan(ret)) {
     return std::numeric_limits<double>::infinity();
   }
@@ -245,14 +348,17 @@ geometry_msgs::msg::Pose API::getRelativePose(std::string from, std::string to)
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 geometry_msgs::msg::Pose API::getRelativePose(geometry_msgs::msg::Pose from, std::string to)
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 geometry_msgs::msg::Pose API::getRelativePose(std::string from, geometry_msgs::msg::Pose to)
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 geometry_msgs::msg::Pose API::getRelativePose(
   geometry_msgs::msg::Pose from,
   geometry_msgs::msg::Pose to)
@@ -266,25 +372,63 @@ bool API::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, 
   }
   return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
 }
+
 bool API::reachPosition(
-  std::string name, std::int64_t lanelet_id, double s, double offset,
+  std::string name, openscenario_msgs::msg::LaneletPose target_pose,
   double tolerance)
 {
   if (!entity_manager_ptr_->entityStatusSetted(name)) {
     return false;
   }
-  return entity_manager_ptr_->reachPosition(name, lanelet_id, s, offset, tolerance);
+  return entity_manager_ptr_->reachPosition(name,
+           target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
 }
+
 boost::optional<double> API::getStandStillDuration(std::string name) const
 {
   return entity_manager_ptr_->getStandStillDuration(name);
 }
+
 bool API::checkCollision(std::string name0, std::string name1)
 {
   return entity_manager_ptr_->checkCollision(name0, name1);
 }
 
-simulation_api::entity::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
+bool API::setEntityStatus(
+  std::string name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  openscenario_msgs::msg::EntityStatus status;
+  status.lanelet_pose = lanelet_pose;
+  status.lanelet_pose_valid = true;
+  status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
+  status.name = name;
+  status.time = getCurrentTime();
+  status.action_status = action_status;
+  return setEntityStatus(name, status);
+}
+
+bool API::setEntityStatus(
+  std::string name, const geometry_msgs::msg::Pose & map_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(map_pose);
+  openscenario_msgs::msg::EntityStatus status;
+  if (lanelet_pose) {
+    status.lanelet_pose = lanelet_pose.get();
+  } else {
+    status.lanelet_pose_valid = false;
+  }
+  status.pose = map_pose;
+  status.name = name;
+  status.action_status = action_status;
+  status.time = getCurrentTime();
+  status.bounding_box = entity_manager_ptr_->getBoundingBox(name);
+  return setEntityStatus(name, status);
+}
+
+openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
 {
   std::string coordinate = param["coordinate"];
   std::string name = param["entity/name"];
@@ -313,8 +457,16 @@ simulation_api::entity::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
     accel.angular.y = param["accel/angular/y"];
     accel.angular.z = param["accel/angular/z"];
     double time = param["time"];
-    simulation_api::entity::EntityStatus status(time, lanelet_id, s, offset, rpy, twist,
-      accel);
+    openscenario_msgs::msg::EntityStatus status;
+    status.name = name;
+    status.time = time;
+    status.lanelet_pose.lanelet_id = lanelet_id;
+    status.lanelet_pose.s = s;
+    status.lanelet_pose.offset = offset;
+    status.lanelet_pose.rpy = rpy;
+    status.action_status.twist = twist;
+    status.action_status.accel = accel;
+    status.pose = entity_manager_ptr_->toMapPose(status.lanelet_pose);
     return status;
   }
   if (coordinate == "world") {
@@ -351,66 +503,57 @@ simulation_api::entity::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
     accel.angular.y = param["accel/angular/y"];
     accel.angular.z = param["accel/angular/z"];
     double time = param["time"];
-    simulation_api::entity::EntityStatus status(time, pose, twist, accel);
+    openscenario_msgs::msg::EntityStatus status;
+    status.name = name;
+    status.time = time;
+    status.action_status.twist = twist;
+    status.action_status.accel = accel;
+    status.pose = pose;
+    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
+    if (lanelet_pose) {
+      status.lanelet_pose_valid = true;
+      status.lanelet_pose = lanelet_pose.get();
+    } else {
+      status.lanelet_pose_valid = false;
+    }
     return status;
   }
   throw(scenario_simulator::ExecutionFailedError("coordinate does not match, coordinate : " +
         coordinate));
 }
-XmlRpc::XmlRpcValue API::toValue(std::string name, simulation_api::entity::EntityStatus status)
+XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
 {
-  if (status.coordinate == simulation_api::entity::CoordinateFrameTypes::WORLD) {
-    XmlRpc::XmlRpcValue param;
-    param["entity/name"] = name;
-    param["coordinate"] = "world";
-    param["pose/position/x"] = status.pose.position.x;
-    param["pose/position/y"] = status.pose.position.y;
-    param["pose/position/z"] = status.pose.position.z;
-    param["pose/orientation/x"] = status.pose.orientation.x;
-    param["pose/orientation/y"] = status.pose.orientation.y;
-    param["pose/orientation/z"] = status.pose.orientation.z;
-    param["pose/orientation/w"] = status.pose.orientation.w;
-    param["twist/linear/x"] = status.twist.linear.x;
-    param["twist/linear/y"] = status.twist.linear.y;
-    param["twist/linear/z"] = status.twist.linear.z;
-    param["twist/angular/x"] = status.twist.angular.x;
-    param["twist/angular/y"] = status.twist.angular.y;
-    param["twist/angular/z"] = status.twist.angular.z;
-    param["accel/linear/x"] = status.accel.linear.x;
-    param["accel/linear/y"] = status.accel.linear.y;
-    param["accel/linear/z"] = status.accel.linear.z;
-    param["accel/angular/x"] = status.accel.angular.x;
-    param["accel/angular/y"] = status.accel.angular.y;
-    param["accel/angular/z"] = status.accel.angular.z;
-    param["time"] = status.time;
-    return param;
-  }
-  if (status.coordinate == simulation_api::entity::CoordinateFrameTypes::LANE) {
-    XmlRpc::XmlRpcValue param;
-    param["entity/name"] = name;
-    param["coordinate"] = "lane";
-    param["lanelet_id"] = std::to_string(status.lanelet_id);
-    param["s"] = status.s;
-    param["offset"] = status.offset;
-    param["roll"] = status.rpy.x;
-    param["pitch"] = status.rpy.y;
-    param["yaw"] = status.rpy.z;
-    param["twist/linear/x"] = status.twist.linear.x;
-    param["twist/linear/y"] = status.twist.linear.y;
-    param["twist/linear/z"] = status.twist.linear.z;
-    param["twist/angular/x"] = status.twist.angular.x;
-    param["twist/angular/y"] = status.twist.angular.y;
-    param["twist/angular/z"] = status.twist.angular.z;
-    param["accel/linear/x"] = status.accel.linear.x;
-    param["accel/linear/y"] = status.accel.linear.y;
-    param["accel/linear/z"] = status.accel.linear.z;
-    param["accel/angular/x"] = status.accel.angular.x;
-    param["accel/angular/y"] = status.accel.angular.y;
-    param["accel/angular/z"] = status.accel.angular.z;
-    param["time"] = status.time;
-    return param;
-  }
-  throw(scenario_simulator::ExecutionFailedError("coordinate does not match"));
+  XmlRpc::XmlRpcValue param;
+  param["entity/name"] = status.name;
+  param["pose/position/x"] = status.pose.position.x;
+  param["pose/position/y"] = status.pose.position.y;
+  param["pose/position/z"] = status.pose.position.z;
+  param["pose/orientation/x"] = status.pose.orientation.x;
+  param["pose/orientation/y"] = status.pose.orientation.y;
+  param["pose/orientation/z"] = status.pose.orientation.z;
+  param["pose/orientation/w"] = status.pose.orientation.w;
+  param["twist/linear/x"] = status.action_status.twist.linear.x;
+  param["twist/linear/y"] = status.action_status.twist.linear.y;
+  param["twist/linear/z"] = status.action_status.twist.linear.z;
+  param["twist/angular/x"] = status.action_status.twist.angular.x;
+  param["twist/angular/y"] = status.action_status.twist.angular.y;
+  param["twist/angular/z"] = status.action_status.twist.angular.z;
+  param["accel/linear/x"] = status.action_status.accel.linear.x;
+  param["accel/linear/y"] = status.action_status.accel.linear.y;
+  param["accel/linear/z"] = status.action_status.accel.linear.z;
+  param["accel/angular/x"] = status.action_status.accel.angular.x;
+  param["accel/angular/y"] = status.action_status.accel.angular.y;
+  param["accel/angular/z"] = status.action_status.accel.angular.z;
+
+  param["lanelet_id"] = std::to_string(status.lanelet_pose.lanelet_id);
+  param["s"] = status.lanelet_pose.s;
+  param["offset"] = status.lanelet_pose.offset;
+  param["roll"] = status.lanelet_pose.rpy.x;
+  param["pitch"] = status.lanelet_pose.rpy.y;
+  param["yaw"] = status.lanelet_pose.rpy.z;
+
+  param["time"] = status.time;
+  return param;
 }
 XmlRpc::XmlRpcValue API::initialize(
   double realtime_factor, double step_time, int times_try,
