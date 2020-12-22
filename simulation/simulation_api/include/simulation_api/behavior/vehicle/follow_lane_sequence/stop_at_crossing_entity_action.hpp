@@ -46,7 +46,7 @@ public:
   boost::optional<double> calculateTargetSpeed(
     const std::vector<std::int64_t> & following_lanelets,
     double current_velocity);
-  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() override;
+  const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

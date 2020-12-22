@@ -56,12 +56,13 @@ public:
     }
     return ports;
   }
-  const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() override;
+  const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
 
 private:
   boost::optional<simulation_api::math::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
+  LaneChangeParameter params_;
 };
 }      // namespace vehicle
 }  // namespace entity_behavior

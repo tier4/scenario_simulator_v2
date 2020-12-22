@@ -1,0 +1,1 @@
+openscenario_msgs/Waypoint[] waypoints

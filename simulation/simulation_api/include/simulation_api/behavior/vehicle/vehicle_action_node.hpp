@@ -20,6 +20,7 @@
 #include <simulation_api/behavior/action_node.hpp>
 
 #include <openscenario_msgs/msg/entity_trajectory.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 
 #include <string>
 #include <memory>
@@ -54,7 +55,7 @@ public:
     const std::vector<std::int64_t> & following_lanelets);
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
-  virtual const openscenario_msgs::msg::CatmullRomSpline calculateTrajectory() = 0;
+  virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
 };
 }  // namespace entity_behavior
 

@@ -33,24 +33,8 @@ YieldAction::YieldAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const openscenario_msgs::msg::CatmullRomSpline YieldAction::calculateTrajectory()
+const openscenario_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
 {
-  if (!entity_status.lanelet_pose_valid) {
-    throw BehaviorTreeRuntimeError("failed to assign lane");
-  }
-  if (entity_status.action_status.twist.linear.x >= 0) {
-    double horizon = boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 0, 50);
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
-      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
-    auto distance_to_stop_target = getYieldStopDistance(following_lanelets);
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
-    auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,
-        entity_status.lanelet_pose.s + distance_to_stop_target.get(), 1.0);
-    return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
-  } else {
-    throw BehaviorTreeRuntimeError("linear velocity must over zero in this action.");
-  }
 }
 
 boost::optional<double> YieldAction::calculateTargetSpeed(

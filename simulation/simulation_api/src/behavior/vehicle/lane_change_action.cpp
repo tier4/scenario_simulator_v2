@@ -15,6 +15,7 @@
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <string>
 #include <memory>
@@ -26,9 +27,8 @@ namespace vehicle
 LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const openscenario_msgs::msg::CatmullRomSpline LaneChangeAction::calculateTrajectory()
+const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
-
 }
 
 BT::NodeStatus LaneChangeAction::tick()
@@ -43,8 +43,7 @@ BT::NodeStatus LaneChangeAction::tick()
     return BT::NodeStatus::FAILURE;
   }
 
-  LaneChangeParameter params;
-  if (!getInput<LaneChangeParameter>("lane_change_params", params)) {
+  if (!getInput<LaneChangeParameter>("lane_change_params", params_)) {
     throw BehaviorTreeRuntimeError("failed to get input lane_change_params in LaneChangeAction");
   }
 
@@ -76,12 +75,12 @@ BT::NodeStatus LaneChangeAction::tick()
   if (!curve_) {
     if (request == "lane_change") {
       if (!hdmap_utils_ptr->canChangeLane(entity_status.lanelet_pose.lanelet_id,
-        params.to_lanelet_id))
+        params_.to_lanelet_id))
       {
         return BT::NodeStatus::FAILURE;
       }
       auto from_pose = hdmap_utils_ptr->toMapPose(entity_status.lanelet_pose).pose;
-      auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose, params.to_lanelet_id);
+      auto ret = hdmap_utils_ptr->getLaneChangeTrajectory(from_pose, params_.to_lanelet_id);
       if (ret) {
         curve_ = ret->first;
         target_s_ = ret->second;
@@ -112,7 +111,7 @@ BT::NodeStatus LaneChangeAction::tick()
       current_s_ = 0;
       openscenario_msgs::msg::EntityStatus entity_status_updated;
       openscenario_msgs::msg::LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = params.to_lanelet_id;
+      lanelet_pose.lanelet_id = params_.to_lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
       entity_status_updated.pose = hdmap_utils_ptr->toMapPose(lanelet_pose).pose;

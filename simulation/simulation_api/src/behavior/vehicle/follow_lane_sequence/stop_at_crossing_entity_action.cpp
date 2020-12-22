@@ -31,29 +31,8 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const openscenario_msgs::msg::CatmullRomSpline StopAtCrossingEntityAction::calculateTrajectory()
+const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
-      50);
-  if (!entity_status.lanelet_pose_valid) {
-    throw BehaviorTreeRuntimeError("failed to assign lane");
-  }
-  auto distance_to_stop_target = getDistanceToConflictingEntity(following_lanelets);
-  if (!distance_to_stop_target) {
-    throw BehaviorTreeRuntimeError("failed to calculate distance to conflicting entity");
-  }
-  if (entity_status.action_status.twist.linear.x >= 0) {
-    double horizon = distance_to_stop_target.get();
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
-      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
-    auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,
-        entity_status.lanelet_pose.s + horizon, 1.0);
-    return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
-  } else {
-    throw BehaviorTreeRuntimeError("linear velocity must over zero in this action.");
-  }
 }
 
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(

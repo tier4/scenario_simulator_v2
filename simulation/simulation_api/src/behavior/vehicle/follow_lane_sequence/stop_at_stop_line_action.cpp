@@ -34,29 +34,8 @@ StopAtStopLineAction::StopAtStopLineAction(
   stopped_ = false;
 }
 
-const openscenario_msgs::msg::CatmullRomSpline StopAtStopLineAction::calculateTrajectory()
+const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
 {
-  if (!entity_status.lanelet_pose_valid) {
-    throw BehaviorTreeRuntimeError("failed to assign lane");
-  }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
-      50);
-  if (entity_status.action_status.twist.linear.x >= 0) {
-    auto distance_to_stop_target = getDistanceToStopLine(following_lanelets);
-    if (!distance_to_stop_target) {
-      throw BehaviorTreeRuntimeError("failed to calculate distance to stop line");
-    }
-    double horizon = distance_to_stop_target.get();
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
-      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
-    auto traj = spline.getTrajectory(entity_status.lanelet_pose.s,
-        entity_status.lanelet_pose.s + horizon, 1.0);
-    return simulation_api::math::CatmullRomSpline(traj).toRosMsg();
-  } else {
-    throw BehaviorTreeRuntimeError("linear velocity must over zero in this action.");
-  }
 }
 
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
