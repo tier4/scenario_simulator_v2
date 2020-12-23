@@ -80,7 +80,7 @@ struct Position
 };
 
 #undef ELEMENT
-} // namespace syntax
-} // namespace openscenario_interpreter
+}  // namespace syntax
+}  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_

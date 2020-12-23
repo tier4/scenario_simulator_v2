@@ -70,7 +70,7 @@ struct ByValueCondition
 };
 
 #undef ELEMENT
-} // namespace syntax
-} // namespace openscenario_interpreter
+}  // namespace syntax
+}  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BY_VALUE_CONDITION_HPP_

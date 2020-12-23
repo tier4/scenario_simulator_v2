@@ -34,18 +34,15 @@ jobs:
       - name: Install dependencies
         run: |
           source /opt/ros/foxy/setup.bash
-          sudo apt install -y python3-pip python3-rosdep2 python3-vcstool
+          sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator.auto/dependency.repos
           rosdep install -iry --from-paths src --rosdistro foxy
 
       - name: Build packages
-        run: |
+        run: | # https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/
           source /opt/ros/foxy/setup.bash
-          # Install colcon
-          # Ref: https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/
-          sudo apt install python3-colcon-common-extensions
           cd ~/ros2_ws
           colcon build --symlink-install
           source ~/ros2_ws/install/setup.bash

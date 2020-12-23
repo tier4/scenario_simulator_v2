@@ -72,7 +72,7 @@ struct PrivateAction
 };
 
 #undef ELEMENT
-} // namespace syntax
-} // namespace openscenario_interpreter
+}  // namespace syntax
+}  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_ACTION_HPP_

@@ -57,7 +57,7 @@ struct RoutingAction
 };
 
 #undef ELEMENT
-} // namespace syntax
-} // namespace openscenario_interpreter
+}  // namespace syntax
+}  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ROUTING_ACTION_HPP_

@@ -74,7 +74,7 @@ struct CollisionCondition
     }
   }
 };
-} // namespace syntax
-} // namespace openscenario_interpreter
+}  // namespace syntax
+}  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_
