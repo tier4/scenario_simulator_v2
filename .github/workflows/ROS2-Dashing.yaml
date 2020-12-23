@@ -12,18 +12,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2-beta
 
-      - name: Install ROS2
-        run: |
-          # Ref: https://index.ros.org/doc/ros2/Installation/dashing/Linux-Install-Debians/
+      - name: Install ROS2 via Debian Packages
+        run: | # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+          sudo apt update
+          sudo apt install locales
           sudo locale-gen en_US en_US.UTF-8
           sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
           export LANG=en_US.UTF-8
-          sudo apt update && sudo apt install curl gnupg2 lsb-release
+          sudo apt update
+          sudo apt install curl gnupg2 lsb-release
           curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64,arm64] http://packages.ros.org/ros2/ubuntu `lsb_release -cs` main" > /etc/apt/sources.list.d/ros2-latest.list'
+          sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
           sudo apt update
           sudo apt install ros-foxy-desktop
-          source /opt/ros/foxy/setup.bash
 
       - name: Copy repository
         run: |
@@ -33,9 +34,8 @@ jobs:
       - name: Install dependencies
         run: |
           source /opt/ros/foxy/setup.bash
-          sudo apt install -y python3-rosdep2 python3-vcstool
-          sudo rosdep init
-          rosdep update
+          sudo apt install -y python3-pip python3-rosdep2 python3-vcstool
+          sudo rosdep init ^ rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator.auto/dependency.repos
           rosdep install -iry --from-paths src --rosdistro foxy
