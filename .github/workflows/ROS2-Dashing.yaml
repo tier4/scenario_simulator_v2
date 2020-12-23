@@ -35,7 +35,7 @@ jobs:
         run: |
           source /opt/ros/foxy/setup.bash
           sudo apt install -y python3-pip python3-rosdep2 python3-vcstool
-          sudo rosdep init ^ rosdep update
+          rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator.auto/dependency.repos
           rosdep install -iry --from-paths src --rosdistro foxy
