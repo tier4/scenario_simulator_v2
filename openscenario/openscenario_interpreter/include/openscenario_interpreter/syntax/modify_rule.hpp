@@ -35,26 +35,30 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<Parameter ## TYPE ## Rule>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 struct ModifyRule
   : public Element
 {
-  template<typename Node>
-  explicit ModifyRule(const Node & node, Scope & outer_scope)
+  template
+  <
+    typename Node, typename ... Ts
+  >
+  explicit ModifyRule(const Node & node, Ts && ... xs)
   : Element(
       choice(
         node,
-
-        std::make_pair("AddValue", [&](auto && node)
-        {
-          return make<ParameterAddValueRule>(node, outer_scope);
-        }),
-
-        std::make_pair("MultiplyByValue", [&](auto && node)
-        {
-          return make<ParameterMultiplyByValueRule>(node, outer_scope);
-        })))
+        ELEMENT(AddValue),
+        ELEMENT(MultiplyByValue)))
   {}
 };
+
+#undef ELEMENT
 }  // inline namespace syntax
 }  // namespace openscenario_interpreter
 

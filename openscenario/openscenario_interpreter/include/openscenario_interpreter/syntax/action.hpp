@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Action ===============================================================
+/* ---- Action -----------------------------------------------------------------
  *
  * <xsd:complexType name="Action">
  *   <xsd:choice>
@@ -37,7 +37,14 @@ inline namespace syntax
  *   <xsd:attribute name="name" type="String" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
+#define ELEMENT(NAME) \
+  std::make_pair( \
+    #NAME, [&](auto && node) \
+    { \
+      return rebind<NAME>(node, scope); \
+    })
+
 struct Action
   : public StoryboardElement<Action>, public Element
 {
@@ -48,16 +55,11 @@ struct Action
   : StoryboardElement(maximum_execution_count),
     name(readAttribute<String>("name", node, scope))
   {
-    choice(node,
-      std::make_pair("GlobalAction", [&](auto && node) {
-        return rebind<GlobalAction>(node, scope);
-      }),
-      std::make_pair("UserDefinedAction", [&](auto && node) {
-        return rebind<UserDefinedAction>(node, scope);
-      }),
-      std::make_pair("PrivateAction", [&](auto && node) {
-        return rebind<PrivateAction>(node, scope);
-      }));
+    choice(
+      node,
+      ELEMENT(GlobalAction),
+      ELEMENT(UserDefinedAction),
+      ELEMENT(PrivateAction));
   }
 
   auto ready() const
@@ -105,7 +107,9 @@ struct Action
     return Element::evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
-}
-}  // namespace openscenario_interpreter
+
+#undef ELEMENT
+} // namespace syntax
+} // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ACTION_HPP_

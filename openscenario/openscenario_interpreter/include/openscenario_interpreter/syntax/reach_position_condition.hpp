@@ -43,7 +43,10 @@ struct ReachPositionCondition
 
   const TriggeringEntities trigger;
 
-  template<typename Node>
+  template
+  <
+    typename Node
+  >
   explicit ReachPositionCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
   : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
@@ -55,24 +58,24 @@ struct ReachPositionCondition
   {
     if (position.is<WorldPosition>()) {
       return asBoolean(
-        trigger([&](auto && entity)
-        {
-          return isReachedPosition(entity, position.as<WorldPosition>(), tolerance);
-        }));
+        trigger(
+          [&](auto && entity)
+          {
+            return isReachedPosition(entity, position.as<WorldPosition>(), tolerance);
+          }));
     } else if (position.is<LanePosition>()) {
       return asBoolean(
-        trigger([&](auto && entity)
-        {
-          const auto lanelet_pose = simulation_api::helper::constractLaneletPose(
-            static_cast<Integer>(position.as<LanePosition>().lane_id),
-            position.as<LanePosition>().s,
-            position.as<LanePosition>().offset
-          );
-          return isReachedPosition(
-            entity,
-            lanelet_pose,
-            tolerance);
-        }));
+        trigger(
+          [&](auto && entity)
+          {
+            return isReachedPosition(
+              entity,
+              simulation_api::helper::constractLaneletPose(
+                static_cast<Integer>(position.as<LanePosition>().lane_id),
+                position.as<LanePosition>().s,
+                position.as<LanePosition>().offset),
+              tolerance);
+          }));
     } else {
       THROW(ImplementationFault);
     }

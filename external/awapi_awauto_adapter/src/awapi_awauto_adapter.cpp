@@ -27,55 +27,164 @@ AutowareAutoAdapter::AutowareAutoAdapter(const rclcpp::NodeOptions & options)
   pub_limit_velocity_ = create_publisher<Float32>("/awapi/vehicle/put/limit_velocity", 1);
   pub_route_ = create_publisher<Route>("/awapi/autoware/put/route", 1);
   pub_traffic_light_status_ = create_publisher<TrafficLightStatus>("output/traffic_light", 1);
+
   // subscriber
-  sub_twist_ = create_subscription<TwistStamped>("/localization/twist",
-      1, [&](const TwistStamped::SharedPtr msg_ptr) {twist_ptr_ = msg_ptr;});
-  sub_steer_ = create_subscription<Float32>("input/steering",
-      1, [&](const Float32::SharedPtr msg_ptr) {steer_ptr_ = msg_ptr;});
-  sub_steer_velocity_ = create_subscription<Float32>("input/steering_velocity",
-      1, [&](const Float32::SharedPtr msg_ptr) {steer_velocity_ptr_ = msg_ptr;});
-  sub_limit_velocity_ = create_subscription<Float32>("input/limit_velocity", 1,
-      [&](const Float32::SharedPtr msg_ptr) {
-        pub_limit_velocity_->publish(*(limit_velocity_ptr_ = msg_ptr));
-      });
-  sub_engage_ = create_subscription<Bool>("/vehicle/get/engage", 1,
-      [&](const Bool::SharedPtr msg_ptr) {pub_engage_->publish(*(engage_ptr_ = msg_ptr));});
-  sub_route_ =
-    create_subscription<Route>("input/route", 1,
-      [&](const Route::SharedPtr msg_ptr) {pub_route_->publish(*(route_ptr_ = msg_ptr));});
-  sub_lane_change_approve_ = create_subscription<Bool>("input/lane_change_approve",
-      1, [&](const Bool::SharedPtr msg_ptr) {lane_change_approve_ptr_ = msg_ptr;});
-  sub_lane_change_force_ = create_subscription<Bool>("input/lane_change_force",
-      1, [&](const Bool::SharedPtr msg_ptr) {lane_change_force_ptr_ = msg_ptr;});
-  sub_lane_change_available_ = create_subscription<Bool>("input/lane_change_avaiable",
-      1, [&](const Bool::SharedPtr msg_ptr) {lane_change_available_ptr_ = msg_ptr;});
-  sub_lane_change_ready_ = create_subscription<Bool>("input/lane_change_ready",
-      1, [&](const Bool::SharedPtr msg_ptr) {lane_change_ready_ptr_ = msg_ptr;});
-  sub_initial_pose_ = create_subscription<PoseStamped>("/initialpose",
-      1, [&](const PoseStamped::SharedPtr msg_ptr) {initial_pose_ptr_ = msg_ptr;});
-  sub_initial_twist_ptr_ = create_subscription<TwistStamped>("/initialtwist",
-      1, [&](const TwistStamped::SharedPtr msg_ptr) {initial_twist_ptr_ = msg_ptr;});
-  sub_checkpoint_ = create_subscription<PoseStamped>("/planning/mission_planning/checkpoint",
-      1, [&](const PoseStamped::SharedPtr msg_ptr) {checkpoint_ptr_ = msg_ptr;});
-  sub_goal_ = create_subscription<Pose>("/planning/mission_planning/goal",
-      1, [&](const Pose::SharedPtr msg_ptr) {goal_ptr_ = msg_ptr;});
+  sub_twist_ = create_subscription<TwistStamped>(
+    "/localization/twist",
+    1,
+    [&](const TwistStamped::SharedPtr msg_ptr)
+    {
+      twist_ptr_ = msg_ptr;
+    });
+
+  sub_steer_ = create_subscription<Float32>(
+    "input/steering",
+    1,
+    [&](const Float32::SharedPtr msg_ptr)
+    {
+      steer_ptr_ = msg_ptr;
+    });
+
+  sub_steer_velocity_ = create_subscription<Float32>(
+    "input/steering_velocity",
+    1,
+    [&](const Float32::SharedPtr msg_ptr)
+    {
+      steer_velocity_ptr_ = msg_ptr;
+    });
+
+  sub_limit_velocity_ = create_subscription<Float32>(
+    "input/limit_velocity",
+    1,
+    [&](const Float32::SharedPtr msg_ptr)
+    {
+      pub_limit_velocity_->publish(*(limit_velocity_ptr_ = msg_ptr));
+    });
+
+  sub_engage_ = create_subscription<Bool>(
+    "/vehicle/get/engage",
+    1,
+    [&](const Bool::SharedPtr msg_ptr)
+    {
+      pub_engage_->publish(*(engage_ptr_ = msg_ptr));
+    });
+
+  sub_route_ = create_subscription<Route>(
+    "input/route",
+    1,
+    [&](const Route::SharedPtr msg_ptr)
+    {
+      pub_route_->publish(*(route_ptr_ = msg_ptr));
+    });
+
+  sub_lane_change_approve_ = create_subscription<Bool>(
+    "input/lane_change_approve",
+    1,
+    [&](const Bool::SharedPtr msg_ptr)
+    {
+      lane_change_approve_ptr_ = msg_ptr;
+    });
+
+  sub_lane_change_force_ = create_subscription<Bool>(
+    "input/lane_change_force",
+    1,
+    [&](const Bool::SharedPtr msg_ptr)
+    {
+      lane_change_force_ptr_ = msg_ptr;
+    });
+
+  sub_lane_change_available_ = create_subscription<Bool>(
+    "input/lane_change_avaiable",
+    1,
+    [&](const Bool::SharedPtr msg_ptr)
+    {
+      lane_change_available_ptr_ = msg_ptr;
+    });
+
+  sub_lane_change_ready_ = create_subscription<Bool>(
+    "input/lane_change_ready",
+    1,
+    [&](const Bool::SharedPtr msg_ptr)
+    {
+      lane_change_ready_ptr_ = msg_ptr;
+    });
+
+  sub_initial_pose_ = create_subscription<PoseStamped>(
+    "/initialpose",
+    1,
+    [&](const PoseStamped::SharedPtr msg_ptr)
+    {
+      initial_pose_ptr_ = msg_ptr;
+    });
+
+  sub_initial_twist_ptr_ = create_subscription<TwistStamped>(
+    "/initialtwist",
+    1,
+    [&](const TwistStamped::SharedPtr msg_ptr)
+    {
+      initial_twist_ptr_ = msg_ptr;
+    });
+
+  sub_checkpoint_ = create_subscription<PoseStamped>(
+    "/planning/mission_planning/checkpoint",
+    1,
+    [&](const PoseStamped::SharedPtr msg_ptr)
+    {
+      checkpoint_ptr_ = msg_ptr;
+    });
+
+  sub_goal_ = create_subscription<Pose>(
+    "/planning/mission_planning/goal",
+    1,
+    [&](const Pose::SharedPtr msg_ptr)
+    {
+      goal_ptr_ = msg_ptr;
+    });
+
   sub_detection_objects_ = create_subscription<Objects>(
     "/perception/object_recognition/detection/objects",
-    1, [&](const Objects::SharedPtr msg_ptr) {detection_object_ptr_ = msg_ptr;});
-  sub_obstacle_avoid_ready_ = create_subscription<Bool>("input/sub_obstacle_avoid_ready",
-      1, [&](const Bool::SharedPtr msg_ptr) {obstacle_avoid_ready_ptr_ = msg_ptr;});
+    1,
+    [&](const Objects::SharedPtr msg_ptr)
+    {
+      detection_object_ptr_ = msg_ptr;
+    });
+
+  sub_obstacle_avoid_ready_ = create_subscription<Bool>(
+    "input/sub_obstacle_avoid_ready",
+    1,
+    [&](const Bool::SharedPtr msg_ptr)
+    {
+      obstacle_avoid_ready_ptr_ = msg_ptr;
+    });
+
   sub_lanelet2_map_ = create_subscription<MapBin>(
     "/map/vector_map",
-    1, [&](const MapBin::SharedPtr msg_ptr) {lanelet2_map_ptr_ = msg_ptr;});
+    1,
+    [&](const MapBin::SharedPtr msg_ptr)
+    {
+      lanelet2_map_ptr_ = msg_ptr;
+    });
+
   sub_no_ground_pointcloud_ = create_subscription<PointXYZ>(
     "/sensing/lidar/no_ground_pointcloud",
-    1, [&](const PointXYZ::SharedPtr msg_ptr) {point_cloud_ptr_ = msg_ptr;});
+    1,
+    [&](const PointXYZ::SharedPtr msg_ptr)
+    {
+      point_cloud_ptr_ = msg_ptr;
+    });
+
   sub_traffic_light_ = create_subscription<TrafficLightStatus>(
     "/perception/traffic_light_recognition/traffic_light_states",
-    1, [&](const TrafficLightStatus::SharedPtr msg_ptr) {traffic_light_status_ptr_ = msg_ptr;});
-  timer_callback_ =
-    this->create_wall_timer(std::chrono::milliseconds(500),
-      std::bind(&AutowareAutoAdapter::timer_callback, this));
+    1,
+    [&](const TrafficLightStatus::SharedPtr msg_ptr)
+    {
+      traffic_light_status_ptr_ = msg_ptr;
+    });
+
+  timer_callback_ = create_wall_timer(
+    std::chrono::milliseconds(500),
+    std::bind(&AutowareAutoAdapter::timer_callback, this));
+
   autoware_status_publisher_ = std::make_unique<AutowareAutoStatusPublisher>(options);
   vehicle_status_publisher_ = std::make_unique<AutowareVehicleStatusPublisher>(options);
   lane_change_status_publisher_ = std::make_unique<AutowareLaneChangeStatusPublisher>(options);

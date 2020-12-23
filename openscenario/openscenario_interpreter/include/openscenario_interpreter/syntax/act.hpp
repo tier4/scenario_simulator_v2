@@ -22,18 +22,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Act ==================================================================
+/* ---- Act --------------------------------------------------------------------
  *
- * <xsd:complexType name="Act">
- *   <xsd:sequence>
- *     <xsd:element name="ManeuverGroup" maxOccurs="unbounded" type="ManeuverGroup"/>
- *     <xsd:element name="StartTrigger" type="Trigger"/>
- *     <xsd:element name="StopTrigger" minOccurs="0" type="Trigger"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Act">
+ *    <xsd:sequence>
+ *      <xsd:element name="ManeuverGroup" maxOccurs="unbounded" type="ManeuverGroup"/>
+ *      <xsd:element name="StartTrigger" type="Trigger"/>
+ *      <xsd:element name="StopTrigger" minOccurs="0" type="Trigger"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Act
   : public StoryboardElement<Act>, public Elements
 {
@@ -45,8 +45,9 @@ struct Act
 
   template<typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    inner_scope{outer_scope}
+  : name(
+      readAttribute<String>("name", node, outer_scope)),
+    inner_scope(outer_scope)
   {
     callWithElements(
       node, "ManeuverGroup", 1, unbounded, [&](auto && node)
@@ -85,10 +86,11 @@ struct Act
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(std::begin(*this), std::end(*this), [&](auto && each)
-             {
-               return each.template as<ManeuverGroup>().complete();
-             });
+    return std::all_of(
+      std::begin(*this), std::end(*this), [&](const Element & each)
+      {
+        return each.as<ManeuverGroup>().complete();
+      });
   }
 
   void stop()

@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ConditionGroup =======================================================
+/* ---- ConditionGroup ---------------------------------------------------------
  *
  * A condition group is an association of conditions that is assessed during
  * simulation time and signals true when all associated conditions are
@@ -35,14 +35,15 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ConditionGroup
   : public std::vector<Condition>
 {
   template<typename Node, typename Scope>
   explicit ConditionGroup(const Node & node, Scope & scope)
   {
-    callWithElements(node, "Condition", 1, unbounded, [&](auto && node)
+    callWithElements(
+      node, "Condition", 1, unbounded, [&](auto && node)
       {
         emplace_back(node, scope);
       });
@@ -50,12 +51,12 @@ struct ConditionGroup
 
   auto evaluate() const
   {
-    return
-      asBoolean(
-      std::all_of(std::begin(*this), std::end(*this), [&](auto && each)
-      {
-        return each.evaluate().template as<Boolean>(__FILE__, __LINE__);
-      }));
+    return asBoolean(
+      std::all_of(
+        std::begin(*this), std::end(*this), [&](auto && each)
+        {
+          return each.evaluate().template as<Boolean>(__FILE__, __LINE__);
+        }));
   }
 };
 }

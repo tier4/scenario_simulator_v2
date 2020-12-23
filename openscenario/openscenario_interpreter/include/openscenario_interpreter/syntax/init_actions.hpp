@@ -27,7 +27,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== InitActions ==========================================================
+/* ---- InitActions ------------------------------------------------------------
  *
  * <xsd:complexType name="InitActions">
  *   <xsd:sequence>
@@ -37,26 +37,35 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      push_back(make<TYPE>(node, scope)); \
+    })
+
 struct InitActions
   : public Elements
 {
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit InitActions(const Node & node, Scope & scope)
   {
-    std::unordered_map<std::string, std::function<void(const Node & node)>> dispatcher
+    std::unordered_map<
+      std::string, std::function<void(const Node & node)>> dispatcher
     {
-      std::make_pair("GlobalAction",
-        [&](auto && node) {push_back(make<GlobalAction>(node, scope));}),
-      std::make_pair("UserDefinedAction", [&](auto && node) {
-          push_back(make<UserDefinedAction>(node, scope));
-        }),
-      std::make_pair("Private", [&](auto && node) {push_back(make<Private>(node, scope));}),
+      ELEMENT(GlobalAction),
+      ELEMENT(UserDefinedAction),
+      ELEMENT(Private),
     };
 
     for (const auto & each : node.children()) {
-      const auto iter {dispatcher.find(each.name())};
-
+      const auto iter {
+        dispatcher.find(each.name())
+      };
       if (iter != std::end(dispatcher)) {
         std::get<1>(* iter)(each);
       }
@@ -68,11 +77,12 @@ struct InitActions
     for (auto && each : *this) {
       each.evaluate();
     }
-
     return unspecified;
   }
 };
-}
-}  // namespace openscenario_interpreter
+
+#undef ELEMENT
+} // namespace syntax
+} // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__INIT_ACTIONS_HPP_

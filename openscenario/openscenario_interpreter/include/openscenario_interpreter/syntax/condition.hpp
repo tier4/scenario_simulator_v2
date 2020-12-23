@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Condition ============================================================
+/* ---- Condition --------------------------------------------------------------
  *
  * <xsd:complexType name="Condition">
  *   <xsd:choice>
@@ -37,7 +37,7 @@ inline namespace syntax
  *   <xsd:attribute name="conditionEdge" type="ConditionEdge" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Condition
   : public Element
 {
@@ -47,17 +47,23 @@ struct Condition
 
   const ConditionEdge condition_edge;
 
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit Condition(const Node & node, Scope & scope)
   : Element(
       choice(
         node,
-        std::make_pair("ByEntityCondition", [&](auto && node) {
-          return make<ByEntityCondition>(node, scope);
-        }),
-        std::make_pair("ByValueCondition", [&](auto && node) {
-          return make<ByValueCondition>(node, scope);
-        }))),
+        std::make_pair(
+          "ByEntityCondition", [&](auto && node)
+          {
+            return make<ByEntityCondition>(node, scope);
+          }),
+        std::make_pair(
+          "ByValueCondition", [&](auto && node) {
+            return make<ByValueCondition>(node, scope);
+          }))),
     name(
       readAttribute<String>("name", node, scope)),
     delay(

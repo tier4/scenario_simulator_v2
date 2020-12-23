@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== CatalogLocations =====================================================
+/* ---- CatalogLocations -------------------------------------------------------
  *
  * <xsd:complexType name="CatalogLocations">
  *   <xsd:all>
@@ -38,39 +38,35 @@ inline namespace syntax
  *   </xsd:all>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  callWithElements( \
+    node, #TYPE "Catalog", 0, 1, [&](auto && node) \
+    { \
+      return emplace(#TYPE "Catalog", CatalogLocation(node, outer_scope)); \
+    })
+
 struct CatalogLocations
   : public std::unordered_map<String, CatalogLocation>
 {
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit CatalogLocations(const Node & node, Scope & outer_scope)
   {
-    callWithElements(node, "VehicleCatalog", 0, 1, [&](auto && node) {
-        emplace("VehicleCatalog", CatalogLocation(node, outer_scope));
-      });
-    callWithElements(node, "ControllerCatalog", 0, 1, [&](auto && node) {
-        emplace("ControllerCatalog", CatalogLocation(node, outer_scope));
-      });
-    callWithElements(node, "PedestrianCatalog", 0, 1, [&](auto && node) {
-        emplace("PedestrianCatalog", CatalogLocation(node, outer_scope));
-      });
-    callWithElements(node, "MiscObjectCatalog", 0, 1, [&](auto && node) {
-        emplace("MiscObjectCatalog", CatalogLocation(node, outer_scope));
-      });
-    callWithElements(node, "EnvironmentCatalog", 0, 1, [&](auto && node) {
-        emplace("EnvironmentCatalog", CatalogLocation(node, outer_scope));
-      });
-    callWithElements(node, "ManeuverCatalog", 0, 1, [&](auto && node) {
-        emplace("ManeuverCatalog", CatalogLocation(node, outer_scope));
-      });
-    callWithElements(node, "TrajectoryCatalog", 0, 1, [&](auto && node) {
-        emplace("TrajectoryCatalog", CatalogLocation(node, outer_scope));
-      });
-    callWithElements(node, "RouteCatalog", 0, 1, [&](auto && node) {
-        emplace("RouteCatalog", CatalogLocation(node, outer_scope));
-      });
+    ELEMENT(Vehicle);
+    ELEMENT(Controller);
+    ELEMENT(Pedestrian);
+    ELEMENT(MiscObject);
+    ELEMENT(Environment);
+    ELEMENT(Maneuver);
+    ELEMENT(Trajectory);
+    ELEMENT(Route);
   }
 };
+
+#undef ELEMENT
 }
 }  // namespace openscenario_interpreter
 

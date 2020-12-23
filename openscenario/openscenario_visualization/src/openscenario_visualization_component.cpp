@@ -47,10 +47,10 @@
 #include <quaternion_operation/quaternion_operation.h>
 #include <rclcpp_components/register_node_macro.hpp>
 
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <cmath>
+#include <string>
+#include <vector>
 
 namespace openscenario_visualization
 {
@@ -61,8 +61,8 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
   marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/entity/marker", 1);
   entity_status_sub_ = this->create_subscription<openscenario_msgs::msg::EntityStatusArray>(
     "/entity/status", 1,
-    std::bind(&OpenscenarioVisualizationComponent::entityStatusCallback, this,
-    std::placeholders::_1));
+    std::bind(
+      &OpenscenarioVisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
@@ -78,7 +78,9 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), marker.first);
     if (itr == entity_name_lists.end()) {
       auto delete_marker = generateDeleteMarker(marker.first);
-      std::copy(delete_marker.markers.begin(), delete_marker.markers.end(),
+      std::copy(
+        delete_marker.markers.begin(),
+        delete_marker.markers.end(),
         std::back_inserter(current_marker.markers));
       erase_names.emplace_back(marker.first);
     }
@@ -88,7 +90,9 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
   }
   for (const auto & status : msg->status) {
     auto marker_array = generateMarker(status);
-    std::copy(marker_array.markers.begin(), marker_array.markers.end(),
+    std::copy(
+      marker_array.markers.begin(),
+      marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
     markers_[status.name] = marker_array;
   }

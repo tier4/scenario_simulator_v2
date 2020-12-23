@@ -24,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== EntityObject =========================================================
+/* ---- EntityObject -----------------------------------------------------------
  *
  * <xsd:group name="EntityObject">
  *   <xsd:choice>
@@ -35,24 +35,32 @@ inline namespace syntax
  *   </xsd:choice>
  * </xsd:group>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct EntityObject
   : public Element
 {
-  template<typename Node, typename ... Ts>
+  #define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
+  template
+  <
+    typename Node, typename ... Ts
+  >
   explicit EntityObject(const Node & node, Ts && ... xs)
   : Element(
       choice(
         node,
         std::make_pair("CatalogReference", UNSUPPORTED()),
-        std::make_pair("Vehicle", [&](auto && node) {
-          return make<Vehicle>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-        std::make_pair("Pedestrian", [&](auto && node) {
-          return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...);
-        }),
+        ELEMENT(Vehicle),
+        ELEMENT(Pedestrian),
         std::make_pair("MiscObject", UNSUPPORTED())))
   {}
+
+  #undef ELEMENT
 };
 }
 }  // namespace openscenario_interpreter

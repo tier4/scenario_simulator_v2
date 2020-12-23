@@ -25,9 +25,9 @@ inline namespace syntax
 {
 /* ---- StandStillCondition ---------------------------------------------------------
  *
- * <xsd:complexType name="StandStillCondition">
- *   <xsd:attribute name="duration" type="Double" use="required"/>
- * </xsd:complexType>*
+ *  <xsd:complexType name="StandStillCondition">
+ *    <xsd:attribute name="duration" type="Double" use="required"/>
+ *  </xsd:complexType>*
  *
  * -------------------------------------------------------------------------- */
 struct StandStillCondition
@@ -38,7 +38,10 @@ struct StandStillCondition
 
   const TriggeringEntities for_each;
 
-  template<typename Node>
+  template
+  <
+    typename Node
+  >
   explicit StandStillCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & for_each)
   : duration(readAttribute<Double>("duration", node, outer_scope)),
@@ -49,13 +52,14 @@ struct StandStillCondition
   auto evaluate() const
   {
     return asBoolean(
-      for_each([&](auto && triggering_entity)
-      {
-        return compare(getStandStillDuration(triggering_entity), duration);
-      }));
+      for_each(
+        [&](auto && triggering_entity)
+        {
+          return compare(getStandStillDuration(triggering_entity), duration);
+        }));
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STAND_STILL_CONDITION_HPP_
