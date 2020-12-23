@@ -272,7 +272,7 @@ const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
 std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_points) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (int i = 0; i <= num_points; i++) {
+  for (size_t i = 0; i <= num_points; i++) {
     double t = static_cast<double>(i) / 100.0;
     ret.emplace_back(getPoint(t, false));
   }

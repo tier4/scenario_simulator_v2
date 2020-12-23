@@ -33,19 +33,31 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
     throw BehaviorTreeRuntimeError("curve is null");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
+    openscenario_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      params_.to_lanelet_id, horizon);
+      params_.to_lanelet_id, 0);
     double l = curve_->getLength();
     double rest_s = current_s_ + horizon - l;
     if (rest_s < 0) {
-
+      const auto curve_waypoints =
+        curve_->getTrajectory(current_s_, current_s_ + horizon, 1.0, true);
+      waypoints.waypoints = curve_waypoints;
     } else {
-      simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
-      const auto waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
+      const auto center_points = hdmap_utils->getCenterPoints(following_lanelets);
+      simulation_api::math::CatmullRomSpline spline(center_points);
+      const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
+      waypoints.waypoints = straight_waypoints;
+      // const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);
+      /*
+      waypoints.waypoints = curve_waypoints;
+      std::copy(straight_waypoints.begin(), straight_waypoints.end(),
+        std::back_inserter(waypoints.waypoints));
+      */
+
     }
-    return openscenario_msgs::msg::WaypointsArray();
+    return waypoints;
   } else {
     return openscenario_msgs::msg::WaypointsArray();
   }
@@ -127,6 +139,7 @@ BT::NodeStatus LaneChangeAction::tick()
       setOutput("waypoints", calculateWaypoints());
       return BT::NodeStatus::RUNNING;
     } else {
+      setOutput("waypoints", calculateWaypoints());
       double s = (current_s_ - curve_->getLength()) + target_s_;
       curve_ = boost::none;
       current_s_ = 0;
@@ -139,7 +152,6 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.lanelet_pose = lanelet_pose;
       entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
-      setOutput("waypoints", calculateWaypoints());
       return BT::NodeStatus::SUCCESS;
     }
   }

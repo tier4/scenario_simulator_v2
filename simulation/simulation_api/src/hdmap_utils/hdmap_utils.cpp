@@ -316,22 +316,14 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     ret.push_back(lanelet_id);
   }
   while (total_dist < distance) {
-    auto ids = getNextLaneletIds(lanelet_id, "straight");
+    auto ids = getNextLaneletIds(lanelet_id);
     if (ids.size() != 0) {
       lanelet_id = ids[0];
       total_dist = total_dist + getLaneletLength(lanelet_id);
       ret.push_back(lanelet_id);
       continue;
     } else {
-      auto else_ids = getNextLaneletIds(lanelet_id);
-      if (else_ids.size() != 0) {
-        lanelet_id = else_ids[0];
-        total_dist = total_dist + getLaneletLength(lanelet_id);
-        ret.push_back(lanelet_id);
-        continue;
-      } else {
-        break;
-      }
+      break;
     }
   }
   return ret;
@@ -364,6 +356,9 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
   std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<geometry_msgs::msg::Point> ret;
+  if (lanelet_ids.size() == 0) {
+    return ret;
+  }
   for (const auto lanelet_id : lanelet_ids) {
     const auto center_points = getCenterPoints(lanelet_id);
     std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
@@ -374,8 +369,16 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
 std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> ret;
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  if (lanelet_map_ptr_ == nullptr) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    throw HdMapError("lanelet map is null pointer.");
+  }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto centerline = lanelet.centerline();
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   for (const auto & point : centerline) {
     geometry_msgs::msg::Point p;
     p.x = point.x();
