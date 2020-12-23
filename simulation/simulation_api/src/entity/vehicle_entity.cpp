@@ -75,8 +75,7 @@ void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose l
 void VehicleEntity::requestLaneChange(std::int64_t to_lanelet_id)
 {
   tree_ptr_->setRequest("lane_change");
-  lane_change_params_.to_lanelet_id = to_lanelet_id;
-  tree_ptr_->setValueToBlackBoard("lane_change_params", lane_change_params_);
+  tree_ptr_->setValueToBlackBoard("to_lanelet_id", to_lanelet_id);
 }
 
 void VehicleEntity::cancelRequest()

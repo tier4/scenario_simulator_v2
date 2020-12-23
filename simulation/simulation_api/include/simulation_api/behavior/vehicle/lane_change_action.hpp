@@ -18,7 +18,6 @@
 #include <simulation_api/math/hermite_curve.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
-#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <openscenario_msgs/msg/entity_trajectory.hpp>
@@ -27,6 +26,7 @@
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <boost/optional.hpp>
+
 #include <string>
 #include <memory>
 #include <vector>
@@ -35,11 +35,6 @@ namespace entity_behavior
 {
 namespace vehicle
 {
-struct LaneChangeParameter
-{
-  std::int64_t to_lanelet_id;
-};
-
 class LaneChangeAction : public entity_behavior::VehicleActionNode
 {
 public:
@@ -48,7 +43,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<LaneChangeParameter>("lane_change_params")
+      BT::InputPort<std::int64_t>("to_lanelet_id")
     };
     BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -57,12 +52,13 @@ public:
     return ports;
   }
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
+  void getBlackBoardValues();
 
 private:
   boost::optional<simulation_api::math::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
-  LaneChangeParameter params_;
+  std::int64_t to_lanelet_id_;
 };
 }      // namespace vehicle
 }  // namespace entity_behavior

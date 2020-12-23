@@ -360,7 +360,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
     return ret;
   }
   for (const auto lanelet_id : lanelet_ids) {
-    const auto center_points = getCenterPoints(lanelet_id);
+    std::vector<geometry_msgs::msg::Point> center_points = getCenterPoints(lanelet_id);
     std::copy(center_points.begin(), center_points.end(), std::back_inserter(ret));
   }
   return ret;
@@ -369,38 +369,28 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
 std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  if (lanelet_map_ptr_ == nullptr) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  if (!lanelet_map_ptr_) {
     throw HdMapError("lanelet map is null pointer.");
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  if (lanelet_map_ptr_->laneletLayer.empty()) {
+    throw HdMapError("lanelet layer is empty.");
+  }
+
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto centerline = lanelet.centerline();
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   for (const auto & point : centerline) {
     geometry_msgs::msg::Point p;
     p.x = point.x();
     p.y = point.y();
     p.z = point.z();
-    ret.emplace_back(p);
+    ret.push_back(p);
   }
   return ret;
 }
 
 double HdMapUtils::getLaneletLength(std::int64_t lanelet_id) const
 {
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  const auto centerline = lanelet.centerline();
-  double ret = 0;
-  for (size_t i = 0; i < centerline.size() - 1; i++) {
-    double x_diff = centerline[i].x() - centerline[i + 1].x();
-    double y_diff = centerline[i].y() - centerline[i + 1].y();
-    double z_diff = centerline[i].z() - centerline[i + 1].z();
-    ret = ret + std::sqrt(x_diff * x_diff + y_diff * y_diff + z_diff * z_diff);
-  }
-  return ret;
+  return lanelet::utils::getLaneletLength2d(lanelet_map_ptr_->laneletLayer.get(lanelet_id));
 }
 
 std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet_id) const
@@ -486,7 +476,7 @@ boost::optional<std::pair<simulation_api::math::HermiteCurve,
     auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
     if (traj) {
       if (traj->getMaximu2DCurvature() < 1.0) {
-        double eval = std::fabs(40 - traj->getLength());
+        double eval = std::fabs(20 - traj->getLength());
         evaluation.push_back(eval);
         curves.push_back(traj.get());
         target_s.push_back(to_s);

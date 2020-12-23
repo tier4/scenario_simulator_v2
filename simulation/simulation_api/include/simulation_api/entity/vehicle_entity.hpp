@@ -74,7 +74,7 @@ public:
 private:
   std::shared_ptr<entity_behavior::vehicle::BehaviorTree> tree_ptr_;
   BT::NodeStatus action_status_;
-  entity_behavior::vehicle::LaneChangeParameter lane_change_params_;
+  std::int64_t to_lanelet_id_;
   boost::optional<double> target_speed_;
 };
 }  // namespace entity
