@@ -58,7 +58,7 @@ private:
   boost::optional<simulation_api::math::HermiteCurve> curve_;
   double current_s_;
   double target_s_;
-  std::int64_t to_lanelet_id_;
+  boost::optional<std::int64_t> to_lanelet_id_;
 };
 }      // namespace vehicle
 }  // namespace entity_behavior

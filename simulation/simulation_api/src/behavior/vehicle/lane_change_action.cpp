@@ -31,16 +31,18 @@ LaneChangeAction::LaneChangeAction(
 
 const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
-  std::cout << hdmap_utils->getLaneletLength(34462) << std::endl;
   if (!curve_) {
     throw BehaviorTreeRuntimeError("curve is null");
+  }
+  if (!to_lanelet_id_) {
+    throw BehaviorTreeRuntimeError("to lanelet id is null");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     openscenario_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      to_lanelet_id_, 0);
+      to_lanelet_id_.get(), 0);
     double l = curve_->getLength();
     double rest_s = current_s_ + horizon - l;
     if (rest_s < 0) {
@@ -72,12 +74,12 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
 void LaneChangeAction::getBlackBoardValues()
 {
   VehicleActionNode::getBlackBoardValues();
-  /*
-  if (!getInput<std::int64_t>("to_lanelet_id", to_lanelet_id_)) {
-    throw BehaviorTreeRuntimeError("failed to get input to_lanelet_id in LaneChangeAction");
+  std::int64_t to_lanelet_id;
+  if (!getInput<std::int64_t>("to_lanelet_id", to_lanelet_id)) {
+    to_lanelet_id_ = boost::none;
+  } else {
+    to_lanelet_id_ = to_lanelet_id;
   }
-  */
-  to_lanelet_id_ = 34462;
 }
 
 BT::NodeStatus LaneChangeAction::tick()
@@ -88,15 +90,20 @@ BT::NodeStatus LaneChangeAction::tick()
     current_s_ = 0;
     return BT::NodeStatus::FAILURE;
   }
+  if (!to_lanelet_id_) {
+    curve_ = boost::none;
+    current_s_ = 0;
+    return BT::NodeStatus::FAILURE;
+  }
   if (!curve_) {
     if (request == "lane_change") {
       if (!hdmap_utils->canChangeLane(entity_status.lanelet_pose.lanelet_id,
-        to_lanelet_id_))
+        to_lanelet_id_.get()))
       {
         return BT::NodeStatus::FAILURE;
       }
       auto from_pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
-      auto ret = hdmap_utils->getLaneChangeTrajectory(from_pose, to_lanelet_id_);
+      auto ret = hdmap_utils->getLaneChangeTrajectory(from_pose, to_lanelet_id_.get());
       if (ret) {
         curve_ = ret->first;
         target_s_ = ret->second;
@@ -129,7 +136,7 @@ BT::NodeStatus LaneChangeAction::tick()
       current_s_ = 0;
       openscenario_msgs::msg::EntityStatus entity_status_updated;
       openscenario_msgs::msg::LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = to_lanelet_id_;
+      lanelet_pose.lanelet_id = to_lanelet_id_.get();
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
       entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;

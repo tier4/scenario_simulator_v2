@@ -65,7 +65,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   connect(
     shared_from_this(),
     script.as<OpenScenario>().scope.logic_file.string(),
-    false);
+    true);
   VERBOSE("  connection established");
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
