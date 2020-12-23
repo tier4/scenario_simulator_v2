@@ -52,7 +52,10 @@ public:
     double ax, double bx, double cx, double dx,
     double ay, double by, double cy, double dy,
     double az, double bz, double cz, double dz);
-  std::vector<geometry_msgs::msg::Point> getTrajectory() const;
+  std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 100) const;
+  const std::vector<geometry_msgs::msg::Point> getTrajectory(
+    double start_s, double end_s,
+    double resolution, bool autoscale = false) const;
   const geometry_msgs::msg::Pose getPose(
     double s,
     bool autoscale = false) const;
@@ -66,7 +69,7 @@ public:
     double s,
     bool autoscale = false) const;
   double getMaximu2DCurvature() const;
-  double getLength() const;
+  double getLength(size_t num_points = 100) const;
   boost::optional<double> getSValue(
     geometry_msgs::msg::Point position,
     double threadhold_distance = 1.0,

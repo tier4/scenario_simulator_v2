@@ -29,7 +29,26 @@ LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfi
 
 const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
-  return openscenario_msgs::msg::WaypointsArray();
+  if (!curve_) {
+    throw BehaviorTreeRuntimeError("curve is null");
+  }
+  if (entity_status.action_status.twist.linear.x >= 0) {
+    double horizon =
+      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    auto following_lanelets = hdmap_utils->getFollowingLanelets(
+      params_.to_lanelet_id, horizon);
+    double l = curve_->getLength();
+    double rest_s = current_s_ + horizon - l;
+    if (rest_s < 0) {
+
+    } else {
+      simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
+      const auto waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
+    }
+    return openscenario_msgs::msg::WaypointsArray();
+  } else {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
 }
 
 BT::NodeStatus LaneChangeAction::tick()

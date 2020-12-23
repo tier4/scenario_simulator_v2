@@ -245,13 +245,36 @@ boost::optional<double> HermiteCurve::getSValue(
   return ret;
 }
 
-std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory() const
+const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
+  double start_s, double end_s,
+  double resolution, bool autoscale) const
+{
+  resolution = std::fabs(resolution);
+  if (start_s <= end_s) {
+    std::vector<geometry_msgs::msg::Point> ret;
+    double s = start_s;
+    while (s <= end_s) {
+      s = s + resolution;
+      ret.emplace_back(getPoint(s, autoscale));
+    }
+    return ret;
+  } else {
+    std::vector<geometry_msgs::msg::Point> ret;
+    double s = start_s;
+    while (s >= end_s) {
+      s = s - resolution;
+      ret.emplace_back(getPoint(s, autoscale));
+    }
+    return ret;
+  }
+}
+
+std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_points) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (int i = 0; i <= 100; i++) {
+  for (int i = 0; i <= num_points; i++) {
     double t = static_cast<double>(i) / 100.0;
-    geometry_msgs::msg::Point p = getPoint(t);
-    ret.push_back(p);
+    ret.emplace_back(getPoint(t, false));
   }
   return ret;
 }
@@ -307,9 +330,9 @@ double HermiteCurve::getMaximu2DCurvature() const
   return *std::max_element(curvatures.begin(), curvatures.end());
 }
 
-double HermiteCurve::getLength() const
+double HermiteCurve::getLength(size_t num_points) const
 {
-  auto trajectory = getTrajectory();
+  auto trajectory = getTrajectory(num_points);
   double ret = 0.0;
   for (size_t i = 0; i < trajectory.size() - 1; i++) {
     ret = ret + std::sqrt(std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
