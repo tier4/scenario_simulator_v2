@@ -33,13 +33,12 @@ jobs:
       - name: Install dependencies
         run: |
           source /opt/ros/foxy/setup.bash
-          sudo apt install -y python-rosdep python3-vcstool
+          sudo apt install -y python3-rosdep2 python3-vcstool
           sudo rosdep init
           rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator.auto/dependency.repos
-          cd ~/ros2_ws/src
-          rosdep install -r -y --from-paths . --ignore-src
+          rosdep install -iry --from-paths src --rosdistro foxy
 
       - name: Build packages
         run: |
