@@ -41,11 +41,10 @@ jobs:
           rosdep install -iry --from-paths src --rosdistro foxy
 
       - name: Build packages
-        run: | # https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/
+        run: |
           source /opt/ros/foxy/setup.bash
           cd ~/ros2_ws
-          colcon build --symlink-install
-          source ~/ros2_ws/install/setup.bash
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
       - name: Test packages
         run: |
