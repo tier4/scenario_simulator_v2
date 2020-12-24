@@ -51,6 +51,11 @@ const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoint
   }
 }
 
+const std::vector<openscenario_msgs::msg::Obstacle> FollowLaneAction::calculateObstacles()
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
+
 BT::NodeStatus FollowLaneAction::tick()
 {
   getBlackBoardValues();

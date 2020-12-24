@@ -21,6 +21,7 @@
 
 #include <openscenario_msgs/msg/entity_trajectory.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
 
 #include <string>
 #include <memory>
@@ -56,6 +57,7 @@ public:
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
+  virtual const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles() = 0;
 };
 }  // namespace entity_behavior
 

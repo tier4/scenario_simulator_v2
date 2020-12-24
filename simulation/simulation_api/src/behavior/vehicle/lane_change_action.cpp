@@ -29,6 +29,11 @@ LaneChangeAction::LaneChangeAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
+const std::vector<openscenario_msgs::msg::Obstacle> LaneChangeAction::calculateObstacles()
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
+
 const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
   if (!curve_) {

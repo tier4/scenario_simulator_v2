@@ -38,6 +38,11 @@ const openscenario_msgs::msg::WaypointsArray AcquirePositionAction::calculateWay
   return openscenario_msgs::msg::WaypointsArray();
 }
 
+const std::vector<openscenario_msgs::msg::Obstacle> AcquirePositionAction::calculateObstacles()
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
+
 void AcquirePositionAction::getBlackBoardValues()
 {
   openscenario_msgs::msg::LaneletPose target_lanelet_pose;

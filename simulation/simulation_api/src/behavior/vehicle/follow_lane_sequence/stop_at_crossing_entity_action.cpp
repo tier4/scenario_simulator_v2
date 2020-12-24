@@ -52,6 +52,11 @@ const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calcula
   }
 }
 
+const std::vector<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacles()
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
+
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
   const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {

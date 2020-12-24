@@ -19,6 +19,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/WaypointsArray.msg
   msg/EntityStatusWithTrajectory.msg
   msg/EntityStatusWithTrajectoryArray.msg
+  msg/Obstacle.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 
