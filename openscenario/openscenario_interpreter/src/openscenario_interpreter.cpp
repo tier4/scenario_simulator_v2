@@ -59,7 +59,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     return Interpreter::Result::FAILURE;
   }
 
-  static constexpr auto real_time_factor = 1.0;
+  static constexpr auto real_time_factor = 3.0;
   VERBOSE("  real_time_factor: " << real_time_factor);
 
   connect(

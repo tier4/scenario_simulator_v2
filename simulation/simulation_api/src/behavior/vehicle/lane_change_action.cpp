@@ -19,6 +19,8 @@
 
 #include <string>
 #include <memory>
+#include <algorithm>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -59,7 +61,6 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
       waypoints.waypoints = curve_waypoints;
       std::copy(straight_waypoints.begin(), straight_waypoints.end(),
         std::back_inserter(waypoints.waypoints));
-
     }
     return waypoints;
   } else {
