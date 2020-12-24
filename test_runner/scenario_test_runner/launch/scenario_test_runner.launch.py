@@ -18,105 +18,180 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import DeclareLaunchArgument
-from launch.actions import Shutdown
 from launch import LaunchDescription
-from launch_ros.actions import LifecycleNode
-from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import LifecycleNode, Node
 
 
 def generate_launch_description():
-    workflow = LaunchConfiguration('workflow')
-
-    declare_workflow = DeclareLaunchArgument(
-        'workflow',
-        default_value=workflow,
-        description='workflow files for scenario testing')
 
     log_directory = LaunchConfiguration('log_directory', default="/tmp")
-
-    declare_log_directory = DeclareLaunchArgument(
-        'log_directory',
-        default_value=log_directory,
-        description='log_directory files for scenario testing')
-
     no_validation = LaunchConfiguration('no_validation', default=False)
-
-    declare_no_validation = DeclareLaunchArgument(
-        'no_validation',
-        default_value=no_validation
-        )
-
-    # NOTE: https://answers.ros.org/question/332829/no-stdout-logging-output-in-ros2-using-launch/
-    scenario_test_runner = Node(
-        package='scenario_test_runner',
-        node_executable='scenario_test_runner',
-        output={
-            'stdout': 'screen',  # THIS OPTION NOT WORKS IF (< ROS2 ELOQUENT)
-            'stderr': 'screen',
-        },
-        on_exit=Shutdown(),
-        arguments=[
-            "--log_directory", log_directory,
-            "--no_validation", no_validation,
-            "--workflow", workflow,
-        ]
-    )
+    workflow      = LaunchConfiguration('workflow')
 
     port = 8080
 
-    scenario_simulator = Node(
-        package='scenario_simulator',
-        node_executable='scenario_simulator_node',
-        node_name='scenario_simulator_node',
-        output='log',
-        parameters=[{
-            'port': port,
-        }],
-        arguments=[('__log_level:=warn')],
-    )
+    return LaunchDescription([
 
-    openscenario_interpreter = LifecycleNode(
-        package='openscenario_interpreter',
-        node_executable='openscenario_interpreter_node',
-        node_name='openscenario_interpreter_node',
-        output='screen',
-        parameters=[{
-            'map_path': os.path.join(
-                get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
-            'origin_latitude': 34.903555800615614,
-            'origin_longitude': 139.93339979022568,
-            'port': port,
-        }]
-    )
+        DeclareLaunchArgument('log_directory',
+            default_value=log_directory,
+            description='log_directory files for scenario testing'),
 
-    rviz2 = Node(
-        package='rviz2',
-        node_executable='rviz2',
-        node_name='rviz2',
-        arguments=[
-            '-d', os.path.join(
-                get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
-            ],
-        output='log'
-    )
+        DeclareLaunchArgument('no_validation',
+            default_value=no_validation),
 
-    openscenario_visualization = Node(
-        package='openscenario_visualization',
-        node_executable='openscenario_visualization_node',
-        node_name='openscenario_visualization_node',
-        output='log'
-    )
+        DeclareLaunchArgument('workflow',
+            default_value=workflow,
+            description='workflow files for scenario testing'),
 
-    description = LaunchDescription()
-    description.add_action(declare_log_directory)
-    description.add_action(declare_no_validation)
-    description.add_action(declare_workflow)
-    description.add_action(openscenario_interpreter)
-    description.add_action(openscenario_visualization)
-    description.add_action(rviz2)
-    description.add_action(scenario_simulator)
-    description.add_action(scenario_test_runner)
+        Node(
+            package='scenario_test_runner',
+            executable='scenario_test_runner',
+            name='scenario_test_runner',
+            output='screen',
+            on_exit=Shutdown(),
+            arguments=[
+                '--log_directory', log_directory,
+                '--no_validation', no_validation,
+                '--workflow',      workflow,
+                ],
+            ),
 
-    return description
+        Node(
+            package='scenario_simulator',
+            executable='scenario_simulator_node',
+            name='scenario_simulator_node',
+            output='log',
+            parameters=[{
+                'port': port,
+                }],
+            ),
+
+        LifecycleNode(
+            package='openscenario_interpreter',
+            executable='openscenario_interpreter_node',
+            name='openscenario_interpreter_node',
+            output='screen',
+            parameters=[{
+                'map_path': os.path.join(
+                    get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
+                'origin_latitude':   34.903555800615614,
+                'origin_longitude': 139.93339979022568,
+                'port': port,
+                }],
+            ),
+
+        Node(
+            package='openscenario_visualization',
+            executable='openscenario_visualization_node',
+            name='openscenario_visualization_node',
+            output='log',
+            ),
+
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='log',
+            arguments=[
+                '-d', os.path.join(
+                    get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
+                ],
+            ),
+        ])
+
+# def generate_launch_description():
+#     # workflow = LaunchConfiguration('workflow')
+#
+#     # declare_workflow = DeclareLaunchArgument(
+#     #     'workflow',
+#     #     default_value=workflow,
+#     #     description='workflow files for scenario testing')
+#
+#     # log_directory = LaunchConfiguration('log_directory', default="/tmp")
+#
+#     # declare_log_directory = DeclareLaunchArgument(
+#     #     'log_directory',
+#     #     default_value=log_directory,
+#     #     description='log_directory files for scenario testing')
+#
+#     # no_validation = LaunchConfiguration('no_validation', default=False)
+#
+#     # declare_no_validation = DeclareLaunchArgument(
+#     #     'no_validation',
+#     #     default_value=no_validation
+#     #     )
+#
+#     # # NOTE: https://answers.ros.org/question/332829/no-stdout-logging-output-in-ros2-using-launch/
+#     # scenario_test_runner = Node(
+#     #     package='scenario_test_runner',
+#     #     executable='scenario_test_runner',
+#     #     output={
+#     #         'stdout': 'screen',  # THIS OPTION NOT WORKS IF (< ROS2 ELOQUENT)
+#     #         'stderr': 'screen',
+#     #         },
+#     #     on_exit=Shutdown(),
+#     #     arguments=[
+#     #         "--log_directory", log_directory,
+#     #         "--no_validation", no_validation,
+#     #         "--workflow", workflow,
+#     #         ]
+#     #     )
+#
+#     # port = 8080
+#
+#     # scenario_simulator = Node(
+#     #     package='scenario_simulator',
+#     #     executable='scenario_simulator_node',
+#     #     name='scenario_simulator_node',
+#     #     output='log',
+#     #     parameters=[{
+#     #         'port': port,
+#     #         }],
+#     #     arguments=[('__log_level:=warn')],
+#     #     )
+#     #
+#     # openscenario_interpreter = LifecycleNode(
+#     #     package='openscenario_interpreter',
+#     #     executable='openscenario_interpreter_node',
+#     #     name='openscenario_interpreter_node',
+#     #     output='screen',
+#     #     parameters=[{
+#     #         'map_path': os.path.join(
+#     #             get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
+#     #         'origin_latitude': 34.903555800615614,
+#     #         'origin_longitude': 139.93339979022568,
+#     #         'port': port,
+#     #         }]
+#     #     )
+#
+#     # rviz2 = Node(
+#     #     package='rviz2',
+#     #     executable='rviz2',
+#     #     name='rviz2',
+#     #     arguments=[
+#     #         '-d', os.path.join(
+#     #             get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
+#     #         ],
+#     #     output='log'
+#     #     )
+#
+#     # openscenario_visualization = Node(
+#     #     package='openscenario_visualization',
+#     #     executable='openscenario_visualization_node',
+#     #     name='openscenario_visualization_node',
+#     #     output='log'
+#     #     )
+#
+#     description = LaunchDescription()
+#     description.add_action(declare_log_directory)
+#     description.add_action(declare_no_validation)
+#     description.add_action(declare_workflow)
+#     # description.add_action(openscenario_interpreter)
+#     # description.add_action(openscenario_visualization)
+#     # description.add_action(rviz2)
+#     # description.add_action(scenario_simulator)
+#     # description.add_action(scenario_test_runner)
+#
+#     return description

@@ -178,9 +178,9 @@ def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
     parser.add_argument(
-        '--timeout',
+        '-t', '--timeout',
         type=int,
-        default=180,
+        default=30,
         help='Specify simulation time limit in seconds.  The default is 180 seconds.',
         )
 
@@ -191,12 +191,12 @@ def main():
     #     )
 
     parser.add_argument(
-        '--scenario',
+        '-s', '--scenario',
         help='Specify the scenario you want to execute.',
         )
 
     parser.add_argument(
-        '--workflow',
+        '-w', '--workflow',
         type=str,
         help='Specify workflow you want to execute.',
         )
@@ -213,6 +213,9 @@ def main():
         default=False,
         help='Disable validation to generated scenarios.',
         )
+
+    parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
+    parser.add_argument('-r', nargs='*')  # XXX DIRTY HACK
 
     args = parser.parse_args()
 
