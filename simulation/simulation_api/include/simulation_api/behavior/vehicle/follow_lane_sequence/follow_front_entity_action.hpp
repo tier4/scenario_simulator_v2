@@ -43,8 +43,6 @@ public:
     return ports;
   }
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
-    const openscenario_msgs::msg::WaypointsArray & waypoints) override;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

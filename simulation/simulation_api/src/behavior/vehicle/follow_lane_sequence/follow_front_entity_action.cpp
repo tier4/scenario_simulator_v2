@@ -31,12 +31,6 @@ FollowFrontEntityAction::FollowFrontEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const std::vector<openscenario_msgs::msg::Obstacle> FollowFrontEntityAction::calculateObstacles(
-  const openscenario_msgs::msg::WaypointsArray & waypoints)
-{
-  return std::vector<openscenario_msgs::msg::Obstacle>();
-}
-
 const openscenario_msgs::msg::WaypointsArray FollowFrontEntityAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {

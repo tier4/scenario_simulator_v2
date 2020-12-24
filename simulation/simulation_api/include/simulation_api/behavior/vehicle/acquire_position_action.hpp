@@ -53,8 +53,6 @@ public:
   }
   void getBlackBoardValues();
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
-    const openscenario_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
   std::vector<std::int64_t> route_;
