@@ -43,7 +43,7 @@ const openscenario_msgs::msg::WaypointsArray AcquirePositionAction::calculateWay
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
+      entity_status.lanelet_pose.lanelet_id, route_,
       horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
     simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
     waypoints.waypoints = spline.getTrajectory(entity_status.lanelet_pose.s,

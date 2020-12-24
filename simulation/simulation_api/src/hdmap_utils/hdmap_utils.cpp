@@ -318,6 +318,9 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     if (found) {
       ret.emplace_back(id);
       total_dist = total_dist + getLaneletLength(id);
+      if (total_dist > distance) {
+        return ret;
+      }
     }
     if (id == lanelet_id) {
       found = true;
@@ -329,11 +332,12 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   if (!found) {
     throw HdMapError("lanelet id did not match.");
   }
-  if (distance < total_dist) {
+  if (total_dist > distance) {
     return ret;
   }
+  std::int64_t end_lanelet = candidate_lanelet_ids[candidate_lanelet_ids.size() - 1];
   const auto followings = getFollowingLanelets(
-    *candidate_lanelet_ids.end(), distance - total_dist, false);
+    end_lanelet, distance - total_dist, false);
   std::copy(followings.begin(), followings.end(), std::back_inserter(ret));
   return ret;
 }
