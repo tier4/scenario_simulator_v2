@@ -54,7 +54,7 @@ public:
     tree_.rootBlackboard()->get("updated_status", status);
     return status;
   }
-  const openscenario_msgs::msg::WaypointsArray getWaypoints()
+  openscenario_msgs::msg::WaypointsArray getWaypoints()
   {
     openscenario_msgs::msg::WaypointsArray waypoints;
     tree_.rootBlackboard()->get("waypoints", waypoints);
