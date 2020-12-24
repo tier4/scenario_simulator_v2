@@ -108,7 +108,10 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
   auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_);
   setOutput("updated_status", entity_status_updated);
-  setOutput("waypoints", calculateWaypoints());
+  const auto waypoints = calculateWaypoints();
+  const auto obstacles = calculateObstacles(waypoints);
+  setOutput("waypoints", waypoints);
+  setOutput("obstacles", obstacles);
   if (target_lanelet_pose_->lanelet_id == entity_status.lanelet_pose.lanelet_id) {
     if (target_lanelet_pose_->s < entity_status.lanelet_pose.s) {
       target_lanelet_pose_ = boost::none;

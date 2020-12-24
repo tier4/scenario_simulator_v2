@@ -92,7 +92,10 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     calculateTargetSpeed(following_lanelets, entity_status.action_status.twist.linear.x);
   if (!target_linear_speed) {
     setOutput("updated_status", calculateEntityStatusUpdated(0));
-    setOutput("waypoints", calculateWaypoints());
+    const auto waypoints = calculateWaypoints();
+    const auto obstacles = calculateObstacles(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacles", obstacles);
     return BT::NodeStatus::SUCCESS;
   }
   if (target_speed) {
@@ -103,7 +106,10 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     target_speed = target_linear_speed.get();
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-  setOutput("waypoints", calculateWaypoints());
+  const auto waypoints = calculateWaypoints();
+  const auto obstacles = calculateObstacles(waypoints);
+  setOutput("waypoints", waypoints);
+  setOutput("obstacles", obstacles);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

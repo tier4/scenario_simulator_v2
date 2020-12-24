@@ -129,10 +129,16 @@ BT::NodeStatus LaneChangeAction::tick()
       }
       entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
-      setOutput("waypoints", calculateWaypoints());
+      const auto waypoints = calculateWaypoints();
+      const auto obstacles = calculateObstacles(waypoints);
+      setOutput("waypoints", waypoints);
+      setOutput("obstacles", obstacles);
       return BT::NodeStatus::RUNNING;
     } else {
-      setOutput("waypoints", calculateWaypoints());
+      const auto waypoints = calculateWaypoints();
+      const auto obstacles = calculateObstacles(waypoints);
+      setOutput("waypoints", waypoints);
+      setOutput("obstacles", obstacles);
       double s = (current_s_ - curve_->getLength()) + target_s_;
       curve_ = boost::none;
       current_s_ = 0;

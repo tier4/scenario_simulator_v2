@@ -108,7 +108,10 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     auto entity_status_updated = calculateEntityStatusUpdated(
       front_entity_status.get().action_status.twist.linear.x);
     setOutput("updated_status", entity_status_updated);
-    setOutput("waypoints", calculateWaypoints());
+    const auto waypoints = calculateWaypoints();
+    const auto obstacles = calculateObstacles(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacles", obstacles);
     return BT::NodeStatus::RUNNING;
   }
 }

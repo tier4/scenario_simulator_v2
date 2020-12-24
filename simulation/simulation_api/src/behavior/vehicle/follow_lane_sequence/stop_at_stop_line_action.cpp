@@ -107,11 +107,17 @@ BT::NodeStatus StopAtStopLineAction::tick()
     if (!dist_to_stopline) {
       stopped_ = false;
       setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-      setOutput("waypoints", calculateWaypoints());
+      const auto waypoints = calculateWaypoints();
+      const auto obstacles = calculateObstacles(waypoints);
+      setOutput("waypoints", waypoints);
+      setOutput("obstacles", obstacles);
       return BT::NodeStatus::SUCCESS;
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-    setOutput("waypoints", calculateWaypoints());
+    const auto waypoints = calculateWaypoints();
+    const auto obstacles = calculateObstacles(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacles", obstacles);
     return BT::NodeStatus::RUNNING;
   }
   auto target_linear_speed =
@@ -129,7 +135,10 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   stopped_ = false;
-  setOutput("waypoints", calculateWaypoints());
+  const auto waypoints = calculateWaypoints();
+  const auto obstacles = calculateObstacles(waypoints);
+  setOutput("waypoints", waypoints);
+  setOutput("obstacles", obstacles);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

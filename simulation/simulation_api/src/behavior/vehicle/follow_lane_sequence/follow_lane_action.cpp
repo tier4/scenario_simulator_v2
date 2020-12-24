@@ -104,7 +104,10 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   auto updated_status = calculateEntityStatusUpdated(target_speed.get());
   setOutput("updated_status", updated_status);
-  setOutput("waypoints", calculateWaypoints());
+  const auto waypoints = calculateWaypoints();
+  const auto obstacles = calculateObstacles(waypoints);
+  setOutput("waypoints", waypoints);
+  setOutput("obstacles", obstacles);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
