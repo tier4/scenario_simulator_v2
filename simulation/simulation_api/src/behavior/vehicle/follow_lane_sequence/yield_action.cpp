@@ -33,7 +33,8 @@ YieldAction::YieldAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const std::vector<openscenario_msgs::msg::Obstacle> YieldAction::calculateObstacles()
+const std::vector<openscenario_msgs::msg::Obstacle> YieldAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   return std::vector<openscenario_msgs::msg::Obstacle>();
 }

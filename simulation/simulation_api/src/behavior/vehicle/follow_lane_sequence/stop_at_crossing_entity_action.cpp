@@ -52,7 +52,8 @@ const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calcula
   }
 }
 
-const std::vector<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacles()
+const std::vector<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   return std::vector<openscenario_msgs::msg::Obstacle>();
 }

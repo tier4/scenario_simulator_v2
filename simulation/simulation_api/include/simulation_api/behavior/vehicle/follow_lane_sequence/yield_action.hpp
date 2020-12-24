@@ -45,7 +45,8 @@ public:
   }
   boost::optional<double> calculateTargetSpeed(std::vector<std::int64_t> following_lanelets);
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
-  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles() override;
+  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
+    const openscenario_msgs::msg::WaypointsArray & waypoints) override;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

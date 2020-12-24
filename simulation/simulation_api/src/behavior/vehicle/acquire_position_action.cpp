@@ -38,7 +38,8 @@ const openscenario_msgs::msg::WaypointsArray AcquirePositionAction::calculateWay
   return openscenario_msgs::msg::WaypointsArray();
 }
 
-const std::vector<openscenario_msgs::msg::Obstacle> AcquirePositionAction::calculateObstacles()
+const std::vector<openscenario_msgs::msg::Obstacle> AcquirePositionAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   return std::vector<openscenario_msgs::msg::Obstacle>();
 }

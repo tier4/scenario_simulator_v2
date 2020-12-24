@@ -51,7 +51,8 @@ const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoint
   }
 }
 
-const std::vector<openscenario_msgs::msg::Obstacle> FollowLaneAction::calculateObstacles()
+const std::vector<openscenario_msgs::msg::Obstacle> FollowLaneAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   return std::vector<openscenario_msgs::msg::Obstacle>();
 }
