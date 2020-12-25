@@ -43,8 +43,9 @@ class ScenarioTestRunner(LifecycleController):
 
     def __init__(
             self,  # Arguments are alphabetically sorted
-            log_directory: Path,  # DEPRECATED
             global_real_time_factor: float,
+            global_step_time: float,
+            log_directory: Path,  # DEPRECATED
             timeout: int,  # [sec]
             ):
         """
@@ -65,8 +66,9 @@ class ScenarioTestRunner(LifecycleController):
         None
 
         """
-        self.timeout = timeout
         self.global_real_time_factor = global_real_time_factor
+        self.global_step_time = global_step_time
+        self.timeout = timeout
 
         self.launcher_path = Path(__file__).resolve().parent.parent
         self.log_path = Path(resolve_ros_package(str(log_directory)))
@@ -165,9 +167,10 @@ class ScenarioTestRunner(LifecycleController):
 
             self.configure_node(
                 expect=self.xosc_expects[index],
-                log_path=str(self.log_path),
+                log_path=self.log_path,
+                real_time_factor=self.global_real_time_factor,
                 scenario=scenario,
-                step_time_ms=self.xosc_step_time_ms[index],
+                step_time=self.xosc_step_time_ms[index],
                 )
 
             if self.get_lifecycle_state() == 'unconfigured':
@@ -199,11 +202,18 @@ def main():
 
     parser.add_argument(
         '--global-real-time-factor',
+        type=float,
         default=1.0,
         help="Specify the ratio of simulation time to real time. If you set a "
              "value greater than 1, the simulation will be faster than in "
              "reality, and if you set a value less than 1, the simulation will "
              "be slower than in reality.")
+
+    parser.add_argument(
+        '--global-step-time',
+        type=float,
+        default=0.002
+        )
 
     parser.add_argument(
         '-s', '--scenario',
@@ -226,8 +236,9 @@ def main():
     args = parser.parse_args()
 
     ScenarioTestRunner(
-        log_directory=args.log_directory,  # DEPRECATED
         global_real_time_factor=args.global_real_time_factor,
+        global_step_time=args.global_step_time,
+        log_directory=args.log_directory,  # DEPRECATED
         timeout=args.timeout,
         ).run_workflow(
             Path(resolve_ros_package(args.workflow)).resolve(),

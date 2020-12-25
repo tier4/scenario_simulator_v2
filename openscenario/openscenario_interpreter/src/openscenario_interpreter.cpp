@@ -24,12 +24,18 @@
 namespace openscenario_interpreter
 {
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
-: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options)
+: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
+  expect("success"),
+  log_path("/tmp"),  // DEPRECATED
+  osc_path(""),
+  real_time_factor(1.0),
+  step_time_ms(2)
 {
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
-  declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
+  declare_parameter<decltype(real_time_factor)>("real_time_factor", real_time_factor);
+  declare_parameter<decltype(step_time_ms)>("step_time_ms", step_time_ms);
 }
 
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
@@ -48,6 +54,9 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("osc_path", osc_path);
   VERBOSE("  osc_path: " << osc_path);
 
+  get_parameter("real_time_factor", real_time_factor);
+  VERBOSE("  real_time_factor: " << real_time_factor);
+
   get_parameter("step_time_ms", step_time_ms);
   VERBOSE("  step_time_ms: " << step_time_ms);
 
@@ -58,9 +67,6 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     std::cerr << "\x1b[1;31m" << error.what() << std::endl;
     return Interpreter::Result::FAILURE;
   }
-
-  static constexpr auto real_time_factor = 10.0;
-  VERBOSE("  real_time_factor: " << real_time_factor);
 
   connect(
     shared_from_this(),

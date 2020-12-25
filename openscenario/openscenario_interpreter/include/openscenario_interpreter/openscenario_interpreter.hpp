@@ -39,13 +39,15 @@ class Interpreter
 
   std::string log_path;
 
+  double real_time_factor;
+
+  int step_time_ms;
+
   Element script;
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
   junit_exporter::JunitExporter exporter;
-
-  int step_time_ms;
 
   const junit_exporter::TestResult ERROR = junit_exporter::TestResult::ERROR;
   const junit_exporter::TestResult FAILURE = junit_exporter::TestResult::FAILURE;
