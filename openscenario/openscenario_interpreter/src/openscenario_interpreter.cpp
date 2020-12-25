@@ -29,13 +29,13 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   log_path("/tmp"),  // DEPRECATED
   osc_path(""),
   real_time_factor(1.0),
-  step_time_ms(2)
+  frame_rate(30)
 {
   declare_parameter<decltype(expect)>("expect", expect);
+  declare_parameter<decltype(frame_rate)>("frame-rate", frame_rate);
   declare_parameter<decltype(log_path)>("log_path", log_path);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
   declare_parameter<decltype(real_time_factor)>("real-time-factor", real_time_factor);
-  declare_parameter<decltype(step_time_ms)>("step_time_ms", step_time_ms);
 }
 
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
@@ -57,8 +57,8 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("real-time-factor", real_time_factor);
   VERBOSE("  real-time-factor: " << real_time_factor);
 
-  get_parameter("step_time_ms", step_time_ms);
-  VERBOSE("  step_time_ms: " << step_time_ms);
+  get_parameter("frame-rate", frame_rate);
+  VERBOSE("  frame-rate: " << frame_rate);
 
   try {
     VERBOSE("  Loading scenario " << osc_path);
@@ -74,7 +74,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     false);
   VERBOSE("  connection established");
 
-  initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
+  initialize(real_time_factor, (1 / frame_rate) * real_time_factor);
   VERBOSE("  simulator initialized");
 
   VERBOSE("<<< Configure");
@@ -87,7 +87,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   VERBOSE(">>> Activate");
 
   timer = create_wall_timer(
-    std::chrono::milliseconds(step_time_ms),
+    std::chrono::milliseconds(int(1 / frame_rate * 1000)),
     [this]()
     {
       guard(

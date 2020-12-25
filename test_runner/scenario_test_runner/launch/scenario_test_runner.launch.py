@@ -26,8 +26,8 @@ from launch_ros.actions import LifecycleNode, Node
 
 def generate_launch_description():
 
+    global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
-    global_step_time = LaunchConfiguration('global-step-time', default=0.002)
     log_directory = LaunchConfiguration('log_directory', default="/tmp")
     no_validation = LaunchConfiguration('no_validation', default=False)
     workflow = LaunchConfiguration('workflow')
@@ -36,8 +36,8 @@ def generate_launch_description():
 
     return LaunchDescription([
 
+        DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
         DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
-        DeclareLaunchArgument('global-step-time', default_value=global_step_time),
         DeclareLaunchArgument('log_directory', default_value=log_directory),
         DeclareLaunchArgument('no_validation', default_value=no_validation),
         DeclareLaunchArgument('workflow', default_value=workflow),
@@ -49,8 +49,8 @@ def generate_launch_description():
             output='screen',
             on_exit=Shutdown(),
             arguments=[
+                '--global-frame-rate', global_frame_rate,
                 '--global-real-time-factor', global_real_time_factor,
-                '--global-step-time', global_step_time,
                 '--log_directory', log_directory,
                 '--no_validation', no_validation,
                 '--workflow', workflow,

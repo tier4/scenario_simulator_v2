@@ -15,7 +15,7 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(fin
 
 ```
 sh save_image.sh
-docker import 
+docker import
 ```
 
 
@@ -39,7 +39,7 @@ OpenSCENARIO:
     date: <string or int>
     description: <string>
     author: <string>
-  ParameterDeclarations: 
+  ParameterDeclarations:
   .
   .
 ```
@@ -94,12 +94,12 @@ ScenarioModifiers:
 
 
 ## Workflow Example
-requirement
+Required
 - path
 
-options
-- expectation
-- step_time_ms
+Optional
+- expect
+- frame-rate
 
 
 ```
@@ -114,7 +114,7 @@ Scenario:
   - {
       path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/success.yaml,
       expect: success,
-      step_time_ms: 2
+      frame-rate: 30
     }
 ```
 

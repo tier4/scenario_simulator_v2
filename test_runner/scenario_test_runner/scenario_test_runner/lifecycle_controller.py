@@ -65,10 +65,10 @@ class LifecycleController(Node):
     def send_request_to_change_parameters(
             self,  # Arguments are alphabetically sorted
             expect,
+            frame_rate: float,
             log_path,  # DEPRECATED
             real_time_factor: float,
             scenario: str,
-            step_time_ms: int,
             ):
         """Send request to change scenario interperter's parameters."""
         request = rcl_interfaces.srv.SetParameters.Request()
@@ -100,10 +100,10 @@ class LifecycleController(Node):
                     double_value=real_time_factor)),
 
             Parameter(
-                name='step_time_ms',
+                name='frame-rate',
                 value=ParameterValue(
-                    type=ParameterType.PARAMETER_INTEGER,
-                    integer_value=step_time_ms)),
+                    type=ParameterType.PARAMETER_DOUBLE,
+                    double_value=frame_rate)),
             ]
 
         future = self.client_set_parameters.call_async(request)
@@ -113,10 +113,10 @@ class LifecycleController(Node):
     def configure_node(
             self,  # Arguments are alphabetically sorted
             expect,
+            frame_rate: float,
             log_path: Path,  # DEPRECATED
             real_time_factor: float,
             scenario: str,
-            step_time: int,
             ):
         """Configure node to chagnge state from unconfigure to inactive."""
 
@@ -124,10 +124,10 @@ class LifecycleController(Node):
 
         while not self.send_request_to_change_parameters(
                 expect=expect,
+                frame_rate=frame_rate,
                 log_path=str(log_path),  # DEPRECATED
                 real_time_factor=real_time_factor,
                 scenario=self.current_scenario,
-                step_time_ms=step_time,
                 ).done():
             self.get_logger().info('Failed to set parameters. Resending...')
 

@@ -43,8 +43,8 @@ class ScenarioTestRunner(LifecycleController):
 
     def __init__(
             self,  # Arguments are alphabetically sorted
+            global_frame_rate: float,
             global_real_time_factor: float,
-            global_step_time: float,
             log_directory: Path,  # DEPRECATED
             timeout: int,  # [sec]
             ):
@@ -66,15 +66,15 @@ class ScenarioTestRunner(LifecycleController):
         None
 
         """
+        self.global_frame_rate = global_frame_rate
         self.global_real_time_factor = global_real_time_factor
-        self.global_step_time = global_step_time
         self.timeout = timeout
 
         self.launcher_path = Path(__file__).resolve().parent.parent
         self.log_path = Path(resolve_ros_package(str(log_directory)))
 
         self.xosc_scenarios = []
-        self.xosc_step_time_ms = []
+        self.local_frame_rates = []
 
     def run_workflow(self, path: Path, no_validation):
         """
@@ -93,8 +93,9 @@ class ScenarioTestRunner(LifecycleController):
         workflow = Workflow(path)
 
         self.yaml_scenarios = []
+
         expects = []
-        step_times_ms = []
+        local_frame_rates = []
 
         for scenario in workflow.scenarios:
             self.yaml_scenarios.append(scenario['path'])
@@ -104,14 +105,14 @@ class ScenarioTestRunner(LifecycleController):
             else:
                 expects.append(scenario['expect'])
 
-            if 'step_time_ms' not in scenario:
-                step_times_ms.append(2)
+            if 'frame-rate' not in scenario:
+                local_frame_rates.append(self.global_frame_rate)
             else:
-                step_times_ms.append(scenario['step_time_ms'])
+                local_frame_rates.append(float(scenario['frame-rate']))
 
-        self.xosc_scenarios, self.xosc_expects, self.xosc_step_time_ms \
+        self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
             = ConverterHandler.convert_all_scenarios(
-                self.yaml_scenarios, expects, step_times_ms, self.launcher_path)
+                self.yaml_scenarios, expects, local_frame_rates, self.launcher_path)
 
         if not no_validation.lower() in ["true", "t", "yes", "1"]:
             self.validate_all_scenarios()
@@ -170,7 +171,7 @@ class ScenarioTestRunner(LifecycleController):
                 log_path=self.log_path,
                 real_time_factor=self.global_real_time_factor,
                 scenario=scenario,
-                step_time=self.xosc_step_time_ms[index],
+                frame_rate=self.local_frame_rates[index],
                 )
 
             if self.get_lifecycle_state() == 'unconfigured':
@@ -201,6 +202,12 @@ def main():
         help='Disable validation to generated scenarios.')
 
     parser.add_argument(
+        '--global-frame-rate',
+        type=float,
+        default=30
+        )
+
+    parser.add_argument(
         '--global-real-time-factor',
         type=float,
         default=1.0,
@@ -208,12 +215,6 @@ def main():
              "value greater than 1, the simulation will be faster than in "
              "reality, and if you set a value less than 1, the simulation will "
              "be slower than in reality.")
-
-    parser.add_argument(
-        '--global-step-time',
-        type=float,
-        default=0.002
-        )
 
     parser.add_argument(
         '-s', '--scenario',
@@ -236,8 +237,8 @@ def main():
     args = parser.parse_args()
 
     ScenarioTestRunner(
+        global_frame_rate=args.global_frame_rate,
         global_real_time_factor=args.global_real_time_factor,
-        global_step_time=args.global_step_time,
         log_directory=args.log_directory,  # DEPRECATED
         timeout=args.timeout,
         ).run_workflow(

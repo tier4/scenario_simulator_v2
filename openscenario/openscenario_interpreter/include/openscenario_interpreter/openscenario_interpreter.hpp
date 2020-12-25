@@ -35,13 +35,13 @@ class Interpreter
 {
   std::string expect;
 
-  std::string osc_path;
-
   std::string log_path;
+
+  std::string osc_path;
 
   double real_time_factor;
 
-  int step_time_ms;
+  double frame_rate;
 
   Element script;
 
