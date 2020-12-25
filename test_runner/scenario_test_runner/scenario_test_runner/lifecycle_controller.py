@@ -94,7 +94,7 @@ class LifecycleController(Node):
                     string_value=scenario)),
 
             Parameter(
-                name="real_time_factor",
+                name="real-time-factor",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_DOUBLE,
                     double_value=real_time_factor)),

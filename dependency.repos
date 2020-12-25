@@ -1,10 +1,8 @@
 repositories:
   quaternion_operation:
     type: git
-    # url: https://github.com/OUXT-Polaris/quaternion_operation.git
-    # version: 9add46f34999757dd4d26349d4d63dc3a9f101ad
-    url: https://github.com/yamacir-kit/quaternion_operation.git
-    version: fix/missing-dependency
+    url: https://github.com/OUXT-Polaris/quaternion_operation.git
+    version: 79e948d155cfaf170000bbeb93e8fc76eddf7b0d
   autoware_auto_msgs:
     type: git
     url: https://gitlab.com/autowarefoundation/autoware.auto/autoware_auto_msgs.git

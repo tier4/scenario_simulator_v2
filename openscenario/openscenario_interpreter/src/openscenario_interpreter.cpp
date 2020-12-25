@@ -34,7 +34,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(log_path)>("log_path", log_path);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
-  declare_parameter<decltype(real_time_factor)>("real_time_factor", real_time_factor);
+  declare_parameter<decltype(real_time_factor)>("real-time-factor", real_time_factor);
   declare_parameter<decltype(step_time_ms)>("step_time_ms", step_time_ms);
 }
 
@@ -54,8 +54,8 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("osc_path", osc_path);
   VERBOSE("  osc_path: " << osc_path);
 
-  get_parameter("real_time_factor", real_time_factor);
-  VERBOSE("  real_time_factor: " << real_time_factor);
+  get_parameter("real-time-factor", real_time_factor);
+  VERBOSE("  real-time-factor: " << real_time_factor);
 
   get_parameter("step_time_ms", step_time_ms);
   VERBOSE("  step_time_ms: " << step_time_ms);
