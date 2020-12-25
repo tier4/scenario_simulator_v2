@@ -162,7 +162,7 @@ def from_yaml(keyword, node):
         return None
 
 
-def convert(input: Path, output: Path):
+def convert(input: Path, output: Path, verbose: bool = True):
 
     if output.exists():
         for each in output.iterdir():
@@ -197,8 +197,9 @@ def convert(input: Path, output: Path):
             output,
             input.stem)
 
-        for each in paths:
-            print(each)
+        if verbose:
+            for each in paths:
+                print(each)
 
 
 def main():

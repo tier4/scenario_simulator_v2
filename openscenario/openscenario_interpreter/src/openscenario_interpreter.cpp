@@ -87,7 +87,8 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   VERBOSE(">>> Activate");
 
   timer = create_wall_timer(
-    std::chrono::milliseconds(int(1 / frame_rate * 1000)),
+    std::chrono::milliseconds(
+      static_cast<unsigned int>(1 / frame_rate * 1000)),
     [this]()
     {
       guard(

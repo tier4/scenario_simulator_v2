@@ -51,7 +51,7 @@ class ConverterHandler():
         folder_name = Path(yaml_scenario_path).stem
         file_name = folder_name + "-" + str(index)
         output_dir = launcher_path.joinpath("test/scenario/converted", folder_name, file_name)
-        convert(Path(yaml_scenario_path), Path(output_dir))
+        convert(Path(yaml_scenario_path), Path(output_dir), False)
         return output_dir
 
     @staticmethod
@@ -61,7 +61,7 @@ class ConverterHandler():
         for root, dirname, filenames in os.walk(converted_dirs):
             for filename in filenames:
                 if (".xosc" in filename):
-                    converted_scenarios.append(root+"/"+filename)
+                    converted_scenarios.append(root + "/" + filename)
         return converted_scenarios
 
 
