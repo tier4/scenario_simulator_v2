@@ -45,15 +45,15 @@ class ScenarioTestRunner(LifecycleController):
             self,  # Arguments are alphabetically sorted
             global_frame_rate: float,
             global_real_time_factor: float,
+            global_timeout: int,  # [sec]
             log_directory: Path,  # DEPRECATED
-            timeout: int,  # [sec]
             ):
         """
         Initialize the class ScenarioTestRunner.
 
         Arguments
         ---------
-        timeout : int
+        global_timeout : int
             If the success or failure of the simulation is not determined even
             after the specified time (seconds) has passed, the simulation is
             forcibly terminated as a failure.
@@ -68,7 +68,7 @@ class ScenarioTestRunner(LifecycleController):
         """
         self.global_frame_rate = global_frame_rate
         self.global_real_time_factor = global_real_time_factor
-        self.timeout = timeout
+        self.global_timeout = global_timeout
 
         self.launcher_path = Path(__file__).resolve().parent.parent
         self.log_path = Path(resolve_ros_package(str(log_directory)))
@@ -131,7 +131,7 @@ class ScenarioTestRunner(LifecycleController):
     def monitor_state(self):
         start = time.time()
 
-        while (time.time() - start) < self.timeout:
+        while (time.time() - start) < self.global_timeout:
             current_state = self.get_lifecycle_state()
             if current_state == 'inactive':
                 self.get_logger().info(
@@ -221,10 +221,13 @@ def main():
         help='Specify the scenario you want to execute.')
 
     parser.add_argument(
-        '-t', '--timeout',
+        '-t', '--global-timeout',
         type=int,
-        default=30,
-        help='Specify simulation time limit in seconds.  The default is 180 seconds.')
+        default=180,
+        help="Specify the simulation time limit. This time limit is independent "
+             "of the simulation playback speed determined by the option "
+             "real_time_factor. It also has nothing to do with OpenSCENARIO's "
+             "SimulationTimeCondition.")
 
     parser.add_argument(
         '-w', '--workflow',
@@ -239,8 +242,8 @@ def main():
     ScenarioTestRunner(
         global_frame_rate=args.global_frame_rate,
         global_real_time_factor=args.global_real_time_factor,
+        global_timeout=args.global_timeout,
         log_directory=args.log_directory,  # DEPRECATED
-        timeout=args.timeout,
         ).run_workflow(
             Path(resolve_ros_package(args.workflow)).resolve(),
             args.no_validation)
