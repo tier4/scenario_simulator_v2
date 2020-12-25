@@ -1,0 +1,131 @@
+[1mdiff --git a/test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py b/test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py[m
+[1mindex 6477f79..83c53a6 100755[m
+[1m--- a/test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py[m
+[1m+++ b/test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py[m
+[36m@@ -28,20 +28,23 @@[m [mdef generate_launch_description():[m
+ [m
+     log_directory = LaunchConfiguration('log_directory', default="/tmp")[m
+     no_validation = LaunchConfiguration('no_validation', default=False)[m
+[31m-    workflow      = LaunchConfiguration('workflow')[m
+[32m+[m[32m    workflow = LaunchConfiguration('workflow')[m
+ [m
+     port = 8080[m
+ [m
+     return LaunchDescription([[m
+ [m
+[31m-        DeclareLaunchArgument('log_directory',[m
+[32m+[m[32m        DeclareLaunchArgument([m
+[32m+[m[32m            'log_directory',[m
+             default_value=log_directory,[m
+             description='log_directory files for scenario testing'),[m
+ [m
+[31m-        DeclareLaunchArgument('no_validation',[m
+[32m+[m[32m        DeclareLaunchArgument([m
+[32m+[m[32m            'no_validation',[m
+             default_value=no_validation),[m
+ [m
+[31m-        DeclareLaunchArgument('workflow',[m
+[32m+[m[32m        DeclareLaunchArgument([m
+[32m+[m[32m            'workflow',[m
+             default_value=workflow,[m
+             description='workflow files for scenario testing'),[m
+ [m
+[36m@@ -100,98 +103,3 @@[m [mdef generate_launch_description():[m
+                 ],[m
+             ),[m
+         ])[m
+[31m-[m
+[31m-# def generate_launch_description():[m
+[31m-#     # workflow = LaunchConfiguration('workflow')[m
+[31m-#[m
+[31m-#     # declare_workflow = DeclareLaunchArgument([m
+[31m-#     #     'workflow',[m
+[31m-#     #     default_value=workflow,[m
+[31m-#     #     description='workflow files for scenario testing')[m
+[31m-#[m
+[31m-#     # log_directory = LaunchConfiguration('log_directory', default="/tmp")[m
+[31m-#[m
+[31m-#     # declare_log_directory = DeclareLaunchArgument([m
+[31m-#     #     'log_directory',[m
+[31m-#     #     default_value=log_directory,[m
+[31m-#     #     description='log_directory files for scenario testing')[m
+[31m-#[m
+[31m-#     # no_validation = LaunchConfiguration('no_validation', default=False)[m
+[31m-#[m
+[31m-#     # declare_no_validation = DeclareLaunchArgument([m
+[31m-#     #     'no_validation',[m
+[31m-#     #     default_value=no_validation[m
+[31m-#     #     )[m
+[31m-#[m
+[31m-#     # # NOTE: https://answers.ros.org/question/332829/no-stdout-logging-output-in-ros2-using-launch/[m
+[31m-#     # scenario_test_runner = Node([m
+[31m-#     #     package='scenario_test_runner',[m
+[31m-#     #     executable='scenario_test_runner',[m
+[31m-#     #     output={[m
+[31m-#     #         'stdout': 'screen',  # THIS OPTION NOT WORKS IF (< ROS2 ELOQUENT)[m
+[31m-#     #         'stderr': 'screen',[m
+[31m-#     #         },[m
+[31m-#     #     on_exit=Shutdown(),[m
+[31m-#     #     arguments=[[m
+[31m-#     #         "--log_directory", log_directory,[m
+[31m-#     #         "--no_validation", no_validation,[m
+[31m-#     #         "--workflow", workflow,[m
+[31m-#     #         ][m
+[31m-#     #     )[m
+[31m-#[m
+[31m-#     # port = 8080[m
+[31m-#[m
+[31m-#     # scenario_simulator = Node([m
+[31m-#     #     package='scenario_simulator',[m
+[31m-#     #     executable='scenario_simulator_node',[m
+[31m-#     #     name='scenario_simulator_node',[m
+[31m-#     #     output='log',[m
+[31m-#     #     parameters=[{[m
+[31m-#     #         'port': port,[m
+[31m-#     #         }],[m
+[31m-#     #     arguments=[('__log_level:=warn')],[m
+[31m-#     #     )[m
+[31m-#     #[m
+[31m-#     # openscenario_interpreter = LifecycleNode([m
+[31m-#     #     package='openscenario_interpreter',[m
+[31m-#     #     executable='openscenario_interpreter_node',[m
+[31m-#     #     name='openscenario_interpreter_node',[m
+[31m-#     #     output='screen',[m
+[31m-#     #     parameters=[{[m
+[31m-#     #         'map_path': os.path.join([m
+[31m-#     #             get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),[m
+[31m-#     #         'origin_latitude': 34.903555800615614,[m
+[31m-#     #         'origin_longitude': 139.93339979022568,[m
+[31m-#     #         'port': port,[m
+[31m-#     #         }][m
+[31m-#     #     )[m
+[31m-#[m
+[31m-#     # rviz2 = Node([m
+[31m-#     #     package='rviz2',[m
+[31m-#     #     executable='rviz2',[m
+[31m-#     #     name='rviz2',[m
+[31m-#     #     arguments=[[m
+[31m-#     #         '-d', os.path.join([m
+[31m-#     #             get_package_share_directory('simulation_api'), 'config/moc_test.rviz')[m
+[31m-#     #         ],[m
+[31m-#     #     output='log'[m
+[31m-#     #     )[m
+[31m-#[m
+[31m-#     # openscenario_visualization = Node([m
+[31m-#     #     package='openscenario_visualization',[m
+[31m-#     #     executable='openscenario_visualization_node',[m
+[31m-#     #     name='openscenario_visualization_node',[m
+[31m-#     #     output='log'[m
+[31m-#     #     )[m
+[31m-#[m
+[31m-#     description = LaunchDescription()[m
+[31m-#     description.add_action(declare_log_directory)[m
+[31m-#     description.add_action(declare_no_validation)[m
+[31m-#     description.add_action(declare_workflow)[m
+[31m-#     # description.add_action(openscenario_interpreter)[m
+[31m-#     # description.add_action(openscenario_visualization)[m
+[31m-#     # description.add_action(rviz2)[m
+[31m-#     # description.add_action(scenario_simulator)[m
+[31m-#     # description.add_action(scenario_test_runner)[m
+[31m-#[m
+[31m-#     return description[m
