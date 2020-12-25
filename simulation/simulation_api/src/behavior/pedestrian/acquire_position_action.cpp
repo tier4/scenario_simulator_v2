@@ -135,16 +135,14 @@ BT::NodeStatus AcquirePositionAction::tick()
       }
     }
     if (is_finded && next_lanelet_id) {
-      geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;
-      openscenario_msgs::msg::LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = next_lanelet_id.get();
-      lanelet_pose.s = new_s;
-      lanelet_pose.offset = entity_status.lanelet_pose.offset;
-      lanelet_pose.rpy = rpy;
       openscenario_msgs::msg::EntityStatus entity_status_updated;
       entity_status_updated.time = current_time + step_time;
-      entity_status_updated.lanelet_pose = lanelet_pose;
-      entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;
+      entity_status_updated.lanelet_pose.lanelet_id = next_lanelet_id.get();
+      entity_status_updated.lanelet_pose.s = new_s;
+      entity_status_updated.lanelet_pose.offset = entity_status.lanelet_pose.offset;
+      entity_status_updated.lanelet_pose.rpy = entity_status.lanelet_pose.rpy;
+      entity_status_updated.pose =
+        hdmap_utils->toMapPose(entity_status_updated.lanelet_pose).pose;
       entity_status_updated.action_status.twist = twist_new;
       entity_status_updated.action_status.accel = accel_new;
       setOutput("updated_status", entity_status_updated);

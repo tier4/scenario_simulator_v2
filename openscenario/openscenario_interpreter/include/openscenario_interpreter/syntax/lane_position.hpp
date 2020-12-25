@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_POSITION_HPP_
 
 #include <openscenario_interpreter/syntax/orientation.hpp>
+#include <openscenario_msgs/msg/lanelet_pose.hpp>
 
 namespace openscenario_interpreter
 {

@@ -59,13 +59,13 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     return Interpreter::Result::FAILURE;
   }
 
-  static constexpr auto real_time_factor = 10.0;
+  static constexpr auto real_time_factor = 3.0;
   VERBOSE("  real_time_factor: " << real_time_factor);
 
   connect(
     shared_from_this(),
     script.as<OpenScenario>().scope.logic_file.string(),
-    false);
+    true);
   VERBOSE("  connection established");
 
   initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);

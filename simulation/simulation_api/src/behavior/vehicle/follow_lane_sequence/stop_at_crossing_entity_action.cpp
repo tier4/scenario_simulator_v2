@@ -14,6 +14,7 @@
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <string>
 #include <vector>
@@ -29,6 +30,27 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
+
+const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
+{
+  if (!entity_status.lanelet_pose_valid) {
+    throw BehaviorTreeRuntimeError("failed to assign lane");
+  }
+  if (entity_status.action_status.twist.linear.x >= 0) {
+    openscenario_msgs::msg::WaypointsArray waypoints;
+    double horizon =
+      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    auto following_lanelets = hdmap_utils->getFollowingLanelets(
+      entity_status.lanelet_pose.lanelet_id,
+      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
+    waypoints.waypoints = spline.getTrajectory(entity_status.lanelet_pose.s,
+        entity_status.lanelet_pose.s + horizon, 1.0);
+    return waypoints;
+  } else {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
+}
 
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
   const std::vector<std::int64_t> & following_lanelets, double current_velocity)
@@ -64,6 +86,10 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     calculateTargetSpeed(following_lanelets, entity_status.action_status.twist.linear.x);
   if (!target_linear_speed) {
     setOutput("updated_status", calculateEntityStatusUpdated(0));
+    const auto waypoints = calculateWaypoints();
+    const auto obstacles = calculateObstacles(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacles", obstacles);
     return BT::NodeStatus::SUCCESS;
   }
   if (target_speed) {
@@ -74,6 +100,10 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     target_speed = target_linear_speed.get();
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+  const auto waypoints = calculateWaypoints();
+  const auto obstacles = calculateObstacles(waypoints);
+  setOutput("waypoints", waypoints);
+  setOutput("obstacles", obstacles);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

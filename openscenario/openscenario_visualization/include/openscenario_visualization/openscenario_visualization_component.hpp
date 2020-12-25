@@ -65,7 +65,7 @@ extern "C" {
 }  // extern "C"
 #endif
 
-#include <openscenario_msgs/msg/entity_status_array.hpp>
+#include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_api/color_utils/color_utils.hpp>
@@ -89,7 +89,8 @@ private:
    * @brief callback function when subscribe entity status array.
    * @param msg entity status array message from openscenario interpretor.
    */
-  void entityStatusCallback(const openscenario_msgs::msg::EntityStatusArray::SharedPtr msg);
+  void entityStatusCallback(
+    const openscenario_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);
   /**
    * @brief generate delete marker for target namespace.
    * @param ns namespace of the marker which you want to delete.
@@ -104,10 +105,12 @@ private:
   /**
    * @brief generate marker from entity status
    * @param status entity status message
+   * @param waypoints waypoints message
    * @return const visualization_msgs::msg::MarkerArray markers which describes entity bounding box and it's status.
    */
   const visualization_msgs::msg::MarkerArray generateMarker(
-    const openscenario_msgs::msg::EntityStatus & status);
+    const openscenario_msgs::msg::EntityStatus & status,
+    const openscenario_msgs::msg::WaypointsArray & waypoints);
   /**
    * @brief publisher of marker topic.
    */
@@ -115,7 +118,8 @@ private:
   /**
    * @brief subscriber of entity status array topic.
    */
-  rclcpp::Subscription<openscenario_msgs::msg::EntityStatusArray>::SharedPtr entity_status_sub_;
+  rclcpp::Subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>::SharedPtr
+    entity_status_sub_;
   /**
    * @brief buffers for generated markers.
    */

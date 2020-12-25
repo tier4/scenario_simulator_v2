@@ -101,7 +101,13 @@ public:
     std::int64_t from_lanelet_id, double from_s,
     std::int64_t to_lanelet_id, double to_s);
   double getSpeedLimit(std::vector<std::int64_t> lanelet_ids);
-  std::vector<std::int64_t> getFollowingLanelets(std::int64_t lanelet_id, double distance = 100);
+  std::vector<std::int64_t> getFollowingLanelets(
+    std::int64_t lanelet_id, double distance = 100,
+    bool include_self = true);
+  std::vector<std::int64_t> getFollowingLanelets(
+    std::int64_t lanelet_id,
+    std::vector<std::int64_t> candidate_lanelet_ids, double distance = 100,
+    bool include_self = true);
   std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::vector<std::int64_t> lanelet_ids);

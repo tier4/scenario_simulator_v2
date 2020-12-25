@@ -34,6 +34,13 @@ HermiteCurve::HermiteCurve(
 {}
 
 HermiteCurve::HermiteCurve(
+  const openscenario_msgs::msg::HermiteCurve & curve)
+: ax_(curve.ax), bx_(curve.bx), cx_(curve.cx), dx_(curve.dx),
+  ay_(curve.ax), by_(curve.by), cy_(curve.cy), dy_(curve.dy),
+  az_(curve.ax), bz_(curve.bz), cz_(curve.cz), dz_(curve.dz)
+{}
+
+HermiteCurve::HermiteCurve(
   geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
   geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec)
 {
@@ -51,6 +58,24 @@ HermiteCurve::HermiteCurve(
   bz_ = -3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z;
   cz_ = start_vec.z;
   dz_ = start_pose.position.z;
+}
+
+const openscenario_msgs::msg::HermiteCurve HermiteCurve::toRosMsg() const
+{
+  openscenario_msgs::msg::HermiteCurve curve;
+  curve.ax = ax_;
+  curve.bx = bx_;
+  curve.cx = cx_;
+  curve.dx = dx_;
+  curve.ay = ay_;
+  curve.by = by_;
+  curve.cy = cy_;
+  curve.dy = dy_;
+  curve.az = az_;
+  curve.bz = bz_;
+  curve.cz = cz_;
+  curve.dz = dz_;
+  return curve;
 }
 
 double HermiteCurve::getSquaredDistanceIn2D(
@@ -220,13 +245,36 @@ boost::optional<double> HermiteCurve::getSValue(
   return ret;
 }
 
-std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory() const
+const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
+  double start_s, double end_s,
+  double resolution, bool autoscale) const
+{
+  resolution = std::fabs(resolution);
+  if (start_s <= end_s) {
+    std::vector<geometry_msgs::msg::Point> ret;
+    double s = start_s;
+    while (s <= end_s) {
+      s = s + resolution;
+      ret.emplace_back(getPoint(s, autoscale));
+    }
+    return ret;
+  } else {
+    std::vector<geometry_msgs::msg::Point> ret;
+    double s = start_s;
+    while (s >= end_s) {
+      s = s - resolution;
+      ret.emplace_back(getPoint(s, autoscale));
+    }
+    return ret;
+  }
+}
+
+std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_points) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (int i = 0; i <= 100; i++) {
+  for (size_t i = 0; i <= num_points; i++) {
     double t = static_cast<double>(i) / 100.0;
-    geometry_msgs::msg::Point p = getPoint(t);
-    ret.push_back(p);
+    ret.emplace_back(getPoint(t, false));
   }
   return ret;
 }
@@ -282,9 +330,9 @@ double HermiteCurve::getMaximu2DCurvature() const
   return *std::max_element(curvatures.begin(), curvatures.end());
 }
 
-double HermiteCurve::getLength() const
+double HermiteCurve::getLength(size_t num_points) const
 {
-  auto trajectory = getTrajectory();
+  auto trajectory = getTrajectory(num_points);
   double ret = 0.0;
   for (size_t i = 0; i < trajectory.size() - 1; i++) {
     ret = ret + std::sqrt(std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +

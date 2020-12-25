@@ -17,9 +17,10 @@
 
 #include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
-
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
+
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -65,11 +66,15 @@ public:
   {
     return tree_ptr_->getCurrentAction();
   }
+  openscenario_msgs::msg::WaypointsArray getWaypoints()
+  {
+    return tree_ptr_->getWaypoints();
+  }
 
 private:
   std::shared_ptr<entity_behavior::vehicle::BehaviorTree> tree_ptr_;
   BT::NodeStatus action_status_;
-  entity_behavior::vehicle::LaneChangeParameter lane_change_params_;
+  std::int64_t to_lanelet_id_;
   boost::optional<double> target_speed_;
 };
 }  // namespace entity

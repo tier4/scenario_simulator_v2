@@ -95,7 +95,7 @@ class ScenarioTestRunner(LifecycleController):
                 expects.append(scenario['expect'])
 
             if 'step_time_ms' not in scenario:
-                step_times_ms.append(2)
+                step_times_ms.append(10)
             else:
                 step_times_ms.append(scenario['step_time_ms'])
 

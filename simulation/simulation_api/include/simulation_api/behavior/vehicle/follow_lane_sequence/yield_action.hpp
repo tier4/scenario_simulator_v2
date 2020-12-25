@@ -18,6 +18,8 @@
 #include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
 
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
+
 #include <string>
 #include <vector>
 
@@ -42,6 +44,7 @@ public:
     return ports;
   }
   boost::optional<double> calculateTargetSpeed(std::vector<std::int64_t> following_lanelets);
+  const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

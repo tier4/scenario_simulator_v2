@@ -9,11 +9,17 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/BoundingBox.msg
   msg/EntityType.msg
   msg/EntityStatus.msg
-  msg/EntityStatusArray.msg
   msg/LaneletPose.msg
   msg/LaneletPoseAndStatus.msg
   msg/MapPoseAndStatus.msg
   msg/ActionStatus.msg
+  msg/HermiteCurve.msg
+  msg/CatmullRomSpline.msg
+  msg/EntityTrajectory.msg
+  msg/WaypointsArray.msg
+  msg/EntityStatusWithTrajectory.msg
+  msg/EntityStatusWithTrajectoryArray.msg
+  msg/Obstacle.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 
