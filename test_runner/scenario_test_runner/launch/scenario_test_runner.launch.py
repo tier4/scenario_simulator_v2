@@ -28,25 +28,17 @@ def generate_launch_description():
 
     log_directory = LaunchConfiguration('log_directory', default="/tmp")
     no_validation = LaunchConfiguration('no_validation', default=False)
+    real_time_factor = LaunchConfiguration('real-time-factor', default=1.0)
     workflow = LaunchConfiguration('workflow')
 
     port = 8080
 
     return LaunchDescription([
 
-        DeclareLaunchArgument(
-            'log_directory',
-            default_value=log_directory,
-            description='log_directory files for scenario testing'),
-
-        DeclareLaunchArgument(
-            'no_validation',
-            default_value=no_validation),
-
-        DeclareLaunchArgument(
-            'workflow',
-            default_value=workflow,
-            description='workflow files for scenario testing'),
+        DeclareLaunchArgument('log_directory', default_value=log_directory),
+        DeclareLaunchArgument('no_validation', default_value=no_validation),
+        DeclareLaunchArgument('real-time-factor', default_value=real_time_factor),
+        DeclareLaunchArgument('workflow', default_value=workflow),
 
         Node(
             package='scenario_test_runner',
@@ -57,7 +49,8 @@ def generate_launch_description():
             arguments=[
                 '--log_directory', log_directory,
                 '--no_validation', no_validation,
-                '--workflow',      workflow,
+                '--real-time-factor', real_time_factor,
+                '--workflow', workflow,
                 ],
             ),
 

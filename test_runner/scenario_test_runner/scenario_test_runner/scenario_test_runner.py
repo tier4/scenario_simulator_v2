@@ -177,42 +177,39 @@ class ScenarioTestRunner(LifecycleController):
 def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
-    parser.add_argument(
-        '-t', '--timeout',
-        type=int,
-        default=30,
-        help='Specify simulation time limit in seconds.  The default is 180 seconds.',
-        )
-
-    # parser.add_argument(
-    #     '--log',
-    #     default='screen',
-    #     help='Specify the type of log output.',
-    #     )
-
-    parser.add_argument(
-        '-s', '--scenario',
-        help='Specify the scenario you want to execute.',
-        )
-
-    parser.add_argument(
-        '-w', '--workflow',
-        type=str,
-        help='Specify workflow you want to execute.',
-        )
-
-    parser.add_argument(
+    parser.add_argument(  # Deprecated
         '--log_directory',
         type=Path,
         default=Path('/tmp'),
-        help='Specify log_directory you want to execute.',
-        )
+        help='Specify log_directory you want to execute.')
 
     parser.add_argument(
         '--no_validation',
         default=False,
-        help='Disable validation to generated scenarios.',
-        )
+        help='Disable validation to generated scenarios.')
+
+    parser.add_argument(
+        '--real-time-factor',
+        default=1.0,
+        help="Specify the ratio of simulation time to real time. If you set a " \
+             "value greater than 1, the simulation will be faster than in " \
+             "reality, and if you set a value less than 1, the simulation will " \
+             "be slower than in reality.")
+
+    parser.add_argument(
+        '-s', '--scenario',
+        help='Specify the scenario you want to execute.')
+
+    parser.add_argument(
+        '-t', '--timeout',
+        type=int,
+        default=30,
+        help='Specify simulation time limit in seconds.  The default is 180 seconds.')
+
+    parser.add_argument(
+        '-w', '--workflow',
+        type=str,
+        help='Specify workflow you want to execute.')
 
     parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
     parser.add_argument('-r', nargs='*')  # XXX DIRTY HACK
