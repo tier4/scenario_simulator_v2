@@ -74,6 +74,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     false);
   VERBOSE("  connection established");
 
+  // XXX ???
   initialize(real_time_factor, (1 / frame_rate) * real_time_factor);
   VERBOSE("  simulator initialized");
 
@@ -88,7 +89,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 
   timer = create_wall_timer(
     std::chrono::milliseconds(
-      static_cast<unsigned int>(1 / frame_rate * 1000)),
+      static_cast<unsigned int>(1 / frame_rate * 1000)),  // XXX ???
     [this]()
     {
       guard(

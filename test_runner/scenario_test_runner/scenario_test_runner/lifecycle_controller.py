@@ -119,7 +119,6 @@ class LifecycleController(Node):
             scenario: str,
             ):
         """Configure node to chagnge state from unconfigure to inactive."""
-
         self.current_scenario = scenario
 
         while not self.send_request_to_change_parameters(
