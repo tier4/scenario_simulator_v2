@@ -131,8 +131,11 @@ class ScenarioTestRunner(LifecycleController):
     def monitor_state(self):
         start = time.time()
 
-        while (time.time() - start) < self.global_timeout:
+        while (time.time() - start) < self.global_timeout \
+                if self.global_timeout is not None else True:
+
             current_state = self.get_lifecycle_state()
+
             if current_state == 'inactive':
                 self.get_logger().info(
                     "Simulator normally transitioned to the inactive state.")
@@ -222,7 +225,6 @@ def main():
 
     parser.add_argument(
         '-t', '--global-timeout',
-        type=int,
         default=180,
         help="Specify the simulation time limit. This time limit is independent "
              "of the simulation playback speed determined by the option "
