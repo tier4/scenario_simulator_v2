@@ -41,7 +41,12 @@ class ScenarioTestRunner(LifecycleController):
 
     SLEEP_RATE = 1
 
-    def __init__(self, timeout: int, log_directory: Path):
+    def __init__(
+            self,  # Arguments are alphabetically sorted
+            log_directory: Path,  # DEPRECATED
+            global_real_time_factor: float,
+            timeout: int,  # [sec]
+            ):
         """
         Initialize the class ScenarioTestRunner.
 
@@ -61,10 +66,13 @@ class ScenarioTestRunner(LifecycleController):
 
         """
         self.timeout = timeout
+        self.global_real_time_factor = global_real_time_factor
+
         self.launcher_path = Path(__file__).resolve().parent.parent
+        self.log_path = Path(resolve_ros_package(str(log_directory)))
+
         self.xosc_scenarios = []
         self.xosc_step_time_ms = []
-        self.log_path = Path(resolve_ros_package(str(log_directory)))
 
     def run_workflow(self, path: Path, no_validation):
         """
@@ -156,10 +164,11 @@ class ScenarioTestRunner(LifecycleController):
                 "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
 
             self.configure_node(
-                scenario,
-                self.xosc_expects[index],
-                self.xosc_step_time_ms[index],
-                str(self.log_path))
+                expect=self.xosc_expects[index],
+                log_path=str(self.log_path),
+                scenario=scenario,
+                step_time_ms=self.xosc_step_time_ms[index],
+                )
 
             if self.get_lifecycle_state() == 'unconfigured':
                 self.get_logger().error("Failed to configure interpreter")
@@ -177,7 +186,7 @@ class ScenarioTestRunner(LifecycleController):
 def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
-    parser.add_argument(  # Deprecated
+    parser.add_argument(  # DEPRECATED
         '--log_directory',
         type=Path,
         default=Path('/tmp'),
@@ -189,11 +198,11 @@ def main():
         help='Disable validation to generated scenarios.')
 
     parser.add_argument(
-        '--real-time-factor',
+        '--global-real-time-factor',
         default=1.0,
-        help="Specify the ratio of simulation time to real time. If you set a " \
-             "value greater than 1, the simulation will be faster than in " \
-             "reality, and if you set a value less than 1, the simulation will " \
+        help="Specify the ratio of simulation time to real time. If you set a "
+             "value greater than 1, the simulation will be faster than in "
+             "reality, and if you set a value less than 1, the simulation will "
              "be slower than in reality.")
 
     parser.add_argument(
@@ -216,10 +225,13 @@ def main():
 
     args = parser.parse_args()
 
-    ScenarioTestRunner(args.timeout,
-                       args.log_directory).run_workflow(
-        Path(resolve_ros_package(args.workflow)).resolve(),
-        args.no_validation)
+    ScenarioTestRunner(
+        log_directory=args.log_directory,  # DEPRECATED
+        global_real_time_factor=args.global_real_time_factor,
+        timeout=args.timeout,
+        ).run_workflow(
+            Path(resolve_ros_package(args.workflow)).resolve(),
+            args.no_validation)
 
     rclpy.shutdown()
 

@@ -26,18 +26,18 @@ from launch_ros.actions import LifecycleNode, Node
 
 def generate_launch_description():
 
+    global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     log_directory = LaunchConfiguration('log_directory', default="/tmp")
     no_validation = LaunchConfiguration('no_validation', default=False)
-    real_time_factor = LaunchConfiguration('real-time-factor', default=1.0)
     workflow = LaunchConfiguration('workflow')
 
     port = 8080
 
     return LaunchDescription([
 
+        DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
         DeclareLaunchArgument('log_directory', default_value=log_directory),
         DeclareLaunchArgument('no_validation', default_value=no_validation),
-        DeclareLaunchArgument('real-time-factor', default_value=real_time_factor),
         DeclareLaunchArgument('workflow', default_value=workflow),
 
         Node(
@@ -47,9 +47,9 @@ def generate_launch_description():
             output='screen',
             on_exit=Shutdown(),
             arguments=[
+                '--global-real-time-factor', global_real_time_factor,
                 '--log_directory', log_directory,
                 '--no_validation', no_validation,
-                '--real-time-factor', real_time_factor,
                 '--workflow', workflow,
                 ],
             ),
@@ -82,14 +82,20 @@ def generate_launch_description():
             package='openscenario_visualization',
             executable='openscenario_visualization_node',
             name='openscenario_visualization_node',
-            output='log',
+            output={
+                'stderr': 'log',
+                'stdout': 'log',
+                },
             ),
 
         Node(
             package='rviz2',
             executable='rviz2',
             name='rviz2',
-            output='log',
+            output={
+                'stderr': 'log',
+                'stdout': 'log',
+                },
             arguments=[
                 '-d', os.path.join(
                     get_package_share_directory('simulation_api'), 'config/moc_test.rviz')

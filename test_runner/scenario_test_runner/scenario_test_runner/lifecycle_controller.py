@@ -97,20 +97,23 @@ class LifecycleController(Node):
         rclpy.spin_until_future_complete(self, future)
         return future
 
-    def configure_node(self, scenario, expect, step_time_ms, log_path):
+    def configure_node(
+            self,  # Arguments are alphabetically sorted
+            expect,
+            log_path,
+            scenario,
+            step_time_ms,
+            ):
         """Configure node to chagnge state from unconfigure to inactive."""
-        # self.get_logger().info(self.get_lifecycle_state())
 
         self.current_scenario = scenario
-        # Logger.print_process(
-        #     "Set value '" +
-        #     self.current_scenario +
-        #     "' to " +
-        #     LifecycleController.NODE_NAME +
-        #     "'s parameter 'scenario'")
 
         while not self.send_request_to_change_parameters(
-                self.current_scenario, expect, step_time_ms, log_path).done():
+                self.current_scenario,
+                expect,
+                step_time_ms,
+                log_path
+                ).done():
             self.get_logger().info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
