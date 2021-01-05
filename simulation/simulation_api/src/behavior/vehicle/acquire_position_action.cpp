@@ -73,7 +73,6 @@ BT::NodeStatus AcquirePositionAction::tick()
     target_lanelet_pose_ = boost::none;
     return BT::NodeStatus::FAILURE;
   }
-
   route_ = hdmap_utils->getRoute(
     entity_status.lanelet_pose.lanelet_id,
     target_lanelet_pose_->lanelet_id);
@@ -103,6 +102,9 @@ BT::NodeStatus AcquirePositionAction::tick()
     {
       target_speed = 0;
     }
+  }
+  if (getRightOfWayEntities(following_lanelets).size() != 0) {
+    return BT::NodeStatus::FAILURE;
   }
   auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get(), route_);
   setOutput("updated_status", entity_status_updated);
