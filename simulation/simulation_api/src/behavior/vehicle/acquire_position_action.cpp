@@ -78,19 +78,8 @@ BT::NodeStatus AcquirePositionAction::tick()
     entity_status.lanelet_pose.lanelet_id,
     target_lanelet_pose_->lanelet_id);
   std::vector<std::int64_t> following_lanelets;
-  bool is_finded = false;
-  for (auto itr = route_.begin(); itr != route_.end(); itr++) {
-    if (is_finded) {
-      if (following_lanelets.size() <= 3) {
-        following_lanelets.push_back(*itr);
-      }
-    } else {
-      if (entity_status.lanelet_pose.lanelet_id == *itr) {
-        following_lanelets.push_back(*itr);
-        is_finded = true;
-      }
-    }
-  }
+  following_lanelets = hdmap_utils->getFollowingLanelets(
+    entity_status.lanelet_pose.lanelet_id, route_);
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
