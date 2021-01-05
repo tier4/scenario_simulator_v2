@@ -24,6 +24,6 @@ RUN rm google-chrome-stable_current_amd64.deb
 
 USER ubuntu
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
-RUN source /opt/ros/foxy/setup.bash && colcon build --symlink-install
+RUN source /opt/ros/foxy/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 USER root
