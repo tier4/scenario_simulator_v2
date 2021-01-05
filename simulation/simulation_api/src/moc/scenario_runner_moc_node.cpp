@@ -69,7 +69,6 @@ public:
       simulation_api::helper::constractLaneletPose(34606, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
-
     api_.requestAcquirePosition(
       "ego",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );

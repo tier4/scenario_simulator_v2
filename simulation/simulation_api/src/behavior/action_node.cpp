@@ -201,7 +201,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     }
   }
   if (dists.size() != 0) {
-    auto iter = std::max_element(dists.begin(), dists.end());
+    auto iter = std::min_element(dists.begin(), dists.end());
     size_t index = std::distance(dists.begin(), iter);
     double stop_s = collision_points[index].second;
     std::int64_t stop_lanelet_id = collision_points[index].first;
@@ -217,7 +217,6 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     auto dist_to_stop_target = hdmap_utils->getLongitudinalDistance(
       entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s,
       stop_target_status.lanelet_pose.lanelet_id, stop_target_status.lanelet_pose.s);
-    std::cout << "distance to conflicting entity : " << dist_to_stop_target.get() << std::endl;
     return dist_to_stop_target;
   }
   return boost::none;
