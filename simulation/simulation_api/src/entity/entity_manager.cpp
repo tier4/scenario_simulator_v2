@@ -442,6 +442,8 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
+  std::chrono::system_clock::time_point start, end;
+  start = std::chrono::system_clock::now();
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
   }
@@ -527,6 +529,11 @@ void EntityManager::update(double current_time, double step_time)
     status_array_msg.data.emplace_back(status_with_traj);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
+  end = std::chrono::system_clock::now();
+  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  if (verbose_) {
+    std::cout << "elapsed " << elapsed/1000 << " secands in update function." << std::endl;
+  }
 }
 
 void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform)
