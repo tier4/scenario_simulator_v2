@@ -173,6 +173,10 @@ public:
     int duration_try_in_msec = 1000);
   XmlRpc::XmlRpcValue updateFrame();
   double getCurrentTime() const {return current_time_;}
+  const boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose) const;
+  const geometry_msgs::msg::Pose toMapPose(const openscenario_msgs::msg::LaneletPose lanelet_pose)
+  const;
 
 private:
   bool spawn(

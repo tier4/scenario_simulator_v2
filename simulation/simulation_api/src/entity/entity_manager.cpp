@@ -384,6 +384,25 @@ const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::str
   throw simulation_api::SimulationRuntimeError("error occurs while getting bounding box : " + name);
 }
 
+openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string name)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw simulation_api::SimulationRuntimeError(
+            "error occurs while getting trajectory : " + name);
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<VehicleEntity &>(it->second).getWaypoints();
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
+  throw simulation_api::SimulationRuntimeError("error occurs while getting bounding box : " + name);
+}
+
 bool EntityManager::entityStatusSetted(std::string name) const
 {
   auto it = entities_.find(name);
@@ -478,8 +497,9 @@ void EntityManager::update(double current_time, double step_time)
     }
   }
   auto entity_type_list = getEntityTypeList();
-  openscenario_msgs::msg::EntityStatusArray status_array_msg;
+  openscenario_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & status : all_status) {
+    openscenario_msgs::msg::EntityStatusWithTrajectory status_with_traj;
     auto status_msg = status.second;
     status_msg.name = status.first;
     status_msg.bounding_box = getBoundingBox(status.first);
@@ -495,7 +515,11 @@ void EntityManager::update(double current_time, double step_time)
         status_msg.type.type = status_msg.type.PEDESTRIAN;
         break;
     }
-    status_array_msg.status.emplace_back(status_msg);
+    status_with_traj.waypoint = getWaypoints(status.first);
+    status_with_traj.status = status_msg;
+    status_with_traj.name = status.first;
+    status_with_traj.time = current_time + step_time;
+    status_array_msg.data.emplace_back(status_with_traj);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
 }

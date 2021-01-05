@@ -36,6 +36,12 @@ void VehicleActionNode::getBlackBoardValues()
   }
 }
 
+const std::vector<openscenario_msgs::msg::Obstacle> VehicleActionNode::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
+
 openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed,
   const std::vector<std::int64_t> & following_lanelets)

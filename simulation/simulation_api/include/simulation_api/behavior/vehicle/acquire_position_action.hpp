@@ -19,6 +19,7 @@
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
 
 #include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/behavior_tree.h>
@@ -51,6 +52,7 @@ public:
     return ports;
   }
   void getBlackBoardValues();
+  const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
 
 private:
   std::vector<std::int64_t> route_;

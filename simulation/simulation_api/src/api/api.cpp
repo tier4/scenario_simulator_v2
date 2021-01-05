@@ -25,6 +25,19 @@ void API::setVerbose(bool verbose)
   entity_manager_ptr_->setVerbose(verbose);
 }
 
+const boost::optional<openscenario_msgs::msg::LaneletPose> API::toLaneletPose(
+  geometry_msgs::msg::Pose pose) const
+{
+  return entity_manager_ptr_->toLaneletPose(pose);
+}
+
+const geometry_msgs::msg::Pose API::toMapPose(
+  const openscenario_msgs::msg::LaneletPose lanelet_pose)
+const
+{
+  return entity_manager_ptr_->toMapPose(lanelet_pose);
+}
+
 bool API::spawn(
   bool is_ego,
   std::string catalog_xml,

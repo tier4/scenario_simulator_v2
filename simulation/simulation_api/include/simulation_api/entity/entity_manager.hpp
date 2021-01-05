@@ -21,7 +21,7 @@
 #include <simulation_api/entity/exception.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
-#include <openscenario_msgs/msg/entity_status_array.hpp>
+#include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
@@ -123,7 +123,7 @@ public:
         options);
     const rclcpp::QoS & entity_marker_qos = EntityMarkerQos();
     entity_status_array_pub_ptr_ =
-      rclcpp::create_publisher<openscenario_msgs::msg::EntityStatusArray>(node,
+      rclcpp::create_publisher<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(node,
         "entity/status", entity_marker_qos,
         options);
     visualization_msgs::msg::MarkerArray markers;
@@ -147,6 +147,7 @@ public:
   void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, Direction direction);
+  openscenario_msgs::msg::WaypointsArray getWaypoints(std::string name);
   boost::optional<double> getLongitudinalDistance(
     std::string from, std::string to,
     double max_distance = 100);
@@ -186,7 +187,7 @@ public:
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-  rclcpp::Publisher<openscenario_msgs::msg::EntityStatusArray>::SharedPtr
+  rclcpp::Publisher<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>::SharedPtr
     entity_status_array_pub_ptr_;
   rclcpp::Publisher<autoware_auto_msgs::msg::VehicleKinematicState>::SharedPtr
     kinematic_state_pub_ptr_;

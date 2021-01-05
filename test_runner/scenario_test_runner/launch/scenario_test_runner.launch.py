@@ -28,8 +28,8 @@ def generate_launch_description():
 
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
-    log_directory = LaunchConfiguration('log_directory', default="/tmp")
-    no_validation = LaunchConfiguration('no_validation', default=False)
+    log_directory = LaunchConfiguration('log_directory', default="/tmp")  # DEPRECATED
+    no_validation = LaunchConfiguration('no_validation', default=False)  # DEPRECATED
     workflow = LaunchConfiguration('workflow')
 
     port = 8080
@@ -38,8 +38,8 @@ def generate_launch_description():
 
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
         DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
-        DeclareLaunchArgument('log_directory', default_value=log_directory),
-        DeclareLaunchArgument('no_validation', default_value=no_validation),
+        DeclareLaunchArgument('log_directory', default_value=log_directory),  # DEPRECATED
+        DeclareLaunchArgument('no_validation', default_value=no_validation),  # DEPRECATED
         DeclareLaunchArgument('workflow', default_value=workflow),
 
         Node(

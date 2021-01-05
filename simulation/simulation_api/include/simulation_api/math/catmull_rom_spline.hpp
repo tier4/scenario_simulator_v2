@@ -15,6 +15,9 @@
 #define SIMULATION_API__MATH__CATMULL_ROM_SPLINE_HPP_
 
 #include <simulation_api/math/hermite_curve.hpp>
+
+#include <openscenario_msgs/msg/catmull_rom_spline.hpp>
+
 #include <geometry_msgs/msg/point.hpp>
 
 #include <vector>
@@ -38,6 +41,8 @@ public:
 class CatmullRomSpline
 {
 public:
+  explicit CatmullRomSpline(openscenario_msgs::msg::CatmullRomSpline spline);
+  explicit CatmullRomSpline(std::vector<openscenario_msgs::msg::HermiteCurve> hermite_curves);
   explicit CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points);
   double getLength() const {return total_length_;}
   double getMaximum2DCurventure() const;
@@ -45,6 +50,9 @@ public:
   const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
   const geometry_msgs::msg::Pose getPose(double s) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(int num_points) const;
+  const std::vector<geometry_msgs::msg::Point> getTrajectory(
+    double start_s, double end_s,
+    double resolution) const;
   boost::optional<double> getSValue(
     geometry_msgs::msg::Point position,
     double threadhold_distance = 3.0,
@@ -62,6 +70,7 @@ public:
     std::vector<geometry_msgs::msg::Point> polygon,
     bool search_backward = false
   ) const;
+  const openscenario_msgs::msg::CatmullRomSpline toRosMsg() const;
 
 private:
   double getSInSplineCurve(size_t curve_index, double s) const;

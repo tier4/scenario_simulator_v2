@@ -225,7 +225,7 @@ def main():
 
     parser.add_argument(
         '-t', '--global-timeout',
-        default=180,
+        default=30,
         help="Specify the simulation time limit. This time limit is independent "
              "of the simulation playback speed determined by the option "
              "real_time_factor. It also has nothing to do with OpenSCENARIO's "

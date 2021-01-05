@@ -18,6 +18,8 @@
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
 
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
+
 #include <string>
 
 namespace entity_behavior
@@ -40,6 +42,7 @@ public:
     }
     return ports;
   }
+  const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

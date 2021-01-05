@@ -14,6 +14,7 @@
 
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <string>
 #include <vector>
@@ -31,6 +32,27 @@ StopAtStopLineAction::StopAtStopLineAction(
 : entity_behavior::VehicleActionNode(name, config)
 {
   stopped_ = false;
+}
+
+const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
+{
+  if (!entity_status.lanelet_pose_valid) {
+    throw BehaviorTreeRuntimeError("failed to assign lane");
+  }
+  if (entity_status.action_status.twist.linear.x >= 0) {
+    openscenario_msgs::msg::WaypointsArray waypoints;
+    double horizon =
+      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+    auto following_lanelets = hdmap_utils->getFollowingLanelets(
+      entity_status.lanelet_pose.lanelet_id,
+      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
+    waypoints.waypoints = spline.getTrajectory(entity_status.lanelet_pose.s,
+        entity_status.lanelet_pose.s + horizon, 1.0);
+    return waypoints;
+  } else {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
 }
 
 boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
@@ -79,9 +101,17 @@ BT::NodeStatus StopAtStopLineAction::tick()
     if (!dist_to_stopline) {
       stopped_ = false;
       setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+      const auto waypoints = calculateWaypoints();
+      const auto obstacles = calculateObstacles(waypoints);
+      setOutput("waypoints", waypoints);
+      setOutput("obstacles", obstacles);
       return BT::NodeStatus::SUCCESS;
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
+    const auto waypoints = calculateWaypoints();
+    const auto obstacles = calculateObstacles(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacles", obstacles);
     return BT::NodeStatus::RUNNING;
   }
   auto target_linear_speed =
@@ -99,6 +129,10 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   stopped_ = false;
+  const auto waypoints = calculateWaypoints();
+  const auto obstacles = calculateObstacles(waypoints);
+  setOutput("waypoints", waypoints);
+  setOutput("obstacles", obstacles);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

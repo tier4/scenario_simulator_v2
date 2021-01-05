@@ -18,6 +18,7 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
 #include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/bt_factory.h>
@@ -52,6 +53,12 @@ public:
     openscenario_msgs::msg::EntityStatus status;
     tree_.rootBlackboard()->get("updated_status", status);
     return status;
+  }
+  openscenario_msgs::msg::WaypointsArray getWaypoints()
+  {
+    openscenario_msgs::msg::WaypointsArray waypoints;
+    tree_.rootBlackboard()->get("waypoints", waypoints);
+    return waypoints;
   }
   void setRequest(std::string request);
 
