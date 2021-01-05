@@ -33,7 +33,8 @@ VehicleEntity::VehicleEntity(
   parameters(xml)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
@@ -44,7 +45,8 @@ VehicleEntity::VehicleEntity(
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
@@ -53,7 +55,8 @@ VehicleEntity::VehicleEntity(std::string name, const pugi::xml_node & xml)
   parameters(xml)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
@@ -62,7 +65,8 @@ VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 

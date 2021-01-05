@@ -393,8 +393,9 @@ bool API::reachPosition(
   if (!entity_manager_ptr_->entityStatusSetted(name)) {
     return false;
   }
-  return entity_manager_ptr_->reachPosition(name,
-           target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
+  return entity_manager_ptr_->reachPosition(
+    name,
+    target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
 }
 
 boost::optional<double> API::getStandStillDuration(std::string name) const
@@ -531,8 +532,9 @@ openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
     }
     return status;
   }
-  throw(scenario_simulator::ExecutionFailedError("coordinate does not match, coordinate : " +
-        coordinate));
+  throw(scenario_simulator::ExecutionFailedError(
+          "coordinate does not match, coordinate : " +
+          coordinate));
 }
 XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
 {

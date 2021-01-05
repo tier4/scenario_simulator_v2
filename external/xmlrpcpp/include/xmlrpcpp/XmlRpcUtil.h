@@ -25,98 +25,100 @@ namespace XmlRpc
 {
 
 //! An interface allowing custom handling of error message reporting.
-class XmlRpcErrorHandler
-{
+  class XmlRpcErrorHandler
+  {
 public:
-  virtual ~XmlRpcErrorHandler() {}
+    virtual ~XmlRpcErrorHandler() {
+    }
 
-  //! Returns a pointer to the currently installed error handling object.
-  static XmlRpcErrorHandler * getErrorHandler()
-  {return _errorHandler;}
+    //! Returns a pointer to the currently installed error handling object.
+    static XmlRpcErrorHandler * getErrorHandler()
+    {return _errorHandler;}
 
-  //! Specifies the error handler.
-  static void setErrorHandler(XmlRpcErrorHandler * eh)
-  {_errorHandler = eh;}
+    //! Specifies the error handler.
+    static void setErrorHandler(XmlRpcErrorHandler * eh)
+    {_errorHandler = eh;}
 
-  //! Report an error. Custom error handlers should define this method.
-  virtual void error(const char * msg) = 0;
+    //! Report an error. Custom error handlers should define this method.
+    virtual void error(const char * msg) = 0;
 
 protected:
-  static XMLRPCPP_DECL XmlRpcErrorHandler * _errorHandler;
-};
+    static XMLRPCPP_DECL XmlRpcErrorHandler * _errorHandler;
+  };
 
 //! An interface allowing custom handling of informational message reporting.
-class XmlRpcLogHandler
-{
+  class XmlRpcLogHandler
+  {
 public:
-  virtual ~XmlRpcLogHandler() {}
+    virtual ~XmlRpcLogHandler() {
+    }
 
-  //! Returns a pointer to the currently installed message reporting object.
-  static XmlRpcLogHandler * getLogHandler()
-  {return _logHandler;}
+    //! Returns a pointer to the currently installed message reporting object.
+    static XmlRpcLogHandler * getLogHandler()
+    {return _logHandler;}
 
-  //! Specifies the message handler.
-  static void setLogHandler(XmlRpcLogHandler * lh)
-  {_logHandler = lh;}
+    //! Specifies the message handler.
+    static void setLogHandler(XmlRpcLogHandler * lh)
+    {_logHandler = lh;}
 
-  //! Returns the level of verbosity of informational messages. 0 is no output, 5 is very verbose.
-  static int getVerbosity()
-  {return _verbosity;}
+    //! Returns the level of verbosity of informational messages. 0 is no output, 5 is very verbose.
+    static int getVerbosity()
+    {return _verbosity;}
 
-  //! Specify the level of verbosity of informational messages. 0 is no output, 5 is very verbose.
-  static void setVerbosity(int v)
-  {_verbosity = v;}
+    //! Specify the level of verbosity of informational messages. 0 is no output, 5 is very verbose.
+    static void setVerbosity(int v)
+    {_verbosity = v;}
 
-  //! Output a message. Custom error handlers should define this method.
-  virtual void log(int level, const char * msg) = 0;
+    //! Output a message. Custom error handlers should define this method.
+    virtual void log(int level, const char * msg) = 0;
 
 protected:
-  static XMLRPCPP_DECL XmlRpcLogHandler * _logHandler;
-  static XMLRPCPP_DECL int _verbosity;
-};
+    static XMLRPCPP_DECL XmlRpcLogHandler * _logHandler;
+    static XMLRPCPP_DECL int _verbosity;
+  };
 
 //! Returns log message verbosity. This is short for XmlRpcLogHandler::getVerbosity()
-XMLRPCPP_DECL int getVerbosity();
+  XMLRPCPP_DECL int getVerbosity();
 //! Sets log message verbosity. This is short for XmlRpcLogHandler::setVerbosity(level)
-XMLRPCPP_DECL void setVerbosity(int level);
+  XMLRPCPP_DECL void setVerbosity(int level);
 
 //! Version identifier
-extern XMLRPCPP_DECL const char XMLRPC_VERSION[];
+  extern XMLRPCPP_DECL const char XMLRPC_VERSION[];
 
 //! Utilities for XML parsing, encoding, and decoding and message handlers.
-class XMLRPCPP_DECL XmlRpcUtil
-{
+  class XMLRPCPP_DECL XmlRpcUtil
+  {
 public:
-  // hokey xml parsing
-  //! Returns contents between <tag> and </tag>, updates offset to char after </tag>
-  static std::string parseTag(const char * tag, std::string const & xml, int * offset);
+    // hokey xml parsing
+    //! Returns contents between <tag> and </tag>, updates offset to char after </tag>
+    static std::string parseTag(const char * tag, std::string const & xml, int * offset);
 
-  //! Returns true if the tag is found and updates offset to the char after the tag
-  static bool findTag(const char * tag, std::string const & xml, int * offset);
+    //! Returns true if the tag is found and updates offset to the char after the tag
+    static bool findTag(const char * tag, std::string const & xml, int * offset);
 
-  //! Returns the next tag and updates offset to the char after the tag, or empty string
-  //! if the next non-whitespace character is not '<'
-  static std::string getNextTag(std::string const & xml, int * offset);
+    //! Returns the next tag and updates offset to the char after the tag, or empty string
+    //! if the next non-whitespace character is not '<'
+    static std::string getNextTag(std::string const & xml, int * offset);
 
-  //! Returns true if the tag is found at the specified offset (modulo any whitespace)
-  //! and updates offset to the char after the tag
-  static bool nextTagIs(const char * tag, std::string const & xml, int * offset);
-
-
-  //! Convert raw text to encoded xml.
-  static std::string xmlEncode(const std::string & raw);
-
-  //! Convert encoded xml to raw text
-  static std::string xmlDecode(const std::string & encoded);
+    //! Returns true if the tag is found at the specified offset (modulo any whitespace)
+    //! and updates offset to the char after the tag
+    static bool nextTagIs(const char * tag, std::string const & xml, int * offset);
 
 
-  //! Dump messages somewhere
-  static void log(int level, const char * fmt, ...);
+    //! Convert raw text to encoded xml.
+    static std::string xmlEncode(const std::string & raw);
 
-  //! Dump error messages somewhere
-  static void error(const char * fmt, ...);
+    //! Convert encoded xml to raw text
+    static std::string xmlDecode(const std::string & encoded);
 
-};
+
+    //! Dump messages somewhere
+    static void log(int level, const char * fmt, ...);
+
+    //! Dump error messages somewhere
+    static void error(const char * fmt, ...);
+
+  };
 } // namespace XmlRpc
 
 #endif // _XMLRPCUTIL_H_

@@ -47,8 +47,9 @@ const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWayp
       entity_status.lanelet_pose.lanelet_id,
       horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
     simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
-    waypoints.waypoints = spline.getTrajectory(entity_status.lanelet_pose.s,
-        entity_status.lanelet_pose.s + horizon, 1.0);
+    waypoints.waypoints = spline.getTrajectory(
+      entity_status.lanelet_pose.s,
+      entity_status.lanelet_pose.s + horizon, 1.0);
     return waypoints;
   } else {
     return openscenario_msgs::msg::WaypointsArray();
@@ -81,8 +82,9 @@ BT::NodeStatus StopAtStopLineAction::tick()
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id,
-      50);
+  auto following_lanelets = hdmap_utils->getFollowingLanelets(
+    entity_status.lanelet_pose.lanelet_id,
+    50);
   if (getRightOfWayEntities(following_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }

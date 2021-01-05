@@ -114,24 +114,28 @@ public:
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
     lanelet_marker_pub_ptr_ = rclcpp::create_publisher
-      <visualization_msgs::msg::MarkerArray>(node,
-        "lanelet/marker", qos,
-        options);
+      <visualization_msgs::msg::MarkerArray>(
+      node,
+      "lanelet/marker", qos,
+      options);
     kinematic_state_pub_ptr_ = rclcpp::create_publisher
-      <autoware_auto_msgs::msg::VehicleKinematicState>(node,
-        "output/kinematic_state", qos,
-        options);
+      <autoware_auto_msgs::msg::VehicleKinematicState>(
+      node,
+      "output/kinematic_state", qos,
+      options);
     const rclcpp::QoS & entity_marker_qos = EntityMarkerQos();
     entity_status_array_pub_ptr_ =
-      rclcpp::create_publisher<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(node,
-        "entity/status", entity_marker_qos,
-        options);
+      rclcpp::create_publisher<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
+      node,
+      "entity/status", entity_marker_qos,
+      options);
     visualization_msgs::msg::MarkerArray markers;
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
 
     hdmap_marker_timer_ =
-      node->create_wall_timer(std::chrono::seconds(1),
-        std::bind(&EntityManager::updateHdmapMarker, this));
+      node->create_wall_timer(
+      std::chrono::seconds(1),
+      std::bind(&EntityManager::updateHdmapMarker, this));
   }
   ~EntityManager() {}
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;

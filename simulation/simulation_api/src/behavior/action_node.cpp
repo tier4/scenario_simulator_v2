@@ -181,17 +181,20 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
 {
   auto conflicting_entity_status = getConflictingEntityStatus(following_lanelets);
   if (!conflicting_entity_status) {
+    std::cout << "no conflicting entity" << std::endl;
     return boost::none;
   }
   std::vector<double> dists;
   std::vector<std::pair<int, double>> collision_points;
   for (const auto & lanelet_id : following_lanelets) {
-    auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id,
-        conflicting_entity_status->lanelet_pose.lanelet_id);
+    auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(
+      lanelet_id,
+      conflicting_entity_status->lanelet_pose.lanelet_id);
     if (stop_position_s) {
-      auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose.lanelet_id,
-          entity_status.lanelet_pose.s,
-          lanelet_id, stop_position_s.get());
+      auto dist = hdmap_utils->getLongitudinalDistance(
+        entity_status.lanelet_pose.lanelet_id,
+        entity_status.lanelet_pose.s,
+        lanelet_id, stop_position_s.get());
       if (dist) {
         dists.push_back(dist.get());
         collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
@@ -215,8 +218,10 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     auto dist_to_stop_target = hdmap_utils->getLongitudinalDistance(
       entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s,
       stop_target_status.lanelet_pose.lanelet_id, stop_target_status.lanelet_pose.s);
+    std::cout << "distance to conflicting entity : " << dist_to_stop_target.get() << std::endl;
     return dist_to_stop_target;
   }
+  std::cout << "no conflicting entity" << std::endl;
   return boost::none;
 }
 
@@ -226,8 +231,9 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
   for (const auto & status : other_entity_status) {
-    if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-      status.second.lanelet_pose.lanelet_id) >= 1)
+    if (std::count(
+        conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        status.second.lanelet_pose.lanelet_id) >= 1)
     {
       conflicting_entity_status.push_back(status.second);
     }
@@ -236,12 +242,14 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
   std::vector<std::pair<int, double>> collision_points;
   for (const auto & status : conflicting_entity_status) {
     for (const auto & lanelet_id : following_lanelets) {
-      auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id,
-          status.lanelet_pose.lanelet_id);
+      auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(
+        lanelet_id,
+        status.lanelet_pose.lanelet_id);
       if (stop_position_s) {
-        auto dist = hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose.lanelet_id,
-            entity_status.lanelet_pose.s,
-            lanelet_id, stop_position_s.get());
+        auto dist = hdmap_utils->getLongitudinalDistance(
+          entity_status.lanelet_pose.lanelet_id,
+          entity_status.lanelet_pose.s,
+          lanelet_id, stop_position_s.get());
         if (dist) {
           dists.push_back(dist.get());
           collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
@@ -275,8 +283,9 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   for (const auto & status : other_entity_status) {
-    if (std::count(conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-      status.second.lanelet_pose.lanelet_id) >= 1)
+    if (std::count(
+        conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        status.second.lanelet_pose.lanelet_id) >= 1)
     {
       return true;
     }

@@ -14,64 +14,64 @@ For details, see http://sourceforge.net/projects/libb64
 
 namespace base64
 {
-extern "C"
-{
+  extern "C"
+  {
                 #include "cencode.h"
-}
-
-struct XMLRPCPP_DECL encoder
-{
-  base64_encodestate _state;
-  int _buffersize;
-
-  encoder(int buffersize_in = 512)
-  : _buffersize(buffersize_in)
-  {
-    base64_init_encodestate(&_state);
   }
 
-  int encode(char value_in)
+  struct XMLRPCPP_DECL encoder
   {
-    return base64_encode_value(value_in);
-  }
+    base64_encodestate _state;
+    int _buffersize;
 
-  int encode(const char * code_in, const int length_in, char * plaintext_out)
-  {
-    return base64_encode_block(code_in, length_in, plaintext_out, &_state);
-  }
+    encoder(int buffersize_in = 512)
+      : _buffersize(buffersize_in)
+    {
+      base64_init_encodestate(&_state);
+    }
 
-  int encode_end(char * plaintext_out)
-  {
-    return base64_encode_blockend(plaintext_out, &_state);
-  }
+    int encode(char value_in)
+    {
+      return base64_encode_value(value_in);
+    }
 
-  void encode(std::istream & istream_in, std::ostream & ostream_in)
-  {
-    base64_init_encodestate(&_state);
-    //
-    const int N = _buffersize;
-    char * plaintext = new char[N];
-    char * code = new char[2 * N];
-    int plainlength;
-    int codelength;
+    int encode(const char * code_in, const int length_in, char * plaintext_out)
+    {
+      return base64_encode_block(code_in, length_in, plaintext_out, &_state);
+    }
 
-    do {
-      istream_in.read(plaintext, N);
-      plainlength = istream_in.gcount();
+    int encode_end(char * plaintext_out)
+    {
+      return base64_encode_blockend(plaintext_out, &_state);
+    }
+
+    void encode(std::istream & istream_in, std::ostream & ostream_in)
+    {
+      base64_init_encodestate(&_state);
       //
-      codelength = encode(plaintext, plainlength, code);
+      const int N = _buffersize;
+      char * plaintext = new char[N];
+      char * code = new char[2 * N];
+      int plainlength;
+      int codelength;
+
+      do {
+        istream_in.read(plaintext, N);
+        plainlength = istream_in.gcount();
+        //
+        codelength = encode(plaintext, plainlength, code);
+        ostream_in.write(code, codelength);
+      } while (istream_in.good() && plainlength > 0);
+
+      codelength = encode_end(code);
       ostream_in.write(code, codelength);
-    } while (istream_in.good() && plainlength > 0);
+      //
+      base64_init_encodestate(&_state);
 
-    codelength = encode_end(code);
-    ostream_in.write(code, codelength);
-    //
-    base64_init_encodestate(&_state);
-
-    delete[] code;
-    delete[] plaintext;
-  }
-};
+      delete[] code;
+      delete[] plaintext;
+    }
+  };
 
 } // namespace base64
 
