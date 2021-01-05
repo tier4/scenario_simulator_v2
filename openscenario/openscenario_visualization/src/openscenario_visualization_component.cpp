@@ -333,14 +333,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     ret.markers.push_back(waypoints_marker);
   } else {
     waypoints_marker.action = waypoints_marker.ADD;
-    // waypoints_marker.points = waypoints.waypoints;
-    for (const auto waypoint : waypoints.waypoints) {
-      geometry_msgs::msg::Point p;
-      p.x = -waypoint.x;
-      p.y = -waypoint.y;
-      p.z = -waypoint.z;
-      waypoints_marker.points.emplace_back(p);
-    }
+    waypoints_marker.points = waypoints.waypoints;
     waypoints_marker.color = color;
     waypoints_marker.type = waypoints_marker.LINE_STRIP;
     waypoints_marker.colors =
