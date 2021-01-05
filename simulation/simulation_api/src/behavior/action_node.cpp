@@ -181,7 +181,6 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
 {
   auto conflicting_entity_status = getConflictingEntityStatus(following_lanelets);
   if (!conflicting_entity_status) {
-    std::cout << "no conflicting entity" << std::endl;
     return boost::none;
   }
   std::vector<double> dists;
@@ -221,7 +220,6 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     std::cout << "distance to conflicting entity : " << dist_to_stop_target.get() << std::endl;
     return dist_to_stop_target;
   }
-  std::cout << "no conflicting entity" << std::endl;
   return boost::none;
 }
 
