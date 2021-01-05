@@ -364,7 +364,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
       ret.push_back(lanelet_id);
       continue;
     }
-    auto ids = getNextLaneletIds(lanelet_id);
+    const auto ids = getNextLaneletIds(lanelet_id);
     if (ids.size() != 0) {
       lanelet_id = ids[0];
       total_dist = total_dist + getLaneletLength(lanelet_id);
