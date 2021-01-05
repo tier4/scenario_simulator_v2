@@ -49,8 +49,9 @@ BT::NodeStatus AcquirePositionAction::tick()
   }
 
   if (!target_lanelet_pose_) {
-    route_ = hdmap_utils->getRoute(entity_status.lanelet_pose.lanelet_id,
-        target_lanelet_pose_->lanelet_id);
+    route_ = hdmap_utils->getRoute(
+      entity_status.lanelet_pose.lanelet_id,
+      target_lanelet_pose_->lanelet_id);
   }
 
   if (!target_speed) {

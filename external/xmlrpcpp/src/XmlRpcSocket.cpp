@@ -204,14 +204,16 @@ XmlRpcSocket::connect(int fd, const std::string & host, int port)
   if (0 != getaddr_err) {
 #if !defined(_WINDOWS)
     if (getaddr_err == EAI_SYSTEM) {
-      XmlRpcUtil::error("Couldn't find an %s address for [%s]: %s\n",
+      XmlRpcUtil::error(
+        "Couldn't find an %s address for [%s]: %s\n",
         s_use_ipv6_ ? "AF_INET6" : "AF_INET",
         host.c_str(), XmlRpcSocket::getErrorMsg().c_str());
     } else {
 #else
     {
 #endif
-      XmlRpcUtil::error("Couldn't find an %s address for [%s]: %s\n",
+      XmlRpcUtil::error(
+        "Couldn't find an %s address for [%s]: %s\n",
         s_use_ipv6_ ? "AF_INET6" : "AF_INET", host.c_str(), gai_strerror(
           getaddr_err));
     }
@@ -244,7 +246,8 @@ XmlRpcSocket::connect(int fd, const std::string & host, int port)
 
       char buf[128];
       // TODO IPV6: check if this also works under Windows
-      XmlRpcUtil::log(5, "found ipv6 host as %s\n",
+      XmlRpcUtil::log(
+        5, "found ipv6 host as %s\n",
         inet_ntop(AF_INET6, (void *)&(address->sin6_addr), buf, sizeof(buf)));
       found = true;
       break;
@@ -253,7 +256,8 @@ XmlRpcSocket::connect(int fd, const std::string & host, int port)
   }
 
   if (!found) {
-    XmlRpcUtil::error("Couldn't find an %s address for [%s]\n",
+    XmlRpcUtil::error(
+      "Couldn't find an %s address for [%s]\n",
       s_use_ipv6_ ? "AF_INET6" : "AF_INET", host.c_str());
     freeaddrinfo(addr);
     return false;

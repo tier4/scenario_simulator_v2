@@ -39,8 +39,9 @@ bool checkCollision2D(
   geometry_msgs::msg::Pose pose1, openscenario_msgs::msg::BoundingBox bbox1)
 {
   double z_diff_pose =
-    std::fabs((pose0.position.z + bbox0.center.z) -
-      (pose1.position.z + bbox1.center.z));
+    std::fabs(
+    (pose0.position.z + bbox0.center.z) -
+    (pose1.position.z + bbox1.center.z));
   if (z_diff_pose > (std::fabs(bbox0.dimensions.z + bbox1.dimensions.z) * 0.5) ) {
     return false;
   }

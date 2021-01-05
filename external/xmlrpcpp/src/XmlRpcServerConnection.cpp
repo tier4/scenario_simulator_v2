@@ -78,7 +78,8 @@ XmlRpcServerConnection::readHeader()
   if (!XmlRpcSocket::nbRead(this->getfd(), _header, &eof)) {
     // Its only an error if we already have read some data
     if (_header.length() > 0) {
-      XmlRpcUtil::error("XmlRpcServerConnection::readHeader: error while reading header (%s).",
+      XmlRpcUtil::error(
+        "XmlRpcServerConnection::readHeader: error while reading header (%s).",
         XmlRpcSocket::getErrorMsg().c_str());
     }
     return false;
@@ -125,12 +126,14 @@ XmlRpcServerConnection::readHeader()
 
   _contentLength = atoi(lp);
   if (_contentLength <= 0) {
-    XmlRpcUtil::error("XmlRpcServerConnection::readHeader: Invalid Content-length specified (%d).",
+    XmlRpcUtil::error(
+      "XmlRpcServerConnection::readHeader: Invalid Content-length specified (%d).",
       _contentLength);
     return false;
   }
 
-  XmlRpcUtil::log(3, "XmlRpcServerConnection::readHeader: specified content length is %d.",
+  XmlRpcUtil::log(
+    3, "XmlRpcServerConnection::readHeader: specified content length is %d.",
     _contentLength);
 
   // Otherwise copy non-header data to request buffer and set state to read request.
@@ -162,7 +165,8 @@ XmlRpcServerConnection::readRequest()
   if (int(_request.length()) < _contentLength) {
     bool eof;
     if (!XmlRpcSocket::nbRead(this->getfd(), _request, &eof)) {
-      XmlRpcUtil::error("XmlRpcServerConnection::readRequest: read error (%s).",
+      XmlRpcUtil::error(
+        "XmlRpcServerConnection::readRequest: read error (%s).",
         XmlRpcSocket::getErrorMsg().c_str());
       return false;
     }
@@ -201,11 +205,13 @@ XmlRpcServerConnection::writeResponse()
 
   // Try to write the response
   if (!XmlRpcSocket::nbWrite(this->getfd(), _response, &_bytesWritten)) {
-    XmlRpcUtil::error("XmlRpcServerConnection::writeResponse: write error (%s).",
+    XmlRpcUtil::error(
+      "XmlRpcServerConnection::writeResponse: write error (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
-  XmlRpcUtil::log(3, "XmlRpcServerConnection::writeResponse: wrote %d of %d bytes.", _bytesWritten,
+  XmlRpcUtil::log(
+    3, "XmlRpcServerConnection::writeResponse: wrote %d of %d bytes.", _bytesWritten,
     _response.length());
 
   // Prepare to read the next request
@@ -225,7 +231,8 @@ XmlRpcServerConnection::executeRequest()
 {
   XmlRpcValue params, resultValue;
   std::string methodName = parseRequest(params);
-  XmlRpcUtil::log(2, "XmlRpcServerConnection::executeRequest: server calling method '%s'",
+  XmlRpcUtil::log(
+    2, "XmlRpcServerConnection::executeRequest: server calling method '%s'",
     methodName.c_str());
 
   try {
@@ -239,7 +246,8 @@ XmlRpcServerConnection::executeRequest()
     }
 
   } catch (const XmlRpcException & fault) {
-    XmlRpcUtil::log(2, "XmlRpcServerConnection::executeRequest: fault %s.",
+    XmlRpcUtil::log(
+      2, "XmlRpcServerConnection::executeRequest: fault %s.",
       fault.getMessage().c_str());
     generateFaultResponse(fault.getMessage(), fault.getCode());
   }

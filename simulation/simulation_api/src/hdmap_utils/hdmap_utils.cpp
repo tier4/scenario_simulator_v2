@@ -64,15 +64,19 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
   }
   overwriteLaneletsCenterline();
   traffic_rules_vehicle_ptr_ =
-    lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany,
-      lanelet::Participants::Vehicle);
-  vehicle_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_,
-      *traffic_rules_vehicle_ptr_);
+    lanelet::traffic_rules::TrafficRulesFactory::create(
+    lanelet::Locations::Germany,
+    lanelet::Participants::Vehicle);
+  vehicle_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(
+    *lanelet_map_ptr_,
+    *traffic_rules_vehicle_ptr_);
   traffic_rules_pedestrian_ptr_ =
-    lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany,
-      lanelet::Participants::Pedestrian);
-  pedestrian_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_,
-      *traffic_rules_pedestrian_ptr_);
+    lanelet::traffic_rules::TrafficRulesFactory::create(
+    lanelet::Locations::Germany,
+    lanelet::Participants::Pedestrian);
+  pedestrian_routing_graph_ptr_ = lanelet::routing::RoutingGraph::build(
+    *lanelet_map_ptr_,
+    *traffic_rules_pedestrian_ptr_);
   std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
   all_graphs.push_back(vehicle_routing_graph_ptr_);
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
@@ -214,8 +218,9 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   }
   auto pose_on_centerline = spline.getPose(s.get());
   auto rpy =
-    quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
-        pose_on_centerline.orientation, pose.orientation));
+    quaternion_operation::convertQuaternionToEulerAngle(
+    quaternion_operation::getRotation(
+      pose_on_centerline.orientation, pose.orientation));
   double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
   openscenario_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
@@ -352,6 +357,13 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     ret.push_back(lanelet_id);
   }
   while (total_dist < distance) {
+    const auto straight_ids = getNextLaneletIds(lanelet_id, "straight");
+    if (straight_ids.size() != 0) {
+      lanelet_id = straight_ids[0];
+      total_dist = total_dist + getLaneletLength(lanelet_id);
+      ret.push_back(lanelet_id);
+      continue;
+    }
     auto ids = getNextLaneletIds(lanelet_id);
     if (ids.size() != 0) {
       lanelet_id = ids[0];
@@ -372,9 +384,10 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   std::vector<std::int64_t> ret;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  lanelet::Optional<lanelet::routing::Route> route = vehicle_routing_graph_ptr_->getRoute(lanelet,
-      to_lanelet, 0,
-      true);
+  lanelet::Optional<lanelet::routing::Route> route = vehicle_routing_graph_ptr_->getRoute(
+    lanelet,
+    to_lanelet, 0,
+    true);
   if (!route) {
     return ret;
   }
@@ -487,9 +500,10 @@ double HdMapUtils::getTrajectoryLength(std::vector<geometry_msgs::msg::Point> tr
 {
   double ret = 0.0;
   for (size_t i = 0; i < trajectory.size() - 1; i++) {
-    ret = ret + std::sqrt(std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
-        std::pow(trajectory[i + 1].y - trajectory[i].y, 2) +
-        std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
+    ret = ret + std::sqrt(
+      std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
+      std::pow(trajectory[i + 1].y - trajectory[i].y, 2) +
+      std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
   }
   return ret;
 }
@@ -506,9 +520,10 @@ boost::optional<std::pair<simulation_api::math::HermiteCurve,
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
     double start_to_goal_dist =
-      std::sqrt(std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
-        std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
-        std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
+      std::sqrt(
+      std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
+      std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
+      std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
     auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
     if (traj) {
       if (traj->getMaximu2DCurvature() < 1.0) {
@@ -608,8 +623,9 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   openscenario_msgs::msg::LaneletPose lanlet_pose)
 {
-  return toMapPose(lanlet_pose.lanelet_id, lanlet_pose.s, lanlet_pose.offset,
-           quaternion_operation::convertEulerAngleToQuaternion(lanlet_pose.rpy));
+  return toMapPose(
+    lanlet_pose.lanelet_id, lanlet_pose.s, lanlet_pose.offset,
+    quaternion_operation::convertEulerAngleToQuaternion(lanlet_pose.rpy));
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
@@ -658,20 +674,18 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
       return to_s - from_s;
     }
   }
-  // double dist_from = getLaneletLength(from_lanelet_id) - from_s;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  lanelet::Optional<lanelet::routing::Route> route = vehicle_routing_graph_ptr_->getRoute(lanelet,
-      to_lanelet, 0,
-      true);
+  lanelet::Optional<lanelet::routing::Route> route = vehicle_routing_graph_ptr_->getRoute(
+    lanelet,
+    to_lanelet, 0,
+    true);
   if (!route) {
-    // std::cout << "failed to get route" << std::endl;
     return boost::none;
   }
   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
   double dist = 0.0;
   if (shortest_path.empty()) {
-    // std::cout << "failed to find shortest path" << std::endl;
     return boost::none;
   }
   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
@@ -745,8 +759,9 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
       road_lanelets, cl_ll_borders, true));
   insertMarkerArray(
     markers,
-    lanelet::visualization::laneletsAsTriangleMarkerArray("road_lanelets",
-    road_lanelets, cl_road));
+    lanelet::visualization::laneletsAsTriangleMarkerArray(
+      "road_lanelets",
+      road_lanelets, cl_road));
   insertMarkerArray(
     markers, lanelet::visualization::laneletsAsTriangleMarkerArray(
       "crosswalk_lanelets", crosswalk_lanelets, cl_cross));
@@ -907,9 +922,11 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
     double intersection_s = 0;
     for (size_t point_index = 0; point_index < (center_lines.size() - 1); point_index++) {
       bg::model::linestring<bg_point> center_line_bg =
-        boost::assign::list_of<bg_point>(center_lines[point_index].x,
-          center_lines[point_index].y)(center_lines[point_index + 1].x,
-          center_lines[point_index + 1].y);
+        boost::assign::list_of<bg_point>(
+        center_lines[point_index].x,
+        center_lines[point_index].y)(
+        center_lines[point_index + 1].x,
+        center_lines[point_index + 1].y);
       std::set<double> s_values_in_segment;
       for (const auto & stop_line : stop_lines) {
         for (size_t i = 0; i < (stop_line.size() - 1); i++) {
@@ -920,15 +937,18 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
           std::vector<bg_point> result;
           bg::intersection(center_line_bg, stop_line_bg, result);
           if (result.size() != 0) {
-            s_values_in_segment.insert(std::hypot(result[0].x() - center_lines[point_index].x,
-              result[0].y() - center_lines[point_index].y));
+            s_values_in_segment.insert(
+              std::hypot(
+                result[0].x() - center_lines[point_index].x,
+                result[0].y() - center_lines[point_index].y));
           }
         }
       }
       if (s_values_in_segment.size() == 0) {
         intersection_s = intersection_s +
-          std::hypot(center_lines[point_index + 1].x - center_lines[point_index].x,
-            center_lines[point_index + 1].y - center_lines[point_index].y);
+          std::hypot(
+          center_lines[point_index + 1].x - center_lines[point_index].x,
+          center_lines[point_index + 1].y - center_lines[point_index].y);
       } else {
         intersection_s = intersection_s + *s_values_in_segment.begin();
         intersection_found = true;

@@ -105,7 +105,8 @@ struct ClearFlagOnExit
 bool
 XmlRpcClient::execute(const char * method, XmlRpcValue const & params, XmlRpcValue & result)
 {
-  XmlRpcUtil::log(1, "XmlRpcClient::execute: method %s (_connectionState %s).", method, connectionStateStr(
+  XmlRpcUtil::log(
+    1, "XmlRpcClient::execute: method %s (_connectionState %s).", method, connectionStateStr(
       _connectionState));
 
   // This is not a thread-safe operation, if you want to do multithreading, use separate
@@ -149,7 +150,8 @@ XmlRpcClient::execute(const char * method, XmlRpcValue const & params, XmlRpcVal
 bool
 XmlRpcClient::executeNonBlock(const char * method, XmlRpcValue const & params)
 {
-  XmlRpcUtil::log(1, "XmlRpcClient::executeNonBlock: method %s (_connectionState %s).", method, connectionStateStr(
+  XmlRpcUtil::log(
+    1, "XmlRpcClient::executeNonBlock: method %s (_connectionState %s).", method, connectionStateStr(
       _connectionState));
 
   // This is not a thread-safe operation, if you want to do multithreading, use separate
@@ -206,10 +208,12 @@ XmlRpcClient::handleEvent(unsigned eventType)
 {
   if (eventType == XmlRpcDispatch::Exception) {
     if (_connectionState == WRITE_REQUEST && _bytesWritten == 0) {
-      XmlRpcUtil::error("Error in XmlRpcClient::handleEvent: could not connect to server (%s).",
+      XmlRpcUtil::error(
+        "Error in XmlRpcClient::handleEvent: could not connect to server (%s).",
         XmlRpcSocket::getErrorMsg().c_str());
     } else {
-      XmlRpcUtil::error("Error in XmlRpcClient::handleEvent (state %s): %s.",
+      XmlRpcUtil::error(
+        "Error in XmlRpcClient::handleEvent (state %s): %s.",
         connectionStateStr(_connectionState),
         XmlRpcSocket::getErrorMsg().c_str());
     }
@@ -265,7 +269,8 @@ XmlRpcClient::doConnect()
 {
   int fd = XmlRpcSocket::socket();
   if (fd < 0) {
-    XmlRpcUtil::error("Error in XmlRpcClient::doConnect: Could not create socket (%s).",
+    XmlRpcUtil::error(
+      "Error in XmlRpcClient::doConnect: Could not create socket (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
@@ -284,7 +289,8 @@ XmlRpcClient::doConnect()
 
   if (!XmlRpcSocket::connect(fd, _host, _port)) {
     this->close();
-    XmlRpcUtil::error("Error in XmlRpcClient::doConnect: Could not connect to server (%s).",
+    XmlRpcUtil::error(
+      "Error in XmlRpcClient::doConnect: Could not connect to server (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
@@ -320,7 +326,8 @@ XmlRpcClient::generateRequest(const char * methodName, XmlRpcValue const & param
   body += REQUEST_END;
 
   std::string header = generateHeader(body.length());
-  XmlRpcUtil::log(4, "XmlRpcClient::generateRequest: header is %d bytes, content-length is %d.",
+  XmlRpcUtil::log(
+    4, "XmlRpcClient::generateRequest: header is %d bytes, content-length is %d.",
     header.length(), body.length());
 
   _request = header + body;
@@ -353,20 +360,23 @@ bool
 XmlRpcClient::writeRequest()
 {
   if (_bytesWritten == 0) {
-    XmlRpcUtil::log(5, "XmlRpcClient::writeRequest (attempt %d):\n%s\n", _sendAttempts + 1,
+    XmlRpcUtil::log(
+      5, "XmlRpcClient::writeRequest (attempt %d):\n%s\n", _sendAttempts + 1,
       _request.c_str());
   }
 
   // Try to write the request
   if (!XmlRpcSocket::nbWrite(this->getfd(), _request, &_bytesWritten)) {
-    XmlRpcUtil::error("Error in XmlRpcClient::writeRequest: write error (%s).",
+    XmlRpcUtil::error(
+      "Error in XmlRpcClient::writeRequest: write error (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     // If the write fails, we had an unrecoverable error. Close the socket.
     close();
     return false;
   }
 
-  XmlRpcUtil::log(3, "XmlRpcClient::writeRequest: wrote %d of %d bytes.", _bytesWritten,
+  XmlRpcUtil::log(
+    3, "XmlRpcClient::writeRequest: wrote %d of %d bytes.", _bytesWritten,
     _request.length());
 
   // Wait for the result
@@ -403,7 +413,8 @@ XmlRpcClient::readHeader()
       return setupConnection();
     }
 
-    XmlRpcUtil::error("Error in XmlRpcClient::readHeader: error while reading "
+    XmlRpcUtil::error(
+      "Error in XmlRpcClient::readHeader: error while reading "
       "header (%s) on fd %d.",
       XmlRpcSocket::getErrorMsg().c_str(), getfd());
     // Read failed; this means the socket is in an unrecoverable state.
@@ -450,7 +461,8 @@ XmlRpcClient::readHeader()
 
   _contentLength = atoi(lp);
   if (_contentLength <= 0) {
-    XmlRpcUtil::error("Error in XmlRpcClient::readHeader: Invalid Content-length specified (%d).",
+    XmlRpcUtil::error(
+      "Error in XmlRpcClient::readHeader: Invalid Content-length specified (%d).",
       _contentLength);
     // Close the socket because we can't make further use of it.
     close();
@@ -474,7 +486,8 @@ XmlRpcClient::readResponse()
   if (int(_response.length()) < _contentLength) {
     std::string buff;
     if (!XmlRpcSocket::nbRead(this->getfd(), buff, &_eof)) {
-      XmlRpcUtil::error("Error in XmlRpcClient::readResponse: read error (%s).",
+      XmlRpcUtil::error(
+        "Error in XmlRpcClient::readResponse: read error (%s).",
         XmlRpcSocket::getErrorMsg().c_str());
       // nbRead returned an error, indicating that the socket is in a bad state.
       // close it and stop monitoring this client.

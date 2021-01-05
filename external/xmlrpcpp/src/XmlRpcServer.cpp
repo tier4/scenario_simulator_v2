@@ -111,7 +111,8 @@ XmlRpcServer::bindAndListen(int port, int backlog /*= 5*/)
 {
   int fd = XmlRpcSocket::socket();
   if (fd < 0) {
-    XmlRpcUtil::error("XmlRpcServer::bindAndListen: Could not create socket (%s).",
+    XmlRpcUtil::error(
+      "XmlRpcServer::bindAndListen: Could not create socket (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
@@ -130,7 +131,8 @@ XmlRpcServer::bindAndListen(int port, int backlog /*= 5*/)
   // Allow this port to be re-bound immediately so server re-starts are not delayed
   if (!XmlRpcSocket::setReuseAddr(fd)) {
     this->close();
-    XmlRpcUtil::error("XmlRpcServer::bindAndListen: Could not set SO_REUSEADDR socket option (%s).",
+    XmlRpcUtil::error(
+      "XmlRpcServer::bindAndListen: Could not set SO_REUSEADDR socket option (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
@@ -138,7 +140,8 @@ XmlRpcServer::bindAndListen(int port, int backlog /*= 5*/)
   // Bind to the specified port on the default interface
   if (!XmlRpcSocket::bind(fd, port)) {
     this->close();
-    XmlRpcUtil::error("XmlRpcServer::bindAndListen: Could not bind to specified port (%s).",
+    XmlRpcUtil::error(
+      "XmlRpcServer::bindAndListen: Could not bind to specified port (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
@@ -146,7 +149,8 @@ XmlRpcServer::bindAndListen(int port, int backlog /*= 5*/)
   // Set in listening mode
   if (!XmlRpcSocket::listen(fd, backlog)) {
     this->close();
-    XmlRpcUtil::error("XmlRpcServer::bindAndListen: Could not set socket in listening mode (%s).",
+    XmlRpcUtil::error(
+      "XmlRpcServer::bindAndListen: Could not set socket in listening mode (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
     return false;
   }
@@ -192,7 +196,8 @@ XmlRpcServer::acceptConnection()
   XmlRpcUtil::log(2, "XmlRpcServer::acceptConnection: socket %d", s);
   if (s < 0) {
     //this->close();
-    XmlRpcUtil::error("XmlRpcServer::acceptConnection: Could not accept connection (%s).",
+    XmlRpcUtil::error(
+      "XmlRpcServer::acceptConnection: Could not accept connection (%s).",
       XmlRpcSocket::getErrorMsg().c_str());
 
     // Note that there was an accept error; retry in 1 second
@@ -252,7 +257,8 @@ bool XmlRpcServer::enoughFreeFDs()
     } else {
       // poll() may fail if interrupted, if the pollfds array is a bad pointer,
       // if nfds exceeds RLIMIT_NOFILE, or if the system is out of memory.
-      XmlRpcUtil::error("XmlRpcServer::enoughFreeFDs: poll() failed: %s",
+      XmlRpcUtil::error(
+        "XmlRpcServer::enoughFreeFDs: poll() failed: %s",
         strerror(errno));
     }
   } else {
@@ -260,7 +266,8 @@ bool XmlRpcServer::enoughFreeFDs()
     // resource is invalid or the second argument is invalid. I'm not sure
     // either of these can actually fail in this code, but it's better to
     // check.
-    XmlRpcUtil::error("XmlRpcServer::enoughFreeFDs: Could not get open file "
+    XmlRpcUtil::error(
+      "XmlRpcServer::enoughFreeFDs: Could not get open file "
       "limit, getrlimit() failed: %s", strerror(errno));
   }
 

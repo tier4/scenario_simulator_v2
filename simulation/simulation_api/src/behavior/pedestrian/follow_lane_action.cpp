@@ -41,7 +41,8 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {
-    setOutput("updated_status",
+    setOutput(
+      "updated_status",
       calculateEntityStatusUpdatedInWorldFrame(entity_status.action_status.twist.linear.x));
     return BT::NodeStatus::RUNNING;
   }

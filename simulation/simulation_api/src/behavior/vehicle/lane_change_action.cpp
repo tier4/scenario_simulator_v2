@@ -59,7 +59,8 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
       waypoints.waypoints = straight_waypoints;
       const auto curve_waypoints = curve_->getTrajectory(current_s_, l, 1.0, true);
       waypoints.waypoints = curve_waypoints;
-      std::copy(straight_waypoints.begin(), straight_waypoints.end(),
+      std::copy(
+        straight_waypoints.begin(), straight_waypoints.end(),
         std::back_inserter(waypoints.waypoints));
     }
     return waypoints;
@@ -94,8 +95,9 @@ BT::NodeStatus LaneChangeAction::tick()
   }
   if (!curve_) {
     if (request == "lane_change") {
-      if (!hdmap_utils->canChangeLane(entity_status.lanelet_pose.lanelet_id,
-        to_lanelet_id_.get()))
+      if (!hdmap_utils->canChangeLane(
+          entity_status.lanelet_pose.lanelet_id,
+          to_lanelet_id_.get()))
       {
         return BT::NodeStatus::FAILURE;
       }
