@@ -72,7 +72,7 @@ VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
 
 void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
-  tree_ptr_->setRequest("acquire_position");
+  // tree_ptr_->setRequest("acquire_position");
   tree_ptr_->setValueToBlackBoard("target_lanelet_pose", lanelet_pose);
 }
 

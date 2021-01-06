@@ -35,7 +35,9 @@ public:
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {};
+    BT::PortsList ports = {
+      BT::InputPort<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose")
+    };
     BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
