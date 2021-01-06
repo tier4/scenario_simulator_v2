@@ -36,14 +36,10 @@ const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoint
     throw BehaviorTreeRuntimeError("failed to assign lane");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
-    if (!following_lanelets_) {
-      return openscenario_msgs::msg::WaypointsArray();
-    }
     openscenario_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(
-        following_lanelets_.get()));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s,
       entity_status.lanelet_pose.s + horizon, 1.0);
@@ -71,40 +67,12 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {
-    following_lanelets_ = boost::none;
     setOutput(
       "updated_status",
       calculateEntityStatusUpdatedInWorldFrame(entity_status.action_status.twist.linear.x));
     return BT::NodeStatus::RUNNING;
   }
-  std::vector<std::int64_t> following_lanelets;
-  if (!target_lanelet_pose_) {
-    following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
-      50);
-  } else {
-    if (!route_) {
-      route_ = hdmap_utils->getRoute(
-        entity_status.lanelet_pose.lanelet_id,
-        target_lanelet_pose_->lanelet_id);
-    } else if (!hdmap_utils->isInRoute(entity_status.lanelet_pose.lanelet_id, route_.get())) {
-      route_ = hdmap_utils->getRoute(
-        entity_status.lanelet_pose.lanelet_id,
-        target_lanelet_pose_->lanelet_id);
-    }
-    if (route_->size() == 0) {
-      target_lanelet_pose_ = boost::none;
-      route_ = boost::none;
-      following_lanelets = hdmap_utils->getFollowingLanelets(
-        entity_status.lanelet_pose.lanelet_id,
-        50);
-    } else {
-      following_lanelets = hdmap_utils->getFollowingLanelets(
-        entity_status.lanelet_pose.lanelet_id, route_.get(), 50);
-    }
-  }
-  following_lanelets_ = following_lanelets;
-  if (getRightOfWayEntities(following_lanelets).size() != 0) {
+  if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
   auto distance_to_front_entity = getDistanceToFrontEntity();
@@ -116,8 +84,8 @@ BT::NodeStatus FollowLaneAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  auto distance_to_stopline = getDistanceToStopLine(following_lanelets);
-  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
+  auto distance_to_stopline = getDistanceToStopLine(route_lanelets);
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets);
   if (distance_to_stopline) {
     if (distance_to_stopline.get() <=
       calculateStopDistance() +
@@ -134,7 +102,7 @@ BT::NodeStatus FollowLaneAction::tick()
     }
   }
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   auto updated_status = calculateEntityStatusUpdated(target_speed.get());
   setOutput("updated_status", updated_status);

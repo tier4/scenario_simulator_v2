@@ -42,10 +42,7 @@ const openscenario_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
     openscenario_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
-      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s,
       entity_status.lanelet_pose.s + horizon, 1.0);
@@ -83,13 +80,10 @@ BT::NodeStatus YieldAction::tick()
   if (!entity_status.lanelet_pose_valid) {
     return BT::NodeStatus::FAILURE;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(
-    entity_status.lanelet_pose.lanelet_id,
-    50);
-  const auto right_of_way_entities = getRightOfWayEntities(following_lanelets);
+  const auto right_of_way_entities = getRightOfWayEntities(route_lanelets);
   if (right_of_way_entities.size() == 0) {
     if (!target_speed) {
-      target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+      target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     const auto waypoints = calculateWaypoints();
@@ -98,9 +92,9 @@ BT::NodeStatus YieldAction::tick()
     setOutput("obstacles", obstacles);
     return BT::NodeStatus::SUCCESS;
   }
-  target_speed = calculateTargetSpeed(following_lanelets);
+  target_speed = calculateTargetSpeed(route_lanelets);
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   const auto waypoints = calculateWaypoints();

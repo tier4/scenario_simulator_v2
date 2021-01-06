@@ -40,10 +40,7 @@ const openscenario_msgs::msg::WaypointsArray FollowFrontEntityAction::calculateW
     openscenario_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
-      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s,
       entity_status.lanelet_pose.s + horizon, 1.0);
@@ -59,17 +56,14 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(
-    entity_status.lanelet_pose.lanelet_id,
-    50);
-  if (getRightOfWayEntities(following_lanelets).size() != 0) {
+  if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
   auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(
-    following_lanelets,
+    route_lanelets,
     entity_status.lanelet_pose.lanelet_id,
     entity_status.lanelet_pose.s);
-  auto distance_to_crossing_entity = getDistanceToConflictingEntity(following_lanelets);
+  auto distance_to_crossing_entity = getDistanceToConflictingEntity(route_lanelets);
   auto distance_to_front_entity = getDistanceToFrontEntity();
   if (!distance_to_front_entity) {
     return BT::NodeStatus::FAILURE;
