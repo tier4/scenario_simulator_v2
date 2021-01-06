@@ -23,12 +23,14 @@ RoutePlanner::RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_
   hdmap_utils_ptr_ = hdmap_utils_ptr;
 }
 
-boost::optional<std::vector<std::int64_t>> RoutePlanner::getRouteLanelets(
+std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
   openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
   double horizon)
 {
   if (!route_) {
-    return boost::none;
+    return hdmap_utils_ptr_->getFollowingLanelets(
+      entity_lanelet_pose.lanelet_id,
+      horizon, true);
   }
   if (hdmap_utils_ptr_->isInRoute(
       entity_lanelet_pose.lanelet_id, route_.get()
@@ -38,17 +40,22 @@ boost::optional<std::vector<std::int64_t>> RoutePlanner::getRouteLanelets(
       entity_lanelet_pose.lanelet_id,
       route_.get(), horizon, true);
   }
-  return boost::none;
+  cancelGoal();
+  return hdmap_utils_ptr_->getFollowingLanelets(
+    entity_lanelet_pose.lanelet_id,
+    horizon, true);
 }
 
-boost::optional<std::vector<std::int64_t>> RoutePlanner::getRouteLanelets(
+std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
   openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
   openscenario_msgs::msg::LaneletPose target_lanelet_pose,
   double horizon)
 {
   plan(entity_lanelet_pose, target_lanelet_pose);
   if (!route_) {
-    return boost::none;
+    return hdmap_utils_ptr_->getFollowingLanelets(
+      entity_lanelet_pose.lanelet_id,
+      horizon, true);
   }
   return hdmap_utils_ptr_->getFollowingLanelets(
     entity_lanelet_pose.lanelet_id,

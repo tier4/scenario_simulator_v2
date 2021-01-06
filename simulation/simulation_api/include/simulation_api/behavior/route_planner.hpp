@@ -22,11 +22,11 @@ class RoutePlanner
 {
 public:
   explicit RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
-  boost::optional<std::vector<std::int64_t>> getRouteLanelets(
-    openscenario_msgs::msg::LaneletPose target_lanelet_pose,
+  std::vector<std::int64_t> getRouteLanelets(
     openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
+    openscenario_msgs::msg::LaneletPose target_lanelet_pose,
     double horizon = 100);
-  boost::optional<std::vector<std::int64_t>> getRouteLanelets(
+  std::vector<std::int64_t> getRouteLanelets(
     openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
     double horizon = 100);
   void cancelGoal();

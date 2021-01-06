@@ -41,7 +41,8 @@ public:
       BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
         "vehicle_parameters"),
       BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
-        "waypoints")
+        "waypoints"),
+      BT::InputPort<std::vector<std::int64_t>>("route_lanelets")
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -59,6 +60,7 @@ public:
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
     const openscenario_msgs::msg::WaypointsArray & waypoints);
+  std::vector<std::int64_t> route_lanelets;
 };
 }  // namespace entity_behavior
 

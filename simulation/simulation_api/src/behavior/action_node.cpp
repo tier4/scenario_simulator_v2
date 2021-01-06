@@ -66,11 +66,6 @@ void ActionNode::getBlackBoardValues()
   {
     throw BehaviorTreeRuntimeError("failed to get input entity_type_list in ActionNode");
   }
-
-  boost::optional<std::vector<std::int64_t>> route_lanelets;
-  if (!getInput<boost::optional<std::vector<std::int64_t>>>("target_speed", route_lanelets)) {
-    route_lanelets = boost::none;
-  }
 }
 
 boost::optional<double> ActionNode::getYieldStopDistance(
