@@ -52,6 +52,17 @@ const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoint
   }
 }
 
+void FollowLaneAction::getBlackBoardValues()
+{
+  openscenario_msgs::msg::LaneletPose target_lanelet_pose;
+  VehicleActionNode::getBlackBoardValues();
+  if (!getInput<openscenario_msgs::msg::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
+    target_lanelet_pose_ = boost::none;
+  } else {
+    target_lanelet_pose_ = target_lanelet_pose;
+  }
+}
+
 BT::NodeStatus FollowLaneAction::tick()
 {
   getBlackBoardValues();
@@ -64,9 +75,33 @@ BT::NodeStatus FollowLaneAction::tick()
       calculateEntityStatusUpdatedInWorldFrame(entity_status.action_status.twist.linear.x));
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(
-    entity_status.lanelet_pose.lanelet_id,
-    50);
+  std::vector<std::int64_t> following_lanelets;
+  if (!target_lanelet_pose_) {
+    following_lanelets = hdmap_utils->getFollowingLanelets(
+      entity_status.lanelet_pose.lanelet_id,
+      50);
+  } else {
+    if (!route_) {
+      route_ = hdmap_utils->getRoute(
+        entity_status.lanelet_pose.lanelet_id,
+        target_lanelet_pose_->lanelet_id);
+    }
+    if (!hdmap_utils->isInRoute(entity_status.lanelet_pose.lanelet_id, route_.get())) {
+      route_ = hdmap_utils->getRoute(
+        entity_status.lanelet_pose.lanelet_id,
+        target_lanelet_pose_->lanelet_id);
+    }
+    if (route_->size() == 0) {
+      target_lanelet_pose_ = boost::none;
+      route_ = boost::none;
+      following_lanelets = hdmap_utils->getFollowingLanelets(
+        entity_status.lanelet_pose.lanelet_id,
+        50);
+    } else {
+      following_lanelets = hdmap_utils->getFollowingLanelets(
+        entity_status.lanelet_pose.lanelet_id, route_.get(), 50);
+    }
+  }
   if (getRightOfWayEntities(following_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
