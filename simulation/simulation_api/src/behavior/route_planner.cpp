@@ -25,7 +25,26 @@ RoutePlanner::RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_
 
 boost::optional<std::vector<std::int64_t>> RoutePlanner::getRouteLanelets(
   openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
-  openscenario_msgs::msg::LaneletPose target_lanelet_pose)
+  double horizon)
+{
+  if (!route_) {
+    return boost::none;
+  }
+  if (hdmap_utils_ptr_->isInRoute(
+      entity_lanelet_pose.lanelet_id, route_.get()
+  ))
+  {
+    return hdmap_utils_ptr_->getFollowingLanelets(
+      entity_lanelet_pose.lanelet_id,
+      route_.get(), horizon, true);
+  }
+  return boost::none;
+}
+
+boost::optional<std::vector<std::int64_t>> RoutePlanner::getRouteLanelets(
+  openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
+  openscenario_msgs::msg::LaneletPose target_lanelet_pose,
+  double horizon)
 {
   plan(entity_lanelet_pose, target_lanelet_pose);
   if (!route_) {
@@ -33,7 +52,7 @@ boost::optional<std::vector<std::int64_t>> RoutePlanner::getRouteLanelets(
   }
   return hdmap_utils_ptr_->getFollowingLanelets(
     entity_lanelet_pose.lanelet_id,
-    route_.get(), 100, true);
+    route_.get(), horizon, true);
 }
 
 void RoutePlanner::cancelGoal()
