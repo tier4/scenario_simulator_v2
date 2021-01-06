@@ -18,7 +18,6 @@
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
-#include <simulation_api/behavior/vehicle/acquire_position_action.hpp>
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -46,7 +45,6 @@ BehaviorTree::BehaviorTree()
   <follow_lane_sequence::StopAtStopLineAction>("StopAtStopLine");
   factory_.registerNodeType
   <follow_lane_sequence::YieldAction>("Yield");
-  factory_.registerNodeType<AcquirePositionAction>("AcquirePosition");
   factory_.registerNodeType<LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
