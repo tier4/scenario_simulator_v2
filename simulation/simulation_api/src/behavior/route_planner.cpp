@@ -71,7 +71,9 @@ void RoutePlanner::plan(
   openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
   openscenario_msgs::msg::LaneletPose target_lanelet_pose)
 {
-  if (target_lanelet_pose.lanelet_id == entity_lanelet_pose.lanelet_id) {
+  if (target_lanelet_pose.lanelet_id == entity_lanelet_pose.lanelet_id &&
+    target_lanelet_pose.s <= entity_lanelet_pose.s)
+  {
     cancelGoal();
     return;
   }

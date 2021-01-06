@@ -72,7 +72,7 @@ VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
 
 void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
-  if (status_) {
+  if (!status_) {
     return;
   }
   if (!status_->lanelet_pose_valid) {
