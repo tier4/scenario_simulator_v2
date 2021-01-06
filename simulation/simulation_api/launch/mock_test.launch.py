@@ -35,8 +35,8 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='simulation_api',
-            node_executable='scenario_runner_moc_node',
-            node_name='scenario_runner_node',
+            executable='scenario_runner_moc_node',
+            name='scenario_runner_node',
             output='screen',
             parameters=[{
                 'map_path': lanlet_path,
@@ -46,8 +46,8 @@ def generate_launch_description():
             arguments=[('__log_level:=info')]),
         Node(
             package='scenario_simulator',
-            node_executable='scenario_simulator_node',
-            node_name='scenario_simulator_node',
+            executable='scenario_simulator_node',
+            name='scenario_simulator_node',
             output='log',
             parameters=[{
                 'port': 8080
@@ -56,14 +56,14 @@ def generate_launch_description():
             ),
         Node(
             package='rviz2',
-            node_executable='rviz2',
-            node_name='rviz2',
+            executable='rviz2',
+            name='rviz2',
             arguments=['-d', rviz_config_dir],
             output='screen'),
         Node(
             package='openscenario_visualization',
-            node_executable='openscenario_visualization_node',
-            node_name='openscenario_visualization_node',
+            executable='openscenario_visualization_node',
+            name='openscenario_visualization_node',
             output='screen'
             )
     ])

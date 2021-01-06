@@ -35,7 +35,7 @@ private:
   void plan(
     openscenario_msgs::msg::LaneletPose target_lanelet_pose,
     openscenario_msgs::msg::LaneletPose entity_lanelet_pose);
-  boost::optional<std::vector<std::int64_t>> route_;
+  boost::optional<std::vector<std::int64_t>> whole_route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 };
 }
