@@ -50,6 +50,7 @@ public:
 private:
   boost::optional<openscenario_msgs::msg::LaneletPose> target_lanelet_pose_;
   boost::optional<std::vector<std::int64_t>> route_;
+  boost::optional<std::vector<std::int64_t>> following_lanelets_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

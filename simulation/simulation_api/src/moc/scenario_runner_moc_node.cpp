@@ -76,7 +76,7 @@ public:
       "npc1",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );
     using namespace std::chrono_literals;
-    update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
+    update_timer_ = this->create_wall_timer(10ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
 
 private:
@@ -104,7 +104,7 @@ private:
       std::cout << "npc2 collision!" << std::endl;
     }
     api_.updateFrame();
-    current_time_ = current_time_ + 0.02;
+    current_time_ = current_time_ + 0.05;
   }
   bool lanechange_excuted_;
   bool target_speed_setted_;
