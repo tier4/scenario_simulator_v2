@@ -35,7 +35,7 @@ public:
         "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
     api_.setVerbose(true);
-    api_.initialize(0.2, 0.02);
+    api_.initialize(1.0, 0.05);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
@@ -69,7 +69,6 @@ public:
       simulation_api::helper::constractLaneletPose(34606, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
-
     api_.requestAcquirePosition(
       "ego",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );

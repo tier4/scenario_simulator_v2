@@ -80,7 +80,7 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
   std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
   all_graphs.push_back(vehicle_routing_graph_ptr_);
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
-  overall_graphs_ptr_ = std::make_unique<lanelet::routing::RoutingGraphContainer>(all_graphs);
+  // overall_graphs_ptr_ = std::make_unique<lanelet::routing::RoutingGraphContainer>(all_graphs);
 }
 
 boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
@@ -135,9 +135,17 @@ std::vector<std::int64_t> HdMapUtils::getConflictingCrosswalkIds(
   std::vector<std::int64_t> lanelet_ids) const
 {
   std::vector<std::int64_t> ret;
+  std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
+  graphs.emplace_back(vehicle_routing_graph_ptr_);
+  graphs.emplace_back(pedestrian_routing_graph_ptr_);
+  lanelet::routing::RoutingGraphContainer container(graphs);
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-    const auto conflicting_crosswalks = overall_graphs_ptr_->conflictingInGraph(lanelet, 1);
+    double height_clearance = 4;
+    size_t routing_graph_id = 1;
+    const auto conflicting_crosswalks = container.conflictingInGraph(
+      lanelet, routing_graph_id,
+      height_clearance);
     for (const auto & crosswalk : conflicting_crosswalks) {
       ret.emplace_back(crosswalk.id());
     }

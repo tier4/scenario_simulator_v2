@@ -147,7 +147,7 @@ private:
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
   lanelet::routing::RoutingGraphConstPtr pedestrian_routing_graph_ptr_;
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
-  lanelet::routing::RoutingGraphContainerUPtr overall_graphs_ptr_;
+  // lanelet::routing::RoutingGraphContainerUPtr overall_graphs_ptr_;
   double getTrajectoryLength(std::vector<geometry_msgs::msg::Point> trajectory);
   std::vector<double> calcEuclidDist(
     const std::vector<double> & x, const std::vector<double> & y,
