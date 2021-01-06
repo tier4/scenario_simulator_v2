@@ -31,6 +31,7 @@ ament_auto_add_library(entity_manager SHARED
   src/behavior/vehicle/follow_lane_sequence/yield_action.cpp
   src/behavior/vehicle/lane_change_action.cpp
   src/behavior/vehicle/vehicle_action_node.cpp
+  src/behavior/route_planner.cpp
   src/color_utils/color_utils.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp

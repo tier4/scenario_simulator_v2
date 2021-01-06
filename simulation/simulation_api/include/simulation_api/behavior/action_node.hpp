@@ -80,7 +80,8 @@ public:
         BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus>>(
           "other_entity_status"),
         BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
-          "entity_type_list")
+          "entity_type_list"),
+        BT::InputPort<boost::optional<std::vector<std::int64_t>>>("route_lanelets")
       };
   }
   void getBlackBoardValues();
@@ -93,6 +94,7 @@ public:
   openscenario_msgs::msg::EntityStatus updated_status;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_entity_status;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list;
+  boost::optional<std::vector<std::int64_t>> route_lanelets_;
 };
 }  // namespace entity_behavior
 
