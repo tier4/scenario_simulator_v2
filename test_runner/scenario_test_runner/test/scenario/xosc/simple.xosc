@@ -57,6 +57,17 @@
               </SpeedAction>
             </LongitudinalAction>
           </PrivateAction>
+          <PrivateAction>
+            <RoutingAction>
+              <AcquirePositionAction>
+                <Position>
+                  <LanePosition roadId="" laneId="34462" s="0" offset="0">
+                    <Orientation type="relative" h="0" p="0" r="0"/>
+                  </LanePosition>
+                </Position>
+              </AcquirePositionAction>
+            </RoutingAction>
+          </PrivateAction>
         </Private>
         <Private entityRef="bob">
           <PrivateAction>
