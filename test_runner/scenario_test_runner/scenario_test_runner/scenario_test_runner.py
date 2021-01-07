@@ -134,14 +134,12 @@ class ScenarioTestRunner(LifecycleController):
         while (time.time() - start) < self.global_timeout \
                 if self.global_timeout is not None else True:
 
-            current_state = self.get_lifecycle_state()
-
-            if current_state == 'inactive':
+            if self.get_lifecycle_state() == 'inactive':
                 self.get_logger().info(
                     "Simulator normally transitioned to the inactive state.")
                 return
-
-            time.sleep(self.SLEEP_RATE)
+            else:
+                time.sleep(self.SLEEP_RATE)
 
         self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
 
@@ -197,18 +195,17 @@ def main():
         '--log_directory',
         type=Path,
         default=Path('/tmp'),
-        help='Specify log_directory you want to execute.')
+        help='(Deprecated) Specify log_directory you want to execute.')
 
-    parser.add_argument(
+    parser.add_argument(  # DEPRECATED
         '--no_validation',
         default=False,
-        help='Disable validation to generated scenarios.')
+        help='(Deprecated) Disable validation to generated scenarios.')
 
     parser.add_argument(
         '--global-frame-rate',
         type=float,
-        default=30
-        )
+        default=30)
 
     parser.add_argument(
         '--global-real-time-factor',
@@ -221,6 +218,7 @@ def main():
 
     parser.add_argument(
         '-s', '--scenario',
+        type=Path,
         help='Specify the scenario you want to execute.')
 
     parser.add_argument(

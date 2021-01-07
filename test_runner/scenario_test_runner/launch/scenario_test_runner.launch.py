@@ -22,6 +22,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import LifecycleNode, Node
+from pathlib import Path
 
 
 def generate_launch_description():
@@ -31,6 +32,7 @@ def generate_launch_description():
     global_timeout = LaunchConfiguration('global-timeout', default=30)
     log_directory = LaunchConfiguration('log_directory', default="/tmp")  # DEPRECATED
     no_validation = LaunchConfiguration('no_validation', default=False)  # DEPRECATED
+    scenario = LaunchConfiguration('scenario', default=Path())
     workflow = LaunchConfiguration('workflow')
 
     port = 8080
@@ -42,6 +44,7 @@ def generate_launch_description():
         DeclareLaunchArgument('global-timeout', default_value=global_timeout),
         DeclareLaunchArgument('log_directory', default_value=log_directory),  # DEPRECATED
         DeclareLaunchArgument('no_validation', default_value=no_validation),  # DEPRECATED
+        DeclareLaunchArgument('scenario', default_value=scenario),
         DeclareLaunchArgument('workflow', default_value=workflow),
 
         Node(
@@ -54,8 +57,9 @@ def generate_launch_description():
                 '--global-frame-rate', global_frame_rate,
                 '--global-real-time-factor', global_real_time_factor,
                 '--global-timeout', global_timeout,
-                '--log_directory', log_directory,
-                '--no_validation', no_validation,
+                '--log_directory', log_directory,  # DEPRECATED
+                '--no_validation', no_validation,  # DEPRECATED
+                '--scenario', scenario,
                 '--workflow', workflow,
                 ],
             ),
