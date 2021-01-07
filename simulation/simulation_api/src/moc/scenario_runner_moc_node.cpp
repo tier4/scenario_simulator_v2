@@ -95,6 +95,9 @@ private:
         "ego",
         simulation_api::helper::constractLaneletPose(34579, 0.0), 5))
     {
+      api_.requestAcquirePosition(
+        "ego",
+        simulation_api::helper::constractLaneletPose(34675, 0.0) );
       api_.setTargetSpeed("npc2", 3, true);
     }
     if (api_.checkCollision("ego", "npc1")) {
