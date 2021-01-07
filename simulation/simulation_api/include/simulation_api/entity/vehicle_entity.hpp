@@ -19,6 +19,7 @@
 #include <simulation_api/entity/vehicle_parameter.hpp>
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
+#include <simulation_api/behavior/route_planner.hpp>
 
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 
@@ -55,6 +56,7 @@ public:
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
   {
     hdmap_utils_ptr_ = ptr;
+    route_planner_ptr_ = std::make_shared<simulation_api::RoutePlanner>(ptr);
     tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
   void setTargetSpeed(double target_speed, bool continuous);
@@ -76,6 +78,7 @@ private:
   BT::NodeStatus action_status_;
   std::int64_t to_lanelet_id_;
   boost::optional<double> target_speed_;
+  std::shared_ptr<simulation_api::RoutePlanner> route_planner_ptr_;
 };
 }  // namespace entity
 }  // namespace simulation_api

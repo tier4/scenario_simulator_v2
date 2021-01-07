@@ -33,6 +33,7 @@ class FollowLaneAction : public entity_behavior::VehicleActionNode
 public:
   FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
+  void getBlackBoardValues();
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {};
@@ -43,6 +44,9 @@ public:
     return ports;
   }
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
+
+private:
+  boost::optional<openscenario_msgs::msg::LaneletPose> target_lanelet_pose_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
