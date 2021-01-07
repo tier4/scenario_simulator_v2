@@ -319,6 +319,16 @@ std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(
   return ret;
 }
 
+bool HdMapUtils::isInRoute(std::int64_t lanelet_id, std::vector<std::int64_t> route) const
+{
+  for (const auto id : route) {
+    if (id == lanelet_id) {
+      return true;
+    }
+  }
+  return false;
+}
+
 std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   std::int64_t lanelet_id,
   std::vector<std::int64_t> candidate_lanelet_ids, double distance,

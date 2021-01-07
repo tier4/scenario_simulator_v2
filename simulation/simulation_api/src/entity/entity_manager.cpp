@@ -530,9 +530,9 @@ void EntityManager::update(double current_time, double step_time)
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
   end = std::chrono::system_clock::now();
-  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
   if (verbose_) {
-    std::cout << "elapsed " << elapsed/1000 << " secands in update function." << std::endl;
+    std::cout << "elapsed " << elapsed / 1000 << " secands in update function." << std::endl;
   }
 }
 

@@ -32,14 +32,14 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='simulation_api',
-            node_executable='catmull_rom_visualization',
-            node_name='scenario_runner_node',
+            executable='catmull_rom_visualization',
+            name='scenario_runner_node',
             output='screen',
             arguments=[('__log_level:=info')]),
         Node(
             package='rviz2',
-            node_executable='rviz2',
-            node_name='rviz2',
+            executable='rviz2',
+            name='rviz2',
             arguments=['-d', rviz_config_dir],
             output='screen')
     ])

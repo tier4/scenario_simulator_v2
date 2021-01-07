@@ -34,6 +34,9 @@ void VehicleActionNode::getBlackBoardValues()
   {
     throw BehaviorTreeRuntimeError("failed to get input vehicle_parameters in VehicleActionNode");
   }
+  if (!getInput<std::vector<std::int64_t>>("route_lanelets", route_lanelets)) {
+    throw BehaviorTreeRuntimeError("failed to get input route_lanelets in ActionNode");
+  }
 }
 
 const std::vector<openscenario_msgs::msg::Obstacle> VehicleActionNode::calculateObstacles(

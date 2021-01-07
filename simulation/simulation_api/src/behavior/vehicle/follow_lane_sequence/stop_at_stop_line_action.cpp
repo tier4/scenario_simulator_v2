@@ -43,10 +43,7 @@ const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWayp
     openscenario_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      entity_status.lanelet_pose.lanelet_id,
-      horizon + hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id));
-    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(following_lanelets));
+    simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s,
       entity_status.lanelet_pose.s + horizon, 1.0);
@@ -82,13 +79,10 @@ BT::NodeStatus StopAtStopLineAction::tick()
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  auto following_lanelets = hdmap_utils->getFollowingLanelets(
-    entity_status.lanelet_pose.lanelet_id,
-    50);
-  if (getRightOfWayEntities(following_lanelets).size() != 0) {
+  if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
-  auto dist_to_stopline = getDistanceToStopLine(following_lanelets);
+  auto dist_to_stopline = getDistanceToStopLine(route_lanelets);
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (dist_to_stopline) {
       if (dist_to_stopline.get() <= vehicle_parameters->bounding_box.dimensions.length + 5) {
@@ -98,7 +92,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   if (stopped_) {
     if (!target_speed) {
-      target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+      target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
     }
     if (!dist_to_stopline) {
       stopped_ = false;
@@ -117,7 +111,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   auto target_linear_speed =
-    calculateTargetSpeed(following_lanelets, entity_status.action_status.twist.linear.x);
+    calculateTargetSpeed(route_lanelets, entity_status.action_status.twist.linear.x);
   if (!target_linear_speed) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
