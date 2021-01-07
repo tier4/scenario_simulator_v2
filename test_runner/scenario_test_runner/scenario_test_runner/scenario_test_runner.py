@@ -76,7 +76,11 @@ class ScenarioTestRunner(LifecycleController):
         self.xosc_scenarios = []
         self.local_frame_rates = []
 
-    def run_workflow(self, path: Path, no_validation):
+    def run_workflow(
+            self,
+            path: Path,
+            # no_validation  # DEPRECATED
+            ):
         """
         Run workflow.
 
@@ -112,21 +116,21 @@ class ScenarioTestRunner(LifecycleController):
 
         self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
             = ConverterHandler.convert_all_scenarios(
-                self.yaml_scenarios, expects, local_frame_rates, self.launcher_path)
+                self.yaml_scenarios,
+                expects,
+                local_frame_rates,
+                self.launcher_path
+                )
 
-        if not no_validation.lower() in ["true", "t", "yes", "1"]:
-            self.validate_all_scenarios()
+        is_valid = XOSCValidator(False)
+
+        for each in self.xosc_scenarios:
+            if not is_valid(each):
+                exit()
 
         super().__init__()
 
         self.run_all_scenarios()
-
-    def validate_all_scenarios(self):
-        """Validate all scenarios."""
-        is_valid = XOSCValidator(False)
-        for scenario in self.xosc_scenarios:
-            if not is_valid(scenario):
-                exit()
 
     def monitor_state(self):
         start = time.time()
@@ -240,14 +244,18 @@ def main():
 
     args = parser.parse_args()
 
-    ScenarioTestRunner(
-        global_frame_rate=args.global_frame_rate,
-        global_real_time_factor=args.global_real_time_factor,
-        global_timeout=args.global_timeout,
-        log_directory=args.log_directory,  # DEPRECATED
-        ).run_workflow(
-            Path(resolve_ros_package(args.workflow)).resolve(),
-            args.no_validation)
+    if args.scenario == Path("/dev/null"):
+        ScenarioTestRunner(
+            global_frame_rate=args.global_frame_rate,
+            global_real_time_factor=args.global_real_time_factor,
+            global_timeout=args.global_timeout,
+            log_directory=args.log_directory,  # DEPRECATED
+            ).run_workflow(
+                Path(resolve_ros_package(args.workflow)).resolve(),
+                # args.no_validation
+                )
+    else:
+        print("Option '--scenario' does not supprted.")
 
     rclpy.shutdown()
 

@@ -31,9 +31,8 @@ def generate_launch_description():
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=30)
     log_directory = LaunchConfiguration('log_directory', default="/tmp")  # DEPRECATED
-    no_validation = LaunchConfiguration('no_validation', default=False)  # DEPRECATED
-    scenario = LaunchConfiguration('scenario', default=Path())
-    workflow = LaunchConfiguration('workflow')
+    scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))
+    workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))
 
     port = 8080
 
@@ -43,7 +42,6 @@ def generate_launch_description():
         DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
         DeclareLaunchArgument('global-timeout', default_value=global_timeout),
         DeclareLaunchArgument('log_directory', default_value=log_directory),  # DEPRECATED
-        DeclareLaunchArgument('no_validation', default_value=no_validation),  # DEPRECATED
         DeclareLaunchArgument('scenario', default_value=scenario),
         DeclareLaunchArgument('workflow', default_value=workflow),
 
@@ -58,7 +56,6 @@ def generate_launch_description():
                 '--global-real-time-factor', global_real_time_factor,
                 '--global-timeout', global_timeout,
                 '--log_directory', log_directory,  # DEPRECATED
-                '--no_validation', no_validation,  # DEPRECATED
                 '--scenario', scenario,
                 '--workflow', workflow,
                 ],
