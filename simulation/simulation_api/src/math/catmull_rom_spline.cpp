@@ -183,8 +183,9 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
     return std::make_pair(0, s);
   }
   if (s >= total_length_) {
-    return std::make_pair(curves_.size() - 1,
-             s - (total_length_ - curves_[curves_.size() - 1].getLength()));
+    return std::make_pair(
+      curves_.size() - 1,
+      s - (total_length_ - curves_[curves_.size() - 1].getLength()));
   }
   double current_s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {
@@ -286,8 +287,9 @@ boost::optional<double> CatmullRomSpline::getSValue(
   std::vector<double> error_values;
   std::vector<size_t> curve_index;
   for (size_t i = 0; i < curves_.size(); i++) {
-    auto s_value = curves_[i].getSValue(position, threadhold_distance, initial_resolution,
-        max_iteration, torelance, true);
+    auto s_value = curves_[i].getSValue(
+      position, threadhold_distance, initial_resolution,
+      max_iteration, torelance, true);
     if (s_value) {
       if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
         s_values.emplace_back(s_value.get());
@@ -365,10 +367,12 @@ bool CatmullRomSpline::checkConnection() const
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
     } else if (!equals(control_point0, p0)) {
-      throw SplineInterpolationError("start point of the curve number " + std::to_string(
+      throw SplineInterpolationError(
+              "start point of the curve number " + std::to_string(
                 i) + " does not match.");
     } else if (!equals(control_point1, p1)) {
-      throw SplineInterpolationError("end point of the curve number " + std::to_string(
+      throw SplineInterpolationError(
+              "end point of the curve number " + std::to_string(
                 i) + " does not match.");
     }
   }

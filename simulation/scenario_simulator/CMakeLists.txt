@@ -81,8 +81,8 @@ EXPORT export_scenario_simulator
 ament_export_libraries(scenario_simulator)
 
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  # find_package(ament_lint_auto REQUIRED)
+  # ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_export_include_directories(include)

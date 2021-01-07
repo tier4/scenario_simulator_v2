@@ -60,7 +60,8 @@ TEST(Math, HermiteCurve1)
   p.y = 0;
   p.z = 0;
   EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) &&
+  EXPECT_TRUE(
+    (curve.getSValue(p, true).get() > 0.099) &&
     (curve.getSValue(p, true).get() < 0.101));
   geometry_msgs::msg::Point start;
   start.x = 0.1;
@@ -93,7 +94,8 @@ TEST(Math, HermiteCurve2)
   p.y = 0;
   p.z = 0;
   EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) &&
+  EXPECT_TRUE(
+    (curve.getSValue(p, true).get() > 0.099) &&
     (curve.getSValue(p, true).get() < 0.101));
   geometry_msgs::msg::Point start;
   start.x = 0.1;

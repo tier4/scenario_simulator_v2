@@ -25,20 +25,25 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 {
   declare_parameter("port", 8080);
   get_parameter("port", port_);
-  auto initialize_func = std::bind(&ScenarioSimulator::initialize, this,
-      std::placeholders::_1, std::placeholders::_2);
+  auto initialize_func = std::bind(
+    &ScenarioSimulator::initialize, this,
+    std::placeholders::_1, std::placeholders::_2);
   addMethod("initialize", initialize_func);
-  auto update_frame_func = std::bind(&ScenarioSimulator::updateFrame, this,
-      std::placeholders::_1, std::placeholders::_2);
+  auto update_frame_func = std::bind(
+    &ScenarioSimulator::updateFrame, this,
+    std::placeholders::_1, std::placeholders::_2);
   addMethod("update_frame", update_frame_func);
-  auto spawn_entity_func = std::bind(&ScenarioSimulator::spawnEntity, this,
-      std::placeholders::_1, std::placeholders::_2);
+  auto spawn_entity_func = std::bind(
+    &ScenarioSimulator::spawnEntity, this,
+    std::placeholders::_1, std::placeholders::_2);
   addMethod("spawn_entity", spawn_entity_func);
-  auto despawn_entity_func = std::bind(&ScenarioSimulator::despawnEntity, this,
-      std::placeholders::_1, std::placeholders::_2);
+  auto despawn_entity_func = std::bind(
+    &ScenarioSimulator::despawnEntity, this,
+    std::placeholders::_1, std::placeholders::_2);
   addMethod("despawn_entity", despawn_entity_func);
-  auto get_entity_status_func = std::bind(&ScenarioSimulator::getEntityStatus, this,
-      std::placeholders::_1, std::placeholders::_2);
+  auto get_entity_status_func = std::bind(
+    &ScenarioSimulator::getEntityStatus, this,
+    std::placeholders::_1, std::placeholders::_2);
   addMethod("get_entity_status", get_entity_status_func);
   server_.bindAndListen(port_);
   server_.enableIntrospection(true);

@@ -24,33 +24,41 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== SpeedActionTarget ====================================================
+/* ---- SpeedActionTarget ------------------------------------------------------
  *
- * <xsd:complexType name="SpeedActionTarget">
- *   <xsd:choice>
- *     <xsd:element name="RelativeTargetSpeed" type="RelativeTargetSpeed"/>
- *     <xsd:element name="AbsoluteTargetSpeed" type="AbsoluteTargetSpeed"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="SpeedActionTarget">
+ *    <xsd:choice>
+ *      <xsd:element name="RelativeTargetSpeed" type="RelativeTargetSpeed"/>
+ *      <xsd:element name="AbsoluteTargetSpeed" type="AbsoluteTargetSpeed"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 struct SpeedActionTarget
   : public Element
 {
-  template<typename Node, typename ... Ts>
+  template
+  <
+    typename Node, typename ... Ts
+  >
   explicit SpeedActionTarget(const Node & node, Ts && ... xs)
   : Element(
       choice(
         node,
-        std::make_pair("RelativeTargetSpeed", [&](auto && node) {
-          return make<RelativeTargetSpeed>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-        std::make_pair("AbsoluteTargetSpeed", [&](auto && node) {
-          return make<AbsoluteTargetSpeed>(node, std::forward<decltype(xs)>(xs)...);
-        })))
+        ELEMENT(RelativeTargetSpeed),
+        ELEMENT(AbsoluteTargetSpeed)))
   {}
 };
-}
+
+#undef ELEMENT
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_TARGET_HPP_

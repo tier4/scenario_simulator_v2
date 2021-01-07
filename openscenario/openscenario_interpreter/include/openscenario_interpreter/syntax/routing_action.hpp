@@ -35,6 +35,13 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 struct RoutingAction
   : public Element
 {
@@ -43,21 +50,14 @@ struct RoutingAction
   : Element(
       choice(
         node,
-
-        std::make_pair("AssignRouteAction", [&](auto && node)
-        {
-          return make<AssignRouteAction>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-
+        ELEMENT(AssignRouteAction),
         std::make_pair("FollowTrajectoryAction", UNSUPPORTED()),
-
-        std::make_pair("AcquirePositionAction", [&](auto && node)
-        {
-          return make<AcquirePositionAction>(node, std::forward<decltype(xs)>(xs)...);
-        })))
+        ELEMENT(AcquirePositionAction)))
   {}
 };
-}
+
+#undef ELEMENT
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ROUTING_ACTION_HPP_

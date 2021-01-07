@@ -47,10 +47,10 @@
 #include <quaternion_operation/quaternion_operation.h>
 #include <rclcpp_components/register_node_macro.hpp>
 
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <cmath>
+#include <string>
+#include <vector>
 
 namespace openscenario_visualization
 {
@@ -62,8 +62,8 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
   entity_status_sub_ =
     this->create_subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
     "/entity/status", 1,
-    std::bind(&OpenscenarioVisualizationComponent::entityStatusCallback, this,
-    std::placeholders::_1));
+    std::bind(
+      &OpenscenarioVisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
@@ -79,7 +79,9 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     auto itr = std::find(entity_name_lists.begin(), entity_name_lists.end(), marker.first);
     if (itr == entity_name_lists.end()) {
       auto delete_marker = generateDeleteMarker(marker.first);
-      std::copy(delete_marker.markers.begin(), delete_marker.markers.end(),
+      std::copy(
+        delete_marker.markers.begin(),
+        delete_marker.markers.end(),
         std::back_inserter(current_marker.markers));
       erase_names.emplace_back(marker.first);
     }
@@ -89,7 +91,9 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
   }
   for (const auto & data : msg->data) {
     auto marker_array = generateMarker(data.status, data.waypoint);
-    std::copy(marker_array.markers.begin(), marker_array.markers.end(),
+    std::copy(
+      marker_array.markers.begin(),
+      marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
     markers_[data.name] = marker_array;
   }
@@ -329,14 +333,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     ret.markers.push_back(waypoints_marker);
   } else {
     waypoints_marker.action = waypoints_marker.ADD;
-    // waypoints_marker.points = waypoints.waypoints;
-    for (const auto waypoint : waypoints.waypoints) {
-      geometry_msgs::msg::Point p;
-      p.x = -waypoint.x;
-      p.y = -waypoint.y;
-      p.z = -waypoint.z;
-      waypoints_marker.points.emplace_back(p);
-    }
+    waypoints_marker.points = waypoints.waypoints;
     waypoints_marker.color = color;
     waypoints_marker.type = waypoints_marker.LINE_STRIP;
     waypoints_marker.colors =

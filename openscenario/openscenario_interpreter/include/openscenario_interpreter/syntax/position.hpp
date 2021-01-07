@@ -41,6 +41,13 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 struct Position
   : public Element
 {
@@ -49,19 +56,12 @@ struct Position
   : Element(
       choice(
         node,
-        std::make_pair("WorldPosition", [&](auto && node) {
-          return make<WorldPosition>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-        std::make_pair("RelativeWorldPosition", [&](auto && node)
-        {
-          return make<RelativeWorldPosition>(node, std::forward<decltype(xs)>(xs)...);
-        }),
+        ELEMENT(/*   */ WorldPosition),
+        ELEMENT(RelativeWorldPosition),
         std::make_pair("RelativeObjectPosition", UNSUPPORTED()),
         std::make_pair("RoadPosition", UNSUPPORTED()),
         std::make_pair("RelativeRoadPosition", UNSUPPORTED()),
-        std::make_pair("LanePosition", [&](auto && node) {
-          return make<LanePosition>(node, std::forward<decltype(xs)>(xs)...);
-        }),
+        ELEMENT(LanePosition),
         std::make_pair("RelativeLanePosition", UNSUPPORTED()),
         std::make_pair("RoutePosition", UNSUPPORTED())))
   {}
@@ -78,7 +78,9 @@ struct Position
     }
   }
 };
-}
+
+#undef ELEMENT
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_

@@ -158,9 +158,12 @@ decltype(auto) choice(const Node & node, Ts && ... xs)
   }
 }
 
-template<typename Callee>
-decltype(auto) callWithElement(const pugi::xml_node & parent, const std::string & name,
-  Callee && call_with)
+template
+<
+  typename Callee
+>
+decltype(auto) callWithElement(
+  const pugi::xml_node & parent, const std::string & name, Callee && call_with)
 {
   return callWithElements(parent, name, 1, 1, std::forward<decltype(call_with)>(call_with));
 }

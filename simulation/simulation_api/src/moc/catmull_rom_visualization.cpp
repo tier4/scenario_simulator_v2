@@ -32,8 +32,9 @@ public:
     marker_pub_ptr_ = create_publisher<visualization_msgs::msg::MarkerArray>("/spline/marker", 1);
     clicked_points_sub_ptr_ = create_subscription<geometry_msgs::msg::PoseStamped>(
       "/move_base_simple/goal", 1,
-      std::bind(&CatmullRomSplineVisualization::goalPoseCallback, this,
-      std::placeholders::_1));
+      std::bind(
+        &CatmullRomSplineVisualization::goalPoseCallback, this,
+        std::placeholders::_1));
   }
 
 private:

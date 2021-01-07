@@ -33,7 +33,8 @@ VehicleEntity::VehicleEntity(
   parameters(xml)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
@@ -44,7 +45,8 @@ VehicleEntity::VehicleEntity(
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
@@ -53,7 +55,8 @@ VehicleEntity::VehicleEntity(std::string name, const pugi::xml_node & xml)
   parameters(xml)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
@@ -62,14 +65,20 @@ VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters",
+  tree_ptr_->setValueToBlackBoard(
+    "vehicle_parameters",
     std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
 }
 
 void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
-  tree_ptr_->setRequest("acquire_position");
-  tree_ptr_->setValueToBlackBoard("target_lanelet_pose", lanelet_pose);
+  if (!status_) {
+    return;
+  }
+  if (!status_->lanelet_pose_valid) {
+    return;
+  }
+  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
 }
 
 void VehicleEntity::requestLaneChange(std::int64_t to_lanelet_id)
@@ -100,6 +109,14 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
   tree_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
   tree_ptr_->setValueToBlackBoard("entity_status", status_.get());
+  if (status_->lanelet_pose_valid) {
+    tree_ptr_->setValueToBlackBoard(
+      "route_lanelets",
+      route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
+  } else {
+    std::vector<std::int64_t> empty = {};
+    tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
+  }
   action_status_ = tree_ptr_->tick(current_time, step_time);
   while (getCurrentAction() == "root") {
     action_status_ = tree_ptr_->tick(current_time, step_time);

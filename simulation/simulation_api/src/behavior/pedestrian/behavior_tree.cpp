@@ -63,14 +63,14 @@ void BehaviorTree::setupLogger()
   auto visitor = [this, subscribeCallback](BT::TreeNode * node) {
       subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
     };
-  applyRecursiveVisitor(tree_.root_node, visitor);
+  BT::applyRecursiveVisitor(tree_.rootNode(), visitor);
 }
 
 BT::NodeStatus BehaviorTree::tick(double current_time, double step_time)
 {
   setValueToBlackBoard("current_time", current_time);
   setValueToBlackBoard("step_time", step_time);
-  auto ret = tree_.root_node->executeTick();
+  auto ret = tree_.rootNode()->executeTick();
   return ret;
 }
 
@@ -81,7 +81,8 @@ void BehaviorTree::callback(
   constexpr const char * whitespaces = "                         ";
   constexpr const size_t ws_count = 25;
   double since_epoch = std::chrono::duration<double>(timestamp).count();
-  printf("[%.3f]: %s%s %s -> %s",
+  printf(
+    "[%.3f]: %s%s %s -> %s",
     since_epoch, node.name().c_str(),
     &whitespaces[std::min(ws_count, node.name().size())],
     toStr(prev_status, true).c_str(),

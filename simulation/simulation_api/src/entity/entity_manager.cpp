@@ -115,8 +115,9 @@ void EntityManager::requestLaneChange(std::string name, Direction direction)
     return;
   }
   if (direction == Direction::LEFT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_pose.lanelet_id,
-        "left");
+    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
+      status->lanelet_pose.lanelet_id,
+      "left");
     if (target) {
       requestLaneChange(name, target.get());
       return;
@@ -124,8 +125,9 @@ void EntityManager::requestLaneChange(std::string name, Direction direction)
     return;
   }
   if (direction == Direction::RIGHT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_pose.lanelet_id,
-        "right");
+    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
+      status->lanelet_pose.lanelet_id,
+      "right");
     if (target) {
       requestLaneChange(name, target.get());
       return;
@@ -143,9 +145,10 @@ boost::optional<double> EntityManager::getLongitudinalDistance(
   auto from_status = getEntityStatus(from);
   auto to_status = getEntityStatus(to);
   if (from_status && to_status) {
-    auto dist = hdmap_utils_ptr_->getLongitudinalDistance(from_status->lanelet_pose.lanelet_id,
-        from_status->lanelet_pose.s,
-        to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s);
+    auto dist = hdmap_utils_ptr_->getLongitudinalDistance(
+      from_status->lanelet_pose.lanelet_id,
+      from_status->lanelet_pose.s,
+      to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s);
     if (!dist) {
       return boost::none;
     } else {
@@ -272,12 +275,14 @@ bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, doubl
   if (status->lanelet_pose.lanelet_id == lanelet_id) {
     return true;
   } else {
-    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(lanelet_id, l,
-        status->lanelet_pose.lanelet_id,
-        status->lanelet_pose.s);
-    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(status->lanelet_pose.lanelet_id,
-        status->lanelet_pose.s,
-        lanelet_id, 0);
+    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(
+      lanelet_id, l,
+      status->lanelet_pose.lanelet_id,
+      status->lanelet_pose.s);
+    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(
+      status->lanelet_pose.lanelet_id,
+      status->lanelet_pose.s,
+      lanelet_id, 0);
     if (dist0) {
       if (dist0.get() < tolerance) {
         return true;
@@ -437,6 +442,8 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
 
 void EntityManager::update(double current_time, double step_time)
 {
+  std::chrono::system_clock::time_point start, end;
+  start = std::chrono::system_clock::now();
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
   }
@@ -522,6 +529,11 @@ void EntityManager::update(double current_time, double step_time)
     status_array_msg.data.emplace_back(status_with_traj);
   }
   entity_status_array_pub_ptr_->publish(status_array_msg);
+  end = std::chrono::system_clock::now();
+  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  if (verbose_) {
+    std::cout << "elapsed " << elapsed / 1000 << " secands in update function." << std::endl;
+  }
 }
 
 void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform)
@@ -552,9 +564,11 @@ bool EntityManager::reachPosition(
   }
   auto pose = status->pose;
   double dist =
-    std::sqrt(std::pow(pose.position.x - target_pose.position.x,
+    std::sqrt(
+    std::pow(
+      pose.position.x - target_pose.position.x,
       2) + std::pow(pose.position.y - target_pose.position.y, 2) +
-      std::pow(pose.position.z - target_pose.position.z, 2));
+    std::pow(pose.position.z - target_pose.position.z, 2));
   if (dist < tolerance) {
     return true;
   }

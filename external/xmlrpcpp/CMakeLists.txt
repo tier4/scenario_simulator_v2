@@ -1,22 +1,21 @@
 cmake_minimum_required(VERSION 3.5)
 project(xmlrpcpp)
 
-if(NOT WIN32)
-  set_directory_properties(PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra")
-endif()
-
-find_package(ament_cmake REQUIRED)
-
-include_directories(
-  include
-  libb64/include
-)
-
 if(WIN32)
   add_definitions(-D_WINDOWS)
 endif()
 
-add_library(xmlrpcpp SHARED
+if(NOT WIN32)
+  set_directory_properties(PROPERTIES COMPILE_OPTIONS "-Wall;-Wextra")
+endif()
+
+find_package(ament_cmake_auto REQUIRED)
+
+ament_auto_find_build_dependencies()
+
+ament_auto_add_library(${PROJECT_NAME} SHARED
+  libb64/src/cdecode.c
+  libb64/src/cencode.c
   src/XmlRpcClient.cpp
   src/XmlRpcDispatch.cpp
   src/XmlRpcServer.cpp
@@ -25,22 +24,8 @@ add_library(xmlrpcpp SHARED
   src/XmlRpcSocket.cpp
   src/XmlRpcSource.cpp
   src/XmlRpcUtil.cpp
-  src/XmlRpcValue.cpp
-  libb64/src/cdecode.c
-  libb64/src/cencode.c
-)
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
-install(TARGETS xmlrpcpp
-  EXPORT export_xmlrpcpp
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  src/XmlRpcValue.cpp)
 
-ament_export_include_directories(include)
+target_include_directories(${PROJECT_NAME} PRIVATE libb64/include)
 
-ament_export_interfaces(export_xmlrpcpp HAS_LIBRARY_TARGET)
-ament_export_libraries(xmlrpcpp)
-ament_package()
+ament_auto_package()

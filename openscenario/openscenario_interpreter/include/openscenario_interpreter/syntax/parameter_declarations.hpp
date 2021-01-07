@@ -25,36 +25,38 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ParameterDeclarations ================================================
+/* ---- ParameterDeclarations --------------------------------------------------
  *
- * <xsd:complexType name="ParameterDeclarations">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclaration" minOccurs="0" maxOccurs="unbounded" type="ParameterDeclaration"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterDeclarations">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterDeclaration" minOccurs="0" maxOccurs="unbounded" type="ParameterDeclaration"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ParameterDeclarations
   : public std::vector<ParameterDeclaration>
 {
   ParameterDeclarations() = default;
 
-  template<typename Node, typename Scope>
-  explicit ParameterDeclarations(const Node & node, Scope & scope)
+  template
+  <
+    typename Node, typename Scope
+  >
+  explicit ParameterDeclarations(const Node & node, Scope & outer_scope)
   {
-    callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) mutable
+    callWithElements(
+      node, "ParameterDeclaration", 0, unbounded, [&](auto && each)
       {
-        return emplace_back(each, scope);
+        return emplace_back(each, outer_scope);
       });
   }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const ParameterDeclarations &)
+std::ostream & operator<<(std::ostream & os, const ParameterDeclarations &)
 {
-  return os << (indent++) << blue << "<ParameterDeclarations>" << reset << "\n" <<
+  return os <<
+         (indent++) << blue << "<ParameterDeclarations>" << reset << "\n" <<
          (--indent) << blue << "</ParameterDeclarations>";
 }
 }

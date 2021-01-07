@@ -1,12 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 project(simulation_api)
 
-# Default to C99
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
 
-# Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
@@ -15,194 +13,65 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(visualization_msgs REQUIRED)
-find_package(geographic_msgs REQUIRED)
-find_package(openscenario_msgs REQUIRED)
-find_package(autoware_auto_msgs REQUIRED)
-find_package(tf2_ros REQUIRED)
-find_package(tf2_geometry_msgs REQUIRED)
-find_package(lanelet2_core REQUIRED)
-find_package(lanelet2_routing REQUIRED)
-find_package(lanelet2_io REQUIRED)
-find_package(lanelet2_extension REQUIRED)
-find_package(lanelet2_projection REQUIRED)
-find_package(behaviortree_cpp_v3 REQUIRED)
-find_package(awapi_accessor REQUIRED)
-find_package(quaternion_operation REQUIRED)
-find_package(ament_index_cpp REQUIRED)
-find_package(xmlrpcpp REQUIRED)
-find_package(Eigen3 REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
 
-# ------------------------------------------------------------------------------
-#  entity_manager
-# ------------------------------------------------------------------------------
+ament_auto_find_build_dependencies()
 
-add_library(entity_manager SHARED
-  src/helper/helper.cpp
-  src/math/polynomial_solver.cpp
-  src/hdmap_utils/hdmap_utils.cpp
-  src/math/catmull_rom_spline.cpp
-  src/math/hermite_curve.cpp
-  src/math/collision.cpp
-  src/entity/entity_manager.cpp
-  src/entity/entity_base.cpp
-  src/entity/vehicle_entity.cpp
-  src/entity/ego_entity.cpp
-  src/entity/pedestrian_entity.cpp
+ament_auto_add_library(entity_manager SHARED
   src/behavior/action_node.cpp
-  src/behavior/vehicle/behavior_tree.cpp
-  src/behavior/vehicle/follow_lane_sequence/yield_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
-  src/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
-  src/behavior/vehicle/lane_change_action.cpp
-  src/behavior/vehicle/acquire_position_action.cpp
-  src/behavior/vehicle/vehicle_action_node.cpp
+  src/behavior/pedestrian/acquire_position_action.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
-  src/behavior/pedestrian/acquire_position_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp
+  src/behavior/vehicle/behavior_tree.cpp
+  src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
+  src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
+  src/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
+  src/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
+  src/behavior/vehicle/follow_lane_sequence/yield_action.cpp
+  src/behavior/vehicle/lane_change_action.cpp
+  src/behavior/vehicle/vehicle_action_node.cpp
+  src/behavior/route_planner.cpp
   src/color_utils/color_utils.cpp
+  src/entity/ego_entity.cpp
+  src/entity/entity_base.cpp
+  src/entity/entity_manager.cpp
+  src/entity/pedestrian_entity.cpp
+  src/entity/vehicle_entity.cpp
+  src/hdmap_utils/hdmap_utils.cpp
+  src/helper/helper.cpp
+  src/math/catmull_rom_spline.cpp
+  src/math/collision.cpp
+  src/math/hermite_curve.cpp
+  src/math/polynomial_solver.cpp
   src/vehicle_model/sim_model_delay_steer_acc.cpp
   src/vehicle_model/sim_model_ideal_steer_acc.cpp
   src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
   src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
-)
-
-target_include_directories(entity_manager PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  )
 
 target_link_libraries(entity_manager pugixml)
 
-ament_target_dependencies(entity_manager
-  rclcpp
-  geometry_msgs
-  quaternion_operation
-  autoware_auto_msgs
-  lanelet2_core
-  lanelet2_io
-  lanelet2_routing
-  lanelet2_projection
-  lanelet2_extension
-  ament_index_cpp
-  behaviortree_cpp_v3
-  tf2_geometry_msgs
-  tf2_ros
-  xmlrpcpp
-  openscenario_msgs
-  visualization_msgs
-  awapi_accessor
-)
-
-ament_export_include_directories(include)
-ament_export_libraries(entity_manager)
-ament_export_interfaces(export_entity_manager)
-ament_export_dependencies(
-  ament_index_cpp
-  autoware_auto_msgs
-  behaviortree_cpp_v3
-  geometry_msgs
-  lanelet2_core
-  lanelet2_extension
-  lanelet2_io
-  lanelet2_projection
-  lanelet2_routing
-  openscenario_msgs
-  quaternion_operation
-  rclcpp
-  tf2_geometry_msgs
-  tf2_ros
-  visualization_msgs
-  xmlrpcpp
-  awapi_accessor)
-
-install(
-  TARGETS entity_manager
-  EXPORT export_entity_manager
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
-
-# ------------------------------------------------------------------------------
-#  simulation_api
-# ------------------------------------------------------------------------------
-
-add_library(simulation_api SHARED
-  src/api/api.cpp)
-
-target_include_directories(simulation_api PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+ament_auto_add_library(simulation_api SHARED src/api/api.cpp)
 
 target_link_libraries(simulation_api entity_manager)
 
-ament_export_include_directories(include)
-ament_export_libraries(simulation_api)
-ament_export_interfaces(export_simulation_api HAS_LIBRARY_TARGET)
+ament_auto_add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 
-install(
-  TARGETS simulation_api
-  EXPORT export_simulation_api
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
-
-# ------------------------------------------------------------------------------
-#  scenario_runner_moc_node
-# ------------------------------------------------------------------------------
-
-add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
-
-target_include_directories(scenario_runner_moc_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
 target_link_libraries(scenario_runner_moc_node simulation_api)
 
-install(
-  TARGETS scenario_runner_moc_node
-  DESTINATION lib/simulation_api)
+ament_auto_add_executable(catmull_rom_visualization src/moc/catmull_rom_visualization.cpp)
 
-# ------------------------------------------------------------------------------
-#  catmull_rom_visualization
-# ------------------------------------------------------------------------------
-
-add_executable(catmull_rom_visualization src/moc/catmull_rom_visualization.cpp)
-
-target_include_directories(catmull_rom_visualization PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
 target_link_libraries(catmull_rom_visualization simulation_api)
 
 install(
-  TARGETS catmull_rom_visualization
-  DESTINATION lib/simulation_api)
-
-# ------------------------------------------------------------------------------
-#  installation
-# ------------------------------------------------------------------------------
-
-install(
-  DIRECTORY include/
-  DESTINATION include)
-
-install(
-  DIRECTORY resource launch config test/catalog test/map
+  DIRECTORY config launch resource test/catalog test/map
   DESTINATION share/${PROJECT_NAME})
 
-# ------------------------------------------------------------------------------
-#  test
-# ------------------------------------------------------------------------------
-
 if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+  # find_package(ament_lint_auto REQUIRED)
+  # ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
 
   ament_add_gtest(test_math test/src/test_math.cpp)
@@ -212,4 +81,4 @@ if(BUILD_TESTING)
   target_link_libraries(test_hdmap_utils simulation_api)
 endif()
 
-ament_package()
+ament_auto_package()

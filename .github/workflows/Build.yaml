@@ -1,0 +1,70 @@
+name: ROS2-Foxy
+
+on:
+  schedule:
+  - cron: 0 0 * * *
+  pull_request:
+
+jobs:
+  job1:
+    name: Build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2-beta
+
+      - name: Install ROS2 via Debian Packages
+        run: | # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+          sudo apt update
+          sudo apt install locales
+          sudo locale-gen en_US en_US.UTF-8
+          sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+          export LANG=en_US.UTF-8
+          sudo apt update
+          sudo apt install curl gnupg2 lsb-release
+          curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+          sudo apt update
+          sudo apt install ros-foxy-desktop
+
+      - name: Copy repository
+        run: |
+          mkdir -p ~/ros2_ws/src/scenario_simulator.auto
+          cp -rf . ~/ros2_ws/src/scenario_simulator.auto
+
+      - name: Install dependencies
+        run: |
+          source /opt/ros/foxy/setup.bash
+          sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
+          rosdep update
+          cd ~/ros2_ws
+          vcs import src < src/scenario_simulator.auto/dependency.repos
+          rosdep install -iry --from-paths src --rosdistro foxy
+
+      - name: Build packages
+        run: |
+          source /opt/ros/foxy/setup.bash
+          cd ~/ros2_ws
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+      - name: Test packages
+        run: |
+          source /opt/ros/foxy/setup.bash
+          source ~/ros2_ws/install/setup.bash
+          cd ~/ros2_ws
+          colcon test
+          colcon test-result --verbose
+
+      - name: Scenario test
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
+          ros2 run scenario_test_runner result_checker /tmp/result.junit.xml
+
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v2
+        if: failure()
+        with:
+          status: ${{ job.status }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

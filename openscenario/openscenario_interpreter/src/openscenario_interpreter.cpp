@@ -24,12 +24,18 @@
 namespace openscenario_interpreter
 {
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
-: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options)
+: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
+  expect("success"),
+  log_path("/tmp"),  // DEPRECATED
+  osc_path(""),
+  real_time_factor(1.0),
+  frame_rate(30)
 {
   declare_parameter<decltype(expect)>("expect", expect);
+  declare_parameter<decltype(frame_rate)>("frame-rate", frame_rate);
   declare_parameter<decltype(log_path)>("log_path", log_path);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
-  declare_parameter<decltype(step_time_ms)>("step_time_ms", 2);
+  declare_parameter<decltype(real_time_factor)>("real-time-factor", real_time_factor);
 }
 
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
@@ -48,8 +54,11 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("osc_path", osc_path);
   VERBOSE("  osc_path: " << osc_path);
 
-  get_parameter("step_time_ms", step_time_ms);
-  VERBOSE("  step_time_ms: " << step_time_ms);
+  get_parameter("real-time-factor", real_time_factor);
+  VERBOSE("  real-time-factor: " << real_time_factor);
+
+  get_parameter("frame-rate", frame_rate);
+  VERBOSE("  frame-rate: " << frame_rate);
 
   try {
     VERBOSE("  Loading scenario " << osc_path);
@@ -59,16 +68,14 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     return Interpreter::Result::FAILURE;
   }
 
-  static constexpr auto real_time_factor = 3.0;
-  VERBOSE("  real_time_factor: " << real_time_factor);
-
   connect(
     shared_from_this(),
     script.as<OpenScenario>().scope.logic_file.string(),
     true);
   VERBOSE("  connection established");
 
-  initialize(real_time_factor, step_time_ms / 1000.0 * real_time_factor);
+  // XXX ???
+  initialize(real_time_factor, (1 / frame_rate) * real_time_factor);
   VERBOSE("  simulator initialized");
 
   VERBOSE("<<< Configure");
@@ -81,38 +88,40 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   VERBOSE(">>> Activate");
 
   timer = create_wall_timer(
-    std::chrono::milliseconds(step_time_ms),
+    std::chrono::milliseconds(
+      static_cast<unsigned int>(1 / frame_rate * 1000)),  // XXX ???
     [this]()
     {
-      guard([this]()
-      {
-        if (script) {
-          if (!script.as<OpenScenario>().complete()) {
-            VERBOSE(">>> Evaluate");
-            const auto result {
-              script.as<OpenScenario>().evaluate()
-            };
-            VERBOSE("<<< Evaluate");
-            VERBOSE("[Storyboard: " << boost::lexical_cast<std::string>(result) << "]");
-            #ifndef NDEBUG
-            RCLCPP_INFO(
-              get_logger(),
-              "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
-              openscenario_interpreter::standby_state.use_count() - 1,
-              openscenario_interpreter::start_transition.use_count() - 1,
-              openscenario_interpreter::running_state.use_count() - 1,
-              openscenario_interpreter::stop_transition.use_count() - 1,
-              openscenario_interpreter::complete_state.use_count() - 1);
-            #endif
-          } else {
-            if (expect == "success") {
-              report(SUCCESS, "intended-success");
+      guard(
+        [this]()
+        {
+          if (script) {
+            if (!script.as<OpenScenario>().complete()) {
+              VERBOSE(">>> Evaluate");
+              const auto result {
+                script.as<OpenScenario>().evaluate()
+              };
+              VERBOSE("<<< Evaluate");
+              VERBOSE("[Storyboard: " << boost::lexical_cast<std::string>(result) << "]");
+              #ifndef NDEBUG
+              RCLCPP_INFO(
+                get_logger(),
+                "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
+                openscenario_interpreter::standby_state.use_count() - 1,
+                openscenario_interpreter::start_transition.use_count() - 1,
+                openscenario_interpreter::running_state.use_count() - 1,
+                openscenario_interpreter::stop_transition.use_count() - 1,
+                openscenario_interpreter::complete_state.use_count() - 1);
+              #endif
             } else {
-              report(FAILURE, "unintended-success", "expected " + expect);
+              if (expect == "success") {
+                report(SUCCESS, "intended-success");
+              } else {
+                report(FAILURE, "unintended-success", "expected " + expect);
+              }
             }
           }
-        }
-      });
+        });
     });
 
   VERBOSE("<<< Activate");

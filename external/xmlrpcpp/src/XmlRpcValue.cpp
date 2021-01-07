@@ -436,11 +436,13 @@ bool XmlRpcValue::timeFromXml(std::string const & valueXml, int * offset)
 
   struct tm t;
 #ifdef _MSC_VER
-  if (sscanf_s(stime.c_str(), "%4d%2d%2dT%2d:%2d:%2d", &t.tm_year, &t.tm_mon, &t.tm_mday,
-    &t.tm_hour, &t.tm_min, &t.tm_sec) != 6)
+  if (sscanf_s(
+      stime.c_str(), "%4d%2d%2dT%2d:%2d:%2d", &t.tm_year, &t.tm_mon, &t.tm_mday,
+      &t.tm_hour, &t.tm_min, &t.tm_sec) != 6)
 #else
-  if (sscanf(stime.c_str(), "%4d%2d%2dT%2d:%2d:%2d", &t.tm_year, &t.tm_mon, &t.tm_mday, &t.tm_hour,
-    &t.tm_min, &t.tm_sec) != 6)
+  if (sscanf(
+      stime.c_str(), "%4d%2d%2dT%2d:%2d:%2d", &t.tm_year, &t.tm_mon, &t.tm_mday, &t.tm_hour,
+      &t.tm_min, &t.tm_sec) != 6)
 #endif
   {return false;}
 
@@ -455,7 +457,8 @@ std::string XmlRpcValue::timeToXml() const
 {
   struct tm * t = _value.asTime;
   char buf[20];
-  std::snprintf(buf, sizeof(buf) - 1, "%4d%02d%02dT%02d:%02d:%02d",
+  std::snprintf(
+    buf, sizeof(buf) - 1, "%4d%02d%02dT%02d:%02d:%02d",
     t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
   buf[sizeof(buf) - 1] = 0;
 
@@ -636,7 +639,8 @@ std::ostream & XmlRpcValue::write(std::ostream & os) const
       {
         struct tm * t = _value.asTime;
         char buf[20];
-        std::snprintf(buf, sizeof(buf) - 1, "%4d%02d%02dT%02d:%02d:%02d",
+        std::snprintf(
+          buf, sizeof(buf) - 1, "%4d%02d%02dT%02d:%02d:%02d",
           t->tm_year, t->tm_mon, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec);
         buf[sizeof(buf) - 1] = 0;
         os << buf;

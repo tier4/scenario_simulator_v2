@@ -66,46 +66,37 @@ struct RelativeDistanceCondition
       case RelativeDistanceType::longitudinal:
 
         return asBoolean(
-          for_each([&](auto && triggering_entity)
-          {
-            const auto distance {
-              std::fabs(getRelativePose(triggering_entity, entity_ref).position.x)
-            };
-            #ifndef NDEBUG
-            std::cout << "DISTANCE: " << distance << std::endl;
-            #endif
-            return compare(distance, value);
-          }));
+          for_each(
+            [&](auto && triggering_entity)
+            {
+              return compare(
+                std::fabs(getRelativePose(triggering_entity, entity_ref).position.x),
+                value);
+            }));
 
       case RelativeDistanceType::lateral:
 
         return asBoolean(
-          for_each([&](auto && triggering_entity)
-          {
-            const auto distance {
-              std::fabs(getRelativePose(triggering_entity, entity_ref).position.y)
-            };
-            #ifndef NDEBUG
-            std::cout << "DISTANCE: " << distance << std::endl;
-            #endif
-            return compare(distance, value);
-          }));
+          for_each(
+            [&](auto && triggering_entity)
+            {
+              return compare(
+                std::fabs(getRelativePose(triggering_entity, entity_ref).position.y),
+                value);
+            }));
 
       case RelativeDistanceType::cartesianDistance:
 
         return asBoolean(
-          for_each([&](auto && triggering_entity)
-          {
-            const auto distance {
-              std::hypot(
-                getRelativePose(triggering_entity, entity_ref).position.x,
-                getRelativePose(triggering_entity, entity_ref).position.y)
-            };
-            #ifndef NDEBUG
-            std::cout << "DISTANCE: " << distance << std::endl;
-            #endif
-            return compare(distance, value);
-          }));
+          for_each(
+            [&](auto && triggering_entity)
+            {
+              return compare(
+                std::hypot(
+                  getRelativePose(triggering_entity, entity_ref).position.x,
+                  getRelativePose(triggering_entity, entity_ref).position.y),
+                value);
+            }));
 
       default:
         THROW(ImplementationFault);

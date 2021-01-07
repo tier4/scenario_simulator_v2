@@ -101,6 +101,7 @@ public:
     std::int64_t from_lanelet_id, double from_s,
     std::int64_t to_lanelet_id, double to_s);
   double getSpeedLimit(std::vector<std::int64_t> lanelet_ids);
+  bool isInRoute(std::int64_t lanelet_id, std::vector<std::int64_t> route) const;
   std::vector<std::int64_t> getFollowingLanelets(
     std::int64_t lanelet_id, double distance = 100,
     bool include_self = true);
@@ -147,7 +148,7 @@ private:
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
   lanelet::routing::RoutingGraphConstPtr pedestrian_routing_graph_ptr_;
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
-  lanelet::routing::RoutingGraphContainerUPtr overall_graphs_ptr_;
+  // lanelet::routing::RoutingGraphContainerUPtr overall_graphs_ptr_;
   double getTrajectoryLength(std::vector<geometry_msgs::msg::Point> trajectory);
   std::vector<double> calcEuclidDist(
     const std::vector<double> & x, const std::vector<double> & y,

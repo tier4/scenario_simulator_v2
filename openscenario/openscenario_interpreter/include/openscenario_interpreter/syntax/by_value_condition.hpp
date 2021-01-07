@@ -41,43 +41,36 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 struct ByValueCondition
   : public Element
 {
-  template<typename Node, typename ... Ts>
+  template
+  <
+    typename Node, typename ... Ts
+  >
   explicit ByValueCondition(const Node & node, Ts && ... xs)
   : Element(
       choice(
         node,
-
-        std::make_pair("ParameterCondition", [&](auto && node)
-        {
-          return make<ParameterCondition>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-
+        ELEMENT(ParameterCondition),
         std::make_pair("TimeOfDayCondition", UNSUPPORTED()),
-
-        std::make_pair("SimulationTimeCondition", [&](auto && node)
-        {
-          return make<SimulationTimeCondition>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-
-        std::make_pair("StoryboardElementStateCondition", [&](auto && node)
-        {
-          return make<StoryboardElementStateCondition>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-
+        ELEMENT(SimulationTimeCondition),
+        ELEMENT(StoryboardElementStateCondition),
         std::make_pair("UserDefinedValueCondition", UNSUPPORTED()),
-
-        std::make_pair("TrafficSignalCondition", [&](auto && node)
-        {
-          return make<TrafficSignalCondition>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-
+        ELEMENT(TrafficSignalCondition),
         std::make_pair("TrafficSignalControllerCondition", UNSUPPORTED())))
   {}
 };
-}
+
+#undef ELEMENT
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BY_VALUE_CONDITION_HPP_

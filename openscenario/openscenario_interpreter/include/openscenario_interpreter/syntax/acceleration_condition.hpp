@@ -50,10 +50,12 @@ struct AccelerationCondition
   auto evaluate() const
   {
     return asBoolean(
-      trigger([&](auto && entity)
-      {
-        return compare(getEntityStatus(entity).action_status.accel.linear.x, value);
-      }));
+      trigger(
+        [&](auto && entity)
+        {
+          return compare(
+            getEntityStatus(entity).action_status.accel.linear.x, value);
+        }));
   }
 };
 }

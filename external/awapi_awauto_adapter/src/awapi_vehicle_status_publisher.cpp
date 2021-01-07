@@ -28,8 +28,14 @@ AutowareVehicleStatusPublisher::AutowareVehicleStatusPublisher(
 {
   // publisher
   pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/vehicle/get/status", 1);
-  sub_twist_ = create_subscription<TwistStamped>("/localization/twist",
-      1, [&](const TwistStamped::SharedPtr msg_ptr) {twist_ptr_ = msg_ptr;});
+
+  sub_twist_ = create_subscription<TwistStamped>(
+    "/localization/twist",
+    1,
+    [&](const TwistStamped::SharedPtr msg_ptr)
+    {
+      twist_ptr_ = msg_ptr;
+    });
 }
 void AutowareVehicleStatusPublisher::publish_vehicle_status()
 {
@@ -37,8 +43,7 @@ void AutowareVehicleStatusPublisher::publish_vehicle_status()
   vehicle_status.header.frame_id = "base_link";
   vehicle_status.header.stamp = get_clock()->now();
   pub_vehicle_status_->publish(vehicle_status);
-  RCLCPP_INFO(this->get_logger(), " VehicleStatus %i",
-    vehicle_status.header.stamp);
+  RCLCPP_INFO(this->get_logger(), " VehicleStatus %i", vehicle_status.header.stamp);
 }
 VehicleStatus AutowareVehicleStatusPublisher::init_vehicle_status()
 {

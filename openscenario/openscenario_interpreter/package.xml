@@ -14,13 +14,13 @@
   <depend>junit_exporter</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>lifecycle_msgs</depend>
+  <depend>openscenario_msgs</depend>
   <depend>pugixml-dev</depend>
-  <depend>rclcpp_components</depend>
   <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>simulation_api</depend>
   <depend>std_msgs</depend>
-  <depend>openscenario_msgs</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

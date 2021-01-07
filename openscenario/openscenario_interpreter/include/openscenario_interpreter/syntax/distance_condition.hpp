@@ -105,13 +105,14 @@ struct DistanceCondition
   auto evaluate()
   {
     return asBoolean(
-      for_each([&](auto && triggering_entity)
-      {
-        const auto pose {
-          getRelativePose(triggering_entity, position.toPose())
-        };
-        return compare(std::hypot(pose.position.x, pose.position.y), value);
-      }));
+      for_each(
+        [&](auto && triggering_entity)
+        {
+          const auto pose {
+            getRelativePose(triggering_entity, position.toPose())
+          };
+          return compare(std::hypot(pose.position.x, pose.position.y), value);
+        }));
   }
 };
 }  // namespace syntax

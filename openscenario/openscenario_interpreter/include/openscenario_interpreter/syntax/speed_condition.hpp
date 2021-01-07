@@ -39,7 +39,10 @@ struct SpeedCondition
 
   const TriggeringEntities trigger;
 
-  template<typename Node>
+  template
+  <
+    typename Node
+  >
   explicit SpeedCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
   : value(readAttribute<Double>("value", node, outer_scope)),
@@ -50,13 +53,15 @@ struct SpeedCondition
   auto evaluate()
   {
     return asBoolean(
-      trigger([&](auto && entity)
-      {
-        return compare(getEntityStatus(entity).action_status.twist.linear.x, value);
-      }));
+      trigger(
+        [&](auto && entity)
+        {
+          return compare(
+            getEntityStatus(entity).action_status.twist.linear.x, value);
+        }));
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_CONDITION_HPP_

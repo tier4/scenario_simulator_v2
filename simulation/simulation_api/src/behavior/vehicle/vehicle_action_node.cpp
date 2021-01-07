@@ -34,6 +34,9 @@ void VehicleActionNode::getBlackBoardValues()
   {
     throw BehaviorTreeRuntimeError("failed to get input vehicle_parameters in VehicleActionNode");
   }
+  if (!getInput<std::vector<std::int64_t>>("route_lanelets", route_lanelets)) {
+    throw BehaviorTreeRuntimeError("failed to get input route_lanelets in ActionNode");
+  }
 }
 
 const std::vector<openscenario_msgs::msg::Obstacle> VehicleActionNode::calculateObstacles(
@@ -43,8 +46,7 @@ const std::vector<openscenario_msgs::msg::Obstacle> VehicleActionNode::calculate
 }
 
 openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
-  double target_speed,
-  const std::vector<std::int64_t> & following_lanelets)
+  double target_speed)
 {
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
@@ -85,18 +87,18 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
     return entity_status_updated;
   } else {
     bool calculation_success = false;
-    for (size_t i = 0; i < following_lanelets.size(); i++) {
-      if (following_lanelets[i] == entity_status.lanelet_pose.lanelet_id) {
+    for (size_t i = 0; i < route_lanelets.size(); i++) {
+      if (route_lanelets[i] == entity_status.lanelet_pose.lanelet_id) {
         double length = hdmap_utils->getLaneletLength(entity_status.lanelet_pose.lanelet_id);
         calculation_success = true;
         if (length < new_s) {
-          if (i != (following_lanelets.size() - 1)) {
+          if (i != (route_lanelets.size() - 1)) {
             new_s = new_s - length;
-            new_lanelet_id = following_lanelets[i + 1];
+            new_lanelet_id = route_lanelets[i + 1];
             break;
           } else {
             new_s = new_s - length;
-            auto next_ids = hdmap_utils->getNextLaneletIds(following_lanelets[i]);
+            auto next_ids = hdmap_utils->getNextLaneletIds(route_lanelets[i]);
             if (next_ids.size() == 0) {
               openscenario_msgs::msg::EntityStatus status_in_world_frame;
               status_in_world_frame.time = entity_status.time;
@@ -191,20 +193,5 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   entity_status_updated.action_status.accel = accel_new;
   entity_status_updated.lanelet_pose_valid = false;
   return entity_status_updated;
-}
-
-openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
-  double target_speed)
-{
-  if (!entity_status.lanelet_pose_valid) {
-    return calculateEntityStatusUpdated(target_speed);
-  }
-  const auto following_lanelets = hdmap_utils->getFollowingLanelets(
-    entity_status.lanelet_pose.lanelet_id);
-  if (following_lanelets.size() == 0) {
-    return calculateEntityStatusUpdated(target_speed);
-  } else {
-    return calculateEntityStatusUpdated(target_speed, following_lanelets);
-  }
 }
 }  // namespace entity_behavior

@@ -21,6 +21,8 @@ import rcl_interfaces
 
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState, GetState
+from pathlib import Path
+from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
 from rclpy.node import Node
 
 
@@ -60,64 +62,75 @@ class LifecycleController(Node):
             rcl_interfaces.srv.SetParameters,
             LifecycleController.NODE_NAME + '/set_parameters')
 
-    def send_request_to_change_parameters(self, scenario, expect, step_time_ms, log_path):
+    def send_request_to_change_parameters(
+            self,  # Arguments are alphabetically sorted
+            expect,
+            frame_rate: float,
+            log_path,  # DEPRECATED
+            real_time_factor: float,
+            scenario: str,
+            ):
         """Send request to change scenario interperter's parameters."""
         request = rcl_interfaces.srv.SetParameters.Request()
+
         request.parameters = [
-            rcl_interfaces.msg.Parameter(
-                name='step_time_ms',
-                value=rcl_interfaces.msg.ParameterValue(
-                    type=rcl_interfaces.msg.ParameterType.PARAMETER_INTEGER,
-                    integer_value=step_time_ms
-                )
-            ),
-            rcl_interfaces.msg.Parameter(
-                name="osc_path",
-                value=rcl_interfaces.msg.ParameterValue(
-                    type=rcl_interfaces.msg.ParameterType.PARAMETER_STRING,
-                    string_value=scenario
-                )
-            ),
-            rcl_interfaces.msg.Parameter(
+
+            Parameter(
                 name="expect",
-                value=rcl_interfaces.msg.ParameterValue(
-                    type=rcl_interfaces.msg.ParameterType.PARAMETER_STRING,
-                    string_value=expect
-                )
-            ),
-            rcl_interfaces.msg.Parameter(
+                value=ParameterValue(
+                    type=ParameterType.PARAMETER_STRING,
+                    string_value=expect)),
+
+            Parameter(  # DEPRECATED
                 name="log_path",
-                value=rcl_interfaces.msg.ParameterValue(
-                    type=rcl_interfaces.msg.ParameterType.PARAMETER_STRING,
-                    string_value=log_path
-                )
-            )
-        ]
+                value=ParameterValue(
+                    type=ParameterType.PARAMETER_STRING,
+                    string_value=log_path)),
+
+            Parameter(
+                name="osc_path",
+                value=ParameterValue(
+                    type=ParameterType.PARAMETER_STRING,
+                    string_value=scenario)),
+
+            Parameter(
+                name="real-time-factor",
+                value=ParameterValue(
+                    type=ParameterType.PARAMETER_DOUBLE,
+                    double_value=real_time_factor)),
+
+            Parameter(
+                name='frame-rate',
+                value=ParameterValue(
+                    type=ParameterType.PARAMETER_DOUBLE,
+                    double_value=frame_rate)),
+            ]
+
         future = self.client_set_parameters.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         return future
 
-    def configure_node(self, scenario, expect, step_time_ms, log_path):
+    def configure_node(
+            self,  # Arguments are alphabetically sorted
+            expect,
+            frame_rate: float,
+            log_path: Path,  # DEPRECATED
+            real_time_factor: float,
+            scenario: str,
+            ):
         """Configure node to chagnge state from unconfigure to inactive."""
-        # self.get_logger().info(self.get_lifecycle_state())
-
         self.current_scenario = scenario
-        # Logger.print_process(
-        #     "Set value '" +
-        #     self.current_scenario +
-        #     "' to " +
-        #     LifecycleController.NODE_NAME +
-        #     "'s parameter 'scenario'")
 
         while not self.send_request_to_change_parameters(
-                self.current_scenario, expect, step_time_ms, log_path).done():
+                expect=expect,
+                frame_rate=frame_rate,
+                log_path=str(log_path),  # DEPRECATED
+                real_time_factor=real_time_factor,
+                scenario=self.current_scenario,
+                ).done():
             self.get_logger().info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
-        # Logger.print_info(
-        #     "Configure -> scenario runner state is " + self.get_lifecycle_state())
-
-        # self.get_logger().info(self.get_lifecycle_state())
 
     def activate_node(self):
         """Activate node to chagnge state from inactive to activate."""

@@ -46,8 +46,7 @@ struct CollisionCondition
 
   template
   <
-    typename Node,
-    typename Scope
+    typename Node, typename Scope
   >
   explicit CollisionCondition(
     const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
@@ -65,15 +64,17 @@ struct CollisionCondition
   {
     if (given.is<EntityRef>()) {
       return asBoolean(
-        for_each([&](auto && triggering_entity) {
-          return checkCollision(triggering_entity, given.as<EntityRef>());
-        }));
+        for_each(
+          [&](auto && triggering_entity)
+          {
+            return checkCollision(triggering_entity, given.as<EntityRef>());
+          }));
     } else {
       return false_v;
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__COLLISION_CONDITION_HPP_

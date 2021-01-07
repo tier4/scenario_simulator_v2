@@ -49,7 +49,8 @@ struct Axles
   : front_axle{readElement<FrontAxle>("FrontAxle", node, scope)},
     rear_axle{readElement<RearAxle>("RearAxle", node, scope)}
   {
-    callWithElements(node, "AdditionalAxle", 0, unbounded, [&](auto && node)
+    callWithElements(
+      node, "AdditionalAxle", 0, unbounded, [&](auto && node)
       {
         additional_axles.emplace_back(node, scope);
       });

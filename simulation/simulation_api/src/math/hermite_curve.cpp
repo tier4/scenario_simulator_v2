@@ -335,9 +335,10 @@ double HermiteCurve::getLength(size_t num_points) const
   auto trajectory = getTrajectory(num_points);
   double ret = 0.0;
   for (size_t i = 0; i < trajectory.size() - 1; i++) {
-    ret = ret + std::sqrt(std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
-        std::pow(trajectory[i + 1].y - trajectory[i].y, 2) +
-        std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
+    ret = ret + std::sqrt(
+      std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
+      std::pow(trajectory[i + 1].y - trajectory[i].y, 2) +
+      std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
   }
   return ret;
 }

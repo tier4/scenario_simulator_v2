@@ -41,13 +41,19 @@ class ScenarioTestRunner(LifecycleController):
 
     SLEEP_RATE = 1
 
-    def __init__(self, timeout: int, log_directory: Path):
+    def __init__(
+            self,  # Arguments are alphabetically sorted
+            global_frame_rate: float,
+            global_real_time_factor: float,
+            global_timeout: int,  # [sec]
+            log_directory: Path,  # DEPRECATED
+            ):
         """
         Initialize the class ScenarioTestRunner.
 
         Arguments
         ---------
-        timeout : int
+        global_timeout : int
             If the success or failure of the simulation is not determined even
             after the specified time (seconds) has passed, the simulation is
             forcibly terminated as a failure.
@@ -60,11 +66,15 @@ class ScenarioTestRunner(LifecycleController):
         None
 
         """
-        self.timeout = timeout
+        self.global_frame_rate = global_frame_rate
+        self.global_real_time_factor = global_real_time_factor
+        self.global_timeout = global_timeout
+
         self.launcher_path = Path(__file__).resolve().parent.parent
-        self.xosc_scenarios = []
-        self.xosc_step_time_ms = []
         self.log_path = Path(resolve_ros_package(str(log_directory)))
+
+        self.xosc_scenarios = []
+        self.local_frame_rates = []
 
     def run_workflow(self, path: Path, no_validation):
         """
@@ -83,8 +93,9 @@ class ScenarioTestRunner(LifecycleController):
         workflow = Workflow(path)
 
         self.yaml_scenarios = []
+
         expects = []
-        step_times_ms = []
+        local_frame_rates = []
 
         for scenario in workflow.scenarios:
             self.yaml_scenarios.append(scenario['path'])
@@ -94,14 +105,14 @@ class ScenarioTestRunner(LifecycleController):
             else:
                 expects.append(scenario['expect'])
 
-            if 'step_time_ms' not in scenario:
-                step_times_ms.append(10)
+            if 'frame-rate' not in scenario:
+                local_frame_rates.append(self.global_frame_rate)
             else:
-                step_times_ms.append(scenario['step_time_ms'])
+                local_frame_rates.append(float(scenario['frame-rate']))
 
-        self.xosc_scenarios, self.xosc_expects, self.xosc_step_time_ms \
+        self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
             = ConverterHandler.convert_all_scenarios(
-                self.yaml_scenarios, expects, step_times_ms, self.launcher_path)
+                self.yaml_scenarios, expects, local_frame_rates, self.launcher_path)
 
         if not no_validation.lower() in ["true", "t", "yes", "1"]:
             self.validate_all_scenarios()
@@ -120,8 +131,11 @@ class ScenarioTestRunner(LifecycleController):
     def monitor_state(self):
         start = time.time()
 
-        while (time.time() - start) < self.timeout:
+        while (time.time() - start) < self.global_timeout \
+                if self.global_timeout is not None else True:
+
             current_state = self.get_lifecycle_state()
+
             if current_state == 'inactive':
                 self.get_logger().info(
                     "Simulator normally transitioned to the inactive state.")
@@ -156,10 +170,12 @@ class ScenarioTestRunner(LifecycleController):
                 "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
 
             self.configure_node(
-                scenario,
-                self.xosc_expects[index],
-                self.xosc_step_time_ms[index],
-                str(self.log_path))
+                expect=self.xosc_expects[index],
+                log_path=self.log_path,
+                real_time_factor=self.global_real_time_factor,
+                scenario=scenario,
+                frame_rate=self.local_frame_rates[index],
+                )
 
             if self.get_lifecycle_state() == 'unconfigured':
                 self.get_logger().error("Failed to configure interpreter")
@@ -177,49 +193,62 @@ class ScenarioTestRunner(LifecycleController):
 def main():
     parser = argparse.ArgumentParser(description='launch simulator')
 
-    parser.add_argument(
-        '--timeout',
-        type=int,
-        default=180,
-        help='Specify simulation time limit in seconds.  The default is 180 seconds.',
-        )
-
-    # parser.add_argument(
-    #     '--log',
-    #     default='screen',
-    #     help='Specify the type of log output.',
-    #     )
-
-    parser.add_argument(
-        '--scenario',
-        help='Specify the scenario you want to execute.',
-        )
-
-    parser.add_argument(
-        '--workflow',
-        type=str,
-        help='Specify workflow you want to execute.',
-        )
-
-    parser.add_argument(
+    parser.add_argument(  # DEPRECATED
         '--log_directory',
         type=Path,
         default=Path('/tmp'),
-        help='Specify log_directory you want to execute.',
-        )
+        help='Specify log_directory you want to execute.')
 
     parser.add_argument(
         '--no_validation',
         default=False,
-        help='Disable validation to generated scenarios.',
+        help='Disable validation to generated scenarios.')
+
+    parser.add_argument(
+        '--global-frame-rate',
+        type=float,
+        default=30
         )
+
+    parser.add_argument(
+        '--global-real-time-factor',
+        type=float,
+        default=1.0,
+        help="Specify the ratio of simulation time to real time. If you set a "
+             "value greater than 1, the simulation will be faster than in "
+             "reality, and if you set a value less than 1, the simulation will "
+             "be slower than in reality.")
+
+    parser.add_argument(
+        '-s', '--scenario',
+        help='Specify the scenario you want to execute.')
+
+    parser.add_argument(
+        '-t', '--global-timeout',
+        default=30,
+        help="Specify the simulation time limit. This time limit is independent "
+             "of the simulation playback speed determined by the option "
+             "real_time_factor. It also has nothing to do with OpenSCENARIO's "
+             "SimulationTimeCondition.")
+
+    parser.add_argument(
+        '-w', '--workflow',
+        type=str,
+        help='Specify workflow you want to execute.')
+
+    parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
+    parser.add_argument('-r', nargs='*')  # XXX DIRTY HACK
 
     args = parser.parse_args()
 
-    ScenarioTestRunner(args.timeout,
-                       args.log_directory).run_workflow(
-        Path(resolve_ros_package(args.workflow)).resolve(),
-        args.no_validation)
+    ScenarioTestRunner(
+        global_frame_rate=args.global_frame_rate,
+        global_real_time_factor=args.global_real_time_factor,
+        global_timeout=args.global_timeout,
+        log_directory=args.log_directory,  # DEPRECATED
+        ).run_workflow(
+            Path(resolve_ros_package(args.workflow)).resolve(),
+            args.no_validation)
 
     rclpy.shutdown()
 
