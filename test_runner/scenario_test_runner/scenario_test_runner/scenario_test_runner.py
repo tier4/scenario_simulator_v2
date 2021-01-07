@@ -76,11 +76,7 @@ class ScenarioTestRunner(LifecycleController):
         self.xosc_scenarios = []
         self.local_frame_rates = []
 
-    def run_workflow(
-            self,
-            path: Path,
-            # no_validation  # DEPRECATED
-            ):
+    def run_workflow(self, path: Path):
         """
         Run workflow.
 
@@ -96,18 +92,15 @@ class ScenarioTestRunner(LifecycleController):
         """
         workflow = Workflow(path)
 
-        self.yaml_scenarios = []
-
+        scenarios = []
         expects = []
         local_frame_rates = []
 
         for scenario in workflow.scenarios:
-            self.yaml_scenarios.append(scenario['path'])
+            scenarios.append(scenario['path'])
 
-            if 'expect' not in scenario:
-                expects.append('success')
-            else:
-                expects.append(scenario['expect'])
+            expects.append(
+                scenario['expect'] if 'expect' in scenario else 'success')
 
             if 'frame-rate' not in scenario:
                 local_frame_rates.append(self.global_frame_rate)
@@ -115,8 +108,8 @@ class ScenarioTestRunner(LifecycleController):
                 local_frame_rates.append(float(scenario['frame-rate']))
 
         self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
-            = ConverterHandler.convert_all_scenarios(
-                self.yaml_scenarios,
+            = ConverterHandler.convert_scenarios(
+                scenarios,
                 expects,
                 local_frame_rates,
                 self.launcher_path
@@ -126,7 +119,7 @@ class ScenarioTestRunner(LifecycleController):
 
         for each in self.xosc_scenarios:
             if not is_valid(each):
-                exit()
+                exit(1)
 
         super().__init__()
 
@@ -201,11 +194,6 @@ def main():
         default=Path('/tmp'),
         help='(Deprecated) Specify log_directory you want to execute.')
 
-    parser.add_argument(  # DEPRECATED
-        '--no_validation',
-        default=False,
-        help='(Deprecated) Disable validation to generated scenarios.')
-
     parser.add_argument(
         '--global-frame-rate',
         type=float,
@@ -251,9 +239,7 @@ def main():
             global_timeout=args.global_timeout,
             log_directory=args.log_directory,  # DEPRECATED
             ).run_workflow(
-                Path(resolve_ros_package(args.workflow)).resolve(),
-                # args.no_validation
-                )
+                Path(resolve_ros_package(args.workflow)).resolve())
     else:
         print("Option '--scenario' does not supprted.")
 

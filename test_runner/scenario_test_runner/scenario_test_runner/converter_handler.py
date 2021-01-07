@@ -25,7 +25,7 @@ class ConverterHandler():
     """class to handler scenario converter."""
 
     @staticmethod
-    def convert_all_scenarios(all_scenarios, expects, step_times_ms, launcher_path):
+    def convert_scenarios(all_scenarios, expects, step_times_ms, launcher_path):
         """Convert all scenarios."""
         assert len(all_scenarios) == len(expects)
         sweeped_xosc_scenarios = []
