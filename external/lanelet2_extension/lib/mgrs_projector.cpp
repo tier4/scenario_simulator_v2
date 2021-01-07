@@ -51,7 +51,7 @@ BasicPoint3d MGRSProjector::forward(const GPSPoint & gps, const int precision) c
     GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp, utm_point.x(), utm_point.y());
     GeographicLib::MGRS::Forward(
       zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
-  } catch (GeographicLib::GeographicErr err) {
+  } catch (const GeographicLib::GeographicErr &) {
     return mgrs_point;
   }
 
@@ -102,7 +102,7 @@ GPSPoint MGRSProjector::reverse(
     utm_point.x() += fmod(mgrs_point.x(), pow(10, 5 - prec));
     utm_point.y() += fmod(mgrs_point.y(), pow(10, 5 - prec));
     GeographicLib::UTMUPS::Reverse(zone, northp, utm_point.x(), utm_point.y(), gps.lat, gps.lon);
-  } catch (GeographicLib::GeographicErr err) {
+  } catch (const GeographicLib::GeographicErr & err) {
     std::string message =
       "Failed to convert from MGRS to WGS " + static_cast<std::string>(err.what());
     throw lanelet::HdMapException(message);
@@ -124,7 +124,7 @@ void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
     GeographicLib::UTMUPS::Forward(gps.lat, gps.lon, zone, northp, utm_point.x(), utm_point.y());
     GeographicLib::MGRS::Forward(
       zone, northp, utm_point.x(), utm_point.y(), gps.lat, precision, mgrs_code);
-  } catch (GeographicLib::GeographicErr err) {
+  } catch (const GeographicLib::GeographicErr & err) {
     throw lanelet::HdMapException(err.what());
   }
 
