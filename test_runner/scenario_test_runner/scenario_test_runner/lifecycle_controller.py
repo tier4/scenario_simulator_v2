@@ -66,9 +66,9 @@ class LifecycleController(Node):
             self,  # Arguments are alphabetically sorted
             expect,
             frame_rate: float,
-            log_path,  # DEPRECATED
+            output_directory: Path,
             real_time_factor: float,
-            scenario: str,
+            scenario: Path,
             ):
         """Send request to change scenario interperter's parameters."""
         request = rcl_interfaces.srv.SetParameters.Request()
@@ -79,19 +79,19 @@ class LifecycleController(Node):
                 name="expect",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
-                    string_value=expect)),
+                    string_value=str(expect.name))),
 
-            Parameter(  # DEPRECATED
-                name="log_path",
+            Parameter(
+                name="log_path",  # TODO RENAME
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
-                    string_value=log_path)),
+                    string_value=str(output_directory))),
 
             Parameter(
                 name="osc_path",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
-                    string_value=scenario)),
+                    string_value=str(scenario))),
 
             Parameter(
                 name="real-time-factor",
@@ -114,7 +114,7 @@ class LifecycleController(Node):
             self,  # Arguments are alphabetically sorted
             expect,
             frame_rate: float,
-            log_path: Path,  # DEPRECATED
+            output_directory: Path,
             real_time_factor: float,
             scenario: str,
             ):
@@ -124,7 +124,7 @@ class LifecycleController(Node):
         while not self.send_request_to_change_parameters(
                 expect=expect,
                 frame_rate=frame_rate,
-                log_path=str(log_path),  # DEPRECATED
+                output_directory=output_directory,
                 real_time_factor=real_time_factor,
                 scenario=self.current_scenario,
                 ).done():
@@ -195,7 +195,7 @@ class LifecycleController(Node):
         """Shutdown lifecycle controller."""
         self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
         # Logger.print_info(self.get_lifecycle_state())
-        self.destroy_node()
+        # self.destroy_node()
 
 
 def main(args=None):

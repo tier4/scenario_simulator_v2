@@ -17,15 +17,34 @@
 
 
 import argparse
-import rclpy
+# import rclpy
 import time
 
+from openscenario_utility.conversion import convert
 from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
-from scenario_test_runner.converter_handler import ConverterHandler
-from scenario_test_runner.workflow import Workflow, resolve_ros_package
 from scenario_test_runner.lifecycle_controller import LifecycleController
+from scenario_test_runner.workflow import Expect, Scenario, Workflow, substitute_ros_package
+from shutil import rmtree
 from sys import exit
+from typing import List
+
+
+def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
+
+    result = []
+
+    for each in scenarios:
+
+        if each.path.suffix == '.xosc':
+            result.append(each)
+
+        else:  # == '.yaml'
+            for path in convert(each.path, output_directory / each.path.stem, False):
+                result.append(
+                    Scenario(path, each.expect, each.frame_rate))
+
+    return result
 
 
 class ScenarioTestRunner(LifecycleController):
@@ -46,7 +65,7 @@ class ScenarioTestRunner(LifecycleController):
             global_frame_rate: float,
             global_real_time_factor: float,
             global_timeout: int,  # [sec]
-            log_directory: Path,  # DEPRECATED
+            output_directory: Path,
             ):
         """
         Initialize the class ScenarioTestRunner.
@@ -58,8 +77,9 @@ class ScenarioTestRunner(LifecycleController):
             after the specified time (seconds) has passed, the simulation is
             forcibly terminated as a failure.
 
-        log_directory : Path
-            Deprecated.
+        output_directory : Path
+            Output destination directory of the generated file including the
+            result file.
 
         Returns
         -------
@@ -70,187 +90,205 @@ class ScenarioTestRunner(LifecycleController):
         self.global_real_time_factor = global_real_time_factor
         self.global_timeout = global_timeout
 
-        self.launcher_path = Path(__file__).resolve().parent.parent
-        self.log_path = Path(resolve_ros_package(str(log_directory)))
+        self.output_directory = substitute_ros_package(output_directory)
 
-        self.xosc_scenarios = []
-        self.local_frame_rates = []
+        if self.output_directory.exists():
+            rmtree(self.output_directory)
+        self.output_directory.mkdir(parents=True, exist_ok=True)
 
-    def run_workflow(self, path: Path, no_validation):
+        self.current_workflow = None
+
+        super().__init__()
+
+    def run_workflow(self, path: Path):
         """
         Run workflow.
 
         Arguments
         ---------
         path : Path
-            The path to the workflow file.
+            Path to the workflow file.
 
         Returns
         -------
         None
 
         """
-        workflow = Workflow(path)
+        self.current_workflow = Workflow(
+            path,
+            self.global_frame_rate,
+            # TODO self.global_real_time_factor,
+            )
 
-        self.yaml_scenarios = []
+        converted_scenarios = convert_scenarios(
+            self.current_workflow.scenarios,
+            self.output_directory)
 
-        expects = []
-        local_frame_rates = []
-
-        for scenario in workflow.scenarios:
-            self.yaml_scenarios.append(scenario['path'])
-
-            if 'expect' not in scenario:
-                expects.append('success')
-            else:
-                expects.append(scenario['expect'])
-
-            if 'frame-rate' not in scenario:
-                local_frame_rates.append(self.global_frame_rate)
-            else:
-                local_frame_rates.append(float(scenario['frame-rate']))
-
-        self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
-            = ConverterHandler.convert_all_scenarios(
-                self.yaml_scenarios, expects, local_frame_rates, self.launcher_path)
-
-        if not no_validation.lower() in ["true", "t", "yes", "1"]:
-            self.validate_all_scenarios()
-
-        super().__init__()
-
-        self.run_all_scenarios()
-
-    def validate_all_scenarios(self):
-        """Validate all scenarios."""
         is_valid = XOSCValidator(False)
-        for scenario in self.xosc_scenarios:
-            if not is_valid(scenario):
-                exit()
 
-    def monitor_state(self):
+        for each in converted_scenarios:
+            if not is_valid(each.path):
+                exit(1)
+
+        self.run_scenarios(converted_scenarios)
+
+    def spin(self):
+        """Run scenario."""
+        time.sleep(self.SLEEP_RATE)
+        self.activate_node()
         start = time.time()
 
         while (time.time() - start) < self.global_timeout \
                 if self.global_timeout is not None else True:
 
-            current_state = self.get_lifecycle_state()
-
-            if current_state == 'inactive':
+            if self.get_lifecycle_state() == 'inactive':
                 self.get_logger().info(
                     "Simulator normally transitioned to the inactive state.")
                 return
-
-            time.sleep(self.SLEEP_RATE)
+            else:
+                time.sleep(self.SLEEP_RATE)
 
         self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
 
         self.deactivate_node()
 
-    def run_scenario(self):
-        """Run scenario."""
-        time.sleep(self.SLEEP_RATE)
-        self.activate_node()
-        self.monitor_state()
+    def run_scenario(self, scenario: Scenario):
 
-    def run_all_scenarios(self):
+        converted_scenarios = convert_scenarios(
+            [scenario],
+            self.output_directory)
+
+        is_valid = XOSCValidator(False)
+
+        for each in converted_scenarios:
+            if not is_valid(each.path):
+                exit(1)
+
+        self.run_scenarios(converted_scenarios)
+
+    def run_scenarios(self, scenarios: List[Scenario]):  # TODO RENAME
         """
-        Run all scenarios.
+        Run all given scenarios.
+
+        Arguments
+        ---------
+        scenarios : List[Scenario]
 
         Returns
         -------
         None
 
         """
-        if not self.log_path.exists():
-            self.log_path.mkdir(parents=True, exist_ok=True)
+        length = len(scenarios)
 
-        for index, scenario in enumerate(self.xosc_scenarios):
+        for index, each in enumerate(scenarios):
+
             self.get_logger().info(
-                "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
+                "Run " + str(each.path.name) + " (" + str(index + 1) + " of " + str(length) + ")")
 
             self.configure_node(
-                expect=self.xosc_expects[index],
-                log_path=self.log_path,
+                expect=each.expect,
+                frame_rate=each.frame_rate,
+                output_directory=self.output_directory,
                 real_time_factor=self.global_real_time_factor,
-                scenario=scenario,
-                frame_rate=self.local_frame_rates[index],
+                scenario=each.path,
                 )
 
             if self.get_lifecycle_state() == 'unconfigured':
                 self.get_logger().error("Failed to configure interpreter")
 
             else:
-                self.run_scenario()
+                self.spin()
                 self.cleanup_node()
 
         self.shutdown()
 
-    def __del__(self):
-        pass
+    # def __del__(self):
+    #     pass
 
 
 def main():
-    parser = argparse.ArgumentParser(description='launch simulator')
-
-    parser.add_argument(  # DEPRECATED
-        '--log_directory',
-        type=Path,
-        default=Path('/tmp'),
-        help='Specify log_directory you want to execute.')
+    parser = argparse.ArgumentParser(
+        description="This provides batch processing of scenarios for Tier IV "
+                    "Scenario Simulator.\nThis program doesn't work on its own "
+                    "and he needs to be called via ROS2 launch as 'ros2 launch "
+                    "scenario_test_runner scenario_test_runner.launch.py'. "
+                    "When calling 'scenario_test_runner.launch.py', the "
+                    "options described below must be given in the form "
+                    "'option:=VALUE' instead of '--option VALUE'.")
 
     parser.add_argument(
-        '--no_validation',
-        default=False,
-        help='Disable validation to generated scenarios.')
+        '--output-directory',
+        default=Path("/tmp"),
+        type=Path,
+        help="Specify the output destination directory of the generated file "
+             "including the result file.")
 
     parser.add_argument(
         '--global-frame-rate',
-        type=float,
-        default=30
-        )
+        default=30,
+        type=float)
 
     parser.add_argument(
-        '--global-real-time-factor',
-        type=float,
+        '-x', '--global-real-time-factor',
         default=1.0,
+        type=float,
         help="Specify the ratio of simulation time to real time. If you set a "
              "value greater than 1, the simulation will be faster than in "
              "reality, and if you set a value less than 1, the simulation will "
              "be slower than in reality.")
 
     parser.add_argument(
-        '-s', '--scenario',
-        help='Specify the scenario you want to execute.')
-
-    parser.add_argument(
         '-t', '--global-timeout',
         default=30,
+        type=float,
         help="Specify the simulation time limit. This time limit is independent "
              "of the simulation playback speed determined by the option "
              "real_time_factor. It also has nothing to do with OpenSCENARIO's "
              "SimulationTimeCondition.")
 
     parser.add_argument(
+        '-s', '--scenario',
+        default="/dev/null",
+        type=Path,
+        help="Specify a scenario file (.yaml or .xosc) you want to execute. If "
+             "a workflow file is also specified by the'--workflow' option at "
+             "the same time, this option takes precedence (that is, only one "
+             "scenario passed to the --scenario option will be executed).")
+
+    parser.add_argument(
         '-w', '--workflow',
-        type=str,
-        help='Specify workflow you want to execute.')
+        default="$(find-pkg-share scenario_test_runner)/workflow_example.yaml",
+        type=Path,
+        help='Specify <workflow>.yaml file you want to execute.')
 
     parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
     parser.add_argument('-r', nargs='*')  # XXX DIRTY HACK
 
     args = parser.parse_args()
 
-    ScenarioTestRunner(
+    test_runner = ScenarioTestRunner(
         global_frame_rate=args.global_frame_rate,
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
-        log_directory=args.log_directory,  # DEPRECATED
-        ).run_workflow(
-            Path(resolve_ros_package(args.workflow)).resolve(),
-            args.no_validation)
+        output_directory=args.output_directory / 'scenario_test_runner',
+        )
 
-    rclpy.shutdown()
+    if args.scenario != Path("/dev/null"):
+        print(str(substitute_ros_package(args.scenario).resolve()))
+
+        test_runner.run_scenario(
+            Scenario(
+                substitute_ros_package(args.scenario).resolve(),
+                Expect['success'],
+                args.global_frame_rate))
+
+    elif args.workflow != Path("/dev/null"):
+        test_runner.run_workflow(
+            substitute_ros_package(args.workflow).resolve())
+
+    else:
+        print("Neither the scenario nor the workflow is specified. Specify either one.")
 
 
 if __name__ == '__main__':
