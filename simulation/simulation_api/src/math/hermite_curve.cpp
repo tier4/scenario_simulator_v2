@@ -167,7 +167,11 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double d = (dx_ - fx) * ratio - (dy_ - fy);
     auto solutions = solver_.solveCubicEquation(a, b, c, d);
     for (const auto solution : solutions) {
-      s_values.emplace_back(solution);
+      double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
+      double t = (y - fy) / ratio;
+      if (0 <= t && t <= 1) {
+        s_values.emplace_back(solution);
+      }
     }
   }
   if (s_values.size() == 0) {

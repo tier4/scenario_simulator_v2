@@ -327,7 +327,6 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   size_t n = curves_.size();
   if (search_backward) {
     for (size_t i = 0; i < n; i++) {
-      std::cout << "index : " << n - 1 - i << std::endl;
       auto s = curves_[n - 1 - i].getCollisionPointIn2D(point0, point1, search_backward);
       if (s) {
         return getSInSplineCurve(n - 1 - i, s.get());
