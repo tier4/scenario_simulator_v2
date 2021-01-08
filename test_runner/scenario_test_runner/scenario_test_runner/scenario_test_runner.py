@@ -102,32 +102,18 @@ class ScenarioTestRunner(LifecycleController):
             self.global_frame_rate,
             )
 
-        # scenarios = []
-        # expects = []
-        # local_frame_rates = []
+        # scenarios = [each.path for each in self.current_workflow.scenarios]
         #
-        # for scenario in self.current_workflow.scenarios:
-        #     scenarios.append(scenario['path'])
+        # expects = [each.expect for each in self.current_workflow.scenarios]
         #
-        #     expects.append(
-        #         scenario['expect'] if 'expect' in scenario else 'success')
-        #
-        #     if 'frame-rate' not in scenario:
-        #         local_frame_rates.append(self.global_frame_rate)
-        #     else:
-        #         local_frame_rates.append(float(scenario['frame-rate']))
-
-        scenarios = [each.path for each in self.current_workflow.scenarios]
-
-        expects = [each.expect for each in self.current_workflow.scenarios]
-
-        frame_rates = [each.frame_rate for each in self.current_workflow.scenarios]
+        # frame_rates = [each.frame_rate for each in self.current_workflow.scenarios]
 
         self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
             = ConverterHandler.convert_scenarios(
-                scenarios,
-                expects,
-                frame_rates,
+                # scenarios,
+                # expects,
+                # frame_rates,
+                self.current_workflow.scenarios,
                 self.launcher_path  # XXX DEPRECATED
                 )
 

@@ -135,17 +135,6 @@ class Workflow():
         if workflow_path.exists():
             with workflow_path.open('r') as file:
 
-                # database = safe_load(file) \
-                #     if workflow_path.suffix == ".yaml" else file.read()
-                #
-                # scenarios = []
-                #
-                # for each in database['Scenario']:
-                #     each['path'] = str(substitute_ros_package(each['path']).resolve())
-                #     scenarios.append(each)
-                #
-                # return scenarios
-
                 scenarios = []
 
                 for each in safe_load(file)['Scenario']:

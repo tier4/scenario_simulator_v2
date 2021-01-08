@@ -17,35 +17,47 @@
 
 import os
 
-from pathlib import Path
 from openscenario_utility.conversion import convert
+from pathlib import Path
+from scenario_test_runner.workflow import Scenario
+from typing import List
 
 
 class ConverterHandler():
     """class to handler scenario converter."""
 
     @staticmethod
-    def convert_scenarios(all_scenarios, expects, step_times_ms, launcher_path):
-        """Convert all scenarios."""
-        assert len(all_scenarios) == len(expects)
+    def convert_scenarios(
+            # all_scenarios,
+            # expects,
+            # step_times_ms,
+            scenarios: List[Scenario],
+            launcher_path
+            ):
+
+        paths = [each.path for each in scenarios]
+
+        expects = [each.expect for each in scenarios]
+
+        frame_rates = [each.frame_rate for each in scenarios]
 
         sweeped_xosc_scenarios = []
         xosc_expects = []
         xosc_step_time_ms = []
 
-        for index, scenario in enumerate(all_scenarios):
+        for index, scenario in enumerate(paths):
 
             if scenario.suffix == ".xosc":
                 sweeped_xosc_scenarios.append(scenario)
                 xosc_expects.append(expects[index])
-                xosc_step_time_ms.append(step_times_ms[index])
+                xosc_step_time_ms.append(frame_rates[index])
             else:
                 output_dir = ConverterHandler.convert_scenario(index, scenario, launcher_path)
                 xosc_scenarios = ConverterHandler.sweep_scenarios(output_dir)
                 sweeped_xosc_scenarios.extend(xosc_scenarios)
                 for each in xosc_scenarios:
                     xosc_expects.append(expects[index])
-                    xosc_step_time_ms.append(step_times_ms[index])
+                    xosc_step_time_ms.append(frame_rates[index])
 
         return sweeped_xosc_scenarios, xosc_expects, xosc_step_time_ms
 
@@ -74,5 +86,4 @@ def main():
 
 
 if __name__ == "__main__":
-    """Entrypoint."""
     main()
