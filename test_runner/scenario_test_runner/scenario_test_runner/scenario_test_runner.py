@@ -106,8 +106,8 @@ class ScenarioTestRunner(LifecycleController):
 
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
-        self.xosc_scenarios = []
-        self.local_frame_rates = []
+        # self.xosc_scenarios = []  # XXX DEPRECATED
+        # self.local_frame_rates = []  # XXX DEPRECATED
 
         self.current_workflow = None
 
@@ -136,17 +136,17 @@ class ScenarioTestRunner(LifecycleController):
             self.current_workflow.scenarios,
             self.output_directory)
 
-        self.xosc_scenarios = [each.path for each in converted_scenarios]
-        self.xosc_expects = [each.expect for each in converted_scenarios]
-        self.local_frame_rates = [each.frame_rate for each in converted_scenarios]
+        # self.xosc_scenarios = [each.path for each in converted_scenarios]  # TODO REMOVE
+        # self.xosc_expects = [each.expect for each in converted_scenarios]  # TODO REMOVE
+        # self.local_frame_rates = [each.frame_rate for each in converted_scenarios]  # TODO REMOVE
 
         is_valid = XOSCValidator(False)
 
-        for each in self.xosc_scenarios:
-            if not is_valid(each):
+        for each in converted_scenarios:
+            if not is_valid(each.path):
                 exit(1)
 
-        self.run_all_scenarios()
+        self.run_scenarios(converted_scenarios)
 
     def spin(self):
         """Run scenario."""
@@ -168,34 +168,45 @@ class ScenarioTestRunner(LifecycleController):
 
         self.deactivate_node()
 
-    def run_all_scenarios(
-            self,
-            # scenarios,
-            ):
+    def run_scenarios(self, scenarios: List[Scenario]):
         """
-        Run all scenarios.
+        Run all given scenarios.
 
         Arguments
         ---------
-        scenarios : List[]
-            The path to the workflow file.
+        scenarios : List[Scenario]
 
         Returns
         -------
         None
 
         """
-        for index, scenario in enumerate(self.xosc_scenarios):
+        length = len(scenarios)
+
+        for index, each in enumerate(scenarios):
+
             self.get_logger().info(
-                "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
+                "Run " + str(each.path.name) + " (" + str(index + 1) + " of " + str(length) + ")")
 
             self.configure_node(
-                expect=self.xosc_expects[index],
+                expect=each.expect,
+                frame_rate=each.frame_rate,
                 output_directory=self.output_directory,
                 real_time_factor=self.global_real_time_factor,
-                scenario=scenario,
-                frame_rate=self.local_frame_rates[index],
+                scenario=each.path,
                 )
+
+        # for index, scenario in enumerate(self.xosc_scenarios):
+        #     self.get_logger().info(
+        #         "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
+        #
+        #     self.configure_node(
+        #         expect=self.xosc_expects[index],
+        #         output_directory=self.output_directory,
+        #         real_time_factor=self.global_real_time_factor,
+        #         scenario=scenario,
+        #         frame_rate=self.local_frame_rates[index],
+        #         )
 
             if self.get_lifecycle_state() == 'unconfigured':
                 self.get_logger().error("Failed to configure interpreter")
@@ -284,7 +295,7 @@ def main():
         test_runner.run_workflow(substitute_ros_package(args.workflow).resolve())
 
     else:
-        print("Option '--scenario' does not supprted.")
+        print("Neither the scenario nor the workflow is specified. Specify either one.")
 
 
 if __name__ == '__main__':

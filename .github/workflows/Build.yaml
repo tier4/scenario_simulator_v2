@@ -58,7 +58,7 @@ jobs:
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml'
-          ros2 run scenario_test_runner result_checker /tmp/scenario_test_runne/result.junit.xml
+          ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v2
