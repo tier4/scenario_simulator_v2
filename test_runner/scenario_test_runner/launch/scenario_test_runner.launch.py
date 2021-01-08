@@ -30,7 +30,7 @@ def generate_launch_description():
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=30)
-    log_directory = LaunchConfiguration('log_directory', default="/tmp/scenario_test_runner")
+    log_directory = LaunchConfiguration('log_directory', default="/tmp")
     scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))
     workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))
 

@@ -25,14 +25,12 @@ from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from scenario_test_runner.workflow import Scenario, Workflow, substitute_ros_package
+from shutil import rmtree
 from sys import exit
 from typing import List
 
 
-def convert_scenarios(
-        scenarios: List[Scenario],
-        launcher_path
-        ):
+def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
 
     result = []
 
@@ -44,23 +42,14 @@ def convert_scenarios(
 
         else:  # == '.yaml'
 
-            directory = Path('/tmp/scenario_test_runner') / each.path.stem
-
-            paths = convert(
-                each.path,
-                directory,
-                False
-                )
-
-            for path in paths:
+            for path in convert(
+                    each.path,  # input
+                    output_directory / each.path.stem,  # output
+                    False
+                    ):
 
                 result.append(
-                    Scenario(
-                        path,
-                        each.expect,
-                        each.frame_rate
-                        )
-                    )
+                    Scenario(path, each.expect, each.frame_rate))
 
     return result
 
@@ -110,7 +99,10 @@ class ScenarioTestRunner(LifecycleController):
         self.launcher_path = Path(__file__).resolve().parent.parent
         self.log_path = substitute_ros_package(log_directory)
 
-        if not self.log_path.exists():
+        if self.log_path.exists():
+            rmtree(self.log_path)
+
+        else:
             self.log_path.mkdir(parents=True, exist_ok=True)
 
         self.xosc_scenarios = []
@@ -141,7 +133,7 @@ class ScenarioTestRunner(LifecycleController):
 
         converted_scenarios = convert_scenarios(
             self.current_workflow.scenarios,
-            self.launcher_path  # XXX DEPRECATED
+            self.log_path  # TODO RENAME
             )
 
         self.xosc_scenarios = [each.path for each in converted_scenarios]
@@ -281,7 +273,7 @@ def main():
         global_frame_rate=args.global_frame_rate,
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
-        log_directory=args.log_directory,  # DEPRECATED
+        log_directory=args.log_directory / 'scenario_test_runner',  # DEPRECATED
         )
 
     if args.scenario != Path("/dev/null"):
