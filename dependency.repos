@@ -3,7 +3,3 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/quaternion_operation.git
     version: ros2
-  autoware_auto_msgs:
-    type: git
-    url: https://gitlab.com/autowarefoundation/autoware.auto/autoware_auto_msgs.git
-    version: master
