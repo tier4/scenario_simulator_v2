@@ -24,12 +24,12 @@ from sys import exit, stderr
 from yaml import safe_load
 
 
-def resolve_ros_package(pathname: str):
+def substitute_ros_package(pathname: Path):
 
-    def replace(match):
+    def find_pkg_share(match):
         return get_package_share_directory(match.group(1))
 
-    return sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", replace, pathname)
+    return Path(sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", find_pkg_share, str(pathname)))
 
 
 class Workflow():
@@ -100,7 +100,7 @@ class Workflow():
                 scenarios = []
 
                 for each in database['Scenario']:
-                    each['path'] = str(Path(resolve_ros_package(each['path'])).resolve())
+                    each['path'] = str(substitute_ros_package(each['path']).resolve())
                     scenarios.append(each)
 
                 return scenarios

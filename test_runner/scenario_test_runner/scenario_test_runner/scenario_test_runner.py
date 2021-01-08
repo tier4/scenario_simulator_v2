@@ -23,7 +23,7 @@ import time
 from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
 from scenario_test_runner.converter_handler import ConverterHandler
-from scenario_test_runner.workflow import Workflow, resolve_ros_package
+from scenario_test_runner.workflow import Workflow, substitute_ros_package
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from sys import exit
 
@@ -71,7 +71,7 @@ class ScenarioTestRunner(LifecycleController):
         self.global_timeout = global_timeout
 
         self.launcher_path = Path(__file__).resolve().parent.parent
-        self.log_path = Path(resolve_ros_package(str(log_directory)))
+        self.log_path = substitute_ros_package(log_directory)
 
         self.xosc_scenarios = []
         self.local_frame_rates = []
@@ -125,7 +125,10 @@ class ScenarioTestRunner(LifecycleController):
 
         self.run_all_scenarios()
 
-    def monitor_state(self):
+    def spin(self):
+        """Run scenario."""
+        time.sleep(self.SLEEP_RATE)
+        self.activate_node()
         start = time.time()
 
         while (time.time() - start) < self.global_timeout \
@@ -141,12 +144,6 @@ class ScenarioTestRunner(LifecycleController):
         self.get_logger().error("The simulation has timed out. Forcibly inactivate.")
 
         self.deactivate_node()
-
-    def run_scenario(self):
-        """Run scenario."""
-        time.sleep(self.SLEEP_RATE)
-        self.activate_node()
-        self.monitor_state()
 
     def run_all_scenarios(self):
         """
@@ -176,7 +173,7 @@ class ScenarioTestRunner(LifecycleController):
                 self.get_logger().error("Failed to configure interpreter")
 
             else:
-                self.run_scenario()
+                self.spin()
                 self.cleanup_node()
 
         self.shutdown()
@@ -209,12 +206,7 @@ def main():
              "be slower than in reality.")
 
     parser.add_argument(
-        '-s', '--scenario',
-        type=Path,
-        help='Specify the scenario you want to execute.')
-
-    parser.add_argument(
-        '-t', '--global-timeout',
+        '--global-timeout',
         type=float,
         default=30,
         help="Specify the simulation time limit. This time limit is independent "
@@ -223,8 +215,13 @@ def main():
              "SimulationTimeCondition.")
 
     parser.add_argument(
+        '-s', '--scenario',
+        type=Path,
+        help='Specify the scenario you want to execute.')
+
+    parser.add_argument(
         '-w', '--workflow',
-        type=str,
+        type=Path,
         help='Specify workflow you want to execute.')
 
     parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
@@ -232,14 +229,16 @@ def main():
 
     args = parser.parse_args()
 
+    test_runner = ScenarioTestRunner(
+        global_frame_rate=args.global_frame_rate,
+        global_real_time_factor=args.global_real_time_factor,
+        global_timeout=args.global_timeout,
+        log_directory=args.log_directory,  # DEPRECATED
+        )
+
     if args.scenario == Path("/dev/null"):
-        ScenarioTestRunner(
-            global_frame_rate=args.global_frame_rate,
-            global_real_time_factor=args.global_real_time_factor,
-            global_timeout=args.global_timeout,
-            log_directory=args.log_directory,  # DEPRECATED
-            ).run_workflow(
-                Path(resolve_ros_package(args.workflow)).resolve())
+        test_runner.run_workflow(
+            substitute_ros_package(args.workflow).resolve())
     else:
         print("Option '--scenario' does not supprted.")
 
