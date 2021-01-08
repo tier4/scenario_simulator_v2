@@ -48,7 +48,10 @@ public:
   double getMaximum2DCurventure() const;
   const geometry_msgs::msg::Point getPoint(double s) const;
   const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
+  const geometry_msgs::msg::Vector3 getNormalVector(double s) const;
   const geometry_msgs::msg::Pose getPose(double s) const;
+  std::vector<geometry_msgs::msg::Point> getRightBounds(double width, size_t num_points = 30) const;
+  std::vector<geometry_msgs::msg::Point> getLeftBounds(double width, size_t num_points = 30) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(int num_points) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s,

@@ -31,26 +31,54 @@ CatmullRomSpline::CatmullRomSpline(std::vector<openscenario_msgs::msg::HermiteCu
   }
 }
 
+std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
+  double width,
+  size_t num_points) const
+{
+  std::vector<geometry_msgs::msg::Point> points;
+  double step_size = 1.0 / static_cast<double>(num_points);
+  for (int i = 0; i < (num_points + 1); i++) {
+    double t = step_size * static_cast<double>(i);
+    /*
+    geometry_msgs::msg::Vector3 vec = getNormalVector(path, t);
+    double theta = std::atan2(vec.y, vec.x);
+    geometry_msgs::msg::Point p = getPointOnHermitePath(path, t);
+    geometry_msgs::msg::Point point;
+    point.x = p.x + 0.5 * robot_width_ * std::cos(theta);
+    point.y = p.y + 0.5 * robot_width_ * std::sin(theta);
+    points.push_back(point);
+    */
+  }
+  return points;
+}
+
+std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
+  double width,
+  size_t num_points) const
+{
+
+}
+
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   double start_s,
   double end_s,
-  double resolution)
+  double num_points)
 const
 {
   std::vector<geometry_msgs::msg::Point> traj;
-  resolution = std::fabs(resolution);
+  num_points = std::fabs(num_points);
   double s = start_s;
   if (start_s < end_s) {
     while (s < end_s) {
       auto p = getPoint(s);
       traj.emplace_back(p);
-      s = s + resolution;
+      s = s + num_points;
     }
   } else {
     while (s < end_s) {
       auto p = getPoint(s);
       traj.emplace_back(p);
-      s = s - resolution;
+      s = s - num_points;
     }
   }
   return traj;
@@ -279,7 +307,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int
 boost::optional<double> CatmullRomSpline::getSValue(
   geometry_msgs::msg::Point position,
   double threadhold_distance,
-  unsigned int initial_resolution,
+  unsigned int initial_num_points,
   unsigned int max_iteration,
   double torelance)
 {
@@ -288,7 +316,7 @@ boost::optional<double> CatmullRomSpline::getSValue(
   std::vector<size_t> curve_index;
   for (size_t i = 0; i < curves_.size(); i++) {
     auto s_value = curves_[i].getSValue(
-      position, threadhold_distance, initial_resolution,
+      position, threadhold_distance, initial_num_points,
       max_iteration, torelance, true);
     if (s_value) {
       if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
@@ -340,6 +368,12 @@ double CatmullRomSpline::getMaximum2DCurventure() const
     throw SplineInterpolationError("maximum 2D curventure vector size is 0.");
   }
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
+}
+
+const geometry_msgs::msg::Vector3 CatmullRomSpline::getNormalVector(double s) const
+{
+  const auto index_and_s = getCurveIndexAndS(s);
+  return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
 }
 
 const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) const

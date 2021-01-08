@@ -106,11 +106,13 @@ private:
    * @brief generate marker from entity status
    * @param status entity status message
    * @param waypoints waypoints message
+   * @param obstacles obstacles in waypoint
    * @return const visualization_msgs::msg::MarkerArray markers which describes entity bounding box and it's status.
    */
   const visualization_msgs::msg::MarkerArray generateMarker(
     const openscenario_msgs::msg::EntityStatus & status,
-    const openscenario_msgs::msg::WaypointsArray & waypoints);
+    const openscenario_msgs::msg::WaypointsArray & waypoints,
+    const std::vector<openscenario_msgs::msg::Obstacle> & obstacles);
   /**
    * @brief publisher of marker topic.
    */

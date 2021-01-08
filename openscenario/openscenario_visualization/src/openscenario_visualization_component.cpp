@@ -90,7 +90,7 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     markers_.erase(markers_.find(name));
   }
   for (const auto & data : msg->data) {
-    auto marker_array = generateMarker(data.status, data.waypoint);
+    auto marker_array = generateMarker(data.status, data.waypoint, data.obstacles);
     std::copy(
       marker_array.markers.begin(),
       marker_array.markers.end(),
@@ -119,7 +119,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
 
 const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
   const openscenario_msgs::msg::EntityStatus & status,
-  const openscenario_msgs::msg::WaypointsArray & waypoints)
+  const openscenario_msgs::msg::WaypointsArray & waypoints,
+  const std::vector<openscenario_msgs::msg::Obstacle> & obstacles)
 {
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();

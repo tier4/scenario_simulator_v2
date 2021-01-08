@@ -49,6 +49,9 @@ public:
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
   const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
     const openscenario_msgs::msg::WaypointsArray & waypoints) override;
+
+private:
+  boost::optional<double> distance_to_stop_target_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

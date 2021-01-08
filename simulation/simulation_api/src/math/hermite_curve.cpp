@@ -279,6 +279,19 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_po
   return ret;
 }
 
+const geometry_msgs::msg::Vector3 HermiteCurve::getNormalVector(
+  double s,
+  bool autoscale) const
+{
+  if (autoscale) {
+    s = s / getLength();
+  }
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = 3 * ay_ * s * s + 2 * by_ * s + cy_;
+  vec.y = (3 * ax_ * s * s + 2 * bx_ * s + cx_) * -1;
+  return vec;
+}
+
 const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale) const
 {
   if (autoscale) {

@@ -34,8 +34,13 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 const std::vector<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacles(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
-  simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
-  return std::vector<openscenario_msgs::msg::Obstacle>();
+  if (!distance_to_stop_target_) {
+    return std::vector<openscenario_msgs::msg::Obstacle>();
+  }
+  openscenario_msgs::msg::Obstacle obstacle;
+  obstacle.type = obstacle.ENTITY;
+  obstacle.s = distance_to_stop_target_.get();
+  return {obstacle};
 }
 
 const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
@@ -60,11 +65,11 @@ const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calcula
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
   const std::vector<std::int64_t> & following_lanelets, double current_velocity)
 {
-  auto distance_to_stop_target = getDistanceToConflictingEntity(following_lanelets);
-  if (!distance_to_stop_target) {
+  distance_to_stop_target_ = getDistanceToConflictingEntity(following_lanelets);
+  if (!distance_to_stop_target_) {
     return boost::none;
   }
-  double rest_distance = distance_to_stop_target.get() -
+  double rest_distance = distance_to_stop_target_.get() -
     (vehicle_parameters->bounding_box.dimensions.length + 10);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
