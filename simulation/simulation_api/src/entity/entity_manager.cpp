@@ -389,12 +389,31 @@ const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::str
   throw simulation_api::SimulationRuntimeError("error occurs while getting bounding box : " + name);
 }
 
+boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(std::string name)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw simulation_api::SimulationRuntimeError(
+            "error occurs while getting obstacle : " + name);
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<VehicleEntity &>(it->second).getObstacle();
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return boost::none;
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    return boost::none;
+  }
+  throw simulation_api::SimulationRuntimeError("error occurs while getting obstacle : " + name);
+}
+
 openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string name)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
-            "error occurs while getting trajectory : " + name);
+            "error occurs while getting wayoints : " + name);
   }
   if (it->second.type() == typeid(VehicleEntity)) {
     return boost::any_cast<VehicleEntity &>(it->second).getWaypoints();
@@ -405,7 +424,7 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string n
   if (it->second.type() == typeid(PedestrianEntity)) {
     return openscenario_msgs::msg::WaypointsArray();
   }
-  throw simulation_api::SimulationRuntimeError("error occurs while getting bounding box : " + name);
+  throw simulation_api::SimulationRuntimeError("error occurs while getting waypoints : " + name);
 }
 
 bool EntityManager::entityStatusSetted(std::string name) const
@@ -523,6 +542,14 @@ void EntityManager::update(double current_time, double step_time)
         break;
     }
     status_with_traj.waypoint = getWaypoints(status.first);
+    const auto obstacle = getObstacle(status.first);
+    if(obstacle) {
+      status_with_traj.obstacle = obstacle.get();
+      status_with_traj.obstacle_find = true;
+    }
+    else {
+      status_with_traj.obstacle_find = false;
+    }
     status_with_traj.status = status_msg;
     status_with_traj.name = status.first;
     status_with_traj.time = current_time + step_time;

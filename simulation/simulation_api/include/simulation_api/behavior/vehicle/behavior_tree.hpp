@@ -61,9 +61,9 @@ public:
     tree_.rootBlackboard()->get("waypoints", waypoints);
     return waypoints;
   }
-  std::vector<openscenario_msgs::msg::Obstacle> getObstacles()
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle()
   {
-    std::vector<openscenario_msgs::msg::Obstacle> obstacle;
+    boost::optional<openscenario_msgs::msg::Obstacle> obstacle;
     tree_.rootBlackboard()->get("obstacle", obstacle);
     return obstacle;
   }
