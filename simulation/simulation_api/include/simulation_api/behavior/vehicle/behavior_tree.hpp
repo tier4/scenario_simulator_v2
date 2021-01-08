@@ -19,6 +19,7 @@
 
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
 
 #include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/bt_factory.h>
@@ -59,6 +60,12 @@ public:
     openscenario_msgs::msg::WaypointsArray waypoints;
     tree_.rootBlackboard()->get("waypoints", waypoints);
     return waypoints;
+  }
+  std::vector<openscenario_msgs::msg::Obstacle> getObstacles()
+  {
+    std::vector<openscenario_msgs::msg::Obstacle> obstacle;
+    tree_.rootBlackboard()->get("obstacle", obstacle);
+    return obstacle;
   }
   void setRequest(std::string request);
 

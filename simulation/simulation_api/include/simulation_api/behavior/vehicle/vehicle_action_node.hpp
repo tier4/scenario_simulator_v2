@@ -40,9 +40,11 @@ public:
     BT::PortsList ports = {
       BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
         "vehicle_parameters"),
+      BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
+      BT::OutputPort<std::vector<openscenario_msgs::msg::Obstacle>>(
+        "obstacles"),
       BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
-        "waypoints"),
-      BT::InputPort<std::vector<std::int64_t>>("route_lanelets")
+        "waypoints")
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
