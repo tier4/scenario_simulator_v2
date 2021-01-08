@@ -44,6 +44,8 @@
 
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 
+#include <simulation_api/math/catmull_rom_spline.hpp>
+
 #include <quaternion_operation/quaternion_operation.h>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -234,7 +236,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   bbox.scale.x = 0.1;
   bbox.scale.y = 0.1;
   bbox.scale.z = 0.1;
-  ret.markers.push_back(bbox);
+  ret.markers.emplace_back(bbox);
 
   visualization_msgs::msg::Marker text;
   text.header.frame_id = status.name;
@@ -256,8 +258,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.scale.z = 0.6;
   text.lifetime = rclcpp::Duration(0.1);
   text.text = status.name;
-  text.color = color;
-  ret.markers.push_back(text);
+  text.color = color_utils::makeColorMsg("black", 0.99);
+  ret.markers.emplace_back(text);
 
   visualization_msgs::msg::Marker arrow;
   arrow.header.frame_id = status.name;
@@ -295,7 +297,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   arrow.scale.z = 1.0;
   arrow.lifetime = rclcpp::Duration(0.1);
   arrow.color = color_utils::makeColorMsg("red", 0.99);
-  ret.markers.push_back(arrow);
+  ret.markers.emplace_back(arrow);
 
   visualization_msgs::msg::Marker text_action;
   text_action.header.frame_id = status.name;
@@ -318,8 +320,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration(0.1);
   text_action.text = status.action_status.current_action;
-  text_action.color = color_utils::makeColorMsg("white", 0.99);
-  ret.markers.push_back(text_action);
+  text_action.color = color_utils::makeColorMsg("black", 0.99);
+  ret.markers.emplace_back(text_action);
 
   /**
    * @brief generate marker for waypoints
@@ -331,19 +333,22 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   waypoints_marker.id = 4;
   if (waypoints.waypoints.size() == 0) {
     waypoints_marker.action = waypoints_marker.DELETE;
-    ret.markers.push_back(waypoints_marker);
+    ret.markers.emplace_back(waypoints_marker);
   } else {
     waypoints_marker.action = waypoints_marker.ADD;
-    waypoints_marker.points = waypoints.waypoints;
+    waypoints_marker.type = waypoints_marker.TRIANGLE_LIST;
+    simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
+    size_t num_points = 50;
+    waypoints_marker.points = spline.getPolygon(
+      status.bounding_box.dimensions.y, num_points);
     waypoints_marker.color = color;
-    waypoints_marker.type = waypoints_marker.LINE_STRIP;
+    waypoints_marker.color.a = 0.8;
     waypoints_marker.colors =
-      std::vector<std_msgs::msg::ColorRGBA>(waypoints.waypoints.size() - 1, color);
-    waypoints_marker.colors = std::vector<std_msgs::msg::ColorRGBA>(1, color);
-    waypoints_marker.scale.x = 0.3;
-    waypoints_marker.scale.y = 0.3;
-    waypoints_marker.scale.z = 0.3;
-    ret.markers.push_back(waypoints_marker);
+      std::vector<std_msgs::msg::ColorRGBA>(num_points * 2, waypoints_marker.color);
+    waypoints_marker.scale.x = 1.0;
+    waypoints_marker.scale.y = 1.0;
+    waypoints_marker.scale.z = 1.0;
+    ret.markers.emplace_back(waypoints_marker);
   }
   return ret;
 }
@@ -354,7 +359,7 @@ OpenscenarioVisualizationComponent::generateDeleteMarker() const
   visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker marker;
   marker.action = marker.DELETEALL;
-  ret.markers.push_back(marker);
+  ret.markers.emplace_back(marker);
   return ret;
 }
 }  // namespace openscenario_visualization
