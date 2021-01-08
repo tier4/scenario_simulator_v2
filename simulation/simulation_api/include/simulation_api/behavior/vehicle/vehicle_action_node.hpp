@@ -60,8 +60,8 @@ public:
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
-  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
-    const openscenario_msgs::msg::WaypointsArray & waypoints);
+  virtual const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
+    const openscenario_msgs::msg::WaypointsArray & waypoints) = 0;
   std::vector<std::int64_t> route_lanelets;
 };
 }  // namespace entity_behavior

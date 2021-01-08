@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
+#include <algorithm>
 #include <set>
 
 namespace entity_behavior

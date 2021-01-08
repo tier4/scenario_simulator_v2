@@ -17,6 +17,7 @@
 #include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <string>
+#include <vector>
 
 
 namespace entity_behavior
@@ -29,6 +30,12 @@ FollowLaneAction::FollowLaneAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
+
+const std::vector<openscenario_msgs::msg::Obstacle> FollowLaneAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
 
 const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
 {

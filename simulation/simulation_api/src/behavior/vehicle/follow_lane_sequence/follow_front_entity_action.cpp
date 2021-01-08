@@ -19,6 +19,7 @@
 #include <boost/algorithm/clamp.hpp>
 
 #include <string>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -30,6 +31,12 @@ FollowFrontEntityAction::FollowFrontEntityAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
+
+const std::vector<openscenario_msgs::msg::Obstacle> FollowFrontEntityAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
 
 const openscenario_msgs::msg::WaypointsArray FollowFrontEntityAction::calculateWaypoints()
 {

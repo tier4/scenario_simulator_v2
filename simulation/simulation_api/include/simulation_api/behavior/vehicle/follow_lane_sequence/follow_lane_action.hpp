@@ -21,6 +21,7 @@
 #include <openscenario_msgs/msg/entity_trajectory.hpp>
 
 #include <string>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -44,6 +45,8 @@ public:
     return ports;
   }
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
+  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
+    const openscenario_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
   boost::optional<openscenario_msgs::msg::LaneletPose> target_lanelet_pose_;

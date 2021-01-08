@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SIMULATION_API__BEHAVIOR__ROUTE_PLANNER_HPP_
+#define SIMULATION_API__BEHAVIOR__ROUTE_PLANNER_HPP_
+
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
 #include <memory>
+#include <vector>
 
 namespace simulation_api
 {
@@ -38,4 +42,6 @@ private:
   boost::optional<std::vector<std::int64_t>> whole_route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 };
-}
+}  // namespace simulation_api
+
+#endif  // SIMULATION_API__BEHAVIOR__ROUTE_PLANNER_HPP_

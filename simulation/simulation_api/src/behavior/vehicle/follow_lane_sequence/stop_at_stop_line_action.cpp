@@ -34,6 +34,12 @@ StopAtStopLineAction::StopAtStopLineAction(
   stopped_ = false;
 }
 
+const std::vector<openscenario_msgs::msg::Obstacle> StopAtStopLineAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
+
 const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {

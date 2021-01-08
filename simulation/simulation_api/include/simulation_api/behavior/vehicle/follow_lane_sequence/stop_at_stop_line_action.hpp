@@ -47,6 +47,8 @@ public:
     const std::vector<std::int64_t> & following_lanelets,
     double current_velocity);
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
+  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
+    const openscenario_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
   bool stopped_;

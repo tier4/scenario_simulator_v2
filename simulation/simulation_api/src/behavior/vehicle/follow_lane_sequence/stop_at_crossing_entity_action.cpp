@@ -31,6 +31,12 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
+const std::vector<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacles(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
+{
+  return std::vector<openscenario_msgs::msg::Obstacle>();
+}
+
 const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {
