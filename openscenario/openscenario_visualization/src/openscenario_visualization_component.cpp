@@ -359,18 +359,30 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       obstacle_marker.ns = status.name;
       obstacle_marker.id = 5;
       obstacle_marker.action = obstacle_marker.ADD;
-      // ret.markers.emplace_back(obstacle_marker);
+      obstacle_marker.type = obstacle_marker.CUBE;
+      obstacle_marker.pose = spline.getPose(obstacle.s);
+      obstacle_marker.color = color_utils::makeColorMsg("red", 0.99);
+      obstacle_marker.scale.x = 0.3;
+      obstacle_marker.scale.y = status.bounding_box.dimensions.y;
+      obstacle_marker.scale.z = status.bounding_box.dimensions.z;
+      ret.markers.emplace_back(obstacle_marker);
     } else {
       visualization_msgs::msg::Marker obstacle_marker;
       obstacle_marker.action = obstacle_marker.DELETE;
+      obstacle_marker.id = 5;
+      obstacle_marker.ns = status.name;
       ret.markers.emplace_back(obstacle_marker);
     }
   } else {
     visualization_msgs::msg::Marker waypoints_marker;
     waypoints_marker.action = waypoints_marker.DELETE;
+    waypoints_marker.id = 4;
+    waypoints_marker.ns = status.name;
     ret.markers.emplace_back(waypoints_marker);
     visualization_msgs::msg::Marker obstacle_marker;
     obstacle_marker.action = obstacle_marker.DELETE;
+    obstacle_marker.id = 5;
+    obstacle_marker.ns = status.name;
     ret.markers.emplace_back(obstacle_marker);
   }
   return ret;
