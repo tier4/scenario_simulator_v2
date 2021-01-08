@@ -30,7 +30,7 @@ def generate_launch_description():
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=30)
-    log_directory = LaunchConfiguration('log_directory', default="/tmp")
+    output_directory = LaunchConfiguration('output-directory', default=Path("/tmp"))
     scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))
     workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))
 
@@ -41,7 +41,7 @@ def generate_launch_description():
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
         DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
         DeclareLaunchArgument('global-timeout', default_value=global_timeout),
-        DeclareLaunchArgument('log_directory', default_value=log_directory),  # DEPRECATED
+        DeclareLaunchArgument('output-directory', default_value=output_directory),
         DeclareLaunchArgument('scenario', default_value=scenario),
         DeclareLaunchArgument('workflow', default_value=workflow),
 
@@ -55,7 +55,7 @@ def generate_launch_description():
                 '--global-frame-rate', global_frame_rate,
                 '--global-real-time-factor', global_real_time_factor,
                 '--global-timeout', global_timeout,
-                '--log_directory', log_directory,  # DEPRECATED
+                '--output-directory', output_directory,
                 '--scenario', scenario,
                 '--workflow', workflow,
                 ],

@@ -72,7 +72,7 @@ class ScenarioTestRunner(LifecycleController):
             global_frame_rate: float,
             global_real_time_factor: float,
             global_timeout: int,  # [sec]
-            log_directory: Path,  # DEPRECATED
+            output_directory: Path,
             ):
         """
         Initialize the class ScenarioTestRunner.
@@ -84,8 +84,9 @@ class ScenarioTestRunner(LifecycleController):
             after the specified time (seconds) has passed, the simulation is
             forcibly terminated as a failure.
 
-        log_directory : Path
-            Deprecated.
+        output_directory : Path
+            Output destination directory of the generated file including the
+            result file.
 
         Returns
         -------
@@ -97,13 +98,13 @@ class ScenarioTestRunner(LifecycleController):
         self.global_timeout = global_timeout
 
         self.launcher_path = Path(__file__).resolve().parent.parent
-        self.log_path = substitute_ros_package(log_directory)
 
-        if self.log_path.exists():
-            rmtree(self.log_path)
+        self.output_directory = substitute_ros_package(output_directory)
 
-        else:
-            self.log_path.mkdir(parents=True, exist_ok=True)
+        if self.output_directory.exists():
+            rmtree(self.output_directory)
+
+        self.output_directory.mkdir(parents=True, exist_ok=True)
 
         self.xosc_scenarios = []
         self.local_frame_rates = []
@@ -133,8 +134,7 @@ class ScenarioTestRunner(LifecycleController):
 
         converted_scenarios = convert_scenarios(
             self.current_workflow.scenarios,
-            self.log_path  # TODO RENAME
-            )
+            self.output_directory)
 
         self.xosc_scenarios = [each.path for each in converted_scenarios]
         self.xosc_expects = [each.expect for each in converted_scenarios]
@@ -191,7 +191,7 @@ class ScenarioTestRunner(LifecycleController):
 
             self.configure_node(
                 expect=self.xosc_expects[index],
-                log_path=self.log_path,
+                output_directory=self.output_directory,
                 real_time_factor=self.global_real_time_factor,
                 scenario=scenario,
                 frame_rate=self.local_frame_rates[index],
@@ -220,11 +220,12 @@ def main():
                     "options described below must be given in the form "
                     "'option:=VALUE' instead of '--option VALUE'.")
 
-    parser.add_argument(  # DEPRECATED
-        '--log_directory',
-        default=Path('/tmp'),
+    parser.add_argument(
+        '--output-directory',
+        default=Path("/tmp"),
         type=Path,
-        help='(Deprecated) Specify log_directory you want to execute.')
+        help="Specify the output destination directory of the generated file "
+             "including the result file.")
 
     parser.add_argument(
         '--global-frame-rate',
@@ -273,7 +274,7 @@ def main():
         global_frame_rate=args.global_frame_rate,
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
-        log_directory=args.log_directory / 'scenario_test_runner',  # DEPRECATED
+        output_directory=args.output_directory / 'scenario_test_runner',
         )
 
     if args.scenario != Path("/dev/null"):

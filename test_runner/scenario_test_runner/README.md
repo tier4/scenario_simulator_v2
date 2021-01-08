@@ -8,7 +8,7 @@ Then convert scenario into a "XML" based format called a "OpenSCENARIO" The form
 
 # How to use
 ```
-ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' log_directory:='/tmp'
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml'
 ```
 
 # Build with docker image
