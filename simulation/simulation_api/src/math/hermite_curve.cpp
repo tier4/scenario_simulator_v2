@@ -169,7 +169,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     for (const auto solution : solutions) {
       double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
       double t = (y - fy) / ratio;
-      if (0 <= t && t <= 1) {
+      if (std::fabs(t) < l * 0.5) {
         s_values.emplace_back(solution);
       }
     }
