@@ -99,7 +99,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   } else {
     target_linear_speed = boost::none;
   }
-  if (!target_linear_speed) {
+  if (!distance_to_stop_target_) {
     setOutput("updated_status", calculateEntityStatusUpdated(0));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
