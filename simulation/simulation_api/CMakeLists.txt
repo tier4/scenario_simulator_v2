@@ -49,7 +49,7 @@ ament_auto_add_library(entity_manager SHARED
   src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
   src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
-  )
+)
 
 target_link_libraries(entity_manager pugixml)
 

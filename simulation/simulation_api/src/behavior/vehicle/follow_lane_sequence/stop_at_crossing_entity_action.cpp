@@ -64,9 +64,8 @@ const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calcula
 }
 
 boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
-  const std::vector<std::int64_t> & following_lanelets, double current_velocity)
+  double current_velocity)
 {
-  distance_to_stop_target_ = getDistanceToConflictingEntity(following_lanelets);
   if (!distance_to_stop_target_) {
     return boost::none;
   }
@@ -91,11 +90,17 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
-  auto target_linear_speed =
-    calculateTargetSpeed(route_lanelets, entity_status.action_status.twist.linear.x);
+  const auto waypoints = calculateWaypoints();
+  const auto spline = simulation_api::math::CatmullRomSpline(waypoints.waypoints);
+  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
+  boost::optional<double> target_linear_speed;
+  if (distance_to_stop_target_) {
+    target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
+  } else {
+    target_linear_speed = boost::none;
+  }
   if (!target_linear_speed) {
     setOutput("updated_status", calculateEntityStatusUpdated(0));
-    const auto waypoints = calculateWaypoints();
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -109,7 +114,6 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     target_speed = target_linear_speed.get();
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-  const auto waypoints = calculateWaypoints();
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

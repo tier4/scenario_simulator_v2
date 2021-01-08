@@ -301,17 +301,19 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   if (search_backward) {
     for (size_t i = 0; i < n; i++) {
       auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward);
-      if (s.get()) {
+      if (s) {
         return getSInSplineCurve(n - 1 - i, s.get());
       }
     }
     return boost::none;
-  }
-  for (size_t i = 0; i < n; i++) {
-    auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward);
-    if (s.get()) {
-      return getSInSplineCurve(n - 1 - i, s.get());
+  } else {
+    for (size_t i = 0; i < n; i++) {
+      auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward);
+      if (s) {
+        return getSInSplineCurve(i, s.get());
+      }
     }
+    return boost::none;
   }
   return boost::none;
 }
@@ -327,17 +329,19 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     for (size_t i = 0; i < n; i++) {
       std::cout << "index : " << n - 1 - i << std::endl;
       auto s = curves_[n - 1 - i].getCollisionPointIn2D(point0, point1, search_backward);
-      if (s.get()) {
+      if (s) {
         return getSInSplineCurve(n - 1 - i, s.get());
       }
     }
     return boost::none;
-  }
-  for (size_t i = 0; i < n; i++) {
-    auto s = curves_[i].getCollisionPointIn2D(point0, point1, search_backward);
-    if (s.get()) {
-      return getSInSplineCurve(i, s.get());
+  } else {
+    for (size_t i = 0; i < n; i++) {
+      auto s = curves_[i].getCollisionPointIn2D(point0, point1, search_backward);
+      if (s) {
+        return getSInSplineCurve(i, s.get());
+      }
     }
+    return boost::none;
   }
   return boost::none;
 }
