@@ -50,8 +50,6 @@ public:
   const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s) const;
   const geometry_msgs::msg::Pose getPose(double s) const;
-  std::vector<geometry_msgs::msg::Point> getRightBounds(double width, size_t num_points = 30) const;
-  std::vector<geometry_msgs::msg::Point> getLeftBounds(double width, size_t num_points = 30) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(int num_points) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s,
@@ -74,8 +72,18 @@ public:
     bool search_backward = false
   ) const;
   const openscenario_msgs::msg::CatmullRomSpline toRosMsg() const;
+  const geometry_msgs::msg::Point getRightBoundsPoint(double width, double s) const;
+  const geometry_msgs::msg::Point getLeftBoundsPoint(double width, double s) const;
+  const std::vector<geometry_msgs::msg::Point> getPolygon(
+    double width, size_t num_points = 30);
 
 private:
+  const std::vector<geometry_msgs::msg::Point> getRightBounds(
+    double width,
+    size_t num_points = 30) const;
+  const std::vector<geometry_msgs::msg::Point> getLeftBounds(
+    double width,
+    size_t num_points = 30) const;
   double getSInSplineCurve(size_t curve_index, double s) const;
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
   bool checkConnection() const;

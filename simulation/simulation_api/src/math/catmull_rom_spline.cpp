@@ -31,32 +31,78 @@ CatmullRomSpline::CatmullRomSpline(std::vector<openscenario_msgs::msg::HermiteCu
   }
 }
 
-std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
-  double width,
-  size_t num_points) const
+const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
+  double width, size_t num_points)
 {
   std::vector<geometry_msgs::msg::Point> points;
-  double step_size = 1.0 / static_cast<double>(num_points);
-  for (int i = 0; i < (num_points + 1); i++) {
-    double t = step_size * static_cast<double>(i);
-    /*
-    geometry_msgs::msg::Vector3 vec = getNormalVector(path, t);
-    double theta = std::atan2(vec.y, vec.x);
-    geometry_msgs::msg::Point p = getPointOnHermitePath(path, t);
-    geometry_msgs::msg::Point point;
-    point.x = p.x + 0.5 * robot_width_ * std::cos(theta);
-    point.y = p.y + 0.5 * robot_width_ * std::sin(theta);
-    points.push_back(point);
-    */
+  std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points);
+  std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(width, num_points);
+  size_t num_sections = static_cast<size_t>(left_bounds.size() - 1);
+  for (size_t i = 0; i < num_sections; i++) {
+    geometry_msgs::msg::Point pr_0 = right_bounds[i];
+    geometry_msgs::msg::Point pl_0 = left_bounds[i];
+    geometry_msgs::msg::Point pr_1 = right_bounds[i + 1];
+    geometry_msgs::msg::Point pl_1 = left_bounds[i + 1];
+    points.emplace_back(pr_0);
+    points.emplace_back(pl_0);
+    points.emplace_back(pr_1);
+    points.emplace_back(pl_0);
+    points.emplace_back(pl_1);
+    points.emplace_back(pr_1);
   }
   return points;
 }
 
-std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
+const geometry_msgs::msg::Point CatmullRomSpline::getRightBoundsPoint(
+  double width,
+  double s) const
+{
+  geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+  double theta = std::atan2(vec.y, vec.x);
+  geometry_msgs::msg::Point p = getPoint(s);
+  geometry_msgs::msg::Point point;
+  point.x = p.x + 0.5 * width * std::cos(theta);
+  point.y = p.y + 0.5 * width * std::sin(theta);
+  return point;
+}
+
+const geometry_msgs::msg::Point CatmullRomSpline::getLeftBoundsPoint(
+  double width,
+  double s) const
+{
+  geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+  double theta = std::atan2(vec.y, vec.x);
+  geometry_msgs::msg::Point p = getPoint(s);
+  geometry_msgs::msg::Point point;
+  point.x = p.x - 0.5 * width * std::cos(theta);
+  point.y = p.y - 0.5 * width * std::sin(theta);
+  return point;
+}
+
+const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
   double width,
   size_t num_points) const
 {
+  std::vector<geometry_msgs::msg::Point> points;
+  double step_size = getLength() / static_cast<double>(num_points);
+  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+    double s = step_size * static_cast<double>(i);
+    points.emplace_back(getRightBoundsPoint(width, s));
+  }
+  return points;
+}
 
+const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
+  double width,
+  size_t num_points) const
+{
+  std::vector<geometry_msgs::msg::Point> points;
+  double step_size = getLength() / static_cast<double>(num_points);
+  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+    double s = step_size * static_cast<double>(i);
+    points.emplace_back(getLeftBoundsPoint(width, s));
+  }
+  return points;
 }
 
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
