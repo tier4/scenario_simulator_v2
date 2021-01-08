@@ -18,6 +18,7 @@
 import yamale
 
 from ament_index_python.packages import get_package_share_directory
+from enum import IntEnum
 from pathlib import Path
 from re import sub
 from sys import exit, stderr
@@ -32,26 +33,66 @@ def substitute_ros_package(pathname: Path):
     return Path(sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", find_pkg_share, str(pathname)))
 
 
+class Expect(IntEnum):
+
+    success = 0
+    failure = 1
+    error = 2
+
+
+class Scenario():
+    """
+    Manages a scenario given as an element of workflow.yaml.
+
+    Attributes
+    ----------
+    path: Path
+        The path to a scenario.
+
+    expect: Expect
+
+    """
+
+    def __init__(
+            self,
+            path: Path,
+            expect: Expect,
+            frame_rate: float,
+            ):
+
+        self.path = substitute_ros_package(path).resolve()
+
+        self.expect = expect
+
+        self.frame_rate = frame_rate
+
+
 class Workflow():
     """
     Manages a set of scenario test items given as workflow.yaml.
 
     Attributes
     ----------
-    path : Path
+    path: Path
         The path to the given workflow file.
 
     scenarios : List[str]
 
     """
 
-    def __init__(self, path: Path):
+    def __init__(
+            self,
+            path: Path,
+            global_frame_rate: float,
+            ):
 
         self.path = path
 
         self.schema = yamale.make_schema(
             Path(get_package_share_directory('scenario_test_runner')).parent.joinpath(
                 'ament_index', 'resource_index', 'packages', 'workflow_schema.yaml'))
+
+        self.global_frame_rate = global_frame_rate
 
         self.scenarios = self.read(self.path)
 
@@ -94,14 +135,28 @@ class Workflow():
         if workflow_path.exists():
             with workflow_path.open('r') as file:
 
-                database = safe_load(file) \
-                    if workflow_path.suffix == ".yaml" else file.read()
+                # database = safe_load(file) \
+                #     if workflow_path.suffix == ".yaml" else file.read()
+                #
+                # scenarios = []
+                #
+                # for each in database['Scenario']:
+                #     each['path'] = str(substitute_ros_package(each['path']).resolve())
+                #     scenarios.append(each)
+                #
+                # return scenarios
 
                 scenarios = []
 
-                for each in database['Scenario']:
-                    each['path'] = str(substitute_ros_package(each['path']).resolve())
-                    scenarios.append(each)
+                for each in safe_load(file)['Scenario']:
+
+                    scenarios.append(
+                        Scenario(
+                            each['path'],
+                            Expect[each['expect'] if 'expect' in each else 'success'],
+                            each['frame-rate'] if 'frame-rate' in each else self.global_frame_rate,
+                            )
+                        )
 
                 return scenarios
 

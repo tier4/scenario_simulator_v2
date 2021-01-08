@@ -28,11 +28,14 @@ class ConverterHandler():
     def convert_scenarios(all_scenarios, expects, step_times_ms, launcher_path):
         """Convert all scenarios."""
         assert len(all_scenarios) == len(expects)
+
         sweeped_xosc_scenarios = []
         xosc_expects = []
         xosc_step_time_ms = []
+
         for index, scenario in enumerate(all_scenarios):
-            if Path(scenario).suffix == ".xosc":
+
+            if scenario.suffix == ".xosc":
                 sweeped_xosc_scenarios.append(scenario)
                 xosc_expects.append(expects[index])
                 xosc_step_time_ms.append(step_times_ms[index])
@@ -43,6 +46,7 @@ class ConverterHandler():
                 for each in xosc_scenarios:
                     xosc_expects.append(expects[index])
                     xosc_step_time_ms.append(step_times_ms[index])
+
         return sweeped_xosc_scenarios, xosc_expects, xosc_step_time_ms
 
     @staticmethod

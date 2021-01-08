@@ -79,19 +79,19 @@ class LifecycleController(Node):
                 name="expect",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
-                    string_value=expect)),
+                    string_value=str(expect.name))),
 
             Parameter(  # DEPRECATED
                 name="log_path",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
-                    string_value=log_path)),
+                    string_value=str(log_path))),
 
             Parameter(
                 name="osc_path",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
-                    string_value=scenario)),
+                    string_value=str(scenario))),
 
             Parameter(
                 name="real-time-factor",

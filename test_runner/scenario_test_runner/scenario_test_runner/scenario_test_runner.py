@@ -73,8 +73,13 @@ class ScenarioTestRunner(LifecycleController):
         self.launcher_path = Path(__file__).resolve().parent.parent
         self.log_path = substitute_ros_package(log_directory)
 
+        if not self.log_path.exists():
+            self.log_path.mkdir(parents=True, exist_ok=True)
+
         self.xosc_scenarios = []
         self.local_frame_rates = []
+
+        self.current_workflow = None
 
         super().__init__()
 
@@ -85,36 +90,45 @@ class ScenarioTestRunner(LifecycleController):
         Arguments
         ---------
         path : Path
-            The path to the workflow file.
+            Path to the workflow file.
 
         Returns
         -------
         None
 
         """
-        workflow = Workflow(path)
+        self.current_workflow = Workflow(
+            path,
+            self.global_frame_rate,
+            )
 
-        scenarios = []
-        expects = []
-        local_frame_rates = []
+        # scenarios = []
+        # expects = []
+        # local_frame_rates = []
+        #
+        # for scenario in self.current_workflow.scenarios:
+        #     scenarios.append(scenario['path'])
+        #
+        #     expects.append(
+        #         scenario['expect'] if 'expect' in scenario else 'success')
+        #
+        #     if 'frame-rate' not in scenario:
+        #         local_frame_rates.append(self.global_frame_rate)
+        #     else:
+        #         local_frame_rates.append(float(scenario['frame-rate']))
 
-        for scenario in workflow.scenarios:
-            scenarios.append(scenario['path'])
+        scenarios = [each.path for each in self.current_workflow.scenarios]
 
-            expects.append(
-                scenario['expect'] if 'expect' in scenario else 'success')
+        expects = [each.expect for each in self.current_workflow.scenarios]
 
-            if 'frame-rate' not in scenario:
-                local_frame_rates.append(self.global_frame_rate)
-            else:
-                local_frame_rates.append(float(scenario['frame-rate']))
+        frame_rates = [each.frame_rate for each in self.current_workflow.scenarios]
 
         self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
             = ConverterHandler.convert_scenarios(
                 scenarios,
                 expects,
-                local_frame_rates,
-                self.launcher_path
+                frame_rates,
+                self.launcher_path  # XXX DEPRECATED
                 )
 
         is_valid = XOSCValidator(False)
@@ -145,18 +159,23 @@ class ScenarioTestRunner(LifecycleController):
 
         self.deactivate_node()
 
-    def run_all_scenarios(self):
+    def run_all_scenarios(
+            self,
+            # scenarios,
+            ):
         """
         Run all scenarios.
+
+        Arguments
+        ---------
+        scenarios : List[]
+            The path to the workflow file.
 
         Returns
         -------
         None
 
         """
-        if not self.log_path.exists():
-            self.log_path.mkdir(parents=True, exist_ok=True)
-
         for index, scenario in enumerate(self.xosc_scenarios):
             self.get_logger().info(
                 "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
@@ -251,8 +270,7 @@ def main():
     if args.scenario != Path("/dev/null"):
         print(str(substitute_ros_package(args.scenario).resolve()))
     elif args.workflow != Path("/dev/null"):
-        test_runner.run_workflow(
-            substitute_ros_package(args.workflow).resolve())
+        test_runner.run_workflow(substitute_ros_package(args.workflow).resolve())
     else:
         print("Option '--scenario' does not supprted.")
 
