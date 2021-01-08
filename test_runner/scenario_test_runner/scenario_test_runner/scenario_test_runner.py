@@ -194,18 +194,6 @@ class ScenarioTestRunner(LifecycleController):
                 scenario=each.path,
                 )
 
-        # for index, scenario in enumerate(self.xosc_scenarios):
-        #     self.get_logger().info(
-        #         "Run " + str(index + 1) + " of " + str(len(self.xosc_scenarios)))
-        #
-        #     self.configure_node(
-        #         expect=self.xosc_expects[index],
-        #         output_directory=self.output_directory,
-        #         real_time_factor=self.global_real_time_factor,
-        #         scenario=scenario,
-        #         frame_rate=self.local_frame_rates[index],
-        #         )
-
             if self.get_lifecycle_state() == 'unconfigured':
                 self.get_logger().error("Failed to configure interpreter")
 
