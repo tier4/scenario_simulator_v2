@@ -351,26 +351,27 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     ret.markers.emplace_back(waypoints_marker);
     if (obstacle_find) {
       /**
-       * @brief generate marker for obstacles
+       * @brief generate marker for obstacle
        */
-      visualization_msgs::msg::Marker obstacles_marker;
-      obstacles_marker.header.frame_id = "map";
-      obstacles_marker.header.stamp = stamp;
-      obstacles_marker.ns = status.name;
-      obstacles_marker.id = 5;
-      obstacles_marker.action = obstacles_marker.ADD;
+      visualization_msgs::msg::Marker obstacle_marker;
+      obstacle_marker.header.frame_id = "map";
+      obstacle_marker.header.stamp = stamp;
+      obstacle_marker.ns = status.name;
+      obstacle_marker.id = 5;
+      obstacle_marker.action = obstacle_marker.ADD;
+      // ret.markers.emplace_back(obstacle_marker);
     } else {
-      visualization_msgs::msg::Marker obstacles_marker;
-      obstacles_marker.action = obstacles_marker.ADD;
-      ret.markers.emplace_back(obstacles_marker);
+      visualization_msgs::msg::Marker obstacle_marker;
+      obstacle_marker.action = obstacle_marker.DELETE;
+      ret.markers.emplace_back(obstacle_marker);
     }
   } else {
     visualization_msgs::msg::Marker waypoints_marker;
     waypoints_marker.action = waypoints_marker.DELETE;
     ret.markers.emplace_back(waypoints_marker);
-    visualization_msgs::msg::Marker obstacles_marker;
-    obstacles_marker.action = obstacles_marker.ADD;
-    ret.markers.emplace_back(obstacles_marker);
+    visualization_msgs::msg::Marker obstacle_marker;
+    obstacle_marker.action = obstacle_marker.DELETE;
+    ret.markers.emplace_back(obstacle_marker);
   }
   return ret;
 }
