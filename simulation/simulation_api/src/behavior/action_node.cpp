@@ -181,15 +181,24 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & route_lanelets,
   const simulation_api::math::CatmullRomSpline & spline)
 {
-  auto conflicting_entity_status = getConflictingEntityStatus(route_lanelets);
-  if (!conflicting_entity_status) {
+  auto conflicting_entity_status = getConflictingEntityStatusOnRoute(route_lanelets);
+  if (conflicting_entity_status.size() == 0) {
     return boost::none;
   }
-  if (!conflicting_entity_status->lanelet_pose_valid) {
+  std::set<double> distances;
+  for (const auto status : conflicting_entity_status) {
+    if (status.lanelet_pose_valid) {
+      auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
+      auto s = spline.getCollisionPointIn2D(polygon);
+      if (s) {
+        distances.insert(s.get());
+      }
+    }
+  }
+  if (distances.size() == 0) {
     return boost::none;
   }
-  auto polygon = hdmap_utils->getLaneletPolygon(conflicting_entity_status->lanelet_pose.lanelet_id);
-  return spline.getCollisionPointIn2D(polygon);
+  return *distances.begin();
 }
 
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
@@ -236,6 +245,22 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
     return dist_to_stop_target;
   }
   return boost::none;
+}
+
+std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatusOnRoute(
+  const std::vector<std::int64_t> & route_lanelets) const
+{
+  auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
+  std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
+  for (const auto & status : other_entity_status) {
+    if (std::count(
+        conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        status.second.lanelet_pose.lanelet_id) >= 1)
+    {
+      conflicting_entity_status.push_back(status.second);
+    }
+  }
+  return conflicting_entity_status;
 }
 
 boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatus(

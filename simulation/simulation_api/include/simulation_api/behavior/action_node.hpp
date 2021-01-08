@@ -42,6 +42,8 @@ public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
   bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
+  std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnRoute(
+    const std::vector<std::int64_t> & route_lanelets) const;
   boost::optional<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatus(
     const std::vector<std::int64_t> & following_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
