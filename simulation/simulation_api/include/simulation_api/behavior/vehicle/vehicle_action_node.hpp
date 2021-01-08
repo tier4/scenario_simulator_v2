@@ -42,7 +42,7 @@ public:
       BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
         "vehicle_parameters"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
-      BT::OutputPort<std::vector<openscenario_msgs::msg::Obstacle>>(
+      BT::OutputPort<boost::optional<openscenario_msgs::msg::Obstacle>>(
         "obstacle"),
       BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
         "waypoints")
