@@ -20,12 +20,49 @@ import argparse
 # import rclpy
 import time
 
+from openscenario_utility.conversion import convert
 from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
-from scenario_test_runner.converter_handler import ConverterHandler
-from scenario_test_runner.workflow import Workflow, substitute_ros_package
 from scenario_test_runner.lifecycle_controller import LifecycleController
+from scenario_test_runner.workflow import Scenario, Workflow, substitute_ros_package
 from sys import exit
+from typing import List
+
+
+def convert_scenarios(
+        scenarios: List[Scenario],
+        launcher_path
+        ):
+
+    result = []
+
+    for each in scenarios:
+
+        if each.path.suffix == '.xosc':
+
+            result.append(each)
+
+        else:  # == '.yaml'
+
+            directory = Path('/tmp/scenario_test_runner') / each.path.stem
+
+            paths = convert(
+                each.path,
+                directory,
+                False
+                )
+
+            for path in paths:
+
+                result.append(
+                    Scenario(
+                        path,
+                        each.expect,
+                        each.frame_rate
+                        )
+                    )
+
+    return result
 
 
 class ScenarioTestRunner(LifecycleController):
@@ -102,7 +139,7 @@ class ScenarioTestRunner(LifecycleController):
             self.global_frame_rate,
             )
 
-        converted_scenarios = ConverterHandler.convert_scenarios(
+        converted_scenarios = convert_scenarios(
             self.current_workflow.scenarios,
             self.launcher_path  # XXX DEPRECATED
             )
@@ -249,8 +286,10 @@ def main():
 
     if args.scenario != Path("/dev/null"):
         print(str(substitute_ros_package(args.scenario).resolve()))
+
     elif args.workflow != Path("/dev/null"):
         test_runner.run_workflow(substitute_ros_package(args.workflow).resolve())
+
     else:
         print("Option '--scenario' does not supprted.")
 
