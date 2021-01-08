@@ -24,7 +24,7 @@ from openscenario_utility.conversion import convert
 from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
 from scenario_test_runner.lifecycle_controller import LifecycleController
-from scenario_test_runner.workflow import Scenario, Workflow, substitute_ros_package
+from scenario_test_runner.workflow import Expect, Scenario, Workflow, substitute_ros_package
 from shutil import rmtree
 from sys import exit
 from typing import List
@@ -37,17 +37,10 @@ def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
     for each in scenarios:
 
         if each.path.suffix == '.xosc':
-
             result.append(each)
 
         else:  # == '.yaml'
-
-            for path in convert(
-                    each.path,  # input
-                    output_directory / each.path.stem,  # output
-                    False
-                    ):
-
+            for path in convert(each.path, output_directory / each.path.stem, False):
                 result.append(
                     Scenario(path, each.expect, each.frame_rate))
 
@@ -97,17 +90,11 @@ class ScenarioTestRunner(LifecycleController):
         self.global_real_time_factor = global_real_time_factor
         self.global_timeout = global_timeout
 
-        self.launcher_path = Path(__file__).resolve().parent.parent
-
         self.output_directory = substitute_ros_package(output_directory)
 
         if self.output_directory.exists():
             rmtree(self.output_directory)
-
         self.output_directory.mkdir(parents=True, exist_ok=True)
-
-        # self.xosc_scenarios = []  # XXX DEPRECATED
-        # self.local_frame_rates = []  # XXX DEPRECATED
 
         self.current_workflow = None
 
@@ -130,15 +117,12 @@ class ScenarioTestRunner(LifecycleController):
         self.current_workflow = Workflow(
             path,
             self.global_frame_rate,
+            # TODO self.global_real_time_factor,
             )
 
         converted_scenarios = convert_scenarios(
             self.current_workflow.scenarios,
             self.output_directory)
-
-        # self.xosc_scenarios = [each.path for each in converted_scenarios]  # TODO REMOVE
-        # self.xosc_expects = [each.expect for each in converted_scenarios]  # TODO REMOVE
-        # self.local_frame_rates = [each.frame_rate for each in converted_scenarios]  # TODO REMOVE
 
         is_valid = XOSCValidator(False)
 
@@ -168,7 +152,21 @@ class ScenarioTestRunner(LifecycleController):
 
         self.deactivate_node()
 
-    def run_scenarios(self, scenarios: List[Scenario]):
+    def run_scenario(self, scenario: Scenario):
+
+        converted_scenarios = convert_scenarios(
+            [scenario],
+            self.output_directory)
+
+        is_valid = XOSCValidator(False)
+
+        for each in converted_scenarios:
+            if not is_valid(each.path):
+                exit(1)
+
+        self.run_scenarios(converted_scenarios)
+
+    def run_scenarios(self, scenarios: List[Scenario]):  # TODO RENAME
         """
         Run all given scenarios.
 
@@ -291,8 +289,15 @@ def main():
     if args.scenario != Path("/dev/null"):
         print(str(substitute_ros_package(args.scenario).resolve()))
 
+        test_runner.run_scenario(
+            Scenario(
+                substitute_ros_package(args.scenario).resolve(),
+                Expect['success'],
+                args.global_frame_rate))
+
     elif args.workflow != Path("/dev/null"):
-        test_runner.run_workflow(substitute_ros_package(args.workflow).resolve())
+        test_runner.run_workflow(
+            substitute_ros_package(args.workflow).resolve())
 
     else:
         print("Neither the scenario nor the workflow is specified. Specify either one.")
