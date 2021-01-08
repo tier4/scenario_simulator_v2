@@ -76,6 +76,8 @@ class ScenarioTestRunner(LifecycleController):
         self.xosc_scenarios = []
         self.local_frame_rates = []
 
+        super().__init__()
+
     def run_workflow(self, path: Path):
         """
         Run workflow.
@@ -120,8 +122,6 @@ class ScenarioTestRunner(LifecycleController):
         for each in self.xosc_scenarios:
             if not is_valid(each):
                 exit(1)
-
-        super().__init__()
 
         self.run_all_scenarios()
 
@@ -183,32 +183,39 @@ class ScenarioTestRunner(LifecycleController):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='launch simulator')
+    parser = argparse.ArgumentParser(
+        description="This provides batch processing of scenarios for Tier IV "
+                    "Scenario Simulator.\nThis program doesn't work on its own "
+                    "and he needs to be called via ROS2 launch as 'ros2 launch "
+                    "scenario_test_runner scenario_test_runner.launch.py'. "
+                    "When calling 'scenario_test_runner.launch.py', the "
+                    "options described below must be given in the form "
+                    "'option:=VALUE' instead of '--option VALUE'.")
 
     parser.add_argument(  # DEPRECATED
         '--log_directory',
-        type=Path,
         default=Path('/tmp'),
+        type=Path,
         help='(Deprecated) Specify log_directory you want to execute.')
 
     parser.add_argument(
         '--global-frame-rate',
-        type=float,
-        default=30)
+        default=30,
+        type=float)
 
     parser.add_argument(
-        '--global-real-time-factor',
-        type=float,
+        '-x', '--global-real-time-factor',
         default=1.0,
+        type=float,
         help="Specify the ratio of simulation time to real time. If you set a "
              "value greater than 1, the simulation will be faster than in "
              "reality, and if you set a value less than 1, the simulation will "
              "be slower than in reality.")
 
     parser.add_argument(
-        '--global-timeout',
-        type=float,
+        '-t', '--global-timeout',
         default=30,
+        type=float,
         help="Specify the simulation time limit. This time limit is independent "
              "of the simulation playback speed determined by the option "
              "real_time_factor. It also has nothing to do with OpenSCENARIO's "
@@ -216,13 +223,18 @@ def main():
 
     parser.add_argument(
         '-s', '--scenario',
+        default="/dev/null",
         type=Path,
-        help='Specify the scenario you want to execute.')
+        help="Specify a scenario file (.yaml or .xosc) you want to execute. If "
+             "a workflow file is also specified by the'--workflow' option at "
+             "the same time, this option takes precedence (that is, only one "
+             "scenario passed to the --scenario option will be executed).")
 
     parser.add_argument(
         '-w', '--workflow',
+        default="$(find-pkg-share scenario_test_runner)/workflow_example.yaml",
         type=Path,
-        help='Specify workflow you want to execute.')
+        help='Specify <workflow>.yaml file you want to execute.')
 
     parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
     parser.add_argument('-r', nargs='*')  # XXX DIRTY HACK
@@ -236,7 +248,9 @@ def main():
         log_directory=args.log_directory,  # DEPRECATED
         )
 
-    if args.scenario == Path("/dev/null"):
+    if args.scenario != Path("/dev/null"):
+        print(str(substitute_ros_package(args.scenario).resolve()))
+    elif args.workflow != Path("/dev/null"):
         test_runner.run_workflow(
             substitute_ros_package(args.workflow).resolve())
     else:
