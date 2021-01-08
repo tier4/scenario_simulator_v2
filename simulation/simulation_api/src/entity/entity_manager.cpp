@@ -543,11 +543,10 @@ void EntityManager::update(double current_time, double step_time)
     }
     status_with_traj.waypoint = getWaypoints(status.first);
     const auto obstacle = getObstacle(status.first);
-    if(obstacle) {
+    if (obstacle) {
       status_with_traj.obstacle = obstacle.get();
       status_with_traj.obstacle_find = true;
-    }
-    else {
+    } else {
       status_with_traj.obstacle_find = false;
     }
     status_with_traj.status = status_msg;

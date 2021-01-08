@@ -178,6 +178,21 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
 }
 
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
+  const std::vector<std::int64_t> & route_lanelets,
+  const simulation_api::math::CatmullRomSpline & spline)
+{
+  auto conflicting_entity_status = getConflictingEntityStatus(route_lanelets);
+  if (!conflicting_entity_status) {
+    return boost::none;
+  }
+  if (!conflicting_entity_status->lanelet_pose_valid) {
+    return boost::none;
+  }
+  auto polygon = hdmap_utils->getLaneletPolygon(conflicting_entity_status->lanelet_pose.lanelet_id);
+  return spline.getCollisionPointIn2D(polygon);
+}
+
+boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_entity_status = getConflictingEntityStatus(following_lanelets);

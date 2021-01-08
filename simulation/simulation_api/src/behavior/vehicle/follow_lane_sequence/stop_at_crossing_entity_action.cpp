@@ -31,7 +31,8 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const boost::optional<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacle(
+const boost::optional<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::
+calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   if (!distance_to_stop_target_) {

@@ -80,7 +80,21 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
   std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
   all_graphs.push_back(vehicle_routing_graph_ptr_);
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
-  // overall_graphs_ptr_ = std::make_unique<lanelet::routing::RoutingGraphContainer>(all_graphs);
+}
+
+const std::vector<geometry_msgs::msg::Point> HdMapUtils::getLaneletPolygon(std::int64_t lanelet_id)
+{
+  std::vector<geometry_msgs::msg::Point> points;
+  lanelet::CompoundPolygon3d lanelet_polygon =
+    lanelet_map_ptr_->laneletLayer.get(lanelet_id).polygon3d();
+  for (const auto & lanelet_point : lanelet_polygon) {
+    geometry_msgs::msg::Point p;
+    p.x = lanelet_point.x();
+    p.y = lanelet_point.y();
+    p.z = lanelet_point.z();
+    points.emplace_back(p);
+  }
+  return points;
 }
 
 boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(

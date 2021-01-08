@@ -72,8 +72,12 @@ public:
     bool search_backward = false
   ) const;
   const openscenario_msgs::msg::CatmullRomSpline toRosMsg() const;
-  const geometry_msgs::msg::Point getRightBoundsPoint(double width, double s, double z_offset = 0) const;
-  const geometry_msgs::msg::Point getLeftBoundsPoint(double width, double s, double z_offset = 0) const;
+  const geometry_msgs::msg::Point getRightBoundsPoint(
+    double width, double s,
+    double z_offset = 0) const;
+  const geometry_msgs::msg::Point getLeftBoundsPoint(
+    double width, double s,
+    double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
     double width, size_t num_points = 30, double z_offset = 0);
 

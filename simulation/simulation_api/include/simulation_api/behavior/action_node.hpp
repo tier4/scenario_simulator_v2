@@ -17,6 +17,7 @@
 
 #include <behaviortree_cpp_v3/action_node.h>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/entity/entity_base.hpp>
 
 #include <boost/algorithm/clamp.hpp>
@@ -45,6 +46,9 @@ public:
     const std::vector<std::int64_t> & following_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & following_lanelets) const;
+  boost::optional<double> getDistanceToConflictingEntity(
+    const std::vector<std::int64_t> & route_lanelets,
+    const simulation_api::math::CatmullRomSpline & spline);
   boost::optional<openscenario_msgs::msg::EntityStatus> getFrontEntityStatus();
   double calculateStopDistance() const;
   boost::optional<double> getDistanceToFrontEntity();
