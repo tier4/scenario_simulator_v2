@@ -92,7 +92,8 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     markers_.erase(markers_.find(name));
   }
   for (const auto & data : msg->data) {
-    auto marker_array = generateMarker(data.status, data.waypoint, data.obstacles);
+    auto marker_array =
+      generateMarker(data.status, data.waypoint, data.obstacle, data.obstacle_find);
     std::copy(
       marker_array.markers.begin(),
       marker_array.markers.end(),
@@ -122,7 +123,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
 const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
   const openscenario_msgs::msg::EntityStatus & status,
   const openscenario_msgs::msg::WaypointsArray & waypoints,
-  const std::vector<openscenario_msgs::msg::Obstacle> & obstacles)
+  const openscenario_msgs::msg::Obstacle & obstacle,
+  bool obstacle_find)
 {
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
@@ -323,22 +325,20 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.color = color_utils::makeColorMsg("black", 0.99);
   ret.markers.emplace_back(text_action);
 
-  /**
-   * @brief generate marker for waypoints
-   */
-  visualization_msgs::msg::Marker waypoints_marker;
-  waypoints_marker.header.frame_id = "map";
-  waypoints_marker.header.stamp = stamp;
-  waypoints_marker.ns = status.name;
-  waypoints_marker.id = 4;
-  if (waypoints.waypoints.size() == 0) {
-    waypoints_marker.action = waypoints_marker.DELETE;
-    ret.markers.emplace_back(waypoints_marker);
-  } else {
+  if (waypoints.waypoints.size() != 0) {
+    simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
+
+    /**
+     * @brief generate marker for waypoints
+     */
+    visualization_msgs::msg::Marker waypoints_marker;
+    waypoints_marker.header.frame_id = "map";
+    waypoints_marker.header.stamp = stamp;
+    waypoints_marker.ns = status.name;
+    waypoints_marker.id = 4;
     waypoints_marker.action = waypoints_marker.ADD;
     waypoints_marker.type = waypoints_marker.TRIANGLE_LIST;
-    simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
-    size_t num_points = 50;
+    size_t num_points = 30;
     waypoints_marker.points = spline.getPolygon(
       status.bounding_box.dimensions.y, num_points);
     waypoints_marker.color = color;
@@ -349,6 +349,28 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     waypoints_marker.scale.y = 1.0;
     waypoints_marker.scale.z = 1.0;
     ret.markers.emplace_back(waypoints_marker);
+    if (obstacle_find) {
+      /**
+       * @brief generate marker for obstacles
+       */
+      visualization_msgs::msg::Marker obstacles_marker;
+      obstacles_marker.header.frame_id = "map";
+      obstacles_marker.header.stamp = stamp;
+      obstacles_marker.ns = status.name;
+      obstacles_marker.id = 5;
+      obstacles_marker.action = obstacles_marker.ADD;
+    } else {
+      visualization_msgs::msg::Marker obstacles_marker;
+      obstacles_marker.action = obstacles_marker.ADD;
+      ret.markers.emplace_back(obstacles_marker);
+    }
+  } else {
+    visualization_msgs::msg::Marker waypoints_marker;
+    waypoints_marker.action = waypoints_marker.DELETE;
+    ret.markers.emplace_back(waypoints_marker);
+    visualization_msgs::msg::Marker obstacles_marker;
+    obstacles_marker.action = obstacles_marker.ADD;
+    ret.markers.emplace_back(obstacles_marker);
   }
   return ret;
 }

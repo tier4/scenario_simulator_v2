@@ -43,7 +43,7 @@ public:
         "vehicle_parameters"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
       BT::OutputPort<std::vector<openscenario_msgs::msg::Obstacle>>(
-        "obstacles"),
+        "obstacle"),
       BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
         "waypoints")
     };
@@ -61,7 +61,7 @@ public:
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
-  virtual const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
+  virtual const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
     const openscenario_msgs::msg::WaypointsArray & waypoints) = 0;
   std::vector<std::int64_t> route_lanelets;
 };

@@ -31,10 +31,10 @@ LaneChangeAction::LaneChangeAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const std::vector<openscenario_msgs::msg::Obstacle> LaneChangeAction::calculateObstacles(
+const boost::optional<openscenario_msgs::msg::Obstacle> LaneChangeAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
-  return std::vector<openscenario_msgs::msg::Obstacle>();
+  return boost::none;
 }
 
 const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
@@ -133,15 +133,15 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
       const auto waypoints = calculateWaypoints();
-      const auto obstacles = calculateObstacles(waypoints);
+      const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
-      setOutput("obstacles", obstacles);
+      setOutput("obstacle", obstacle);
       return BT::NodeStatus::RUNNING;
     } else {
       const auto waypoints = calculateWaypoints();
-      const auto obstacles = calculateObstacles(waypoints);
+      const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
-      setOutput("obstacles", obstacles);
+      setOutput("obstacle", obstacle);
       double s = (current_s_ - curve_->getLength()) + target_s_;
       curve_ = boost::none;
       current_s_ = 0;

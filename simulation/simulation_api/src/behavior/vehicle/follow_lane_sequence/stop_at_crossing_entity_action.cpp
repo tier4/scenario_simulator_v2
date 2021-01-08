@@ -31,16 +31,16 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const std::vector<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacles(
+const boost::optional<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   if (!distance_to_stop_target_) {
-    return std::vector<openscenario_msgs::msg::Obstacle>();
+    return boost::none;
   }
   openscenario_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
   obstacle.s = distance_to_stop_target_.get();
-  return {obstacle};
+  return obstacle;
 }
 
 const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
@@ -95,9 +95,9 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (!target_linear_speed) {
     setOutput("updated_status", calculateEntityStatusUpdated(0));
     const auto waypoints = calculateWaypoints();
-    const auto obstacles = calculateObstacles(waypoints);
+    const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
-    setOutput("obstacles", obstacles);
+    setOutput("obstacle", obstacle);
     return BT::NodeStatus::SUCCESS;
   }
   if (target_speed) {
@@ -109,9 +109,9 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   const auto waypoints = calculateWaypoints();
-  const auto obstacles = calculateObstacles(waypoints);
+  const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
-  setOutput("obstacles", obstacles);
+  setOutput("obstacle", obstacle);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

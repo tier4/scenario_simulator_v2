@@ -34,10 +34,10 @@ StopAtStopLineAction::StopAtStopLineAction(
   stopped_ = false;
 }
 
-const std::vector<openscenario_msgs::msg::Obstacle> StopAtStopLineAction::calculateObstacles(
+const boost::optional<openscenario_msgs::msg::Obstacle> StopAtStopLineAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
-  return std::vector<openscenario_msgs::msg::Obstacle>();
+  return boost::none;
 }
 
 const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
@@ -104,16 +104,16 @@ BT::NodeStatus StopAtStopLineAction::tick()
       stopped_ = false;
       setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
       const auto waypoints = calculateWaypoints();
-      const auto obstacles = calculateObstacles(waypoints);
+      const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
-      setOutput("obstacles", obstacles);
+      setOutput("obstacle", obstacle);
       return BT::NodeStatus::SUCCESS;
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     const auto waypoints = calculateWaypoints();
-    const auto obstacles = calculateObstacles(waypoints);
+    const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
-    setOutput("obstacles", obstacles);
+    setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   }
   auto target_linear_speed =
@@ -132,9 +132,9 @@ BT::NodeStatus StopAtStopLineAction::tick()
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   stopped_ = false;
   const auto waypoints = calculateWaypoints();
-  const auto obstacles = calculateObstacles(waypoints);
+  const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
-  setOutput("obstacles", obstacles);
+  setOutput("obstacle", obstacle);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence
