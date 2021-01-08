@@ -17,7 +17,7 @@
 
 
 import argparse
-import rclpy
+# import rclpy
 import time
 
 from openscenario_utility.validation import XOSCValidator
@@ -102,20 +102,14 @@ class ScenarioTestRunner(LifecycleController):
             self.global_frame_rate,
             )
 
-        # scenarios = [each.path for each in self.current_workflow.scenarios]
-        #
-        # expects = [each.expect for each in self.current_workflow.scenarios]
-        #
-        # frame_rates = [each.frame_rate for each in self.current_workflow.scenarios]
+        converted_scenarios = ConverterHandler.convert_scenarios(
+            self.current_workflow.scenarios,
+            self.launcher_path  # XXX DEPRECATED
+            )
 
-        self.xosc_scenarios, self.xosc_expects, self.local_frame_rates \
-            = ConverterHandler.convert_scenarios(
-                # scenarios,
-                # expects,
-                # frame_rates,
-                self.current_workflow.scenarios,
-                self.launcher_path  # XXX DEPRECATED
-                )
+        self.xosc_scenarios = [each.path for each in converted_scenarios]
+        self.xosc_expects = [each.expect for each in converted_scenarios]
+        self.local_frame_rates = [each.frame_rate for each in converted_scenarios]
 
         is_valid = XOSCValidator(False)
 
@@ -183,8 +177,8 @@ class ScenarioTestRunner(LifecycleController):
 
         self.shutdown()
 
-    def __del__(self):
-        pass
+    # def __del__(self):
+    #     pass
 
 
 def main():
@@ -259,8 +253,6 @@ def main():
         test_runner.run_workflow(substitute_ros_package(args.workflow).resolve())
     else:
         print("Option '--scenario' does not supprted.")
-
-    rclpy.shutdown()
 
 
 if __name__ == '__main__':

@@ -201,6 +201,8 @@ def convert(input: Path, output: Path, verbose: bool = True):
             for each in paths:
                 print(each)
 
+        return paths
+
 
 def main():
     parser = ArgumentParser(description='Convert OpenSCENARIO.yaml into .xosc')

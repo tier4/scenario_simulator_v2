@@ -195,7 +195,7 @@ class LifecycleController(Node):
         """Shutdown lifecycle controller."""
         self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
         # Logger.print_info(self.get_lifecycle_state())
-        self.destroy_node()
+        # self.destroy_node()
 
 
 def main(args=None):
