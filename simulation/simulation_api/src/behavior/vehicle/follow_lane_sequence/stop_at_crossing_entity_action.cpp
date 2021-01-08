@@ -34,6 +34,7 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
 const std::vector<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::calculateObstacles(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
+  simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
   return std::vector<openscenario_msgs::msg::Obstacle>();
 }
 

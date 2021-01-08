@@ -64,7 +64,6 @@ public:
   virtual const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
     const openscenario_msgs::msg::WaypointsArray & waypoints) = 0;
   std::vector<std::int64_t> route_lanelets;
-  boost::optional<simulation_api::math::CatmullRomSpline> trajectory_curve;
 };
 }  // namespace entity_behavior
 
