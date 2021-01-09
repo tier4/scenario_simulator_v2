@@ -152,16 +152,16 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
     auto solutions = solver_.solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
     for (const auto solution : solutions) {
-      double t = (point0.x - fx) / ex;
-      if (std::fabs(t) < l * 0.5) {
+      double t = (point0.y - fy) / ey;
+      if (std::fabs(t) < l) {
         s_values.emplace_back(solution);
       }
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
     auto solutions = solver_.solveCubicEquation(ay_, by_, cy_, dy_ - fy);
     for (const auto solution : solutions) {
-      double t = (point0.y - fy) / ey;
-      if (std::fabs(t) < l * 0.5) {
+      double t = (point0.x - fx) / ex;
+      if (std::fabs(t) < l) {
         s_values.emplace_back(solution);
       }
     }
@@ -175,7 +175,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     for (const auto solution : solutions) {
       double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
       double t = (y - fy) / ratio;
-      if (std::fabs(t) < l * 0.5) {
+      if (std::fabs(t) < l) {
         s_values.emplace_back(solution);
       }
     }
