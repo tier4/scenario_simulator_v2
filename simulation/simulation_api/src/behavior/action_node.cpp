@@ -69,29 +69,44 @@ void ActionNode::getBlackBoardValues()
   }
 }
 
+std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getOtherEntityStatus(
+  std::int64_t lanelet_id)
+{
+  std::vector<openscenario_msgs::msg::EntityStatus> ret;
+  for (const auto & status : other_entity_status) {
+    if (status.second.lanelet_pose_valid) {
+      if (status.second.lanelet_pose.lanelet_id == lanelet_id) {
+        ret.emplace_back(status.second);
+      }
+    }
+  }
+  return ret;
+}
+
 boost::optional<double> ActionNode::getYieldStopDistance(
   const std::vector<std::int64_t> & following_lanelets)
 {
   std::set<double> dists;
-  const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
-  for (const auto & status : other_entity_status) {
-    for (const auto & following_lanelet : following_lanelets) {
-      for (const std::int64_t & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
-        if (lanelet_id == status.second.lanelet_pose.lanelet_id) {
-          auto distance = hdmap_utils->getLongitudinalDistance(
-            entity_status.lanelet_pose.lanelet_id,
-            entity_status.lanelet_pose.s, following_lanelet, 0);
-          if (distance) {
-            dists.insert(distance.get());
-          }
+  for (const auto & lanelet : following_lanelets) {
+    const auto right_of_way_ids = hdmap_utils->getRightOfWayLaneletIds(lanelet);
+    for (const auto right_of_way_id : right_of_way_ids) {
+      const auto other_status = getOtherEntityStatus(right_of_way_id);
+      if (other_status.size() != 0) {
+        auto distance = hdmap_utils->getLongitudinalDistance(
+          entity_status.lanelet_pose.lanelet_id,
+          entity_status.lanelet_pose.s,
+          lanelet,
+          0);
+        if (distance) {
+          dists.insert(distance.get());
         }
       }
     }
+    if (dists.size() != 0) {
+      return *dists.begin();
+    }
   }
-  if (dists.size() == 0) {
-    return boost::none;
-  }
-  return *dists.begin();
+  return boost::none;
 }
 
 std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntities(
