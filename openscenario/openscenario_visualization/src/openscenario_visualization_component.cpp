@@ -363,7 +363,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       obstacle_marker.pose = spline.getPose(obstacle.s);
       obstacle_marker.color = color_utils::makeColorMsg("red", 0.99);
       obstacle_marker.scale.x = 0.3;
-      obstacle_marker.scale.y = status.bounding_box.dimensions.y;
+      obstacle_marker.scale.y = status.bounding_box.dimensions.y + 0.3;
       obstacle_marker.scale.z = status.bounding_box.dimensions.z;
       ret.markers.emplace_back(obstacle_marker);
     } else {
