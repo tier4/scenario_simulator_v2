@@ -152,14 +152,16 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
     auto solutions = solver_.solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
     for (const auto solution : solutions) {
-      if (std::fabs(solver_.cubicFunction(ay_, by_, cy_, dy_ - fy, solution) < e)) {
+      double t = (point0.y - fy) / ey;
+      if (std::fabs(t) < l) {
         s_values.emplace_back(solution);
       }
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
     auto solutions = solver_.solveCubicEquation(ay_, by_, cy_, dy_ - fy);
     for (const auto solution : solutions) {
-      if (std::fabs(solver_.cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
+      double t = (point0.x - fx) / ex;
+      if (std::fabs(t) < l) {
         s_values.emplace_back(solution);
       }
     }
@@ -171,7 +173,9 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double d = (dx_ - fx) * ratio - (dy_ - fy);
     auto solutions = solver_.solveCubicEquation(a, b, c, d);
     for (const auto solution : solutions) {
-      if (std::fabs(solver_.cubicFunction(ax_, bx_, cx_, dx_ - fy, solution) < e)) {
+      double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
+      double t = (y - fy) / ratio;
+      if (std::fabs(t) < l) {
         s_values.emplace_back(solution);
       }
     }
@@ -277,6 +281,19 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_po
     ret.emplace_back(getPoint(t, false));
   }
   return ret;
+}
+
+const geometry_msgs::msg::Vector3 HermiteCurve::getNormalVector(
+  double s,
+  bool autoscale) const
+{
+  if (autoscale) {
+    s = s / getLength();
+  }
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = 3 * ay_ * s * s + 2 * by_ * s + cy_;
+  vec.y = (3 * ax_ * s * s + 2 * bx_ * s + cx_) * -1;
+  return vec;
 }
 
 const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale) const

@@ -18,6 +18,7 @@
 #include <behaviortree_cpp_v3/action_node.h>
 #include <simulation_api/entity/vehicle_parameter.hpp>
 #include <simulation_api/behavior/action_node.hpp>
+#include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <openscenario_msgs/msg/entity_trajectory.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
@@ -40,9 +41,11 @@ public:
     BT::PortsList ports = {
       BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
         "vehicle_parameters"),
+      BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
+      BT::OutputPort<boost::optional<openscenario_msgs::msg::Obstacle>>(
+        "obstacle"),
       BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
-        "waypoints"),
-      BT::InputPort<std::vector<std::int64_t>>("route_lanelets")
+        "waypoints")
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
@@ -58,8 +61,8 @@ public:
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
-  const std::vector<openscenario_msgs::msg::Obstacle> calculateObstacles(
-    const openscenario_msgs::msg::WaypointsArray & waypoints);
+  virtual const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
+    const openscenario_msgs::msg::WaypointsArray & waypoints) = 0;
   std::vector<std::int64_t> route_lanelets;
 };
 }  // namespace entity_behavior

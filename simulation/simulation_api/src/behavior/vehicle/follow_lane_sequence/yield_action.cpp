@@ -33,6 +33,12 @@ YieldAction::YieldAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
+const boost::optional<openscenario_msgs::msg::Obstacle> YieldAction::calculateObstacle(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
+{
+  return boost::none;
+}
+
 const openscenario_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {
@@ -87,9 +93,9 @@ BT::NodeStatus YieldAction::tick()
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     const auto waypoints = calculateWaypoints();
-    const auto obstacles = calculateObstacles(waypoints);
+    const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
-    setOutput("obstacles", obstacles);
+    setOutput("obstacle", obstacle);
     return BT::NodeStatus::SUCCESS;
   }
   target_speed = calculateTargetSpeed(route_lanelets);
@@ -98,9 +104,9 @@ BT::NodeStatus YieldAction::tick()
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   const auto waypoints = calculateWaypoints();
-  const auto obstacles = calculateObstacles(waypoints);
+  const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
-  setOutput("obstacles", obstacles);
+  setOutput("obstacle", obstacle);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

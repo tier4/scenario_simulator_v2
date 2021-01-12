@@ -17,6 +17,7 @@
 #include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <string>
+#include <vector>
 
 
 namespace entity_behavior
@@ -29,6 +30,12 @@ FollowLaneAction::FollowLaneAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
+
+const boost::optional<openscenario_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
+  const openscenario_msgs::msg::WaypointsArray & waypoints)
+{
+  return boost::none;
+}
 
 const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
 {
@@ -107,9 +114,9 @@ BT::NodeStatus FollowLaneAction::tick()
   auto updated_status = calculateEntityStatusUpdated(target_speed.get());
   setOutput("updated_status", updated_status);
   const auto waypoints = calculateWaypoints();
-  const auto obstacles = calculateObstacles(waypoints);
+  const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
-  setOutput("obstacles", obstacles);
+  setOutput("obstacle", obstacle);
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

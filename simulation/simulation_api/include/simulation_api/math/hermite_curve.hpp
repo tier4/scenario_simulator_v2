@@ -52,7 +52,7 @@ public:
     double ax, double bx, double cx, double dx,
     double ay, double by, double cy, double dy,
     double az, double bz, double cz, double dz);
-  std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 100) const;
+  std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 30) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s,
     double resolution, bool autoscale = false) const;
@@ -63,6 +63,9 @@ public:
     double s,
     bool autoscale = false) const;
   const geometry_msgs::msg::Vector3 getTangentVector(
+    double s,
+    bool autoscale = false) const;
+  const geometry_msgs::msg::Vector3 getNormalVector(
     double s,
     bool autoscale = false) const;
   double get2DCurvature(

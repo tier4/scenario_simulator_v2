@@ -72,6 +72,10 @@ public:
   {
     return tree_ptr_->getWaypoints();
   }
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle()
+  {
+    return tree_ptr_->getObstacle();
+  }
 
 private:
   std::shared_ptr<entity_behavior::vehicle::BehaviorTree> tree_ptr_;

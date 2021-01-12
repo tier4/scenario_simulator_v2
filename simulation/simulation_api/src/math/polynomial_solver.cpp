@@ -17,6 +17,7 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -145,6 +146,7 @@ int PolynomialSolver::solveP3(
     }
     return 1;
   }
+  return 0;
 }
 
 double PolynomialSolver::_root3(double x) const

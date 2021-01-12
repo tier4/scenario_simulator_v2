@@ -15,6 +15,7 @@
 #include <simulation_api/behavior/route_planner.hpp>
 
 #include <memory>
+#include <vector>
 
 namespace simulation_api
 {
@@ -95,4 +96,4 @@ void RoutePlanner::plan(
     return;
   }
 }
-}
+}  // namespace simulation_api

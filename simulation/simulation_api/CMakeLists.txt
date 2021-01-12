@@ -49,7 +49,7 @@ ament_auto_add_library(entity_manager SHARED
   src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
   src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
-  )
+)
 
 target_link_libraries(entity_manager pugixml)
 
@@ -70,8 +70,8 @@ install(
   DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
-  # find_package(ament_lint_auto REQUIRED)
-  # ament_lint_auto_find_test_dependencies()
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
 
   ament_add_gtest(test_math test/src/test_math.cpp)

@@ -14,7 +14,8 @@
             other_entity_status="{other_entity_status}"
             entity_type_list="{entity_type_list}"
             to_lanelet_id="{to_lanelet_id}"
-            route_lanelets="{route_lanelets}"/>
+            route_lanelets="{route_lanelets}"
+            obstacle="{obstacle}"/>
         <Fallback name="follow_lane_sequence">
             <FollowLane name="follow_lane"
                 waypoints="{waypoints}"
@@ -28,7 +29,8 @@
                 target_speed="{target_speed}"
                 other_entity_status="{other_entity_status}"
                 entity_type_list="{entity_type_list}"
-                route_lanelets="{route_lanelets}"/>
+                route_lanelets="{route_lanelets}"
+                obstacle="{obstacle}"/>
             <Fallback name="follow_lane_behavior_selector">
                 <FollowFrontEntity name="follow_front_entity"
                     waypoints="{waypoints}"
@@ -42,7 +44,8 @@
                     target_speed="{target_speed}"
                     other_entity_status="{other_entity_status}"
                     entity_type_list="{entity_type_list}"
-                    route_lanelets="{route_lanelets}"/>
+                    route_lanelets="{route_lanelets}"
+                    obstacle="{obstacle}"/>
                 <StopAtStopLine name="stop_at_stop_line"
                     waypoints="{waypoints}"
                     request="{request}"
@@ -55,7 +58,8 @@
                     target_speed="{target_speed}"
                     other_entity_status="{other_entity_status}"
                     entity_type_list="{entity_type_list}"
-                    route_lanelets="{route_lanelets}"/>
+                    route_lanelets="{route_lanelets}"
+                    obstacle="{obstacle}"/>
                 <StopAtCrossingEntity name="stop_at_crossing_entity"
                     waypoints="{waypoints}"
                     request="{request}"
@@ -68,7 +72,8 @@
                     target_speed="{target_speed}"
                     other_entity_status="{other_entity_status}"
                     entity_type_list="{entity_type_list}"
-                    route_lanelets="{route_lanelets}"/>
+                    route_lanelets="{route_lanelets}"
+                    obstacle="{obstacle}"/>
                 <Yield name="yield"
                     waypoints="{waypoints}"
                     request="{request}"
@@ -81,7 +86,8 @@
                     target_speed="{target_speed}"
                     other_entity_status="{other_entity_status}"
                     entity_type_list="{entity_type_list}"
-                    route_lanelets="{route_lanelets}"/>
+                    route_lanelets="{route_lanelets}"
+                    obstacle="{obstacle}"/>
             </Fallback>
         </Fallback>
     </Fallback>
