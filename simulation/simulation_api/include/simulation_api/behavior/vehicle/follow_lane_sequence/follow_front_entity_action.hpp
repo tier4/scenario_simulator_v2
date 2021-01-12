@@ -46,6 +46,7 @@ public:
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
   const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
     const openscenario_msgs::msg::WaypointsArray & waypoints) override;
+
 private:
   boost::optional<double> distance_to_front_entity_;
 };

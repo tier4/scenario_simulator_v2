@@ -40,6 +40,13 @@ const boost::optional<openscenario_msgs::msg::Obstacle> StopAtStopLineAction::ca
   if (!distance_to_stopline_) {
     return boost::none;
   }
+  if (distance_to_stopline_.get() < 0) {
+    return boost::none;
+  }
+  simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
+  if (distance_to_stopline_.get() > spline.getLength()) {
+    return boost::none;
+  }
   openscenario_msgs::msg::Obstacle obstacle;
   obstacle.type = obstacle.ENTITY;
   obstacle.s = distance_to_stopline_.get();
