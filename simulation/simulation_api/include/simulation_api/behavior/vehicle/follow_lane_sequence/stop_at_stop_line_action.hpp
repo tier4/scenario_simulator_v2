@@ -44,7 +44,6 @@ public:
     return ports;
   }
   boost::optional<double> calculateTargetSpeed(
-    const std::vector<std::int64_t> & following_lanelets,
     double current_velocity);
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
   const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
@@ -52,6 +51,7 @@ public:
 
 private:
   bool stopped_;
+  boost::optional<double> distance_to_stopline_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
