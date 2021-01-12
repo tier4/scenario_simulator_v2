@@ -338,7 +338,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     waypoints_marker.id = 4;
     waypoints_marker.action = waypoints_marker.ADD;
     waypoints_marker.type = waypoints_marker.TRIANGLE_LIST;
-    size_t num_points = 30;
+    size_t num_points = 20;
     waypoints_marker.points = spline.getPolygon(
       status.bounding_box.dimensions.y, num_points);
     waypoints_marker.color = color;
