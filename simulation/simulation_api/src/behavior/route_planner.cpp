@@ -77,6 +77,10 @@ void RoutePlanner::plan(
   {
     cancelGoal();
     return;
+  } else {
+    std::vector<std::int64_t> route = {entity_lanelet_pose.lanelet_id};
+    whole_route_ = route;
+    return;
   }
   if (!whole_route_) {
     whole_route_ = hdmap_utils_ptr_->getRoute(

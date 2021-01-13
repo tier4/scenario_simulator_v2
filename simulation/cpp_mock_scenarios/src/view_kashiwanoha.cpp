@@ -36,6 +36,17 @@ public:
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
+    pugi::xml_document catalog_xml_doc;
+    catalog_xml_doc.load_string(catalog_xml.c_str());
+    simulation_api::entity::VehicleParameters params(catalog_xml_doc);
+    api_.spawn(false, "ego", params);
+    api_.setEntityStatus(
+      "ego",
+      simulation_api::helper::constractLaneletPose(120684, 5.5361, -0.591),
+      simulation_api::helper::constractActionStatus(0));
+    api_.requestAcquirePosition(
+      "ego",
+      simulation_api::helper::constractLaneletPose(120684, 35.1072, -0.6315) );
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
