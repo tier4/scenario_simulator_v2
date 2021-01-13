@@ -20,6 +20,8 @@
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 
+#include <openscenario_msgs/msg/driver_model.hpp>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <iostream>
@@ -48,6 +50,9 @@ BehaviorTree::BehaviorTree()
   factory_.registerNodeType<LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
+
+  openscenario_msgs::msg::DriverModel driver_model;
+  setValueToBlackBoard("driver_model", driver_model);
   // logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);
   setupLogger();
   setRequest("none");
