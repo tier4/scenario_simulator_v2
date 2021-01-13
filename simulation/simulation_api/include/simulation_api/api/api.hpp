@@ -20,6 +20,8 @@
 
 #include <awapi_accessor/accessor.hpp>
 
+#include <openscenario_msgs/msg/driver_model.hpp>
+
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -91,6 +93,7 @@ public:
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
     setVerbose(verbose);
   }
+  void setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model);
   void setVerbose(bool verbose);
   bool spawn(
     bool is_ego, std::string name,

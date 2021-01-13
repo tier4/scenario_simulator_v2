@@ -38,6 +38,11 @@ const
   return entity_manager_ptr_->toMapPose(lanelet_pose);
 }
 
+void API::setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model)
+{
+  entity_manager_ptr_->setDriverModel(name, model);
+}
+
 bool API::spawn(
   bool is_ego,
   std::string catalog_xml,
