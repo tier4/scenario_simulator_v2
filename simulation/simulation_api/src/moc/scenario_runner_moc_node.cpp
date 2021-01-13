@@ -106,12 +106,14 @@ private:
     if (api_.checkCollision("ego", "npc2")) {
       std::cout << "npc2 collision!" << std::endl;
     }
+    if (current_time_ > 10.0 && api_.entityExists("bob")) {
+      api_.despawnEntity("bob");
+    }
     api_.updateFrame();
     current_time_ = current_time_ + 0.05;
   }
   bool lanechange_excuted_;
   bool target_speed_setted_;
-  bool bob_spawned_;
   double current_time_;
   int port_;
   scenario_simulator::API api_;
