@@ -1,4 +1,5 @@
 external/autoware_auto_msgs
+external/operational-design-domains
 external/doxybook2
 external/quaternion_operation
 html
