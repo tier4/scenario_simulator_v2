@@ -260,7 +260,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.scale.z = 0.6;
   text.lifetime = rclcpp::Duration(0.1);
   text.text = status.name;
-  text.color = color_utils::makeColorMsg("black", 0.99);
+  text.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text);
 
   visualization_msgs::msg::Marker arrow;
@@ -322,7 +322,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration(0.1);
   text_action.text = status.action_status.current_action;
-  text_action.color = color_utils::makeColorMsg("black", 0.99);
+  text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);
 
   if (waypoints.waypoints.size() != 0) {
@@ -338,7 +338,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     waypoints_marker.id = 4;
     waypoints_marker.action = waypoints_marker.ADD;
     waypoints_marker.type = waypoints_marker.TRIANGLE_LIST;
-    size_t num_points = 30;
+    size_t num_points = 20;
     waypoints_marker.points = spline.getPolygon(
       status.bounding_box.dimensions.y, num_points);
     waypoints_marker.color = color;
@@ -361,9 +361,11 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       obstacle_marker.action = obstacle_marker.ADD;
       obstacle_marker.type = obstacle_marker.CUBE;
       obstacle_marker.pose = spline.getPose(obstacle.s);
-      obstacle_marker.color = color_utils::makeColorMsg("red", 0.99);
+      obstacle_marker.pose.position.z = obstacle_marker.pose.position.z +
+        status.bounding_box.dimensions.z * 0.5;
+      obstacle_marker.color = color_utils::makeColorMsg("red", 0.5);
       obstacle_marker.scale.x = 0.3;
-      obstacle_marker.scale.y = status.bounding_box.dimensions.y;
+      obstacle_marker.scale.y = status.bounding_box.dimensions.y + 0.3;
       obstacle_marker.scale.z = status.bounding_box.dimensions.z;
       ret.markers.emplace_back(obstacle_marker);
     } else {

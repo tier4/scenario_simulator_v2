@@ -36,7 +36,20 @@ YieldAction::YieldAction(
 const boost::optional<openscenario_msgs::msg::Obstacle> YieldAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
-  return boost::none;
+  if (!distance_to_stop_target_) {
+    return boost::none;
+  }
+  if (distance_to_stop_target_.get() < 0) {
+    return boost::none;
+  }
+  simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
+  if (distance_to_stop_target_.get() > spline.getLength()) {
+    return boost::none;
+  }
+  openscenario_msgs::msg::Obstacle obstacle;
+  obstacle.type = obstacle.ENTITY;
+  obstacle.s = distance_to_stop_target_.get();
+  return obstacle;
 }
 
 const openscenario_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
@@ -58,15 +71,13 @@ const openscenario_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
   }
 }
 
-boost::optional<double> YieldAction::calculateTargetSpeed(
-  std::vector<std::int64_t> following_lanelets)
+boost::optional<double> YieldAction::calculateTargetSpeed()
 {
-  auto distance_to_stop_target = getYieldStopDistance(following_lanelets);
-  if (!distance_to_stop_target) {
+  if (!distance_to_stop_target_) {
     return boost::none;
   }
-  double rest_distance = distance_to_stop_target.get() -
-    (vehicle_parameters->bounding_box.dimensions.length);
+  double rest_distance = distance_to_stop_target_.get() -
+    (vehicle_parameters->bounding_box.dimensions.length) - 10;
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
       return std::sqrt(2 * 5 * rest_distance);
@@ -98,7 +109,8 @@ BT::NodeStatus YieldAction::tick()
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::SUCCESS;
   }
-  target_speed = calculateTargetSpeed(route_lanelets);
+  distance_to_stop_target_ = getYieldStopDistance(route_lanelets);
+  target_speed = calculateTargetSpeed();
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }

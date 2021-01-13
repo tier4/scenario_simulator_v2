@@ -35,7 +35,20 @@ FollowFrontEntityAction::FollowFrontEntityAction(
 const boost::optional<openscenario_msgs::msg::Obstacle> FollowFrontEntityAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
-  return boost::none;
+  if (!distance_to_front_entity_) {
+    return boost::none;
+  }
+  if (distance_to_front_entity_.get() < 0) {
+    return boost::none;
+  }
+  simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
+  if (distance_to_front_entity_.get() > spline.getLength()) {
+    return boost::none;
+  }
+  openscenario_msgs::msg::Obstacle obstacle;
+  obstacle.type = obstacle.ENTITY;
+  obstacle.s = distance_to_front_entity_.get();
+  return obstacle;
 }
 
 const openscenario_msgs::msg::WaypointsArray FollowFrontEntityAction::calculateWaypoints()
@@ -71,17 +84,17 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     entity_status.lanelet_pose.lanelet_id,
     entity_status.lanelet_pose.s);
   auto distance_to_crossing_entity = getDistanceToConflictingEntity(route_lanelets);
-  auto distance_to_front_entity = getDistanceToFrontEntity();
-  if (!distance_to_front_entity) {
+  distance_to_front_entity_ = getDistanceToFrontEntity();
+  if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
   if (distance_to_crossing_entity) {
-    if (distance_to_front_entity.get() > distance_to_crossing_entity.get()) {
+    if (distance_to_front_entity_.get() > distance_to_crossing_entity.get()) {
       return BT::NodeStatus::FAILURE;
     }
   }
   if (distance_to_stopline) {
-    if (distance_to_front_entity.get() > distance_to_stopline.get()) {
+    if (distance_to_front_entity_.get() > distance_to_stopline.get()) {
       return BT::NodeStatus::FAILURE;
     }
   }
@@ -89,7 +102,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (!front_entity_status) {
     return BT::NodeStatus::FAILURE;
   }
-  if (distance_to_front_entity.get() >=
+  if (distance_to_front_entity_.get() >=
     (calculateStopDistance() +
     vehicle_parameters->bounding_box.dimensions.length + 5))
   {
@@ -97,7 +110,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       front_entity_status.get().action_status.twist.linear.x + 2);
     setOutput("updated_status", entity_status_updated);
     return BT::NodeStatus::RUNNING;
-  } else if (distance_to_front_entity.get() <= calculateStopDistance()) {
+  } else if (distance_to_front_entity_.get() <= calculateStopDistance()) {
     auto entity_status_updated = calculateEntityStatusUpdated(
       front_entity_status.get().action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);

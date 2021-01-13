@@ -37,7 +37,20 @@ StopAtStopLineAction::StopAtStopLineAction(
 const boost::optional<openscenario_msgs::msg::Obstacle> StopAtStopLineAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
-  return boost::none;
+  if (!distance_to_stopline_) {
+    return boost::none;
+  }
+  if (distance_to_stopline_.get() < 0) {
+    return boost::none;
+  }
+  simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
+  if (distance_to_stopline_.get() > spline.getLength()) {
+    return boost::none;
+  }
+  openscenario_msgs::msg::Obstacle obstacle;
+  obstacle.type = obstacle.ENTITY;
+  obstacle.s = distance_to_stopline_.get();
+  return obstacle;
 }
 
 const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
@@ -59,14 +72,12 @@ const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWayp
   }
 }
 
-boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(
-  const std::vector<std::int64_t> & following_lanelets, double current_velocity)
+boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_velocity)
 {
-  auto distance_to_stop_target = getDistanceToStopLine(following_lanelets);
-  if (!distance_to_stop_target) {
+  if (!distance_to_stopline_) {
     return boost::none;
   }
-  double rest_distance = distance_to_stop_target.get() -
+  double rest_distance = distance_to_stopline_.get() -
     (vehicle_parameters->bounding_box.dimensions.length);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
@@ -88,10 +99,10 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
-  auto dist_to_stopline = getDistanceToStopLine(route_lanelets);
+  distance_to_stopline_ = getDistanceToStopLine(route_lanelets);
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
-    if (dist_to_stopline) {
-      if (dist_to_stopline.get() <= vehicle_parameters->bounding_box.dimensions.length + 5) {
+    if (distance_to_stopline_) {
+      if (distance_to_stopline_.get() <= vehicle_parameters->bounding_box.dimensions.length + 5) {
         stopped_ = true;
       }
     }
@@ -100,7 +111,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
     }
-    if (!dist_to_stopline) {
+    if (!distance_to_stopline_) {
       stopped_ = false;
       setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
       const auto waypoints = calculateWaypoints();
@@ -117,7 +128,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   auto target_linear_speed =
-    calculateTargetSpeed(route_lanelets, entity_status.action_status.twist.linear.x);
+    calculateTargetSpeed(entity_status.action_status.twist.linear.x);
   if (!target_linear_speed) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;

@@ -31,11 +31,18 @@ StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config) {}
 
-const boost::optional<openscenario_msgs::msg::Obstacle> StopAtCrossingEntityAction::
-calculateObstacle(
+const boost::optional<openscenario_msgs::msg::Obstacle>
+StopAtCrossingEntityAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray & waypoints)
 {
   if (!distance_to_stop_target_) {
+    return boost::none;
+  }
+  if (distance_to_stop_target_.get() < 0) {
+    return boost::none;
+  }
+  simulation_api::math::CatmullRomSpline spline(waypoints.waypoints);
+  if (distance_to_stop_target_.get() > spline.getLength()) {
     return boost::none;
   }
   openscenario_msgs::msg::Obstacle obstacle;
