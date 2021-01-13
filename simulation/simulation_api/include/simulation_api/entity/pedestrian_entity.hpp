@@ -17,8 +17,8 @@
 
 #include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/entity/pedestrian_parameter.hpp>
-
 #include <simulation_api/behavior/pedestrian/behavior_tree.hpp>
+#include <simulation_api/behavior/route_planner.hpp>
 
 // headers in pugixml
 #include <pugixml.hpp>
@@ -51,6 +51,7 @@ public:
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
   {
     hdmap_utils_ptr_ = ptr;
+    route_planner_ptr_ = std::make_shared<simulation_api::RoutePlanner>(ptr);
     tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
   void setTargetSpeed(double target_speed, bool continuous);
@@ -66,8 +67,8 @@ public:
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;
   BT::NodeStatus action_status_;
-  // entity_behavior::pedestrian::LaneChangeParameter lane_change_params_;
   boost::optional<double> target_speed_;
+  std::shared_ptr<simulation_api::RoutePlanner> route_planner_ptr_;
 };
 }  // namespace entity
 }  // namespace simulation_api

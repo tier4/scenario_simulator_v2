@@ -17,7 +17,6 @@
 
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_api/behavior/pedestrian/follow_lane_action.hpp>
-#include <simulation_api/behavior/pedestrian/acquire_position_action.hpp>
 
 #include <openscenario_msgs/msg/entity_status.hpp>
 

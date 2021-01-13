@@ -67,6 +67,18 @@ void ActionNode::getBlackBoardValues()
   {
     throw BehaviorTreeRuntimeError("failed to get input entity_type_list in ActionNode");
   }
+  if (!getInput<std::vector<std::int64_t>>("route_lanelets", route_lanelets)) {
+    throw BehaviorTreeRuntimeError("failed to get input route_lanelets in ActionNode");
+  }
+}
+
+openscenario_msgs::msg::EntityStatus ActionNode::stopAtEndOfRoad()
+{
+  openscenario_msgs::msg::EntityStatus entity_status_updated = entity_status;
+  entity_status_updated.time = current_time + step_time;
+  entity_status_updated.action_status.twist = geometry_msgs::msg::Twist();
+  entity_status_updated.action_status.accel = geometry_msgs::msg::Accel();
+  return entity_status_updated;
 }
 
 std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getOtherEntityStatus(
