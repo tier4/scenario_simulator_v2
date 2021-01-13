@@ -23,6 +23,7 @@
 
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
@@ -138,6 +139,7 @@ public:
       std::bind(&EntityManager::updateHdmapMarker, this));
   }
   ~EntityManager() {}
+  void setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model);
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
   const boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose) const;
