@@ -32,7 +32,7 @@ public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
   : Node("scenario_runner", option),
     api_(this, ament_index_cpp::get_package_share_directory(
-        "kashiwanoha_map") + "/map/lanelet2_map.osm")
+        "cargo_delivery") + "/maps/kashiwa/lanelet2_map_with_private_road_and_walkway_ele_fix.osm")
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
@@ -42,39 +42,11 @@ public:
     api_.spawn(false, "ego", params);
     api_.setEntityStatus(
       "ego",
-      simulation_api::helper::constractLaneletPose(120545, 0),
-      simulation_api::helper::constractActionStatus(10));
-    api_.setTargetSpeed("ego", 15, true);
-    pugi::xml_document pedestrian_xml_doc;
-    pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
-    simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
-    api_.spawn(false, "tom", pedestrian_params);
-    api_.setEntityStatus(
-      "tom", "ego",
-      simulation_api::helper::constractPose(10, 3, 0, 0, 0, 1.57),
-      simulation_api::helper::constractActionStatus());
-    api_.spawn(
-      false, "bob", pedestrian_params,
-      simulation_api::helper::constractLaneletPose(34378, 0.0),
-      simulation_api::helper::constractActionStatus(1));
-    api_.setTargetSpeed("bob", 1, true);
-    api_.spawn(
-      false, "npc1", params,
-      simulation_api::helper::constractLaneletPose(34579, 20.0),
-      simulation_api::helper::constractActionStatus(5));
-    api_.setTargetSpeed("npc1", 5, true);
-    lanechange_excuted_ = false;
-    api_.spawn(
-      false, "npc2", params,
-      simulation_api::helper::constractLaneletPose(34606, 20.0),
-      simulation_api::helper::constractActionStatus(5));
-    api_.setTargetSpeed("npc2", 0, true);
+      simulation_api::helper::constractLaneletPose(120684, 5.5361, -0.591),
+      simulation_api::helper::constractActionStatus(0));
     api_.requestAcquirePosition(
       "ego",
-      simulation_api::helper::constractLaneletPose(34675, 0.0) );
-    api_.requestAcquirePosition(
-      "npc1",
-      simulation_api::helper::constractLaneletPose(34675, 0.0) );
+      simulation_api::helper::constractLaneletPose(120684, 35.1072, -0.6315) );
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -82,38 +54,12 @@ public:
 private:
   void update()
   {
-    if (api_.reachPosition(
-        "ego",
-        simulation_api::helper::constractLaneletPose(34615, 10.0), 5))
-    {
-      api_.requestAcquirePosition(
-        "ego",
-        simulation_api::helper::constractLaneletPose(35026, 0.0) );
-      api_.setTargetSpeed("npc2", 13, true);
-    }
-    if (api_.reachPosition(
-        "ego",
-        simulation_api::helper::constractLaneletPose(34579, 0.0), 5))
-    {
-      api_.requestAcquirePosition(
-        "ego",
-        simulation_api::helper::constractLaneletPose(34675, 0.0) );
-      api_.setTargetSpeed("npc2", 3, true);
-    }
-    if (api_.checkCollision("ego", "npc1")) {
-      std::cout << "npc1 collision!" << std::endl;
-    }
-    if (api_.checkCollision("ego", "npc2")) {
-      std::cout << "npc2 collision!" << std::endl;
-    }
-    if (current_time_ > 10.0 && api_.entityExists("bob")) {
-      api_.despawnEntity("bob");
-    }
     api_.updateFrame();
     current_time_ = current_time_ + 0.05;
   }
   bool lanechange_excuted_;
   bool target_speed_setted_;
+  bool bob_spawned_;
   double current_time_;
   int port_;
   scenario_simulator::API api_;

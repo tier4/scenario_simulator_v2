@@ -102,5 +102,14 @@ bool EntityBase::getVisibility()
 {
   return visibility_;
 }
+
+void EntityBase::stopAtEndOfRoad()
+{
+  if (!status_) {
+    throw SimulationRuntimeError("status is not set");
+  }
+  status_.get().action_status.twist = geometry_msgs::msg::Twist();
+  status_.get().action_status.accel = geometry_msgs::msg::Accel();
+}
 }  // namespace entity
 }  // namespace simulation_api

@@ -20,6 +20,9 @@
 #include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/entity/entity_base.hpp>
 
+#include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
+
 #include <boost/algorithm/clamp.hpp>
 
 #include <string>
@@ -62,6 +65,7 @@ public:
   boost::optional<double> getYieldStopDistance(
     const std::vector<std::int64_t> & following_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> getOtherEntityStatus(std::int64_t lanelet_id);
+  openscenario_msgs::msg::EntityStatus stopAtEndOfRoad();
 
   /// throws if the derived class return RUNNING.
   BT::NodeStatus executeTick() override;
@@ -87,7 +91,12 @@ public:
         BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus>>(
           "other_entity_status"),
         BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
-          "entity_type_list")
+          "entity_type_list"),
+        BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
+        BT::OutputPort<boost::optional<openscenario_msgs::msg::Obstacle>>(
+          "obstacle"),
+        BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
+          "waypoints")
       };
   }
   void getBlackBoardValues();
@@ -100,6 +109,7 @@ public:
   openscenario_msgs::msg::EntityStatus updated_status;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_entity_status;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list;
+  std::vector<std::int64_t> route_lanelets;
 };
 }  // namespace entity_behavior
 

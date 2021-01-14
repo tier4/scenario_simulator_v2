@@ -348,6 +348,9 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   std::vector<std::int64_t> candidate_lanelet_ids, double distance,
   bool include_self)
 {
+  if (candidate_lanelet_ids.size() == 0) {
+    return {};
+  }
   std::vector<std::int64_t> ret;
   double total_dist = 0.0;
   bool found = false;

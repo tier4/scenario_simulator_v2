@@ -37,9 +37,6 @@ void VehicleActionNode::getBlackBoardValues()
   {
     throw BehaviorTreeRuntimeError("failed to get input vehicle_parameters in VehicleActionNode");
   }
-  if (!getInput<std::vector<std::int64_t>>("route_lanelets", route_lanelets)) {
-    throw BehaviorTreeRuntimeError("failed to get input route_lanelets in ActionNode");
-  }
 }
 
 openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
@@ -97,18 +94,7 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
             new_s = new_s - length;
             auto next_ids = hdmap_utils->getNextLaneletIds(route_lanelets[i]);
             if (next_ids.size() == 0) {
-              openscenario_msgs::msg::EntityStatus status_in_world_frame;
-              status_in_world_frame.time = entity_status.time;
-              status_in_world_frame.pose = entity_status.pose;
-              status_in_world_frame.action_status = entity_status.action_status;
-              auto lanelet_pose = hdmap_utils->toLaneletPose(status_in_world_frame.pose);
-              if (lanelet_pose) {
-                status_in_world_frame.lanelet_pose = lanelet_pose.get();
-              } else {
-                status_in_world_frame.lanelet_pose_valid = false;
-              }
-              entity_status = status_in_world_frame;
-              return calculateEntityStatusUpdatedInWorldFrame(target_speed);
+              return stopAtEndOfRoad();
             }
             new_lanelet_id = next_ids[0];
             break;

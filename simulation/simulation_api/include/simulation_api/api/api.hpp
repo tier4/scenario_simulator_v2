@@ -180,6 +180,8 @@ public:
     geometry_msgs::msg::Pose pose) const;
   const geometry_msgs::msg::Pose toMapPose(const openscenario_msgs::msg::LaneletPose lanelet_pose)
   const;
+  bool despawnEntity(std::string name);
+  bool entityExists(std::string name);
 
 private:
   bool spawn(

@@ -76,7 +76,7 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!entity_status.lanelet_pose_valid) {
     setOutput(
       "updated_status",
-      calculateEntityStatusUpdatedInWorldFrame(entity_status.action_status.twist.linear.x));
+      stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }
   if (getRightOfWayEntities(route_lanelets).size() != 0) {

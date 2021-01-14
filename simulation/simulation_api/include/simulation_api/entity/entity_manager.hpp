@@ -220,6 +220,13 @@ public:
     entities_.erase(name);
     return true;
   }
+  bool entityExists(std::string name)
+  {
+    if (entities_.count(name) == 0) {
+      return false;
+    }
+    return true;
+  }
 };
 }  // namespace entity
 }  // namespace simulation_api
