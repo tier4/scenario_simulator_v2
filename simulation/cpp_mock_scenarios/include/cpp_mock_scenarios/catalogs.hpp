@@ -17,8 +17,10 @@
 
 #include <string>
 
-std::string vehicle_catalog_xml = 
-    R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
+struct Catalog
+{
+std::string vehicle_catalog_xml =
+  R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
             <ParameterDeclarations/>
             <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
             <BoundingBox>
@@ -34,8 +36,8 @@ std::string vehicle_catalog_xml =
             </Properties>
         </Vehicle>)";
 
-std::string pedestrian_catalog_xml = 
-    R"(
+std::string pedestrian_catalog_xml =
+  R"(
     <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
             <BoundingBox>
                 <Center x='0.0' y='0.0' z='0.5'/>
@@ -43,5 +45,7 @@ std::string pedestrian_catalog_xml =
             </BoundingBox>
             <Properties/>
         </Pedestrian>)";
-        
+};
+
+
 #endif  // CPP_MOCK_SCENARIOS__CATALOGS_HPP_

@@ -39,7 +39,8 @@ public:
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
     pugi::xml_document vehicle_catalog_xml_doc;
-    vehicle_catalog_xml_doc.load_string(vehicle_catalog_xml.c_str());
+    Catalog catalog;
+    vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
     simulation_api::entity::VehicleParameters params(vehicle_catalog_xml_doc);
     api_.spawn(false, "ego", params);
     api_.setEntityStatus(
