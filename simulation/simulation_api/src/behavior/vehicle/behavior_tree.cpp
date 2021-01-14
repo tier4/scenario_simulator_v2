@@ -50,9 +50,6 @@ BehaviorTree::BehaviorTree()
   factory_.registerNodeType<LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
-
-  openscenario_msgs::msg::DriverModel driver_model;
-  setValueToBlackBoard("driver_model", driver_model);
   // logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);
   setupLogger();
   setRequest("none");

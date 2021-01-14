@@ -30,7 +30,7 @@ void VehicleActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
   if (!getInput<openscenario_msgs::msg::DriverModel>("drive_model", driver_model)) {
-    throw BehaviorTreeRuntimeError("failed to get input driver_model in VehicleActionNode");
+    driver_model = openscenario_msgs::msg::DriverModel();
   }
   if (!getInput<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
       "vehicle_parameters", vehicle_parameters))
