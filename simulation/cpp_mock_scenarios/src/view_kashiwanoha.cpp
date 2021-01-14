@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cpp_mock_scenarios/catalogs.hpp>
+
 #include <simulation_api/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -36,9 +38,9 @@ public:
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
-    pugi::xml_document catalog_xml_doc;
-    catalog_xml_doc.load_string(catalog_xml.c_str());
-    simulation_api::entity::VehicleParameters params(catalog_xml_doc);
+    pugi::xml_document vehicle_catalog_xml_doc;
+    vehicle_catalog_xml_doc.load_string(vehicle_catalog_xml.c_str());
+    simulation_api::entity::VehicleParameters params(vehicle_catalog_xml_doc);
     api_.spawn(false, "ego", params);
     api_.setEntityStatus(
       "ego",
@@ -64,33 +66,6 @@ private:
   int port_;
   scenario_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
-
-  std::string catalog_xml =
-    R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
-            <ParameterDeclarations/>
-            <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
-            <BoundingBox>
-                <Center x='1.5' y='0.0' z='0.9'/>
-                <Dimensions width='2.1' length='4.5' height='1.8'/>
-            </BoundingBox>
-            <Axles>
-                <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
-                <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>
-            </Axles>
-            <Properties>
-                <Property name='type' value='ego_vehicle'/>
-            </Properties>
-        </Vehicle>)";
-
-  std::string pedestrian_xml =
-    R"(
-    <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
-            <BoundingBox>
-                <Center x='0.0' y='0.0' z='0.5'/>
-                <Dimensions width='1.0' length='1.0' height='2.0'/>
-            </BoundingBox>
-            <Properties/>
-        </Pedestrian>)";
 };
 
 int main(int argc, char * argv[])
