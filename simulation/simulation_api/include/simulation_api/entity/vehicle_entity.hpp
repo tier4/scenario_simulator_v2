@@ -22,6 +22,7 @@
 #include <simulation_api/behavior/route_planner.hpp>
 
 #include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -53,6 +54,10 @@ public:
   void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();
+  void setDriverModel(const openscenario_msgs::msg::DriverModel & model)
+  {
+    tree_ptr_->setValueToBlackBoard("driver_model", model);
+  }
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
   {
     hdmap_utils_ptr_ = ptr;

@@ -20,6 +20,8 @@
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 
+#include <openscenario_msgs/msg/driver_model.hpp>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 #include <iostream>

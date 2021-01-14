@@ -32,6 +32,23 @@ void EntityManager::setVehicleCommands(
   state_cmd_ = state_cmd;
 }
 
+void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw simulation_api::SimulationRuntimeError("entity : " + name + " does not exist");
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    boost::any_cast<VehicleEntity &>(it->second).setDriverModel(model);
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return;
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    throw simulation_api::SimulationRuntimeError("entity : " + name + " pedestrian");
+  }
+}
+
 const boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::toLaneletPose(
   geometry_msgs::msg::Pose pose) const
 {

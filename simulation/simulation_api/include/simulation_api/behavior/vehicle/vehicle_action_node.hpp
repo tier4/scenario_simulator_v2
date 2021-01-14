@@ -21,6 +21,9 @@
 #include <simulation_api/math/catmull_rom_spline.hpp>
 
 #include <openscenario_msgs/msg/entity_trajectory.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 
 #include <string>
 #include <memory>
@@ -37,6 +40,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
+      BT::InputPort<openscenario_msgs::msg::DriverModel>("driver_model"),
       BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
         "vehicle_parameters")
     };
@@ -56,6 +60,7 @@ public:
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   virtual const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
     const openscenario_msgs::msg::WaypointsArray & waypoints) = 0;
+  openscenario_msgs::msg::DriverModel driver_model;
 };
 }  // namespace entity_behavior
 

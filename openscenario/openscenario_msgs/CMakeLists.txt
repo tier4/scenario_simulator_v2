@@ -20,6 +20,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/EntityStatusWithTrajectory.msg
   msg/EntityStatusWithTrajectoryArray.msg
   msg/Obstacle.msg
+  msg/DriverModel.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 

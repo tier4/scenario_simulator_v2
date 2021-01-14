@@ -29,6 +29,9 @@ VehicleActionNode::VehicleActionNode(
 void VehicleActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
+  if (!getInput<openscenario_msgs::msg::DriverModel>("driver_model", driver_model)) {
+    driver_model = openscenario_msgs::msg::DriverModel();
+  }
   if (!getInput<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
       "vehicle_parameters", vehicle_parameters))
   {
@@ -128,9 +131,9 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   }
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed) {
-    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
+    target_accel = boost::algorithm::clamp(target_accel, -1 * driver_model.deceleration, 0);
   } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
+    target_accel = boost::algorithm::clamp(target_accel, 0, driver_model.acceleration);
   }
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
