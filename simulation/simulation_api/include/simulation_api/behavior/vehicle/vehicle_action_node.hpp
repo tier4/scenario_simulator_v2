@@ -60,7 +60,6 @@ public:
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;
   virtual const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
     const openscenario_msgs::msg::WaypointsArray & waypoints) = 0;
-  std::vector<std::int64_t> route_lanelets;
   openscenario_msgs::msg::DriverModel driver_model;
 };
 }  // namespace entity_behavior
