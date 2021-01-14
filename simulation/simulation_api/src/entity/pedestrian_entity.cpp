@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace simulation_api
 {
@@ -72,8 +73,13 @@ PedestrianEntity::PedestrianEntity(std::string name, PedestrianParameters params
 
 void PedestrianEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
-  tree_ptr_->setRequest("acquire_position");
-  tree_ptr_->setValueToBlackBoard("target_lanelet_pose", lanelet_pose);
+  if (!status_) {
+    return;
+  }
+  if (!status_->lanelet_pose_valid) {
+    return;
+  }
+  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
 }
 
 void PedestrianEntity::cancelRequest()
@@ -98,6 +104,15 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
   tree_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
   tree_ptr_->setValueToBlackBoard("entity_status", status_.get());
+  if (status_->lanelet_pose_valid) {
+    auto route = route_planner_ptr_->getRouteLanelets(status_->lanelet_pose);
+    tree_ptr_->setValueToBlackBoard(
+      "route_lanelets",
+      route);
+  } else {
+    std::vector<std::int64_t> empty = {};
+    tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
+  }
   action_status_ = tree_ptr_->tick(current_time, step_time);
   while (getCurrentAction() == "root") {
     action_status_ = tree_ptr_->tick(current_time, step_time);
@@ -108,7 +123,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
       status_updated.lanelet_pose.lanelet_id);
     auto l = hdmap_utils_ptr_->getLaneletLength(status_updated.lanelet_pose.lanelet_id);
     if (following_lanelets.size() == 1 && l <= status_updated.lanelet_pose.s) {
-      status_ = boost::none;
+      stopAtEndOfRoad();
       return;
     }
   }

@@ -3,3 +3,6 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/quaternion_operation.git
     version: ros2
+  operational-design-domains:
+    type: git
+    url: https://gitlab.com/hakuturu583/operational-design-domains.git

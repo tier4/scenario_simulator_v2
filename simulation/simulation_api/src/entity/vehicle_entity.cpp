@@ -128,7 +128,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       status_updated.lanelet_pose.lanelet_id);
     auto l = hdmap_utils_ptr_->getLaneletLength(status_updated.lanelet_pose.lanelet_id);
     if (following_lanelets.size() == 1 && l <= status_updated.lanelet_pose.s) {
-      status_ = boost::none;
+      stopAtEndOfRoad();
       return;
     }
   }

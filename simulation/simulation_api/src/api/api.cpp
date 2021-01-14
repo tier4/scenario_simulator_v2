@@ -20,6 +20,16 @@
 
 namespace scenario_simulator
 {
+bool API::despawnEntity(std::string name)
+{
+  return entity_manager_ptr_->despawnEntity(name);
+}
+
+bool API::entityExists(std::string name)
+{
+  return entity_manager_ptr_->entityExists(name);
+}
+
 void API::setVerbose(bool verbose)
 {
   entity_manager_ptr_->setVerbose(verbose);

@@ -44,6 +44,8 @@ public:
   std::shared_ptr<simulation_api::entity::PedestrianParameters> pedestrian_parameters;
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
+  openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(
+    double target_speed);
 };
 }  // namespace entity_behavior
 

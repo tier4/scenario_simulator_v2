@@ -19,7 +19,6 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(entity_manager SHARED
   src/behavior/action_node.cpp
-  src/behavior/pedestrian/acquire_position_action.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp

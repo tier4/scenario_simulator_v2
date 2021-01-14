@@ -1,19 +1,8 @@
 <root>
     <BehaviorTree>
     <Fallback name="root">
-        <AcquirePosition name="acquire_position"
-            request="{request}"
-            hdmap_utils="{hdmap_utils}"
-            current_time="{current_time}"
-            step_time="{step_time}"
-            entity_status="{entity_status}"
-            pedestrian_parameters="{pedestrian_parameters}"
-            updated_status="{updated_status}"
-            target_speed="{target_speed}"
-            target_lanelet_pose="{target_lanelet_pose}"
-            other_entity_status="{other_entity_status}"
-            entity_type_list="{entity_type_list}"/>
         <FollowLane name="follow_lane"
+            waypoints="{waypoints}"
             request="{request}"
             hdmap_utils="{hdmap_utils}"
             current_time="{current_time}"
@@ -23,7 +12,9 @@
             updated_status="{updated_status}"
             target_speed="{target_speed}"
             other_entity_status="{other_entity_status}"
-            entity_type_list="{entity_type_list}"/>
+            entity_type_list="{entity_type_list}"
+            route_lanelets="{route_lanelets}"
+            obstacle="{obstacle}"/>
     </Fallback>
     </BehaviorTree>
 </root>
