@@ -110,7 +110,9 @@ public:
     node->undeclare_parameter("origin_latitude");
     node->undeclare_parameter("origin_longitude");
     // node->undeclare_parameter("origin_altitude");
-    hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
+    if (map_path != "") {
+      hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
+    }
     const rclcpp::QoS & qos = LaneletMarkerQos();
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();

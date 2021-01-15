@@ -18,8 +18,9 @@
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/metrics/metric_base.hpp>
 
-#include <vector>
+#include <unordered_map>
 #include <memory>
+#include <string>
 #include <utility>
 
 namespace metrics
@@ -28,16 +29,16 @@ class MetricsManager
 {
 public:
   template<typename T, typename ... Ts>
-  void addMetric(Ts && ... xs)
+  void addMetric(std::string name, Ts && ... xs)
   {
     auto metric_ptr = new T(std::forward<Ts>(xs)...);
-    metrics_.push_back(metric_ptr);
+    metric_ptr->setEntityManager(this->entity_manager_ptr_);
+    metrics_.insert({name, metric_ptr});
   }
-
   void calculate();
 
 private:
-  std::vector<MetricBase> metrics_;
+  std::unordered_map<std::string, MetricBase> metrics_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace metrics

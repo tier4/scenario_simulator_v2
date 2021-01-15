@@ -1,4 +1,4 @@
-// Copyright 2015-2021 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_api/metrics/metrics_manager.hpp>
-#include <simulation_api/metrics/metric_base.hpp>
+#include <simulation_api/metrics/traveled_distance_metric.hpp>
 
-#include <memory>
+#include <string>
 
 namespace metrics
 {
-void MetricsManager::calculate()
+TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
+: MetricBase(target_entity, "TraveledDistance") {}
+
+void TraveledDistanceMetric::calculate()
 {
-  for (auto & metric : metrics_) {
-    metric.second.calculate();
-  }
 }
 }  // namespace metrics

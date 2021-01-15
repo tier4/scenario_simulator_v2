@@ -50,6 +50,7 @@ ament_auto_add_library(entity_manager SHARED
   src/vehicle_model/sim_model_interface.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
+  src/metrics/traveled_distance_metric.cpp
 )
 
 target_link_libraries(entity_manager pugixml)
@@ -80,9 +81,6 @@ if(BUILD_TESTING)
 
   ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
   target_link_libraries(test_hdmap_utils simulation_api)
-
-  ament_add_gtest(test_metrics test/src/test_metrics.cpp)
-  target_link_libraries(test_metrics simulation_api)
 endif()
 
 ament_auto_package()
