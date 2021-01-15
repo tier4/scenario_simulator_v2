@@ -16,13 +16,17 @@
 
 #include <simulation_api/metrics/metrics_manager.hpp>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
+#include <rclcpp/rclcpp.hpp>
+
 #include <memory>
 
-class TestMetrics : metrics::MetricsBase
+class TestMetric : metrics::MetricBase
 {
 public:
-  TestMetrics()
-  : metrics::MetricsBase("ego", "test") {}
+  TestMetric()
+  : metrics::MetricBase("ego", "test") {}
   void calculate()
   {
     foundSpecificationViolation("error");
@@ -31,7 +35,12 @@ public:
 
 TEST(Metrics, AddMetrics)
 {
-  metrics::MetricsManager manager;
+  auto node = std::make_shared<rclcpp::Node>("metrics_test_node", "/metrics_test");
+  std::string map_path = ament_index_cpp::get_package_share_directory(
+    "kashiwanoha_map") + "/map/lanelet2_map.osm";
+  simulation_api::entity::EntityManager manager(node, map_path);
+  node.reset();
+  // metrics::MetricsManager manager;
   // manager.addMetrics();
 }
 

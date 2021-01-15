@@ -16,7 +16,7 @@
 #define SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
 
 #include <simulation_api/entity/entity_manager.hpp>
-#include <simulation_api/metrics/metrics_base.hpp>
+#include <simulation_api/metrics/metric_base.hpp>
 
 #include <vector>
 #include <memory>
@@ -37,7 +37,7 @@ public:
   void calculate();
 
 private:
-  std::vector<MetricsBase> metrics_;
+  std::vector<MetricBase> metrics_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace metrics

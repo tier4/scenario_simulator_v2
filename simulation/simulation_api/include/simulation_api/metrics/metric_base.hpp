@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__METRICS_BASE_HPP_
-#define SIMULATION_API__METRICS__METRICS_BASE_HPP_
+#ifndef SIMULATION_API__METRICS__METRIC_BASE_HPP_
+#define SIMULATION_API__METRICS__METRIC_BASE_HPP_
 
 #include <simulation_api/entity/entity_manager.hpp>
 
@@ -34,10 +34,10 @@ public:
 private:
 };
 
-class MetricsBase
+class MetricBase
 {
 public:
-  MetricsBase(std::string target_entity, std::string metrics_type);
+  MetricBase(std::string target_entity, std::string metrics_type);
   void calculate() {}
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   const std::string target_entity;
@@ -51,4 +51,4 @@ private:
 };
 }  // namespace metrics
 
-#endif  // SIMULATION_API__METRICS__METRICS_BASE_HPP_
+#endif  // SIMULATION_API__METRICS__METRIC_BASE_HPP_

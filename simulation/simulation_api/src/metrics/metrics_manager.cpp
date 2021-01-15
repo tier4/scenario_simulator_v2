@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/metrics/metrics_manager.hpp>
-#include <simulation_api/metrics/metrics_base.hpp>
+#include <simulation_api/metrics/metric_base.hpp>
 
 #include <memory>
 

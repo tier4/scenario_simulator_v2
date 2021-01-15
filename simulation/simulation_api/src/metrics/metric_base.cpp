@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_api/metrics/metrics_base.hpp>
+#include <simulation_api/metrics/metric_base.hpp>
 
 #include <string>
 #include <memory>
 
 namespace metrics
 {
-MetricsBase::MetricsBase(std::string target_entity, std::string metrics_type)
+MetricBase::MetricBase(std::string target_entity, std::string metrics_type)
 : target_entity(target_entity), metrics_type(metrics_type) {}
 
-void MetricsBase::foundSpecificationViolation(std::string message)
+void MetricBase::foundSpecificationViolation(std::string message)
 {
   message = "target_entity : " + target_entity + "\n" +
     "metrics_type : " + metrics_type + "\n" + message;
   throw SpecificationViolationError(message);
 }
 
-void MetricsBase::setEntityManager(
+void MetricBase::setEntityManager(
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr)
 {
   entity_manager_ptr_ = entity_manager_ptr;
