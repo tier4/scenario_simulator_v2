@@ -80,6 +80,9 @@ if(BUILD_TESTING)
 
   ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
   target_link_libraries(test_hdmap_utils simulation_api)
+
+  ament_add_gtest(test_metrics test/src/test_metrics.cpp)
+  target_link_libraries(test_metrics simulation_api)
 endif()
 
 ament_auto_package()

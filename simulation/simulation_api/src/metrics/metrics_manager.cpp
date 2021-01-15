@@ -15,17 +15,19 @@
 #include <simulation_api/metrics/metrics_manager.hpp>
 #include <simulation_api/metrics/metrics_base.hpp>
 
+#include <memory>
+
 namespace metrics
 {
-void MetricsManager::addMetrics(MetricsBase metrics)
+void MetricsManager::addMetrics(std::shared_ptr<MetricsBase> metrics)
 {
-  metrics_list_.emplace_back(metrics);
+  metrics_ptrs_.emplace_back(metrics);
 }
 
 void MetricsManager::calculate()
 {
-  for (auto & metrics : metrics_list_) {
-    metrics.calculate();
+  for (auto & metrics_ptr : metrics_ptrs_) {
+    metrics_ptr->calculate();
   }
 }
 }  // namespace metrics

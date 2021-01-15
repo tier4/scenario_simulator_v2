@@ -17,9 +17,15 @@
 
 #include <string>
 #include <limits>
+#include <memory>
 
 namespace scenario_simulator
 {
+void API::addMetrics(std::shared_ptr<metrics::MetricsBase> metrics)
+{
+  metrics_manager_.addMetrics(metrics);
+}
+
 bool API::despawnEntity(std::string name)
 {
   return entity_manager_ptr_->despawnEntity(name);

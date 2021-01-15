@@ -1,4 +1,4 @@
-// Copyright 2015-2021 TierIV.inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,25 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
-#define SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
+#include <gtest/gtest.h>
 
-#include <simulation_api/metrics/metrics_base.hpp>
+#include <simulation_api/metrics/metrics_manager.hpp>
 
-#include <vector>
-#include <memory>
-
-namespace metrics
-{
-class MetricsManager
+class TestMetrics : metrics::MetricsBase
 {
 public:
-  void addMetrics(std::shared_ptr<MetricsBase> metrics);
-  void calculate();
-
-private:
-  std::vector<std::shared_ptr<MetricsBase>> metrics_ptrs_;
+  TestMetrics()
+  : metrics::MetricsBase("ego", "test") {}
 };
-}  // namespace metrics
 
-#endif  // SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

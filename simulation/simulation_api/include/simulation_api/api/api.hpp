@@ -17,6 +17,7 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
+#include <simulation_api/metrics/metrics_manager.hpp>
 
 #include <awapi_accessor/accessor.hpp>
 
@@ -182,6 +183,7 @@ public:
   const;
   bool despawnEntity(std::string name);
   bool entityExists(std::string name);
+  void addMetrics(std::shared_ptr<metrics::MetricsBase> metrics);
 
 private:
   bool spawn(
@@ -208,6 +210,7 @@ private:
   void vehicleStateCommandCallback(autoware_auto_msgs::msg::VehicleStateCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> current_state_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleStateCommand>::SharedPtr state_cmd_sub_;
+  metrics::MetricsManager metrics_manager_;
 };
 }  // namespace scenario_simulator
 
