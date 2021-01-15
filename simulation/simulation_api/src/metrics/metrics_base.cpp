@@ -18,8 +18,13 @@
 
 namespace metrics
 {
+MetricsBase::MetricsBase(std::string target_entity, std::string metrics_type)
+: target_entity(target_entity), metrics_type(metrics_type) {}
+
 void MetricsBase::foundSpecificationViolation(std::string message)
 {
+  message = "target_entity : " + target_entity + "\n" +
+    "metrics_type : " + metrics_type + "\n" + message;
   throw SpecificationViolationError(message);
 }
 }  // namespace metrics

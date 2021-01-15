@@ -34,10 +34,13 @@ private:
 class MetricsBase
 {
 public:
+  MetricsBase(std::string target_entity, std::string metrics_type);
   void calculate() {}
 
 protected:
   void foundSpecificationViolation(std::string message);
+  const std::string target_entity;
+  const std::string metrics_type;
 };
 }  // namespace metrics
 
