@@ -21,6 +21,10 @@ class TestMetrics : metrics::MetricsBase
 public:
   TestMetrics()
   : metrics::MetricsBase("ego", "test") {}
+  void calculate() override
+  {
+    foundSpecificationViolation("error");
+  }
 };
 
 int main(int argc, char ** argv)

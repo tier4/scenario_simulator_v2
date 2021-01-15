@@ -15,8 +15,8 @@
 #ifndef SCENARIO_SIMULATOR__EXCEPTION_HPP_
 #define SCENARIO_SIMULATOR__EXCEPTION_HPP_
 
-#include <stdexcept>
 #include <xmlrpcpp/XmlRpcValue.h>
+#include <stdexcept>
 
 namespace scenario_simulator
 {

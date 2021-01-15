@@ -36,7 +36,6 @@ class MetricsBase
 public:
   MetricsBase(std::string target_entity, std::string metrics_type);
   virtual void calculate() = 0;
-  bool isEnabled() const;
   const std::string target_entity;
   const std::string metrics_type;
 
