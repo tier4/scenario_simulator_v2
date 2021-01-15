@@ -13,3 +13,11 @@
 // limitations under the License.
 
 #include <simulation_api/metrics/metrics_base.hpp>
+
+namespace metrics
+{
+void MetricsBase::foundSpecificationViolation(std::string message)
+{
+  throw SpecificationViolationError(message);
+}
+}

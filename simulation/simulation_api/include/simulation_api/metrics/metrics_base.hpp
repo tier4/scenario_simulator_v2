@@ -15,14 +15,28 @@
 #ifndef SIMULATION_API__METRICS__METRICS_BASE_HPP_
 #define SIMULATION_API__METRICS__METRICS_BASE_HPP_
 
-#include <exception>
+#include <stdexcept>
 
 namespace metrics
 {
+class SpecificationViolationError : public std::runtime_error
+{
+public:
+  explicit SpecificationViolationError(const char * message)
+  : runtime_error(message) {}
+  explicit SpecificationViolationError(std::string message)
+  : runtime_error(message.c_str()) {}
+
+private:
+};
+
 class MetricsBase
 {
 public:
-    MetricsBase();
+  virtual void calculate() = 0;
+
+protected:
+  void foundSpecificationViolation(std::string message);
 };
 }
 
