@@ -27,4 +27,19 @@ void MetricsBase::foundSpecificationViolation(std::string message)
     "metrics_type : " + metrics_type + "\n" + message;
   throw SpecificationViolationError(message);
 }
+
+bool MetricsBase::isEnabled() const
+{
+  return enabled_;
+}
+
+void MetricsBase::enable()
+{
+  enabled_ = true;
+}
+
+void MetricsBase::disable()
+{
+  enabled_ = false;
+}
 }  // namespace metrics
