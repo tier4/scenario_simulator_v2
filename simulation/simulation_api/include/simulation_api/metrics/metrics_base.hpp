@@ -15,8 +15,11 @@
 #ifndef SIMULATION_API__METRICS__METRICS_BASE_HPP_
 #define SIMULATION_API__METRICS__METRICS_BASE_HPP_
 
+#include <simulation_api/entity/entity_manager.hpp>
+
 #include <stdexcept>
 #include <string>
+#include <memory>
 
 namespace metrics
 {
@@ -35,12 +38,16 @@ class MetricsBase
 {
 public:
   MetricsBase(std::string target_entity, std::string metrics_type);
-  virtual void calculate() = 0;
+  void calculate() {}
+  void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   const std::string target_entity;
   const std::string metrics_type;
 
 protected:
   void foundSpecificationViolation(std::string message);
+
+private:
+  std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace metrics
 

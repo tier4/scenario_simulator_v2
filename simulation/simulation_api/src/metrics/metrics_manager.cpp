@@ -19,15 +19,10 @@
 
 namespace metrics
 {
-void MetricsManager::addMetrics(std::shared_ptr<MetricsBase> metrics)
-{
-  metrics_ptrs_.emplace_back(metrics);
-}
-
 void MetricsManager::calculate()
 {
-  for (auto & metrics_ptr : metrics_ptrs_) {
-    metrics_ptr->calculate();
+  for (auto & metric : metrics_) {
+    metric.calculate();
   }
 }
 }  // namespace metrics

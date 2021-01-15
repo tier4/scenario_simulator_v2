@@ -183,7 +183,6 @@ public:
   const;
   bool despawnEntity(std::string name);
   bool entityExists(std::string name);
-  void addMetrics(std::shared_ptr<metrics::MetricsBase> metrics);
 
 private:
   bool spawn(

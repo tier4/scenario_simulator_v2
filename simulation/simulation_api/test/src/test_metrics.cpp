@@ -16,16 +16,24 @@
 
 #include <simulation_api/metrics/metrics_manager.hpp>
 
+#include <memory>
+
 class TestMetrics : metrics::MetricsBase
 {
 public:
   TestMetrics()
   : metrics::MetricsBase("ego", "test") {}
-  void calculate() override
+  void calculate()
   {
     foundSpecificationViolation("error");
   }
 };
+
+TEST(Metrics, AddMetrics)
+{
+  metrics::MetricsManager manager;
+  // manager.addMetrics();
+}
 
 int main(int argc, char ** argv)
 {

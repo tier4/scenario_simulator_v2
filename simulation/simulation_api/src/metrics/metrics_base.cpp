@@ -15,6 +15,7 @@
 #include <simulation_api/metrics/metrics_base.hpp>
 
 #include <string>
+#include <memory>
 
 namespace metrics
 {
@@ -26,5 +27,11 @@ void MetricsBase::foundSpecificationViolation(std::string message)
   message = "target_entity : " + target_entity + "\n" +
     "metrics_type : " + metrics_type + "\n" + message;
   throw SpecificationViolationError(message);
+}
+
+void MetricsBase::setEntityManager(
+  std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr)
+{
+  entity_manager_ptr_ = entity_manager_ptr;
 }
 }  // namespace metrics

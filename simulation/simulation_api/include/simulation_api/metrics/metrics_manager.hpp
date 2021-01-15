@@ -15,21 +15,30 @@
 #ifndef SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
 #define SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
 
+#include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/metrics/metrics_base.hpp>
 
 #include <vector>
 #include <memory>
+#include <utility>
 
 namespace metrics
 {
 class MetricsManager
 {
 public:
-  void addMetrics(std::shared_ptr<MetricsBase> metrics);
+  template<typename T, typename ... Ts>
+  void addMetric(Ts && ... xs)
+  {
+    auto metric_ptr = new T(std::forward<Ts>(xs)...);
+    metrics_.push_back(metric_ptr);
+  }
+
   void calculate();
 
 private:
-  std::vector<std::shared_ptr<MetricsBase>> metrics_ptrs_;
+  std::vector<MetricsBase> metrics_;
+  std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace metrics
 
