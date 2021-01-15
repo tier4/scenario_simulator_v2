@@ -928,6 +928,20 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
 }
 
+boost::optional<std::int64_t> HdMapUtils::getNextStopLineId(
+  std::vector<std::int64_t> following_lanelets,
+  openscenario_msgs::msg::LaneletPose lanlet_pose)
+{
+  std::vector<lanelet::ConstLineString3d> stop_lines;
+  for (const auto & following_lanelet_id : following_lanelets) {
+    stop_lines = getStopLinesOnPath({following_lanelet_id});
+    if (stop_lines.size() == 0) {
+      return stop_lines[0].id();
+    }
+  }
+  return boost::none;
+}
+
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> following_lanelets,
   std::int64_t lanelet_id, double s)
