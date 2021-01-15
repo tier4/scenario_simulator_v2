@@ -21,12 +21,12 @@
 
 namespace metrics
 {
-class TraveledDistanceMetric : MetricBase
+class TraveledDistanceMetric : public MetricBase
 {
 public:
   TraveledDistanceMetric(std::string target_entity, double step_time);
   ~TraveledDistanceMetric() = default;
-  void calculate();
+  void calculate() override;
 
 private:
   double traveled_distance = 0;

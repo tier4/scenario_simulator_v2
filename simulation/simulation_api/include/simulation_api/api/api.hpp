@@ -90,9 +90,15 @@ public:
       std::move(state_cmd_cb),
       options);
     entity_manager_ptr_ = std::make_shared<EntityManager>(node, map_path);
+    metrics_manager_.setEntityManager(entity_manager_ptr_);
     client_ptr_ =
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
     setVerbose(verbose);
+  }
+  template<typename T, typename ... Ts>
+  void addMetric(std::string name, Ts && ... xs)
+  {
+    metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
   }
   void setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model);
   void setVerbose(bool verbose);

@@ -635,6 +635,7 @@ XmlRpc::XmlRpcValue API::updateFrame()
   }
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;
+  metrics_manager_.calculate();
   return result[0][0];
 }
 void API::vehicleControlCommandCallback(
