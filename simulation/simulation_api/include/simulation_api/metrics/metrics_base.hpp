@@ -37,16 +37,11 @@ public:
   MetricsBase(std::string target_entity, std::string metrics_type);
   void calculate() {}
   bool isEnabled() const;
-  void enable();
-  void disable();
   const std::string target_entity;
   const std::string metrics_type;
 
 protected:
   void foundSpecificationViolation(std::string message);
-
-private:
-  bool enabled_;
 };
 }  // namespace metrics
 
