@@ -96,7 +96,7 @@ private:
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
-  explicit EntityManager(NodeT && node, const std::string & map_path = "")
+  explicit EntityManager(NodeT && node, const std::string & map_path)
   : broadcaster_(node), base_link_broadcaster_(node)
   {
     clock_ptr_ = node->get_clock();
@@ -110,9 +110,7 @@ public:
     node->undeclare_parameter("origin_latitude");
     node->undeclare_parameter("origin_longitude");
     // node->undeclare_parameter("origin_altitude");
-    if (map_path != "") {
-      hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
-    }
+    hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
     const rclcpp::QoS & qos = LaneletMarkerQos();
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();

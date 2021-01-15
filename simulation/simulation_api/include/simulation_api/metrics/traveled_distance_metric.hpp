@@ -24,9 +24,13 @@ namespace metrics
 class TraveledDistanceMetric : MetricBase
 {
 public:
-  explicit TraveledDistanceMetric(std::string target_entity);
+  TraveledDistanceMetric(std::string target_entity, double step_time);
   ~TraveledDistanceMetric() = default;
   void calculate();
+
+private:
+  double traveled_distance = 0;
+  const double step_time;
 };
 }  // namespace metrics
 

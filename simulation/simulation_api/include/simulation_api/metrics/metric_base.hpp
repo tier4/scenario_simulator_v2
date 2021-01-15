@@ -45,8 +45,6 @@ public:
 
 protected:
   void foundSpecificationViolation(std::string message);
-
-private:
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace metrics
