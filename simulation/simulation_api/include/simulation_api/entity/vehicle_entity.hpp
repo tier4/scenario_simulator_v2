@@ -81,6 +81,16 @@ public:
   {
     return tree_ptr_->getObstacle();
   }
+  std::vector<std::int64_t> getRouteLanelet(double horizon = 100)
+  {
+    if (!status_) {
+      return {};
+    }
+    if (status_->lanelet_pose_valid) {
+      return {};
+    }
+    return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
+  }
 
 private:
   std::shared_ptr<entity_behavior::vehicle::BehaviorTree> tree_ptr_;
