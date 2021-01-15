@@ -15,4 +15,21 @@
 #ifndef SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
 #define SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
 
+#include <simulation_api/metrics/metrics_base.hpp>
+
+#include <vector>
+
+namespace metrics
+{
+class MetricsManager
+{
+public:
+  void addMetrics(MetricsBase metrics);
+  void calculate();
+
+private:
+  std::vector<MetricsBase> metrics_list_;
+};
+}  // namespace metrics
+
 #endif  // SIMULATION_API__METRICS__METRICS_MANAGER_HPP_

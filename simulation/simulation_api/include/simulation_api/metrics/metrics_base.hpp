@@ -16,6 +16,7 @@
 #define SIMULATION_API__METRICS__METRICS_BASE_HPP_
 
 #include <stdexcept>
+#include <string>
 
 namespace metrics
 {
@@ -33,11 +34,11 @@ private:
 class MetricsBase
 {
 public:
-  virtual void calculate() = 0;
+  void calculate() {}
 
 protected:
   void foundSpecificationViolation(std::string message);
 };
-}
+}  // namespace metrics
 
 #endif  // SIMULATION_API__METRICS__METRICS_BASE_HPP_

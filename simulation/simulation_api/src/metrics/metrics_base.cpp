@@ -14,10 +14,12 @@
 
 #include <simulation_api/metrics/metrics_base.hpp>
 
+#include <string>
+
 namespace metrics
 {
 void MetricsBase::foundSpecificationViolation(std::string message)
 {
   throw SpecificationViolationError(message);
 }
-}
+}  // namespace metrics
