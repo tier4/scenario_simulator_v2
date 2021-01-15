@@ -21,6 +21,11 @@
 
 namespace scenario_simulator
 {
+boost::optional<double> API::getDistanceToStopLine(std::string name)
+{
+  return entity_manager_ptr_->getDistanceToStopLine(name);
+}
+
 bool API::despawnEntity(std::string name)
 {
   return entity_manager_ptr_->despawnEntity(name);
