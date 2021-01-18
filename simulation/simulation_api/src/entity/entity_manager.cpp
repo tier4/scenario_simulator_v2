@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <string>
+#include <limits>
 #include <unordered_map>
 
 namespace simulation_api
@@ -30,6 +31,19 @@ void EntityManager::setVehicleCommands(
 {
   control_cmd_ = control_cmd;
   state_cmd_ = state_cmd;
+}
+
+bool EntityManager::isStopping(std::string name) const
+{
+  const auto status = getEntityStatus(name);
+  if (!status) {
+    throw simulation_api::SimulationRuntimeError("failed to get entity : " + name + " status");
+  }
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if ((std::fabs(status->action_status.twist.linear.x)) < e) {
+    return true;
+  }
+  return false;
 }
 
 void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model)
@@ -554,10 +568,16 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
   }
 }
 
+double EntityManager::getStepTime() const
+{
+  return step_time_;
+}
+
 void EntityManager::update(double current_time, double step_time)
 {
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
+  step_time_ = step_time;
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
   }
