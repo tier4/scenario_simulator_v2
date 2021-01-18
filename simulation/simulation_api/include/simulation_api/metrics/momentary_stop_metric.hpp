@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__METRICS_HPP_
-#define SIMULATION_API__METRICS__METRICS_HPP_
+#ifndef SIMULATION_API__METRICS__MOMENTARY_STOP_METRIC_HPP_
+#define SIMULATION_API__METRICS__MOMENTARY_STOP_METRIC_HPP_
 
-#include <simulation_api/metrics/metric_base.hpp>
-#include <simulation_api/metrics/traveled_distance_metric.hpp>
-#include <simulation_api/metrics/momentary_stop_metric.hpp>
-
-#endif  // SIMULATION_API__METRICS__METRICS_HPP_
+#endif  // SIMULATION_API__METRICS__MOMENTARY_STOP_METRIC_HPP_
