@@ -119,9 +119,19 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(double tim
   status.bounding_box = getBoundingBox();
   status.action_status.twist = twist;
   status.action_status.accel = accel;
+  
+  auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
+  Eigen::VectorXd v(3);
+  v(0) = pose.position.x;
+  v(1) = pose.position.y;
+  v(2) = pose.position.z;
+  v = rotation_mat * v;
+  status.pose.position.x = v(0) + origin_.get().position.x;
+  status.pose.position.y = v(1) + origin_.get().position.y;
+  status.pose.position.z = v(2) + origin_.get().position.z;
+
   status.pose.orientation = origin_.get().orientation * pose.orientation;
-  status.pose.position = pose.position;
-  auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(pose);
+  auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
   if (lanelet_pose) {
     status.lanelet_pose = lanelet_pose.get();
   } else {
