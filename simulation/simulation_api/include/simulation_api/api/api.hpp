@@ -189,6 +189,8 @@ public:
   const;
   bool despawnEntity(std::string name);
   bool entityExists(std::string name);
+  boost::optional<double> getDistanceToStopLine(std::string name, double horizon = 100);
+  boost::optional<int64_t> getNextStopLineId(std::string name, double horizon = 100);
 
 private:
   bool spawn(
