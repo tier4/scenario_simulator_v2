@@ -22,7 +22,11 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(joy_to_vehicle_cmd_component SHARED
   src/joy_to_vehicle_cmd_component.cpp)
 
-install(DIRECTORY launch
+ament_auto_add_executable(joy_to_vehicle_cmd_node
+  src/joy_to_vehicle_cmd_component.cpp
+  src/joy_to_vehicle_cmd_node.cpp)
+
+install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
 

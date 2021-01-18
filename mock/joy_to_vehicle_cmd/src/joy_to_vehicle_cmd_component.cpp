@@ -13,7 +13,31 @@
 // limitations under the License.
 
 #include <joy_to_vehicle_cmd/joy_to_vehicle_cmd_component.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 
 namespace joy_to_vehicle_cmd
 {
+JoyToVehicleCommandComponent::JoyToVehicleCommandComponent(const rclcpp::NodeOptions & options)
+: Node("joy_to_vehicle_cmd", options)
+{
+  declare_parameter("velocity_axes_index", 1);
+  get_parameter("velocity_axes_index", velocity_axes_index_);
+  declare_parameter("angluar_axes_index", 3);
+  get_parameter("angluar_axes_index", angluar_axes_index_);
+  joy_sub_ =
+    this->create_subscription<sensor_msgs::msg::Joy>(
+    "joy", 1,
+    std::bind(&JoyToVehicleCommandComponent::JoyCallback, this, std::placeholders::_1));
+  cmd_pub_ = this->create_publisher<autoware_auto_msgs::msg::VehicleControlCommand>(
+    "input/vehicle_control_command", 1);
+}
+
+void JoyToVehicleCommandComponent::JoyCallback(const sensor_msgs::msg::Joy::SharedPtr msg)
+{
+  current_cmd_.front_wheel_angle_rad = msg->axes[angluar_axes_index_];
+  current_cmd_.velocity_mps = msg->axes[velocity_axes_index_];
+  cmd_pub_->publish(current_cmd_);
+}
 }  // namespace joy_to_vehicle_cmd
+
+RCLCPP_COMPONENTS_REGISTER_NODE(joy_to_vehicle_cmd::JoyToVehicleCommandComponent)

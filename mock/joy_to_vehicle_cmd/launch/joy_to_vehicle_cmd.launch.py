@@ -35,11 +35,11 @@ def generate_launch_description():
             executable='joy_node',
             name='joy_node',
             parameters=[joy_param_file],
-            output='screen')
-        #Node(
-        #    package='joy_to_twist',
-        #    node_executable='joy_to_twist_node',
-        #    node_name='joy_to_twist_node',
-        #    output='screen'),
+            output='screen'),
+        Node(
+            package='joy_to_vehicle_cmd',
+            executable='joy_to_vehicle_cmd_node',
+            name='joy_to_vehicle_cmd_node',
+            output='screen'),
     ])
     return description

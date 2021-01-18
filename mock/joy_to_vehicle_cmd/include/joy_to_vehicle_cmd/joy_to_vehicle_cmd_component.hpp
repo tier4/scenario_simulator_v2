@@ -30,11 +30,14 @@ extern "C" {
 #define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_IMPORT __declspec(dllimport)
 #endif
 #ifdef JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_BUILDING_DLL
-#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_EXPORT
+#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC \
+  JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_EXPORT
 #else
-#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_IMPORT
+#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC \
+  JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_IMPORT
 #endif
-#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC_TYPE JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC
+#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC_TYPE \
+  JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC
 #define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_LOCAL
 #else
 #define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_EXPORT __attribute__((visibility("default")))
@@ -54,9 +57,26 @@ extern "C" {
 
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joy.hpp>
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 
 namespace joy_to_vehicle_cmd
 {
+class JoyToVehicleCommandComponent : public rclcpp::Node
+{
+public:
+  JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC
+  explicit JoyToVehicleCommandComponent(const rclcpp::NodeOptions & options);
+
+private:
+  rcl_interfaces::msg::SetParametersResult paramCallback(
+    const std::vector<rclcpp::Parameter> & params);
+  void JoyCallback(const sensor_msgs::msg::Joy::SharedPtr msg);
+  rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_sub_;
+  rclcpp::Publisher<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_pub_;
+  int velocity_axes_index_;
+  int angluar_axes_index_;
+  autoware_auto_msgs::msg::VehicleControlCommand current_cmd_;
+};
 }  // namespace joy_to_vehicle_cmd
 
 #endif  // JOY_TO_VEHICLE_CMD__JOY_TO_VEHICLE_CMD_COMPONENT_HPP_
