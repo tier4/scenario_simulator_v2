@@ -19,10 +19,10 @@
 #include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/string/cat.hpp>
 
-#include <memory>
-#include <stdexcept>
+#include <iterator>  // std::distance
+#include <stdexcept>  // std::runtime_error
 #include <string>
-#include <type_traits>
+#include <type_traits>  // std::true_type
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -70,6 +70,11 @@ struct CustomCommandAction
     return *reinterpret_cast<std::add_pointer<int>::type>(0);
   }
 
+  static int test()
+  {
+    std::cout << "test" << std::endl;
+  }
+
   const std::unordered_map<
     std::string, std::function<int(void)>
   >
@@ -96,12 +101,53 @@ struct CustomCommandAction
 
   auto evaluate()
   {
-    const auto iter = builtins.find(type);
+    /* -------------------------------------------------------------------------
+     *
+     *  <CustomCommandAction type="function(hoge, &quot;hello, world!&quot;, 3.14)"/>
+     *
+     *  result[0] = function(hoge, "hello, world!", 3.14)
+     *  result[1] = function
+     *  result[2] = (hoge, "hello, world!", 3.14)
+     *  result[3] = hoge, "hello, world!", 3.14
+     *
+     * ---------------------------------------------------------------------- */
+    static const std::regex pattern {
+      // R"(^(\w+)(\(((?:\s*[^\s,\(\)]+\s*,?\s*)*)\))?$)"
+      R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"
+    };
 
-    if (iter != std::end(builtins)) {
-      std::get<1>(* iter)();
+    std::smatch result {};
+
+    if (std::regex_match(type, result, pattern))
+    {
+      for (auto iter = std::cbegin(result); iter != std::cend(result); ++iter)
+      {
+        std::cout << "match[" <<
+          std::distance(std::cbegin(result), iter) << "] " << *iter << std::endl;
+      }
+
+      {
+        static const std::regex pattern {
+          R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"
+        };
+
+        const auto args = result[3].str();
+
+        for (std::sregex_iterator iter {
+               std::cbegin(args), std::cend(args), pattern
+             }, end; iter != end; ++iter)
+        {
+          std::cout << "iter: " << (*iter)[1].str() << std::endl;
+        }
+      }
+
+      if (builtins.find(result[1]) != std::end(builtins))
+      {
+        builtins.at(result[1])(/* TODO */);
+      }
     } else {
       fork_exec(type, content);
+      // std::cout << "FORK_EXEC: " << type << " " << content << std::endl;
     }
 
     return unspecified;
