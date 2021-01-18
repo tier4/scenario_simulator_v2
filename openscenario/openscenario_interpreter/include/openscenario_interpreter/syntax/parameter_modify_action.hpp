@@ -38,6 +38,8 @@ struct ParameterModifyAction
 
   const ModifyRule rule;
 
+  const std::true_type accomplished {};
+
   template<typename Node>
   explicit ParameterModifyAction(
     const Node & node, Scope & outer_scope, const String & parameter_ref)
@@ -61,11 +63,6 @@ struct ParameterModifyAction
     return unspecified;
   } catch (const std::out_of_range &) {
     throw SemanticError("No such parameter '" + parameter_ref + "'");
-  }
-
-  static constexpr auto accomplished() noexcept
-  {
-    return true;
   }
 };
 }  // inline namespace syntax

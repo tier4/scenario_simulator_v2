@@ -40,6 +40,8 @@ struct ParameterSetAction
 
   const String value;
 
+  const std::true_type accomplished {};
+
   template<typename Node, typename Scope>
   explicit ParameterSetAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
   : inner_scope(outer_scope),
@@ -117,11 +119,6 @@ struct ParameterSetAction
     } else {
       THROW_IMPLEMENTATION_FAULT();
     }
-  }
-
-  static constexpr auto accomplished() noexcept
-  {
-    return true;
   }
 };
 }  // inline namespace syntax

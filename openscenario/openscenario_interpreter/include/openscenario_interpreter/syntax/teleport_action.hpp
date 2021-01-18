@@ -39,6 +39,8 @@ struct TeleportAction
 
   const Position position;
 
+  const std::true_type accomplished {};
+
   template
   <
     typename Node
@@ -74,11 +76,6 @@ struct TeleportAction
     } else {
       THROW(ImplementationFault);
     }
-  }
-
-  static constexpr auto accomplished() noexcept
-  {
-    return true;
   }
 };
 }

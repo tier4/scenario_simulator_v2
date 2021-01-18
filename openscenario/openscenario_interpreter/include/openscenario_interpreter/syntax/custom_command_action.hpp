@@ -17,10 +17,14 @@
 
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
+#include <openscenario_interpreter/string/cat.hpp>
 
 #include <memory>
+#include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace openscenario_interpreter
@@ -44,40 +48,39 @@ struct CustomCommandAction
 
   const String content;
 
+  const std::true_type accomplished {};
+
+  static int exitSuccess()
+  {
+    throw EXIT_SUCCESS;
+  }
+
+  static int exitFailure()
+  {
+    throw EXIT_FAILURE;
+  }
+
+  static int error()
+  {
+    throw std::runtime_error(cat(__FILE__, ":", __LINE__));
+  }
+
+  static int segv()
+  {
+    return *reinterpret_cast<std::add_pointer<int>::type>(0);
+  }
+
   const std::unordered_map<
-    std::string,
-    std::function<int(void)>
+    std::string, std::function<int(void)>
   >
   builtins
   {
-    {
-      "error", []() -> int
-      {
-        struct UnexpectedException {} it;
-        throw it;
-      }
-    },
+    std::make_pair("error", error),
 
-    {
-      "sigsegv", []()
-      {
-        return *reinterpret_cast<std::add_pointer<int>::type>(0);
-      }
-    },
+    std::make_pair("sigsegv", segv),
 
-    {
-      "exitSuccess", []() -> int
-      {
-        throw EXIT_SUCCESS;
-      }
-    },
-
-    {
-      "exitFailure", []() -> int
-      {
-        throw EXIT_FAILURE;
-      }
-    },
+    std::make_pair("exitSuccess", exitSuccess),
+    std::make_pair("exitFailure", exitFailure),
   };
 
   template
@@ -90,11 +93,6 @@ struct CustomCommandAction
     content(
       readContent<String>(node, scope))
   {}
-
-  static constexpr auto accomplished() noexcept
-  {
-    return true;
-  }
 
   auto evaluate()
   {

@@ -89,7 +89,7 @@ auto fork_exec(const std::string & f_xs)
 
 auto fork_exec(const std::string & f, const std::string & xs)
 {
-  return fork_exec(f + " " + xs);
+  return fork_exec(xs.empty() ? f : f + " " + xs);
 }
 }  // namespace posix
 }  // namespace openscenario_interpreter
