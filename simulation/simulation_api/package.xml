@@ -32,7 +32,6 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>visualization_msgs</depend>
-  <depend>simulation_metric_msgs</depend>
   <depend>xmlrpcpp</depend>
 
   <!--<exec_depend>lexus_rx_450h_description</exec_depend> -->

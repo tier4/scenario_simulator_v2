@@ -15,8 +15,6 @@
 #ifndef SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
 #define SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
 
-#include <simulation_metric_msgs/msg/traveled_distance_metric_parameters.hpp>
-
 #include <simulation_api/metrics/metric_base.hpp>
 
 #include <string>
@@ -27,14 +25,11 @@ class TraveledDistanceMetric : public MetricBase
 {
 public:
   TraveledDistanceMetric(std::string target_entity);
-  TraveledDistanceMetric(
-    const simulation_metric_msgs::msg::TraveledDistanceMetricParameters & params);
   ~TraveledDistanceMetric() = default;
   void calculate() override;
 
 private:
   double traveled_distance = 0;
-  simulation_metric_msgs::msg::TraveledDistanceMetricParameters parameters_;
 };
 }  // namespace metrics
 

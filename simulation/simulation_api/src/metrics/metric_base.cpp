@@ -22,11 +22,6 @@ namespace metrics
 MetricBase::MetricBase(std::string target_entity, std::string metrics_type)
 : target_entity(target_entity), metrics_type(metrics_type) {}
 
-MetricBase::MetricBase(
-  const simulation_metric_msgs::msg::DefaultParameters & params,
-  std::string metrics_type)
-: target_entity(params.target_entity), metrics_type(metrics_type) {}
-
 void MetricBase::foundSpecificationViolation(std::string message)
 {
   message = "target_entity : " + target_entity + "\n" +

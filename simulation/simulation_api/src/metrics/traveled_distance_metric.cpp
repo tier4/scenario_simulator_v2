@@ -24,19 +24,13 @@ TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
   traveled_distance = 0;
 }
 
-TraveledDistanceMetric::TraveledDistanceMetric(
-  const simulation_metric_msgs::msg::TraveledDistanceMetricParameters & params)
-: MetricBase(params.default_parameters, "TraveledDistance")
-{
-
-}
-
 void TraveledDistanceMetric::calculate()
 {
   double step_time = entity_manager_ptr_->getStepTime();
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (status) {
-    traveled_distance = traveled_distance + status.get().action_status.twist.linear.x * step_time;
+    traveled_distance = traveled_distance +
+      std::fabs(status.get().action_status.twist.linear.x) * step_time;
   }
 }
 }  // namespace metrics
