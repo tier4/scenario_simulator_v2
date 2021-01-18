@@ -48,6 +48,9 @@ ament_auto_add_library(entity_manager SHARED
   src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
   src/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_model/sim_model_interface.cpp
+  src/metrics/metric_base.cpp
+  src/metrics/metrics_manager.cpp
+  src/metrics/traveled_distance_metric.cpp
 )
 
 target_link_libraries(entity_manager pugixml)

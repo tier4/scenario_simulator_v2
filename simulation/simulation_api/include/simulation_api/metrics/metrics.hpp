@@ -12,24 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__EXCEPTION_HPP_
-#define SCENARIO_SIMULATOR__EXCEPTION_HPP_
+#ifndef SIMULATION_API__METRICS__METRICS_HPP_
+#define SIMULATION_API__METRICS__METRICS_HPP_
 
-#include <xmlrpcpp/XmlRpcValue.h>
-#include <stdexcept>
+#include <simulation_api/metrics/metric_base.hpp>
+#include <simulation_api/metrics/traveled_distance_metric.hpp>
 
-namespace scenario_simulator
-{
-class SimulationRuntimeError : public std::runtime_error
-{
-public:
-  explicit SimulationRuntimeError(XmlRpc::XmlRpcValue value)
-  : runtime_error(value["message"]) {}
-  explicit SimulationRuntimeError(const char * message)
-  : runtime_error(message) {}
-
-private:
-};
-}  // namespace scenario_simulator
-
-#endif  // SCENARIO_SIMULATOR__EXCEPTION_HPP_
+#endif  // SIMULATION_API__METRICS__METRICS_HPP_

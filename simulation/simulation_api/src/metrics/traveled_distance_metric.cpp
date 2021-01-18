@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__EXCEPTION_HPP_
-#define SCENARIO_SIMULATOR__EXCEPTION_HPP_
+#include <simulation_api/metrics/traveled_distance_metric.hpp>
 
-#include <xmlrpcpp/XmlRpcValue.h>
-#include <stdexcept>
+#include <string>
 
-namespace scenario_simulator
+namespace metrics
 {
-class SimulationRuntimeError : public std::runtime_error
+TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity, double step_time)
+: MetricBase(target_entity, "TraveledDistance"), step_time(step_time)
 {
-public:
-  explicit SimulationRuntimeError(XmlRpc::XmlRpcValue value)
-  : runtime_error(value["message"]) {}
-  explicit SimulationRuntimeError(const char * message)
-  : runtime_error(message) {}
+  traveled_distance = 0;
+}
 
-private:
-};
-}  // namespace scenario_simulator
-
-#endif  // SCENARIO_SIMULATOR__EXCEPTION_HPP_
+void TraveledDistanceMetric::calculate()
+{
+  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
+  if (status) {
+    traveled_distance = traveled_distance + status.get().action_status.twist.linear.x * step_time;
+  }
+}
+}  // namespace metrics

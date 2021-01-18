@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
+#include <simulation_api/metrics/metrics.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -75,6 +76,7 @@ public:
     api_.requestAcquirePosition(
       "npc1",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );
+    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego", 0.05);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }

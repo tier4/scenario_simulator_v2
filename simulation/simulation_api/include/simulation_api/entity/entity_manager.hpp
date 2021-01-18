@@ -96,7 +96,7 @@ private:
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
-  explicit EntityManager(NodeT && node, const std::string & map_path = "")
+  explicit EntityManager(NodeT && node, const std::string & map_path)
   : broadcaster_(node), base_link_broadcaster_(node)
   {
     clock_ptr_ = node->get_clock();

@@ -17,6 +17,7 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
+#include <simulation_api/metrics/metrics_manager.hpp>
 
 #include <awapi_accessor/accessor.hpp>
 
@@ -89,9 +90,15 @@ public:
       std::move(state_cmd_cb),
       options);
     entity_manager_ptr_ = std::make_shared<EntityManager>(node, map_path);
+    metrics_manager_.setEntityManager(entity_manager_ptr_);
     client_ptr_ =
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
     setVerbose(verbose);
+  }
+  template<typename T, typename ... Ts>
+  void addMetric(std::string name, Ts && ... xs)
+  {
+    metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
   }
   void setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model);
   void setVerbose(bool verbose);
@@ -208,6 +215,7 @@ private:
   void vehicleStateCommandCallback(autoware_auto_msgs::msg::VehicleStateCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> current_state_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleStateCommand>::SharedPtr state_cmd_sub_;
+  metrics::MetricsManager metrics_manager_;
 };
 }  // namespace scenario_simulator
 
