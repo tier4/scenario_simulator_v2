@@ -1,1 +1,1 @@
-string target_entity
+simulation_metric_msgs/DefaultParameters default_parameters
