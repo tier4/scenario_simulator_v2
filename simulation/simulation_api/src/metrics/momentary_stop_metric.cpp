@@ -23,11 +23,14 @@ void MomentaryStopMetric::calculate()
   auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
   if (!id) {
     if (in_stop_sequence_) {
-      THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id while ");
+      THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
     }
     return;
   }
   if (id.get() != stop_line_lanelet_id) {
+    if (in_stop_sequence_) {
+      THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
+    }
     return;
   }
 }
