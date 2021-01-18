@@ -15,26 +15,30 @@
 #ifndef OPENSCENARIO_INTERPRETER__POSIX__FORK_EXEC_HPP_
 #define OPENSCENARIO_INTERPRETER__POSIX__FORK_EXEC_HPP_
 
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
+#include <iostream>
 #include <string>
+#include <system_error>
 #include <vector>
 
 namespace openscenario_interpreter
 {
 inline namespace posix
 {
-auto execvp(const std::vector<std::string> & args)
+auto execvp(const std::vector<std::string> & f_xs)
 {
   std::vector<std::vector<char>> buffer {};
 
-  buffer.resize(args.size());
+  buffer.resize(f_xs.size());
 
   std::vector<std::add_pointer<char>::type> argv {};
 
-  argv.reserve(args.size());
+  argv.reserve(f_xs.size());
 
-  for (const auto & each : args) {
+  for (const auto & each : f_xs) {
     #ifndef NDEBUG
     std::cout << std::quoted(each) << std::endl;
     #endif
@@ -47,6 +51,33 @@ auto execvp(const std::vector<std::string> & args)
   argv.emplace_back(static_cast<std::add_pointer<char>::type>(0));
 
   return ::execvp(argv[0], argv.data());
+}
+
+auto fork_exec(const std::vector<std::string> & f_xs)
+{
+  const auto pid = fork();
+
+  if (pid < 0) {
+    throw std::system_error(errno, std::system_category());
+  } else {
+    int status = 0;
+
+    switch (pid) {
+      case 0:
+        if (execvp(f_xs) < 0) {
+          std::cerr << std::system_error(errno, std::system_category()).what() << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+        break;
+
+      default:
+        do {
+          ::waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    }
+
+    return EXIT_SUCCESS;
+  }
 }
 }  // namespace posix
 }  // namespace openscenario_interpreter

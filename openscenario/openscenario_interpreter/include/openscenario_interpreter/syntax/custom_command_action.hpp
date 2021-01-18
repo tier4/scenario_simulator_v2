@@ -15,16 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
-#include <sys/types.h>
-#include <sys/wait.h>
-
 #include <boost/algorithm/string.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
 
 #include <memory>
 #include <string>
-#include <system_error>
 #include <unordered_map>
 #include <vector>
 
@@ -112,28 +108,9 @@ struct CustomCommandAction
 
   auto execute() const
   {
-    const auto pid {fork()};
+    const auto command = split(content.empty() ? type : type + " " + content);
 
-    int status {0};
-
-    if (pid < 0) {
-      throw std::system_error(errno, std::system_category());
-    } else {
-      switch (pid) {
-        case 0:
-          if (execvp(split(content.empty() ? type : type + " " + content)) < 0) {
-            std::exit(EXIT_FAILURE);
-          }
-          break;
-
-        default:
-          do {
-            ::waitpid(pid, &status, WUNTRACED);
-          } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-      }
-
-      return EXIT_SUCCESS;
-    }
+    return fork_exec(command);
   }
 
   auto evaluate()
