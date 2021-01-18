@@ -29,7 +29,7 @@ public:
   void calculate() override;
 
 private:
-  double traveled_distance = 0;
+  double traveled_distance;
 };
 }  // namespace metrics
 
