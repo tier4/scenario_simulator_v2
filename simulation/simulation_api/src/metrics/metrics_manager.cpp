@@ -21,8 +21,15 @@ namespace metrics
 {
 void MetricsManager::calculate()
 {
+  std::vector<std::string> disable_metrics_list = {};
   for (auto & metric : metrics_) {
     metric.second->calculate();
+    if (!metric.second->calculateFinished()) {
+      disable_metrics_list.emplace_back(metric.first);
+    }
+  }
+  for (const auto name : disable_metrics_list) {
+    metrics_.erase(name);
   }
 }
 

@@ -22,15 +22,27 @@ MomentaryStopMetric::MomentaryStopMetric(
   std::string target_entity,
   double min_acceleration,
   double max_acceleration,
-  std::int64_t stop_line_lanelet_id)
+  std::int64_t stop_line_lanelet_id,
+  double stop_sequence_start_distance,
+  double stop_sequence_end_distance,
+  std::function<void(const MomentaryStopMetric &)> failure_callback)
 : MetricBase(target_entity, "TraveledDistance"),
   min_acceleration(min_acceleration),
   max_acceleration(max_acceleration),
-  stop_line_lanelet_id(stop_line_lanelet_id)
+  stop_line_lanelet_id(stop_line_lanelet_id),
+  stop_sequence_start_distance(stop_sequence_start_distance),
+  stop_sequence_end_distance(stop_sequence_end_distance)
 {
+  failure_callback_ = failure_callback;
 }
 
 void MomentaryStopMetric::calculate()
 {
+  // failure_callback(this);
+}
+
+bool MomentaryStopMetric::calculateFinished()
+{
+  return false;
 }
 }  // namespace metrics

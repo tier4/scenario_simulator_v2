@@ -24,6 +24,11 @@ TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
   traveled_distance = 0;
 }
 
+bool TraveledDistanceMetric::calculateFinished()
+{
+  return false;
+}
+
 void TraveledDistanceMetric::calculate()
 {
   double step_time = entity_manager_ptr_->getStepTime();

@@ -27,6 +27,7 @@ public:
   TraveledDistanceMetric(std::string target_entity);
   ~TraveledDistanceMetric() = default;
   void calculate() override;
+  bool calculateFinished() override;
 
 private:
   double traveled_distance;

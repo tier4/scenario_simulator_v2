@@ -28,14 +28,24 @@ public:
     std::string target_entity,
     double min_acceleration,
     double max_acceleration,
-    std::int64_t stop_line_lanelet_id);
+    std::int64_t stop_line_lanelet_id,
+    double stop_sequence_start_distance,
+    double stop_sequence_end_distance,
+    std::function<void(const MomentaryStopMetric &)> failure_callback =
+    [](auto &&) {
+      throw SpecificationViolationError("spec violation error found in momentary stop metric");
+    });
   ~MomentaryStopMetric() = default;
   void calculate() override;
-
-private:
+  bool calculateFinished() override;
   const double min_acceleration;
   const double max_acceleration;
   const std::int64_t stop_line_lanelet_id;
+  const double stop_sequence_start_distance;
+  const double stop_sequence_end_distance;
+
+private:
+  std::function<void(const MomentaryStopMetric &)> failure_callback_;
 };
 }  // namespace metrics
 

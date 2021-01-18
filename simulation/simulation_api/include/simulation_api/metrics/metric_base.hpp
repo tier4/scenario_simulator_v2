@@ -39,6 +39,7 @@ class MetricBase
 public:
   MetricBase(std::string target_entity, std::string metrics_type);
   virtual void calculate() = 0;
+  virtual bool calculateFinished() = 0;
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   const std::string target_entity;
   const std::string metrics_type;
