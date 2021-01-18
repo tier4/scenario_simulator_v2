@@ -177,6 +177,8 @@ public:
   void setTargetSpeed(std::string name, double target_speed, bool continuous);
   void update(double current_time, double step_time);
   void broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform = true);
+  boost::optional<double> getDistanceToStopLine(std::string name, double horizon = 100);
+  boost::optional<int64_t> getNextStopLineId(std::string name, double horizon = 100);
   bool reachPosition(
     std::string name, geometry_msgs::msg::Pose target_pose,
     double tolerance) const;
@@ -198,6 +200,7 @@ public:
     entity_status_array_pub_ptr_;
   rclcpp::Publisher<autoware_auto_msgs::msg::VehicleKinematicState>::SharedPtr
     kinematic_state_pub_ptr_;
+  boost::optional<openscenario_msgs::msg::LaneletPose> getLaneletPose(std::string name);
   template<typename T>
   bool spawnEntity(T & entity)
   {
