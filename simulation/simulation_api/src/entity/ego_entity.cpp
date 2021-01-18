@@ -27,35 +27,25 @@ EgoEntity::EgoEntity(
   const pugi::xml_node & xml)
 : VehicleEntity(name, initial_state, xml)
 {
-  double wheelbase = parameters.axles.front_axle.position_x -
-    parameters.axles.rear_axle.position_x;
-  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
   current_kinematic_state_ = boost::none;
+  setStatus(initial_state);
 }
 EgoEntity::EgoEntity(
   std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
   VehicleParameters parameters)
 : VehicleEntity(name, initial_state, parameters)
 {
-  double wheelbase = parameters.axles.front_axle.position_x -
-    parameters.axles.rear_axle.position_x;
-  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
   current_kinematic_state_ = boost::none;
+  setStatus(initial_state);
 }
 EgoEntity::EgoEntity(std::string name, const pugi::xml_node & xml)
 : VehicleEntity(name, xml)
 {
-  double wheelbase = parameters.axles.front_axle.position_x -
-    parameters.axles.rear_axle.position_x;
-  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
   current_kinematic_state_ = boost::none;
 }
 EgoEntity::EgoEntity(std::string name, VehicleParameters parameters)
 : VehicleEntity(name, parameters)
 {
-  double wheelbase = parameters.axles.front_axle.position_x -
-    parameters.axles.rear_axle.position_x;
-  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
   current_kinematic_state_ = boost::none;
 }
 autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
@@ -68,6 +58,9 @@ autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
+  double wheelbase = parameters.axles.front_axle.position_x -
+    parameters.axles.rear_axle.position_x;
+  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
   bool ret = VehicleEntity::setStatus(status);
   auto current_entity_status = getStatus();
   autoware_auto_msgs::msg::VehicleKinematicState state;
@@ -82,6 +75,7 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   state.state.front_wheel_angle_rad = 0;
   state.state.rear_wheel_angle_rad = 0;
   current_kinematic_state_ = state;
+  origin_ = current_entity_status.pose;
   return ret;
 }
 
@@ -91,6 +85,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     return;
   }
   if (!current_kinematic_state_) {
+    return;
+  }
+  if (!origin_) {
     return;
   }
   Eigen::VectorXd input(2);

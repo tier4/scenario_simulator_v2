@@ -35,7 +35,7 @@ JoyToVehicleCommandComponent::JoyToVehicleCommandComponent(const rclcpp::NodeOpt
 void JoyToVehicleCommandComponent::JoyCallback(const sensor_msgs::msg::Joy::SharedPtr msg)
 {
   current_cmd_.front_wheel_angle_rad = msg->axes[angluar_axes_index_];
-  current_cmd_.velocity_mps = msg->axes[velocity_axes_index_];
+  current_cmd_.velocity_mps = msg->axes[velocity_axes_index_] * 5;
   cmd_pub_->publish(current_cmd_);
 }
 }  // namespace joy_to_vehicle_cmd
