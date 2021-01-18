@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
-#include <boost/algorithm/string.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
+#include <openscenario_interpreter/string/split.hpp>
 
 #include <memory>
 #include <string>
@@ -81,15 +81,6 @@ struct CustomCommandAction
     },
   };
 
-  static auto split(const std::string & target)
-  {
-    std::vector<std::string> result {};
-
-    boost::split(result, target, boost::is_space());
-
-    return result;
-  }
-
   template
   <
     typename Node, typename Scope
@@ -108,16 +99,12 @@ struct CustomCommandAction
 
   auto execute() const
   {
-    const auto command = split(content.empty() ? type : type + " " + content);
-
-    return fork_exec(command);
+    return fork_exec(split(content.empty() ? type : type + " " + content));
   }
 
   auto evaluate()
   {
-    auto iter {
-      builtins.find(type)
-    };
+    const auto iter = builtins.find(type);
 
     if (iter != std::end(builtins)) {
       std::get<1>(* iter)();
