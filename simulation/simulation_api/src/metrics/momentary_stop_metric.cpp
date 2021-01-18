@@ -20,6 +20,10 @@ namespace metrics
 {
 void MomentaryStopMetric::calculate()
 {
+  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
+  if (!status) {
+    return;
+  }
   auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
   if (!id) {
     if (in_stop_sequence_) {
@@ -32,6 +36,25 @@ void MomentaryStopMetric::calculate()
       THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
     }
     return;
+  }
+  auto distance = entity_manager_ptr_->getDistanceToStopLine(
+    target_entity,
+    stop_sequence_start_distance);
+  if (!distance) {
+    THROW_METRICS_CALCULATION_ERROR("failed to calculate distance to stop line.");
+  }
+  if (!in_stop_sequence_ && distance.get() < stop_sequence_start_distance) {
+    in_stop_sequence_ = true;
+  }
+  if (!in_stop_sequence_) {
+    return;
+  }
+  if (min_acceleration <= status->action_status.accel.linear.x &&
+    status->action_status.accel.linear.x <= max_acceleration)
+  {
+    return;
+  } else {
+    failure_callback_();
   }
 }
 
