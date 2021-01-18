@@ -17,6 +17,8 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 
+#include <simulation_metric_msgs/msg/default_parameters.hpp>
+
 #include <stdexcept>
 #include <string>
 #include <memory>
@@ -38,6 +40,9 @@ class MetricBase
 {
 public:
   MetricBase(std::string target_entity, std::string metrics_type);
+  explicit MetricBase(
+    const simulation_metric_msgs::msg::DefaultParameters & params,
+    std::string metrics_type);
   virtual void calculate() = 0;
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   const std::string target_entity;

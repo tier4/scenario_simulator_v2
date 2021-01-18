@@ -24,6 +24,13 @@ TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
   traveled_distance = 0;
 }
 
+TraveledDistanceMetric::TraveledDistanceMetric(
+  const simulation_metric_msgs::msg::TraveledDistanceMetricParameters & params)
+: MetricBase(params.default_parameters, "TraveledDistance")
+{
+
+}
+
 void TraveledDistanceMetric::calculate()
 {
   double step_time = entity_manager_ptr_->getStepTime();

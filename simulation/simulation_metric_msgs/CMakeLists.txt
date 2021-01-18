@@ -6,8 +6,8 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  msg/TraveledDistanceMetric.msg
-  msg/MomentaryStopMetric.msg
+  msg/TraveledDistanceMetricParameters.msg
+  msg/MomentaryStopMetricParameters.msg
   msg/DefaultParameters.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
