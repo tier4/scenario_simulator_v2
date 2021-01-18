@@ -1,2 +1,0 @@
-string target_entity
-string metric_name
