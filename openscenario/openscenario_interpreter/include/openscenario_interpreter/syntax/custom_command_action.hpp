@@ -17,10 +17,10 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 
-#include <openscenario_interpreter/reader/content.hpp>
 #include <boost/algorithm/string.hpp>
+#include <openscenario_interpreter/posix/fork_exec.hpp>
+#include <openscenario_interpreter/reader/content.hpp>
 
 #include <memory>
 #include <string>
@@ -32,17 +32,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== CustomCommandAction ==================================================
+/* ---- CustomCommandAction ----------------------------------------------------
  *
- * <xsd:complexType name="CustomCommandAction">
- *   <xsd:simpleContent>
- *     <xsd:extension base="xsd:string">
- *       <xsd:attribute name="type" type="String" use="required"/>
- *     </xsd:extension>
- *   </xsd:simpleContent>
- * </xsd:complexType>
+ *  <xsd:complexType name="CustomCommandAction">
+ *    <xsd:simpleContent>
+ *      <xsd:extension base="xsd:string">
+ *        <xsd:attribute name="type" type="String" use="required"/>
+ *      </xsd:extension>
+ *    </xsd:simpleContent>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct CustomCommandAction
 {
   const String type;
@@ -94,46 +94,20 @@ struct CustomCommandAction
     return result;
   }
 
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit CustomCommandAction(const Node & node, Scope & scope)
-  : type
-    {
-      readAttribute<String>("type", node, scope)
-    },
-    content
-    {
-      readContent<String>(node, scope)
-    }
+  : type(
+      readAttribute<String>("type", node, scope)),
+    content(
+      readContent<String>(node, scope))
   {}
 
   static constexpr auto accomplished() noexcept
   {
     return true;
-  }
-
-  auto execvp(const std::vector<std::string> & args) const
-  {
-    std::vector<std::vector<char>> buffer {};
-
-    buffer.resize(args.size());
-
-    std::vector<std::add_pointer<char>::type> argv {};
-
-    argv.reserve(args.size());
-
-    for (const auto & each : args) {
-      #ifndef NDEBUG
-      std::cout << std::quoted(each) << std::endl;
-      #endif
-      buffer.emplace_back(std::begin(each), std::end(each));
-      buffer.back().push_back('\0');
-
-      argv.push_back(buffer.back().data());
-    }
-
-    argv.emplace_back(static_cast<char *>(0));
-
-    return ::execvp(argv[0], argv.data());
   }
 
   auto execute() const
@@ -177,9 +151,7 @@ struct CustomCommandAction
     }
   }
 
-  template<typename ... Ts>
-  friend std::basic_ostream<Ts...> & operator<<(
-    std::basic_ostream<Ts...> & os, const CustomCommandAction & action)
+  friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)
   {
     os << indent << blue << "<CustomCommandAction" << " " << highlight("type", action.type);
 
