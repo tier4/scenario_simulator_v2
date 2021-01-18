@@ -30,9 +30,34 @@ public:
   : runtime_error(message) {}
   explicit SpecificationViolationError(std::string message)
   : runtime_error(message.c_str()) {}
-
-private:
+  explicit SpecificationViolationError(
+    std::string message,
+    const char * file,
+    int line)
+  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line)) {}
 };
+
+class MetricsCalculationError : public std::runtime_error
+{
+public:
+  explicit MetricsCalculationError(const char * message)
+  : runtime_error(message) {}
+  explicit MetricsCalculationError(std::string message)
+  : runtime_error(message.c_str()) {}
+  explicit MetricsCalculationError(
+    std::string message,
+    const char * file,
+    int line)
+  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line)) {}
+};
+
+#define THROW_SPECIFICATION_VIOLATION_ERROR(description) \
+  throw SpecificationViolationError( \
+    description, __FILE__, __LINE__);
+
+#define THROW_METRICS_CALCULATION_ERROR(description) \
+  throw MetricsCalculationError( \
+    description, __FILE__, __LINE__);
 
 class MetricBase
 {

@@ -43,6 +43,7 @@ public:
     stop_sequence_end_distance(stop_sequence_end_distance)
   {
     failure_callback_ = failure_callback;
+    in_stop_sequence_ = false;
   }
 
   ~MomentaryStopMetric() = default;
@@ -56,6 +57,7 @@ public:
 
 private:
   std::function<void(void)> failure_callback_;
+  bool in_stop_sequence_;
 };
 }  // namespace metrics
 

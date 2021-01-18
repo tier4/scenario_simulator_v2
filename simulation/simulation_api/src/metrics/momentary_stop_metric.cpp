@@ -20,7 +20,16 @@ namespace metrics
 {
 void MomentaryStopMetric::calculate()
 {
-  failure_callback_();
+  auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
+  if (!id) {
+    if (in_stop_sequence_) {
+      THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id while ");
+    }
+    return;
+  }
+  if (id.get() != stop_line_lanelet_id) {
+    return;
+  }
 }
 
 bool MomentaryStopMetric::calculateFinished()
