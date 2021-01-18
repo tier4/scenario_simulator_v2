@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/string/cat.hpp>
@@ -50,33 +51,39 @@ struct CustomCommandAction
 
   const std::true_type accomplished {};
 
-  static int exitSuccess()
+  static int exitSuccess(const std::vector<std::string> &)
   {
     throw EXIT_SUCCESS;
   }
 
-  static int exitFailure()
+  static int exitFailure(const std::vector<std::string> &)
   {
     throw EXIT_FAILURE;
   }
 
-  static int error()
+  static int error(const std::vector<std::string> &)
   {
     throw std::runtime_error(cat(__FILE__, ":", __LINE__));
   }
 
-  static int segv()
+  static int segv(const std::vector<std::string> &)
   {
     return *reinterpret_cast<std::add_pointer<int>::type>(0);
   }
 
-  static int test()
+  static int test(const std::vector<std::string> & argv)
   {
     std::cout << "test" << std::endl;
+
+    for (const auto & each : argv) {
+      std::cout << "  " << each << std::endl;
+    }
+
+    return argv.size();
   }
 
   const std::unordered_map<
-    std::string, std::function<int(void)>
+    std::string, std::function<int(const std::vector<std::string> &)>
   >
   builtins
   {
@@ -86,6 +93,8 @@ struct CustomCommandAction
 
     std::make_pair("exitSuccess", exitSuccess),
     std::make_pair("exitFailure", exitFailure),
+
+    std::make_pair("test", test),
   };
 
   template
@@ -98,6 +107,24 @@ struct CustomCommandAction
     content(
       readContent<String>(node, scope))
   {}
+
+  static auto parse(const std::string & args)
+  {
+    static const std::regex pattern {
+      R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"
+    };
+
+    std::vector<std::string> argv {};
+
+    for (std::sregex_iterator iter {
+          std::cbegin(args), std::cend(args), pattern
+        }, end; iter != end; ++iter)
+    {
+      argv.emplace_back((*iter)[1]);
+    }
+
+    return argv;
+  }
 
   auto evaluate()
   {
@@ -112,42 +139,24 @@ struct CustomCommandAction
      *
      * ---------------------------------------------------------------------- */
     static const std::regex pattern {
-      // R"(^(\w+)(\(((?:\s*[^\s,\(\)]+\s*,?\s*)*)\))?$)"
       R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"
     };
 
     std::smatch result {};
 
-    if (std::regex_match(type, result, pattern))
-    {
-      for (auto iter = std::cbegin(result); iter != std::cend(result); ++iter)
-      {
-        std::cout << "match[" <<
-          std::distance(std::cbegin(result), iter) << "] " << *iter << std::endl;
-      }
+    if (std::regex_match(type, result, pattern)) {
+      // for (auto iter = std::cbegin(result); iter != std::cend(result); ++iter) {
+      //   std::cout << "match[" <<
+      //     std::distance(std::cbegin(result), iter) << "] " << *iter << std::endl;
+      // }
 
-      {
-        static const std::regex pattern {
-          R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"
-        };
-
-        const auto args = result[3].str();
-
-        for (std::sregex_iterator iter {
-               std::cbegin(args), std::cend(args), pattern
-             }, end; iter != end; ++iter)
-        {
-          std::cout << "iter: " << (*iter)[1].str() << std::endl;
-        }
-      }
-
-      if (builtins.find(result[1]) != std::end(builtins))
-      {
-        builtins.at(result[1])(/* TODO */);
+      if (builtins.find(result[1]) != std::end(builtins)) {
+        builtins.at(result[1])(parse(result[3]));
+      } else {
+        throw SyntaxError("unknown CustomCommandAction: ", result[1]);
       }
     } else {
       fork_exec(type, content);
-      // std::cout << "FORK_EXEC: " << type << " " << content << std::endl;
     }
 
     return unspecified;

@@ -38,6 +38,9 @@ OpenSCENARIO:
             parameterRef: value
             SetAction:
               value: INITIAL-VALUE
+        UserDefinedAction:
+          CustomCommandAction:
+            type: test(hoge, "hello, world!", 3.14)
     Story:
       - name: story
         Act:
