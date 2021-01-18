@@ -119,7 +119,8 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(double tim
   status.bounding_box = getBoundingBox();
   status.action_status.twist = twist;
   status.action_status.accel = accel;
-  status.pose = pose;
+  status.pose.orientation = origin_.get().orientation * pose.orientation;
+  status.pose.position = pose.position;
   auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(pose);
   if (lanelet_pose) {
     status.lanelet_pose = lanelet_pose.get();
