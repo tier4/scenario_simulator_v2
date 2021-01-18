@@ -16,6 +16,8 @@
 #include <simulation_api/metrics/metric_base.hpp>
 
 #include <memory>
+#include <vector>
+#include <string>
 
 namespace metrics
 {

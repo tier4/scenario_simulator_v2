@@ -36,11 +36,6 @@ public:
     metric_ptr->setEntityManager(this->entity_manager_ptr_);
     metrics_.insert({name, std::move(metric_ptr)});
   }
-  template<typename T>
-  void registerCallback(std::string name, std::function<void(const T &)> function)
-  {
-
-  }
   void calculate();
 
 private:

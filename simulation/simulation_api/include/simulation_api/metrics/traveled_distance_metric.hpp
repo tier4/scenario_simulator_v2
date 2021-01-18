@@ -24,7 +24,7 @@ namespace metrics
 class TraveledDistanceMetric : public MetricBase
 {
 public:
-  TraveledDistanceMetric(std::string target_entity);
+  explicit TraveledDistanceMetric(std::string target_entity);
   ~TraveledDistanceMetric() = default;
   void calculate() override;
   bool calculateFinished() override;
