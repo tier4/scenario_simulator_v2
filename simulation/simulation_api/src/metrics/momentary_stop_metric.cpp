@@ -52,14 +52,26 @@ void MomentaryStopMetric::calculate()
   if (min_acceleration <= status->action_status.accel.linear.x &&
     status->action_status.accel.linear.x <= max_acceleration)
   {
+    auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
+    if (!standstill_duration) {
+      THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
+    }
+    if (entity_manager_ptr_->isStopping(target_entity) &&
+      standstill_duration.get() > stop_duration)
+    {
+      sequence_finished_ = true;
+    }
+    if (!sequence_finished_ && distance.get() <= stop_sequence_end_distance) {
+      THROW_SPECIFICATION_VIOLATION_ERROR("overrun detected.");
+    }
     return;
   } else {
-    failure_callback_();
+    THROW_SPECIFICATION_VIOLATION_ERROR("acceleration is out of range.");
   }
 }
 
 bool MomentaryStopMetric::calculateFinished()
 {
-  return false;
+  return sequence_finished_;
 }
 }  // namespace metrics

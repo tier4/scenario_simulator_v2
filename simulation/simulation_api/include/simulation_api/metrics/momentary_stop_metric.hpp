@@ -31,19 +31,17 @@ public:
     std::int64_t stop_line_lanelet_id,
     double stop_sequence_start_distance,
     double stop_sequence_end_distance,
-    std::function<void(void)> failure_callback =
-    []() {
-      throw SpecificationViolationError("spec violation error found in momentary stop metric");
-    })
-    : MetricBase(target_entity, "TraveledDistance"),
+    double stop_duration)
+  : MetricBase(target_entity, "TraveledDistance"),
     min_acceleration(min_acceleration),
     max_acceleration(max_acceleration),
     stop_line_lanelet_id(stop_line_lanelet_id),
     stop_sequence_start_distance(stop_sequence_start_distance),
-    stop_sequence_end_distance(stop_sequence_end_distance)
+    stop_sequence_end_distance(stop_sequence_end_distance),
+    stop_duration(stop_duration)
   {
-    failure_callback_ = failure_callback;
     in_stop_sequence_ = false;
+    sequence_finished_ = false;
   }
 
   ~MomentaryStopMetric() = default;
@@ -54,10 +52,11 @@ public:
   const std::int64_t stop_line_lanelet_id;
   const double stop_sequence_start_distance;
   const double stop_sequence_end_distance;
+  const double stop_duration;
 
 private:
-  std::function<void(void)> failure_callback_;
   bool in_stop_sequence_;
+  bool sequence_finished_;
 };
 }  // namespace metrics
 

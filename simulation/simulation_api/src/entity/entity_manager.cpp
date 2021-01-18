@@ -32,6 +32,19 @@ void EntityManager::setVehicleCommands(
   state_cmd_ = state_cmd;
 }
 
+bool EntityManager::isStopping(std::string name) const
+{
+  const auto status = getEntityStatus(name);
+  if (!status) {
+    throw simulation_api::SimulationRuntimeError("failed to get entity : " + name + " status");
+  }
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if ((std::fabs(status->action_status.twist.linear.x)) < e) {
+    return true;
+  }
+  return false;
+}
+
 void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model)
 {
   auto it = entities_.find(name);

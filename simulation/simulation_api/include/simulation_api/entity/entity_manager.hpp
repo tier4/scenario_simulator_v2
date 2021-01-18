@@ -190,6 +190,7 @@ public:
   void broadcastEntityTransform();
   void broadcastBaseLinkTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
+  bool isStopping(std::string name) const;
   const std::unordered_map<std::string,
     openscenario_msgs::msg::EntityType> getEntityTypeList() const;
   bool isEgo(std::string name) const;
