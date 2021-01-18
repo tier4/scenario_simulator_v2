@@ -13,3 +13,24 @@
 // limitations under the License.
 
 #include <simulation_api/metrics/momentary_stop_metric.hpp>
+
+#include <string>
+
+namespace metrics
+{
+MomentaryStopMetric::MomentaryStopMetric(
+  std::string target_entity,
+  double min_acceleration,
+  double max_acceleration,
+  std::int64_t stop_line_lanelet_id)
+: MetricBase(target_entity, "TraveledDistance"),
+  min_acceleration(min_acceleration),
+  max_acceleration(max_acceleration),
+  stop_line_lanelet_id(stop_line_lanelet_id)
+{
+}
+
+void MomentaryStopMetric::calculate()
+{
+}
+}  // namespace metrics

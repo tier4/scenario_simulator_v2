@@ -18,14 +18,15 @@
 
 namespace metrics
 {
-TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity, double step_time)
-: MetricBase(target_entity, "TraveledDistance"), step_time(step_time)
+TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
+: MetricBase(target_entity, "TraveledDistance")
 {
   traveled_distance = 0;
 }
 
 void TraveledDistanceMetric::calculate()
 {
+  double step_time = entity_manager_ptr_->getStepTime();
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (status) {
     traveled_distance = traveled_distance + status.get().action_status.twist.linear.x * step_time;

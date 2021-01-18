@@ -15,4 +15,28 @@
 #ifndef SIMULATION_API__METRICS__MOMENTARY_STOP_METRIC_HPP_
 #define SIMULATION_API__METRICS__MOMENTARY_STOP_METRIC_HPP_
 
+#include <simulation_api/metrics/metric_base.hpp>
+
+#include <string>
+
+namespace metrics
+{
+class MomentaryStopMetric : public MetricBase
+{
+public:
+  MomentaryStopMetric(
+    std::string target_entity,
+    double min_acceleration,
+    double max_acceleration,
+    std::int64_t stop_line_lanelet_id);
+  ~MomentaryStopMetric() = default;
+  void calculate() override;
+
+private:
+  const double min_acceleration;
+  const double max_acceleration;
+  const std::int64_t stop_line_lanelet_id;
+};
+}  // namespace metrics
+
 #endif  // SIMULATION_API__METRICS__MOMENTARY_STOP_METRIC_HPP_

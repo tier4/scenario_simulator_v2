@@ -76,7 +76,7 @@ public:
     api_.requestAcquirePosition(
       "npc1",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );
-    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego", 0.05);
+    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
