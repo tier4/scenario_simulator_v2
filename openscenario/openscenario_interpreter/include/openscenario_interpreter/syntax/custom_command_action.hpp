@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
-#include <openscenario_interpreter/string/split.hpp>
 
 #include <memory>
 #include <string>
@@ -97,22 +96,17 @@ struct CustomCommandAction
     return true;
   }
 
-  auto execute() const
-  {
-    return fork_exec(split(content.empty() ? type : type + " " + content));
-  }
-
   auto evaluate()
   {
     const auto iter = builtins.find(type);
 
     if (iter != std::end(builtins)) {
       std::get<1>(* iter)();
-      return unspecified;
     } else {
-      execute();
-      return unspecified;
+      fork_exec(type, content);
     }
+
+    return unspecified;
   }
 
   friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)

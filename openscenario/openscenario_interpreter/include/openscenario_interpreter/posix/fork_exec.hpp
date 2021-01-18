@@ -19,6 +19,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <openscenario_interpreter/string/split.hpp>
+
 #include <iostream>
 #include <string>
 #include <system_error>
@@ -78,6 +80,16 @@ auto fork_exec(const std::vector<std::string> & f_xs)
 
     return EXIT_SUCCESS;
   }
+}
+
+auto fork_exec(const std::string & f_xs)
+{
+  return fork_exec(split(f_xs));
+}
+
+auto fork_exec(const std::string & f, const std::string & xs)
+{
+  return fork_exec(f + " " + xs);
 }
 }  // namespace posix
 }  // namespace openscenario_interpreter
