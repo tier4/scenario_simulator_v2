@@ -122,8 +122,9 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
   status.type.type = openscenario_msgs::msg::EntityType::EGO;
   status.bounding_box = getBoundingBox();
   status.action_status.twist = twist;
-  if(previous_angular_velocity_ && previous_velocity_) {
-
+  if (previous_angular_velocity_ && previous_velocity_) {
+    accel.linear.x = (twist.linear.x - previous_velocity_.get()) / step_time;
+    accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
   }
   status.action_status.accel = accel;
 
