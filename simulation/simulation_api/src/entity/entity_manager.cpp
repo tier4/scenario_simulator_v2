@@ -573,11 +573,17 @@ double EntityManager::getStepTime() const
   return step_time_;
 }
 
+double EntityManager::getCurrentTime() const
+{
+  return current_time_;
+}
+
 void EntityManager::update(double current_time, double step_time)
 {
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
+  current_time_ = current_time;
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
   }

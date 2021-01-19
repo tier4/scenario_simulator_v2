@@ -94,6 +94,7 @@ private:
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
   double step_time_;
+  double current_time_;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
@@ -140,6 +141,7 @@ public:
       std::bind(&EntityManager::updateHdmapMarker, this));
   }
   double getStepTime() const;
+  double getCurrentTime() const;
   ~EntityManager() {}
   void setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model);
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;

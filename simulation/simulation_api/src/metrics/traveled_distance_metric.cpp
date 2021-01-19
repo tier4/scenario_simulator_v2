@@ -41,6 +41,6 @@ void TraveledDistanceMetric::calculate()
 
 nlohmann::json TraveledDistanceMetric::to_json()
 {
-  return nlohmann::json{};
+  return nlohmann::json{{"traveled_distance", traveled_distance}};
 }
 }  // namespace metrics
