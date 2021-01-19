@@ -38,8 +38,7 @@ void MetricsManager::calculate()
   std::vector<std::string> disable_metrics_list = {};
   for (auto & metric : metrics_) {
     metric.second->calculate();
-    const auto json = metric.second->to_json();
-    log.merge_patch({metric.first, json});
+    log[metric.first] = metric.second->to_json();
     if (metric.second->calculateFinished()) {
       disable_metrics_list.emplace_back(metric.first);
     }
