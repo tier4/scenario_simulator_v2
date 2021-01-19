@@ -93,6 +93,7 @@ private:
   int getNumberOfEgo() const;
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
+  double step_time_;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
@@ -138,6 +139,7 @@ public:
       std::chrono::seconds(1),
       std::bind(&EntityManager::updateHdmapMarker, this));
   }
+  double getStepTime() const;
   ~EntityManager() {}
   void setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model);
   const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
@@ -188,6 +190,7 @@ public:
   void broadcastEntityTransform();
   void broadcastBaseLinkTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
+  bool isStopping(std::string name) const;
   const std::unordered_map<std::string,
     openscenario_msgs::msg::EntityType> getEntityTypeList() const;
   bool isEgo(std::string name) const;

@@ -17,5 +17,6 @@
 
 #include <simulation_api/metrics/metric_base.hpp>
 #include <simulation_api/metrics/traveled_distance_metric.hpp>
+#include <simulation_api/metrics/momentary_stop_metric.hpp>
 
 #endif  // SIMULATION_API__METRICS__METRICS_HPP_
