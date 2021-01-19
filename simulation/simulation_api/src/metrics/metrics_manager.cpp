@@ -18,9 +18,20 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace metrics
 {
+MetricsManager::MetricsManager(bool verbose)
+{
+  verbose_ = verbose;
+}
+
+void MetricsManager::setVerbose(bool verbose)
+{
+  verbose_ = verbose;
+}
+
 void MetricsManager::calculate()
 {
   nlohmann::json log;
@@ -29,9 +40,12 @@ void MetricsManager::calculate()
     metric.second->calculate();
     const auto json = metric.second->to_json();
     log.merge_patch({metric.first, json});
-    if (!metric.second->calculateFinished()) {
+    if (metric.second->calculateFinished()) {
       disable_metrics_list.emplace_back(metric.first);
     }
+  }
+  if (verbose_) {
+    std::cout << log << std::endl;
   }
   log_ = log;
   for (const auto name : disable_metrics_list) {

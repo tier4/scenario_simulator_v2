@@ -82,7 +82,7 @@ nlohmann::json MomentaryStopMetric::to_json()
     THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
   }
   nlohmann::json json = {{"stop_duration", standstill_duration.get()}};
-  json.merge_patch(MetricBase::to_json());
+  json.merge_patch(MetricBase::to_base_json());
   return json;
 }
 }  // namespace metrics
