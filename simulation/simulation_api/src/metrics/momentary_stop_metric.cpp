@@ -77,12 +77,16 @@ bool MomentaryStopMetric::calculateFinished()
 
 nlohmann::json MomentaryStopMetric::to_json()
 {
+  nlohmann::json json = {{"in_stop_sequence", in_stop_sequence_}};
+  json.merge_patch(MetricBase::to_base_json());
+  if (!in_stop_sequence_) {
+    return json;
+  }
   auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
   if (!standstill_duration) {
     THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
   }
-  nlohmann::json json = {{"stop_duration", standstill_duration.get()}};
-  json.merge_patch(MetricBase::to_base_json());
+  json.merge_patch({"stop_duration", standstill_duration.get()});
   return json;
 }
 }  // namespace metrics
