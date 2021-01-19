@@ -96,9 +96,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   input << acc, steer;
   vehicle_model_ptr_->setInput(input);
   vehicle_model_ptr_->update(step_time);
-  status_ = getEntityStatus(current_time + step_time);
+  status_ = getEntityStatus(current_time + step_time, step_time);
+  previous_velocity_ = vehicle_model_ptr_->getVx();
+  previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
-const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(double time) const
+const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
+  double time,
+  double step_time) const
 {
   geometry_msgs::msg::Pose pose;
   pose.position.x = vehicle_model_ptr_->getX();
@@ -118,6 +122,9 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(double tim
   status.type.type = openscenario_msgs::msg::EntityType::EGO;
   status.bounding_box = getBoundingBox();
   status.action_status.twist = twist;
+  if(previous_angular_velocity_ && previous_velocity_) {
+
+  }
   status.action_status.accel = accel;
 
   auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);

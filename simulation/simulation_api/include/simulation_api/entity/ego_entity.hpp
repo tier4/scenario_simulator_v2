@@ -62,11 +62,13 @@ public:
 private:
   boost::optional<geometry_msgs::msg::Pose> origin_;
   autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
-  const openscenario_msgs::msg::EntityStatus getEntityStatus(double time) const;
+  const openscenario_msgs::msg::EntityStatus getEntityStatus(double time, double step_time) const;
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleKinematicState> current_kinematic_state_;
   std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
+  boost::optional<double> previous_velocity_;
+  boost::optional<double> previous_angular_velocity_;
 };
 }      // namespace entity
 }  // namespace simulation_api
