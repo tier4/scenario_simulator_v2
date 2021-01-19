@@ -15,179 +15,151 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-
+#include <openscenario_interpreter/posix/fork_exec.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
-#include <boost/algorithm/string.hpp>
+#include <openscenario_interpreter/string/cat.hpp>
 
-#include <memory>
+#include <iterator>  // std::distance
+#include <stdexcept>  // std::runtime_error
 #include <string>
-#include <system_error>
+#include <type_traits>  // std::true_type
 #include <unordered_map>
+#include <utility>  // std::make_pair
 #include <vector>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== CustomCommandAction ==================================================
+/* ---- CustomCommandAction ----------------------------------------------------
  *
- * <xsd:complexType name="CustomCommandAction">
- *   <xsd:simpleContent>
- *     <xsd:extension base="xsd:string">
- *       <xsd:attribute name="type" type="String" use="required"/>
- *     </xsd:extension>
- *   </xsd:simpleContent>
- * </xsd:complexType>
+ *  <xsd:complexType name="CustomCommandAction">
+ *    <xsd:simpleContent>
+ *      <xsd:extension base="xsd:string">
+ *        <xsd:attribute name="type" type="String" use="required"/>
+ *      </xsd:extension>
+ *    </xsd:simpleContent>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct CustomCommandAction
 {
   const String type;
 
   const String content;
 
+  template
+  <
+    typename Node, typename Scope
+  >
+  explicit CustomCommandAction(const Node & node, Scope & scope)
+  : type(readAttribute<String>("type", node, scope)),
+    content(readContent<String>(node, scope))
+  {}
+
+  const std::true_type accomplished {};
+
+  static int exitSuccess(const std::vector<std::string> &)
+  {
+    throw EXIT_SUCCESS;
+  }
+
+  static int exitFailure(const std::vector<std::string> &)
+  {
+    throw EXIT_FAILURE;
+  }
+
+  static int error(const std::vector<std::string> &)
+  {
+    throw std::runtime_error(cat(__FILE__, ":", __LINE__));
+  }
+
+  static int segv(const std::vector<std::string> &)
+  {
+    return *reinterpret_cast<std::add_pointer<int>::type>(0);
+  }
+
+  static int test(const std::vector<std::string> & args)
+  {
+    std::cout << "test" << std::endl;
+
+    for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
+      std::cout << "  args[" <<
+        std::distance(std::cbegin(args), iter) << "] = " << *iter << std::endl;
+    }
+
+    return args.size();
+  }
+
   const std::unordered_map<
-    std::string,
-    std::function<int(void)>
+    std::string, std::function<int(const std::vector<std::string> &)>
   >
   builtins
   {
-    {
-      "error", []() -> int
-      {
-        struct UnexpectedException {} it;
-        throw it;
-      }
-    },
-
-    {
-      "sigsegv", []()
-      {
-        return *reinterpret_cast<std::add_pointer<int>::type>(0);
-      }
-    },
-
-    {
-      "exitSuccess", []() -> int
-      {
-        throw EXIT_SUCCESS;
-      }
-    },
-
-    {
-      "exitFailure", []() -> int
-      {
-        throw EXIT_FAILURE;
-      }
-    },
+    std::make_pair("error", error),
+    std::make_pair("exitFailure", exitFailure),
+    std::make_pair("exitSuccess", exitSuccess),
+    std::make_pair("sigsegv", segv),
+    std::make_pair("test", test),
   };
 
-  static auto split(const std::string & target)
+  static auto split(const std::string & s)
   {
-    std::vector<std::string> result {};
+    static const std::regex pattern {
+      R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"
+    };
 
-    boost::split(result, target, boost::is_space());
+    std::vector<std::string> args {};
 
-    return result;
-  }
-
-  template<typename Node, typename Scope>
-  explicit CustomCommandAction(const Node & node, Scope & scope)
-  : type
+    for (std::sregex_iterator iter {
+          std::cbegin(s), std::cend(s), pattern
+        }, end; iter != end; ++iter)
     {
-      readAttribute<String>("type", node, scope)
-    },
-    content
-    {
-      readContent<String>(node, scope)
-    }
-  {}
-
-  static constexpr auto accomplished() noexcept
-  {
-    return true;
-  }
-
-  auto execvp(const std::vector<std::string> & args) const
-  {
-    std::vector<std::vector<char>> buffer {};
-
-    buffer.resize(args.size());
-
-    std::vector<std::add_pointer<char>::type> argv {};
-
-    argv.reserve(args.size());
-
-    for (const auto & each : args) {
-      #ifndef NDEBUG
-      std::cout << std::quoted(each) << std::endl;
-      #endif
-      buffer.emplace_back(std::begin(each), std::end(each));
-      buffer.back().push_back('\0');
-
-      argv.push_back(buffer.back().data());
+      args.emplace_back((*iter)[1]);
     }
 
-    argv.emplace_back(static_cast<char *>(0));
-
-    return ::execvp(argv[0], argv.data());
-  }
-
-  auto execute() const
-  {
-    const auto pid {fork()};
-
-    int status {0};
-
-    if (pid < 0) {
-      throw std::system_error(errno, std::system_category());
-    } else {
-      switch (pid) {
-        case 0:
-          if (execvp(split(content.empty() ? type : type + " " + content)) < 0) {
-            std::exit(EXIT_FAILURE);
-          }
-          break;
-
-        default:
-          do {
-            ::waitpid(pid, &status, WUNTRACED);
-          } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-      }
-
-      return EXIT_SUCCESS;
-    }
+    return args;
   }
 
   auto evaluate()
   {
-    auto iter {
-      builtins.find(type)
+    /* -------------------------------------------------------------------------
+     *
+     *  <CustomCommandAction type="function(hoge, &quot;hello, world!&quot;, 3.14)"/>
+     *
+     *  result[0] = function(hoge, "hello, world!", 3.14)
+     *  result[1] = function
+     *  result[2] = (hoge, "hello, world!", 3.14)
+     *  result[3] = hoge, "hello, world!", 3.14
+     *
+     * ---------------------------------------------------------------------- */
+    static const std::regex pattern {
+      R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"
     };
 
-    if (iter != std::end(builtins)) {
-      std::get<1>(* iter)();
-      return unspecified;
+    std::smatch result {};
+
+    if (
+      std::regex_match(type, result, pattern) && builtins.find(result[1]) != std::end(builtins))
+    {
+      builtins.at(result[1])(split(result[3]));
     } else {
-      execute();
-      return unspecified;
+      fork_exec(type, content);
     }
+
+    return unspecified;
   }
 
-  template<typename ... Ts>
-  friend std::basic_ostream<Ts...> & operator<<(
-    std::basic_ostream<Ts...> & os, const CustomCommandAction & action)
+  friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)
   {
     os << indent << blue << "<CustomCommandAction" << " " << highlight("type", action.type);
 
     if (action.content.empty()) {
       return os << blue << "/>" << reset;
     } else {
-      return os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>" <<
-             reset;
+      return
+        os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>" << reset;
     }
   }
 };

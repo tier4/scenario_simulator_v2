@@ -48,7 +48,10 @@ struct LaneChangeAction
 
   const LaneChangeTarget lane_change_target;
 
-  template<typename Node>
+  template
+  <
+    typename Node
+  >
   explicit LaneChangeAction(const Node & node, Scope & outer_scope)
   : target_lane_offset(
       readAttribute<Double>("targetLaneOffset", node, outer_scope, Double())),

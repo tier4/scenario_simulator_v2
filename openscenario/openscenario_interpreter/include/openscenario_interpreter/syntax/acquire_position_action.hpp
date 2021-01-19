@@ -70,9 +70,9 @@ struct AcquirePositionAction
     }
   }
 
+  #ifndef OPENSCENARIO_INTERPRETER_NO_EXTENSION
   auto accomplished()
   {
-    #ifndef OPENSCENARIO_INTERPRETER_NO_EXTENSION
     if (position.is<LanePosition>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
@@ -90,10 +90,10 @@ struct AcquirePositionAction
     } else {
       THROW(ImplementationFault);
     }
-    #else
-    return true;
-    #endif
   }
+  #else
+  const std::true_type accomplished {};
+  #endif
 };
 }
 }  // namespace openscenario_interpreter

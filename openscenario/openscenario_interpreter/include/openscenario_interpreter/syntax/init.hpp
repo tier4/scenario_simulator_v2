@@ -21,21 +21,24 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Init ================================================================
+/* ---- Init -------------------------------------------------------------------
  *
- * <xsd:complexType name="Init">
- *   <xsd:sequence>
- *     <xsd:element name="Actions" type="InitActions"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="Init">
+ *    <xsd:sequence>
+ *      <xsd:element name="Actions" type="InitActions"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Init
   : public InitActions
 {
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit Init(const Node & node, Scope & scope)
-  : InitActions{readElement<InitActions>("Actions", node, scope)}
+  : InitActions(readElement<InitActions>("Actions", node, scope))
   {}
 };
 }
