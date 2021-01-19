@@ -38,4 +38,9 @@ void TraveledDistanceMetric::calculate()
       std::fabs(status.get().action_status.twist.linear.x) * step_time;
   }
 }
+
+nlohmann::json TraveledDistanceMetric::to_json()
+{
+  return nlohmann::json{};
+}
 }  // namespace metrics

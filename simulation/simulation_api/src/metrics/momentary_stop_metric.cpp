@@ -74,4 +74,9 @@ bool MomentaryStopMetric::calculateFinished()
 {
   return sequence_finished_;
 }
+
+nlohmann::json MomentaryStopMetric::to_json()
+{
+  return nlohmann::json{};
+}
 }  // namespace metrics
