@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
-#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/string/cat.hpp>
 
@@ -25,7 +25,7 @@
 #include <string>
 #include <type_traits>  // std::true_type
 #include <unordered_map>
-#include <utility>
+#include <utility>  // std::make_pair
 #include <vector>
 
 namespace openscenario_interpreter
@@ -48,6 +48,15 @@ struct CustomCommandAction
   const String type;
 
   const String content;
+
+  template
+  <
+    typename Node, typename Scope
+  >
+  explicit CustomCommandAction(const Node & node, Scope & scope)
+  : type(readAttribute<String>("type", node, scope)),
+    content(readContent<String>(node, scope))
+  {}
 
   const std::true_type accomplished {};
 
@@ -95,16 +104,7 @@ struct CustomCommandAction
     std::make_pair("test", test),
   };
 
-  template
-  <
-    typename Node, typename Scope
-  >
-  explicit CustomCommandAction(const Node & node, Scope & scope)
-  : type(readAttribute<String>("type", node, scope)),
-    content(readContent<String>(node, scope))
-  {}
-
-  static auto split(const std::string & args)
+  static auto split(const std::string & s)
   {
     static const std::regex pattern {
       R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"
@@ -113,7 +113,7 @@ struct CustomCommandAction
     std::vector<std::string> args {};
 
     for (std::sregex_iterator iter {
-          std::cbegin(args), std::cend(args), pattern
+          std::cbegin(s), std::cend(s), pattern
         }, end; iter != end; ++iter)
     {
       args.emplace_back((*iter)[1]);
@@ -141,7 +141,7 @@ struct CustomCommandAction
     std::smatch result {};
 
     if (
-      std::regex_match(type, result, pattern) and builtins.find(result[1]) != std::end(builtins))
+      std::regex_match(type, result, pattern) && builtins.find(result[1]) != std::end(builtins))
     {
       builtins.at(result[1])(split(result[3]));
     } else {
@@ -158,8 +158,8 @@ struct CustomCommandAction
     if (action.content.empty()) {
       return os << blue << "/>" << reset;
     } else {
-      return os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>" <<
-             reset;
+      return
+        os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>" << reset;
     }
   }
 };

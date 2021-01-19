@@ -1,9 +1,11 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: INITIAL-VALUE
-      list: [1, 50, 100]
+      # list: [1, 50, 100]
+      list: [100]
     - name: STEP
-      list: [1, 2]
+      # list: [1, 2]
+      list: [1]
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
