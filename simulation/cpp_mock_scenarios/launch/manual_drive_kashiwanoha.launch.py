@@ -71,6 +71,7 @@ def generate_launch_description():
             output='screen'
             ),
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([joy_to_cmd_launch_dir, '/joy_to_vehicle_cmd.launch.py']),
+            PythonLaunchDescriptionSource(
+                [joy_to_cmd_launch_dir, '/joy_to_vehicle_cmd.launch.py']),
         )
     ])

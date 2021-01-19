@@ -119,7 +119,7 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(double tim
   status.bounding_box = getBoundingBox();
   status.action_status.twist = twist;
   status.action_status.accel = accel;
-  
+
   auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
   Eigen::VectorXd v(3);
   v(0) = pose.position.x;
