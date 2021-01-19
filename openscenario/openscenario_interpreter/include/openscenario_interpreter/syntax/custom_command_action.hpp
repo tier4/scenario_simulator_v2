@@ -71,15 +71,16 @@ struct CustomCommandAction
     return *reinterpret_cast<std::add_pointer<int>::type>(0);
   }
 
-  static int test(const std::vector<std::string> & argv)
+  static int test(const std::vector<std::string> & args)
   {
     std::cout << "test" << std::endl;
 
-    for (const auto & each : argv) {
-      std::cout << "  " << each << std::endl;
+    for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
+      std::cout << "  args[" <<
+        std::distance(std::cbegin(args), iter) << "] = " << *iter << std::endl;
     }
 
-    return argv.size();
+    return args.size();
   }
 
   const std::unordered_map<
@@ -88,12 +89,9 @@ struct CustomCommandAction
   builtins
   {
     std::make_pair("error", error),
-
-    std::make_pair("sigsegv", segv),
-
-    std::make_pair("exitSuccess", exitSuccess),
     std::make_pair("exitFailure", exitFailure),
-
+    std::make_pair("exitSuccess", exitSuccess),
+    std::make_pair("sigsegv", segv),
     std::make_pair("test", test),
   };
 
@@ -102,28 +100,26 @@ struct CustomCommandAction
     typename Node, typename Scope
   >
   explicit CustomCommandAction(const Node & node, Scope & scope)
-  : type(
-      readAttribute<String>("type", node, scope)),
-    content(
-      readContent<String>(node, scope))
+  : type(readAttribute<String>("type", node, scope)),
+    content(readContent<String>(node, scope))
   {}
 
-  static auto parse(const std::string & args)
+  static auto split(const std::string & args)
   {
     static const std::regex pattern {
       R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"
     };
 
-    std::vector<std::string> argv {};
+    std::vector<std::string> args {};
 
     for (std::sregex_iterator iter {
           std::cbegin(args), std::cend(args), pattern
         }, end; iter != end; ++iter)
     {
-      argv.emplace_back((*iter)[1]);
+      args.emplace_back((*iter)[1]);
     }
 
-    return argv;
+    return args;
   }
 
   auto evaluate()
@@ -144,17 +140,10 @@ struct CustomCommandAction
 
     std::smatch result {};
 
-    if (std::regex_match(type, result, pattern)) {
-      // for (auto iter = std::cbegin(result); iter != std::cend(result); ++iter) {
-      //   std::cout << "match[" <<
-      //     std::distance(std::cbegin(result), iter) << "] " << *iter << std::endl;
-      // }
-
-      if (builtins.find(result[1]) != std::end(builtins)) {
-        builtins.at(result[1])(parse(result[3]));
-      } else {
-        throw SyntaxError("unknown CustomCommandAction: ", result[1]);
-      }
+    if (
+      std::regex_match(type, result, pattern) and builtins.find(result[1]) != std::end(builtins))
+    {
+      builtins.at(result[1])(split(result[3]));
     } else {
       fork_exec(type, content);
     }
