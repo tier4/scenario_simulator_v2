@@ -5,4 +5,4 @@ repositories:
     version: ros2
   operational-design-domains:
     type: git
-    url: https://gitlab.com/hakuturu583/operational-design-domains.git
+    url: https://gitlab.com/autowarefoundation/operational-design-domains
