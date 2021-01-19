@@ -1,17 +1,19 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>cpp_mock_scenarios</name>
+  <name>joy_to_vehicle_cmd</name>
   <version>0.0.0</version>
-  <description>C++ mock scenarios</description>
-  <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
-  <license>Apach 2</license>
+  <description>TODO: Package description</description>
+  <maintainer email="ms.kataoka@gmail.com">masaya</maintainer>
+  <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>cargo_delivery</depend>
-  <depend>simulation_api</depend>
-  <depend>scenario_simulator</depend>
+  <depend>joy</depend>
+  <depend>autoware_auto_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>ament_cmake_auto</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
