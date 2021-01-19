@@ -24,7 +24,9 @@ void MomentaryStopMetric::calculate()
   if (!status) {
     return;
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (!id) {
     if (in_stop_sequence_) {
       THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
