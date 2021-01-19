@@ -21,6 +21,9 @@ ament_auto_find_build_dependencies()
 ament_auto_add_executable(view_kashiwanoha
   src/view_kashiwanoha.cpp
 )
+ament_auto_add_executable(manual_drive_kashiwanoha
+  src/manual_drive_kashiwanoha.cpp
+)
 
 install(
   DIRECTORY launch rviz

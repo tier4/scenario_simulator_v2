@@ -60,6 +60,7 @@ public:
   }
 
 private:
+  boost::optional<geometry_msgs::msg::Pose> origin_;
   autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
   const openscenario_msgs::msg::EntityStatus getEntityStatus(double time) const;
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
