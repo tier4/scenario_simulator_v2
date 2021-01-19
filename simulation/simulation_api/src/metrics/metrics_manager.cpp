@@ -23,16 +23,25 @@ namespace metrics
 {
 void MetricsManager::calculate()
 {
+  nlohmann::json log;
   std::vector<std::string> disable_metrics_list = {};
   for (auto & metric : metrics_) {
     metric.second->calculate();
+    const auto json = metric.second->to_json();
+    log.merge_patch({metric.first, json});
     if (!metric.second->calculateFinished()) {
       disable_metrics_list.emplace_back(metric.first);
     }
   }
+  log_ = log;
   for (const auto name : disable_metrics_list) {
     metrics_.erase(name);
   }
+}
+
+nlohmann::json MetricsManager::getJsonLog()
+{
+  return log_;
 }
 
 void MetricsManager::setEntityManager(

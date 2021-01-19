@@ -38,8 +38,7 @@ void MetricBase::setEntityManager(
 nlohmann::json MetricBase::to_json()
 {
   return nlohmann::json{
-    {"target_entity", target_entity},
-    {"simulation_time", entity_manager_ptr_->getCurrentTime()}
+    {"target_entity", target_entity}
   };
 }
 }  // namespace metrics

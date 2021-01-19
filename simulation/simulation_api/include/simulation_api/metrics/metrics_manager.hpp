@@ -37,8 +37,10 @@ public:
     metrics_.insert({name, std::move(metric_ptr)});
   }
   void calculate();
+  nlohmann::json getJsonLog();
 
 private:
+  nlohmann::json log_;
   std::unordered_map<std::string, std::shared_ptr<MetricBase>> metrics_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
