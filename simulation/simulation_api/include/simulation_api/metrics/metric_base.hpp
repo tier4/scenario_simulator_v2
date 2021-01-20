@@ -19,6 +19,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include <boost/optional.hpp>
+
 #include <stdexcept>
 #include <string>
 #include <memory>
@@ -53,29 +55,48 @@ public:
   : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line)) {}
 };
 
-#define THROW_SPECIFICATION_VIOLATION_ERROR(description) \
-  throw SpecificationViolationError( \
-    description, __FILE__, __LINE__);
+#define SPECIFICATION_VIOLATION_ERROR(description) \
+  SpecificationViolationError( \
+    description, __FILE__, __LINE__)
 
 #define THROW_METRICS_CALCULATION_ERROR(description) \
   throw MetricsCalculationError( \
     description, __FILE__, __LINE__);
 
+enum class MetricLifecycle
+{
+  INACTIVE,
+  ACTIVE,
+  FAILURE,
+  SUCCESS
+};
+
 class MetricBase
 {
 public:
   MetricBase(std::string target_entity, std::string metrics_type);
-  virtual void calculate() = 0;
-  virtual bool calculateFinished() = 0;
+  virtual bool activateTrigger() = 0;
+  virtual void update() = 0;
+  void success();
+  void failure(SpecificationViolationError error);
+  void activate();
   virtual nlohmann::json to_json() = 0;
   nlohmann::json to_base_json();
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   const std::string target_entity;
   const std::string metrics_type;
+  MetricLifecycle getLifecycle()
+  {
+    return lifecycle_;
+  }
+  void throwException();
 
 protected:
-  void foundSpecificationViolation(std::string message);
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
+
+private:
+  boost::optional<SpecificationViolationError> error_;
+  MetricLifecycle lifecycle_;
 };
 }  // namespace metrics
 

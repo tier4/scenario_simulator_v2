@@ -18,82 +18,83 @@
 
 namespace metrics
 {
-void MomentaryStopMetric::calculate()
+void MomentaryStopMetric::update()
 {
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (!status) {
+    THROW_METRICS_CALCULATION_ERROR("failed to get target entity status.");
     return;
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (!id) {
-    if (in_stop_sequence_) {
-      THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
-    }
+    THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
     return;
   }
   if (id.get() != stop_line_lanelet_id) {
-    if (in_stop_sequence_) {
-      THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
-    }
+    THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
     return;
   }
   auto distance = entity_manager_ptr_->getDistanceToStopLine(
     target_entity,
     stop_sequence_start_distance);
+  distance_to_stopline_ = distance.get();
   if (!distance) {
     THROW_METRICS_CALCULATION_ERROR("failed to calculate distance to stop line.");
   }
-  if (!in_stop_sequence_ && distance.get() < stop_sequence_start_distance) {
-    in_stop_sequence_ = true;
-  }
-  if (!in_stop_sequence_) {
-    return;
-  }
-  if (min_acceleration <= status->action_status.accel.linear.x &&
-    status->action_status.accel.linear.x <= max_acceleration)
-  {
+  linear_acceleration_ = status->action_status.accel.linear.x;
+  if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
     if (!standstill_duration) {
       THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
     }
+    standstill_duration_ = standstill_duration.get();
     if (entity_manager_ptr_->isStopping(target_entity) &&
       standstill_duration.get() > stop_duration)
     {
-      sequence_finished_ = true;
+      success();
     }
-    if (!sequence_finished_ && distance.get() <= stop_sequence_end_distance) {
-      THROW_SPECIFICATION_VIOLATION_ERROR("overrun detected.");
+    if (distance.get() <= stop_sequence_end_distance) {
+      failure(SPECIFICATION_VIOLATION_ERROR("overrun detected"));
     }
     return;
   } else {
-    THROW_SPECIFICATION_VIOLATION_ERROR("acceleration is out of range.");
+    failure(SPECIFICATION_VIOLATION_ERROR("acceleration is out of range."));
   }
 }
 
-bool MomentaryStopMetric::calculateFinished()
+bool MomentaryStopMetric::activateTrigger()
 {
-  return sequence_finished_;
+  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
+  if (!status) {
+    return false;
+  }
+  auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
+  if (!id) {
+    return false;
+  }
+  if (id.get() != stop_line_lanelet_id) {
+    return false;
+  }
+  auto distance = entity_manager_ptr_->getDistanceToStopLine(
+    target_entity,
+    stop_sequence_start_distance);
+  if (!distance) {
+    return false;
+  }
+  if (distance.get() <= stop_sequence_start_distance) {
+    return true;
+  }
+  return false;
 }
 
 nlohmann::json MomentaryStopMetric::to_json()
 {
-  nlohmann::json json = {{"in_stop_sequence", in_stop_sequence_}};
-  json.merge_patch(MetricBase::to_base_json());
-  if (!in_stop_sequence_) {
-    return json;
+  nlohmann::json json = MetricBase::to_base_json();
+  if (getLifecycle() != MetricLifecycle::INACTIVE) {
+    json["linear_acceleration"] = linear_acceleration_;
+    json["stop_duration"] = standstill_duration_;
+    json["distance_to_stopline"] = distance_to_stopline_;
   }
-  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (!status) {
-    return json;
-  }
-  json.merge_patch({"linear_acceleration", status->action_status.accel.linear.x});
-  auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
-  if (!standstill_duration) {
-    THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
-  }
-  json.merge_patch({"stop_duration", standstill_duration.get()});
   return json;
 }
 }  // namespace metrics

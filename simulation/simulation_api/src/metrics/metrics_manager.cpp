@@ -37,17 +37,31 @@ void MetricsManager::calculate()
   nlohmann::json log;
   std::vector<std::string> disable_metrics_list = {};
   for (auto & metric : metrics_) {
-    metric.second->calculate();
+    if (metric.second->getLifecycle() == MetricLifecycle::INACTIVE) {
+      if (metric.second->activateTrigger()) {
+        metric.second->activate();
+      }
+    }
+    if (metric.second->getLifecycle() == MetricLifecycle::ACTIVE) {
+      metric.second->update();
+    }
     log[metric.first] = metric.second->to_json();
-    if (metric.second->calculateFinished()) {
+    if (metric.second->getLifecycle() == MetricLifecycle::SUCCESS ||
+      metric.second->getLifecycle() == MetricLifecycle::FAILURE)
+    {
       disable_metrics_list.emplace_back(metric.first);
     }
   }
   if (verbose_) {
-    std::cout << log << std::endl;
+    for (const auto metric_json : log) {
+      std::cout << metric_json << std::endl;
+    }
   }
   log_ = log;
   for (const auto name : disable_metrics_list) {
+    if (metrics_[name]->getLifecycle() == MetricLifecycle::FAILURE) {
+      metrics_[name]->throwException();
+    }
     metrics_.erase(name);
   }
 }
