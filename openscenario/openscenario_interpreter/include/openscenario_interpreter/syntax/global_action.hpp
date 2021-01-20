@@ -40,7 +40,10 @@ inline namespace syntax
 struct GlobalAction
   : public Element
 {
-  template<typename Node, typename ... Ts>
+  template
+  <
+    typename Node, typename ... Ts
+  >
   explicit GlobalAction(const Node & node, Ts && ... xs)
   : Element(
       choice(
