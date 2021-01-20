@@ -585,9 +585,16 @@ std::vector<std::int64_t> EntityManager::getRouteLanelets(std::string name, doub
   throw SimulationRuntimeError("entity " + name + " does not matches to entity type.");
 }
 
-std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(std::string name)
+std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
+  std::string name,
+  double horizon)
 {
-
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw SimulationRuntimeError("entity " + name + " does not exist");
+  }
+  const auto route = getRouteLanelets(name, horizon);
+  return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
 }
 
 double EntityManager::getStepTime() const

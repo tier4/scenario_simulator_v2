@@ -157,7 +157,7 @@ public:
   void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, Direction direction);
-  std::vector<std::int64_t> getConflictingEntityOnRouteLanelets(std::string name);
+  std::vector<std::int64_t> getConflictingEntityOnRouteLanelets(std::string name, double horizon);
   std::vector<std::int64_t> getRouteLanelets(std::string name, double horizon);
   openscenario_msgs::msg::WaypointsArray getWaypoints(std::string name);
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle(std::string name);
