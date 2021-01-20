@@ -53,7 +53,9 @@ void MetricsManager::calculate()
     }
   }
   if (verbose_) {
-    std::cout << log << std::endl;
+    for (const auto metric_json : log) {
+      std::cout << metric_json << std::endl;
+    }
   }
   log_ = log;
   for (const auto name : disable_metrics_list) {

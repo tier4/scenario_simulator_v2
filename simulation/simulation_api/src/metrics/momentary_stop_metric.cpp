@@ -88,8 +88,10 @@ bool MomentaryStopMetric::activateTrigger()
 
 nlohmann::json MomentaryStopMetric::to_json()
 {
-  nlohmann::json json = {};
-  json.merge_patch(MetricBase::to_base_json());
+  nlohmann::json json = MetricBase::to_base_json();
+  if (getLifecycle() != MetricLifecycle::ACTIVE) {
+    return json;
+  }
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (!status) {
     return json;
