@@ -44,7 +44,7 @@ public:
 private:
   bool verbose_;
   nlohmann::json log_;
-  std::unordered_map<std::string, std::shared_ptr<MetricBase>> metrics_;
+  std::unordered_map<std::string, std::unique_ptr<MetricBase>> metrics_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
 }  // namespace metrics

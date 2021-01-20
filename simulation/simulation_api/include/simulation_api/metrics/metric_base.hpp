@@ -75,6 +75,7 @@ class MetricBase
 {
 public:
   MetricBase(std::string target_entity, std::string metrics_type);
+  virtual ~MetricBase() = default;
   virtual bool activateTrigger() = 0;
   virtual void update() = 0;
   void success();
