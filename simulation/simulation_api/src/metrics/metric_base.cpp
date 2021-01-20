@@ -20,19 +20,41 @@
 namespace metrics
 {
 MetricBase::MetricBase(std::string target_entity, std::string metrics_type)
-: target_entity(target_entity), metrics_type(metrics_type) {}
-
-void MetricBase::foundSpecificationViolation(std::string message)
+: target_entity(target_entity), metrics_type(metrics_type)
 {
-  message = "target_entity : " + target_entity + "\n" +
-    "metrics_type : " + metrics_type + "\n" + message;
-  throw SpecificationViolationError(message);
+  lifecycle_ = MetricLifecycle::INACTIVE;
+  error_ = boost::none;
 }
 
 void MetricBase::setEntityManager(
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr)
 {
   entity_manager_ptr_ = entity_manager_ptr;
+}
+
+void MetricBase::success()
+{
+  if (lifecycle_ != MetricLifecycle::ACTIVE) {
+    THROW_METRICS_CALCULATION_ERROR("lifecycle of the metric should be active");
+  }
+  lifecycle_ = MetricLifecycle::SUCCESS;
+}
+
+void MetricBase::activate()
+{
+  if (lifecycle_ != MetricLifecycle::INACTIVE) {
+    THROW_METRICS_CALCULATION_ERROR("lifecycle of the metric should be inactive");
+  }
+  lifecycle_ = MetricLifecycle::ACTIVE;
+}
+
+void MetricBase::failure(SpecificationViolationError error)
+{
+  if (lifecycle_ != MetricLifecycle::ACTIVE) {
+    THROW_METRICS_CALCULATION_ERROR("lifecycle of the metric should be active");
+  }
+  error_ = error;
+  lifecycle_ = MetricLifecycle::FAILURE;
 }
 
 nlohmann::json MetricBase::to_base_json()

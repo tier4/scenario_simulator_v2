@@ -38,15 +38,12 @@ public:
     stop_line_lanelet_id(stop_line_lanelet_id),
     stop_sequence_start_distance(stop_sequence_start_distance),
     stop_sequence_end_distance(stop_sequence_end_distance),
-    stop_duration(stop_duration)
-  {
-    in_stop_sequence_ = false;
-    sequence_finished_ = false;
-  }
+    stop_duration(stop_duration) {}
 
   ~MomentaryStopMetric() = default;
-  void calculate() override;
+  void update() override;
   bool calculateFinished() override;
+  bool activateTrigger();
   const double min_acceleration;
   const double max_acceleration;
   const std::int64_t stop_line_lanelet_id;
@@ -54,10 +51,6 @@ public:
   const double stop_sequence_end_distance;
   const double stop_duration;
   nlohmann::json to_json();
-
-private:
-  bool in_stop_sequence_;
-  bool sequence_finished_;
 };
 }  // namespace metrics
 

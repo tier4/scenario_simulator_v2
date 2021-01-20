@@ -24,12 +24,17 @@ TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
   traveled_distance = 0;
 }
 
+bool TraveledDistanceMetric::activateTrigger()
+{
+  return true;
+}
+
 bool TraveledDistanceMetric::calculateFinished()
 {
   return false;
 }
 
-void TraveledDistanceMetric::calculate()
+void TraveledDistanceMetric::update()
 {
   double step_time = entity_manager_ptr_->getStepTime();
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
