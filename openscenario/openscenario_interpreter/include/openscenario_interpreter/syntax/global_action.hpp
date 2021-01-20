@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__GLOBAL_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__GLOBAL_ACTION_HPP_
 
+#include <openscenario_interpreter/syntax/entity_action.hpp>
 #include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_action.hpp>
 
@@ -37,6 +38,13 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 struct GlobalAction
   : public Element
 {
@@ -49,13 +57,8 @@ struct GlobalAction
       choice(
         node,
         std::make_pair("EnvironmentAction", UNSUPPORTED()),
-        std::make_pair("EntityAction", UNSUPPORTED()),
-
-        std::make_pair("ParameterAction", [&](auto && node)
-        {
-          return make<ParameterAction>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-
+        ELEMENT(EntityAction),
+        ELEMENT(ParameterAction),
         std::make_pair("InfrastructureAction", UNSUPPORTED()),
         std::make_pair("TrafficAction", UNSUPPORTED())))
   {}
