@@ -122,6 +122,47 @@ boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPo
   return toLaneletPose(status->pose);
 }
 
+boost::optional<int64_t> EntityManager::getDistanceToCrosswalk(
+  std::string name,
+  std::int64_t target_crosswalk_id,
+  double horizon)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    return boost::none;
+  }
+  const auto route = getRouteLanelets(name, horizon);
+  const auto lanelet_pose = getLaneletPose(name);
+  if (!lanelet_pose) {
+    return boost::none;
+  }
+  simulation_api::math::CatmullRomSpline spline(hdmap_utils_ptr_->getCenterPoints(route));
+}
+
+boost::optional<double> EntityManager::getSValueInRoute(
+  std::string name,
+  std::vector<std::int64_t> route)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    return boost::none;
+  }
+  const auto lanelet_pose = getLaneletPose(name);
+  if (!lanelet_pose) {
+    return boost::none;
+  }
+  double s = 0;
+  for (const auto id : route) {
+    if (id == lanelet_pose->lanelet_id) {
+      s = s + lanelet_pose->s;
+      return s;
+    } else {
+      s = s + hdmap_utils_ptr_->getLaneletLength(id);
+    }
+  }
+  return boost::none;
+}
+
 boost::optional<double> EntityManager::getDistanceToStopLine(
   std::string name,
   std::int64_t target_stop_line_id,
