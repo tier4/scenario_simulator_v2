@@ -26,9 +26,9 @@ class TraveledDistanceMetric : public MetricBase
 public:
   explicit TraveledDistanceMetric(std::string target_entity);
   ~TraveledDistanceMetric() = default;
-  void calculate() override;
-  bool calculateFinished() override;
+  void update() override;
   nlohmann::json to_json();
+  bool activateTrigger();
 
 private:
   double traveled_distance;

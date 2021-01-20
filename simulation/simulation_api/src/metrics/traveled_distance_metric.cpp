@@ -24,12 +24,12 @@ TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
   traveled_distance = 0;
 }
 
-bool TraveledDistanceMetric::calculateFinished()
+bool TraveledDistanceMetric::activateTrigger()
 {
-  return false;
+  return true;
 }
 
-void TraveledDistanceMetric::calculate()
+void TraveledDistanceMetric::update()
 {
   double step_time = entity_manager_ptr_->getStepTime();
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
@@ -41,8 +41,10 @@ void TraveledDistanceMetric::calculate()
 
 nlohmann::json TraveledDistanceMetric::to_json()
 {
-  nlohmann::json json = {{"traveled_distance", traveled_distance}};
-  json.merge_patch(MetricBase::to_base_json());
+  nlohmann::json json = MetricBase::to_base_json();
+  if (getLifecycle() != MetricLifecycle::INACTIVE) {
+    json["traveled_distance"] = traveled_distance;
+  }
   return json;
 }
 }  // namespace metrics
