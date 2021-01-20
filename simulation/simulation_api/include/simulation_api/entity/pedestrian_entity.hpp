@@ -63,7 +63,7 @@ public:
   {
     return tree_ptr_->getCurrentAction();
   }
-  std::vector<std::int64_t> getRouteLanelet(double horizon = 100)
+  std::vector<std::int64_t> getRouteLanelets(double horizon = 100)
   {
     if (!status_) {
       return {};

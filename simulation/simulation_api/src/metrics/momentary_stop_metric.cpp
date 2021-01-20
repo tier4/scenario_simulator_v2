@@ -49,7 +49,7 @@ void MomentaryStopMetric::update()
     }
     standstill_duration_ = standstill_duration.get();
     if (entity_manager_ptr_->isStopping(target_entity) &&
-      standstill_duration.get() > stop_duration)
+      standstill_duration.get() >= stop_duration)
     {
       success();
     }

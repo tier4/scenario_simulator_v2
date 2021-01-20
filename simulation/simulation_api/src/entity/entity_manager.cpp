@@ -128,8 +128,8 @@ boost::optional<int64_t> EntityManager::getNextStopLineId(std::string name, doub
   if (it == entities_.end()) {
     return boost::none;
   }
+  const auto route = getRouteLanelets(name, horizon);
   if (it->second.type() == typeid(VehicleEntity)) {
-    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelet(horizon);
     const auto lanelet_pose = getLaneletPose(name);
     if (!lanelet_pose) {
       return boost::none;
@@ -137,7 +137,6 @@ boost::optional<int64_t> EntityManager::getNextStopLineId(std::string name, doub
     return hdmap_utils_ptr_->getNextStopLineId(route, lanelet_pose.get());
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelet(horizon);
     const auto lanelet_pose = getLaneletPose(name);
     if (!lanelet_pose) {
       return boost::none;
@@ -145,7 +144,6 @@ boost::optional<int64_t> EntityManager::getNextStopLineId(std::string name, doub
     return hdmap_utils_ptr_->getNextStopLineId(route, lanelet_pose.get());
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelet(horizon);
     const auto lanelet_pose = getLaneletPose(name);
     if (!lanelet_pose) {
       return boost::none;
@@ -161,8 +159,8 @@ boost::optional<double> EntityManager::getDistanceToStopLine(std::string name, d
   if (it == entities_.end()) {
     return boost::none;
   }
+  const auto route = getRouteLanelets(name, horizon);
   if (it->second.type() == typeid(VehicleEntity)) {
-    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelet(horizon);
     const auto lanelet_pose = getLaneletPose(name);
     if (!lanelet_pose) {
       return boost::none;
@@ -170,7 +168,6 @@ boost::optional<double> EntityManager::getDistanceToStopLine(std::string name, d
     return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelet(horizon);
     const auto lanelet_pose = getLaneletPose(name);
     if (!lanelet_pose) {
       return boost::none;
@@ -178,7 +175,6 @@ boost::optional<double> EntityManager::getDistanceToStopLine(std::string name, d
     return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelet(horizon);
     const auto lanelet_pose = getLaneletPose(name);
     if (!lanelet_pose) {
       return boost::none;
@@ -566,6 +562,32 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
   if (it->second.type() == typeid(PedestrianEntity)) {
     boost::any_cast<PedestrianEntity &>(it->second).setTargetSpeed(target_speed, continuous);
   }
+}
+
+std::vector<std::int64_t> EntityManager::getRouteLanelets(std::string name, double horizon)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw SimulationRuntimeError("entity " + name + " does not exist");
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelets(horizon);
+    return route;
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelets(horizon);
+    return route;
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelets(horizon);
+    return route;
+  }
+  throw SimulationRuntimeError("entity " + name + " does not matches to entity type.");
+}
+
+std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(std::string name)
+{
+
 }
 
 double EntityManager::getStepTime() const
