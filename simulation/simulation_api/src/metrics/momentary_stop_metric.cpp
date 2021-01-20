@@ -37,16 +37,17 @@ void MomentaryStopMetric::update()
   auto distance = entity_manager_ptr_->getDistanceToStopLine(
     target_entity,
     stop_sequence_start_distance);
+  distance_to_stopline_ = distance.get();
   if (!distance) {
     THROW_METRICS_CALCULATION_ERROR("failed to calculate distance to stop line.");
   }
-  if (min_acceleration <= status->action_status.accel.linear.x &&
-    status->action_status.accel.linear.x <= max_acceleration)
-  {
+  linear_acceleration_ = status->action_status.accel.linear.x;
+  if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
     if (!standstill_duration) {
       THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
     }
+    standstill_duration_ = standstill_duration.get();
     if (entity_manager_ptr_->isStopping(target_entity) &&
       standstill_duration.get() > stop_duration)
     {
@@ -89,19 +90,11 @@ bool MomentaryStopMetric::activateTrigger()
 nlohmann::json MomentaryStopMetric::to_json()
 {
   nlohmann::json json = MetricBase::to_base_json();
-  if (getLifecycle() != MetricLifecycle::ACTIVE) {
-    return json;
+  if (getLifecycle() != MetricLifecycle::INACTIVE) {
+    json["linear_acceleration"] = linear_acceleration_;
+    json["stop_duration"] = standstill_duration_;
+    json["distance_to_stopline"] = distance_to_stopline_;
   }
-  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (!status) {
-    return json;
-  }
-  json["linear_acceleration"] = status->action_status.accel.linear.x;
-  auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
-  if (!standstill_duration) {
-    THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
-  }
-  json["stop_duration"] = standstill_duration.get();
   return json;
 }
 }  // namespace metrics

@@ -50,6 +50,11 @@ public:
   const double stop_sequence_end_distance;
   const double stop_duration;
   nlohmann::json to_json();
+
+private:
+  double linear_acceleration_;
+  double standstill_duration_;
+  double distance_to_stopline_;
 };
 }  // namespace metrics
 
