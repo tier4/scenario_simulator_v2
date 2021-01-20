@@ -38,7 +38,6 @@ struct DeleteEntityAction
 
   decltype(auto) operator()(const String & entity_ref) const
   {
-    std::cout << "DeleteEntityAction: " << entity_ref << std::endl;
     despawn(entity_ref);
     return unspecified;
   }
