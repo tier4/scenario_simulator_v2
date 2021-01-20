@@ -24,7 +24,9 @@ void MomentaryStopMetric::calculate()
   if (!status) {
     return;
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (!id) {
     if (in_stop_sequence_) {
       THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
@@ -73,5 +75,25 @@ void MomentaryStopMetric::calculate()
 bool MomentaryStopMetric::calculateFinished()
 {
   return sequence_finished_;
+}
+
+nlohmann::json MomentaryStopMetric::to_json()
+{
+  nlohmann::json json = {{"in_stop_sequence", in_stop_sequence_}};
+  json.merge_patch(MetricBase::to_base_json());
+  if (!in_stop_sequence_) {
+    return json;
+  }
+  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
+  if (!status) {
+    return json;
+  }
+  json.merge_patch({"linear_acceleration", status->action_status.accel.linear.x});
+  auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
+  if (!standstill_duration) {
+    THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
+  }
+  json.merge_patch({"stop_duration", standstill_duration.get()});
+  return json;
 }
 }  // namespace metrics

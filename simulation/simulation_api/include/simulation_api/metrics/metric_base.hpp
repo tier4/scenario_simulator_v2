@@ -17,6 +17,8 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include <stdexcept>
 #include <string>
 #include <memory>
@@ -65,6 +67,8 @@ public:
   MetricBase(std::string target_entity, std::string metrics_type);
   virtual void calculate() = 0;
   virtual bool calculateFinished() = 0;
+  virtual nlohmann::json to_json() = 0;
+  nlohmann::json to_base_json();
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   const std::string target_entity;
   const std::string metrics_type;

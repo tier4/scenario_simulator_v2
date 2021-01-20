@@ -43,6 +43,7 @@ bool API::entityExists(std::string name)
 
 void API::setVerbose(bool verbose)
 {
+  metrics_manager_.setVerbose(verbose);
   entity_manager_ptr_->setVerbose(verbose);
 }
 

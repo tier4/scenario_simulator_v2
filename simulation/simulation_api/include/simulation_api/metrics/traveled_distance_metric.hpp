@@ -28,6 +28,7 @@ public:
   ~TraveledDistanceMetric() = default;
   void calculate() override;
   bool calculateFinished() override;
+  nlohmann::json to_json();
 
 private:
   double traveled_distance;

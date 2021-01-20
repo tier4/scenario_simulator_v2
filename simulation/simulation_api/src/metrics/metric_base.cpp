@@ -34,4 +34,11 @@ void MetricBase::setEntityManager(
 {
   entity_manager_ptr_ = entity_manager_ptr;
 }
+
+nlohmann::json MetricBase::to_base_json()
+{
+  return nlohmann::json{
+    {"target_entity", target_entity}
+  };
+}
 }  // namespace metrics

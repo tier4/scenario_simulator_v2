@@ -66,7 +66,7 @@ public:
     bool verbose = false,
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
-  : autoware_api::Accessor(node)
+  : autoware_api::Accessor(node), metrics_manager_(verbose)
   {
     std::string address = "127.0.0.1";
 

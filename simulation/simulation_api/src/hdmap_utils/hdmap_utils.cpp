@@ -935,7 +935,7 @@ boost::optional<std::int64_t> HdMapUtils::getNextStopLineId(
   std::vector<lanelet::ConstLineString3d> stop_lines;
   for (const auto & following_lanelet_id : following_lanelets) {
     stop_lines = getStopLinesOnPath({following_lanelet_id});
-    if (stop_lines.size() == 0) {
+    if (stop_lines.size() != 0) {
       return stop_lines[0].id();
     }
   }
