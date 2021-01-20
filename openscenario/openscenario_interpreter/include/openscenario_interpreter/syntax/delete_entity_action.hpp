@@ -12,44 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-
-#include <utility>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- EntityRef --------------------------------------------------------------
+/* ---- DeleteEntityAction -----------------------------------------------------
  *
- *  <xsd:complexType name="EntityRef">
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *  </xsd:complexType>
+ *  <xsd:complexType name="DeleteEntityAction"/>
  *
  * -------------------------------------------------------------------------- */
-struct EntityRef
-  : public String
+struct DeleteEntityAction
 {
   template
   <
     typename ... Ts
   >
-  explicit constexpr EntityRef(Ts && ... xs)
-  : String(std::forward<decltype(xs)>(xs)...)
+  explicit DeleteEntityAction(Ts && ...)
   {}
 
-  template
-  <
-    typename Node, typename Scope
-  >
-  explicit EntityRef(const Node & node, Scope & scope)
-  : String(readAttribute<String>("entityRef", node, scope))
-  {}
+  decltype(auto) operator()(const String & entity_ref) const
+  {
+    std::cout << "DeleteEntityAction: " << entity_ref << std::endl;
+    return unspecified;
+  }
 };
-}  // namespace syntax
+}  // inline namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
