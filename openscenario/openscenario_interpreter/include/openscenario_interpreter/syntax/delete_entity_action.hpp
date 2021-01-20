@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
 
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
@@ -38,6 +39,7 @@ struct DeleteEntityAction
   decltype(auto) operator()(const String & entity_ref) const
   {
     std::cout << "DeleteEntityAction: " << entity_ref << std::endl;
+    despawn(entity_ref);
     return unspecified;
   }
 };

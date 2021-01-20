@@ -44,6 +44,8 @@ struct EntityAction
 {
   const String entity_ref;
 
+  const std::true_type accomplished {};
+
   template
   <
     typename Node, typename Scope
