@@ -42,7 +42,6 @@ public:
 
   ~MomentaryStopMetric() = default;
   void update() override;
-  bool calculateFinished() override;
   bool activateTrigger();
   const double min_acceleration;
   const double max_acceleration;

@@ -86,12 +86,6 @@ bool MomentaryStopMetric::activateTrigger()
   return false;
 }
 
-bool MomentaryStopMetric::calculateFinished()
-{
-  // return sequence_finished_;
-  return true;
-}
-
 nlohmann::json MomentaryStopMetric::to_json()
 {
   nlohmann::json json = {};

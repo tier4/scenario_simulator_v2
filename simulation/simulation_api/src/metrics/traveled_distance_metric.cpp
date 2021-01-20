@@ -29,11 +29,6 @@ bool TraveledDistanceMetric::activateTrigger()
   return true;
 }
 
-bool TraveledDistanceMetric::calculateFinished()
-{
-  return false;
-}
-
 void TraveledDistanceMetric::update()
 {
   double step_time = entity_manager_ptr_->getStepTime();

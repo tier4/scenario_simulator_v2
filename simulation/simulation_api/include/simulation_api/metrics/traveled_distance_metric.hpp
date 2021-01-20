@@ -27,7 +27,6 @@ public:
   explicit TraveledDistanceMetric(std::string target_entity);
   ~TraveledDistanceMetric() = default;
   void update() override;
-  bool calculateFinished() override;
   nlohmann::json to_json();
   bool activateTrigger();
 

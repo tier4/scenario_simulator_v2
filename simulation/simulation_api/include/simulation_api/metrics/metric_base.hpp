@@ -80,8 +80,6 @@ public:
   void success();
   void failure(SpecificationViolationError error);
   void activate();
-
-  virtual bool calculateFinished() = 0;
   virtual nlohmann::json to_json() = 0;
   nlohmann::json to_base_json();
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
