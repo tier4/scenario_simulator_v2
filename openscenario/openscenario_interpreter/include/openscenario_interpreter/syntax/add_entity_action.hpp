@@ -15,10 +15,41 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_
 
+#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/position.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+/* ---- AddEntityAction --------------------------------------------------------
+ *
+ *  <xsd:complexType name="AddEntityAction">
+ *    <xsd:all>
+ *      <xsd:element name="Position" type="Position"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
+ *
+ * -------------------------------------------------------------------------- */
+struct AddEntityAction
+{
+  const Position position;
+
+  template
+  <
+    typename Node, typename Scope
+  >
+  explicit AddEntityAction(const Node & node, Scope & outer_scope)
+  : position(readElement<Position>("Position", node, outer_scope))
+  {}
+
+  decltype(auto) operator()(const String & entity_ref) const
+  {
+    std::cout << "AddEntityAction: " << entity_ref << std::endl;
+    return unspecified;
+  }
+};
 }  // inline namespace syntax
 }  // namespace openscenario_interpreter
 

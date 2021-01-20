@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-// #include <openscenario_interpreter/syntax/add_entity_action.hpp> TODO
+#include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/delete_entity_action.hpp>
 
 #include <typeindex>
@@ -52,12 +52,19 @@ struct EntityAction
   : Element(
       choice(
         node,
-        std::make_pair("AddEntityAction", UNSUPPORTED()),
+
+        std::make_pair(
+          "AddEntityAction", [&](auto && node)
+          {
+            return make<AddEntityAction>(node, outer_scope);
+          }),
+
         std::make_pair(
           "DeleteEntityAction", [&](auto && node)
           {
             return make<DeleteEntityAction>(node, outer_scope);
           }) )),
+
     entity_ref(readAttribute<String>("entityRef", node, outer_scope))
   {}
 
@@ -66,12 +73,12 @@ struct EntityAction
     static const std::unordered_map<
       std::type_index, std::function<Element(const String &)>> overloads
     {
-      // {
-      //   typeid(AddEntityAction), [this](auto && ... xs)
-      //   {
-      //     return as<AddEntityAction>()(std::forward<decltype(xs)>(xs)...);
-      //   }
-      // },
+      {
+        typeid(AddEntityAction), [this](auto && ... xs)
+        {
+          return as<AddEntityAction>()(std::forward<decltype(xs)>(xs)...);
+        }
+      },
 
       {
         typeid(DeleteEntityAction), [this](auto && ... xs)
