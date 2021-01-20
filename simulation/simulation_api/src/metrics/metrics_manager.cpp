@@ -46,15 +46,13 @@ void MetricsManager::calculate()
       metric.second->update();
     }
     log[metric.first] = metric.second->to_json();
+    if (verbose_) {
+      std::cout << "metric : " << metric.first << " => " << log[metric.first] << std::endl;
+    }
     if (metric.second->getLifecycle() == MetricLifecycle::SUCCESS ||
       metric.second->getLifecycle() == MetricLifecycle::FAILURE)
     {
       disable_metrics_list.emplace_back(metric.first);
-    }
-  }
-  if (verbose_) {
-    for (const auto metric_json : log) {
-      std::cout << metric_json << std::endl;
     }
   }
   log_ = log;

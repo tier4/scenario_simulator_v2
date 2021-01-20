@@ -183,8 +183,10 @@ public:
   void setTargetSpeed(std::string name, double target_speed, bool continuous);
   void update(double current_time, double step_time);
   void broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform = true);
-  boost::optional<double> getDistanceToStopLine(std::string name, double horizon = 100);
-  boost::optional<int64_t> getNextStopLineId(std::string name, double horizon = 100);
+  boost::optional<double> getDistanceToStopLine(
+    std::string name, std::int64_t target_stop_line_id,
+    double horizon = 100);
+  boost::optional<int64_t> getDistanceToCrosswalk(std::string name, double horizon = 100);
   bool reachPosition(
     std::string name, geometry_msgs::msg::Pose target_pose,
     double tolerance) const;

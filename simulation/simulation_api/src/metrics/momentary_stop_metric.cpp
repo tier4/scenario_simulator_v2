@@ -25,17 +25,9 @@ void MomentaryStopMetric::update()
     THROW_METRICS_CALCULATION_ERROR("failed to get target entity status.");
     return;
   }
-  auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
-  if (!id) {
-    THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
-    return;
-  }
-  if (id.get() != stop_line_lanelet_id) {
-    THROW_METRICS_CALCULATION_ERROR("failed to find next stop line id.");
-    return;
-  }
   auto distance = entity_manager_ptr_->getDistanceToStopLine(
     target_entity,
+    stop_line_lanelet_id,
     stop_sequence_start_distance);
   distance_to_stopline_ = distance.get();
   if (!distance) {
@@ -68,15 +60,9 @@ bool MomentaryStopMetric::activateTrigger()
   if (!status) {
     return false;
   }
-  auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
-  if (!id) {
-    return false;
-  }
-  if (id.get() != stop_line_lanelet_id) {
-    return false;
-  }
   auto distance = entity_manager_ptr_->getDistanceToStopLine(
     target_entity,
+    stop_line_lanelet_id,
     stop_sequence_start_distance);
   if (!distance) {
     return false;
