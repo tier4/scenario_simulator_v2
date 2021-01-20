@@ -100,12 +100,12 @@ nlohmann::json MomentaryStopMetric::to_json()
   if (!status) {
     return json;
   }
-  json.merge_patch({"linear_acceleration", status->action_status.accel.linear.x});
+  json["linear_acceleration"] = status->action_status.accel.linear.x;
   auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
   if (!standstill_duration) {
     THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
   }
-  json.merge_patch({"stop_duration", standstill_duration.get()});
+  json["stop_duration"] = standstill_duration.get();
   return json;
 }
 }  // namespace metrics

@@ -45,23 +45,23 @@ void MetricsManager::calculate()
     if (metric.second->getLifecycle() == MetricLifecycle::ACTIVE) {
       metric.second->update();
     }
-
-    /*
     log[metric.first] = metric.second->to_json();
-    if (metric.second->calculateFinished()) {
+    if (metric.second->getLifecycle() == MetricLifecycle::SUCCESS ||
+      metric.second->getLifecycle() == MetricLifecycle::FAILURE)
+    {
       disable_metrics_list.emplace_back(metric.first);
     }
-    */
   }
   if (verbose_) {
     std::cout << log << std::endl;
   }
   log_ = log;
-  /*
   for (const auto name : disable_metrics_list) {
+    if (metrics_[name]->getLifecycle() == MetricLifecycle::FAILURE) {
+      metrics_[name]->throwException();
+    }
     metrics_.erase(name);
   }
-  */
 }
 
 nlohmann::json MetricsManager::getJsonLog()

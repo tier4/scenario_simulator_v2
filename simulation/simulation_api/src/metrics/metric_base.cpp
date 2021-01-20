@@ -59,8 +59,32 @@ void MetricBase::failure(SpecificationViolationError error)
 
 nlohmann::json MetricBase::to_base_json()
 {
-  return nlohmann::json{
-    {"target_entity", target_entity}
-  };
+  nlohmann::json json;
+  json["target_entity"] = target_entity;
+  std::string lifecycle;
+  switch (lifecycle_) {
+    case MetricLifecycle::INACTIVE:
+      lifecycle = "inactive";
+      break;
+    case MetricLifecycle::ACTIVE:
+      lifecycle = "active";
+      break;
+    case MetricLifecycle::FAILURE:
+      lifecycle = "failure";
+      break;
+    case MetricLifecycle::SUCCESS:
+      lifecycle = "success";
+      break;
+  }
+  json["lifecycle"] = lifecycle;
+  return json;
+}
+
+void MetricBase::throwException()
+{
+  if (error_) {
+    throw error_.get();
+  }
+  THROW_METRICS_CALCULATION_ERROR("error is empty");
 }
 }  // namespace metrics

@@ -91,6 +91,7 @@ public:
   {
     return lifecycle_;
   }
+  void throwException();
 
 protected:
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
