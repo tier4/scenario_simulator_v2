@@ -64,7 +64,7 @@ void MomentaryStopMetric::update()
 bool MomentaryStopMetric::activateTrigger()
 {
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (status) {
+  if (!status) {
     return false;
   }
   auto id = entity_manager_ptr_->getNextStopLineId(target_entity, stop_sequence_start_distance);
