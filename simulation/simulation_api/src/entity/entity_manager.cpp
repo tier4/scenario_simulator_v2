@@ -550,6 +550,24 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string n
   throw simulation_api::SimulationRuntimeError("error occurs while getting waypoints : " + name);
 }
 
+boost::optional<double> EntityManager::getJerk(std::string name)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    return false;
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<const VehicleEntity &>(it->second).statusSetted();
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return boost::any_cast<const EgoEntity &>(it->second).statusSetted();
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    return boost::any_cast<const PedestrianEntity &>(it->second).statusSetted();
+  }
+  return boost::none;
+}
+
 bool EntityManager::entityStatusSetted(std::string name) const
 {
   auto it = entities_.find(name);
