@@ -40,7 +40,7 @@ public:
     stop_sequence_end_distance(stop_sequence_end_distance),
     stop_duration(stop_duration) {}
 
-  ~MomentaryStopMetric() = default;
+  ~MomentaryStopMetric() override = default;
   void update() override;
   bool activateTrigger();
   const double min_acceleration;

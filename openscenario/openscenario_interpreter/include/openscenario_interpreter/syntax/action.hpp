@@ -42,7 +42,7 @@ inline namespace syntax
   std::make_pair( \
     #NAME, [&](auto && node) \
     { \
-      return rebind<NAME>(node, scope); \
+      return make<NAME>(node, scope); \
     })
 
 struct Action
@@ -50,17 +50,20 @@ struct Action
 {
   const String name;
 
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit Action(const Node & node, Scope & scope, std::size_t maximum_execution_count)
   : StoryboardElement(maximum_execution_count),
+    Element(
+      choice(
+        node,
+        ELEMENT(GlobalAction),
+        ELEMENT(UserDefinedAction),
+        ELEMENT(PrivateAction))),
     name(readAttribute<String>("name", node, scope))
-  {
-    choice(
-      node,
-      ELEMENT(GlobalAction),
-      ELEMENT(UserDefinedAction),
-      ELEMENT(PrivateAction));
-  }
+  {}
 
   auto ready() const
   {

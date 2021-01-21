@@ -51,6 +51,15 @@ decltype(auto) spawn(Ts && ... xs)
   return connection.spawn(std::forward<decltype(xs)>(xs)...);
 }
 
+template
+<
+  typename ... Ts
+>
+decltype(auto) despawn(Ts && ... xs)
+{
+  return connection.despawnEntity(std::forward<decltype(xs)>(xs)...);
+}
+
 template<typename ... Ts>
 decltype(auto) requestLaneChange(Ts && ... xs)
 {
