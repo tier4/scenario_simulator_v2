@@ -24,19 +24,26 @@ namespace metrics
 class MomentaryStopMetric : public MetricBase
 {
 public:
+  enum class StopTargetLaneletType
+  {
+    STOP_LINE,
+    CROSSWALK
+  };
   MomentaryStopMetric(
     std::string target_entity,
     double min_acceleration,
     double max_acceleration,
     std::int64_t stop_target_lanelet_id,
+    StopTargetLaneletType stop_target_lanelet_type,
     double stop_sequence_start_distance,
     double stop_sequence_end_distance,
     double stop_duration)
-  : MetricBase("TraveledDistance"),
+  : MetricBase("MomentaryStop"),
     target_entity(target_entity),
     min_acceleration(min_acceleration),
     max_acceleration(max_acceleration),
     stop_target_lanelet_id(stop_target_lanelet_id),
+    stop_target_lanelet_type(stop_target_lanelet_type),
     stop_sequence_start_distance(stop_sequence_start_distance),
     stop_sequence_end_distance(stop_sequence_end_distance),
     stop_duration(stop_duration) {}
@@ -48,6 +55,7 @@ public:
   const double min_acceleration;
   const double max_acceleration;
   const std::int64_t stop_target_lanelet_id;
+  const StopTargetLaneletType stop_target_lanelet_type;
   const double stop_sequence_start_distance;
   const double stop_sequence_end_distance;
   const double stop_duration;
