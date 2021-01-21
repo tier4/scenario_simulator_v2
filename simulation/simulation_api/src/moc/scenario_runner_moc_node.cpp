@@ -85,6 +85,10 @@ public:
       "ego_momentary_stop1", "ego",
       -10, 10, 120635, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
       30, 1, 0.05);
+    api_.addMetric<metrics::MomentaryStopMetric>(
+      "ego_momentary_stop_crosswalk", "ego",
+      -10, 10, 34378, metrics::MomentaryStopMetric::StopTargetLaneletType::CROSSWALK,
+      30, 1, 0.05);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
