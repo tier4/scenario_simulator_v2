@@ -141,6 +141,41 @@
             </Event>
           </Maneuver>
         </ManeuverGroup>
+
+        <ManeuverGroup name="despawn-bob" maximumExecutionCount="1">
+          <Actors selectTriggeringEntities="false"/>
+          <Maneuver name="maneuver">
+            <ParameterDeclarations/>
+            <Event name="event" priority="overwrite">
+              <Action name="action">
+                <GlobalAction>
+                  <EntityAction entityRef="bob">
+                    <DeleteEntityAction/>
+                  </EntityAction>
+                </GlobalAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="condition" conditionEdge="none" delay="0">
+                    <ByEntityCondition>
+                      <TriggeringEntities triggeringEntitiesRule="any">
+                        <EntityRef entityRef="bob"/>
+                      </TriggeringEntities>
+                      <EntityCondition>
+                        <ReachPositionCondition tolerance="0.5">
+                          <Position>
+                            <LanePosition roadId="none" laneId="34378" s="8" offset="0"/>
+                          </Position>
+                        </ReachPositionCondition>
+                      </EntityCondition>
+                    </ByEntityCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+
         <StartTrigger>
           <ConditionGroup>
             <Condition name="condition" conditionEdge="none" delay="0">

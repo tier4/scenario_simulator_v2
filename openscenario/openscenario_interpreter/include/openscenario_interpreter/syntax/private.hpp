@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Private ==============================================================
+/* ---- Private ----------------------------------------------------------------
  *
  * <xsd:complexType name="Private">
  *   <xsd:sequence>
@@ -32,15 +32,18 @@ inline namespace syntax
  *   <xsd:attribute name="entityRef" type="String" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Private
   : public std::vector<PrivateAction>
 {
   Scope inner_scope;
 
-  template<typename Node>
+  template
+  <
+    typename Node
+  >
   explicit Private(const Node & node, Scope & outer_scope)
-  : inner_scope{outer_scope}
+  : inner_scope(outer_scope)
   {
     inner_scope.actors.emplace_back(
       readAttribute<String>("entityRef", node, inner_scope));

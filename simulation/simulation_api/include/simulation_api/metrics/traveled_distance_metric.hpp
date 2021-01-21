@@ -25,7 +25,7 @@ class TraveledDistanceMetric : public MetricBase
 {
 public:
   explicit TraveledDistanceMetric(std::string target_entity);
-  ~TraveledDistanceMetric() = default;
+  ~TraveledDistanceMetric() override = default;
   void update() override;
   nlohmann::json to_json();
   bool activateTrigger();
