@@ -157,6 +157,8 @@ public:
   void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, Direction direction);
+  std::vector<std::int64_t> getConflictingEntityOnRouteLanelets(std::string name, double horizon);
+  std::vector<std::int64_t> getRouteLanelets(std::string name, double horizon);
   openscenario_msgs::msg::WaypointsArray getWaypoints(std::string name);
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle(std::string name);
   boost::optional<double> getLongitudinalDistance(
@@ -176,13 +178,19 @@ public:
   bool setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status);
   const boost::optional<openscenario_msgs::msg::EntityStatus> getEntityStatus(
     std::string name) const;
+  boost::optional<double> getSValueInRoute(std::string name, std::vector<std::int64_t> route);
   bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance);
   bool entityStatusSetted(std::string name) const;
   void setTargetSpeed(std::string name, double target_speed, bool continuous);
   void update(double current_time, double step_time);
   void broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform = true);
-  boost::optional<double> getDistanceToStopLine(std::string name, double horizon = 100);
-  boost::optional<int64_t> getNextStopLineId(std::string name, double horizon = 100);
+  boost::optional<double> getDistanceToStopLine(
+    std::string name, std::int64_t target_stop_line_id,
+    double horizon = 100);
+  boost::optional<double> getDistanceToCrosswalk(
+    std::string name,
+    std::int64_t target_crosswalk_id,
+    double horizon = 100);
   bool reachPosition(
     std::string name, geometry_msgs::msg::Pose target_pose,
     double tolerance) const;
