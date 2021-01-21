@@ -26,6 +26,8 @@ MetricBase::MetricBase(std::string target_entity, std::string metrics_type)
   error_ = boost::none;
 }
 
+MetricBase::~MetricBase() {}
+
 void MetricBase::setEntityManager(
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr)
 {

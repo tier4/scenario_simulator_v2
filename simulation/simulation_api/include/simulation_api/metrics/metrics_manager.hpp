@@ -29,21 +29,20 @@ class MetricsManager
 {
 public:
   explicit MetricsManager(bool verbose);
+  ~MetricsManager() {}
   void setVerbose(bool verbose);
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   template<typename T, typename ... Ts>
   void addMetric(std::string name, Ts && ... xs)
   {
-    auto metric_ptr = std::make_unique<T>(std::forward<Ts>(xs)...);
+    auto metric_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
     metric_ptr->setEntityManager(this->entity_manager_ptr_);
-    metrics_.insert({name, std::move(metric_ptr)});
+    metrics_.insert({name, metric_ptr});
   }
   void calculate();
-  nlohmann::json getJsonLog();
 
 private:
   bool verbose_;
-  nlohmann::json log_;
   std::unordered_map<std::string, std::shared_ptr<MetricBase>> metrics_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };

@@ -23,6 +23,7 @@
 namespace metrics
 {
 MetricsManager::MetricsManager(bool verbose)
+: metrics_()
 {
   verbose_ = verbose;
 }
@@ -57,18 +58,13 @@ void MetricsManager::calculate()
       std::cout << metric_json << std::endl;
     }
   }
-  log_ = log;
+  // log_ = log;
   for (const auto name : disable_metrics_list) {
     if (metrics_[name]->getLifecycle() == MetricLifecycle::FAILURE) {
       metrics_[name]->throwException();
     }
     metrics_.erase(name);
   }
-}
-
-nlohmann::json MetricsManager::getJsonLog()
-{
-  return log_;
 }
 
 void MetricsManager::setEntityManager(
