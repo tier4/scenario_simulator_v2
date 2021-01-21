@@ -138,6 +138,14 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       tree_ptr_->setValueToBlackBoard("target_speed", target_speed_);
     }
   }
+  if (!status_) {
+    linear_jerk_ = 0;
+  } else {
+    linear_jerk_ =
+      (status_updated.action_status.accel.linear.x -
+      status_->action_status.accel.linear.x) /
+      step_time;
+  }
   setStatus(status_updated);
   updateStandStillDuration(step_time);
 }
