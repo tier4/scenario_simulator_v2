@@ -187,7 +187,7 @@ public:
   boost::optional<double> getDistanceToStopLine(
     std::string name, std::int64_t target_stop_line_id,
     double horizon = 100);
-  boost::optional<int64_t> getDistanceToCrosswalk(
+  boost::optional<double> getDistanceToCrosswalk(
     std::string name,
     std::int64_t target_crosswalk_id,
     double horizon = 100);

@@ -122,7 +122,7 @@ boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPo
   return toLaneletPose(status->pose);
 }
 
-boost::optional<int64_t> EntityManager::getDistanceToCrosswalk(
+boost::optional<double> EntityManager::getDistanceToCrosswalk(
   std::string name,
   std::int64_t target_crosswalk_id,
   double horizon)
@@ -137,6 +137,12 @@ boost::optional<int64_t> EntityManager::getDistanceToCrosswalk(
     return boost::none;
   }
   simulation_api::math::CatmullRomSpline spline(hdmap_utils_ptr_->getCenterPoints(route));
+  auto waypoints = spline.getTrajectory(
+    lanelet_pose->s,
+    lanelet_pose->s + horizon, 1.0);
+  simulation_api::math::CatmullRomSpline waypoints_curve(waypoints);
+  auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
+  return spline.getCollisionPointIn2D(polygon);
 }
 
 boost::optional<double> EntityManager::getSValueInRoute(
@@ -596,15 +602,6 @@ std::vector<std::int64_t> EntityManager::getRouteLanelets(std::string name, doub
   }
   throw SimulationRuntimeError("entity " + name + " does not matches to entity type.");
 }
-
-/*
-boost::optional<int64_t> EntityManager::getDistanceToCrosswalk(
-  std::string name,
-  double horizon)
-{
-
-}
-*/
 
 std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
   std::string name,
