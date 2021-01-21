@@ -44,13 +44,13 @@ public:
   ~MomentaryStopMetric() override = default;
   void update() override;
   bool activateTrigger();
+  const std::string target_entity;
   const double min_acceleration;
   const double max_acceleration;
   const std::int64_t stop_line_lanelet_id;
   const double stop_sequence_start_distance;
   const double stop_sequence_end_distance;
   const double stop_duration;
-  const std::string target_entity;
   nlohmann::json to_json();
 
 private:
