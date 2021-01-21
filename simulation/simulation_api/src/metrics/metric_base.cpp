@@ -19,8 +19,8 @@
 
 namespace metrics
 {
-MetricBase::MetricBase(std::string target_entity, std::string metrics_type)
-: target_entity(target_entity), metrics_type(metrics_type)
+MetricBase::MetricBase(std::string metrics_type)
+: metrics_type(metrics_type)
 {
   lifecycle_ = MetricLifecycle::INACTIVE;
   error_ = boost::none;
@@ -62,7 +62,7 @@ void MetricBase::failure(SpecificationViolationError error)
 nlohmann::json MetricBase::to_base_json()
 {
   nlohmann::json json;
-  json["target_entity"] = target_entity;
+  json["type"] = metrics_type;
   std::string lifecycle;
   switch (lifecycle_) {
     case MetricLifecycle::INACTIVE:

@@ -32,7 +32,8 @@ public:
     double stop_sequence_start_distance,
     double stop_sequence_end_distance,
     double stop_duration)
-  : MetricBase(target_entity, "TraveledDistance"),
+  : MetricBase("TraveledDistance"),
+    target_entity(target_entity),
     min_acceleration(min_acceleration),
     max_acceleration(max_acceleration),
     stop_line_lanelet_id(stop_line_lanelet_id),
@@ -49,6 +50,7 @@ public:
   const double stop_sequence_start_distance;
   const double stop_sequence_end_distance;
   const double stop_duration;
+  const std::string target_entity;
   nlohmann::json to_json();
 
 private:

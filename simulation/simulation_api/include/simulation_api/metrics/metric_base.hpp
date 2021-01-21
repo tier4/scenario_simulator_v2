@@ -74,7 +74,7 @@ enum class MetricLifecycle
 class MetricBase
 {
 public:
-  MetricBase(std::string target_entity, std::string metrics_type);
+  MetricBase(std::string metrics_type);
   virtual ~MetricBase();
   virtual bool activateTrigger() = 0;
   virtual void update() = 0;
@@ -84,7 +84,6 @@ public:
   virtual nlohmann::json to_json() = 0;
   nlohmann::json to_base_json();
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
-  const std::string target_entity;
   const std::string metrics_type;
   MetricLifecycle getLifecycle()
   {
