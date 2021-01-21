@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(lanelet2_extension)
+project(lanelet2_extension_psim)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)

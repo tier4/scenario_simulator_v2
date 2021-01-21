@@ -805,9 +805,9 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
       "walkway_lanelets", walkway_lanelets, cl_cross));
   insertMarkerArray(
     markers, lanelet::visualization::laneletDirectionAsMarkerArray(road_lanelets));
-  insertMarkerArray(
-    markers,
-    lanelet::visualization::lineStringsAsMarkerArray(stop_lines, "stop_lines", cl_stoplines));
+  // insertMarkerArray(
+  //   markers,
+  //   lanelet::visualization::lineStringsAsMarkerArray(stop_lines, "stop_lines", cl_stoplines));
   insertMarkerArray(
     markers,
     lanelet::visualization::autowareTrafficLightsAsMarkerArray(aw_tl_reg_elems, cl_trafficlights));
@@ -820,12 +820,12 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
   insertMarkerArray(
     markers,
     lanelet::visualization::parkingSpacesAsMarkerArray(parking_spaces, cl_parking_spaces));
-  insertMarkerArray(
-    markers,
-    lanelet::visualization::generateLaneletIdMarker(road_lanelets, cl_lanelet_id));
-  insertMarkerArray(
-    markers,
-    lanelet::visualization::generateLaneletIdMarker(crosswalk_lanelets, cl_lanelet_id));
+  // insertMarkerArray(
+  //   markers,
+  //   lanelet::visualization::generateLaneletIdMarker(road_lanelets, cl_lanelet_id));
+  // insertMarkerArray(
+  //   markers,
+  //   lanelet::visualization::generateLaneletIdMarker(crosswalk_lanelets, cl_lanelet_id));
   return markers;
 }
 

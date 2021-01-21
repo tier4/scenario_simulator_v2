@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>lanelet2_extension</name>
+  <name>lanelet2_extension_psim</name>
   <version>0.1.0</version>
-  <description>The lanelet2_extension pacakge contains libraries to handle Lanelet2 format data.</description>
+  <description>The lanelet2_extension_psim pacakge contains libraries to handle Lanelet2 format data.</description>
 
   <maintainer email="ryohsuke.mitsudome@tier4.jp">mitsudome-r</maintainer>
 

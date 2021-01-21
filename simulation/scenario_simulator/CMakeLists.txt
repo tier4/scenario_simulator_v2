@@ -26,7 +26,7 @@ find_package(quaternion_operation REQUIRED)
 find_package(autoware_auto_msgs REQUIRED)
 find_package(lanelet2_core REQUIRED)
 find_package(lanelet2_routing REQUIRED)
-find_package(lanelet2_extension REQUIRED)
+find_package(lanelet2_extension_psim REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(openscenario_msgs REQUIRED)
@@ -51,7 +51,7 @@ ament_target_dependencies(scenario_simulator
   autoware_auto_msgs
   lanelet2_core
   lanelet2_routing
-  lanelet2_extension
+  lanelet2_extension_psim
   visualization_msgs
   behaviortree_cpp_v3
   openscenario_msgs
