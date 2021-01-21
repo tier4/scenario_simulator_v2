@@ -83,7 +83,7 @@ public:
   virtual const openscenario_msgs::msg::BoundingBox getBoundingBox() const = 0;
   virtual const std::string getCurrentAction() const = 0;
   void stopAtEndOfRoad();
-  boost::optional<double> getLinearJerk()
+  boost::optional<double> getLinearJerk() const
   {
     return linear_jerk_;
   }

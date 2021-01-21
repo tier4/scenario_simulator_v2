@@ -31,6 +31,11 @@ bool API::entityExists(std::string name)
   return entity_manager_ptr_->entityExists(name);
 }
 
+boost::optional<double> API::getLinearJerk(std::string name)
+{
+  return entity_manager_ptr_->getLinearJerk(name);
+}
+
 void API::setVerbose(bool verbose)
 {
   metrics_manager_.setVerbose(verbose);

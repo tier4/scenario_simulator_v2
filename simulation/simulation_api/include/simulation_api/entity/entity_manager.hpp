@@ -140,7 +140,7 @@ public:
       std::chrono::seconds(1),
       std::bind(&EntityManager::updateHdmapMarker, this));
   }
-  boost::optional<double> getJerk(std::string name);
+  boost::optional<double> getLinearJerk(std::string name);
   double getStepTime() const;
   double getCurrentTime() const;
   ~EntityManager() {}
