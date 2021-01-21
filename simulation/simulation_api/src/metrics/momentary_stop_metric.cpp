@@ -27,7 +27,7 @@ void MomentaryStopMetric::update()
   }
   auto distance = entity_manager_ptr_->getDistanceToStopLine(
     target_entity,
-    stop_line_lanelet_id,
+    stop_target_lanelet_id,
     stop_sequence_start_distance);
   distance_to_stopline_ = distance.get();
   if (!distance) {
@@ -62,7 +62,7 @@ bool MomentaryStopMetric::activateTrigger()
   }
   auto distance = entity_manager_ptr_->getDistanceToStopLine(
     target_entity,
-    stop_line_lanelet_id,
+    stop_target_lanelet_id,
     stop_sequence_start_distance);
   if (!distance) {
     return false;

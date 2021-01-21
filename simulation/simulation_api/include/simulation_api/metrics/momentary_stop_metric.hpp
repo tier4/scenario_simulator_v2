@@ -28,7 +28,7 @@ public:
     std::string target_entity,
     double min_acceleration,
     double max_acceleration,
-    std::int64_t stop_line_lanelet_id,
+    std::int64_t stop_target_lanelet_id,
     double stop_sequence_start_distance,
     double stop_sequence_end_distance,
     double stop_duration)
@@ -36,7 +36,7 @@ public:
     target_entity(target_entity),
     min_acceleration(min_acceleration),
     max_acceleration(max_acceleration),
-    stop_line_lanelet_id(stop_line_lanelet_id),
+    stop_target_lanelet_id(stop_target_lanelet_id),
     stop_sequence_start_distance(stop_sequence_start_distance),
     stop_sequence_end_distance(stop_sequence_end_distance),
     stop_duration(stop_duration) {}
@@ -47,7 +47,7 @@ public:
   const std::string target_entity;
   const double min_acceleration;
   const double max_acceleration;
-  const std::int64_t stop_line_lanelet_id;
+  const std::int64_t stop_target_lanelet_id;
   const double stop_sequence_start_distance;
   const double stop_sequence_end_distance;
   const double stop_duration;

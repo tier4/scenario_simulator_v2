@@ -52,7 +52,6 @@ ament_auto_add_library(entity_manager SHARED
   src/metrics/metrics_manager.cpp
   src/metrics/traveled_distance_metric.cpp
   src/metrics/momentary_stop_metric.cpp
-  src/metrics/stop_at_crosswalk_metric.cpp
 )
 
 target_link_libraries(entity_manager pugixml)
