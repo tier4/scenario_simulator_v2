@@ -29,7 +29,7 @@ class MetricsManager
 {
 public:
   explicit MetricsManager(bool verbose);
-  ~MetricsManager() {};
+  ~MetricsManager() {}
   void setVerbose(bool verbose);
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   template<typename T, typename ... Ts>

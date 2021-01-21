@@ -22,7 +22,8 @@
 
 namespace metrics
 {
-MetricsManager::MetricsManager(bool verbose) : metrics_()
+MetricsManager::MetricsManager(bool verbose)
+: metrics_()
 {
   verbose_ = verbose;
 }
