@@ -25,14 +25,28 @@ void MomentaryStopMetric::update()
     THROW_METRICS_CALCULATION_ERROR("failed to get target entity status.");
     return;
   }
-  auto distance = entity_manager_ptr_->getDistanceToStopLine(
-    target_entity,
-    stop_line_lanelet_id,
-    stop_sequence_start_distance);
-  distance_to_stopline_ = distance.get();
+  boost::optional<double> distance;
+  switch (stop_target_lanelet_type) {
+    case StopTargetLaneletType::STOP_LINE:
+      distance = entity_manager_ptr_->getDistanceToStopLine(
+        target_entity,
+        stop_target_lanelet_id,
+        stop_sequence_start_distance);
+      break;
+    case StopTargetLaneletType::CROSSWALK:
+      distance = entity_manager_ptr_->getDistanceToCrosswalk(
+        target_entity,
+        stop_target_lanelet_id,
+        stop_sequence_start_distance);
+      break;
+    default:
+      THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");
+      break;
+  }
   if (!distance) {
     THROW_METRICS_CALCULATION_ERROR("failed to calculate distance to stop line.");
   }
+  distance_to_stopline_ = distance.get();
   linear_acceleration_ = status->action_status.accel.linear.x;
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
@@ -60,10 +74,24 @@ bool MomentaryStopMetric::activateTrigger()
   if (!status) {
     return false;
   }
-  auto distance = entity_manager_ptr_->getDistanceToStopLine(
-    target_entity,
-    stop_line_lanelet_id,
-    stop_sequence_start_distance);
+  boost::optional<double> distance;
+  switch (stop_target_lanelet_type) {
+    case StopTargetLaneletType::STOP_LINE:
+      distance = entity_manager_ptr_->getDistanceToStopLine(
+        target_entity,
+        stop_target_lanelet_id,
+        stop_sequence_start_distance);
+      break;
+    case StopTargetLaneletType::CROSSWALK:
+      distance = entity_manager_ptr_->getDistanceToCrosswalk(
+        target_entity,
+        stop_target_lanelet_id,
+        stop_sequence_start_distance);
+      break;
+    default:
+      THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");
+      break;
+  }
   if (!distance) {
     return false;
   }

@@ -29,6 +29,7 @@ public:
   void update() override;
   nlohmann::json to_json();
   bool activateTrigger();
+  const std::string target_entity;
 
 private:
   double traveled_distance;
