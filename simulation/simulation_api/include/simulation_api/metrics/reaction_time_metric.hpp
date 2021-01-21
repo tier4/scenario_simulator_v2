@@ -15,4 +15,31 @@
 #ifndef SIMULATION_API__METRICS__REACTION_TIME_METRIC_HPP_
 #define SIMULATION_API__METRICS__REACTION_TIME_METRIC_HPP_
 
+#include <simulation_api/metrics/metric_base.hpp>
+
+#include <string>
+
+namespace metrics
+{
+class ReactionTimeMetric : public MetricBase
+{
+public:
+  enum class Operator
+  {
+    OVER,
+    UNDER
+  };
+  explicit ReactionTimeMetric(std::string target_entity, double threashold);
+  ~ReactionTimeMetric() override = default;
+  void update() override;
+  nlohmann::json to_json();
+  bool activateTrigger();
+  const std::string target_entity;
+  const double threashold;
+
+private:
+  double elapsed_duration_;
+};
+}  // namespace metrics
+
 #endif  // SIMULATION_API__METRICS__REACTION_TIME_METRIC_HPP_

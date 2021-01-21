@@ -13,3 +13,39 @@
 // limitations under the License.
 
 #include <simulation_api/metrics/reaction_time_metric.hpp>
+
+#include <string>
+
+namespace metrics
+{
+ReactionTimeMetric::ReactionTimeMetric(std::string target_entity, double threashold)
+: MetricBase("ReactopmTime"), target_entity(target_entity), threashold(threashold)
+{
+}
+
+bool ReactionTimeMetric::activateTrigger()
+{
+  return true;
+}
+
+void ReactionTimeMetric::update()
+{
+  double step_time = entity_manager_ptr_->getStepTime();
+  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
+  if (status) {
+    /*
+    traveled_distance = traveled_distance +
+      std::fabs(status.get().action_status.twist.linear.x) * step_time;
+      */
+  }
+}
+
+nlohmann::json ReactionTimeMetric::to_json()
+{
+  nlohmann::json json = MetricBase::to_base_json();
+  if (getLifecycle() != MetricLifecycle::INACTIVE) {
+    // json["traveled_distance"] = traveled_distance;
+  }
+  return json;
+}
+}  // namespace metrics
