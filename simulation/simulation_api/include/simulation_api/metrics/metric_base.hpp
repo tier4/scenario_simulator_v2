@@ -74,7 +74,7 @@ enum class MetricLifecycle
 class MetricBase
 {
 public:
-  MetricBase(std::string metrics_type);
+  explicit MetricBase(std::string metrics_type);
   virtual ~MetricBase();
   virtual bool activateTrigger() = 0;
   virtual void update() = 0;
