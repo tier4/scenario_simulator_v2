@@ -24,21 +24,27 @@ namespace metrics
 class ReactionTimeMetric : public MetricBase
 {
 public:
-  enum class Operator
-  {
-    OVER,
-    UNDER
-  };
-  explicit ReactionTimeMetric(std::string target_entity, double threashold);
+  explicit ReactionTimeMetric(
+    std::string target_entity,
+    double maximum_reaction_time,
+    double jerk_upper_threashold,
+    double jerk_lower_threashold,
+    bool check_upper_threashold = true,
+    bool check_lower_threashold = true);
   ~ReactionTimeMetric() override = default;
   void update() override;
   nlohmann::json to_json();
   bool activateTrigger();
   const std::string target_entity;
-  const double threashold;
+  const double maximum_reaction_time;
+  const double jerk_upper_threashold;
+  const double jerk_lower_threashold;
+  const bool check_upper_threashold;
+  const bool check_lower_threashold;
 
 private:
   double elapsed_duration_;
+  double current_linear_jerk_;
 };
 }  // namespace metrics
 

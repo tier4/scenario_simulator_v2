@@ -18,9 +18,22 @@
 
 namespace metrics
 {
-ReactionTimeMetric::ReactionTimeMetric(std::string target_entity, double threashold)
-: MetricBase("ReactopmTime"), target_entity(target_entity), threashold(threashold)
+ReactionTimeMetric::ReactionTimeMetric(
+  std::string target_entity,
+  double maximum_reaction_time,
+  double jerk_upper_threashold,
+  double jerk_lower_threashold,
+  bool check_upper_threashold,
+  bool check_lower_threashold)
+: MetricBase("ReactionTime"),
+  target_entity(target_entity),
+  maximum_reaction_time(maximum_reaction_time),
+  jerk_upper_threashold(jerk_upper_threashold),
+  jerk_lower_threashold(jerk_lower_threashold),
+  check_upper_threashold(check_upper_threashold),
+  check_lower_threashold(check_lower_threashold)
 {
+  elapsed_duration_ = 0;
 }
 
 bool ReactionTimeMetric::activateTrigger()
@@ -30,21 +43,32 @@ bool ReactionTimeMetric::activateTrigger()
 
 void ReactionTimeMetric::update()
 {
-  double step_time = entity_manager_ptr_->getStepTime();
-  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (status) {
-    /*
-    traveled_distance = traveled_distance +
-      std::fabs(status.get().action_status.twist.linear.x) * step_time;
-      */
+  const auto jerk = entity_manager_ptr_->getLinearJerk(target_entity);
+  if (!jerk) {
+    THROW_METRICS_CALCULATION_ERROR("failed to calculate linear jerk.");
   }
+  current_linear_jerk_ = jerk.get();
+  if (check_lower_threashold && jerk_lower_threashold >= jerk.get()) {
+    success();
+    return;
+  }
+  if (check_upper_threashold && jerk_upper_threashold <= jerk.get()) {
+    success();
+    return;
+  }
+  if (elapsed_duration_ > maximum_reaction_time) {
+    failure(SPECIFICATION_VIOLATION_ERROR("maximum reaction time is expired."));
+    return;
+  }
+  elapsed_duration_ = elapsed_duration_ + entity_manager_ptr_->getStepTime();
 }
 
 nlohmann::json ReactionTimeMetric::to_json()
 {
   nlohmann::json json = MetricBase::to_base_json();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {
-    // json["traveled_distance"] = traveled_distance;
+    json["elapsed_duration"] = elapsed_duration_;
+    json["current linear jerk"] = current_linear_jerk_;
   }
   return json;
 }
