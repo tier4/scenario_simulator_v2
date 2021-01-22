@@ -767,6 +767,16 @@ void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, boo
 }
 
 bool EntityManager::reachPosition(
+  std::string name, std::string target_name, double torelance) const
+{
+  auto status = getEntityStatus(target_name);
+  if (status) {
+    return false;
+  }
+  return reachPosition(name, status->pose, torelance);
+}
+
+bool EntityManager::reachPosition(
   std::string name, geometry_msgs::msg::Pose target_pose,
   double tolerance) const
 {

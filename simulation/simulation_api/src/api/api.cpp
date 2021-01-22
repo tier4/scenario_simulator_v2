@@ -400,6 +400,7 @@ geometry_msgs::msg::Pose API::getRelativePose(
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 bool API::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance)
 {
   if (!entity_manager_ptr_->entityStatusSetted(name)) {
