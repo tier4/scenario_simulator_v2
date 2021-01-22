@@ -77,10 +77,12 @@ public:
       "npc1",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
+    /*
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop0", "ego",
       -10, 10, 34805, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
       30, 1, 0.05);
+    */
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop1", "ego",
       -10, 10, 120635, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
@@ -97,7 +99,7 @@ private:
   void update()
   {
     if (api_.getLinearJerk("ego")) {
-      std::cout << "ego linear jerk : " << api_.getLinearJerk("ego").get() << std::endl;
+      std::cout << "ego linear jerk :" << api_.getLinearJerk("ego").get() << std::endl;
     }
     if (api_.reachPosition(
         "ego",
