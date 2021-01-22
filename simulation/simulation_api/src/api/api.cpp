@@ -421,6 +421,17 @@ bool API::reachPosition(
     target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
 }
 
+bool API::reachPosition(std::string name, std::string target_name, double tolerance) const
+{
+  if (!entity_manager_ptr_->entityStatusSetted(name)) {
+    return false;
+  }
+  if (!entity_manager_ptr_->entityStatusSetted(target_name)) {
+    return false;
+  }
+  return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
+}
+
 boost::optional<double> API::getStandStillDuration(std::string name) const
 {
   return entity_manager_ptr_->getStandStillDuration(name);

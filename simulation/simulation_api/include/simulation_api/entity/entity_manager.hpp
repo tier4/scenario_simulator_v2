@@ -199,7 +199,7 @@ public:
     std::string name, std::int64_t lanelet_id, double s, double offset,
     double tolerance) const;
   bool reachPosition(
-    std::string name, std::string target_name, double torelance) const;
+    std::string name, std::string target_name, double tolerance) const;
   void broadcastEntityTransform();
   void broadcastBaseLinkTransform();
   const boost::optional<double> getStandStillDuration(std::string name) const;
