@@ -28,26 +28,17 @@ TrafficLight::TrafficLight(std::int64_t id)
 }
 
 void TrafficLight::setColorPhase(
-  TrafficLightPhase<TrafficLightColor> color_phase,
+  const std::vector<std::pair<double, TrafficLightColor>> & phase,
   double time_offset)
 {
-  /*
-  color_phase_ = color_phase;
-  elapsed_time_in_color_phase_ = time_offset;
-  */
+  color_phase_.setPhase(phase, time_offset);
 }
 
 void TrafficLight::setArrowPhase(
-  TrafficLightPhase<TrafficLightArrow> arrow_phase,
+  const std::vector<std::pair<double, TrafficLightArrow>> & phase,
   double time_offset)
 {
-  /*
-  if (!contain_arrow) {
-    throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
-  }
-  arrow_phase_ = arrow_phase;
-  elapsed_time_in_arrow_phase_ = time_offset;
-  */
+  arrow_phase_.setPhase(phase, time_offset);
 }
 
 void TrafficLight::setColor(TrafficLightColor color)
