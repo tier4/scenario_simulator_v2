@@ -91,9 +91,6 @@ public:
     double s);
   boost::optional<double> getDistanceToStopLine(
     std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose);
-  boost::optional<std::int64_t> getNextStopLineId(
-    std::vector<std::int64_t> following_lanelets,
-    openscenario_msgs::msg::LaneletPose lanlet_pose);
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
@@ -138,6 +135,7 @@ public:
     std::vector<std::int64_t> lanelet_ids) const;
   int64_t getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh = 30.0);
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
+  const std::vector<geometry_msgs::msg::Point> getStopLinesPolygon(std::int64_t lanelet_id);
 
 private:
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(

@@ -186,12 +186,10 @@ public:
   void update(double current_time, double step_time);
   void broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform = true);
   boost::optional<double> getDistanceToStopLine(
-    std::string name, std::int64_t target_stop_line_id,
-    double horizon = 100);
+    std::string name, std::int64_t target_stop_line_id);
   boost::optional<double> getDistanceToCrosswalk(
     std::string name,
-    std::int64_t target_crosswalk_id,
-    double horizon = 100);
+    std::int64_t target_crosswalk_id);
   bool reachPosition(
     std::string name, geometry_msgs::msg::Pose target_pose,
     double tolerance) const;

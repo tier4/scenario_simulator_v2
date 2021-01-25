@@ -30,14 +30,12 @@ void MomentaryStopMetric::update()
     case StopTargetLaneletType::STOP_LINE:
       distance = entity_manager_ptr_->getDistanceToStopLine(
         target_entity,
-        stop_target_lanelet_id,
-        stop_sequence_start_distance);
+        stop_target_lanelet_id);
       break;
     case StopTargetLaneletType::CROSSWALK:
       distance = entity_manager_ptr_->getDistanceToCrosswalk(
         target_entity,
-        stop_target_lanelet_id,
-        stop_sequence_start_distance);
+        stop_target_lanelet_id);
       break;
     default:
       THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");
@@ -79,14 +77,12 @@ bool MomentaryStopMetric::activateTrigger()
     case StopTargetLaneletType::STOP_LINE:
       distance = entity_manager_ptr_->getDistanceToStopLine(
         target_entity,
-        stop_target_lanelet_id,
-        stop_sequence_start_distance);
+        stop_target_lanelet_id);
       break;
     case StopTargetLaneletType::CROSSWALK:
       distance = entity_manager_ptr_->getDistanceToCrosswalk(
         target_entity,
-        stop_target_lanelet_id,
-        stop_sequence_start_distance);
+        stop_target_lanelet_id);
       break;
     default:
       THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");

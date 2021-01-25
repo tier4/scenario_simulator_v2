@@ -928,18 +928,19 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
 }
 
-boost::optional<std::int64_t> HdMapUtils::getNextStopLineId(
-  std::vector<std::int64_t> following_lanelets,
-  openscenario_msgs::msg::LaneletPose lanlet_pose)
+const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinesPolygon(
+  std::int64_t lanelet_id)
 {
-  std::vector<lanelet::ConstLineString3d> stop_lines;
-  for (const auto & following_lanelet_id : following_lanelets) {
-    stop_lines = getStopLinesOnPath({following_lanelet_id});
-    if (stop_lines.size() != 0) {
-      return stop_lines[0].id();
-    }
+  std::vector<geometry_msgs::msg::Point> points;
+  const auto stop_line = lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
+  for (const auto point : stop_line) {
+    geometry_msgs::msg::Point p;
+    p.x = point.x();
+    p.y = point.y();
+    p.z = point.z();
+    points.emplace_back(p);
   }
-  return boost::none;
+  return points;
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(

@@ -124,23 +124,13 @@ boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPo
 
 boost::optional<double> EntityManager::getDistanceToCrosswalk(
   std::string name,
-  std::int64_t target_crosswalk_id,
-  double horizon)
+  std::int64_t target_crosswalk_id)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
-  const auto route = getRouteLanelets(name, horizon);
-  const auto lanelet_pose = getLaneletPose(name);
-  if (!lanelet_pose) {
-    return boost::none;
-  }
-  simulation_api::math::CatmullRomSpline spline(hdmap_utils_ptr_->getCenterPoints(route));
-  auto waypoints = spline.getTrajectory(
-    lanelet_pose->s,
-    lanelet_pose->s + horizon, 1.0);
-  simulation_api::math::CatmullRomSpline waypoints_curve(waypoints);
+  simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
   return spline.getCollisionPointIn2D(polygon);
 }
@@ -171,35 +161,15 @@ boost::optional<double> EntityManager::getSValueInRoute(
 
 boost::optional<double> EntityManager::getDistanceToStopLine(
   std::string name,
-  std::int64_t target_stop_line_id,
-  double horizon)
+  std::int64_t target_stop_line_id)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
-  const auto route = getRouteLanelets(name, horizon);
-  const auto lanelet_pose = getLaneletPose(name);
-  if (!lanelet_pose) {
-    return boost::none;
-  }
-  const auto stop_line_id = hdmap_utils_ptr_->getNextStopLineId(route, lanelet_pose.get());
-  if (!stop_line_id) {
-    return boost::none;
-  }
-  if (stop_line_id.get() == target_stop_line_id) {
-    return boost::none;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
-  }
-  return boost::none;
+  simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
+  auto polygon = hdmap_utils_ptr_->getStopLinesPolygon(target_stop_line_id);
+  return spline.getCollisionPointIn2D(polygon);
 }
 
 void EntityManager::requestAcquirePosition(
