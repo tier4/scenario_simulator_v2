@@ -20,131 +20,69 @@
 
 namespace simulation_api
 {
-TrafficLight::TrafficLight(std::int64_t id, bool contain_arrow)
-: id(id), contain_arrow(contain_arrow)
+TrafficLight::TrafficLight(std::int64_t id)
+: id(id)
 {
-  color_phase_.emplace_back(
-    std::make_pair(std::numeric_limits<double>::infinity(), TrafficLightColor::NONE) );
-  arrow_phase_ = {};
-  elapsed_time_in_color_phase_ = 0;
-}
-
-TrafficLight::TrafficLight(
-  std::int64_t id, std::vector<std::pair<double,
-  TrafficLightColor>> color_phase, bool contain_arrow)
-: id(id), contain_arrow(contain_arrow)
-{
-  color_phase_ = color_phase;
-  arrow_phase_ = {};
-  elapsed_time_in_color_phase_ = 0;
-}
-
-TrafficLight::TrafficLight(
-  std::int64_t id,
-  std::vector<std::pair<double, TrafficLightColor>> color_phase,
-  std::vector<std::pair<double, TrafficLightArrow>> arrow_phase)
-: id(id), contain_arrow(true)
-{
-  color_phase_ = color_phase;
-  arrow_phase_ = arrow_phase;
-  elapsed_time_in_color_phase_ = 0;
+  color_phase_.setState(TrafficLightColor::NONE);
+  arrow_phase_.setState(TrafficLightArrow::NONE);
 }
 
 void TrafficLight::setColorPhase(
-  std::vector<std::pair<double,
-  TrafficLightColor>> color_phase, double time_offset)
+  TrafficLightPhase<TrafficLightColor> color_phase,
+  double time_offset)
 {
+  /*
   color_phase_ = color_phase;
   elapsed_time_in_color_phase_ = time_offset;
+  */
 }
 
 void TrafficLight::setArrowPhase(
-  std::vector<std::pair<double,
-  TrafficLightArrow>> arrow_phase, double time_offset)
+  TrafficLightPhase<TrafficLightArrow> arrow_phase,
+  double time_offset)
 {
+  /*
   if (!contain_arrow) {
     throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
   }
   arrow_phase_ = arrow_phase;
   elapsed_time_in_arrow_phase_ = time_offset;
+  */
 }
 
 void TrafficLight::setColor(TrafficLightColor color)
 {
-  color_phase_ = {};
-  color_phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), color) );
-  elapsed_time_in_color_phase_ = 0;
+  color_phase_.setState(color);
 }
 
 void TrafficLight::setArrow(TrafficLightArrow arrow)
 {
-  if (!contain_arrow) {
-    throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
-  }
-  arrow_phase_ = {};
-  arrow_phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), arrow) );
-  elapsed_time_in_arrow_phase_ = 0;
+  arrow_phase_.setState(arrow);
 }
 
 double TrafficLight::getColorPhaseLength() const
 {
-  double ret = 0;
-  for (const auto seq : color_phase_) {
-    ret = ret + seq.first;
-  }
-  return ret;
+  return color_phase_.getPhaseLength();
 }
 
 double TrafficLight::getArrowPhaseLength() const
 {
-  if (!contain_arrow) {
-    throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
-  }
-  double ret = 0;
-  for (const auto seq : arrow_phase_) {
-    ret = ret + seq.first;
-  }
-  return ret;
+  return arrow_phase_.getPhaseLength();
 }
 
 TrafficLightArrow TrafficLight::getArrow() const
 {
-  if (!contain_arrow) {
-    throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
-  }
-  double t = 0;
-  for (const auto seq : arrow_phase_) {
-    t = t + seq.first;
-    if (t > elapsed_time_in_arrow_phase_) {
-      return seq.second;
-    }
-  }
-  throw SimulationRuntimeError("failed to get arrow in phase");
+  return arrow_phase_.getState();
 }
 
 TrafficLightColor TrafficLight::getColor() const
 {
-  double t = 0;
-  for (const auto seq : color_phase_) {
-    t = t + seq.first;
-    if (t > elapsed_time_in_color_phase_) {
-      return seq.second;
-    }
-  }
-  throw SimulationRuntimeError("failed to get color in phase");
+  return color_phase_.getState();
 }
 
 void TrafficLight::update(double step_time)
 {
-  if (contain_arrow) {
-    elapsed_time_in_arrow_phase_ = elapsed_time_in_arrow_phase_ + step_time;
-    if (elapsed_time_in_color_phase_ > getArrowPhaseLength()) {
-      elapsed_time_in_color_phase_ = elapsed_time_in_color_phase_ - getArrowPhaseLength();
-    }
-  }
-  elapsed_time_in_color_phase_ = elapsed_time_in_color_phase_ + step_time;
-  if (elapsed_time_in_color_phase_ > getArrowPhaseLength()) {
-    elapsed_time_in_color_phase_ = elapsed_time_in_color_phase_ - getArrowPhaseLength();
-  }
+  arrow_phase_.update(step_time);
+  color_phase_.update(step_time);
 }
 }  // namespace simulation_api
