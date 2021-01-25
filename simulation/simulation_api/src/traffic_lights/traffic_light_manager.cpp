@@ -32,7 +32,7 @@ void TrafficLightManager::setColorPhase(
   if (traffic_lights_.count(lanelet_id) == 0) {
     throw SimulationRuntimeError("lanelet id does not match");
   }
-  traffic_lights_[lanelet_id]->setColorPhase(phase, time_offset);
+  traffic_lights_.at(lanelet_id)->setColorPhase(phase, time_offset);
 }
 
 void TrafficLightManager::setArrowPhase(
@@ -43,7 +43,7 @@ void TrafficLightManager::setArrowPhase(
   if (traffic_lights_.count(lanelet_id) == 0) {
     throw SimulationRuntimeError("lanelet id does not match");
   }
-  traffic_lights_[lanelet_id]->setArrowPhase(phase, time_offset);
+  traffic_lights_.at(lanelet_id)->setArrowPhase(phase, time_offset);
 }
 
 void TrafficLightManager::setColor(std::int64_t lanelet_id, TrafficLightColor color)
@@ -51,7 +51,7 @@ void TrafficLightManager::setColor(std::int64_t lanelet_id, TrafficLightColor co
   if (traffic_lights_.count(lanelet_id) == 0) {
     throw SimulationRuntimeError("lanelet id does not match");
   }
-  traffic_lights_[lanelet_id]->setColor(color);
+  traffic_lights_.at(lanelet_id)->setColor(color);
 }
 
 void TrafficLightManager::setArrow(std::int64_t lanelet_id, TrafficLightArrow arrow)
@@ -59,6 +59,29 @@ void TrafficLightManager::setArrow(std::int64_t lanelet_id, TrafficLightArrow ar
   if (traffic_lights_.count(lanelet_id) == 0) {
     throw SimulationRuntimeError("lanelet id does not match");
   }
-  traffic_lights_[lanelet_id]->setArrow(arrow);
+  traffic_lights_.at(lanelet_id)->setArrow(arrow);
+}
+
+void TrafficLightManager::update(double step_time)
+{
+  for (const auto light : traffic_lights_) {
+    light.second->update(step_time);
+  }
+}
+
+TrafficLightArrow TrafficLightManager::getArrow(std::int64_t lanelet_id) const
+{
+  if (traffic_lights_.count(lanelet_id) == 0) {
+    throw SimulationRuntimeError("lanelet id does not match");
+  }
+  return traffic_lights_.at(lanelet_id)->getArrow();
+}
+
+TrafficLightColor TrafficLightManager::getColor(std::int64_t lanelet_id) const
+{
+  if (traffic_lights_.count(lanelet_id) == 0) {
+    throw SimulationRuntimeError("lanelet id does not match");
+  }
+  return traffic_lights_.at(lanelet_id)->getColor();
 }
 }  // namespace simulation_api
