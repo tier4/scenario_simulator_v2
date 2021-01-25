@@ -22,11 +22,7 @@ TrafficLight::TrafficLight(std::int64_t id, bool contain_arrow)
 : id(id), contain_arrow(contain_arrow)
 {
   color_sequence_.emplace_back(
-    std::make_pair(10, TrafficLightColor::RED) );
-  color_sequence_.emplace_back(
-    std::make_pair(10, TrafficLightColor::GREEN) );
-  color_sequence_.emplace_back(
-    std::make_pair(10, TrafficLightColor::YELLOW) );
+    std::make_pair(std::numeric_limits<double>::infinity(), TrafficLightColor::NONE) );
   arrow_sequence_ = {};
   elapsed_time_in_color_sequence_ = 0;
 }

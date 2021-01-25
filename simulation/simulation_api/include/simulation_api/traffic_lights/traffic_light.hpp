@@ -22,6 +22,7 @@ namespace simulation_api
 
 enum class TrafficLightColor
 {
+  NONE,
   RED,
   GREEN,
   YELLOW
