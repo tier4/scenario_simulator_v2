@@ -16,6 +16,8 @@
 #include <simulation_api/entity/exception.hpp>
 
 #include <memory>
+#include <vector>
+#include <utility>
 
 namespace simulation_api
 {
@@ -23,7 +25,7 @@ TrafficLightManager::TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils
 {
   traffic_lights_ = {};
   const auto ids = hdmap_utils_ptr->getTrafficLightIds();
-  for(const auto id : ids) {
+  for (const auto id : ids) {
     std::shared_ptr<TrafficLight> light_ptr = std::make_shared<TrafficLight>(id);
     traffic_lights_.insert({id, light_ptr});
   }

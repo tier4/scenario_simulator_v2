@@ -539,9 +539,9 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   for (const auto light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
       std::cout << "scannig " << light_string.id() << std::endl;
-      if(light_string.hasAttribute("traffic_light_id")) {
+      if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
-        if(id) {
+        if (id) {
           ret.emplace_back(id.get());
         }
       }
