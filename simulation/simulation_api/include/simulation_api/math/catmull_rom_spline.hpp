@@ -59,7 +59,7 @@ public:
     double threadhold_distance = 3.0,
     unsigned int initial_resolution = 30,
     unsigned int max_iteration = 30,
-    double torelance = 0.001);
+    double tolerance = 0.001);
   double getSquaredDistanceIn2D(
     geometry_msgs::msg::Point point, double s) const;
   boost::optional<double> getCollisionPointIn2D(

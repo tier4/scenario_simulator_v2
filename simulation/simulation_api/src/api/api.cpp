@@ -400,6 +400,7 @@ geometry_msgs::msg::Pose API::getRelativePose(
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 bool API::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance)
 {
   if (!entity_manager_ptr_->entityStatusSetted(name)) {
@@ -418,6 +419,17 @@ bool API::reachPosition(
   return entity_manager_ptr_->reachPosition(
     name,
     target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
+}
+
+bool API::reachPosition(std::string name, std::string target_name, double tolerance) const
+{
+  if (!entity_manager_ptr_->entityStatusSetted(name)) {
+    return false;
+  }
+  if (!entity_manager_ptr_->entityStatusSetted(target_name)) {
+    return false;
+  }
+  return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
 }
 
 boost::optional<double> API::getStandStillDuration(std::string name) const

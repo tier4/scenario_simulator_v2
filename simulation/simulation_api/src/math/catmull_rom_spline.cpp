@@ -364,7 +364,7 @@ boost::optional<double> CatmullRomSpline::getSValue(
   double threadhold_distance,
   unsigned int initial_num_points,
   unsigned int max_iteration,
-  double torelance)
+  double tolerance)
 {
   std::vector<double> s_values;
   std::vector<double> error_values;
@@ -372,7 +372,7 @@ boost::optional<double> CatmullRomSpline::getSValue(
   for (size_t i = 0; i < curves_.size(); i++) {
     auto s_value = curves_[i].getSValue(
       position, threadhold_distance, initial_num_points,
-      max_iteration, torelance, true);
+      max_iteration, tolerance, true);
     if (s_value) {
       if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
         s_values.emplace_back(s_value.get());

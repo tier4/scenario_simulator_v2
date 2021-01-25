@@ -194,7 +194,7 @@ boost::optional<double> HermiteCurve::getSValue(
   double threadhold_distance,
   unsigned int initial_resolution,
   unsigned int max_iteration,
-  double torelance,
+  double tolerance,
   bool autoscale) const
 {
   double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
@@ -213,7 +213,7 @@ boost::optional<double> HermiteCurve::getSValue(
   std::vector<double> s_values;
   for (unsigned i = 0; i < max_iteration; i++) {
     double error = getSquaredDistanceIn2D(point, ret);
-    if (std::fabs(error) < (torelance * torelance)) {
+    if (std::fabs(error) < (tolerance * tolerance)) {
       return ret;
     }
     s_values.push_back(ret);
