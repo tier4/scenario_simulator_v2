@@ -83,10 +83,15 @@ public:
   virtual const openscenario_msgs::msg::BoundingBox getBoundingBox() const = 0;
   virtual const std::string getCurrentAction() const = 0;
   void stopAtEndOfRoad();
+  boost::optional<double> getLinearJerk() const
+  {
+    return linear_jerk_;
+  }
 
 protected:
   bool visibility_;
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;
+  boost::optional<double> linear_jerk_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   bool verbose_;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_status_;

@@ -96,6 +96,9 @@ public:
 private:
   void update()
   {
+    if (api_.getLinearJerk("ego")) {
+      std::cout << "ego linear jerk : " << api_.getLinearJerk("ego").get() << std::endl;
+    }
     if (api_.reachPosition(
         "ego",
         simulation_api::helper::constractLaneletPose(34615, 10.0), 5))

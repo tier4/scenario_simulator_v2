@@ -100,6 +100,7 @@ public:
   {
     metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
   }
+  boost::optional<double> getLinearJerk(std::string name);
   void setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model);
   void setVerbose(bool verbose);
   bool spawn(
