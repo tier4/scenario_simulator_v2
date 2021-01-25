@@ -42,21 +42,21 @@ public:
   explicit TrafficLight(std::int64_t id, bool contain_arrow = false);
   explicit TrafficLight(
     std::int64_t id, std::vector<std::pair<double,
-    TrafficLightColor>> color_sequence, bool contain_arrow = false);
+    TrafficLightColor>> color_phase, bool contain_arrow = false);
   explicit TrafficLight(
     std::int64_t id,
-    std::vector<std::pair<double, TrafficLightColor>> color_sequence,
-    std::vector<std::pair<double, TrafficLightArrow>> arrow_sequence);
-  void setColorSequence(
-    std::vector<std::pair<double, TrafficLightColor>> color_sequence,
+    std::vector<std::pair<double, TrafficLightColor>> color_phase,
+    std::vector<std::pair<double, TrafficLightArrow>> arrow_phase);
+  void setColorPhase(
+    std::vector<std::pair<double, TrafficLightColor>> color_phase,
     double time_offset = 0);
-  void setArrowSequence(
-    std::vector<std::pair<double, TrafficLightArrow>> arrow_sequence,
+  void setArrowPhase(
+    std::vector<std::pair<double, TrafficLightArrow>> arrow_phase,
     double time_offset = 0);
   void setColor(TrafficLightColor color);
   void setArrow(TrafficLightArrow arrow);
-  double getColorSequenceLength() const;
-  double getArrowSequenceLength() const;
+  double getColorPhaseLength() const;
+  double getArrowPhaseLength() const;
   void update(double step_time);
   const std::int64_t id;
   const bool contain_arrow;
@@ -64,10 +64,10 @@ public:
   TrafficLightColor getColor() const;
 
 private:
-  std::vector<std::pair<double, TrafficLightColor>> color_sequence_;
-  std::vector<std::pair<double, TrafficLightArrow>> arrow_sequence_;
-  double elapsed_time_in_color_sequence_;
-  double elapsed_time_in_arrow_sequence_;
+  std::vector<std::pair<double, TrafficLightColor>> color_phase_;
+  std::vector<std::pair<double, TrafficLightArrow>> arrow_phase_;
+  double elapsed_time_in_color_phase_;
+  double elapsed_time_in_arrow_phase_;
 };
 }  // namespace simulation_api
 

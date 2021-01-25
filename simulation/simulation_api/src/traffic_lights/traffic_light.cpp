@@ -21,57 +21,57 @@ namespace simulation_api
 TrafficLight::TrafficLight(std::int64_t id, bool contain_arrow)
 : id(id), contain_arrow(contain_arrow)
 {
-  color_sequence_.emplace_back(
+  color_phase_.emplace_back(
     std::make_pair(std::numeric_limits<double>::infinity(), TrafficLightColor::NONE) );
-  arrow_sequence_ = {};
-  elapsed_time_in_color_sequence_ = 0;
+  arrow_phase_ = {};
+  elapsed_time_in_color_phase_ = 0;
 }
 
 TrafficLight::TrafficLight(
   std::int64_t id, std::vector<std::pair<double,
-  TrafficLightColor>> color_sequence, bool contain_arrow)
+  TrafficLightColor>> color_phase, bool contain_arrow)
 : id(id), contain_arrow(contain_arrow)
 {
-  color_sequence_ = color_sequence;
-  arrow_sequence_ = {};
-  elapsed_time_in_color_sequence_ = 0;
+  color_phase_ = color_phase;
+  arrow_phase_ = {};
+  elapsed_time_in_color_phase_ = 0;
 }
 
 TrafficLight::TrafficLight(
   std::int64_t id,
-  std::vector<std::pair<double, TrafficLightColor>> color_sequence,
-  std::vector<std::pair<double, TrafficLightArrow>> arrow_sequence)
+  std::vector<std::pair<double, TrafficLightColor>> color_phase,
+  std::vector<std::pair<double, TrafficLightArrow>> arrow_phase)
 : id(id), contain_arrow(true)
 {
-  color_sequence_ = color_sequence;
-  arrow_sequence_ = arrow_sequence;
-  elapsed_time_in_color_sequence_ = 0;
+  color_phase_ = color_phase;
+  arrow_phase_ = arrow_phase;
+  elapsed_time_in_color_phase_ = 0;
 }
 
-void TrafficLight::setColorSequence(
+void TrafficLight::setColorPhase(
   std::vector<std::pair<double,
-  TrafficLightColor>> color_sequence, double time_offset)
+  TrafficLightColor>> color_phase, double time_offset)
 {
-  color_sequence_ = color_sequence;
-  elapsed_time_in_color_sequence_ = time_offset;
+  color_phase_ = color_phase;
+  elapsed_time_in_color_phase_ = time_offset;
 }
 
-void TrafficLight::setArrowSequence(
+void TrafficLight::setArrowPhase(
   std::vector<std::pair<double,
-  TrafficLightArrow>> arrow_sequence, double time_offset)
+  TrafficLightArrow>> arrow_phase, double time_offset)
 {
   if (!contain_arrow) {
     throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
   }
-  arrow_sequence_ = arrow_sequence;
-  elapsed_time_in_arrow_sequence_ = time_offset;
+  arrow_phase_ = arrow_phase;
+  elapsed_time_in_arrow_phase_ = time_offset;
 }
 
 void TrafficLight::setColor(TrafficLightColor color)
 {
-  color_sequence_ = {};
-  color_sequence_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), color) );
-  elapsed_time_in_color_sequence_ = 0;
+  color_phase_ = {};
+  color_phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), color) );
+  elapsed_time_in_color_phase_ = 0;
 }
 
 void TrafficLight::setArrow(TrafficLightArrow arrow)
@@ -79,27 +79,27 @@ void TrafficLight::setArrow(TrafficLightArrow arrow)
   if (!contain_arrow) {
     throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
   }
-  arrow_sequence_ = {};
-  arrow_sequence_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), arrow) );
-  elapsed_time_in_arrow_sequence_ = 0;
+  arrow_phase_ = {};
+  arrow_phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), arrow) );
+  elapsed_time_in_arrow_phase_ = 0;
 }
 
-double TrafficLight::getColorSequenceLength() const
+double TrafficLight::getColorPhaseLength() const
 {
   double ret = 0;
-  for (const auto seq : color_sequence_) {
+  for (const auto seq : color_phase_) {
     ret = ret + seq.first;
   }
   return ret;
 }
 
-double TrafficLight::getArrowSequenceLength() const
+double TrafficLight::getArrowPhaseLength() const
 {
   if (!contain_arrow) {
     throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
   }
   double ret = 0;
-  for (const auto seq : arrow_sequence_) {
+  for (const auto seq : arrow_phase_) {
     ret = ret + seq.first;
   }
   return ret;
@@ -111,38 +111,38 @@ TrafficLightArrow TrafficLight::getArrow() const
     throw SimulationRuntimeError("traffic light " + std::to_string(id) + " does not contain arrow");
   }
   double t = 0;
-  for (const auto seq : arrow_sequence_) {
+  for (const auto seq : arrow_phase_) {
     t = t + seq.first;
-    if (t > elapsed_time_in_arrow_sequence_) {
+    if (t > elapsed_time_in_arrow_phase_) {
       return seq.second;
     }
   }
-  throw SimulationRuntimeError("failed to get arrow in sequence");
+  throw SimulationRuntimeError("failed to get arrow in phase");
 }
 
 TrafficLightColor TrafficLight::getColor() const
 {
   double t = 0;
-  for (const auto seq : color_sequence_) {
+  for (const auto seq : color_phase_) {
     t = t + seq.first;
-    if (t > elapsed_time_in_color_sequence_) {
+    if (t > elapsed_time_in_color_phase_) {
       return seq.second;
     }
   }
-  throw SimulationRuntimeError("failed to get color in sequence");
+  throw SimulationRuntimeError("failed to get color in phase");
 }
 
 void TrafficLight::update(double step_time)
 {
   if (contain_arrow) {
-    elapsed_time_in_arrow_sequence_ = elapsed_time_in_arrow_sequence_ + step_time;
-    if (elapsed_time_in_color_sequence_ > getArrowSequenceLength()) {
-      elapsed_time_in_color_sequence_ = elapsed_time_in_color_sequence_ - getArrowSequenceLength();
+    elapsed_time_in_arrow_phase_ = elapsed_time_in_arrow_phase_ + step_time;
+    if (elapsed_time_in_color_phase_ > getArrowPhaseLength()) {
+      elapsed_time_in_color_phase_ = elapsed_time_in_color_phase_ - getArrowPhaseLength();
     }
   }
-  elapsed_time_in_color_sequence_ = elapsed_time_in_color_sequence_ + step_time;
-  if (elapsed_time_in_color_sequence_ > getArrowSequenceLength()) {
-    elapsed_time_in_color_sequence_ = elapsed_time_in_color_sequence_ - getArrowSequenceLength();
+  elapsed_time_in_color_phase_ = elapsed_time_in_color_phase_ + step_time;
+  if (elapsed_time_in_color_phase_ > getArrowPhaseLength()) {
+    elapsed_time_in_color_phase_ = elapsed_time_in_color_phase_ - getArrowPhaseLength();
   }
 }
 }

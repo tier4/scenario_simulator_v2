@@ -11,3 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_api/traffic_lights/traffic_light.hpp>
+
+#include <memory>
+#include <unordered_map>
+
+namespace simulation_api
+{
+class TrafficLightManager
+{
+public:
+  TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+private:
+  std::unordered_map<std::int64_t, TrafficLight> traffic_lights_;
+};
+}  // namespace simulation_api
