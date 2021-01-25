@@ -535,10 +535,20 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
   std::vector<std::int64_t> ret;
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto traffic_lights = lanelet::utils::query::trafficLights(all_lanelets);
-  for (const auto light : traffic_lights) {
-    ret.emplace_back(light.get()->id());
+  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
+  for (const auto light : autoware_traffic_lights) {
+    for (auto light_string : light->lightBulbs()) {
+      std::cout << "scannig " << light_string.id() << std::endl;
+      if(light_string.hasAttribute("traffic_light_id")) {
+        auto id = light_string.attribute("traffic_light_id").asId();
+        if(id) {
+          ret.emplace_back(id.get());
+          std::cout << "traffic light id " << id.get() << std::endl;
+        }
+      }
+    }
   }
+  std::cout << "number of traffic lights " << ret.size() << std::endl; 
   return ret;
 }
 
@@ -767,8 +777,6 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
   lanelet::ConstLanelets walkway_lanelets = lanelet::utils::query::walkwayLanelets(all_lanelets);
   std::vector<lanelet::ConstLineString3d> stop_lines =
     lanelet::utils::query::stopLinesLanelets(road_lanelets);
-  std::vector<lanelet::TrafficLightConstPtr> tl_reg_elems =
-    lanelet::utils::query::trafficLights(all_lanelets);
   std::vector<lanelet::AutowareTrafficLightConstPtr> aw_tl_reg_elems =
     lanelet::utils::query::autowareTrafficLights(all_lanelets);
   std::vector<lanelet::DetectionAreaConstPtr> da_reg_elems =
