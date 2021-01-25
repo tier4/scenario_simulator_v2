@@ -17,6 +17,8 @@
 
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
+#include <simulation_api/entity/exception.hpp>
+
 namespace simulation_api
 {
 
@@ -26,6 +28,55 @@ enum class TrafficLightColor
   RED,
   GREEN,
   YELLOW
+};
+
+template<typename T>
+class Phase
+{
+public:
+  Phase(const std::vector<std::pair<double, T>> & phase)
+  : phase_(phase) {}
+  double getPhaseLength() const
+  {
+    double l = 0;
+    for (const auto p : phase_) {
+      l = l + p.first;
+    }
+    return l;
+  }
+  T getState()
+  {
+    double t = 0;
+    for (const auto p : phase_) {
+      t = t + p.first;
+      if (t > elapsed_time_) {
+        return p.second;
+      }
+    }
+    throw SimulationRuntimeError("failed to get color in phase");
+  }
+  void update(double step_time)
+  {
+    elapsed_time_ = elapsed_time_ + step_time;
+    if (elapsed_time_ > getPhaseLength()) {
+      elapsed_time_ = elapsed_time_ - getPhaseLength();
+    }
+  }
+  void setState(const T & state)
+  {
+    phase_ = {};
+    phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), state) );
+    elapsed_time_ = 0;
+  }
+  void setPhase(const std::vector<std::pair<double, T>> & phase, double time_offset = 0)
+  {
+    phase_ = phase;
+    elapsed_time_ = time_offset;
+  }
+
+private:
+  std::vector<std::pair<double, T>> phase_;
+  double elapsed_time_;
 };
 
 enum class TrafficLightArrow

@@ -14,8 +14,6 @@
 
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 
-#include <simulation_api/entity/exception.hpp>
-
 namespace simulation_api
 {
 TrafficLight::TrafficLight(std::int64_t id, bool contain_arrow)

@@ -24,6 +24,8 @@ class TrafficLightManager
 {
 public:
   TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+  void setColorPhase(std::int64_t lanelet_id);
+
 private:
   std::unordered_map<std::int64_t, TrafficLight> traffic_lights_;
 };
