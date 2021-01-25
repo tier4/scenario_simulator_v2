@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
+#define SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
+
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 
@@ -23,10 +26,12 @@ namespace simulation_api
 class TrafficLightManager
 {
 public:
-  TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+  explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
   void setColorPhase(std::int64_t lanelet_id);
 
 private:
   std::unordered_map<std::int64_t, TrafficLight> traffic_lights_;
 };
 }  // namespace simulation_api
+
+#endif  // SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_

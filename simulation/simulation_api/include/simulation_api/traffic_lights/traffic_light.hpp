@@ -19,9 +19,12 @@
 
 #include <simulation_api/entity/exception.hpp>
 
+#include <vector>
+#include <limits>
+#include <utility>
+
 namespace simulation_api
 {
-
 enum class TrafficLightColor
 {
   NONE,
@@ -34,7 +37,7 @@ template<typename T>
 class Phase
 {
 public:
-  Phase(const std::vector<std::pair<double, T>> & phase)
+  explicit Phase(const std::vector<std::pair<double, T>> & phase)
   : phase_(phase) {}
   double getPhaseLength() const
   {

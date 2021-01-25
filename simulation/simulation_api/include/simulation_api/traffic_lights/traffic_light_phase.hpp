@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_api/traffic_lights/traffic_light_manager.hpp>
+#ifndef SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PHASE_HPP_
+#define SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PHASE_HPP_
 
-#include <memory>
-
-namespace simulation_api
-{
-TrafficLightManager::TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr)
-{}
-}  // namespace simulation_api
+#endif  // SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PHASE_HPP_

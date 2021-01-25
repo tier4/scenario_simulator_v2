@@ -14,6 +14,10 @@
 
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 
+#include <vector>
+#include <limits>
+#include <utility>
+
 namespace simulation_api
 {
 TrafficLight::TrafficLight(std::int64_t id, bool contain_arrow)
@@ -143,4 +147,4 @@ void TrafficLight::update(double step_time)
     elapsed_time_in_color_phase_ = elapsed_time_in_color_phase_ - getArrowPhaseLength();
   }
 }
-}
+}  // namespace simulation_api
