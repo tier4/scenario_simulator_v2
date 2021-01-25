@@ -543,12 +543,10 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
         auto id = light_string.attribute("traffic_light_id").asId();
         if(id) {
           ret.emplace_back(id.get());
-          std::cout << "traffic light id " << id.get() << std::endl;
         }
       }
     }
   }
-  std::cout << "number of traffic lights " << ret.size() << std::endl; 
   return ret;
 }
 
