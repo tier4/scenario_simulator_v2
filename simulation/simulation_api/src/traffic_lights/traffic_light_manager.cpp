@@ -13,11 +13,52 @@
 // limitations under the License.
 
 #include <simulation_api/traffic_lights/traffic_light_manager.hpp>
+#include <simulation_api/entity/exception.hpp>
 
 #include <memory>
 
 namespace simulation_api
 {
 TrafficLightManager::TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr)
-{}
+{
+  traffic_lights_ = {};
+}
+
+void TrafficLightManager::setColorPhase(
+  std::int64_t lanelet_id,
+  const std::vector<std::pair<double, TrafficLightColor>> & phase,
+  double time_offset)
+{
+  if (traffic_lights_.count(lanelet_id) == 0) {
+    throw SimulationRuntimeError("lanelet id does not match");
+  }
+  traffic_lights_[lanelet_id]->setColorPhase(phase, time_offset);
+}
+
+void TrafficLightManager::setArrowPhase(
+  std::int64_t lanelet_id,
+  const std::vector<std::pair<double, TrafficLightArrow>> & phase,
+  double time_offset)
+{
+  if (traffic_lights_.count(lanelet_id) == 0) {
+    throw SimulationRuntimeError("lanelet id does not match");
+  }
+  traffic_lights_[lanelet_id]->setArrowPhase(phase, time_offset);
+}
+
+void TrafficLightManager::setColor(std::int64_t lanelet_id, TrafficLightColor color)
+{
+  if (traffic_lights_.count(lanelet_id) == 0) {
+    throw SimulationRuntimeError("lanelet id does not match");
+  }
+  traffic_lights_[lanelet_id]->setColor(color);
+}
+
+void TrafficLightManager::setArrow(std::int64_t lanelet_id, TrafficLightArrow arrow)
+{
+  if (traffic_lights_.count(lanelet_id) == 0) {
+    throw SimulationRuntimeError("lanelet id does not match");
+  }
+  traffic_lights_[lanelet_id]->setArrow(arrow);
+}
 }  // namespace simulation_api

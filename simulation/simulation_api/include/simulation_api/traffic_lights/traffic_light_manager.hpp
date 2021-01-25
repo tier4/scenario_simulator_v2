@@ -27,10 +27,19 @@ class TrafficLightManager
 {
 public:
   explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
-  void setColorPhase(std::int64_t lanelet_id);
+  void setColorPhase(
+    std::int64_t lanelet_id,
+    const std::vector<std::pair<double, TrafficLightColor>> & phase,
+    double time_offset = 0);
+  void setArrowPhase(
+    std::int64_t lanelet_id,
+    const std::vector<std::pair<double, TrafficLightArrow>> & phase,
+    double time_offset = 0);
+  void setColor(std::int64_t lanelet_id, TrafficLightColor color);
+  void setArrow(std::int64_t lanelet_id, TrafficLightArrow arrow);
 
 private:
-  std::unordered_map<std::int64_t, TrafficLight> traffic_lights_;
+  std::unordered_map<std::int64_t, std::shared_ptr<TrafficLight>> traffic_lights_;
 };
 }  // namespace simulation_api
 
