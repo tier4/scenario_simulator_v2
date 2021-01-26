@@ -71,8 +71,6 @@ ament_auto_add_executable(catmull_rom_visualization src/moc/catmull_rom_visualiz
 
 target_link_libraries(catmull_rom_visualization simulation_api)
 
-ament_auto_add_executable(moc_termcolor src/moc/moc_termcolor.cpp)
-
 install(
   DIRECTORY config launch resource test/catalog test/map
   DESTINATION share/${PROJECT_NAME})

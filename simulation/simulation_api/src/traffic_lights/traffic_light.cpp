@@ -82,21 +82,25 @@ void TrafficLight::update(double step_time)
 void TrafficLight::printState() const
 {
   std::cout << "traffic light id : " << id << std::endl;
+  std::stringstream ss;
   const auto color = getColor();
   switch (color) {
     case TrafficLightColor::RED:
-      std::cout << termcolor::red << "color : RED" << std::endl;
+      ss << termcolor::red << "color : RED" << std::endl;
       break;
     case TrafficLightColor::GREEN:
-      std::cout << termcolor::green << "color : GREEN" << std::endl;
+      ss << termcolor::green << "color : GREEN" << std::endl;
       break;
     case TrafficLightColor::YELLOW:
-      std::cout << termcolor::yellow << "color : YELLOW" << std::endl;
+      ss << termcolor::yellow << "color : YELLOW" << std::endl;
       break;
     case TrafficLightColor::NONE:
-      std::cout << "color : NONE" << std::endl;
+      ss << "color : NONE" << std::endl;
       break;
   }
-  std::cout << termcolor::reset;
+  printf(ss.str().c_str());
+  ss << termcolor::reset;
+  std::cout << ss.str().c_str();
+  printf("\x1b[31mSUCCESS\x1b[0m");
 }
 }  // namespace simulation_api
