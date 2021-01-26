@@ -531,14 +531,21 @@ std::vector<std::int64_t> HdMapUtils::getNextLaneletIds(
   return ret;
 }
 
-double HdMapUtils::getTrajectoryLength(std::vector<geometry_msgs::msg::Point> trajectory)
+const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
 {
-  double ret = 0.0;
-  for (size_t i = 0; i < trajectory.size() - 1; i++) {
-    ret = ret + std::sqrt(
-      std::pow(trajectory[i + 1].x - trajectory[i].x, 2) +
-      std::pow(trajectory[i + 1].y - trajectory[i].y, 2) +
-      std::pow(trajectory[i + 1].z - trajectory[i].z, 2));
+  std::vector<std::int64_t> ret;
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
+  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
+  for (const auto light : autoware_traffic_lights) {
+    for (auto light_string : light->lightBulbs()) {
+      std::cout << "scannig " << light_string.id() << std::endl;
+      if (light_string.hasAttribute("traffic_light_id")) {
+        auto id = light_string.attribute("traffic_light_id").asId();
+        if (id) {
+          ret.emplace_back(id.get());
+        }
+      }
+    }
   }
   return ret;
 }
@@ -768,8 +775,6 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
   lanelet::ConstLanelets walkway_lanelets = lanelet::utils::query::walkwayLanelets(all_lanelets);
   std::vector<lanelet::ConstLineString3d> stop_lines =
     lanelet::utils::query::stopLinesLanelets(road_lanelets);
-  std::vector<lanelet::TrafficLightConstPtr> tl_reg_elems =
-    lanelet::utils::query::trafficLights(all_lanelets);
   std::vector<lanelet::AutowareTrafficLightConstPtr> aw_tl_reg_elems =
     lanelet::utils::query::autowareTrafficLights(all_lanelets);
   std::vector<lanelet::DetectionAreaConstPtr> da_reg_elems =
