@@ -20,12 +20,12 @@
 #include <quaternion_operation/quaternion_operation.h>
 #include <lanelet2_core/utility/Units.h>
 
-#include <lanelet2_extension/io/autoware_osm_parser.hpp>
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
-#include <lanelet2_extension/utility/message_conversion.hpp>
-#include <lanelet2_extension/utility/utilities.hpp>
-#include <lanelet2_extension/utility/query.hpp>
-#include <lanelet2_extension/visualization/visualization.hpp>
+#include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
+#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
+#include <lanelet2_extension_psim/utility/utilities.hpp>
+#include <lanelet2_extension_psim/utility/query.hpp>
+#include <lanelet2_extension_psim/visualization/visualization.hpp>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
 #include <lanelet2_projection/UTM.h>

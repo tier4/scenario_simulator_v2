@@ -17,8 +17,8 @@
 #ifndef LANELET2_EXTENSION__UTILITY__QUERY_HPP_
 #define LANELET2_EXTENSION__UTILITY__QUERY_HPP_
 
-#include <lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp>
-#include <lanelet2_extension/regulatory_elements/detection_area.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/detection_area.hpp>
 
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/primitives/Lanelet.h>

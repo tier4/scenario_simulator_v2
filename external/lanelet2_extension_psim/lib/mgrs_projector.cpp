@@ -14,7 +14,7 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 #include <set>

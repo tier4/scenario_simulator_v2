@@ -15,7 +15,7 @@
 // Authors: Ryohsuke Mitsudome
 
 #include <boost/variant.hpp>
-#include <lanelet2_extension/regulatory_elements/autoware_traffic_light.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
 
 #include <lanelet2_core/primitives/RegulatoryElement.h>
 

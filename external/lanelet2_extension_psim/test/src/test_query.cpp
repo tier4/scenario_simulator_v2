@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <lanelet2_extension/utility/query.hpp>
+#include <lanelet2_extension_psim/utility/query.hpp>
 #include <math.h>
 
 using lanelet::Lanelet;

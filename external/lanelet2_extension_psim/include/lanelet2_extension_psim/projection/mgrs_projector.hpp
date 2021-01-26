@@ -17,7 +17,7 @@
 #ifndef LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_
 #define LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_
 
-#include <lanelet2_extension/exception.hpp>
+#include <lanelet2_extension_psim/exception.hpp>
 #include <lanelet2_io/Exceptions.h>
 #include <lanelet2_io/Projection.h>
 #include <GeographicLib/MGRS.hpp>

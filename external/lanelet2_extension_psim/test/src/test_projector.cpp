@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 #include <math.h>
 
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
 
 class TestSuite : public ::testing::Test
 {

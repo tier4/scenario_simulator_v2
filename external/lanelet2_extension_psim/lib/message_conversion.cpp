@@ -14,9 +14,9 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
-#include <lanelet2_extension/exception.hpp>
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
-#include <lanelet2_extension/utility/message_conversion.hpp>
+#include <lanelet2_extension_psim/exception.hpp>
+#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
 
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_io/Exceptions.h>

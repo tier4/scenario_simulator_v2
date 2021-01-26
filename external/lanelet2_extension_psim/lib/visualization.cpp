@@ -14,11 +14,11 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
-#include <lanelet2_extension/exception.hpp>
-#include <lanelet2_extension/utility/message_conversion.hpp>
-#include <lanelet2_extension/utility/query.hpp>
-#include <lanelet2_extension/utility/utilities.hpp>
-#include <lanelet2_extension/visualization/visualization.hpp>
+#include <lanelet2_extension_psim/exception.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
+#include <lanelet2_extension_psim/utility/query.hpp>
+#include <lanelet2_extension_psim/utility/utilities.hpp>
+#include <lanelet2_extension_psim/visualization/visualization.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker.hpp>
@@ -378,7 +378,7 @@ void visualization::polygon2Triangle(
     }
     if (clipped_vertex < 0 || clipped_vertex >= N) {
       lanelet::HdMapException(
-        R"(Could not find valid vertex for ear clipping triangulation. 
+        R"(Could not find valid vertex for ear clipping triangulation.
         Triangulation result might be invalid)");
       clipped_vertex = 0;
     }

@@ -40,7 +40,7 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(lanelet2_extension_lib SHARED
+ament_auto_add_library(lanelet2_extension_psim_lib SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/autoware_osm_parser.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/autoware_traffic_light.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/detection_area.cpp
@@ -54,7 +54,7 @@ ament_auto_add_library(lanelet2_extension_lib SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/visualization.cpp
 )
 
-target_include_directories(lanelet2_extension_lib PRIVATE
+target_include_directories(lanelet2_extension_psim_lib PRIVATE
   ${GeographicLib_INCLUDE_DIRS}
   ${PUGIXML_INCLUDE_DIRS})
 
@@ -62,7 +62,7 @@ ament_auto_add_executable(sample_code
   src/sample_code.cpp
 )
 
-target_link_libraries(sample_code lanelet2_extension_lib)
+target_link_libraries(sample_code lanelet2_extension_psim_lib)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -83,7 +83,7 @@ if(BUILD_TESTING)
       geometry_msgs
       visualization_msgs
     )
-    target_link_libraries(test_message_conversion lanelet2_extension_lib)
+    target_link_libraries(test_message_conversion lanelet2_extension_psim_lib)
   endif()
 
   ament_add_gtest(test_projector test/src/test_projector.cpp)
@@ -101,7 +101,7 @@ if(BUILD_TESTING)
       geometry_msgs
       visualization_msgs
     )
-    target_link_libraries(test_projector lanelet2_extension_lib)
+    target_link_libraries(test_projector lanelet2_extension_psim_lib)
   endif()
 
   ament_add_gtest(test_query test/src/test_query.cpp)
@@ -119,7 +119,7 @@ if(BUILD_TESTING)
       geometry_msgs
       visualization_msgs
     )
-    target_link_libraries(test_query lanelet2_extension_lib)
+    target_link_libraries(test_query lanelet2_extension_psim_lib)
   endif()
 
   ament_add_gtest(test_regulatory_elements test/src/test_regulatory_elements.cpp)
@@ -137,7 +137,7 @@ if(BUILD_TESTING)
       geometry_msgs
       visualization_msgs
     )
-    target_link_libraries(test_regulatory_elements lanelet2_extension_lib)
+    target_link_libraries(test_regulatory_elements lanelet2_extension_psim_lib)
   endif()
 
   ament_add_gtest(test_utilities test/src/test_utilities.cpp)
@@ -155,7 +155,7 @@ if(BUILD_TESTING)
       geometry_msgs
       visualization_msgs
     )
-    target_link_libraries(test_utilities lanelet2_extension_lib)
+    target_link_libraries(test_utilities lanelet2_extension_psim_lib)
   endif()
 endif()
 

@@ -14,7 +14,7 @@
 
 // Authors: Ryohsuke Mitsudome
 
-#include <lanelet2_extension/io/autoware_osm_parser.hpp>
+#include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
 
 #include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_io/io_handlers/Factory.h>
