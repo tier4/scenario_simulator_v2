@@ -193,32 +193,32 @@ public:
   bool despawnEntity(std::string name);
   bool entityExists(std::string name);
   template<typename ... Ts>
-  void setColorPhase(Ts && ... xs)
+  void setrafficLightColorPhase(Ts && ... xs)
   {
     entity_manager_ptr_->setColorPhase(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setArrowPhase(Ts && ... xs)
+  void setrafficLightArrowPhase(Ts && ... xs)
   {
     entity_manager_ptr_->setArrowPhase(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setColor(Ts && ... xs)
+  void setTrafficLightColor(Ts && ... xs)
   {
     entity_manager_ptr_->setColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setArrow(Ts && ... xs)
+  void setrafficLightArrow(Ts && ... xs)
   {
     entity_manager_ptr_->setArrow(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  simulation_api::TrafficLightColor getColor(Ts && ... xs)
+  simulation_api::TrafficLightColor getTrafficLightColor(Ts && ... xs)
   {
     return entity_manager_ptr_->getColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  simulation_api::TrafficLightArrow getArrow(Ts && ... xs)
+  simulation_api::TrafficLightArrow getTrafficLightArrow(Ts && ... xs)
   {
     return entity_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
   }
