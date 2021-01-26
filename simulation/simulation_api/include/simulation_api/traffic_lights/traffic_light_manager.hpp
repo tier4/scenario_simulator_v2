@@ -40,8 +40,8 @@ public:
   void setColor(std::int64_t lanelet_id, TrafficLightColor color);
   void setArrow(std::int64_t lanelet_id, TrafficLightArrow arrow);
   void update(double step_time);
-  TrafficLightArrow getArrow(std::int64_t lanelet_id) const;
   TrafficLightColor getColor(std::int64_t lanelet_id) const;
+  TrafficLightArrow getArrow(std::int64_t lanelet_id) const;
 
 private:
   std::unordered_map<std::int64_t, std::shared_ptr<TrafficLight>> traffic_lights_;
