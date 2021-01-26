@@ -14,6 +14,8 @@
 
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 
+#include <termcolor/termcolor.hpp>
+
 #include <vector>
 #include <limits>
 #include <utility>
@@ -83,17 +85,18 @@ void TrafficLight::printState() const
   const auto color = getColor();
   switch (color) {
     case TrafficLightColor::RED:
-      std::cout << "color : RED" << std::endl;
+      std::cout << termcolor::red << "color : RED" << std::endl;
       break;
     case TrafficLightColor::GREEN:
-      std::cout << "color : GREEN" << std::endl;
+      std::cout << termcolor::green << "color : GREEN" << std::endl;
       break;
     case TrafficLightColor::YELLOW:
-      std::cout << "color : YELLOW" << std::endl;
+      std::cout << termcolor::yellow << "color : YELLOW" << std::endl;
       break;
     case TrafficLightColor::NONE:
       std::cout << "color : NONE" << std::endl;
       break;
   }
+  std::cout << termcolor::reset;
 }
 }  // namespace simulation_api
