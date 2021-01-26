@@ -13,8 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/traffic_lights/traffic_light.hpp>
-
-#include <termcolor/termcolor.hpp>
+#include <simulation_api/color_utils/color_utils.hpp>
 
 #include <vector>
 #include <limits>
@@ -84,6 +83,7 @@ void TrafficLight::printState() const
   std::cout << "traffic light id : " << id << std::endl;
   std::stringstream ss;
   const auto color = getColor();
+  /*
   switch (color) {
     case TrafficLightColor::RED:
       ss << termcolor::red << "color : RED" << std::endl;
@@ -95,12 +95,10 @@ void TrafficLight::printState() const
       ss << termcolor::yellow << "color : YELLOW" << std::endl;
       break;
     case TrafficLightColor::NONE:
-      ss << "color : NONE" << std::endl;
+      color_utils::printRed("color : NONE");
       break;
   }
-  printf(ss.str().c_str());
-  ss << termcolor::reset;
-  std::cout << ss.str().c_str();
-  printf("\x1b[31mSUCCESS\x1b[0m");
+  */
+  color_utils::printRed("color : NONE");
 }
 }  // namespace simulation_api
