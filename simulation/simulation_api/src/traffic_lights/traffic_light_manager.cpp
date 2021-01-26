@@ -59,6 +59,6 @@ void TrafficLightManager::printState(std::int64_t lanelet_id)
   if (traffic_lights_.count(lanelet_id) == 0) {
     throw SimulationRuntimeError("lanelet id does not match");
   }
-  std::cout << traffic_lights_.at(lanelet_id).get() << std::endl;
+  traffic_lights_.at(lanelet_id)->printState();
 }
 }  // namespace simulation_api

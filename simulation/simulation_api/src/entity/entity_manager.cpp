@@ -604,6 +604,11 @@ std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
   return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
 }
 
+void EntityManager::printTrafficLightState(std::int64_t lanelet_id)
+{
+  traffic_light_manager_ptr_->printState(lanelet_id);
+}
+
 double EntityManager::getStepTime() const
 {
   return step_time_;

@@ -222,6 +222,7 @@ public:
   {
     return entity_manager_ptr_->getTrafficLightArrow(std::forward<Ts>(xs)...);
   }
+  void printTrafficLightState(std::int64_t lanelet_id);
 
 private:
   bool spawn(

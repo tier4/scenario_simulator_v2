@@ -61,14 +61,13 @@ public:
   void update(double step_time);
   TrafficLightArrow getArrow() const;
   TrafficLightColor getColor() const;
+  void printState() const;
   const std::int64_t id;
 
 private:
   TrafficLightPhase<TrafficLightColor> color_phase_;
   TrafficLightPhase<TrafficLightArrow> arrow_phase_;
 };
-
-std::ostream & operator<<(std::ostream & os, const TrafficLight & light);
 }  // namespace simulation_api
 
 #endif  // SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
