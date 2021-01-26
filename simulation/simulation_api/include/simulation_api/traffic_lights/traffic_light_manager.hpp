@@ -27,21 +27,41 @@ namespace simulation_api
 {
 class TrafficLightManager
 {
-  using duration = double;
-
 public:
   explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
-  void setColorPhase(
-    std::int64_t lanelet_id,
-    const std::vector<std::pair<duration, TrafficLightColor>> & phase,
-    double time_offset = 0);
-  void setArrowPhase(
-    std::int64_t lanelet_id,
-    const std::vector<std::pair<duration, TrafficLightArrow>> & phase,
-    double time_offset = 0);
-  void setColor(std::int64_t lanelet_id, TrafficLightColor color);
-  void setArrow(std::int64_t lanelet_id, TrafficLightArrow arrow);
   void update(double step_time);
+  template<typename ... Ts>
+  void setColorPhase(std::int64_t lanelet_id, Ts && ... xs)
+  {
+    if (traffic_lights_.count(lanelet_id) == 0) {
+      throw SimulationRuntimeError("lanelet id does not match");
+    }
+    traffic_lights_.at(lanelet_id)->setColorPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setArrowPhase(std::int64_t lanelet_id, Ts && ... xs)
+  {
+    if (traffic_lights_.count(lanelet_id) == 0) {
+      throw SimulationRuntimeError("lanelet id does not match");
+    }
+    traffic_lights_.at(lanelet_id)->setArrowPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setColor(std::int64_t lanelet_id, Ts && ... xs)
+  {
+    if (traffic_lights_.count(lanelet_id) == 0) {
+      throw SimulationRuntimeError("lanelet id does not match");
+    }
+    traffic_lights_.at(lanelet_id)->setColor(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setArrow(std::int64_t lanelet_id, Ts && ... xs)
+  {
+    if (traffic_lights_.count(lanelet_id) == 0) {
+      throw SimulationRuntimeError("lanelet id does not match");
+    }
+    traffic_lights_.at(lanelet_id)->setArrow(std::forward<Ts>(xs)...);
+  }
   TrafficLightColor getColor(std::int64_t lanelet_id) const;
   TrafficLightArrow getArrow(std::int64_t lanelet_id) const;
 
