@@ -17,6 +17,7 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
+#include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api/metrics/metrics_manager.hpp>
 
 #include <awapi_accessor/accessor.hpp>
@@ -191,6 +192,36 @@ public:
   const;
   bool despawnEntity(std::string name);
   bool entityExists(std::string name);
+  template<typename ... Ts>
+  void setColorPhase(Ts && ... xs)
+  {
+    entity_manager_ptr_->setColorPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setArrowPhase(Ts && ... xs)
+  {
+    entity_manager_ptr_->setArrowPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setColor(Ts && ... xs)
+  {
+    entity_manager_ptr_->setColor(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setArrow(Ts && ... xs)
+  {
+    entity_manager_ptr_->setArrow(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  simulation_api::TrafficLightColor getColor(Ts && ... xs)
+  {
+    entity_manager_ptr_->getColor(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  simulation_api::TrafficLightArrow getArrow(Ts && ... xs)
+  {
+    entity_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
+  }
 
 private:
   bool spawn(
