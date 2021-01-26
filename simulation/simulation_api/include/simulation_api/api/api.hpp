@@ -215,12 +215,12 @@ public:
   template<typename ... Ts>
   simulation_api::TrafficLightColor getColor(Ts && ... xs)
   {
-    entity_manager_ptr_->getColor(std::forward<Ts>(xs)...);
+    return entity_manager_ptr_->getColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
   simulation_api::TrafficLightArrow getArrow(Ts && ... xs)
   {
-    entity_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
+    return entity_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
   }
 
 private:

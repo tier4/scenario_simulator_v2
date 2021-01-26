@@ -122,12 +122,12 @@ public:
   template<typename ... Ts>
   TrafficLightColor getColor(Ts && ... xs)
   {
-    traffic_light_manager_ptr_->getColor(std::forward<Ts>(xs)...);
+    return traffic_light_manager_ptr_->getColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
   TrafficLightArrow getArrow(Ts && ... xs)
   {
-    traffic_light_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
+    return traffic_light_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
   }
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path)
