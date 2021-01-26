@@ -195,32 +195,32 @@ public:
   template<typename ... Ts>
   void setrafficLightColorPhase(Ts && ... xs)
   {
-    entity_manager_ptr_->setColorPhase(std::forward<Ts>(xs)...);
+    entity_manager_ptr_->setTrafficLightColorPhase(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
   void setTrafficLightArrowPhase(Ts && ... xs)
   {
-    entity_manager_ptr_->setArrowPhase(std::forward<Ts>(xs)...);
+    entity_manager_ptr_->setTrafficLightArrowPhase(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
   void setTrafficLightColor(Ts && ... xs)
   {
-    entity_manager_ptr_->setColor(std::forward<Ts>(xs)...);
+    entity_manager_ptr_->setTrafficLightColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
   void setTrafficLightArrow(Ts && ... xs)
   {
-    entity_manager_ptr_->setArrow(std::forward<Ts>(xs)...);
+    entity_manager_ptr_->setTrafficLightArrow(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
   simulation_api::TrafficLightColor getTrafficLightColor(Ts && ... xs)
   {
-    return entity_manager_ptr_->getColor(std::forward<Ts>(xs)...);
+    return entity_manager_ptr_->getTrafficLightColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
   simulation_api::TrafficLightArrow getTrafficLightArrow(Ts && ... xs)
   {
-    return entity_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
+    return entity_manager_ptr_->getTrafficLightArrow(std::forward<Ts>(xs)...);
   }
 
 private:

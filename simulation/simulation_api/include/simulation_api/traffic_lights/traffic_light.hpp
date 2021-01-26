@@ -59,21 +59,16 @@ public:
   double getColorPhaseLength() const;
   double getArrowPhaseLength() const;
   void update(double step_time);
-  const std::int64_t id;
   TrafficLightArrow getArrow() const;
   TrafficLightColor getColor() const;
+  const std::int64_t id;
 
 private:
   TrafficLightPhase<TrafficLightColor> color_phase_;
   TrafficLightPhase<TrafficLightArrow> arrow_phase_;
 };
 
-/*
-std::ostream& operator<<(std::ostream& os, const TrafficLight& light)
-{
-  os << "ID : " << light.id << std::endl;
-}
-*/
+std::ostream & operator<<(std::ostream & os, const TrafficLight & light);
 }  // namespace simulation_api
 
 #endif  // SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_

@@ -77,27 +77,24 @@ void TrafficLight::update(double step_time)
   color_phase_.update(step_time);
 }
 
-/*
-void TrafficLight::printState() const
+std::ostream & operator<<(std::ostream & os, const TrafficLight & light)
 {
-  std::string state_string;
-  state_string = "ID : " << id;
-  const auto color = getColor();
-  switch (color)
-  {
-  case TrafficLightColor::NONE:
-    os << "NONE";
-    break;
-  case TrafficLightColor::RED:
-    os << "RED";
-    break;
-  case TrafficLightColor::GREEN:
-    os << "GREEN";
-    break;
-  case TrafficLightColor::YELLOW:
-    os << "YELLOW";
-    break;
+  os << "ID : " << light.id << std::endl;
+  const auto color = light.getColor();
+  switch (color) {
+    case TrafficLightColor::RED:
+      os << "color : RED" << std::endl;
+      break;
+    case TrafficLightColor::GREEN:
+      os << "color : GREEN" << std::endl;
+      break;
+    case TrafficLightColor::YELLOW:
+      os << "color : YELLOW" << std::endl;
+      break;
+    case TrafficLightColor::NONE:
+      os << "color : NONE" << std::endl;
+      break;
   }
+  return os;
 }
-*/
 }  // namespace simulation_api

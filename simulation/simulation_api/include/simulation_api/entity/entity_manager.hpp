@@ -100,32 +100,32 @@ private:
 
 public:
   template<typename ... Ts>
-  void setColorPhase(Ts && ... xs)
+  void setTrafficLightColorPhase(Ts && ... xs)
   {
     traffic_light_manager_ptr_->setColorPhase(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setArrowPhase(Ts && ... xs)
+  void setTrafficLightArrowPhase(Ts && ... xs)
   {
     traffic_light_manager_ptr_->setArrowPhase(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setColor(Ts && ... xs)
+  void setTrafficLightColor(Ts && ... xs)
   {
     traffic_light_manager_ptr_->setColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setArrow(Ts && ... xs)
+  void setTrafficLightArrow(Ts && ... xs)
   {
     traffic_light_manager_ptr_->setArrow(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  TrafficLightColor getColor(Ts && ... xs)
+  TrafficLightColor getTrafficLightColor(Ts && ... xs)
   {
     return traffic_light_manager_ptr_->getColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  TrafficLightArrow getArrow(Ts && ... xs)
+  TrafficLightArrow getTrafficLightArrow(Ts && ... xs)
   {
     return traffic_light_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
   }

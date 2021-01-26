@@ -53,4 +53,12 @@ TrafficLightColor TrafficLightManager::getColor(std::int64_t lanelet_id) const
   }
   return traffic_lights_.at(lanelet_id)->getColor();
 }
+
+void TrafficLightManager::printState(std::int64_t lanelet_id)
+{
+  if (traffic_lights_.count(lanelet_id) == 0) {
+    throw SimulationRuntimeError("lanelet id does not match");
+  }
+  std::cout << traffic_lights_.at(lanelet_id).get() << std::endl;
+}
 }  // namespace simulation_api
