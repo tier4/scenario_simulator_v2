@@ -27,7 +27,8 @@ namespace simulation_api
 {
 class TrafficLightManager
 {
-using duration = double;
+  using duration = double;
+
 public:
   explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
   void setColorPhase(

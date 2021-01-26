@@ -44,7 +44,8 @@ enum class TrafficLightArrow
 
 class TrafficLight
 {
-using duration = double;
+  using duration = double;
+
 public:
   explicit TrafficLight(std::int64_t id);
   void setColorPhase(

@@ -22,6 +22,7 @@
 // headers in STL
 #include <memory>
 #include <vector>
+#include <utility>
 #include <string>
 
 // headers in pugixml
