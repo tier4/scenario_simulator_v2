@@ -33,7 +33,7 @@ public:
   : phase_(phase) {}
   double getPhaseLength() const
   {
-    if (phase_.size()) {
+    if (phase_.size() == 0) {
       throw SimulationRuntimeError("phase is empty");
     }
     double l = 0;
@@ -44,7 +44,7 @@ public:
   }
   const T getState() const
   {
-    if (phase_.size()) {
+    if (phase_.size() == 0) {
       throw SimulationRuntimeError("phase is empty");
     }
     double t = 0;
@@ -58,7 +58,7 @@ public:
   }
   void update(double step_time)
   {
-    if (phase_.size()) {
+    if (phase_.size() == 0) {
       elapsed_time_ = 0;
       return;
     }

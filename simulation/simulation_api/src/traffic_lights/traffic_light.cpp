@@ -79,7 +79,7 @@ void TrafficLight::update(double step_time)
 
 void TrafficLight::printState() const
 {
-  std::cout << "ID : " << id << std::endl;
+  std::cout << "traffic light id : " << id << std::endl;
   const auto color = getColor();
   switch (color) {
     case TrafficLightColor::RED:
