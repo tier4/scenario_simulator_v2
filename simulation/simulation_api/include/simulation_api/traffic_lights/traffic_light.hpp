@@ -49,10 +49,10 @@ class TrafficLight
 public:
   explicit TrafficLight(std::int64_t id);
   void setColorPhase(
-    const std::vector<std::pair<duration, TrafficLightColor>> & phase,
+    const std::vector<std::pair<Duration, TrafficLightColor>> & phase,
     double time_offset = 0);
   void setArrowPhase(
-    const std::vector<std::pair<duration, TrafficLightArrow>> & phase,
+    const std::vector<std::pair<Duration, TrafficLightArrow>> & phase,
     double time_offset = 0);
   void setColor(TrafficLightColor color);
   void setArrow(TrafficLightArrow arrow);
