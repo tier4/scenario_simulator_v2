@@ -25,10 +25,11 @@
 
 #include <std_msgs/msg/color_rgba.hpp>
 
+#include <stdio.h>
+
 #include <cassert>
 #include <map>
 #include <string>
-#include <stdio.h>
 
 namespace color_utils
 {
