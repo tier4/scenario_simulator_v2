@@ -198,7 +198,7 @@ public:
     entity_manager_ptr_->setColorPhase(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setrafficLightArrowPhase(Ts && ... xs)
+  void setTrafficLightArrowPhase(Ts && ... xs)
   {
     entity_manager_ptr_->setArrowPhase(std::forward<Ts>(xs)...);
   }
@@ -208,7 +208,7 @@ public:
     entity_manager_ptr_->setColor(std::forward<Ts>(xs)...);
   }
   template<typename ... Ts>
-  void setrafficLightArrow(Ts && ... xs)
+  void setTrafficLightArrow(Ts && ... xs)
   {
     entity_manager_ptr_->setArrow(std::forward<Ts>(xs)...);
   }
