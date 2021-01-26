@@ -22,6 +22,7 @@
 #include <vector>
 #include <limits>
 #include <utility>
+#include <iostream>
 
 namespace simulation_api
 {
@@ -43,13 +44,14 @@ enum class TrafficLightArrow
 
 class TrafficLight
 {
+using duration = double;
 public:
   explicit TrafficLight(std::int64_t id);
   void setColorPhase(
-    const std::vector<std::pair<double, TrafficLightColor>> & phase,
+    const std::vector<std::pair<duration, TrafficLightColor>> & phase,
     double time_offset = 0);
   void setArrowPhase(
-    const std::vector<std::pair<double, TrafficLightArrow>> & phase,
+    const std::vector<std::pair<duration, TrafficLightArrow>> & phase,
     double time_offset = 0);
   void setColor(TrafficLightColor color);
   void setArrow(TrafficLightArrow arrow);
@@ -64,6 +66,13 @@ private:
   TrafficLightPhase<TrafficLightColor> color_phase_;
   TrafficLightPhase<TrafficLightArrow> arrow_phase_;
 };
+
+/*
+std::ostream& operator<<(std::ostream& os, const TrafficLight& light)
+{
+  os << "ID : " << light.id << std::endl;
+}
+*/
 }  // namespace simulation_api
 
 #endif  // SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_

@@ -27,15 +27,16 @@ namespace simulation_api
 {
 class TrafficLightManager
 {
+using duration = double;
 public:
   explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
   void setColorPhase(
     std::int64_t lanelet_id,
-    const std::vector<std::pair<double, TrafficLightColor>> & phase,
+    const std::vector<std::pair<duration, TrafficLightColor>> & phase,
     double time_offset = 0);
   void setArrowPhase(
     std::int64_t lanelet_id,
-    const std::vector<std::pair<double, TrafficLightArrow>> & phase,
+    const std::vector<std::pair<duration, TrafficLightArrow>> & phase,
     double time_offset = 0);
   void setColor(std::int64_t lanelet_id, TrafficLightColor color);
   void setArrow(std::int64_t lanelet_id, TrafficLightArrow arrow);
