@@ -87,14 +87,6 @@ public:
   {
     return linear_jerk_;
   }
-  void enableSeeAround()
-  {
-    see_around_ = true;
-  }
-  void disableSeeAround()
-  {
-    see_around_ = false;
-  }
 
 protected:
   bool visibility_;
@@ -106,7 +98,6 @@ protected:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;
   boost::optional<double> stand_still_duration_;
   visualization_msgs::msg::MarkerArray current_marker_;
-  bool see_around_;
 };
 }  // namespace entity
 }  // namespace simulation_api

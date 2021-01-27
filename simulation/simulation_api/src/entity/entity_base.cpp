@@ -32,7 +32,6 @@ EntityBase::EntityBase(
   status_ = initial_state;
   visibility_ = true;
   verbose_ = true;
-  see_around_ = true;
 }
 
 EntityBase::EntityBase(std::string type, std::string name)
@@ -41,7 +40,6 @@ EntityBase::EntityBase(std::string type, std::string name)
   status_ = boost::none;
   visibility_ = true;
   verbose_ = true;
-  see_around_ = true;
 }
 
 boost::optional<double> EntityBase::getStandStillDuration() const
