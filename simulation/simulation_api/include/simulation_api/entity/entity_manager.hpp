@@ -99,6 +99,36 @@ private:
   std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
 
 public:
+  template<typename ... Ts>
+  void setTrafficLightColorPhase(Ts && ... xs)
+  {
+    traffic_light_manager_ptr_->setColorPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setTrafficLightArrowPhase(Ts && ... xs)
+  {
+    traffic_light_manager_ptr_->setArrowPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setTrafficLightColor(Ts && ... xs)
+  {
+    traffic_light_manager_ptr_->setColor(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setTrafficLightArrow(Ts && ... xs)
+  {
+    traffic_light_manager_ptr_->setArrow(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  TrafficLightColor getTrafficLightColor(Ts && ... xs)
+  {
+    return traffic_light_manager_ptr_->getColor(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  TrafficLightArrow getTrafficLightArrow(Ts && ... xs)
+  {
+    return traffic_light_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
+  }
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path)
   : broadcaster_(node), base_link_broadcaster_(node)

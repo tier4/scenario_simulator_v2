@@ -31,44 +31,6 @@ TrafficLightManager::TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils
   }
 }
 
-void TrafficLightManager::setColorPhase(
-  std::int64_t lanelet_id,
-  const std::vector<std::pair<double, TrafficLightColor>> & phase,
-  double time_offset)
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  traffic_lights_.at(lanelet_id)->setColorPhase(phase, time_offset);
-}
-
-void TrafficLightManager::setArrowPhase(
-  std::int64_t lanelet_id,
-  const std::vector<std::pair<double, TrafficLightArrow>> & phase,
-  double time_offset)
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  traffic_lights_.at(lanelet_id)->setArrowPhase(phase, time_offset);
-}
-
-void TrafficLightManager::setColor(std::int64_t lanelet_id, TrafficLightColor color)
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  traffic_lights_.at(lanelet_id)->setColor(color);
-}
-
-void TrafficLightManager::setArrow(std::int64_t lanelet_id, TrafficLightArrow arrow)
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  traffic_lights_.at(lanelet_id)->setArrow(arrow);
-}
-
 void TrafficLightManager::update(double step_time)
 {
   for (const auto light : traffic_lights_) {

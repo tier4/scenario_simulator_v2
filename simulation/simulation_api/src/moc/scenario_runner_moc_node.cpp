@@ -22,6 +22,7 @@
 // headers in STL
 #include <memory>
 #include <vector>
+#include <utility>
 #include <string>
 
 // headers in pugixml
@@ -91,6 +92,13 @@ public:
       "ego_momentary_stop_crosswalk", "ego",
       -10, 10, 34378, metrics::MomentaryStopMetric::StopTargetLaneletType::CROSSWALK,
       30, 1, 0.05);
+    std::vector<std::pair<double, simulation_api::TrafficLightColor>> phase;
+    phase = {
+      {10, simulation_api::TrafficLightColor::GREEN},
+      {10, simulation_api::TrafficLightColor::YELLOW},
+      {10, simulation_api::TrafficLightColor::RED}
+    };
+    api_.setrafficLightColorPhase(34802, phase);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/traffic_lights/traffic_light.hpp>
+#include <simulation_api/color_utils/color_utils.hpp>
 
 #include <vector>
 #include <limits>

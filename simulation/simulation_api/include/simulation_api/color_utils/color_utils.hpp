@@ -25,12 +25,22 @@
 
 #include <std_msgs/msg/color_rgba.hpp>
 
+#include <stdio.h>
+
 #include <cassert>
 #include <map>
 #include <string>
 
 namespace color_utils
 {
+void printRed(const std::string & text);
+void printGreen(const std::string & text);
+void printYellow(const std::string & text);
+void printBlue(const std::string & text);
+void printMagenta(const std::string & text);
+void printCyan(const std::string & text);
+void printWhite(const std::string & text);
+
 const std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha = 1.0);
 /**
    * @brief 0 <= h <= 1.0,0 <= s <= 1.0,0 <= v <= 1.0

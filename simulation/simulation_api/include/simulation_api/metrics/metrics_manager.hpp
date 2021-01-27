@@ -18,18 +18,25 @@
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/metrics/metric_base.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include <unordered_map>
 #include <memory>
 #include <string>
 #include <utility>
+#include <fstream>
 
 namespace metrics
 {
 class MetricsManager
 {
 public:
-  explicit MetricsManager(bool verbose);
-  ~MetricsManager() {}
+  explicit MetricsManager(bool verbose, const std::string & logfile_path);
+  ~MetricsManager()
+  {
+    std::ofstream file(logfile_path);
+    file << log_;
+  }
   void setVerbose(bool verbose);
   void setEntityManager(std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr);
   template<typename T, typename ... Ts>
@@ -40,9 +47,11 @@ public:
     metrics_.insert({name, metric_ptr});
   }
   void calculate();
+  const std::string logfile_path;
 
 private:
   bool verbose_;
+  nlohmann::json log_;
   std::unordered_map<std::string, std::shared_ptr<MetricBase>> metrics_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
 };
