@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
-#define SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#ifndef SIMULATION_API__METRICS__REACTION_TIME_METRIC_HPP_
+#define SIMULATION_API__METRICS__REACTION_TIME_METRIC_HPP_
 
 #include <simulation_api/metrics/metric_base.hpp>
 
@@ -21,19 +21,31 @@
 
 namespace metrics
 {
-class TraveledDistanceMetric : public MetricBase
+class ReactionTimeMetric : public MetricBase
 {
 public:
-  explicit TraveledDistanceMetric(std::string target_entity);
-  ~TraveledDistanceMetric() override = default;
+  explicit ReactionTimeMetric(
+    std::string target_entity,
+    double maximum_reaction_time,
+    double jerk_upper_threashold,
+    double jerk_lower_threashold,
+    bool check_upper_threashold = true,
+    bool check_lower_threashold = true);
+  ~ReactionTimeMetric() override = default;
   void update() override;
   nlohmann::json to_json();
   bool activateTrigger();
   const std::string target_entity;
+  const double maximum_reaction_time;
+  const double jerk_upper_threashold;
+  const double jerk_lower_threashold;
+  const bool check_upper_threashold;
+  const bool check_lower_threashold;
 
 private:
-  double traveled_distance;
+  double elapsed_duration_;
+  double current_linear_jerk_;
 };
 }  // namespace metrics
 
-#endif  // SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#endif  // SIMULATION_API__METRICS__REACTION_TIME_METRIC_HPP_

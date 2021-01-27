@@ -81,7 +81,7 @@ public:
   {
     return tree_ptr_->getObstacle();
   }
-  std::vector<std::int64_t> getRouteLanelet(double horizon = 100)
+  std::vector<std::int64_t> getRouteLanelets(double horizon = 100)
   {
     if (!status_) {
       return {};

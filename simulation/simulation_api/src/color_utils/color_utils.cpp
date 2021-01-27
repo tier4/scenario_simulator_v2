@@ -19,6 +19,47 @@
 
 namespace color_utils
 {
+void printRed(const std::string & text)
+{
+  std::string raw_text = "\x1b[31m" + text + "\x1b[0m\n";
+  printf("%s", raw_text.c_str());
+}
+
+void printGreen(const std::string & text)
+{
+  std::string raw_text = "\x1b[32m" + text + "\x1b[0m\n";
+  printf("%s", raw_text.c_str());
+}
+
+void printYellow(const std::string & text)
+{
+  std::string raw_text = "\x1b[33m" + text + "\x1b[0m\n";
+  printf("%s", raw_text.c_str());
+}
+
+void printBlue(const std::string & text)
+{
+  std::string raw_text = "\x1b[34m" + text + "\x1b[0m\n";
+  printf("%s", raw_text.c_str());
+}
+
+void printMagenta(const std::string & text)
+{
+  std::string raw_text = "\x1b[35m" + text + "\x1b[0m\n";
+  printf("%s", raw_text.c_str());
+}
+
+void printCyan(const std::string & text)
+{
+  std::string raw_text = "\x1b[36m" + text + "\x1b[0m\n";
+  printf("%s", raw_text.c_str());
+}
+
+void printWhite(const std::string & text)
+{
+  std::string raw_text = "\x1b[37m" + text + "\x1b[0m\n";
+  printf("%s", raw_text.c_str());
+}
 
 /**
  * @brief generate std_msgs::msg::ColorRGBA message from rgb values

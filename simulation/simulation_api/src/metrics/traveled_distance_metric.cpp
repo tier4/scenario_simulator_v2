@@ -19,7 +19,7 @@
 namespace metrics
 {
 TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
-: MetricBase(target_entity, "TraveledDistance")
+: MetricBase("TraveledDistance"), target_entity(target_entity)
 {
   traveled_distance = 0;
 }

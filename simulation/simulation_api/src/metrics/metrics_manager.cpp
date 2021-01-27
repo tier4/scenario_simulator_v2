@@ -22,8 +22,8 @@
 
 namespace metrics
 {
-MetricsManager::MetricsManager(bool verbose)
-: metrics_()
+MetricsManager::MetricsManager(bool verbose, const std::string & logfile_path)
+: logfile_path(logfile_path), metrics_()
 {
   verbose_ = verbose;
 }
@@ -47,24 +47,25 @@ void MetricsManager::calculate()
       metric.second->update();
     }
     log[metric.first] = metric.second->to_json();
+    if (verbose_) {
+      std::cout << "metric : " << metric.first << " => " << log[metric.first] << std::endl;
+    }
     if (metric.second->getLifecycle() == MetricLifecycle::SUCCESS ||
       metric.second->getLifecycle() == MetricLifecycle::FAILURE)
     {
       disable_metrics_list.emplace_back(metric.first);
     }
   }
-  if (verbose_) {
-    for (const auto metric_json : log) {
-      std::cout << metric_json << std::endl;
-    }
-  }
-  // log_ = log;
   for (const auto name : disable_metrics_list) {
     if (metrics_[name]->getLifecycle() == MetricLifecycle::FAILURE) {
       metrics_[name]->throwException();
     }
     metrics_.erase(name);
   }
+  double current_time = entity_manager_ptr_->getCurrentTime();
+  log_[std::to_string(current_time)] = log;
+  std::ofstream file(logfile_path);
+  file << log_;
 }
 
 void MetricsManager::setEntityManager(

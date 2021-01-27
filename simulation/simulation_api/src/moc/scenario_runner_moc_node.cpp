@@ -22,6 +22,7 @@
 // headers in STL
 #include <memory>
 #include <vector>
+#include <utility>
 #include <string>
 
 // headers in pugixml
@@ -77,12 +78,27 @@ public:
       "npc1",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
+    /*
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop0", "ego",
-      -10, 10, 34805, 30, 1, 0.05);
+      -10, 10, 34805, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
+      30, 1, 0.05);
+    */
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop1", "ego",
-      -10, 10, 120635, 30, 1, 0.05);
+      -10, 10, 120635, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
+      30, 1, 0.05);
+    api_.addMetric<metrics::MomentaryStopMetric>(
+      "ego_momentary_stop_crosswalk", "ego",
+      -10, 10, 34378, metrics::MomentaryStopMetric::StopTargetLaneletType::CROSSWALK,
+      30, 1, 0.05);
+    std::vector<std::pair<double, simulation_api::TrafficLightColor>> phase;
+    phase = {
+      {10, simulation_api::TrafficLightColor::GREEN},
+      {10, simulation_api::TrafficLightColor::YELLOW},
+      {10, simulation_api::TrafficLightColor::RED}
+    };
+    api_.setrafficLightColorPhase(34802, phase);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -90,6 +106,9 @@ public:
 private:
   void update()
   {
+    if (api_.getLinearJerk("ego")) {
+      std::cout << "ego linear jerk :" << api_.getLinearJerk("ego").get() << std::endl;
+    }
     if (api_.reachPosition(
         "ego",
         simulation_api::helper::constractLaneletPose(34615, 10.0), 5))

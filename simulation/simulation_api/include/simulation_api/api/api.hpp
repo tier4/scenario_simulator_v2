@@ -17,6 +17,7 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
+#include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api/metrics/metrics_manager.hpp>
 
 #include <awapi_accessor/accessor.hpp>
@@ -63,10 +64,10 @@ public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node, const std::string & map_path = "",
-    bool verbose = false,
+    bool verbose = false, const std::string metrics_logfile_path = "/tmp/metrics.json",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
-  : autoware_api::Accessor(node), metrics_manager_(verbose)
+  : autoware_api::Accessor(node), metrics_manager_(verbose, metrics_logfile_path)
   {
     std::string address = "127.0.0.1";
 
@@ -100,6 +101,7 @@ public:
   {
     metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
   }
+  boost::optional<double> getLinearJerk(std::string name);
   void setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model);
   void setVerbose(bool verbose);
   bool spawn(
@@ -176,6 +178,7 @@ public:
   bool reachPosition(
     std::string name, openscenario_msgs::msg::LaneletPose target_pose,
     double tolerance);
+  bool reachPosition(std::string name, std::string target_name, double tolerance) const;
   boost::optional<double> getStandStillDuration(std::string name) const;
   bool checkCollision(std::string name0, std::string name1);
   XmlRpc::XmlRpcValue initialize(
@@ -189,8 +192,36 @@ public:
   const;
   bool despawnEntity(std::string name);
   bool entityExists(std::string name);
-  boost::optional<double> getDistanceToStopLine(std::string name, double horizon = 100);
-  boost::optional<int64_t> getNextStopLineId(std::string name, double horizon = 100);
+  template<typename ... Ts>
+  void setrafficLightColorPhase(Ts && ... xs)
+  {
+    entity_manager_ptr_->setTrafficLightColorPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setTrafficLightArrowPhase(Ts && ... xs)
+  {
+    entity_manager_ptr_->setTrafficLightArrowPhase(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setTrafficLightColor(Ts && ... xs)
+  {
+    entity_manager_ptr_->setTrafficLightColor(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  void setTrafficLightArrow(Ts && ... xs)
+  {
+    entity_manager_ptr_->setTrafficLightArrow(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  simulation_api::TrafficLightColor getTrafficLightColor(Ts && ... xs)
+  {
+    return entity_manager_ptr_->getTrafficLightColor(std::forward<Ts>(xs)...);
+  }
+  template<typename ... Ts>
+  simulation_api::TrafficLightArrow getTrafficLightArrow(Ts && ... xs)
+  {
+    return entity_manager_ptr_->getTrafficLightArrow(std::forward<Ts>(xs)...);
+  }
 
 private:
   bool spawn(

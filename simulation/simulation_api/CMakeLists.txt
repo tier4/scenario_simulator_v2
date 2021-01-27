@@ -52,6 +52,9 @@ ament_auto_add_library(entity_manager SHARED
   src/metrics/metrics_manager.cpp
   src/metrics/traveled_distance_metric.cpp
   src/metrics/momentary_stop_metric.cpp
+  src/metrics/reaction_time_metric.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic_lights/traffic_light_manager.cpp
 )
 
 target_link_libraries(entity_manager pugixml)

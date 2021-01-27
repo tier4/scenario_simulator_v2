@@ -122,70 +122,54 @@ boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPo
   return toLaneletPose(status->pose);
 }
 
-boost::optional<int64_t> EntityManager::getNextStopLineId(std::string name, double horizon)
+boost::optional<double> EntityManager::getDistanceToCrosswalk(
+  std::string name,
+  std::int64_t target_crosswalk_id)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelet(horizon);
-    const auto lanelet_pose = getLaneletPose(name);
-    if (!lanelet_pose) {
-      return boost::none;
-    }
-    return hdmap_utils_ptr_->getNextStopLineId(route, lanelet_pose.get());
+  simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
+  auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
+  return spline.getCollisionPointIn2D(polygon);
+}
+
+boost::optional<double> EntityManager::getSValueInRoute(
+  std::string name,
+  std::vector<std::int64_t> route)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    return boost::none;
   }
-  if (it->second.type() == typeid(EgoEntity)) {
-    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelet(horizon);
-    const auto lanelet_pose = getLaneletPose(name);
-    if (!lanelet_pose) {
-      return boost::none;
-    }
-    return hdmap_utils_ptr_->getNextStopLineId(route, lanelet_pose.get());
+  const auto lanelet_pose = getLaneletPose(name);
+  if (!lanelet_pose) {
+    return boost::none;
   }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelet(horizon);
-    const auto lanelet_pose = getLaneletPose(name);
-    if (!lanelet_pose) {
-      return boost::none;
+  double s = 0;
+  for (const auto id : route) {
+    if (id == lanelet_pose->lanelet_id) {
+      s = s + lanelet_pose->s;
+      return s;
+    } else {
+      s = s + hdmap_utils_ptr_->getLaneletLength(id);
     }
-    return hdmap_utils_ptr_->getNextStopLineId(route, lanelet_pose.get());
   }
   return boost::none;
 }
 
-boost::optional<double> EntityManager::getDistanceToStopLine(std::string name, double horizon)
+boost::optional<double> EntityManager::getDistanceToStopLine(
+  std::string name,
+  std::int64_t target_stop_line_id)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelet(horizon);
-    const auto lanelet_pose = getLaneletPose(name);
-    if (!lanelet_pose) {
-      return boost::none;
-    }
-    return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelet(horizon);
-    const auto lanelet_pose = getLaneletPose(name);
-    if (!lanelet_pose) {
-      return boost::none;
-    }
-    return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelet(horizon);
-    const auto lanelet_pose = getLaneletPose(name);
-    if (!lanelet_pose) {
-      return boost::none;
-    }
-    return hdmap_utils_ptr_->getDistanceToStopLine(route, lanelet_pose.get());
-  }
-  return boost::none;
+  simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
+  auto polygon = hdmap_utils_ptr_->getStopLinesPolygon(target_stop_line_id);
+  return spline.getCollisionPointIn2D(polygon);
 }
 
 void EntityManager::requestAcquirePosition(
@@ -536,6 +520,25 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string n
   throw simulation_api::SimulationRuntimeError("error occurs while getting waypoints : " + name);
 }
 
+boost::optional<double> EntityManager::getLinearJerk(std::string name)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw simulation_api::SimulationRuntimeError(
+            "entity " + name + " does not exist");
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<const VehicleEntity &>(it->second).getLinearJerk();
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    return boost::any_cast<const EgoEntity &>(it->second).getLinearJerk();
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    return boost::any_cast<const PedestrianEntity &>(it->second).getLinearJerk();
+  }
+  return boost::none;
+}
+
 bool EntityManager::entityStatusSetted(std::string name) const
 {
   auto it = entities_.find(name);
@@ -568,6 +571,39 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
   }
 }
 
+std::vector<std::int64_t> EntityManager::getRouteLanelets(std::string name, double horizon)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw SimulationRuntimeError("entity " + name + " does not exist");
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelets(horizon);
+    return route;
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelets(horizon);
+    return route;
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelets(horizon);
+    return route;
+  }
+  throw SimulationRuntimeError("entity " + name + " does not matches to entity type.");
+}
+
+std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
+  std::string name,
+  double horizon)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    throw SimulationRuntimeError("entity " + name + " does not exist");
+  }
+  const auto route = getRouteLanelets(name, horizon);
+  return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
+}
+
 double EntityManager::getStepTime() const
 {
   return step_time_;
@@ -583,6 +619,7 @@ void EntityManager::update(double current_time, double step_time)
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
+  traffic_light_manager_ptr_->update(step_time_);
   current_time_ = current_time;
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
@@ -698,6 +735,16 @@ void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, boo
   } else {
     base_link_broadcaster_.sendTransform(transform_stamped);
   }
+}
+
+bool EntityManager::reachPosition(
+  std::string name, std::string target_name, double tolerance) const
+{
+  auto status = getEntityStatus(target_name);
+  if (status) {
+    return false;
+  }
+  return reachPosition(name, status->pose, tolerance);
 }
 
 bool EntityManager::reachPosition(

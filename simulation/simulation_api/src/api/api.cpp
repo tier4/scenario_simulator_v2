@@ -21,16 +21,6 @@
 
 namespace scenario_simulator
 {
-boost::optional<double> API::getDistanceToStopLine(std::string name, double horizon)
-{
-  return entity_manager_ptr_->getDistanceToStopLine(name, horizon);
-}
-
-boost::optional<int64_t> API::getNextStopLineId(std::string name, double horizon)
-{
-  return entity_manager_ptr_->getNextStopLineId(name, horizon);
-}
-
 bool API::despawnEntity(std::string name)
 {
   return entity_manager_ptr_->despawnEntity(name);
@@ -39,6 +29,11 @@ bool API::despawnEntity(std::string name)
 bool API::entityExists(std::string name)
 {
   return entity_manager_ptr_->entityExists(name);
+}
+
+boost::optional<double> API::getLinearJerk(std::string name)
+{
+  return entity_manager_ptr_->getLinearJerk(name);
 }
 
 void API::setVerbose(bool verbose)
@@ -405,6 +400,7 @@ geometry_msgs::msg::Pose API::getRelativePose(
 {
   return entity_manager_ptr_->getRelativePose(from, to);
 }
+
 bool API::reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance)
 {
   if (!entity_manager_ptr_->entityStatusSetted(name)) {
@@ -423,6 +419,17 @@ bool API::reachPosition(
   return entity_manager_ptr_->reachPosition(
     name,
     target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
+}
+
+bool API::reachPosition(std::string name, std::string target_name, double tolerance) const
+{
+  if (!entity_manager_ptr_->entityStatusSetted(name)) {
+    return false;
+  }
+  if (!entity_manager_ptr_->entityStatusSetted(target_name)) {
+    return false;
+  }
+  return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
 }
 
 boost::optional<double> API::getStandStillDuration(std::string name) const
