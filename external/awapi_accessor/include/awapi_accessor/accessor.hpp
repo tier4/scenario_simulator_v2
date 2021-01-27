@@ -30,15 +30,10 @@
 namespace autoware_api
 {
 
-class Accessor
-{
 #define DEFINE_SUBSCRIPTION(TYPE) \
-protected: \
-  TYPE current_value_of_ ## TYPE; \
- \
 private: \
+  TYPE current_value_of_ ## TYPE; \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_ ## TYPE; \
- \
 public: \
   const auto & get ## TYPE() const noexcept \
   { \
@@ -46,11 +41,9 @@ public: \
   } \
   static_assert(true, "")
 
-
-#define DEFINE_PUBLICATION(TYPE) \
+#define DEFINE_PUBLISHER(TYPE) \
 private: \
   rclcpp::Publisher<TYPE>::SharedPtr publisher_of_ ## TYPE; \
- \
 public: \
   template \
   < \
@@ -62,6 +55,21 @@ public: \
   } \
   static_assert(true, "")
 
+#define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
+  subscription_of_ ## TYPE( \
+    (*node).template create_subscription<TYPE>( \
+      TOPIC, 1, \
+      [this](const TYPE::SharedPtr message) \
+      { \
+        current_value_of_ ## TYPE = *message; \
+      }))
+
+#define MAKE_PUBLISHER(TYPE, TOPIC) \
+  publisher_of_ ## TYPE( \
+    (*node).template create_publisher<TYPE>(TOPIC, 10))
+
+class Accessor
+{
   /** ---- AutowareEngage ------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage
@@ -69,7 +77,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using AutowareEngage = std_msgs::msg::Bool;
 
-  DEFINE_PUBLICATION(AutowareEngage);
+  DEFINE_PUBLISHER(AutowareEngage);
 
   /** ---- AutowareRoute -------------------------------------------------------
    *
@@ -78,7 +86,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using AutowareRoute = autoware_planning_msgs::msg::Route;
 
-  DEFINE_PUBLICATION(AutowareRoute);
+  DEFINE_PUBLISHER(AutowareRoute);
 
   /** ---- LaneChangeApproval --------------------------------------------------
    *
@@ -87,7 +95,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using LaneChangeApproval = std_msgs::msg::Bool;
 
-  DEFINE_PUBLICATION(LaneChangeApproval);
+  DEFINE_PUBLISHER(LaneChangeApproval);
 
   /** ---- LaneChangeForce -----------------------------------------------------
    *
@@ -96,7 +104,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using LaneChangeForce = std_msgs::msg::Bool;
 
-  DEFINE_PUBLICATION(LaneChangeForce);
+  DEFINE_PUBLISHER(LaneChangeForce);
 
   /** ---- TrafficLightStateArray ----------------------------------------------
    *
@@ -107,7 +115,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using TrafficLightStateArray = autoware_perception_msgs::msg::TrafficLightStateArray;
 
-  DEFINE_PUBLICATION(TrafficLightStateArray);
+  DEFINE_PUBLISHER(TrafficLightStateArray);
 
   /** ---- VehicleVelocity -----------------------------------------------------
    *
@@ -118,7 +126,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using VehicleVelocity = std_msgs::msg::Float32;
 
-  DEFINE_PUBLICATION(VehicleVelocity);
+  DEFINE_PUBLISHER(VehicleVelocity);
 
   /** ---- AutowareStatus ------------------------------------------------------
    *
@@ -154,49 +162,38 @@ public: \
    * ------------------------------------------------------------------------ */
   using DebugString = std_msgs::msg::String;
 
-  DEFINE_PUBLICATION(DebugString);
+  DEFINE_PUBLISHER(DebugString);
   DEFINE_SUBSCRIPTION(DebugString);
 
-#undef DEFINE_SUBSCRIPTION
-#undef DEFINE_PUBLICATION
-
 public:
-#define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
-  subscription_of_ ## TYPE( \
-    (*node).template create_subscription<TYPE>( \
-      TOPIC, 1, \
-      [this](const TYPE::SharedPtr message) \
-      { \
-        current_value_of_ ## TYPE = *message; \
-      }))
-
-#define MAKE_PUBLICATION(TYPE, TOPIC) \
-  publisher_of_ ## TYPE( \
-    (*node).template create_publisher<TYPE>(TOPIC, 10))
-
   template
   <
     typename Node
   >
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Node && node)
-  : MAKE_PUBLICATION(AutowareEngage, "/awapi/autoware/put/engage"),
-    MAKE_PUBLICATION(AutowareRoute, "/awapi/autoware/put/route"),
-    MAKE_PUBLICATION(LaneChangeApproval, "/awapi/lane_change/put/approval"),
-    MAKE_PUBLICATION(LaneChangeForce, "/awapi/lane_change/put/force"),
-    MAKE_PUBLICATION(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
-    MAKE_PUBLICATION(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+  : MAKE_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+    MAKE_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
+    MAKE_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
+    MAKE_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
+    MAKE_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    MAKE_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     MAKE_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
     MAKE_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
     MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
-    // Debug
-    MAKE_PUBLICATION(DebugString, "debug/string"),
+
+  #ifndef NDEBUG
+    MAKE_PUBLISHER(DebugString, "debug/string"),
     MAKE_SUBSCRIPTION(DebugString, "debug/string")
+  #endif
   {}
+};
+
+#undef DEFINE_SUBSCRIPTION
+#undef DEFINE_PUBLISHER
 
 #undef MAKE_SUBSCRIPTION
 #undef MAKE_PUBLICATION
-};
 
 }  // namespace autoware_api
 
