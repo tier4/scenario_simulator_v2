@@ -665,9 +665,4 @@ void API::vehicleStateCommandCallback(autoware_auto_msgs::msg::VehicleStateComma
 {
   current_state_cmd_ = *msg;
 }
-
-void API::printTrafficLightState(std::int64_t lanelet_id)
-{
-  entity_manager_ptr_->printTrafficLightState(lanelet_id);
-}
 }  // namespace scenario_simulator

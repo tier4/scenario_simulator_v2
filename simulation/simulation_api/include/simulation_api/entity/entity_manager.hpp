@@ -129,7 +129,6 @@ public:
   {
     return traffic_light_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
   }
-  void printTrafficLightState(std::int64_t lanelet_id);
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path)
   : broadcaster_(node), base_link_broadcaster_(node)

@@ -61,7 +61,6 @@ public:
   void update(double step_time);
   TrafficLightArrow getArrow() const;
   TrafficLightColor getColor() const;
-  void printState() const;
   const std::int64_t id;
 
 private:

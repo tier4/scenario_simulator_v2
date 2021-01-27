@@ -106,7 +106,6 @@ public:
 private:
   void update()
   {
-    api_.printTrafficLightState(34802);
     if (api_.getLinearJerk("ego")) {
       std::cout << "ego linear jerk :" << api_.getLinearJerk("ego").get() << std::endl;
     }
