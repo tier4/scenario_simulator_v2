@@ -64,10 +64,10 @@ public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node, const std::string & map_path = "",
-    bool verbose = false,
+    bool verbose = false, const std::string metrics_logfile_path = "/tmp/metrics.json",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
-  : autoware_api::Accessor(node), metrics_manager_(verbose)
+  : autoware_api::Accessor(node), metrics_manager_(verbose, metrics_logfile_path)
   {
     std::string address = "127.0.0.1";
 
