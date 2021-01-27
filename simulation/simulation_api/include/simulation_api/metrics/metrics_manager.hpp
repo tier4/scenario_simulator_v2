@@ -18,6 +18,8 @@
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/metrics/metric_base.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include <unordered_map>
 #include <memory>
 #include <string>
@@ -40,6 +42,7 @@ public:
     metrics_.insert({name, metric_ptr});
   }
   void calculate();
+  nlohmann::json log_;
 
 private:
   bool verbose_;
