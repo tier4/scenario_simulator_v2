@@ -22,8 +22,8 @@
 
 namespace metrics
 {
-MetricsManager::MetricsManager(bool verbose)
-: metrics_()
+MetricsManager::MetricsManager(bool verbose, const std::string & logfile_path)
+: logfile_path(logfile_path), metrics_()
 {
   verbose_ = verbose;
 }
@@ -62,6 +62,8 @@ void MetricsManager::calculate()
     }
     metrics_.erase(name);
   }
+  double current_time = entity_manager_ptr_->getCurrentTime();
+  log_[std::to_string(current_time)] = log;
 }
 
 void MetricsManager::setEntityManager(
