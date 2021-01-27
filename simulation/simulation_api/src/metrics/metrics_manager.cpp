@@ -63,7 +63,7 @@ void MetricsManager::calculate()
     metrics_.erase(name);
   }
   double current_time = entity_manager_ptr_->getCurrentTime();
-  log_[current_time] = log;
+  log_[std::to_string(current_time)] = log;
 }
 
 void MetricsManager::setEntityManager(
