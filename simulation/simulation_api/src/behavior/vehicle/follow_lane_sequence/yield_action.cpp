@@ -94,7 +94,7 @@ BT::NodeStatus YieldAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
-  if(!driver_model.see_around) {
+  if (!driver_model.see_around) {
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {

@@ -96,7 +96,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     stopped_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if(!driver_model.see_around) {
+  if (!driver_model.see_around) {
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets).size() != 0) {

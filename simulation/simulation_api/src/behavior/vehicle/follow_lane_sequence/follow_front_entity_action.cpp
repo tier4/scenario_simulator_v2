@@ -79,7 +79,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
-  if(!driver_model.see_around) {
+  if (!driver_model.see_around) {
     return BT::NodeStatus::FAILURE;
   }
   auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(
