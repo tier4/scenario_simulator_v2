@@ -64,6 +64,8 @@ void MetricsManager::calculate()
   }
   double current_time = entity_manager_ptr_->getCurrentTime();
   log_[std::to_string(current_time)] = log;
+  std::ofstream file(logfile_path);
+  file << log_;
 }
 
 void MetricsManager::setEntityManager(
