@@ -23,6 +23,7 @@
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -133,6 +134,28 @@ class Accessor
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
+  /** ---- Checkpoint ----------------------------------------------------------
+   *
+   *  Set goal pose of Autoware.
+   *
+   *  Topic: /planning/mission_planning/checkpoint
+   *
+   * ------------------------------------------------------------------------ */
+  using Checkpoint = geometry_msgs::msg::PoseStamped;
+
+  DEFINE_PUBLISHER(Checkpoint);
+
+  /** ---- GoalPose ------------------------------------------------------------
+   *
+   *  Set goal pose of Autoware.
+   *
+   *  Topic: /planning/mission_planning/goal
+   *
+   * ------------------------------------------------------------------------ */
+  using GoalPose = geometry_msgs::msg::PoseStamped;
+
+  DEFINE_PUBLISHER(GoalPose);
+
   /** ---- InitialPose ---------------------------------------------------------
    *
    *  Set initial pose of Autoware.
@@ -179,6 +202,8 @@ public:
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
 
     // Simulation specific topics (lexicographically sorted)
+    INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
+    INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(InitialTwist, "/initialtwist")
   {}
