@@ -19,54 +19,15 @@
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
+#include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 
-#include <utility>
-
 namespace autoware_api
 {
-
-#define DEFINE_SUBSCRIPTION(TYPE) \
-private: \
-  TYPE current_value_of_ ## TYPE; \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_ ## TYPE; \
-public: \
-  const auto & get ## TYPE() const noexcept \
-  { \
-    return current_value_of_ ## TYPE; \
-  } \
-  static_assert(true, "")
-
-#define DEFINE_PUBLISHER(TYPE) \
-private: \
-  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_ ## TYPE; \
-public: \
-  template \
-  < \
-    typename ... Ts \
-  > \
-  decltype(auto) set ## TYPE(Ts && ... xs) const \
-  { \
-    return (*publisher_of_ ## TYPE).publish(std::forward<decltype(xs)>(xs)...); \
-  } \
-  static_assert(true, "")
-
-#define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
-  subscription_of_ ## TYPE( \
-    (*node).template create_subscription<TYPE>( \
-      TOPIC, 1, \
-      [this](const TYPE::SharedPtr message) \
-      { \
-        current_value_of_ ## TYPE = *message; \
-      }))
-
-#define MAKE_PUBLISHER(TYPE, TOPIC) \
-  publisher_of_ ## TYPE( \
-    (*node).template create_publisher<TYPE>(TOPIC, 10))
 
 class Accessor
 {
@@ -155,6 +116,7 @@ class Accessor
 
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
+#ifndef NDEBUG
   /** ---- DummyData -----------------------------------------------------------
    *
    *  Topic: ~/dummy
@@ -164,6 +126,7 @@ class Accessor
 
   DEFINE_PUBLISHER(DebugString);
   DEFINE_SUBSCRIPTION(DebugString);
+#endif
 
 public:
   template
@@ -181,20 +144,15 @@ public:
     MAKE_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
     MAKE_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
     MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
-
-  #ifndef NDEBUG
+#ifndef NDEBUG
     MAKE_PUBLISHER(DebugString, "debug/string"),
     MAKE_SUBSCRIPTION(DebugString, "debug/string")
-  #endif
+#endif
   {}
 };
 
-#undef DEFINE_SUBSCRIPTION
-#undef DEFINE_PUBLISHER
-
-#undef MAKE_SUBSCRIPTION
-#undef MAKE_PUBLICATION
-
 }  // namespace autoware_api
+
+#include <awapi_accessor/undefine_macro.hpp>
 
 #endif  // AWAPI_ACCESSOR__ACCESSOR_HPP_
