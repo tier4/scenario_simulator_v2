@@ -73,41 +73,44 @@ BT::NodeStatus FollowLaneAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
+  if (driver_model.see_around) {
+    if (getRightOfWayEntities(route_lanelets).size() != 0) {
+      return BT::NodeStatus::FAILURE;
+    }
+    auto distance_to_front_entity = getDistanceToFrontEntity();
+    if (distance_to_front_entity) {
+      if (distance_to_front_entity.get() <=
+        calculateStopDistance() +
+        vehicle_parameters->bounding_box.dimensions.length + 5)
+      {
+        return BT::NodeStatus::FAILURE;
+      }
+    }
+    auto distance_to_stopline = getDistanceToStopLine(route_lanelets);
+    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets);
+    if (distance_to_stopline) {
+      if (distance_to_stopline.get() <=
+        calculateStopDistance() +
+        vehicle_parameters->bounding_box.dimensions.length * 0.5 + 5)
+      {
+        return BT::NodeStatus::FAILURE;
+      }
+    }
+    if (distance_to_conflicting_entity) {
+      if (distance_to_conflicting_entity.get() <
+        (vehicle_parameters->bounding_box.dimensions.length + calculateStopDistance()))
+      {
+        return BT::NodeStatus::FAILURE;
+      }
+    }
+  }
   if (!entity_status.lanelet_pose_valid) {
     setOutput(
       "updated_status",
       stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
-    return BT::NodeStatus::FAILURE;
-  }
-  auto distance_to_front_entity = getDistanceToFrontEntity();
-  if (distance_to_front_entity) {
-    if (distance_to_front_entity.get() <=
-      calculateStopDistance() +
-      vehicle_parameters->bounding_box.dimensions.length + 5)
-    {
-      return BT::NodeStatus::FAILURE;
-    }
-  }
-  auto distance_to_stopline = getDistanceToStopLine(route_lanelets);
-  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets);
-  if (distance_to_stopline) {
-    if (distance_to_stopline.get() <=
-      calculateStopDistance() +
-      vehicle_parameters->bounding_box.dimensions.length * 0.5 + 5)
-    {
-      return BT::NodeStatus::FAILURE;
-    }
-  }
-  if (distance_to_conflicting_entity) {
-    if (distance_to_conflicting_entity.get() <
-      (vehicle_parameters->bounding_box.dimensions.length + calculateStopDistance()))
-    {
-      return BT::NodeStatus::FAILURE;
-    }
-  }
+
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
