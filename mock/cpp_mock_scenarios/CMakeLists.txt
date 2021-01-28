@@ -24,6 +24,9 @@ ament_auto_add_executable(view_kashiwanoha
 ament_auto_add_executable(manual_drive_kashiwanoha
   src/manual_drive_kashiwanoha.cpp
 )
+ament_auto_add_executable(idiot_npc
+  src/idiot_npc.cpp
+)
 
 install(
   DIRECTORY launch rviz
