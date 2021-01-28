@@ -31,6 +31,18 @@ namespace autoware_api
 
 class Accessor
 {
+#ifndef NDEBUG
+  /** ---- DummyData -----------------------------------------------------------
+   *
+   *  Topic: ~/dummy
+   *
+   * ------------------------------------------------------------------------ */
+  using DebugString = std_msgs::msg::String;
+
+  DEFINE_PUBLISHER(DebugString);
+  DEFINE_SUBSCRIPTION(DebugString);
+#endif
+
   /** ---- AutowareEngage ------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage
@@ -116,18 +128,6 @@ class Accessor
 
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
-#ifndef NDEBUG
-  /** ---- DummyData -----------------------------------------------------------
-   *
-   *  Topic: ~/dummy
-   *
-   * ------------------------------------------------------------------------ */
-  using DebugString = std_msgs::msg::String;
-
-  DEFINE_PUBLISHER(DebugString);
-  DEFINE_SUBSCRIPTION(DebugString);
-#endif
-
 public:
   template
   <
@@ -135,19 +135,20 @@ public:
   >
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Node && node)
-  : MAKE_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
-    MAKE_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
-    MAKE_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
-    MAKE_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
-    MAKE_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
-    MAKE_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
-    MAKE_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
-    MAKE_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
-    MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
+  :
 #ifndef NDEBUG
-    MAKE_PUBLISHER(DebugString, "debug/string"),
-    MAKE_SUBSCRIPTION(DebugString, "debug/string")
+    INIT_PUBLISHER(DebugString, "debug/string"),
+    INIT_SUBSCRIPTION(DebugString, "debug/string"),
 #endif
+    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+    INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
+    INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
+    INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
+    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
+    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status")
   {}
 };
 

@@ -42,7 +42,7 @@ public: \
   } \
   static_assert(true, "")
 
-#define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
+#define INIT_SUBSCRIPTION(TYPE, TOPIC) \
   subscription_of_ ## TYPE( \
     (*node).template create_subscription<TYPE>( \
       TOPIC, 1, \
@@ -51,7 +51,7 @@ public: \
         current_value_of_ ## TYPE = *message; \
       }))
 
-#define MAKE_PUBLISHER(TYPE, TOPIC) \
+#define INIT_PUBLISHER(TYPE, TOPIC) \
   publisher_of_ ## TYPE( \
     (*node).template create_publisher<TYPE>(TOPIC, 10))
 
