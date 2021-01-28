@@ -15,12 +15,16 @@
 #ifndef AWAPI_ACCESSOR__ACCESSOR_HPP_
 #define AWAPI_ACCESSOR__ACCESSOR_HPP_
 
+// Note: headers are lexicographically sorted.
+
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
@@ -129,6 +133,29 @@ class Accessor
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
+  /** ---- InitialPose ---------------------------------------------------------
+   *
+   *  Set initial pose of Autoware.
+   *
+   *  Topic: /initialpose
+   *
+   * ------------------------------------------------------------------------ */
+  using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
+
+  DEFINE_PUBLISHER(InitialPose);
+
+  /** ---- InitialTwist --------------------------------------------------------
+   *
+   *  Set initial velocity of Autoware.
+   *
+   *  Topic: /initialtwist
+   *
+   * ------------------------------------------------------------------------ */
+  using InitialTwist = geometry_msgs::msg::TwistStamped;
+
+  DEFINE_PUBLISHER(InitialTwist);
+
+public:
   template
   <
     typename Node
@@ -140,6 +167,7 @@ public:
     INIT_PUBLISHER(DebugString, "debug/string"),
     INIT_SUBSCRIPTION(DebugString, "debug/string"),
 #endif
+    // AWAPI topics (lexicographically sorted)
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
@@ -148,7 +176,11 @@ public:
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
     INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
-    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status")
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
+
+    // Simulation specific topics (lexicographically sorted)
+    INIT_PUBLISHER(InitialPose, "/initialpose"),
+    INIT_PUBLISHER(InitialTwist, "/initialtwist")
   {}
 };
 
