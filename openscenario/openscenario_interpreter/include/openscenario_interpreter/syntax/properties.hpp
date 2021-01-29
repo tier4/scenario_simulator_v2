@@ -18,6 +18,10 @@
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/property.hpp>
 
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -36,7 +40,9 @@ struct Properties
 {
   Properties() = default;
 
-  // std::unordered_map<String, Property> properties;
+  std::unordered_map<Property::Name, Property> properties;
+
+  std::vector<File> files;
 
   template
   <
@@ -44,12 +50,20 @@ struct Properties
   >
   explicit Properties(const Node & node, Scope & outer_scope)
   {
-    // callWithElements(
-    //   node, "Property", 0, unbounded, [this](auto && each)
-    //   {
-    //     return properties.emplace(
-    //       readAttribute<String>("name", each, outer_scope), each, outer_scope);
-    //   });
+    callWithElements(
+      node, "Property", 0, unbounded, [&](auto && node)
+      {
+        return properties.emplace(
+          std::piecewise_construct,
+          std::forward_as_tuple(readAttribute<Property::Name>("name", node, outer_scope)),
+          std::forward_as_tuple(node, outer_scope));
+      });
+
+    callWithElements(
+      node, "File", 0, unbounded, [&](auto && node)
+      {
+        return files.emplace_back(std::forward<decltype(node)>(node), outer_scope);
+      });
   }
 };
 }  // namespace syntax
