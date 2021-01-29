@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTIES_HPP_
 
 #include <openscenario_interpreter/syntax/file.hpp>
+#include <openscenario_interpreter/syntax/property.hpp>
 
 namespace openscenario_interpreter
 {

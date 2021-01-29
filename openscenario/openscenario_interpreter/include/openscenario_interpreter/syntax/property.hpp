@@ -15,10 +15,40 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTY_HPP_
 
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+/* ---- Property ---------------------------------------------------------------
+ *
+ *  <xsd:complexType name="Property">
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *  </xsd:complexType>
+ *
+ * -------------------------------------------------------------------------- */
+struct Property
+{
+  using Name = String;
+
+  const Name name;
+
+  using Value = String;
+
+  const Value value;
+
+  template
+  <
+    typename Node, typename Scope
+  >
+  explicit Property(const Node & node, Scope & outer_scope)
+  : name(readAttribute<Name>("name", node, outer_scope)),
+    value(readAttribute<Value>("value", node, outer_scope))
+  {}
+};
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
