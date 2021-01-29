@@ -9,6 +9,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>rclcpp</depend>
   <depend>xmlrpcpp</depend>
   <depend>protobuf</depend>
   <depend>protobuf-dev</depend>

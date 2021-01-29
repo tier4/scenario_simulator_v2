@@ -12,30 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef XMLRPC_PROTOBUF__SERVER_HPP_
-#define XMLRPC_PROTOBUF__SERVER_HPP_
-
-#include <rclcpp/rclcpp.hpp>
-
-#include <xmlrpcpp/XmlRpc.h>
-
-#include <thread>
+#include <xmlrpc_protobuf/server.hpp>
 
 namespace xmlrpc_protobuf
 {
-class Server
+Server::Server(int port)
+: port(port)
 {
-private:
-  XmlRpc::XmlRpcServer server_;
-  void runXmlRpc();
-  std::thread xmlrpc_thread_;
-
-public:
-  void start();
-  Server(int port);
-  ~Server();
-  const int port;
-};
 }
 
-#endif  // XMLRPC_PROTOBUF__SERVER_HPP_
+Server::~Server()
+{
+  xmlrpc_thread_.join();
+}
+
+void Server::runXmlRpc()
+{
+  while (rclcpp::ok()) {
+    server_.work(1);
+  }
+}
+
+void Server::start()
+{
+  server_.bindAndListen(port);
+  server_.enableIntrospection(true);
+  xmlrpc_thread_ = std::thread(&Server::runXmlRpc, this);
+}
+}
