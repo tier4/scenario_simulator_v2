@@ -19,17 +19,6 @@
 
 int main()
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  test::String string;
-  // simulation_api_schema::Result ret;
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  // result.set_description("test");
-  /*
-  result.set_description("test");
-  result.set_success(true);
-  res.set_allocated_result(&result);
-  XmlRpc::XmlRpcValue xml;
-  xmlrpc_interfae::fromProto(res, xml);
-  */
+  simulation_api_schema::Result ret;
   return 0;
 }

@@ -16,14 +16,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(xmlrpcpp)
+find_package(ament_cmake_auto REQUIRED)
+find_package(Boost COMPONENTS thread REQUIRED)
 include(FindProtobuf REQUIRED)
-
-include_directories(
-  include
-  ${CMAKE_BINARY_DIR}
-)
+ament_auto_find_build_dependencies()
 
 set(PROTO_FILES
   "proto/geometry_msgs.proto"
@@ -32,28 +28,29 @@ set(PROTO_FILES
   "proto/test.proto"
 )
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
-add_library(xmlrpc_interface
-  src/conversions.cpp
-  ${PROTO_SRCS}
-  ${PROTO_HDRS}
+add_library(proto_msgs SHARED ${PROTO_SRCS} ${PROTO_HDRS})
+target_link_libraries(proto_msgs ${PROTOBUF_LIBRARY})
+
+include_directories(
+  include
+  ${CMAKE_BINARY_DIR}
 )
-ament_target_dependencies(xmlrpc_interface
-  xmlrpcpp
+
+ament_auto_add_library(xmlrpc_interface
+  src/conversions.cpp
 )
 target_link_libraries(xmlrpc_interface
   ${PROTOBUF_LIBRARY}
+  Boost::thread
+  proto_msgs
 )
-ament_export_targets(export_xmlrpc_interface HAS_LIBRARY_TARGET)
-ament_export_libraries(xmlrpc_interface)
 
-add_executable(example
+ament_auto_add_executable(example
   src/example.cpp
-)
-ament_target_dependencies(example
-  xmlrpcpp
 )
 target_link_libraries(example
   xmlrpc_interface
+  Boost::thread
 )
 
 install(TARGETS
