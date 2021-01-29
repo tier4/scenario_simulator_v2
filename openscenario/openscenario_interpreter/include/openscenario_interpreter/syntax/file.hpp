@@ -36,7 +36,10 @@ struct File
   : filepath("./")
   {}
 
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit File(const Node & node, Scope & outer_scope)
   : filepath(readAttribute<String>("filepath", node, outer_scope))
   {}

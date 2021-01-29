@@ -57,8 +57,8 @@ void callWithElements(
   typename std::iterator_traits<typename Node::iterator>::difference_type max_occurs,
   Callee && call_with)
 {
-  const auto children {parent.children(name.c_str())};
-  if (const auto size {iterator::size(children)}) {
+  const auto children = parent.children(name.c_str());
+  if (const auto size = iterator::size(children)) {
     if (min_occurs != 0 && size < min_occurs) {
       std::stringstream ss {};
       ss << parent.name() << " requires class " << name <<
@@ -85,7 +85,10 @@ void callWithElements(
   }
 }
 
-template<typename Node, typename ... Ts>
+template
+<
+  typename Node, typename ... Ts
+>
 decltype(auto) choice(const Node & node, Ts && ... xs)
 {
   const std::unordered_map<

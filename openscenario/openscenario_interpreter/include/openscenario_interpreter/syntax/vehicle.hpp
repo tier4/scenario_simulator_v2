@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Vehicle ==============================================================
+/* ---- Vehicle ----------------------------------------------------------------
  *
  * <xsd:complexType name="Vehicle">
  *   <xsd:all>
@@ -40,7 +40,7 @@ inline namespace syntax
  *   <xsd:attribute name="vehicleCategory" type="VehicleCategory" use="required"/>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Vehicle
 {
   const String name;
@@ -59,22 +59,24 @@ struct Vehicle
 
   const Properties properties;
 
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node, typename Scope
+  >
   explicit Vehicle(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    vehicle_category{readAttribute<VehicleCategory>("vehicleCategory", node, outer_scope)},
-    inner_scope{outer_scope},
-    parameter_declarations{
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)},
-    bounding_box{readElement<BoundingBox>("BoundingBox", node, inner_scope)},
-    performance{readElement<Performance>("Performance", node, inner_scope)},
-    axles{readElement<Axles>("Axles", node, inner_scope)},
-    properties{readElement<Properties>("Properties", node, inner_scope)}
+  : name(readAttribute<String>("name", node, outer_scope)),
+    vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, outer_scope)),
+    inner_scope(outer_scope),
+    parameter_declarations(
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)),
+    bounding_box(readElement<BoundingBox>("BoundingBox", node, inner_scope)),
+    performance(readElement<Performance>("Performance", node, inner_scope)),
+    axles(readElement<Axles>("Axles", node, inner_scope)),
+    properties(readElement<Properties>("Properties", node, inner_scope))
   {}
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Vehicle & rhs)
+std::ostream & operator<<(std::ostream & os, const Vehicle & rhs)
 {
   return os << (indent++) << blue << "<Vehicle" << " " << highlight("name", rhs.name) <<
          " " << highlight("vehicleCategory", rhs.vehicle_category) << blue << ">\n" << reset <<

@@ -15,29 +15,43 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTIES_HPP_
 
+#include <openscenario_interpreter/syntax/file.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Properties ===========================================================
+/* ---- Properties -------------------------------------------------------------
  *
- * <xsd:complexType name="Properties">
- *   <xsd:sequence>
- *     <xsd:element name="Property" minOccurs="0" maxOccurs="unbounded" type="Property"/>
- *     <xsd:element name="File" type="File" minOccurs="0" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="Properties">
+ *    <xsd:sequence>
+ *      <xsd:element name="Property" minOccurs="0" maxOccurs="unbounded" type="Property"/>
+ *      <xsd:element name="File" type="File" minOccurs="0" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Properties
 {
   Properties() = default;
 
-  template<typename Node, typename Scope>
-  explicit Properties(const Node &, Scope &)
-  {}
+  // std::unordered_map<String, Property> properties;
+
+  template
+  <
+    typename Node, typename Scope
+  >
+  explicit Properties(const Node & node, Scope & outer_scope)
+  {
+    // callWithElements(
+    //   node, "Property", 0, unbounded, [this](auto && each)
+    //   {
+    //     return properties.emplace(
+    //       readAttribute<String>("name", each, outer_scope), each, outer_scope);
+    //   });
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PROPERTIES_HPP_

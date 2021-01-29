@@ -36,16 +36,16 @@ inline namespace syntax
  * </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct EntityObject
-  : public Element
-{
-  #define ELEMENT(TYPE) \
+#define ELEMENT(TYPE) \
   std::make_pair( \
     #TYPE, [&](auto && node) \
     { \
       return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
     })
 
+struct EntityObject
+  : public Element
+{
   template
   <
     typename Node, typename ... Ts
@@ -59,10 +59,10 @@ struct EntityObject
         ELEMENT(Pedestrian),
         std::make_pair("MiscObject", UNSUPPORTED())))
   {}
-
-  #undef ELEMENT
 };
-}
+
+#undef ELEMENT
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
