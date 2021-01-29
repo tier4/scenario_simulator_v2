@@ -14,6 +14,23 @@
 
 #include <gtest/gtest.h>
 
+#include <xmlrpc_interface/conversions.hpp>
+
+#include <string>
+
+TEST(Conversion, InitializeResponse)
+{
+  simulation_api_schema::InitializeResponse res;
+  simulation_api_schema::Result result;
+  result.set_description("test");
+  result.set_success(true);
+  res.set_allocated_result(&result);
+  XmlRpc::XmlRpcValue xml;
+  xmlrpc_interfae::fromProto(res, xml);
+  std::string description = xml["description"];
+  EXPECT_STREQ(description.c_str(), "test");
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

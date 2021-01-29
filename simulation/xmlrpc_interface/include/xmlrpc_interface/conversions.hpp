@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__CONVERSIONS_HPP_
-#define SCENARIO_SIMULATOR__CONVERSIONS_HPP_
+#ifndef XMLRPC_INTERFACE__CONVERSIONS_HPP_
+#define XMLRPC_INTERFACE__CONVERSIONS_HPP_
 
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
@@ -30,4 +30,4 @@ void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::X
 }  // namespace xmlrpc_interfae
 
 
-#endif  // SCENARIO_SIMULATOR__CONVERSIONS_HPP_
+#endif  // XMLRPC_INTERFACE__CONVERSIONS_HPP_
