@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <xmlrpc_interface/conversions.hpp>
 
-#include <string>
+#include <simulation_api_schema.pb.h>
+#include <test.pb.h>
 
-TEST(Conversion, InitializeResponse)
+int main()
 {
-  simulation_api_schema::InitializeResponse res;
-  simulation_api_schema::Result result;
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  test::String string;
+  // simulation_api_schema::Result ret;
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   // result.set_description("test");
-  // result.set_success(true);
-  // res.set_allocated_result(&result);
-  // XmlRpc::XmlRpcValue xml;
-  // xmlrpc_interfae::fromProto(res, xml);
-  // std::string description = xml["description"];
-  // EXPECT_STREQ(description.c_str(), "test");
-}
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  /*
+  result.set_description("test");
+  result.set_success(true);
+  res.set_allocated_result(&result);
+  XmlRpc::XmlRpcValue xml;
+  xmlrpc_interfae::fromProto(res, xml);
+  */
+  return 0;
 }

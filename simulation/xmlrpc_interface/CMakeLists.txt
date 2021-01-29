@@ -29,6 +29,7 @@ set(PROTO_FILES
   "proto/geometry_msgs.proto"
   "proto/openscenario_msgs.proto"
   "proto/simulation_api_schema.proto"
+  "proto/test.proto"
 )
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 add_library(xmlrpc_interface
@@ -44,6 +45,21 @@ target_link_libraries(xmlrpc_interface
 )
 ament_export_targets(export_xmlrpc_interface HAS_LIBRARY_TARGET)
 ament_export_libraries(xmlrpc_interface)
+
+add_executable(example
+  src/example.cpp
+)
+ament_target_dependencies(example
+  xmlrpcpp
+)
+target_link_libraries(example
+  xmlrpc_interface
+)
+
+install(TARGETS
+  example
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 install(TARGETS xmlrpc_interface
 EXPORT export_xmlrpc_interface
