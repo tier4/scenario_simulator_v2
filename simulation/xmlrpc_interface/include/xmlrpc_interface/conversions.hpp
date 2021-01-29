@@ -21,7 +21,9 @@
 namespace xmlrpc_interfae
 {
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to);
+void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeRequest & to);
 void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to);
+void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to);
 }  // namespace xmlrpc_interfae
 
 
