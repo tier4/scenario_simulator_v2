@@ -28,6 +28,9 @@ inline namespace syntax
 {
 /* ---- Properties -------------------------------------------------------------
  *
+ *  Container for one or more properties. Properties encloses multiple property
+ *  instances and/or multiple file references.
+ *
  *  <xsd:complexType name="Properties">
  *    <xsd:sequence>
  *      <xsd:element name="Property" minOccurs="0" maxOccurs="unbounded" type="Property"/>
@@ -38,11 +41,28 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Properties
 {
-  Properties() = default;
-
+  /* ---- properties -----------------------------------------------------------
+   *
+   *  A name-value pair. The semantic of the name/values are subject of a
+   *  contract between the provider of a simulation environment and the author
+   *  of a scenario.
+   *
+   * ------------------------------------------------------------------------ */
   std::unordered_map<Property::Name, Property> properties;
 
+  /* ---- files ----------------------------------------------------------------
+   *
+   *  A list of arbitrary files attached to an object that owns the properties.
+   *  The semantic and the file formats are subject of a contract between the
+   *  provider of a simulation environment and the author of a scenario.
+   *
+   *  Note: currently ignored.
+   *
+   * ------------------------------------------------------------------------ */
   std::vector<File> files;
+
+  // Note: Properties is an essential element in any case.
+  Properties() = delete;
 
   template
   <
