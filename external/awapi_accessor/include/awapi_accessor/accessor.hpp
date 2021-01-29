@@ -15,52 +15,38 @@
 #ifndef AWAPI_ACCESSOR__ACCESSOR_HPP_
 #define AWAPI_ACCESSOR__ACCESSOR_HPP_
 
+// Note: headers are lexicographically sorted.
+
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
+#include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
-
-#include <utility>
 
 namespace autoware_api
 {
 
 class Accessor
 {
-#define DEFINE_SUBSCRIPTION(TYPE) \
-protected: \
-  TYPE current_value_of_ ## TYPE; \
- \
-private: \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_ ## TYPE; \
- \
-public: \
-  const auto & get ## TYPE() const noexcept \
-  { \
-    return current_value_of_ ## TYPE; \
-  } \
-  static_assert(true, "")
+#ifndef NDEBUG
+  /** ---- DummyData -----------------------------------------------------------
+   *
+   *  Topic: ~/dummy
+   *
+   * ------------------------------------------------------------------------ */
+  using DebugString = std_msgs::msg::String;
 
-
-#define DEFINE_PUBLICATION(TYPE) \
-private: \
-  rclcpp::Publisher<TYPE>::SharedPtr publisher_of_ ## TYPE; \
- \
-public: \
-  template \
-  < \
-    typename ... Ts \
-  > \
-  decltype(auto) set ## TYPE(Ts && ... xs) const \
-  { \
-    return (*publisher_of_ ## TYPE).publish(std::forward<decltype(xs)>(xs)...); \
-  } \
-  static_assert(true, "")
+  DEFINE_PUBLISHER(DebugString);
+  DEFINE_SUBSCRIPTION(DebugString);
+#endif
 
   /** ---- AutowareEngage ------------------------------------------------------
    *
@@ -69,7 +55,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using AutowareEngage = std_msgs::msg::Bool;
 
-  DEFINE_PUBLICATION(AutowareEngage);
+  DEFINE_PUBLISHER(AutowareEngage);
 
   /** ---- AutowareRoute -------------------------------------------------------
    *
@@ -78,7 +64,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using AutowareRoute = autoware_planning_msgs::msg::Route;
 
-  DEFINE_PUBLICATION(AutowareRoute);
+  DEFINE_PUBLISHER(AutowareRoute);
 
   /** ---- LaneChangeApproval --------------------------------------------------
    *
@@ -87,7 +73,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using LaneChangeApproval = std_msgs::msg::Bool;
 
-  DEFINE_PUBLICATION(LaneChangeApproval);
+  DEFINE_PUBLISHER(LaneChangeApproval);
 
   /** ---- LaneChangeForce -----------------------------------------------------
    *
@@ -96,7 +82,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using LaneChangeForce = std_msgs::msg::Bool;
 
-  DEFINE_PUBLICATION(LaneChangeForce);
+  DEFINE_PUBLISHER(LaneChangeForce);
 
   /** ---- TrafficLightStateArray ----------------------------------------------
    *
@@ -107,7 +93,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using TrafficLightStateArray = autoware_perception_msgs::msg::TrafficLightStateArray;
 
-  DEFINE_PUBLICATION(TrafficLightStateArray);
+  DEFINE_PUBLISHER(TrafficLightStateArray);
 
   /** ---- VehicleVelocity -----------------------------------------------------
    *
@@ -118,7 +104,7 @@ public: \
    * ------------------------------------------------------------------------ */
   using VehicleVelocity = std_msgs::msg::Float32;
 
-  DEFINE_PUBLICATION(VehicleVelocity);
+  DEFINE_PUBLISHER(VehicleVelocity);
 
   /** ---- AutowareStatus ------------------------------------------------------
    *
@@ -147,57 +133,84 @@ public: \
 
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
-  /** ---- DummyData -----------------------------------------------------------
+public:
+  /** ---- Checkpoint ----------------------------------------------------------
    *
-   *  Topic: ~/dummy
+   *  Set goal pose of Autoware.
+   *
+   *  Topic: /planning/mission_planning/checkpoint
    *
    * ------------------------------------------------------------------------ */
-  using DebugString = std_msgs::msg::String;
+  using Checkpoint = geometry_msgs::msg::PoseStamped;
 
-  DEFINE_PUBLICATION(DebugString);
-  DEFINE_SUBSCRIPTION(DebugString);
+  DEFINE_PUBLISHER(Checkpoint);
 
-#undef DEFINE_SUBSCRIPTION
-#undef DEFINE_PUBLICATION
+  /** ---- GoalPose ------------------------------------------------------------
+   *
+   *  Set goal pose of Autoware.
+   *
+   *  Topic: /planning/mission_planning/goal
+   *
+   * ------------------------------------------------------------------------ */
+  using GoalPose = geometry_msgs::msg::PoseStamped;
+
+  DEFINE_PUBLISHER(GoalPose);
+
+  /** ---- InitialPose ---------------------------------------------------------
+   *
+   *  Set initial pose of Autoware.
+   *
+   *  Topic: /initialpose
+   *
+   * ------------------------------------------------------------------------ */
+  using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
+
+  DEFINE_PUBLISHER(InitialPose);
+
+  /** ---- InitialTwist --------------------------------------------------------
+   *
+   *  Set initial velocity of Autoware.
+   *
+   *  Topic: /initialtwist
+   *
+   * ------------------------------------------------------------------------ */
+  using InitialTwist = geometry_msgs::msg::TwistStamped;
+
+  DEFINE_PUBLISHER(InitialTwist);
 
 public:
-#define MAKE_SUBSCRIPTION(TYPE, TOPIC) \
-  subscription_of_ ## TYPE( \
-    (*node).template create_subscription<TYPE>( \
-      TOPIC, 1, \
-      [this](const TYPE::SharedPtr message) \
-      { \
-        current_value_of_ ## TYPE = *message; \
-      }))
-
-#define MAKE_PUBLICATION(TYPE, TOPIC) \
-  publisher_of_ ## TYPE( \
-    (*node).template create_publisher<TYPE>(TOPIC, 10))
-
   template
   <
     typename Node
   >
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Node && node)
-  : MAKE_PUBLICATION(AutowareEngage, "/awapi/autoware/put/engage"),
-    MAKE_PUBLICATION(AutowareRoute, "/awapi/autoware/put/route"),
-    MAKE_PUBLICATION(LaneChangeApproval, "/awapi/lane_change/put/approval"),
-    MAKE_PUBLICATION(LaneChangeForce, "/awapi/lane_change/put/force"),
-    MAKE_PUBLICATION(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
-    MAKE_PUBLICATION(VehicleVelocity, "/awapi/vehicle/put/velocity"),
-    MAKE_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
-    MAKE_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
-    MAKE_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
-    // Debug
-    MAKE_PUBLICATION(DebugString, "debug/string"),
-    MAKE_SUBSCRIPTION(DebugString, "debug/string")
-  {}
+  :
+#ifndef NDEBUG
+    INIT_PUBLISHER(DebugString, "debug/string"),
+    INIT_SUBSCRIPTION(DebugString, "debug/string"),
+#endif
+    // AWAPI topics (lexicographically sorted)
+    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+    INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
+    INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
+    INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
+    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
+    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
 
-#undef MAKE_SUBSCRIPTION
-#undef MAKE_PUBLICATION
+    // Simulation specific topics (lexicographically sorted)
+    INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
+    INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
+    INIT_PUBLISHER(InitialPose, "/initialpose"),
+    INIT_PUBLISHER(InitialTwist, "/initialtwist")
+  {}
 };
 
 }  // namespace autoware_api
+
+#include <awapi_accessor/undefine_macro.hpp>
 
 #endif  // AWAPI_ACCESSOR__ACCESSOR_HPP_
