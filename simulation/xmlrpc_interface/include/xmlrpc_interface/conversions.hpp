@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__CONVERSION_HPP_
-#define SCENARIO_SIMULATOR__CONVERSION_HPP_
+#ifndef SCENARIO_SIMULATOR__CONVERSIONS_HPP_
+#define SCENARIO_SIMULATOR__CONVERSIONS_HPP_
 
 #include <simulation_api_schema.pb.h>
-#include <rclcpp/rclcpp.hpp>
 #include <xmlrpcpp/XmlRpc.h>
 
-void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeResponse&  to)
+void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeResponse & to)
 {
-    simulation_api_schema::Result result;
-    result.set_success(from["success"]);
-    to.set_allocated_result(&result);
+  simulation_api_schema::Result result;
+  result.set_success(from["success"]);
+  to.set_allocated_result(&result);
 }
 
-#endif  // SCENARIO_SIMULATOR__CONVERSION_HPP_
+#endif  // SCENARIO_SIMULATOR__CONVERSIONS_HPP_
