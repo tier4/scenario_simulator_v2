@@ -15,15 +15,18 @@
 #ifndef XMLRPC_PROTOBUF__SERVER_HPP_
 #define XMLRPC_PROTOBUF__SERVER_HPP_
 
+#include <xmlrpcpp/XmlRpc.h>
+
 namespace xmlrpc_protobuf
 {
 class Server
 {
 private:
-    /* data */
+  XmlRpc::XmlRpcServer server_;
+
 public:
-    Server(/* args */);
-    ~Server();
+  Server(/* args */);
+  ~Server();
 };
 
 Server::Server(/* args */)
@@ -36,4 +39,4 @@ Server::~Server()
 
 }
 
-#endif  // XMLRPC_PROTOBUF__SERVER_HPP_ 
+#endif  // XMLRPC_PROTOBUF__SERVER_HPP_

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package geometry_msgs;
+
+message Point {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}

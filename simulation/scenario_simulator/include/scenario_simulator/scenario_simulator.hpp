@@ -43,10 +43,6 @@ public:
   ~ScenarioSimulator();
 
 private:
-  /*
-  ros::NodeHandle nh_;
-  ros::NodeHandle pnh_;
-  */
   XmlRpc::XmlRpcServer server_;
   int port_;
   std::map<std::string, std::shared_ptr<scenario_simulator::XmlRpcMethod>> methods_;
