@@ -17,8 +17,18 @@
 #include <simulation_api_schema.pb.h>
 #include <test.pb.h>
 
+#include <string>
+
 int main()
 {
-  simulation_api_schema::Result ret;
+  simulation_api_schema::InitializeResponse res;
+  simulation_api_schema::Result result;
+  result.set_description("test");
+  result.set_success(true);
+  res.set_allocated_result(&result);
+  XmlRpc::XmlRpcValue xml;
+  xmlrpc_interfae::fromProto(res, xml);
+  std::string description = xml["description"];
+  std::cout << description.c_str() << std::endl;
   return 0;
 }

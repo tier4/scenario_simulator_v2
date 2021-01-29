@@ -70,7 +70,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_conversion test/test_conversions.cpp)
-  target_link_libraries(test_conversion xmlrpc_interface)
+  target_link_libraries(test_conversion xmlrpc_interface Boost::thread)
 endif()
 
 ament_package()
