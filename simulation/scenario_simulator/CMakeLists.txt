@@ -30,6 +30,7 @@ find_package(lanelet2_extension REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(openscenario_msgs REQUIRED)
+find_package(xmlrpc_protobuf REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
@@ -55,6 +56,7 @@ ament_target_dependencies(scenario_simulator
   visualization_msgs
   behaviortree_cpp_v3
   openscenario_msgs
+  xmlrpc_protobuf
 )
 
 add_executable(scenario_simulator_node

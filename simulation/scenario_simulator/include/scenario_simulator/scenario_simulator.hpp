@@ -18,6 +18,8 @@
 #include <scenario_simulator/xmlrpc_method.hpp>
 #include <scenario_simulator/scenario_simulator_impl.hpp>
 
+#include <xmlrpc_protobuf/server.hpp>
+
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <xmlrpcpp/XmlRpc.h>
