@@ -37,17 +37,37 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct ScenarioObject
-  : public EntityObject  // Note: This framework expresses xsd:group as a mixin by inheritance.
+/* -----------------------------------------------------------------------------
+ *
+ *  The EntityObject (either instance of type Vehicle, Pedestrian or
+ *  MiscObject).
+ *
+ *  NOTE: This framework expresses xsd:group as a mixin by inheritance.
+ *
+ * ------------------------------------------------------------------------- */
+  : public EntityObject
 {
+  /* ---- name -----------------------------------------------------------------
+   *
+   *  Identifier of the scenario object.
+   *
+   * ------------------------------------------------------------------------ */
   using Name = String;
 
   const Name name;
 
-  Element object_controller;  // TODO(yamacir-kit): DefaultConstructible!
+  /* ---- ObjectController -----------------------------------------------------
+   *
+   *  Controller of the EntityObject instance.
+   *
+   *  TODO(yamacir-kit): DefaultConstructible!
+   *
+   * ------------------------------------------------------------------------ */
+  Element object_controller;
 
   template
   <
-    typename Node
+    typename Node, typename Scope
   >
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
   : EntityObject(node, outer_scope),
@@ -62,12 +82,21 @@ struct ScenarioObject
 
   auto evaluate() const
   {
+    // TODO(yamacir-kit)
+    //
+    // spawn(
+    //   (*this).is<Vehicle>() && (*this).as<Vehicle>().properties.isEgo,
+    //   name,
+    //   static_cast<const simulation_api::entity::VehicleParameter>(*this)
+    // )
+
     return asBoolean(
       spawn(
-        false,
+        // false,
+        (*this).is<Vehicle>() && (*this).as<Vehicle>()["isEgo"],
         name,
         boost::lexical_cast<String>(
-          static_cast<const EntityObject &>(*this))));
+          static_cast<const EntityObject &>(*this))));  // XXX UGLY CODE!!!
   }
 };
 

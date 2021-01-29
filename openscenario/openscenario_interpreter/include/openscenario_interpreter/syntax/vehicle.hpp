@@ -22,6 +22,8 @@
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
 
+#include <utility>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -43,21 +45,56 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Vehicle
 {
+  /* ---- name -----------------------------------------------------------------
+   *
+   *  Name of the vehicle type.
+   *
+   * ------------------------------------------------------------------------ */
   const String name;
 
+  /* ---- vehicleCategory ------------------------------------------------------
+   *
+   *  Category of the vehicle (bicycle, train,...).
+   *
+   * ------------------------------------------------------------------------ */
   const VehicleCategory vehicle_category;
 
   Scope inner_scope;
 
+  /* ---- ParameterDeclarations ------------------------------------------------
+   *
+   *  Definition of additional parameters.
+   *
+   * ------------------------------------------------------------------------ */
   const ParameterDeclarations parameter_declarations;
 
+  /* ---- BoundingBox ----------------------------------------------------------
+   *
+   *  The three dimensional bounding box that encloses the vehicle.
+   *
+   * ------------------------------------------------------------------------ */
   const BoundingBox bounding_box;
 
+  /* ---- Performance ----------------------------------------------------------
+   *
+   *  Performance properties of the vehicle.
+   *
+   * ------------------------------------------------------------------------ */
   const Performance performance;
 
+  /* ---- Axles ----------------------------------------------------------------
+   *
+   *  A set of axles (front, rear, additional) and their geometric locations.
+   *
+   * ------------------------------------------------------------------------ */
   const Axles axles;
 
-  const Properties properties;
+  /* ---- Properties -----------------------------------------------------------
+   *
+   *  Additional properties as name value pairs.
+   *
+   * ------------------------------------------------------------------------ */
+  Properties properties;
 
   template
   <
@@ -74,17 +111,24 @@ struct Vehicle
     axles(readElement<Axles>("Axles", node, inner_scope)),
     properties(readElement<Properties>("Properties", node, inner_scope))
   {}
+
+  template
+  <
+    typename ... Ts
+  >
+  decltype(auto) operator[](Ts && ... xs)
+  {
+    return properties.operator[](std::forward<decltype(xs)>(xs)...);
+  }
 };
 
 std::ostream & operator<<(std::ostream & os, const Vehicle & rhs)
 {
-  return os << (indent++) << blue << "<Vehicle" << " " << highlight("name", rhs.name) <<
-         " " << highlight("vehicleCategory", rhs.vehicle_category) << blue << ">\n" << reset <<
-         rhs.parameter_declarations << "\n" <<
-         rhs.bounding_box << "\n" <<
-         rhs.performance << "\n" <<
-         rhs.axles << "\n" <<
-         (--indent) << blue << "</Vehicle>" << reset;
+  return
+    os << (indent++) << blue << "<Vehicle" << " " << highlight("name", rhs.name) << " " <<
+    highlight("vehicleCategory", rhs.vehicle_category) << blue << ">\n" << reset <<
+    rhs.parameter_declarations << "\n" << rhs.bounding_box << "\n" << rhs.performance << "\n" <<
+    rhs.axles << "\n" << (--indent) << blue << "</Vehicle>" << reset;
 }
 }
 }  // namespace openscenario_interpreter

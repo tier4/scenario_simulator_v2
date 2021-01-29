@@ -85,6 +85,15 @@ struct Properties
         return files.emplace_back(std::forward<decltype(node)>(node), outer_scope);
       });
   }
+
+  template
+  <
+    typename ... Ts
+  >
+  decltype(auto) operator[](Ts && ... xs)
+  {
+    return properties.operator[](std::forward<decltype(xs)>(xs)...);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
