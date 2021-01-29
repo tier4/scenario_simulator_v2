@@ -30,24 +30,14 @@ find_package(lanelet2_extension REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(behaviortree_cpp_v3 REQUIRED)
 find_package(openscenario_msgs REQUIRED)
-find_package(xmlrpc_protobuf REQUIRED)
-include(FindProtobuf REQUIRED)
 
 find_package(Eigen3 REQUIRED)
 
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIR}
+  ${CMAKE_BINARY_DIR}
 )
-
-set(PROTO_FILES
-  "proto/geometry_msgs.proto"
-  "proto/openscenario_msgs.proto"
-  "proto/simulation_api_schema.proto"
-)
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
-add_library(proto_msgs SHARED ${PROTO_SRCS} ${PROTO_HDRS})
-target_link_libraries(proto_msgs ${PROTOBUF_LIBRARY})
 
 add_library(scenario_simulator SHARED
   src/xmlrpc_method.cpp
@@ -66,10 +56,6 @@ ament_target_dependencies(scenario_simulator
   visualization_msgs
   behaviortree_cpp_v3
   openscenario_msgs
-  xmlrpc_protobuf
-)
-target_link_libraries(scenario_simulator
-  proto_msgs
 )
 
 add_executable(scenario_simulator_node
@@ -81,7 +67,6 @@ ament_target_dependencies(scenario_simulator_node
 )
 target_link_libraries(scenario_simulator_node
   scenario_simulator
-  proto_msgs
 )
 
 install(TARGETS
