@@ -24,6 +24,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 /* ---- EntityObject -----------------------------------------------------------
  *
  * <xsd:group name="EntityObject">
@@ -36,22 +43,15 @@ inline namespace syntax
  * </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
-
 struct EntityObject
-  : public Element
+  : public Group
 {
   template
   <
     typename Node, typename ... Ts
   >
   explicit EntityObject(const Node & node, Ts && ... xs)
-  : Element(
+  : Group(
       choice(
         node,
         std::make_pair("CatalogReference", UNSUPPORTED()),

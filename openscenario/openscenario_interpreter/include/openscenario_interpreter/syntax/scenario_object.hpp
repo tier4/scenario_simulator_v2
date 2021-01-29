@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
@@ -26,28 +27,31 @@ inline namespace syntax
 {
 /* ---- ScenarioObject ---------------------------------------------------------
  *
- * <xsd:complexType name="ScenarioObject">
- *   <xsd:sequence>
- *     <xsd:group ref="EntityObject"/>
- *     <xsd:element name="ObjectController" minOccurs="0" type="ObjectController"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ScenarioObject">
+ *    <xsd:sequence>
+ *      <xsd:group ref="EntityObject"/>
+ *      <xsd:element name="ObjectController" minOccurs="0" type="ObjectController"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ScenarioObject
+  : public EntityObject  // Note: This framework expresses xsd:group as a mixin by inheritance.
 {
-  const String name;
+  using Name = String;
 
-  Element entity_object, object_controller;
+  const Name name;
+
+  Element object_controller;  // TODO(yamacir-kit): DefaultConstructible!
 
   template
   <
     typename Node
   >
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
-    entity_object(make<EntityObject>(node, outer_scope))
+  : EntityObject(node, outer_scope),
+    name(readAttribute<String>("name", node, outer_scope))
   {
     callWithElements(
       node, "ObjectController", 0, 1, [&](auto && node)
@@ -56,24 +60,23 @@ struct ScenarioObject
       });
   }
 
-  decltype(auto) getEntityObject()
+  auto evaluate() const
   {
-    return entity_object.as<EntityObject>(__FILE__, __LINE__);
-  }
-
-  auto evaluate()
-  {
-    return asBoolean(spawn(false, name, boost::lexical_cast<String>(entity_object)));
+    return asBoolean(
+      spawn(
+        false,
+        name,
+        boost::lexical_cast<String>(
+          static_cast<const EntityObject &>(*this))));
   }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ScenarioObject & rhs)
+std::ostream & operator<<(std::ostream & os, const ScenarioObject & datum)
 {
-  return os << (indent++) << blue << "<ScenarioObject" << " " <<
-         highlight("name", rhs.name) << blue << ">\n" << reset <<
-         rhs.entity_object << "\n" <<
-         (--indent) << blue << "</ScenarioObject>" << reset;
+  return
+    os << (indent++) << blue << "<ScenarioObject" << " " << highlight("name", datum.name) <<
+    blue << ">\n" << reset << static_cast<const EntityObject &>(datum) << "\n" << (--indent) <<
+    blue << "</ScenarioObject>" << reset;
 }
 }
 }  // namespace openscenario_interpreter
