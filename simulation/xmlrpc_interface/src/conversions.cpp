@@ -19,6 +19,7 @@ namespace xmlrpc_interfae
 {
 void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeResponse & to)
 {
+  to = simulation_api_schema::InitializeResponse();
   simulation_api_schema::Result result;
   result.set_success(from["success"]);
   result.set_description(from["description"]);
@@ -32,8 +33,9 @@ void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::X
   to["description"] = from.result().description();
 }
 
-void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeRequest & to)
+void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to)
 {
+  to = simulation_api_schema::InitializeRequest();
   to.set_realtime_factor(from["realtime_factor"]);
   to.set_step_time(from["step_time"]);
 }
@@ -43,5 +45,26 @@ void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::Xm
   to = XmlRpc::XmlRpcValue();
   to["realtime_factor"] = from.realtime_factor();
   to["step_time"] = from.step_time();
+}
+
+void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameRequest & to)
+{
+  to = simulation_api_schema::UpdateFrameRequest();
+  to.set_current_time(from["current_time"]);
+}
+
+void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to)
+{
+  to = XmlRpc::XmlRpcValue();
+  to["current_time"] = from.current_time();
+}
+
+void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to)
+{
+  to = simulation_api_schema::UpdateFrameResponse();
+  simulation_api_schema::Result result;
+  result.set_success(from["success"]);
+  result.set_description(from["description"]);
+  to.set_allocated_result(&result);
 }
 }  // namespace xmlrpc_interfae
