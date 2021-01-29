@@ -18,11 +18,11 @@
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
 
-void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeResponse & to)
+namespace xmlrpc_interfae
 {
-  simulation_api_schema::Result result;
-  result.set_success(from["success"]);
-  to.set_allocated_result(&result);
-}
+void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to);
+void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to);
+}  // namespace xmlrpc_interfae
+
 
 #endif  // SCENARIO_SIMULATOR__CONVERSIONS_HPP_

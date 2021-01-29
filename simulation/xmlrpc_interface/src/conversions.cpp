@@ -13,3 +13,35 @@
 // limitations under the License.
 
 #include <xmlrpc_interface/conversions.hpp>
+
+
+namespace xmlrpc_interfae
+{
+void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeResponse & to)
+{
+  simulation_api_schema::Result result;
+  result.set_success(from["success"]);
+  result.set_description(from["description"]);
+  to.set_allocated_result(&result);
+}
+
+void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to)
+{
+  to = XmlRpc::XmlRpcValue();
+  to["success"] = from.result().success();
+  to["description"] = from.result().description();
+}
+
+void toProto(const XmlRpc::XmlRpcValue from, simulation_api_schema::InitializeRequest & to)
+{
+  to.set_realtime_factor(from["realtime_factor"]);
+  to.set_step_time(from["step_time"]);
+}
+
+void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to)
+{
+  to = XmlRpc::XmlRpcValue();
+  to["realtime_factor"] = from.realtime_factor();
+  to["step_time"] = from.step_time();
+}
+}  // namespace xmlrpc_interfae
