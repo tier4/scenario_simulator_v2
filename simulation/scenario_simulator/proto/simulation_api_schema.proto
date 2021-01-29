@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package simulation_api_schema;
+
+message Result
+{
+    bool success = 1;
+    string description = 2;
+}
+
+message InitializeRequest
+{
+    double realtime_factor = 1;
+    double step_time = 2;
+}
+
+message InitializeResponse
+{
+    Result result = 1;
+}
+
+message UpdateFrameRequest
+{
+    double current_time = 1;
+}
+
+message UpdateFrameResponse
+{
+    Result result = 1;
+}

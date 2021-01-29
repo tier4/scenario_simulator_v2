@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "geometry_msgs.proto";
+
+package openscenario_msgs;
+
+message ActionStatus
+{
+    string current_action = 1;
+    geometry_msgs.Twist twist = 2;
+    geometry_msgs.Accel accel = 3;
+}
+
+message BoundingBox
+{
+    geometry_msgs.Point center = 1;
+    geometry_msgs.Vector3 dimensions = 2;
+}
+
+message LaneletPose
+{
+    int64 lanlet_id = 1;
+    double s = 2;
+    double offset = 3;
+    geometry_msgs.Vector3 rpy = 4;
+}
+
+enum EntityType
+{
+    EGO = 0;
+    VEHICLE = 1;
+    PEDESTRIAN = 2;
+}
+
+message EntityStatus
+{
+    EntityType type = 1;
+    double time = 2;
+    string name = 3;
+    BoundingBox bounding_box = 4;
+    ActionStatus action_status = 5;
+    geometry_msgs.Pose pose = 6;
+    LaneletPose lanelet_pose = 7;
+    bool lanelet_pose_valid = 8;
+}

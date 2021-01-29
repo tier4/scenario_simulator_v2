@@ -42,6 +42,8 @@ include_directories(
 
 set(PROTO_FILES
   "proto/geometry_msgs.proto"
+  "proto/openscenario_msgs.proto"
+  "proto/simulation_api_schema.proto"
 )
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 add_library(proto_msgs SHARED ${PROTO_SRCS} ${PROTO_HDRS})
