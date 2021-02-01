@@ -20,8 +20,29 @@
 
 #include <string>
 
+#include <exception>
+
 namespace xmlrpc_interfae
 {
+
+class XmlParameterError : public std::runtime_error
+{
+public:
+  explicit XmlParameterError(
+    std::string message,
+    const char * file,
+    int line)
+  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line)) {}
+};
+
+#define THROW_XML_PARAMETER_ERROR(description) \
+  throw XmlParameterError( \
+    description, __FILE__, __LINE__);
+
+#define THROW_XML_PARAMETER_NOT_DEFINED_ERROR(name) \
+  throw XmlParameterError( \
+    std::string("parameter : ") + name + std::string(" does not defined."), __FILE__, __LINE__);
+
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to);
 void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to);
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to);
@@ -30,6 +51,9 @@ void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFram
 void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to);
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to);
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to);
+
+const char key_success[] = "success";
+
 template<typename T>
 const std::string serialize(const XmlRpc::XmlRpcValue & from)
 {

@@ -20,14 +20,20 @@ namespace xmlrpc_interfae
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to)
 {
   to = simulation_api_schema::InitializeResponse();
-  to.mutable_result()->set_success(from["success"]);
+  if (!from.hasMember(key_success)) {
+    THROW_XML_PARAMETER_NOT_DEFINED_ERROR(key_success);
+  }
+  to.mutable_result()->set_success(from[key_success]);
+  if (!from.hasMember("description")) {
+    THROW_XML_PARAMETER_NOT_DEFINED_ERROR("description");
+  }
   to.mutable_result()->set_description(from["description"]);
 }
 
 void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to["success"] = from.result().success();
+  to[key_success] = from.result().success();
   to["description"] = from.result().description();
 }
 
@@ -60,14 +66,14 @@ void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::X
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to)
 {
   to = simulation_api_schema::UpdateFrameResponse();
-  to.mutable_result()->set_success(from["success"]);
+  to.mutable_result()->set_success(from[key_success]);
   to.mutable_result()->set_description(from["description"]);
 }
 
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to["success"] = from.result().success();
+  to[key_success] = from.result().success();
   to["description"] = from.result().description();
 }
 }  // namespace xmlrpc_interfae
