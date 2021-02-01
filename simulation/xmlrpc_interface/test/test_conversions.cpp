@@ -37,6 +37,22 @@ TEST(Conversion, ConvertInitializeResponse)
     serialized_str.c_str());
 }
 
+TEST(Conversion, ConvertInitializeRequest)
+{
+  simulation_api_schema::InitializeRequest req;
+  req.set_realtime_factor(0.1);
+  req.set_step_time(0.5);
+  XmlRpc::XmlRpcValue xml;
+  xmlrpc_interfae::fromProto(req, xml);
+  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interfae::key_step_time]);
+  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interfae::key_realtime_factor]);
+  req.set_realtime_factor(0);
+  req.set_step_time(0);
+  xmlrpc_interfae::toProto(xml, req);
+  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interfae::key_step_time]);
+  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interfae::key_realtime_factor]);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
