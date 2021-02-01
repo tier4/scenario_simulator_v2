@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
+#include <xmlrpc_interface/conversions.hpp>
+
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <string>
@@ -612,6 +614,12 @@ XmlRpc::XmlRpcValue API::initialize(
   current_state_cmd_ = boost::none;
   step_time_ = step_time;
   current_time_ = 0.0;
+
+  simulation_api_schema::InitializeRequest req;
+  req.set_step_time(step_time);
+  req.set_realtime_factor(realtime_factor);
+  xmlrpc_interfae::serialize(req);
+
   XmlRpc::XmlRpcValue value;
   value[0][0]["methodName"] = "initialize";
   value[0][0]["params"]["sim/realtime_factor"] = realtime_factor;

@@ -14,6 +14,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
+include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
@@ -60,8 +61,7 @@ ament_auto_add_library(entity_manager SHARED
 target_link_libraries(entity_manager pugixml)
 
 ament_auto_add_library(simulation_api SHARED src/api/api.cpp)
-
-target_link_libraries(simulation_api entity_manager)
+target_link_libraries(simulation_api entity_manager ${PROTOBUF_LIBRARY})
 
 ament_auto_add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 

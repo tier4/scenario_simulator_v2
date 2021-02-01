@@ -84,6 +84,7 @@ const char key_description[] = "description";
 const char key_realtime_factor[] = "realtime_factor";
 const char key_step_time[] = "step_time";
 const char key_current_time[] = "current_time";
+const char key_parameters[] = "params";
 
 template<typename T>
 const std::string serialize(const XmlRpc::XmlRpcValue & from)
@@ -93,6 +94,17 @@ const std::string serialize(const XmlRpc::XmlRpcValue & from)
   toProto(from, to);
   to.SerializeToString(&serialized_str);
   return serialized_str;
+}
+
+template<typename T>
+const XmlRpc::XmlRpcValue serialize(const T & data)
+{
+  std::string serialized_str = "";
+  T to;
+  to.SerializeToString(&serialized_str);
+  XmlRpc::XmlRpcValue ret;
+  ret[key_parameters] = serialized_str;
+  return ret;
 }
 }  // namespace xmlrpc_interfae
 
