@@ -18,6 +18,8 @@
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
 
+#include <string>
+
 namespace xmlrpc_interfae
 {
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to);
@@ -28,6 +30,15 @@ void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFram
 void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to);
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to);
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to);
+template<typename T>
+const std::string serialize(const XmlRpc::XmlRpcValue & from)
+{
+  std::string serialized_str = "";
+  T to;
+  toProto(from, to);
+  to.SerializeToString(&serialized_str);
+  return serialized_str;
+}
 }  // namespace xmlrpc_interfae
 
 
