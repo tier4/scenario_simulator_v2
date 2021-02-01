@@ -82,17 +82,8 @@ struct ScenarioObject
 
   auto evaluate() const
   {
-    // TODO(yamacir-kit)
-    //
-    // spawn(
-    //   (*this).is<Vehicle>() && (*this).as<Vehicle>().properties.isEgo,
-    //   name,
-    //   static_cast<const simulation_api::entity::VehicleParameter>(*this)
-    // )
-
     return asBoolean(
       spawn(
-        // false,
         (*this).is<Vehicle>() && (*this).as<Vehicle>()["isEgo"],
         name,
         boost::lexical_cast<String>(
