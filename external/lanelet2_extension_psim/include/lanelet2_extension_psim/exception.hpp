@@ -14,8 +14,8 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome, Masaya Kataoka
 
-#ifndef LANELET2_EXTENSION__EXCEPTION_HPP_
-#define LANELET2_EXTENSION__EXCEPTION_HPP_
+#ifndef LANELET2_EXTENSION_PSIM__EXCEPTION_HPP_
+#define LANELET2_EXTENSION_PSIM__EXCEPTION_HPP_
 
 #include <exception>
 #include <string>
@@ -47,4 +47,4 @@ protected:
 };
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION__EXCEPTION_HPP_
+#endif  // LANELET2_EXTENSION_PSIM__EXCEPTION_HPP_

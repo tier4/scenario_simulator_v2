@@ -14,8 +14,8 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
-#ifndef LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_
-#define LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_
+#ifndef LANELET2_EXTENSION_PSIM__PROJECTION__MGRS_PROJECTOR_HPP_
+#define LANELET2_EXTENSION_PSIM__PROJECTION__MGRS_PROJECTOR_HPP_
 
 #include <lanelet2_extension_psim/exception.hpp>
 #include <lanelet2_io/Exceptions.h>
@@ -113,4 +113,4 @@ private:
 }  // namespace projection
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION__PROJECTION__MGRS_PROJECTOR_HPP_
+#endif  // LANELET2_EXTENSION_PSIM__PROJECTION__MGRS_PROJECTOR_HPP_

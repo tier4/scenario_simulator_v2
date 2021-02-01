@@ -14,8 +14,8 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
-#ifndef LANELET2_EXTENSION__VISUALIZATION__VISUALIZATION_HPP_
-#define LANELET2_EXTENSION__VISUALIZATION__VISUALIZATION_HPP_
+#ifndef LANELET2_EXTENSION_PSIM__VISUALIZATION__VISUALIZATION_HPP_
+#define LANELET2_EXTENSION_PSIM__VISUALIZATION__VISUALIZATION_HPP_
 
 #include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
 #include <lanelet2_extension_psim/utility/query.hpp>
@@ -184,4 +184,4 @@ visualization_msgs::msg::MarkerArray generateLaneletIdMarker(
 }  // namespace visualization
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION__VISUALIZATION__VISUALIZATION_HPP_
+#endif  // LANELET2_EXTENSION_PSIM__VISUALIZATION__VISUALIZATION_HPP_

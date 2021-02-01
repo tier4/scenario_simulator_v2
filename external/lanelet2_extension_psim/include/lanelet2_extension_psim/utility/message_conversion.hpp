@@ -14,8 +14,8 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
-#ifndef LANELET2_EXTENSION__UTILITY__MESSAGE_CONVERSION_HPP_
-#define LANELET2_EXTENSION__UTILITY__MESSAGE_CONVERSION_HPP_
+#ifndef LANELET2_EXTENSION_PSIM__UTILITY__MESSAGE_CONVERSION_HPP_
+#define LANELET2_EXTENSION_PSIM__UTILITY__MESSAGE_CONVERSION_HPP_
 
 #include <lanelet2_core/LaneletMap.h>
 #include <autoware_auto_msgs/msg/had_map_bin.hpp>
@@ -98,4 +98,4 @@ void toGeomMsgPt32(const Eigen::Vector3d & src, geometry_msgs::msg::Point32 * ds
 }  // namespace utils
 }  // namespace lanelet
 
-#endif  // LANELET2_EXTENSION__UTILITY__MESSAGE_CONVERSION_HPP_
+#endif  // LANELET2_EXTENSION_PSIM__UTILITY__MESSAGE_CONVERSION_HPP_
