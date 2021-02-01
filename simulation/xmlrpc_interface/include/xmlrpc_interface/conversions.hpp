@@ -81,6 +81,9 @@ T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)
 
 const char key_success[] = "success";
 const char key_description[] = "description";
+const char key_realtime_factor[] = "realtime_factor";
+const char key_step_time[] = "step_time";
+const char key_current_time[] = "current_time";
 
 template<typename T>
 const std::string serialize(const XmlRpc::XmlRpcValue & from)

@@ -32,46 +32,46 @@ void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::X
 {
   to = XmlRpc::XmlRpcValue();
   to[key_success] = from.result().success();
-  to["description"] = from.result().description();
+  to[key_description] = from.result().description();
 }
 
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to)
 {
   to = simulation_api_schema::InitializeRequest();
-  to.set_realtime_factor(from["realtime_factor"]);
-  to.set_step_time(from["step_time"]);
+  to.set_realtime_factor(xmlrpc_interfae::getXmlValue<double>(from, key_realtime_factor));
+  to.set_step_time(xmlrpc_interfae::getXmlValue<double>(from, key_step_time));
 }
 
 void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to["realtime_factor"] = from.realtime_factor();
-  to["step_time"] = from.step_time();
+  to[key_realtime_factor] = from.realtime_factor();
+  to[key_step_time] = from.step_time();
 }
 
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameRequest & to)
 {
   to = simulation_api_schema::UpdateFrameRequest();
-  to.set_current_time(from["current_time"]);
+  to.set_current_time(from[key_current_time]);
 }
 
 void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to["current_time"] = from.current_time();
+  to[key_current_time] = from.current_time();
 }
 
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to)
 {
   to = simulation_api_schema::UpdateFrameResponse();
   to.mutable_result()->set_success(from[key_success]);
-  to.mutable_result()->set_description(from["description"]);
+  to.mutable_result()->set_description(from[key_description]);
 }
 
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
   to[key_success] = from.result().success();
-  to["description"] = from.result().description();
+  to[key_description] = from.result().description();
 }
 }  // namespace xmlrpc_interfae
