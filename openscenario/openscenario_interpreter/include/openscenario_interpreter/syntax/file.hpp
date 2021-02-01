@@ -16,6 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+
+#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -30,15 +33,20 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct File
 {
-  const String filepath;
+  using FilePath = String;
+
+  const FilePath filepath;
 
   File()
   : filepath("./")
   {}
 
-  template<typename Node, typename Scope>
-  explicit File(const Node & node, Scope & outer_scope)
-  : filepath(readAttribute<String>("filepath", node, outer_scope))
+  template
+  <
+    typename ... Ts
+  >
+  explicit File(Ts && ... xs)
+  : filepath(readAttribute<FilePath>("filepath", std::forward<decltype(xs)>(xs)...))
   {}
 
   operator String() const noexcept

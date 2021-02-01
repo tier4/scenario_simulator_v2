@@ -17,14 +17,16 @@
 
 #include <utility>
 
+#define CURRENT_VALUE_OF(TYPE) current_value_of_ ## TYPE
+
 #define DEFINE_SUBSCRIPTION(TYPE) \
 private: \
-  TYPE current_value_of_ ## TYPE; \
+  TYPE CURRENT_VALUE_OF(TYPE); \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_ ## TYPE; \
 public: \
   const auto & get ## TYPE() const noexcept \
   { \
-    return current_value_of_ ## TYPE; \
+    return CURRENT_VALUE_OF(TYPE); \
   } \
   static_assert(true, "")
 
@@ -42,13 +44,14 @@ public: \
   } \
   static_assert(true, "")
 
-#define INIT_SUBSCRIPTION(TYPE, TOPIC) \
+#define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK) \
   subscription_of_ ## TYPE( \
     (*node).template create_subscription<TYPE>( \
       TOPIC, 1, \
       [this](const TYPE::SharedPtr message) \
       { \
-        current_value_of_ ## TYPE = *message; \
+        CURRENT_VALUE_OF(TYPE) = *message; \
+        ERROR_CHECK(); \
       }))
 
 #define INIT_PUBLISHER(TYPE, TOPIC) \

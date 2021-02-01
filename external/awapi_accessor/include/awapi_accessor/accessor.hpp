@@ -21,6 +21,7 @@
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -33,6 +34,10 @@
 
 namespace autoware_api
 {
+
+struct AutowareError
+{
+};
 
 class Accessor
 {
@@ -179,6 +184,25 @@ public:
   DEFINE_PUBLISHER(InitialTwist);
 
 public:
+  auto ready() const
+  {
+    static auto ready = false;
+
+    return ready || (ready =
+           (CURRENT_VALUE_OF(AutowareStatus).autoware_state ==
+           autoware_system_msgs::msg::AutowareState::WAITING_FOR_ROUTE));
+  }
+
+  void checkAutowareState() const
+  {
+    if (ready() && CURRENT_VALUE_OF(AutowareStatus).autoware_state ==
+      autoware_system_msgs::msg::AutowareState::EMERGENCY)
+    {
+      throw AutowareError();
+    }
+  }
+
+public:
   template
   <
     typename Node
@@ -188,7 +212,7 @@ public:
   :
 #ifndef NDEBUG
     INIT_PUBLISHER(DebugString, "debug/string"),
-    INIT_SUBSCRIPTION(DebugString, "debug/string"),
+    INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),
 #endif
     // AWAPI topics (lexicographically sorted)
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
@@ -197,9 +221,9 @@ public:
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
-    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status"),
-    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status"),
-    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status"),
+    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
+    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
 
     // Simulation specific topics (lexicographically sorted)
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
