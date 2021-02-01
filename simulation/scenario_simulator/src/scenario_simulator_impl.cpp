@@ -15,6 +15,8 @@
 #include <scenario_simulator/scenario_simulator_impl.hpp>
 #include <scenario_simulator/exception.hpp>
 
+#include <xmlrpc_interface/conversions.hpp>
+
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <simulation_api/entity/vehicle_parameter.hpp>
@@ -41,8 +43,9 @@ void ScenarioSimulatorImpl::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlR
     std::swap(*this, other);
   }
   initialized_ = true;
-  realtime_factor_ = param["sim/realtime_factor"];
-  step_time_ = param["sim/step_time"];
+  const auto req = xmlrpc_interfae::deserialize<simulation_api_schema::InitializeRequest>(result);
+  realtime_factor_ = req.realtime_factor();
+  step_time_ = req.step_time();
   result["sim/initialized"] = initialized_;
   result["message"] = "succeed to initialize simulation";
 }

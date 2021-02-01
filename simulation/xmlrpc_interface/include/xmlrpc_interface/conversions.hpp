@@ -105,6 +105,14 @@ const XmlRpc::XmlRpcValue serialize(const T & data)
   ret[key_parameters] = serialized_str;
   return ret;
 }
+
+template<typename T>
+T deserialize(const XmlRpc::XmlRpcValue & data)
+{
+  T ret;
+  toProto(data[key_parameters], ret);
+  return ret;
+}
 }  // namespace xmlrpc_interfae
 
 

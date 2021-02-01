@@ -615,11 +615,17 @@ XmlRpc::XmlRpcValue API::initialize(
   step_time_ = step_time;
   current_time_ = 0.0;
 
+  XmlRpc::XmlRpcValue value;
   simulation_api_schema::InitializeRequest req;
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
-  xmlrpc_interfae::serialize(req);
-
+  value[0][0] = xmlrpc_interfae::serialize(req);
+  value[0][0]["methodName"] = "initialize";
+  XmlRpc::XmlRpcValue result;
+  client_ptr_->execute("system.multicall", value, result);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  return true;
+  /*
   XmlRpc::XmlRpcValue value;
   value[0][0]["methodName"] = "initialize";
   value[0][0]["params"]["sim/realtime_factor"] = realtime_factor;
@@ -638,6 +644,7 @@ XmlRpc::XmlRpcValue API::initialize(
     std::this_thread::sleep_for(std::chrono::milliseconds(duration_try_in_msec));
   }
   throw ExecutionFailedError("failed to call initaialize API, xmlrpc timeout");
+  */
 }
 
 XmlRpc::XmlRpcValue API::updateFrame()
