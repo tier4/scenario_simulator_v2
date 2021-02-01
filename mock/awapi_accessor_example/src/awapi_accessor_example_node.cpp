@@ -82,6 +82,7 @@ public:
             };
           }
 
+          #ifndef NDEBUG
           {
             static auto value = 0;
             std_msgs::msg::String message {};
@@ -96,6 +97,7 @@ public:
 
             std::cout << current.data << std::endl;
           }
+          #endif
 
           std::cout << "<<< TIMER CALLBACK!" << std::endl;
         }))

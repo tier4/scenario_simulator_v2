@@ -22,26 +22,30 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Entities =============================================================
+/* ---- Entities ---------------------------------------------------------------
  *
- * <xsd:complexType name="Entities">
- *   <xsd:sequence>
- *     <xsd:element name="ScenarioObject" minOccurs="0" maxOccurs="unbounded" type="ScenarioObject"/>
- *     <xsd:element name="EntitySelection" minOccurs="0" maxOccurs="unbounded" type="EntitySelection"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="Entities">
+ *    <xsd:sequence>
+ *      <xsd:element name="ScenarioObject" minOccurs="0" maxOccurs="unbounded" type="ScenarioObject"/>
+ *      <xsd:element name="EntitySelection" minOccurs="0" maxOccurs="unbounded" type="EntitySelection"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Entities
 {
-  template<typename Node>
-  explicit Entities(const Node & node, Scope & scope)
+  template
+  <
+    typename Node, typename Scope
+  >
+  explicit Entities(const Node & node, Scope & outer_scope)
   {
     callWithElements(
       node, "ScenarioObject", 0, unbounded, [&](auto && node)
       {
-        scope.entities.emplace(
-          readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
+        outer_scope.entities.emplace(
+          readAttribute<ScenarioObject::Name>("name", node, outer_scope),
+          make<ScenarioObject>(node, outer_scope));
       });
 
     callWithElements(node, "EntitySelection", 0, unbounded, UNSUPPORTED());
