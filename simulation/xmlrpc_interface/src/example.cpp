@@ -21,13 +21,14 @@
 int main()
 {
   simulation_api_schema::InitializeResponse res;
-  simulation_api_schema::Result result;
-  result.set_description("test");
-  result.set_success(true);
-  res.set_allocated_result(&result);
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("test");
   XmlRpc::XmlRpcValue xml;
   xmlrpc_interfae::fromProto(res, xml);
   std::string description = xml["description"];
   std::cout << description.c_str() << std::endl;
+  XmlRpc::XmlRpcValue from_xml;
+  from_xml["description"] = "test";
+  xmlrpc_interfae::toProto(from_xml, res);
   return 0;
 }
