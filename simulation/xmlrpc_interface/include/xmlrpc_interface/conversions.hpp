@@ -97,6 +97,14 @@ const std::string serialize(const XmlRpc::XmlRpcValue & from)
 }
 
 template<typename T>
+const std::string serializeToString(const T & data)
+{
+  std::string serialized_str = "";
+  data.SerializeToString(&serialized_str);
+  return serialized_str;
+}
+
+template<typename T>
 const XmlRpc::XmlRpcValue serialize(const T & data)
 {
   std::string serialized_str = "";

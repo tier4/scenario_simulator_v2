@@ -43,11 +43,20 @@ void ScenarioSimulatorImpl::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlR
     std::swap(*this, other);
   }
   initialized_ = true;
-  const auto req = xmlrpc_interfae::deserialize<simulation_api_schema::InitializeRequest>(result);
+  simulation_api_schema::InitializeRequest req;
+  std::vector<char> bin = param;
+  req.ParseFromArray(bin.data(), bin.size());
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
-  result["sim/initialized"] = initialized_;
-  result["message"] = "succeed to initialize simulation";
+  simulation_api_schema::InitializeResponse res;
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("succeed to initialize simulation");
+  result = XmlRpc::XmlRpcValue();
+  size_t size = res.ByteSizeLong(); 
+  void *buffer = malloc(size);
+  res.SerializeToArray(buffer, size);
+  result["return"] = XmlRpc::XmlRpcValue(buffer, size);
+  free(buffer);
 }
 
 void ScenarioSimulatorImpl::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
