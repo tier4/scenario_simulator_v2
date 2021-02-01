@@ -100,8 +100,7 @@ template<typename T>
 const XmlRpc::XmlRpcValue serialize(const T & data)
 {
   std::string serialized_str = "";
-  T to;
-  to.SerializeToString(&serialized_str);
+  data.SerializeToString(&serialized_str);
   XmlRpc::XmlRpcValue ret;
   ret[key_parameters] = serialized_str;
   return ret;
