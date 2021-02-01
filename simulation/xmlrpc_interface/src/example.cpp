@@ -15,7 +15,6 @@
 #include <xmlrpc_interface/conversions.hpp>
 
 #include <simulation_api_schema.pb.h>
-#include <test.pb.h>
 
 #include <string>
 
