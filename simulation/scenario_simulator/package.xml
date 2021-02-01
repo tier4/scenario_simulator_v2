@@ -36,9 +36,9 @@
   <depend>eigen</depend>
   <depend>quaternion_operation</depend>
   <depend>xmlrpcpp</depend>
-  <depend>protobuf</depend>
-  <depend>protobuf-dev</depend>
+  <depend>xmlrpc_interface</depend>
   <depend>openscenario_msgs</depend>
+  <depend>ament_cmake_auto</depend>
   <exec_depend>rviz2</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
