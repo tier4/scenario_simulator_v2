@@ -43,11 +43,11 @@ jobs:
       - name: Dirty Hacks
         working-directory: ~/ros2_ws/src/scenario_simulator.auto
         run: |
-          git clone https://github.com/tier4/pilot.auto.git
-          mv pilot.auto/awapi/autoware_api_msgs              external/
-          mv pilot.auto/common/msgs/autoware_perception_msgs external/
-          mv pilot.auto/common/msgs/autoware_planning_msgs   external/
-          mv pilot.auto/common/msgs/autoware_system_msgs     external/
+          git clone -b ros2 https://github.com/tier4/pilot.auto.git
+          mv -v pilot.auto/awapi/autoware_api_msgs              external/
+          mv -v pilot.auto/common/msgs/autoware_perception_msgs external/
+          mv -v pilot.auto/common/msgs/autoware_planning_msgs   external/
+          mv -v pilot.auto/common/msgs/autoware_system_msgs     external/
           rm -rf pilot.auto
 
       - name: Build packages
