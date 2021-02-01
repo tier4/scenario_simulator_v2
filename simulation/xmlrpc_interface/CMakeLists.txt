@@ -31,17 +31,19 @@ include_directories(
   include
   ${CMAKE_BINARY_DIR}
 )
+ament_auto_add_library(proto_msgs SHARED
+  ${PROTO_SRCS}
+)
+target_link_libraries(proto_msgs
+  ${PROTOBUF_LIBRARY}
+)
 
 ament_auto_add_library(xmlrpc_interface SHARED
   src/conversions.cpp
 )
 target_link_libraries(xmlrpc_interface
-  ${PROTOBUF_LIBRARY}
-  ${PROTO_SRCS}
-  ${PROTO_HDRS}
+  proto_msgs
 )
-ament_export_targets(export_xmlrpc_interface HAS_LIBRARY_TARGET)
-ament_export_libraries(xmlrpc_interface)
 
 ament_auto_add_executable(example
   src/example.cpp
