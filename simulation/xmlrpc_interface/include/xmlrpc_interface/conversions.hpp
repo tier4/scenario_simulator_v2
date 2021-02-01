@@ -52,7 +52,35 @@ void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::X
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to);
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to);
 
+template<typename T>
+T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)
+{
+  if (!xml.hasMember(key)) {
+    THROW_XML_PARAMETER_NOT_DEFINED_ERROR(key);
+  }
+  if (typeid(T) == typeid(double)) {
+    if (xml[key].getType() == XmlRpc::XmlRpcValue::TypeDouble) {
+      return xml[key];
+    }
+    THROW_XML_PARAMETER_ERROR("param : " + key + " is does not double type");
+  }
+  if (typeid(T) == typeid(bool)) {
+    if (xml[key].getType() == XmlRpc::XmlRpcValue::TypeBoolean) {
+      return xml[key];
+    }
+    THROW_XML_PARAMETER_ERROR("param : " + key + " is does not bool type");
+  }
+  if (typeid(T) == typeid(std::string)) {
+    if (xml[key].getType() == XmlRpc::XmlRpcValue::TypeString) {
+      return xml[key];
+    }
+    THROW_XML_PARAMETER_ERROR("param : " + key + " is does not string type");
+  }
+  THROW_XML_PARAMETER_ERROR("type of the param : " + key + " does not supported yet");
+}
+
 const char key_success[] = "success";
+const char key_description[] = "description";
 
 template<typename T>
 const std::string serialize(const XmlRpc::XmlRpcValue & from)

@@ -14,20 +14,18 @@
 
 #include <xmlrpc_interface/conversions.hpp>
 
+#include <string>
 
 namespace xmlrpc_interfae
 {
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to)
 {
   to = simulation_api_schema::InitializeResponse();
-  if (!from.hasMember(key_success)) {
-    THROW_XML_PARAMETER_NOT_DEFINED_ERROR(key_success);
-  }
-  to.mutable_result()->set_success(from[key_success]);
-  if (!from.hasMember("description")) {
-    THROW_XML_PARAMETER_NOT_DEFINED_ERROR("description");
-  }
-  to.mutable_result()->set_description(from["description"]);
+  to.mutable_result()->set_success(xmlrpc_interfae::getXmlValue<bool>(from, key_success));
+  to.mutable_result()->set_description(
+    xmlrpc_interfae::getXmlValue<std::string>(
+      from,
+      key_description));
 }
 
 void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to)

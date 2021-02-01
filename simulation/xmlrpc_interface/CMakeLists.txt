@@ -17,7 +17,6 @@ endif()
 
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
-find_package(Boost COMPONENTS thread REQUIRED)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
@@ -41,7 +40,6 @@ ament_auto_add_library(xmlrpc_interface
 )
 target_link_libraries(xmlrpc_interface
   ${PROTOBUF_LIBRARY}
-  Boost::thread
   proto_msgs
 )
 
@@ -50,7 +48,6 @@ ament_auto_add_executable(example
 )
 target_link_libraries(example
   xmlrpc_interface
-  Boost::thread
 )
 
 install(TARGETS
@@ -70,7 +67,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_conversion test/test_conversions.cpp)
-  target_link_libraries(test_conversion xmlrpc_interface Boost::thread proto_msgs)
+  target_link_libraries(test_conversion xmlrpc_interface proto_msgs)
 endif()
 
 ament_package()

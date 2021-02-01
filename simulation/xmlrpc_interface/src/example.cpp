@@ -26,9 +26,7 @@ int main()
   XmlRpc::XmlRpcValue xml;
   xmlrpc_interfae::fromProto(res, xml);
   std::string description = xml["description"];
-  std::cout << description.c_str() << std::endl;
-  XmlRpc::XmlRpcValue from_xml;
-  from_xml["description"] = "test";
-  xmlrpc_interfae::toProto(from_xml, res);
+  // std::cout << description.c_str() << std::endl;
+  xmlrpc_interfae::toProto(xml, res);
   return 0;
 }
