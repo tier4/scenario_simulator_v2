@@ -27,8 +27,8 @@
 #include <typeinfo>
 #include <utility>
 
-#define DEBUG() std::cout << green << __FILE__ << magenta << ":" << cyan << __LINE__ << reset << \
-    std::endl
+#define DEBUG() \
+  std::cout << green << __FILE__ << magenta << ":" << cyan << __LINE__ << reset << std::endl
 
 namespace openscenario_interpreter
 {
@@ -56,7 +56,7 @@ class Pointer
     }
 
 private:
-// ^ NOTE This broken indent was forced by ament_uncrustify.
+// ^ Note: This broken indent was forced by ament_uncrustify.
     std::ostream & write(std::ostream & os) const override
     {
       return IfHasStreamOutputOperator<Bound>::applyIt(os, *this);

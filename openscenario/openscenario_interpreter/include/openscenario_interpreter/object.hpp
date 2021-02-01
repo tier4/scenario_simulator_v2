@@ -23,6 +23,10 @@ namespace openscenario_interpreter
 {
 using Element = Pointer<Expression>;
 
+using ComplexType = Element;
+
+using Group = Element;
+
 using Elements = std::vector<Element>;
 
 // static const Element unit {nullptr};
