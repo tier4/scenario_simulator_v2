@@ -40,6 +40,16 @@ jobs:
           vcs import src < src/scenario_simulator.auto/dependency.repos
           rosdep install -iry --from-paths src --rosdistro foxy
 
+      - name: Dirty Hacks
+        working-directory: ~/ros2_ws/src/scenario_simulator.auto
+        run: |
+          git clone https://github.com/tier4/pilot.auto.git
+          mv pilot.auto/awapi/autoware_api_msgs              external/
+          mv pilot.auto/common/msgs/autoware_perception_msgs external/
+          mv pilot.auto/common/msgs/autoware_planning_msgs   external/
+          mv pilot.auto/common/msgs/autoware_system_msgs     external/
+          rm -rf pilot.auto
+
       - name: Build packages
         run: |
           source /opt/ros/foxy/setup.bash
