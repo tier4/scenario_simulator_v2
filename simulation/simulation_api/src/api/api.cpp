@@ -620,13 +620,9 @@ XmlRpc::XmlRpcValue API::initialize(
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
   value[0][0]["methodName"] = "initialize";
-  size_t size = req.ByteSizeLong(); 
-  void *buffer = malloc(size);
-  req.SerializeToArray(buffer, size);
-  value[0][0]["params"] = XmlRpc::XmlRpcValue(buffer, size);
+  value[0][0]["params"] = xmlrpc_interfae::serializeToBinValue(req);
   XmlRpc::XmlRpcValue result;
   client_ptr_->execute("system.multicall", value, result);
-  free(buffer);
   std::vector<char> bin = result[0][0]["return"];
   simulation_api_schema::InitializeResponse res;
   res.ParseFromArray(bin.data(), bin.size());

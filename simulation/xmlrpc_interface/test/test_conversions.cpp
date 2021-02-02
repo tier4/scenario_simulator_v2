@@ -32,9 +32,6 @@ TEST(Conversion, ConvertInitializeResponse)
   EXPECT_STREQ(res.result().description().c_str(), "test");
   std::string serialized_str = "";
   res.SerializeToString(&serialized_str);
-  EXPECT_STREQ(
-    xmlrpc_interfae::serialize<simulation_api_schema::InitializeResponse>(xml).c_str(),
-    serialized_str.c_str());
 }
 
 TEST(Conversion, ConvertInitializeRequest)

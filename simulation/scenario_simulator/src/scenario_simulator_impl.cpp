@@ -52,8 +52,8 @@ void ScenarioSimulatorImpl::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlR
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
   result = XmlRpc::XmlRpcValue();
-  size_t size = res.ByteSizeLong(); 
-  void *buffer = malloc(size);
+  size_t size = res.ByteSizeLong();
+  void * buffer = malloc(size);
   res.SerializeToArray(buffer, size);
   result["return"] = XmlRpc::XmlRpcValue(buffer, size);
   free(buffer);
