@@ -33,6 +33,7 @@ const char realtime_factor[] = "realtime_factor";
 const char step_time[] = "step_time";
 const char current_time[] = "current_time";
 const char parameters[] = "params";
+const char response[] = "return";
 }  // namespace keys
 
 class XmlParameterError : public std::runtime_error
@@ -87,12 +88,6 @@ T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)
     THROW_XML_PARAMETER_ERROR("param : " + key + " is does not string type");
   }
   THROW_XML_PARAMETER_ERROR("type of the param : " + key + " does not supported yet");
-}
-
-template<typename T>
-void print(const T & data)
-{
-  std::cout << data.DebugString() << std::endl;
 }
 
 template<typename T>
