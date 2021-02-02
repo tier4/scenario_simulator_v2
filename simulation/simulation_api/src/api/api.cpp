@@ -107,26 +107,7 @@ bool API::spawn(
   return result[0][0]["success"];
 }
 
-bool API::spawn(
-  bool is_ego,
-  const std::string & name,
-  const std::string & catalog_xml,
-  const geometry_msgs::msg::Pose & map_pose,
-  const openscenario_msgs::msg::ActionStatus & action_status)
-{
-  return spawn(is_ego, name, catalog_xml) && setEntityStatus(name, map_pose, action_status);
-}
-
-bool API::spawn(
-  bool is_ego,
-  const std::string & name,
-  const std::string & catalog_xml,
-  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-  const openscenario_msgs::msg::ActionStatus & action_status)
-{
-  return spawn(is_ego, name, catalog_xml) && setEntityStatus(name, lanelet_pose, action_status);
-}
-
+// (1)
 bool API::spawn(
   bool is_ego,
   const std::string & name,
@@ -171,6 +152,7 @@ bool API::spawn(
   return true;
 }
 
+// (2) => (1)
 bool API::spawn(
   bool is_ego,
   const std::string & name,
@@ -181,26 +163,6 @@ bool API::spawn(
 
 bool API::spawn(
   bool is_ego,
-  const std::string & name,
-  const simulation_api::entity::VehicleParameters & params,
-  const geometry_msgs::msg::Pose & map_pose,
-  const openscenario_msgs::msg::ActionStatus & action_status)
-{
-  return spawn(is_ego, name, params) && setEntityStatus(name, map_pose, action_status);
-}
-
-bool API::spawn(
-  bool is_ego,
-  const std::string & name,
-  const simulation_api::entity::VehicleParameters & params,
-  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-  const openscenario_msgs::msg::ActionStatus & action_status)
-{
-  return spawn(is_ego, name, params) && setEntityStatus(name, lanelet_pose, action_status);
-}
-
-bool API::spawn(
-  bool is_ego,
   const simulation_api::entity::VehicleParameters & params,
   const openscenario_msgs::msg::EntityStatus & status)
 {
@@ -215,32 +177,13 @@ bool API::spawn(
   return spawn(is_ego, params.toXml(), status);
 }
 
+// (3) => (1)
 bool API::spawn(
   bool is_ego,
   const std::string & name,
   const simulation_api::entity::PedestrianParameters & params)
 {
   return spawn(is_ego, name, params.toXml());
-}
-
-bool API::spawn(
-  bool is_ego,
-  const std::string & name,
-  const simulation_api::entity::PedestrianParameters & params,
-  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-  const openscenario_msgs::msg::ActionStatus & action_status)
-{
-  return spawn(is_ego, name, params) && setEntityStatus(name, lanelet_pose, action_status);
-}
-
-bool API::spawn(
-  bool is_ego,
-  const std::string & name,
-  const simulation_api::entity::PedestrianParameters & params,
-  const geometry_msgs::msg::Pose & map_pose,
-  const openscenario_msgs::msg::ActionStatus & action_status)
-{
-  return spawn(is_ego, name, params) && setEntityStatus(name, map_pose, action_status);
 }
 
 openscenario_msgs::msg::EntityStatus API::getEntityStatus(
@@ -595,10 +538,8 @@ XmlRpc::XmlRpcValue API::initialize(
   value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
   XmlRpc::XmlRpcValue result;
   client_ptr_->execute("system.multicall", value, result);
-  const auto res =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
-    result[0][
-      0]["return"]);
+  const auto res = xmlrpc_interface::deserializeFromBinValue<
+    simulation_api_schema::InitializeResponse>(result[0][0]["return"]);
   return res.result().success();
 }
 
