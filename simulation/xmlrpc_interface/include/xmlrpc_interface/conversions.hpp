@@ -97,6 +97,17 @@ const XmlRpc::XmlRpcValue serializeToBinValue(const T & data)
   return val;
 }
 
+template<typename T>
+const T deserializeFromBinValue(const XmlRpc::XmlRpcValue & data)
+{
+  if (data.getType() != XmlRpc::XmlRpcValue::TypeBase64) {
+    THROW_XML_PARAMETER_ERROR("data is not a binary type");
+  }
+  std::vector<char> bin = data;
+  T ret;
+  ret.ParseFromArray(bin.data(), bin.size());
+  return ret;
+}
 }  // namespace xmlrpc_interfae
 
 

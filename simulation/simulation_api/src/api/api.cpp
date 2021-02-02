@@ -623,10 +623,10 @@ XmlRpc::XmlRpcValue API::initialize(
   value[0][0]["params"] = xmlrpc_interfae::serializeToBinValue(req);
   XmlRpc::XmlRpcValue result;
   client_ptr_->execute("system.multicall", value, result);
-  std::vector<char> bin = result[0][0]["return"];
-  simulation_api_schema::InitializeResponse res;
-  res.ParseFromArray(bin.data(), bin.size());
-  std::cout << "description : " << res.result().description() << std::endl;
+  const auto res =
+    xmlrpc_interfae::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
+    result[0][
+      0]["return"]);
   return res.result().success();
 }
 
