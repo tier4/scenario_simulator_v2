@@ -19,10 +19,10 @@
 #include <xmlrpcpp/XmlRpc.h>
 
 #include <string>
-
+#include <vector>
 #include <exception>
 
-namespace xmlrpc_interfae
+namespace xmlrpc_interface
 {
 
 class XmlParameterError : public std::runtime_error
@@ -84,17 +84,31 @@ const char key_description[] = "description";
 const char key_realtime_factor[] = "realtime_factor";
 const char key_step_time[] = "step_time";
 const char key_current_time[] = "current_time";
+const char key_parameters[] = "params";
 
 template<typename T>
-const std::string serialize(const XmlRpc::XmlRpcValue & from)
+const XmlRpc::XmlRpcValue serializeToBinValue(const T & data)
 {
-  std::string serialized_str = "";
-  T to;
-  toProto(from, to);
-  to.SerializeToString(&serialized_str);
-  return serialized_str;
+  size_t size = data.ByteSizeLong();
+  void * buffer = malloc(size);
+  data.SerializeToArray(buffer, size);
+  const auto val = XmlRpc::XmlRpcValue(buffer, size);
+  free(buffer);
+  return val;
 }
-}  // namespace xmlrpc_interfae
+
+template<typename T>
+const T deserializeFromBinValue(const XmlRpc::XmlRpcValue & data)
+{
+  if (data.getType() != XmlRpc::XmlRpcValue::TypeBase64) {
+    THROW_XML_PARAMETER_ERROR("data is not a binary type");
+  }
+  std::vector<char> bin = data;
+  T ret;
+  ret.ParseFromArray(bin.data(), bin.size());
+  return ret;
+}
+}  // namespace xmlrpc_interface
 
 
 #endif  // XMLRPC_INTERFACE__CONVERSIONS_HPP_

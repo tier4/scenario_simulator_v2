@@ -9,6 +9,7 @@
   <license>Apach 2</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <build_depend>geometry_msgs</build_depend>
   <build_depend>rclcpp</build_depend>
@@ -36,8 +37,7 @@
   <depend>eigen</depend>
   <depend>quaternion_operation</depend>
   <depend>xmlrpcpp</depend>
-  <depend>protobuf</depend>
-  <depend>protobuf-dev</depend>
+  <depend>xmlrpc_interface</depend>
   <depend>openscenario_msgs</depend>
   <exec_depend>rviz2</exec_depend>
 

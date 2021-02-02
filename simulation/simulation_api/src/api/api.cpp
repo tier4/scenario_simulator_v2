@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
+#include <xmlrpc_interface/conversions.hpp>
+
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <string>
@@ -578,31 +580,26 @@ XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
   return param;
 }
 XmlRpc::XmlRpcValue API::initialize(
-  double realtime_factor, double step_time, int times_try,
-  int duration_try_in_msec)
+  double realtime_factor, double step_time)
 {
   current_cmd_ = boost::none;
   current_state_cmd_ = boost::none;
   step_time_ = step_time;
   current_time_ = 0.0;
+
   XmlRpc::XmlRpcValue value;
+  simulation_api_schema::InitializeRequest req;
+  req.set_step_time(step_time);
+  req.set_realtime_factor(realtime_factor);
   value[0][0]["methodName"] = "initialize";
-  value[0][0]["params"]["sim/realtime_factor"] = realtime_factor;
-  value[0][0]["params"]["sim/step_time"] = step_time;
+  value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
   XmlRpc::XmlRpcValue result;
-  for (int count_try = 0; count_try < times_try; count_try = count_try + 1) {
-    try {
-      client_ptr_->execute("system.multicall", value, result);
-      if (result[0][0].hasMember("sim/initialized")) {
-        return result[0][0];
-      }
-    } catch (...) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(duration_try_in_msec));
-      continue;
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(duration_try_in_msec));
-  }
-  throw ExecutionFailedError("failed to call initaialize API, xmlrpc timeout");
+  client_ptr_->execute("system.multicall", value, result);
+  const auto res =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
+    result[0][
+      0]["return"]);
+  return res.result().success();
 }
 
 XmlRpc::XmlRpcValue API::updateFrame()

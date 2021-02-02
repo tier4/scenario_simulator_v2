@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <scenario_simulator/scenario_simulator.hpp>
+#include <xmlrpc_interface/conversions.hpp>
 
 #include <string>
 #include <vector>
@@ -71,9 +72,7 @@ void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcV
 
 void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
-  if (checkRequiredFields({"sim/realtime_factor", "sim/step_time"}, param, result)) {
-    impl_.initialize(param, result);
-  }
+  impl_.initialize(param, result);
 }
 
 void ScenarioSimulator::spawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)

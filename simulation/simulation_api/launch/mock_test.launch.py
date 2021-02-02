@@ -48,7 +48,7 @@ def generate_launch_description():
             package='scenario_simulator',
             executable='scenario_simulator_node',
             name='scenario_simulator_node',
-            output='log',
+            output='screen',
             parameters=[{
                 'port': 8080
             }],

@@ -24,9 +24,9 @@ int main()
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("test");
   XmlRpc::XmlRpcValue xml;
-  xmlrpc_interfae::fromProto(res, xml);
+  xmlrpc_interface::fromProto(res, xml);
   std::string description = xml["description"];
   // std::cout << description.c_str() << std::endl;
-  xmlrpc_interfae::toProto(xml, res);
+  xmlrpc_interface::toProto(xml, res);
   return 0;
 }
