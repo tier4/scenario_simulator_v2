@@ -91,6 +91,11 @@ T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)
 template<typename T>
 const XmlRpc::XmlRpcValue serializeToBinValue(const T & data)
 {
+  if(!data.IsInitialized()) {
+    std::string message = "all of required requeired field does not initialized yet.\n";
+    message = message + data.DebugString();
+    THROW_XML_PARAMETER_ERROR(message);
+  }
   size_t size = data.ByteSizeLong();
   void * buffer = malloc(size);
   data.SerializeToArray(buffer, size);
