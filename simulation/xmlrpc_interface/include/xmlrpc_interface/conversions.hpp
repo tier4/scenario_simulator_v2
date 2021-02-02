@@ -26,6 +26,7 @@
 #include <openscenario_msgs.pb.h>
 #include <openscenario_msgs/msg/performance.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/axle.hpp>
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
 
