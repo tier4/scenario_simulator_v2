@@ -152,6 +152,18 @@ TEST(Conversion, ConvertAccel)
   EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
 }
 
+TEST(Conversion, ConvertPerformance)
+{
+  openscenario_msgs::Performance proto;
+  openscenario_msgs::msg::Performance performance;
+  performance.max_speed = 10;
+  performance.max_deceleration = 3;
+  xmlrpc_interface::toProto(performance, proto);
+  EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
+  EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
+  EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

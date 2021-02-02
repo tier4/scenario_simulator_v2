@@ -24,6 +24,8 @@
 #include <geometry_msgs/msg/accel.hpp>
 
 #include <openscenario_msgs.pb.h>
+#include <openscenario_msgs/msg/performance.hpp>
+#include <openscenario_msgs/msg/bounding_box.hpp>
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
 
@@ -78,6 +80,12 @@ void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto);
 void toProto(const geometry_msgs::msg::Vector3 & v, geometry_msgs::Vector3 & proto);
 void toProto(const geometry_msgs::msg::Twist & t, geometry_msgs::Twist & proto);
 void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto);
+void toProto(
+  const openscenario_msgs::msg::BoundingBox & box,
+  openscenario_msgs::BoundingBox & proto);
+void toProto(
+  const openscenario_msgs::msg::Performance & performance,
+  openscenario_msgs::Performance & proto);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

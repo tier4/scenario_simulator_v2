@@ -115,4 +115,21 @@ void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto)
   toProto(a.linear, *proto.mutable_linear());
   toProto(a.angular, *proto.mutable_angular());
 }
+
+void toProto(
+  const openscenario_msgs::msg::BoundingBox & box,
+  openscenario_msgs::BoundingBox & proto)
+{
+  toProto(box.center, *proto.mutable_center());
+  toProto(box.dimensions, *proto.mutable_dimensions());
+}
+
+void toProto(
+  const openscenario_msgs::msg::Performance & performance,
+  openscenario_msgs::Performance & proto)
+{
+  proto.set_max_acceleration(performance.max_acceleration);
+  proto.set_max_deceleration(performance.max_deceleration);
+  proto.set_max_speed(performance.max_speed);
+}
 }  // namespace xmlrpc_interface
