@@ -78,10 +78,16 @@ class API
   } static_assert(true, "")
 
 public:
-  template<class NodeT, class AllocatorT = std::allocator<void>>
+  template
+  <
+    class NodeT,
+    class AllocatorT = std::allocator<void>
+  >
   explicit API(
-    NodeT && node, const std::string & map_path = "",
-    bool verbose = false, const std::string metrics_logfile_path = "/tmp/metrics.json",
+    NodeT && node,
+    const std::string & map_path = "",
+    const bool verbose = false,
+    const std::string & metrics_logfile_path = "/tmp/metrics.json",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   : access_rights_(std::make_unique<decltype(access_rights_)::element_type>(node)),
@@ -116,25 +122,22 @@ public:
   }
 
   template<typename T, typename ... Ts>
-  void addMetric(std::string name, Ts && ... xs)
+  void addMetric(const std::string & name, Ts && ... xs)
   {
     metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
   }
 
-  FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
-  FORWARD_TO_ENTITY_MANAGER(setDriverModel);
-
-  void setVerbose(bool verbose);
+  void setVerbose(const bool verbose);
 
   // (1) Basis
   bool spawn(
-    bool is_ego,
+    const bool is_ego,
     const std::string & name,
     const std::string & catalog_xml);
 
   // (2) => (1)
   bool spawn(
-    bool is_ego,
+    const bool is_ego,
     const std::string & name,
     const simulation_api::entity::VehicleParameters & params)
   {
@@ -143,7 +146,7 @@ public:
 
   // (3) => (1)
   bool spawn(
-    bool is_ego,
+    const bool is_ego,
     const std::string & name,
     const simulation_api::entity::PedestrianParameters & params)
   {
@@ -155,7 +158,7 @@ public:
     typename ... Ts  // Arguments for setEntityStatus
   >
   decltype(auto) spawn(
-    bool is_ego,
+    const bool is_ego,
     const std::string & name,
     const std::string & catalog_xml,
     Ts && ... xs)
@@ -171,7 +174,7 @@ public:
     typename ... Ts  // Arguments for setEntityStatus
   >
   decltype(auto) spawn(
-    bool is_ego,
+    const bool is_ego,
     const std::string & name,
     const Parameters & params,
     Ts && ... xs)
@@ -181,48 +184,60 @@ public:
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
-  openscenario_msgs::msg::EntityStatus getEntityStatus(std::string name);
+  openscenario_msgs::msg::EntityStatus getEntityStatus(
+    const std::string & name);
+
   bool setEntityStatus(
-    std::string name, const geometry_msgs::msg::Pose & map_pose,
+    const std::string & name,
+    const openscenario_msgs::msg::EntityStatus & status);
+  bool setEntityStatus(
+    const std::string & name,
+    const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool setEntityStatus(
-    std::string name, const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const std::string & name,
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
-  bool setEntityStatus(std::string name, const openscenario_msgs::msg::EntityStatus & status);
   bool setEntityStatus(
-    std::string name, std::string reference_entity_name,
-    const geometry_msgs::msg::Pose relative_pose,
-    const openscenario_msgs::msg::ActionStatus action_status);
+    const std::string & name,
+    const std::string & reference_entity_name,
+    const geometry_msgs::msg::Pose & relative_pose,
+    const openscenario_msgs::msg::ActionStatus & action_status);
   bool setEntityStatus(
-    std::string name, std::string reference_entity_name,
-    const geometry_msgs::msg::Point relative_position,
-    const geometry_msgs::msg::Vector3 relative_rpy,
-    const openscenario_msgs::msg::ActionStatus action_status);
+    const std::string & name,
+    const std::string & reference_entity_name,
+    const geometry_msgs::msg::Point & relative_position,
+    const geometry_msgs::msg::Vector3 & relative_rpy,
+    const openscenario_msgs::msg::ActionStatus & action_status);
 
-  FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
+  boost::optional<double> getTimeHeadway(
+    const std::string & from,
+    const std::string & to);
 
-  boost::optional<double> getTimeHeadway(std::string from, std::string to);
+  void requestLaneChange(
+    const std::string & name,
+    const std::int64_t to_lanelet_id);
+  void requestLaneChange(
+    const std::string & name,
+    const simulation_api::entity::Direction & direction);
 
-  FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
+  void setTargetSpeed(
+    const std::string & name,
+    const double target_speed,
+    const bool continuous);
 
-  void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
-  void requestLaneChange(std::string name, simulation_api::entity::Direction direction);
-
-  FORWARD_TO_ENTITY_MANAGER(isInLanelet);
-
-  void setTargetSpeed(std::string name, double target_speed, bool continuous);
-
-  FORWARD_TO_ENTITY_MANAGER(getRelativePose);
-
-  bool reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance);
   bool reachPosition(
-    std::string name, openscenario_msgs::msg::LaneletPose target_pose,
-    double tolerance);
-  bool reachPosition(std::string name, std::string target_name, double tolerance) const;
-
-  FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
-
-  FORWARD_TO_ENTITY_MANAGER(checkCollision);
+    const std::string & name,
+    const geometry_msgs::msg::Pose & target_pose,
+    const double tolerance);
+  bool reachPosition(
+    const std::string & name,
+    const openscenario_msgs::msg::LaneletPose & target_pose,
+    const double tolerance);
+  bool reachPosition(
+    const std::string & name,
+    const std::string & target_name,
+    const double tolerance) const;
 
   XmlRpc::XmlRpcValue initialize(double realtime_factor, double step_time);
   XmlRpc::XmlRpcValue updateFrame();
@@ -232,22 +247,28 @@ public:
     return current_time_;
   }
 
-  FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
-  FORWARD_TO_ENTITY_MANAGER(toMapPose);
-
+  FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(despawnEntity);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
-
+  FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
+  FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
+  FORWARD_TO_ENTITY_MANAGER(getRelativePose);
+  FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
+  FORWARD_TO_ENTITY_MANAGER(isInLanelet);
+  FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
+  FORWARD_TO_ENTITY_MANAGER(setDriverModel);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
+  FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
+  FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 private:
   bool spawn(
-    bool is_ego,
+    const bool is_ego,
     const std::string & catalog_xml,
     const openscenario_msgs::msg::EntityStatus & status);
 
@@ -256,7 +277,7 @@ private:
     typename Parameters  // Maybe, VehicleParameters or PedestrianParameters
   >
   bool spawn(
-    bool is_ego,
+    const bool is_ego,
     const Parameters & parameters,
     const openscenario_msgs::msg::EntityStatus & status)
   {
