@@ -19,6 +19,9 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/accel.hpp>
 
 #include <openscenario_msgs.pb.h>
 #include <simulation_api_schema.pb.h>
@@ -72,6 +75,9 @@ void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::
 void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto);
 void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto);
 void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto);
+void toProto(const geometry_msgs::msg::Vector3 & v, geometry_msgs::Vector3 & proto);
+void toProto(const geometry_msgs::msg::Twist & t, geometry_msgs::Twist & proto);
+void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

@@ -96,4 +96,23 @@ void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto)
   toProto(p.position, *proto.mutable_position());
   toProto(p.orientation, *proto.mutable_orientation());
 }
+
+void toProto(const geometry_msgs::msg::Vector3 & v, geometry_msgs::Vector3 & proto)
+{
+  proto.set_x(v.x);
+  proto.set_y(v.y);
+  proto.set_z(v.z);
+}
+
+void toProto(const geometry_msgs::msg::Twist & t, geometry_msgs::Twist & proto)
+{
+  toProto(t.linear, *proto.mutable_linear());
+  toProto(t.angular, *proto.mutable_angular());
+}
+
+void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto)
+{
+  toProto(a.linear, *proto.mutable_linear());
+  toProto(a.angular, *proto.mutable_angular());
+}
 }  // namespace xmlrpc_interface
