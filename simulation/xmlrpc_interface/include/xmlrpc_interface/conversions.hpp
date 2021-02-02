@@ -29,6 +29,7 @@
 #include <openscenario_msgs/msg/axle.hpp>
 #include <openscenario_msgs/msg/axles.hpp>
 #include <openscenario_msgs/msg/property.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
@@ -120,6 +121,12 @@ void toProto(
 void toMsg(
   const openscenario_msgs::Property & proto,
   openscenario_msgs::msg::Property & p);
+void toProto(
+  const openscenario_msgs::msg::VehicleParameters & p,
+  openscenario_msgs::VehicleParameters & proto);
+void toMsg(
+  const openscenario_msgs::VehicleParameters & proto,
+  openscenario_msgs::msg::VehicleParameters & p);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

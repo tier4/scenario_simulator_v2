@@ -241,4 +241,24 @@ void toMsg(
 {
   p.is_ego = proto.is_ego();
 }
+
+void toProto(
+  const openscenario_msgs::msg::VehicleParameters & p,
+  openscenario_msgs::VehicleParameters & proto)
+{
+  toProto(p.axles, *proto.mutable_axles());
+  toProto(p.bounding_box, *proto.mutable_bounding_box());
+  toProto(p.performance, *proto.mutable_performance());
+  toProto(p.property, *proto.mutable_property());
+}
+
+void toMsg(
+  const openscenario_msgs::VehicleParameters & proto,
+  openscenario_msgs::msg::VehicleParameters & p)
+{
+  toMsg(proto.axles(), p.axles);
+  toMsg(proto.bounding_box(), p.bounding_box);
+  toMsg(proto.performance(), p.performance);
+  toMsg(proto.property(), p.property);
+}
 }  // namespace xmlrpc_interface

@@ -294,6 +294,18 @@ TEST(Conversion, ConvertProperty)
   EXPECT_EQ(proto.is_ego(), p.is_ego);
 }
 
+TEST(Conversion, ConvertVehicleParametrs)
+{
+  openscenario_msgs::VehicleParameters proto;
+  openscenario_msgs::msg::VehicleParameters p;
+  p.property.is_ego = true;
+  xmlrpc_interface::toProto(p, proto);
+  EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
+  p.property.is_ego = false;
+  xmlrpc_interface::toMsg(proto, p);
+  EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

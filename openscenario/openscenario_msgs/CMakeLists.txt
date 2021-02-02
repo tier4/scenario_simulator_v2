@@ -25,6 +25,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Axle.msg
   msg/Axles.msg
   msg/Property.msg
+  msg/VehicleParameters.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 
