@@ -53,7 +53,6 @@ install(TARGETS
 )
 
 install(TARGETS xmlrpc_interface
-  EXPORT export_xmlrpc_interface
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

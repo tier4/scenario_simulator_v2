@@ -619,11 +619,11 @@ XmlRpc::XmlRpcValue API::initialize(
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
   value[0][0]["methodName"] = "initialize";
-  value[0][0]["params"] = xmlrpc_interfae::serializeToBinValue(req);
+  value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
   XmlRpc::XmlRpcValue result;
   client_ptr_->execute("system.multicall", value, result);
   const auto res =
-    xmlrpc_interfae::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
     result[0][
       0]["return"]);
   return res.result().success();

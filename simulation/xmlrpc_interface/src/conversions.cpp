@@ -15,15 +15,16 @@
 #include <xmlrpc_interface/conversions.hpp>
 
 #include <string>
+#include <vector>
 
-namespace xmlrpc_interfae
+namespace xmlrpc_interface
 {
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to)
 {
   to = simulation_api_schema::InitializeResponse();
-  to.mutable_result()->set_success(xmlrpc_interfae::getXmlValue<bool>(from, key::success));
+  to.mutable_result()->set_success(xmlrpc_interface::getXmlValue<bool>(from, key::success));
   to.mutable_result()->set_description(
-    xmlrpc_interfae::getXmlValue<std::string>(
+    xmlrpc_interface::getXmlValue<std::string>(
       from,
       key::description));
 }
@@ -38,8 +39,8 @@ void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::X
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to)
 {
   to = simulation_api_schema::InitializeRequest();
-  to.set_realtime_factor(xmlrpc_interfae::getXmlValue<double>(from, key::realtime_factor));
-  to.set_step_time(xmlrpc_interfae::getXmlValue<double>(from, key::step_time));
+  to.set_realtime_factor(xmlrpc_interface::getXmlValue<double>(from, key::realtime_factor));
+  to.set_step_time(xmlrpc_interface::getXmlValue<double>(from, key::step_time));
 }
 
 void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to)
@@ -74,4 +75,4 @@ void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::
   to[key::success] = from.result().success();
   to[key::description] = from.result().description();
 }
-}  // namespace xmlrpc_interfae
+}  // namespace xmlrpc_interface

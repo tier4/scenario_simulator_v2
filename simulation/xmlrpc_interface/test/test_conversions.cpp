@@ -24,11 +24,11 @@ TEST(Conversion, ConvertInitializeResponse)
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("test");
   XmlRpc::XmlRpcValue xml;
-  EXPECT_NO_THROW(xmlrpc_interfae::fromProto(res, xml));
-  std::string description = xml[xmlrpc_interfae::key::description];
+  EXPECT_NO_THROW(xmlrpc_interface::fromProto(res, xml));
+  std::string description = xml[xmlrpc_interface::key::description];
   EXPECT_STREQ(description.c_str(), "test");
   res.mutable_result()->set_description("");
-  EXPECT_NO_THROW(xmlrpc_interfae::toProto(xml, res));
+  EXPECT_NO_THROW(xmlrpc_interface::toProto(xml, res));
   EXPECT_STREQ(res.result().description().c_str(), "test");
   std::string serialized_str = "";
   res.SerializeToString(&serialized_str);
@@ -40,14 +40,14 @@ TEST(Conversion, ConvertInitializeRequest)
   req.set_realtime_factor(0.1);
   req.set_step_time(0.5);
   XmlRpc::XmlRpcValue xml;
-  xmlrpc_interfae::fromProto(req, xml);
-  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interfae::key::step_time]);
-  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interfae::key::realtime_factor]);
+  xmlrpc_interface::fromProto(req, xml);
+  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interface::key::step_time]);
+  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interface::key::realtime_factor]);
   req.set_realtime_factor(0);
   req.set_step_time(0);
-  xmlrpc_interfae::toProto(xml, req);
-  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interfae::key::step_time]);
-  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interfae::key::realtime_factor]);
+  xmlrpc_interface::toProto(xml, req);
+  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interface::key::step_time]);
+  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interface::key::realtime_factor]);
 }
 
 int main(int argc, char ** argv)

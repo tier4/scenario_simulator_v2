@@ -50,12 +50,10 @@ EXPORT export_scenario_simulator
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
-ament_export_libraries(scenario_simulator)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-ament_export_include_directories(include)
-ament_package()
+ament_auto_package()

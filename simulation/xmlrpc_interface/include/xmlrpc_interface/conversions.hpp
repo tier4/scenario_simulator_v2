@@ -19,10 +19,10 @@
 #include <xmlrpcpp/XmlRpc.h>
 
 #include <string>
-
+#include <vector>
 #include <exception>
 
-namespace xmlrpc_interfae
+namespace xmlrpc_interface
 {
 namespace key
 {
@@ -110,7 +110,7 @@ const T deserializeFromBinValue(const XmlRpc::XmlRpcValue & data)
   ret.ParseFromArray(bin.data(), bin.size());
   return ret;
 }
-}  // namespace xmlrpc_interfae
+}  // namespace xmlrpc_interface
 
 
 #endif  // XMLRPC_INTERFACE__CONVERSIONS_HPP_

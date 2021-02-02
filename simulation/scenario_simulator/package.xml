@@ -9,6 +9,7 @@
   <license>Apach 2</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <build_depend>geometry_msgs</build_depend>
   <build_depend>rclcpp</build_depend>
@@ -38,7 +39,6 @@
   <depend>xmlrpcpp</depend>
   <depend>xmlrpc_interface</depend>
   <depend>openscenario_msgs</depend>
-  <depend>ament_cmake_auto</depend>
   <exec_depend>rviz2</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
