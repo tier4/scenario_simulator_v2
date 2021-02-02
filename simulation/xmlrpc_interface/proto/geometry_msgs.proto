@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package geometry_msgs;
+
+message Point {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+message Quaternion {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+    double w = 4;
+}
+
+message Pose {
+    Point position = 1;
+    Quaternion orientation = 2;
+}
+
+message Vector3 {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+}
+
+message Twist {
+    Vector3 linear = 1;
+    Vector3 angular = 2;
+}
+
+message Accel {
+    Vector3 linear = 1;
+    Vector3 angular = 2;
+}

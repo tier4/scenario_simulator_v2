@@ -36,6 +36,7 @@ find_package(Eigen3 REQUIRED)
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIR}
+  ${CMAKE_BINARY_DIR}
 )
 
 add_library(scenario_simulator SHARED
