@@ -15,6 +15,7 @@
 #include <xmlrpc_interface/conversions.hpp>
 
 #include <string>
+#include <vector>
 
 namespace xmlrpc_interfae
 {

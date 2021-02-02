@@ -19,7 +19,7 @@
 #include <xmlrpcpp/XmlRpc.h>
 
 #include <string>
-
+#include <vector>
 #include <exception>
 
 namespace xmlrpc_interfae
