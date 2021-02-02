@@ -43,6 +43,8 @@ public:
   XmlRpcRuntimeError(const char * message, int result)
   : runtime_error(message), error_info_(result) {}
 
+  virtual ~XmlRpcRuntimeError() = default;
+
 private:
   int error_info_;
 };
@@ -52,8 +54,11 @@ class ExecutionFailedError : public std::runtime_error
 public:
   explicit ExecutionFailedError(XmlRpc::XmlRpcValue value)
   : runtime_error(value["message"]) {}
+
   explicit ExecutionFailedError(const char * message)
   : runtime_error(message) {}
+
+  virtual ~ExecutionFailedError() = default;
 };
 
 class API
@@ -61,6 +66,16 @@ class API
   using EntityManager = simulation_api::entity::EntityManager;
 
   std::unique_ptr<autoware_api::Accessor> access_rights_;
+
+#define FORWARD_TO_ENTITY_MANAGER(NAME) \
+  template \
+  < \
+    typename ... Ts \
+  > \
+  decltype(auto) NAME(Ts && ... xs) \
+  { \
+    return entity_manager_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
@@ -99,13 +114,16 @@ public:
       std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
     setVerbose(verbose);
   }
+
   template<typename T, typename ... Ts>
   void addMetric(std::string name, Ts && ... xs)
   {
     metrics_manager_.addMetric<T>(name, std::forward<Ts>(xs)...);
   }
-  boost::optional<double> getLinearJerk(std::string name);
-  void setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model);
+
+  FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
+  FORWARD_TO_ENTITY_MANAGER(setDriverModel);
+
   void setVerbose(bool verbose);
 
   // (1) Basis
@@ -118,13 +136,19 @@ public:
   bool spawn(
     bool is_ego,
     const std::string & name,
-    const simulation_api::entity::VehicleParameters & params);
+    const simulation_api::entity::VehicleParameters & params)
+  {
+    return spawn(is_ego, name, params.toXml());
+  }
 
   // (3) => (1)
   bool spawn(
     bool is_ego,
     const std::string & name,
-    const simulation_api::entity::PedestrianParameters & params);
+    const simulation_api::entity::PedestrianParameters & params)
+  {
+    return spawn(is_ego, name, params.toXml());
+  }
 
   template
   <
@@ -136,7 +160,9 @@ public:
     const std::string & catalog_xml,
     Ts && ... xs)
   {
-    return spawn(is_ego, name, catalog_xml) && setEntityStatus(name, std::forward<Ts>(xs)...);
+    return
+      spawn(is_ego, name, catalog_xml) &&
+      setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
   template
@@ -150,7 +176,9 @@ public:
     const Parameters & params,
     Ts && ... xs)
   {
-    return spawn(is_ego, name, params) && setEntityStatus(name, std::forward<Ts>(xs)...);
+    return
+      spawn(is_ego, name, params) &&
+      setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(std::string name);
@@ -171,65 +199,51 @@ public:
     const geometry_msgs::msg::Vector3 relative_rpy,
     const openscenario_msgs::msg::ActionStatus action_status);
 
-  boost::optional<double> getLongitudinalDistance(std::string from, std::string to);
+  FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
+
   boost::optional<double> getTimeHeadway(std::string from, std::string to);
-  void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
+
+  FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
+
   void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
   void requestLaneChange(std::string name, simulation_api::entity::Direction direction);
-  bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance);
+
+  FORWARD_TO_ENTITY_MANAGER(isInLanelet);
+
   void setTargetSpeed(std::string name, double target_speed, bool continuous);
-  geometry_msgs::msg::Pose getRelativePose(std::string from, std::string to);
-  geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, std::string to);
-  geometry_msgs::msg::Pose getRelativePose(std::string from, geometry_msgs::msg::Pose to);
-  geometry_msgs::msg::Pose getRelativePose(
-    geometry_msgs::msg::Pose from,
-    geometry_msgs::msg::Pose to);
+
+  FORWARD_TO_ENTITY_MANAGER(getRelativePose);
+
   bool reachPosition(std::string name, geometry_msgs::msg::Pose target_pose, double tolerance);
   bool reachPosition(
     std::string name, openscenario_msgs::msg::LaneletPose target_pose,
     double tolerance);
   bool reachPosition(std::string name, std::string target_name, double tolerance) const;
-  boost::optional<double> getStandStillDuration(std::string name) const;
-  bool checkCollision(std::string name0, std::string name1);
+
+  FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
+
+  FORWARD_TO_ENTITY_MANAGER(checkCollision);
+
   XmlRpc::XmlRpcValue initialize(double realtime_factor, double step_time);
   XmlRpc::XmlRpcValue updateFrame();
-  double getCurrentTime() const {return current_time_;}
-  const boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
-    geometry_msgs::msg::Pose pose) const;
-  const geometry_msgs::msg::Pose toMapPose(const openscenario_msgs::msg::LaneletPose lanelet_pose)
-  const;
-  bool despawnEntity(std::string name);
-  bool entityExists(std::string name);
-  template<typename ... Ts>
-  void setrafficLightColorPhase(Ts && ... xs)
+
+  double getCurrentTime() const noexcept
   {
-    entity_manager_ptr_->setTrafficLightColorPhase(std::forward<Ts>(xs)...);
+    return current_time_;
   }
-  template<typename ... Ts>
-  void setTrafficLightArrowPhase(Ts && ... xs)
-  {
-    entity_manager_ptr_->setTrafficLightArrowPhase(std::forward<Ts>(xs)...);
-  }
-  template<typename ... Ts>
-  void setTrafficLightColor(Ts && ... xs)
-  {
-    entity_manager_ptr_->setTrafficLightColor(std::forward<Ts>(xs)...);
-  }
-  template<typename ... Ts>
-  void setTrafficLightArrow(Ts && ... xs)
-  {
-    entity_manager_ptr_->setTrafficLightArrow(std::forward<Ts>(xs)...);
-  }
-  template<typename ... Ts>
-  simulation_api::TrafficLightColor getTrafficLightColor(Ts && ... xs)
-  {
-    return entity_manager_ptr_->getTrafficLightColor(std::forward<Ts>(xs)...);
-  }
-  template<typename ... Ts>
-  simulation_api::TrafficLightArrow getTrafficLightArrow(Ts && ... xs)
-  {
-    return entity_manager_ptr_->getTrafficLightArrow(std::forward<Ts>(xs)...);
-  }
+
+  FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
+  FORWARD_TO_ENTITY_MANAGER(toMapPose);
+
+  FORWARD_TO_ENTITY_MANAGER(despawnEntity);
+  FORWARD_TO_ENTITY_MANAGER(entityExists);
+
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLightArrow);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
+  FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
+  FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
+  FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
+  FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
 
 private:
   bool spawn(
@@ -249,18 +263,22 @@ private:
     return spawn(is_ego, parameters.toXml(), status);
   }
 
+  openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
+  XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
+
   std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;
   double current_time_;
-  openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
-  XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
+
   void vehicleControlCommandCallback(autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> current_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_sub_;
+
   void vehicleStateCommandCallback(autoware_auto_msgs::msg::VehicleStateCommand::SharedPtr msg);
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> current_state_cmd_;
   rclcpp::Subscription<autoware_auto_msgs::msg::VehicleStateCommand>::SharedPtr state_cmd_sub_;
+
   metrics::MetricsManager metrics_manager_;
 };
 }  // namespace scenario_simulator
