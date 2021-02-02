@@ -8,8 +8,8 @@
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
   
-  <depend>ament_cmake_auto</depend>
   <depend>protobuf</depend>
   <depend>protobuf-dev</depend>
   <depend>xmlrpcpp</depend>
