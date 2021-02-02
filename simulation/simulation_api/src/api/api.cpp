@@ -607,8 +607,7 @@ XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
   return param;
 }
 XmlRpc::XmlRpcValue API::initialize(
-  double realtime_factor, double step_time, int times_try,
-  int duration_try_in_msec)
+  double realtime_factor, double step_time)
 {
   current_cmd_ = boost::none;
   current_state_cmd_ = boost::none;

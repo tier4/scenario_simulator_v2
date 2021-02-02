@@ -182,8 +182,7 @@ public:
   boost::optional<double> getStandStillDuration(std::string name) const;
   bool checkCollision(std::string name0, std::string name1);
   XmlRpc::XmlRpcValue initialize(
-    double realtime_factor, double step_time, int times_try = 10,
-    int duration_try_in_msec = 1000);
+    double realtime_factor, double step_time);
   XmlRpc::XmlRpcValue updateFrame();
   double getCurrentTime() const {return current_time_;}
   const boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
