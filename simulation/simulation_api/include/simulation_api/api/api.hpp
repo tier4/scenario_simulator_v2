@@ -40,8 +40,8 @@ namespace scenario_simulator
 class XmlRpcRuntimeError : public std::runtime_error
 {
 public:
-  XmlRpcRuntimeError(const char * message, int res)
-  : runtime_error(message), error_info_(res) {}
+  XmlRpcRuntimeError(const char * message, int result)
+  : runtime_error(message), error_info_(result) {}
 
 private:
   int error_info_;
@@ -56,9 +56,11 @@ public:
   : runtime_error(message) {}
 };
 
-class API : private autoware_api::Accessor
+class API
 {
   using EntityManager = simulation_api::entity::EntityManager;
+
+  std::unique_ptr<autoware_api::Accessor> access_rights_;
 
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
@@ -67,7 +69,8 @@ public:
     bool verbose = false, const std::string metrics_logfile_path = "/tmp/metrics.json",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
-  : autoware_api::Accessor(node), metrics_manager_(verbose, metrics_logfile_path)
+  : access_rights_(std::make_unique<decltype(access_rights_)::element_type>(node)),
+    metrics_manager_(verbose, metrics_logfile_path)
   {
     std::string address = "127.0.0.1";
 

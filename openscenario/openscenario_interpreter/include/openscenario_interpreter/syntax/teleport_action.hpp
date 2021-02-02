@@ -66,8 +66,7 @@ struct TeleportAction
             rpy.x,
             rpy.y,
             rpy.z),
-          simulation_api::helper::constractActionStatus()
-          );
+          simulation_api::helper::constractActionStatus());
       }
     } else if (position.is<RelativeWorldPosition>()) {
       for (const auto & each : inner_scope.actors) {

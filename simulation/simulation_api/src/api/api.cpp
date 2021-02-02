@@ -331,8 +331,8 @@ void API::requestLaneChange(std::string name, std::int64_t to_lanelet_id)
   if (entity_manager_ptr_->isEgo(name)) {
     std_msgs::msg::Bool msg;
     msg.data = true;
-    setLaneChangeApproval(msg);
-    // setLaneChangeForce(msg);
+    // TODO(yamacir-kit): setLaneChangeApproval(msg);
+    // TODO(yamacir-kit): setLaneChangeForce(msg);
   } else {
     entity_manager_ptr_->requestLaneChange(name, to_lanelet_id);
   }
@@ -355,7 +355,7 @@ void API::setTargetSpeed(std::string name, double target_speed, bool continuous)
   if (entity_manager_ptr_->isEgo(name)) {
     std_msgs::msg::Float32 msg;
     msg.data = target_speed;
-    setVehicleVelocity(msg);
+    // TODO(yamacir-kit): setVehicleVelocity(msg);
   } else {
     entity_manager_ptr_->setTargetSpeed(name, target_speed, continuous);
   }
