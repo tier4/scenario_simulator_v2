@@ -15,19 +15,21 @@
 #ifndef SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 #define SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 
+#include <autoware_auto_msgs/msg/complex32.hpp>
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <awapi_accessor/accessor.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/vehicle_model/sim_model.hpp>
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-#include <autoware_auto_msgs/msg/complex32.hpp>
 
 // headers in pugixml
 #include <pugixml.hpp>
 #include <boost/optional.hpp>
 
-#include <string>
 #include <memory>
+#include <string>
+#include <utility>
 
 namespace simulation_api
 {
@@ -35,27 +37,25 @@ namespace entity
 {
 class EgoEntity : public VehicleEntity
 {
+  const std::shared_ptr<autoware_api::Accessor> autoware;  // TODO(yamacir-kit): Use unique_ptr
+
 public:
   template
   <
     typename ... Ts
   >
   explicit EgoEntity(
+    const std::shared_ptr<autoware_api::Accessor> & access_rights,
     const std::string & name,
     const openscenario_msgs::msg::EntityStatus & initial_state,
     Ts && ... xs)
-  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
+  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
+    autoware(access_rights)
   {
     setStatus(initial_state);
   }
 
-  template
-  <
-    typename ... Ts
-  >
-  explicit EgoEntity(Ts && ... xs)
-  : VehicleEntity(std::forward<decltype(xs)>(xs)...)
-  {}
+  using VehicleEntity::VehicleEntity;  // for dummy ego mode
 
   void setVehicleCommands(
     const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,

@@ -65,7 +65,7 @@ class API
 {
   using EntityManager = simulation_api::entity::EntityManager;
 
-  std::unique_ptr<autoware_api::Accessor> access_rights_;
+  std::shared_ptr<autoware_api::Accessor> access_rights_;
 
 #define FORWARD_TO_ENTITY_MANAGER(NAME) \
   template \
@@ -90,7 +90,7 @@ public:
     const std::string & metrics_logfile_path = "/tmp/metrics.json",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
-  : access_rights_(std::make_unique<decltype(access_rights_)::element_type>(node)),
+  : access_rights_(std::make_shared<decltype(access_rights_)::element_type>(node)),
     metrics_manager_(verbose, metrics_logfile_path)
   {
     std::string address = "127.0.0.1";

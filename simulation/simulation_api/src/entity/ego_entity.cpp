@@ -25,8 +25,8 @@ namespace entity
 autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
 {
   autoware_auto_msgs::msg::Complex32 heading;
-  heading.real = static_cast<float>(std::cos(yaw * 0.5));
-  heading.imag = static_cast<float>(std::sin(yaw * 0.5));
+  heading.real = static_cast<decltype(heading.real)>(std::cos(yaw * 0.5));
+  heading.imag = static_cast<decltype(heading.imag)>(std::sin(yaw * 0.5));
   return heading;
 }
 
