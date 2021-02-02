@@ -75,17 +75,29 @@ void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFram
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to);
 
 void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto);
+void toMsg(const geometry_msgs::Point & proto, geometry_msgs::msg::Point & p);
 void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto);
+void toMsg(const geometry_msgs::Quaternion & proto, geometry_msgs::msg::Quaternion & q);
 void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto);
+void toMsg(const geometry_msgs::Pose & proto, geometry_msgs::msg::Pose & p);
 void toProto(const geometry_msgs::msg::Vector3 & v, geometry_msgs::Vector3 & proto);
+void toMsg(const geometry_msgs::Vector3 & proto, geometry_msgs::msg::Vector3 & v);
 void toProto(const geometry_msgs::msg::Twist & t, geometry_msgs::Twist & proto);
+void toMsg(const geometry_msgs::Twist & proto, geometry_msgs::msg::Twist & t);
 void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto);
+void toMsg(const geometry_msgs::Accel & proto, geometry_msgs::msg::Accel & a);
 void toProto(
   const openscenario_msgs::msg::BoundingBox & box,
   openscenario_msgs::BoundingBox & proto);
+void toMsg(
+  const openscenario_msgs::BoundingBox & proto,
+  openscenario_msgs::msg::BoundingBox & box);
 void toProto(
   const openscenario_msgs::msg::Performance & performance,
   openscenario_msgs::Performance & proto);
+void toProto(
+  const openscenario_msgs::Performance & proto,
+  openscenario_msgs::msg::Performance & performance);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

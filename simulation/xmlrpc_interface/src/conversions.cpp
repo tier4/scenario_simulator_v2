@@ -83,6 +83,13 @@ void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto)
   proto.set_z(p.z);
 }
 
+void toMsg(const geometry_msgs::Point & proto, geometry_msgs::msg::Point & p)
+{
+  p.x = proto.x();
+  p.y = proto.y();
+  p.z = proto.z();
+}
+
 void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto)
 {
   proto.set_x(q.x);
@@ -91,10 +98,24 @@ void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion
   proto.set_w(q.w);
 }
 
+void toMsg(const geometry_msgs::Quaternion & proto, geometry_msgs::msg::Quaternion & q)
+{
+  q.x = proto.x();
+  q.y = proto.y();
+  q.z = proto.z();
+  q.w = proto.w();
+}
+
 void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto)
 {
   toProto(p.position, *proto.mutable_position());
   toProto(p.orientation, *proto.mutable_orientation());
+}
+
+void toMsg(const geometry_msgs::Pose & proto, geometry_msgs::msg::Pose & p)
+{
+  toMsg(proto.position(), p.position);
+  toMsg(proto.orientation(), p.orientation);
 }
 
 void toProto(const geometry_msgs::msg::Vector3 & v, geometry_msgs::Vector3 & proto)
@@ -104,16 +125,35 @@ void toProto(const geometry_msgs::msg::Vector3 & v, geometry_msgs::Vector3 & pro
   proto.set_z(v.z);
 }
 
+void toMsg(const geometry_msgs::Vector3 & proto, geometry_msgs::msg::Vector3 & v)
+{
+  v.x = proto.x();
+  v.y = proto.y();
+  v.z = proto.z();
+}
+
 void toProto(const geometry_msgs::msg::Twist & t, geometry_msgs::Twist & proto)
 {
   toProto(t.linear, *proto.mutable_linear());
   toProto(t.angular, *proto.mutable_angular());
 }
 
+void toMsg(const geometry_msgs::Twist & proto, geometry_msgs::msg::Twist & t)
+{
+  toMsg(proto.linear(), t.linear);
+  toMsg(proto.angular(), t.angular);
+}
+
 void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto)
 {
   toProto(a.linear, *proto.mutable_linear());
   toProto(a.angular, *proto.mutable_angular());
+}
+
+void toMsg(const geometry_msgs::Accel & proto, geometry_msgs::msg::Accel & a)
+{
+  toMsg(proto.linear(), a.linear);
+  toMsg(proto.angular(), a.angular);
 }
 
 void toProto(
@@ -124,6 +164,14 @@ void toProto(
   toProto(box.dimensions, *proto.mutable_dimensions());
 }
 
+void toMsg(
+  const openscenario_msgs::BoundingBox & proto,
+  openscenario_msgs::msg::BoundingBox & box)
+{
+  toMsg(proto.center(), box.center);
+  toMsg(proto.dimensions(), box.dimensions);
+}
+
 void toProto(
   const openscenario_msgs::msg::Performance & performance,
   openscenario_msgs::Performance & proto)
@@ -131,5 +179,14 @@ void toProto(
   proto.set_max_acceleration(performance.max_acceleration);
   proto.set_max_deceleration(performance.max_deceleration);
   proto.set_max_speed(performance.max_speed);
+}
+
+void toProto(
+  const openscenario_msgs::Performance & proto,
+  openscenario_msgs::msg::Performance & performance)
+{
+  performance.max_acceleration = proto.max_acceleration();
+  performance.max_deceleration = proto.max_deceleration();
+  performance.max_speed = proto.max_speed();
 }
 }  // namespace xmlrpc_interface
