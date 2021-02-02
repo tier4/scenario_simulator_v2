@@ -22,7 +22,7 @@
 #include <vector>
 #include <exception>
 
-namespace xmlrpc_interfae
+namespace xmlrpc_interface
 {
 
 class XmlParameterError : public std::runtime_error
@@ -108,7 +108,7 @@ const T deserializeFromBinValue(const XmlRpc::XmlRpcValue & data)
   ret.ParseFromArray(bin.data(), bin.size());
   return ret;
 }
-}  // namespace xmlrpc_interfae
+}  // namespace xmlrpc_interface
 
 
 #endif  // XMLRPC_INTERFACE__CONVERSIONS_HPP_
