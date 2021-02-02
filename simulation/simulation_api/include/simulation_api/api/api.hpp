@@ -107,45 +107,56 @@ public:
   boost::optional<double> getLinearJerk(std::string name);
   void setDriverModel(std::string name, const openscenario_msgs::msg::DriverModel & model);
   void setVerbose(bool verbose);
+
   bool spawn(
-    bool is_ego, std::string name,
-    std::string catalog_xml,
+    bool is_ego,
+    const std::string & name,
+    const std::string & catalog_xml,
     const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
-    bool is_ego, std::string name,
-    std::string catalog_xml,
+    bool is_ego,
+    const std::string & name,
+    const std::string & catalog_xml,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::VehicleParameters params,
+    bool is_ego,
+    const std::string & name,
+    const simulation_api::entity::VehicleParameters & params,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::VehicleParameters params,
+    bool is_ego,
+    const std::string & name,
+    const simulation_api::entity::VehicleParameters & params,
     const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::PedestrianParameters params,
+    bool is_ego,
+    const std::string & name,
+    const simulation_api::entity::PedestrianParameters & params,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::PedestrianParameters params,
+    bool is_ego,
+    const std::string & name,
+    const simulation_api::entity::PedestrianParameters & params,
     const geometry_msgs::msg::Pose & map_pose,
     const openscenario_msgs::msg::ActionStatus & action_status);
   bool spawn(
-    bool is_ego, std::string name,
-    std::string catalog_xml);
+    bool is_ego,
+    const std::string & name,
+    const std::string & catalog_xml);
   bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::VehicleParameters params);
+    bool is_ego,
+    const std::string & name,
+    const simulation_api::entity::VehicleParameters & params);
   bool spawn(
-    bool is_ego, std::string name,
-    simulation_api::entity::PedestrianParameters params);
+    bool is_ego,
+    const std::string & name,
+    const simulation_api::entity::PedestrianParameters & params);
+
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     std::string name);
   bool setEntityStatus(
@@ -229,16 +240,17 @@ public:
 private:
   bool spawn(
     bool is_ego,
-    std::string catalog_xml,
-    openscenario_msgs::msg::EntityStatus status);
+    const std::string & catalog_xml,
+    const openscenario_msgs::msg::EntityStatus & status);
   bool spawn(
     bool is_ego,
-    simulation_api::entity::PedestrianParameters params,
-    openscenario_msgs::msg::EntityStatus status);
+    const simulation_api::entity::PedestrianParameters & params,
+    const openscenario_msgs::msg::EntityStatus & status);
   bool spawn(
     bool is_ego,
-    simulation_api::entity::VehicleParameters params,
-    openscenario_msgs::msg::EntityStatus status);
+    const simulation_api::entity::VehicleParameters & params,
+    const openscenario_msgs::msg::EntityStatus & status);
+
   std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;

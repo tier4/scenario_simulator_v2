@@ -62,8 +62,8 @@ void API::setDriverModel(std::string name, const openscenario_msgs::msg::DriverM
 
 bool API::spawn(
   bool is_ego,
-  std::string catalog_xml,
-  openscenario_msgs::msg::EntityStatus status)
+  const std::string & catalog_xml,
+  const openscenario_msgs::msg::EntityStatus & status)
 {
   XmlRpc::XmlRpcValue value, status_value;
   status_value = toValue(status);
@@ -106,38 +106,29 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  std::string catalog_xml,
+  bool is_ego,
+  const std::string & name,
+  const std::string & catalog_xml,
   const geometry_msgs::msg::Pose & map_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  if (!spawn(is_ego, name, catalog_xml)) {
-    return false;
-  }
-  if (!setEntityStatus(name, map_pose, action_status)) {
-    return false;
-  }
-  return true;
+  return spawn(is_ego, name, catalog_xml) && setEntityStatus(name, map_pose, action_status);
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  std::string catalog_xml,
+  bool is_ego,
+  const std::string & name,
+  const std::string & catalog_xml,
   const openscenario_msgs::msg::LaneletPose & lanelet_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  if (!spawn(is_ego, name, catalog_xml)) {
-    return false;
-  }
-  if (!setEntityStatus(name, lanelet_pose, action_status)) {
-    return false;
-  }
-  return true;
+  return spawn(is_ego, name, catalog_xml) && setEntityStatus(name, lanelet_pose, action_status);
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  std::string catalog_xml)
+  bool is_ego,
+  const std::string & name,
+  const std::string & catalog_xml)
 {
   XmlRpc::XmlRpcValue value;
   value[0][0]["methodName"] = "spawn_entity";
@@ -179,93 +170,75 @@ bool API::spawn(
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  simulation_api::entity::VehicleParameters params)
+  bool is_ego,
+  const std::string & name,
+  const simulation_api::entity::VehicleParameters & params)
 {
   return spawn(is_ego, name, params.toXml());
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  simulation_api::entity::VehicleParameters params,
+  bool is_ego,
+  const std::string & name,
+  const simulation_api::entity::VehicleParameters & params,
   const geometry_msgs::msg::Pose & map_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  if (!spawn(is_ego, name, params)) {
-    return false;
-  }
-  if (!setEntityStatus(name, map_pose, action_status)) {
-    return false;
-  }
-  return true;
-}
-
-bool API::spawn(
-  bool is_ego, std::string name,
-  simulation_api::entity::VehicleParameters params,
-  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-  const openscenario_msgs::msg::ActionStatus & action_status)
-{
-  if (!spawn(is_ego, name, params)) {
-    return false;
-  }
-  if (!setEntityStatus(name, lanelet_pose, action_status)) {
-    return false;
-  }
-  return true;
+  return spawn(is_ego, name, params) && setEntityStatus(name, map_pose, action_status);
 }
 
 bool API::spawn(
   bool is_ego,
-  simulation_api::entity::VehicleParameters params,
-  openscenario_msgs::msg::EntityStatus status)
+  const std::string & name,
+  const simulation_api::entity::VehicleParameters & params,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+  const openscenario_msgs::msg::ActionStatus & action_status)
+{
+  return spawn(is_ego, name, params) && setEntityStatus(name, lanelet_pose, action_status);
+}
+
+bool API::spawn(
+  bool is_ego,
+  const simulation_api::entity::VehicleParameters & params,
+  const openscenario_msgs::msg::EntityStatus & status)
 {
   return spawn(is_ego, params.toXml(), status);
 }
 
 bool API::spawn(
   bool is_ego,
-  simulation_api::entity::PedestrianParameters params,
-  openscenario_msgs::msg::EntityStatus status)
+  const simulation_api::entity::PedestrianParameters & params,
+  const openscenario_msgs::msg::EntityStatus & status)
 {
   return spawn(is_ego, params.toXml(), status);
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  simulation_api::entity::PedestrianParameters params)
+  bool is_ego,
+  const std::string & name,
+  const simulation_api::entity::PedestrianParameters & params)
 {
   return spawn(is_ego, name, params.toXml());
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  simulation_api::entity::PedestrianParameters params,
+  bool is_ego,
+  const std::string & name,
+  const simulation_api::entity::PedestrianParameters & params,
   const openscenario_msgs::msg::LaneletPose & lanelet_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  if (!spawn(is_ego, name, params)) {
-    return false;
-  }
-  if (!setEntityStatus(name, lanelet_pose, action_status)) {
-    return false;
-  }
-  return true;
+  return spawn(is_ego, name, params) && setEntityStatus(name, lanelet_pose, action_status);
 }
 
 bool API::spawn(
-  bool is_ego, std::string name,
-  simulation_api::entity::PedestrianParameters params,
+  bool is_ego,
+  const std::string & name,
+  const simulation_api::entity::PedestrianParameters & params,
   const geometry_msgs::msg::Pose & map_pose,
   const openscenario_msgs::msg::ActionStatus & action_status)
 {
-  if (!spawn(is_ego, name, params)) {
-    return false;
-  }
-  if (!setEntityStatus(name, map_pose, action_status)) {
-    return false;
-  }
-  return true;
+  return spawn(is_ego, name, params) && setEntityStatus(name, map_pose, action_status);
 }
 
 openscenario_msgs::msg::EntityStatus API::getEntityStatus(
