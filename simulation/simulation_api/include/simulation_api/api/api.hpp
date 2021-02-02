@@ -128,7 +128,7 @@ public:
 
   template
   <
-    typename ... Ts
+    typename ... Ts  // Arguments for setEntityStatus
   >
   decltype(auto) spawn(
     bool is_ego,
@@ -136,15 +136,13 @@ public:
     const std::string & catalog_xml,
     Ts && ... xs)
   {
-    return
-      spawn(is_ego, name, catalog_xml) &&
-      setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
+    return spawn(is_ego, name, catalog_xml) && setEntityStatus(name, std::forward<Ts>(xs)...);
   }
 
   template
   <
     typename Parameters,  // Maybe, VehicleParameters or PedestrianParameters
-    typename ... Ts
+    typename ... Ts  // Arguments for setEntityStatus
   >
   decltype(auto) spawn(
     bool is_ego,
@@ -152,9 +150,7 @@ public:
     const Parameters & params,
     Ts && ... xs)
   {
-    return
-      spawn(is_ego, name, params) &&
-      setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
+    return spawn(is_ego, name, params) && setEntityStatus(name, std::forward<Ts>(xs)...);
   }
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(std::string name);
@@ -240,14 +236,18 @@ private:
     bool is_ego,
     const std::string & catalog_xml,
     const openscenario_msgs::msg::EntityStatus & status);
+
+  template
+  <
+    typename Parameters  // Maybe, VehicleParameters or PedestrianParameters
+  >
   bool spawn(
     bool is_ego,
-    const simulation_api::entity::PedestrianParameters & params,
-    const openscenario_msgs::msg::EntityStatus & status);
-  bool spawn(
-    bool is_ego,
-    const simulation_api::entity::VehicleParameters & params,
-    const openscenario_msgs::msg::EntityStatus & status);
+    const Parameters & parameters,
+    const openscenario_msgs::msg::EntityStatus & status)
+  {
+    return spawn(is_ego, parameters.toXml(), status);
+  }
 
   std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;

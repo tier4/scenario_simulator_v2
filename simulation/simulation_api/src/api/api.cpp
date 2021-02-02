@@ -161,22 +161,6 @@ bool API::spawn(
   return spawn(is_ego, name, params.toXml());
 }
 
-bool API::spawn(
-  bool is_ego,
-  const simulation_api::entity::VehicleParameters & params,
-  const openscenario_msgs::msg::EntityStatus & status)
-{
-  return spawn(is_ego, params.toXml(), status);
-}
-
-bool API::spawn(
-  bool is_ego,
-  const simulation_api::entity::PedestrianParameters & params,
-  const openscenario_msgs::msg::EntityStatus & status)
-{
-  return spawn(is_ego, params.toXml(), status);
-}
-
 // (3) => (1)
 bool API::spawn(
   bool is_ego,
