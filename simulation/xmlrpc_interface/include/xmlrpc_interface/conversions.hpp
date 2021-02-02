@@ -24,6 +24,15 @@
 
 namespace xmlrpc_interfae
 {
+namespace key
+{
+const char success[] = "success";
+const char description[] = "description";
+const char realtime_factor[] = "realtime_factor";
+const char step_time[] = "step_time";
+const char current_time[] = "current_time";
+const char parameters[] = "params";
+}  // namespace keys
 
 class XmlParameterError : public std::runtime_error
 {
@@ -78,13 +87,6 @@ T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)
   }
   THROW_XML_PARAMETER_ERROR("type of the param : " + key + " does not supported yet");
 }
-
-const char key_success[] = "success";
-const char key_description[] = "description";
-const char key_realtime_factor[] = "realtime_factor";
-const char key_step_time[] = "step_time";
-const char key_current_time[] = "current_time";
-const char key_parameters[] = "params";
 
 template<typename T>
 const XmlRpc::XmlRpcValue serializeToBinValue(const T & data)
