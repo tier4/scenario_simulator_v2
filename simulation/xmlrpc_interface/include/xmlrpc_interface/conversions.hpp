@@ -15,6 +15,12 @@
 #ifndef XMLRPC_INTERFACE__CONVERSIONS_HPP_
 #define XMLRPC_INTERFACE__CONVERSIONS_HPP_
 
+#include <geometry_msgs.pb.h>
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+
+#include <openscenario_msgs.pb.h>
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
 
@@ -34,7 +40,7 @@ const char step_time[] = "step_time";
 const char current_time[] = "current_time";
 const char parameters[] = "params";
 const char response[] = "return";
-}  // namespace keys
+}  // namespace key
 
 class XmlParameterError : public std::runtime_error
 {
@@ -62,6 +68,10 @@ void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFram
 void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to);
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to);
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to);
+
+void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto);
+void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto);
+void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

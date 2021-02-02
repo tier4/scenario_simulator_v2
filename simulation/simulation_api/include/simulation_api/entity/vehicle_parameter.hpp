@@ -16,6 +16,7 @@
 #define SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
 
 // headers in pugixml
+#include <openscenario_msgs.pb.h>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 
 #include <pugixml.hpp>

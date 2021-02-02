@@ -75,4 +75,25 @@ void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::
   to[key::success] = from.result().success();
   to[key::description] = from.result().description();
 }
+
+void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto)
+{
+  proto.set_x(p.x);
+  proto.set_y(p.y);
+  proto.set_z(p.z);
+}
+
+void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto)
+{
+  proto.set_x(q.x);
+  proto.set_y(q.y);
+  proto.set_z(q.z);
+  proto.set_w(q.w);
+}
+
+void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto)
+{
+  toProto(p.position, *proto.mutable_position());
+  toProto(p.orientation, *proto.mutable_orientation());
+}
 }  // namespace xmlrpc_interface

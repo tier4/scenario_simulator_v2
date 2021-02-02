@@ -14,6 +14,11 @@
 
 #include <gtest/gtest.h>
 
+#include <geometry_msgs.pb.h>
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+
 #include <xmlrpc_interface/conversions.hpp>
 
 #include <string>
@@ -48,6 +53,16 @@ TEST(Conversion, ConvertInitializeRequest)
   xmlrpc_interface::toProto(xml, req);
   EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interface::key::step_time]);
   EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interface::key::realtime_factor]);
+}
+
+TEST(Conversion, ConvertPoint)
+{
+  geometry_msgs::Point proto;
+  geometry_msgs::msg::Point p;
+  p.x = 1.0;
+  p.y = 2;
+  p.z = 3.1;
+  xmlrpc_interface::toProto(p, proto);
 }
 
 int main(int argc, char ** argv)

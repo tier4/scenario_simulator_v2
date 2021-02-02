@@ -613,7 +613,6 @@ XmlRpc::XmlRpcValue API::initialize(
   current_state_cmd_ = boost::none;
   step_time_ = step_time;
   current_time_ = 0.0;
-
   XmlRpc::XmlRpcValue value;
   simulation_api_schema::InitializeRequest req;
   req.set_step_time(step_time);
