@@ -282,6 +282,18 @@ TEST(Conversion, ConvertAxles)
   EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
 }
 
+TEST(Conversion, ConvertProperty)
+{
+  openscenario_msgs::Property proto;
+  openscenario_msgs::msg::Property p;
+  p.is_ego = true;
+  xmlrpc_interface::toProto(p, proto);
+  EXPECT_EQ(proto.is_ego(), p.is_ego);
+  p.is_ego = false;
+  xmlrpc_interface::toMsg(proto, p);
+  EXPECT_EQ(proto.is_ego(), p.is_ego);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
