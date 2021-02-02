@@ -22,36 +22,6 @@ namespace simulation_api
 {
 namespace entity
 {
-EgoEntity::EgoEntity(
-  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  const pugi::xml_node & xml)
-: VehicleEntity(name, initial_state, xml)
-{
-  current_kinematic_state_ = boost::none;
-  setStatus(initial_state);
-}
-
-EgoEntity::EgoEntity(
-  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  VehicleParameters parameters)
-: VehicleEntity(name, initial_state, parameters)
-{
-  current_kinematic_state_ = boost::none;
-  setStatus(initial_state);
-}
-
-EgoEntity::EgoEntity(std::string name, const pugi::xml_node & xml)
-: VehicleEntity(name, xml)
-{
-  current_kinematic_state_ = boost::none;
-}
-
-EgoEntity::EgoEntity(std::string name, VehicleParameters parameters)
-: VehicleEntity(name, parameters)
-{
-  current_kinematic_state_ = boost::none;
-}
-
 autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
 {
   autoware_auto_msgs::msg::Complex32 heading;
@@ -116,8 +86,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 }
 
 const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
-  double time,
-  double step_time) const
+  const double time,
+  const double step_time) const
 {
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0;
@@ -168,8 +138,8 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
 }
 
 void EgoEntity::setVehicleCommands(
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd)
+  const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,
+  const boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> & state_cmd)
 {
   control_cmd_ = control_cmd;
   state_cmd_ = state_cmd;

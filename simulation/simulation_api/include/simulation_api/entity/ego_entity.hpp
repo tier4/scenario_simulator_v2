@@ -36,37 +36,59 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
 public:
-  EgoEntity(
-    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    const pugi::xml_node & xml);
-  EgoEntity(
-    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    VehicleParameters parameters);
-  EgoEntity(std::string name, const pugi::xml_node & xml);
-  EgoEntity(std::string name, VehicleParameters parameters);
+  template
+  <
+    typename ... Ts
+  >
+  explicit EgoEntity(
+    const std::string & name,
+    const openscenario_msgs::msg::EntityStatus & initial_state,
+    Ts && ... xs)
+  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
+  {
+    setStatus(initial_state);
+  }
+
+  template
+  <
+    typename ... Ts
+  >
+  explicit EgoEntity(Ts && ... xs)
+  : VehicleEntity(std::forward<decltype(xs)>(xs)...)
+  {}
+
   void setVehicleCommands(
-    boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
-    boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd);
+    const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,
+    const boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> & state_cmd);
+
   const std::string getCurrentAction() const
   {
     return "none";
   }
+
   void onUpdate(double current_time, double step_time) override;
+
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
-  boost::optional<autoware_auto_msgs::msg::VehicleKinematicState>
-  getCurrentKinematicState() const
+
+  const auto & getCurrentKinematicState() const noexcept
   {
     return current_kinematic_state_;
   }
 
 private:
-  boost::optional<geometry_msgs::msg::Pose> origin_;
   autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
-  const openscenario_msgs::msg::EntityStatus getEntityStatus(double time, double step_time) const;
+
+  const openscenario_msgs::msg::EntityStatus getEntityStatus(
+    const double time,
+    const double step_time) const;
+
+  boost::optional<geometry_msgs::msg::Pose> origin_;
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleKinematicState> current_kinematic_state_;
+
   std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
+
   boost::optional<double> previous_velocity_;
   boost::optional<double> previous_angular_velocity_;
 };
