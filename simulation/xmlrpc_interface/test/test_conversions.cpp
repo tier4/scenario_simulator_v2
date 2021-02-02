@@ -63,7 +63,47 @@ TEST(Conversion, ConvertPoint)
   p.y = 2;
   p.z = 3.1;
   xmlrpc_interface::toProto(p, proto);
+  EXPECT_DOUBLE_EQ(p.x, proto.x());
+  EXPECT_DOUBLE_EQ(p.y, proto.y());
+  EXPECT_DOUBLE_EQ(p.z, proto.z());
 }
+
+TEST(Conversion, ConvertQuaternion)
+{
+  geometry_msgs::Quaternion proto;
+  geometry_msgs::msg::Quaternion q;
+  q.x = 1.0;
+  q.y = 2;
+  q.z = 3.1;
+  q.w = -10;
+  xmlrpc_interface::toProto(q, proto);
+  EXPECT_DOUBLE_EQ(q.x, proto.x());
+  EXPECT_DOUBLE_EQ(q.y, proto.y());
+  EXPECT_DOUBLE_EQ(q.z, proto.z());
+  EXPECT_DOUBLE_EQ(q.w, proto.w());
+}
+
+TEST(Conversion, ConvertPose)
+{
+  geometry_msgs::Pose proto;
+  geometry_msgs::msg::Pose p;
+  p.position.x = 1.0;
+  p.position.y = 2;
+  p.position.z = 3.1;
+  p.orientation.x = 0;
+  p.orientation.y = 0;
+  p.orientation.z = 0;
+  p.orientation.w = 1;
+  xmlrpc_interface::toProto(p, proto);
+  EXPECT_DOUBLE_EQ(p.position.x, proto.position().x());
+  EXPECT_DOUBLE_EQ(p.position.y, proto.position().y());
+  EXPECT_DOUBLE_EQ(p.position.z, proto.position().z());
+  EXPECT_DOUBLE_EQ(p.orientation.x, proto.orientation().x());
+  EXPECT_DOUBLE_EQ(p.orientation.y, proto.orientation().y());
+  EXPECT_DOUBLE_EQ(p.orientation.z, proto.orientation().z());
+  EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
+}
+
 
 int main(int argc, char ** argv)
 {
