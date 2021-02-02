@@ -95,7 +95,7 @@ void toMsg(
 void toProto(
   const openscenario_msgs::msg::Performance & performance,
   openscenario_msgs::Performance & proto);
-void toProto(
+void toMsg(
   const openscenario_msgs::Performance & proto,
   openscenario_msgs::msg::Performance & performance);
 

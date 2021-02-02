@@ -181,7 +181,7 @@ void toProto(
   proto.set_max_speed(performance.max_speed);
 }
 
-void toProto(
+void toMsg(
   const openscenario_msgs::Performance & proto,
   openscenario_msgs::msg::Performance & performance)
 {

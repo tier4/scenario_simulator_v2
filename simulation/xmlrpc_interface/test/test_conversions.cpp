@@ -69,6 +69,12 @@ TEST(Conversion, ConvertPoint)
   EXPECT_DOUBLE_EQ(p.x, proto.x());
   EXPECT_DOUBLE_EQ(p.y, proto.y());
   EXPECT_DOUBLE_EQ(p.z, proto.z());
+  p = geometry_msgs::msg::Point();
+  EXPECT_DOUBLE_EQ(p.x, 0);
+  xmlrpc_interface::toMsg(proto, p);
+  EXPECT_DOUBLE_EQ(p.x, proto.x());
+  EXPECT_DOUBLE_EQ(p.y, proto.y());
+  EXPECT_DOUBLE_EQ(p.z, proto.z());
 }
 
 TEST(Conversion, ConvertQuaternion)
@@ -80,6 +86,13 @@ TEST(Conversion, ConvertQuaternion)
   q.z = 3.1;
   q.w = -10;
   xmlrpc_interface::toProto(q, proto);
+  EXPECT_DOUBLE_EQ(q.x, proto.x());
+  EXPECT_DOUBLE_EQ(q.y, proto.y());
+  EXPECT_DOUBLE_EQ(q.z, proto.z());
+  EXPECT_DOUBLE_EQ(q.w, proto.w());
+  q = geometry_msgs::msg::Quaternion();
+  EXPECT_DOUBLE_EQ(q.x, 0);
+  xmlrpc_interface::toMsg(proto, q);
   EXPECT_DOUBLE_EQ(q.x, proto.x());
   EXPECT_DOUBLE_EQ(q.y, proto.y());
   EXPECT_DOUBLE_EQ(q.z, proto.z());
@@ -105,6 +118,16 @@ TEST(Conversion, ConvertPose)
   EXPECT_DOUBLE_EQ(p.orientation.y, proto.orientation().y());
   EXPECT_DOUBLE_EQ(p.orientation.z, proto.orientation().z());
   EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
+  p = geometry_msgs::msg::Pose();
+  EXPECT_DOUBLE_EQ(p.position.x, 0);
+  xmlrpc_interface::toMsg(proto, p);
+  EXPECT_DOUBLE_EQ(p.position.x, proto.position().x());
+  EXPECT_DOUBLE_EQ(p.position.y, proto.position().y());
+  EXPECT_DOUBLE_EQ(p.position.z, proto.position().z());
+  EXPECT_DOUBLE_EQ(p.orientation.x, proto.orientation().x());
+  EXPECT_DOUBLE_EQ(p.orientation.y, proto.orientation().y());
+  EXPECT_DOUBLE_EQ(p.orientation.z, proto.orientation().z());
+  EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
 }
 
 TEST(Conversion, ConvertVector)
@@ -118,6 +141,12 @@ TEST(Conversion, ConvertVector)
   EXPECT_DOUBLE_EQ(vec.x, proto.x());
   EXPECT_DOUBLE_EQ(vec.y, proto.y());
   EXPECT_DOUBLE_EQ(vec.z, proto.z());
+  vec = geometry_msgs::msg::Vector3();
+  EXPECT_DOUBLE_EQ(vec.x, 0);
+  xmlrpc_interface::toMsg(proto, vec);
+  EXPECT_DOUBLE_EQ(vec.x, proto.x());
+  EXPECT_DOUBLE_EQ(vec.y, proto.y());
+  EXPECT_DOUBLE_EQ(vec.z, proto.z());
 }
 
 TEST(Conversion, ConvertTwist)
@@ -128,6 +157,15 @@ TEST(Conversion, ConvertTwist)
   twist.linear.y = 2;
   twist.linear.z = 3.0;
   xmlrpc_interface::toProto(twist, proto);
+  EXPECT_DOUBLE_EQ(twist.linear.x, proto.linear().x());
+  EXPECT_DOUBLE_EQ(twist.linear.y, proto.linear().y());
+  EXPECT_DOUBLE_EQ(twist.linear.z, proto.linear().z());
+  EXPECT_DOUBLE_EQ(twist.angular.x, proto.angular().x());
+  EXPECT_DOUBLE_EQ(twist.angular.y, proto.angular().y());
+  EXPECT_DOUBLE_EQ(twist.angular.z, proto.angular().z());
+  twist = geometry_msgs::msg::Twist();
+  EXPECT_DOUBLE_EQ(twist.linear.x, 0);
+  xmlrpc_interface::toMsg(proto, twist);
   EXPECT_DOUBLE_EQ(twist.linear.x, proto.linear().x());
   EXPECT_DOUBLE_EQ(twist.linear.y, proto.linear().y());
   EXPECT_DOUBLE_EQ(twist.linear.z, proto.linear().z());
@@ -150,6 +188,15 @@ TEST(Conversion, ConvertAccel)
   EXPECT_DOUBLE_EQ(accel.angular.x, proto.angular().x());
   EXPECT_DOUBLE_EQ(accel.angular.y, proto.angular().y());
   EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
+  accel = geometry_msgs::msg::Accel();
+  EXPECT_DOUBLE_EQ(accel.linear.x, 0);
+  xmlrpc_interface::toMsg(proto, accel);
+  EXPECT_DOUBLE_EQ(accel.linear.x, proto.linear().x());
+  EXPECT_DOUBLE_EQ(accel.linear.y, proto.linear().y());
+  EXPECT_DOUBLE_EQ(accel.linear.z, proto.linear().z());
+  EXPECT_DOUBLE_EQ(accel.angular.x, proto.angular().x());
+  EXPECT_DOUBLE_EQ(accel.angular.y, proto.angular().y());
+  EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
 }
 
 TEST(Conversion, ConvertPerformance)
@@ -159,6 +206,12 @@ TEST(Conversion, ConvertPerformance)
   performance.max_speed = 10;
   performance.max_deceleration = 3;
   xmlrpc_interface::toProto(performance, proto);
+  EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
+  EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
+  EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
+  performance = openscenario_msgs::msg::Performance();
+  EXPECT_DOUBLE_EQ(performance.max_speed, 0);
+  xmlrpc_interface::toMsg(proto, performance);
   EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
   EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
   EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
