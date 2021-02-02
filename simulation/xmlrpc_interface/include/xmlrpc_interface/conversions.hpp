@@ -27,6 +27,8 @@
 #include <openscenario_msgs/msg/performance.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/axle.hpp>
+#include <openscenario_msgs/msg/axles.hpp>
+
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
 
@@ -99,6 +101,18 @@ void toProto(
 void toMsg(
   const openscenario_msgs::Performance & proto,
   openscenario_msgs::msg::Performance & performance);
+void toProto(
+  const openscenario_msgs::msg::Axle & axle,
+  openscenario_msgs::Axle & proto);
+void toMsg(
+  const openscenario_msgs::Axle & proto,
+  openscenario_msgs::msg::Axle & axle);
+void toProto(
+  const openscenario_msgs::msg::Axles & axles,
+  openscenario_msgs::Axles & proto);
+void toMsg(
+  const openscenario_msgs::Axles & proto,
+  openscenario_msgs::msg::Axles & axles);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

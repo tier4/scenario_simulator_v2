@@ -189,4 +189,42 @@ void toMsg(
   performance.max_deceleration = proto.max_deceleration();
   performance.max_speed = proto.max_speed();
 }
+
+void toProto(
+  const openscenario_msgs::msg::Axle & axle,
+  openscenario_msgs::Axle & proto)
+{
+  proto.set_position_x(axle.position_x);
+  proto.set_position_z(axle.position_z);
+  proto.set_track_width(axle.track_width);
+  proto.set_wheel_diameter(axle.wheel_diameter);
+  proto.set_max_steering(axle.max_steering);
+}
+
+void toMsg(
+  const openscenario_msgs::Axle & proto,
+  openscenario_msgs::msg::Axle & axle)
+{
+  axle.position_x = proto.position_x();
+  axle.position_z = proto.position_z();
+  axle.track_width = proto.track_width();
+  axle.wheel_diameter = proto.wheel_diameter();
+  axle.max_steering = proto.max_steering();
+}
+
+void toProto(
+  const openscenario_msgs::msg::Axles & axles,
+  openscenario_msgs::Axles & proto)
+{
+  toProto(axles.front_axle, *proto.mutable_front_axle());
+  toProto(axles.rear_axle, *proto.mutable_rear_axle());
+}
+
+void toMsg(
+  const openscenario_msgs::Axles & proto,
+  openscenario_msgs::msg::Axles & axles)
+{
+  toMsg(proto.front_axle(), axles.front_axle);
+  toMsg(proto.rear_axle(), axles.rear_axle);
+}
 }  // namespace xmlrpc_interface

@@ -217,6 +217,71 @@ TEST(Conversion, ConvertPerformance)
   EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
 }
 
+TEST(Conversion, ConvertAxle)
+{
+  openscenario_msgs::Axle proto;
+  openscenario_msgs::msg::Axle axle;
+  axle.max_steering = 30;
+  axle.position_x = 3;
+  axle.position_z = 14;
+  axle.track_width = -10;
+  axle.wheel_diameter = 53;
+  xmlrpc_interface::toProto(axle, proto);
+  EXPECT_DOUBLE_EQ(axle.max_steering, proto.max_steering());
+  EXPECT_DOUBLE_EQ(axle.position_x, proto.position_x());
+  EXPECT_DOUBLE_EQ(axle.position_z, proto.position_z());
+  EXPECT_DOUBLE_EQ(axle.track_width, proto.track_width());
+  EXPECT_DOUBLE_EQ(axle.wheel_diameter, proto.wheel_diameter());
+  axle = openscenario_msgs::msg::Axle();
+  EXPECT_DOUBLE_EQ(axle.max_steering, 0);
+  xmlrpc_interface::toMsg(proto, axle);
+  EXPECT_DOUBLE_EQ(axle.max_steering, proto.max_steering());
+  EXPECT_DOUBLE_EQ(axle.position_x, proto.position_x());
+  EXPECT_DOUBLE_EQ(axle.position_z, proto.position_z());
+  EXPECT_DOUBLE_EQ(axle.track_width, proto.track_width());
+  EXPECT_DOUBLE_EQ(axle.wheel_diameter, proto.wheel_diameter());
+}
+
+TEST(Conversion, ConvertAxles)
+{
+  openscenario_msgs::Axles proto;
+  openscenario_msgs::msg::Axles axles;
+  axles.front_axle.max_steering = 3;
+  axles.front_axle.position_x = 35;
+  axles.front_axle.position_z = 234;
+  axles.front_axle.track_width = 1;
+  axles.front_axle.wheel_diameter = 123;
+  axles.rear_axle.max_steering = 13;
+  axles.rear_axle.position_x = 3;
+  axles.rear_axle.position_z = 23;
+  axles.rear_axle.track_width = 14;
+  axles.rear_axle.wheel_diameter = 122;
+  xmlrpc_interface::toProto(axles, proto);
+  EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, proto.front_axle().max_steering());
+  EXPECT_DOUBLE_EQ(axles.front_axle.position_x, proto.front_axle().position_x());
+  EXPECT_DOUBLE_EQ(axles.front_axle.position_z, proto.front_axle().position_z());
+  EXPECT_DOUBLE_EQ(axles.front_axle.track_width, proto.front_axle().track_width());
+  EXPECT_DOUBLE_EQ(axles.front_axle.wheel_diameter, proto.front_axle().wheel_diameter());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.max_steering, proto.rear_axle().max_steering());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.position_x, proto.rear_axle().position_x());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.position_z, proto.rear_axle().position_z());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.track_width, proto.rear_axle().track_width());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
+  axles = openscenario_msgs::msg::Axles();
+  EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, 0);
+  xmlrpc_interface::toMsg(proto, axles);
+  EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, proto.front_axle().max_steering());
+  EXPECT_DOUBLE_EQ(axles.front_axle.position_x, proto.front_axle().position_x());
+  EXPECT_DOUBLE_EQ(axles.front_axle.position_z, proto.front_axle().position_z());
+  EXPECT_DOUBLE_EQ(axles.front_axle.track_width, proto.front_axle().track_width());
+  EXPECT_DOUBLE_EQ(axles.front_axle.wheel_diameter, proto.front_axle().wheel_diameter());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.max_steering, proto.rear_axle().max_steering());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.position_x, proto.rear_axle().position_x());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.position_z, proto.rear_axle().position_z());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.track_width, proto.rear_axle().track_width());
+  EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
