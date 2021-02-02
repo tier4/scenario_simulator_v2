@@ -15,6 +15,9 @@
 #include <gtest/gtest.h>
 
 #include <geometry_msgs.pb.h>
+#include <geometry_msgs/msg/vector3.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -104,6 +107,50 @@ TEST(Conversion, ConvertPose)
   EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
 }
 
+TEST(Conversion, ConvertVector)
+{
+  geometry_msgs::Vector3 proto;
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = 1;
+  vec.y = 2;
+  vec.z = 3.0;
+  xmlrpc_interface::toProto(vec, proto);
+  EXPECT_DOUBLE_EQ(vec.x, proto.x());
+  EXPECT_DOUBLE_EQ(vec.y, proto.y());
+  EXPECT_DOUBLE_EQ(vec.z, proto.z());
+}
+
+TEST(Conversion, ConvertTwist)
+{
+  geometry_msgs::Twist proto;
+  geometry_msgs::msg::Twist twist;
+  twist.linear.x = 1;
+  twist.linear.y = 2;
+  twist.linear.z = 3.0;
+  xmlrpc_interface::toProto(twist, proto);
+  EXPECT_DOUBLE_EQ(twist.linear.x, proto.linear().x());
+  EXPECT_DOUBLE_EQ(twist.linear.y, proto.linear().y());
+  EXPECT_DOUBLE_EQ(twist.linear.z, proto.linear().z());
+  EXPECT_DOUBLE_EQ(twist.angular.x, proto.angular().x());
+  EXPECT_DOUBLE_EQ(twist.angular.y, proto.angular().y());
+  EXPECT_DOUBLE_EQ(twist.angular.z, proto.angular().z());
+}
+
+TEST(Conversion, ConvertAccel)
+{
+  geometry_msgs::Accel proto;
+  geometry_msgs::msg::Accel accel;
+  accel.linear.x = 1;
+  accel.linear.y = 2;
+  accel.linear.z = 3.0;
+  xmlrpc_interface::toProto(accel, proto);
+  EXPECT_DOUBLE_EQ(accel.linear.x, proto.linear().x());
+  EXPECT_DOUBLE_EQ(accel.linear.y, proto.linear().y());
+  EXPECT_DOUBLE_EQ(accel.linear.z, proto.linear().z());
+  EXPECT_DOUBLE_EQ(accel.angular.x, proto.angular().x());
+  EXPECT_DOUBLE_EQ(accel.angular.y, proto.angular().y());
+  EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
+}
 
 int main(int argc, char ** argv)
 {
