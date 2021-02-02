@@ -27,20 +27,17 @@ set(PROTO_FILES
   "proto/test.proto"
 )
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
-add_library(proto_msgs SHARED ${PROTO_SRCS} ${PROTO_HDRS})
-target_link_libraries(proto_msgs ${PROTOBUF_LIBRARY})
-
 include_directories(
   include
   ${CMAKE_BINARY_DIR}
 )
 
-ament_auto_add_library(xmlrpc_interface
+ament_auto_add_library(xmlrpc_interface SHARED
   src/conversions.cpp
+  ${PROTO_SRCS}
 )
 target_link_libraries(xmlrpc_interface
   ${PROTOBUF_LIBRARY}
-  proto_msgs
 )
 
 ament_auto_add_executable(example
@@ -56,18 +53,22 @@ install(TARGETS
 )
 
 install(TARGETS xmlrpc_interface
-EXPORT export_xmlrpc_interface
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
   INCLUDES DESTINATION include)
+
+install(
+  FILES ${PROTO_HDRS}
+  DESTINATION include
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_conversion test/test_conversions.cpp)
-  target_link_libraries(test_conversion xmlrpc_interface proto_msgs)
+  target_link_libraries(test_conversion xmlrpc_interface)
 endif()
 
-ament_package()
+ament_auto_package()
