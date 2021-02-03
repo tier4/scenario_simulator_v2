@@ -441,9 +441,14 @@ XmlRpc::XmlRpcValue API::initialize(
   value[0][0]["methodName"] = "initialize";
   value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
   XmlRpc::XmlRpcValue result;
-  client_ptr_->execute("system.multicall", value, result);
-  const auto res = xmlrpc_interface::deserializeFromBinValue<
-    simulation_api_schema::InitializeResponse>(result[0][0]["return"]);
+  try {
+    client_ptr_->execute("system.multicall", value, result);
+  } catch (XmlRpc::XmlRpcException e) {
+    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
+  }
+  const auto res =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
+    result[0][0][xmlrpc_interface::key::response]);
   return res.result().success();
 }
 
@@ -453,23 +458,22 @@ XmlRpc::XmlRpcValue API::updateFrame()
   entity_manager_ptr_->setVehicleCommands(current_cmd_, current_state_cmd_);
   XmlRpc::XmlRpcValue value;
   value[0][0]["methodName"] = "update_frame";
-  value[0][0]["params"]["runner/current_time"] = current_time_;
+  simulation_api_schema::UpdateFrameRequest req;
+  req.set_current_time(current_time_);
+  value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
   XmlRpc::XmlRpcValue result;
   try {
     client_ptr_->execute("system.multicall", value, result);
   } catch (XmlRpc::XmlRpcException e) {
     throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
   }
-  if (!result[0][0].hasMember("sim/update_frame")) {
-    throw ExecutionFailedError("there is no sim/update_frmae field in the result");
-  }
-  if (!result[0][0]["sim/update_frame"]) {
-    throw ExecutionFailedError("failed to update simulation frame");
-  }
+  const auto res =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameResponse>(
+    result[0][0][xmlrpc_interface::key::response]);
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;
   metrics_manager_.calculate();
-  return result[0][0];
+  return res.result().success();
 }
 
 void API::vehicleControlCommandCallback(

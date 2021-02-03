@@ -22,57 +22,57 @@ namespace xmlrpc_interface
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to)
 {
   to = simulation_api_schema::InitializeResponse();
-  to.mutable_result()->set_success(xmlrpc_interface::getXmlValue<bool>(from, key_success));
+  to.mutable_result()->set_success(xmlrpc_interface::getXmlValue<bool>(from, key::success));
   to.mutable_result()->set_description(
     xmlrpc_interface::getXmlValue<std::string>(
       from,
-      key_description));
+      key::description));
 }
 
 void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to[key_success] = from.result().success();
-  to[key_description] = from.result().description();
+  to[key::success] = from.result().success();
+  to[key::description] = from.result().description();
 }
 
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to)
 {
   to = simulation_api_schema::InitializeRequest();
-  to.set_realtime_factor(xmlrpc_interface::getXmlValue<double>(from, key_realtime_factor));
-  to.set_step_time(xmlrpc_interface::getXmlValue<double>(from, key_step_time));
+  to.set_realtime_factor(xmlrpc_interface::getXmlValue<double>(from, key::realtime_factor));
+  to.set_step_time(xmlrpc_interface::getXmlValue<double>(from, key::step_time));
 }
 
 void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to[key_realtime_factor] = from.realtime_factor();
-  to[key_step_time] = from.step_time();
+  to[key::realtime_factor] = from.realtime_factor();
+  to[key::step_time] = from.step_time();
 }
 
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameRequest & to)
 {
   to = simulation_api_schema::UpdateFrameRequest();
-  to.set_current_time(from[key_current_time]);
+  to.set_current_time(from[key::current_time]);
 }
 
 void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to[key_current_time] = from.current_time();
+  to[key::current_time] = from.current_time();
 }
 
 void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to)
 {
   to = simulation_api_schema::UpdateFrameResponse();
-  to.mutable_result()->set_success(from[key_success]);
-  to.mutable_result()->set_description(from[key_description]);
+  to.mutable_result()->set_success(from[key::success]);
+  to.mutable_result()->set_description(from[key::description]);
 }
 
 void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to)
 {
   to = XmlRpc::XmlRpcValue();
-  to[key_success] = from.result().success();
-  to[key_description] = from.result().description();
+  to[key::success] = from.result().success();
+  to[key::description] = from.result().description();
 }
 }  // namespace xmlrpc_interface

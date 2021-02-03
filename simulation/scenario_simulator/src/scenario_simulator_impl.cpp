@@ -44,41 +44,43 @@ void ScenarioSimulatorImpl::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlR
     std::swap(*this, other);
   }
   initialized_ = true;
-  simulation_api_schema::InitializeRequest req;
-  std::vector<char> bin = param;
-  req.ParseFromArray(bin.data(), bin.size());
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeRequest>(param);
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
   simulation_api_schema::InitializeResponse res;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
   result = XmlRpc::XmlRpcValue();
-  size_t size = res.ByteSizeLong();
-  void * buffer = malloc(size);
-  res.SerializeToArray(buffer, size);
-  result["return"] = XmlRpc::XmlRpcValue(buffer, size);
-  free(buffer);
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulatorImpl::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   if (!initialized_) {
-    result["message"] = "simulator have not initialized yet.";
-    result["sim/current_time"] = current_time_;
-    result["sim/update_frame"] = false;
+    simulation_api_schema::UpdateFrameResponse res;
+    res.mutable_result()->set_description("simulator have not initialized yet.");
+    res.mutable_result()->set_success(false);
+    result = XmlRpc::XmlRpcValue();
+    result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
     return;
   }
-  double current_time_in_runner = param["runner/current_time"];
-  if (current_time_in_runner != current_time_) {
-    result["sim/current_time"] = current_time_;
-    result["sim/update_frame"] = false;
-    result["message"] = "timestamp of the simulator and runner does not match.";
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameRequest>(param);
+  simulation_api_schema::UpdateFrameResponse res;
+  if (req.current_time() != current_time_) {
+    res.mutable_result()->set_success(false);
+    res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
+    result = XmlRpc::XmlRpcValue();
+    result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+    return;
+  } else {
+    res.mutable_result()->set_success(true);
+    res.mutable_result()->set_description("succeed to update frame");
+    result = XmlRpc::XmlRpcValue();
+    result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
     return;
   }
-  current_time_ = current_time_ + step_time_;
-  result["sim/update_frame"] = true;
-  result["sim/current_time"] = current_time_;
-  result["message"] = "succeed to update frame";
 }
 
 void ScenarioSimulatorImpl::setEntityStatus(

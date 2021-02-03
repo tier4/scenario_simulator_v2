@@ -17,6 +17,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
+find_package(Boost REQUIRED thread)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
@@ -42,9 +43,12 @@ target_link_libraries(xmlrpc_interface
 
 ament_auto_add_executable(example
   src/example.cpp
+  src/conversions.cpp
+  ${PROTO_SRCS}
 )
 target_link_libraries(example
-  xmlrpc_interface
+  ${PROTOBUF_LIBRARY}
+  Boost::thread
 )
 
 install(TARGETS
