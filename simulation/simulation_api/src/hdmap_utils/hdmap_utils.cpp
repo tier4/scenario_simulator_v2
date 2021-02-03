@@ -20,12 +20,12 @@
 #include <quaternion_operation/quaternion_operation.h>
 #include <lanelet2_core/utility/Units.h>
 
-#include <lanelet2_extension/io/autoware_osm_parser.hpp>
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
-#include <lanelet2_extension/utility/message_conversion.hpp>
-#include <lanelet2_extension/utility/utilities.hpp>
-#include <lanelet2_extension/utility/query.hpp>
-#include <lanelet2_extension/visualization/visualization.hpp>
+#include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
+#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
+#include <lanelet2_extension_psim/utility/utilities.hpp>
+#include <lanelet2_extension_psim/utility/query.hpp>
+#include <lanelet2_extension_psim/visualization/visualization.hpp>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
 #include <lanelet2_projection/UTM.h>
@@ -810,9 +810,9 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
       "walkway_lanelets", walkway_lanelets, cl_cross));
   insertMarkerArray(
     markers, lanelet::visualization::laneletDirectionAsMarkerArray(road_lanelets));
-  insertMarkerArray(
-    markers,
-    lanelet::visualization::lineStringsAsMarkerArray(stop_lines, "stop_lines", cl_stoplines));
+  // insertMarkerArray(
+  //   markers,
+  //   lanelet::visualization::lineStringsAsMarkerArray(stop_lines, "stop_lines", cl_stoplines));
   insertMarkerArray(
     markers,
     lanelet::visualization::autowareTrafficLightsAsMarkerArray(aw_tl_reg_elems, cl_trafficlights));
@@ -825,12 +825,12 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
   insertMarkerArray(
     markers,
     lanelet::visualization::parkingSpacesAsMarkerArray(parking_spaces, cl_parking_spaces));
-  insertMarkerArray(
-    markers,
-    lanelet::visualization::generateLaneletIdMarker(road_lanelets, cl_lanelet_id));
-  insertMarkerArray(
-    markers,
-    lanelet::visualization::generateLaneletIdMarker(crosswalk_lanelets, cl_lanelet_id));
+  // insertMarkerArray(
+  //   markers,
+  //   lanelet::visualization::generateLaneletIdMarker(road_lanelets, cl_lanelet_id));
+  // insertMarkerArray(
+  //   markers,
+  //   lanelet::visualization::generateLaneletIdMarker(crosswalk_lanelets, cl_lanelet_id));
   return markers;
 }
 

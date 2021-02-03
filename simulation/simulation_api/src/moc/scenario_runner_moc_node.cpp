@@ -98,7 +98,7 @@ public:
       {10, simulation_api::TrafficLightColor::YELLOW},
       {10, simulation_api::TrafficLightColor::RED}
     };
-    api_.setrafficLightColorPhase(34802, phase);
+    api_.setTrafficLightColorPhase(34802, phase);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }

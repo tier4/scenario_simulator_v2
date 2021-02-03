@@ -171,7 +171,7 @@ struct VehicleParameters
   const std::string name;
   const std::string vehicle_categoly;
 
-  std::string toXml()
+  std::string toXml() const
   {
     using boost::property_tree::ptree;
     ptree pt;
