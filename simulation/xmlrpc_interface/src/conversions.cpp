@@ -272,7 +272,7 @@ void toProto(
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   proto.set_name(p.name);
-  proto.set_pedestrian_category(p.pedestrian_categoly);
+  proto.set_pedestrian_category(p.pedestrian_category);
 }
 
 void toMsg(
@@ -280,7 +280,7 @@ void toMsg(
   openscenario_msgs::msg::PedestrianParameters & p)
 {
   p.name = proto.name();
-  p.pedestrian_categoly = proto.pedestrian_category();
+  p.pedestrian_category = proto.pedestrian_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
 }  // namespace xmlrpc_interface
