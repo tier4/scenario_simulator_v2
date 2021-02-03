@@ -27,7 +27,7 @@ PedestrianActionNode::PedestrianActionNode(
 void PedestrianActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
-  if (!getInput<std::shared_ptr<simulation_api::entity::PedestrianParameters>>(
+  if (!getInput<openscenario_msgs::msg::PedestrianParameters>(
       "pedestrian_parameters", pedestrian_parameters))
   {
     throw BehaviorTreeRuntimeError(

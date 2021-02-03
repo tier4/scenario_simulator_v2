@@ -60,7 +60,8 @@ bool API::spawn(
   }
   pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
   if (pedestrian_node != NULL) {
-    simulation_api::entity::PedestrianEntity pedestrian(status.name, status, catalog_xml_doc);
+    const auto params = simulation_api::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
+    simulation_api::entity::PedestrianEntity pedestrian(status.name, status, params);
     if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
       return false;
     }
@@ -91,6 +92,19 @@ bool API::spawn(
       return false;
     }
   }
+  return true;
+}
+
+bool API::spawn(
+  const bool is_ego,
+  const std::string & name,
+  const openscenario_msgs::msg::PedestrianParameters & params)
+{
+  simulation_api::entity::PedestrianEntity pedestrian(name, params);
+  if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
+    return false;
+  }
+  return true;
 }
 
 bool API::spawn(
@@ -109,24 +123,12 @@ bool API::spawn(
   // catalog_xml_doc.has("Vehicle");
   if (vehicle_node != NULL) {
     const auto params = simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
-    if (is_ego) {
-      simulation_api::entity::EgoEntity ego(access_rights_, name, params);
-      if (!entity_manager_ptr_->spawnEntity(ego)) {
-        return false;
-      }
-    } else {
-      simulation_api::entity::VehicleEntity npc(name, params);
-      if (!entity_manager_ptr_->spawnEntity(npc)) {
-        return false;
-      }
-    }
+    spawn(is_ego, name, params);
   }
   pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
   if (pedestrian_node != NULL) {
-    simulation_api::entity::PedestrianEntity pedestrian(name, catalog_xml_doc);
-    if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
-      return false;
-    }
+    const auto params = simulation_api::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
+    spawn(false, name, params);
   }
 
   XmlRpc::XmlRpcValue result;

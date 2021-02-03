@@ -73,7 +73,7 @@ struct PedestrianParameters
     return ss.str();
   }
 
-  const openscenario_msgs::msg::PedestrianParameters toRosMsg()
+  const openscenario_msgs::msg::PedestrianParameters toRosMsg() const
   {
     openscenario_msgs::msg::PedestrianParameters msg;
     msg.bounding_box = bounding_box.toRosMsg();

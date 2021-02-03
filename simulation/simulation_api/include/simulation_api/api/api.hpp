@@ -129,27 +129,21 @@ public:
 
   void setVerbose(const bool verbose);
 
-  // (1) Basis
   [[deprecated("catalog_xml will be deprecated in the near future")]]
   bool spawn(
     const bool is_ego,
     const std::string & name,
     const std::string & catalog_xml);
 
-  // (2) => (1)
   bool spawn(
     const bool is_ego,
     const std::string & name,
     const openscenario_msgs::msg::VehicleParameters & params);
 
-  // (3) => (1)
   bool spawn(
     const bool is_ego,
     const std::string & name,
-    const simulation_api::entity::PedestrianParameters & params)
-  {
-    return spawn(is_ego, name, params.toXml());
-  }
+    const openscenario_msgs::msg::PedestrianParameters & params);
 
   template
   <
@@ -166,7 +160,6 @@ public:
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
-  /*
   template
   <
     typename Parameters,  // Maybe, VehicleParameters or PedestrianParameters
@@ -179,10 +172,9 @@ public:
     Ts && ... xs)
   {
     return
-      spawn(is_ego, name, params) &&
+      // spawn(is_ego, name, params) &&
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
-  */
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     const std::string & name);

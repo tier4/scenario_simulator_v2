@@ -46,10 +46,10 @@ public:
       simulation_api::helper::constractLaneletPose(120545, 0),
       simulation_api::helper::constractActionStatus(10));
     api_.setTargetSpeed("ego", 15, true);
-    /*
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
-    simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
+    const auto pedestrian_params =
+      simulation_api::entity::PedestrianParameters(pedestrian_xml_doc).toRosMsg();
     api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus(
       "tom", "ego",
@@ -82,7 +82,6 @@ public:
       "ego_momentary_stop0", "ego",
       -10, 10, 34805, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
       30, 1, 0.05);
-    */
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop1", "ego",
       -10, 10, 120635, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
