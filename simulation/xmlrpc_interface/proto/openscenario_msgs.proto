@@ -73,8 +73,17 @@ message Property
 
 message VehicleParameters
 {
-    Performance performance = 1;
-    BoundingBox bounding_box = 2;
-    Axles axles = 3;
-    Property property = 4;
+    string name = 1;
+    string vehicle_category = 2;
+    Performance performance = 3;
+    BoundingBox bounding_box = 4;
+    Axles axles = 5;
+    Property property = 6;
+}
+
+message PedestrianParameters
+{
+    string name = 1;
+    string pedestrian_category = 2;
+    BoundingBox bounding_box = 3;
 }

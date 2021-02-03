@@ -1,3 +1,5 @@
+string name
+string vehicle_category
 openscenario_msgs/Performance performance
 openscenario_msgs/BoundingBox bounding_box
 openscenario_msgs/Axles axles

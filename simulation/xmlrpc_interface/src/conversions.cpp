@@ -246,10 +246,12 @@ void toProto(
   const openscenario_msgs::msg::VehicleParameters & p,
   openscenario_msgs::VehicleParameters & proto)
 {
-  toProto(p.axles, *proto.mutable_axles());
   toProto(p.bounding_box, *proto.mutable_bounding_box());
+  toProto(p.axles, *proto.mutable_axles());
   toProto(p.performance, *proto.mutable_performance());
   toProto(p.property, *proto.mutable_property());
+  proto.set_name(p.name);
+  proto.set_vehicle_category(p.vehicle_category);
 }
 
 void toMsg(
@@ -260,5 +262,25 @@ void toMsg(
   toMsg(proto.bounding_box(), p.bounding_box);
   toMsg(proto.performance(), p.performance);
   toMsg(proto.property(), p.property);
+  p.name = proto.name();
+  p.vehicle_category = proto.vehicle_category();
+}
+
+void toProto(
+  const openscenario_msgs::msg::PedestrianParameters & p,
+  openscenario_msgs::PedestrianParameters & proto)
+{
+  toProto(p.bounding_box, *proto.mutable_bounding_box());
+  proto.set_name(p.name);
+  proto.set_pedestrian_category(p.pedestrian_categoly);
+}
+
+void toMsg(
+  const openscenario_msgs::PedestrianParameters & proto,
+  openscenario_msgs::msg::PedestrianParameters & p)
+{
+  p.name = proto.name();
+  p.pedestrian_categoly = proto.pedestrian_category();
+  toMsg(proto.bounding_box(), p.bounding_box);
 }
 }  // namespace xmlrpc_interface
