@@ -34,7 +34,7 @@ const char step_time[] = "step_time";
 const char current_time[] = "current_time";
 const char parameters[] = "params";
 const char response[] = "return";
-}  // namespace keys
+}  // namespace key
 
 class XmlParameterError : public std::runtime_error
 {
