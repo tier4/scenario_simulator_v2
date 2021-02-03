@@ -40,22 +40,54 @@ class EgoEntity : public VehicleEntity
   const std::shared_ptr<autoware_api::Accessor> autoware;  // TODO(yamacir-kit): Use unique_ptr
 
 public:
+  /* ---------------------------------------------------------------------------
+   *
+   *  NOTE: from yamacir-kit
+   *
+   *  This constructor makes an Ego type entity with the proper initial state.
+   *  It is mainly used when writing scenarios in C++.
+   *
+   * ------------------------------------------------------------------------ */
   template
   <
-    typename ... Ts
+    typename ... Ts  // Maybe, VehicleParameters or pugi::xml_node
   >
   explicit EgoEntity(
-    const std::shared_ptr<autoware_api::Accessor> & access_rights,
     const std::string & name,
-    const openscenario_msgs::msg::EntityStatus & initial_state,
-    Ts && ... xs)
-  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
-    autoware(access_rights)
+    const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
+  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
   {
     setStatus(initial_state);
   }
 
   using VehicleEntity::VehicleEntity;  // for dummy ego mode
+
+  /* ---------------------------------------------------------------------------
+   *
+   *  NOTE: from yamacir-kit
+   *
+   *  This constructor builds an Ego-type entity with an ambiguous initial
+   *  state. In this case, the values for status_ and current_kinematic_state_
+   *  are boost::none, respectively.
+   *
+   *  This constructor is used for the purpose of delaying the transmission of
+   *  the initial position from the entity's spawn. If you build an ego-type
+   *  entity with this constructor, you must explicitly call setStatus at least
+   *  once before the first onUpdate call to establish location and kinematic
+   *  state.
+   *
+   *  For OpenSCENARIO, setStatus before the onUpdate call is called by
+   *  TeleportAction in the Storyboard.Init section.
+   *
+   * ------------------------------------------------------------------------ */
+  template
+  <
+    typename ... Ts
+  >
+  explicit EgoEntity(const std::shared_ptr<autoware_api::Accessor> & access_rights, Ts && ... xs)
+  : VehicleEntity(std::forward<decltype(xs)>(xs)...),
+    autoware(access_rights)
+  {}
 
   void setVehicleCommands(
     const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,

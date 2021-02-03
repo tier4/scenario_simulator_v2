@@ -32,14 +32,16 @@ autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  double wheelbase =
+  const double wheelbase =
     parameters.axles.front_axle.position_x -
     parameters.axles.rear_axle.position_x;
 
   vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
 
-  bool ret = VehicleEntity::setStatus(status);
-  auto current_entity_status = getStatus();
+  // NOTE Currently, setStatus always succeeds.
+  const bool success = VehicleEntity::setStatus(status);
+
+  const auto current_entity_status = getStatus();
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   state.state.x = current_entity_status.pose.position.x;
@@ -55,7 +57,8 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   current_kinematic_state_ = state;
   origin_ = current_entity_status.pose;
-  return ret;
+
+  return success;
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)
