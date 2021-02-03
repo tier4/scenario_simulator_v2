@@ -31,27 +31,9 @@ namespace entity
 {
 VehicleEntity::VehicleEntity(
   std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  const pugi::xml_node & xml)
-: EntityBase(xml.child("Vehicle").attribute("name").as_string(), name, initial_state),
-  parameters(simulation_api::entity::VehicleParameters(xml).toRosMsg())
-{
-  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
-}
-
-VehicleEntity::VehicleEntity(
-  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
   openscenario_msgs::msg::VehicleParameters params)
 : EntityBase(params.name, name, initial_state),
   parameters(params)
-{
-  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
-}
-
-VehicleEntity::VehicleEntity(std::string name, const pugi::xml_node & xml)
-: EntityBase(xml.child("Vehicle").attribute("name").as_string(), name),
-  parameters(simulation_api::entity::VehicleParameters(xml).toRosMsg())
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);

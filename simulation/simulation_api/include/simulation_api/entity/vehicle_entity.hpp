@@ -44,11 +44,7 @@ class VehicleEntity : public EntityBase
 public:
   VehicleEntity(
     std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    const pugi::xml_node & xml);
-  VehicleEntity(
-    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
     openscenario_msgs::msg::VehicleParameters parameters);
-  VehicleEntity(std::string name, const pugi::xml_node & xml);
   VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters parameters);
   const openscenario_msgs::msg::VehicleParameters parameters;
   void onUpdate(double current_time, double step_time) override;
