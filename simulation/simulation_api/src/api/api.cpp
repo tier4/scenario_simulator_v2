@@ -90,13 +90,14 @@ bool API::spawn(
   pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
   // catalog_xml_doc.has("Vehicle");
   if (vehicle_node != NULL) {
+    const auto params = simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
     if (is_ego) {
-      simulation_api::entity::EgoEntity ego(access_rights_, name, catalog_xml_doc);
+      simulation_api::entity::EgoEntity ego(access_rights_, name, params);
       if (!entity_manager_ptr_->spawnEntity(ego)) {
         return false;
       }
     } else {
-      simulation_api::entity::VehicleEntity npc(name, catalog_xml_doc);
+      simulation_api::entity::VehicleEntity npc(name, params);
       if (!entity_manager_ptr_->spawnEntity(npc)) {
         return false;
       }
