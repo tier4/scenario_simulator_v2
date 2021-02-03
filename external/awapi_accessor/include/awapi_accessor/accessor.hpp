@@ -184,7 +184,7 @@ public:
   DEFINE_PUBLISHER(InitialTwist);
 
 public:
-  auto ready() const
+  auto isReady() const
   {
     static auto ready = false;
 
@@ -193,9 +193,14 @@ public:
            autoware_system_msgs::msg::AutowareState::WAITING_FOR_ROUTE));
   }
 
+  auto isNotReady() const
+  {
+    return !isReady();
+  }
+
   void checkAutowareState() const
   {
-    if (ready() && CURRENT_VALUE_OF(AutowareStatus).autoware_state ==
+    if (isReady() && CURRENT_VALUE_OF(AutowareStatus).autoware_state ==
       autoware_system_msgs::msg::AutowareState::EMERGENCY)
     {
       throw AutowareError();
@@ -215,15 +220,15 @@ public:
     INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),
 #endif
     // AWAPI topics (lexicographically sorted)
-    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
-    INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
-    INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
-    INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
-    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
-    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
-    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
-    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
+    INIT_PUBLISHER(AutowareEngage, "/autoware/put/engage"),
+    INIT_PUBLISHER(AutowareRoute, "/autoware/put/route"),
+    INIT_PUBLISHER(LaneChangeApproval, "/lane_change/put/approval"),
+    INIT_PUBLISHER(LaneChangeForce, "/lane_change/put/force"),
+    INIT_PUBLISHER(TrafficLightStateArray, "/traffic_light/put/traffic_light"),
+    INIT_PUBLISHER(VehicleVelocity, "/vehicle/put/velocity"),
+    INIT_SUBSCRIPTION(AutowareStatus, "/autoware/get/status", checkAutowareState),
+    INIT_SUBSCRIPTION(TrafficLightStatus, "/traffic_light/get/status", []() {}),
+    INIT_SUBSCRIPTION(VehicleStatus, "/vehicle/get/status", []() {}),
 
     // Simulation specific topics (lexicographically sorted)
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
