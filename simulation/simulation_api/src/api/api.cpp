@@ -90,7 +90,7 @@ bool API::spawn(
   // catalog_xml_doc.has("Vehicle");
   if (vehicle_node != NULL) {
     if (is_ego) {
-      simulation_api::entity::EgoEntity ego(access_rights_, name, catalog_xml_doc);
+      simulation_api::entity::EgoEntity ego(name, catalog_xml_doc);
       if (!entity_manager_ptr_->spawnEntity(ego)) {
         return false;
       }

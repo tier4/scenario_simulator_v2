@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_api/entity/ego_entity.hpp>
+#include <awapi_accessor/accessor.hpp>
 #include <quaternion_operation/quaternion_operation.h>
+#include <simulation_api/entity/ego_entity.hpp>
 
 #include <string>
 #include <memory>
@@ -42,6 +43,33 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   const bool success = VehicleEntity::setStatus(status);
 
   const auto current_entity_status = getStatus();
+
+  static auto first_time = true;
+
+  if (first_time) {
+    // (*autoware).waitForAutowareToBeReady();
+
+    // TODO(yamacir-kit): MUTEX!!!
+
+    // NOTE: ament_uncrustify's strange indentation.
+    for (
+      rclcpp::WallRate rate {
+          std::chrono::seconds(1)
+        }; (*autoware).isNotReady(); rate.sleep())
+    {
+      static auto count = 0;
+      std::cout << "[accessor] Waiting for Autoware to be ready. (" << ++count << ")" << std::endl;
+    }
+
+    std::cout << "[accessor] Autoware is ready." << std::endl;
+
+    autoware_api::Accessor::InitialPose initial_pose {};
+    initial_pose.pose.pose = current_entity_status.pose;
+
+    (*autoware).setInitialPose(initial_pose);
+
+    first_time = false;
+  }
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   state.state.x = current_entity_status.pose.position.x;

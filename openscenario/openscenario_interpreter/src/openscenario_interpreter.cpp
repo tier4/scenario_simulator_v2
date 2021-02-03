@@ -68,10 +68,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     return Interpreter::Result::FAILURE;
   }
 
-  connect(
-    shared_from_this(),
-    script.as<OpenScenario>().scope.logic_file.string(),
-    true);
+  connect(shared_from_this(), script.as<OpenScenario>().scope.logic_file.string());
   VERBOSE("  connection established");
 
   // XXX ???

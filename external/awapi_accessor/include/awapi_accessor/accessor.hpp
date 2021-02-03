@@ -39,8 +39,9 @@ struct AutowareError
 {
 };
 
-class Accessor
+class Accessor : public rclcpp::Node
 {
+public:
 #ifndef NDEBUG
   /** ---- DummyData -----------------------------------------------------------
    *
@@ -210,11 +211,11 @@ public:
 public:
   template
   <
-    typename Node
+    typename ... Ts
   >
   AWAPI_ACCESSOR_PUBLIC
-  explicit Accessor(Node && node)
-  :
+  explicit Accessor(Ts && ... xs)
+  : rclcpp::Node("awapi_accessor", std::forward<decltype(xs)>(xs)...),
 #ifndef NDEBUG
     INIT_PUBLISHER(DebugString, "debug/string"),
     INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),

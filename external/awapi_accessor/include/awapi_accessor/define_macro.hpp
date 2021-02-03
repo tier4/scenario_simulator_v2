@@ -46,7 +46,7 @@ public: \
 
 #define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK) \
   subscription_of_ ## TYPE( \
-    (*node).template create_subscription<TYPE>( \
+    create_subscription<TYPE>( \
       TOPIC, 1, \
       [this](const TYPE::SharedPtr message) \
       { \
@@ -56,6 +56,6 @@ public: \
 
 #define INIT_PUBLISHER(TYPE, TOPIC) \
   publisher_of_ ## TYPE( \
-    (*node).template create_publisher<TYPE>(TOPIC, 10))
+    create_publisher<TYPE>(TOPIC, 10))
 
 #endif  // AWAPI_ACCESSOR__DEFINE_MACRO_HPP_

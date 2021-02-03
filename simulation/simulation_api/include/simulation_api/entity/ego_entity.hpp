@@ -60,7 +60,7 @@ public:
     setStatus(initial_state);
   }
 
-  using VehicleEntity::VehicleEntity;  // for dummy ego mode
+  // using VehicleEntity::VehicleEntity;
 
   /* ---------------------------------------------------------------------------
    *
@@ -84,10 +84,18 @@ public:
   <
     typename ... Ts
   >
-  explicit EgoEntity(const std::shared_ptr<autoware_api::Accessor> & access_rights, Ts && ... xs)
+  explicit EgoEntity(Ts && ... xs)
   : VehicleEntity(std::forward<decltype(xs)>(xs)...),
-    autoware(access_rights)
-  {}
+    autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
+  {
+    std::thread(
+      [autoware]()
+      {
+        rclcpp::executors::MultiThreadedExecutor executor {};
+        executor.add_node((*autoware).get_node_base_interface());
+        executor.spin();
+      }).detach();
+  }
 
   void setVehicleCommands(
     const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,
