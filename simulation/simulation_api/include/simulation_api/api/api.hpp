@@ -172,7 +172,7 @@ public:
     Ts && ... xs)
   {
     return
-      // spawn(is_ego, name, params) &&
+      spawn(is_ego, name, params) &&
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
