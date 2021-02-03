@@ -78,7 +78,7 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double curren
     return boost::none;
   }
   double rest_distance = distance_to_stopline_.get() -
-    (vehicle_parameters->bounding_box.dimensions.length);
+    (vehicle_parameters.bounding_box.dimensions.x);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
       return std::sqrt(2 * 5 * rest_distance);
@@ -105,7 +105,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   distance_to_stopline_ = getDistanceToStopLine(route_lanelets);
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (distance_to_stopline_) {
-      if (distance_to_stopline_.get() <= vehicle_parameters->bounding_box.dimensions.length + 5) {
+      if (distance_to_stopline_.get() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
         stopped_ = true;
       }
     }

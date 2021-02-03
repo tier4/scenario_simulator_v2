@@ -24,6 +24,7 @@
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <openscenario_msgs/msg/obstacle.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 
 #include <string>
 #include <memory>
@@ -41,7 +42,7 @@ public:
   {
     BT::PortsList ports = {
       BT::InputPort<openscenario_msgs::msg::DriverModel>("driver_model"),
-      BT::InputPort<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
+      BT::InputPort<openscenario_msgs::msg::VehicleParameters>(
         "vehicle_parameters")
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
@@ -50,7 +51,7 @@ public:
     }
     return ports;
   }
-  std::shared_ptr<simulation_api::entity::VehicleParameters> vehicle_parameters;
+  openscenario_msgs::msg::VehicleParameters vehicle_parameters;
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(
     double target_speed,

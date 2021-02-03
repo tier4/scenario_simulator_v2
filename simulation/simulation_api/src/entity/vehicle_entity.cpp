@@ -36,9 +36,7 @@ VehicleEntity::VehicleEntity(
   parameters(simulation_api::entity::VehicleParameters(xml).toRosMsg())
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<openscenario_msgs::msg::VehicleParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
 VehicleEntity::VehicleEntity(
@@ -48,9 +46,7 @@ VehicleEntity::VehicleEntity(
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<openscenario_msgs::msg::VehicleParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
 VehicleEntity::VehicleEntity(std::string name, const pugi::xml_node & xml)
@@ -58,9 +54,7 @@ VehicleEntity::VehicleEntity(std::string name, const pugi::xml_node & xml)
   parameters(simulation_api::entity::VehicleParameters(xml).toRosMsg())
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<openscenario_msgs::msg::VehicleParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
 VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters params)
@@ -68,9 +62,7 @@ VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehiclePa
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<openscenario_msgs::msg::VehicleParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
 void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
