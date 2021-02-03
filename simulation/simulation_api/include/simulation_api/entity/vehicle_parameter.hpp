@@ -18,6 +18,7 @@
 // headers in pugixml
 #include <openscenario_msgs.pb.h>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 
 #include <pugixml.hpp>
 
@@ -171,6 +172,12 @@ struct VehicleParameters
   const Axles axles;
   const std::string name;
   const std::string vehicle_categoly;
+
+  const openscenario_msgs::msg::VehicleParameters toRosMsg()
+  {
+    openscenario_msgs::msg::VehicleParameters ret;
+    return ret;
+  }
 
   std::string toXml() const
   {
