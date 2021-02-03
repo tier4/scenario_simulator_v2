@@ -40,13 +40,13 @@ public:
     api_.initialize(1.0, 0.05);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
-    simulation_api::entity::VehicleParameters params(catalog_xml_doc);
-    api_.spawn(false, "ego", params);
+    api_.spawn(false, "ego", simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "ego",
       simulation_api::helper::constractLaneletPose(120545, 0),
       simulation_api::helper::constractActionStatus(10));
     api_.setTargetSpeed("ego", 15, true);
+    /*
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
@@ -61,13 +61,13 @@ public:
       simulation_api::helper::constractActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     api_.spawn(
-      false, "npc1", params,
+      false, "npc1", simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg(),
       simulation_api::helper::constractLaneletPose(34579, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
     lanechange_excuted_ = false;
     api_.spawn(
-      false, "npc2", params,
+      false, "npc2", simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg(),
       simulation_api::helper::constractLaneletPose(34606, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
@@ -78,7 +78,6 @@ public:
       "npc1",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
-    /*
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop0", "ego",
       -10, 10, 34805, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,

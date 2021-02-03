@@ -140,10 +140,7 @@ public:
   bool spawn(
     const bool is_ego,
     const std::string & name,
-    const simulation_api::entity::VehicleParameters & params)
-  {
-    return spawn(is_ego, name, params.toXml());
-  }
+    const openscenario_msgs::msg::VehicleParameters & params);
 
   // (3) => (1)
   bool spawn(
@@ -169,6 +166,7 @@ public:
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
+  /*
   template
   <
     typename Parameters,  // Maybe, VehicleParameters or PedestrianParameters
@@ -184,6 +182,7 @@ public:
       spawn(is_ego, name, params) &&
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
+  */
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     const std::string & name);

@@ -78,6 +78,24 @@ bool API::spawn(
 bool API::spawn(
   const bool is_ego,
   const std::string & name,
+  const openscenario_msgs::msg::VehicleParameters & params)
+{
+  if (is_ego) {
+    simulation_api::entity::EgoEntity ego(access_rights_, name, params);
+    if (!entity_manager_ptr_->spawnEntity(ego)) {
+      return false;
+    }
+  } else {
+    simulation_api::entity::VehicleEntity npc(name, params);
+    if (!entity_manager_ptr_->spawnEntity(npc)) {
+      return false;
+    }
+  }
+}
+
+bool API::spawn(
+  const bool is_ego,
+  const std::string & name,
   const std::string & catalog_xml)
 {
   XmlRpc::XmlRpcValue value;
