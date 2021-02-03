@@ -130,6 +130,7 @@ public:
   void setVerbose(const bool verbose);
 
   // (1) Basis
+  [[deprecated("catalog_xml will be deprecated in the near future")]]
   bool spawn(
     const bool is_ego,
     const std::string & name,
