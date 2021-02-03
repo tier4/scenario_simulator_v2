@@ -55,14 +55,18 @@ struct TeleportAction
   {
     if (position.is<LanePosition>()) {
       geometry_msgs::msg::Vector3 rpy = position.as<LanePosition>().orientation;
-      const auto lanelet_pose = simulation_api::helper::constractLaneletPose(
-        Integer(position.as<LanePosition>().lane_id),
-        position.as<LanePosition>().s,
-        position.as<LanePosition>().offset,
-        rpy.x, rpy.y, rpy.z);
-      const auto action_status = simulation_api::helper::constractActionStatus();
+
       for (const auto & each : inner_scope.actors) {
-        setEntityStatus(each, lanelet_pose, action_status);
+        setEntityStatus(
+          each,
+          simulation_api::helper::constractLaneletPose(
+            Integer(position.as<LanePosition>().lane_id),
+            position.as<LanePosition>().s,
+            position.as<LanePosition>().offset,
+            rpy.x,
+            rpy.y,
+            rpy.z),
+          simulation_api::helper::constractActionStatus());
       }
     } else if (position.is<RelativeWorldPosition>()) {
       for (const auto & each : inner_scope.actors) {

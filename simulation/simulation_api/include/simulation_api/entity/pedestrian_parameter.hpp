@@ -51,7 +51,7 @@ struct PedestrianParameters
   const std::string pedestrian_categoly;
   const BoundingBox bounding_box;
 
-  std::string toXml()
+  std::string toXml() const
   {
     using boost::property_tree::ptree;
     ptree pt;

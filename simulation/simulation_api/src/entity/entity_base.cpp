@@ -66,8 +66,7 @@ void EntityBase::updateStandStillDuration(double step_time)
 }
 
 void EntityBase::setOtherStatus(
-  const std::unordered_map<std::string,
-  openscenario_msgs::msg::EntityStatus> & status)
+  const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status)
 {
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_status;
   for (const auto & each : status) {
