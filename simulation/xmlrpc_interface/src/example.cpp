@@ -23,10 +23,12 @@ int main()
   simulation_api_schema::InitializeResponse res;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("test");
+  res.PrintDebugString();
   XmlRpc::XmlRpcValue xml;
+  xmlrpc_interface::serializeToBinValue(res);
   xmlrpc_interface::fromProto(res, xml);
   std::string description = xml["description"];
-  // std::cout << description.c_str() << std::endl;
   xmlrpc_interface::toProto(xml, res);
+  res.PrintDebugString();
   return 0;
 }

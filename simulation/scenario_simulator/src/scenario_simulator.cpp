@@ -65,9 +65,7 @@ void ScenarioSimulator::runXmlRpc()
 
 void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
-  if (checkRequiredFields({"runner/current_time"}, param, result)) {
-    impl_.updateFrame(param, result);
-  }
+  impl_.updateFrame(param, result);
 }
 
 void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
