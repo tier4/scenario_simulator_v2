@@ -57,7 +57,7 @@ template
 >
 decltype(auto) despawn(Ts && ... xs)
 {
-  return connection.despawnEntity(std::forward<decltype(xs)>(xs)...);
+  return connection.despawn(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>

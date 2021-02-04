@@ -234,7 +234,6 @@ public:
   const bool standalone_mode;
 
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
-  FORWARD_TO_ENTITY_MANAGER(despawnEntity);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);

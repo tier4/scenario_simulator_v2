@@ -27,25 +27,45 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
   declare_parameter("port", 8080);
   get_parameter("port", port_);
 
-  auto initialize_func = std::bind(
-    &ScenarioSimulator::initialize, this,
-    std::placeholders::_1, std::placeholders::_2);
-  addMethod(xmlrpc_interface::method::initialize, initialize_func);
+  addMethod(
+    xmlrpc_interface::method::initialize,
+    std::bind(
+      &ScenarioSimulator::initialize,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
 
-  auto update_frame_func = std::bind(
-    &ScenarioSimulator::updateFrame, this,
-    std::placeholders::_1, std::placeholders::_2);
-  addMethod(xmlrpc_interface::method::update_frame, update_frame_func);
+  addMethod(
+    xmlrpc_interface::method::update_frame,
+    std::bind(
+      &ScenarioSimulator::updateFrame,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
 
-  auto spawn_vehicle_entity_func = std::bind(
-    &ScenarioSimulator::spawnVehicleEntity, this,
-    std::placeholders::_1, std::placeholders::_2);
-  addMethod(xmlrpc_interface::method::spawn_vehicle_entity, spawn_vehicle_entity_func);
+  addMethod(
+    xmlrpc_interface::method::spawn_vehicle_entity,
+    std::bind(
+      &ScenarioSimulator::spawnVehicleEntity,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
 
-  auto spawn_pedestrian_entity_func = std::bind(
-    &ScenarioSimulator::spawnPedestrianEntity, this,
-    std::placeholders::_1, std::placeholders::_2);
-  addMethod(xmlrpc_interface::method::spawn_pedestrian_entity, spawn_pedestrian_entity_func);
+  addMethod(
+    xmlrpc_interface::method::spawn_pedestrian_entity,
+    std::bind(
+      &ScenarioSimulator::spawnPedestrianEntity,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
+
+  addMethod(
+    xmlrpc_interface::method::despawn_entity,
+    std::bind(
+      &ScenarioSimulator::despawnEntity,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
 
   server_.bindAndListen(port_);
   server_.enableIntrospection(true);
@@ -86,6 +106,11 @@ void ScenarioSimulator::spawnPedestrianEntity(
   XmlRpc::XmlRpcValue & result)
 {
   impl_.spawnPedestrianEntity(param, result);
+}
+
+void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+{
+  impl_.despawnEntity(param, result);
 }
 
 void ScenarioSimulator::addMethod(

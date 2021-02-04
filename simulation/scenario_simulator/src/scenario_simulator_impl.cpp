@@ -93,7 +93,7 @@ void ScenarioSimulatorImpl::spawnVehicleEntity(
   vehicles_.emplace_back(req.parameters());
   simulation_api_schema::SpawnVehicleEntityResponse res;
   res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
+  res.mutable_result()->set_description("");
   result = XmlRpc::XmlRpcValue();
   result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
@@ -108,7 +108,40 @@ void ScenarioSimulatorImpl::spawnPedestrianEntity(
   pedestrians_.emplace_back(req.parameters());
   simulation_api_schema::SpawnPedestrianEntityResponse res;
   res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
+  res.mutable_result()->set_description("");
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+}
+
+void ScenarioSimulatorImpl::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+{
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::DespawnEntityRequest>(param);
+  bool found = false;
+  std::vector<openscenario_msgs::VehicleParameters> vehicles;
+  for (const auto vehicle : vehicles_) {
+    if (vehicle.name() != req.name()) {
+      vehicles.emplace_back(vehicle);
+    } else {
+      found = true;
+    }
+  }
+  vehicles_ = vehicles;
+  std::vector<openscenario_msgs::PedestrianParameters> pedestrians;
+  for (const auto pedestrian : pedestrians_) {
+    if (pedestrian.name() != req.name()) {
+      pedestrians.emplace_back(pedestrian);
+    } else {
+      found = true;
+    }
+  }
+  pedestrians_ = pedestrians;
+  simulation_api_schema::DespawnEntityResponse res;
+  if (found) {
+    res.mutable_result()->set_success(true);
+  } else {
+    res.mutable_result()->set_success(false);
+  }
   result = XmlRpc::XmlRpcValue();
   result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
