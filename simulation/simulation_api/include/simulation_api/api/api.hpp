@@ -37,18 +37,6 @@
 
 namespace scenario_simulator
 {
-class XmlRpcRuntimeError : public std::runtime_error
-{
-public:
-  XmlRpcRuntimeError(const char * message, int result)
-  : runtime_error(message), error_info_(result) {}
-
-  virtual ~XmlRpcRuntimeError() = default;
-
-private:
-  int error_info_;
-};
-
 class ExecutionFailedError : public std::runtime_error
 {
 public:
@@ -87,10 +75,12 @@ public:
     NodeT && node,
     const std::string & map_path = "",
     const bool verbose = false,
+    const bool standalone_mode = false,
     const std::string & metrics_logfile_path = "/tmp/metrics.json",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
   : access_rights_(std::make_shared<decltype(access_rights_)::element_type>(node)),
+    standalone_mode(standalone_mode),
     metrics_manager_(verbose, metrics_logfile_path)
   {
     std::string address = "127.0.0.1";
@@ -238,6 +228,8 @@ public:
   {
     return current_time_;
   }
+
+  const bool standalone_mode;
 
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(despawnEntity);
