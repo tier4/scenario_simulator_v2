@@ -59,6 +59,7 @@ namespace method
 const char initialize[] = "initialize";
 const char update_frame[] = "update_frame";
 const char spawn_vehicle_entity[] = "spawn_vehicle_entity";
+const char spawn_pedestrian_entity[] = "spawn_pedestrian_entity";
 }  // namespace method
 
 class XmlParameterError : public std::runtime_error

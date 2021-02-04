@@ -37,12 +37,12 @@ private:
 template<typename ReqType, typename ResType>
 bool call(
   const std::shared_ptr<XmlRpc::XmlRpcClient> & client_ptr, const std::string & method_name,
-  const ReqType & request, ResType & res)
+  const ReqType & req, ResType & res)
 {
   XmlRpc::XmlRpcValue result, value;
   value[0][0][xmlrpc_interface::key::method_name] = method_name;
   value[0][0][xmlrpc_interface::key::parameters] = xmlrpc_interface::serializeToBinValue<ReqType>(
-    request);
+    req);
   try {
     client_ptr->execute("system.multicall", value, result);
   } catch (XmlRpc::XmlRpcException e) {

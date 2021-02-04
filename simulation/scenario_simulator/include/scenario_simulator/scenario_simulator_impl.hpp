@@ -34,10 +34,8 @@ public:
   ScenarioSimulatorImpl();
   void initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void getEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void setEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void spawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void spawnVehicleEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void spawnPedestrianEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
 
 private:
   double realtime_factor_;
