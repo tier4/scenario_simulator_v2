@@ -68,7 +68,6 @@ message Axles
 
 message Property
 {
-    bool is_ego = 1;   
 }
 
 message VehicleParameters

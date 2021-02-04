@@ -232,14 +232,14 @@ void toProto(
   const openscenario_msgs::msg::Property & p,
   openscenario_msgs::Property & proto)
 {
-  proto.set_is_ego(p.is_ego);
+  // proto.set_is_ego(p.is_ego);
 }
 
 void toMsg(
   const openscenario_msgs::Property & proto,
   openscenario_msgs::msg::Property & p)
 {
-  p.is_ego = proto.is_ego();
+  // p.is_ego = proto.is_ego();
 }
 
 void toProto(
