@@ -100,6 +100,9 @@ bool API::spawn(
   const std::string & name,
   const openscenario_msgs::msg::PedestrianParameters & params)
 {
+  if (is_ego) {
+    throw simulation_api::SimulationRuntimeError("pedestrian should not be ego");
+  }
   simulation_api::entity::PedestrianEntity pedestrian(name, params);
   if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
     return false;

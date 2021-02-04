@@ -116,12 +116,14 @@ void toProto(
 void toMsg(
   const openscenario_msgs::Axles & proto,
   openscenario_msgs::msg::Axles & axles);
+/*
 void toProto(
   const openscenario_msgs::msg::Property & p,
   openscenario_msgs::Property & proto);
 void toMsg(
   const openscenario_msgs::Property & proto,
   openscenario_msgs::msg::Property & p);
+*/
 void toProto(
   const openscenario_msgs::msg::VehicleParameters & p,
   openscenario_msgs::VehicleParameters & proto);

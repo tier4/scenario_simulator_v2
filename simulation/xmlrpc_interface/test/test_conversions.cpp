@@ -282,6 +282,7 @@ TEST(Conversion, ConvertAxles)
   EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
 }
 
+/*
 TEST(Conversion, ConvertProperty)
 {
   openscenario_msgs::Property proto;
@@ -293,6 +294,7 @@ TEST(Conversion, ConvertProperty)
   // p.is_ego = false;
   // EXPECT_EQ(proto.is_ego(), p.is_ego);
 }
+*/
 
 TEST(Conversion, ConvertVehicleParametrs)
 {

@@ -228,6 +228,7 @@ void toMsg(
   toMsg(proto.rear_axle(), axles.rear_axle);
 }
 
+/*
 void toProto(
   const openscenario_msgs::msg::Property & p,
   openscenario_msgs::Property & proto)
@@ -241,6 +242,7 @@ void toMsg(
 {
   // p.is_ego = proto.is_ego();
 }
+*/
 
 void toProto(
   const openscenario_msgs::msg::VehicleParameters & p,
@@ -249,7 +251,7 @@ void toProto(
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   toProto(p.axles, *proto.mutable_axles());
   toProto(p.performance, *proto.mutable_performance());
-  toProto(p.property, *proto.mutable_property());
+  // toProto(p.property, *proto.mutable_property());
   proto.set_name(p.name);
   proto.set_vehicle_category(p.vehicle_category);
 }
@@ -261,7 +263,7 @@ void toMsg(
   toMsg(proto.axles(), p.axles);
   toMsg(proto.bounding_box(), p.bounding_box);
   toMsg(proto.performance(), p.performance);
-  toMsg(proto.property(), p.property);
+  // toMsg(proto.property(), p.property);
   p.name = proto.name();
   p.vehicle_category = proto.vehicle_category();
 }
