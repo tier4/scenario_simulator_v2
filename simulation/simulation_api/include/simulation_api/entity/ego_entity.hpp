@@ -37,7 +37,7 @@ namespace entity
 {
 class EgoEntity : public VehicleEntity
 {
-  const std::shared_ptr<autoware_api::Accessor> autoware;  // TODO(yamacir-kit): Use unique_ptr
+  const std::shared_ptr<autoware_api::Accessor> autoware;
 
 public:
   /* ---------------------------------------------------------------------------
@@ -89,7 +89,7 @@ public:
     autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
   {
     std::thread(
-      [autoware]()
+      [this]()
       {
         rclcpp::executors::MultiThreadedExecutor executor {};
         executor.add_node((*autoware).get_node_base_interface());

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <!-- <include file="$(find-pkg-share system_launch)/launch/system.launch.xml"> -->
+  <!--   <arg name="run_mode" value="planning_simulation"/>                      -->
+  <!-- </include>                                                                -->
+
+  <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml" />
+</launch>

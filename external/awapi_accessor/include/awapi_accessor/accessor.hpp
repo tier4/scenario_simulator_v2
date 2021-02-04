@@ -32,6 +32,8 @@
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 
+#include <mutex>
+
 namespace autoware_api
 {
 
@@ -41,6 +43,8 @@ struct AutowareError
 
 class Accessor : public rclcpp::Node
 {
+  std::mutex mutex;
+
 public:
 #ifndef NDEBUG
   /** ---- DummyData -----------------------------------------------------------
@@ -185,24 +189,35 @@ public:
   DEFINE_PUBLISHER(InitialTwist);
 
 public:
-  auto isReady() const
+  auto isWaitingForRoute() const noexcept
+  {
+    using autoware_system_msgs::msg::AutowareState;
+
+    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::WAITING_FOR_ROUTE;
+  }
+
+  auto isEmergency() const noexcept
+  {
+    using autoware_system_msgs::msg::AutowareState;
+
+    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::EMERGENCY;
+  }
+
+  auto isReady() const noexcept
   {
     static auto ready = false;
 
-    return ready || (ready =
-           (CURRENT_VALUE_OF(AutowareStatus).autoware_state ==
-           autoware_system_msgs::msg::AutowareState::WAITING_FOR_ROUTE));
+    return ready || (ready = isWaitingForRoute());
   }
 
-  auto isNotReady() const
+  auto isNotReady() const noexcept
   {
     return !isReady();
   }
 
   void checkAutowareState() const
   {
-    if (isReady() && CURRENT_VALUE_OF(AutowareStatus).autoware_state ==
-      autoware_system_msgs::msg::AutowareState::EMERGENCY)
+    if (isReady() && isEmergency())
     {
       throw AutowareError();
     }
@@ -215,7 +230,7 @@ public:
   >
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Ts && ... xs)
-  : rclcpp::Node("awapi_accessor", std::forward<decltype(xs)>(xs)...),
+  : rclcpp::Node("awapi_accessor_node", std::forward<decltype(xs)>(xs)...),
 #ifndef NDEBUG
     INIT_PUBLISHER(DebugString, "debug/string"),
     INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),

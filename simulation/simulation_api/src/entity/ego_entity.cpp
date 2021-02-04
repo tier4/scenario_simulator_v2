@@ -49,14 +49,7 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   if (first_time) {
     // (*autoware).waitForAutowareToBeReady();
 
-    // TODO(yamacir-kit): MUTEX!!!
-
-    // NOTE: ament_uncrustify's strange indentation.
-    for (
-      rclcpp::WallRate rate {
-          std::chrono::seconds(1)
-        }; (*autoware).isNotReady(); rate.sleep())
-    {
+    for (rclcpp::WallRate rate {std::chrono::seconds(1)}; (*autoware).isNotReady(); rate.sleep()) {
       static auto count = 0;
       std::cout << "[accessor] Waiting for Autoware to be ready. (" << ++count << ")" << std::endl;
     }
@@ -64,9 +57,11 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
     std::cout << "[accessor] Autoware is ready." << std::endl;
 
     autoware_api::Accessor::InitialPose initial_pose {};
-    initial_pose.pose.pose = current_entity_status.pose;
+    {
+      initial_pose.pose.pose = current_entity_status.pose;
+    }
 
-    (*autoware).setInitialPose(initial_pose);
+    std::atomic_load(&autoware)->setInitialPose(initial_pose);
 
     first_time = false;
   }
