@@ -166,6 +166,8 @@ public:
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
+  bool despawn(const std::string & name);
+
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     const std::string & name);
 

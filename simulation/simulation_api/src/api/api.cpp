@@ -30,6 +30,22 @@ void API::setVerbose(bool verbose)
   entity_manager_ptr_->setVerbose(verbose);
 }
 
+bool API::despawn(const std::string & name)
+{
+  auto result = entity_manager_ptr_->despawnEntity(name);
+  if (!result) {
+    return false;
+  }
+  if (!standalone_mode) {
+    simulation_api_schema::DespawnEntityRequest req;
+    simulation_api_schema::DespawnEntityResponse res;
+    req.set_name(name);
+    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::despawn_entity, req, res);
+    return res.result().success();
+  }
+  return true;
+}
+
 bool API::spawn(
   const bool is_ego,
   const std::string & catalog_xml,
@@ -461,7 +477,7 @@ bool API::updateFrame()
 {
   entity_manager_ptr_->update(current_time_, step_time_);
   entity_manager_ptr_->setVehicleCommands(current_cmd_, current_state_cmd_);
-  if(!standalone_mode) {
+  if (!standalone_mode) {
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(current_time_);
     simulation_api_schema::UpdateFrameResponse res;
