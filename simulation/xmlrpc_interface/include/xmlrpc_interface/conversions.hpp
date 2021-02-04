@@ -49,9 +49,17 @@ const char description[] = "description";
 const char realtime_factor[] = "realtime_factor";
 const char step_time[] = "step_time";
 const char current_time[] = "current_time";
+const char method_name[] = "methodName";
 const char parameters[] = "params";
 const char response[] = "return";
 }  // namespace key
+
+namespace method
+{
+const char initialize[] = "initialize";
+const char update_frame[] = "update_frame";
+const char spawn_vehicle_entity[] = "spawn_vehicle_entity";
+}  // namespace method
 
 class XmlParameterError : public std::runtime_error
 {

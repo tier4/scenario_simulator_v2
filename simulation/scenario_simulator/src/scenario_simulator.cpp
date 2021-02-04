@@ -29,11 +29,11 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
   auto initialize_func = std::bind(
     &ScenarioSimulator::initialize, this,
     std::placeholders::_1, std::placeholders::_2);
-  addMethod("initialize", initialize_func);
+  addMethod(xmlrpc_interface::method::initialize, initialize_func);
   auto update_frame_func = std::bind(
     &ScenarioSimulator::updateFrame, this,
     std::placeholders::_1, std::placeholders::_2);
-  addMethod("update_frame", update_frame_func);
+  addMethod(xmlrpc_interface::method::update_frame, update_frame_func);
   auto spawn_entity_func = std::bind(
     &ScenarioSimulator::spawnEntity, this,
     std::placeholders::_1, std::placeholders::_2);

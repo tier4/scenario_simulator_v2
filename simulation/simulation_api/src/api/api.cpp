@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
+#include <xmlrpc_interface/xmlrpc_client.hpp>
 #include <xmlrpc_interface/conversions.hpp>
 
 #include <tf2/LinearMath/Quaternion.h>
@@ -36,10 +37,10 @@ bool API::spawn(
 {
   XmlRpc::XmlRpcValue value, status_value;
   status_value = toValue(status);
-  value[0][0]["methodName"] = "spawn_entity";
-  value[0][0]["params"] = status_value;
-  value[0][0]["params"]["entity/is_ego"] = is_ego;
-  value[0][0]["params"]["entity/catalog_xml"] = catalog_xml;
+  value[0][0][xmlrpc_interface::key::method_name] = "spawn_entity";
+  value[0][0][xmlrpc_interface::key::parameters] = status_value;
+  value[0][0][xmlrpc_interface::key::parameters]["entity/is_ego"] = is_ego;
+  value[0][0][xmlrpc_interface::key::parameters]["entity/catalog_xml"] = catalog_xml;
   pugi::xml_document catalog_xml_doc;
   catalog_xml_doc.load_string(catalog_xml.c_str());
   pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
@@ -107,6 +108,18 @@ bool API::spawn(
   if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
     return false;
   }
+  XmlRpc::XmlRpcValue value;
+  value[0][0][xmlrpc_interface::key::method_name] = xmlrpc_interface::method::spawn_vehicle_entity;
+  openscenario_msgs::PedestrianParameters proto;
+  xmlrpc_interface::toProto(params, proto);
+  /*
+  XmlRpc::XmlRpcValue result;
+  try {
+    client_ptr_->execute("system.multicall", value, result);
+  } catch (XmlRpc::XmlRpcException e) {
+    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
+  }
+  */
   return true;
 }
 
@@ -116,9 +129,9 @@ bool API::spawn(
   const std::string & catalog_xml)
 {
   XmlRpc::XmlRpcValue value;
-  value[0][0]["methodName"] = "spawn_entity";
-  value[0][0]["params"]["entity/is_ego"] = is_ego;
-  value[0][0]["params"]["entity/catalog_xml"] = catalog_xml;
+  value[0][0][xmlrpc_interface::key::method_name] = "spawn_entity";
+  value[0][0][xmlrpc_interface::key::parameters]["entity/is_ego"] = is_ego;
+  value[0][0][xmlrpc_interface::key::parameters]["entity/catalog_xml"] = catalog_xml;
 
   pugi::xml_document catalog_xml_doc;
   catalog_xml_doc.load_string(catalog_xml.c_str());
@@ -451,7 +464,7 @@ XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
   return param;
 }
 
-XmlRpc::XmlRpcValue API::initialize(
+bool API::initialize(
   double realtime_factor, double step_time)
 {
   current_cmd_ = boost::none;
@@ -462,38 +475,21 @@ XmlRpc::XmlRpcValue API::initialize(
   simulation_api_schema::InitializeRequest req;
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
-  value[0][0]["methodName"] = "initialize";
-  value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
-  XmlRpc::XmlRpcValue result;
-  try {
-    client_ptr_->execute("system.multicall", value, result);
-  } catch (XmlRpc::XmlRpcException e) {
-    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
-  }
-  const auto res =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
-    result[0][0][xmlrpc_interface::key::response]);
-  return res.result().success();
+  simulation_api_schema::InitializeResponse res;
+  return xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
 }
 
-XmlRpc::XmlRpcValue API::updateFrame()
+bool API::updateFrame()
 {
   entity_manager_ptr_->update(current_time_, step_time_);
   entity_manager_ptr_->setVehicleCommands(current_cmd_, current_state_cmd_);
-  XmlRpc::XmlRpcValue value;
-  value[0][0]["methodName"] = "update_frame";
   simulation_api_schema::UpdateFrameRequest req;
   req.set_current_time(current_time_);
-  value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
-  XmlRpc::XmlRpcValue result;
-  try {
-    client_ptr_->execute("system.multicall", value, result);
-  } catch (XmlRpc::XmlRpcException e) {
-    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
+  simulation_api_schema::UpdateFrameResponse res;
+  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
+  if(!res.result().success()) {
+    return false;
   }
-  const auto res =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameResponse>(
-    result[0][0][xmlrpc_interface::key::response]);
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;
   metrics_manager_.calculate();

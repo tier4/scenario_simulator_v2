@@ -231,8 +231,8 @@ public:
     const std::string & target_name,
     const double tolerance) const;
 
-  XmlRpc::XmlRpcValue initialize(double realtime_factor, double step_time);
-  XmlRpc::XmlRpcValue updateFrame();
+  bool initialize(double realtime_factor, double step_time);
+  bool updateFrame();
 
   double getCurrentTime() const noexcept
   {

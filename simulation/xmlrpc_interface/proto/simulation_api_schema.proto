@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "openscenario_msgs.proto";
 package simulation_api_schema;
 
 message Result
@@ -27,4 +28,10 @@ message UpdateFrameRequest
 message UpdateFrameResponse
 {
     Result result = 1;
+}
+
+message SpawnVehicleEntityRequest
+{
+    openscenario_msgs.VehicleParameters parameters = 1;
+    bool is_ego = 2;
 }
