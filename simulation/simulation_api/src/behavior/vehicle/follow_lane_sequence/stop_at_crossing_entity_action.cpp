@@ -77,7 +77,7 @@ boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
     return boost::none;
   }
   double rest_distance = distance_to_stop_target_.get() -
-    (vehicle_parameters->bounding_box.dimensions.length + 3);
+    (vehicle_parameters.bounding_box.dimensions.x + 3);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
       return std::sqrt(2 * 5 * rest_distance);

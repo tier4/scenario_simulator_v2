@@ -19,6 +19,8 @@
 #include <simulation_api/entity/pedestrian_parameter.hpp>
 #include <simulation_api/behavior/action_node.hpp>
 
+#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+
 #include <string>
 #include <memory>
 
@@ -32,7 +34,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<std::shared_ptr<simulation_api::entity::PedestrianParameters>>(
+      BT::InputPort<openscenario_msgs::msg::PedestrianParameters>(
         "pedestrian_parameters")
     };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
@@ -41,7 +43,7 @@ public:
     }
     return ports;
   }
-  std::shared_ptr<simulation_api::entity::PedestrianParameters> pedestrian_parameters;
+  openscenario_msgs::msg::PedestrianParameters pedestrian_parameters;
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(

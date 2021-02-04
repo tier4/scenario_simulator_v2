@@ -16,7 +16,9 @@
 #define SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
 
 // headers in pugixml
+#include <openscenario_msgs.pb.h>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 
 #include <pugixml.hpp>
 
@@ -48,6 +50,14 @@ struct Performance
   const double max_speed;
   const double max_acceleration;
   const double max_deceleration;
+  const openscenario_msgs::msg::Performance toRosMsg() const
+  {
+    openscenario_msgs::msg::Performance ret;
+    ret.max_speed = max_speed;
+    ret.max_acceleration = max_acceleration;
+    ret.max_deceleration = max_deceleration;
+    return ret;
+  }
 };
 
 struct Center
@@ -129,6 +139,16 @@ struct Axle
   const double track_width;
   const double position_x;
   const double position_z;
+  const openscenario_msgs::msg::Axle toRosMsg() const
+  {
+    openscenario_msgs::msg::Axle ret;
+    ret.max_steering = max_steering;
+    ret.wheel_diameter = wheel_diameter;
+    ret.track_width = track_width;
+    ret.position_x = position_x;
+    ret.position_z = position_z;
+    return ret;
+  }
 };
 
 struct Axles
@@ -142,6 +162,13 @@ struct Axles
   {}
   const Axle front_axle;
   const Axle rear_axle;
+  const openscenario_msgs::msg::Axles toRosMsg() const
+  {
+    openscenario_msgs::msg::Axles ret;
+    ret.front_axle = front_axle.toRosMsg();
+    ret.rear_axle = rear_axle.toRosMsg();
+    return ret;
+  }
 };
 
 struct VehicleParameters
@@ -170,6 +197,17 @@ struct VehicleParameters
   const Axles axles;
   const std::string name;
   const std::string vehicle_categoly;
+
+  const openscenario_msgs::msg::VehicleParameters toRosMsg()
+  {
+    openscenario_msgs::msg::VehicleParameters ret;
+    ret.name = name;
+    ret.vehicle_category = vehicle_categoly;
+    ret.bounding_box = bounding_box.toRosMsg();
+    ret.axles = axles.toRosMsg();
+    ret.performance = performance.toRosMsg();
+    return ret;
+  }
 
   std::string toXml() const
   {

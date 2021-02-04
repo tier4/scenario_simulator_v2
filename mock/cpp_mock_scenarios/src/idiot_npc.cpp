@@ -43,8 +43,9 @@ public:
     pugi::xml_document vehicle_catalog_xml_doc;
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
-    simulation_api::entity::VehicleParameters params(vehicle_catalog_xml_doc);
-    api_.spawn(false, "idiot", params);
+    api_.spawn(
+      false, "idiot", simulation_api::entity::VehicleParameters(
+        vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "idiot",
       simulation_api::helper::constractLaneletPose(34741, 0, 0),
@@ -53,7 +54,9 @@ public:
     openscenario_msgs::msg::DriverModel driver_model;
     driver_model.see_around = false;
     api_.setDriverModel("idiot", driver_model);
-    api_.spawn(false, "npc", params);
+    api_.spawn(
+      false, "npc", simulation_api::entity::VehicleParameters(
+        vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
       simulation_api::helper::constractLaneletPose(34741, 10, 0),

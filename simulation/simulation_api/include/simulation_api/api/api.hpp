@@ -129,29 +129,21 @@ public:
 
   void setVerbose(const bool verbose);
 
-  // (1) Basis
+  [[deprecated("catalog_xml will be deprecated in the near future")]]
   bool spawn(
     const bool is_ego,
     const std::string & name,
     const std::string & catalog_xml);
 
-  // (2) => (1)
   bool spawn(
     const bool is_ego,
     const std::string & name,
-    const simulation_api::entity::VehicleParameters & params)
-  {
-    return spawn(is_ego, name, params.toXml());
-  }
+    const openscenario_msgs::msg::VehicleParameters & params);
 
-  // (3) => (1)
   bool spawn(
     const bool is_ego,
     const std::string & name,
-    const simulation_api::entity::PedestrianParameters & params)
-  {
-    return spawn(is_ego, name, params.toXml());
-  }
+    const openscenario_msgs::msg::PedestrianParameters & params);
 
   template
   <
@@ -239,8 +231,8 @@ public:
     const std::string & target_name,
     const double tolerance) const;
 
-  XmlRpc::XmlRpcValue initialize(double realtime_factor, double step_time);
-  XmlRpc::XmlRpcValue updateFrame();
+  bool initialize(double realtime_factor, double step_time);
+  bool updateFrame();
 
   double getCurrentTime() const noexcept
   {

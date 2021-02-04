@@ -40,8 +40,9 @@ public:
     api_.initialize(1.0, 0.05);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
-    simulation_api::entity::VehicleParameters params(catalog_xml_doc);
-    api_.spawn(false, "ego", params);
+    auto vehicle_params = simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
+    vehicle_params.name = "ego";
+    api_.spawn(false, "ego", vehicle_params);
     api_.setEntityStatus(
       "ego",
       simulation_api::helper::constractLaneletPose(120545, 0),
@@ -49,7 +50,8 @@ public:
     api_.setTargetSpeed("ego", 15, true);
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
-    simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
+    const auto pedestrian_params =
+      simulation_api::entity::PedestrianParameters(pedestrian_xml_doc).toRosMsg();
     api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus(
       "tom", "ego",
@@ -60,14 +62,16 @@ public:
       simulation_api::helper::constractLaneletPose(34378, 0.0),
       simulation_api::helper::constractActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
+    vehicle_params.name = "npc1";
     api_.spawn(
-      false, "npc1", params,
+      false, "npc1", vehicle_params,
       simulation_api::helper::constractLaneletPose(34579, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
     lanechange_excuted_ = false;
+    vehicle_params.name = "npc2";
     api_.spawn(
-      false, "npc2", params,
+      false, "npc2", vehicle_params,
       simulation_api::helper::constractLaneletPose(34606, 20.0),
       simulation_api::helper::constractActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
@@ -78,12 +82,10 @@ public:
       "npc1",
       simulation_api::helper::constractLaneletPose(34675, 0.0) );
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
-    /*
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop0", "ego",
       -10, 10, 34805, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,
       30, 1, 0.05);
-    */
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop1", "ego",
       -10, 10, 120635, metrics::MomentaryStopMetric::StopTargetLaneletType::STOP_LINE,

@@ -787,12 +787,12 @@ const visualization_msgs::msg::MarkerArray HdMapUtils::generateMarker() const
   auto cl_ll_borders = color_utils::fromRgba(1.0, 1.0, 1.0, 0.999);
   auto cl_road = color_utils::fromRgba(0.2, 0.7, 0.7, 0.3);
   auto cl_cross = color_utils::fromRgba(0.2, 0.7, 0.2, 0.3);
-  auto cl_stoplines = color_utils::fromRgba(1.0, 0.0, 0.0, 0.5);
+  // auto cl_stoplines = color_utils::fromRgba(1.0, 0.0, 0.0, 0.5);
   auto cl_trafficlights = color_utils::fromRgba(0.7, 0.7, 0.7, 0.8);
   auto cl_detection_areas = color_utils::fromRgba(0.7, 0.7, 0.7, 0.3);
   auto cl_parking_lots = color_utils::fromRgba(0.7, 0.7, 0.0, 0.3);
   auto cl_parking_spaces = color_utils::fromRgba(1.0, 0.647, 0.0, 0.6);
-  auto cl_lanelet_id = color_utils::fromRgba(0.8, 0.2, 0.2, 0.999);
+  // auto cl_lanelet_id = color_utils::fromRgba(0.8, 0.2, 0.2, 0.999);
 
   insertMarkerArray(
     markers, lanelet::visualization::laneletsBoundaryAsMarkerArray(

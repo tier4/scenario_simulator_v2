@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
+#include <xmlrpc_interface/xmlrpc_client.hpp>
 #include <xmlrpc_interface/conversions.hpp>
 
 #include <tf2/LinearMath/Quaternion.h>
@@ -34,44 +35,72 @@ bool API::spawn(
   const std::string & catalog_xml,
   const openscenario_msgs::msg::EntityStatus & status)
 {
-  XmlRpc::XmlRpcValue value, status_value;
-  status_value = toValue(status);
-  value[0][0]["methodName"] = "spawn_entity";
-  value[0][0]["params"] = status_value;
-  value[0][0]["params"]["entity/is_ego"] = is_ego;
-  value[0][0]["params"]["entity/catalog_xml"] = catalog_xml;
   pugi::xml_document catalog_xml_doc;
   catalog_xml_doc.load_string(catalog_xml.c_str());
   pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
-  // catalog_xml_doc.has("Vehicle");
   if (vehicle_node != NULL) {
-    if (is_ego) {
-      simulation_api::entity::EgoEntity ego(status.name, status, catalog_xml_doc);
-      if (!entity_manager_ptr_->spawnEntity(ego)) {
-        return false;
-      }
-    } else {
-      simulation_api::entity::VehicleEntity npc(status.name, status, catalog_xml_doc);
-      if (!entity_manager_ptr_->spawnEntity(npc)) {
-        return false;
-      }
-    }
+    const auto params = simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
+    return spawn(is_ego, status.name, params);
   }
   pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
   if (pedestrian_node != NULL) {
-    simulation_api::entity::PedestrianEntity pedestrian(status.name, status, catalog_xml_doc);
-    if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
+    const auto params = simulation_api::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
+    return spawn(is_ego, status.name, params);
+  }
+  return false;
+}
+
+bool API::spawn(
+  const bool is_ego,
+  const std::string & name,
+  const openscenario_msgs::msg::VehicleParameters & params)
+{
+  if (is_ego) {
+    simulation_api::entity::EgoEntity ego(access_rights_, name, params);
+    if (!entity_manager_ptr_->spawnEntity(ego)) {
       return false;
     }
+    simulation_api_schema::SpawnVehicleEntityRequest req;
+    simulation_api_schema::SpawnVehicleEntityResponse res;
+    req.set_is_ego(true);
+    xmlrpc_interface::toProto(params, *req.mutable_parameters());
+    return xmlrpc_interface::call(
+      client_ptr_, xmlrpc_interface::method::spawn_vehicle_entity, req,
+      res);
+  } else {
+    simulation_api::entity::VehicleEntity npc(name, params);
+    if (!entity_manager_ptr_->spawnEntity(npc)) {
+      return false;
+    }
+    simulation_api_schema::SpawnVehicleEntityRequest req;
+    simulation_api_schema::SpawnVehicleEntityResponse res;
+    req.set_is_ego(false);
+    xmlrpc_interface::toProto(params, *req.mutable_parameters());
+    return xmlrpc_interface::call(
+      client_ptr_, xmlrpc_interface::method::spawn_pedestrian_entity,
+      req, res);
   }
+  return false;
+}
 
-  XmlRpc::XmlRpcValue result;
-  try {
-    client_ptr_->execute("system.multicall", value, result);
-  } catch (XmlRpc::XmlRpcException e) {
-    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
+bool API::spawn(
+  const bool is_ego,
+  const std::string & name,
+  const openscenario_msgs::msg::PedestrianParameters & params)
+{
+  if (is_ego) {
+    throw simulation_api::SimulationRuntimeError("pedestrian should not be ego");
   }
-  return result[0][0]["success"];
+  simulation_api::entity::PedestrianEntity pedestrian(name, params);
+  if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
+    return false;
+  }
+  simulation_api_schema::SpawnPedestrianEntityRequest req;
+  simulation_api_schema::SpawnPedestrianEntityResponse res;
+  xmlrpc_interface::toProto(params, *req.mutable_parameters());
+  return xmlrpc_interface::call(
+    client_ptr_, xmlrpc_interface::method::spawn_pedestrian_entity, req,
+    res);
 }
 
 bool API::spawn(
@@ -79,41 +108,17 @@ bool API::spawn(
   const std::string & name,
   const std::string & catalog_xml)
 {
-  XmlRpc::XmlRpcValue value;
-  value[0][0]["methodName"] = "spawn_entity";
-  value[0][0]["params"]["entity/is_ego"] = is_ego;
-  value[0][0]["params"]["entity/catalog_xml"] = catalog_xml;
-
   pugi::xml_document catalog_xml_doc;
   catalog_xml_doc.load_string(catalog_xml.c_str());
   pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
-  // catalog_xml_doc.has("Vehicle");
   if (vehicle_node != NULL) {
-    if (is_ego) {
-      simulation_api::entity::EgoEntity ego(access_rights_, name, catalog_xml_doc);
-      if (!entity_manager_ptr_->spawnEntity(ego)) {
-        return false;
-      }
-    } else {
-      simulation_api::entity::VehicleEntity npc(name, catalog_xml_doc);
-      if (!entity_manager_ptr_->spawnEntity(npc)) {
-        return false;
-      }
-    }
+    const auto params = simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
+    spawn(is_ego, name, params);
   }
   pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
   if (pedestrian_node != NULL) {
-    simulation_api::entity::PedestrianEntity pedestrian(name, catalog_xml_doc);
-    if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
-      return false;
-    }
-  }
-
-  XmlRpc::XmlRpcValue result;
-  try {
-    client_ptr_->execute("system.multicall", value, result);
-  } catch (XmlRpc::XmlRpcException e) {
-    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
+    const auto params = simulation_api::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
+    spawn(false, name, params);
   }
   return true;
 }
@@ -426,50 +431,32 @@ XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
   return param;
 }
 
-XmlRpc::XmlRpcValue API::initialize(
+bool API::initialize(
   double realtime_factor, double step_time)
 {
   current_cmd_ = boost::none;
   current_state_cmd_ = boost::none;
   step_time_ = step_time;
   current_time_ = 0.0;
-
   XmlRpc::XmlRpcValue value;
   simulation_api_schema::InitializeRequest req;
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
-  value[0][0]["methodName"] = "initialize";
-  value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
-  XmlRpc::XmlRpcValue result;
-  try {
-    client_ptr_->execute("system.multicall", value, result);
-  } catch (XmlRpc::XmlRpcException e) {
-    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
-  }
-  const auto res =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeResponse>(
-    result[0][0][xmlrpc_interface::key::response]);
-  return res.result().success();
+  simulation_api_schema::InitializeResponse res;
+  return xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
 }
 
-XmlRpc::XmlRpcValue API::updateFrame()
+bool API::updateFrame()
 {
   entity_manager_ptr_->update(current_time_, step_time_);
   entity_manager_ptr_->setVehicleCommands(current_cmd_, current_state_cmd_);
-  XmlRpc::XmlRpcValue value;
-  value[0][0]["methodName"] = "update_frame";
   simulation_api_schema::UpdateFrameRequest req;
   req.set_current_time(current_time_);
-  value[0][0]["params"] = xmlrpc_interface::serializeToBinValue(req);
-  XmlRpc::XmlRpcValue result;
-  try {
-    client_ptr_->execute("system.multicall", value, result);
-  } catch (XmlRpc::XmlRpcException e) {
-    throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
+  simulation_api_schema::UpdateFrameResponse res;
+  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
+  if (!res.result().success()) {
+    return false;
   }
-  const auto res =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameResponse>(
-    result[0][0][xmlrpc_interface::key::response]);
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;
   metrics_manager_.calculate();

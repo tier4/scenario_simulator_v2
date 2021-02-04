@@ -43,3 +43,46 @@ message EntityStatus
     LaneletPose lanelet_pose = 7;
     bool lanelet_pose_valid = 8;
 }
+
+message Performance
+{
+    double max_speed = 1;
+    double max_acceleration = 2;
+    double max_deceleration = 3;
+}
+
+message Axle
+{
+    double max_steering = 1;
+    double wheel_diameter = 2;
+    double track_width = 3;
+    double position_x = 4;
+    double position_z = 5;
+}
+
+message Axles
+{
+    Axle front_axle = 1;
+    Axle rear_axle = 2;
+}
+
+message Property
+{
+}
+
+message VehicleParameters
+{
+    string name = 1;
+    string vehicle_category = 2;
+    Performance performance = 3;
+    BoundingBox bounding_box = 4;
+    Axles axles = 5;
+    Property property = 6;
+}
+
+message PedestrianParameters
+{
+    string name = 1;
+    string pedestrian_category = 2;
+    BoundingBox bounding_box = 3;
+}

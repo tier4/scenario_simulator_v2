@@ -15,6 +15,8 @@
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/entity/exception.hpp>
 
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
+
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/algorithm/clamp.hpp>
@@ -29,46 +31,20 @@ namespace entity
 {
 VehicleEntity::VehicleEntity(
   std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  const pugi::xml_node & xml)
-: EntityBase(xml.child("Vehicle").attribute("name").as_string(), name, initial_state),
-  parameters(xml)
-{
-  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
-}
-
-VehicleEntity::VehicleEntity(
-  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  VehicleParameters params)
+  openscenario_msgs::msg::VehicleParameters params)
 : EntityBase(params.name, name, initial_state),
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
-VehicleEntity::VehicleEntity(std::string name, const pugi::xml_node & xml)
-: EntityBase(xml.child("Vehicle").attribute("name").as_string(), name),
-  parameters(xml)
-{
-  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
-}
-
-VehicleEntity::VehicleEntity(std::string name, VehicleParameters params)
+VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters params)
 : EntityBase(params.name, name),
   parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "vehicle_parameters",
-    std::make_shared<simulation_api::entity::VehicleParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
 void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)

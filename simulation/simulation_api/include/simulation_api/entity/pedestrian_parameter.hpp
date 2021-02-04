@@ -26,6 +26,8 @@
 #include <boost/foreach.hpp>
 #include <simulation_api/entity/vehicle_parameter.hpp>
 
+#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+
 #include <string>
 #include <sstream>
 
@@ -37,18 +39,18 @@ struct PedestrianParameters
 {
   explicit PedestrianParameters(const pugi::xml_node & xml)
   : name(xml.child("Pedestrian").attribute("name").as_string()),
-    pedestrian_categoly(xml.child("Pedestrian").attribute("pedestrianCategory").as_string()),
+    pedestrian_category(xml.child("Pedestrian").attribute("pedestrianCategory").as_string()),
     bounding_box(xml.child("Pedestrian"))
   {}
   PedestrianParameters(
     std::string name,
-    std::string pedestrian_categoly, BoundingBox bounding_box)
+    std::string pedestrian_category, BoundingBox bounding_box)
   : name(name),
-    pedestrian_categoly(pedestrian_categoly),
+    pedestrian_category(pedestrian_category),
     bounding_box(bounding_box)
   {}
   const std::string name;
-  const std::string pedestrian_categoly;
+  const std::string pedestrian_category;
   const BoundingBox bounding_box;
 
   std::string toXml() const
@@ -57,7 +59,7 @@ struct PedestrianParameters
     ptree pt;
     ptree & pedestrian_tree = pt.add("Pedestrian", "");
     pedestrian_tree.put("<xmlattr>.name", name);
-    pedestrian_tree.put("<xmlattr>.PedestrianCategory", pedestrian_categoly);
+    pedestrian_tree.put("<xmlattr>.PedestrianCategory", pedestrian_category);
     ptree & center_tree = pedestrian_tree.add("BoundingBox.Center", "");
     center_tree.put("<xmlattr>.x", bounding_box.center.x);
     center_tree.put("<xmlattr>.y", bounding_box.center.y);
@@ -69,6 +71,15 @@ struct PedestrianParameters
     std::stringstream ss;
     boost::property_tree::write_xml(ss, pt);
     return ss.str();
+  }
+
+  const openscenario_msgs::msg::PedestrianParameters toRosMsg() const
+  {
+    openscenario_msgs::msg::PedestrianParameters msg;
+    msg.bounding_box = bounding_box.toRosMsg();
+    msg.name = name;
+    msg.pedestrian_category = pedestrian_category;
+    return msg;
   }
 };
 }  // namespace entity

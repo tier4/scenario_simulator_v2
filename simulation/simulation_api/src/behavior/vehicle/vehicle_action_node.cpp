@@ -32,7 +32,7 @@ void VehicleActionNode::getBlackBoardValues()
   if (!getInput<openscenario_msgs::msg::DriverModel>("driver_model", driver_model)) {
     driver_model = openscenario_msgs::msg::DriverModel();
   }
-  if (!getInput<std::shared_ptr<simulation_api::entity::VehicleParameters>>(
+  if (!getInput<openscenario_msgs::msg::VehicleParameters>(
       "vehicle_parameters", vehicle_parameters))
   {
     throw BehaviorTreeRuntimeError("failed to get input vehicle_parameters in VehicleActionNode");
@@ -54,7 +54,7 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
     entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time,
-    -10, vehicle_parameters->performance.max_speed);
+    -10, vehicle_parameters.performance.max_speed);
   twist_new.linear.y = 0.0;
   twist_new.linear.z = 0.0;
   twist_new.angular.x = 0.0;
@@ -124,8 +124,8 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
 openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdatedInWorldFrame(
   double target_speed)
 {
-  if (target_speed > vehicle_parameters->performance.max_speed) {
-    target_speed = vehicle_parameters->performance.max_speed;
+  if (target_speed > vehicle_parameters.performance.max_speed) {
+    target_speed = vehicle_parameters.performance.max_speed;
   } else {
     target_speed = entity_status.action_status.twist.linear.x;
   }

@@ -1,0 +1,3 @@
+float64 max_speed
+float64 max_acceleration
+float64 max_deceleration

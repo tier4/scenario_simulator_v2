@@ -83,31 +83,31 @@ void ScenarioSimulatorImpl::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::Xml
   }
 }
 
-void ScenarioSimulatorImpl::setEntityStatus(
-  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
+void ScenarioSimulatorImpl::spawnVehicleEntity(
+  XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
-  result["success"] = true;
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnVehicleEntityRequest>(
+    param);
+  simulation_api_schema::SpawnVehicleEntityResponse res;
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
-void ScenarioSimulatorImpl::getEntityStatus(
-  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
+void ScenarioSimulatorImpl::spawnPedestrianEntity(
+  XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
-  result["success"] = true;
-}
-
-void ScenarioSimulatorImpl::spawnEntity(
-  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
-{
-  result["success"] = true;
-}
-
-void ScenarioSimulatorImpl::despawnEntity(
-  [[maybe_unused]] XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
-{
-  result["success"] = true;
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnPedestrianEntityRequest>(
+    param);
+  simulation_api_schema::SpawnPedestrianEntityResponse res;
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 }  // namespace scenario_simulator

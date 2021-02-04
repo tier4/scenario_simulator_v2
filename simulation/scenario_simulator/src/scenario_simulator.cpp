@@ -26,26 +26,27 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 {
   declare_parameter("port", 8080);
   get_parameter("port", port_);
+
   auto initialize_func = std::bind(
     &ScenarioSimulator::initialize, this,
     std::placeholders::_1, std::placeholders::_2);
-  addMethod("initialize", initialize_func);
+  addMethod(xmlrpc_interface::method::initialize, initialize_func);
+
   auto update_frame_func = std::bind(
     &ScenarioSimulator::updateFrame, this,
     std::placeholders::_1, std::placeholders::_2);
-  addMethod("update_frame", update_frame_func);
-  auto spawn_entity_func = std::bind(
-    &ScenarioSimulator::spawnEntity, this,
+  addMethod(xmlrpc_interface::method::update_frame, update_frame_func);
+
+  auto spawn_vehicle_entity_func = std::bind(
+    &ScenarioSimulator::spawnVehicleEntity, this,
     std::placeholders::_1, std::placeholders::_2);
-  addMethod("spawn_entity", spawn_entity_func);
-  auto despawn_entity_func = std::bind(
-    &ScenarioSimulator::despawnEntity, this,
+  addMethod(xmlrpc_interface::method::spawn_vehicle_entity, spawn_vehicle_entity_func);
+
+  auto spawn_pedestrian_entity_func = std::bind(
+    &ScenarioSimulator::spawnPedestrianEntity, this,
     std::placeholders::_1, std::placeholders::_2);
-  addMethod("despawn_entity", despawn_entity_func);
-  auto get_entity_status_func = std::bind(
-    &ScenarioSimulator::getEntityStatus, this,
-    std::placeholders::_1, std::placeholders::_2);
-  addMethod("get_entity_status", get_entity_status_func);
+  addMethod(xmlrpc_interface::method::spawn_pedestrian_entity, spawn_pedestrian_entity_func);
+
   server_.bindAndListen(port_);
   server_.enableIntrospection(true);
   xmlrpc_thread_ = std::thread(&ScenarioSimulator::runXmlRpc, this);
@@ -73,45 +74,18 @@ void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcVa
   impl_.initialize(param, result);
 }
 
-void ScenarioSimulator::spawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
-{
-  if (checkRequiredFields({"entity/is_ego", "entity/name", "entity/catalog_xml"}, param, result)) {
-    impl_.spawnEntity(param, result);
-  }
-}
-
-void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
-{
-  if (checkRequiredFields({"entity/name"}, param, result)) {
-    impl_.despawnEntity(param, result);
-  }
-}
-
-void ScenarioSimulator::getEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
-{
-  if (checkRequiredFields({"entity/name"}, param, result)) {
-    impl_.getEntityStatus(param, result);
-  }
-}
-
-bool ScenarioSimulator::checkRequiredFields(
-  std::vector<std::string> required_fields,
+void ScenarioSimulator::spawnVehicleEntity(
   XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
-  result = XmlRpc::XmlRpcValue();
+  impl_.spawnVehicleEntity(param, result);
+}
 
-  auto non_existing_fileds = getNonExistingRequredFields(required_fields, param);
-  if (non_existing_fileds.size() != 0) {
-    int i = 0;
-    for (auto itr = non_existing_fileds.begin(); itr != non_existing_fileds.end(); itr++) {
-      result["required_fields"][i] = *itr;
-      i++;
-    }
-    return false;
-  } else {
-    return true;
-  }
+void ScenarioSimulator::spawnPedestrianEntity(
+  XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
+{
+  impl_.spawnPedestrianEntity(param, result);
 }
 
 void ScenarioSimulator::addMethod(
@@ -121,17 +95,5 @@ void ScenarioSimulator::addMethod(
   auto method_ptr = std::make_shared<scenario_simulator::XmlRpcMethod>(name, &server_);
   method_ptr->setFunction(func);
   methods_[name] = method_ptr;
-}
-
-std::vector<std::string> ScenarioSimulator::getNonExistingRequredFields(
-  std::vector<std::string> required_fields, XmlRpc::XmlRpcValue & param)
-{
-  std::vector<std::string> ret;
-  for (auto itr = required_fields.begin(); itr != required_fields.end(); itr++) {
-    if (!param.hasMember(*itr)) {
-      ret.push_back(*itr);
-    }
-  }
-  return ret;
 }
 }  // namespace scenario_simulator

@@ -75,4 +75,214 @@ void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::
   to[key::success] = from.result().success();
   to[key::description] = from.result().description();
 }
+
+void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto)
+{
+  proto.set_x(p.x);
+  proto.set_y(p.y);
+  proto.set_z(p.z);
+}
+
+void toMsg(const geometry_msgs::Point & proto, geometry_msgs::msg::Point & p)
+{
+  p.x = proto.x();
+  p.y = proto.y();
+  p.z = proto.z();
+}
+
+void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto)
+{
+  proto.set_x(q.x);
+  proto.set_y(q.y);
+  proto.set_z(q.z);
+  proto.set_w(q.w);
+}
+
+void toMsg(const geometry_msgs::Quaternion & proto, geometry_msgs::msg::Quaternion & q)
+{
+  q.x = proto.x();
+  q.y = proto.y();
+  q.z = proto.z();
+  q.w = proto.w();
+}
+
+void toProto(const geometry_msgs::msg::Pose & p, geometry_msgs::Pose & proto)
+{
+  toProto(p.position, *proto.mutable_position());
+  toProto(p.orientation, *proto.mutable_orientation());
+}
+
+void toMsg(const geometry_msgs::Pose & proto, geometry_msgs::msg::Pose & p)
+{
+  toMsg(proto.position(), p.position);
+  toMsg(proto.orientation(), p.orientation);
+}
+
+void toProto(const geometry_msgs::msg::Vector3 & v, geometry_msgs::Vector3 & proto)
+{
+  proto.set_x(v.x);
+  proto.set_y(v.y);
+  proto.set_z(v.z);
+}
+
+void toMsg(const geometry_msgs::Vector3 & proto, geometry_msgs::msg::Vector3 & v)
+{
+  v.x = proto.x();
+  v.y = proto.y();
+  v.z = proto.z();
+}
+
+void toProto(const geometry_msgs::msg::Twist & t, geometry_msgs::Twist & proto)
+{
+  toProto(t.linear, *proto.mutable_linear());
+  toProto(t.angular, *proto.mutable_angular());
+}
+
+void toMsg(const geometry_msgs::Twist & proto, geometry_msgs::msg::Twist & t)
+{
+  toMsg(proto.linear(), t.linear);
+  toMsg(proto.angular(), t.angular);
+}
+
+void toProto(const geometry_msgs::msg::Accel & a, geometry_msgs::Accel & proto)
+{
+  toProto(a.linear, *proto.mutable_linear());
+  toProto(a.angular, *proto.mutable_angular());
+}
+
+void toMsg(const geometry_msgs::Accel & proto, geometry_msgs::msg::Accel & a)
+{
+  toMsg(proto.linear(), a.linear);
+  toMsg(proto.angular(), a.angular);
+}
+
+void toProto(
+  const openscenario_msgs::msg::BoundingBox & box,
+  openscenario_msgs::BoundingBox & proto)
+{
+  toProto(box.center, *proto.mutable_center());
+  toProto(box.dimensions, *proto.mutable_dimensions());
+}
+
+void toMsg(
+  const openscenario_msgs::BoundingBox & proto,
+  openscenario_msgs::msg::BoundingBox & box)
+{
+  toMsg(proto.center(), box.center);
+  toMsg(proto.dimensions(), box.dimensions);
+}
+
+void toProto(
+  const openscenario_msgs::msg::Performance & performance,
+  openscenario_msgs::Performance & proto)
+{
+  proto.set_max_acceleration(performance.max_acceleration);
+  proto.set_max_deceleration(performance.max_deceleration);
+  proto.set_max_speed(performance.max_speed);
+}
+
+void toMsg(
+  const openscenario_msgs::Performance & proto,
+  openscenario_msgs::msg::Performance & performance)
+{
+  performance.max_acceleration = proto.max_acceleration();
+  performance.max_deceleration = proto.max_deceleration();
+  performance.max_speed = proto.max_speed();
+}
+
+void toProto(
+  const openscenario_msgs::msg::Axle & axle,
+  openscenario_msgs::Axle & proto)
+{
+  proto.set_position_x(axle.position_x);
+  proto.set_position_z(axle.position_z);
+  proto.set_track_width(axle.track_width);
+  proto.set_wheel_diameter(axle.wheel_diameter);
+  proto.set_max_steering(axle.max_steering);
+}
+
+void toMsg(
+  const openscenario_msgs::Axle & proto,
+  openscenario_msgs::msg::Axle & axle)
+{
+  axle.position_x = proto.position_x();
+  axle.position_z = proto.position_z();
+  axle.track_width = proto.track_width();
+  axle.wheel_diameter = proto.wheel_diameter();
+  axle.max_steering = proto.max_steering();
+}
+
+void toProto(
+  const openscenario_msgs::msg::Axles & axles,
+  openscenario_msgs::Axles & proto)
+{
+  toProto(axles.front_axle, *proto.mutable_front_axle());
+  toProto(axles.rear_axle, *proto.mutable_rear_axle());
+}
+
+void toMsg(
+  const openscenario_msgs::Axles & proto,
+  openscenario_msgs::msg::Axles & axles)
+{
+  toMsg(proto.front_axle(), axles.front_axle);
+  toMsg(proto.rear_axle(), axles.rear_axle);
+}
+
+/*
+void toProto(
+  const openscenario_msgs::msg::Property & p,
+  openscenario_msgs::Property & proto)
+{
+  // proto.set_is_ego(p.is_ego);
+}
+
+void toMsg(
+  const openscenario_msgs::Property & proto,
+  openscenario_msgs::msg::Property & p)
+{
+  // p.is_ego = proto.is_ego();
+}
+*/
+
+void toProto(
+  const openscenario_msgs::msg::VehicleParameters & p,
+  openscenario_msgs::VehicleParameters & proto)
+{
+  toProto(p.bounding_box, *proto.mutable_bounding_box());
+  toProto(p.axles, *proto.mutable_axles());
+  toProto(p.performance, *proto.mutable_performance());
+  // toProto(p.property, *proto.mutable_property());
+  proto.set_name(p.name);
+  proto.set_vehicle_category(p.vehicle_category);
+}
+
+void toMsg(
+  const openscenario_msgs::VehicleParameters & proto,
+  openscenario_msgs::msg::VehicleParameters & p)
+{
+  toMsg(proto.axles(), p.axles);
+  toMsg(proto.bounding_box(), p.bounding_box);
+  toMsg(proto.performance(), p.performance);
+  // toMsg(proto.property(), p.property);
+  p.name = proto.name();
+  p.vehicle_category = proto.vehicle_category();
+}
+
+void toProto(
+  const openscenario_msgs::msg::PedestrianParameters & p,
+  openscenario_msgs::PedestrianParameters & proto)
+{
+  toProto(p.bounding_box, *proto.mutable_bounding_box());
+  proto.set_name(p.name);
+  proto.set_pedestrian_category(p.pedestrian_category);
+}
+
+void toMsg(
+  const openscenario_msgs::PedestrianParameters & proto,
+  openscenario_msgs::msg::PedestrianParameters & p)
+{
+  p.name = proto.name();
+  p.pedestrian_category = proto.pedestrian_category();
+  toMsg(proto.bounding_box(), p.bounding_box);
+}
 }  // namespace xmlrpc_interface

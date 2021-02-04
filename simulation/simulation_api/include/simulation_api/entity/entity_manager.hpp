@@ -22,6 +22,7 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_api/traffic_lights/traffic_light_manager.hpp>
 
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
@@ -207,7 +208,8 @@ public:
   geometry_msgs::msg::Pose getMapPose(
     std::string reference_entity_name,
     geometry_msgs::msg::Pose relative_pose);
-  const boost::optional<VehicleParameters> getVehicleParameters(std::string name) const;
+  const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters(
+    std::string name) const;
   const std::vector<std::string> getEntityNames() const;
   bool setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status);
   const boost::optional<openscenario_msgs::msg::EntityStatus> getEntityStatus(
