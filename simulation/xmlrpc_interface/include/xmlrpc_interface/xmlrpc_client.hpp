@@ -18,6 +18,7 @@
 #include <xmlrpcpp/XmlRpc.h>
 #include <xmlrpc_interface/conversions.hpp>
 
+#include <string>
 #include <memory>
 
 namespace xmlrpc_interface
@@ -55,6 +56,6 @@ bool call(
     response]);
   return res.result().success();
 }
-}
+}  // namespace xmlrpc_interface
 
 #endif  // XMLRPC_INTERFACE__XMLRPC_CLIENT_HPP_
