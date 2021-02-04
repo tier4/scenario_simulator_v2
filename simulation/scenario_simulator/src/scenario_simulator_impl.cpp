@@ -90,6 +90,7 @@ void ScenarioSimulatorImpl::spawnVehicleEntity(
   const auto req =
     xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnVehicleEntityRequest>(
     param);
+  vehicles_.emplace_back(req.parameters());
   simulation_api_schema::SpawnVehicleEntityResponse res;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
@@ -104,6 +105,7 @@ void ScenarioSimulatorImpl::spawnPedestrianEntity(
   const auto req =
     xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnPedestrianEntityRequest>(
     param);
+  pedestrians_.emplace_back(req.parameters());
   simulation_api_schema::SpawnPedestrianEntityResponse res;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
