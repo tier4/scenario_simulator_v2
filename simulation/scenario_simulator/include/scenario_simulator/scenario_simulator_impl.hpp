@@ -23,8 +23,11 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+#include <simulation_api_schema.pb.h>
+
 #include <map>
 #include <string>
+#include <vector>
 
 namespace scenario_simulator
 {
@@ -36,8 +39,11 @@ public:
   void updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void spawnVehicleEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void spawnPedestrianEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
 
 private:
+  std::vector<openscenario_msgs::VehicleParameters> vehicles_;
+  std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;
   double realtime_factor_;
   double step_time_;
   double current_time_;

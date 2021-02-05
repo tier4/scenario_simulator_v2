@@ -136,7 +136,7 @@ private:
       std::cout << "npc2 collision!" << std::endl;
     }
     if (current_time_ > 10.0 && api_.entityExists("bob")) {
-      api_.despawnEntity("bob");
+      api_.despawn("bob");
     }
     api_.updateFrame();
     current_time_ = current_time_ + 0.05;

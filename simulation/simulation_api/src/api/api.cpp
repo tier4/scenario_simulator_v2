@@ -30,6 +30,22 @@ void API::setVerbose(bool verbose)
   entity_manager_ptr_->setVerbose(verbose);
 }
 
+bool API::despawn(const std::string & name)
+{
+  auto result = entity_manager_ptr_->despawnEntity(name);
+  if (!result) {
+    return false;
+  }
+  if (!standalone_mode) {
+    simulation_api_schema::DespawnEntityRequest req;
+    simulation_api_schema::DespawnEntityResponse res;
+    req.set_name(name);
+    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::despawn_entity, req, res);
+    return res.result().success();
+  }
+  return true;
+}
+
 bool API::spawn(
   const bool is_ego,
   const std::string & catalog_xml,
@@ -60,6 +76,9 @@ bool API::spawn(
     if (!entity_manager_ptr_->spawnEntity(ego)) {
       return false;
     }
+    if (standalone_mode) {
+      return true;
+    }
     simulation_api_schema::SpawnVehicleEntityRequest req;
     simulation_api_schema::SpawnVehicleEntityResponse res;
     req.set_is_ego(true);
@@ -71,6 +90,9 @@ bool API::spawn(
     simulation_api::entity::VehicleEntity npc(name, params);
     if (!entity_manager_ptr_->spawnEntity(npc)) {
       return false;
+    }
+    if (standalone_mode) {
+      return true;
     }
     simulation_api_schema::SpawnVehicleEntityRequest req;
     simulation_api_schema::SpawnVehicleEntityResponse res;
@@ -94,6 +116,9 @@ bool API::spawn(
   simulation_api::entity::PedestrianEntity pedestrian(name, params);
   if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
     return false;
+  }
+  if (standalone_mode) {
+    return true;
   }
   simulation_api_schema::SpawnPedestrianEntityRequest req;
   simulation_api_schema::SpawnPedestrianEntityResponse res;
@@ -438,7 +463,9 @@ bool API::initialize(
   current_state_cmd_ = boost::none;
   step_time_ = step_time;
   current_time_ = 0.0;
-  XmlRpc::XmlRpcValue value;
+  if (standalone_mode) {
+    return true;
+  }
   simulation_api_schema::InitializeRequest req;
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
@@ -450,17 +477,23 @@ bool API::updateFrame()
 {
   entity_manager_ptr_->update(current_time_, step_time_);
   entity_manager_ptr_->setVehicleCommands(current_cmd_, current_state_cmd_);
-  simulation_api_schema::UpdateFrameRequest req;
-  req.set_current_time(current_time_);
-  simulation_api_schema::UpdateFrameResponse res;
-  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
-  if (!res.result().success()) {
-    return false;
+  if (!standalone_mode) {
+    simulation_api_schema::UpdateFrameRequest req;
+    req.set_current_time(current_time_);
+    simulation_api_schema::UpdateFrameResponse res;
+    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
+    if (!res.result().success()) {
+      return false;
+    }
+    entity_manager_ptr_->broadcastEntityTransform();
+    current_time_ = current_time_ + step_time_;
+    metrics_manager_.calculate();
+    return res.result().success();
   }
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;
   metrics_manager_.calculate();
-  return res.result().success();
+  return true;
 }
 
 void API::vehicleControlCommandCallback(

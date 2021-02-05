@@ -50,3 +50,13 @@ message SpawnPedestrianEntityResponse
 {
     Result result = 1;
 }
+
+message DespawnEntityRequest
+{
+    string name = 1;
+}
+
+message DespawnEntityResponse
+{
+    Result result = 1;
+}
