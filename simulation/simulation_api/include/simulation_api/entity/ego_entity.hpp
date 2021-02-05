@@ -89,12 +89,34 @@ public:
     autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
   {
     std::thread(
-      [this]()
+      [&](auto && node)
       {
-        rclcpp::executors::MultiThreadedExecutor executor {};
-        executor.add_node((*autoware).get_node_base_interface());
-        executor.spin();
-      }).detach();
+        rclcpp::executors::SingleThreadedExecutor executor {};
+        executor.add_node(std::forward<decltype(node)>(node));
+        while (rclcpp::ok()) {
+          executor.spin_some();
+        }
+      }, std::atomic_load(&autoware)->get_node_base_interface()).detach();
+  }
+
+  void requestAcquirePosition(
+    const geometry_msgs::msg::PoseStamped & map_pose, const openscenario_msgs::msg::LaneletPose &)
+  {
+    for (
+      rclcpp::WallRate rate {std::chrono::seconds(1)};
+      std::atomic_load(&autoware)->isWaitingForRoute();
+      rate.sleep())
+    {
+      std::atomic_load(&autoware)->setGoalPose(map_pose);
+    }
+
+    for (
+      rclcpp::WallRate rate {std::chrono::seconds(1)};
+      std::atomic_load(&autoware)->isWaitingForRoute();
+      rate.sleep())
+    {
+      std::atomic_load(&autoware)->setAutowareEngage(true);
+    }
   }
 
   void setVehicleCommands(
@@ -113,6 +135,48 @@ public:
   const auto & getCurrentKinematicState() const noexcept
   {
     return current_kinematic_state_;
+  }
+
+private:
+  void waitForAutowareToBeReady() const
+  {
+    for (
+      rclcpp::WallRate rate {std::chrono::seconds(1)};
+      std::atomic_load(&autoware)->isNotReady();
+      rate.sleep())
+    {
+      static auto count = 0;
+      std::cout << "[accessor] Waiting for Autoware to be ready. (" << ++count << ")" << std::endl;
+    }
+
+    std::cout << "[accessor] Autoware is ready." << std::endl;
+  }
+
+  decltype(auto) getTransform() const
+  {
+    while (rclcpp::ok()) {
+      try {
+        return std::atomic_load(&autoware)->transform_buffer.lookupTransform(
+          "map", "base_link", tf2::TimePointZero);
+      } catch (const tf2::TransformException &) {
+      }
+    }
+  }
+
+  decltype(auto) setTransform(const geometry_msgs::msg::Pose & pose) const
+  {
+    geometry_msgs::msg::TransformStamped transform {};
+    {
+      transform.header.stamp = std::atomic_load(&autoware)->get_clock()->now();
+      transform.header.frame_id = "map";
+      transform.child_frame_id = "base_link";
+      transform.transform.translation.x = pose.position.x;
+      transform.transform.translation.y = pose.position.y;
+      transform.transform.translation.z = pose.position.z;
+      transform.transform.rotation = pose.orientation;
+    }
+
+    return std::atomic_load(&autoware)->transform_broadcaster.sendTransform(transform);
   }
 
 private:

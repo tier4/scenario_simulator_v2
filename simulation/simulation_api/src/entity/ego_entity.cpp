@@ -34,8 +34,7 @@ autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
   const double wheelbase =
-    parameters.axles.front_axle.position_x -
-    parameters.axles.rear_axle.position_x;
+    parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x;
 
   vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
 
@@ -47,22 +46,11 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   static auto first_time = true;
 
   if (first_time) {
-    // (*autoware).waitForAutowareToBeReady();
-
-    for (rclcpp::WallRate rate {std::chrono::seconds(1)}; (*autoware).isNotReady(); rate.sleep()) {
-      static auto count = 0;
-      std::cout << "[accessor] Waiting for Autoware to be ready. (" << ++count << ")" << std::endl;
-    }
-
-    std::cout << "[accessor] Autoware is ready." << std::endl;
-
-    autoware_api::Accessor::InitialPose initial_pose {};
-    {
-      initial_pose.pose.pose = current_entity_status.pose;
-    }
-
-    std::atomic_load(&autoware)->setInitialPose(initial_pose);
-
+    waitForAutowareToBeReady();
+    std::atomic_load(&autoware)->setInitialPose(current_entity_status.pose);
+    std::atomic_load(&autoware)->setInitialTwist();
+    std::atomic_load(&autoware)->setVehicleVelocity(100.0);  // Upper bound velocity
+    setTransform(current_entity_status.pose);
     first_time = false;
   }
 
@@ -86,27 +74,52 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  if (!status_ || !control_cmd_) {
+  if (!status_ || !control_cmd_ || !current_kinematic_state_ || !origin_) {
     return;
   }
-  if (!current_kinematic_state_) {
-    return;
-  }
-  if (!origin_) {
-    return;
-  }
+
   Eigen::VectorXd input(2);
-  auto steer = control_cmd_->front_wheel_angle_rad;
-  auto acc = control_cmd_->velocity_mps;
-  input << acc, steer;
+  {
+    input <<
+      std::atomic_load(&autoware)->getVehicleStatus().acceleration,
+      std::atomic_load(&autoware)->getVehicleStatus().steering;
+  }
+
   vehicle_model_ptr_->setInput(input);
   vehicle_model_ptr_->update(step_time);
+
   status_ = getEntityStatus(current_time + step_time, step_time);
+
+  auto updateAutoware =
+    [&]()
+    {
+      geometry_msgs::msg::Twist twist {};
+      {
+        twist.linear.x = (*vehicle_model_ptr_).getVx();
+        twist.angular.z = (*vehicle_model_ptr_).getWz();
+      }
+
+      using autoware_vehicle_msgs::msg::ControlMode;
+
+      std::atomic_load(&autoware)->setCurrentControlMode(ControlMode::AUTO);
+      std::atomic_load(&autoware)->setCurrentPose(status_.get().pose);
+      std::atomic_load(&autoware)->setCurrentShift(twist);
+      std::atomic_load(&autoware)->setCurrentSteering(twist);
+      std::atomic_load(&autoware)->setCurrentTurnSignal();
+      std::atomic_load(&autoware)->setCurrentTwist(twist);
+      std::atomic_load(&autoware)->setCurrentVelocity(twist);
+
+      setTransform(status_.get().pose);
+    };
+
+  updateAutoware();
+
   if (!previous_velocity_) {
     linear_jerk_ = 0;
   } else {
     linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_velocity_.get()) / step_time;
   }
+
   previous_velocity_ = vehicle_model_ptr_->getVx();
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
