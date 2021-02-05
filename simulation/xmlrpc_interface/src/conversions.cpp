@@ -228,4 +228,42 @@ void toMsg(
   p.pedestrian_category = proto.pedestrian_category();
   toMsg(proto.bounding_box(), p.bounding_box);
 }
+
+void toProto(
+  const openscenario_msgs::msg::ActionStatus & s,
+  openscenario_msgs::ActionStatus & proto)
+{
+  proto.set_current_action(s.current_action);
+  toProto(s.twist, *proto.mutable_twist());
+  toProto(s.accel, *proto.mutable_accel());
+}
+
+void toMsg(
+  const openscenario_msgs::ActionStatus & proto,
+  openscenario_msgs::msg::ActionStatus & s)
+{
+  s.current_action = proto.current_action();
+  toMsg(proto.twist(), s.twist);
+  toMsg(proto.accel(), s.accel);
+}
+
+void toProto(
+  const openscenario_msgs::msg::LaneletPose & pose,
+  openscenario_msgs::LaneletPose & proto)
+{
+  proto.set_lanlet_id(pose.lanelet_id);
+  proto.set_s(pose.s);
+  proto.set_offset(pose.offset);
+  toProto(pose.rpy, *proto.mutable_rpy());
+}
+
+void toMsg(
+  const openscenario_msgs::LaneletPose & proto,
+  openscenario_msgs::msg::LaneletPose & pose)
+{
+  pose.lanelet_id = proto.lanlet_id();
+  pose.s = proto.s();
+  pose.offset = proto.offset();
+  toMsg(proto.rpy(), pose.rpy);
+}
 }  // namespace xmlrpc_interface

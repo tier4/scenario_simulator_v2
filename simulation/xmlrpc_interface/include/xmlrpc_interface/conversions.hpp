@@ -33,6 +33,8 @@
 #include <openscenario_msgs/msg/property.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <openscenario_msgs/msg/action_status.hpp>
+#include <openscenario_msgs/msg/lanelet_pose.hpp>
 
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
@@ -118,6 +120,18 @@ void toProto(
 void toMsg(
   const openscenario_msgs::PedestrianParameters & proto,
   openscenario_msgs::msg::PedestrianParameters & p);
+void toProto(
+  const openscenario_msgs::msg::ActionStatus & s,
+  openscenario_msgs::ActionStatus & proto);
+void toMsg(
+  openscenario_msgs::ActionStatus & proto,
+  const openscenario_msgs::msg::ActionStatus & s);
+void toProto(
+  const openscenario_msgs::msg::LaneletPose & pose,
+  openscenario_msgs::LaneletPose & proto);
+void toMsg(
+  const openscenario_msgs::LaneletPose & proto,
+  openscenario_msgs::msg::LaneletPose & pose);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

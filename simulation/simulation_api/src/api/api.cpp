@@ -478,10 +478,10 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   simulation_api_schema::UpdateEntityStatusResponse res;
   const auto names = entity_manager_ptr_->getEntityNames();
-  for(const auto name : names) {
+  for (const auto name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);
-    if(status) {
-      
+    if (status) {
+
     }
   }
 }
