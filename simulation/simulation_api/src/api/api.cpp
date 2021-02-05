@@ -476,14 +476,18 @@ bool API::initialize(
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
-  simulation_api_schema::UpdateEntityStatusResponse res;
   const auto names = entity_manager_ptr_->getEntityNames();
   for (const auto name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);
     if (status) {
-
+      openscenario_msgs::EntityStatus proto;
+      xmlrpc_interface::toProto(status.get(), proto);
+      *req.add_status() = proto;
     }
   }
+  simulation_api_schema::UpdateEntityStatusResponse res;
+  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_entity_status, req, res);
+  return res.result().success();
 }
 
 bool API::updateFrame()
@@ -501,7 +505,7 @@ bool API::updateFrame()
     entity_manager_ptr_->broadcastEntityTransform();
     current_time_ = current_time_ + step_time_;
     metrics_manager_.calculate();
-    return res.result().success();
+    return updateEntityStatusInSim();
   }
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;
