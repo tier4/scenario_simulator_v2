@@ -252,6 +252,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 private:
+  bool updateEntityStatusInSim();
   bool spawn(
     const bool is_ego,
     const std::string & catalog_xml,

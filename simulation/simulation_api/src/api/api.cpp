@@ -473,6 +473,19 @@ bool API::initialize(
   return xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
 }
 
+bool API::updateEntityStatusInSim()
+{
+  simulation_api_schema::UpdateEntityStatusRequest req;
+  simulation_api_schema::UpdateEntityStatusResponse res;
+  const auto names = entity_manager_ptr_->getEntityNames();
+  for(const auto name : names) {
+    auto status = entity_manager_ptr_->getEntityStatus(name);
+    if(status) {
+      
+    }
+  }
+}
+
 bool API::updateFrame()
 {
   entity_manager_ptr_->update(current_time_, step_time_);
