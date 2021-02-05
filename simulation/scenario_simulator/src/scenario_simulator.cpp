@@ -67,6 +67,14 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_1,
       std::placeholders::_2));
 
+  addMethod(
+    xmlrpc_interface::method::update_entity_status,
+    std::bind(
+      &ScenarioSimulator::updateEntityStatus,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
+
   server_.bindAndListen(port_);
   server_.enableIntrospection(true);
   xmlrpc_thread_ = std::thread(&ScenarioSimulator::runXmlRpc, this);
@@ -82,6 +90,13 @@ void ScenarioSimulator::runXmlRpc()
   while (rclcpp::ok()) {
     server_.work(1);
   }
+}
+
+void ScenarioSimulator::updateEntityStatus(
+  XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
+{
+  impl_.updateEntityStatus(param, result);
 }
 
 void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)

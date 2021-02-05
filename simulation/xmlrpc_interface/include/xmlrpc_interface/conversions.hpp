@@ -62,15 +62,6 @@ public:
   throw XmlParameterError( \
     std::string("parameter : ") + name + std::string(" does not defined."), __FILE__, __LINE__);
 
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to);
-void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to);
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to);
-void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to);
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameRequest & to);
-void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to);
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to);
-void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to);
-
 void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto);
 void toMsg(const geometry_msgs::Point & proto, geometry_msgs::msg::Point & p);
 void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto);
