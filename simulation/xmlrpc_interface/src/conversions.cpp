@@ -266,4 +266,56 @@ void toMsg(
   pose.offset = proto.offset();
   toMsg(proto.rpy(), pose.rpy);
 }
+
+void toProto(
+  const openscenario_msgs::msg::EntityType & type,
+  openscenario_msgs::EntityType & proto)
+{
+  if (type.type == openscenario_msgs::msg::EntityType::EGO) {
+    proto = openscenario_msgs::EntityType::EGO;
+    return;
+  } else if (type.type == openscenario_msgs::msg::EntityType::VEHICLE) {
+    proto = openscenario_msgs::EntityType::VEHICLE;
+    return;
+  } else if (type.type == openscenario_msgs::msg::EntityType::PEDESTRIAN) {
+    proto = openscenario_msgs::EntityType::PEDESTRIAN;
+    return;
+  }
+  std::string message = "type of the Entity Type is inavlid!\ntype is " + std::to_string(type.type);
+  THROW_PROTOBUF_PARAMETER_ERROR(message);
+}
+
+void toMsg(
+  const openscenario_msgs::EntityType & proto,
+  openscenario_msgs::msg::EntityType & type)
+{
+  if (proto == openscenario_msgs::EntityType::EGO) {
+    type.type = openscenario_msgs::msg::EntityType::EGO;
+    return;
+  }
+  if (proto == openscenario_msgs::EntityType::VEHICLE) {
+    type.type = openscenario_msgs::msg::EntityType::VEHICLE;
+    return;
+  }
+  if (proto == openscenario_msgs::EntityType::PEDESTRIAN) {
+    type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+    return;
+  }
+  std::string message = "type of the Entity Type is inavlid!";
+  THROW_PROTOBUF_PARAMETER_ERROR(message);
+}
+
+void toProto(
+  const openscenario_msgs::msg::EntityStatus & status,
+  openscenario_msgs::EntityStatus & proto)
+{
+  // proto.set_type(status.type.type);
+}
+
+void toMsg(
+  const openscenario_msgs::EntityStatus & proto,
+  openscenario_msgs::msg::EntityStatus & status)
+{
+
+}
 }  // namespace xmlrpc_interface
