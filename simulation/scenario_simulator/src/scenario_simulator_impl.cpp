@@ -132,7 +132,10 @@ void ScenarioSimulatorImpl::updateEntityStatus(
     *status_ptr->mutable_lanelet_pose() = status.lanelet_pose();
     status_ptr->set_lanelet_pose_valid(status.lanelet_pose_valid());
   }
-  // res.mutable_status() = req.status();
+  result = XmlRpc::XmlRpcValue();
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("");
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulatorImpl::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
