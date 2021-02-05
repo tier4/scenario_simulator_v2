@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef XMLRPC_INTERFACE__CONSTANTS_HPP_
+#define XMLRPC_INTERFACE__CONSTANTS_HPP_
+
 namespace xmlrpc_interface
 {
 namespace key
@@ -35,3 +38,5 @@ const char spawn_pedestrian_entity[] = "spawn_pedestrian_entity";
 const char despawn_entity[] = "despawn_entity";
 }  // namespace method
 }  // namespace xmlrpc_interface
+
+#endif  // XMLRPC_INTERFACE__CONSTANTS_HPP_

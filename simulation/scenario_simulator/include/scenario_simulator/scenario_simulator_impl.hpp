@@ -27,6 +27,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 namespace scenario_simulator
 {
