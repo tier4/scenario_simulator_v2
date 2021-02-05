@@ -309,13 +309,31 @@ void toProto(
   const openscenario_msgs::msg::EntityStatus & status,
   openscenario_msgs::EntityStatus & proto)
 {
-  // proto.set_type(status.type.type);
+  openscenario_msgs::EntityType type;
+  toProto(status.type, type);
+  proto.set_type(type);
+  proto.set_time(status.time);
+  proto.set_name(status.name);
+  toProto(status.bounding_box, *proto.mutable_bounding_box());
+  toProto(status.action_status, *proto.mutable_action_status());
+  toProto(status.pose, *proto.mutable_pose());
+  toProto(status.lanelet_pose, *proto.mutable_lanelet_pose());
+  proto.set_lanelet_pose_valid(status.lanelet_pose_valid);
 }
 
 void toMsg(
   const openscenario_msgs::EntityStatus & proto,
   openscenario_msgs::msg::EntityStatus & status)
 {
-
+  openscenario_msgs::msg::EntityType type;
+  toMsg(proto.type(), type);
+  status.type = type;
+  status.time = proto.time();
+  status.name = proto.name();
+  toMsg(proto.bounding_box(), status.bounding_box);
+  toMsg(proto.action_status(), status.action_status);
+  toMsg(proto.pose(), status.pose);
+  toMsg(proto.lanelet_pose(), status.lanelet_pose);
+  status.lanelet_pose_valid = proto.lanelet_pose_valid();
 }
 }  // namespace xmlrpc_interface
