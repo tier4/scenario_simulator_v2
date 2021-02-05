@@ -28,6 +28,7 @@ message UpdateFrameRequest
 message UpdateFrameResponse
 {
     Result result = 1;
+    repeated openscenario_msgs.EntityStatus status = 2;
 }
 
 message SpawnVehicleEntityRequest
