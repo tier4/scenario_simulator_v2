@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "geometry_msgs.proto";
 import "openscenario_msgs.proto";
 package simulation_api_schema;
 
@@ -11,9 +12,10 @@ message Result
 
 message LidarConfiguration
 {
-    string frame_id = 1;
+    string entity = 1;
     repeated double vertical_angles = 2;
     double horizontal_resolution = 3;
+    double scan_duration = 4;
 }
 
 // Requests and Responses

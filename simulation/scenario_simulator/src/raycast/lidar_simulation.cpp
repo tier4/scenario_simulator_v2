@@ -17,6 +17,8 @@
 #include <xmlrpc_interface/conversions.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/optional.hpp>
+
 #include <vector>
 
 namespace scenario_simulator
@@ -35,7 +37,12 @@ void LidarSimulation::raycast(
   const rclcpp::Time & stamp)
 {
   Raycaster raycaster;
+  boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto s : status) {
+    if (configuration.entity() == s.name()) {
+      xmlrpc_interface::toMsg(s.pose(), ego_pose.get());
+      continue;
+    }
     geometry_msgs::msg::Pose pose;
     xmlrpc_interface::toMsg(s.pose(), pose);
     const auto bbox = s.bounding_box();
@@ -55,6 +62,8 @@ void LidarSimulation::raycast(
       s.bounding_box().dimensions().z(),
       pose);
   }
-  // raycaster.raycast(configuration.frame_id(), stamp, );
+  if (ego_pose) {
+    raycaster.raycast(configuration.entity(), stamp, ego_pose.get(), 0.01, {10});
+  }
 }
 }  // namespace scenario_simulator

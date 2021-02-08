@@ -89,7 +89,14 @@ void ScenarioSimulatorImpl::spawnVehicleEntity(
   const auto req =
     xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnVehicleEntityRequest>(
     param);
-  vehicles_.emplace_back(req.parameters());
+  if (ego_vehicles_.size() != 0 && req.is_ego()) {
+    throw SimulationRuntimeError("multi ego does not support");
+  }
+  if (req.is_ego()) {
+    ego_vehicles_.emplace_back(req.parameters());
+  } else {
+    vehicles_.emplace_back(req.parameters());
+  }
   simulation_api_schema::SpawnVehicleEntityResponse res;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
