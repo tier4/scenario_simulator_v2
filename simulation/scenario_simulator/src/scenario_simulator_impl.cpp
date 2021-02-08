@@ -113,6 +113,31 @@ void ScenarioSimulatorImpl::spawnPedestrianEntity(
   result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
+void ScenarioSimulatorImpl::updateEntityStatus(
+  XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
+{
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateEntityStatusRequest>(
+    param);
+  simulation_api_schema::UpdateEntityStatusResponse res;
+  for (const auto status : req.status()) {
+    auto status_ptr = res.mutable_status()->Add();
+    status_ptr->set_type(status.type());
+    status_ptr->set_time(status.time());
+    status_ptr->set_name(status.name());
+    *status_ptr->mutable_bounding_box() = status.bounding_box();
+    *status_ptr->mutable_action_status() = status.action_status();
+    *status_ptr->mutable_pose() = status.pose();
+    *status_ptr->mutable_lanelet_pose() = status.lanelet_pose();
+    status_ptr->set_lanelet_pose_valid(status.lanelet_pose_valid());
+  }
+  result = XmlRpc::XmlRpcValue();
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("");
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+}
+
 void ScenarioSimulatorImpl::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   const auto req =

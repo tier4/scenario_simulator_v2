@@ -20,6 +20,7 @@
 
 int main()
 {
+  /*
   simulation_api_schema::InitializeResponse res;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("test");
@@ -30,5 +31,6 @@ int main()
   std::string description = xml["description"];
   xmlrpc_interface::toProto(xml, res);
   res.PrintDebugString();
+  */
   return 0;
 }

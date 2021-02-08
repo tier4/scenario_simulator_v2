@@ -19,63 +19,6 @@
 
 namespace xmlrpc_interface
 {
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to)
-{
-  to = simulation_api_schema::InitializeResponse();
-  to.mutable_result()->set_success(xmlrpc_interface::getXmlValue<bool>(from, key::success));
-  to.mutable_result()->set_description(
-    xmlrpc_interface::getXmlValue<std::string>(
-      from,
-      key::description));
-}
-
-void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to)
-{
-  to = XmlRpc::XmlRpcValue();
-  to[key::success] = from.result().success();
-  to[key::description] = from.result().description();
-}
-
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to)
-{
-  to = simulation_api_schema::InitializeRequest();
-  to.set_realtime_factor(xmlrpc_interface::getXmlValue<double>(from, key::realtime_factor));
-  to.set_step_time(xmlrpc_interface::getXmlValue<double>(from, key::step_time));
-}
-
-void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to)
-{
-  to = XmlRpc::XmlRpcValue();
-  to[key::realtime_factor] = from.realtime_factor();
-  to[key::step_time] = from.step_time();
-}
-
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameRequest & to)
-{
-  to = simulation_api_schema::UpdateFrameRequest();
-  to.set_current_time(from[key::current_time]);
-}
-
-void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to)
-{
-  to = XmlRpc::XmlRpcValue();
-  to[key::current_time] = from.current_time();
-}
-
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to)
-{
-  to = simulation_api_schema::UpdateFrameResponse();
-  to.mutable_result()->set_success(from[key::success]);
-  to.mutable_result()->set_description(from[key::description]);
-}
-
-void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to)
-{
-  to = XmlRpc::XmlRpcValue();
-  to[key::success] = from.result().success();
-  to[key::description] = from.result().description();
-}
-
 void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto)
 {
   proto.set_x(p.x);
@@ -284,5 +227,113 @@ void toMsg(
   p.name = proto.name();
   p.pedestrian_category = proto.pedestrian_category();
   toMsg(proto.bounding_box(), p.bounding_box);
+}
+
+void toProto(
+  const openscenario_msgs::msg::ActionStatus & s,
+  openscenario_msgs::ActionStatus & proto)
+{
+  proto.set_current_action(s.current_action);
+  toProto(s.twist, *proto.mutable_twist());
+  toProto(s.accel, *proto.mutable_accel());
+}
+
+void toMsg(
+  const openscenario_msgs::ActionStatus & proto,
+  openscenario_msgs::msg::ActionStatus & s)
+{
+  s.current_action = proto.current_action();
+  toMsg(proto.twist(), s.twist);
+  toMsg(proto.accel(), s.accel);
+}
+
+void toProto(
+  const openscenario_msgs::msg::LaneletPose & pose,
+  openscenario_msgs::LaneletPose & proto)
+{
+  proto.set_lanlet_id(pose.lanelet_id);
+  proto.set_s(pose.s);
+  proto.set_offset(pose.offset);
+  toProto(pose.rpy, *proto.mutable_rpy());
+}
+
+void toMsg(
+  const openscenario_msgs::LaneletPose & proto,
+  openscenario_msgs::msg::LaneletPose & pose)
+{
+  pose.lanelet_id = proto.lanlet_id();
+  pose.s = proto.s();
+  pose.offset = proto.offset();
+  toMsg(proto.rpy(), pose.rpy);
+}
+
+void toProto(
+  const openscenario_msgs::msg::EntityType & type,
+  openscenario_msgs::EntityType & proto)
+{
+  if (type.type == openscenario_msgs::msg::EntityType::EGO) {
+    proto = openscenario_msgs::EntityType::EGO;
+    return;
+  } else if (type.type == openscenario_msgs::msg::EntityType::VEHICLE) {
+    proto = openscenario_msgs::EntityType::VEHICLE;
+    return;
+  } else if (type.type == openscenario_msgs::msg::EntityType::PEDESTRIAN) {
+    proto = openscenario_msgs::EntityType::PEDESTRIAN;
+    return;
+  }
+  std::string message = "type of the Entity Type is inavlid!\ntype is " + std::to_string(type.type);
+  THROW_PROTOBUF_PARAMETER_ERROR(message);
+}
+
+void toMsg(
+  const openscenario_msgs::EntityType & proto,
+  openscenario_msgs::msg::EntityType & type)
+{
+  if (proto == openscenario_msgs::EntityType::EGO) {
+    type.type = openscenario_msgs::msg::EntityType::EGO;
+    return;
+  }
+  if (proto == openscenario_msgs::EntityType::VEHICLE) {
+    type.type = openscenario_msgs::msg::EntityType::VEHICLE;
+    return;
+  }
+  if (proto == openscenario_msgs::EntityType::PEDESTRIAN) {
+    type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+    return;
+  }
+  std::string message = "type of the Entity Type is inavlid!";
+  THROW_PROTOBUF_PARAMETER_ERROR(message);
+}
+
+void toProto(
+  const openscenario_msgs::msg::EntityStatus & status,
+  openscenario_msgs::EntityStatus & proto)
+{
+  openscenario_msgs::EntityType type;
+  toProto(status.type, type);
+  proto.set_type(type);
+  proto.set_time(status.time);
+  proto.set_name(status.name);
+  toProto(status.bounding_box, *proto.mutable_bounding_box());
+  toProto(status.action_status, *proto.mutable_action_status());
+  toProto(status.pose, *proto.mutable_pose());
+  toProto(status.lanelet_pose, *proto.mutable_lanelet_pose());
+  proto.set_lanelet_pose_valid(status.lanelet_pose_valid);
+}
+
+void toMsg(
+  const openscenario_msgs::EntityStatus & proto,
+  openscenario_msgs::msg::EntityStatus & status)
+{
+  openscenario_msgs::msg::EntityType type;
+  toMsg(proto.type(), type);
+  status.type = type;
+  status.time = proto.time();
+  status.name = proto.name();
+  toMsg(proto.bounding_box(), status.bounding_box);
+  toMsg(proto.action_status(), status.action_status);
+  toMsg(proto.pose(), status.pose);
+  toMsg(proto.lanelet_pose(), status.lanelet_pose);
+  status.lanelet_pose_valid = proto.lanelet_pose_valid();
 }
 }  // namespace xmlrpc_interface
