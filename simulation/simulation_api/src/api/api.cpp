@@ -487,8 +487,7 @@ bool API::updateEntityStatusInSim()
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
   xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_entity_status, req, res);
-  for(const auto status: res.status())
-  {
+  for (const auto status : res.status()) {
     openscenario_msgs::msg::EntityStatus msg;
     xmlrpc_interface::toMsg(status, msg);
     entity_manager_ptr_->setEntityStatus(status.name(), msg);
