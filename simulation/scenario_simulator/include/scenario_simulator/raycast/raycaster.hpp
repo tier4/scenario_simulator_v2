@@ -52,6 +52,8 @@ public:
     primitive_ptrs_.emplace(name, std::move(primitive_ptr));
   }
   const sensor_msgs::msg::PointCloud2 raycast(
+    std::string frame_id,
+    const rclcpp::Time & stamp,
     geometry_msgs::msg::Pose origin,
     double horizontal_resolution,
     std::vector<double> vertical_angles,
@@ -61,12 +63,6 @@ public:
     double noise_distribution = 0.0,
     double ghost_ratio = 0.0
   );
-  const sensor_msgs::msg::PointCloud2 raycast(
-    geometry_msgs::msg::Pose origin,
-    std::vector<geometry_msgs::msg::Quaternion> directions,
-    double max_distance = 100, double min_distance = 0,
-    double noise_distribution = 0.0,
-    double ghost_ratio = 0.0);
 
 private:
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
@@ -74,6 +70,14 @@ private:
   RTCScene scene_;
   std::random_device seed_gen_;
   std::default_random_engine engine_;
+  const sensor_msgs::msg::PointCloud2 raycast(
+    std::string frame_id,
+    const rclcpp::Time & stamp,
+    geometry_msgs::msg::Pose origin,
+    std::vector<geometry_msgs::msg::Quaternion> directions,
+    double max_distance = 100, double min_distance = 0,
+    double noise_distribution = 0.0,
+    double ghost_ratio = 0.0);
 };
 }  // namespace scenario_simulator
 

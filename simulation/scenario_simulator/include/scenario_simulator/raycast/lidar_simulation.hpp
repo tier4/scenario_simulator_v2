@@ -17,7 +17,11 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+
 #include <vector>
+#include <unordered_map>
 
 namespace scenario_simulator
 {
@@ -26,11 +30,10 @@ class LidarSimulation
 public:
   LidarSimulation();
   ~LidarSimulation();
-  void raycast(const std::vector<openscenario_msgs::EntityStatus> & status);
-  void addConfiguration(const simulation_api_schema::LidarConfiguration & configuration);
-
-private:
-  std::vector<simulation_api_schema::LidarConfiguration> lidar_models_;
+  void raycast(
+    const simulation_api_schema::LidarConfiguration & configuration,
+    const std::vector<openscenario_msgs::EntityStatus> & status,
+    const rclcpp::Time & stamp);
 };
 }  // namespace scenario_simulator
 

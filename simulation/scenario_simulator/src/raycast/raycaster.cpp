@@ -50,6 +50,8 @@ Raycaster::~Raycaster()
 }
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
+  std::string frame_id,
+  const rclcpp::Time & stamp,
   geometry_msgs::msg::Pose origin,
   double horizontal_resolution,
   std::vector<double> vertical_angles,
@@ -72,10 +74,14 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
       directions.emplace_back(quat);
     }
   }
-  return raycast(origin, directions, max_distance, min_distance, noise_distribution, ghost_ratio);
+  return raycast(
+    frame_id, stamp, origin, directions, max_distance, min_distance,
+    noise_distribution, ghost_ratio);
 }
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
+  std::string frame_id,
+  const rclcpp::Time & stamp,
   geometry_msgs::msg::Pose origin,
   std::vector<geometry_msgs::msg::Quaternion> directions,
   double max_distance, double min_distance,
@@ -122,11 +128,9 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     } else {
       if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
         double distance = rayhit.ray.tfar + dist(engine_);
-        const auto vector = quaternion_operation::getRotationMatrix(direction) * Eigen::Vector3d(
-          1.0f,
-          0.0f,
-          0.0f) *
-          distance;
+        const auto vector =
+          quaternion_operation::getRotationMatrix(direction) *
+          Eigen::Vector3d(1.0f, 0.0f, 0.0f) * distance;
         pcl::PointXYZI p;
         p.x = vector[0];
         p.y = vector[1];
@@ -138,6 +142,8 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   sensor_msgs::msg::PointCloud2 pointcloud_msg;
   pcl::toROSMsg(*cloud, pointcloud_msg);
   rtcReleaseScene(scene_);
+  pointcloud_msg.header.frame_id = frame_id;
+  pointcloud_msg.header.stamp = stamp;
   return pointcloud_msg;
 }
 }  // namespace scenario_simulator

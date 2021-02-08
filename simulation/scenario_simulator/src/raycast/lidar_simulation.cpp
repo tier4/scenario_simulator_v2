@@ -29,20 +29,18 @@ LidarSimulation::~LidarSimulation()
 {
 }
 
-void LidarSimulation::addConfiguration(
-  const simulation_api_schema::LidarConfiguration & configuration)
-{
-  lidar_models_.emplace_back(configuration);
-}
-
-void LidarSimulation::raycast(const std::vector<openscenario_msgs::EntityStatus> & status)
+void LidarSimulation::raycast(
+  const simulation_api_schema::LidarConfiguration & configuration,
+  const std::vector<openscenario_msgs::EntityStatus> & status,
+  const rclcpp::Time & stamp)
 {
   Raycaster raycaster;
   for (const auto s : status) {
     geometry_msgs::msg::Pose pose;
     xmlrpc_interface::toMsg(s.pose(), pose);
     const auto bbox = s.bounding_box();
-    auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+    auto rotation =
+      quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(pose.orientation));
     geometry_msgs::msg::Point center_point;
     xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
     Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
@@ -57,5 +55,6 @@ void LidarSimulation::raycast(const std::vector<openscenario_msgs::EntityStatus>
       s.bounding_box().dimensions().z(),
       pose);
   }
+  // raycaster.raycast(configuration.frame_id(), stamp, );
 }
 }  // namespace scenario_simulator
