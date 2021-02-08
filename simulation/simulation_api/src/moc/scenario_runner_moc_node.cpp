@@ -42,7 +42,7 @@ public:
     catalog_xml_doc.load_string(catalog_xml.c_str());
     auto vehicle_params = simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
     vehicle_params.name = "ego";
-    api_.spawn(false, "ego", vehicle_params);
+    api_.spawn(true, "ego", vehicle_params);
     api_.setEntityStatus(
       "ego",
       simulation_api::helper::constractLaneletPose(120545, 0),

@@ -53,7 +53,7 @@ public:
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
-      simulation_api::helper::constractLaneletPose(35026, 5.5361, -0.1),
+      simulation_api::helper::constractLaneletPose(35026, 5.5361, 0.01),
       simulation_api::helper::constractActionStatus(10));
     api_.setTargetSpeed("npc", 5, true);
     using namespace std::chrono_literals;
