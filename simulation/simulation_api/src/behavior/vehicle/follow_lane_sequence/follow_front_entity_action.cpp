@@ -107,7 +107,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   }
   if (distance_to_front_entity_.get() >=
     (calculateStopDistance() +
-    vehicle_parameters->bounding_box.dimensions.length + 5))
+    vehicle_parameters.bounding_box.dimensions.x + 5))
   {
     auto entity_status_updated = calculateEntityStatusUpdated(
       front_entity_status.get().action_status.twist.linear.x + 2);

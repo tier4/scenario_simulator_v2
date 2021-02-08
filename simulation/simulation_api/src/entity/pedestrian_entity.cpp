@@ -29,46 +29,20 @@ namespace entity
 {
 PedestrianEntity::PedestrianEntity(
   std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  const pugi::xml_node & xml)
-: EntityBase(xml.child("Pedestrian").attribute("name").as_string(), name, initial_state),
-  parameters(xml)
+  openscenario_msgs::msg::PedestrianParameters params)
+: EntityBase(params.name, name, initial_state), parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "pedestrian_parameters",
-    std::make_shared<simulation_api::entity::PedestrianParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
 }
 
 PedestrianEntity::PedestrianEntity(
-  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  PedestrianParameters params)
-: EntityBase(params.name, name, initial_state),
-  parameters(params)
+  std::string name,
+  openscenario_msgs::msg::PedestrianParameters params)
+: EntityBase(params.name, name), parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "pedestrian_parameters",
-    std::make_shared<simulation_api::entity::PedestrianParameters>(parameters));
-}
-
-PedestrianEntity::PedestrianEntity(std::string name, const pugi::xml_node & xml)
-: EntityBase(xml.child("Pedestrian").attribute("name").as_string(), name),
-  parameters(xml)
-{
-  tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "pedestrian_parameters",
-    std::make_shared<simulation_api::entity::PedestrianParameters>(parameters));
-}
-
-PedestrianEntity::PedestrianEntity(std::string name, PedestrianParameters params)
-: EntityBase(params.name, name),
-  parameters(params)
-{
-  tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard(
-    "pedestrian_parameters",
-    std::make_shared<simulation_api::entity::PedestrianParameters>(parameters));
+  tree_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
 }
 
 void PedestrianEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)

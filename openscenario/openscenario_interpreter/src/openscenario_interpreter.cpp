@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
+#define EXPERIMENTAL_AUTOWARE_IV_SUPPORT
+// #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
+
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 

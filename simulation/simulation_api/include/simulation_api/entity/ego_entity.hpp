@@ -60,8 +60,6 @@ public:
     setStatus(initial_state);
   }
 
-  // using VehicleEntity::VehicleEntity;
-
   /* ---------------------------------------------------------------------------
    *
    *  NOTE: from yamacir-kit

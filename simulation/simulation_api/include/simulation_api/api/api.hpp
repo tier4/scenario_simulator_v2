@@ -37,18 +37,6 @@
 
 namespace scenario_simulator
 {
-class XmlRpcRuntimeError : public std::runtime_error
-{
-public:
-  XmlRpcRuntimeError(const char * message, int result)
-  : runtime_error(message), error_info_(result) {}
-
-  virtual ~XmlRpcRuntimeError() = default;
-
-private:
-  int error_info_;
-};
-
 class ExecutionFailedError : public std::runtime_error
 {
 public:
@@ -64,8 +52,6 @@ public:
 class API
 {
   using EntityManager = simulation_api::entity::EntityManager;
-
-  // std::shared_ptr<autoware_api::Accessor> access_rights_;
 
 #define FORWARD_TO_ENTITY_MANAGER(NAME) \
   template \
@@ -87,10 +73,11 @@ public:
     NodeT && node,
     const std::string & map_path = "",
     const bool verbose = false,
+    const bool standalone_mode = false,
     const std::string & metrics_logfile_path = "/tmp/metrics.json",
     const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
     rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
-  : // access_rights_(std::make_shared<decltype(access_rights_)::element_type>(node)),
+  : standalone_mode(standalone_mode),
     metrics_manager_(verbose, metrics_logfile_path)
   {
     std::string address = "127.0.0.1";
@@ -129,29 +116,21 @@ public:
 
   void setVerbose(const bool verbose);
 
-  // (1) Basis
+  [[deprecated("catalog_xml will be deprecated in the near future")]]
   bool spawn(
     const bool is_ego,
     const std::string & name,
     const std::string & catalog_xml);
 
-  // (2) => (1)
   bool spawn(
     const bool is_ego,
     const std::string & name,
-    const simulation_api::entity::VehicleParameters & params)
-  {
-    return spawn(is_ego, name, params.toXml());
-  }
+    const openscenario_msgs::msg::VehicleParameters & params);
 
-  // (3) => (1)
   bool spawn(
     const bool is_ego,
     const std::string & name,
-    const simulation_api::entity::PedestrianParameters & params)
-  {
-    return spawn(is_ego, name, params.toXml());
-  }
+    const openscenario_msgs::msg::PedestrianParameters & params);
 
   template
   <
@@ -183,6 +162,8 @@ public:
       spawn(is_ego, name, params) &&
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
+
+  bool despawn(const std::string & name);
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     const std::string & name);
@@ -239,16 +220,17 @@ public:
     const std::string & target_name,
     const double tolerance) const;
 
-  XmlRpc::XmlRpcValue initialize(double realtime_factor, double step_time);
-  XmlRpc::XmlRpcValue updateFrame();
+  bool initialize(double realtime_factor, double step_time);
+  bool updateFrame();
 
   double getCurrentTime() const noexcept
   {
     return current_time_;
   }
 
+  const bool standalone_mode;
+
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
-  FORWARD_TO_ENTITY_MANAGER(despawnEntity);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);

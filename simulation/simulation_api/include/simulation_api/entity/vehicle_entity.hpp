@@ -23,6 +23,7 @@
 
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -43,13 +44,9 @@ class VehicleEntity : public EntityBase
 public:
   VehicleEntity(
     std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    const pugi::xml_node & xml);
-  VehicleEntity(
-    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    VehicleParameters parameters);
-  VehicleEntity(std::string name, const pugi::xml_node & xml);
-  VehicleEntity(std::string name, VehicleParameters parameters);
-  const VehicleParameters parameters;
+    openscenario_msgs::msg::VehicleParameters parameters);
+  VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters parameters);
+  const openscenario_msgs::msg::VehicleParameters parameters;
   void onUpdate(double current_time, double step_time) override;
   void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::int64_t to_lanelet_id);
@@ -67,7 +64,7 @@ public:
   void setTargetSpeed(double target_speed, bool continuous);
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {
-    return parameters.bounding_box.toRosMsg();
+    return parameters.bounding_box;
   }
   const std::string getCurrentAction() const
   {

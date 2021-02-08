@@ -20,6 +20,8 @@
 #include <simulation_api/behavior/pedestrian/behavior_tree.hpp>
 #include <simulation_api/behavior/route_planner.hpp>
 
+#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+
 // headers in pugixml
 #include <pugixml.hpp>
 
@@ -37,13 +39,9 @@ class PedestrianEntity : public EntityBase
 public:
   PedestrianEntity(
     std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    const pugi::xml_node & xml);
-  PedestrianEntity(
-    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    PedestrianParameters parameters);
-  PedestrianEntity(std::string name, const pugi::xml_node & xml);
-  PedestrianEntity(std::string name, PedestrianParameters parameters);
-  const PedestrianParameters parameters;
+    openscenario_msgs::msg::PedestrianParameters parameters);
+  PedestrianEntity(std::string name, openscenario_msgs::msg::PedestrianParameters parameters);
+  const openscenario_msgs::msg::PedestrianParameters parameters;
   void onUpdate(double current_time, double step_time) override;
   void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   // void requestLaneChange(std::int64_t to_lanelet_id);
@@ -57,7 +55,7 @@ public:
   void setTargetSpeed(double target_speed, bool continuous);
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {
-    return parameters.bounding_box.toRosMsg();
+    return parameters.bounding_box;
   }
   const std::string getCurrentAction() const
   {

@@ -41,8 +41,9 @@ public:
     pugi::xml_document vehicle_catalog_xml_doc;
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
-    simulation_api::entity::VehicleParameters params(vehicle_catalog_xml_doc);
-    api_.spawn(false, "ego", params);
+    api_.spawn(
+      false, "ego", simulation_api::entity::VehicleParameters(
+        vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "ego",
       simulation_api::helper::constractLaneletPose(120684, 5.5361, -0.591),

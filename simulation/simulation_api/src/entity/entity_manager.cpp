@@ -338,7 +338,8 @@ geometry_msgs::msg::Pose EntityManager::getRelativePose(
   return ret;
 }
 
-const boost::optional<VehicleParameters> EntityManager::getVehicleParameters(std::string name) const
+const boost::optional<openscenario_msgs::msg::VehicleParameters>
+EntityManager::getVehicleParameters(std::string name) const
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {

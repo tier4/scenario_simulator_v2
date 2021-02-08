@@ -1,0 +1,3 @@
+string name
+string pedestrian_category
+openscenario_msgs/BoundingBox bounding_box
