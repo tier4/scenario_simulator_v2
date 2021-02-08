@@ -15,6 +15,9 @@
 #include <scenario_simulator/raycast/lidar_simulation.hpp>
 #include <scenario_simulator/raycast/raycaster.hpp>
 #include <xmlrpc_interface/conversions.hpp>
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <vector>
 
 namespace scenario_simulator
 {
@@ -39,6 +42,14 @@ void LidarSimulation::raycast(const std::vector<openscenario_msgs::EntityStatus>
     geometry_msgs::msg::Pose pose;
     xmlrpc_interface::toMsg(s.pose(), pose);
     const auto bbox = s.bounding_box();
+    auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+    geometry_msgs::msg::Point center_point;
+    xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
+    Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
+    center = rotation * center;
+    pose.position.x = pose.position.x + center.x();
+    pose.position.y = pose.position.y + center.y();
+    pose.position.z = pose.position.z + center.z();
     raycaster.addPrimitive<scenario_simulator::primitives::Box>(
       s.name(),
       s.bounding_box().dimensions().x(),
