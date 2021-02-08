@@ -14,5 +14,6 @@ mv "$repository_root/pilot.auto/awapi/autoware_api_msgs"              "$reposito
 mv "$repository_root/pilot.auto/common/msgs/autoware_perception_msgs" "$repository_root/external"
 mv "$repository_root/pilot.auto/common/msgs/autoware_planning_msgs"   "$repository_root/external"
 mv "$repository_root/pilot.auto/common/msgs/autoware_system_msgs"     "$repository_root/external"
+mv "$repository_root/pilot.auto/common/msgs/autoware_vehicle_msgs"    "$repository_root/external"
 
 rm -rf "$repository_root/pilot.auto"
