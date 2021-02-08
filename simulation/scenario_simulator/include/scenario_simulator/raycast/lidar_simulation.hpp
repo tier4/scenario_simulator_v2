@@ -25,15 +25,41 @@
 
 namespace scenario_simulator
 {
+class LidarModel
+{
+public:
+  LidarModel(
+    const simulation_api_schema::LidarConfiguration & configuration,
+    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
+  void update(
+    double current_time,
+    const std::vector<openscenario_msgs::EntityStatus> & status,
+    const rclcpp::Time & stamp);
+
+private:
+  simulation_api_schema::LidarConfiguration configuration_;
+  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr_;
+  const sensor_msgs::msg::PointCloud2 raycast(
+    const std::vector<openscenario_msgs::EntityStatus> & status,
+    const rclcpp::Time & stamp);
+  double last_update_stamp_;
+};
+
 class LidarSimulation
 {
 public:
   LidarSimulation();
   ~LidarSimulation();
-  void raycast(
+  void addLidar(
     const simulation_api_schema::LidarConfiguration & configuration,
+    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
+  void update(
+    double current_time,
     const std::vector<openscenario_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp);
+
+private:
+  std::vector<LidarModel> lidar_models_;
 };
 }  // namespace scenario_simulator
 

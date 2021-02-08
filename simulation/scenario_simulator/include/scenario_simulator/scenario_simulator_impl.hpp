@@ -52,6 +52,7 @@ private:
   double current_time_;
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
+  LidarSimulation lidar_sim_;
 };
 }  // namespace scenario_simulator
 

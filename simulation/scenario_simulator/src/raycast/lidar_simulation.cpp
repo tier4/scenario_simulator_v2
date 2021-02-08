@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <scenario_simulator/exception.hpp>
 #include <scenario_simulator/raycast/lidar_simulation.hpp>
 #include <scenario_simulator/raycast/raycaster.hpp>
 #include <xmlrpc_interface/conversions.hpp>
@@ -23,23 +24,33 @@
 
 namespace scenario_simulator
 {
-LidarSimulation::LidarSimulation()
-{
-}
-
-LidarSimulation::~LidarSimulation()
-{
-}
-
-void LidarSimulation::raycast(
+LidarModel::LidarModel(
   const simulation_api_schema::LidarConfiguration & configuration,
+  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
+: configuration_(configuration), publisher_ptr_(publisher_ptr)
+{
+  last_update_stamp_ = 0;
+}
+
+void LidarModel::update(
+  double current_time,
+  const std::vector<openscenario_msgs::EntityStatus> & status,
+  const rclcpp::Time & stamp)
+{
+  if ((current_time - last_update_stamp_) >= configuration_.scan_duration()) {
+    last_update_stamp_ = current_time;
+    publisher_ptr_->publish(raycast(status, stamp));
+  }
+}
+
+const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
   Raycaster raycaster;
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto s : status) {
-    if (configuration.entity() == s.name()) {
+    if (configuration_.entity() == s.name()) {
       xmlrpc_interface::toMsg(s.pose(), ego_pose.get());
       continue;
     }
@@ -63,7 +74,44 @@ void LidarSimulation::raycast(
       pose);
   }
   if (ego_pose) {
-    raycaster.raycast(configuration.entity(), stamp, ego_pose.get(), 0.01, {10});
+    std::vector<double> vertical_angles;
+    for (const auto v : configuration_.vertical_angles()) {
+      vertical_angles.emplace_back(v);
+    }
+    return raycaster.raycast(
+      configuration_.entity(),
+      stamp,
+      ego_pose.get(),
+      configuration_.horizontal_resolution(),
+      vertical_angles);
+  }
+  throw scenario_simulator::SimulationRuntimeError("failed to found ego vehicle");
+}
+
+LidarSimulation::LidarSimulation()
+{
+}
+
+LidarSimulation::~LidarSimulation()
+{
+}
+
+void LidarSimulation::addLidar(
+  const simulation_api_schema::LidarConfiguration & configuration,
+  std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
+{
+  LidarModel model(configuration, publisher_ptr);
+  lidar_models_.emplace_back(model);
+}
+
+void LidarSimulation::update(
+  double current_time,
+  const std::vector<openscenario_msgs::EntityStatus> & status,
+  const rclcpp::Time & stamp)
+{
+  for(auto & model : lidar_models_)
+  {
+    model.update(current_time, status, stamp);
   }
 }
 }  // namespace scenario_simulator
