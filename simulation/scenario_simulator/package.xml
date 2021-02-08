@@ -32,13 +32,15 @@
   <exec_depend>tf2_geometry_msgs</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>simulation_api</exec_depend>
-  <depend>pugixml-dev</depend>
   <depend>visualization_msgs</depend>
   <depend>eigen</depend>
   <depend>quaternion_operation</depend>
   <depend>xmlrpcpp</depend>
   <depend>xmlrpc_interface</depend>
   <depend>openscenario_msgs</depend>
+  <depend>embree</depend>
+  <depend>pcl_conversions</depend>
+  <depend>libpcl-all-dev</depend>
   <exec_depend>rviz2</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
