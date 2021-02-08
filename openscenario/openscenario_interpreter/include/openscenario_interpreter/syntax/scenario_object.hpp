@@ -98,7 +98,7 @@ std::ostream & operator<<(std::ostream & os, const ScenarioObject & datum)
     blue << ">\n" << reset << static_cast<const EntityObject &>(datum) << "\n" << (--indent) <<
     blue << "</ScenarioObject>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_

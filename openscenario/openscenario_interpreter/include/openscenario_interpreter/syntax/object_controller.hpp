@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/controller.hpp>
 
 #include <utility>
 
@@ -23,29 +23,43 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ObjectController =====================================================
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
+/* ---- ObjectController -------------------------------------------------------
  *
- * <xsd:complexType name="ObjectController">
- *   <xsd:choice>
- *     <xsd:element name="CatalogReference" type="CatalogReference"/>
- *     <xsd:element name="Controller" type="Controller"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  Definition of a controller for a scenario object. Either an inline
+ *  definition or a catalog reference to a controller.
  *
- * ======================================================================== */
-struct ObjectController
-  : public Element
+ *  <xsd:complexType name="ObjectController">
+ *    <xsd:choice>
+ *      <xsd:element name="CatalogReference" type="CatalogReference"/>
+ *      <xsd:element name="Controller" type="Controller"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
+ *
+ * -------------------------------------------------------------------------- */
+struct ObjectController : public ComplexType
 {
-  template<typename Node, typename ... Ts>
-  explicit ObjectController(const Node & node, Ts && ...)
-  : Element(
+  template
+  <
+    typename Node, typename ... Ts
+  >
+  explicit ObjectController(const Node & node, Ts && ... xs)
+  : ComplexType(
       choice(
         node,
         std::make_pair("CatalogReference", UNSUPPORTED()),
-        std::make_pair("Controller", UNSUPPORTED())))
+        ELEMENT(Controller)))
   {}
 };
-}
+
+#undef ELEMENT
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
