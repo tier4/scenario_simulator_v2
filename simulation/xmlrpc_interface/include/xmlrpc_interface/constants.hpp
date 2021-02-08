@@ -37,6 +37,7 @@ const char spawn_vehicle_entity[] = "spawn_vehicle_entity";
 const char spawn_pedestrian_entity[] = "spawn_pedestrian_entity";
 const char despawn_entity[] = "despawn_entity";
 const char update_entity_status[] = "update_entity_status";
+const char add_lidar_sensor[] = "attach_lidar_sensor";
 }  // namespace method
 }  // namespace xmlrpc_interface
 

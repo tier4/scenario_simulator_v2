@@ -80,3 +80,13 @@ message UpdateEntityStatusResponse
     Result result = 1;
     repeated openscenario_msgs.EntityStatus status = 2;
 }
+
+message AttachLidarSensorRequest
+{
+    LidarConfiguration configuration = 1;
+}
+
+message AttachLidarSensorResponse
+{
+    Result result = 1;
+}

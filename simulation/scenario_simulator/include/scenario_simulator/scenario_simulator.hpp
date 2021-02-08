@@ -16,7 +16,7 @@
 #define SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 
 #include <scenario_simulator/xmlrpc_method.hpp>
-#include <scenario_simulator/scenario_simulator_impl.hpp>
+#include <scenario_simulator/raycast/lidar_simulation.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -55,7 +55,15 @@ private:
     XmlRpc::XmlRpcValue &)> func);
   void runXmlRpc();
   std::thread xmlrpc_thread_;
-  scenario_simulator::ScenarioSimulatorImpl impl_;
+  std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
+  std::vector<openscenario_msgs::VehicleParameters> vehicles_;
+  std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;
+  double realtime_factor_;
+  double step_time_;
+  double current_time_;
+  bool initialized_;
+  std::vector<openscenario_msgs::EntityStatus> entity_status_;
+  LidarSimulation lidar_sim_;
 };
 }  // namespace scenario_simulator
 

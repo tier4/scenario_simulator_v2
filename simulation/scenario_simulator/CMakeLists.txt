@@ -32,7 +32,6 @@ include_directories(
 
 ament_auto_add_library(scenario_simulator SHARED
   src/xmlrpc_method.cpp
-  src/scenario_simulator_impl.cpp
   src/scenario_simulator.cpp
   src/primitives/primitive.cpp
   src/primitives/box.cpp
