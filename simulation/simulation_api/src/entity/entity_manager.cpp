@@ -793,7 +793,7 @@ void EntityManager::broadcastBaseLinkTransform()
         pose.pose = status->pose;
         pose.header.stamp = clock_ptr_->now();
         pose.header.frame_id = "base_link";
-        broadcastTransform(pose);
+        broadcastTransform(pose, false);
       }
       return;
     }
