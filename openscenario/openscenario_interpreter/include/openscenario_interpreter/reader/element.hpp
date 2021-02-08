@@ -42,8 +42,8 @@ constexpr auto unbounded {
 template<typename T, typename Node, typename ... Ts>
 auto readElement(const std::string & name, const Node & parent, Ts && ... xs)
 {
-  if (const auto child {parent.child(name.c_str())}) {
-    return T {child, std::forward<decltype(xs)>(xs)...};
+  if (const auto child = parent.child(name.c_str())) {
+    return T(child, std::forward<decltype(xs)>(xs)...);
   } else {
     return IfNotDefaultConstructible<T>::error(parent.name(), name);
   }

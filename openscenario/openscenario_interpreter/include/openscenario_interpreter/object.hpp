@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
 #include <openscenario_interpreter/expression.hpp>
+
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -29,7 +31,11 @@ using Group = Element;
 
 using Elements = std::vector<Element>;
 
-// static const Element unit {nullptr};
+template
+<
+  typename ... Ts
+>
+using IsOptionalElement = std::is_default_constructible<Ts...>;
 
 template<typename T, typename ... Ts>
 inline constexpr decltype(auto) make(Ts && ... xs)
@@ -49,7 +55,7 @@ struct Unspecified
 {
   decltype(auto) evaluate() const noexcept
   {
-    return unspecified;
+    return unspecified;  // Self-evaluating.
   }
 };
 

@@ -45,6 +45,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectController : public ComplexType
 {
+  explicit ObjectController() = default;  // ObjectController is optional element.
+
   template
   <
     typename Node, typename ... Ts

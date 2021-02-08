@@ -42,7 +42,7 @@ struct ScenarioObject
  *  The EntityObject (either instance of type Vehicle, Pedestrian or
  *  MiscObject).
  *
- *  NOTE: This framework expresses xsd:group as a mixin by inheritance.
+ *  NOTE: This framework expresses xsd:group as mixin.
  *
  * ------------------------------------------------------------------------- */
   : public EntityObject
@@ -60,10 +60,10 @@ struct ScenarioObject
    *
    *  Controller of the EntityObject instance.
    *
-   *  TODO(yamacir-kit): DefaultConstructible!
-   *
    * ------------------------------------------------------------------------ */
-  Element object_controller;
+  const ObjectController object_controller;
+
+  static_assert(IsOptionalElement<ObjectController>::value);  // minOccurs="0"
 
   template
   <
@@ -71,14 +71,9 @@ struct ScenarioObject
   >
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
   : EntityObject(node, outer_scope),
-    name(readAttribute<String>("name", node, outer_scope))
-  {
-    callWithElements(
-      node, "ObjectController", 0, 1, [&](auto && node)
-      {
-        return object_controller.rebind<ObjectController>(node, outer_scope);
-      });
-  }
+    name(readAttribute<String>("name", node, outer_scope)),
+    object_controller(readElement<ObjectController>("ObjectController", node, outer_scope))
+  {}
 
   auto evaluate() const
   {
