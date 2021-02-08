@@ -49,6 +49,8 @@ struct AutowareError
 
 class Accessor : public rclcpp::Node
 {
+  std::mutex mutex;
+
   static auto convertBooleanToROSMessage(const bool value)
   {
     AutowareEngage message {};
@@ -85,7 +87,7 @@ public:
 
   DEFINE_PUBLISHER(AutowareEngage);
 
-  decltype(auto) setAutowareEngage(const bool value) const
+  decltype(auto) setAutowareEngage(const bool value)
   {
     return setAutowareEngage(convertBooleanToROSMessage(value));
   }
@@ -107,6 +109,16 @@ public:
   using LaneChangeApproval = std_msgs::msg::Bool;
 
   DEFINE_PUBLISHER(LaneChangeApproval);
+
+  decltype(auto) setLaneChangeApproval(const bool approve = true)
+  {
+    LaneChangeApproval lane_change_approval {};
+    {
+      lane_change_approval.data = approve;
+    }
+
+    return setLaneChangeApproval(lane_change_approval);
+  }
 
   /** ---- LaneChangeForce -----------------------------------------------------
    *
@@ -217,6 +229,27 @@ public:
     return setCurrentControlMode(current_control_mode);
   }
 
+  /* ---- CurrentPose ----------------------------------------------------------
+   *
+   *  Topic: /current_pose
+   *
+   * ------------------------------------------------------------------------ */
+  using CurrentPose = geometry_msgs::msg::PoseStamped;
+
+  DEFINE_PUBLISHER(CurrentPose);
+
+  decltype(auto) setCurrentPose(const geometry_msgs::msg::Pose & pose)
+  {
+    geometry_msgs::msg::PoseStamped current_pose {};
+    {
+      current_pose.header.stamp = get_clock()->now();
+      current_pose.header.frame_id = "map";
+      current_pose.pose = pose;
+    }
+
+    return setCurrentPose(current_pose);
+  }
+
   /* ---- CurrentShift ---------------------------------------------------------
    *
    *  Topic: /vehicle/status/shift
@@ -252,27 +285,6 @@ public:
   decltype(auto) setCurrentShift(const geometry_msgs::msg::Twist & twist)
   {
     return setCurrentShift(twist.linear.x);
-  }
-
-  /* ---- CurrentPose ----------------------------------------------------------
-   *
-   *  Topic: /current_pose
-   *
-   * ------------------------------------------------------------------------ */
-  using CurrentPose = geometry_msgs::msg::PoseStamped;
-
-  DEFINE_PUBLISHER(CurrentPose);
-
-  decltype(auto) setCurrentPose(const geometry_msgs::msg::Pose & pose)
-  {
-    geometry_msgs::msg::PoseStamped current_pose {};
-    {
-      current_pose.header.stamp = get_clock()->now();
-      current_pose.header.frame_id = "map";
-      current_pose.pose = pose;
-    }
-
-    return setCurrentPose(current_pose);
   }
 
   /* ---- CurrentSteering ------------------------------------------------------
@@ -323,6 +335,8 @@ public:
     }
 
     return setCurrentTurnSignal(current_turn_signal);
+
+    // return setCurrentTurnSignal(getTurnSignalCommand());
   }
 
   /* ---- CurrentTwist ---------------------------------------------------------
@@ -432,6 +446,26 @@ public:
     return setInitialTwist(initial_twist);
   }
 
+  /* ---- Turn Signal Command --------------------------------------------------
+   *
+   *  Topic: /control/turn_signal_cmd
+   *
+   * ------------------------------------------------------------------------ */
+  using TurnSignalCommand = autoware_vehicle_msgs::msg::TurnSignal;
+
+  DEFINE_SUBSCRIPTION(TurnSignalCommand);
+
+  /** ---- InitialTwist --------------------------------------------------------
+   *
+   *  Set initial velocity of Autoware.
+   *
+   *  Topic: /initialtwist
+   *
+   * ------------------------------------------------------------------------ */
+  using VehicleCommand = autoware_vehicle_msgs::msg::VehicleCommand;
+
+  DEFINE_SUBSCRIPTION(VehicleCommand);
+
 public:
   auto isWaitingForRoute() const noexcept
   {
@@ -503,6 +537,7 @@ public:
     // Simulation specific topics (lexicographically sorted)
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
+    INIT_PUBLISHER(CurrentPose, "/current_pose"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),
@@ -511,6 +546,8 @@ public:
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(InitialTwist, "/initialtwist"),
+    INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
+    INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
 
     transform_buffer(get_clock()),
     transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto&&...) {}))

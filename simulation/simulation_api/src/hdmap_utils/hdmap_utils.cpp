@@ -51,9 +51,13 @@ namespace hdmap_utils
 {
 HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin)
 {
+  #ifdef EXPERIMENTAL_AUTOWARE_IV_SUPPORT
+  lanelet::projection::MGRSProjector projector {};  // TODO(yamacir-kit)
+  #else
   lanelet::GPSPoint origin_gps_point {origin.latitude, origin.longitude, origin.altitude};
   lanelet::Origin origin_lanelet {origin_gps_point};
   lanelet::projection::UtmProjector projector(origin_lanelet);
+  #endif
   lanelet::ErrorMessages errors;
   lanelet_map_ptr_ = lanelet::load(lanelet_path, projector, &errors);
   if (!errors.empty()) {

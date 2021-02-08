@@ -49,6 +49,7 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
     waitForAutowareToBeReady();
     std::atomic_load(&autoware)->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autoware)->setInitialTwist();
+    std::atomic_load(&autoware)->setLaneChangeApproval(true);
     std::atomic_load(&autoware)->setVehicleVelocity(100.0);  // Upper bound velocity
     setTransform(current_entity_status.pose);
     first_time = false;
@@ -74,15 +75,15 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  if (!status_ || !control_cmd_ || !current_kinematic_state_ || !origin_) {
-    return;
-  }
+  // if (!status_ || !control_cmd_ || !current_kinematic_state_ || !origin_) {
+  //   return;
+  // }
 
   Eigen::VectorXd input(2);
   {
     input <<
-      std::atomic_load(&autoware)->getVehicleStatus().acceleration,
-      std::atomic_load(&autoware)->getVehicleStatus().steering;
+      std::atomic_load(&autoware)->getVehicleCommand().control.velocity,
+      std::atomic_load(&autoware)->getVehicleCommand().control.steering_angle;
   }
 
   vehicle_model_ptr_->setInput(input);
@@ -108,6 +109,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       std::atomic_load(&autoware)->setCurrentTurnSignal();
       std::atomic_load(&autoware)->setCurrentTwist(twist);
       std::atomic_load(&autoware)->setCurrentVelocity(twist);
+      std::atomic_load(&autoware)->setAutowareEngage(true);  // XXX DIRTY HACK!!!
+      std::atomic_load(&autoware)->setVehicleVelocity(100.0);  // XXX DIRTY HACK!!!
 
       setTransform(status_.get().pose);
     };
