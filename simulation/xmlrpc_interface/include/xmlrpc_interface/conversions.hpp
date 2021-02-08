@@ -33,6 +33,10 @@
 #include <openscenario_msgs/msg/property.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <openscenario_msgs/msg/action_status.hpp>
+#include <openscenario_msgs/msg/lanelet_pose.hpp>
+#include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/entity_type.hpp>
 
 #include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpc.h>
@@ -62,14 +66,19 @@ public:
   throw XmlParameterError( \
     std::string("parameter : ") + name + std::string(" does not defined."), __FILE__, __LINE__);
 
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeRequest & to);
-void fromProto(const simulation_api_schema::InitializeRequest & from, XmlRpc::XmlRpcValue & to);
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::InitializeResponse & to);
-void fromProto(const simulation_api_schema::InitializeResponse & from, XmlRpc::XmlRpcValue & to);
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameRequest & to);
-void fromProto(const simulation_api_schema::UpdateFrameRequest & from, XmlRpc::XmlRpcValue & to);
-void toProto(const XmlRpc::XmlRpcValue & from, simulation_api_schema::UpdateFrameResponse & to);
-void fromProto(const simulation_api_schema::UpdateFrameResponse & from, XmlRpc::XmlRpcValue & to);
+class ProtobufConversionError : public std::runtime_error
+{
+public:
+  explicit ProtobufConversionError(
+    std::string message,
+    const char * file,
+    int line)
+  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line)) {}
+};
+
+#define THROW_PROTOBUF_PARAMETER_ERROR(description) \
+  throw ProtobufConversionError( \
+    description, __FILE__, __LINE__);
 
 void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto);
 void toMsg(const geometry_msgs::Point & proto, geometry_msgs::msg::Point & p);
@@ -127,6 +136,30 @@ void toProto(
 void toMsg(
   const openscenario_msgs::PedestrianParameters & proto,
   openscenario_msgs::msg::PedestrianParameters & p);
+void toProto(
+  const openscenario_msgs::msg::ActionStatus & s,
+  openscenario_msgs::ActionStatus & proto);
+void toMsg(
+  openscenario_msgs::ActionStatus & proto,
+  const openscenario_msgs::msg::ActionStatus & s);
+void toProto(
+  const openscenario_msgs::msg::LaneletPose & pose,
+  openscenario_msgs::LaneletPose & proto);
+void toMsg(
+  const openscenario_msgs::LaneletPose & proto,
+  openscenario_msgs::msg::LaneletPose & pose);
+void toProto(
+  const openscenario_msgs::msg::EntityType & type,
+  openscenario_msgs::EntityType & proto);
+void toMsg(
+  const openscenario_msgs::EntityType & proto,
+  openscenario_msgs::msg::EntityType & type);
+void toProto(
+  const openscenario_msgs::msg::EntityStatus & status,
+  openscenario_msgs::EntityStatus & proto);
+void toMsg(
+  const openscenario_msgs::EntityStatus & proto,
+  openscenario_msgs::msg::EntityStatus & status);
 
 template<typename T>
 T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)

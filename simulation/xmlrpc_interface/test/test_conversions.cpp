@@ -26,38 +26,6 @@
 
 #include <string>
 
-TEST(Conversion, ConvertInitializeResponse)
-{
-  simulation_api_schema::InitializeResponse res;
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("test");
-  XmlRpc::XmlRpcValue xml;
-  EXPECT_NO_THROW(xmlrpc_interface::fromProto(res, xml));
-  std::string description = xml[xmlrpc_interface::key::description];
-  EXPECT_STREQ(description.c_str(), "test");
-  res.mutable_result()->set_description("");
-  EXPECT_NO_THROW(xmlrpc_interface::toProto(xml, res));
-  EXPECT_STREQ(res.result().description().c_str(), "test");
-  std::string serialized_str = "";
-  res.SerializeToString(&serialized_str);
-}
-
-TEST(Conversion, ConvertInitializeRequest)
-{
-  simulation_api_schema::InitializeRequest req;
-  req.set_realtime_factor(0.1);
-  req.set_step_time(0.5);
-  XmlRpc::XmlRpcValue xml;
-  xmlrpc_interface::fromProto(req, xml);
-  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interface::key::step_time]);
-  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interface::key::realtime_factor]);
-  req.set_realtime_factor(0);
-  req.set_step_time(0);
-  xmlrpc_interface::toProto(xml, req);
-  EXPECT_DOUBLE_EQ(req.step_time(), xml[xmlrpc_interface::key::step_time]);
-  EXPECT_DOUBLE_EQ(req.realtime_factor(), xml[xmlrpc_interface::key::realtime_factor]);
-}
-
 TEST(Conversion, ConvertPoint)
 {
   geometry_msgs::Point proto;
@@ -306,6 +274,39 @@ TEST(Conversion, ConvertVehicleParametrs)
   // p.property.is_ego = false;
   EXPECT_NO_THROW(xmlrpc_interface::toMsg(proto, p));
   // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
+}
+
+TEST(Conversion, ConvertActionStatus)
+{
+  openscenario_msgs::ActionStatus proto;
+  openscenario_msgs::msg::ActionStatus action;
+  action.current_action = "test";
+  action.twist.linear.x = 1.0;
+  action.twist.linear.y = 2.0;
+  action.twist.linear.z = 3.0;
+  action.twist.angular.x = -20;
+  action.twist.angular.y = -4.2;
+  action.twist.angular.z = 9;
+  action.accel.linear.x = 3.0;
+  action.accel.linear.y = 908;
+  action.accel.linear.z = 987.0;
+  action.accel.angular.x = 0.3;
+  action.accel.angular.y = 0.5;
+  action.accel.angular.z = 98;
+  xmlrpc_interface::toProto(action, proto);
+  EXPECT_STREQ(action.current_action.c_str(), proto.current_action().c_str());
+  EXPECT_DOUBLE_EQ(action.twist.linear.x, proto.twist().linear().x());
+  EXPECT_DOUBLE_EQ(action.twist.linear.y, proto.twist().linear().y());
+  EXPECT_DOUBLE_EQ(action.twist.linear.z, proto.twist().linear().z());
+  EXPECT_DOUBLE_EQ(action.twist.angular.x, proto.twist().angular().x());
+  EXPECT_DOUBLE_EQ(action.twist.angular.y, proto.twist().angular().y());
+  EXPECT_DOUBLE_EQ(action.twist.angular.z, proto.twist().angular().z());
+  EXPECT_DOUBLE_EQ(action.accel.linear.x, proto.accel().linear().x());
+  EXPECT_DOUBLE_EQ(action.accel.linear.y, proto.accel().linear().y());
+  EXPECT_DOUBLE_EQ(action.accel.linear.z, proto.accel().linear().z());
+  EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
+  EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
+  EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
 }
 
 int main(int argc, char ** argv)

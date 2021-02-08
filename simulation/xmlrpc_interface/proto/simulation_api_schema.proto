@@ -60,3 +60,14 @@ message DespawnEntityResponse
 {
     Result result = 1;
 }
+
+message UpdateEntityStatusRequest
+{
+    repeated openscenario_msgs.EntityStatus status = 1;
+}
+
+message UpdateEntityStatusResponse
+{
+    Result result = 1;
+    repeated openscenario_msgs.EntityStatus status = 2;
+}

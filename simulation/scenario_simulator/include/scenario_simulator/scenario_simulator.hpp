@@ -49,6 +49,7 @@ private:
   void spawnVehicleEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void spawnPedestrianEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void updateEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void addMethod(
     std::string name, std::function<void(XmlRpc::XmlRpcValue &,
     XmlRpc::XmlRpcValue &)> func);
