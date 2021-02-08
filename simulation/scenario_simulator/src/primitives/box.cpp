@@ -20,6 +20,8 @@
 
 namespace scenario_simulator
 {
+namespace primitives
+{
 Box::Box(float depth, float width, float height, geometry_msgs::msg::Pose pose)
 : Primitive("Box", pose), depth(depth), width(width), height(height)
 {
@@ -109,4 +111,5 @@ Box::Box(float depth, float width, float height, geometry_msgs::msg::Pose pose)
 
   transform();
 }
+}  // namespace primitives
 }  // namespace scenario_simulator

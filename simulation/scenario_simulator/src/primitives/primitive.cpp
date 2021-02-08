@@ -23,6 +23,8 @@
 
 namespace scenario_simulator
 {
+namespace primitives
+{
 Primitive::Primitive(std::string type, geometry_msgs::msg::Pose pose)
 : type(type), pose(pose) {}
 
@@ -85,4 +87,5 @@ unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
   rtcReleaseGeometry(mesh);
   return geometry_id;
 }
+}  // namespace primitives
 }  // namespace scenario_simulator

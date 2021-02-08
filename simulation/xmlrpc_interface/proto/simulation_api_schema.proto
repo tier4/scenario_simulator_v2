@@ -9,6 +9,14 @@ message Result
     string description = 2;
 }
 
+message LidarConfiguration
+{
+    string frame_id = 1;
+    repeated double vertical_angles = 2;
+    double horizontal_resolution = 3;
+}
+
+// Requests and Responses
 message InitializeRequest
 {
     double realtime_factor = 1;

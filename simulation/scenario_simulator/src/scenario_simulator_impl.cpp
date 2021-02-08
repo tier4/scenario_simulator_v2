@@ -120,6 +120,7 @@ void ScenarioSimulatorImpl::updateEntityStatus(
   const auto req =
     xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateEntityStatusRequest>(
     param);
+  entity_status_ = {};
   simulation_api_schema::UpdateEntityStatusResponse res;
   for (const auto status : req.status()) {
     auto status_ptr = res.mutable_status()->Add();
@@ -131,6 +132,7 @@ void ScenarioSimulatorImpl::updateEntityStatus(
     *status_ptr->mutable_pose() = status.pose();
     *status_ptr->mutable_lanelet_pose() = status.lanelet_pose();
     status_ptr->set_lanelet_pose_valid(status.lanelet_pose_valid());
+    entity_status_.emplace_back(status);
   }
   result = XmlRpc::XmlRpcValue();
   res.mutable_result()->set_success(true);

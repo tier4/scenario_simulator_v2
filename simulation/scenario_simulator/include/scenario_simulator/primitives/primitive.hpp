@@ -39,6 +39,8 @@ struct Triangle
   unsigned int v2;
 };
 
+namespace primitives
+{
 class Primitive
 {
 public:
@@ -58,6 +60,7 @@ protected:
 private:
   Vertex transform(Vertex v) const;
 };
+}  // namespace primitives
 }  // namespace scenario_simulator
 
 #endif  // SCENARIO_SIMULATOR__PRIMITIVES__PRIMITIVE_HPP_

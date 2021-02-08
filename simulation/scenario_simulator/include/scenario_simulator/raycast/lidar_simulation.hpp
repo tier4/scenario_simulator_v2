@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
+#define SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
 
-#ifndef SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
-#define SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
-
-#include <scenario_simulator/primitives/primitive.hpp>
 #include <simulation_api_schema.pb.h>
+
+#include <vector>
 
 namespace scenario_simulator
 {
-namespace primitives
-{
-class Box : public Primitive
+class LidarSimulation
 {
 public:
-  explicit Box(float depth, float width, float height, geometry_msgs::msg::Pose pose);
-  ~Box() = default;
-  const float depth;
-  const float width;
-  const float height;
+  LidarSimulation();
+  ~LidarSimulation();
+  void raycast(const std::vector<openscenario_msgs::EntityStatus> & status);
+  void addConfiguration(const simulation_api_schema::LidarConfiguration & configuration);
+
+private:
+  std::vector<simulation_api_schema::LidarConfiguration> lidar_models_;
 };
-}  // namespace primitives
 }  // namespace scenario_simulator
 
-#endif  // SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
+#endif  // SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_

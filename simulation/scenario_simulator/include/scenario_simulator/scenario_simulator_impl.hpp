@@ -49,6 +49,7 @@ private:
   double step_time_;
   double current_time_;
   bool initialized_;
+  std::vector<openscenario_msgs::EntityStatus> entity_status_;
 };
 }  // namespace scenario_simulator
 

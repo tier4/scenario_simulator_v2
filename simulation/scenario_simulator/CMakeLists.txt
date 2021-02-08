@@ -37,6 +37,7 @@ ament_auto_add_library(scenario_simulator SHARED
   src/primitives/primitive.cpp
   src/primitives/box.cpp
   src/raycast/raycaster.cpp
+  src/raycast/lidar_simulation.cpp
 )
 target_link_libraries(scenario_simulator
   embree3

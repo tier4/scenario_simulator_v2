@@ -13,3 +13,131 @@
 // limitations under the License.
 
 #include <scenario_simulator/raycast/raycaster.hpp>
+#include <scenario_simulator/primitives/primitive.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <unordered_map>
+#include <string>
+#include <algorithm>
+#include <vector>
+#include <utility>
+#include <iostream>
+
+namespace scenario_simulator
+{
+Raycaster::Raycaster()
+: primitive_ptrs_(0),
+  device_(nullptr),
+  scene_(nullptr),
+  engine_(seed_gen_())
+{
+  device_ = rtcNewDevice(nullptr);
+}
+
+Raycaster::Raycaster(std::string embree_config)
+: primitive_ptrs_(0),
+  device_(nullptr),
+  scene_(nullptr),
+  engine_(seed_gen_())
+{
+  device_ = rtcNewDevice(embree_config.c_str());
+}
+
+Raycaster::~Raycaster()
+{
+  rtcReleaseDevice(device_);
+}
+
+const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
+  geometry_msgs::msg::Pose origin,
+  double horizontal_resolution,
+  std::vector<double> vertical_angles,
+  double horizontal_angle_start,
+  double horizontal_angle_end,
+  double max_distance, double min_distance,
+  double noise_distribution, double ghost_ratio
+)
+{
+  std::vector<geometry_msgs::msg::Quaternion> directions;
+  double horizontal_angle = horizontal_angle_start;
+  while (horizontal_angle <= (horizontal_angle_end)) {
+    horizontal_angle = horizontal_angle + horizontal_resolution;
+    for (const auto vertical_angle : vertical_angles) {
+      geometry_msgs::msg::Vector3 rpy;
+      rpy.x = 0;
+      rpy.y = vertical_angle;
+      rpy.z = horizontal_angle;
+      auto quat = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+      directions.emplace_back(quat);
+    }
+  }
+  return raycast(origin, directions, max_distance, min_distance, noise_distribution, ghost_ratio);
+}
+
+const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
+  geometry_msgs::msg::Pose origin,
+  std::vector<geometry_msgs::msg::Quaternion> directions,
+  double max_distance, double min_distance,
+  double noise_distribution, double ghost_ratio)
+{
+  std::normal_distribution<> dist(0.0, noise_distribution);
+  std::uniform_real_distribution<> ghost_dist(0.0, 1.0);
+  scene_ = rtcNewScene(device_);
+  pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
+  for (auto && pair : primitive_ptrs_) {
+    pair.second->addToScene(device_, scene_);
+  }
+  rtcCommitScene(scene_);
+  RTCIntersectContext context;
+  rtcInitIntersectContext(&context);
+  for (auto direction : directions) {
+    RTCRayHit rayhit;
+    rayhit.ray.org_x = origin.position.x;
+    rayhit.ray.org_y = origin.position.y;
+    rayhit.ray.org_z = origin.position.z;
+    rayhit.ray.tfar = max_distance;
+    rayhit.ray.tnear = min_distance;
+    rayhit.ray.flags = false;
+    const auto ray_direction = origin.orientation * direction;
+    const auto rotation_mat = quaternion_operation::getRotationMatrix(ray_direction);
+    const auto rotated_direction = rotation_mat * Eigen::Vector3d(1.0f, 0.0f, 0.0f);
+    rayhit.ray.dir_x = rotated_direction[0];
+    rayhit.ray.dir_y = rotated_direction[1];
+    rayhit.ray.dir_z = rotated_direction[2];
+    rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
+    rtcIntersect1(scene_, &context, &rayhit);
+    if (ghost_dist(engine_) < ghost_ratio) {
+      double distance = (max_distance - min_distance) * ghost_dist(engine_) + min_distance;
+      const auto vector = quaternion_operation::getRotationMatrix(direction) * Eigen::Vector3d(
+        1.0f,
+        0.0f,
+        0.0f) *
+        distance;
+      pcl::PointXYZI p;
+      p.x = vector[0];
+      p.y = vector[1];
+      p.z = vector[2];
+      cloud->emplace_back(p);
+    } else {
+      if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
+        double distance = rayhit.ray.tfar + dist(engine_);
+        const auto vector = quaternion_operation::getRotationMatrix(direction) * Eigen::Vector3d(
+          1.0f,
+          0.0f,
+          0.0f) *
+          distance;
+        pcl::PointXYZI p;
+        p.x = vector[0];
+        p.y = vector[1];
+        p.z = vector[2];
+        cloud->emplace_back(p);
+      }
+    }
+  }
+  sensor_msgs::msg::PointCloud2 pointcloud_msg;
+  pcl::toROSMsg(*cloud, pointcloud_msg);
+  rtcReleaseScene(scene_);
+  return pointcloud_msg;
+}
+}  // namespace scenario_simulator
