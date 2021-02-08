@@ -20,10 +20,6 @@
 
 namespace scenario_simulator
 {
-
-Box::Box()
-: Primitive("Box", geometry_msgs::msg::Pose()), depth(0), width(0), height(0) {}
-
 Box::Box(float depth, float width, float height, geometry_msgs::msg::Pose pose)
 : Primitive("Box", pose), depth(depth), width(width), height(height)
 {

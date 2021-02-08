@@ -12,24 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#ifndef SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
-#define SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
-
-#include <scenario_simulator/primitives/primitive.hpp>
-#include <simulation_api_schema.pb.h>
-
-namespace scenario_simulator
-{
-class Box : public Primitive
-{
-public:
-  explicit Box(float depth, float width, float height, geometry_msgs::msg::Pose pose);
-  ~Box() = default;
-  const float depth;
-  const float width;
-  const float height;
-};
-}  // namespace scenario_simulator
-
-#endif  // SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
+#include <scenario_simulator/raycast/raycaster.hpp>
