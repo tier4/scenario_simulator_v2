@@ -59,9 +59,7 @@ public:
     std::vector<double> vertical_angles,
     double horizontal_angle_start = 0,
     double horizontal_angle_end = 2 * M_PI,
-    double max_distance = 100, double min_distance = 0,
-    double noise_distribution = 0.0,
-    double ghost_ratio = 0.0
+    double max_distance = 100, double min_distance = 0
   );
 
 private:
@@ -75,9 +73,7 @@ private:
     const rclcpp::Time & stamp,
     geometry_msgs::msg::Pose origin,
     std::vector<geometry_msgs::msg::Quaternion> directions,
-    double max_distance = 100, double min_distance = 0,
-    double noise_distribution = 0.0,
-    double ghost_ratio = 0.0);
+    double max_distance = 100, double min_distance = 0);
 };
 }  // namespace scenario_simulator
 

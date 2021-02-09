@@ -50,6 +50,7 @@ std::vector<Vertex> Primitive::transform() const
 {
   std::vector<Vertex> ret;
   for (auto & v : vertices_) {
+    // std::cout << v.x << "," << v.y << "," << v.z << std::endl;
     ret.emplace_back(transform(v));
   }
   return ret;

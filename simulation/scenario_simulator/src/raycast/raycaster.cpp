@@ -57,9 +57,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::vector<double> vertical_angles,
   double horizontal_angle_start,
   double horizontal_angle_end,
-  double max_distance, double min_distance,
-  double noise_distribution, double ghost_ratio
-)
+  double max_distance, double min_distance)
 {
   std::vector<geometry_msgs::msg::Quaternion> directions;
   double horizontal_angle = horizontal_angle_start;
@@ -75,8 +73,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     }
   }
   return raycast(
-    frame_id, stamp, origin, directions, max_distance, min_distance,
-    noise_distribution, ghost_ratio);
+    frame_id, stamp, origin, directions, max_distance, min_distance);
 }
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
@@ -84,11 +81,8 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   const rclcpp::Time & stamp,
   geometry_msgs::msg::Pose origin,
   std::vector<geometry_msgs::msg::Quaternion> directions,
-  double max_distance, double min_distance,
-  double noise_distribution, double ghost_ratio)
+  double max_distance, double min_distance)
 {
-  std::normal_distribution<> dist(0.0, noise_distribution);
-  std::uniform_real_distribution<> ghost_dist(0.0, 1.0);
   scene_ = rtcNewScene(device_);
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
   for (auto && pair : primitive_ptrs_) {
@@ -113,30 +107,16 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     rayhit.ray.dir_z = rotated_direction[2];
     rayhit.hit.geomID = RTC_INVALID_GEOMETRY_ID;
     rtcIntersect1(scene_, &context, &rayhit);
-    if (ghost_dist(engine_) < ghost_ratio) {
-      double distance = (max_distance - min_distance) * ghost_dist(engine_) + min_distance;
-      const auto vector = quaternion_operation::getRotationMatrix(direction) * Eigen::Vector3d(
-        1.0f,
-        0.0f,
-        0.0f) *
-        distance;
+    if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
+      double distance = rayhit.ray.tfar;
+      const auto vector =
+        quaternion_operation::getRotationMatrix(direction) *
+        Eigen::Vector3d(1.0f, 0.0f, 0.0f) * distance;
       pcl::PointXYZI p;
       p.x = vector[0];
       p.y = vector[1];
       p.z = vector[2];
       cloud->emplace_back(p);
-    } else {
-      if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
-        double distance = rayhit.ray.tfar + dist(engine_);
-        const auto vector =
-          quaternion_operation::getRotationMatrix(direction) *
-          Eigen::Vector3d(1.0f, 0.0f, 0.0f) * distance;
-        pcl::PointXYZI p;
-        p.x = vector[0];
-        p.y = vector[1];
-        p.z = vector[2];
-        cloud->emplace_back(p);
-      }
     }
   }
   sensor_msgs::msg::PointCloud2 pointcloud_msg;

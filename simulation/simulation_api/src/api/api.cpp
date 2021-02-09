@@ -507,8 +507,8 @@ bool API::updateEntityStatusInSim()
     auto status = entity_manager_ptr_->getEntityStatus(name);
     if (status) {
       openscenario_msgs::EntityStatus proto;
+      status.get().name = name;
       xmlrpc_interface::toProto(status.get(), proto);
-      proto.set_name(name);
       *req.add_status() = proto;
     }
   }
