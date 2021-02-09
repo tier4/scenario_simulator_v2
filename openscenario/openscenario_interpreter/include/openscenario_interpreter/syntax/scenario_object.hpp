@@ -79,12 +79,14 @@ struct ScenarioObject
   {
     if (
       spawn(
-        (*this).is<Vehicle>() && (*this).as<Vehicle>()["isEgo"],
+        is<Vehicle>() && as<Vehicle>()["isEgo"],
         name,
         boost::lexical_cast<String>(
           static_cast<const EntityObject &>(*this))))  // XXX UGLY CODE!!!
     {
-      setController(name, object_controller);
+      if (is<Vehicle>()) {
+        setController(name, object_controller);
+      }
       return unspecified;
     } else {
       throw SemanticError("Failed to spawn entity '", name, "'.");
