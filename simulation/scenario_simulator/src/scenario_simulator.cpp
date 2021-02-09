@@ -130,7 +130,6 @@ void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcVa
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
-  lidar_sim_ = LidarSimulation();
   result = XmlRpc::XmlRpcValue();
   result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
@@ -148,19 +147,11 @@ void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcV
   const auto req =
     xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameRequest>(param);
   simulation_api_schema::UpdateFrameResponse res;
-  if (req.current_time() != current_time_) {
-    res.mutable_result()->set_success(false);
-    res.mutable_result()->set_description("timestamp of the simulator and runner does not match.");
-    result = XmlRpc::XmlRpcValue();
-    result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
-    return;
-  } else {
-    res.mutable_result()->set_success(true);
-    res.mutable_result()->set_description("succeed to update frame");
-    result = XmlRpc::XmlRpcValue();
-    result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
-    return;
-  }
+  current_time_ = req.current_time();
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("succeed to update frame");
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::updateEntityStatus(
@@ -268,7 +259,8 @@ void ScenarioSimulator::attachLidarSensor(
     xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::AttachLidarSensorRequest>(param);
   const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
     req.configuration().topic_name(), 1);
-  lidar_sim_.addLidar(req.configuration(), pub);
+  LidarModel lidar_model(req.configuration(), pub);
+  lidar_models_.push_back(lidar_model);
   pointcloud_pub_.emplace_back(pub);
   simulation_api_schema::AttachLidarSensorResponse res;
   res.mutable_result()->set_success(true);
@@ -278,7 +270,10 @@ void ScenarioSimulator::attachLidarSensor(
 
 void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
 {
-  lidar_sim_.update(current_time_, entity_status_, get_clock()->now());
+  // lidar_sim_.update(current_time_, entity_status_, get_clock()->now());
+  for (auto & model : lidar_models_) {
+    model.update(current_time_, entity_status_, get_clock()->now());
+  }
   simulation_api_schema::UpdateSensorFrameResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();

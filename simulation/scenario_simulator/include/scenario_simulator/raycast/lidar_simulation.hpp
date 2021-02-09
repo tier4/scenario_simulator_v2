@@ -44,23 +44,6 @@ private:
     const rclcpp::Time & stamp);
   double last_update_stamp_;
 };
-
-class LidarSimulation
-{
-public:
-  LidarSimulation();
-  ~LidarSimulation();
-  void addLidar(
-    const simulation_api_schema::LidarConfiguration & configuration,
-    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
-  void update(
-    double current_time,
-    const std::vector<openscenario_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp);
-
-private:
-  std::vector<LidarModel> lidar_models_;
-};
 }  // namespace scenario_simulator
 
 #endif  // SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_

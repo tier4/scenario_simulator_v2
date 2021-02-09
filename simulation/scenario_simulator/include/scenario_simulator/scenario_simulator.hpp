@@ -66,7 +66,7 @@ private:
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
   std::vector<std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>>> pointcloud_pub_;
-  LidarSimulation lidar_sim_;
+  std::vector<LidarModel> lidar_models_;
 };
 }  // namespace scenario_simulator
 

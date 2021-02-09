@@ -528,15 +528,15 @@ bool API::updateFrame()
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(current_time_);
     simulation_api_schema::UpdateFrameResponse res;
-    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
+    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_frame, req, res);
+    res.PrintDebugString();
     if (!res.result().success()) {
       return false;
     }
     entity_manager_ptr_->broadcastEntityTransform();
     current_time_ = current_time_ + step_time_;
     metrics_manager_.calculate();
-    if(!updateEntityStatusInSim())
-    {
+    if (!updateEntityStatusInSim()) {
       return false;
     }
     return updateSensorFrame();
