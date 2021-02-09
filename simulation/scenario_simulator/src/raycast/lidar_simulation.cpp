@@ -58,6 +58,7 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
     }
     geometry_msgs::msg::Pose pose;
     xmlrpc_interface::toMsg(s.pose(), pose);
+    /*
     const auto bbox = s.bounding_box();
     auto rotation =
       quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(pose.orientation));
@@ -68,6 +69,7 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
     pose.position.x = pose.position.x + center.x();
     pose.position.y = pose.position.y + center.y();
     pose.position.z = pose.position.z + center.z();
+    */
     raycaster.addPrimitive<scenario_simulator::primitives::Box>(
       s.name(),
       s.bounding_box().dimensions().x(),
