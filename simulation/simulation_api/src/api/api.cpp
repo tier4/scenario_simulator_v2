@@ -508,7 +508,6 @@ bool API::updateEntityStatusInSim()
     if (status) {
       openscenario_msgs::EntityStatus proto;
       status.get().name = name;
-      std::cout << status.get().bounding_box.dimensions.x << "," << std::endl;
       xmlrpc_interface::toProto(status.get(), proto);
       *req.add_status() = proto;
     }
