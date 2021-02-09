@@ -487,6 +487,17 @@ bool API::attachLidarSensor(
   return res.result().success();
 }
 
+bool API::updateSensorFrame()
+{
+  if (standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::UpdateSensorFrameRequest req;
+  simulation_api_schema::UpdateSensorFrameResponse res;
+  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_sensor_frame, req, res);
+  return res.result().success();
+}
+
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
@@ -524,7 +535,11 @@ bool API::updateFrame()
     entity_manager_ptr_->broadcastEntityTransform();
     current_time_ = current_time_ + step_time_;
     metrics_manager_.calculate();
-    return updateEntityStatusInSim();
+    if(!updateEntityStatusInSim())
+    {
+      return false;
+    }
+    return updateSensorFrame();
   }
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;

@@ -227,6 +227,7 @@ public:
   bool attachLidarSensor(
     simulation_api_schema::LidarConfiguration configuration
   );
+  bool updateSensorFrame();
 
   bool initialize(double realtime_factor, double step_time);
   bool updateFrame();

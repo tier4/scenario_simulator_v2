@@ -92,6 +92,14 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_1,
       std::placeholders::_2));
 
+  addMethod(
+    xmlrpc_interface::method::update_sensor_frame,
+    std::bind(
+      &ScenarioSimulator::updateSensorFrame,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
+
   server_.bindAndListen(port_);
   server_.enableIntrospection(true);
   xmlrpc_thread_ = std::thread(&ScenarioSimulator::runXmlRpc, this);
@@ -263,6 +271,15 @@ void ScenarioSimulator::attachLidarSensor(
   lidar_sim_.addLidar(req.configuration(), pub);
   pointcloud_pub_.emplace_back(pub);
   simulation_api_schema::AttachLidarSensorResponse res;
+  res.mutable_result()->set_success(true);
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+}
+
+void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
+{
+  lidar_sim_.update(current_time_, entity_status_, get_clock()->now());
+  simulation_api_schema::UpdateSensorFrameResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();
   result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
