@@ -26,6 +26,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 /* ---- PrivateAction ----------------------------------------------------------
  *
  *  <xsd:complexType name="PrivateAction">
@@ -42,22 +49,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
-
-struct PrivateAction
-  : public Element
+struct PrivateAction : public ComplexType
 {
   template
   <
     typename Node, typename ... Ts
   >
   explicit PrivateAction(const Node & node, Ts && ... xs)
-  : Element(
+  : ComplexType(
       choice(
         node,
         ELEMENT(LongitudinalAction),

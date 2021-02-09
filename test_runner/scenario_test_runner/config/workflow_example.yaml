@@ -1,5 +1,5 @@
 Scenario:
-  - { path: $(find-pkg-share scenario_test_runner)/test/scenario/xosc/simple.xosc }
+  # - { path: $(find-pkg-share scenario_test_runner)/test/scenario/xosc/simple.xosc }
   - { path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/blind.yaml }
   - { path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/collision.yaml }
 #  - { path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/distance-condition.yaml }
