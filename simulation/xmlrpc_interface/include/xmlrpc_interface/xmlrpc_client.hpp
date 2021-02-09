@@ -42,8 +42,17 @@ bool call(
 {
   XmlRpc::XmlRpcValue result, value;
   value[0][0][xmlrpc_interface::key::method_name] = method_name;
-  value[0][0][xmlrpc_interface::key::parameters] = xmlrpc_interface::serializeToBinValue<ReqType>(
-    req);
+  try
+  {
+    value[0][0][xmlrpc_interface::key::parameters] = xmlrpc_interface::serializeToBinValue<ReqType>(req);
+  }
+  catch(const XmlParameterError & e)
+  {
+    std::string message = "error found while calling " + method_name + " method.\n" + e.what();
+    THROW_XML_PARAMETER_ERROR(message);
+  }
+  
+
   try {
     client_ptr->execute("system.multicall", value, result);
   } catch (XmlRpc::XmlRpcException e) {

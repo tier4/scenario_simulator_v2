@@ -493,6 +493,7 @@ bool API::updateSensorFrame()
     return true;
   }
   simulation_api_schema::UpdateSensorFrameRequest req;
+  req.set_current_time(current_time_);
   simulation_api_schema::UpdateSensorFrameResponse res;
   xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_sensor_frame, req, res);
   return res.result().success();
@@ -529,7 +530,6 @@ bool API::updateFrame()
     req.set_current_time(current_time_);
     simulation_api_schema::UpdateFrameResponse res;
     xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_frame, req, res);
-    res.PrintDebugString();
     if (!res.result().success()) {
       return false;
     }

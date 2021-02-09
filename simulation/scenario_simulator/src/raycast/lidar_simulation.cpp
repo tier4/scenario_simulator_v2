@@ -66,12 +66,14 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
     pose.position.x = pose.position.x + center.x();
     pose.position.y = pose.position.y + center.y();
     pose.position.z = pose.position.z + center.z();
+    /*
     raycaster.addPrimitive<scenario_simulator::primitives::Box>(
       s.name(),
       s.bounding_box().dimensions().x(),
       s.bounding_box().dimensions().y(),
       s.bounding_box().dimensions().z(),
       pose);
+    */
   }
   if (ego_pose) {
     std::vector<double> vertical_angles;
@@ -85,6 +87,7 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
       configuration_.horizontal_resolution(),
       vertical_angles);
   }
-  throw scenario_simulator::SimulationRuntimeError("failed to found ego vehicle");
+  return sensor_msgs::msg::PointCloud2();
+  // throw scenario_simulator::SimulationRuntimeError("failed to found ego vehicle");
 }
 }  // namespace scenario_simulator

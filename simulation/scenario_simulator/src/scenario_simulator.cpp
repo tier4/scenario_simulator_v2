@@ -163,7 +163,7 @@ void ScenarioSimulator::updateEntityStatus(
     param);
   entity_status_ = {};
   simulation_api_schema::UpdateEntityStatusResponse res;
-  for (const auto status : req.status()) {
+  for (auto status : req.status()) {
     auto status_ptr = res.mutable_status()->Add();
     status_ptr->set_type(status.type());
     status_ptr->set_time(status.time());

@@ -94,6 +94,7 @@ message AttachLidarSensorResponse
 
 message UpdateSensorFrameRequest
 {
+    double current_time = 1;
 }
 
 message UpdateSensorFrameResponse
