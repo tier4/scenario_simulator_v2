@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_ACTION_HPP_
 
+#include <openscenario_interpreter/syntax/controller_action.hpp>
 #include <openscenario_interpreter/syntax/lateral_action.hpp>
 #include <openscenario_interpreter/syntax/longitudinal_action.hpp>
 #include <openscenario_interpreter/syntax/routing_action.hpp>
@@ -64,7 +65,7 @@ struct PrivateAction : public ComplexType
         std::make_pair("VisibilityAction", UNSUPPORTED()),
         std::make_pair("SynchronizeAction", UNSUPPORTED()),
         std::make_pair("ActivateControllerAction", UNSUPPORTED()),
-        std::make_pair("ControllerAction", UNSUPPORTED()),
+        ELEMENT(ControllerAction),
         ELEMENT(TeleportAction),
         ELEMENT(RoutingAction)))
   {}

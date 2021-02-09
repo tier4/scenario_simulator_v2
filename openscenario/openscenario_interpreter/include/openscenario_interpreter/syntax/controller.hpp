@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 
 #include <utility>
 
@@ -92,6 +93,16 @@ struct Controller
   decltype(auto) operator[](Ts && ... xs)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);
+  }
+
+  operator openscenario_msgs::msg::DriverModel()
+  {
+    openscenario_msgs::msg::DriverModel controller;
+    {
+      controller.see_around = !(*this)["isBlind"];
+    }
+
+    return controller;
   }
 };
 }  // namespace syntax

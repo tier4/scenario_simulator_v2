@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
 #include <openscenario_interpreter/syntax/controller.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
 
 #include <utility>
 
@@ -71,11 +70,7 @@ struct ObjectController : public ComplexType
       }
       return controller;
     } else {
-      openscenario_msgs::msg::DriverModel controller;
-      {
-        controller.see_around = !as<Controller>()["isBlind"];
-      }
-      return controller;
+      return as<Controller>();
     }
   }
 };

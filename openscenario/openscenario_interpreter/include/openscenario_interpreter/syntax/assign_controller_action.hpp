@@ -16,7 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -27,7 +29,7 @@ inline namespace syntax
   std::make_pair( \
     #TYPE, [&](auto && node) \
     { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+      return make<TYPE>(node, outer_scope); \
     })
 
 /* ---- AssignControllerAction -------------------------------------------------
@@ -46,17 +48,30 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct AssignControllerAction : public ComplexType
 {
+  Scope inner_scope;
+
   template
   <
-    typename Node,
-    typename ... Ts
+    typename Node
   >
-  explicit AssignControllerAction(const Node & node, Ts && ... xs)
+  explicit AssignControllerAction(const Node & node, Scope & outer_scope)
   : ComplexType(
       choice(
         node,
         ELEMENT(Controller),
-        std::make_pair("CatalogReference", UNSUPPORTED())))
+        std::make_pair("CatalogReference", UNSUPPORTED()))),
+    inner_scope(outer_scope)
+  {}
+
+  void start() const
+  {
+    std::cout << "ASSIGN-CONTROLLER-ACTION" << std::endl;
+    for (const auto & actor : inner_scope.actors) {
+      setController(actor, (*this).as<Controller>());
+    }
+  }
+
+  const std::true_type accomplished {};
 };
 
 #undef ELEMENT
