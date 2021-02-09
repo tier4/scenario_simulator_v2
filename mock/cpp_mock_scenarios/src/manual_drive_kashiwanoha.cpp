@@ -46,14 +46,14 @@ public:
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "ego",
-      simulation_api::helper::constractLaneletPose(35026, 5.5361, -0.591),
+      simulation_api::helper::constractLaneletPose(35026, 0, -0.591),
       simulation_api::helper::constractActionStatus(0));
     api_.spawn(
       false, "npc", simulation_api::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
-      simulation_api::helper::constractLaneletPose(35026, 5.5361, 0.01),
+      simulation_api::helper::constractLaneletPose(35026, 10, 0.0000001),
       simulation_api::helper::constractActionStatus(10));
     api_.setTargetSpeed("npc", 5, true);
     using namespace std::chrono_literals;

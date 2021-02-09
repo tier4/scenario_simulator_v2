@@ -15,6 +15,7 @@ message LidarConfiguration
     double horizontal_resolution = 2;
     repeated double vertical_angles = 3;
     double scan_duration = 4;
+    string topic_name = 5;
 }
 
 // Requests and Responses

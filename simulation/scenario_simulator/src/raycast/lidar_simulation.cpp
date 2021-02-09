@@ -109,8 +109,7 @@ void LidarSimulation::update(
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
-  for(auto & model : lidar_models_)
-  {
+  for (auto & model : lidar_models_) {
     model.update(current_time, status, stamp);
   }
 }
