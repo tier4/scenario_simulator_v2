@@ -51,7 +51,9 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto s : status) {
     if (configuration_.entity() == s.name()) {
-      xmlrpc_interface::toMsg(s.pose(), ego_pose.get());
+      geometry_msgs::msg::Pose pose;
+      xmlrpc_interface::toMsg(s.pose(), pose);
+      ego_pose = pose;
       continue;
     }
     geometry_msgs::msg::Pose pose;
@@ -66,14 +68,12 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
     pose.position.x = pose.position.x + center.x();
     pose.position.y = pose.position.y + center.y();
     pose.position.z = pose.position.z + center.z();
-    /*
     raycaster.addPrimitive<scenario_simulator::primitives::Box>(
       s.name(),
       s.bounding_box().dimensions().x(),
       s.bounding_box().dimensions().y(),
       s.bounding_box().dimensions().z(),
       pose);
-    */
   }
   if (ego_pose) {
     std::vector<double> vertical_angles;
