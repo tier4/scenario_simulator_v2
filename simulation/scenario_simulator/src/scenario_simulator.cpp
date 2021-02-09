@@ -85,7 +85,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::add_lidar_sensor,
+    xmlrpc_interface::method::attach_lidar_sensor,
     std::bind(
       &ScenarioSimulator::attachLidarSensor,
       this,
@@ -261,6 +261,7 @@ void ScenarioSimulator::attachLidarSensor(
   const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
     req.configuration().topic_name(), 1);
   lidar_sim_.addLidar(req.configuration(), pub);
+  pointcloud_pub_.emplace_back(pub);
   simulation_api_schema::AttachLidarSensorResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();

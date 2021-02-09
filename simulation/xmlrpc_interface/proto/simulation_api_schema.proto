@@ -91,3 +91,12 @@ message AttachLidarSensorResponse
 {
     Result result = 1;
 }
+
+message UpdateSensorFrameRequest
+{
+}
+
+message UpdateSensorFrameResponse
+{
+    Result result = 1;
+}

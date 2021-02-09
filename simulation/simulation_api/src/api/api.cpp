@@ -483,7 +483,7 @@ bool API::attachLidarSensor(
   simulation_api_schema::AttachLidarSensorRequest req;
   simulation_api_schema::AttachLidarSensorResponse res;
   *req.mutable_configuration() = configuration;
-  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::add_lidar_sensor, req, res);
+  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::attach_lidar_sensor, req, res);
   return res.result().success();
 }
 

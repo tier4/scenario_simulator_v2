@@ -37,7 +37,9 @@ void LidarModel::update(
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if ((current_time - last_update_stamp_) >= configuration_.scan_duration()) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     last_update_stamp_ = current_time;
     publisher_ptr_->publish(raycast(status, stamp));
   }
