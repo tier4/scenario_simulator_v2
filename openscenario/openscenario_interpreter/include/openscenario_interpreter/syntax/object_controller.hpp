@@ -46,7 +46,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectController : public ComplexType
 {
-  explicit ObjectController() // ObjectController is optional element.
+  explicit ObjectController()  // ObjectController is optional element.
   : ComplexType(unspecified)
   {}
 
@@ -67,13 +67,13 @@ struct ObjectController : public ComplexType
     if (is<Unspecified>()) {
       openscenario_msgs::msg::DriverModel controller;
       {
-        controller.see_around = not DefaultController()["blind"];
+        controller.see_around = !DefaultController()["isBlind"];
       }
       return controller;
     } else {
       openscenario_msgs::msg::DriverModel controller;
       {
-        controller.see_around = not as<Controller>()["blind"];
+        controller.see_around = !as<Controller>()["isBlind"];
       }
       return controller;
     }
