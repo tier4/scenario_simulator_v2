@@ -88,6 +88,7 @@ const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
 bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
   this->status_ = status;
+  this->status_->name = name;
   return true;
 }
 

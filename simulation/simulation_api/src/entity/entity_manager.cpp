@@ -410,6 +410,7 @@ const std::vector<std::string> EntityManager::getEntityNames() const
 bool EntityManager::setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status)
 {
   auto it = entities_.find(name);
+  status.name = name;
   if (it == entities_.end()) {
     return false;
   }

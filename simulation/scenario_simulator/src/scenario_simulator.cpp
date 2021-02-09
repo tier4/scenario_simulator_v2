@@ -270,7 +270,6 @@ void ScenarioSimulator::attachLidarSensor(
 
 void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
 {
-  // lidar_sim_.update(current_time_, entity_status_, get_clock()->now());
   for (auto & model : lidar_models_) {
     model.update(current_time_, entity_status_, get_clock()->now());
   }
