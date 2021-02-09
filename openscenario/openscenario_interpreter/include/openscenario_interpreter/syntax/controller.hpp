@@ -44,6 +44,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
+using DefaultController = Properties;
+
 struct Controller
 {
   /* ---- name -----------------------------------------------------------------

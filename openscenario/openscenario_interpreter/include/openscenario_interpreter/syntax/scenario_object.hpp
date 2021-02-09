@@ -63,7 +63,7 @@ struct ScenarioObject
    * ------------------------------------------------------------------------ */
   const ObjectController object_controller;
 
-  static_assert(IsOptionalElement<ObjectController>::value);  // minOccurs="0"
+  static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
   template
   <
@@ -77,12 +77,18 @@ struct ScenarioObject
 
   auto evaluate() const
   {
-    return asBoolean(
+    if (
       spawn(
         (*this).is<Vehicle>() && (*this).as<Vehicle>()["isEgo"],
         name,
         boost::lexical_cast<String>(
-          static_cast<const EntityObject &>(*this))));  // XXX UGLY CODE!!!
+          static_cast<const EntityObject &>(*this))))  // XXX UGLY CODE!!!
+    {
+      setController(name, object_controller);
+      return unspecified;
+    } else {
+      throw SemanticError("Failed to spawn entity '", name, "'.");
+    }
   }
 };
 

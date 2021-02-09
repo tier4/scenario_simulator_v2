@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 
 #include <utility>
 
@@ -45,7 +46,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectController : public ComplexType
 {
-  explicit ObjectController() = default;  // ObjectController is optional element.
+  explicit ObjectController() // ObjectController is optional element.
+  : ComplexType(unspecified)
+  {}
 
   template
   <
@@ -58,6 +61,23 @@ struct ObjectController : public ComplexType
         std::make_pair("CatalogReference", UNSUPPORTED()),
         ELEMENT(Controller)))
   {}
+
+  operator openscenario_msgs::msg::DriverModel() const
+  {
+    if (is<Unspecified>()) {
+      openscenario_msgs::msg::DriverModel controller;
+      {
+        controller.see_around = not DefaultController()["blind"];
+      }
+      return controller;
+    } else {
+      openscenario_msgs::msg::DriverModel controller;
+      {
+        controller.see_around = not as<Controller>()["blind"];
+      }
+      return controller;
+    }
+  }
 };
 
 #undef ELEMENT
