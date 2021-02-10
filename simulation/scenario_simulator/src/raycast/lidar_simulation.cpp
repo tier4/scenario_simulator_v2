@@ -37,14 +37,10 @@ void LidarModel::update(
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
-  /*
   if ((current_time - last_update_stamp_) >= configuration_.scan_duration()) {
     last_update_stamp_ = current_time;
     publisher_ptr_->publish(raycast(status, stamp));
   }
-  */
-  last_update_stamp_ = current_time;
-  publisher_ptr_->publish(raycast(status, stamp));
 }
 
 const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
@@ -66,9 +62,7 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
       geometry_msgs::msg::Point center_point;
       xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
       Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
-      // std::cout << "before : " << center.x() << "," << center.y() << "," << center.z() << std::endl;
       center = rotation * center;
-      // std::cout << "after : " << center.x() << "," << center.y() << "," << center.z() << std::endl;
       pose.position.x = pose.position.x + center.x();
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
