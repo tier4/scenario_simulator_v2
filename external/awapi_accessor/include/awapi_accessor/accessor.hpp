@@ -15,7 +15,7 @@
 #ifndef AWAPI_ACCESSOR__ACCESSOR_HPP_
 #define AWAPI_ACCESSOR__ACCESSOR_HPP_
 
-// Note: headers are lexicographically sorted.
+// NOTE: headers are lexicographically sorted.
 
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
@@ -39,6 +39,10 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
+
+#include <memory>
+#include <mutex>
+#include <utility>
 
 namespace autoware_api
 {
@@ -193,11 +197,6 @@ public:
 
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
-
-/* ---- Simulation Specific Topics ---------------------------------------------
- *
- *
- * -------------------------------------------------------------------------- */
 public:
   /** ---- Checkpoint ----------------------------------------------------------
    *
@@ -502,8 +501,7 @@ public:
 
   void checkAutowareState() const
   {
-    if (isReady() && isEmergency())
-    {
+    if (isReady() && isEmergency()) {
       throw AutowareError();
     }
   }
@@ -550,7 +548,7 @@ public:
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
 
     transform_buffer(get_clock()),
-    transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto&&...) {}))
+    transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto && ...) {}))
   {}
 };
 
