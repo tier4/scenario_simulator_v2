@@ -63,15 +63,12 @@ struct AssignControllerAction : public ComplexType
     inner_scope(outer_scope)
   {}
 
-  void start() const
+  void operator()() const
   {
-    std::cout << "ASSIGN-CONTROLLER-ACTION" << std::endl;
     for (const auto & actor : inner_scope.actors) {
       setController(actor, (*this).as<Controller>());
     }
   }
-
-  const std::true_type accomplished {};
 };
 
 #undef ELEMENT
