@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <string>
 
 namespace simulation_api
 {

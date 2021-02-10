@@ -258,7 +258,7 @@ void ScenarioSimulator::attachLidarSensor(
 {
   const auto req =
     xmlrpc_interface::deserializeFromBinValue<
-      simulation_api_schema::AttachLidarSensorRequest>(param);
+    simulation_api_schema::AttachLidarSensorRequest>(param);
   const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
     req.configuration().topic_name(), 1);
   LidarModel lidar_model(req.configuration(), pub);
