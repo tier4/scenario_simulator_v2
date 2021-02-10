@@ -21,7 +21,7 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
 #include <vector>
-#include <unordered_map>
+#include <string>
 #include <memory>
 
 namespace scenario_simulator
@@ -44,6 +44,7 @@ private:
     const std::vector<openscenario_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp);
   double last_update_stamp_;
+  std::vector<std::string> detected_objects_;
 };
 }  // namespace scenario_simulator
 

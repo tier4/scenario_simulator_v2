@@ -76,6 +76,11 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     frame_id, stamp, origin, directions, max_distance, min_distance);
 }
 
+const std::vector<std::string> Raycaster::getDetectedObject() const
+{
+  return detected_objects_;
+}
+
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::string frame_id,
   const rclcpp::Time & stamp,
@@ -83,10 +88,13 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::vector<geometry_msgs::msg::Quaternion> directions,
   double max_distance, double min_distance)
 {
+  detected_objects_ = {};
+  std::vector<unsigned int> detected_ids = {};
   scene_ = rtcNewScene(device_);
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
   for (auto && pair : primitive_ptrs_) {
-    pair.second->addToScene(device_, scene_);
+    auto id = pair.second->addToScene(device_, scene_);
+    geometry_ids_.insert({id, pair.first});
   }
   rtcCommitScene(scene_);
   RTCIntersectContext context;
@@ -117,7 +125,13 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
       p.y = vector[1];
       p.z = vector[2];
       cloud->emplace_back(p);
+      if (std::count(detected_ids.begin(), detected_ids.end(), rayhit.hit.geomID) == 0) {
+        detected_ids.emplace_back(rayhit.hit.geomID);
+      }
     }
+  }
+  for (const auto & id : detected_ids) {
+    detected_objects_.emplace_back(geometry_ids_[id]);
   }
   sensor_msgs::msg::PointCloud2 pointcloud_msg;
   pcl::toROSMsg(*cloud, pointcloud_msg);

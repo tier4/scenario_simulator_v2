@@ -61,6 +61,7 @@ public:
     double horizontal_angle_end = 2 * M_PI,
     double max_distance = 100, double min_distance = 0
   );
+  const std::vector<std::string> getDetectedObject() const;
 
 private:
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
@@ -74,6 +75,8 @@ private:
     geometry_msgs::msg::Pose origin,
     std::vector<geometry_msgs::msg::Quaternion> directions,
     double max_distance = 100, double min_distance = 0);
+  std::vector<std::string> detected_objects_;
+  std::unordered_map<unsigned int, std::string> geometry_ids_;
 };
 }  // namespace scenario_simulator
 
