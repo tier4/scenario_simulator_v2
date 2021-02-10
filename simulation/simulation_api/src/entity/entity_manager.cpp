@@ -25,14 +25,6 @@ namespace simulation_api
 {
 namespace entity
 {
-void EntityManager::setVehicleCommands(
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd)
-{
-  control_cmd_ = control_cmd;
-  state_cmd_ = state_cmd;
-}
-
 bool EntityManager::isStopping(std::string name) const
 {
   const auto status = getEntityStatus(name);

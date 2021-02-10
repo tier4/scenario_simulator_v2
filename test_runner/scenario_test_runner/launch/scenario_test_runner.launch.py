@@ -89,23 +89,20 @@ def generate_launch_description():
             package='openscenario_visualization',
             executable='openscenario_visualization_node',
             name='openscenario_visualization_node',
-            output={
-                'stderr': 'log',
-                'stdout': 'log',
-                },
+            output='log',
             ),
 
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2',
-            output={
-                'stderr': 'log',
-                'stdout': 'log',
-                },
-            arguments=[
-                '-d', os.path.join(
-                    get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
-                ],
-            ),
+        # Node(
+        #     package='rviz2',
+        #     executable='rviz2',
+        #     name='rviz2',
+        #     output={
+        #         'stderr': 'log',
+        #         'stdout': 'log',
+        #         },
+        #     arguments=[
+        #         '-d', os.path.join(
+        #             get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
+        #         ],
+        #     ),
         ])
