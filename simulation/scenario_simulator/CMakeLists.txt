@@ -36,7 +36,7 @@ ament_auto_add_library(scenario_simulator SHARED
   src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/primitives/box.cpp
   src/sensor_simulation/lidar/raycaster.cpp
-  src/sensor_simulation/lidar/lidar_model.cpp
+  src/sensor_simulation/lidar/lidar_sensor.cpp
   src/sensor_simulation/sensor_simulation.cpp
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
 )
