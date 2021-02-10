@@ -47,14 +47,18 @@ void SensorSimulation::updateSensorFrame(
 {
   std::vector<std::string> detected_objects = {};
   const auto now = clock_ptr_->now();
-  for (auto & model : lidar_sensors_) {
-    model.update(current_time, status, now);
-    const auto objects = model.getDetectedObjects();
+  for (auto & sensor : lidar_sensors_) {
+    sensor.update(current_time, status, now);
+    const auto objects = sensor.getDetectedObjects();
     for (const auto & obj : objects) {
       if (std::count(detected_objects.begin(), detected_objects.end(), obj) == 0) {
         detected_objects.emplace_back(obj);
       }
     }
+  }
+  for (auto & sensor : detection_sensors_)
+  {
+    sensor.update(current_time, status, now, detected_objects);
   }
 }
 }  // namespace scenario_simulator
