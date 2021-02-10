@@ -15,8 +15,32 @@
 #ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_
 #define SCENARIO_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_
 
-namespace scenario_simulation
+#include <scenario_simulator/sensor_simulation/lidar/lidar_model.hpp>
+
+#include <simulation_api_schema.pb.h>
+
+#include <rclcpp/rclcpp.hpp>
+
+#include <memory>
+#include <vector>
+
+namespace scenario_simulator
 {
-}  // namespace scenario_simulation
+class SensorSimulation
+{
+public:
+  SensorSimulation(std::shared_ptr<rclcpp::Clock> clock_ptr);
+  void attachLidarSensor(
+    const simulation_api_schema::LidarConfiguration & configuration,
+    std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
+  void updateSensorFrame(
+    double current_time,
+    const std::vector<openscenario_msgs::EntityStatus> & status);
+
+private:
+  std::vector<LidarModel> lidar_models_;
+  std::shared_ptr<rclcpp::Clock> clock_ptr_;
+};
+}  // namespace scenario_simulator
 
 #endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_

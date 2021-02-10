@@ -32,7 +32,7 @@
 namespace scenario_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
-: Node("scenario_simulator", options)
+: Node("scenario_simulator", options), sensor_sim_(get_clock())
 {
   declare_parameter("port", 8080);
   get_parameter("port", port_);
@@ -261,9 +261,7 @@ void ScenarioSimulator::attachLidarSensor(
     simulation_api_schema::AttachLidarSensorRequest>(param);
   const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
     req.configuration().topic_name(), 1);
-  LidarModel lidar_model(req.configuration(), pub);
-  lidar_models_.push_back(lidar_model);
-  pointcloud_pub_.emplace_back(pub);
+  sensor_sim_.attachLidarSensor(req.configuration(), pub);
   simulation_api_schema::AttachLidarSensorResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();
@@ -272,9 +270,7 @@ void ScenarioSimulator::attachLidarSensor(
 
 void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
 {
-  for (auto & model : lidar_models_) {
-    model.update(current_time_, entity_status_, get_clock()->now());
-  }
+  sensor_sim_.updateSensorFrame(current_time_, entity_status_);
   simulation_api_schema::UpdateSensorFrameResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();
