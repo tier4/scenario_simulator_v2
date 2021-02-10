@@ -55,17 +55,8 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto s : status) {
     if (configuration_.entity() == s.name()) {
-      geometry_msgs::msg::Point center_point;
-      xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
       geometry_msgs::msg::Pose pose;
       xmlrpc_interface::toMsg(s.pose(), pose);
-      auto rotation =
-        quaternion_operation::getRotationMatrix(pose.orientation);
-      Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
-      center = rotation * center;
-      pose.position.x = pose.position.x + center.x();
-      pose.position.y = pose.position.y + center.y();
-      pose.position.z = pose.position.z + center.z();
       ego_pose = pose;
     } else {
       geometry_msgs::msg::Pose pose;
