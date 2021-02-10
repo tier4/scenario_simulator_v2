@@ -14,6 +14,9 @@
 
 #include <scenario_simulator/sensor_simulation/sensor_simulation.hpp>
 
+#include <memory>
+#include <vector>
+
 namespace scenario_simulator
 {
 SensorSimulation::SensorSimulation(std::shared_ptr<rclcpp::Clock> clock_ptr)

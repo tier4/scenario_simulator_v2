@@ -38,6 +38,7 @@ ament_auto_add_library(scenario_simulator SHARED
   src/sensor_simulation/lidar/raycaster.cpp
   src/sensor_simulation/lidar/lidar_model.cpp
   src/sensor_simulation/sensor_simulation.cpp
+  src/sensor_simulation/detection_sensor/detection_sensor.cpp
 )
 target_link_libraries(scenario_simulator
   embree3

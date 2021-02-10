@@ -29,7 +29,7 @@ namespace scenario_simulator
 class SensorSimulation
 {
 public:
-  SensorSimulation(std::shared_ptr<rclcpp::Clock> clock_ptr);
+  explicit SensorSimulation(std::shared_ptr<rclcpp::Clock> clock_ptr);
   void attachLidarSensor(
     const simulation_api_schema::LidarConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);

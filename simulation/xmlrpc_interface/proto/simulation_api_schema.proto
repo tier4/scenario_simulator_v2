@@ -21,7 +21,6 @@ message LidarConfiguration
 message DetectionSensorConfiguration
 {
     string entity = 1;
-    repeated string detection_source = 2;
 }
 
 // Requests and Responses
