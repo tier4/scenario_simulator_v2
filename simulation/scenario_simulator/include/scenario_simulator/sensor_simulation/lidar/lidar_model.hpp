@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
-#define SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
+#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_MODEL_HPP_
+#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_MODEL_HPP_
 
 #include <simulation_api_schema.pb.h>
 
@@ -47,4 +47,4 @@ private:
 };
 }  // namespace scenario_simulator
 
-#endif  // SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
+#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_MODEL_HPP_

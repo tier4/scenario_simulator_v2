@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__RAYCAST__RAYCASTER_HPP_
-#define SCENARIO_SIMULATOR__RAYCAST__RAYCASTER_HPP_
+#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
+#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
-#include <scenario_simulator/primitives/box.hpp>
-#include <scenario_simulator/primitives/primitive.hpp>
+#include <scenario_simulator/sensor_simulation/primitives/box.hpp>
+#include <scenario_simulator/sensor_simulation/primitives/primitive.hpp>
 
 #include <embree3/rtcore.h>
 
@@ -77,4 +77,4 @@ private:
 };
 }  // namespace scenario_simulator
 
-#endif  // SCENARIO_SIMULATOR__RAYCAST__RAYCASTER_HPP_
+#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_

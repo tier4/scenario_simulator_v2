@@ -16,7 +16,8 @@
 #define SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 
 #include <scenario_simulator/xmlrpc_method.hpp>
-#include <scenario_simulator/raycast/lidar_simulation.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_model.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>

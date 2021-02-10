@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <scenario_simulator/exception.hpp>
-#include <scenario_simulator/raycast/lidar_simulation.hpp>
-#include <scenario_simulator/raycast/raycaster.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_model.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <xmlrpc_interface/conversions.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 

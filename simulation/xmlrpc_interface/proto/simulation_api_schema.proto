@@ -18,6 +18,12 @@ message LidarConfiguration
     string topic_name = 5;
 }
 
+message DetectionSensorConfiguration
+{
+    string entity = 1;
+    repeated string detection_source = 2;
+}
+
 // Requests and Responses
 message InitializeRequest
 {
@@ -88,6 +94,16 @@ message AttachLidarSensorRequest
 }
 
 message AttachLidarSensorResponse
+{
+    Result result = 1;
+}
+
+message AttachDetectionSensorRequest
+{
+    DetectionSensorConfiguration configuration = 1;
+}
+
+message AttachDetectionSensorResponse
 {
     Result result = 1;
 }
