@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /PointCloud21
+        - /PointCloud21/Autocompute Value Bounds1
       Splitter Ratio: 0.5
     Tree Height: 1147
   - Class: rviz_common/Selection
@@ -62,9 +63,9 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: -9999
-        Min Value: 9999
-        Value: true
+        Max Value: -3
+        Min Value: 5
+        Value: false
       Axis: Z
       Channel Name: intensity
       Class: rviz_default_plugins/PointCloud2
@@ -150,10 +151,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3303987383842468
+      Pitch: 0.3203984498977661
       Target Frame: base_link
       Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 2.3903934955596924
+      Yaw: 2.3403913974761963
     Saved: ~
 Window Geometry:
   Displays:
