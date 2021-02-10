@@ -55,28 +55,39 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
   for (const auto s : status) {
     if (configuration_.entity() == s.name()) {
+      geometry_msgs::msg::Point center_point;
+      xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
       geometry_msgs::msg::Pose pose;
       xmlrpc_interface::toMsg(s.pose(), pose);
+      auto rotation =
+        quaternion_operation::getRotationMatrix(pose.orientation);
+      Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
+      center = rotation * center;
+      pose.position.x = pose.position.x + center.x();
+      pose.position.y = pose.position.y + center.y();
+      pose.position.z = pose.position.z + center.z();
       ego_pose = pose;
-      continue;
+    } else {
+      geometry_msgs::msg::Pose pose;
+      xmlrpc_interface::toMsg(s.pose(), pose);
+      auto rotation =
+        quaternion_operation::getRotationMatrix(pose.orientation);
+      geometry_msgs::msg::Point center_point;
+      xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
+      Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
+      // std::cout << "before : " << center.x() << "," << center.y() << "," << center.z() << std::endl;
+      center = rotation * center;
+      // std::cout << "after : " << center.x() << "," << center.y() << "," << center.z() << std::endl;
+      pose.position.x = pose.position.x + center.x();
+      pose.position.y = pose.position.y + center.y();
+      pose.position.z = pose.position.z + center.z();
+      raycaster.addPrimitive<scenario_simulator::primitives::Box>(
+        s.name(),
+        s.bounding_box().dimensions().x(),
+        s.bounding_box().dimensions().y(),
+        s.bounding_box().dimensions().z(),
+        pose);
     }
-    geometry_msgs::msg::Pose pose;
-    xmlrpc_interface::toMsg(s.pose(), pose);
-    auto rotation =
-      quaternion_operation::getRotationMatrix(quaternion_operation::conjugate(pose.orientation));
-    geometry_msgs::msg::Point center_point;
-    xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
-    Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
-    center = rotation * center;
-    pose.position.x = pose.position.x + center.x();
-    pose.position.y = pose.position.y + center.y();
-    pose.position.z = pose.position.z + center.z();
-    raycaster.addPrimitive<scenario_simulator::primitives::Box>(
-      s.name(),
-      s.bounding_box().dimensions().x(),
-      s.bounding_box().dimensions().y(),
-      s.bounding_box().dimensions().z(),
-      pose);
   }
   if (ego_pose) {
     std::vector<double> vertical_angles;
@@ -90,7 +101,6 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
       configuration_.horizontal_resolution(),
       vertical_angles);
   }
-  return sensor_msgs::msg::PointCloud2();
-  // throw scenario_simulator::SimulationRuntimeError("failed to found ego vehicle");
+  throw scenario_simulator::SimulationRuntimeError("failed to found ego vehicle");
 }
 }  // namespace scenario_simulator
