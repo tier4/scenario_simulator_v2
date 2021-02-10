@@ -28,8 +28,8 @@ void SensorSimulation::attachLidarSensor(
   const simulation_api_schema::LidarConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
 {
-  LidarModel lidar_model(configuration, publisher_ptr);
-  lidar_models_.push_back(lidar_model);
+  LidarSensor lidar_sensors(configuration, publisher_ptr);
+  lidar_sensors_.push_back(lidar_sensor);
 }
 
 void SensorSimulation::updateSensorFrame(
@@ -37,7 +37,7 @@ void SensorSimulation::updateSensorFrame(
   const std::vector<openscenario_msgs::EntityStatus> & status)
 {
   const auto now = clock_ptr_->now();
-  for (auto & model : lidar_models_) {
+  for (auto & model : lidar_sensors_) {
     model.update(current_time, status, now);
   }
 }

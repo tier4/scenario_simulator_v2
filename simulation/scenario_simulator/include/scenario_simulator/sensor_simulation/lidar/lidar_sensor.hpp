@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_MODEL_HPP_
-#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_MODEL_HPP_
+#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
+#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 
 #include <simulation_api_schema.pb.h>
 
@@ -26,10 +26,10 @@
 
 namespace scenario_simulator
 {
-class LidarModel
+class LidarSensor
 {
 public:
-  LidarModel(
+  LidarSensor(
     const simulation_api_schema::LidarConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
   void update(
@@ -48,4 +48,4 @@ private:
 };
 }  // namespace scenario_simulator
 
-#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_MODEL_HPP_
+#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_

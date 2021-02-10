@@ -15,4 +15,20 @@
 #ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 #define SCENARIO_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 
+#include <simulation_api_schema.pb.h>
+
+#include <rclcpp/rclcpp.hpp>
+#include <autoware_perception_msgs/msg/dynamic_object_array.hpp>
+
+namespace scenario_simulator
+{
+class DetectionSensor
+{
+public:
+  DetectionSensor();
+
+private:
+};
+}  // namespace scenario_simulator
+
 #endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_

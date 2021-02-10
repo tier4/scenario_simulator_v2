@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <scenario_simulator/exception.hpp>
-#include <scenario_simulator/sensor_simulation/lidar/lidar_model.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <xmlrpc_interface/conversions.hpp>
 #include <quaternion_operation/quaternion_operation.h>
@@ -25,7 +25,7 @@
 
 namespace scenario_simulator
 {
-LidarModel::LidarModel(
+LidarSensor::LidarSensor(
   const simulation_api_schema::LidarConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
 : configuration_(configuration), publisher_ptr_(publisher_ptr)
@@ -33,7 +33,7 @@ LidarModel::LidarModel(
   last_update_stamp_ = 0;
 }
 
-void LidarModel::update(
+void LidarSensor::update(
   double current_time,
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
@@ -44,7 +44,7 @@ void LidarModel::update(
   }
 }
 
-const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
+const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {

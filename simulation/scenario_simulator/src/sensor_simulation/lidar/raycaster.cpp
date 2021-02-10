@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
-#include <scenario_simulator/sensor_simulation/lidar/lidar_model.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 
 #include <quaternion_operation/quaternion_operation.h>
 

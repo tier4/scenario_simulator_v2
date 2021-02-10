@@ -19,7 +19,7 @@
 
 #include <scenario_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
-#include <scenario_simulator/sensor_simulation/lidar/lidar_model.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>

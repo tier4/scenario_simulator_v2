@@ -13,3 +13,8 @@
 // limitations under the License.
 
 #include <scenario_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
+
+namespace scenario_simulator
+{
+
+}  // namespace scenario_simulator

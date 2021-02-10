@@ -15,7 +15,7 @@
 #ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_
 #define SCENARIO_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_
 
-#include <scenario_simulator/sensor_simulation/lidar/lidar_model.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 
 #include <simulation_api_schema.pb.h>
 
@@ -38,7 +38,7 @@ public:
     const std::vector<openscenario_msgs::EntityStatus> & status);
 
 private:
-  std::vector<LidarModel> lidar_models_;
+  std::vector<LidarSensor> lidar_sensors_;
   std::shared_ptr<rclcpp::Clock> clock_ptr_;
 };
 }  // namespace scenario_simulator
