@@ -61,8 +61,7 @@ struct Properties
    * ------------------------------------------------------------------------ */
   std::vector<File> files;
 
-  // Note: Properties is an essential element in any case.
-  Properties() = delete;
+  Properties() = default;
 
   template
   <

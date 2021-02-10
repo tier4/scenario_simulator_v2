@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_ACTION_HPP_
 
+#include <openscenario_interpreter/syntax/controller_action.hpp>
 #include <openscenario_interpreter/syntax/lateral_action.hpp>
 #include <openscenario_interpreter/syntax/longitudinal_action.hpp>
 #include <openscenario_interpreter/syntax/routing_action.hpp>
@@ -26,6 +27,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+#define ELEMENT(TYPE) \
+  std::make_pair( \
+    #TYPE, [&](auto && node) \
+    { \
+      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+    })
+
 /* ---- PrivateAction ----------------------------------------------------------
  *
  *  <xsd:complexType name="PrivateAction">
@@ -42,22 +50,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
-
-struct PrivateAction
-  : public Element
+struct PrivateAction : public ComplexType
 {
   template
   <
     typename Node, typename ... Ts
   >
   explicit PrivateAction(const Node & node, Ts && ... xs)
-  : Element(
+  : ComplexType(
       choice(
         node,
         ELEMENT(LongitudinalAction),
@@ -65,7 +65,7 @@ struct PrivateAction
         std::make_pair("VisibilityAction", UNSUPPORTED()),
         std::make_pair("SynchronizeAction", UNSUPPORTED()),
         std::make_pair("ActivateControllerAction", UNSUPPORTED()),
-        std::make_pair("ControllerAction", UNSUPPORTED()),
+        ELEMENT(ControllerAction),
         ELEMENT(TeleportAction),
         ELEMENT(RoutingAction)))
   {}

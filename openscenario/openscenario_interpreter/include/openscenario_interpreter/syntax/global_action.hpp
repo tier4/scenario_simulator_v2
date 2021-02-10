@@ -63,6 +63,8 @@ struct GlobalAction
         std::make_pair("TrafficAction", UNSUPPORTED())))
   {}
 };
+
+#undef ELEMENT
 }
 }  // namespace openscenario_interpreter
 
