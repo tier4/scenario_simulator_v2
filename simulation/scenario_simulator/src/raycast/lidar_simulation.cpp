@@ -21,6 +21,7 @@
 #include <boost/optional.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace scenario_simulator
 {

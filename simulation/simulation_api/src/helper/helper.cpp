@@ -16,6 +16,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <string>
+
 namespace simulation_api
 {
 namespace helper
