@@ -68,8 +68,8 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
     xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
     Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
     center = rotation * center;
-    pose.position.x = pose.position.x + center.x();
-    pose.position.y = pose.position.y + center.y();
+    pose.position.x = pose.position.x - center.x();
+    pose.position.y = pose.position.y - center.y();
     pose.position.z = pose.position.z + center.z();
     raycaster.addPrimitive<scenario_simulator::primitives::Box>(
       s.name(),

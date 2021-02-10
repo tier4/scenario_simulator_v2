@@ -20,7 +20,10 @@
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <openscenario_msgs/msg/action_status.hpp>
 
+#include <simulation_api_schema.pb.h>
+
 #include <iostream>
+#include <cmath>
 
 namespace simulation_api
 {
@@ -91,6 +94,15 @@ geometry_msgs::msg::Pose constractPose(
   double yaw);
 
 std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose);
+
+enum class LidarType
+{
+  VLP16,
+};
+
+const simulation_api_schema::LidarConfiguration constractLidarConfiguration(
+  LidarType type, std::string entity, std::string topic_name,
+  double horizontal_resolution = 1.0 / 180.0 * M_PI);
 
 }  // namespace helper
 }  // namespace simulation_api

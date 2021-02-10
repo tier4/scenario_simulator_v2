@@ -86,5 +86,37 @@ std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::Lanel
   return os;
 }
 
+const simulation_api_schema::LidarConfiguration constractLidarConfiguration(
+  LidarType type, std::string entity, std::string topic_name,
+  double horizontal_resolution)
+{
+  simulation_api_schema::LidarConfiguration configuration;
+  configuration.set_horizontal_resolution(horizontal_resolution);
+  configuration.set_topic_name(topic_name);
+  configuration.set_entity(entity);
+  switch (type) {
+    case LidarType::VLP16:
+      configuration.set_scan_duration(0.1);
+      configuration.add_vertical_angles(-15.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(-13.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(-11.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(-9.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(-7.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(-5.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(-3.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(-1.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(1.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(3.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(5.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(7.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(9.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(11.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(13.0 / 180.0 * M_PI);
+      configuration.add_vertical_angles(15.0 / 180.0 * M_PI);
+      break;
+  }
+  return configuration;
+}
+
 }  // namespace helper
 }  // namespace simulation_api

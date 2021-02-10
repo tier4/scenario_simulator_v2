@@ -56,28 +56,12 @@ public:
       simulation_api::helper::constractLaneletPose(35026, 10, 0.0000001),
       simulation_api::helper::constractActionStatus(10));
     api_.setTargetSpeed("npc", 5, true);
-    simulation_api_schema::LidarConfiguration configuration;
-    configuration.set_entity("ego");
-    configuration.set_horizontal_resolution(1.0 / 180.0 * M_PI);
-    configuration.set_scan_duration(0.1);
-    configuration.set_topic_name("points_raw");
-    configuration.add_vertical_angles(-15.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(-13.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(-11.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(-9.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(-7.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(-5.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(-3.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(-1.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(1.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(3.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(5.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(7.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(9.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(11.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(13.0 / 180.0 * M_PI);
-    configuration.add_vertical_angles(15.0 / 180.0 * M_PI);
-    api_.attachLidarSensor(configuration);
+    api_.attachLidarSensor(
+      simulation_api::helper::constractLidarConfiguration(
+        simulation_api::helper::LidarType::VLP16,
+        "ego",
+        "points_raw")
+    );
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }

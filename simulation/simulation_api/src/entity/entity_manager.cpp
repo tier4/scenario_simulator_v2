@@ -436,14 +436,11 @@ const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEn
   }
   if (it->second.type() == typeid(VehicleEntity)) {
     status_msg = boost::any_cast<const VehicleEntity &>(it->second).getStatus();
-  }
-  else if (it->second.type() == typeid(EgoEntity)) {
+  } else if (it->second.type() == typeid(EgoEntity)) {
     status_msg = boost::any_cast<const EgoEntity &>(it->second).getStatus();
-  }
-  else if (it->second.type() == typeid(PedestrianEntity)) {
+  } else if (it->second.type() == typeid(PedestrianEntity)) {
     status_msg = boost::any_cast<const PedestrianEntity &>(it->second).getStatus();
-  }
-  else {
+  } else {
     return boost::none;
   }
   status_msg.bounding_box = getBoundingBox(name);
