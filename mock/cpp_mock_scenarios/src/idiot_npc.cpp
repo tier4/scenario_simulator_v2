@@ -48,8 +48,8 @@ public:
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "idiot",
-      simulation_api::helper::constractLaneletPose(34741, 0, 0),
-      simulation_api::helper::constractActionStatus(0));
+      simulation_api::helper::constructLaneletPose(34741, 0, 0),
+      simulation_api::helper::constructActionStatus(0));
     api_.setTargetSpeed("idiot", 15, true);
     openscenario_msgs::msg::DriverModel driver_model;
     driver_model.see_around = false;
@@ -59,8 +59,8 @@ public:
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
-      simulation_api::helper::constractLaneletPose(34741, 10, 0),
-      simulation_api::helper::constractActionStatus(0));
+      simulation_api::helper::constructLaneletPose(34741, 10, 0),
+      simulation_api::helper::constructActionStatus(0));
     api_.setTargetSpeed("npc", 5, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));

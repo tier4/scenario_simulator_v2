@@ -70,7 +70,7 @@ struct ReachPositionCondition
           {
             return isReachedPosition(
               entity,
-              simulation_api::helper::constractLaneletPose(
+              simulation_api::helper::constructLaneletPose(
                 static_cast<Integer>(position.as<LanePosition>().lane_id),
                 position.as<LanePosition>().s,
                 position.as<LanePosition>().offset),

@@ -22,7 +22,7 @@ namespace simulation_api
 {
 namespace helper
 {
-openscenario_msgs::msg::ActionStatus constractActionStatus(
+openscenario_msgs::msg::ActionStatus constructActionStatus(
   double linear_vel,
   double angular_vel,
   double linear_accel,
@@ -40,7 +40,7 @@ openscenario_msgs::msg::ActionStatus constractActionStatus(
   return status;
 }
 
-openscenario_msgs::msg::LaneletPose constractLaneletPose(
+openscenario_msgs::msg::LaneletPose constructLaneletPose(
   std::int64_t lanelet_id, double s,
   double offset, double roll,
   double pitch, double yaw)
@@ -55,7 +55,7 @@ openscenario_msgs::msg::LaneletPose constractLaneletPose(
   return lanelet_pose;
 }
 
-geometry_msgs::msg::Vector3 constractRPY(double roll, double pitch, double yaw)
+geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)
 {
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = roll;
@@ -64,12 +64,12 @@ geometry_msgs::msg::Vector3 constractRPY(double roll, double pitch, double yaw)
   return rpy;
 }
 
-geometry_msgs::msg::Vector3 constractRPYfronQuaternion(geometry_msgs::msg::Quaternion quaternion)
+geometry_msgs::msg::Vector3 constructRPYfronQuaternion(geometry_msgs::msg::Quaternion quaternion)
 {
   return quaternion_operation::convertQuaternionToEulerAngle(quaternion);
 }
 
-geometry_msgs::msg::Pose constractPose(
+geometry_msgs::msg::Pose constructPose(
   double x, double y, double z, double roll, double pitch,
   double yaw)
 {
@@ -78,7 +78,7 @@ geometry_msgs::msg::Pose constractPose(
   pose.position.y = y;
   pose.position.z = z;
   pose.orientation =
-    quaternion_operation::convertEulerAngleToQuaternion(constractRPY(roll, pitch, yaw));
+    quaternion_operation::convertEulerAngleToQuaternion(constructRPY(roll, pitch, yaw));
   return pose;
 }
 
@@ -88,7 +88,7 @@ std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::Lanel
   return os;
 }
 
-const simulation_api_schema::LidarConfiguration constractLidarConfiguration(
+const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   LidarType type, std::string entity, std::string topic_name,
   double horizontal_resolution)
 {
