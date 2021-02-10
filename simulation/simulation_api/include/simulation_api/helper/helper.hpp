@@ -98,6 +98,7 @@ std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::Lanel
 enum class LidarType
 {
   VLP16,
+  VLP32
 };
 
 const simulation_api_schema::LidarConfiguration constractLidarConfiguration(

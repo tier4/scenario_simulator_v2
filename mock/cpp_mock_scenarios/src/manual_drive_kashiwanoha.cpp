@@ -58,7 +58,7 @@ public:
     api_.setTargetSpeed("npc", 5, true);
     api_.attachLidarSensor(
       simulation_api::helper::constractLidarConfiguration(
-        simulation_api::helper::LidarType::VLP16,
+        simulation_api::helper::LidarType::VLP32,
         "ego",
         "points_raw")
     );
