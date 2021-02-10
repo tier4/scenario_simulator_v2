@@ -28,7 +28,7 @@ void SensorSimulation::attachLidarSensor(
   const simulation_api_schema::LidarConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
 {
-  LidarSensor lidar_sensors(configuration, publisher_ptr);
+  LidarSensor lidar_sensor(configuration, publisher_ptr);
   lidar_sensors_.push_back(lidar_sensor);
 }
 
