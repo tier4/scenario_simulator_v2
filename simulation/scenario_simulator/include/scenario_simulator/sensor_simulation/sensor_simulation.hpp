@@ -16,6 +16,7 @@
 #define SCENARIO_SIMULATOR__SENSOR_SIMULATION__SENSOR_SIMULATION_HPP_
 
 #include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+#include <scenario_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 
 #include <simulation_api_schema.pb.h>
 
@@ -33,12 +34,17 @@ public:
   void attachLidarSensor(
     const simulation_api_schema::LidarConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
+  void attachDetectionSensor(
+    const simulation_api_schema::DetectionSensorConfiguration & configuration,
+    std::shared_ptr<
+      rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>> publisher_ptr);
   void updateSensorFrame(
     double current_time,
     const std::vector<openscenario_msgs::EntityStatus> & status);
 
 private:
   std::vector<LidarSensor> lidar_sensors_;
+  std::vector<DetectionSensor> detection_sensors_;
   std::shared_ptr<rclcpp::Clock> clock_ptr_;
 };
 }  // namespace scenario_simulator

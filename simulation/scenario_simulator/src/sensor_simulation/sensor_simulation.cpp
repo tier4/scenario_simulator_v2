@@ -32,13 +32,29 @@ void SensorSimulation::attachLidarSensor(
   lidar_sensors_.push_back(lidar_sensor);
 }
 
+void SensorSimulation::attachDetectionSensor(
+  const simulation_api_schema::DetectionSensorConfiguration & configuration,
+  std::shared_ptr<
+    rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>> publisher_ptr)
+{
+  DetectionSensor detection_sensor(configuration, publisher_ptr);
+  detection_sensors_.push_back(detection_sensor);
+}
+
 void SensorSimulation::updateSensorFrame(
   double current_time,
   const std::vector<openscenario_msgs::EntityStatus> & status)
 {
+  std::vector<std::string> detected_objects = {};
   const auto now = clock_ptr_->now();
   for (auto & model : lidar_sensors_) {
     model.update(current_time, status, now);
+    const auto objects = model.getDetectedObjects();
+    for (const auto & obj : objects) {
+      if (std::count(detected_objects.begin(), detected_objects.end(), obj) == 0) {
+        detected_objects.emplace_back(obj);
+      }
+    }
   }
 }
 }  // namespace scenario_simulator

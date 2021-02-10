@@ -22,6 +22,30 @@ DetectionSensor::DetectionSensor(
   const simulation_api_schema::DetectionSensorConfiguration & configuration,
   std::shared_ptr<
     rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>> publisher_ptr)
+: configuration_(configuration), publisher_ptr_(publisher_ptr)
 {
+  last_update_stamp_ = 0;
+}
+
+
+void DetectionSensor::update(
+  double current_time,
+  const std::vector<openscenario_msgs::EntityStatus> & status,
+  const rclcpp::Time & stamp,
+  const std::vector<std::string> & detected_objects)
+{
+  if ((current_time - last_update_stamp_) >= configuration_.update_duration()) {
+    autoware_perception_msgs::msg::DynamicObjectArray msg;
+    last_update_stamp_ = current_time;
+    for (const auto & s : status) {
+      auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
+      if (result != detected_objects.end()) {
+        /*
+        Generate Detection Result for Entity;
+        */
+      }
+    }
+    publisher_ptr_->publish(msg);
+  }
 }
 }  // namespace scenario_simulator
