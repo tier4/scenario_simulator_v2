@@ -18,21 +18,18 @@
 #include <cstdlib>
 #include <memory>
 
-int main(int argc, char ** argv)
+int main(const int argc, char const * const * const argv)
 {
   google::InitGoogleLogging(argv[0]);
   google::InstallFailureSignalHandler();
 
   rclcpp::init(argc, argv);
 
-  // rclcpp::executors::MultiThreadedExecutor executor {};
   rclcpp::executors::SingleThreadedExecutor executor {};
 
   rclcpp::NodeOptions options {};
 
-  auto node {
-    std::make_shared<openscenario_interpreter::Interpreter>(options)
-  };
+  auto node = std::make_shared<openscenario_interpreter::Interpreter>(options);
 
   executor.add_node((*node).get_node_base_interface());
 

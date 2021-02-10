@@ -64,14 +64,11 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
     VERBOSE("  Loading scenario " << osc_path);
     script.rebind<OpenScenario>(osc_path);
   } catch (const openscenario_interpreter::SyntaxError & error) {
-    std::cerr << "\x1b[1;31m" << error.what() << std::endl;
+    std::cerr << "\x1b[1;31m" << error.what() << "\x1b[0m" << std::endl;
     return Interpreter::Result::FAILURE;
   }
 
-  connect(
-    shared_from_this(),
-    script.as<OpenScenario>().scope.logic_file.string(),
-    true);
+  connect(shared_from_this(), script.as<OpenScenario>().scope.logic_file.string());
   VERBOSE("  connection established");
 
   // XXX ???
@@ -88,8 +85,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   VERBOSE(">>> Activate");
 
   timer = create_wall_timer(
-    std::chrono::milliseconds(
-      static_cast<unsigned int>(1 / frame_rate * 1000)),  // XXX ???
+    std::chrono::milliseconds(static_cast<unsigned int>(1 / frame_rate * 1000)),  // XXX ???
     [this]()
     {
       guard(

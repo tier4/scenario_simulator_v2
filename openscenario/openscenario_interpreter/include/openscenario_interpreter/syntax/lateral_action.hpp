@@ -23,23 +23,26 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== LateralAction ========================================================
+/* ---- LateralAction ----------------------------------------------------------
  *
- * <xsd:complexType name="LateralAction">
- *   <xsd:choice>
- *     <xsd:element name="LaneChangeAction" type="LaneChangeAction"/>
- *     <xsd:element name="LaneOffsetAction" type="LaneOffsetAction"/>
- *     <xsd:element name="LateralDistanceAction" type="LateralDistanceAction"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="LateralAction">
+ *    <xsd:choice>
+ *      <xsd:element name="LaneChangeAction" type="LaneChangeAction"/>
+ *      <xsd:element name="LaneOffsetAction" type="LaneOffsetAction"/>
+ *      <xsd:element name="LateralDistanceAction" type="LateralDistanceAction"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
-struct LateralAction
-  : public Element
+ * -------------------------------------------------------------------------- */
+struct LateralAction : public ComplexType
 {
-  template<typename Node, typename Scope>
+  template
+  <
+    typename Node,
+    typename Scope
+  >
   explicit LateralAction(const Node & node, Scope & scope)
-  : Element(
+  : ComplexType(
       choice(
         node,
         std::make_pair("LaneChangeAction", [&](auto && node) {
@@ -49,7 +52,7 @@ struct LateralAction
         std::make_pair("LateralDistanceAction", UNSUPPORTED())))
   {}
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__LATERAL_ACTION_HPP_

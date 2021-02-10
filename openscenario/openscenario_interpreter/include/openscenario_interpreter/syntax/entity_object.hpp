@@ -43,8 +43,7 @@ inline namespace syntax
  * </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct EntityObject
-  : public Group
+struct EntityObject : public Group
 {
   template
   <

@@ -68,9 +68,7 @@ struct SpeedAction
           case DynamicsShape::step:
             // XXX UGLY CODE
             {
-              auto status {
-                getEntityStatus(each)
-              };
+              auto status = getEntityStatus(each);
               status.action_status.twist.linear.x =
                 speed_action_target.as<AbsoluteTargetSpeed>().value;
               setEntityStatus(each, status);

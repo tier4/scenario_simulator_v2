@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/controller.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 
+#include <type_traits>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -27,50 +29,44 @@ inline namespace syntax
   std::make_pair( \
     #TYPE, [&](auto && node) \
     { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
+      return make<TYPE>(node, outer_scope); \
     })
 
-/* ---- ObjectController -------------------------------------------------------
+/* ---- AssignControllerAction -------------------------------------------------
  *
- *  Definition of a controller for a scenario object. Either an inline
- *  definition or a catalog reference to a controller.
+ *  This action assigns a controller to the given entity defined in the
+ *  enclosing PrivateAction. Controllers could be defined inline or by using a
+ *  catalog reference.
  *
- *  <xsd:complexType name="ObjectController">
+ *  <xsd:complexType name="AssignControllerAction">
  *    <xsd:choice>
- *      <xsd:element name="CatalogReference" type="CatalogReference"/>
  *      <xsd:element name="Controller" type="Controller"/>
+ *      <xsd:element name="CatalogReference" type="CatalogReference"/>
  *    </xsd:choice>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ObjectController : public ComplexType
+struct AssignControllerAction : public ComplexType
 {
-  explicit ObjectController()  // ObjectController is optional element.
-  : ComplexType(unspecified)
-  {}
+  Scope inner_scope;
 
   template
   <
-    typename Node, typename ... Ts
+    typename Node
   >
-  explicit ObjectController(const Node & node, Ts && ... xs)
+  explicit AssignControllerAction(const Node & node, Scope & outer_scope)
   : ComplexType(
       choice(
         node,
-        std::make_pair("CatalogReference", UNSUPPORTED()),
-        ELEMENT(Controller)))
+        ELEMENT(Controller),
+        std::make_pair("CatalogReference", UNSUPPORTED()))),
+    inner_scope(outer_scope)
   {}
 
-  operator openscenario_msgs::msg::DriverModel() const
+  void operator()() const
   {
-    if (is<Unspecified>()) {
-      openscenario_msgs::msg::DriverModel controller;
-      {
-        controller.see_around = !DefaultController()["isBlind"];
-      }
-      return controller;
-    } else {
-      return as<Controller>();
+    for (const auto & actor : inner_scope.actors) {
+      setController(actor, (*this).as<Controller>());
     }
   }
 };
@@ -79,4 +75,4 @@ struct ObjectController : public ComplexType
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_CONTROLLER_ACTION_HPP_
