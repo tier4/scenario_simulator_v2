@@ -42,7 +42,7 @@ struct ScenarioObject
  *  The EntityObject (either instance of type Vehicle, Pedestrian or
  *  MiscObject).
  *
- *  NOTE: This framework expresses xsd:group as a mixin by inheritance.
+ *  NOTE: This framework expresses xsd:group as mixin.
  *
  * ------------------------------------------------------------------------- */
   : public EntityObject
@@ -60,10 +60,10 @@ struct ScenarioObject
    *
    *  Controller of the EntityObject instance.
    *
-   *  TODO(yamacir-kit): DefaultConstructible!
-   *
    * ------------------------------------------------------------------------ */
-  Element object_controller;
+  const ObjectController object_controller;
+
+  static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
   template
   <
@@ -71,23 +71,26 @@ struct ScenarioObject
   >
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
   : EntityObject(node, outer_scope),
-    name(readAttribute<String>("name", node, outer_scope))
-  {
-    callWithElements(
-      node, "ObjectController", 0, 1, [&](auto && node)
-      {
-        return object_controller.rebind<ObjectController>(node, outer_scope);
-      });
-  }
+    name(readAttribute<String>("name", node, outer_scope)),
+    object_controller(readElement<ObjectController>("ObjectController", node, outer_scope))
+  {}
 
   auto evaluate() const
   {
-    return asBoolean(
+    if (
       spawn(
-        (*this).is<Vehicle>() && (*this).as<Vehicle>()["isEgo"],
+        is<Vehicle>() && as<Vehicle>()["isEgo"],
         name,
         boost::lexical_cast<String>(
-          static_cast<const EntityObject &>(*this))));  // XXX UGLY CODE!!!
+          static_cast<const EntityObject &>(*this))))  // XXX UGLY CODE!!!
+    {
+      if (is<Vehicle>()) {
+        setController(name, object_controller);
+      }
+      return unspecified;
+    } else {
+      throw SemanticError("Failed to spawn entity '", name, "'.");
+    }
   }
 };
 
@@ -98,7 +101,7 @@ std::ostream & operator<<(std::ostream & os, const ScenarioObject & datum)
     blue << ">\n" << reset << static_cast<const EntityObject &>(datum) << "\n" << (--indent) <<
     blue << "</ScenarioObject>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
