@@ -21,6 +21,7 @@ message LidarConfiguration
 message DetectionSensorConfiguration
 {
     string entity = 1;
+    string topic_name = 2;
 }
 
 // Requests and Responses

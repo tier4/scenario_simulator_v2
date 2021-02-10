@@ -25,7 +25,9 @@ namespace scenario_simulator
 class DetectionSensor
 {
 public:
-  DetectionSensor();
+  DetectionSensor(
+    const simulation_api_schema::DetectionSensorConfiguration & configuration,
+    std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>> publisher_ptr_);
 
 private:
 };
