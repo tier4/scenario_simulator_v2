@@ -58,14 +58,14 @@ struct TeleportAction
       for (const auto & each : inner_scope.actors) {
         setEntityStatus(
           each,
-          simulation_api::helper::constractLaneletPose(
+          simulation_api::helper::constructLaneletPose(
             Integer(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,
             position.as<LanePosition>().offset,
             rpy.x,
             rpy.y,
             rpy.z),
-          simulation_api::helper::constractActionStatus());
+          simulation_api::helper::constructActionStatus());
       }
     } else if (position.is<RelativeWorldPosition>()) {
       for (const auto & each : inner_scope.actors) {
@@ -74,7 +74,7 @@ struct TeleportAction
           position.as<RelativeWorldPosition>().reference,
           position.as<RelativeWorldPosition>(),  // geometry_msgs::msg::Point
           position.as<RelativeWorldPosition>().orientation,  // geometry_msgs::msg::Vector3
-          simulation_api::helper::constractActionStatus());
+          simulation_api::helper::constructActionStatus());
       }
     } else {
       THROW(ImplementationFault);

@@ -59,7 +59,7 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
-        auto lanelet_pose = simulation_api::helper::constractLaneletPose(
+        auto lanelet_pose = simulation_api::helper::constructLaneletPose(
           Integer(position.as<LanePosition>().lane_id),
           position.as<LanePosition>().s,
           position.as<LanePosition>().offset);
@@ -76,7 +76,7 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          auto lanelet_pose = simulation_api::helper::constractLaneletPose(
+          auto lanelet_pose = simulation_api::helper::constructLaneletPose(
             Integer(position.as<LanePosition>().lane_id),
             position.as<LanePosition>().s,
             position.as<LanePosition>().offset);

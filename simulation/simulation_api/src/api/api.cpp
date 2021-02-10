@@ -473,6 +473,32 @@ bool API::initialize(
   return xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
 }
 
+bool API::attachLidarSensor(
+  simulation_api_schema::LidarConfiguration configuration
+)
+{
+  if (standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::AttachLidarSensorRequest req;
+  simulation_api_schema::AttachLidarSensorResponse res;
+  *req.mutable_configuration() = configuration;
+  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::attach_lidar_sensor, req, res);
+  return res.result().success();
+}
+
+bool API::updateSensorFrame()
+{
+  if (standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::UpdateSensorFrameRequest req;
+  req.set_current_time(current_time_);
+  simulation_api_schema::UpdateSensorFrameResponse res;
+  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_sensor_frame, req, res);
+  return res.result().success();
+}
+
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
@@ -481,6 +507,7 @@ bool API::updateEntityStatusInSim()
     auto status = entity_manager_ptr_->getEntityStatus(name);
     if (status) {
       openscenario_msgs::EntityStatus proto;
+      status.get().name = name;
       xmlrpc_interface::toProto(status.get(), proto);
       *req.add_status() = proto;
     }
@@ -503,14 +530,17 @@ bool API::updateFrame()
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(current_time_);
     simulation_api_schema::UpdateFrameResponse res;
-    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
+    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_frame, req, res);
     if (!res.result().success()) {
       return false;
     }
     entity_manager_ptr_->broadcastEntityTransform();
     current_time_ = current_time_ + step_time_;
     metrics_manager_.calculate();
-    return updateEntityStatusInSim();
+    if (!updateEntityStatusInSim()) {
+      return false;
+    }
+    return updateSensorFrame();
   }
   entity_manager_ptr_->broadcastEntityTransform();
   current_time_ = current_time_ + step_time_;

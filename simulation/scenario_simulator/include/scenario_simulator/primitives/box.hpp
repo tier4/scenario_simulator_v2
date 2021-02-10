@@ -12,28 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
-#define SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
 
-#include <simulation_api/metrics/metric_base.hpp>
+#ifndef SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
+#define SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
 
-#include <string>
+#include <scenario_simulator/primitives/primitive.hpp>
+#include <simulation_api_schema.pb.h>
 
-namespace metrics
+namespace scenario_simulator
 {
-class TraveledDistanceMetric : public MetricBase
+namespace primitives
+{
+class Box : public Primitive
 {
 public:
-  explicit TraveledDistanceMetric(std::string target_entity);
-  ~TraveledDistanceMetric() override = default;
-  void update() override;
-  nlohmann::json to_json();
-  bool activateTrigger() override;
-  const std::string target_entity;
-
-private:
-  double traveled_distance;
+  explicit Box(float depth, float width, float height, geometry_msgs::msg::Pose pose);
+  ~Box() = default;
+  const float depth;
+  const float width;
+  const float height;
 };
-}  // namespace metrics
+}  // namespace primitives
+}  // namespace scenario_simulator
 
-#endif  // SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#endif  // SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_

@@ -16,7 +16,7 @@
 #define SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 
 #include <scenario_simulator/xmlrpc_method.hpp>
-#include <scenario_simulator/scenario_simulator_impl.hpp>
+#include <scenario_simulator/raycast/lidar_simulation.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -50,12 +50,23 @@ private:
   void spawnPedestrianEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void updateEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void attachLidarSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void updateSensorFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void addMethod(
     std::string name, std::function<void(XmlRpc::XmlRpcValue &,
     XmlRpc::XmlRpcValue &)> func);
   void runXmlRpc();
   std::thread xmlrpc_thread_;
-  scenario_simulator::ScenarioSimulatorImpl impl_;
+  std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
+  std::vector<openscenario_msgs::VehicleParameters> vehicles_;
+  std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;
+  double realtime_factor_;
+  double step_time_;
+  double current_time_;
+  bool initialized_;
+  std::vector<openscenario_msgs::EntityStatus> entity_status_;
+  std::vector<std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>>> pointcloud_pub_;
+  std::vector<LidarModel> lidar_models_;
 };
 }  // namespace scenario_simulator
 

@@ -13,11 +13,21 @@
 // limitations under the License.
 
 #include <scenario_simulator/scenario_simulator.hpp>
+#include <scenario_simulator/exception.hpp>
+
 #include <xmlrpc_interface/conversions.hpp>
 
-#include <string>
-#include <vector>
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <pugixml.hpp>
+
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <rclcpp/rclcpp.hpp>
+
 #include <memory>
+#include <utility>
+#include <vector>
+#include <string>
 
 namespace scenario_simulator
 {
@@ -75,6 +85,22 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_1,
       std::placeholders::_2));
 
+  addMethod(
+    xmlrpc_interface::method::attach_lidar_sensor,
+    std::bind(
+      &ScenarioSimulator::attachLidarSensor,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
+
+  addMethod(
+    xmlrpc_interface::method::update_sensor_frame,
+    std::bind(
+      &ScenarioSimulator::updateSensorFrame,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
+
   server_.bindAndListen(port_);
   server_.enableIntrospection(true);
   xmlrpc_thread_ = std::thread(&ScenarioSimulator::runXmlRpc, this);
@@ -92,40 +118,167 @@ void ScenarioSimulator::runXmlRpc()
   }
 }
 
-void ScenarioSimulator::updateEntityStatus(
-  XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
+void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
-  impl_.updateEntityStatus(param, result);
+  initialized_ = true;
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeRequest>(param);
+  realtime_factor_ = req.realtime_factor();
+  step_time_ = req.step_time();
+  simulation_api_schema::InitializeResponse res;
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("succeed to initialize simulation");
+  ego_vehicles_ = {};
+  vehicles_ = {};
+  pedestrians_ = {};
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
-  impl_.updateFrame(param, result);
+  if (!initialized_) {
+    simulation_api_schema::UpdateFrameResponse res;
+    res.mutable_result()->set_description("simulator have not initialized yet.");
+    res.mutable_result()->set_success(false);
+    result = XmlRpc::XmlRpcValue();
+    result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+    return;
+  }
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameRequest>(param);
+  simulation_api_schema::UpdateFrameResponse res;
+  current_time_ = req.current_time();
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("succeed to update frame");
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
-void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulator::updateEntityStatus(
+  XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
 {
-  impl_.initialize(param, result);
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateEntityStatusRequest>(
+    param);
+  entity_status_ = {};
+  simulation_api_schema::UpdateEntityStatusResponse res;
+  for (auto status : req.status()) {
+    auto status_ptr = res.mutable_status()->Add();
+    status_ptr->set_type(status.type());
+    status_ptr->set_time(status.time());
+    status_ptr->set_name(status.name());
+    *status_ptr->mutable_bounding_box() = status.bounding_box();
+    *status_ptr->mutable_action_status() = status.action_status();
+    *status_ptr->mutable_pose() = status.pose();
+    *status_ptr->mutable_lanelet_pose() = status.lanelet_pose();
+    status_ptr->set_lanelet_pose_valid(status.lanelet_pose_valid());
+    entity_status_.emplace_back(status);
+  }
+  result = XmlRpc::XmlRpcValue();
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("");
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::spawnVehicleEntity(
   XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
-  impl_.spawnVehicleEntity(param, result);
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnVehicleEntityRequest>(
+    param);
+  if (ego_vehicles_.size() != 0 && req.is_ego()) {
+    throw SimulationRuntimeError("multi ego does not support");
+  }
+  if (req.is_ego()) {
+    ego_vehicles_.emplace_back(req.parameters());
+  } else {
+    vehicles_.emplace_back(req.parameters());
+  }
+  simulation_api_schema::SpawnVehicleEntityResponse res;
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("");
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::spawnPedestrianEntity(
   XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
-  impl_.spawnPedestrianEntity(param, result);
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnPedestrianEntityRequest>(
+    param);
+  pedestrians_.emplace_back(req.parameters());
+  simulation_api_schema::SpawnPedestrianEntityResponse res;
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("");
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
-  impl_.despawnEntity(param, result);
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::DespawnEntityRequest>(param);
+  bool found = false;
+  std::vector<openscenario_msgs::VehicleParameters> vehicles;
+  for (const auto vehicle : vehicles_) {
+    if (vehicle.name() != req.name()) {
+      vehicles.emplace_back(vehicle);
+    } else {
+      found = true;
+    }
+  }
+  vehicles_ = vehicles;
+  std::vector<openscenario_msgs::PedestrianParameters> pedestrians;
+  for (const auto pedestrian : pedestrians_) {
+    if (pedestrian.name() != req.name()) {
+      pedestrians.emplace_back(pedestrian);
+    } else {
+      found = true;
+    }
+  }
+  pedestrians_ = pedestrians;
+  simulation_api_schema::DespawnEntityResponse res;
+  if (found) {
+    res.mutable_result()->set_success(true);
+  } else {
+    res.mutable_result()->set_success(false);
+  }
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+}
+
+void ScenarioSimulator::attachLidarSensor(
+  XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
+{
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<
+    simulation_api_schema::AttachLidarSensorRequest>(param);
+  const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
+    req.configuration().topic_name(), 1);
+  LidarModel lidar_model(req.configuration(), pub);
+  lidar_models_.push_back(lidar_model);
+  pointcloud_pub_.emplace_back(pub);
+  simulation_api_schema::AttachLidarSensorResponse res;
+  res.mutable_result()->set_success(true);
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+}
+
+void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
+{
+  for (auto & model : lidar_models_) {
+    model.update(current_time_, entity_status_, get_clock()->now());
+  }
+  simulation_api_schema::UpdateSensorFrameResponse res;
+  res.mutable_result()->set_success(true);
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::addMethod(

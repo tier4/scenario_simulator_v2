@@ -32,7 +32,7 @@ FollowLaneAction::FollowLaneAction(
 : entity_behavior::VehicleActionNode(name, config) {}
 
 const boost::optional<openscenario_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
-  const openscenario_msgs::msg::WaypointsArray & waypoints)
+  const openscenario_msgs::msg::WaypointsArray &)
 {
   return boost::none;
 }

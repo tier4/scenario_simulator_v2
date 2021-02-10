@@ -34,7 +34,7 @@ public:
   ~ReactionTimeMetric() override = default;
   void update() override;
   nlohmann::json to_json();
-  bool activateTrigger();
+  bool activateTrigger() override;
   const std::string target_entity;
   const double maximum_reaction_time;
   const double jerk_upper_threashold;

@@ -130,6 +130,10 @@ boost::optional<double> EntityManager::getDistanceToCrosswalk(
   if (it == entities_.end()) {
     return boost::none;
   }
+  if (getWaypoints(name).waypoints.size() == 0) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    return boost::none;
+  }
   simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
   auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
   return spline.getCollisionPointIn2D(polygon);
@@ -165,6 +169,9 @@ boost::optional<double> EntityManager::getDistanceToStopLine(
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
+    return boost::none;
+  }
+  if (getWaypoints(name).waypoints.size() == 0) {
     return boost::none;
   }
   simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
@@ -403,6 +410,7 @@ const std::vector<std::string> EntityManager::getEntityNames() const
 bool EntityManager::setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status)
 {
   auto it = entities_.find(name);
+  status.name = name;
   if (it == entities_.end()) {
     return false;
   }
@@ -422,19 +430,35 @@ const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEn
   std::string name) const
 {
   auto it = entities_.find(name);
+  openscenario_msgs::msg::EntityStatus status_msg;
   if (it == entities_.end()) {
     return boost::none;
   }
   if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).getStatus();
+    status_msg = boost::any_cast<const VehicleEntity &>(it->second).getStatus();
+  } else if (it->second.type() == typeid(EgoEntity)) {
+    status_msg = boost::any_cast<const EgoEntity &>(it->second).getStatus();
+  } else if (it->second.type() == typeid(PedestrianEntity)) {
+    status_msg = boost::any_cast<const PedestrianEntity &>(it->second).getStatus();
+  } else {
+    return boost::none;
   }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).getStatus();
+  status_msg.bounding_box = getBoundingBox(name);
+  status_msg.action_status.current_action = getCurrentAction(name);
+  switch (getEntityType(name).type) {
+    case openscenario_msgs::msg::EntityType::EGO:
+      status_msg.type.type = status_msg.type.EGO;
+      break;
+    case openscenario_msgs::msg::EntityType::VEHICLE:
+      status_msg.type.type = status_msg.type.VEHICLE;
+      break;
+    case openscenario_msgs::msg::EntityType::PEDESTRIAN:
+      status_msg.type.type = status_msg.type.PEDESTRIAN;
+      break;
   }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<const PedestrianEntity &>(it->second).getStatus();
-  }
-  return boost::none;
+  status_msg.time = current_time_;
+  status_msg.name = name;
+  return status_msg;
 }
 
 bool EntityManager::checkCollision(std::string name0, std::string name1)
@@ -793,7 +817,7 @@ void EntityManager::broadcastBaseLinkTransform()
         pose.pose = status->pose;
         pose.header.stamp = clock_ptr_->now();
         pose.header.frame_id = "base_link";
-        broadcastTransform(pose);
+        broadcastTransform(pose, false);
       }
       return;
     }
