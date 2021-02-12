@@ -14,6 +14,10 @@
 
 #include <scenario_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+
 #include <memory>
 
 namespace scenario_simulator
@@ -42,6 +46,23 @@ void DetectionSensor::update(
     for (const auto & s : status) {
       auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
       if (result != detected_objects.end()) {
+        autoware_perception_msgs::msg::DynamicObject object;
+        if (s.type() == openscenario_msgs::EntityType::EGO) {
+          object.semantic.type = object.semantic.CAR;
+          object.semantic.confidence = 1;
+        } else if (s.type() == openscenario_msgs::EntityType::VEHICLE) {
+          object.semantic.type = object.semantic.CAR;
+          object.semantic.confidence = 1;
+        } else if (s.type() == openscenario_msgs::EntityType::PEDESTRIAN) {
+          object.semantic.type = object.semantic.PEDESTRIAN;
+          object.semantic.confidence = 1;
+        }
+        boost::uuids::uuid base =
+          boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
+        boost::uuids::name_generator gen(base);
+        boost::uuids::uuid uuid = gen(s.name());
+        std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
+        msg.objects.emplace_back(object);
         /*
         Generate Detection Result for Entity;
         */

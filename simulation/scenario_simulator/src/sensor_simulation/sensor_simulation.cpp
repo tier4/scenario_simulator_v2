@@ -56,8 +56,7 @@ void SensorSimulation::updateSensorFrame(
       }
     }
   }
-  for (auto & sensor : detection_sensors_)
-  {
+  for (auto & sensor : detection_sensors_) {
     sensor.update(current_time, status, now, detected_objects);
   }
 }
