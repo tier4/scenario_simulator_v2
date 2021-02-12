@@ -53,6 +53,16 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
     std::atomic_load(&autoware)->setVehicleVelocity(100.0);  // Upper bound velocity
     setTransform(current_entity_status.pose);
     first_time = false;
+
+    using autoware_vehicle_msgs::msg::ControlMode;
+    geometry_msgs::msg::Twist twist;
+    std::atomic_load(&autoware)->setCurrentControlMode(ControlMode::AUTO);
+    std::atomic_load(&autoware)->setCurrentPose(current_entity_status.pose);
+    std::atomic_load(&autoware)->setCurrentShift(twist);
+    std::atomic_load(&autoware)->setCurrentSteering(twist);
+    std::atomic_load(&autoware)->setCurrentTurnSignal();
+    std::atomic_load(&autoware)->setCurrentTwist(twist);
+    std::atomic_load(&autoware)->setCurrentVelocity(twist);
   }
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
@@ -109,7 +119,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       std::atomic_load(&autoware)->setCurrentTurnSignal();
       std::atomic_load(&autoware)->setCurrentTwist(twist);
       std::atomic_load(&autoware)->setCurrentVelocity(twist);
-      // std::atomic_load(&autoware)->setAutowareEngage(true);  // XXX DIRTY HACK!!!
       std::atomic_load(&autoware)->setVehicleVelocity(twist.linear.x);
 
       setTransform(status_.get().pose);

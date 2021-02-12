@@ -85,10 +85,7 @@ void EntityManager::setVerbose(bool verbose)
 
 bool EntityManager::isEgo(std::string name) const
 {
-  if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
-    return true;
-  }
-  return false;
+  return getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO;
 }
 
 int EntityManager::getNumberOfEgo() const
