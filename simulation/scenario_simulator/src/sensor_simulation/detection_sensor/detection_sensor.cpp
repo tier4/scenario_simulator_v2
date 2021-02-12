@@ -69,7 +69,8 @@ void DetectionSensor::update(
         object.state.orientation_reliable = true;
         xmlrpc_interface::toMsg(s.action_status().twist(), object.state.twist_covariance.twist);
         object.state.twist_reliable = true;
-        xmlrpc_interface::toMsg(s.action_status().accel(), object.state.acceleration_covariance.accel);
+        xmlrpc_interface::toMsg(
+          s.action_status().accel(), object.state.acceleration_covariance.accel);
         object.state.acceleration_reliable = true;
         msg.objects.emplace_back(object);
       }

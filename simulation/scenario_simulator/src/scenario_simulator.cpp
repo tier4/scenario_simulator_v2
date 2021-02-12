@@ -252,6 +252,23 @@ void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRp
   result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
+void ScenarioSimulator::attachDetectionSensor(
+  XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
+{
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<
+    simulation_api_schema::AttachDetectionSensorRequest>(param);
+  const auto pub = this->create_publisher<
+    autoware_perception_msgs::msg::DynamicObjectArray>(
+    req.configuration().topic_name(), 1);
+  sensor_sim_.attachDetectionSensor(req.configuration(), pub);
+  simulation_api_schema::AttachDetectionSensorResponse res;
+  res.mutable_result()->set_success(true);
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+}
+
 void ScenarioSimulator::attachLidarSensor(
   XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)

@@ -54,6 +54,7 @@ private:
   void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void updateEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void attachLidarSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void attachDetectionSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void updateSensorFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void addMethod(
     std::string name, std::function<void(XmlRpc::XmlRpcValue &,
