@@ -735,19 +735,19 @@ void EntityManager::update(double current_time, double step_time)
 
 void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform)
 {
-  geometry_msgs::msg::TransformStamped transform_stamped;
-  transform_stamped.header.stamp = pose.header.stamp;
-  transform_stamped.header.frame_id = "map";
-  transform_stamped.child_frame_id = pose.header.frame_id;
-  transform_stamped.transform.translation.x = pose.pose.position.x;
-  transform_stamped.transform.translation.y = pose.pose.position.y;
-  transform_stamped.transform.translation.z = pose.pose.position.z;
-  transform_stamped.transform.rotation = pose.pose.orientation;
-  if (static_transform) {
-    broadcaster_.sendTransform(transform_stamped);
-  } else {
-    base_link_broadcaster_.sendTransform(transform_stamped);
-  }
+  // geometry_msgs::msg::TransformStamped transform_stamped;
+  // transform_stamped.header.stamp = pose.header.stamp;
+  // transform_stamped.header.frame_id = "map";
+  // transform_stamped.child_frame_id = pose.header.frame_id;
+  // transform_stamped.transform.translation.x = pose.pose.position.x;
+  // transform_stamped.transform.translation.y = pose.pose.position.y;
+  // transform_stamped.transform.translation.z = pose.pose.position.z;
+  // transform_stamped.transform.rotation = pose.pose.orientation;
+  // if (static_transform) {
+  //   broadcaster_.sendTransform(transform_stamped);
+  // } else {
+  //   base_link_broadcaster_.sendTransform(transform_stamped);
+  // }
 }
 
 bool EntityManager::reachPosition(
@@ -792,37 +792,37 @@ bool EntityManager::reachPosition(
 
 void EntityManager::broadcastBaseLinkTransform()
 {
-  for (const auto & name : getEntityNames()) {
-    if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
-      auto status = getEntityStatus(name);
-      if (status) {
-        geometry_msgs::msg::PoseStamped pose;
-        pose.pose = status->pose;
-        pose.header.stamp = clock_ptr_->now();
-        pose.header.frame_id = "base_link";
-        broadcastTransform(pose, false);
-      }
-      return;
-    }
-  }
+  // for (const auto & name : getEntityNames()) {
+  //   if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
+  //     auto status = getEntityStatus(name);
+  //     if (status) {
+  //       geometry_msgs::msg::PoseStamped pose;
+  //       pose.pose = status->pose;
+  //       pose.header.stamp = clock_ptr_->now();
+  //       pose.header.frame_id = "base_link";
+  //       broadcastTransform(pose, false);
+  //     }
+  //     return;
+  //   }
+  // }
 }
 
 void EntityManager::broadcastEntityTransform()
 {
-  std::vector<std::string> names = getEntityNames();
-  for (auto it = names.begin(); it != names.end(); it++) {
-    if (entityStatusSetted(*it)) {
-      auto status = getEntityStatus(*it);
-      if (status) {
-        geometry_msgs::msg::PoseStamped pose;
-        pose.pose = status->pose;
-        pose.header.stamp = clock_ptr_->now();
-        pose.header.frame_id = *it;
-        broadcastTransform(pose);
-      }
-    }
-  }
-  broadcastBaseLinkTransform();
+  // std::vector<std::string> names = getEntityNames();
+  // for (auto it = names.begin(); it != names.end(); it++) {
+  //   if (entityStatusSetted(*it)) {
+  //     auto status = getEntityStatus(*it);
+  //     if (status) {
+  //       geometry_msgs::msg::PoseStamped pose;
+  //       pose.pose = status->pose;
+  //       pose.header.stamp = clock_ptr_->now();
+  //       pose.header.frame_id = *it;
+  //       broadcastTransform(pose);
+  //     }
+  //   }
+  // }
+  // broadcastBaseLinkTransform();
 }
 
 const boost::optional<double> EntityManager::getStandStillDuration(std::string name) const
