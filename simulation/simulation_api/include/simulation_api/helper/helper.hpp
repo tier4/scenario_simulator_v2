@@ -106,6 +106,9 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   LidarType type, std::string entity, std::string topic_name,
   double horizontal_resolution = 1.0 / 180.0 * M_PI);
 
+const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
+  std::string entity, std::string topic_name, double update_duration);
+
 }  // namespace helper
 }  // namespace simulation_api
 
