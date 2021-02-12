@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace scenario_simulator
 {

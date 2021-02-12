@@ -21,6 +21,9 @@
 #include <boost/uuid/uuid_generators.hpp>
 
 #include <memory>
+#include <string>
+#include <algorithm>
+#include <vector>
 
 namespace scenario_simulator
 {
