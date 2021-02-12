@@ -19,18 +19,27 @@ endif()
 
 find_package(ament_cmake_auto REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(PCL REQUIRED)
 
 ament_auto_find_build_dependencies()
 
+link_directories(${PCL_LIBRARY_DIRS})
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIR}
+  ${PCL_INCLUDE_DIRS}
 )
 
 ament_auto_add_library(scenario_simulator SHARED
   src/xmlrpc_method.cpp
-  src/scenario_simulator_impl.cpp
   src/scenario_simulator.cpp
+  src/primitives/primitive.cpp
+  src/primitives/box.cpp
+  src/raycast/raycaster.cpp
+  src/raycast/lidar_simulation.cpp
+)
+target_link_libraries(scenario_simulator
+  embree3
 )
 
 ament_auto_add_executable(scenario_simulator_node

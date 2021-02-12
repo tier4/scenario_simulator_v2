@@ -15,6 +15,8 @@
 #ifndef SIMULATION_API__API__API_HPP_
 #define SIMULATION_API__API__API_HPP_
 
+#include <simulation_api_schema.pb.h>
+
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
 #include <simulation_api/traffic_lights/traffic_light.hpp>
@@ -205,6 +207,10 @@ public:
     const std::string & name,
     const std::string & target_name,
     const double tolerance) const;
+  bool attachLidarSensor(
+    simulation_api_schema::LidarConfiguration configuration
+  );
+  bool updateSensorFrame();
 
   bool initialize(double realtime_factor, double step_time);
   bool updateFrame();

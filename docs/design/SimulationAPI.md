@@ -34,28 +34,28 @@ public:
     simulation_api::entity::VehicleParameters params(catalog_xml_doc);
     api_.spawn(false, "ego", params);
     api_.setEntityStatus("ego",
-      simulation_api::helper::constractLaneletPose(120545, 0),
-      simulation_api::helper::constractActionStatus(10));
+      simulation_api::helper::constructLaneletPose(120545, 0),
+      simulation_api::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 15, true);
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
     api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus("tom", "ego",
-      simulation_api::helper::constractPose(10, 3, 0, 0, 0, 1.57),
-      simulation_api::helper::constractActionStatus());
+      simulation_api::helper::constructPose(10, 3, 0, 0, 0, 1.57),
+      simulation_api::helper::constructActionStatus());
     api_.spawn(false, "bob", pedestrian_params,
-      simulation_api::helper::constractLaneletPose(34378, 0.0),
-      simulation_api::helper::constractActionStatus(1));
+      simulation_api::helper::constructLaneletPose(34378, 0.0),
+      simulation_api::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     api_.spawn(false, "npc1", params,
-      simulation_api::helper::constractLaneletPose(34579, 20.0),
-      simulation_api::helper::constractActionStatus(5));
+      simulation_api::helper::constructLaneletPose(34579, 20.0),
+      simulation_api::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
     lanechange_excuted_ = false;
     api_.spawn(false, "npc2", params,
-      simulation_api::helper::constractLaneletPose(34606, 20.0),
-      simulation_api::helper::constractActionStatus(5));
+      simulation_api::helper::constructLaneletPose(34606, 20.0),
+      simulation_api::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
@@ -65,14 +65,14 @@ private:
   void update()
   {
     if (api_.reachPosition("ego",
-      simulation_api::helper::constractLaneletPose(34615, 10.0), 5))
+      simulation_api::helper::constructLaneletPose(34615, 10.0), 5))
     {
       api_.requestAcquirePosition("ego",
-        simulation_api::helper::constractLaneletPose(35026, 0.0) );
+        simulation_api::helper::constructLaneletPose(35026, 0.0) );
       api_.setTargetSpeed("npc2", 13, true);
     }
     if (api_.reachPosition("ego",
-      simulation_api::helper::constractLaneletPose(34579, 0.0), 5))
+      simulation_api::helper::constructLaneletPose(34579, 0.0), 5))
     {
       api_.setTargetSpeed("npc2", 3, true);
     }

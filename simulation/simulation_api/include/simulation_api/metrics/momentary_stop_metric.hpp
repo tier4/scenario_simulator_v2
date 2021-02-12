@@ -50,7 +50,7 @@ public:
 
   ~MomentaryStopMetric() override = default;
   void update() override;
-  bool activateTrigger();
+  bool activateTrigger() override;
   const std::string target_entity;
   const double min_acceleration;
   const double max_acceleration;

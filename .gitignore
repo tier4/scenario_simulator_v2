@@ -2,6 +2,10 @@ external/autoware_auto_msgs
 external/operational-design-domains
 external/doxybook2
 external/quaternion_operation
+external/autoware_api_msgs
+external/autoware_perception_msgs
+external/autoware_planning_msgs
+external/autoware_system_msgs
 html
 latex
 scenario_simulator.tar

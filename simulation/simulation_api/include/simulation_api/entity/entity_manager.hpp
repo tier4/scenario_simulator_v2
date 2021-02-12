@@ -168,11 +168,7 @@ public:
       options);
     visualization_msgs::msg::MarkerArray markers;
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
-
-    hdmap_marker_timer_ =
-      node->create_wall_timer(
-      std::chrono::seconds(1),
-      std::bind(&EntityManager::updateHdmapMarker, this));
+    updateHdmapMarker();
   }
   boost::optional<double> getLinearJerk(std::string name);
   double getStepTime() const;
