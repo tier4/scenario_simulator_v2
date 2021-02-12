@@ -94,6 +94,14 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
+    xmlrpc_interface::method::attach_detection_sensor,
+    std::bind(
+      &ScenarioSimulator::attachDetectionSensor,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
+
+  addMethod(
     xmlrpc_interface::method::update_sensor_frame,
     std::bind(
       &ScenarioSimulator::updateSensorFrame,
