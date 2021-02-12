@@ -19,6 +19,7 @@
 
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_control_msgs/msg/engage_mode.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
@@ -27,6 +28,7 @@
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <awapi_accessor/conversion.hpp>
 #include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -55,16 +57,6 @@ class Accessor : public rclcpp::Node
 {
   std::mutex mutex;
 
-  static auto convertBooleanToROSMessage(const bool value)
-  {
-    AutowareEngage message {};
-    {
-      message.data = value;
-    }
-
-    return message;
-  }
-
 public:
 #ifndef NDEBUG
   /** ---- DummyData -----------------------------------------------------------
@@ -87,13 +79,13 @@ public:
    *    setAutowareEngage(const bool) const
    *
    * ------------------------------------------------------------------------ */
-  using AutowareEngage = std_msgs::msg::Bool;
+  using AutowareEngage = autoware_control_msgs::msg::EngageMode;
 
   DEFINE_PUBLISHER(AutowareEngage);
 
-  decltype(auto) setAutowareEngage(const bool value)
+  decltype(auto) setAutowareEngage(const bool value = true)
   {
-    return setAutowareEngage(convertBooleanToROSMessage(value));
+    return setAutowareEngage(convertTo<AutowareEngage>(value));
   }
 
   /** ---- AutowareRoute -------------------------------------------------------
@@ -116,12 +108,7 @@ public:
 
   decltype(auto) setLaneChangeApproval(const bool approve = true)
   {
-    LaneChangeApproval lane_change_approval {};
-    {
-      lane_change_approval.data = approve;
-    }
-
-    return setLaneChangeApproval(lane_change_approval);
+    return setLaneChangeApproval(convertTo<LaneChangeApproval>(approve));
   }
 
   /** ---- LaneChangeForce -----------------------------------------------------
@@ -158,16 +145,11 @@ public:
   template
   <
     typename T,
-    typename = typename std::enable_if<std::is_floating_point<T>::value>::type
+    REQUIRES(std::is_floating_point<T>)
   >
   decltype(auto) setVehicleVelocity(const T value)
   {
-    VehicleVelocity vehicle_velocity {};
-    {
-      vehicle_velocity.data = value;
-    }
-
-    return setVehicleVelocity(vehicle_velocity);
+    return setVehicleVelocity(convertTo<VehicleVelocity>(value));
   }
 
   /** ---- AutowareStatus ------------------------------------------------------
@@ -265,7 +247,7 @@ public:
   template
   <
     typename T,
-    typename = typename std::enable_if<std::is_floating_point<T>::value>::type
+    REQUIRES(std::is_floating_point<T>)
   >
   decltype(auto) setCurrentShift(const T twist_linear_x)
   {
@@ -298,16 +280,11 @@ public:
   template
   <
     typename T,
-    typename = typename std::enable_if<std::is_floating_point<T>::value>::type
+    REQUIRES(std::is_floating_point<T>)
   >
   decltype(auto) setCurrentSteering(const T value)
   {
-    CurrentSteering current_steering {};
-    {
-      current_steering.data = value;
-    }
-
-    return setCurrentSteering(current_steering);
+    return setCurrentSteering(convertTo<CurrentSteering>(value));
   }
 
   decltype(auto) setCurrentSteering(const geometry_msgs::msg::Twist & twist)
@@ -371,16 +348,11 @@ public:
   template
   <
     typename T,
-    typename = typename std::enable_if<std::is_floating_point<T>::value>::type
+    REQUIRES(std::is_floating_point<T>)
   >
   decltype(auto) setCurrentVelocity(const T twist_linear_x)
   {
-    CurrentVelocity current_velocity {};
-    {
-      current_velocity.data = twist_linear_x;
-    }
-
-    return setCurrentVelocity(current_velocity);
+    return setCurrentVelocity(convertTo<CurrentVelocity>(twist_linear_x));
   }
 
   decltype(auto) setCurrentVelocity(const geometry_msgs::msg::Twist & twist)

@@ -60,5 +60,5 @@
   <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)" />
 
   <!-- Web Controller -->
-  <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml" /> -->
+  <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml" />
 </launch>

@@ -109,8 +109,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       std::atomic_load(&autoware)->setCurrentTurnSignal();
       std::atomic_load(&autoware)->setCurrentTwist(twist);
       std::atomic_load(&autoware)->setCurrentVelocity(twist);
-      std::atomic_load(&autoware)->setAutowareEngage(true);  // XXX DIRTY HACK!!!
-      std::atomic_load(&autoware)->setVehicleVelocity(100.0);  // XXX DIRTY HACK!!!
+      // std::atomic_load(&autoware)->setAutowareEngage(true);  // XXX DIRTY HACK!!!
+      std::atomic_load(&autoware)->setVehicleVelocity(twist.linear.x);
 
       setTransform(status_.get().pose);
     };

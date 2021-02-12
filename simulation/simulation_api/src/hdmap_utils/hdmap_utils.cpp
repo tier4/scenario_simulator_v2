@@ -38,14 +38,14 @@
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <deque>
 #include <algorithm>
-#include <vector>
-#include <utility>
+#include <deque>
 #include <memory>
-#include <string>
 #include <set>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 // #define EXPERIMENTAL_AUTOWARE_IV_SUPPORT
 

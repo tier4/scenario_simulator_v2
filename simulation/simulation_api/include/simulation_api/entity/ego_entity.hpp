@@ -110,9 +110,10 @@ public:
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autoware)->isWaitingForRoute();
+      std::atomic_load(&autoware)->isWaitingForEngage();
       rate.sleep())
     {
+      std::cout << "ENGAGE!" << std::endl;
       std::atomic_load(&autoware)->setAutowareEngage(true);
     }
   }
