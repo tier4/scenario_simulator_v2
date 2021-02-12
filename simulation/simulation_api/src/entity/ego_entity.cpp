@@ -178,13 +178,5 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
   }
   return status;
 }
-
-void EgoEntity::setVehicleCommands(
-  const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,
-  const boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> & state_cmd)
-{
-  control_cmd_ = control_cmd;
-  state_cmd_ = state_cmd;
-}
 }  // namespace entity
 }  // namespace simulation_api

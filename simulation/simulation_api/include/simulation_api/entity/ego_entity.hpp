@@ -100,13 +100,28 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose, const openscenario_msgs::msg::LaneletPose &)
   {
+    std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
+
+    for (
+      rclcpp::WallRate rate {std::chrono::seconds(1)};
+      !std::atomic_load(&autoware)->isWaitingForRoute();
+      rate.sleep())
+    {}
+
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       std::atomic_load(&autoware)->isWaitingForRoute();
       rate.sleep())
     {
+      std::cout << "SEND GOAL-POSE!" << std::endl;
       std::atomic_load(&autoware)->setGoalPose(map_pose);
     }
+
+    for (
+      rclcpp::WallRate rate {std::chrono::seconds(1)};
+      !std::atomic_load(&autoware)->isWaitingForEngage();
+      rate.sleep())
+    {}
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
@@ -116,11 +131,9 @@ public:
       std::cout << "ENGAGE!" << std::endl;
       std::atomic_load(&autoware)->setAutowareEngage(true);
     }
-  }
 
-  void setVehicleCommands(
-    const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,
-    const boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> & state_cmd);
+    std::cout << "REQUEST END" << std::endl;
+  }
 
   const std::string getCurrentAction() const
   {
@@ -162,7 +175,7 @@ private:
     }
   }
 
-  decltype(auto) setTransform(const geometry_msgs::msg::Pose & pose) const
+  void setTransform(const geometry_msgs::msg::Pose & pose) const
   {
     geometry_msgs::msg::TransformStamped transform {};
     {
@@ -175,7 +188,7 @@ private:
       transform.transform.rotation = pose.orientation;
     }
 
-    return std::atomic_load(&autoware)->transform_broadcaster.sendTransform(transform);
+    std::atomic_load(&autoware)->transform_broadcaster.sendTransform(transform);
   }
 
 private:

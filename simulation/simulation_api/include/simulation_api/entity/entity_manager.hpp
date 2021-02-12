@@ -247,8 +247,7 @@ public:
   bool spawnEntity(T & entity)
   {
     if (entities_.count(entity.name) != 0) {
-      throw simulation_api::SimulationRuntimeError(
-              "entity " + entity.name + " already exist.");
+      throw simulation_api::SimulationRuntimeError("entity " + entity.name + " already exist.");
     }
     if (std::is_base_of<EntityBase, T>::value == false) {
       return false;
