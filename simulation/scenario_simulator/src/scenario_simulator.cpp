@@ -209,7 +209,8 @@ void ScenarioSimulator::spawnPedestrianEntity(
   XmlRpc::XmlRpcValue & result)
 {
   const auto req =
-    simulation_interface::deserializeFromBinValue<simulation_api_schema::SpawnPedestrianEntityRequest>(
+    simulation_interface::deserializeFromBinValue<
+    simulation_api_schema::SpawnPedestrianEntityRequest>(
     param);
   pedestrians_.emplace_back(req.parameters());
   simulation_api_schema::SpawnPedestrianEntityResponse res;
@@ -222,7 +223,8 @@ void ScenarioSimulator::spawnPedestrianEntity(
 void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   const auto req =
-    simulation_interface::deserializeFromBinValue<simulation_api_schema::DespawnEntityRequest>(param);
+    simulation_interface::deserializeFromBinValue<
+    simulation_api_schema::DespawnEntityRequest>(param);
   bool found = false;
   std::vector<openscenario_msgs::VehicleParameters> vehicles;
   for (const auto vehicle : vehicles_) {
