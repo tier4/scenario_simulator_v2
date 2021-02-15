@@ -21,8 +21,10 @@
 
 namespace simulation_api
 {
-TrafficLight::TrafficLight(std::int64_t id)
-: id(id)
+TrafficLight::TrafficLight(std::int64_t id,
+  std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions,
+  std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions)
+: id(id), color_positions_(color_positions), arrow_positions_(arrow_positions)
 {
   color_phase_.setState(TrafficLightColor::NONE);
   arrow_phase_.setState(TrafficLightArrow::NONE);
