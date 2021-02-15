@@ -142,11 +142,9 @@ public:
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
-  template
-  <
+  template<
     typename T,
-    REQUIRES(std::is_floating_point<T>)
-  >
+    REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setVehicleVelocity(const T value)
   {
     return setVehicleVelocity(convertTo<VehicleVelocity>(value));
@@ -244,11 +242,9 @@ public:
 
   DEFINE_PUBLISHER(CurrentShift);
 
-  template
-  <
+  template<
     typename T,
-    REQUIRES(std::is_floating_point<T>)
-  >
+    REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentShift(const T twist_linear_x)
   {
     CurrentShift current_shift {};
@@ -277,11 +273,9 @@ public:
 
   DEFINE_PUBLISHER(CurrentSteering);
 
-  template
-  <
+  template<
     typename T,
-    REQUIRES(std::is_floating_point<T>)
-  >
+    REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentSteering(const T value)
   {
     return setCurrentSteering(convertTo<CurrentSteering>(value));
@@ -345,11 +339,9 @@ public:
 
   DEFINE_PUBLISHER(CurrentVelocity);
 
-  template
-  <
+  template<
     typename T,
-    REQUIRES(std::is_floating_point<T>)
-  >
+    REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentVelocity(const T twist_linear_x)
   {
     return setCurrentVelocity(convertTo<CurrentVelocity>(twist_linear_x));
@@ -505,10 +497,8 @@ public:
   }
 
 public:
-  template
-  <
-    typename ... Ts
-  >
+  template<
+    typename ... Ts>
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Ts && ... xs)
   : rclcpp::Node("awapi_accessor_node", std::forward<decltype(xs)>(xs)...),
@@ -547,7 +537,7 @@ public:
 
     timer(
       create_wall_timer(
-        std::chrono::milliseconds(10),
+        std::chrono::milliseconds(5),
         [this]()
         {
           return updateTransform();

@@ -49,10 +49,9 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
     waitForAutowareToBeReady();
     std::atomic_load(&autoware)->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autoware)->setInitialTwist();
+    updateAutoware(current_entity_status.pose);
     first_time = false;
   }
-
-  updateAutoware(current_entity_status.pose);
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   state.state.x = current_entity_status.pose.position.x;
@@ -81,13 +80,19 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       std::atomic_load(&autoware)->getVehicleCommand().control.steering_angle;
   }
 
+  std::cout << "input = [" << input.x() << ", " << input.y() << "]" << std::endl;
+
   vehicle_model_ptr_->setInput(input);
   vehicle_model_ptr_->update(step_time);
 
+  const auto current_entity_status = getEntityStatus(current_time + step_time, step_time);
+
   updateAutoware(
-    getEntityStatus(current_time + step_time, step_time).pose,
-    vehicle_model_ptr_->getVx(),
-    vehicle_model_ptr_->getWz());
+    current_entity_status.pose,
+    (*vehicle_model_ptr_).getVx(),
+    (*vehicle_model_ptr_).getWz());
+
+  setStatus(current_entity_status);
 
   if (!previous_velocity_) {
     linear_jerk_ = 0;
@@ -111,6 +116,8 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
   geometry_msgs::msg::Pose pose;
   pose.position.x = vehicle_model_ptr_->getX();
   pose.position.y = vehicle_model_ptr_->getY();
+  std::cout << "x = " << pose.position.x << std::endl;
+  std::cout << "y = " << pose.position.y << std::endl;
   pose.position.z = 0.0;
   pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
 
@@ -136,18 +143,33 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
   v(0) = pose.position.x;
   v(1) = pose.position.y;
   v(2) = pose.position.z;
+  std::cout << "v = " << v << std::endl;
   v = rotation_mat * v;
+  std::cout << "v' = " << v << std::endl;
+  std::cout << "origin.pose = [\n"
+            << "  pose.position.x = " << origin_.get().position.x << "\n"
+            << "  pose.position.y = " << origin_.get().position.y << "\n"
+            << "  pose.position.z = " << origin_.get().position.z << "\n"
+            << "]" << std::endl;;
   status.pose.position.x = v(0) + origin_.get().position.x;
   status.pose.position.y = v(1) + origin_.get().position.y;
   status.pose.position.z = v(2) + origin_.get().position.z;
+  std::cout << "status.pose = [\n"
+            << "  pose.position.x = " << status.pose.position.x << "\n"
+            << "  pose.position.y = " << status.pose.position.y << "\n"
+            << "  pose.position.z = " << status.pose.position.z << "\n"
+            << "]" << std::endl;;
 
   status.pose.orientation = origin_.get().orientation * pose.orientation;
-  auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
+
+  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
+
   if (lanelet_pose) {
     status.lanelet_pose = lanelet_pose.get();
   } else {
     status.lanelet_pose_valid = false;
   }
+
   return status;
 }
 }  // namespace entity

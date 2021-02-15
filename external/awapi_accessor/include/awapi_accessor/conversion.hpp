@@ -33,18 +33,15 @@ namespace autoware_api
 #define REQUIRES_VA(...) \
   typename = typename std::enable_if<boost::mpl::and_<__VA_ARGS__>::value>::type
 
-template
-<
-  typename From, typename To
->
+template<
+  typename From,
+  typename To>
 struct converter
 {};
 
-template
-<
+template<
   typename To,
-  typename From
->
+  typename From>
 decltype(auto) convertTo(From && from)
 {
   return converter<
@@ -52,18 +49,13 @@ decltype(auto) convertTo(From && from)
   >()(std::forward<decltype(from)>(from));
 }
 
-template
-<
-  typename From
->
+template<typename From>
 struct converter<From, std_msgs::msg::Bool>
 {
   using result_type = std_msgs::msg::Bool;
 
-  template
-  <
-    REQUIRES(std::is_convertible<From, bool>)
-  >
+  template<
+    REQUIRES(std::is_convertible<From, bool>)>
   result_type operator()(const From & from)
   {
     result_type to;
@@ -75,18 +67,15 @@ struct converter<From, std_msgs::msg::Bool>
   }
 };
 
-template
-<
+template<
   typename From
 >
 struct converter<From, std_msgs::msg::Float32>
 {
   using result_type = std_msgs::msg::Float32;
 
-  template
-  <
-    REQUIRES(std::is_floating_point<From>)
-  >
+  template<
+    REQUIRES(std::is_floating_point<From>)>
   result_type operator()(const From from)
   {
     result_type to;
@@ -98,18 +87,14 @@ struct converter<From, std_msgs::msg::Float32>
   }
 };
 
-template
-<
-  typename From
->
+template<
+  typename From>
 struct converter<From, autoware_control_msgs::msg::EngageMode>
 {
   using result_type = autoware_control_msgs::msg::EngageMode;
 
-  template
-  <
-    REQUIRES(std::is_convertible<From, bool>)
-  >
+  template<
+    REQUIRES(std::is_convertible<From, bool>)>
   result_type operator()(const From & from)
   {
     result_type to;
