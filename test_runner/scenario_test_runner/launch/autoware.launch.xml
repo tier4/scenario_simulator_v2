@@ -15,6 +15,7 @@
   <arg name="sensing/visible_range" default="300.0"/>
 
   <!-- Vehicle Description -->
+  <!-- from vehicle_interface.launch.xml -->
   <arg name ="vehicle_id" default="$(env VEHICLE_ID default)" />
   <group>
     <include file="$(find-pkg-share vehicle_launch)/launch/vehicle_description.launch.xml">
@@ -23,6 +24,12 @@
       <arg name="vehicle_id" value="$(var vehicle_id)"/>
     </include>
   </group>
+  <!-- from simple_planning_simulator.launch.xml -->
+  <node pkg="topic_tools" exec="relay" name="twist_relay" output="log" >
+    <param name="input_topic" value="/vehicle/status/twist" />
+    <param name="output_topic" value="/localization/twist" />
+    <param name="type" value="geometry_msgs/msg/TwistStamped" />
+  </node>
 
   <!-- System -->
   <include file="$(find-pkg-share system_launch)/launch/system.launch.xml">

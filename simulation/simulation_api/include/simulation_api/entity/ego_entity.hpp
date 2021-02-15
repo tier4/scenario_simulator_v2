@@ -175,10 +175,6 @@ private:
       current_twist.angular.z = angular_z;
     }
 
-    // std::cout << "pose.position.x = " << current_pose.position.x << std::endl;
-    // std::cout << "pose.position.y = " << current_pose.position.y << std::endl;
-    // std::cout << "pose.position.z = " << current_pose.position.z << std::endl;
-
     std::atomic_load(&autoware)->setCurrentControlMode();
     std::atomic_load(&autoware)->setCurrentPose(current_pose);
     std::atomic_load(&autoware)->setCurrentShift(current_twist);
