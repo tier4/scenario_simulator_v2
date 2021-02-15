@@ -32,6 +32,7 @@
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
+#include <simulation_interface/conversions.hpp>
 
 namespace autoware_api
 {
@@ -243,9 +244,17 @@ public:
   {}
 
 public:
-  const Trajectory getTrajectory()
+  const openscenario_msgs::WayPoints getTrajectory()
   {
-    return trajectory;
+    openscenario_msgs::WayPoints waypoints;
+    for(const auto trajectory_point : trajectory.points)
+    {
+      geometry_msgs::msg::Point p = trajectory_point.pose.position;
+      geometry_msgs::Point proto;
+      simulation_interface::toProto(p, proto);
+      *waypoints.add_waypoints() = proto;
+    }
+    return waypoints;
   }
 
 private:
