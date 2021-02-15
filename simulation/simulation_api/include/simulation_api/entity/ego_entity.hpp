@@ -77,8 +77,7 @@ public:
    *  TeleportAction in the Storyboard.Init section.
    *
    * ------------------------------------------------------------------------ */
-  template<
-    typename ... Ts>
+  template<typename ... Ts>
   explicit EgoEntity(Ts && ... xs)
   : VehicleEntity(std::forward<decltype(xs)>(xs)...),
     autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
@@ -181,7 +180,7 @@ private:
     std::atomic_load(&autoware)->setCurrentVelocity(current_twist);
     std::atomic_load(&autoware)->setLaneChangeApproval(true);
     std::atomic_load(&autoware)->setTransform(current_pose);
-    std::atomic_load(&autoware)->setVehicleVelocity(100.0);
+    std::atomic_load(&autoware)->setVehicleVelocity(current_twist.linear.x);
   }
 
 private:
