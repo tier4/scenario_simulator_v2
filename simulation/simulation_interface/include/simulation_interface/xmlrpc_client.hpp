@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef XMLRPC_INTERFACE__XMLRPC_CLIENT_HPP_
-#define XMLRPC_INTERFACE__XMLRPC_CLIENT_HPP_
+#ifndef SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_
+#define SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_
 
 #include <xmlrpcpp/XmlRpc.h>
 #include <simulation_interface/conversions.hpp>
@@ -66,4 +66,4 @@ bool call(
 }
 }  // namespace simulation_interface
 
-#endif  // XMLRPC_INTERFACE__XMLRPC_CLIENT_HPP_
+#endif  // SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_

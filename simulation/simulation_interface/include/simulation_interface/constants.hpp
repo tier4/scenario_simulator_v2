@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef XMLRPC_INTERFACE__CONSTANTS_HPP_
-#define XMLRPC_INTERFACE__CONSTANTS_HPP_
+#ifndef SIMULATION_INTERFACE__CONSTANTS_HPP_
+#define SIMULATION_INTERFACE__CONSTANTS_HPP_
 
 namespace simulation_interface
 {
@@ -42,4 +42,4 @@ const char attach_lidar_sensor[] = "attach_lidar_sensor";
 }  // namespace method
 }  // namespace simulation_interface
 
-#endif  // XMLRPC_INTERFACE__CONSTANTS_HPP_
+#endif  // SIMULATION_INTERFACE__CONSTANTS_HPP_
