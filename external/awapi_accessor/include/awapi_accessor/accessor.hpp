@@ -247,8 +247,7 @@ public:
   const openscenario_msgs::msg::WaypointsArray getWaypoints()
   {
     openscenario_msgs::msg::WaypointsArray waypoints;
-    for(const auto trajectory_point : trajectory.points)
-    {
+    for (const auto trajectory_point : trajectory.points) {
       geometry_msgs::msg::Point p = trajectory_point.pose.position;
       waypoints.waypoints.emplace_back(p);
     }

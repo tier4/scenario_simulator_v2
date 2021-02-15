@@ -483,7 +483,9 @@ bool API::attachDetectionSensor(simulation_api_schema::DetectionSensorConfigurat
   simulation_api_schema::AttachDetectionSensorRequest req;
   simulation_api_schema::AttachDetectionSensorResponse res;
   *req.mutable_configuration() = configuration;
-  simulation_interface::call(client_ptr_, simulation_interface::method::attach_detection_sensor, req, res);
+  simulation_interface::call(
+    client_ptr_, simulation_interface::method::attach_detection_sensor,
+    req, res);
   return res.result().success();
 }
 
