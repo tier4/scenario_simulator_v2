@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
-#define SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
+#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
+#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 
 #include <simulation_api_schema.pb.h>
 
@@ -21,21 +21,22 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 
 #include <vector>
-#include <unordered_map>
+#include <string>
 #include <memory>
 
 namespace scenario_simulator
 {
-class LidarModel
+class LidarSensor
 {
 public:
-  LidarModel(
+  LidarSensor(
     const simulation_api_schema::LidarConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
   void update(
     double current_time,
     const std::vector<openscenario_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp);
+  const std::vector<std::string> & getDetectedObjects() const;
 
 private:
   simulation_api_schema::LidarConfiguration configuration_;
@@ -44,7 +45,8 @@ private:
     const std::vector<openscenario_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp);
   double last_update_stamp_;
+  std::vector<std::string> detected_objects_;
 };
 }  // namespace scenario_simulator
 
-#endif  // SCENARIO_SIMULATOR__RAYCAST__LIDAR_SIMULATION_HPP_
+#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_

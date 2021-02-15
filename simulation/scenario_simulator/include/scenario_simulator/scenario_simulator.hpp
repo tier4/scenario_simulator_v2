@@ -16,7 +16,10 @@
 #define SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 
 #include <scenario_simulator/xmlrpc_method.hpp>
-#include <scenario_simulator/raycast/lidar_simulation.hpp>
+
+#include <scenario_simulator/sensor_simulation/sensor_simulation.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -51,6 +54,7 @@ private:
   void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void updateEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void attachLidarSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
+  void attachDetectionSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void updateSensorFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void addMethod(
     std::string name, std::function<void(XmlRpc::XmlRpcValue &,
@@ -65,8 +69,7 @@ private:
   double current_time_;
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
-  std::vector<std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>>> pointcloud_pub_;
-  std::vector<LidarModel> lidar_models_;
+  SensorSimulation sensor_sim_;
 };
 }  // namespace scenario_simulator
 
