@@ -15,6 +15,7 @@
 #ifndef SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <simulation_api/traffic_lights/traffic_light_state.hpp>
 #include <simulation_api/traffic_lights/traffic_light_phase.hpp>
 
 #include <simulation_api/entity/exception.hpp>
@@ -23,25 +24,10 @@
 #include <limits>
 #include <utility>
 #include <iostream>
+#include <unordered_map>
 
 namespace simulation_api
 {
-enum class TrafficLightColor
-{
-  NONE,
-  RED,
-  GREEN,
-  YELLOW
-};
-
-enum class TrafficLightArrow
-{
-  NONE,
-  STRAIGHT,
-  LEFT,
-  RIGHT
-};
-
 class TrafficLight
 {
   using Duration = double;

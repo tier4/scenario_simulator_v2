@@ -544,7 +544,6 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
-      std::cout << "scannig " << light_string.id() << std::endl;
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
         if (id) {
@@ -555,6 +554,28 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   }
   return ret;
 }
+
+/*
+const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightColorPosition(
+  std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const
+{
+  if(color == simulation_api::TrafficLightColor::NONE)
+  {
+    return boost::none;
+  }
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
+  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
+  for (const auto light : autoware_traffic_lights) {
+    for (auto light_string : light->lightBulbs()) {
+      if (light_string.hasAttribute("traffic_light_id")) {
+        auto id = light_string.attribute("traffic_light_id").asId();
+        if (id) {
+        }
+      }
+    }
+  }
+}
+*/
 
 boost::optional<std::pair<simulation_api::math::HermiteCurve,
   double>> HdMapUtils::getLaneChangeTrajectory(
