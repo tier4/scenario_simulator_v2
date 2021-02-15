@@ -20,10 +20,8 @@
 
 namespace scenario_simulator
 {
-SensorSimulation::SensorSimulation(std::shared_ptr<rclcpp::Clock> clock_ptr)
-{
-  clock_ptr_ = clock_ptr;
-}
+SensorSimulation::SensorSimulation(const std::shared_ptr<rclcpp::Clock> & clock_ptr)
+: clock_ptr_(clock_ptr) {}
 
 void SensorSimulation::attachLidarSensor(
   const simulation_api_schema::LidarConfiguration & configuration,
