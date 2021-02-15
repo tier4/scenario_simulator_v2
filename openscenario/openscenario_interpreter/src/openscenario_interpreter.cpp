@@ -26,19 +26,19 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   expect("success"),
-  log_path("/tmp"),  // DEPRECATED
+  output_directory("/tmp"),  // DEPRECATED
   osc_path(""),
   real_time_factor(1.0),
   frame_rate(30)
 {
   declare_parameter<decltype(expect)>("expect", expect);
   declare_parameter<decltype(frame_rate)>("frame-rate", frame_rate);
-  declare_parameter<decltype(log_path)>("log_path", log_path);
+  declare_parameter<decltype(output_directory)>("output_directory", output_directory);
   declare_parameter<decltype(osc_path)>("osc_path", osc_path);
   declare_parameter<decltype(real_time_factor)>("real-time-factor", real_time_factor);
 }
 
-Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
+Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) try
 {
   VERBOSE(">>> Configure");
 
@@ -47,9 +47,8 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("expect", expect);
   VERBOSE("  expect: " << expect);
 
-  get_parameter("log_path", log_path);
-  log_path = log_path + "/result.junit.xml";
-  VERBOSE("  log_path: " << log_path);
+  get_parameter("output_directory", output_directory);
+  VERBOSE("  output_directory: " << output_directory);
 
   get_parameter("osc_path", osc_path);
   VERBOSE("  osc_path: " << osc_path);
@@ -60,24 +59,21 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
   get_parameter("frame-rate", frame_rate);
   VERBOSE("  frame-rate: " << frame_rate);
 
-  try {
-    VERBOSE("  Loading scenario " << osc_path);
-    script.rebind<OpenScenario>(osc_path);
-  } catch (const openscenario_interpreter::SyntaxError & error) {
-    std::cerr << "\x1b[1;31m" << error.what() << "\x1b[0m" << std::endl;
-    return Interpreter::Result::FAILURE;
-  }
+  VERBOSE("  Loading scenario " << osc_path);
+  script.rebind<OpenScenario>(osc_path);
 
   connect(shared_from_this(), script.as<OpenScenario>().scope.logic_file.string());
   VERBOSE("  connection established");
 
-  // XXX ???
   initialize(real_time_factor, (1 / frame_rate) * real_time_factor);
   VERBOSE("  simulator initialized");
 
   VERBOSE("<<< Configure");
 
   return Interpreter::Result::SUCCESS;
+} catch (const openscenario_interpreter::SyntaxError & error) {
+  std::cerr << "\x1b[1;31m" << error.what() << "\x1b[0m" << std::endl;
+  return Interpreter::Result::FAILURE;
 }
 
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)

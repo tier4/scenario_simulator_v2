@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_api/entity/ego_entity.hpp>
+#include <awapi_accessor/accessor.hpp>
 #include <quaternion_operation/quaternion_operation.h>
+#include <simulation_api/entity/ego_entity.hpp>
 
 #include <string>
 #include <memory>
@@ -37,30 +38,44 @@ openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  const double wheelbase =
-    parameters.axles.front_axle.position_x -
-    parameters.axles.rear_axle.position_x;
-
-  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(wheelbase);
+  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(
+    parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
 
   // NOTE Currently, setStatus always succeeds.
   const bool success = VehicleEntity::setStatus(status);
 
   const auto current_entity_status = getStatus();
 
+  static auto first_time = true;
+
+  if (first_time) {
+    waitForAutowareToBeReady();
+    std::atomic_load(&autoware)->setInitialPose(current_entity_status.pose);
+    std::atomic_load(&autoware)->setInitialTwist();
+    first_time = false;
+  }
+
+  updateAutoware(
+    current_entity_status.pose,
+    current_entity_status.action_status.twist.linear.x,
+    current_entity_status.action_status.twist.angular.z);
+
   autoware_auto_msgs::msg::VehicleKinematicState state;
-  state.state.x = current_entity_status.pose.position.x;
-  state.state.y = current_entity_status.pose.position.y;
-  state.state.heading = toHeading(
-    quaternion_operation::convertQuaternionToEulerAngle(
-      current_entity_status.pose.orientation).z);
-  state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
-  state.state.lateral_velocity_mps = 0;
-  state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;
-  state.state.front_wheel_angle_rad = 0;
-  state.state.rear_wheel_angle_rad = 0;
+  {
+    state.state.x = current_entity_status.pose.position.x;
+    state.state.y = current_entity_status.pose.position.y;
+    state.state.heading = toHeading(
+      quaternion_operation::convertQuaternionToEulerAngle(
+        current_entity_status.pose.orientation).z);
+    state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
+    state.state.lateral_velocity_mps = 0;
+    state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;
+    state.state.front_wheel_angle_rad = 0;
+    state.state.rear_wheel_angle_rad = 0;
+  }
 
   current_kinematic_state_ = state;
+
   origin_ = current_entity_status.pose;
 
   return success;
@@ -68,27 +83,24 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  if (!status_ || !control_cmd_) {
-    return;
-  }
-  if (!current_kinematic_state_) {
-    return;
-  }
-  if (!origin_) {
-    return;
-  }
   Eigen::VectorXd input(2);
-  auto steer = control_cmd_->front_wheel_angle_rad;
-  auto acc = control_cmd_->velocity_mps;
-  input << acc, steer;
+  {
+    input <<
+      std::atomic_load(&autoware)->getVehicleCommand().control.velocity,
+      std::atomic_load(&autoware)->getVehicleCommand().control.steering_angle;
+  }
+
   vehicle_model_ptr_->setInput(input);
   vehicle_model_ptr_->update(step_time);
-  status_ = getEntityStatus(current_time + step_time, step_time);
+
+  setStatus(getEntityStatus(current_time + step_time, step_time));
+
   if (!previous_velocity_) {
     linear_jerk_ = 0;
   } else {
     linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_velocity_.get()) / step_time;
   }
+
   previous_velocity_ = vehicle_model_ptr_->getVx();
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
@@ -98,59 +110,66 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
   const double step_time) const
 {
   geometry_msgs::msg::Vector3 rpy;
-  rpy.x = 0;
-  rpy.y = 0;
-  rpy.z = vehicle_model_ptr_->getYaw();
+  {
+    rpy.x = 0;
+    rpy.y = 0;
+    rpy.z = vehicle_model_ptr_->getYaw();
+  }
 
   geometry_msgs::msg::Pose pose;
-  pose.position.x = vehicle_model_ptr_->getX();
-  pose.position.y = vehicle_model_ptr_->getY();
-  pose.position.z = 0.0;
-  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  {
+    pose.position.x = vehicle_model_ptr_->getX();
+    pose.position.y = vehicle_model_ptr_->getY();
+    pose.position.z = 0.0;
+    pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  }
 
   geometry_msgs::msg::Twist twist;
-  twist.linear.x = vehicle_model_ptr_->getVx();
-  twist.angular.z = vehicle_model_ptr_->getWz();
-
-  openscenario_msgs::msg::EntityStatus status;
-  status.time = time;
-  status.type.type = openscenario_msgs::msg::EntityType::EGO;
-  status.bounding_box = getBoundingBox();
-  status.action_status.twist = twist;
+  {
+    twist.linear.x = vehicle_model_ptr_->getVx();
+    twist.angular.z = vehicle_model_ptr_->getWz();
+  }
 
   geometry_msgs::msg::Accel accel;
-  if (previous_angular_velocity_ && previous_velocity_) {
-    accel.linear.x = (twist.linear.x - previous_velocity_.get()) / step_time;
-    accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
+  {
+    if (previous_angular_velocity_ && previous_velocity_) {
+      accel.linear.x = (twist.linear.x - previous_velocity_.get()) / step_time;
+      accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
+    }
   }
-  status.action_status.accel = accel;
 
-  auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
   Eigen::VectorXd v(3);
-  v(0) = pose.position.x;
-  v(1) = pose.position.y;
-  v(2) = pose.position.z;
-  v = rotation_mat * v;
-  status.pose.position.x = v(0) + origin_.get().position.x;
-  status.pose.position.y = v(1) + origin_.get().position.y;
-  status.pose.position.z = v(2) + origin_.get().position.z;
-
-  status.pose.orientation = origin_.get().orientation * pose.orientation;
-  auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
-  if (lanelet_pose) {
-    status.lanelet_pose = lanelet_pose.get();
-  } else {
-    status.lanelet_pose_valid = false;
+  {
+    v(0) = pose.position.x;
+    v(1) = pose.position.y;
+    v(2) = pose.position.z;
   }
-  return status;
-}
 
-void EgoEntity::setVehicleCommands(
-  const boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> & control_cmd,
-  const boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> & state_cmd)
-{
-  control_cmd_ = control_cmd;
-  state_cmd_ = state_cmd;
+  const auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
+  v = rotation_mat * v;
+
+  openscenario_msgs::msg::EntityStatus status;
+  {
+    status.time = time;
+    status.type.type = openscenario_msgs::msg::EntityType::EGO;
+    status.bounding_box = getBoundingBox();
+    status.action_status.twist = twist;
+    status.action_status.accel = accel;
+    status.pose.position.x = v(0) + origin_.get().position.x;
+    status.pose.position.y = v(1) + origin_.get().position.y;
+    status.pose.position.z = v(2) + origin_.get().position.z;
+    status.pose.orientation = origin_.get().orientation * pose.orientation;
+
+    const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
+
+    if (lanelet_pose) {
+      status.lanelet_pose = lanelet_pose.get();
+    } else {
+      status.lanelet_pose_valid = false;
+    }
+  }
+
+  return status;
 }
 }  // namespace entity
 }  // namespace simulation_api

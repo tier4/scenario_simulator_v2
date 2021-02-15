@@ -55,8 +55,6 @@ class API
 {
   using EntityManager = simulation_api::entity::EntityManager;
 
-  std::shared_ptr<autoware_api::Accessor> access_rights_;
-
 #define FORWARD_TO_ENTITY_MANAGER(NAME) \
   template \
   < \
@@ -78,11 +76,9 @@ public:
     const std::string & map_path = "",
     const bool verbose = false,
     const bool standalone_mode = false,
-    const std::string & metrics_logfile_path = "/tmp/metrics.json",
-    const rclcpp::SubscriptionOptionsWithAllocator<AllocatorT> & options =
-    rclcpp::SubscriptionOptionsWithAllocator<AllocatorT>())
-  : access_rights_(std::make_shared<decltype(access_rights_)::element_type>(node)),
-    standalone_mode(standalone_mode),
+    const std::string & metrics_logfile_path = "/tmp/metrics.json")
+  : standalone_mode(standalone_mode),
+    entity_manager_ptr_(std::make_shared<EntityManager>(node, map_path)),
     metrics_manager_(verbose, metrics_logfile_path)
   {
     std::string address = "127.0.0.1";
@@ -92,24 +88,11 @@ public:
     node->declare_parameter("port", port);
     node->get_parameter("port", port);
     node->undeclare_parameter("port");
-    auto cmd_cb = std::bind(&API::vehicleControlCommandCallback, this, std::placeholders::_1);
-    cmd_sub_ = rclcpp::create_subscription<autoware_auto_msgs::msg::VehicleControlCommand>(
-      node,
-      "input/vehicle_control_command",
-      rclcpp::QoS(10),
-      std::move(cmd_cb),
-      options);
-    auto state_cmd_cb = std::bind(&API::vehicleStateCommandCallback, this, std::placeholders::_1);
-    state_cmd_sub_ = rclcpp::create_subscription<autoware_auto_msgs::msg::VehicleStateCommand>(
-      node,
-      "input/vehicle_state_command",
-      rclcpp::QoS(10),
-      std::move(state_cmd_cb),
-      options);
-    entity_manager_ptr_ = std::make_shared<EntityManager>(node, map_path);
+
+    client_ptr_ = std::make_shared<XmlRpc::XmlRpcClient>(address.c_str(), port);
+
     metrics_manager_.setEntityManager(entity_manager_ptr_);
-    client_ptr_ =
-      std::shared_ptr<XmlRpc::XmlRpcClient>(new XmlRpc::XmlRpcClient(address.c_str(), port));
+
     setVerbose(verbose);
   }
 
@@ -286,14 +269,6 @@ private:
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;
   double current_time_;
-
-  void vehicleControlCommandCallback(autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg);
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> current_cmd_;
-  rclcpp::Subscription<autoware_auto_msgs::msg::VehicleControlCommand>::SharedPtr cmd_sub_;
-
-  void vehicleStateCommandCallback(autoware_auto_msgs::msg::VehicleStateCommand::SharedPtr msg);
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> current_state_cmd_;
-  rclcpp::Subscription<autoware_auto_msgs::msg::VehicleStateCommand>::SharedPtr state_cmd_sub_;
 
   metrics::MetricsManager metrics_manager_;
 };
