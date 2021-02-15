@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <scenario_simulator/primitives/box.hpp>
+#include <scenario_simulator/sensor_simulation/primitives/box.hpp>
 
 #include <vector>
 #include <string>

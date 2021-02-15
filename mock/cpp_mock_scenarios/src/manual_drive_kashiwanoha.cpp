@@ -62,6 +62,8 @@ public:
         "ego",
         "points_raw")
     );
+    api_.attachDetectionSensor(
+      simulation_api::helper::constructDetectionSensorConfiguration("ego", "/detection", 0.1));
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }

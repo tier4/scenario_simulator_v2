@@ -32,7 +32,7 @@
 namespace scenario_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
-: Node("scenario_simulator", options)
+: Node("scenario_simulator", options), sensor_sim_(get_clock())
 {
   declare_parameter("port", 8080);
   get_parameter("port", port_);
@@ -89,6 +89,14 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     xmlrpc_interface::method::attach_lidar_sensor,
     std::bind(
       &ScenarioSimulator::attachLidarSensor,
+      this,
+      std::placeholders::_1,
+      std::placeholders::_2));
+
+  addMethod(
+    xmlrpc_interface::method::attach_detection_sensor,
+    std::bind(
+      &ScenarioSimulator::attachDetectionSensor,
       this,
       std::placeholders::_1,
       std::placeholders::_2));
@@ -252,6 +260,23 @@ void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRp
   result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
 }
 
+void ScenarioSimulator::attachDetectionSensor(
+  XmlRpc::XmlRpcValue & param,
+  XmlRpc::XmlRpcValue & result)
+{
+  const auto req =
+    xmlrpc_interface::deserializeFromBinValue<
+    simulation_api_schema::AttachDetectionSensorRequest>(param);
+  const auto pub = this->create_publisher<
+    autoware_perception_msgs::msg::DynamicObjectArray>(
+    req.configuration().topic_name(), 1);
+  sensor_sim_.attachDetectionSensor(req.configuration(), pub);
+  simulation_api_schema::AttachDetectionSensorResponse res;
+  res.mutable_result()->set_success(true);
+  result = XmlRpc::XmlRpcValue();
+  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+}
+
 void ScenarioSimulator::attachLidarSensor(
   XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
@@ -261,9 +286,7 @@ void ScenarioSimulator::attachLidarSensor(
     simulation_api_schema::AttachLidarSensorRequest>(param);
   const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
     req.configuration().topic_name(), 1);
-  LidarModel lidar_model(req.configuration(), pub);
-  lidar_models_.push_back(lidar_model);
-  pointcloud_pub_.emplace_back(pub);
+  sensor_sim_.attachLidarSensor(req.configuration(), pub);
   simulation_api_schema::AttachLidarSensorResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();
@@ -272,9 +295,7 @@ void ScenarioSimulator::attachLidarSensor(
 
 void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
 {
-  for (auto & model : lidar_models_) {
-    model.update(current_time_, entity_status_, get_clock()->now());
-  }
+  sensor_sim_.updateSensorFrame(current_time_, entity_status_);
   simulation_api_schema::UpdateSensorFrameResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();

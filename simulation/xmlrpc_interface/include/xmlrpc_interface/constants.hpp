@@ -39,6 +39,7 @@ const char spawn_pedestrian_entity[] = "spawn_pedestrian_entity";
 const char despawn_entity[] = "despawn_entity";
 const char update_entity_status[] = "update_entity_status";
 const char attach_lidar_sensor[] = "attach_lidar_sensor";
+const char attach_detection_sensor[] = "attach_detection_sensor";
 }  // namespace method
 }  // namespace xmlrpc_interface
 

@@ -88,6 +88,16 @@ std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::Lanel
   return os;
 }
 
+const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
+  std::string entity, std::string topic_name, double update_duration)
+{
+  simulation_api_schema::DetectionSensorConfiguration configuration;
+  configuration.set_entity(entity);
+  configuration.set_topic_name(topic_name);
+  configuration.set_update_duration(update_duration);
+  return configuration;
+}
+
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   LidarType type, std::string entity, std::string topic_name,
   double horizontal_resolution)

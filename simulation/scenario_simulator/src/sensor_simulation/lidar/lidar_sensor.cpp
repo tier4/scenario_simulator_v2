@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <scenario_simulator/exception.hpp>
-#include <scenario_simulator/raycast/lidar_simulation.hpp>
-#include <scenario_simulator/raycast/raycaster.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+#include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <xmlrpc_interface/conversions.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 
@@ -22,10 +22,11 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace scenario_simulator
 {
-LidarModel::LidarModel(
+LidarSensor::LidarSensor(
   const simulation_api_schema::LidarConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
 : configuration_(configuration), publisher_ptr_(publisher_ptr)
@@ -33,7 +34,12 @@ LidarModel::LidarModel(
   last_update_stamp_ = 0;
 }
 
-void LidarModel::update(
+const std::vector<std::string> & LidarSensor::getDetectedObjects() const
+{
+  return detected_objects_;
+}
+
+void LidarSensor::update(
   double current_time,
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
@@ -41,10 +47,12 @@ void LidarModel::update(
   if ((current_time - last_update_stamp_) >= configuration_.scan_duration()) {
     last_update_stamp_ = current_time;
     publisher_ptr_->publish(raycast(status, stamp));
+  } else {
+    detected_objects_ = {};
   }
 }
 
-const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
+const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
   const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
@@ -80,12 +88,14 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
     for (const auto v : configuration_.vertical_angles()) {
       vertical_angles.emplace_back(v);
     }
-    return raycaster.raycast(
+    const auto poincloud = raycaster.raycast(
       configuration_.entity(),
       stamp,
       ego_pose.get(),
       configuration_.horizontal_resolution(),
       vertical_angles);
+    detected_objects_ = raycaster.getDetectedObject();
+    return poincloud;
   }
   throw scenario_simulator::SimulationRuntimeError("failed to found ego vehicle");
 }

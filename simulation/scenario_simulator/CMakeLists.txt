@@ -33,10 +33,12 @@ include_directories(
 ament_auto_add_library(scenario_simulator SHARED
   src/xmlrpc_method.cpp
   src/scenario_simulator.cpp
-  src/primitives/primitive.cpp
-  src/primitives/box.cpp
-  src/raycast/raycaster.cpp
-  src/raycast/lidar_simulation.cpp
+  src/sensor_simulation/primitives/primitive.cpp
+  src/sensor_simulation/primitives/box.cpp
+  src/sensor_simulation/lidar/raycaster.cpp
+  src/sensor_simulation/lidar/lidar_sensor.cpp
+  src/sensor_simulation/sensor_simulation.cpp
+  src/sensor_simulation/detection_sensor/detection_sensor.cpp
 )
 target_link_libraries(scenario_simulator
   embree3
