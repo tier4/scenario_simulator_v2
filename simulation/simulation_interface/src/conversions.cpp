@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <xmlrpc_interface/conversions.hpp>
+#include <simulation_interface/conversions.hpp>
 
 #include <string>
 #include <vector>
 
-namespace xmlrpc_interface
+namespace simulation_interface
 {
 void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto)
 {
@@ -336,4 +336,4 @@ void toMsg(
   toMsg(proto.lanelet_pose(), status.lanelet_pose);
   status.lanelet_pose_valid = proto.lanelet_pose_valid();
 }
-}  // namespace xmlrpc_interface
+}  // namespace simulation_interface

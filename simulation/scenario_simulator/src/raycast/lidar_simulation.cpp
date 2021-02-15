@@ -15,7 +15,7 @@
 #include <scenario_simulator/exception.hpp>
 #include <scenario_simulator/raycast/lidar_simulation.hpp>
 #include <scenario_simulator/raycast/raycaster.hpp>
-#include <xmlrpc_interface/conversions.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/optional.hpp>
@@ -53,15 +53,15 @@ const sensor_msgs::msg::PointCloud2 LidarModel::raycast(
   for (const auto s : status) {
     if (configuration_.entity() == s.name()) {
       geometry_msgs::msg::Pose pose;
-      xmlrpc_interface::toMsg(s.pose(), pose);
+      simulation_interface::toMsg(s.pose(), pose);
       ego_pose = pose;
     } else {
       geometry_msgs::msg::Pose pose;
-      xmlrpc_interface::toMsg(s.pose(), pose);
+      simulation_interface::toMsg(s.pose(), pose);
       auto rotation =
         quaternion_operation::getRotationMatrix(pose.orientation);
       geometry_msgs::msg::Point center_point;
-      xmlrpc_interface::toMsg(s.bounding_box().center(), center_point);
+      simulation_interface::toMsg(s.bounding_box().center(), center_point);
       Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
       center = rotation * center;
       pose.position.x = pose.position.x + center.x();

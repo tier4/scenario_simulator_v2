@@ -21,6 +21,7 @@
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
+#include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
@@ -138,6 +139,15 @@ class Accessor
 
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
+  /** ---- Trajectory ----------------------------------------------------------
+   *
+   *  Topic: /planning/scenario_planning/trajectory
+   *
+   * ------------------------------------------------------------------------ */
+  using Trajectory = autoware_planning_msgs::msg::Trajectory;
+
+  DEFINE_SUBSCRIPTION(Trajectory);
+
 public:
   /** ---- Checkpoint ----------------------------------------------------------
    *
@@ -231,6 +241,15 @@ public:
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(InitialTwist, "/initialtwist")
   {}
+
+public:
+  const Trajectory getTrajectory()
+  {
+    return trajectory;
+  }
+
+private:
+  Trajectory trajectory;
 };
 
 }  // namespace autoware_api

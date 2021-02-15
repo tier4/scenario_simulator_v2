@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
-#include <xmlrpc_interface/xmlrpc_client.hpp>
-#include <xmlrpc_interface/conversions.hpp>
+#include <simulation_interface/xmlrpc_client.hpp>
+#include <simulation_interface/conversions.hpp>
 
 #include <tf2/LinearMath/Quaternion.h>
 
@@ -40,7 +40,7 @@ bool API::despawn(const std::string & name)
     simulation_api_schema::DespawnEntityRequest req;
     simulation_api_schema::DespawnEntityResponse res;
     req.set_name(name);
-    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::despawn_entity, req, res);
+    simulation_interface::call(client_ptr_, simulation_interface::method::despawn_entity, req, res);
     return res.result().success();
   }
   return true;
@@ -82,9 +82,9 @@ bool API::spawn(
     simulation_api_schema::SpawnVehicleEntityRequest req;
     simulation_api_schema::SpawnVehicleEntityResponse res;
     req.set_is_ego(true);
-    xmlrpc_interface::toProto(params, *req.mutable_parameters());
-    return xmlrpc_interface::call(
-      client_ptr_, xmlrpc_interface::method::spawn_vehicle_entity, req,
+    simulation_interface::toProto(params, *req.mutable_parameters());
+    return simulation_interface::call(
+      client_ptr_, simulation_interface::method::spawn_vehicle_entity, req,
       res);
   } else {
     simulation_api::entity::VehicleEntity npc(name, params);
@@ -97,9 +97,9 @@ bool API::spawn(
     simulation_api_schema::SpawnVehicleEntityRequest req;
     simulation_api_schema::SpawnVehicleEntityResponse res;
     req.set_is_ego(false);
-    xmlrpc_interface::toProto(params, *req.mutable_parameters());
-    return xmlrpc_interface::call(
-      client_ptr_, xmlrpc_interface::method::spawn_pedestrian_entity,
+    simulation_interface::toProto(params, *req.mutable_parameters());
+    return simulation_interface::call(
+      client_ptr_, simulation_interface::method::spawn_pedestrian_entity,
       req, res);
   }
   return false;
@@ -122,9 +122,9 @@ bool API::spawn(
   }
   simulation_api_schema::SpawnPedestrianEntityRequest req;
   simulation_api_schema::SpawnPedestrianEntityResponse res;
-  xmlrpc_interface::toProto(params, *req.mutable_parameters());
-  return xmlrpc_interface::call(
-    client_ptr_, xmlrpc_interface::method::spawn_pedestrian_entity, req,
+  simulation_interface::toProto(params, *req.mutable_parameters());
+  return simulation_interface::call(
+    client_ptr_, simulation_interface::method::spawn_pedestrian_entity, req,
     res);
 }
 
@@ -470,7 +470,9 @@ bool API::initialize(
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
   simulation_api_schema::InitializeResponse res;
-  return xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::initialize, req, res);
+  return simulation_interface::call(
+    client_ptr_, simulation_interface::method::initialize, req,
+    res);
 }
 
 bool API::attachLidarSensor(
@@ -483,7 +485,9 @@ bool API::attachLidarSensor(
   simulation_api_schema::AttachLidarSensorRequest req;
   simulation_api_schema::AttachLidarSensorResponse res;
   *req.mutable_configuration() = configuration;
-  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::attach_lidar_sensor, req, res);
+  simulation_interface::call(
+    client_ptr_, simulation_interface::method::attach_lidar_sensor, req,
+    res);
   return res.result().success();
 }
 
@@ -495,7 +499,9 @@ bool API::updateSensorFrame()
   simulation_api_schema::UpdateSensorFrameRequest req;
   req.set_current_time(current_time_);
   simulation_api_schema::UpdateSensorFrameResponse res;
-  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_sensor_frame, req, res);
+  simulation_interface::call(
+    client_ptr_, simulation_interface::method::update_sensor_frame, req,
+    res);
   return res.result().success();
 }
 
@@ -508,15 +514,17 @@ bool API::updateEntityStatusInSim()
     if (status) {
       openscenario_msgs::EntityStatus proto;
       status.get().name = name;
-      xmlrpc_interface::toProto(status.get(), proto);
+      simulation_interface::toProto(status.get(), proto);
       *req.add_status() = proto;
     }
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
-  xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_entity_status, req, res);
+  simulation_interface::call(
+    client_ptr_, simulation_interface::method::update_entity_status, req,
+    res);
   for (const auto status : res.status()) {
     openscenario_msgs::msg::EntityStatus msg;
-    xmlrpc_interface::toMsg(status, msg);
+    simulation_interface::toMsg(status, msg);
     entity_manager_ptr_->setEntityStatus(status.name(), msg);
   }
   return res.result().success();
@@ -530,7 +538,7 @@ bool API::updateFrame()
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(current_time_);
     simulation_api_schema::UpdateFrameResponse res;
-    xmlrpc_interface::call(client_ptr_, xmlrpc_interface::method::update_frame, req, res);
+    simulation_interface::call(client_ptr_, simulation_interface::method::update_frame, req, res);
     if (!res.result().success()) {
       return false;
     }

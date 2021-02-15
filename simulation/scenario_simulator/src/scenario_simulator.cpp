@@ -15,7 +15,7 @@
 #include <scenario_simulator/scenario_simulator.hpp>
 #include <scenario_simulator/exception.hpp>
 
-#include <xmlrpc_interface/conversions.hpp>
+#include <simulation_interface/conversions.hpp>
 
 #include <quaternion_operation/quaternion_operation.h>
 
@@ -38,7 +38,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
   get_parameter("port", port_);
 
   addMethod(
-    xmlrpc_interface::method::initialize,
+    simulation_interface::method::initialize,
     std::bind(
       &ScenarioSimulator::initialize,
       this,
@@ -46,7 +46,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::update_frame,
+    simulation_interface::method::update_frame,
     std::bind(
       &ScenarioSimulator::updateFrame,
       this,
@@ -54,7 +54,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::spawn_vehicle_entity,
+    simulation_interface::method::spawn_vehicle_entity,
     std::bind(
       &ScenarioSimulator::spawnVehicleEntity,
       this,
@@ -62,7 +62,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::spawn_pedestrian_entity,
+    simulation_interface::method::spawn_pedestrian_entity,
     std::bind(
       &ScenarioSimulator::spawnPedestrianEntity,
       this,
@@ -70,7 +70,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::despawn_entity,
+    simulation_interface::method::despawn_entity,
     std::bind(
       &ScenarioSimulator::despawnEntity,
       this,
@@ -78,7 +78,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::update_entity_status,
+    simulation_interface::method::update_entity_status,
     std::bind(
       &ScenarioSimulator::updateEntityStatus,
       this,
@@ -86,7 +86,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::attach_lidar_sensor,
+    simulation_interface::method::attach_lidar_sensor,
     std::bind(
       &ScenarioSimulator::attachLidarSensor,
       this,
@@ -94,7 +94,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       std::placeholders::_2));
 
   addMethod(
-    xmlrpc_interface::method::update_sensor_frame,
+    simulation_interface::method::update_sensor_frame,
     std::bind(
       &ScenarioSimulator::updateSensorFrame,
       this,
@@ -122,7 +122,7 @@ void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcVa
 {
   initialized_ = true;
   const auto req =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::InitializeRequest>(param);
+    simulation_interface::deserializeFromBinValue<simulation_api_schema::InitializeRequest>(param);
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
   simulation_api_schema::InitializeResponse res;
@@ -132,7 +132,7 @@ void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcVa
   vehicles_ = {};
   pedestrians_ = {};
   result = XmlRpc::XmlRpcValue();
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
@@ -142,17 +142,17 @@ void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcV
     res.mutable_result()->set_description("simulator have not initialized yet.");
     res.mutable_result()->set_success(false);
     result = XmlRpc::XmlRpcValue();
-    result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+    result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
     return;
   }
   const auto req =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameRequest>(param);
+    simulation_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameRequest>(param);
   simulation_api_schema::UpdateFrameResponse res;
   current_time_ = req.current_time();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
   result = XmlRpc::XmlRpcValue();
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::updateEntityStatus(
@@ -160,7 +160,7 @@ void ScenarioSimulator::updateEntityStatus(
   XmlRpc::XmlRpcValue & result)
 {
   const auto req =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::UpdateEntityStatusRequest>(
+    simulation_interface::deserializeFromBinValue<simulation_api_schema::UpdateEntityStatusRequest>(
     param);
   entity_status_ = {};
   simulation_api_schema::UpdateEntityStatusResponse res;
@@ -179,7 +179,7 @@ void ScenarioSimulator::updateEntityStatus(
   result = XmlRpc::XmlRpcValue();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::spawnVehicleEntity(
@@ -187,7 +187,7 @@ void ScenarioSimulator::spawnVehicleEntity(
   XmlRpc::XmlRpcValue & result)
 {
   const auto req =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnVehicleEntityRequest>(
+    simulation_interface::deserializeFromBinValue<simulation_api_schema::SpawnVehicleEntityRequest>(
     param);
   if (ego_vehicles_.size() != 0 && req.is_ego()) {
     throw SimulationRuntimeError("multi ego does not support");
@@ -201,7 +201,7 @@ void ScenarioSimulator::spawnVehicleEntity(
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
   result = XmlRpc::XmlRpcValue();
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::spawnPedestrianEntity(
@@ -209,20 +209,20 @@ void ScenarioSimulator::spawnPedestrianEntity(
   XmlRpc::XmlRpcValue & result)
 {
   const auto req =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::SpawnPedestrianEntityRequest>(
+    simulation_interface::deserializeFromBinValue<simulation_api_schema::SpawnPedestrianEntityRequest>(
     param);
   pedestrians_.emplace_back(req.parameters());
   simulation_api_schema::SpawnPedestrianEntityResponse res;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
   result = XmlRpc::XmlRpcValue();
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   const auto req =
-    xmlrpc_interface::deserializeFromBinValue<simulation_api_schema::DespawnEntityRequest>(param);
+    simulation_interface::deserializeFromBinValue<simulation_api_schema::DespawnEntityRequest>(param);
   bool found = false;
   std::vector<openscenario_msgs::VehicleParameters> vehicles;
   for (const auto vehicle : vehicles_) {
@@ -249,7 +249,7 @@ void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRp
     res.mutable_result()->set_success(false);
   }
   result = XmlRpc::XmlRpcValue();
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::attachLidarSensor(
@@ -257,7 +257,7 @@ void ScenarioSimulator::attachLidarSensor(
   XmlRpc::XmlRpcValue & result)
 {
   const auto req =
-    xmlrpc_interface::deserializeFromBinValue<
+    simulation_interface::deserializeFromBinValue<
     simulation_api_schema::AttachLidarSensorRequest>(param);
   const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
     req.configuration().topic_name(), 1);
@@ -267,7 +267,7 @@ void ScenarioSimulator::attachLidarSensor(
   simulation_api_schema::AttachLidarSensorResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
@@ -278,7 +278,7 @@ void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcV
   simulation_api_schema::UpdateSensorFrameResponse res;
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();
-  result[xmlrpc_interface::key::response] = xmlrpc_interface::serializeToBinValue(res);
+  result[simulation_interface::key::response] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::addMethod(
