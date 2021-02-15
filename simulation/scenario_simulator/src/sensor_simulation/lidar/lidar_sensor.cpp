@@ -34,7 +34,7 @@ LidarSensor::LidarSensor(
   last_update_stamp_ = 0;
 }
 
-const std::vector<std::string> LidarSensor::getDetectedObjects() const
+const std::vector<std::string> & LidarSensor::getDetectedObjects() const
 {
   return detected_objects_;
 }

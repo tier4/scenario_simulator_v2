@@ -61,7 +61,7 @@ public:
     double horizontal_angle_end = 2 * M_PI,
     double max_distance = 100, double min_distance = 0
   );
-  const std::vector<std::string> getDetectedObject() const;
+  const std::vector<std::string> & getDetectedObject() const;
 
 private:
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;

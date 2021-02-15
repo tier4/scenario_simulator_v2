@@ -76,7 +76,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     frame_id, stamp, origin, directions, max_distance, min_distance);
 }
 
-const std::vector<std::string> Raycaster::getDetectedObject() const
+const std::vector<std::string> & Raycaster::getDetectedObject() const
 {
   return detected_objects_;
 }

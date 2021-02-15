@@ -36,7 +36,7 @@ public:
     double current_time,
     const std::vector<openscenario_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp);
-  const std::vector<std::string> getDetectedObjects() const;
+  const std::vector<std::string> & getDetectedObjects() const;
 
 private:
   simulation_api_schema::LidarConfiguration configuration_;
