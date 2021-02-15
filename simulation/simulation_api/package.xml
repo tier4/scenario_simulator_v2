@@ -34,6 +34,7 @@
   <depend>visualization_msgs</depend>
   <depend>xmlrpcpp</depend>
   <depend>xmlrpc_interface</depend>
+  <depend>nlohmann-json-dev</depend>
 
   <!--<exec_depend>lexus_rx_450h_description</exec_depend> -->
   <exec_depend>kashiwanoha_map</exec_depend>
