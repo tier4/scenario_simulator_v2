@@ -294,3 +294,5 @@ void ScenarioSimulator::addMethod(
   methods_[name] = method_ptr;
 }
 }  // namespace scenario_simulator
+
+RCLCPP_COMPONENTS_REGISTER_NODE(scenario_simulator::ScenarioSimulator)
