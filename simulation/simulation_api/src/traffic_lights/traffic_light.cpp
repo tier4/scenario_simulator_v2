@@ -14,6 +14,7 @@
 
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api/color_utils/color_utils.hpp>
+#include <simulation_api/entity/exception.hpp>
 
 #include <vector>
 #include <limits>
@@ -21,7 +22,8 @@
 
 namespace simulation_api
 {
-TrafficLight::TrafficLight(std::int64_t id,
+TrafficLight::TrafficLight(
+  std::int64_t id,
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions,
   std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions)
 : id(id), color_positions_(color_positions), arrow_positions_(arrow_positions)
@@ -78,5 +80,23 @@ void TrafficLight::update(double step_time)
 {
   arrow_phase_.update(step_time);
   color_phase_.update(step_time);
+}
+
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor color)
+{
+  if(color_positions_.count(color) == 0)
+  {
+    throw simulation_api::SimulationRuntimeError("target color does not exists");
+  }
+  return color_positions_[color];
+}
+
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow arrow)
+{
+  if(arrow_positions_.count(arrow) == 0)
+  {
+    throw simulation_api::SimulationRuntimeError("target arrow does not exists");
+  }
+  return arrow_positions_[arrow];
 }
 }  // namespace simulation_api

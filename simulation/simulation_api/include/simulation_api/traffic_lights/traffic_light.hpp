@@ -47,7 +47,8 @@ class TrafficLight
   using Duration = double;
 
 public:
-  explicit TrafficLight(std::int64_t id,
+  explicit TrafficLight(
+    std::int64_t id,
     std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions = {},
     std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions = {});
   void setColorPhase(
@@ -64,6 +65,8 @@ public:
   TrafficLightArrow getArrow() const;
   TrafficLightColor getColor() const;
   const std::int64_t id;
+  const geometry_msgs::msg::Point getPosition(const TrafficLightColor color);
+  const geometry_msgs::msg::Point getPosition(const TrafficLightArrow arrow);
 
 private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;
