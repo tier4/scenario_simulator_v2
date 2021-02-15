@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__RAYCAST__RAYCASTER_HPP_
-#define SCENARIO_SIMULATOR__RAYCAST__RAYCASTER_HPP_
+#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
+#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
-#include <scenario_simulator/primitives/box.hpp>
-#include <scenario_simulator/primitives/primitive.hpp>
+#include <scenario_simulator/sensor_simulation/primitives/box.hpp>
+#include <scenario_simulator/sensor_simulation/primitives/primitive.hpp>
 
 #include <embree3/rtcore.h>
 
@@ -61,6 +61,7 @@ public:
     double horizontal_angle_end = 2 * M_PI,
     double max_distance = 100, double min_distance = 0
   );
+  const std::vector<std::string> & getDetectedObject() const;
 
 private:
   std::unordered_map<std::string, std::unique_ptr<primitives::Primitive>> primitive_ptrs_;
@@ -74,7 +75,9 @@ private:
     geometry_msgs::msg::Pose origin,
     std::vector<geometry_msgs::msg::Quaternion> directions,
     double max_distance = 100, double min_distance = 0);
+  std::vector<std::string> detected_objects_;
+  std::unordered_map<unsigned int, std::string> geometry_ids_;
 };
 }  // namespace scenario_simulator
 
-#endif  // SCENARIO_SIMULATOR__RAYCAST__RAYCASTER_HPP_
+#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 
-#ifndef SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
-#define SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
+#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
+#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
 
-#include <scenario_simulator/primitives/primitive.hpp>
+#include <scenario_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <simulation_api_schema.pb.h>
 
 namespace scenario_simulator
@@ -35,4 +35,4 @@ public:
 }  // namespace primitives
 }  // namespace scenario_simulator
 
-#endif  // SCENARIO_SIMULATOR__PRIMITIVES__BOX_HPP_
+#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_

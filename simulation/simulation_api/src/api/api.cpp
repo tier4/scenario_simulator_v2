@@ -475,9 +475,19 @@ bool API::initialize(
     res);
 }
 
-bool API::attachLidarSensor(
-  simulation_api_schema::LidarConfiguration configuration
-)
+bool API::attachDetectionSensor(simulation_api_schema::DetectionSensorConfiguration configuration)
+{
+  if (standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::AttachDetectionSensorRequest req;
+  simulation_api_schema::AttachDetectionSensorResponse res;
+  *req.mutable_configuration() = configuration;
+  simulation_interface::call(client_ptr_, simulation_interface::method::attach_detection_sensor, req, res);
+  return res.result().success();
+}
+
+bool API::attachLidarSensor(simulation_api_schema::LidarConfiguration configuration)
 {
   if (standalone_mode) {
     return true;
