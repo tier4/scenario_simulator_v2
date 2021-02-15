@@ -89,7 +89,7 @@ public:
     std::thread(
       [&](auto && node)
       {
-        rclcpp::executors::SingleThreadedExecutor executor {};
+        rclcpp::executors::MultiThreadedExecutor executor {};
         executor.add_node(std::forward<decltype(node)>(node));
         while (rclcpp::ok()) {
           executor.spin_some();
@@ -164,22 +164,6 @@ private:
     std::cout << "[accessor] Autoware is ready." << std::endl;
   }
 
-  void setTransform(const geometry_msgs::msg::Pose & pose) const
-  {
-    geometry_msgs::msg::TransformStamped transform {};
-    {
-      transform.header.stamp = std::atomic_load(&autoware)->get_clock()->now();
-      transform.header.frame_id = "map";
-      transform.child_frame_id = "base_link";
-      transform.transform.translation.x = pose.position.x;
-      transform.transform.translation.y = pose.position.y;
-      transform.transform.translation.z = pose.position.z;
-      transform.transform.rotation = pose.orientation;
-    }
-
-    std::atomic_load(&autoware)->transform_broadcaster.sendTransform(transform);
-  }
-
   void updateAutoware(
     const geometry_msgs::msg::Pose & current_pose,
     const double linear_x = 0,
@@ -191,13 +175,11 @@ private:
       current_twist.angular.z = angular_z;
     }
 
-    using autoware_vehicle_msgs::msg::ControlMode;
-
     // std::cout << "pose.position.x = " << current_pose.position.x << std::endl;
     // std::cout << "pose.position.y = " << current_pose.position.y << std::endl;
     // std::cout << "pose.position.z = " << current_pose.position.z << std::endl;
 
-    std::atomic_load(&autoware)->setCurrentControlMode(ControlMode::AUTO);
+    std::atomic_load(&autoware)->setCurrentControlMode();
     std::atomic_load(&autoware)->setCurrentPose(current_pose);
     std::atomic_load(&autoware)->setCurrentShift(current_twist);
     std::atomic_load(&autoware)->setCurrentSteering(current_twist);
@@ -205,9 +187,8 @@ private:
     std::atomic_load(&autoware)->setCurrentTwist(current_twist);
     std::atomic_load(&autoware)->setCurrentVelocity(current_twist);
     std::atomic_load(&autoware)->setLaneChangeApproval(true);
+    std::atomic_load(&autoware)->setTransform(current_pose);
     std::atomic_load(&autoware)->setVehicleVelocity(current_twist.linear.x);
-
-    setTransform(current_pose);
   }
 
 private:

@@ -200,7 +200,7 @@ public:
 
   DEFINE_PUBLISHER(CurrentControlMode);
 
-  decltype(auto) setCurrentControlMode(const std::uint8_t mode)
+  decltype(auto) setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTO)
   {
     CurrentControlMode current_control_mode {};
     {
@@ -481,6 +481,29 @@ public:
   tf2_ros::Buffer transform_buffer;
   tf2_ros::TransformBroadcaster transform_broadcaster;
 
+  geometry_msgs::msg::TransformStamped current_transform;
+
+  const auto & setTransform(const geometry_msgs::msg::Pose & pose)
+  {
+    current_transform.header.stamp = get_clock()->now();
+    current_transform.header.frame_id = "map";
+    current_transform.child_frame_id = "base_link";
+    current_transform.transform.translation.x = pose.position.x;
+    current_transform.transform.translation.y = pose.position.y;
+    current_transform.transform.translation.z = pose.position.z;
+    current_transform.transform.rotation = pose.orientation;
+
+    return current_transform;
+  }
+
+  const rclcpp::TimerBase::SharedPtr timer;
+
+  decltype(auto) updateTransform()
+  {
+    current_transform.header.stamp = get_clock()->now();
+    return transform_broadcaster.sendTransform(current_transform);
+  }
+
 public:
   template
   <
@@ -520,7 +543,15 @@ public:
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
 
     transform_buffer(get_clock()),
-    transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto && ...) {}))
+    transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto && ...) {})),
+
+    timer(
+      create_wall_timer(
+        std::chrono::milliseconds(10),
+        [this]()
+        {
+          return updateTransform();
+        }))
   {}
 };
 
