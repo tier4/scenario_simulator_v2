@@ -30,6 +30,11 @@ autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
   return heading;
 }
 
+openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()
+{
+  return autoware->getWaypoints();
+}
+
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
   const double wheelbase =

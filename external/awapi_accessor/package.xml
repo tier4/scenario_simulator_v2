@@ -15,11 +15,11 @@
   <depend>autoware_planning_msgs</depend>
   <depend>autoware_system_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>openscenario_msgs</depend>
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
-  <depend>simulation_interface</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

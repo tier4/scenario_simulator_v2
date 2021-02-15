@@ -131,7 +131,6 @@ boost::optional<double> EntityManager::getDistanceToCrosswalk(
     return boost::none;
   }
   if (getWaypoints(name).waypoints.size() == 0) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     return boost::none;
   }
   simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
@@ -537,7 +536,7 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string n
     return boost::any_cast<VehicleEntity &>(it->second).getWaypoints();
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    return openscenario_msgs::msg::WaypointsArray();
+    return boost::any_cast<EgoEntity &>(it->second).getWaypoints();
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
     return openscenario_msgs::msg::WaypointsArray();

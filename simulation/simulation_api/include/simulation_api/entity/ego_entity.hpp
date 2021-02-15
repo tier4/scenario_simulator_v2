@@ -107,6 +107,8 @@ public:
     return current_kinematic_state_;
   }
 
+  openscenario_msgs::msg::WaypointsArray getWaypoints();
+
 private:
   autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
 

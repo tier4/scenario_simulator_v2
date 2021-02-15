@@ -28,11 +28,11 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
-#include <simulation_interface/conversions.hpp>
 
 namespace autoware_api
 {
@@ -244,15 +244,13 @@ public:
   {}
 
 public:
-  const openscenario_msgs::WayPoints getTrajectory()
+  const openscenario_msgs::msg::WaypointsArray getWaypoints()
   {
-    openscenario_msgs::WayPoints waypoints;
+    openscenario_msgs::msg::WaypointsArray waypoints;
     for(const auto trajectory_point : trajectory.points)
     {
       geometry_msgs::msg::Point p = trajectory_point.pose.position;
-      geometry_msgs::Point proto;
-      simulation_interface::toProto(p, proto);
-      *waypoints.add_waypoints() = proto;
+      waypoints.waypoints.emplace_back(p);
     }
     return waypoints;
   }
