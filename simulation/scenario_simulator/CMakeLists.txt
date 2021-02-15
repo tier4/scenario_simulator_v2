@@ -44,6 +44,8 @@ target_link_libraries(scenario_simulator_component
 ament_target_dependencies(scenario_simulator_component
   simulation_interface
 )
+rclcpp_components_register_nodes(scenario_simulator_component
+  "scenario_simulator::ScenarioSimulator")
 
 ament_auto_add_executable(scenario_simulator_node
   src/scenario_simulator_node.cpp
