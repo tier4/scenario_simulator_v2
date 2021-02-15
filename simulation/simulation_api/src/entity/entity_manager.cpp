@@ -25,14 +25,6 @@ namespace simulation_api
 {
 namespace entity
 {
-void EntityManager::setVehicleCommands(
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd,
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd)
-{
-  control_cmd_ = control_cmd;
-  state_cmd_ = state_cmd;
-}
-
 bool EntityManager::isStopping(std::string name) const
 {
   const auto status = getEntityStatus(name);
@@ -93,21 +85,17 @@ void EntityManager::setVerbose(bool verbose)
 
 bool EntityManager::isEgo(std::string name) const
 {
-  if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
-    return true;
-  }
-  return false;
+  return getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO;
 }
 
 int EntityManager::getNumberOfEgo() const
 {
-  int count = 0;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (it->second.type() == typeid(EgoEntity)) {
-      count = count + 1;
-    }
-  }
-  return count;
+  return std::count_if(
+    std::begin(entities_), std::end(entities_),
+    [](const auto & each)
+    {
+      return each.second.type() == typeid(EgoEntity);
+    });
 }
 
 boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPose(std::string name)
@@ -189,7 +177,8 @@ void EntityManager::requestAcquirePosition(
     boost::any_cast<VehicleEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
   if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).requestAcquirePosition(lanelet_pose);
+    boost::any_cast<EgoEntity &>(it->second).requestAcquirePosition(
+      (*hdmap_utils_ptr_).toMapPose(lanelet_pose), lanelet_pose);
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
     boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_pose);
@@ -668,7 +657,6 @@ void EntityManager::update(double current_time, double step_time)
     }
     if (it->second.type() == typeid(EgoEntity)) {
       boost::any_cast<EgoEntity &>(it->second).setEntityTypeList(type_list);
-      boost::any_cast<EgoEntity &>(it->second).setVehicleCommands(control_cmd_, state_cmd_);
       auto kinematic_state =
         boost::any_cast<EgoEntity &>(it->second).getCurrentKinematicState();
       if (kinematic_state) {
@@ -781,16 +769,12 @@ bool EntityManager::reachPosition(
             "error occurs while getting entity stauts, target entity : " + name);
   }
   auto pose = status->pose;
-  double dist =
-    std::sqrt(
+  double dist = std::sqrt(
     std::pow(
       pose.position.x - target_pose.position.x,
       2) + std::pow(pose.position.y - target_pose.position.y, 2) +
     std::pow(pose.position.z - target_pose.position.z, 2));
-  if (dist < tolerance) {
-    return true;
-  }
-  return false;
+  return dist < tolerance;
 }
 
 bool EntityManager::reachPosition(
@@ -807,20 +791,19 @@ bool EntityManager::reachPosition(
 
 void EntityManager::broadcastBaseLinkTransform()
 {
-  std::vector<std::string> names = getEntityNames();
-  for (const auto & name : names) {
-    if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
-      auto status = getEntityStatus(name);
-      if (status) {
-        geometry_msgs::msg::PoseStamped pose;
-        pose.pose = status->pose;
-        pose.header.stamp = clock_ptr_->now();
-        pose.header.frame_id = "base_link";
-        broadcastTransform(pose, false);
-      }
-      return;
-    }
-  }
+  // for (const auto & name : getEntityNames()) {
+  //   if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
+  //     auto status = getEntityStatus(name);
+  //     if (status) {
+  //       geometry_msgs::msg::PoseStamped pose;
+  //       pose.pose = status->pose;
+  //       pose.header.stamp = clock_ptr_->now();
+  //       pose.header.frame_id = "base_link";
+  //       broadcastTransform(pose, false);
+  //     }
+  //     return;
+  //   }
+  // }
 }
 
 void EntityManager::broadcastEntityTransform()
@@ -838,7 +821,7 @@ void EntityManager::broadcastEntityTransform()
       }
     }
   }
-  broadcastBaseLinkTransform();
+  // broadcastBaseLinkTransform();
 }
 
 const boost::optional<double> EntityManager::getStandStillDuration(std::string name) const

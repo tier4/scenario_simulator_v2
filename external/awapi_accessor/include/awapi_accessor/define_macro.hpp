@@ -15,6 +15,7 @@
 #ifndef AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
 #define AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
 
+#include <mutex>
 #include <utility>
 
 #define CURRENT_VALUE_OF(TYPE) current_value_of_ ## TYPE
@@ -24,8 +25,9 @@ private: \
   TYPE CURRENT_VALUE_OF(TYPE); \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_ ## TYPE; \
 public: \
-  const auto & get ## TYPE() const noexcept \
+  const auto & get ## TYPE() \
   { \
+    auto lock = std::unique_lock<decltype(mutex)>(mutex); \
     return CURRENT_VALUE_OF(TYPE); \
   } \
   static_assert(true, "")
@@ -34,28 +36,25 @@ public: \
 private: \
   rclcpp::Publisher<TYPE>::SharedPtr publisher_of_ ## TYPE; \
 public: \
-  template \
-  < \
-    typename ... Ts \
-  > \
-  decltype(auto) set ## TYPE(Ts && ... xs) const \
+  decltype(auto) set ## TYPE(const TYPE & message) \
   { \
-    return (*publisher_of_ ## TYPE).publish(std::forward<decltype(xs)>(xs)...); \
+    return std::atomic_load(&publisher_of_ ## TYPE)->publish(message); \
   } \
   static_assert(true, "")
 
 #define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK) \
   subscription_of_ ## TYPE( \
-    (*node).template create_subscription<TYPE>( \
+    create_subscription<TYPE>( \
       TOPIC, 1, \
       [this](const TYPE::SharedPtr message) \
       { \
+        auto lock = std::unique_lock<decltype(mutex)>(mutex); \
         CURRENT_VALUE_OF(TYPE) = *message; \
         ERROR_CHECK(); \
       }))
 
 #define INIT_PUBLISHER(TYPE, TOPIC) \
   publisher_of_ ## TYPE( \
-    (*node).template create_publisher<TYPE>(TOPIC, 10))
+    create_publisher<TYPE>(TOPIC, 10))
 
 #endif  // AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
