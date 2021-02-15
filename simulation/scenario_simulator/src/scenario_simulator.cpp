@@ -15,6 +15,8 @@
 #include <scenario_simulator/scenario_simulator.hpp>
 #include <scenario_simulator/exception.hpp>
 
+#include <rclcpp_components/register_node_macro.hpp>
+
 #include <simulation_interface/conversions.hpp>
 
 #include <quaternion_operation/quaternion_operation.h>

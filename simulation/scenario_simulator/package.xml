@@ -29,6 +29,7 @@
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_geometry_msgs</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
+  <depend>rclcpp_components</depend>
   <depend>visualization_msgs</depend>
   <depend>eigen</depend>
   <depend>quaternion_operation</depend>
