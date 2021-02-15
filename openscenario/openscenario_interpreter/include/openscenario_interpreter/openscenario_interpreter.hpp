@@ -35,7 +35,7 @@ class Interpreter
 {
   std::string expect;
 
-  std::string log_path;
+  std::string output_directory;
 
   std::string osc_path;
 
@@ -54,7 +54,7 @@ class Interpreter
   const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
 
   decltype(auto) report(
-    junit_exporter::TestResult result,
+    const junit_exporter::TestResult & result,
     const std::string & type,
     const std::string & what = "")
   {
@@ -65,14 +65,6 @@ class Interpreter
 
     switch (result) {
       case junit_exporter::TestResult::ERROR:
-        if (what.empty()) {
-          std::cout << "\x1b[1;31mYield " << type.c_str() << "\x1b[0m" << std::endl;
-        } else {
-          std::cout << "\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m" <<
-            std::endl;
-        }
-        break;
-
       case junit_exporter::TestResult::FAILURE:
         if (what.empty()) {
           std::cout << "\x1b[1;31mYield " << type.c_str() << "\x1b[0m" << std::endl;
@@ -93,7 +85,7 @@ class Interpreter
     }
     VERBOSE("");
 
-    exporter.write(log_path);
+    exporter.write(output_directory + "/result.junit.xml");
 
     script.reset();
 

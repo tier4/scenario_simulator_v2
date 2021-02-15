@@ -82,16 +82,16 @@ class LifecycleController(Node):
                     string_value=str(expect.name))),
 
             Parameter(
-                name="log_path",  # TODO RENAME
-                value=ParameterValue(
-                    type=ParameterType.PARAMETER_STRING,
-                    string_value=str(output_directory))),
-
-            Parameter(
                 name="osc_path",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
                     string_value=str(scenario))),
+
+            Parameter(
+                name="output_directory",
+                value=ParameterValue(
+                    type=ParameterType.PARAMETER_STRING,
+                    string_value=str(output_directory))),
 
             Parameter(
                 name="real-time-factor",

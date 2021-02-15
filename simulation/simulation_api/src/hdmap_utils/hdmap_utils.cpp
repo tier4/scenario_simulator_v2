@@ -38,22 +38,28 @@
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/assign/list_of.hpp>
 
-#include <deque>
 #include <algorithm>
-#include <vector>
-#include <utility>
+#include <deque>
 #include <memory>
-#include <string>
 #include <set>
+#include <string>
 #include <unordered_map>
+#include <utility>
+#include <vector>
+
+// #define EXPERIMENTAL_AUTOWARE_IV_SUPPORT
 
 namespace hdmap_utils
 {
 HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin)
 {
+  #ifndef EXPERIMENTAL_AUTOWARE_IV_SUPPORT
   lanelet::GPSPoint origin_gps_point {origin.latitude, origin.longitude, origin.altitude};
   lanelet::Origin origin_lanelet {origin_gps_point};
   lanelet::projection::UtmProjector projector(origin_lanelet);
+  #else
+  lanelet::projection::MGRSProjector projector {};  // TODO(yamacir-kit)
+  #endif
   lanelet::ErrorMessages errors;
   lanelet_map_ptr_ = lanelet::load(lanelet_path, projector, &errors);
   if (!errors.empty()) {

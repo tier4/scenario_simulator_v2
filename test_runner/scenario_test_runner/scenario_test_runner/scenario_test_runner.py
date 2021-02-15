@@ -240,7 +240,7 @@ def main():
 
     parser.add_argument(
         '-t', '--global-timeout',
-        default=30,
+        default=180,
         type=float,
         help="Specify the simulation time limit. This time limit is independent "
              "of the simulation playback speed determined by the option "

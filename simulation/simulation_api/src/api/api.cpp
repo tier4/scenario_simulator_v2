@@ -72,7 +72,7 @@ bool API::spawn(
   const openscenario_msgs::msg::VehicleParameters & params)
 {
   if (is_ego) {
-    simulation_api::entity::EgoEntity ego(access_rights_, name, params);
+    simulation_api::entity::EgoEntity ego(name, params);
     if (!entity_manager_ptr_->spawnEntity(ego)) {
       return false;
     }
@@ -459,8 +459,6 @@ XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
 bool API::initialize(
   double realtime_factor, double step_time)
 {
-  current_cmd_ = boost::none;
-  current_state_cmd_ = boost::none;
   step_time_ = step_time;
   current_time_ = 0.0;
   if (standalone_mode) {
@@ -535,7 +533,6 @@ bool API::updateEntityStatusInSim()
 bool API::updateFrame()
 {
   entity_manager_ptr_->update(current_time_, step_time_);
-  entity_manager_ptr_->setVehicleCommands(current_cmd_, current_state_cmd_);
   if (!standalone_mode) {
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(current_time_);
@@ -556,16 +553,5 @@ bool API::updateFrame()
   current_time_ = current_time_ + step_time_;
   metrics_manager_.calculate();
   return true;
-}
-
-void API::vehicleControlCommandCallback(
-  autoware_auto_msgs::msg::VehicleControlCommand::SharedPtr msg)
-{
-  current_cmd_ = *msg;
-}
-
-void API::vehicleStateCommandCallback(autoware_auto_msgs::msg::VehicleStateCommand::SharedPtr msg)
-{
-  current_state_cmd_ = *msg;
 }
 }  // namespace scenario_simulator
