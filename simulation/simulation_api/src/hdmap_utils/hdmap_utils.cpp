@@ -555,12 +555,10 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   return ret;
 }
 
-/*
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightColorPosition(
   std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const
 {
-  if(color == simulation_api::TrafficLightColor::NONE)
-  {
+  if (color == simulation_api::TrafficLightColor::NONE) {
     return boost::none;
   }
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
@@ -570,12 +568,44 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightColo
       if (light_string.hasAttribute("traffic_light_id")) {
         auto id = light_string.attribute("traffic_light_id").asId();
         if (id) {
+          if (id.get() == traffic_light_id) {
+            const auto light_bulbs = light->lightBulbs();
+            for (auto ls : light_bulbs) {
+              lanelet::ConstLineString3d l = static_cast<lanelet::ConstLineString3d>(ls);
+              for (auto pt : l) {
+                if (pt.hasAttribute("color")) {
+                  std::string color_string;
+                  switch (color) {
+                    case simulation_api::TrafficLightColor::GREEN:
+                      color_string = "green";
+                      break;
+                    case simulation_api::TrafficLightColor::YELLOW:
+                      color_string = "yellow";
+                      break;
+                    case simulation_api::TrafficLightColor::RED:
+                      color_string = "red";
+                      break;
+                    case simulation_api::TrafficLightColor::NONE:
+                      return boost::none;
+                  }
+                  lanelet::Attribute attr = pt.attribute("color");
+                  if (attr.value().compare(color_string) == 0) {
+                    geometry_msgs::msg::Point point;
+                    point.x = pt.x();
+                    point.y = pt.y();
+                    point.z = pt.z();
+                    return point;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
   }
+  return boost::none;
 }
-*/
 
 boost::optional<std::pair<simulation_api::math::HermiteCurve,
   double>> HdMapUtils::getLaneChangeTrajectory(
