@@ -555,7 +555,7 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   return ret;
 }
 
-const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightColorPosition(
+const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
   std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const
 {
   if (color == simulation_api::TrafficLightColor::NONE) {
