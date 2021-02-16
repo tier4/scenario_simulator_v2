@@ -35,7 +35,6 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
@@ -47,6 +46,8 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+
+#define DEBUG_VALUE(...) std::cout << #__VA_ARGS__ " = " << (__VA_ARGS__) << std::endl
 
 namespace autoware_api
 {
@@ -144,9 +145,7 @@ public:
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setVehicleVelocity(const T value)
   {
     return setVehicleVelocity(convertTo<VehicleVelocity>(value));
@@ -178,15 +177,6 @@ public:
   using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
 
   DEFINE_SUBSCRIPTION(VehicleStatus);
-
-  /** ---- Trajectory ----------------------------------------------------------
-   *
-   *  Topic: /planning/scenario_planning/trajectory
-   *
-   * ------------------------------------------------------------------------ */
-  using Trajectory = autoware_planning_msgs::msg::Trajectory;
-
-  DEFINE_SUBSCRIPTION(Trajectory);
 
 public:
   /** ---- Checkpoint ----------------------------------------------------------
@@ -253,9 +243,7 @@ public:
 
   DEFINE_PUBLISHER(CurrentShift);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentShift(const T twist_linear_x)
   {
     CurrentShift current_shift {};
@@ -280,16 +268,21 @@ public:
    *  Topic: /vehicle/status/steering
    *
    * ------------------------------------------------------------------------ */
-  using CurrentSteering = std_msgs::msg::Float32;
+  using CurrentSteering = autoware_vehicle_msgs::msg::Steering;
 
   DEFINE_PUBLISHER(CurrentSteering);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentSteering(const T value)
   {
-    return setCurrentSteering(convertTo<CurrentSteering>(value));
+    CurrentSteering current_steering {};
+    {
+      current_steering.header.stamp = get_clock()->now();
+      current_steering.header.frame_id = "base_link";
+      current_steering.data = value;
+    }
+
+    return setCurrentSteering(current_steering);
   }
 
   decltype(auto) setCurrentSteering(const geometry_msgs::msg::Twist & twist)
@@ -350,9 +343,7 @@ public:
 
   DEFINE_PUBLISHER(CurrentVelocity);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentVelocity(const T twist_linear_x)
   {
     return setCurrentVelocity(convertTo<CurrentVelocity>(twist_linear_x));
@@ -419,6 +410,15 @@ public:
 
     return setInitialTwist(initial_twist);
   }
+
+  /** ---- Trajectory ----------------------------------------------------------
+   *
+   *  Topic: /planning/scenario_planning/trajectory
+   *
+   * ------------------------------------------------------------------------ */
+  using Trajectory = autoware_planning_msgs::msg::Trajectory;
+
+  DEFINE_SUBSCRIPTION(Trajectory);
 
   /* ---- Turn Signal Command --------------------------------------------------
    *
@@ -501,15 +501,16 @@ public:
 
   const rclcpp::TimerBase::SharedPtr timer;
 
-  decltype(auto) updateTransform()
+  void updateTransform()
   {
-    current_transform.header.stamp = get_clock()->now();
-    return transform_broadcaster.sendTransform(current_transform);
+    if (!current_transform.header.frame_id.empty() && !current_transform.child_frame_id.empty()) {
+      current_transform.header.stamp = get_clock()->now();
+      return transform_broadcaster.sendTransform(current_transform);
+    }
   }
 
 public:
-  template<
-    typename ... Ts>
+  template<typename ... Ts>
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Ts && ... xs)
   : rclcpp::Node("awapi_accessor_node", std::forward<decltype(xs)>(xs)...),
@@ -540,6 +541,7 @@ public:
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(InitialTwist, "/initialtwist"),
+    INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
 
@@ -554,20 +556,6 @@ public:
           return updateTransform();
         }))
   {}
-
-public:
-  const openscenario_msgs::msg::WaypointsArray getWaypoints()
-  {
-    openscenario_msgs::msg::WaypointsArray waypoints;
-    for (const auto trajectory_point : trajectory.points) {
-      geometry_msgs::msg::Point p = trajectory_point.pose.position;
-      waypoints.waypoints.emplace_back(p);
-    }
-    return waypoints;
-  }
-
-private:
-  Trajectory trajectory;
 };
 
 }  // namespace autoware_api
