@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <awapi_accessor/accessor.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <simulation_api/entity/ego_entity.hpp>
 
@@ -29,6 +30,17 @@ autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
   heading.real = static_cast<decltype(heading.real)>(std::cos(yaw * 0.5));
   heading.imag = static_cast<decltype(heading.imag)>(std::sin(yaw * 0.5));
   return heading;
+}
+
+openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
+{
+  openscenario_msgs::msg::WaypointsArray waypoints {};
+
+  for (const auto & point : std::atomic_load(&autoware)->getTrajectory().points) {
+    waypoints.waypoints.emplace_back(point.pose.position);
+  }
+
+  return waypoints;
 }
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef XMLRPC_INTERFACE__CONVERSIONS_HPP_
-#define XMLRPC_INTERFACE__CONVERSIONS_HPP_
+#ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
+#define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
-#include <xmlrpc_interface/constants.hpp>
+#include <simulation_interface/constants.hpp>
 
 #include <geometry_msgs.pb.h>
 #include <geometry_msgs/msg/point.hpp>
@@ -46,7 +46,7 @@
 #include <exception>
 #include <iostream>
 
-namespace xmlrpc_interface
+namespace simulation_interface
 {
 class XmlParameterError : public std::runtime_error
 {
@@ -210,7 +210,7 @@ const T deserializeFromBinValue(const XmlRpc::XmlRpcValue & data)
   ret.ParseFromArray(bin.data(), bin.size());
   return ret;
 }
-}  // namespace xmlrpc_interface
+}  // namespace simulation_interface
 
 
-#endif  // XMLRPC_INTERFACE__CONVERSIONS_HPP_
+#endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <xmlrpc_interface/conversions.hpp>
+#include <simulation_interface/conversions.hpp>
 
 #include <simulation_api_schema.pb.h>
 
@@ -26,10 +26,10 @@ int main()
   res.mutable_result()->set_description("test");
   res.PrintDebugString();
   XmlRpc::XmlRpcValue xml;
-  xmlrpc_interface::serializeToBinValue(res);
-  xmlrpc_interface::fromProto(res, xml);
+  simulation_interface::serializeToBinValue(res);
+  simulation_interface::fromProto(res, xml);
   std::string description = xml["description"];
-  xmlrpc_interface::toProto(xml, res);
+  simulation_interface::toProto(xml, res);
   res.PrintDebugString();
   */
   return 0;

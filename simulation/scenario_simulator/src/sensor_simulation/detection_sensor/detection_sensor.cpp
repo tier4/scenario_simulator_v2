@@ -14,7 +14,7 @@
 
 #include <scenario_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 
-#include <xmlrpc_interface/conversions.hpp>
+#include <simulation_interface/conversions.hpp>
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -67,12 +67,12 @@ void DetectionSensor::update(
         boost::uuids::name_generator gen(base);
         boost::uuids::uuid uuid = gen(s.name());
         std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
-        xmlrpc_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
+        simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
         object.shape.type = object.shape.BOUNDING_BOX;
         object.state.orientation_reliable = true;
-        xmlrpc_interface::toMsg(s.action_status().twist(), object.state.twist_covariance.twist);
+        simulation_interface::toMsg(s.action_status().twist(), object.state.twist_covariance.twist);
         object.state.twist_reliable = true;
-        xmlrpc_interface::toMsg(
+        simulation_interface::toMsg(
           s.action_status().accel(), object.state.acceleration_covariance.accel);
         object.state.acceleration_reliable = true;
         msg.objects.emplace_back(object);

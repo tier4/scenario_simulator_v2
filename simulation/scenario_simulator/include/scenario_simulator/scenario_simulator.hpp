@@ -35,11 +35,55 @@
 #include <vector>
 #include <string>
 
+#if __cplusplus
+extern "C" {
+#endif
+
+// The below macros are taken from https://gcc.gnu.org/wiki/Visibility and from
+// demos/composition/include/composition/visibility_control.h at https://github.com/ros2/demos
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef __GNUC__
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_EXPORT __attribute__((dllexport))
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_IMPORT __attribute__((dllimport))
+#else
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_EXPORT __declspec(dllexport)
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_IMPORT __declspec(dllimport)
+#endif
+#ifdef SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_BUILDING_DLL
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC \
+  SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_EXPORT
+#else
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC \
+  SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_IMPORT
+#endif
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC_TYPE \
+  SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_LOCAL
+#else
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_EXPORT \
+  __attribute__((visibility("default")))
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_IMPORT
+#if __GNUC__ >= 4
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC \
+  __attribute__((visibility("default")))
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_LOCAL \
+  __attribute__((visibility("hidden")))
+#else
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_LOCAL
+#endif
+#define SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC_TYPE
+#endif
+#if __cplusplus
+}  // extern "C"
+#endif
+
 namespace scenario_simulator
 {
 class ScenarioSimulator : public rclcpp::Node
 {
 public:
+  SCENARIO_SIMULATOR_SCENARIO_SIMULATOR_COMPONENT_PUBLIC
   explicit ScenarioSimulator(const rclcpp::NodeOptions & options);
   ~ScenarioSimulator();
 

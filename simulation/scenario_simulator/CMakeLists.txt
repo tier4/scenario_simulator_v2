@@ -30,7 +30,7 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
 )
 
-ament_auto_add_library(scenario_simulator SHARED
+ament_auto_add_library(scenario_simulator_component SHARED
   src/xmlrpc_method.cpp
   src/scenario_simulator.cpp
   src/sensor_simulation/primitives/primitive.cpp
@@ -40,15 +40,20 @@ ament_auto_add_library(scenario_simulator SHARED
   src/sensor_simulation/sensor_simulation.cpp
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
 )
-target_link_libraries(scenario_simulator
+target_link_libraries(scenario_simulator_component
   embree3
 )
+ament_target_dependencies(scenario_simulator_component
+  simulation_interface
+)
+rclcpp_components_register_nodes(scenario_simulator_component
+  "scenario_simulator::ScenarioSimulator")
 
 ament_auto_add_executable(scenario_simulator_node
   src/scenario_simulator_node.cpp
 )
 target_link_libraries(scenario_simulator_node
-  scenario_simulator
+  scenario_simulator_component
 )
 
 install(TARGETS
@@ -56,8 +61,8 @@ install(TARGETS
   DESTINATION lib/scenario_simulator
 )
 
-install(TARGETS scenario_simulator
-EXPORT export_scenario_simulator
+install(TARGETS scenario_simulator_component
+EXPORT export_scenario_simulator_component
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)

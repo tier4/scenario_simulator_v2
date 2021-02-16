@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef XMLRPC_INTERFACE__XMLRPC_CLIENT_HPP_
-#define XMLRPC_INTERFACE__XMLRPC_CLIENT_HPP_
+#ifndef SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_
+#define SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_
 
 #include <xmlrpcpp/XmlRpc.h>
-#include <xmlrpc_interface/conversions.hpp>
+#include <simulation_interface/conversions.hpp>
 
 #include <string>
 #include <memory>
 
-namespace xmlrpc_interface
+namespace simulation_interface
 {
 class XmlRpcRuntimeError : public std::runtime_error
 {
@@ -41,9 +41,10 @@ bool call(
   const ReqType & req, ResType & res)
 {
   XmlRpc::XmlRpcValue result, value;
-  value[0][0][xmlrpc_interface::key::method_name] = method_name;
+  value[0][0][simulation_interface::key::method_name] = method_name;
   try {
-    value[0][0][xmlrpc_interface::key::parameters] = xmlrpc_interface::serializeToBinValue<ReqType>(
+    value[0][0][simulation_interface::key::parameters] =
+      simulation_interface::serializeToBinValue<ReqType>(
       req);
   } catch (const XmlParameterError & e) {
     std::string message = "error found while calling " + method_name + " method.\n" + e.what();
@@ -58,11 +59,11 @@ bool call(
   }
   res = ResType();
   res =
-    xmlrpc_interface::deserializeFromBinValue<ResType>(
-    result[0][0][xmlrpc_interface::key::
+    simulation_interface::deserializeFromBinValue<ResType>(
+    result[0][0][simulation_interface::key::
     response]);
   return res.result().success();
 }
-}  // namespace xmlrpc_interface
+}  // namespace simulation_interface
 
-#endif  // XMLRPC_INTERFACE__XMLRPC_CLIENT_HPP_
+#endif  // SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_

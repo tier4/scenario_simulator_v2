@@ -33,7 +33,7 @@
   <depend>tf2_ros</depend>
   <depend>visualization_msgs</depend>
   <depend>xmlrpcpp</depend>
-  <depend>xmlrpc_interface</depend>
+  <depend>simulation_interface</depend>
   <depend>nlohmann-json-dev</depend>
 
   <!--<exec_depend>lexus_rx_450h_description</exec_depend> -->

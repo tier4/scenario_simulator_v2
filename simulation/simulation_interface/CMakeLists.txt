@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(xmlrpc_interface)
+project(simulation_interface)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -33,11 +33,11 @@ include_directories(
   ${CMAKE_BINARY_DIR}
 )
 
-ament_auto_add_library(xmlrpc_interface SHARED
+ament_auto_add_library(simulation_interface SHARED
   src/conversions.cpp
   ${PROTO_SRCS}
 )
-target_link_libraries(xmlrpc_interface
+target_link_libraries(simulation_interface
   ${PROTOBUF_LIBRARY}
 )
 
@@ -56,7 +56,7 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(TARGETS xmlrpc_interface
+install(TARGETS simulation_interface
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -72,7 +72,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(test_conversion test/test_conversions.cpp)
-  target_link_libraries(test_conversion xmlrpc_interface)
+  target_link_libraries(test_conversion simulation_interface)
 endif()
 
 ament_auto_package()

@@ -145,6 +145,8 @@ public:
     return current_kinematic_state_;
   }
 
+  openscenario_msgs::msg::WaypointsArray getWaypoints() const;
+
 private:
   void waitForAutowareToBeReady() const
   {

@@ -22,6 +22,7 @@
 #include <autoware_control_msgs/msg/engage_mode.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
+#include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
@@ -409,6 +410,15 @@ public:
     return setInitialTwist(initial_twist);
   }
 
+  /** ---- Trajectory ----------------------------------------------------------
+   *
+   *  Topic: /planning/scenario_planning/trajectory
+   *
+   * ------------------------------------------------------------------------ */
+  using Trajectory = autoware_planning_msgs::msg::Trajectory;
+
+  DEFINE_SUBSCRIPTION(Trajectory);
+
   /* ---- Turn Signal Command --------------------------------------------------
    *
    *  Topic: /control/turn_signal_cmd
@@ -490,15 +500,16 @@ public:
 
   const rclcpp::TimerBase::SharedPtr timer;
 
-  decltype(auto) updateTransform()
+  void updateTransform()
   {
-    current_transform.header.stamp = get_clock()->now();
-    return transform_broadcaster.sendTransform(current_transform);
+    if (!current_transform.header.frame_id.empty() && !current_transform.child_frame_id.empty()) {
+      current_transform.header.stamp = get_clock()->now();
+      return transform_broadcaster.sendTransform(current_transform);
+    }
   }
 
 public:
-  template<
-    typename ... Ts>
+  template<typename ... Ts>
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Ts && ... xs)
   : rclcpp::Node("awapi_accessor_node", std::forward<decltype(xs)>(xs)...),
@@ -529,6 +540,7 @@ public:
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(InitialTwist, "/initialtwist"),
+    INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
 
