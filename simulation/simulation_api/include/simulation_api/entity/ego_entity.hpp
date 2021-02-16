@@ -164,10 +164,15 @@ private:
 
   void updateAutoware(
     const geometry_msgs::msg::Pose & current_pose,
-    const geometry_msgs::msg::Twist & current_twist)
+    const geometry_msgs::msg::Twist & current_twist_)
   {
-    std::cout << "lx = " << current_twist.linear.x << std::endl;
-    std::cout << "az = " << current_twist.angular.z << std::endl;
+    geometry_msgs::msg::Twist current_twist;
+    {
+      current_twist.linear.x =
+        std::atomic_load(&autoware)->getVehicleCommand().control.velocity;
+      current_twist.angular.z =
+        std::atomic_load(&autoware)->getVehicleCommand().control.steering_angle;
+    }
 
     std::atomic_load(&autoware)->setCurrentControlMode();
     std::atomic_load(&autoware)->setCurrentPose(current_pose);

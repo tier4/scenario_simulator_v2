@@ -47,6 +47,8 @@
 #include <mutex>
 #include <utility>
 
+#define DEBUG_VALUE(...) std::cout << #__VA_ARGS__ " = " << (__VA_ARGS__) << std::endl
+
 namespace autoware_api
 {
 
@@ -143,9 +145,7 @@ public:
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setVehicleVelocity(const T value)
   {
     return setVehicleVelocity(convertTo<VehicleVelocity>(value));
@@ -243,9 +243,7 @@ public:
 
   DEFINE_PUBLISHER(CurrentShift);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentShift(const T twist_linear_x)
   {
     CurrentShift current_shift {};
@@ -270,16 +268,21 @@ public:
    *  Topic: /vehicle/status/steering
    *
    * ------------------------------------------------------------------------ */
-  using CurrentSteering = std_msgs::msg::Float32;
+  using CurrentSteering = autoware_vehicle_msgs::msg::Steering;
 
   DEFINE_PUBLISHER(CurrentSteering);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentSteering(const T value)
   {
-    return setCurrentSteering(convertTo<CurrentSteering>(value));
+    CurrentSteering current_steering {};
+    {
+      current_steering.header.stamp = get_clock()->now();
+      current_steering.header.frame_id = "base_link";
+      current_steering.data = value;
+    }
+
+    return setCurrentSteering(current_steering);
   }
 
   decltype(auto) setCurrentSteering(const geometry_msgs::msg::Twist & twist)
@@ -340,9 +343,7 @@ public:
 
   DEFINE_PUBLISHER(CurrentVelocity);
 
-  template<
-    typename T,
-    REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentVelocity(const T twist_linear_x)
   {
     return setCurrentVelocity(convertTo<CurrentVelocity>(twist_linear_x));

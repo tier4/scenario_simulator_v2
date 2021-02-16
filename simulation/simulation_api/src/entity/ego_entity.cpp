@@ -148,11 +148,11 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     v(2) = pose.position.z;
   }
 
-  const auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
-  v = rotation_mat * v;
-
   openscenario_msgs::msg::EntityStatus status;
   {
+    const auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
+    v = rotation_mat * v;
+
     status.time = time;
     status.type.type = openscenario_msgs::msg::EntityType::EGO;
     status.bounding_box = getBoundingBox();

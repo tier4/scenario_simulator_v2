@@ -47,7 +47,7 @@
 #include <utility>
 #include <vector>
 
-#define EXPERIMENTAL_AUTOWARE_IV_SUPPORT
+// #define EXPERIMENTAL_AUTOWARE_IV_SUPPORT
 
 namespace hdmap_utils
 {

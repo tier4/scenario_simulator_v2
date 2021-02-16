@@ -6,8 +6,8 @@
   <arg name="sensor_model" default="aip_xx1"/>
   <!-- Optional parameters -->
   <arg name="rviz" default="true" doc="launch rviz"/>
-  <arg name="lanelet2_map_file" default="lanelet2_map.osm" />
-  <arg name="pointcloud_map_file" default="pointcloud_map.pcd" />
+  <arg name="lanelet2_map_file" default="lanelet2_map.osm"/>
+  <arg name="pointcloud_map_file" default="pointcloud_map.pcd"/>
   <!-- Optional parameters for scenario simulation -->
   <arg name="initial_engage_state" default="true"/>
   <arg name="perception/enable_detection_failure" default="true"/>
@@ -15,20 +15,20 @@
   <arg name="sensing/visible_range" default="300.0"/>
 
   <!-- Vehicle Description -->
-  <!-- from vehicle_interface.launch.xml -->
-  <arg name ="vehicle_id" default="$(env VEHICLE_ID default)" />
+  <!-- from vehicle.launch.xml -->
+  <arg name ="vehicle_id" default="$(env VEHICLE_ID default)"/>
   <group>
     <include file="$(find-pkg-share vehicle_launch)/launch/vehicle_description.launch.xml">
-      <arg name="vehicle_model" value="$(var vehicle_model)"/>
       <arg name="sensor_model" value="$(var sensor_model)"/>
       <arg name="vehicle_id" value="$(var vehicle_id)"/>
+      <arg name="vehicle_model" value="$(var vehicle_model)"/>
     </include>
   </group>
   <!-- from simple_planning_simulator.launch.xml -->
   <node pkg="topic_tools" exec="relay" name="twist_relay" output="log" >
-    <param name="input_topic" value="/vehicle/status/twist" />
-    <param name="output_topic" value="/localization/twist" />
-    <param name="type" value="geometry_msgs/msg/TwistStamped" />
+    <param name="input_topic" value="/vehicle/status/twist"/>
+    <param name="output_topic" value="/localization/twist"/>
+    <param name="type" value="geometry_msgs/msg/TwistStamped"/>
   </node>
 
   <!-- System -->
@@ -38,7 +38,7 @@
 
   <!-- Map -->
   <include file="$(find-pkg-share map_launch)/launch/map.launch.xml">
-    <arg name="lanelet2_map_path" value="$(var map_path)/$(var lanelet2_map_file)" />
+    <arg name="lanelet2_map_path" value="$(var map_path)/$(var lanelet2_map_file)"/>
     <arg name="pointcloud_map_path" value="$(var map_path)/$(var pointcloud_map_file)"/>
   </include>
 
@@ -61,11 +61,11 @@
   </include>
 
   <!-- AutowareAPI -->
-  <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml" />
+  <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml"/>
 
   <!-- Rviz -->
-  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)" />
+  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/>
 
   <!-- Web Controller -->
-  <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml" /> -->
+  <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->
 </launch>
