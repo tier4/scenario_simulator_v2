@@ -17,7 +17,7 @@
 
 #include <simulation_api/traffic_lights/traffic_light_state.hpp>
 #include <simulation_api/traffic_lights/traffic_light_phase.hpp>
-
+#include <simulation_api/color_utils/color_utils.hpp>
 #include <simulation_api/entity/exception.hpp>
 
 #include <vector>

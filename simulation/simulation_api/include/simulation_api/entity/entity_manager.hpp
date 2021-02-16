@@ -171,11 +171,12 @@ public:
     auto traffic_light_marker_pub = rclcpp::create_publisher
       <visualization_msgs::msg::MarkerArray>(
       node,
-      "traffic_light/marker", entity_marker_qos,
+      "traffic_light/marker", qos,
       options);
     traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(
       hdmap_utils_ptr_,
-      traffic_light_marker_pub);
+      traffic_light_marker_pub,
+      clock_ptr_);
   }
   boost::optional<double> getLinearJerk(std::string name);
   double getStepTime() const;
