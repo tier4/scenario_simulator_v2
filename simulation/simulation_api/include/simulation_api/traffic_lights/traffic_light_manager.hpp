@@ -25,6 +25,7 @@
 #include <unordered_map>
 #include <vector>
 #include <utility>
+#include <string>
 
 namespace simulation_api
 {

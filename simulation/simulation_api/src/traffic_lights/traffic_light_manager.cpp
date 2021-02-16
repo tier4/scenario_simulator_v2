@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 #include <utility>
+#include <string>
 
 namespace simulation_api
 {
