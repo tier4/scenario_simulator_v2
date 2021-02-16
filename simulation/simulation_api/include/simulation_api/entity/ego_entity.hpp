@@ -96,7 +96,7 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose, const openscenario_msgs::msg::LaneletPose &)
   {
-    std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
+    // std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
@@ -109,7 +109,7 @@ public:
       std::atomic_load(&autoware)->isWaitingForRoute();
       rate.sleep())
     {
-      std::cout << "SEND GOAL-POSE!" << std::endl;
+      // std::cout << "SEND GOAL-POSE!" << std::endl;
       std::atomic_load(&autoware)->setGoalPose(map_pose);
     }
 
@@ -124,11 +124,11 @@ public:
       std::atomic_load(&autoware)->isWaitingForEngage();
       rate.sleep())
     {
-      std::cout << "ENGAGE!" << std::endl;
+      // std::cout << "ENGAGE!" << std::endl;
       std::atomic_load(&autoware)->setAutowareEngage(true);
     }
 
-    std::cout << "REQUEST END" << std::endl;
+    // std::cout << "REQUEST END" << std::endl;
   }
 
   const std::string getCurrentAction() const
@@ -164,14 +164,10 @@ private:
 
   void updateAutoware(
     const geometry_msgs::msg::Pose & current_pose,
-    const double linear_x = 0,
-    const double angular_z = 0)
+    const geometry_msgs::msg::Twist & current_twist)
   {
-    geometry_msgs::msg::Twist current_twist {};
-    {
-      current_twist.linear.x = linear_x;
-      current_twist.angular.z = angular_z;
-    }
+    std::cout << "lx = " << current_twist.linear.x << std::endl;
+    std::cout << "az = " << current_twist.angular.z << std::endl;
 
     std::atomic_load(&autoware)->setCurrentControlMode();
     std::atomic_load(&autoware)->setCurrentPose(current_pose);
