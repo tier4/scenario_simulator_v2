@@ -112,6 +112,7 @@ void TrafficLightManager::update(double step_time)
   if (color_changed) {
     deleteAllMarkers();
   }
+  drawMarkers();
 }
 
 TrafficLightArrow TrafficLightManager::getArrow(std::int64_t lanelet_id) const
