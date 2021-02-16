@@ -32,6 +32,13 @@ TrafficLight::TrafficLight(
   arrow_phase_.setState(TrafficLightArrow::NONE);
 }
 
+void TrafficLight::setPosition(
+  const TrafficLightColor & color,
+  const geometry_msgs::msg::Point & position)
+{
+  color_positions_.insert({color, position});
+}
+
 void TrafficLight::setColorPhase(
   const std::vector<std::pair<double, TrafficLightColor>> & phase,
   double time_offset)

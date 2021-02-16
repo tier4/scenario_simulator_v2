@@ -28,7 +28,7 @@ namespace simulation_api
 class TrafficLightManager
 {
 public:
-  explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+  explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
   void update(double step_time);
   template<typename ... Ts>
   void setColorPhase(std::int64_t lanelet_id, Ts && ... xs)

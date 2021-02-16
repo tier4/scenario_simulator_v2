@@ -21,12 +21,31 @@
 
 namespace simulation_api
 {
-TrafficLightManager::TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr)
+TrafficLightManager::TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 {
   traffic_lights_ = {};
   const auto ids = hdmap_utils_ptr->getTrafficLightIds();
   for (const auto id : ids) {
     std::shared_ptr<TrafficLight> light_ptr = std::make_shared<TrafficLight>(id);
+    auto red_position = hdmap_utils_ptr->getTrafficLightBulbPosition(
+      id,
+      TrafficLightColor::RED);
+    if (red_position) {
+      light_ptr->setPosition(TrafficLightColor::RED, red_position.get());
+    }
+    auto yellow_position = hdmap_utils_ptr->getTrafficLightBulbPosition(
+      id,
+      TrafficLightColor::YELLOW);
+    if (yellow_position) {
+      light_ptr->setPosition(TrafficLightColor::YELLOW, yellow_position.get());
+    }
+    auto green_position =
+      hdmap_utils_ptr->getTrafficLightBulbPosition(
+      id,
+      TrafficLightColor::GREEN);
+    if (green_position) {
+      light_ptr->setPosition(TrafficLightColor::GREEN, green_position.get());
+    }
     traffic_lights_.insert({id, light_ptr});
   }
 }

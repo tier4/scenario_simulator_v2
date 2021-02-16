@@ -52,6 +52,7 @@ public:
   TrafficLightColor getColor() const;
   const std::int64_t id;
   const geometry_msgs::msg::Point getPosition(const TrafficLightColor color);
+  void setPosition(const TrafficLightColor & color, const geometry_msgs::msg::Point & position);
   const geometry_msgs::msg::Point getPosition(const TrafficLightArrow arrow);
 
 private:
