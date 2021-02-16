@@ -138,7 +138,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinesPolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;
-  const boost::optional<geometry_msgs::msg::Point> getTrafficLightBlubPosition(
+  const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const;
 
 private:
