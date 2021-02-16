@@ -21,7 +21,10 @@
 
 namespace simulation_api
 {
-TrafficLightManager::TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+TrafficLightManager::TrafficLightManager(
+  std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher)
+: marker_pub_(publisher)
 {
   traffic_lights_ = {};
   const auto ids = hdmap_utils_ptr->getTrafficLightIds();

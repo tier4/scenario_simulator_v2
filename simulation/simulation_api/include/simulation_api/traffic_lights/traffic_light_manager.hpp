@@ -18,6 +18,9 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 
+#include <rclcpp/rclcpp.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -28,7 +31,9 @@ namespace simulation_api
 class TrafficLightManager
 {
 public:
-  explicit TrafficLightManager(std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+  explicit TrafficLightManager(
+    std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher);
   void update(double step_time);
   template<typename ... Ts>
   void setColorPhase(std::int64_t lanelet_id, Ts && ... xs)
@@ -68,6 +73,7 @@ public:
 
 private:
   std::unordered_map<std::int64_t, std::shared_ptr<TrafficLight>> traffic_lights_;
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 };
 }  // namespace simulation_api
 

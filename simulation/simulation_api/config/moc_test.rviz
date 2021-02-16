@@ -5,12 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /Simulation1
-        - /Simulation1/Lanelet1
-        - /Simulation1/Lanelet1/Status1
         - /Simulation1/Lanelet1/Topic1
         - /Simulation1/Lanelet1/Namespaces1
-        - /Simulation1/Grid1/Line Style1
       Splitter Ratio: 0.5
     Tree Height: 1147
   - Class: rviz_common/Selection
@@ -81,26 +77,38 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /lanelet/marker
           Value: true
-        - Alpha: 0.30000001192092896
-          Cell Size: 10
-          Class: rviz_default_plugins/Grid
-          Color: 213; 90; 250
+        - Class: rviz_default_plugins/MarkerArray
           Enabled: true
-          Line Style:
-            Line Width: 0.009999999776482582
-            Value: Lines
-          Name: Grid
-          Normal Cell Count: 0
-          Offset:
-            X: 0
-            Y: 0
-            Z: -2.5
-          Plane: XY
-          Plane Cell Count: 50
-          Reference Frame: <Fixed Frame>
+          Name: TrafficLight
+          Namespaces:
+            {}
+          Topic:
+            Depth: 5
+            Durability Policy: Transient Local
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /traffic_light/marker
           Value: true
       Enabled: true
       Name: Simulation
+    - Alpha: 0.30000001192092896
+      Cell Size: 10
+      Class: rviz_default_plugins/Grid
+      Color: 213; 90; 250
+      Enabled: true
+      Line Style:
+        Line Width: 0.009999999776482582
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: -2.5
+      Plane: XY
+      Plane Cell Count: 50
+      Reference Frame: <Fixed Frame>
+      Value: true
     - Alpha: 0.25
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false

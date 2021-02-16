@@ -146,7 +146,6 @@ public:
     node->undeclare_parameter("origin_longitude");
     // node->undeclare_parameter("origin_altitude");
     hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
-    traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(hdmap_utils_ptr_);
     const rclcpp::QoS & qos = LaneletMarkerQos();
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
@@ -169,6 +168,14 @@ public:
     visualization_msgs::msg::MarkerArray markers;
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
     updateHdmapMarker();
+    auto traffic_light_marker_pub = rclcpp::create_publisher
+      <visualization_msgs::msg::MarkerArray>(
+      node,
+      "traffic_light/marker", entity_marker_qos,
+      options);
+    traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(
+      hdmap_utils_ptr_,
+      traffic_light_marker_pub);
   }
   boost::optional<double> getLinearJerk(std::string name);
   double getStepTime() const;
