@@ -54,12 +54,16 @@ public:
   const geometry_msgs::msg::Point getPosition(const TrafficLightColor color);
   void setPosition(const TrafficLightColor & color, const geometry_msgs::msg::Point & position);
   const geometry_msgs::msg::Point getPosition(const TrafficLightArrow arrow);
+  bool colorChanged() const;
+  bool arrowChanged() const;
 
 private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;
   std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions_;
   TrafficLightPhase<TrafficLightColor> color_phase_;
   TrafficLightPhase<TrafficLightArrow> arrow_phase_;
+  bool color_changed_;
+  bool arrow_changed_;
 };
 }  // namespace simulation_api
 

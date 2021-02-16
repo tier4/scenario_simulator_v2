@@ -28,7 +28,9 @@ TrafficLight::TrafficLight(
   std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions)
 : id(id), color_positions_(color_positions), arrow_positions_(arrow_positions)
 {
+  color_changed_ = true;
   color_phase_.setState(TrafficLightColor::NONE);
+  arrow_changed_ = true;
   arrow_phase_.setState(TrafficLightArrow::NONE);
 }
 
@@ -83,10 +85,34 @@ TrafficLightColor TrafficLight::getColor() const
   return color_phase_.getState();
 }
 
+bool TrafficLight::colorChanged() const
+{
+  return color_changed_;
+}
+
+bool TrafficLight::arrowChanged() const
+{
+  return arrow_changed_;
+}
+
 void TrafficLight::update(double step_time)
 {
+  const auto previous_arrow = getArrow();
   arrow_phase_.update(step_time);
+  const auto arrow = getArrow();
+  if (previous_arrow == arrow) {
+    arrow_changed_ = false;
+  } else {
+    arrow_changed_ = true;
+  }
+  const auto previous_color = getColor();
   color_phase_.update(step_time);
+  const auto color = getColor();
+  if (previous_color == color) {
+    color_changed_ = false;
+  } else {
+    color_changed_ = true;
+  }
 }
 
 const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor color)
