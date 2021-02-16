@@ -53,19 +53,15 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   const auto current_entity_status = getStatus();
 
-  static auto first_time = true;
+  static auto uninitialized = true;
 
-  if (first_time) {
+  if (std::exchange(uninitialized, false)) {
     waitForAutowareToBeReady();
     std::atomic_load(&autoware)->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autoware)->setInitialTwist();
-    first_time = false;
   }
 
-  updateAutoware(
-    current_entity_status.pose,
-    current_entity_status.action_status.twist.linear.x,
-    current_entity_status.action_status.twist.angular.z);
+  updateAutoware(current_entity_status.pose, current_entity_status.action_status.twist);
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   {
@@ -152,11 +148,11 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     v(2) = pose.position.z;
   }
 
-  const auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
-  v = rotation_mat * v;
-
   openscenario_msgs::msg::EntityStatus status;
   {
+    const auto rotation_mat = quaternion_operation::getRotationMatrix(origin_.get().orientation);
+    v = rotation_mat * v;
+
     status.time = time;
     status.type.type = openscenario_msgs::msg::EntityType::EGO;
     status.bounding_box = getBoundingBox();
@@ -169,10 +165,10 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
 
     const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
 
+    status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+
     if (lanelet_pose) {
       status.lanelet_pose = lanelet_pose.get();
-    } else {
-      status.lanelet_pose_valid = false;
     }
   }
 
