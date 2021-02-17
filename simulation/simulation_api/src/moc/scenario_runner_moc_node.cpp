@@ -129,6 +129,14 @@ private:
         simulation_api::helper::constructLaneletPose(34675, 0.0) );
       api_.setTargetSpeed("npc2", 3, true);
     }
+    if (api_.reachPosition(
+        "npc2",
+        simulation_api::helper::constructLaneletPose(34513, 0.0), 5))
+    {
+      api_.requestAcquirePosition(
+        "npc2",
+        simulation_api::helper::constructLaneletPose(34630, 0.0) );
+    }
     if (api_.checkCollision("ego", "npc1")) {
       std::cout << "npc1 collision!" << std::endl;
     }
