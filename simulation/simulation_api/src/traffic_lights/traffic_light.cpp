@@ -117,19 +117,19 @@ void TrafficLight::update(double step_time)
   }
 }
 
-const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor color)
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor & color)
 {
   if (color_positions_.count(color) == 0) {
     throw simulation_api::SimulationRuntimeError("target color does not exists");
   }
-  return color_positions_[color];
+  return color_positions_.at(color);
 }
 
-const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow arrow)
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow & arrow)
 {
   if (arrow_positions_.count(arrow) == 0) {
     throw simulation_api::SimulationRuntimeError("target arrow does not exists");
   }
-  return arrow_positions_[arrow];
+  return arrow_positions_.at(arrow);
 }
 }  // namespace simulation_api
