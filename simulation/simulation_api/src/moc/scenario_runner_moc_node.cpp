@@ -28,6 +28,105 @@
 // headers in pugixml
 #include "pugixml.hpp"
 
+struct Catalog
+{
+  std::string vehicle_catalog_xml =
+    R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
+            <ParameterDeclarations/>
+            <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
+            <BoundingBox>
+                <Center x='1.5' y='0.0' z='0.9'/>
+                <Dimensions width='2.1' length='4.5' height='1.8'/>
+            </BoundingBox>
+            <Axles>
+                <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
+                <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>
+            </Axles>
+            <Properties>
+                <Property name='type' value='ego_vehicle'/>
+            </Properties>
+        </Vehicle>)";
+
+  std::string pedestrian_catalog_xml =
+    R"(
+    <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
+            <BoundingBox>
+                <Center x='0.0' y='0.0' z='0.5'/>
+                <Dimensions width='1.0' length='1.0' height='2.0'/>
+            </BoundingBox>
+            <Properties/>
+        </Pedestrian>)";
+};
+
+class ScenarioRunnerMoc : public rclcpp::Node
+{
+public:
+  explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
+  : Node("scenario_runner", option),
+    api_(this, ament_index_cpp::get_package_share_directory(
+        "cargo_delivery") + "/maps/kashiwa/lanelet2_map_with_private_road_and_walkway_ele_fix.osm")
+  {
+    api_.setVerbose(true);
+    api_.initialize(1.0, 0.05);
+    pugi::xml_document vehicle_catalog_xml_doc;
+    Catalog catalog;
+    vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
+    api_.spawn(
+      false, "ego", simulation_api::entity::VehicleParameters(
+        vehicle_catalog_xml_doc).toRosMsg());
+    api_.setEntityStatus(
+      "ego",
+      simulation_api::helper::constructLaneletPose(35026, 0, -0.591),
+      simulation_api::helper::constructActionStatus(0));
+    api_.spawn(
+      false, "npc", simulation_api::entity::VehicleParameters(
+        vehicle_catalog_xml_doc).toRosMsg());
+    api_.setEntityStatus(
+      "npc",
+      simulation_api::helper::constructLaneletPose(35026, 10, 0.0000001),
+      simulation_api::helper::constructActionStatus(10));
+    api_.setTargetSpeed("npc", 5, true);
+    /*
+    api_.attachLidarSensor(
+      simulation_api::helper::constructLidarConfiguration(
+        simulation_api::helper::LidarType::VLP32,
+        "ego",
+        "points_raw")
+    );
+    api_.attachDetectionSensor(
+      simulation_api::helper::constructDetectionSensorConfiguration("ego", "/detection", 0.1));
+    */
+    using namespace std::chrono_literals;
+    update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
+  }
+
+private:
+  void update()
+  {
+    api_.updateFrame();
+    current_time_ = current_time_ + 0.05;
+  }
+  bool lanechange_excuted_;
+  bool target_speed_setted_;
+  bool bob_spawned_;
+  double current_time_;
+  int port_;
+  scenario_simulator::API api_;
+  rclcpp::TimerBase::SharedPtr update_timer_;
+};
+
+int main(int argc, char * argv[])
+{
+  rclcpp::init(argc, argv);
+  rclcpp::NodeOptions options;
+  auto component = std::make_shared<ScenarioRunnerMoc>(options);
+  rclcpp::spin(component);
+  rclcpp::shutdown();
+  return 0;
+}
+
+
+/*
 class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
@@ -193,3 +292,4 @@ int main(int argc, char * argv[])
   rclcpp::shutdown();
   return 0;
 }
+*/
