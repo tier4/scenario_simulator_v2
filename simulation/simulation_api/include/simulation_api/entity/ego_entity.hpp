@@ -20,12 +20,12 @@
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
+#include <boost/optional.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/vehicle_model/sim_model.hpp>
 
 // headers in pugixml
 #include <pugixml.hpp>
-#include <boost/optional.hpp>
 
 #include <memory>
 #include <string>
@@ -48,9 +48,7 @@ public:
    *  It is mainly used when writing scenarios in C++.
    *
    * ------------------------------------------------------------------------ */
-  template<
-    typename ... Ts  // Maybe, VehicleParameters or pugi::xml_node
-  >
+  template<typename ... Ts>
   explicit EgoEntity(
     const std::string & name,
     const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
@@ -83,14 +81,13 @@ public:
     autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
   {
     std::thread(
-      [&](auto && node)
+      [](const auto node)
       {
-        rclcpp::executors::MultiThreadedExecutor executor {};
-        executor.add_node(std::forward<decltype(node)>(node));
-        while (rclcpp::ok()) {
-          executor.spin_some();
-        }
-      }, std::atomic_load(&autoware)->get_node_base_interface()).detach();
+        // NOTE An executor keeps a WEAK REFERENCE to the nodes that have been added to it.
+        rclcpp::executors::SingleThreadedExecutor executor {};
+        executor.add_node(node);
+        executor.spin();
+      }, autoware).detach();
   }
 
   void requestAcquirePosition(
@@ -162,9 +159,7 @@ private:
     std::cout << "[accessor] Autoware is ready." << std::endl;
   }
 
-  void updateAutoware(
-    const geometry_msgs::msg::Pose & current_pose,
-    const geometry_msgs::msg::Twist & current_twist_)
+  void updateAutoware(const geometry_msgs::msg::Pose & current_pose)
   {
     geometry_msgs::msg::Twist current_twist;
     {
