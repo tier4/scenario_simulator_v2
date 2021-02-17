@@ -49,7 +49,7 @@ public:
       simulation_api::helper::constructLaneletPose(35026, 0, -0.591),
       simulation_api::helper::constructActionStatus(0));
     api_.spawn(
-      true, "npc", simulation_api::entity::VehicleParameters(
+      false, "npc", simulation_api::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",

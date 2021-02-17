@@ -131,7 +131,6 @@ void ScenarioSimulator::runXmlRpc()
 void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   initialized_ = true;
-  std::cout << param << std::endl;
   const auto req =
     simulation_interface::deserializeFromBinValue<simulation_api_schema::InitializeRequest>(param);
   realtime_factor_ = req.realtime_factor();
