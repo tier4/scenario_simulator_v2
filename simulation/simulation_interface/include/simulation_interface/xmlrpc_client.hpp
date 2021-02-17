@@ -49,7 +49,10 @@ bool call(
     THROW_XML_PARAMETER_ERROR(message);
   }
   try {
+    std::cout << method_name << std::endl;
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     client_ptr->execute(method_name.c_str(), value, result);
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
   } catch (XmlRpc::XmlRpcException e) {
     throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
   }
