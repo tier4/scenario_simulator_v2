@@ -14,18 +14,33 @@
 
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api/color_utils/color_utils.hpp>
+#include <simulation_api/entity/exception.hpp>
 
 #include <vector>
 #include <limits>
 #include <utility>
+#include <unordered_map>
+#include <string>
 
 namespace simulation_api
 {
-TrafficLight::TrafficLight(std::int64_t id)
-: id(id)
+TrafficLight::TrafficLight(
+  std::int64_t id,
+  const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions,
+  const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions)
+: id(id), color_positions_(color_positions), arrow_positions_(arrow_positions)
 {
+  color_changed_ = true;
   color_phase_.setState(TrafficLightColor::NONE);
+  arrow_changed_ = true;
   arrow_phase_.setState(TrafficLightArrow::NONE);
+}
+
+void TrafficLight::setPosition(
+  const TrafficLightColor & color,
+  const geometry_msgs::msg::Point & position)
+{
+  color_positions_.insert({color, position});
 }
 
 void TrafficLight::setColorPhase(
@@ -72,9 +87,49 @@ TrafficLightColor TrafficLight::getColor() const
   return color_phase_.getState();
 }
 
+bool TrafficLight::colorChanged() const
+{
+  return color_changed_;
+}
+
+bool TrafficLight::arrowChanged() const
+{
+  return arrow_changed_;
+}
+
 void TrafficLight::update(double step_time)
 {
+  const auto previous_arrow = getArrow();
   arrow_phase_.update(step_time);
+  const auto arrow = getArrow();
+  if (previous_arrow == arrow) {
+    arrow_changed_ = false;
+  } else {
+    arrow_changed_ = true;
+  }
+  const auto previous_color = getColor();
   color_phase_.update(step_time);
+  const auto color = getColor();
+  if (previous_color == color) {
+    color_changed_ = false;
+  } else {
+    color_changed_ = true;
+  }
+}
+
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor & color)
+{
+  if (color_positions_.count(color) == 0) {
+    throw simulation_api::SimulationRuntimeError("target color does not exists");
+  }
+  return color_positions_.at(color);
+}
+
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow & arrow)
+{
+  if (arrow_positions_.count(arrow) == 0) {
+    throw simulation_api::SimulationRuntimeError("target arrow does not exists");
+  }
+  return arrow_positions_.at(arrow);
 }
 }  // namespace simulation_api

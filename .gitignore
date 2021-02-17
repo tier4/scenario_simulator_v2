@@ -6,6 +6,8 @@ external/autoware_api_msgs
 external/autoware_perception_msgs
 external/autoware_planning_msgs
 external/autoware_system_msgs
+external/autoware_vehicle_msgs
+external/autoware_control_msgs
 html
 latex
 scenario_simulator.tar

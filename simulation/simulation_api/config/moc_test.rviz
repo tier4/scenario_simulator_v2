@@ -7,10 +7,8 @@ Panels:
         - /Global Options1
         - /Simulation1
         - /Simulation1/Lanelet1
-        - /Simulation1/Lanelet1/Status1
         - /Simulation1/Lanelet1/Topic1
         - /Simulation1/Lanelet1/Namespaces1
-        - /Simulation1/Grid1/Line Style1
       Splitter Ratio: 0.5
     Tree Height: 1147
   - Class: rviz_common/Selection
@@ -72,7 +70,7 @@ Visualization Manager:
             parking_space: true
             right_lane_bound: true
             road_lanelets: true
-            traffic_light: true
+            traffic_light: false
             traffic_light_triangle: true
           Topic:
             Depth: 5
@@ -81,26 +79,38 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /lanelet/marker
           Value: true
-        - Alpha: 0.30000001192092896
-          Cell Size: 10
-          Class: rviz_default_plugins/Grid
-          Color: 213; 90; 250
+        - Class: rviz_default_plugins/MarkerArray
           Enabled: true
-          Line Style:
-            Line Width: 0.009999999776482582
-            Value: Lines
-          Name: Grid
-          Normal Cell Count: 0
-          Offset:
-            X: 0
-            Y: 0
-            Z: -2.5
-          Plane: XY
-          Plane Cell Count: 50
-          Reference Frame: <Fixed Frame>
+          Name: TrafficLight
+          Namespaces:
+            bulb: true
+          Topic:
+            Depth: 5
+            Durability Policy: Transient Local
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /traffic_light/marker
           Value: true
       Enabled: true
       Name: Simulation
+    - Alpha: 0.30000001192092896
+      Cell Size: 10
+      Class: rviz_default_plugins/Grid
+      Color: 213; 90; 250
+      Enabled: true
+      Line Style:
+        Line Width: 0.009999999776482582
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: -2.5
+      Plane: XY
+      Plane Cell Count: 50
+      Reference Frame: <Fixed Frame>
+      Value: true
     - Alpha: 0.25
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -165,7 +175,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 10
+      Distance: 14.049280166625977
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -180,10 +190,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.15039867162704468
+      Pitch: 0.265398770570755
       Target Frame: ego
       Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 2.985422134399414
+      Yaw: 2.84542179107666
     Saved: ~
 Window Geometry:
   Displays:
