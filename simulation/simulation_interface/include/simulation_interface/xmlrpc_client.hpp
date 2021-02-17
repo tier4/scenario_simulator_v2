@@ -41,11 +41,15 @@ bool call(
   const ReqType & req, ResType & res)
 {
   XmlRpc::XmlRpcValue result, value;
-  value[0][0][simulation_interface::key::method_name] = method_name;
+  // value[0][0][simulation_interface::key::method_name] = method_name;
   try {
+    value = simulation_interface::serializeToBinValue<ReqType>(
+      req);
+    /*
     value[0][0][simulation_interface::key::parameters] =
       simulation_interface::serializeToBinValue<ReqType>(
       req);
+    */
   } catch (const XmlParameterError & e) {
     std::string message = "error found while calling " + method_name + " method.\n" + e.what();
     THROW_XML_PARAMETER_ERROR(message);
@@ -53,15 +57,15 @@ bool call(
 
 
   try {
-    client_ptr->execute("system.multicall", value, result);
+    // client_ptr->execute("system.multicall", value, result);
+    client_ptr->execute(method_name.c_str(), value, result);
   } catch (XmlRpc::XmlRpcException e) {
     throw XmlRpcRuntimeError(e.getMessage().c_str(), e.getCode());
   }
   res = ResType();
   res =
     simulation_interface::deserializeFromBinValue<ResType>(
-    result[0][0][simulation_interface::key::
-    response]);
+    result[simulation_interface::key::response]);
   return res.result().success();
 }
 }  // namespace simulation_interface
