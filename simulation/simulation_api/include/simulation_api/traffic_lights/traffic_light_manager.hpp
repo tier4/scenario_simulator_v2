@@ -78,7 +78,7 @@ private:
   void deleteAllMarkers() const;
   void drawMarkers() const;
   std::unordered_map<std::int64_t, std::shared_ptr<TrafficLight>> traffic_lights_;
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   const std::shared_ptr<rclcpp::Clock> clock_ptr_;
   const std::string map_frame_;
 };

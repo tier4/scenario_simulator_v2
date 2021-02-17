@@ -117,7 +117,7 @@ void TrafficLight::update(double step_time)
   }
 }
 
-const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor color)
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor & color)
 {
   if (color_positions_.count(color) == 0) {
     throw simulation_api::SimulationRuntimeError("target color does not exists");
@@ -125,7 +125,7 @@ const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColo
   return color_positions_[color];
 }
 
-const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow arrow)
+const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow & arrow)
 {
   if (arrow_positions_.count(arrow) == 0) {
     throw simulation_api::SimulationRuntimeError("target arrow does not exists");
