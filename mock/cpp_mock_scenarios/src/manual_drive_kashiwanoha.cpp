@@ -53,7 +53,7 @@ public:
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
-      simulation_api::helper::constructLaneletPose(35026, 10, 0.0000001),
+      simulation_api::helper::constructLaneletPose(35026, 10, 0.0),
       simulation_api::helper::constructActionStatus(10));
     api_.setTargetSpeed("npc", 5, true);
     /*
