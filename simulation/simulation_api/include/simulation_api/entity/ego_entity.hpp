@@ -163,8 +163,7 @@ private:
   }
 
   void updateAutoware(
-    const geometry_msgs::msg::Pose & current_pose,
-    const geometry_msgs::msg::Twist & current_twist_)
+    const geometry_msgs::msg::Pose & current_pose)
   {
     geometry_msgs::msg::Twist current_twist;
     {

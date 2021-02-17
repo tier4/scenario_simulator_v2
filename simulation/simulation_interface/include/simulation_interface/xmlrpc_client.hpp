@@ -43,8 +43,8 @@ bool call(
   XmlRpc::XmlRpcValue result, value;
   // value[0][0][simulation_interface::key::method_name] = method_name;
   try {
-    value = simulation_interface::serializeToBinValue<ReqType>(
-      req);
+    value[simulation_interface::key::parameters] = 
+    simulation_interface::serializeToBinValue<ReqType>(req);
     /*
     value[0][0][simulation_interface::key::parameters] =
       simulation_interface::serializeToBinValue<ReqType>(
