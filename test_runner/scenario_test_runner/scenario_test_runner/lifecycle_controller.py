@@ -37,10 +37,12 @@ class LifecycleController(Node):
 
     """
 
-    NODE_NAME = "simulation/openscenario_interpreter"
+    NODE_NAME = "openscenario_interpreter"
 
     def __init__(self):
-        super().__init__('openscenario_interpreter_controller')
+        super().__init__(
+            node_name='openscenario_interpreter_controller',
+            namespace='simulation')
 
         self.client_get_state = self.create_client(
             GetState, LifecycleController.NODE_NAME + "/get_state")

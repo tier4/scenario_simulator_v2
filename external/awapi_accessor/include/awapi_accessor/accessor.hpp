@@ -513,7 +513,7 @@ public:
   template<typename ... Ts>
   AWAPI_ACCESSOR_PUBLIC
   explicit Accessor(Ts && ... xs)
-  : rclcpp::Node("awapi_accessor_node", std::forward<decltype(xs)>(xs)...),
+  : rclcpp::Node(std::forward<decltype(xs)>(xs)...),
 #ifndef NDEBUG
     INIT_PUBLISHER(DebugString, "debug/string"),
     INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),

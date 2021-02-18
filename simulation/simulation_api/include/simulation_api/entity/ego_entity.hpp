@@ -74,7 +74,9 @@ public:
   template<typename ... Ts>
   explicit EgoEntity(Ts && ... xs)
   : VehicleEntity(std::forward<decltype(xs)>(xs)...),
-    autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
+    autoware(
+      std::make_shared<autoware_api::Accessor>(
+        "accessor", rclcpp::NodeOptions().use_global_arguments(false)))
   {
     /* ---- NOTE ---------------------------------------------------------------
      *
