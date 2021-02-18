@@ -113,6 +113,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 
   server_.bindAndListen(port_);
   server_.enableIntrospection(true);
+  XmlRpc::setVerbosity(5);
   xmlrpc_thread_ = std::thread(&ScenarioSimulator::runXmlRpc, this);
 }
 
@@ -124,7 +125,7 @@ ScenarioSimulator::~ScenarioSimulator()
 void ScenarioSimulator::runXmlRpc()
 {
   while (rclcpp::ok()) {
-    server_.work(1);
+    server_.work(1000);
   }
 }
 
@@ -169,7 +170,6 @@ void ScenarioSimulator::updateEntityStatus(
   XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto req =
     simulation_interface::deserializeFromBinValue<simulation_api_schema::UpdateEntityStatusRequest>(
     param);
@@ -191,7 +191,6 @@ void ScenarioSimulator::updateEntityStatus(
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
   result[0] = simulation_interface::serializeToBinValue(res);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
 }
 
 void ScenarioSimulator::spawnVehicleEntity(

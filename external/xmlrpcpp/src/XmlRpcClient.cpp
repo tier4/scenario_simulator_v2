@@ -131,7 +131,7 @@ XmlRpcClient::execute(const char * method, XmlRpcValue const & params, XmlRpcVal
   }
 
   result.clear();
-  double msTime = -1.0;   // Process until exit is called
+  double msTime = -1;   // Process until exit is called
   _disp.work(msTime);
 
   if (_connectionState != IDLE || !parseResponse(result)) {
