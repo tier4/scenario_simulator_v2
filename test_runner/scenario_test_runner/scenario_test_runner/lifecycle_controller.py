@@ -40,8 +40,7 @@ class LifecycleController(Node):
     NODE_NAME = "openscenario_interpreter_node"
 
     def __init__(self):
-        rclpy.init(args=self.NODE_NAME)
-        super().__init__(LifecycleController.NODE_NAME)
+        super().__init__('openscenario_interpreter_controller')
 
         self.client_get_state = self.create_client(
             GetState, LifecycleController.NODE_NAME + "/get_state")
