@@ -40,9 +40,7 @@ class EgoEntity : public VehicleEntity
   const std::shared_ptr<autoware_api::Accessor> autoware;
 
 public:
-  /* ---------------------------------------------------------------------------
-   *
-   *  NOTE: from yamacir-kit
+  /* ---- NOTE -----------------------------------------------------------------
    *
    *  This constructor makes an Ego type entity with the proper initial state.
    *  It is mainly used when writing scenarios in C++.
@@ -53,13 +51,12 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
   : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
+  // TODO INITIALIZE AUTOWARE?
   {
     setStatus(initial_state);
   }
 
-  /* ---------------------------------------------------------------------------
-   *
-   *  NOTE: from yamacir-kit
+  /* ---- NOTE -----------------------------------------------------------------
    *
    *  This constructor builds an Ego-type entity with an ambiguous initial
    *  state. In this case, the values for status_ and current_kinematic_state_
@@ -80,6 +77,39 @@ public:
   : VehicleEntity(std::forward<decltype(xs)>(xs)...),
     autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
   {
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  To suppress too verbose error message from rviz2 like below, we
+     *  broadcast dummy transform until Autoware to be initialized.
+     *
+     *    [rviz2-3]          at line 133 in \
+     *    /tmp/binarydeb/ros-foxy-tf2-0.13.9/src/buffer_core.cpp
+     *    [rviz2-3] Warning: Invalid frame ID "map" passed to canTransform \
+     *    argument target_frame - frame does not exist
+     *
+     * ---------------------------------------------------------------------- */
+    std::atomic_load(&autoware)->setTransform(geometry_msgs::msg::Pose());
+
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  The simulator needs to run in a fixed-cycle loop, but the communication
+     *  part with Autoware needs to run at a higher frequency (e.g. the
+     *  transform in map -> base_link needs to be updated at a higher frequency
+     *  even if the value does not change). We also need to keep collecting the
+     *  latest values of topics from Autoware, independently of the simulator.
+     *
+     *  For this reason, autoware_api::Accessor, which is responsible for
+     *  communication with Autoware, should run in an independent thread. This
+     *  is probably an EXTREMELY DIRTY HACK.
+     *
+     *  Ideally, the constructor caller of traffic_simulator::API should
+     *  provide a std::shared_ptr to autoware_api::Accessor and spin that node
+     *  with MultiThreadedExecutor.
+     *
+     *  If you have a nice idea to solve this, and are interested in improving
+     *  the quality of the Tier IV simulator, please contact @yamacir-kit.
+     *
+     * ---------------------------------------------------------------------- */
     std::thread(
       [](const auto node)
       {
