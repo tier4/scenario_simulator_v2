@@ -532,11 +532,13 @@ bool API::updateEntityStatusInSim()
   simulation_interface::call(
     client_ptr_, simulation_interface::method::update_entity_status, req,
     res);
+  /*
   for (const auto status : res.status()) {
     openscenario_msgs::msg::EntityStatus msg;
     simulation_interface::toMsg(status, msg);
     entity_manager_ptr_->setEntityStatus(status.name(), msg);
   }
+  */
   return res.result().success();
 }
 

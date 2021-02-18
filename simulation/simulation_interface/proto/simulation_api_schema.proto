@@ -86,7 +86,7 @@ message UpdateEntityStatusRequest
 message UpdateEntityStatusResponse
 {
     Result result = 1;
-    repeated openscenario_msgs.EntityStatus status = 2;
+    // repeated openscenario_msgs.EntityStatus status = 2;
 }
 
 message AttachLidarSensorRequest

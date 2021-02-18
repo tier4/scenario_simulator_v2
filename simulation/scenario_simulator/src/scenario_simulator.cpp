@@ -175,6 +175,7 @@ void ScenarioSimulator::updateEntityStatus(
     param);
   entity_status_ = {};
   simulation_api_schema::UpdateEntityStatusResponse res;
+  /*
   for (auto status : req.status()) {
     auto status_ptr = res.mutable_status()->Add();
     status_ptr->set_type(status.type());
@@ -187,6 +188,7 @@ void ScenarioSimulator::updateEntityStatus(
     status_ptr->set_lanelet_pose_valid(status.lanelet_pose_valid());
     entity_status_.emplace_back(status);
   }
+  */
   result = XmlRpc::XmlRpcValue();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
