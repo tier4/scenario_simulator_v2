@@ -35,7 +35,5 @@ int main(const int argc, char const * const * const argv)
 
   executor.spin();
 
-  rclcpp::shutdown();
-
-  return EXIT_SUCCESS;
+  return rclcpp::shutdown() ? EXIT_SUCCESS : EXIT_FAILURE;
 }

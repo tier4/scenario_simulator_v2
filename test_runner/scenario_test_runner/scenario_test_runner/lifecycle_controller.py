@@ -37,7 +37,7 @@ class LifecycleController(Node):
 
     """
 
-    NODE_NAME = "openscenario_interpreter_node"
+    NODE_NAME = "simulation/openscenario_interpreter"
 
     def __init__(self):
         super().__init__('openscenario_interpreter_controller')

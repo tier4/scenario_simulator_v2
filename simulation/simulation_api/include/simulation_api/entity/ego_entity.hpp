@@ -51,7 +51,6 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
   : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
-  // TODO INITIALIZE AUTOWARE?
   {
     setStatus(initial_state);
   }
@@ -77,19 +76,6 @@ public:
   : VehicleEntity(std::forward<decltype(xs)>(xs)...),
     autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
   {
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  To suppress too verbose error message from rviz2 like below, we
-     *  broadcast dummy transform until Autoware to be initialized.
-     *
-     *    [rviz2-3]          at line 133 in \
-     *    /tmp/binarydeb/ros-foxy-tf2-0.13.9/src/buffer_core.cpp
-     *    [rviz2-3] Warning: Invalid frame ID "map" passed to canTransform \
-     *    argument target_frame - frame does not exist
-     *
-     * ---------------------------------------------------------------------- */
-    std::atomic_load(&autoware)->setTransform(geometry_msgs::msg::Pose());
-
     /* ---- NOTE ---------------------------------------------------------------
      *
      *  The simulator needs to run in a fixed-cycle loop, but the communication
