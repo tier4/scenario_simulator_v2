@@ -17,13 +17,18 @@
 #include <quaternion_operation/quaternion_operation.h>
 #include <simulation_api/entity/ego_entity.hpp>
 
-#include <string>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace simulation_api
 {
 namespace entity
 {
+std::unordered_map<
+  std::string, std::shared_ptr<autoware_api::Accessor>
+> EgoEntity::autowares {};
+
 autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
 {
   autoware_auto_msgs::msg::Complex32 heading;
@@ -36,7 +41,7 @@ openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
 {
   openscenario_msgs::msg::WaypointsArray waypoints {};
 
-  for (const auto & point : std::atomic_load(&autoware)->getTrajectory().points) {
+  for (const auto & point : std::atomic_load(&autowares.at(name))->getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);
   }
 
@@ -57,8 +62,8 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   if (std::exchange(uninitialized, false)) {
     waitForAutowareToBeReady();
-    std::atomic_load(&autoware)->setInitialPose(current_entity_status.pose);
-    std::atomic_load(&autoware)->setInitialTwist();
+    std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
+    std::atomic_load(&autowares.at(name))->setInitialTwist();
   }
 
   updateAutoware(current_entity_status.pose);
@@ -89,8 +94,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   Eigen::VectorXd input(2);
   {
     input <<
-      std::atomic_load(&autoware)->getVehicleCommand().control.velocity,
-      std::atomic_load(&autoware)->getVehicleCommand().control.steering_angle;
+      std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity,
+      std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
   }
 
   vehicle_model_ptr_->setInput(input);

@@ -17,6 +17,9 @@
 
 // NOTE: headers are lexicographically sorted.
 
+#define AUTOWARE_IV  // or #define AUTOWARE_AUTO
+
+#ifdef AUTOWARE_IV
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_control_msgs/msg/engage_mode.hpp>
@@ -29,6 +32,10 @@
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#elif AUTOWARE_AUTO
+// TODO(yamacir-kit)
+#endif
+
 #include <awapi_accessor/conversion.hpp>
 #include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
@@ -47,7 +54,7 @@
 #include <mutex>
 #include <utility>
 
-#define DEBUG_VALUE(...) std::cout << #__VA_ARGS__ " = " << (__VA_ARGS__) << std::endl
+// #define DEBUG_VALUE(...) std::cout << #__VA_ARGS__ " = " << (__VA_ARGS__) << std::endl
 
 namespace autoware_api
 {
