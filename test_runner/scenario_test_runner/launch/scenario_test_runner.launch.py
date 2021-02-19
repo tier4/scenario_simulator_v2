@@ -48,6 +48,7 @@ def generate_launch_description():
         Node(
             package='scenario_test_runner',
             executable='scenario_test_runner',
+            namespace='simulation',
             name='scenario_test_runner',
             output='screen',
             on_exit=Shutdown(),
@@ -64,7 +65,8 @@ def generate_launch_description():
         Node(
             package='scenario_simulator',
             executable='scenario_simulator_node',
-            name='scenario_simulator_node',
+            namespace='simulation',
+            name='sensor_simulator',
             output='log',
             parameters=[{
                 'port': port,
@@ -74,7 +76,8 @@ def generate_launch_description():
         LifecycleNode(
             package='openscenario_interpreter',
             executable='openscenario_interpreter_node',
-            name='openscenario_interpreter_node',
+            namespace='simulation',
+            name='openscenario_interpreter',
             output='screen',
             parameters=[{
                 'map_path': os.path.join(
@@ -88,7 +91,8 @@ def generate_launch_description():
         Node(
             package='openscenario_visualization',
             executable='openscenario_visualization_node',
-            name='openscenario_visualization_node',
+            namespace='simulation',
+            name='openscenario_visualizer',
             output='log',
             ),
 

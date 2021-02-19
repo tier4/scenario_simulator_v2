@@ -17,7 +17,7 @@
 
 
 import argparse
-# import rclpy
+import rclpy
 import time
 
 from openscenario_utility.conversion import convert
@@ -208,6 +208,8 @@ class ScenarioTestRunner(LifecycleController):
 
 
 def main():
+    rclpy.init(args='scenario_test_runner')
+
     parser = argparse.ArgumentParser(
         description="This provides batch processing of scenarios for Tier IV "
                     "Scenario Simulator.\nThis program doesn't work on its own "

@@ -178,7 +178,7 @@ void EntityManager::requestAcquirePosition(
   }
   if (it->second.type() == typeid(EgoEntity)) {
     boost::any_cast<EgoEntity &>(it->second).requestAcquirePosition(
-      (*hdmap_utils_ptr_).toMapPose(lanelet_pose), lanelet_pose);
+      (*hdmap_utils_ptr_).toMapPose(lanelet_pose));
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
     boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_pose);
