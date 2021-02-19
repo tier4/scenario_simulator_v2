@@ -555,6 +555,28 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   return ret;
 }
 
+const std::int64_t HdMapUtils::getStopLineId(std::int64_t traffic_light_id) const
+{
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
+  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
+  for (const auto light : autoware_traffic_lights) {
+    for (auto light_string : light->lightBulbs()) {
+      if (light_string.hasAttribute("traffic_light_id")) {
+        auto id = light_string.attribute("traffic_light_id").asId();
+        if (id) {
+          if (id.get() == traffic_light_id) {
+            const auto stop_line = light->stopLine();
+            if(stop_line)
+            {
+              return stop_line->id();
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
   std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const
 {
