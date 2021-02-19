@@ -76,7 +76,7 @@ public:
   : VehicleEntity(std::forward<decltype(xs)>(xs)...),
     autoware(
       std::make_shared<autoware_api::Accessor>(
-        "accessor", rclcpp::NodeOptions().use_global_arguments(false)))
+        "awapi_accessor", "simulation", rclcpp::NodeOptions().use_global_arguments(false)))
   {
     /* ---- NOTE ---------------------------------------------------------------
      *
