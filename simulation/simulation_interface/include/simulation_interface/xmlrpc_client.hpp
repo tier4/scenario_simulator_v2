@@ -40,7 +40,7 @@ bool call(
   const std::shared_ptr<XmlRpc::XmlRpcClient> & client_ptr, const std::string & method_name,
   const ReqType & req, ResType & res)
 {
-  XmlRpc::setVerbosity(5);
+  // XmlRpc::setVerbosity(5);
   XmlRpc::XmlRpcValue result, value;
   try {
     value = simulation_interface::serializeToBinValue<ReqType>(

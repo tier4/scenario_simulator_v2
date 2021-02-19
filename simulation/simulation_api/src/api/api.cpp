@@ -532,13 +532,30 @@ bool API::updateEntityStatusInSim()
   simulation_interface::call(
     client_ptr_, simulation_interface::method::update_entity_status, req,
     res);
-  /*
   for (const auto status : res.status()) {
-    openscenario_msgs::msg::EntityStatus msg;
-    simulation_interface::toMsg(status, msg);
-    entity_manager_ptr_->setEntityStatus(status.name(), msg);
+    auto entity_status = entity_manager_ptr_->getEntityStatus(status.name());
+    if (!entity_status) {
+      continue;
+    }
+    openscenario_msgs::msg::EntityStatus status_msg;
+    status_msg = entity_status.get();
+    geometry_msgs::msg::Pose pose;
+    simulation_interface::toMsg(status.pose(), pose);
+    status_msg.pose = pose;
+    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
+    if (lanelet_pose) {
+      status_msg.lanelet_pose_valid = true;
+      status_msg.lanelet_pose = lanelet_pose.get();
+    } else {
+      status_msg.lanelet_pose_valid = false;
+      status_msg.lanelet_pose = openscenario_msgs::msg::LaneletPose();
+    }
+    simulation_interface::toMsg(
+      status.action_status().twist(), status_msg.action_status.twist);
+    simulation_interface::toMsg(
+      status.action_status().accel(), status_msg.action_status.accel);
+    entity_manager_ptr_->setEntityStatus(status.name(), status_msg);
   }
-  */
   return res.result().success();
 }
 

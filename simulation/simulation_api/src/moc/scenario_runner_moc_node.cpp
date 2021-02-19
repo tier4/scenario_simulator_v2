@@ -52,13 +52,11 @@ public:
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
     const auto pedestrian_params =
       simulation_api::entity::PedestrianParameters(pedestrian_xml_doc).toRosMsg();
-    // api_.spawn(false, "tom", pedestrian_params);
-    /*
+    api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus(
       "tom", "ego",
       simulation_api::helper::constructPose(10, 3, 0, 0, 0, 1.57),
       simulation_api::helper::constructActionStatus());
-    */
     api_.spawn(
       false, "bob", pedestrian_params,
       simulation_api::helper::constructLaneletPose(34378, 0.0),

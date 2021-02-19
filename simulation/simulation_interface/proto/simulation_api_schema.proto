@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "geometry_msgs.proto";
 import "openscenario_msgs.proto";
 package simulation_api_schema;
 
@@ -23,6 +24,13 @@ message DetectionSensorConfiguration
     string entity = 1;
     double update_duration = 2;
     string topic_name = 3;
+}
+
+message UpdatedEntityStatus
+{
+    string name = 1;
+    openscenario_msgs.ActionStatus action_status = 2;
+    geometry_msgs.Pose pose = 3;
 }
 
 // Requests and Responses
@@ -86,7 +94,7 @@ message UpdateEntityStatusRequest
 message UpdateEntityStatusResponse
 {
     Result result = 1;
-    // repeated openscenario_msgs.EntityStatus status = 2;
+    repeated UpdatedEntityStatus status = 2;
 }
 
 message AttachLidarSensorRequest
