@@ -108,9 +108,11 @@ public:
 private:
   void update()
   {
+    /*
     if (api_.getLinearJerk("ego")) {
       std::cout << "ego linear jerk :" << api_.getLinearJerk("ego").get() << std::endl;
     }
+    */
     if (api_.reachPosition(
         "ego",
         simulation_api::helper::constructLaneletPose(34615, 10.0), 5))
@@ -136,13 +138,16 @@ private:
       api_.requestAcquirePosition(
         "npc2",
         simulation_api::helper::constructLaneletPose(34630, 0.0) );
+      api_.setTargetSpeed("npc2", 13, true);
     }
+    /*
     if (api_.checkCollision("ego", "npc1")) {
       std::cout << "npc1 collision!" << std::endl;
     }
     if (api_.checkCollision("ego", "npc2")) {
       std::cout << "npc2 collision!" << std::endl;
     }
+    */
     if (current_time_ > 10.0 && api_.entityExists("bob")) {
       api_.despawn("bob");
     }

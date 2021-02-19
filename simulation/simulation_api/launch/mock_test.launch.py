@@ -59,11 +59,11 @@ def generate_launch_description():
             executable='rviz2',
             name='rviz2',
             arguments=['-d', rviz_config_dir],
-            output='screen'),
+            output='log'),
         Node(
             package='openscenario_visualization',
             executable='openscenario_visualization_node',
             name='openscenario_visualization_node',
-            output='screen'
+            output='log'
             )
     ])

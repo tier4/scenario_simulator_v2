@@ -114,7 +114,7 @@ XmlRpcDispatch::setSourceEvents(XmlRpcSource * source, unsigned eventMask)
   }
 }
 
-
+#include <iostream>
 // Watch current set of sources and process events
 void
 XmlRpcDispatch::work(double timeout)
@@ -158,10 +158,8 @@ XmlRpcDispatch::work(double timeout)
       if (it->getMask() & WritableEvent) {fds[i].events |= POLLOUT_REQ;}
       if (it->getMask() & Exception) {fds[i].events |= POLLEX_REQ;}
     }
-
     // Check for events
-    int nEvents = poll(&fds[0], source_cnt, (timeout_ms < 0) ? -1 : timeout_ms);
-
+    int nEvents = poll(&fds[0], source_cnt, timeout_ms);
     if (nEvents < 0) {
 #if defined(_WINDOWS)
       XmlRpcUtil::error("Error in XmlRpcDispatch::work: error in poll (%d).", WSAGetLastError());
