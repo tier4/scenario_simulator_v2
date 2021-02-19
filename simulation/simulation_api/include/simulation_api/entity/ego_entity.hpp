@@ -20,15 +20,15 @@
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
+#include <boost/optional.hpp>
+#include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/vehicle_model/sim_model.hpp>
 
-// headers in pugixml
-#include <pugixml.hpp>
-#include <boost/optional.hpp>
-
+#include <algorithm>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 namespace simulation_api
@@ -37,20 +37,19 @@ namespace entity
 {
 class EgoEntity : public VehicleEntity
 {
-  const std::shared_ptr<autoware_api::Accessor> autoware;
+  // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
+  static std::unordered_map<
+    std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
+  > autowares;
 
 public:
-  /* ---------------------------------------------------------------------------
-   *
-   *  NOTE: from yamacir-kit
+  /* ---- NOTE -----------------------------------------------------------------
    *
    *  This constructor makes an Ego type entity with the proper initial state.
    *  It is mainly used when writing scenarios in C++.
    *
    * ------------------------------------------------------------------------ */
-  template<
-    typename ... Ts  // Maybe, VehicleParameters or pugi::xml_node
-  >
+  template<typename ... Ts>
   explicit EgoEntity(
     const std::string & name,
     const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
@@ -59,9 +58,7 @@ public:
     setStatus(initial_state);
   }
 
-  /* ---------------------------------------------------------------------------
-   *
-   *  NOTE: from yamacir-kit
+  /* ---- NOTE -----------------------------------------------------------------
    *
    *  This constructor builds an Ego-type entity with an ambiguous initial
    *  state. In this case, the values for status_ and current_kinematic_state_
@@ -79,53 +76,83 @@ public:
    * ------------------------------------------------------------------------ */
   template<typename ... Ts>
   explicit EgoEntity(Ts && ... xs)
-  : VehicleEntity(std::forward<decltype(xs)>(xs)...),
-    autoware(std::make_shared<autoware_api::Accessor>(rclcpp::NodeOptions()))
+  : VehicleEntity(std::forward<decltype(xs)>(xs)...)
   {
-    std::thread(
-      [&](auto && node)
-      {
-        rclcpp::executors::MultiThreadedExecutor executor {};
-        executor.add_node(std::forward<decltype(node)>(node));
-        while (rclcpp::ok()) {
-          executor.spin_some();
-        }
-      }, std::atomic_load(&autoware)->get_node_base_interface()).detach();
+    if (autowares.find(name) == std::end(autowares)) {
+      auto my_name = name;
+
+      std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
+
+      autowares.emplace(
+        name,
+        std::make_shared<autoware_api::Accessor>(
+          "awapi_accessor",
+          "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
+          rclcpp::NodeOptions().use_global_arguments(false)));
+    }
+
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  The simulator needs to run in a fixed-cycle loop, but the communication
+     *  part with Autoware needs to run at a higher frequency (e.g. the
+     *  transform in map -> base_link needs to be updated at a higher frequency
+     *  even if the value does not change). We also need to keep collecting the
+     *  latest values of topics from Autoware, independently of the simulator.
+     *
+     *  For this reason, autoware_api::Accessor, which is responsible for
+     *  communication with Autoware, should run in an independent thread. This
+     *  is probably an EXTREMELY DIRTY HACK.
+     *
+     *  Ideally, the constructor caller of traffic_simulator::API should
+     *  provide a std::shared_ptr to autoware_api::Accessor and spin that node
+     *  with MultiThreadedExecutor.
+     *
+     *  If you have a nice idea to solve this, and are interested in improving
+     *  the quality of the Tier IV simulator, please contact @yamacir-kit.
+     *
+     * ---------------------------------------------------------------------- */
+    if (autowares.at(name).use_count() < 2) {
+      std::thread(
+        [](const auto node)  // NOTE: This copy increments use_count to 2 from 1.
+        {
+          rclcpp::spin(node);
+        }, autowares.at(name)).detach();
+    }
   }
 
   void requestAcquirePosition(
-    const geometry_msgs::msg::PoseStamped & map_pose, const openscenario_msgs::msg::LaneletPose &)
+    const geometry_msgs::msg::PoseStamped & map_pose)
   {
     // std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
-      !std::atomic_load(&autoware)->isWaitingForRoute();
+      !std::atomic_load(&autowares.at(name))->isWaitingForRoute();
       rate.sleep())
     {}
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autoware)->isWaitingForRoute();
+      std::atomic_load(&autowares.at(name))->isWaitingForRoute();
       rate.sleep())
     {
       // std::cout << "SEND GOAL-POSE!" << std::endl;
-      std::atomic_load(&autoware)->setGoalPose(map_pose);
+      std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
     }
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
-      !std::atomic_load(&autoware)->isWaitingForEngage();
+      !std::atomic_load(&autowares.at(name))->isWaitingForEngage();
       rate.sleep())
     {}
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autoware)->isWaitingForEngage();
+      std::atomic_load(&autowares.at(name))->isWaitingForEngage();
       rate.sleep())
     {
       // std::cout << "ENGAGE!" << std::endl;
-      std::atomic_load(&autoware)->setAutowareEngage(true);
+      std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
     }
 
     // std::cout << "REQUEST END" << std::endl;
@@ -152,7 +179,7 @@ private:
   {
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autoware)->isNotReady();
+      std::atomic_load(&autowares.at(name))->isNotReady();
       rate.sleep())
     {
       static auto count = 0;
@@ -162,28 +189,26 @@ private:
     std::cout << "[accessor] Autoware is ready." << std::endl;
   }
 
-  void updateAutoware(
-    const geometry_msgs::msg::Pose & current_pose,
-    const geometry_msgs::msg::Twist & current_twist_)
+  void updateAutoware(const geometry_msgs::msg::Pose & current_pose)
   {
     geometry_msgs::msg::Twist current_twist;
     {
       current_twist.linear.x =
-        std::atomic_load(&autoware)->getVehicleCommand().control.velocity;
+        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity;
       current_twist.angular.z =
-        std::atomic_load(&autoware)->getVehicleCommand().control.steering_angle;
+        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
     }
 
-    std::atomic_load(&autoware)->setCurrentControlMode();
-    std::atomic_load(&autoware)->setCurrentPose(current_pose);
-    std::atomic_load(&autoware)->setCurrentShift(current_twist);
-    std::atomic_load(&autoware)->setCurrentSteering(current_twist);
-    std::atomic_load(&autoware)->setCurrentTurnSignal();
-    std::atomic_load(&autoware)->setCurrentTwist(current_twist);
-    std::atomic_load(&autoware)->setCurrentVelocity(current_twist);
-    std::atomic_load(&autoware)->setLaneChangeApproval(true);
-    std::atomic_load(&autoware)->setTransform(current_pose);
-    std::atomic_load(&autoware)->setVehicleVelocity(current_twist.linear.x);
+    std::atomic_load(&autowares.at(name))->setCurrentControlMode();
+    std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);
+    std::atomic_load(&autowares.at(name))->setCurrentShift(current_twist);
+    std::atomic_load(&autowares.at(name))->setCurrentSteering(current_twist);
+    std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
+    std::atomic_load(&autowares.at(name))->setCurrentTwist(current_twist);
+    std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
+    std::atomic_load(&autowares.at(name))->setLaneChangeApproval(true);
+    std::atomic_load(&autowares.at(name))->setTransform(current_pose);
+    std::atomic_load(&autowares.at(name))->setVehicleVelocity(current_twist.linear.x);
   }
 
 private:
