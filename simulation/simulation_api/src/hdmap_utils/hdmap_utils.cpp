@@ -555,7 +555,7 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   return ret;
 }
 
-const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinePoints(
+const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePoints(
   std::int64_t traffic_light_id) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
@@ -585,7 +585,7 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLine
   return ret;
 }
 
-const std::int64_t HdMapUtils::getTrafficLightStopLineId(std::int64_t traffic_light_id) const
+const std::int64_t HdMapUtils::getStopLineId(std::int64_t traffic_light_id) const
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
@@ -1036,30 +1036,9 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
 }
 
 std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> HdMapUtils::
-getTrafficLightRegElementsOnPath(std::vector<std::int64_t> lanelet_ids)
+  getTrafficLightRegElementsOnPath(std::vector<std::int64_t> lanelet_ids)
 {
-  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
-  for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-    const auto traffic_lights =
-      lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
-    for (const auto traffic_light : traffic_lights) {
-      ret.push_back(traffic_light);
-    }
-  }
-  return ret;
-}
 
-std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinesOnPath(
-  const std::vector<std::int64_t> & lanelet_ids)
-{
-  std::vector<geometry_msgs::msg::Point> ret;
-  const auto traffic_lights = getTrafficLightRegElementsOnPath(lanelet_ids);
-  if (traffic_lights.size() == 0) {
-    return ret;
-  } else {
-    return getTrafficLightStopLinePoints(traffic_lights[0]->id());
-  }
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
@@ -1068,7 +1047,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
 }
 
-const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
+const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinesPolygon(
   std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> points;
