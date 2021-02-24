@@ -47,9 +47,17 @@ class EgoEntity : public VehicleEntity
     std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
   > autowares;
 
-  int autoware_process_id;
+  int autoware_process_id = 0;
 
 public:
+  EgoEntity() = delete;
+
+  // EgoEntity(EgoEntity &&) = delete;
+  // EgoEntity(const EgoEntity &) = delete;
+
+  // EgoEntity & operator=(EgoEntity &&) = delete;
+  // EgoEntity & operator=(const EgoEntity &) = delete;
+
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  This constructor makes an Ego type entity with the proper initial state.
@@ -62,6 +70,7 @@ public:
     const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
   : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
   {
+    std::cout << "\x1b[31m" << __LINE__ << "\x1b[0m" << std::endl;
     setStatus(initial_state);
   }
 
@@ -82,9 +91,11 @@ public:
    *
    * ------------------------------------------------------------------------ */
   template<typename ... Ts>
-  explicit EgoEntity(Ts && ... xs)
-  : VehicleEntity(std::forward<decltype(xs)>(xs)...)
+  explicit EgoEntity(const std::string & name, Ts && ... xs)
+  : VehicleEntity(name, std::forward<decltype(xs)>(xs)...)
   {
+    std::cout << "\x1b[31m" << __LINE__ << "\x1b[0m" << std::endl;
+
     if (autowares.find(name) == std::end(autowares)) {
       auto my_name = name;
       std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
@@ -100,8 +111,19 @@ public:
       if (autoware_process_id < 0) {
         throw std::system_error(errno, std::system_category());
       } else if (autoware_process_id == 0) {
-        std::system("ros2 launch scenario_test_runner autoware.launch.xml");
-        std::exit(0);
+        std::vector<char *> argv {
+          "python3",
+          "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
+          "launch",
+          "scenario_test_runner",
+          "autoware.launch.xml",
+          nullptr
+        };
+        if (::execvp(argv[0], argv.data()) < 0) {
+          std::exit(EXIT_FAILURE);
+        }
+      } else {
+        // ::waitpid(autoware_process_id, &status, WUNTRACED);  // only once
       }
     }
 
@@ -127,8 +149,9 @@ public:
      * ---------------------------------------------------------------------- */
     if (autowares.at(name).use_count() < 2) {
       std::thread(
-        [](const auto node)  // NOTE: This copy increments use_count to 2 from 1.
+        [](const auto node_)  // NOTE: This copy increments use_count to 2 from 1.
         {
+          const auto node = node_;
           rclcpp::spin(node);
         }, autowares.at(name)).detach();
     }
@@ -136,7 +159,14 @@ public:
 
   ~EgoEntity() override
   {
-    kill(autoware_process_id, SIGKILL);
+    std::cout << "\x1b[31m" << __LINE__ << "\x1b[0m" << std::endl;
+
+    // if (autoware_process_id)
+    // {
+    //   std::cout << "KILL!" << std::endl;
+    //   kill(autoware_process_id, SIGKILL);
+    //   std::cout << "KILL END" << std::endl;
+    // }
   }
 
   void requestAcquirePosition(
