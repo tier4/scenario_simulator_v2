@@ -1035,6 +1035,12 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   return ret;
 }
 
+std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> HdMapUtils::
+  getTrafficLightRegElementsOnPath(std::vector<std::int64_t> lanelet_ids)
+{
+
+}
+
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose)
 {
