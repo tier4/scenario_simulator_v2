@@ -141,8 +141,6 @@ public:
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const;
   const std::int64_t getStopLineId(std::int64_t traffic_light_id) const;
-  const std::vector<geometry_msgs::msg::Point> getStopLinePoints(std::int64_t traffic_light_id)
-  const;
 
 private:
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
