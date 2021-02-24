@@ -555,57 +555,6 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIds() const
   return ret;
 }
 
-const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinePoints(
-  std::int64_t traffic_light_id) const
-{
-  std::vector<geometry_msgs::msg::Point> ret;
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          if (id.get() == traffic_light_id) {
-            const auto stop_line = light->stopLine();
-            if (stop_line) {
-              for (auto point = stop_line->begin(); point != stop_line->end(); point++) {
-                geometry_msgs::msg::Point p;
-                p.x = point->x();
-                p.y = point->y();
-                p.z = point->z();
-                ret.emplace_back(p);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  return ret;
-}
-
-const std::int64_t HdMapUtils::getTrafficLightStopLineId(std::int64_t traffic_light_id) const
-{
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          if (id.get() == traffic_light_id) {
-            const auto stop_line = light->stopLine();
-            if (stop_line) {
-              return stop_line->id();
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulbPosition(
   std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const
 {
@@ -1035,41 +984,13 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   return ret;
 }
 
-std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> HdMapUtils::
-getTrafficLightRegElementsOnPath(std::vector<std::int64_t> lanelet_ids)
-{
-  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
-  for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-    const auto traffic_lights =
-      lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
-    for (const auto traffic_light : traffic_lights) {
-      ret.push_back(traffic_light);
-    }
-  }
-  return ret;
-}
-
-std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinesOnPath(
-  const std::vector<std::int64_t> & lanelet_ids)
-{
-  std::vector<geometry_msgs::msg::Point> ret;
-  const auto traffic_lights = getTrafficLightRegElementsOnPath(lanelet_ids);
-  if (traffic_lights.size() == 0) {
-    return ret;
-  } else {
-    return getTrafficLightStopLinePoints(traffic_lights[0]->id());
-  }
-  return ret;
-}
-
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose)
 {
   return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
 }
 
-const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
+const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinesPolygon(
   std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> points;
