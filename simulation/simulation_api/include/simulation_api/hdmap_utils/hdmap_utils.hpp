@@ -137,21 +137,24 @@ public:
     std::vector<std::int64_t> lanelet_ids) const;
   int64_t getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh = 30.0);
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
-  const std::vector<geometry_msgs::msg::Point> getStopLinesPolygon(std::int64_t lanelet_id);
+  const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const;
-  const std::int64_t getStopLineId(std::int64_t traffic_light_id) const;
-  const std::vector<geometry_msgs::msg::Point> getStopLinePoints(std::int64_t traffic_light_id)
+  const std::int64_t getTrafficLightStopLineId(std::int64_t traffic_light_id) const;
+  const std::vector<geometry_msgs::msg::Point> getTrafficLightStopLinePoints(
+    std::int64_t traffic_light_id)
   const;
+  std::vector<geometry_msgs::msg::Point> getTrafficLightStopLinesOnPath(
+    const std::vector<std::int64_t> & lanelet_ids);
 
 private:
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
     const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
     std::vector<std::int64_t> lanelet_ids);
-  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> getTrafficLightRegElementsOnPath(
-    std::vector<std::int64_t> lanelet_ids);
+  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
+  getTrafficLightRegElementsOnPath(std::vector<std::int64_t> lanelet_ids);
   std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<std::int64_t> lanelet_ids);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
   void mapCallback(const autoware_auto_msgs::msg::HADMapBin & msg);
