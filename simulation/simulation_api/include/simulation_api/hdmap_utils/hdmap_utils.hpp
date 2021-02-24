@@ -32,7 +32,6 @@
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
-#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/utilities.hpp>
 #include <lanelet2_routing/Route.h>
@@ -149,8 +148,6 @@ private:
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
     const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
-    std::vector<std::int64_t> lanelet_ids);
-  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> getTrafficLightRegElementsOnPath(
     std::vector<std::int64_t> lanelet_ids);
   std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(std::vector<std::int64_t> lanelet_ids);
   geometry_msgs::msg::Vector3 getVectorFromPose(geometry_msgs::msg::Pose pose, double magnitude);
