@@ -19,11 +19,11 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, Shutdown
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, Shutdown
+from launch.launch_description_sources import AnyLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import LifecycleNode, Node
 from pathlib import Path
-
 
 def generate_launch_description():
 
@@ -109,4 +109,8 @@ def generate_launch_description():
         #             get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
         #         ],
         #     ),
+
+        # IncludeLaunchDescription(
+        #     AnyLaunchDescriptionSource(
+        #         get_package_share_directory('scenario_test_runner') + '/autoware.launch.xml'))
         ])

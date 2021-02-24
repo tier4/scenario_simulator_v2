@@ -20,16 +20,21 @@
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
+#include <boost/asio.hpp>
 #include <boost/optional.hpp>
+#include <boost/process.hpp>
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/vehicle_model/sim_model.hpp>
 
 #include <algorithm>
+#include <cstdlib>
 #include <memory>
 #include <string>
+#include <system_error>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace simulation_api
 {
@@ -41,6 +46,8 @@ class EgoEntity : public VehicleEntity
   static std::unordered_map<
     std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
   > autowares;
+
+  int autoware_process_id;
 
 public:
   /* ---- NOTE -----------------------------------------------------------------
@@ -80,15 +87,22 @@ public:
   {
     if (autowares.find(name) == std::end(autowares)) {
       auto my_name = name;
-
       std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
-
       autowares.emplace(
         name,
         std::make_shared<autoware_api::Accessor>(
           "awapi_accessor",
           "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
           rclcpp::NodeOptions().use_global_arguments(false)));
+
+      autoware_process_id = fork();
+
+      if (autoware_process_id < 0) {
+        throw std::system_error(errno, std::system_category());
+      } else if (autoware_process_id == 0) {
+        std::system("ros2 launch scenario_test_runner autoware.launch.xml");
+        std::exit(0);
+      }
     }
 
     /* ---- NOTE ---------------------------------------------------------------
@@ -118,6 +132,11 @@ public:
           rclcpp::spin(node);
         }, autowares.at(name)).detach();
     }
+  }
+
+  ~EgoEntity() override
+  {
+    kill(autoware_process_id, SIGKILL);
   }
 
   void requestAcquirePosition(
