@@ -1060,7 +1060,6 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinesOnPat
   } else {
     return getTrafficLightStopLinePoints(traffic_lights[0]->id());
   }
-  return ret;
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
