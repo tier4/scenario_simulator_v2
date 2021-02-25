@@ -34,6 +34,7 @@
 #include <lanelet2_core/primitives/LaneletSequence.h>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/utilities.hpp>
+#include <lanelet2_extension_psim/utility/query.hpp>
 #include <lanelet2_routing/Route.h>
 #include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_routing/RoutingGraph.h>
@@ -140,11 +141,13 @@ public:
   const std::vector<std::int64_t> getTrafficLightIds() const;
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const;
-  const std::int64_t getTrafficLightStopLineId(std::int64_t traffic_light_id) const;
+  const boost::optional<std::int64_t> getTrafficLightStopLineId(
+    const std::int64_t & traffic_light_id) const;
   const std::vector<geometry_msgs::msg::Point> getTrafficLightStopLinePoints(
     std::int64_t traffic_light_id);
 
 private:
+  lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
     const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
