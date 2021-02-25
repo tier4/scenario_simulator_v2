@@ -230,7 +230,8 @@ private:
     std::cout << "[accessor] Autoware is ready." << std::endl;
   }
 
-  void updateAutoware(const geometry_msgs::msg::Pose & current_pose)
+  void updateAutoware(
+    const geometry_msgs::msg::Pose & current_pose)
   {
     geometry_msgs::msg::Twist current_twist;
     {

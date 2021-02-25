@@ -42,7 +42,7 @@ public:
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
     api_.spawn(
-      true, "ego", simulation_api::entity::VehicleParameters(
+      false, "ego", simulation_api::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "ego",
@@ -53,9 +53,10 @@ public:
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
-      simulation_api::helper::constructLaneletPose(35026, 10, 0.0000001),
+      simulation_api::helper::constructLaneletPose(35026, 10, 0.0),
       simulation_api::helper::constructActionStatus(10));
     api_.setTargetSpeed("npc", 5, true);
+    /*
     api_.attachLidarSensor(
       simulation_api::helper::constructLidarConfiguration(
         simulation_api::helper::LidarType::VLP32,
@@ -64,6 +65,7 @@ public:
     );
     api_.attachDetectionSensor(
       simulation_api::helper::constructDetectionSensorConfiguration("ego", "/detection", 0.1));
+    */
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }

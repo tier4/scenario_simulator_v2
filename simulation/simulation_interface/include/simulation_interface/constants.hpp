@@ -25,8 +25,6 @@ const char realtime_factor[] = "realtime_factor";
 const char step_time[] = "step_time";
 const char current_time[] = "current_time";
 const char method_name[] = "methodName";
-const char parameters[] = "params";
-const char response[] = "return";
 }  // namespace key
 
 namespace method

@@ -49,7 +49,6 @@ XmlRpcServerConnection::~XmlRpcServerConnection()
   _server->removeConnection(this);
 }
 
-
 // Handle input on the server socket by accepting the connection
 // and reading the rpc request. Return true to continue to monitor
 // the socket for events, false to remove it from the dispatcher.

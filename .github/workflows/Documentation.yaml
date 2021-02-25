@@ -14,7 +14,7 @@ jobs:
         - name: Set up Python
           uses: actions/setup-python@v1
           with:
-            python-version: '3.6.12'
+            python-version: '3.6.13'
         - name: Install
           run: pip3 install mkdocs mkdocs-material pymdown-extensions mdx_unimoji fontawesome_markdown markdown python-markdown-math plantuml-markdown
         - name: Install doxygen/depends of doxybook
