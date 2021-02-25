@@ -19,14 +19,13 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, Shutdown
-from launch.launch_description_sources import AnyLaunchDescriptionSource
+from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import LifecycleNode, Node
 from pathlib import Path
 
-def generate_launch_description():
 
+def generate_launch_description():
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=180)
@@ -37,7 +36,6 @@ def generate_launch_description():
     port = 8080
 
     return LaunchDescription([
-
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
         DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
         DeclareLaunchArgument('global-timeout', default_value=global_timeout),
@@ -96,19 +94,21 @@ def generate_launch_description():
             output='log',
             ),
 
-        # Node(
-        #     package='rviz2',
-        #     executable='rviz2',
-        #     name='rviz2',
-        #     output={
-        #         'stderr': 'log',
-        #         'stdout': 'log',
-        #         },
-        #     arguments=[
-        #         '-d', os.path.join(
-        #             get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
-        #         ],
-        #     ),
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output={
+                'stderr': 'log',
+                'stdout': 'log',
+                },
+            arguments=[
+                # '-d', os.path.join(
+                #     get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
+                '-d', str(
+                    Path(get_package_share_directory('autoware_launch')) / 'rviz/autoware.rviz')
+                ],
+            ),
 
         # IncludeLaunchDescription(
         #     AnyLaunchDescriptionSource(

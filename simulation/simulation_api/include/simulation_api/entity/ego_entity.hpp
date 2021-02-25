@@ -20,24 +20,24 @@
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
-#include <boost/asio.hpp>
 #include <boost/optional.hpp>
-#include <boost/process.hpp>
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/vehicle_model/sim_model.hpp>
 
 #include <algorithm>
 #include <cstdlib>
+#include <future>
 #include <memory>
 #include <string>
 #include <system_error>
+#include <thread>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
-#define DEBUG_VALUE(...) \
-  std::cout << "\x1b[31m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
+// #define DEBUG_VALUE(...) \
+//   std::cout << "\x1b[31m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
 
 namespace simulation_api
 {
@@ -51,6 +51,12 @@ class EgoEntity : public VehicleEntity
   > autowares;
 
   // int autoware_process_id = 0;
+
+  // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
+  std::shared_ptr<std::promise<void>> accessor_status;
+
+  // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
+  std::shared_ptr<std::thread> accessor_spinner;
 
 public:
   EgoEntity() = delete;
@@ -150,16 +156,32 @@ public:
      *
      * ---------------------------------------------------------------------- */
     if (autowares.at(name).use_count() < 2) {
-      std::thread(
-        [](const auto node)  // NOTE: This copy increments use_count to 2 from 1.
+      accessor_status = std::make_shared<std::promise<void>>();
+      accessor_spinner = std::make_shared<std::thread>(
+        [](const auto node, auto status)  // NOTE: This copy increments use_count to 2 from 1.
         {
-          rclcpp::spin(node);
-          // kill(id, SIGKILL);
-        }, autowares.at(name)).detach();
+          while (
+            rclcpp::ok() &&
+            status.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout)
+          {
+            rclcpp::spin_some(node);
+          }
+          std::cout << "ACCESSOR STOPEED!" << std::endl;
+        }, autowares.at(name), std::move(accessor_status->get_future()));
     }
   }
 
-  ~EgoEntity() override = default;
+  ~EgoEntity() override
+  {
+    if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
+      accessor_status->set_value();
+      std::cout << "ACCESSOR TERMINATING" << std::endl;
+      accessor_spinner->join();
+      std::cout << "ACCESSOR TERMINATED" << std::endl;
+      // std::cout << "PID: " << autoware_process_id << std::endl;
+      // kill(autoware_process_id, SIGTERM);
+    }
+  }
 
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)

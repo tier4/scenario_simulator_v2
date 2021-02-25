@@ -19,11 +19,17 @@
 import rclpy
 import rcl_interfaces
 
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription, LaunchService
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import AnyLaunchDescriptionSource
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState, GetState
+from multiprocessing import Process
 from pathlib import Path
 from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
 from rclpy.node import Node
+from time import sleep
 
 
 class LifecycleController(Node):
@@ -40,28 +46,27 @@ class LifecycleController(Node):
     NODE_NAME = "openscenario_interpreter"
 
     def __init__(self):
-        super().__init__(
-            node_name='openscenario_interpreter_controller',
-            namespace='simulation')
+        super().__init__(node_name='lifecycle_controller', namespace='simulation')
 
         self.client_get_state = self.create_client(
             GetState, LifecycleController.NODE_NAME + "/get_state")
 
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn(
-                self.client_get_state.srv_name + ' service not available')
+            self.get_logger().warn(self.client_get_state.srv_name + ' service unavailable')
 
         self.client_change_state = self.create_client(
             ChangeState, LifecycleController.NODE_NAME + "/change_state")
 
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn(
-                self.client_change_state.srv_name + ' service not available')
+            self.get_logger().warn(self.client_change_state.srv_name + ' service unavailable')
 
         self.current_scenario = ""
         self.client_set_parameters = self.create_client(
             rcl_interfaces.srv.SetParameters,
             LifecycleController.NODE_NAME + '/set_parameters')
+
+        # self.launch_service = None
+        self.autoware_process = None
 
     def send_request_to_change_parameters(
             self,  # Arguments are alphabetically sorted
@@ -75,7 +80,6 @@ class LifecycleController(Node):
         request = rcl_interfaces.srv.SetParameters.Request()
 
         request.parameters = [
-
             Parameter(
                 name="expect",
                 value=ParameterValue(
@@ -140,6 +144,28 @@ class LifecycleController(Node):
         #     "Activate -> scenario runner state is " + self.get_lifecycle_state())
         # self.get_logger().info(self.get_lifecycle_state())
 
+        # print('Run service!')
+        # # self.launch_service.run_async(shutdown_when_idle=False)
+        #
+        # def autoware_launch():
+        #     launch_service = LaunchService(
+        #         debug=False,
+        #         )
+        #
+        #     launch_service.include_launch_description(
+        #         LaunchDescription([
+        #             IncludeLaunchDescription(
+        #                 AnyLaunchDescriptionSource(
+        #                     get_package_share_directory('scenario_test_runner') +
+        #                     '/autoware.launch.xml'))]))
+        #
+        #     return launch_service.run(shutdown_when_idle=False)
+        #
+        # self.autoware_process = Process(target=autoware_launch)
+        # self.autoware_process.start()
+        #
+        # print('Activation done!')
+
     def deactivate_node(self):
         """Dectivate node to chagnge state from active to inactive."""
         self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
@@ -148,11 +174,18 @@ class LifecycleController(Node):
         # self.get_logger().info(self.get_lifecycle_state())
 
     def cleanup_node(self):
-        """Cleanup node to chagnge state from inactive to unconfigure."""
+        """Cleanup node to change state from inactive to unconfigure."""
         self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
         # Logger.print_info(
         #     "CleanUp -> scenario runner state is " + self.get_lifecycle_state())
         # self.get_logger().info(self.get_lifecycle_state())
+
+        # print('Shutdown service!')
+        # # self.launch_service.shutdown()
+        # if self.autoware_process.is_alive():
+        #     self.autoware_process.kill()
+        # sleep(5)
+        # print('Shutdown service done!')
 
     def set_lifecycle_state(self, transition_id):
         """
