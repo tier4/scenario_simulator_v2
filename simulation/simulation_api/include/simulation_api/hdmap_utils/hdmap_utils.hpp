@@ -136,10 +136,13 @@ public:
     std::vector<std::int64_t> lanelet_ids) const;
   int64_t getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh = 30.0);
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
-  const std::vector<geometry_msgs::msg::Point> getStopLinesPolygon(std::int64_t lanelet_id);
+  const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;
   const boost::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, simulation_api::TrafficLightColor color) const;
+  const std::int64_t getTrafficLightStopLineId(std::int64_t traffic_light_id) const;
+  const std::vector<geometry_msgs::msg::Point> getTrafficLightStopLinePoints(
+    std::int64_t traffic_light_id);
 
 private:
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(

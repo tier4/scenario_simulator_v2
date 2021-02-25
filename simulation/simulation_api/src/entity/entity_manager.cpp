@@ -162,7 +162,7 @@ boost::optional<double> EntityManager::getDistanceToStopLine(
     return boost::none;
   }
   simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
-  auto polygon = hdmap_utils_ptr_->getStopLinesPolygon(target_stop_line_id);
+  auto polygon = hdmap_utils_ptr_->getStopLinePolygon(target_stop_line_id);
   return spline.getCollisionPointIn2D(polygon);
 }
 
