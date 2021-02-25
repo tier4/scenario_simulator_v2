@@ -1026,11 +1026,11 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLine
   const auto traffic_light = getTrafficLight(traffic_light_id);
   const auto stop_line = traffic_light->stopLine();
   if (stop_line) {
-    for (auto point = stop_line->begin(); point != stop_line->end(); point++) {
+    for (const auto point : stop_line.get()) {
       geometry_msgs::msg::Point p;
-      p.x = point->x();
-      p.y = point->y();
-      p.z = point->z();
+      p.x = point.x();
+      p.y = point.y();
+      p.z = point.z();
       ret.emplace_back(p);
     }
   }
