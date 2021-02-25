@@ -1053,6 +1053,33 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
+  const std::vector<std::int64_t> & route_lanelets,
+  const std::vector<geometry_msgs::msg::Point> & waypoints)
+{
+  std::set<double> collision_points;
+  simulation_api::math::CatmullRomSpline spline(waypoints);
+  const auto stop_lines = getStopLinesOnPath({route_lanelets});
+  for (const auto & stop_line : stop_lines) {
+    std::vector<geometry_msgs::msg::Point> stop_line_points;
+    for (const auto & point : stop_line) {
+      geometry_msgs::msg::Point p;
+      p.x = point.x();
+      p.y = point.y();
+      p.z = point.z();
+      stop_line_points.emplace_back(p);
+    }
+    const auto collision_point = spline.getCollisionPointIn2D(stop_line_points);
+    if (collision_point) {
+      collision_points.insert(collision_point.get());
+    }
+  }
+  if (collision_points.size() == 0) {
+    return boost::none;
+  }
+  return *collision_points.begin();
+}
+
+boost::optional<double> HdMapUtils::getDistanceToStopLine(
   std::vector<std::int64_t> following_lanelets,
   std::int64_t lanelet_id, double s)
 {
