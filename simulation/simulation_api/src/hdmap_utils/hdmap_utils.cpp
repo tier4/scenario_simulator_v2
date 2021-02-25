@@ -1023,31 +1023,6 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLine
   std::int64_t traffic_light_id)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  /*
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
-  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
-  for (const auto light : autoware_traffic_lights) {
-    for (auto light_string : light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        auto id = light_string.attribute("traffic_light_id").asId();
-        if (id) {
-          if (id.get() == traffic_light_id) {
-            const auto stop_line = light->stopLine();
-            if (stop_line) {
-              for (auto point = stop_line->begin(); point != stop_line->end(); point++) {
-                geometry_msgs::msg::Point p;
-                p.x = point->x();
-                p.y = point->y();
-                p.z = point->z();
-                ret.emplace_back(p);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  */
   const auto traffic_light = getTrafficLight(traffic_light_id);
   const auto stop_line = traffic_light->stopLine();
   if (stop_line) {
