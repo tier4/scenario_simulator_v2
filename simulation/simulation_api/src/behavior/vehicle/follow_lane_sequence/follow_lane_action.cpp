@@ -86,7 +86,9 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline = getDistanceToStopLine(route_lanelets);
+    const auto waypoints = calculateWaypoints();
+    auto distance_to_stopline =
+      hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets);
     if (distance_to_stopline) {
       if (distance_to_stopline.get() <=
