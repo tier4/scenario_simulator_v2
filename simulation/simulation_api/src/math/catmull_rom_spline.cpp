@@ -147,7 +147,7 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
 : control_points(control_points)
 {
   size_t n = control_points.size() - 1;
-  if (n <= 1) {
+  if (control_points.size() <= 2) {
     throw SplineInterpolationError("numbers of control points are not enough.");
   }
   for (size_t i = 0; i < n; i++) {
