@@ -157,12 +157,6 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
 }
 
 boost::optional<double> ActionNode::getDistanceToStopLine(
-  const std::vector<std::int64_t> & following_lanelets)
-{
-  return hdmap_utils->getDistanceToStopLine(following_lanelets, entity_status.lanelet_pose);
-}
-
-boost::optional<double> ActionNode::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
   const std::vector<geometry_msgs::msg::Point> & waypoints)
 {

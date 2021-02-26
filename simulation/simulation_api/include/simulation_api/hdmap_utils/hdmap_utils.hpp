@@ -91,11 +91,6 @@ public:
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
-  boost::optional<double> getDistanceToStopLine(
-    std::vector<std::int64_t> following_lanelets, std::int64_t lanelet_id,
-    double s);
-  boost::optional<double> getDistanceToStopLine(
-    std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose);
   double getLaneletLength(std::int64_t lanelet_id) const;
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(

@@ -18,7 +18,7 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(entity_manager SHARED
+ament_auto_add_library(simulation_api SHARED
   src/behavior/action_node.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
@@ -56,12 +56,10 @@ ament_auto_add_library(entity_manager SHARED
   src/metrics/reaction_time_metric.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
+  src/api/api.cpp
 )
 
-target_link_libraries(entity_manager pugixml)
-
-ament_auto_add_library(simulation_api SHARED src/api/api.cpp)
-target_link_libraries(simulation_api entity_manager ${PROTOBUF_LIBRARY})
+target_link_libraries(simulation_api pugixml ${PROTOBUF_LIBRARY})
 
 ament_auto_add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 

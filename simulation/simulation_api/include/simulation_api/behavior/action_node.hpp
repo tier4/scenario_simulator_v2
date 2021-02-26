@@ -58,8 +58,6 @@ public:
   double calculateStopDistance() const;
   boost::optional<double> getDistanceToFrontEntity();
   boost::optional<double> getDistanceToStopLine(
-    const std::vector<std::int64_t> & following_lanelets);
-  boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
   std::vector<openscenario_msgs::msg::EntityStatus> getRightOfWayEntities();
