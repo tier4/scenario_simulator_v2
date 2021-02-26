@@ -1051,6 +1051,9 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   const std::vector<geometry_msgs::msg::Point> & waypoints)
 {
   std::set<double> collision_points;
+  if (waypoints.size() == 0) {
+    return boost::none;
+  }
   simulation_api::math::CatmullRomSpline spline(waypoints);
   const auto stop_lines = getStopLinesOnPath({route_lanelets});
   for (const auto & stop_line : stop_lines) {

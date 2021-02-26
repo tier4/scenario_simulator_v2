@@ -41,6 +41,7 @@ public:
 class CatmullRomSpline
 {
 public:
+  CatmullRomSpline() = delete;
   explicit CatmullRomSpline(openscenario_msgs::msg::CatmullRomSpline spline);
   explicit CatmullRomSpline(std::vector<openscenario_msgs::msg::HermiteCurve> hermite_curves);
   explicit CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points);
