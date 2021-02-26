@@ -78,7 +78,7 @@ void validateTrafficLight(const lanelet::LaneletMapPtr lanelet_map)
       continue;
     }
     for (auto light : autoware_traffic_lights) {
-      if (light->lightBulbs().size() == 0) {
+      if (light->lightBulbs().empty()) {
         std::stringstream sstream;
         sstream << "regulatory element traffic light " << light->id() <<
           " is missing optional light_bulb member. You won't "
@@ -129,7 +129,7 @@ void validateTurnDirection(const lanelet::LaneletMapPtr lanelet_map)
     }
 
     const auto conflicting_lanelets_or_areas = vehicle_graph->conflicting(lanelet);
-    if (conflicting_lanelets_or_areas.size() == 0) {
+    if (conflicting_lanelets_or_areas.empty()) {
       continue;
     }
     if (!lanelet.hasAttribute("turn_direction")) {

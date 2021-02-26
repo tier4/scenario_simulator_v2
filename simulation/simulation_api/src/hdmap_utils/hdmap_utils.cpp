@@ -279,7 +279,7 @@ int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double dist
 double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<double> limits;
-  if (lanelet_ids.size() == 0) {
+  if (lanelet_ids.empty()) {
     throw HdMapError("size of the vector lanelet ids should be more than 1");
   }
   for (auto itr = lanelet_ids.begin(); itr != lanelet_ids.end(); itr++) {
@@ -354,7 +354,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   std::vector<std::int64_t> candidate_lanelet_ids, double distance,
   bool include_self)
 {
-  if (candidate_lanelet_ids.size() == 0) {
+  if (candidate_lanelet_ids.empty()) {
     return {};
   }
   std::vector<std::int64_t> ret;
@@ -446,7 +446,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
   std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  if (lanelet_ids.size() == 0) {
+  if (lanelet_ids.empty()) {
     return ret;
   }
   for (const auto lanelet_id : lanelet_ids) {
@@ -633,7 +633,7 @@ boost::optional<std::pair<simulation_api::math::HermiteCurve,
       }
     }
   }
-  if (evaluation.size() == 0) {
+  if (evaluation.empty()) {
     return boost::none;
   }
   std::vector<double>::iterator min_itr = std::min_element(evaluation.begin(), evaluation.end());
@@ -1051,7 +1051,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
   const std::vector<geometry_msgs::msg::Point> & waypoints)
 {
   std::set<double> collision_points;
-  if (waypoints.size() == 0) {
+  if (waypoints.empty()) {
     return boost::none;
   }
   simulation_api::math::CatmullRomSpline spline(waypoints);
@@ -1070,7 +1070,7 @@ boost::optional<double> HdMapUtils::getDistanceToStopLine(
       collision_points.insert(collision_point.get());
     }
   }
-  if (collision_points.size() == 0) {
+  if (collision_points.empty()) {
     return boost::none;
   }
   return *collision_points.begin();
