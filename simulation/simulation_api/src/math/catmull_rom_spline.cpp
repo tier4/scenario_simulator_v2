@@ -24,7 +24,8 @@ namespace simulation_api
 {
 namespace math
 {
-CatmullRomSpline::CatmullRomSpline(const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves)
+CatmullRomSpline::CatmullRomSpline(
+  const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves)
 {
   for (const auto & curve : hermite_curves) {
     curves_.emplace_back(HermiteCurve(curve));
