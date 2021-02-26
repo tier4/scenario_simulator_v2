@@ -153,7 +153,6 @@ class ScenarioTestRunner(LifecycleController):
         self.deactivate_node()
 
     def run_scenario(self, scenario: Scenario):
-
         converted_scenarios = convert_scenarios(
             [scenario],
             self.output_directory)

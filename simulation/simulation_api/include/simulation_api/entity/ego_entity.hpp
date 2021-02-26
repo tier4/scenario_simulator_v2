@@ -24,6 +24,7 @@
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/vehicle_model/sim_model.hpp>
+#include <sys/wait.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -179,7 +180,16 @@ public:
       accessor_spinner->join();
       std::cout << "ACCESSOR TERMINATED" << std::endl;
       // std::cout << "PID: " << autoware_process_id << std::endl;
+      // std::cout << "KILL START" << std::endl;
+      // // while (kill(autoware_process_id, SIGTERM))
+      // // {
+      // //   std::cout << "KILL " << std::endl;
+      // // }
       // kill(autoware_process_id, SIGTERM);
+      // std::cout << "WAITING" << std::endl;
+      // int status = 0;
+      // ::waitpid(autoware_process_id, &status, WUNTRACED);  // only once
+      // std::cout << "KILL END" << std::endl;
     }
   }
 

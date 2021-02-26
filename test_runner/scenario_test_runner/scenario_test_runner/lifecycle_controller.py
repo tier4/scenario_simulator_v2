@@ -16,8 +16,9 @@
 # limitations under the License.
 
 
-import rclpy
 import rcl_interfaces
+import rclpy
+import subprocess
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription, LaunchService
@@ -26,9 +27,11 @@ from launch.launch_description_sources import AnyLaunchDescriptionSource
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState, GetState
 from multiprocessing import Process
+from os import killpg
 from pathlib import Path
 from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
 from rclpy.node import Node
+from signal import SIGTERM
 from time import sleep
 
 
@@ -148,20 +151,21 @@ class LifecycleController(Node):
         # # self.launch_service.run_async(shutdown_when_idle=False)
         #
         # def autoware_launch():
-        #     launch_service = LaunchService(
-        #         debug=False,
-        #         )
+        #     # launch_service = LaunchService(
+        #     #     debug=False,
+        #     #     )
+        #     #
+        #     # launch_service.include_launch_description(
+        #     #     LaunchDescription([
+        #     #         IncludeLaunchDescription(
+        #     #             AnyLaunchDescriptionSource(
+        #     #                 get_package_share_directory('scenario_test_runner') +
+        #     #                 '/autoware.launch.xml'))]))
+        #     #
+        #     # return launch_service.run(shutdown_when_idle=False)
+        #     return subprocess.call('ros2 launch scenario_test_runner autoware.launch.xml')
         #
-        #     launch_service.include_launch_description(
-        #         LaunchDescription([
-        #             IncludeLaunchDescription(
-        #                 AnyLaunchDescriptionSource(
-        #                     get_package_share_directory('scenario_test_runner') +
-        #                     '/autoware.launch.xml'))]))
-        #
-        #     return launch_service.run(shutdown_when_idle=False)
-        #
-        # self.autoware_process = Process(target=autoware_launch)
+        # self.autoware_process = Process(name='Autoware', target=autoware_launch)
         # self.autoware_process.start()
         #
         # print('Activation done!')
@@ -184,6 +188,7 @@ class LifecycleController(Node):
         # # self.launch_service.shutdown()
         # if self.autoware_process.is_alive():
         #     self.autoware_process.kill()
+        #     # killpg(self.autoware_process.pid, SIGTERM)
         # sleep(5)
         # print('Shutdown service done!')
 
