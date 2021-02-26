@@ -101,7 +101,7 @@ BT::NodeStatus YieldAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto right_of_way_entities = getRightOfWayEntities(route_lanelets);
-  if (right_of_way_entities.size() == 0) {
+  if (right_of_way_entities.empty()) {
     if (!target_speed) {
       target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
     }

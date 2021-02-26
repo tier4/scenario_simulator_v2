@@ -143,7 +143,7 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
   std::vector<openscenario_msgs::msg::EntityStatus> ret;
   const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(
     entity_status.lanelet_pose.lanelet_id);
-  if (lanelet_ids.size() == 0) {
+  if (lanelet_ids.empty()) {
     return ret;
   }
   for (const auto & status : other_entity_status) {
@@ -210,7 +210,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const simulation_api::math::CatmullRomSpline & spline)
 {
   auto conflicting_entity_status = getConflictingEntityStatusOnRoute(route_lanelets);
-  if (conflicting_entity_status.size() == 0) {
+  if (conflicting_entity_status.empty()) {
     return boost::none;
   }
   std::set<double> distances;
@@ -223,7 +223,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
       }
     }
   }
-  if (distances.size() == 0) {
+  if (distances.empty()) {
     return boost::none;
   }
   return *distances.begin();
