@@ -124,7 +124,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       s_values.emplace_back(s.get());
     }
   }
-  if (s_values.size() == 0) {
+  if (s_values.empty()) {
     return boost::none;
   }
   if (search_backward) {
@@ -180,7 +180,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       }
     }
   }
-  if (s_values.size() == 0) {
+  if (s_values.empty()) {
     return boost::none;
   }
   if (search_backward) {

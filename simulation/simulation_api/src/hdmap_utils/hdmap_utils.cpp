@@ -279,7 +279,7 @@ int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double dist
 double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<double> limits;
-  if (lanelet_ids.size() == 0) {
+  if (lanelet_ids.empty()) {
     throw HdMapError("size of the vector lanelet ids should be more than 1");
   }
   for (auto itr = lanelet_ids.begin(); itr != lanelet_ids.end(); itr++) {
@@ -354,7 +354,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   std::vector<std::int64_t> candidate_lanelet_ids, double distance,
   bool include_self)
 {
-  if (candidate_lanelet_ids.size() == 0) {
+  if (candidate_lanelet_ids.empty()) {
     return {};
   }
   std::vector<std::int64_t> ret;
@@ -446,7 +446,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
   std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  if (lanelet_ids.size() == 0) {
+  if (lanelet_ids.empty()) {
     return ret;
   }
   for (const auto lanelet_id : lanelet_ids) {
@@ -633,7 +633,7 @@ boost::optional<std::pair<simulation_api::math::HermiteCurve,
       }
     }
   }
-  if (evaluation.size() == 0) {
+  if (evaluation.empty()) {
     return boost::none;
   }
   std::vector<double>::iterator min_itr = std::min_element(evaluation.begin(), evaluation.end());
@@ -984,13 +984,54 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   return ret;
 }
 
-boost::optional<double> HdMapUtils::getDistanceToStopLine(
-  std::vector<std::int64_t> following_lanelets, openscenario_msgs::msg::LaneletPose lanlet_pose)
+lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
+  const std::int64_t traffic_light_id) const
 {
-  return getDistanceToStopLine(following_lanelets, lanlet_pose.lanelet_id, lanlet_pose.s);
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
+  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
+  for (const auto light : autoware_traffic_lights) {
+    for (auto light_string : light->lightBulbs()) {
+      if (light_string.hasAttribute("traffic_light_id")) {
+        auto id = light_string.attribute("traffic_light_id").asId();
+        if (id) {
+          return light;
+        }
+      }
+    }
+  }
+  std::string message = "traffic_light_id does not match. ID : " + std::to_string(traffic_light_id);
+  throw HdMapError(message.c_str());
 }
 
-const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinesPolygon(
+const boost::optional<std::int64_t> HdMapUtils::getTrafficLightStopLineId(
+  const std::int64_t & traffic_light_id) const
+{
+  const auto traffic_light = getTrafficLight(traffic_light_id);
+  if (traffic_light->stopLine()) {
+    return traffic_light->stopLine()->id();
+  }
+  return boost::none;
+}
+
+const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinePoints(
+  std::int64_t traffic_light_id)
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  const auto traffic_light = getTrafficLight(traffic_light_id);
+  const auto stop_line = traffic_light->stopLine();
+  if (stop_line) {
+    for (const auto point : stop_line.get()) {
+      geometry_msgs::msg::Point p;
+      p.x = point.x();
+      p.y = point.y();
+      p.z = point.z();
+      ret.emplace_back(p);
+    }
+  }
+  return ret;
+}
+
+const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
   std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> points;
@@ -1006,72 +1047,33 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinesPolygon(
 }
 
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
-  std::vector<std::int64_t> following_lanelets,
-  std::int64_t lanelet_id, double s)
+  const std::vector<std::int64_t> & route_lanelets,
+  const std::vector<geometry_msgs::msg::Point> & waypoints)
 {
-  std::vector<std::int64_t> lanelet_ids;
-  std::vector<double> s_values;
-  bool stop_lines_found = false;
-  std::int64_t stop_lanelet_id;
-  std::vector<lanelet::ConstLineString3d> stop_lines;
-  for (const auto & following_lanelet_id : following_lanelets) {
-    stop_lines = getStopLinesOnPath({following_lanelet_id});
-    if (stop_lines.size() == 0) {
-      continue;
-    }
-    stop_lines_found = true;
-    stop_lanelet_id = following_lanelet_id;
-    break;
+  std::set<double> collision_points;
+  if (waypoints.empty()) {
+    return boost::none;
   }
-  if (stop_lines_found) {
-    namespace bg = boost::geometry;
-    typedef bg::model::d2::point_xy<double> bg_point;
-    const auto center_lines = getCenterPoints(stop_lanelet_id);
-    if (center_lines.size() <= 1) {
-      return boost::none;
+  simulation_api::math::CatmullRomSpline spline(waypoints);
+  const auto stop_lines = getStopLinesOnPath({route_lanelets});
+  for (const auto & stop_line : stop_lines) {
+    std::vector<geometry_msgs::msg::Point> stop_line_points;
+    for (const auto & point : stop_line) {
+      geometry_msgs::msg::Point p;
+      p.x = point.x();
+      p.y = point.y();
+      p.z = point.z();
+      stop_line_points.emplace_back(p);
     }
-    bool intersection_found = false;
-    double intersection_s = 0;
-    for (size_t point_index = 0; point_index < (center_lines.size() - 1); point_index++) {
-      bg::model::linestring<bg_point> center_line_bg =
-        boost::assign::list_of<bg_point>(
-        center_lines[point_index].x,
-        center_lines[point_index].y)(
-        center_lines[point_index + 1].x,
-        center_lines[point_index + 1].y);
-      std::set<double> s_values_in_segment;
-      for (const auto & stop_line : stop_lines) {
-        for (size_t i = 0; i < (stop_line.size() - 1); i++) {
-          const lanelet::ConstPoint3d ps_0 = stop_line[i];
-          const lanelet::ConstPoint3d ps_1 = stop_line[i + 1];
-          bg::model::linestring<bg_point> stop_line_bg =
-            boost::assign::list_of<bg_point>(ps_0.x(), ps_0.y())(ps_1.x(), ps_1.y());
-          std::vector<bg_point> result;
-          bg::intersection(center_line_bg, stop_line_bg, result);
-          if (result.size() != 0) {
-            s_values_in_segment.insert(
-              std::hypot(
-                result[0].x() - center_lines[point_index].x,
-                result[0].y() - center_lines[point_index].y));
-          }
-        }
-      }
-      if (s_values_in_segment.size() == 0) {
-        intersection_s = intersection_s +
-          std::hypot(
-          center_lines[point_index + 1].x - center_lines[point_index].x,
-          center_lines[point_index + 1].y - center_lines[point_index].y);
-      } else {
-        intersection_s = intersection_s + *s_values_in_segment.begin();
-        intersection_found = true;
-        break;
-      }
-    }
-    if (intersection_found) {
-      return getLongitudinalDistance(lanelet_id, s, stop_lanelet_id, intersection_s);
+    const auto collision_point = spline.getCollisionPointIn2D(stop_line_points);
+    if (collision_point) {
+      collision_points.insert(collision_point.get());
     }
   }
-  return boost::none;
+  if (collision_points.empty()) {
+    return boost::none;
+  }
+  return *collision_points.begin();
 }
 
 std::vector<double> HdMapUtils::calculateSegmentDistances(

@@ -93,7 +93,7 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
           } else {
             new_s = new_s - length;
             auto next_ids = hdmap_utils->getNextLaneletIds(route_lanelets[i]);
-            if (next_ids.size() == 0) {
+            if (next_ids.empty()) {
               return stopAtEndOfRoad();
             }
             new_lanelet_id = next_ids[0];

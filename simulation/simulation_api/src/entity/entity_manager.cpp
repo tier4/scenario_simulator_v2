@@ -118,7 +118,7 @@ boost::optional<double> EntityManager::getDistanceToCrosswalk(
   if (it == entities_.end()) {
     return boost::none;
   }
-  if (getWaypoints(name).waypoints.size() == 0) {
+  if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
   simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
@@ -158,11 +158,11 @@ boost::optional<double> EntityManager::getDistanceToStopLine(
   if (it == entities_.end()) {
     return boost::none;
   }
-  if (getWaypoints(name).waypoints.size() == 0) {
+  if (getWaypoints(name).waypoints.empty()) {
     return boost::none;
   }
   simulation_api::math::CatmullRomSpline spline(getWaypoints(name).waypoints);
-  auto polygon = hdmap_utils_ptr_->getStopLinesPolygon(target_stop_line_id);
+  auto polygon = hdmap_utils_ptr_->getStopLinePolygon(target_stop_line_id);
   return spline.getCollisionPointIn2D(polygon);
 }
 

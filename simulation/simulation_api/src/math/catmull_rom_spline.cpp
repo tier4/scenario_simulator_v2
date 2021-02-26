@@ -24,7 +24,8 @@ namespace simulation_api
 {
 namespace math
 {
-CatmullRomSpline::CatmullRomSpline(std::vector<openscenario_msgs::msg::HermiteCurve> hermite_curves)
+CatmullRomSpline::CatmullRomSpline(
+  const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves)
 {
   for (const auto & curve : hermite_curves) {
     curves_.emplace_back(HermiteCurve(curve));
@@ -136,18 +137,18 @@ const
   return traj;
 }
 
-CatmullRomSpline::CatmullRomSpline(openscenario_msgs::msg::CatmullRomSpline spline)
+CatmullRomSpline::CatmullRomSpline(const openscenario_msgs::msg::CatmullRomSpline & spline)
 {
   for (const auto & curve : spline.curves) {
     curves_.emplace_back(HermiteCurve(curve));
   }
 }
 
-CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points)
+CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
 : control_points(control_points)
 {
   size_t n = control_points.size() - 1;
-  if (n <= 1) {
+  if (control_points.size() <= 2) {
     throw SplineInterpolationError("numbers of control points are not enough.");
   }
   for (size_t i = 0; i < n; i++) {
@@ -387,7 +388,7 @@ boost::optional<double> CatmullRomSpline::getSValue(
   if (s_values.size() != curve_index.size()) {
     throw SplineInterpolationError("s values and error values size are does not match.");
   }
-  if (s_values.size() == 0) {
+  if (s_values.empty()) {
     return boost::none;
   }
   double s = 0;
@@ -419,7 +420,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 
 double CatmullRomSpline::getMaximum2DCurventure() const
 {
-  if (maximum_2d_curvatures_.size() == 0) {
+  if (maximum_2d_curvatures_.empty()) {
     throw SplineInterpolationError("maximum 2D curventure vector size is 0.");
   }
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
@@ -465,7 +466,7 @@ bool CatmullRomSpline::checkConnection() const
                 i) + " does not match.");
     }
   }
-  if (curves_.size() == 0) {
+  if (curves_.empty()) {
     throw SplineInterpolationError("curve size should not be zero.");
   }
   return true;
