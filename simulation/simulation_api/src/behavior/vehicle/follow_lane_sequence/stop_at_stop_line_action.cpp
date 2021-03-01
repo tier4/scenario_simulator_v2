@@ -102,7 +102,9 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stopline_ = getDistanceToStopLine(route_lanelets);
+  const auto waypoints = calculateWaypoints();
+  auto distance_to_stopline_ =
+    hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (distance_to_stopline_) {
       if (distance_to_stopline_.get() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
@@ -117,14 +119,12 @@ BT::NodeStatus StopAtStopLineAction::tick()
     if (!distance_to_stopline_) {
       stopped_ = false;
       setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-      const auto waypoints = calculateWaypoints();
       const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);
       return BT::NodeStatus::SUCCESS;
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
-    const auto waypoints = calculateWaypoints();
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -145,7 +145,6 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   stopped_ = false;
-  const auto waypoints = calculateWaypoints();
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

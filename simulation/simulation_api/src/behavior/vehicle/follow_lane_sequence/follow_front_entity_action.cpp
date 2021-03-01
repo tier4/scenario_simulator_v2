@@ -82,10 +82,9 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (!driver_model.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(
-    route_lanelets,
-    entity_status.lanelet_pose.lanelet_id,
-    entity_status.lanelet_pose.s);
+  const auto waypoints = calculateWaypoints();
+  auto distance_to_stopline =
+    hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
   auto distance_to_crossing_entity = getDistanceToConflictingEntity(route_lanelets);
   distance_to_front_entity_ = getDistanceToFrontEntity();
   if (!distance_to_front_entity_) {
@@ -122,7 +121,6 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     auto entity_status_updated = calculateEntityStatusUpdated(
       front_entity_status.get().action_status.twist.linear.x);
     setOutput("updated_status", entity_status_updated);
-    const auto waypoints = calculateWaypoints();
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
