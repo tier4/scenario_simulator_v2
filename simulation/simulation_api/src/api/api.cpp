@@ -13,9 +13,8 @@
 // limitations under the License.
 
 #include <simulation_api/api/api.hpp>
-#include <simulation_interface/xmlrpc_client.hpp>
 #include <simulation_interface/conversions.hpp>
-
+#include <simulation_interface/xmlrpc_client.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <string>
@@ -32,7 +31,7 @@ void API::setVerbose(bool verbose)
 
 bool API::despawn(const std::string & name)
 {
-  auto result = entity_manager_ptr_->despawnEntity(name);
+  const auto result = entity_manager_ptr_->despawnEntity(name);
   if (!result) {
     return false;
   }
@@ -54,12 +53,12 @@ bool API::spawn(
   pugi::xml_document catalog_xml_doc;
   catalog_xml_doc.load_string(catalog_xml.c_str());
   pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
-  if (vehicle_node != NULL) {
+  if (vehicle_node != nullptr) {
     const auto params = simulation_api::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
     return spawn(is_ego, status.name, params);
   }
   pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
-  if (pedestrian_node != NULL) {
+  if (pedestrian_node != nullptr) {
     const auto params = simulation_api::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
     return spawn(is_ego, status.name, params);
   }
@@ -478,28 +477,28 @@ bool API::attachDetectionSensor(simulation_api_schema::DetectionSensorConfigurat
 {
   if (standalone_mode) {
     return true;
+  } else {
+    simulation_api_schema::AttachDetectionSensorRequest req;
+    simulation_api_schema::AttachDetectionSensorResponse res;
+    *req.mutable_configuration() = configuration;
+    simulation_interface::call(
+      client_ptr_, simulation_interface::method::attach_detection_sensor, req, res);
+    return res.result().success();
   }
-  simulation_api_schema::AttachDetectionSensorRequest req;
-  simulation_api_schema::AttachDetectionSensorResponse res;
-  *req.mutable_configuration() = configuration;
-  simulation_interface::call(
-    client_ptr_, simulation_interface::method::attach_detection_sensor,
-    req, res);
-  return res.result().success();
 }
 
 bool API::attachLidarSensor(simulation_api_schema::LidarConfiguration configuration)
 {
   if (standalone_mode) {
     return true;
+  } else {
+    simulation_api_schema::AttachLidarSensorRequest req;
+    simulation_api_schema::AttachLidarSensorResponse res;
+    *req.mutable_configuration() = configuration;
+    simulation_interface::call(
+      client_ptr_, simulation_interface::method::attach_lidar_sensor, req, res);
+    return res.result().success();
   }
-  simulation_api_schema::AttachLidarSensorRequest req;
-  simulation_api_schema::AttachLidarSensorResponse res;
-  *req.mutable_configuration() = configuration;
-  simulation_interface::call(
-    client_ptr_, simulation_interface::method::attach_lidar_sensor, req,
-    res);
-  return res.result().success();
 }
 
 bool API::updateSensorFrame()

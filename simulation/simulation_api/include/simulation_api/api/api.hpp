@@ -15,23 +15,19 @@
 #ifndef SIMULATION_API__API__API_HPP_
 #define SIMULATION_API__API__API_HPP_
 
-#include <simulation_api_schema.pb.h>
-
-#include <simulation_api/entity/entity_manager.hpp>
-#include <simulation_api/helper/helper.hpp>
-#include <simulation_api/traffic_lights/traffic_light.hpp>
-#include <simulation_api/metrics/metrics_manager.hpp>
-
-#include <awapi_accessor/accessor.hpp>
-
-#include <openscenario_msgs/msg/driver_model.hpp>
-
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <awapi_accessor/accessor.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <simulation_api/entity/entity_manager.hpp>
+#include <simulation_api/helper/helper.hpp>
+#include <simulation_api/metrics/metrics_manager.hpp>
+#include <simulation_api/traffic_lights/traffic_light.hpp>
+#include <simulation_api_schema.pb.h>
 #include <xmlrpcpp/XmlRpcClient.h>
-#include <xmlrpcpp/XmlRpcValue.h>
 #include <xmlrpcpp/XmlRpcException.h>
+#include <xmlrpcpp/XmlRpcValue.h>
 
 #include <memory>
 #include <string>
@@ -56,38 +52,34 @@ class API
   using EntityManager = simulation_api::entity::EntityManager;
 
 #define FORWARD_TO_ENTITY_MANAGER(NAME) \
-  template \
-  < \
-    typename ... Ts \
-  > \
+  template<typename ... Ts> \
   decltype(auto) NAME(Ts && ... xs) \
   { \
     return entity_manager_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
   } static_assert(true, "")
 
 public:
-  template
-  <
+  template<
     class NodeT,
-    class AllocatorT = std::allocator<void>
-  >
+    class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node,
-    const std::string & map_path = "",
+    const std::string & lanelet2_map_osm,
     const bool verbose = false,
     const bool standalone_mode = false,
     const std::string & metrics_logfile_path = "/tmp/metrics.json")
   : standalone_mode(standalone_mode),
-    entity_manager_ptr_(std::make_shared<EntityManager>(node, map_path)),
+    entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
     metrics_manager_(verbose, metrics_logfile_path)
   {
-    std::string address = "127.0.0.1";
+    static const std::string address = "127.0.0.1";
 
     int port = 8080;
-
-    node->declare_parameter("port", port);
-    node->get_parameter("port", port);
-    node->undeclare_parameter("port");
+    {
+      node->declare_parameter("port", port);
+      node->get_parameter("port", port);
+      node->undeclare_parameter("port");
+    }
 
     client_ptr_ = std::make_shared<XmlRpc::XmlRpcClient>(address.c_str(), port);
 
