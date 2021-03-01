@@ -54,6 +54,8 @@ class EgoEntity : public VehicleEntity
     std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
   > autowares;
 
+  bool autoware_uninitialized = true;
+
   int autoware_process_id = 0;
 
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
@@ -179,20 +181,6 @@ public:
   ~EgoEntity() override
   {
     if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
-      geometry_msgs::msg::Twist zero_twist {};
-      geometry_msgs::msg::Pose zero_pose {};
-
-      std::atomic_load(&autowares.at(name))->setCurrentControlMode();
-      std::atomic_load(&autowares.at(name))->setCurrentPose(zero_pose);
-      std::atomic_load(&autowares.at(name))->setCurrentShift(zero_twist);
-      std::atomic_load(&autowares.at(name))->setCurrentSteering(zero_twist);
-      std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
-      std::atomic_load(&autowares.at(name))->setCurrentTwist(zero_twist);
-      std::atomic_load(&autowares.at(name))->setCurrentVelocity(zero_twist);
-      std::atomic_load(&autowares.at(name))->setLaneChangeApproval(true);
-      std::atomic_load(&autowares.at(name))->setTransform(zero_pose);
-      std::atomic_load(&autowares.at(name))->setVehicleVelocity(zero_twist.linear.x);
-
       accessor_status->set_value();
       std::cout << "ACCESSOR TERMINATING" << std::endl;
       accessor_spinner->join();

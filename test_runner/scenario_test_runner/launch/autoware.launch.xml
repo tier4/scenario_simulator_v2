@@ -25,7 +25,7 @@
     </include>
   </group>
   <!-- from simple_planning_simulator.launch.xml -->
-  <node pkg="topic_tools" exec="relay" name="twist_relay" output="log" >
+  <node pkg="topic_tools" exec="relay" name="twist_relay" output="log">
     <param name="input_topic" value="/vehicle/status/twist"/>
     <param name="output_topic" value="/localization/twist"/>
     <param name="type" value="geometry_msgs/msg/TwistStamped"/>
@@ -64,7 +64,7 @@
   <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml"/>
 
   <!-- Rviz -->
-  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/>
+  <!-- <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/> -->
 
   <!-- Web Controller -->
   <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->

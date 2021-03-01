@@ -18,21 +18,12 @@
 
 import rcl_interfaces
 import rclpy
-import subprocess
 
-from ament_index_python.packages import get_package_share_directory
-from launch import LaunchDescription, LaunchService
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import AnyLaunchDescriptionSource
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState, GetState
-from multiprocessing import Process
-from os import killpg
 from pathlib import Path
 from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
 from rclpy.node import Node
-from signal import SIGTERM
-from time import sleep
 
 
 class LifecycleController(Node):
@@ -67,9 +58,6 @@ class LifecycleController(Node):
         self.client_set_parameters = self.create_client(
             rcl_interfaces.srv.SetParameters,
             LifecycleController.NODE_NAME + '/set_parameters')
-
-        # self.launch_service = None
-        self.autoware_process = None
 
     def send_request_to_change_parameters(
             self,  # Arguments are alphabetically sorted
@@ -147,29 +135,6 @@ class LifecycleController(Node):
         #     "Activate -> scenario runner state is " + self.get_lifecycle_state())
         # self.get_logger().info(self.get_lifecycle_state())
 
-        # print('Run service!')
-        # # self.launch_service.run_async(shutdown_when_idle=False)
-        #
-        # def autoware_launch():
-        #     # launch_service = LaunchService(
-        #     #     debug=False,
-        #     #     )
-        #     #
-        #     # launch_service.include_launch_description(
-        #     #     LaunchDescription([
-        #     #         IncludeLaunchDescription(
-        #     #             AnyLaunchDescriptionSource(
-        #     #                 get_package_share_directory('scenario_test_runner') +
-        #     #                 '/autoware.launch.xml'))]))
-        #     #
-        #     # return launch_service.run(shutdown_when_idle=False)
-        #     return subprocess.call('ros2 launch scenario_test_runner autoware.launch.xml')
-        #
-        # self.autoware_process = Process(name='Autoware', target=autoware_launch)
-        # self.autoware_process.start()
-        #
-        # print('Activation done!')
-
     def deactivate_node(self):
         """Dectivate node to chagnge state from active to inactive."""
         self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
@@ -183,14 +148,6 @@ class LifecycleController(Node):
         # Logger.print_info(
         #     "CleanUp -> scenario runner state is " + self.get_lifecycle_state())
         # self.get_logger().info(self.get_lifecycle_state())
-
-        # print('Shutdown service!')
-        # # self.launch_service.shutdown()
-        # if self.autoware_process.is_alive():
-        #     self.autoware_process.kill()
-        #     # killpg(self.autoware_process.pid, SIGTERM)
-        # sleep(5)
-        # print('Shutdown service done!')
 
     def set_lifecycle_state(self, transition_id):
         """

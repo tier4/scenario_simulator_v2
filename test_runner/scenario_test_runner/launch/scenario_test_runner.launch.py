@@ -16,9 +16,6 @@
 # limitations under the License.
 
 import os
-import launch
-import launch_ros
-import lifecycle_msgs
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
@@ -49,12 +46,13 @@ def generate_launch_description():
                 get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
             'origin_latitude':   34.903555800615614,
             'origin_longitude': 139.93339979022568,
-            'port': port,}],)
+            'port': port,
+            }],)
 
-    launch_autoware = launch.actions.IncludeLaunchDescription(
-        launch.launch_description_sources.AnyLaunchDescriptionSource(
-            get_package_share_directory('scenario_test_runner') +
-            '/autoware.launch.xml'))
+    # launch_autoware = launch.actions.IncludeLaunchDescription(
+    #     launch.launch_description_sources.AnyLaunchDescriptionSource(
+    #         get_package_share_directory('scenario_test_runner') +
+    #         '/autoware.launch.xml'))
 
     return LaunchDescription([
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
@@ -77,7 +75,8 @@ def generate_launch_description():
                 '--global-timeout', global_timeout,
                 '--output-directory', output_directory,
                 '--scenario', scenario,
-                '--workflow', workflow,],),
+                '--workflow', workflow,
+                ],),
 
         Node(
             package='scenario_simulator',
@@ -86,7 +85,8 @@ def generate_launch_description():
             name='sensor_simulator',
             output='log',
             parameters=[{
-                'port': port,}],),
+                'port': port,
+                }],),
 
         interpreter,
 

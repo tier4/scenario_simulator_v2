@@ -469,19 +469,19 @@ public:
     return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::WAITING_FOR_ENGAGE;
   }
 
-  auto isReady() const noexcept
-  {
-    static auto ready = false;
+  bool ready = false;
 
+  auto isReady() noexcept
+  {
     return ready || (ready = isWaitingForRoute());
   }
 
-  auto isNotReady() const noexcept
+  auto isNotReady() noexcept
   {
     return !isReady();
   }
 
-  void checkAutowareState() const
+  void checkAutowareState()
   {
     if (isReady() && isEmergency()) {
       throw AutowareError();

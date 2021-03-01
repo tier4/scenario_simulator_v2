@@ -58,9 +58,7 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   const auto current_entity_status = getStatus();
 
-  static auto uninitialized = true;
-
-  if (std::exchange(uninitialized, false)) {
+  if (std::exchange(autoware_uninitialized, false)) {
     waitForAutowareToBeReady();
     std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autowares.at(name))->setInitialTwist();
