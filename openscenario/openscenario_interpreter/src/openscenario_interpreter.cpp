@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   expect("success"),
-  output_directory("/tmp"),  // DEPRECATED
+  output_directory("/tmp"),
   osc_path(""),
   real_time_factor(1.0),
   frame_rate(30)
@@ -84,7 +84,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
     std::chrono::milliseconds(static_cast<unsigned int>(1 / frame_rate * 1000)),  // XXX ???
     [this]()
     {
-      guard(
+      withExceptionHandler(
         [this]()
         {
           if (script) {
