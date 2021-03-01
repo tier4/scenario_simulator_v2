@@ -37,8 +37,11 @@
 #include <utility>
 #include <vector>
 
-// #define DEBUG_VALUE(...) \
-//   std::cout << "\x1b[31m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
+#define DEBUG_VALUE(...) \
+  std::cout << "\x1b[31m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
+
+#define DEBUG_LINE() \
+  std::cout << "\x1b[31m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
 
 namespace simulation_api
 {
@@ -51,7 +54,7 @@ class EgoEntity : public VehicleEntity
     std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
   > autowares;
 
-  // int autoware_process_id = 0;
+  int autoware_process_id = 0;
 
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
   std::shared_ptr<std::promise<void>> accessor_status;
@@ -62,11 +65,10 @@ class EgoEntity : public VehicleEntity
 public:
   EgoEntity() = delete;
 
-  // EgoEntity(EgoEntity &&) = delete;
-  // EgoEntity(const EgoEntity &) = delete;
-
-  // EgoEntity & operator=(EgoEntity &&) = delete;
-  // EgoEntity & operator=(const EgoEntity &) = delete;
+  // TODO(yamacir-kit): EgoEntity(EgoEntity &&) = delete;
+  // TODO(yamacir-kit): EgoEntity(const EgoEntity &) = delete;
+  // TODO(yamacir-kit): EgoEntity & operator=(EgoEntity &&) = delete;
+  // TODO(yamacir-kit): EgoEntity & operator=(const EgoEntity &) = delete;
 
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -103,6 +105,28 @@ public:
   explicit EgoEntity(const std::string & name, Ts && ... xs)
   : VehicleEntity(name, std::forward<decltype(xs)>(xs)...)
   {
+    auto launch_autoware =
+      [this]()
+      {
+        autoware_process_id = fork();
+
+        const std::vector<char *> argv {
+          "python3",
+          "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
+          "launch",
+          "scenario_test_runner",
+          "autoware.launch.xml",
+          nullptr
+        };
+
+        if (autoware_process_id < 0) {
+          throw std::system_error(errno, std::system_category());
+        } else if (autoware_process_id == 0 && ::execvp(argv[0], argv.data()) < 0) {
+          std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+          std::exit(EXIT_FAILURE);
+        }
+      };
+
     if (autowares.find(name) == std::end(autowares)) {
       auto my_name = name;
       std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
@@ -113,27 +137,7 @@ public:
           "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
           rclcpp::NodeOptions().use_global_arguments(false)));
 
-      // autoware_process_id = fork();
-      //
-      // if (autoware_process_id < 0) {
-      //   throw std::system_error(errno, std::system_category());
-      // } else if (autoware_process_id == 0) {
-      //   std::vector<char *> argv {
-      //     "python3",
-      //     "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-      //     "launch",
-      //     "scenario_test_runner",
-      //     "autoware.launch.xml",
-      //     nullptr
-      //   };
-      //   if (::execvp(argv[0], argv.data()) < 0) {
-      //     std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-      //     std::exit(EXIT_FAILURE);
-      //   }
-      // } else {
-      //   // int status {};
-      //   // ::waitpid(autoware_process_id, &status, WUNTRACED);  // only once
-      // }
+      launch_autoware();
     }
 
     /* ---- NOTE ---------------------------------------------------------------
@@ -175,21 +179,33 @@ public:
   ~EgoEntity() override
   {
     if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
+      geometry_msgs::msg::Twist zero_twist {};
+      geometry_msgs::msg::Pose zero_pose {};
+
+      std::atomic_load(&autowares.at(name))->setCurrentControlMode();
+      std::atomic_load(&autowares.at(name))->setCurrentPose(zero_pose);
+      std::atomic_load(&autowares.at(name))->setCurrentShift(zero_twist);
+      std::atomic_load(&autowares.at(name))->setCurrentSteering(zero_twist);
+      std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
+      std::atomic_load(&autowares.at(name))->setCurrentTwist(zero_twist);
+      std::atomic_load(&autowares.at(name))->setCurrentVelocity(zero_twist);
+      std::atomic_load(&autowares.at(name))->setLaneChangeApproval(true);
+      std::atomic_load(&autowares.at(name))->setTransform(zero_pose);
+      std::atomic_load(&autowares.at(name))->setVehicleVelocity(zero_twist.linear.x);
+
       accessor_status->set_value();
       std::cout << "ACCESSOR TERMINATING" << std::endl;
       accessor_spinner->join();
       std::cout << "ACCESSOR TERMINATED" << std::endl;
-      // std::cout << "PID: " << autoware_process_id << std::endl;
-      // std::cout << "KILL START" << std::endl;
-      // // while (kill(autoware_process_id, SIGTERM))
-      // // {
-      // //   std::cout << "KILL " << std::endl;
-      // // }
-      // kill(autoware_process_id, SIGTERM);
-      // std::cout << "WAITING" << std::endl;
-      // int status = 0;
-      // ::waitpid(autoware_process_id, &status, WUNTRACED);  // only once
-      // std::cout << "KILL END" << std::endl;
+
+      autowares.erase(name);
+
+      std::cout << "KILLING PID: " << autoware_process_id << std::endl;
+      kill(autoware_process_id, SIGINT);
+      std::cout << "WAITING" << std::endl;
+      int status = 0;
+      ::waitpid(autoware_process_id, &status, WUNTRACED);
+      std::cout << "KILL END" << std::endl;
     }
   }
 
@@ -198,36 +214,43 @@ public:
   {
     // std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
 
+    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       !std::atomic_load(&autowares.at(name))->isWaitingForRoute();
       rate.sleep())
     {}
 
+    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       std::atomic_load(&autowares.at(name))->isWaitingForRoute();
       rate.sleep())
     {
+      DEBUG_LINE();
       // std::cout << "SEND GOAL-POSE!" << std::endl;
       std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
     }
 
+    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       !std::atomic_load(&autowares.at(name))->isWaitingForEngage();
       rate.sleep())
     {}
 
+    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       std::atomic_load(&autowares.at(name))->isWaitingForEngage();
       rate.sleep())
     {
+      DEBUG_LINE();
       // std::cout << "ENGAGE!" << std::endl;
       std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
     }
 
+    DEBUG_LINE();
     // std::cout << "REQUEST END" << std::endl;
   }
 
