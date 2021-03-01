@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
   <!-- Essential parameters -->
-  <arg name="map_path" default="/home/yamasa/Downloads/planning_simulator_sample_map" doc="point cloud and lanelet2 map directory path"/>
+  <arg name="map_path" default="$(find-pkg-share kashiwanoha_map)/map" doc="point cloud and lanelet2 map directory path"/>
   <arg name="vehicle_model" default="lexus"/>
   <arg name="sensor_model" default="aip_xx1"/>
   <!-- Optional parameters -->
@@ -25,7 +25,7 @@
     </include>
   </group>
   <!-- from simple_planning_simulator.launch.xml -->
-  <node pkg="topic_tools" exec="relay" name="twist_relay" output="log" >
+  <node pkg="topic_tools" exec="relay" name="twist_relay" output="log">
     <param name="input_topic" value="/vehicle/status/twist"/>
     <param name="output_topic" value="/localization/twist"/>
     <param name="type" value="geometry_msgs/msg/TwistStamped"/>
@@ -64,7 +64,7 @@
   <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml"/>
 
   <!-- Rviz -->
-  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/>
+  <!-- <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/> -->
 
   <!-- Web Controller -->
   <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->

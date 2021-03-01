@@ -16,8 +16,8 @@
 # limitations under the License.
 
 
-import rclpy
 import rcl_interfaces
+import rclpy
 
 from lifecycle_msgs.msg import Transition
 from lifecycle_msgs.srv import ChangeState, GetState
@@ -40,23 +40,19 @@ class LifecycleController(Node):
     NODE_NAME = "openscenario_interpreter"
 
     def __init__(self):
-        super().__init__(
-            node_name='openscenario_interpreter_controller',
-            namespace='simulation')
+        super().__init__(node_name='lifecycle_controller', namespace='simulation')
 
         self.client_get_state = self.create_client(
             GetState, LifecycleController.NODE_NAME + "/get_state")
 
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn(
-                self.client_get_state.srv_name + ' service not available')
+            self.get_logger().warn(self.client_get_state.srv_name + ' service unavailable')
 
         self.client_change_state = self.create_client(
             ChangeState, LifecycleController.NODE_NAME + "/change_state")
 
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn(
-                self.client_change_state.srv_name + ' service not available')
+            self.get_logger().warn(self.client_change_state.srv_name + ' service unavailable')
 
         self.current_scenario = ""
         self.client_set_parameters = self.create_client(
@@ -75,7 +71,6 @@ class LifecycleController(Node):
         request = rcl_interfaces.srv.SetParameters.Request()
 
         request.parameters = [
-
             Parameter(
                 name="expect",
                 value=ParameterValue(
@@ -148,7 +143,7 @@ class LifecycleController(Node):
         # self.get_logger().info(self.get_lifecycle_state())
 
     def cleanup_node(self):
-        """Cleanup node to chagnge state from inactive to unconfigure."""
+        """Cleanup node to change state from inactive to unconfigure."""
         self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
         # Logger.print_info(
         #     "CleanUp -> scenario runner state is " + self.get_lifecycle_state())

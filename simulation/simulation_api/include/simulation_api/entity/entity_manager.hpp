@@ -76,7 +76,7 @@ class EntityManager
 {
 private:
   bool verbose_;
-  std::map<std::string, boost::any> entities_;
+  std::unordered_map<std::string, boost::any> entities_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   rclcpp::Clock::SharedPtr clock_ptr_;
   visualization_msgs::msg::MarkerArray markers_raw_;
@@ -251,33 +251,31 @@ public:
   rclcpp::Publisher<autoware_auto_msgs::msg::VehicleKinematicState>::SharedPtr
     kinematic_state_pub_ptr_;
   boost::optional<openscenario_msgs::msg::LaneletPose> getLaneletPose(std::string name);
-  template<typename T>
-  bool spawnEntity(T & entity)
+
+  template<
+    typename Entity,
+    typename = typename std::enable_if<
+      std::is_base_of<EntityBase, typename std::decay<Entity>::type>::value
+    >::type>
+  bool spawnEntity(Entity && entity)
   {
     if (entities_.count(entity.name) != 0) {
       throw simulation_api::SimulationRuntimeError("entity " + entity.name + " already exist.");
+    } else {
+      entity.setHdMapUtils(hdmap_utils_ptr_);
+      entities_.emplace(entity.name, std::forward<decltype(entity)>(entity));
+      return true;
     }
-    if (std::is_base_of<EntityBase, T>::value == false) {
-      return false;
-    }
-    entity.setHdMapUtils(hdmap_utils_ptr_);
-    entities_.insert(std::make_pair(entity.name, entity));
-    return true;
   }
-  bool despawnEntity(std::string name)
+
+  bool despawnEntity(const std::string & name)
   {
-    if (entities_.count(name) == 0) {
-      return false;
-    }
-    entities_.erase(name);
-    return true;
+    return entityExists(name) && entities_.erase(name);
   }
-  bool entityExists(std::string name)
+
+  bool entityExists(const std::string & name)
   {
-    if (entities_.count(name) == 0) {
-      return false;
-    }
-    return true;
+    return entities_.count(name) != 0;
   }
 };
 }  // namespace entity

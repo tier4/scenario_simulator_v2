@@ -72,8 +72,11 @@ bool API::spawn(
   const openscenario_msgs::msg::VehicleParameters & params)
 {
   if (is_ego) {
-    simulation_api::entity::EgoEntity ego(name, params);
-    if (!entity_manager_ptr_->spawnEntity(ego)) {
+    if (
+      !entity_manager_ptr_->entityExists(name) &&
+      !entity_manager_ptr_->spawnEntity(
+        simulation_api::entity::EgoEntity(name, params)))
+    {
       return false;
     }
     if (standalone_mode) {
@@ -84,8 +87,7 @@ bool API::spawn(
     req.set_is_ego(true);
     simulation_interface::toProto(params, *req.mutable_parameters());
     return simulation_interface::call(
-      client_ptr_, simulation_interface::method::spawn_vehicle_entity, req,
-      res);
+      client_ptr_, simulation_interface::method::spawn_vehicle_entity, req, res);
   } else {
     simulation_api::entity::VehicleEntity npc(name, params);
     if (!entity_manager_ptr_->spawnEntity(npc)) {
@@ -99,8 +101,7 @@ bool API::spawn(
     req.set_is_ego(false);
     simulation_interface::toProto(params, *req.mutable_parameters());
     return simulation_interface::call(
-      client_ptr_, simulation_interface::method::spawn_pedestrian_entity,
-      req, res);
+      client_ptr_, simulation_interface::method::spawn_pedestrian_entity, req, res);
   }
   return false;
 }

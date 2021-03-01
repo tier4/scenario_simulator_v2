@@ -753,15 +753,11 @@ bool EntityManager::reachPosition(
   std::string name, std::string target_name, double tolerance) const
 {
   auto status = getEntityStatus(target_name);
-  if (status) {
-    return false;
-  }
-  return reachPosition(name, status->pose, tolerance);
+  return status && reachPosition(name, status->pose, tolerance);
 }
 
 bool EntityManager::reachPosition(
-  std::string name, geometry_msgs::msg::Pose target_pose,
-  double tolerance) const
+  std::string name, geometry_msgs::msg::Pose target_pose, double tolerance) const
 {
   auto status = getEntityStatus(name);
   if (!status) {
@@ -770,16 +766,14 @@ bool EntityManager::reachPosition(
   }
   auto pose = status->pose;
   double dist = std::sqrt(
-    std::pow(
-      pose.position.x - target_pose.position.x,
-      2) + std::pow(pose.position.y - target_pose.position.y, 2) +
+    std::pow(pose.position.x - target_pose.position.x, 2) +
+    std::pow(pose.position.y - target_pose.position.y, 2) +
     std::pow(pose.position.z - target_pose.position.z, 2));
   return dist < tolerance;
 }
 
 bool EntityManager::reachPosition(
-  std::string name, std::int64_t lanelet_id, double s, double offset,
-  double tolerance) const
+  std::string name, std::int64_t lanelet_id, double s, double offset, double tolerance) const
 {
   openscenario_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
