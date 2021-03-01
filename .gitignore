@@ -17,4 +17,5 @@ site
 
 *.bak
 *.log
+*.pcd
 *.pyc

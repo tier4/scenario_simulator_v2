@@ -212,27 +212,23 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
-    // std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
+    std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
 
-    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       !std::atomic_load(&autowares.at(name))->isWaitingForRoute();
       rate.sleep())
     {}
 
-    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       std::atomic_load(&autowares.at(name))->isWaitingForRoute();
       rate.sleep())
     {
-      DEBUG_LINE();
-      // std::cout << "SEND GOAL-POSE!" << std::endl;
+      std::cout << "SEND GOAL-POSE!" << std::endl;
       std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
     }
 
-    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       !std::atomic_load(&autowares.at(name))->isWaitingForEngage();
@@ -245,13 +241,11 @@ public:
       std::atomic_load(&autowares.at(name))->isWaitingForEngage();
       rate.sleep())
     {
-      DEBUG_LINE();
-      // std::cout << "ENGAGE!" << std::endl;
+      std::cout << "ENGAGE!" << std::endl;
       std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
     }
 
-    DEBUG_LINE();
-    // std::cout << "REQUEST END" << std::endl;
+    std::cout << "REQUEST END" << std::endl;
   }
 
   const std::string getCurrentAction() const
