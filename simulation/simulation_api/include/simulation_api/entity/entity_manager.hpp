@@ -83,8 +83,6 @@ private:
 
   rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
 
-  std::size_t getNumberOfEgo() const;
-
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
 
@@ -107,42 +105,34 @@ private:
   using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
   rclcpp::Publisher<VehicleKinematicState>::SharedPtr kinematic_state_pub_ptr_;
 
+  std::size_t getNumberOfEgo() const;
+
 public:
-  template<typename ... Ts>
-  decltype(auto) setTrafficLightColorPhase(Ts && ... xs)
-  {
-    traffic_light_manager_ptr_->setColorPhase(std::forward<Ts>(xs)...);
-  }
+# define DEFINE_SET_TRAFFIC_LIGHT(NAME) \
+  template<typename ... Ts> \
+  decltype(auto) setTrafficLight ## NAME(Ts && ... xs) \
+  { \
+    return traffic_light_manager_ptr_->set ## NAME(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
 
-  template<typename ... Ts>
-  decltype(auto) setTrafficLightArrowPhase(Ts && ... xs)
-  {
-    traffic_light_manager_ptr_->setArrowPhase(std::forward<Ts>(xs)...);
-  }
+  DEFINE_SET_TRAFFIC_LIGHT(Arrow);
+  DEFINE_SET_TRAFFIC_LIGHT(ArrowPhase);
+  DEFINE_SET_TRAFFIC_LIGHT(Color);
+  DEFINE_SET_TRAFFIC_LIGHT(ColorPhase);
 
-  template<typename ... Ts>
-  decltype(auto) setTrafficLightColor(Ts && ... xs)
-  {
-    traffic_light_manager_ptr_->setColor(std::forward<Ts>(xs)...);
-  }
+# undef DEFINE_SET_TRAFFIC_LIGHT
 
-  template<typename ... Ts>
-  decltype(auto) setTrafficLightArrow(Ts && ... xs)
-  {
-    traffic_light_manager_ptr_->setArrow(std::forward<Ts>(xs)...);
-  }
+# define DEFINE_GET_TRAFFIC_LIGHT(NAME) \
+  template<typename ... Ts> \
+  decltype(auto) getTrafficLight ## NAME(Ts && ... xs) \
+  { \
+    return traffic_light_manager_ptr_->get ## NAME(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
 
-  template<typename ... Ts>
-  decltype(auto) getTrafficLightColor(Ts && ... xs)
-  {
-    return traffic_light_manager_ptr_->getColor(std::forward<Ts>(xs)...);
-  }
+  DEFINE_GET_TRAFFIC_LIGHT(Color);
+  DEFINE_GET_TRAFFIC_LIGHT(Arrow);
 
-  template<typename ... Ts>
-  decltype(auto) getTrafficLightArrow(Ts && ... xs)
-  {
-    return traffic_light_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
-  }
+# undef DEFINE_GET_TRAFFIC_LIGHT
 
 #define FORWARD_TO_HDMAP_UTILS(NAME) \
   template<typename ... Ts> \
@@ -159,7 +149,19 @@ public:
   explicit EntityManager(NodeT && node, const std::string & map_path)
   : broadcaster_(node),
     base_link_broadcaster_(node),
-    clock_ptr_(node->get_clock())
+    clock_ptr_(node->get_clock()),
+    lanelet_marker_pub_ptr_(
+      rclcpp::create_publisher<MarkerArray>(
+        node, "lanelet/marker", LaneletMarkerQoS(),
+        rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    kinematic_state_pub_ptr_(
+      rclcpp::create_publisher<VehicleKinematicState>(
+        node, "output/kinematic_state", LaneletMarkerQoS(),
+        rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    entity_status_array_pub_ptr_(
+      rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
+        node, "entity/status", EntityMarkerQoS(),
+        rclcpp::PublisherOptionsWithAllocator<AllocatorT>()))
   {
     geographic_msgs::msg::GeoPoint origin;
     {
@@ -176,24 +178,13 @@ public:
 
     hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
 
-    const rclcpp::PublisherOptionsWithAllocator<AllocatorT> options =
-      rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
-
-    lanelet_marker_pub_ptr_ = rclcpp::create_publisher<MarkerArray>(
-      node, "lanelet/marker", LaneletMarkerQoS(), options);
-
-    kinematic_state_pub_ptr_ = rclcpp::create_publisher<VehicleKinematicState>(
-      node, "output/kinematic_state", LaneletMarkerQoS(), options);
-
-    entity_status_array_pub_ptr_ = rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
-      node, "entity/status", EntityMarkerQoS(), options);
-
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
 
     updateHdmapMarker();
 
     const auto traffic_light_marker_pub = rclcpp::create_publisher<MarkerArray>(
-      node, "traffic_light/marker", LaneletMarkerQoS(), options);
+      node, "traffic_light/marker", LaneletMarkerQoS(),
+      rclcpp::PublisherOptionsWithAllocator<AllocatorT>());
 
     traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(
       hdmap_utils_ptr_, traffic_light_marker_pub, clock_ptr_);
@@ -222,98 +213,147 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::DriverModel & model);
 
-  const openscenario_msgs::msg::BoundingBox getBoundingBox(std::string name) const;
+  const openscenario_msgs::msg::BoundingBox getBoundingBox(
+    const std::string & name) const;
 
   const geometry_msgs::msg::Pose toMapPose(
-    const openscenario_msgs::msg::LaneletPose lanelet_pose) const;
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose) const;
 
-  bool checkCollision(std::string name0, std::string name1);
+  bool checkCollision(
+    const std::string & name0,
+    const std::string & name1);
 
   void setVerbose(bool verbose);
 
-  void requestAcquirePosition(std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose);
+  void requestAcquirePosition(
+    const std::string & name,
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose);
 
-  void requestLaneChange(std::string name, std::int64_t to_lanelet_id);
-  void requestLaneChange(std::string name, Direction direction);
+  void requestLaneChange(const std::string & name, std::int64_t to_lanelet_id);
+  void requestLaneChange(const std::string & name, const Direction & direction);
 
-  std::vector<std::int64_t> getConflictingEntityOnRouteLanelets(std::string name, double horizon);
+  std::vector<std::int64_t> getConflictingEntityOnRouteLanelets(
+    const std::string & name, const double horizon);
 
-  std::vector<std::int64_t> getRouteLanelets(std::string name, double horizon);
+  std::vector<std::int64_t> getRouteLanelets(
+    const std::string & name, const double horizon);
 
-  openscenario_msgs::msg::WaypointsArray getWaypoints(std::string name);
+  openscenario_msgs::msg::WaypointsArray getWaypoints(
+    const std::string & name);
 
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle(std::string name);
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle(
+    const std::string & name);
 
   boost::optional<double> getLongitudinalDistance(
     const std::string & from,
     const std::string & to,
     const double max_distance = 100);
 
-  geometry_msgs::msg::Pose getRelativePose(std::string from, std::string to);
-  geometry_msgs::msg::Pose getRelativePose(std::string from, geometry_msgs::msg::Pose to);
-  geometry_msgs::msg::Pose getRelativePose(geometry_msgs::msg::Pose from, std::string to);
   geometry_msgs::msg::Pose getRelativePose(
-    geometry_msgs::msg::Pose from,
-    geometry_msgs::msg::Pose to) const;
+    const std::string & from,
+    const std::string & to);
+
+  geometry_msgs::msg::Pose getRelativePose(
+    const std::string & from,
+    const geometry_msgs::msg::Pose & to);
+
+  geometry_msgs::msg::Pose getRelativePose(
+    const geometry_msgs::msg::Pose & from,
+    const std::string & to);
+
+  geometry_msgs::msg::Pose getRelativePose(
+    const geometry_msgs::msg::Pose & from,
+    const geometry_msgs::msg::Pose & to) const;
 
   geometry_msgs::msg::Pose getMapPose(
-    std::string reference_entity_name,
-    geometry_msgs::msg::Pose relative_pose);
+    const std::string & reference_entity_name,
+    const geometry_msgs::msg::Pose & relative_pose);
 
   const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters(
-    std::string name) const;
+    const std::string & name) const;
 
   const std::vector<std::string> getEntityNames() const;
 
-  bool setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status);
+  bool setEntityStatus(
+    const std::string & name,
+    openscenario_msgs::msg::EntityStatus status);
 
   const boost::optional<openscenario_msgs::msg::EntityStatus> getEntityStatus(
-    std::string name) const;
+    const std::string & name) const;
 
-  boost::optional<double> getSValueInRoute(std::string name, std::vector<std::int64_t> route);
+  boost::optional<double> getSValueInRoute(
+    const std::string & name,
+    const std::vector<std::int64_t> & route);
 
-  bool isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance);
+  bool isInLanelet(
+    const std::string & name,
+    const std::int64_t lanelet_id,
+    const double tolerance);
 
-  bool entityStatusSetted(std::string name) const;
+  bool entityStatusSetted(
+    const std::string & name) const;
 
-  void setTargetSpeed(std::string name, double target_speed, bool continuous);
+  void setTargetSpeed(
+    const std::string & name,
+    const double target_speed,
+    const bool continuous);
 
-  void update(double current_time, double step_time);
+  void update(
+    const double current_time,
+    const double step_time);
 
-  void broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform = true);
+  void broadcastTransform(
+    const geometry_msgs::msg::PoseStamped & pose,
+    const bool static_transform = true);
 
   boost::optional<double> getDistanceToStopLine(
-    std::string name, std::int64_t target_stop_line_id);
+    const std::string & name,
+    const std::int64_t target_stop_line_id);
 
   boost::optional<double> getDistanceToCrosswalk(
-    std::string name,
-    std::int64_t target_crosswalk_id);
+    const std::string & name,
+    const std::int64_t target_crosswalk_id);
 
   bool reachPosition(
-    std::string name, geometry_msgs::msg::Pose target_pose, double tolerance) const;
+    const std::string & name,
+    const geometry_msgs::msg::Pose & target_pose,
+    const double tolerance) const;
+
   bool reachPosition(
-    std::string name, std::int64_t lanelet_id, double s, double offset, double tolerance) const;
+    const std::string & name,
+    const std::int64_t lanelet_id,
+    const double s,
+    const double offset,
+    const double tolerance) const;
+
   bool reachPosition(
-    std::string name, std::string target_name, double tolerance) const;
+    const std::string & name,
+    const std::string & target_name,
+    const double tolerance) const;
 
   void broadcastEntityTransform();
 
   void broadcastBaseLinkTransform();
 
-  const boost::optional<double> getStandStillDuration(std::string name) const;
+  const boost::optional<double> getStandStillDuration(
+    const std::string & name) const;
 
-  bool isStopping(std::string name) const;
+  bool isStopping(
+    const std::string & name) const;
 
-  const std::unordered_map<std::string,
-    openscenario_msgs::msg::EntityType> getEntityTypeList() const;
+  const std::unordered_map<
+    std::string,
+    openscenario_msgs::msg::EntityType>
+  getEntityTypeList() const;
 
-  bool isEgo(std::string name) const;
+  bool isEgo(const std::string & name) const;
 
-  openscenario_msgs::msg::EntityType getEntityType(std::string name) const;
+  openscenario_msgs::msg::EntityType getEntityType(const std::string & name) const;
 
-  const std::string getCurrentAction(std::string name) const;
+  const std::string getCurrentAction(const std::string & name) const;
 
-  boost::optional<openscenario_msgs::msg::LaneletPose> getLaneletPose(std::string name);
+  boost::optional<openscenario_msgs::msg::LaneletPose> getLaneletPose(
+    const std::string & name);
 
   template<
     typename Entity,
