@@ -81,7 +81,6 @@ private:
 
   rclcpp::Clock::SharedPtr clock_ptr_;
 
-  visualization_msgs::msg::MarkerArray markers_raw_;
   rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
 
   std::size_t getNumberOfEgo() const;
@@ -97,11 +96,16 @@ private:
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-  rclcpp::Publisher<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>::SharedPtr
-    entity_status_array_pub_ptr_;
-  rclcpp::Publisher<autoware_auto_msgs::msg::VehicleKinematicState>::SharedPtr
-    kinematic_state_pub_ptr_;
+
+  using MarkerArray = visualization_msgs::msg::MarkerArray;
+  rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
+  MarkerArray markers_raw_;
+
+  using EntityStatusWithTrajectoryArray = openscenario_msgs::msg::EntityStatusWithTrajectoryArray;
+  rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
+
+  using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
+  rclcpp::Publisher<VehicleKinematicState>::SharedPtr kinematic_state_pub_ptr_;
 
 public:
   template<typename ... Ts>
@@ -175,24 +179,20 @@ public:
     const rclcpp::PublisherOptionsWithAllocator<AllocatorT> options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
 
-    lanelet_marker_pub_ptr_ =
-      rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+    lanelet_marker_pub_ptr_ = rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(), options);
 
-    kinematic_state_pub_ptr_ =
-      rclcpp::create_publisher<autoware_auto_msgs::msg::VehicleKinematicState>(
+    kinematic_state_pub_ptr_ = rclcpp::create_publisher<VehicleKinematicState>(
       node, "output/kinematic_state", LaneletMarkerQoS(), options);
 
-    entity_status_array_pub_ptr_ =
-      rclcpp::create_publisher<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
+    entity_status_array_pub_ptr_ = rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(), options);
 
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
 
     updateHdmapMarker();
 
-    const auto traffic_light_marker_pub =
-      rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+    const auto traffic_light_marker_pub = rclcpp::create_publisher<MarkerArray>(
       node, "traffic_light/marker", LaneletMarkerQoS(), options);
 
     traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(
@@ -203,8 +203,8 @@ public:
 
   void updateHdmapMarker()
   {
-    visualization_msgs::msg::MarkerArray markers;
-    auto stamp = clock_ptr_->now();
+    MarkerArray markers;
+    const auto stamp = clock_ptr_->now();
     for (const auto & marker_raw : markers_raw_.markers) {
       visualization_msgs::msg::Marker marker = marker_raw;
       marker.header.stamp = stamp;
