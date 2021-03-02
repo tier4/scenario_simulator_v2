@@ -56,7 +56,10 @@ private:
         ResType res_proto;
         func_(req_proto, res_proto);
         std::string res_serialized_str;
-        res_proto.SerializeToString(&res_serialized_str);
+        if(!res_proto.SerializeToString(&res_serialized_str))
+        {
+          throw std::runtime_error("failed to serialize from proto");
+        }
         zmqpp::message response;
         response << res_serialized_str;
         socket_.send(response);

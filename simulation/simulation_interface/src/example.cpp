@@ -25,14 +25,11 @@ void callback(
   const simulation_api_schema::InitializeRequest & req,
   simulation_api_schema::InitializeResponse & res)
 {
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   req.PrintDebugString();
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
-  res.PrintDebugString();
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  res.mutable_result()->set_description("test");
+  // res.PrintDebugString();
 }
 
 class ExampleNode : public rclcpp::Node
@@ -52,11 +49,16 @@ public:
     request.set_realtime_factor(1.0);
     request.set_step_time(0.1);
     simulation_api_schema::InitializeResponse response;
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     client_.call(request, response);
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    if(response.result().success())
+    {
+      std::cout << "success" << std::endl;
+    }
+    else
+    {
+      std::cout << "fail" << std::endl;
+    }
     response.PrintDebugString();
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
   }
 
 private:

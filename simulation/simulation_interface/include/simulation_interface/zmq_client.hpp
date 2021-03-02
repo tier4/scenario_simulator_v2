@@ -46,7 +46,7 @@ public:
     zmqpp::message buffer;
     socket_.receive(buffer);
     std::string recieved_string = buffer.get(0);
-    res.ParseFromString(request_string);
+    res.ParseFromString(recieved_string);
   }
 
 private:
