@@ -58,7 +58,7 @@ namespace entity
 class LaneletMarkerQos : public rclcpp::QoS
 {
 public:
-  explicit LaneletMarkerQos(size_t depth = 1)
+  explicit LaneletMarkerQos(std::size_t depth = 1)
   : rclcpp::QoS(depth)
   {
     transient_local();
@@ -68,7 +68,7 @@ public:
 class EntityMarkerQos : public rclcpp::QoS
 {
 public:
-  explicit EntityMarkerQos(size_t depth = 100)
+  explicit EntityMarkerQos(std::size_t depth = 100)
   : rclcpp::QoS(depth) {}
 };
 
@@ -132,7 +132,8 @@ public:
   }
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path)
-  : broadcaster_(node), base_link_broadcaster_(node)
+  : broadcaster_(node),
+    base_link_broadcaster_(node)
   {
     clock_ptr_ = node->get_clock();
     geographic_msgs::msg::GeoPoint origin;

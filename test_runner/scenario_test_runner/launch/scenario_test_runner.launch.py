@@ -123,21 +123,21 @@ def generate_launch_description():
             name='openscenario_visualizer',
             output='log',),
 
-        # Node(
-        #     package='rviz2',
-        #     executable='rviz2',
-        #     name='rviz2',
-        #     output={
-        #         'stderr': 'log',
-        #         'stdout': 'log',
-        #         },
-        #     arguments=[
-        #         # '-d', os.path.join(
-        #         #     get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
-        #         '-d', str(
-        #             Path(get_package_share_directory('autoware_launch')) / 'rviz/autoware.rviz')
-        #         ],
-        #     ),
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output={
+                'stderr': 'log',
+                'stdout': 'log',
+                },
+            arguments=[
+                # '-d', os.path.join(
+                #     get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
+                '-d', str(
+                    Path(get_package_share_directory('autoware_launch')) / 'rviz/autoware.rviz')
+                ],
+            ),
 
         # IncludeLaunchDescription(
         #     AnyLaunchDescriptionSource(
