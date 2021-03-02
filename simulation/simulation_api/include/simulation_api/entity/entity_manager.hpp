@@ -55,20 +55,20 @@ namespace simulation_api
 namespace entity
 {
 
-class LaneletMarkerQos : public rclcpp::QoS
+class LaneletMarkerQoS : public rclcpp::QoS
 {
 public:
-  explicit LaneletMarkerQos(std::size_t depth = 1)
+  explicit LaneletMarkerQoS(std::size_t depth = 1)
   : rclcpp::QoS(depth)
   {
     transient_local();
   }
 };
 
-class EntityMarkerQos : public rclcpp::QoS
+class EntityMarkerQoS : public rclcpp::QoS
 {
 public:
-  explicit EntityMarkerQos(std::size_t depth = 100)
+  explicit EntityMarkerQoS(std::size_t depth = 100)
   : rclcpp::QoS(depth) {}
 };
 
@@ -130,55 +130,55 @@ public:
   {
     return traffic_light_manager_ptr_->getArrow(std::forward<Ts>(xs)...);
   }
+
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path)
   : broadcaster_(node),
-    base_link_broadcaster_(node)
+    base_link_broadcaster_(node),
+    clock_ptr_(node->get_clock())
   {
-    clock_ptr_ = node->get_clock();
     geographic_msgs::msg::GeoPoint origin;
-    node->declare_parameter("origin_latitude", 0.0);
-    node->declare_parameter("origin_longitude", 0.0);
-    // node->declare_parameter("origin_altitude", 0.0);
-    node->get_parameter("origin_latitude", origin.latitude);
-    node->get_parameter("origin_longitude", origin.longitude);
-    // node->get_parameter("origin_altitude", origin.altitude);
-    node->undeclare_parameter("origin_latitude");
-    node->undeclare_parameter("origin_longitude");
-    // node->undeclare_parameter("origin_altitude");
+    {
+      node->declare_parameter("origin_latitude", 0.0);
+      node->declare_parameter("origin_longitude", 0.0);
+      // node->declare_parameter("origin_altitude", 0.0);
+      node->get_parameter("origin_latitude", origin.latitude);
+      node->get_parameter("origin_longitude", origin.longitude);
+      // node->get_parameter("origin_altitude", origin.altitude);
+      node->undeclare_parameter("origin_latitude");
+      node->undeclare_parameter("origin_longitude");
+      // node->undeclare_parameter("origin_altitude");
+    }
+
     hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
-    const rclcpp::QoS & qos = LaneletMarkerQos();
-    const rclcpp::PublisherOptionsWithAllocator<AllocatorT> & options =
+
+    const rclcpp::PublisherOptionsWithAllocator<AllocatorT> options =
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>();
-    lanelet_marker_pub_ptr_ = rclcpp::create_publisher
-      <visualization_msgs::msg::MarkerArray>(
-      node,
-      "lanelet/marker", qos,
-      options);
-    kinematic_state_pub_ptr_ = rclcpp::create_publisher
-      <autoware_auto_msgs::msg::VehicleKinematicState>(
-      node,
-      "output/kinematic_state", qos,
-      options);
-    const rclcpp::QoS & entity_marker_qos = EntityMarkerQos();
+
+    lanelet_marker_pub_ptr_ =
+      rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+      node, "lanelet/marker", LaneletMarkerQoS(), options);
+
+    kinematic_state_pub_ptr_ =
+      rclcpp::create_publisher<autoware_auto_msgs::msg::VehicleKinematicState>(
+      node, "output/kinematic_state", LaneletMarkerQoS(), options);
+
     entity_status_array_pub_ptr_ =
       rclcpp::create_publisher<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
-      node,
-      "entity/status", entity_marker_qos,
-      options);
-    visualization_msgs::msg::MarkerArray markers;
+      node, "entity/status", EntityMarkerQoS(), options);
+
     markers_raw_ = hdmap_utils_ptr_->generateMarker();
+
     updateHdmapMarker();
-    auto traffic_light_marker_pub = rclcpp::create_publisher
-      <visualization_msgs::msg::MarkerArray>(
-      node,
-      "traffic_light/marker", qos,
-      options);
+
+    const auto traffic_light_marker_pub =
+      rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+      node, "traffic_light/marker", LaneletMarkerQoS(), options);
+
     traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(
-      hdmap_utils_ptr_,
-      traffic_light_marker_pub,
-      clock_ptr_);
+      hdmap_utils_ptr_, traffic_light_marker_pub, clock_ptr_);
   }
+
   boost::optional<double> getLinearJerk(std::string name);
   double getStepTime() const;
   double getCurrentTime() const;

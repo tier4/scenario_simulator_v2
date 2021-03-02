@@ -31,11 +31,7 @@ bool EntityManager::isStopping(std::string name) const
   if (!status) {
     throw simulation_api::SimulationRuntimeError("failed to get entity : " + name + " status");
   }
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if ((std::fabs(status->action_status.twist.linear.x)) < e) {
-    return true;
-  }
-  return false;
+  return std::fabs(status->action_status.twist.linear.x) < std::numeric_limits<double>::epsilon();
 }
 
 void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model)
