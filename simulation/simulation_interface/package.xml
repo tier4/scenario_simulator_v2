@@ -9,10 +9,12 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <depend>rclcpp</depend>
   <depend>geometry_msgs</depend>
   <depend>openscenario_msgs</depend>
   <depend>protobuf</depend>
   <depend>protobuf-dev</depend>
+  <depend>libzmqpp-dev</depend>
   <depend>xmlrpcpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>

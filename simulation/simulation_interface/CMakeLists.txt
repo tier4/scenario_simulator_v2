@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 find_package(Boost REQUIRED thread)
+find_package(rclcpp REQUIRED)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
@@ -49,6 +50,10 @@ ament_auto_add_executable(example
 target_link_libraries(example
   ${PROTOBUF_LIBRARY}
   Boost::thread
+  pthread
+  sodium
+  zmqpp
+  zmq
 )
 
 install(TARGETS
@@ -66,6 +71,10 @@ install(
   FILES ${PROTO_HDRS}
   DESTINATION include
 )
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
