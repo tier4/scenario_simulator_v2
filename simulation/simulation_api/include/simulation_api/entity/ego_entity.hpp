@@ -255,12 +255,13 @@ public:
 private:
   void waitForAutowareToBeReady() const
   {
+    std::size_t count = 0;
+
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       std::atomic_load(&autowares.at(name))->isNotReady();
       rate.sleep())
     {
-      static auto count = 0;
       std::cout << "[accessor] Waiting for Autoware to be ready. (" << ++count << ")" << std::endl;
     }
 

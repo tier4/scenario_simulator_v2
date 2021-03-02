@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
   <!-- Essential parameters -->
-  <arg name="map_path" default="$(find-pkg-share kashiwanoha_map)/map" doc="point cloud and lanelet2 map directory path"/>
-  <arg name="vehicle_model" default="lexus"/>
+  <arg name="lanelet2_map_file"   default="$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"/>
+  <arg name="pointcloud_map_file" default="$(find-pkg-share kashiwanoha_map)/map/pointcloud_map.pcd"/>
   <arg name="sensor_model" default="aip_xx1"/>
+  <arg name="vehicle_model" default="lexus"/>
   <!-- Optional parameters -->
   <arg name="rviz" default="true" doc="launch rviz"/>
-  <arg name="lanelet2_map_file" default="lanelet2_map.osm"/>
-  <arg name="pointcloud_map_file" default="pointcloud_map.pcd"/>
   <!-- Optional parameters for scenario simulation -->
   <arg name="initial_engage_state" default="true"/>
   <arg name="perception/enable_detection_failure" default="true"/>
@@ -38,8 +37,8 @@
 
   <!-- Map -->
   <include file="$(find-pkg-share map_launch)/launch/map.launch.xml">
-    <arg name="lanelet2_map_path" value="$(var map_path)/$(var lanelet2_map_file)"/>
-    <arg name="pointcloud_map_path" value="$(var map_path)/$(var pointcloud_map_file)"/>
+    <arg name="lanelet2_map_path" value="$(var lanelet2_map_file)"/>
+    <arg name="pointcloud_map_path" value="$(var pointcloud_map_file)"/>
   </include>
 
   <!-- Dummy Perception -->
@@ -64,7 +63,7 @@
   <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml"/>
 
   <!-- Rviz -->
-  <!-- <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/> -->
+  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/>
 
   <!-- Web Controller -->
   <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->

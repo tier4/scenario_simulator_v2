@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   expect("success"),
-  output_directory("/tmp"),  // DEPRECATED
+  output_directory("/tmp"),
   osc_path(""),
   real_time_factor(1.0),
   frame_rate(30)
@@ -62,7 +62,9 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) t
   VERBOSE("  Loading scenario " << osc_path);
   script.rebind<OpenScenario>(osc_path);
 
-  connect(shared_from_this(), script.as<OpenScenario>().scope.logic_file.string());
+  connect(
+    shared_from_this(),
+    script.as<OpenScenario>().scope.logic_file.string());  // NOTE: /path/to/lanelet2_map.osm
   VERBOSE("  connection established");
 
   initialize(real_time_factor, (1 / frame_rate) * real_time_factor);
@@ -84,7 +86,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
     std::chrono::milliseconds(static_cast<unsigned int>(1 / frame_rate * 1000)),  // XXX ???
     [this]()
     {
-      guard(
+      withExceptionHandler(
         [this]()
         {
           if (script) {

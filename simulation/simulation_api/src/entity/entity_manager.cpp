@@ -13,32 +13,32 @@
 // limitations under the License.
 
 #include <simulation_api/entity/entity_manager.hpp>
-#include <simulation_api/math/collision.hpp>
 #include <simulation_api/helper/helper.hpp>
+#include <simulation_api/math/collision.hpp>
 
-#include <vector>
-#include <string>
 #include <limits>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace simulation_api
 {
 namespace entity
 {
-bool EntityManager::isStopping(std::string name) const
+bool EntityManager::isStopping(
+  const std::string & name) const
 {
   const auto status = getEntityStatus(name);
   if (!status) {
     throw simulation_api::SimulationRuntimeError("failed to get entity : " + name + " status");
   }
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if ((std::fabs(status->action_status.twist.linear.x)) < e) {
-    return true;
-  }
-  return false;
+  return std::fabs(status->action_status.twist.linear.x) < std::numeric_limits<double>::epsilon();
 }
 
-void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model)
+void EntityManager::setDriverModel(
+  const std::string & name,
+  const openscenario_msgs::msg::DriverModel & model)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -55,14 +55,8 @@ void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::Dri
   }
 }
 
-const boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::toLaneletPose(
-  geometry_msgs::msg::Pose pose) const
-{
-  return hdmap_utils_ptr_->toLaneletPose(pose);
-}
-
 const geometry_msgs::msg::Pose EntityManager::toMapPose(
-  const openscenario_msgs::msg::LaneletPose lanelet_pose) const
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose) const
 {
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
@@ -70,25 +64,25 @@ const geometry_msgs::msg::Pose EntityManager::toMapPose(
 void EntityManager::setVerbose(bool verbose)
 {
   verbose_ = verbose;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (it->second.type() == typeid(VehicleEntity)) {
-      boost::any_cast<VehicleEntity &>(it->second).setVerbose(verbose);
+  for (auto & each : entities_) {
+    if (each.second.type() == typeid(VehicleEntity)) {
+      boost::any_cast<VehicleEntity &>(each.second).setVerbose(verbose);
     }
-    if (it->second.type() == typeid(EgoEntity)) {
-      boost::any_cast<EgoEntity &>(it->second).setVerbose(verbose);
+    if (each.second.type() == typeid(EgoEntity)) {
+      boost::any_cast<EgoEntity &>(each.second).setVerbose(verbose);
     }
-    if (it->second.type() == typeid(PedestrianEntity)) {
-      boost::any_cast<PedestrianEntity &>(it->second).setVerbose(verbose);
+    if (each.second.type() == typeid(PedestrianEntity)) {
+      boost::any_cast<PedestrianEntity &>(each.second).setVerbose(verbose);
     }
   }
 }
 
-bool EntityManager::isEgo(std::string name) const
+bool EntityManager::isEgo(const std::string & name) const
 {
   return getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO;
 }
 
-int EntityManager::getNumberOfEgo() const
+std::size_t EntityManager::getNumberOfEgo() const
 {
   return std::count_if(
     std::begin(entities_), std::end(entities_),
@@ -98,7 +92,8 @@ int EntityManager::getNumberOfEgo() const
     });
 }
 
-boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPose(std::string name)
+boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPose(
+  const std::string & name)
 {
   const auto status = getEntityStatus(name);
   if (!status) {
@@ -111,10 +106,10 @@ boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPo
 }
 
 boost::optional<double> EntityManager::getDistanceToCrosswalk(
-  std::string name,
-  std::int64_t target_crosswalk_id)
+  const std::string & name,
+  const std::int64_t target_crosswalk_id)
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
@@ -127,10 +122,10 @@ boost::optional<double> EntityManager::getDistanceToCrosswalk(
 }
 
 boost::optional<double> EntityManager::getSValueInRoute(
-  std::string name,
-  std::vector<std::int64_t> route)
+  const std::string & name,
+  const std::vector<std::int64_t> & route)
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
@@ -151,8 +146,8 @@ boost::optional<double> EntityManager::getSValueInRoute(
 }
 
 boost::optional<double> EntityManager::getDistanceToStopLine(
-  std::string name,
-  std::int64_t target_stop_line_id)
+  const std::string & name,
+  const std::int64_t target_stop_line_id)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -167,7 +162,8 @@ boost::optional<double> EntityManager::getDistanceToStopLine(
 }
 
 void EntityManager::requestAcquirePosition(
-  std::string name, openscenario_msgs::msg::LaneletPose lanelet_pose)
+  const std::string & name,
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -185,7 +181,7 @@ void EntityManager::requestAcquirePosition(
   }
 }
 
-void EntityManager::requestLaneChange(std::string name, std::int64_t to_lanelet_id)
+void EntityManager::requestLaneChange(const std::string & name, const std::int64_t to_lanelet_id)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -196,7 +192,7 @@ void EntityManager::requestLaneChange(std::string name, std::int64_t to_lanelet_
   }
 }
 
-void EntityManager::requestLaneChange(std::string name, Direction direction)
+void EntityManager::requestLaneChange(const std::string & name, const Direction & direction)
 {
   auto status = getEntityStatus(name);
   if (!status) {
@@ -223,35 +219,33 @@ void EntityManager::requestLaneChange(std::string name, Direction direction)
     return;
   }
 }
+
 boost::optional<double> EntityManager::getLongitudinalDistance(
-  std::string from, std::string to,
-  double max_distance)
+  const std::string & from,
+  const std::string & to,
+  const double max_distance)
 {
   if (!entityStatusSetted(from) || !entityStatusSetted(to)) {
     return boost::none;
-  }
-  auto from_status = getEntityStatus(from);
-  auto to_status = getEntityStatus(to);
-  if (from_status && to_status) {
-    auto dist = hdmap_utils_ptr_->getLongitudinalDistance(
-      from_status->lanelet_pose.lanelet_id,
-      from_status->lanelet_pose.s,
-      to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s);
-    if (!dist) {
-      return boost::none;
+  } else {
+    const auto from_status = getEntityStatus(from);
+    const auto to_status = getEntityStatus(to);
+    if (from_status && to_status) {
+      const auto distance = hdmap_utils_ptr_->getLongitudinalDistance(
+        from_status->lanelet_pose.lanelet_id,
+        from_status->lanelet_pose.s,
+        to_status->lanelet_pose.lanelet_id,
+        to_status->lanelet_pose.s);
+      return (distance && distance <= max_distance) ? distance : boost::none;
     } else {
-      if (dist <= max_distance) {
-        return dist.get();
-      }
       return boost::none;
     }
   }
-  return boost::none;
 }
 
 geometry_msgs::msg::Pose EntityManager::getMapPose(
-  std::string reference_entity_name,
-  geometry_msgs::msg::Pose relative_pose)
+  const std::string & reference_entity_name,
+  const geometry_msgs::msg::Pose & relative_pose)
 {
   const auto ref_status = getEntityStatus(reference_entity_name);
   if (!ref_status) {
@@ -266,10 +260,12 @@ geometry_msgs::msg::Pose EntityManager::getMapPose(
   return ret;
 }
 
-geometry_msgs::msg::Pose EntityManager::getRelativePose(std::string from, std::string to)
+geometry_msgs::msg::Pose EntityManager::getRelativePose(
+  const std::string & from,
+  const std::string & to)
 {
-  auto from_status = getEntityStatus(from);
-  auto to_status = getEntityStatus(to);
+  const auto from_status = getEntityStatus(from);
+  const auto to_status = getEntityStatus(to);
   if (!from_status) {
     throw simulation_api::SimulationRuntimeError(
             "failed to get status of " + from + " entity in getRelativePose");
@@ -278,16 +274,16 @@ geometry_msgs::msg::Pose EntityManager::getRelativePose(std::string from, std::s
     throw simulation_api::SimulationRuntimeError(
             "failed to get status of " + to + " entity in getRelativePose");
   }
-  auto from_pose = from_status->pose;
-  auto to_pose = to_status->pose;
+  const auto from_pose = from_status->pose;
+  const auto to_pose = to_status->pose;
   return getRelativePose(from_pose, to_pose);
 }
 
 geometry_msgs::msg::Pose EntityManager::getRelativePose(
-  std::string from,
-  geometry_msgs::msg::Pose to)
+  const std::string & from,
+  const geometry_msgs::msg::Pose & to)
 {
-  auto from_status = getEntityStatus(from);
+  const auto from_status = getEntityStatus(from);
   if (!from_status) {
     throw simulation_api::SimulationRuntimeError(
             "failed to get status of " + from + " entity in getRelativePose");
@@ -296,10 +292,10 @@ geometry_msgs::msg::Pose EntityManager::getRelativePose(
 }
 
 geometry_msgs::msg::Pose EntityManager::getRelativePose(
-  geometry_msgs::msg::Pose from,
-  std::string to)
+  const geometry_msgs::msg::Pose & from,
+  const std::string & to)
 {
-  auto to_status = getEntityStatus(to);
+  const auto to_status = getEntityStatus(to);
   if (!to_status) {
     throw simulation_api::SimulationRuntimeError(
             "failed to get status of " + to + " entity in getRelativePose");
@@ -308,34 +304,50 @@ geometry_msgs::msg::Pose EntityManager::getRelativePose(
 }
 
 geometry_msgs::msg::Pose EntityManager::getRelativePose(
-  geometry_msgs::msg::Pose from,
-  geometry_msgs::msg::Pose to) const
+  const geometry_msgs::msg::Pose & from,
+  const geometry_msgs::msg::Pose & to) const
 {
   geometry_msgs::msg::Transform from_translation;
-  from_translation.translation.x = from.position.x;
-  from_translation.translation.y = from.position.y;
-  from_translation.translation.z = from.position.z;
-  from_translation.rotation = from.orientation;
+  {
+    from_translation.translation.x = from.position.x;
+    from_translation.translation.y = from.position.y;
+    from_translation.translation.z = from.position.z;
+    from_translation.rotation = from.orientation;
+  }
+
   tf2::Transform from_tf;
-  tf2::fromMsg(from_translation, from_tf);
+  {
+    tf2::fromMsg(from_translation, from_tf);
+  }
+
   geometry_msgs::msg::Transform to_translation;
-  to_translation.translation.x = to.position.x;
-  to_translation.translation.y = to.position.y;
-  to_translation.translation.z = to.position.z;
-  to_translation.rotation = to.orientation;
+  {
+    to_translation.translation.x = to.position.x;
+    to_translation.translation.y = to.position.y;
+    to_translation.translation.z = to.position.z;
+    to_translation.rotation = to.orientation;
+  }
+
   tf2::Transform to_tf;
-  tf2::fromMsg(to_translation, to_tf);
-  tf2::Transform tf_delta;
-  tf_delta = from_tf.inverse() * to_tf;
+  {
+    tf2::fromMsg(to_translation, to_tf);
+  }
+
+  tf2::Transform tf_delta = from_tf.inverse() * to_tf;
+
   geometry_msgs::msg::Pose ret;
-  tf2::toMsg(tf_delta, ret);
+  {
+    tf2::toMsg(tf_delta, ret);
+  }
+
   return ret;
 }
 
 const boost::optional<openscenario_msgs::msg::VehicleParameters>
-EntityManager::getVehicleParameters(std::string name) const
+EntityManager::getVehicleParameters(
+  const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
@@ -348,7 +360,10 @@ EntityManager::getVehicleParameters(std::string name) const
   return boost::none;
 }
 
-bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, double tolerance)
+bool EntityManager::isInLanelet(
+  const std::string & name,
+  const std::int64_t lanelet_id,
+  const double tolerance)
 {
   if (!entityStatusSetted(name)) {
     return false;
@@ -388,17 +403,20 @@ bool EntityManager::isInLanelet(std::string name, std::int64_t lanelet_id, doubl
 
 const std::vector<std::string> EntityManager::getEntityNames() const
 {
-  std::vector<std::string> ret;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    ret.push_back(it->first);
+  std::vector<std::string> names {};
+  for (const auto & each : entities_) {
+    names.push_back(each.first);
   }
-  return ret;
+  return names;
 }
 
-bool EntityManager::setEntityStatus(std::string name, openscenario_msgs::msg::EntityStatus status)
+bool EntityManager::setEntityStatus(
+  const std::string & name,
+  openscenario_msgs::msg::EntityStatus status)
 {
-  auto it = entities_.find(name);
-  status.name = name;
+  status.name = name;  // XXX UGLY CODE
+
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     return false;
   }
@@ -415,10 +433,10 @@ bool EntityManager::setEntityStatus(std::string name, openscenario_msgs::msg::En
 }
 
 const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEntityStatus(
-  std::string name) const
+  const std::string & name) const
 {
-  auto it = entities_.find(name);
   openscenario_msgs::msg::EntityStatus status_msg;
+  auto it = entities_.find(name);
   if (it == entities_.end()) {
     return boost::none;
   }
@@ -449,7 +467,9 @@ const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEn
   return status_msg;
 }
 
-bool EntityManager::checkCollision(std::string name0, std::string name1)
+bool EntityManager::checkCollision(
+  const std::string & name0,
+  const std::string & name1)
 {
   if (name0 == name1) {
     return false;
@@ -476,9 +496,10 @@ bool EntityManager::checkCollision(std::string name0, std::string name1)
   return simulation_api::math::checkCollision2D(status0->pose, bbox0, status1->pose, bbox1);
 }
 
-const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::string name) const
+const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(
+  const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting bounding box : " + name);
@@ -495,9 +516,10 @@ const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(std::str
   throw simulation_api::SimulationRuntimeError("error occurs while getting bounding box : " + name);
 }
 
-boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(std::string name)
+boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
+  const std::string & name)
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting obstacle : " + name);
@@ -514,9 +536,10 @@ boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(std
   throw simulation_api::SimulationRuntimeError("error occurs while getting obstacle : " + name);
 }
 
-openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string name)
+openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(
+  const std::string & name)
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting wayoints : " + name);
@@ -533,9 +556,10 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(std::string n
   throw simulation_api::SimulationRuntimeError("error occurs while getting waypoints : " + name);
 }
 
-boost::optional<double> EntityManager::getLinearJerk(std::string name)
+boost::optional<double> EntityManager::getLinearJerk(
+  const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "entity " + name + " does not exist");
@@ -552,9 +576,10 @@ boost::optional<double> EntityManager::getLinearJerk(std::string name)
   return boost::none;
 }
 
-bool EntityManager::entityStatusSetted(std::string name) const
+bool EntityManager::entityStatusSetted(
+  const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     return false;
   }
@@ -570,9 +595,12 @@ bool EntityManager::entityStatusSetted(std::string name) const
   return false;
 }
 
-void EntityManager::setTargetSpeed(std::string name, double target_speed, bool continuous)
+void EntityManager::setTargetSpeed(
+  const std::string & name,
+  const double target_speed,
+  const bool continuous)
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it->second.type() == typeid(VehicleEntity)) {
     boost::any_cast<VehicleEntity &>(it->second).setTargetSpeed(target_speed, continuous);
   }
@@ -584,7 +612,9 @@ void EntityManager::setTargetSpeed(std::string name, double target_speed, bool c
   }
 }
 
-std::vector<std::int64_t> EntityManager::getRouteLanelets(std::string name, double horizon)
+std::vector<std::int64_t> EntityManager::getRouteLanelets(
+  const std::string & name,
+  const double horizon)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -606,8 +636,8 @@ std::vector<std::int64_t> EntityManager::getRouteLanelets(std::string name, doub
 }
 
 std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
-  std::string name,
-  double horizon)
+  const std::string & name,
+  const double horizon)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -617,17 +647,19 @@ std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
   return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
 }
 
-double EntityManager::getStepTime() const
+double EntityManager::getStepTime() const noexcept
 {
   return step_time_;
 }
 
-double EntityManager::getCurrentTime() const
+double EntityManager::getCurrentTime() const noexcept
 {
   return current_time_;
 }
 
-void EntityManager::update(double current_time, double step_time)
+void EntityManager::update(
+  const double current_time,
+  const double step_time)
 {
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
@@ -732,16 +764,21 @@ void EntityManager::update(double current_time, double step_time)
   }
 }
 
-void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, bool static_transform)
+void EntityManager::broadcastTransform(
+  const geometry_msgs::msg::PoseStamped & pose,
+  const bool static_transform)
 {
   geometry_msgs::msg::TransformStamped transform_stamped;
-  transform_stamped.header.stamp = pose.header.stamp;
-  transform_stamped.header.frame_id = "map";
-  transform_stamped.child_frame_id = pose.header.frame_id;
-  transform_stamped.transform.translation.x = pose.pose.position.x;
-  transform_stamped.transform.translation.y = pose.pose.position.y;
-  transform_stamped.transform.translation.z = pose.pose.position.z;
-  transform_stamped.transform.rotation = pose.pose.orientation;
+  {
+    transform_stamped.header.stamp = pose.header.stamp;
+    transform_stamped.header.frame_id = "map";
+    transform_stamped.child_frame_id = pose.header.frame_id;
+    transform_stamped.transform.translation.x = pose.pose.position.x;
+    transform_stamped.transform.translation.y = pose.pose.position.y;
+    transform_stamped.transform.translation.z = pose.pose.position.z;
+    transform_stamped.transform.rotation = pose.pose.orientation;
+  }
+
   if (static_transform) {
     broadcaster_.sendTransform(transform_stamped);
   } else {
@@ -750,36 +787,51 @@ void EntityManager::broadcastTransform(geometry_msgs::msg::PoseStamped pose, boo
 }
 
 bool EntityManager::reachPosition(
-  std::string name, std::string target_name, double tolerance) const
+  const std::string & name,
+  const std::string & target_name,
+  const double tolerance) const
 {
-  auto status = getEntityStatus(target_name);
+  const auto status = getEntityStatus(target_name);
   return status && reachPosition(name, status->pose, tolerance);
 }
 
 bool EntityManager::reachPosition(
-  std::string name, geometry_msgs::msg::Pose target_pose, double tolerance) const
+  const std::string & name,
+  const geometry_msgs::msg::Pose & target_pose,
+  const double tolerance) const
 {
-  auto status = getEntityStatus(name);
+  const auto status = getEntityStatus(name);
   if (!status) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting entity stauts, target entity : " + name);
   }
-  auto pose = status->pose;
-  double dist = std::sqrt(
+
+  const auto pose = status->pose;
+
+  const double distance = std::sqrt(
     std::pow(pose.position.x - target_pose.position.x, 2) +
     std::pow(pose.position.y - target_pose.position.y, 2) +
     std::pow(pose.position.z - target_pose.position.z, 2));
-  return dist < tolerance;
+
+  return distance < tolerance;
 }
 
 bool EntityManager::reachPosition(
-  std::string name, std::int64_t lanelet_id, double s, double offset, double tolerance) const
+  const std::string & name,
+  const std::int64_t lanelet_id,
+  const double s,
+  const double offset,
+  const double tolerance) const
 {
   openscenario_msgs::msg::LaneletPose lanelet_pose;
-  lanelet_pose.lanelet_id = lanelet_id;
-  lanelet_pose.s = s;
-  lanelet_pose.offset = offset;
-  auto target_pose = hdmap_utils_ptr_->toMapPose(lanelet_pose);
+  {
+    lanelet_pose.lanelet_id = lanelet_id;
+    lanelet_pose.s = s;
+    lanelet_pose.offset = offset;
+  }
+
+  const auto target_pose = hdmap_utils_ptr_->toMapPose(lanelet_pose);
+
   return reachPosition(name, target_pose.pose, tolerance);
 }
 
@@ -818,9 +870,10 @@ void EntityManager::broadcastEntityTransform()
   // broadcastBaseLinkTransform();
 }
 
-const boost::optional<double> EntityManager::getStandStillDuration(std::string name) const
+const boost::optional<double> EntityManager::getStandStillDuration(
+  const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it->second.type() == typeid(VehicleEntity)) {
     return boost::any_cast<const VehicleEntity &>(it->second).getStandStillDuration();
   }
@@ -833,9 +886,9 @@ const boost::optional<double> EntityManager::getStandStillDuration(std::string n
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }
 
-const std::string EntityManager::getCurrentAction(std::string name) const
+const std::string EntityManager::getCurrentAction(const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it->second.type() == typeid(VehicleEntity)) {
     return boost::any_cast<const VehicleEntity &>(it->second).getCurrentAction();
   }
@@ -848,9 +901,9 @@ const std::string EntityManager::getCurrentAction(std::string name) const
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }
 
-openscenario_msgs::msg::EntityType EntityManager::getEntityType(std::string name) const
+openscenario_msgs::msg::EntityType EntityManager::getEntityType(const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it->second.type() == typeid(VehicleEntity)) {
     openscenario_msgs::msg::EntityType type;
     type.type = openscenario_msgs::msg::EntityType::VEHICLE;
@@ -869,8 +922,10 @@ openscenario_msgs::msg::EntityType EntityManager::getEntityType(std::string name
   throw simulation_api::SimulationRuntimeError("entity " + name + "does not exist");
 }
 
-const std::unordered_map<std::string,
-  openscenario_msgs::msg::EntityType> EntityManager::getEntityTypeList() const
+const std::unordered_map<
+  std::string,
+  openscenario_msgs::msg::EntityType>
+EntityManager::getEntityTypeList() const
 {
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> ret;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {

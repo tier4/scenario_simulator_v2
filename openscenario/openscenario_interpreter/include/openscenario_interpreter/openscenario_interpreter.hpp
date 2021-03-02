@@ -98,7 +98,7 @@ class Interpreter
   }
 
   template<typename Thunk>
-  void guard(Thunk && thunk) try
+  void withExceptionHandler(Thunk && thunk) try
   {
     return thunk();
   } catch (const int command) {
