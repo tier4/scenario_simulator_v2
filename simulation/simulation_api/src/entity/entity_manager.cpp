@@ -53,12 +53,6 @@ void EntityManager::setDriverModel(
   }
 }
 
-// const boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::toLaneletPose(
-//   geometry_msgs::msg::Pose pose) const
-// {
-//   return hdmap_utils_ptr_->toLaneletPose(pose);
-// }
-
 const geometry_msgs::msg::Pose EntityManager::toMapPose(
   const openscenario_msgs::msg::LaneletPose lanelet_pose) const
 {
@@ -222,29 +216,26 @@ void EntityManager::requestLaneChange(std::string name, Direction direction)
   }
 }
 boost::optional<double> EntityManager::getLongitudinalDistance(
-  std::string from, std::string to,
-  double max_distance)
+  const std::string & from,
+  const std::string & to,
+  const double max_distance)
 {
   if (!entityStatusSetted(from) || !entityStatusSetted(to)) {
     return boost::none;
-  }
-  auto from_status = getEntityStatus(from);
-  auto to_status = getEntityStatus(to);
-  if (from_status && to_status) {
-    auto dist = hdmap_utils_ptr_->getLongitudinalDistance(
-      from_status->lanelet_pose.lanelet_id,
-      from_status->lanelet_pose.s,
-      to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s);
-    if (!dist) {
-      return boost::none;
+  } else {
+    const auto from_status = getEntityStatus(from);
+    const auto to_status = getEntityStatus(to);
+    if (from_status && to_status) {
+      const auto distance = hdmap_utils_ptr_->getLongitudinalDistance(
+        from_status->lanelet_pose.lanelet_id,
+        from_status->lanelet_pose.s,
+        to_status->lanelet_pose.lanelet_id,
+        to_status->lanelet_pose.s);
+      return (distance && distance <= max_distance) ? distance : boost::none;
     } else {
-      if (dist <= max_distance) {
-        return dist.get();
-      }
       return boost::none;
     }
   }
-  return boost::none;
 }
 
 geometry_msgs::msg::Pose EntityManager::getMapPose(
