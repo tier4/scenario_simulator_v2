@@ -25,9 +25,11 @@ void callback(
   const simulation_api_schema::InitializeRequest & req,
   simulation_api_schema::InitializeResponse & res)
 {
-  std::cout << __LINE__ << "," << __FILE__ << std::endl;
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   req.PrintDebugString();
-  std::cout << __LINE__ << "," << __FILE__ << std::endl;
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  res = simulation_api_schema::InitializeResponse();
+  res.mutable_result()->set_success(true);
 }
 
 class ExampleNode : public rclcpp::Node
@@ -39,16 +41,17 @@ public:
     client_("tcp://localhost:5555")
   {
     using namespace std::chrono_literals;
-    update_timer_ = this->create_wall_timer(50ms, std::bind(&ExampleNode::sendRequest, this));
+    update_timer_ = this->create_wall_timer(250ms, std::bind(&ExampleNode::sendRequest, this));
   }
   void sendRequest()
   {
     simulation_api_schema::InitializeRequest request;
+    request.set_realtime_factor(1.0);
+    request.set_step_time(0.1);
     simulation_api_schema::InitializeResponse response;
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     client_.call(request, response);
-    std::cout << __LINE__ << "," << __FILE__ << std::endl;
-    request.PrintDebugString();
-    std::cout << __LINE__ << "," << __FILE__ << std::endl;
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
   }
 
 private:
@@ -67,6 +70,7 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   auto component = std::make_shared<ExampleNode>(options);
+  component->sendRequest();
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

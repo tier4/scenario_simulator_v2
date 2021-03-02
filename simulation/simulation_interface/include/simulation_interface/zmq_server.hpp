@@ -33,7 +33,8 @@ public:
   : endpoint_(endpoint),
     context_(zmqpp::context()),
     type_(zmqpp::socket_type::reply),
-    socket_(context_, type_)
+    socket_(context_, type_),
+    func_(func)
   {
     using namespace std::chrono_literals;
     socket_.bind(endpoint_);

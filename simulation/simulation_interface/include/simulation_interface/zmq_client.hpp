@@ -30,7 +30,7 @@ public:
   explicit Client(const std::string & endpoint)
   : endpoint_(endpoint),
     context_(zmqpp::context()),
-    type_(zmqpp::socket_type::reply),
+    type_(zmqpp::socket_type::request),
     socket_(context_, type_)
   {
     using namespace std::chrono_literals;
@@ -41,6 +41,12 @@ public:
     std::string request_string;
     req.SerializeToString(&request_string);
     zmqpp::message message;
+    message << request_string;
+    socket_.send(message);
+    zmqpp::message buffer;
+    socket_.receive(buffer);
+    std::string recieved_string = buffer.get(0);
+    res.ParseFromString(request_string);
   }
 
 private:
