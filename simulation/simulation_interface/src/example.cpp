@@ -30,6 +30,9 @@ void callback(
   std::cout << __FILE__ << "," << __LINE__ << std::endl;
   res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
+  res.PrintDebugString();
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
 }
 
 class ExampleNode : public rclcpp::Node
@@ -51,6 +54,8 @@ public:
     simulation_api_schema::InitializeResponse response;
     std::cout << __FILE__ << "," << __LINE__ << std::endl;
     client_.call(request, response);
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    response.PrintDebugString();
     std::cout << __FILE__ << "," << __LINE__ << std::endl;
   }
 
