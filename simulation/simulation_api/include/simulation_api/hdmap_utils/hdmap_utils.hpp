@@ -72,15 +72,14 @@ public:
     std::int64_t lanelet_id,
     std::vector<double> s);
   boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(geometry_msgs::msg::Pose pose);
+
   geometry_msgs::msg::PoseStamped toMapPose(
-    std::int64_t lanelet_id, double s,
-    double offset,
-    geometry_msgs::msg::Quaternion quat);
+    std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
   geometry_msgs::msg::PoseStamped toMapPose(
     openscenario_msgs::msg::LaneletPose lanlet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(
-    std::int64_t lanelet_id, double s,
-    double offset);
+    std::int64_t lanelet_id, double s, double offset);
+
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(

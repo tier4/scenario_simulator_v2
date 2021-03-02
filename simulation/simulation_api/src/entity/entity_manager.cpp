@@ -34,7 +34,9 @@ bool EntityManager::isStopping(std::string name) const
   return std::fabs(status->action_status.twist.linear.x) < std::numeric_limits<double>::epsilon();
 }
 
-void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::DriverModel model)
+void EntityManager::setDriverModel(
+  const std::string & name,
+  const openscenario_msgs::msg::DriverModel & model)
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
@@ -51,11 +53,11 @@ void EntityManager::setDriverModel(std::string name, openscenario_msgs::msg::Dri
   }
 }
 
-const boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::toLaneletPose(
-  geometry_msgs::msg::Pose pose) const
-{
-  return hdmap_utils_ptr_->toLaneletPose(pose);
-}
+// const boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::toLaneletPose(
+//   geometry_msgs::msg::Pose pose) const
+// {
+//   return hdmap_utils_ptr_->toLaneletPose(pose);
+// }
 
 const geometry_msgs::msg::Pose EntityManager::toMapPose(
   const openscenario_msgs::msg::LaneletPose lanelet_pose) const
@@ -84,7 +86,7 @@ bool EntityManager::isEgo(std::string name) const
   return getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO;
 }
 
-int EntityManager::getNumberOfEgo() const
+std::size_t EntityManager::getNumberOfEgo() const
 {
   return std::count_if(
     std::begin(entities_), std::end(entities_),
@@ -613,12 +615,12 @@ std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
   return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
 }
 
-double EntityManager::getStepTime() const
+double EntityManager::getStepTime() const noexcept
 {
   return step_time_;
 }
 
-double EntityManager::getCurrentTime() const
+double EntityManager::getCurrentTime() const noexcept
 {
   return current_time_;
 }
