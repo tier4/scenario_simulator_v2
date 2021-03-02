@@ -33,7 +33,6 @@ public:
     type_(zmqpp::socket_type::request),
     socket_(context_, type_)
   {
-    using namespace std::chrono_literals;
     socket_.connect(endpoint_);
   }
   void call(const ReqType & req, ResType & res)
