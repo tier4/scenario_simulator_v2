@@ -13,13 +13,14 @@
 // limitations under the License.
 
 #include <simulation_api/entity/entity_manager.hpp>
-#include <simulation_api/math/collision.hpp>
 #include <simulation_api/helper/helper.hpp>
+#include <simulation_api/math/collision.hpp>
 
-#include <vector>
-#include <string>
 #include <limits>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace simulation_api
 {
@@ -63,15 +64,15 @@ const geometry_msgs::msg::Pose EntityManager::toMapPose(
 void EntityManager::setVerbose(bool verbose)
 {
   verbose_ = verbose;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (it->second.type() == typeid(VehicleEntity)) {
-      boost::any_cast<VehicleEntity &>(it->second).setVerbose(verbose);
+  for (auto & each : entities_) {
+    if (each.second.type() == typeid(VehicleEntity)) {
+      boost::any_cast<VehicleEntity &>(each.second).setVerbose(verbose);
     }
-    if (it->second.type() == typeid(EgoEntity)) {
-      boost::any_cast<EgoEntity &>(it->second).setVerbose(verbose);
+    if (each.second.type() == typeid(EgoEntity)) {
+      boost::any_cast<EgoEntity &>(each.second).setVerbose(verbose);
     }
-    if (it->second.type() == typeid(PedestrianEntity)) {
-      boost::any_cast<PedestrianEntity &>(it->second).setVerbose(verbose);
+    if (each.second.type() == typeid(PedestrianEntity)) {
+      boost::any_cast<PedestrianEntity &>(each.second).setVerbose(verbose);
     }
   }
 }
@@ -402,11 +403,11 @@ bool EntityManager::isInLanelet(
 
 const std::vector<std::string> EntityManager::getEntityNames() const
 {
-  std::vector<std::string> ret;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    ret.push_back(it->first);
+  std::vector<std::string> names {};
+  for (const auto & each : entities_) {
+    names.push_back(each.first);
   }
-  return ret;
+  return names;
 }
 
 bool EntityManager::setEntityStatus(
@@ -498,7 +499,7 @@ bool EntityManager::checkCollision(
 const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(
   const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting bounding box : " + name);
@@ -518,7 +519,7 @@ const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(
 boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
   const std::string & name)
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting obstacle : " + name);
@@ -538,7 +539,7 @@ boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
 openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(
   const std::string & name)
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "error occurs while getting wayoints : " + name);
@@ -555,9 +556,10 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(
   throw simulation_api::SimulationRuntimeError("error occurs while getting waypoints : " + name);
 }
 
-boost::optional<double> EntityManager::getLinearJerk(std::string name)
+boost::optional<double> EntityManager::getLinearJerk(
+  const std::string & name) const
 {
-  auto it = entities_.find(name);
+  const auto it = entities_.find(name);
   if (it == entities_.end()) {
     throw simulation_api::SimulationRuntimeError(
             "entity " + name + " does not exist");

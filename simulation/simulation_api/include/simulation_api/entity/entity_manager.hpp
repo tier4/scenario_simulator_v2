@@ -204,7 +204,8 @@ public:
     lanelet_marker_pub_ptr_->publish(markers);
   }
 
-  boost::optional<double> getLinearJerk(std::string name);
+  boost::optional<double> getLinearJerk(
+    const std::string & name) const;
 
   double getStepTime() const noexcept;
   double getCurrentTime() const noexcept;
