@@ -36,7 +36,6 @@ public:
     socket_(context_, type_),
     func_(func)
   {
-    using namespace std::chrono_literals;
     socket_.bind(endpoint_);
     poller_.add(socket_);
     thread_ = std::thread(&Server::poll, this);
@@ -56,8 +55,7 @@ private:
         ResType res_proto;
         func_(req_proto, res_proto);
         std::string res_serialized_str;
-        if(!res_proto.SerializeToString(&res_serialized_str))
-        {
+        if (!res_proto.SerializeToString(&res_serialized_str)) {
           throw std::runtime_error("failed to serialize from proto");
         }
         zmqpp::message response;

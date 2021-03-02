@@ -20,6 +20,7 @@
 #include <simulation_api_schema.pb.h>
 #include <string>
 #include <chrono>
+#include <memory>
 
 void callback(
   const simulation_api_schema::InitializeRequest & req,
@@ -50,12 +51,9 @@ public:
     request.set_step_time(0.1);
     simulation_api_schema::InitializeResponse response;
     client_.call(request, response);
-    if(response.result().success())
-    {
+    if (response.result().success()) {
       std::cout << "success" << std::endl;
-    }
-    else
-    {
+    } else {
       std::cout << "fail" << std::endl;
     }
     response.PrintDebugString();
@@ -69,7 +67,6 @@ private:
   zeromq::Client<
     simulation_api_schema::InitializeRequest,
     simulation_api_schema::InitializeResponse> client_;
-
 };
 
 int main(int argc, char * argv[])
