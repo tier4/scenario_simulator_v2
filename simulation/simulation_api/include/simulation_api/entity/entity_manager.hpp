@@ -77,11 +77,14 @@ class EntityManager
 private:
   bool verbose_;
 
-  std::unordered_map<std::string, boost::any> entities_;
+  tf2_ros::StaticTransformBroadcaster broadcaster_;
+  tf2_ros::TransformBroadcaster base_link_broadcaster_;
 
   rclcpp::Clock::SharedPtr clock_ptr_;
 
-  rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
+  std::unordered_map<std::string, boost::any> entities_;
+
+  // rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
 
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
@@ -89,21 +92,19 @@ private:
   double step_time_;
   double current_time_;
 
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-  std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
-
-  tf2_ros::StaticTransformBroadcaster broadcaster_;
-  tf2_ros::TransformBroadcaster base_link_broadcaster_;
+  using EntityStatusWithTrajectoryArray = openscenario_msgs::msg::EntityStatusWithTrajectoryArray;
+  rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
 
   using MarkerArray = visualization_msgs::msg::MarkerArray;
   rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
   MarkerArray markers_raw_;
 
-  using EntityStatusWithTrajectoryArray = openscenario_msgs::msg::EntityStatusWithTrajectoryArray;
-  rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
-
   using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
   rclcpp::Publisher<VehicleKinematicState>::SharedPtr kinematic_state_pub_ptr_;
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+
+  std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
 
   std::size_t getNumberOfEgo() const;
 
@@ -147,9 +148,14 @@ public:
 public:
   template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path)
-  : broadcaster_(node),
+  : verbose_(false),
+    broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
+    entity_status_array_pub_ptr_(
+      rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
+        node, "entity/status", EntityMarkerQoS(),
+        rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     lanelet_marker_pub_ptr_(
       rclcpp::create_publisher<MarkerArray>(
         node, "lanelet/marker", LaneletMarkerQoS(),
@@ -157,10 +163,6 @@ public:
     kinematic_state_pub_ptr_(
       rclcpp::create_publisher<VehicleKinematicState>(
         node, "output/kinematic_state", LaneletMarkerQoS(),
-        rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    entity_status_array_pub_ptr_(
-      rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
-        node, "entity/status", EntityMarkerQoS(),
         rclcpp::PublisherOptionsWithAllocator<AllocatorT>()))
   {
     geographic_msgs::msg::GeoPoint origin;
