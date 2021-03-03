@@ -92,7 +92,19 @@ public:
     despawn_entity_client_(
       simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::LOCLHOST,
-      simulation_interface::ports::despawn_entity)
+      simulation_interface::ports::despawn_entity),
+    update_entity_status_client_(
+      simulation_interface::TransportProtocol::TCP,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::update_entity_status),
+    attach_lidar_sensor_client_(
+      simulation_interface::TransportProtocol::TCP,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::attach_lidar_sensor),
+    attach_detection_sensor_client_(
+      simulation_interface::TransportProtocol::TCP,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::attach_detection_sensor)
   {
     static const std::string address = "127.0.0.1";
     // client_ptr_ = std::make_shared<XmlRpc::XmlRpcClient>(address.c_str(), port);
@@ -290,6 +302,12 @@ private:
     simulation_api_schema::SpawnPedestrianEntityResponse> spawn_pedestrian_entity_client_;
   zeromq::Client<simulation_api_schema::DespawnEntityRequest,
     simulation_api_schema::DespawnEntityResponse> despawn_entity_client_;
+  zeromq::Client<simulation_api_schema::UpdateEntityStatusRequest,
+    simulation_api_schema::UpdateEntityStatusResponse> update_entity_status_client_;
+  zeromq::Client<simulation_api_schema::AttachLidarSensorRequest,
+    simulation_api_schema::AttachLidarSensorResponse> attach_lidar_sensor_client_;
+  zeromq::Client<simulation_api_schema::AttachDetectionSensorRequest,
+    simulation_api_schema::AttachDetectionSensorResponse> attach_detection_sensor_client_;
 };
 }  // namespace scenario_simulator
 
