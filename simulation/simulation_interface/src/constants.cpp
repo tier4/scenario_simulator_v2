@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_interface/constants.hpp>
+#include <string>
 
 namespace simulation_interface
 {
