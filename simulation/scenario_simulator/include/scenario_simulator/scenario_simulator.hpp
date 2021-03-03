@@ -95,10 +95,25 @@ private:
   void initialize(
     const simulation_api_schema::InitializeRequest & req,
     simulation_api_schema::InitializeResponse & res);
+  zeromq::Server<
+    simulation_api_schema::UpdateFrameRequest,
+    simulation_api_schema::UpdateFrameResponse> update_frame_server_;
+  void updateFrame(
+    const simulation_api_schema::UpdateFrameRequest & req,
+    simulation_api_schema::UpdateFrameResponse & res);
+  zeromq::Server<
+    simulation_api_schema::UpdateEntityStatusRequest,
+    simulation_api_schema::UpdateEntityStatusResponse> update_entity_status_server_;
+  void updateEntityStatus(
+    const simulation_api_schema::UpdateEntityStatusRequest & req,
+    simulation_api_schema::UpdateEntityStatusResponse & res);
+  zeromq::Server<
+    simulation_api_schema::SpawnVehicleEntityRequest,
+    simulation_api_schema::SpawnVehicleEntityResponse> spawn_vehicle_entity_server_;
+  void spawnVehicleEntity(
+    const simulation_api_schema::SpawnVehicleEntityRequest & req,
+    simulation_api_schema::SpawnVehicleEntityResponse & res);
   /*
-  std::map<std::string, std::shared_ptr<scenario_simulator::XmlRpcMethod>> methods_;
-  void updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void spawnVehicleEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void spawnPedestrianEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);

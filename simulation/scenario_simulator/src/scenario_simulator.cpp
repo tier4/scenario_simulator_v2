@@ -38,7 +38,22 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
   initialize_server_(simulation_interface::TransportProtocol::TCP,
     simulation_interface::HostName::ANY,
     simulation_interface::ports::initialize,
-    std::bind(&ScenarioSimulator::initialize, this, 
+    std::bind(&ScenarioSimulator::initialize, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  update_frame_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::update_frame,
+    std::bind(&ScenarioSimulator::updateFrame, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  update_entity_status_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::update_entity_status,
+    std::bind(&ScenarioSimulator::updateEntityStatus, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  spawn_vehicle_entity_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::spawn_vehicle_entity,
+    std::bind(&ScenarioSimulator::spawnVehicleEntity, this,
     std::placeholders::_1, std::placeholders::_2))
 {
   declare_parameter("port", 8080);
@@ -64,49 +79,38 @@ void ScenarioSimulator::initialize(
   pedestrians_ = {};
 }
 
-/*
-void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulator::updateFrame(
+  const simulation_api_schema::UpdateFrameRequest & req,
+  simulation_api_schema::UpdateFrameResponse & res)
 {
+  res = simulation_api_schema::UpdateFrameResponse();
   if (!initialized_) {
-    simulation_api_schema::UpdateFrameResponse res;
     res.mutable_result()->set_description("simulator have not initialized yet.");
     res.mutable_result()->set_success(false);
-    result = XmlRpc::XmlRpcValue();
-    result[0] = simulation_interface::serializeToBinValue(res);
     return;
   }
-  const auto req =
-    simulation_interface::deserializeFromBinValue<simulation_api_schema::UpdateFrameRequest>(param);
-  simulation_api_schema::UpdateFrameResponse res;
   current_time_ = req.current_time();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::updateEntityStatus(
-  XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
+  const simulation_api_schema::UpdateEntityStatusRequest & req,
+  simulation_api_schema::UpdateEntityStatusResponse & res)
 {
-  const auto req =
-    simulation_interface::deserializeFromBinValue<simulation_api_schema::UpdateEntityStatusRequest>(
-    param);
   entity_status_ = {};
-  simulation_api_schema::UpdateEntityStatusResponse res;
-  result = XmlRpc::XmlRpcValue();
+  for (const auto proto : req.status()) {
+    entity_status_.emplace_back(proto);
+  }
+  res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::spawnVehicleEntity(
-  XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
+  const simulation_api_schema::SpawnVehicleEntityRequest & req,
+  simulation_api_schema::SpawnVehicleEntityResponse & res)
 {
-  const auto req =
-    simulation_interface::deserializeFromBinValue<simulation_api_schema::SpawnVehicleEntityRequest>(
-    param);
   if (ego_vehicles_.size() != 0 && req.is_ego()) {
     throw SimulationRuntimeError("multi ego does not support");
   }
@@ -115,13 +119,12 @@ void ScenarioSimulator::spawnVehicleEntity(
   } else {
     vehicles_.emplace_back(req.parameters());
   }
-  simulation_api_schema::SpawnVehicleEntityResponse res;
+  res = simulation_api_schema::SpawnVehicleEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
+/*
 void ScenarioSimulator::spawnPedestrianEntity(
   XmlRpc::XmlRpcValue & param,
   XmlRpc::XmlRpcValue & result)
