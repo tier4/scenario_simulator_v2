@@ -137,10 +137,12 @@ private:
   void attachLidarSensor(
     const simulation_api_schema::AttachLidarSensorRequest & req,
     simulation_api_schema::AttachLidarSensorResponse & res);
-  // void updateSensorFrame()
-  /*
-  void updateSensorFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  */
+  zeromq::Server<
+    simulation_api_schema::UpdateSensorFrameRequest,
+    simulation_api_schema::UpdateSensorFrameResponse> update_sensor_frame_server_;
+  void updateSensorFrame(
+    const simulation_api_schema::UpdateSensorFrameRequest & req,
+    simulation_api_schema::UpdateSensorFrameResponse & res);
   std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
   std::vector<openscenario_msgs::VehicleParameters> vehicles_;
   std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;

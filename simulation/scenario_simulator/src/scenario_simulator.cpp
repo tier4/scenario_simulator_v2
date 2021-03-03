@@ -74,6 +74,11 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     simulation_interface::HostName::ANY,
     simulation_interface::ports::attach_lidar_sensor,
     std::bind(&ScenarioSimulator::attachLidarSensor, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  update_sensor_frame_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::update_sensor_frame,
+    std::bind(&ScenarioSimulator::updateSensorFrame, this,
     std::placeholders::_1, std::placeholders::_2))
 {
   declare_parameter("port", 8080);
@@ -206,16 +211,20 @@ void ScenarioSimulator::attachLidarSensor(
   res.mutable_result()->set_success(true);
 }
 
-/*
-void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
+
+void ScenarioSimulator::updateSensorFrame(
+  const simulation_api_schema::UpdateSensorFrameRequest & req,
+  simulation_api_schema::UpdateSensorFrameResponse & res)
 {
+  constexpr double e = std::numeric_limits<double>::epsilon();
+  if (std::abs(req.current_time() - current_time_) > e) {
+    res.mutable_result()->set_success(false);
+    res.mutable_result()->set_description("timestamp does not match");
+  }
   sensor_sim_.updateSensorFrame(current_time_, entity_status_);
-  simulation_api_schema::UpdateSensorFrameResponse res;
+  res = simulation_api_schema::UpdateSensorFrameResponse();
   res.mutable_result()->set_success(true);
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
-*/
 }  // namespace scenario_simulator
 
 RCLCPP_COMPONENTS_REGISTER_NODE(scenario_simulator::ScenarioSimulator)
