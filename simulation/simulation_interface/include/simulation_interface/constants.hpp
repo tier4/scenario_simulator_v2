@@ -35,6 +35,19 @@ enum class HostName
 
 std::string enumToString(const HostName & hostname);
 
+namespace ports
+{
+const unsigned int initialize = 5555;
+const unsigned int update_frame = 5556;
+const unsigned int update_sensor_frame = 5557;
+const unsigned int spawn_vehicle_entity = 5558;
+const unsigned int spawn_pedestrian_entity = 5559;
+const unsigned int despawn_entity = 5560;
+const unsigned int update_entity_status = 5561;
+const unsigned int attach_lidar_sensor = 5562;
+const unsigned int attach_detection_sensor = 5563;
+}
+
 namespace key
 {
 const char success[] = "success";
