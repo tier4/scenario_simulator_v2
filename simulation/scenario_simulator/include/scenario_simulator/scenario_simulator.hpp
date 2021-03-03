@@ -15,15 +15,14 @@
 #ifndef SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 #define SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 
-#include <scenario_simulator/xmlrpc_method.hpp>
-
 #include <scenario_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 
+#include <simulation_interface/zmq_server.hpp>
+
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <xmlrpcpp/XmlRpc.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -88,8 +87,15 @@ public:
   ~ScenarioSimulator();
 
 private:
-  XmlRpc::XmlRpcServer server_;
+  SensorSimulation sensor_sim_;
   int port_;
+  zeromq::Server<
+    simulation_api_schema::InitializeRequest,
+    simulation_api_schema::InitializeResponse> initialize_server_;
+  void initialize(
+    const simulation_api_schema::InitializeRequest & req,
+    simulation_api_schema::InitializeResponse & res);
+  /*
   std::map<std::string, std::shared_ptr<scenario_simulator::XmlRpcMethod>> methods_;
   void updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
@@ -104,7 +110,7 @@ private:
     std::string name, std::function<void(XmlRpc::XmlRpcValue &,
     XmlRpc::XmlRpcValue &)> func);
   void runXmlRpc();
-  std::thread xmlrpc_thread_;
+  */
   std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
   std::vector<openscenario_msgs::VehicleParameters> vehicles_;
   std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;
@@ -113,7 +119,6 @@ private:
   double current_time_;
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
-  SensorSimulation sensor_sim_;
 };
 }  // namespace scenario_simulator
 

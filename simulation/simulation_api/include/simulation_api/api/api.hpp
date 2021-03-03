@@ -25,9 +25,6 @@
 #include <simulation_api/metrics/metrics_manager.hpp>
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api_schema.pb.h>
-#include <xmlrpcpp/XmlRpcClient.h>
-#include <xmlrpcpp/XmlRpcException.h>
-#include <xmlrpcpp/XmlRpcValue.h>
 
 #include <memory>
 #include <string>

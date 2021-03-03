@@ -15,7 +15,6 @@
 #ifndef SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_
 #define SIMULATION_INTERFACE__XMLRPC_CLIENT_HPP_
 
-#include <xmlrpcpp/XmlRpc.h>
 #include <simulation_interface/conversions.hpp>
 
 #include <string>

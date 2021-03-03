@@ -47,29 +47,6 @@ const unsigned int update_entity_status = 5561;
 const unsigned int attach_lidar_sensor = 5562;
 const unsigned int attach_detection_sensor = 5563;
 }  // namespace ports
-
-namespace key
-{
-const char success[] = "success";
-const char description[] = "description";
-const char realtime_factor[] = "realtime_factor";
-const char step_time[] = "step_time";
-const char current_time[] = "current_time";
-const char method_name[] = "methodName";
-}  // namespace key
-
-namespace method
-{
-const char initialize[] = "initialize";
-const char update_frame[] = "update_frame";
-const char update_sensor_frame[] = "update_sensor_frame";
-const char spawn_vehicle_entity[] = "spawn_vehicle_entity";
-const char spawn_pedestrian_entity[] = "spawn_pedestrian_entity";
-const char despawn_entity[] = "despawn_entity";
-const char update_entity_status[] = "update_entity_status";
-const char attach_lidar_sensor[] = "attach_lidar_sensor";
-const char attach_detection_sensor[] = "attach_detection_sensor";
-}  // namespace method
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONSTANTS_HPP_

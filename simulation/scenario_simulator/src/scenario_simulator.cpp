@@ -34,118 +34,37 @@
 namespace scenario_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
-: Node("scenario_simulator", options), sensor_sim_(get_clock())
+: Node("scenario_simulator", options), sensor_sim_(get_clock()),
+  initialize_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::initialize,
+    std::bind(&ScenarioSimulator::initialize, this, 
+    std::placeholders::_1, std::placeholders::_2))
 {
   declare_parameter("port", 8080);
   get_parameter("port", port_);
-
-  addMethod(
-    simulation_interface::method::initialize,
-    std::bind(
-      &ScenarioSimulator::initialize,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::update_frame,
-    std::bind(
-      &ScenarioSimulator::updateFrame,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::spawn_vehicle_entity,
-    std::bind(
-      &ScenarioSimulator::spawnVehicleEntity,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::spawn_pedestrian_entity,
-    std::bind(
-      &ScenarioSimulator::spawnPedestrianEntity,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::despawn_entity,
-    std::bind(
-      &ScenarioSimulator::despawnEntity,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::update_entity_status,
-    std::bind(
-      &ScenarioSimulator::updateEntityStatus,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::attach_lidar_sensor,
-    std::bind(
-      &ScenarioSimulator::attachLidarSensor,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::attach_detection_sensor,
-    std::bind(
-      &ScenarioSimulator::attachDetectionSensor,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  addMethod(
-    simulation_interface::method::update_sensor_frame,
-    std::bind(
-      &ScenarioSimulator::updateSensorFrame,
-      this,
-      std::placeholders::_1,
-      std::placeholders::_2));
-
-  server_.bindAndListen(port_);
-  server_.enableIntrospection(true);
-  // XmlRpc::setVerbosity(5);
-  xmlrpc_thread_ = std::thread(&ScenarioSimulator::runXmlRpc, this);
 }
 
 ScenarioSimulator::~ScenarioSimulator()
 {
-  xmlrpc_thread_.join();
 }
 
-void ScenarioSimulator::runXmlRpc()
-{
-  while (rclcpp::ok()) {
-    server_.work(1000);
-  }
-}
-
-void ScenarioSimulator::initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulator::initialize(
+  const simulation_api_schema::InitializeRequest & req,
+  simulation_api_schema::InitializeResponse & res)
 {
   initialized_ = true;
-  const auto req =
-    simulation_interface::deserializeFromBinValue<simulation_api_schema::InitializeRequest>(param);
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
-  simulation_api_schema::InitializeResponse res;
+  res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
+/*
 void ScenarioSimulator::updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
 {
   if (!initialized_) {
@@ -303,6 +222,7 @@ void ScenarioSimulator::addMethod(
   method_ptr->setFunction(func);
   methods_[name] = method_ptr;
 }
+*/
 }  // namespace scenario_simulator
 
 RCLCPP_COMPONENTS_REGISTER_NODE(scenario_simulator::ScenarioSimulator)

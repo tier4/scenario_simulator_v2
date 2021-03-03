@@ -15,7 +15,6 @@
 #ifndef SCENARIO_SIMULATOR__EXCEPTION_HPP_
 #define SCENARIO_SIMULATOR__EXCEPTION_HPP_
 
-#include <xmlrpcpp/XmlRpcValue.h>
 #include <stdexcept>
 
 namespace scenario_simulator
@@ -23,8 +22,6 @@ namespace scenario_simulator
 class SimulationRuntimeError : public std::runtime_error
 {
 public:
-  explicit SimulationRuntimeError(XmlRpc::XmlRpcValue value)
-  : runtime_error(value["message"]) {}
   explicit SimulationRuntimeError(const char * message)
   : runtime_error(message) {}
 

@@ -31,7 +31,6 @@ include_directories(
 )
 
 ament_auto_add_library(scenario_simulator_component SHARED
-  src/xmlrpc_method.cpp
   src/scenario_simulator.cpp
   src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/primitives/box.cpp
@@ -42,6 +41,10 @@ ament_auto_add_library(scenario_simulator_component SHARED
 )
 target_link_libraries(scenario_simulator_component
   embree3
+  pthread
+  sodium
+  zmqpp
+  zmq
 )
 ament_target_dependencies(scenario_simulator_component
   simulation_interface

@@ -64,6 +64,7 @@ install(TARGETS
 )
 
 install(TARGETS simulation_interface
+  EXPORT export_simulation_interface
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

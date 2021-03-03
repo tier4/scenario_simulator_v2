@@ -14,7 +14,6 @@
 
 #include <simulation_api/api/api.hpp>
 #include <simulation_interface/conversions.hpp>
-#include <simulation_interface/xmlrpc_client.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <string>
