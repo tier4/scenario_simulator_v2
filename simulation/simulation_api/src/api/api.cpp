@@ -74,7 +74,7 @@ bool API::spawn(
     if (
       !entity_manager_ptr_->entityExists(name) &&
       !entity_manager_ptr_->spawnEntity(
-        simulation_api::entity::EgoEntity(name, params)))
+        simulation_api::entity::EgoEntity(lanelet2_map_osm, name, params)))
     {
       return false;
     }

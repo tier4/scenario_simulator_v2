@@ -59,6 +59,8 @@ class API
   } static_assert(true, "")
 
 public:
+  const std::string lanelet2_map_osm;
+
   template<
     class NodeT,
     class AllocatorT = std::allocator<void>>
@@ -68,7 +70,8 @@ public:
     const bool verbose = false,
     const bool standalone_mode = false,
     const std::string & metrics_logfile_path = "/tmp/metrics.json")
-  : standalone_mode(standalone_mode),
+  : lanelet2_map_osm(lanelet2_map_osm),
+    standalone_mode(standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
     metrics_manager_(verbose, metrics_logfile_path)
   {
@@ -96,7 +99,7 @@ public:
 
   void setVerbose(const bool verbose);
 
-  [[deprecated("catalog_xml will be deprecated in the near future")]]
+  [[deprecated("catalog_xml will be removed in the near future")]]
   bool spawn(
     const bool is_ego,
     const std::string & name,

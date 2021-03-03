@@ -20,6 +20,7 @@
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
@@ -38,10 +39,10 @@
 #include <vector>
 
 #define DEBUG_VALUE(...) \
-  std::cout << "\x1b[31m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
+  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
 
 #define DEBUG_LINE() \
-  std::cout << "\x1b[31m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
+  std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
 
 namespace simulation_api
 {
@@ -63,6 +64,27 @@ class EgoEntity : public VehicleEntity
 
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
   std::shared_ptr<std::thread> accessor_spinner;
+
+  auto execute(const std::vector<std::string> & f_xs)
+  {
+    std::vector<std::vector<char>> buffer {};
+
+    buffer.resize(f_xs.size());
+
+    std::vector<std::add_pointer<char>::type> argv {};
+
+    argv.reserve(f_xs.size());
+
+    for (const auto & each : f_xs) {
+      buffer.emplace_back(std::begin(each), std::end(each));
+      buffer.back().push_back('\0');
+      argv.push_back(buffer.back().data());
+    }
+
+    argv.emplace_back(static_cast<std::add_pointer<char>::type>(0));
+
+    return ::execvp(argv[0], argv.data());
+  }
 
 public:
   EgoEntity() = delete;
@@ -103,27 +125,38 @@ public:
    *  TeleportAction in the Storyboard.Init section.
    *
    * ------------------------------------------------------------------------ */
-  template<typename ... Ts>
-  explicit EgoEntity(const std::string & name, Ts && ... xs)
-  : VehicleEntity(name, std::forward<decltype(xs)>(xs)...)
+  explicit EgoEntity(
+    const boost::filesystem::path & lanelet2_map_osm,
+    const std::string & name,
+    const openscenario_msgs::msg::VehicleParameters & parameters)
+  : VehicleEntity(name, parameters)
   {
+    DEBUG_VALUE(lanelet2_map_osm);
+
+    // XXX(yamacir-kit) UGLY CODE!!!
     auto launch_autoware =
-      [this]()
+      [&]()
       {
         autoware_process_id = fork();
 
-        const std::vector<char *> argv {
+        const std::vector<std::string> argv {
           "python3",
           "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
           "launch",
           "scenario_test_runner",
           "autoware.launch.xml",
-          nullptr
+          std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
+          std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
         };
+
+        for (const auto & each : argv) {
+          std::cout << each << " ";
+        }
+        std::cout << std::endl;
 
         if (autoware_process_id < 0) {
           throw std::system_error(errno, std::system_category());
-        } else if (autoware_process_id == 0 && ::execvp(argv[0], argv.data()) < 0) {
+        } else if (autoware_process_id == 0 && execute(argv) < 0) {
           std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
           std::exit(EXIT_FAILURE);
         }
@@ -138,7 +171,6 @@ public:
           "awapi_accessor",
           "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
           rclcpp::NodeOptions().use_global_arguments(false)));
-
       launch_autoware();
     }
 
