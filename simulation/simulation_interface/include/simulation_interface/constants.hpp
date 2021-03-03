@@ -27,6 +27,14 @@ enum class TransportProtocol
 
 std::string enumToString(const TransportProtocol & protocol);
 
+enum class HostName
+{
+  LOCLHOST,
+  ANY
+};
+
+std::string enumToString(const HostName & hostname);
+
 namespace key
 {
 const char success[] = "success";

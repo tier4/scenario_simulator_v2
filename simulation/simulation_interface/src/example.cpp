@@ -41,7 +41,8 @@ public:
   explicit ExampleNode(const rclcpp::NodeOptions & option)
   : Node("example", option),
     server_("tcp://*:5555", callback),
-    client_(simulation_interface::TransportProtocol::TCP, "localhost", 5555)
+    client_(simulation_interface::TransportProtocol::TCP,
+      simulation_interface::HostName::LOCLHOST, 5555)
   {
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(250ms, std::bind(&ExampleNode::sendRequest, this));

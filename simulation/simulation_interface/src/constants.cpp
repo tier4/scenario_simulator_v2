@@ -26,4 +26,15 @@ std::string enumToString(const TransportProtocol & protocol)
   }
   return "";
 }
+
+std::string enumToString(const HostName & hostname)
+{
+  switch (hostname) {
+    case HostName::LOCLHOST:
+      return "localhost";
+    case HostName::ANY:
+      return "*";
+  }
+  return "";
+}
 }  // namespace simulation_interface

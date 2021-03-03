@@ -30,6 +30,14 @@ class Client
 public:
   explicit Client(
     const simulation_interface::TransportProtocol & protocol,
+    const simulation_interface::HostName & hostname,
+    const unsigned int & port)
+  : Client(
+      simulation_interface::enumToString(protocol) +
+      "://" + simulation_interface::enumToString(hostname) +
+      ":" + std::to_string(port)) {}
+  explicit Client(
+    const simulation_interface::TransportProtocol & protocol,
     const std::string & ip_address, const unsigned int & port)
   : Client(
       simulation_interface::enumToString(protocol) +
