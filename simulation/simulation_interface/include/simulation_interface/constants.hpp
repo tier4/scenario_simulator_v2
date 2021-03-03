@@ -15,8 +15,18 @@
 #ifndef SIMULATION_INTERFACE__CONSTANTS_HPP_
 #define SIMULATION_INTERFACE__CONSTANTS_HPP_
 
+#include <string>
+
 namespace simulation_interface
 {
+enum class TransportProtocol
+{
+  TCP,
+  UDP
+};
+
+std::string enumToString(const TransportProtocol & protocol);
+
 namespace key
 {
 const char success[] = "success";

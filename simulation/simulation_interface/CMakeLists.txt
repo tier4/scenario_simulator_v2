@@ -36,6 +36,7 @@ include_directories(
 
 ament_auto_add_library(simulation_interface SHARED
   src/conversions.cpp
+  src/constants.cpp
   ${PROTO_SRCS}
 )
 target_link_libraries(simulation_interface
@@ -45,6 +46,7 @@ target_link_libraries(simulation_interface
 ament_auto_add_executable(example
   src/example.cpp
   src/conversions.cpp
+  src/constants.cpp
   ${PROTO_SRCS}
 )
 target_link_libraries(example
