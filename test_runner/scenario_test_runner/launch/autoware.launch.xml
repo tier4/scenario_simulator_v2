@@ -4,10 +4,11 @@
   <arg name="map_path" doc="point cloud and lanelet2 map directory path"/>
   <arg name="sensor_model" default="aip_xx1"/>
   <arg name="vehicle_model" default="lexus"/>
+  <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
   <!-- Optional parameters -->
+  <arg name="rviz" default="true" doc="launch rviz"/>
   <arg name="lanelet2_map_file" default="lanelet2_map.osm" />
   <arg name="pointcloud_map_file" default="pointcloud_map.pcd" />
-  <arg name="rviz" default="true" doc="launch rviz"/>
   <!-- Optional parameters for scenario simulation -->
   <arg name="initial_engage_state" default="true"/>
   <arg name="perception/enable_detection_failure" default="true"/>
@@ -15,8 +16,7 @@
   <arg name="sensing/visible_range" default="300.0"/>
 
   <!-- Vehicle Description -->
-  <!-- from vehicle.launch.xml -->
-  <arg name ="vehicle_id" default="$(env VEHICLE_ID default)"/>
+  <!-- Spliced from vehicle.launch.xml -->
   <group>
     <include file="$(find-pkg-share vehicle_launch)/launch/vehicle_description.launch.xml">
       <arg name="sensor_model" value="$(var sensor_model)"/>
@@ -24,7 +24,7 @@
       <arg name="vehicle_model" value="$(var vehicle_model)"/>
     </include>
   </group>
-  <!-- from simple_planning_simulator.launch.xml -->
+  <!-- Spliced from simple_planning_simulator.launch.xml from vehicle_interface.launch.xml -->
   <node pkg="topic_tools" exec="relay" name="twist_relay" output="log">
     <param name="input_topic" value="/vehicle/status/twist"/>
     <param name="output_topic" value="/localization/twist"/>
@@ -51,20 +51,20 @@
 
   <!-- Planning -->
   <include file="$(find-pkg-share planning_launch)/launch/planning.launch.xml">
-    <arg name="vehicle_param_file" value="$(find-pkg-share $(var vehicle_model)_description)/config/vehicle_info.yaml"/>
+    <arg name="vehicle_param_file" value="$(find-pkg-share $(var vehicle_model)_description)/config/vehicle_info.param.yaml"/>
   </include>
 
   <!-- Control -->
   <include file="$(find-pkg-share control_launch)/launch/control.launch.xml">
-    <arg name="vehicle_param_file" value="$(find-pkg-share $(var vehicle_model)_description)/config/vehicle_info.yaml"/>
+    <arg name="vehicle_param_file" value="$(find-pkg-share $(var vehicle_model)_description)/config/vehicle_info.param.yaml"/>
     <arg name="lateral_controller_mode" value="mpc_follower" doc="options: mpc_follower, pure_pursuit"/>
   </include>
 
   <!-- AutowareAPI -->
-  <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml"/>
+  <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml" />
 
   <!-- Rviz -->
-  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz" if="$(var rviz)"/>
+  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)" />
 
   <!-- Web Controller -->
   <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->
