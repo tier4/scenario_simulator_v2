@@ -35,6 +35,8 @@ enum class HostName
 
 std::string enumToString(const HostName & hostname);
 
+const TransportProtocol protocol = TransportProtocol::TCP;
+
 namespace ports
 {
 const unsigned int initialize = 5555;
