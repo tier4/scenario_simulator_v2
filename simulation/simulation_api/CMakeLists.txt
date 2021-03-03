@@ -59,7 +59,13 @@ ament_auto_add_library(simulation_api SHARED
   src/api/api.cpp
 )
 
-target_link_libraries(simulation_api pugixml ${PROTOBUF_LIBRARY})
+target_link_libraries(simulation_api 
+  pugixml
+  pthread
+  sodium
+  zmqpp
+  zmq
+  ${PROTOBUF_LIBRARY})
 
 ament_auto_add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
 

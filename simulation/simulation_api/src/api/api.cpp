@@ -38,7 +38,7 @@ bool API::despawn(const std::string & name)
     simulation_api_schema::DespawnEntityRequest req;
     simulation_api_schema::DespawnEntityResponse res;
     req.set_name(name);
-    simulation_interface::call(client_ptr_, simulation_interface::method::despawn_entity, req, res);
+    // simulation_interface::call(client_ptr_, simulation_interface::method::despawn_entity, req, res);
     return res.result().success();
   }
   return true;
@@ -84,8 +84,7 @@ bool API::spawn(
     simulation_api_schema::SpawnVehicleEntityResponse res;
     req.set_is_ego(true);
     simulation_interface::toProto(params, *req.mutable_parameters());
-    return simulation_interface::call(
-      client_ptr_, simulation_interface::method::spawn_vehicle_entity, req, res);
+    return true;  // simulation_interface::call(client_ptr_, simulation_interface::method::spawn_vehicle_entity, req, res);
   } else {
     simulation_api::entity::VehicleEntity npc(name, params);
     if (!entity_manager_ptr_->spawnEntity(npc)) {
@@ -98,8 +97,7 @@ bool API::spawn(
     simulation_api_schema::SpawnVehicleEntityResponse res;
     req.set_is_ego(false);
     simulation_interface::toProto(params, *req.mutable_parameters());
-    return simulation_interface::call(
-      client_ptr_, simulation_interface::method::spawn_pedestrian_entity, req, res);
+    return true; // simulation_interface::call(client_ptr_, simulation_interface::method::spawn_pedestrian_entity, req, res);
   }
   return false;
 }
@@ -122,9 +120,12 @@ bool API::spawn(
   simulation_api_schema::SpawnPedestrianEntityRequest req;
   simulation_api_schema::SpawnPedestrianEntityResponse res;
   simulation_interface::toProto(params, *req.mutable_parameters());
-  return simulation_interface::call(
-    client_ptr_, simulation_interface::method::spawn_pedestrian_entity, req,
-    res);
+  return true;
+  /*
+  simulation_interface::call(
+  client_ptr_, simulation_interface::method::spawn_pedestrian_entity, req,
+  res);
+  */
 }
 
 bool API::spawn(
@@ -325,6 +326,7 @@ bool API::setEntityStatus(
   return setEntityStatus(name, status);
 }
 
+/*
 openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
 {
   std::string coordinate = param["coordinate"];
@@ -419,7 +421,9 @@ openscenario_msgs::msg::EntityStatus API::toStatus(XmlRpc::XmlRpcValue param)
           "coordinate does not match, coordinate : " +
           coordinate));
 }
+*/
 
+/*
 XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
 {
   XmlRpc::XmlRpcValue param;
@@ -454,6 +458,7 @@ XmlRpc::XmlRpcValue API::toValue(openscenario_msgs::msg::EntityStatus status)
   param["time"] = status.time;
   return param;
 }
+*/
 
 bool API::initialize(
   double realtime_factor, double step_time)
@@ -467,9 +472,7 @@ bool API::initialize(
   req.set_step_time(step_time);
   req.set_realtime_factor(realtime_factor);
   simulation_api_schema::InitializeResponse res;
-  return simulation_interface::call(
-    client_ptr_, simulation_interface::method::initialize, req,
-    res);
+  return true; // simulation_interface::call(client_ptr_, simulation_interface::method::initialize, req, res);
 }
 
 bool API::attachDetectionSensor(simulation_api_schema::DetectionSensorConfiguration configuration)
@@ -480,8 +483,7 @@ bool API::attachDetectionSensor(simulation_api_schema::DetectionSensorConfigurat
     simulation_api_schema::AttachDetectionSensorRequest req;
     simulation_api_schema::AttachDetectionSensorResponse res;
     *req.mutable_configuration() = configuration;
-    simulation_interface::call(
-      client_ptr_, simulation_interface::method::attach_detection_sensor, req, res);
+    // simulation_interface::call(client_ptr_, simulation_interface::method::attach_detection_sensor, req, res);
     return res.result().success();
   }
 }
@@ -494,8 +496,7 @@ bool API::attachLidarSensor(simulation_api_schema::LidarConfiguration configurat
     simulation_api_schema::AttachLidarSensorRequest req;
     simulation_api_schema::AttachLidarSensorResponse res;
     *req.mutable_configuration() = configuration;
-    simulation_interface::call(
-      client_ptr_, simulation_interface::method::attach_lidar_sensor, req, res);
+    // simulation_interface::call(client_ptr_, simulation_interface::method::attach_lidar_sensor, req, res);
     return res.result().success();
   }
 }
@@ -508,9 +509,11 @@ bool API::updateSensorFrame()
   simulation_api_schema::UpdateSensorFrameRequest req;
   req.set_current_time(current_time_);
   simulation_api_schema::UpdateSensorFrameResponse res;
+  /*
   simulation_interface::call(
     client_ptr_, simulation_interface::method::update_sensor_frame, req,
     res);
+  */
   return res.result().success();
 }
 
@@ -528,9 +531,11 @@ bool API::updateEntityStatusInSim()
     }
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
+  /*
   simulation_interface::call(
     client_ptr_, simulation_interface::method::update_entity_status, req,
     res);
+  */
   for (const auto status : res.status()) {
     auto entity_status = entity_manager_ptr_->getEntityStatus(status.name());
     if (!entity_status) {
@@ -565,7 +570,7 @@ bool API::updateFrame()
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(current_time_);
     simulation_api_schema::UpdateFrameResponse res;
-    simulation_interface::call(client_ptr_, simulation_interface::method::update_frame, req, res);
+    // simulation_interface::call(client_ptr_, simulation_interface::method::update_frame, req, res);
     if (!res.result().success()) {
       return false;
     }
