@@ -68,7 +68,8 @@ public:
   }
 
 private:
-  void poll() {
+  void poll()
+  {
     poller_.poll(0.01);
     if (poller_.has_input(socket_)) {
       zmqpp::message request;
@@ -80,7 +81,6 @@ private:
       func_(req_proto, res_proto);
       std::string res_serialized_str;
       if (!res_proto.SerializeToString(&res_serialized_str)) {
-        std::cout << __FILE__ << "," << __LINE__ << std::endl;
         throw std::runtime_error("failed to serialize from proto");
       }
       zmqpp::message response;

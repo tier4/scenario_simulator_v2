@@ -120,9 +120,11 @@ void ScenarioSimulator::updateEntityStatus(
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
   entity_status_ = {};
+  /*
   for (const auto proto : req.status()) {
     entity_status_.emplace_back(proto);
   }
+  */
   res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
