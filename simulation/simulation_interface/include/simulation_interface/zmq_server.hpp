@@ -35,7 +35,7 @@ public:
     std::function<void(const ReqType &, ResType &)> func)
   : Server(
       simulation_interface::enumToString(protocol) +
-      "://" + simulation_interface::enumToString(hostname) + 
+      "://" + simulation_interface::enumToString(hostname) +
       ":" + std::to_string(port), func) {}
   explicit Server(
     const simulation_interface::TransportProtocol & protocol,

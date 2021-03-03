@@ -40,7 +40,7 @@ class ExampleNode : public rclcpp::Node
 public:
   explicit ExampleNode(const rclcpp::NodeOptions & option)
   : Node("example", option),
-    server_(simulation_interface::TransportProtocol::TCP, 
+    server_(simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::ANY, 5555, callback),
     client_(simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::LOCLHOST, 5555)
