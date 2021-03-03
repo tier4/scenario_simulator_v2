@@ -22,12 +22,12 @@
 #ifdef AUTOWARE_IV
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
-#include <autoware_control_msgs/msg/engage_mode.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
+#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
@@ -89,7 +89,7 @@ public:
    *    setAutowareEngage(const bool) const
    *
    * ------------------------------------------------------------------------ */
-  using AutowareEngage = autoware_control_msgs::msg::EngageMode;
+  using AutowareEngage = autoware_vehicle_msgs::msg::Engage;
 
   DEFINE_PUBLISHER(AutowareEngage);
 
