@@ -54,15 +54,33 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     simulation_interface::HostName::ANY,
     simulation_interface::ports::spawn_vehicle_entity,
     std::bind(&ScenarioSimulator::spawnVehicleEntity, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  spawn_pedestrian_entity_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::spawn_pedestrian_entity,
+    std::bind(&ScenarioSimulator::spawnPedestrianEntity, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  despawn_entity_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::despawn_entity,
+    std::bind(&ScenarioSimulator::despawnEntity, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  attach_detection_sensor_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::attach_detection_sensor,
+    std::bind(&ScenarioSimulator::attachDetectionSensor, this,
+    std::placeholders::_1, std::placeholders::_2)),
+  attach_lidar_sensor_server_(simulation_interface::TransportProtocol::TCP,
+    simulation_interface::HostName::ANY,
+    simulation_interface::ports::attach_lidar_sensor,
+    std::bind(&ScenarioSimulator::attachLidarSensor, this,
     std::placeholders::_1, std::placeholders::_2))
 {
   declare_parameter("port", 8080);
   get_parameter("port", port_);
 }
 
-ScenarioSimulator::~ScenarioSimulator()
-{
-}
+ScenarioSimulator::~ScenarioSimulator() {}
 
 void ScenarioSimulator::initialize(
   const simulation_api_schema::InitializeRequest & req,
@@ -124,29 +142,22 @@ void ScenarioSimulator::spawnVehicleEntity(
   res.mutable_result()->set_description("");
 }
 
-/*
 void ScenarioSimulator::spawnPedestrianEntity(
-  XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
+  const simulation_api_schema::SpawnPedestrianEntityRequest & req,
+  simulation_api_schema::SpawnPedestrianEntityResponse & res)
 {
-  const auto req =
-    simulation_interface::deserializeFromBinValue<
-    simulation_api_schema::SpawnPedestrianEntityRequest>(
-    param);
   pedestrians_.emplace_back(req.parameters());
-  simulation_api_schema::SpawnPedestrianEntityResponse res;
+  res = simulation_api_schema::SpawnPedestrianEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
-void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result)
+void ScenarioSimulator::despawnEntity(
+  const simulation_api_schema::DespawnEntityRequest & req,
+  simulation_api_schema::DespawnEntityResponse & res)
 {
-  const auto req =
-    simulation_interface::deserializeFromBinValue<
-    simulation_api_schema::DespawnEntityRequest>(param);
   bool found = false;
+  res = simulation_api_schema::DespawnEntityResponse();
   std::vector<openscenario_msgs::VehicleParameters> vehicles;
   for (const auto vehicle : vehicles_) {
     if (vehicle.name() != req.name()) {
@@ -165,49 +176,37 @@ void ScenarioSimulator::despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRp
     }
   }
   pedestrians_ = pedestrians;
-  simulation_api_schema::DespawnEntityResponse res;
   if (found) {
     res.mutable_result()->set_success(true);
   } else {
     res.mutable_result()->set_success(false);
   }
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::attachDetectionSensor(
-  XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
+  const simulation_api_schema::AttachDetectionSensorRequest & req,
+  simulation_api_schema::AttachDetectionSensorResponse & res)
 {
-  const auto req =
-    simulation_interface::deserializeFromBinValue<
-    simulation_api_schema::AttachDetectionSensorRequest>(param);
   const auto pub = this->create_publisher<
     autoware_perception_msgs::msg::DynamicObjectArray>(
     req.configuration().topic_name(), 1);
   sensor_sim_.attachDetectionSensor(req.configuration(), pub);
-  simulation_api_schema::AttachDetectionSensorResponse res;
+  res = simulation_api_schema::AttachDetectionSensorResponse();
   res.mutable_result()->set_success(true);
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
 void ScenarioSimulator::attachLidarSensor(
-  XmlRpc::XmlRpcValue & param,
-  XmlRpc::XmlRpcValue & result)
+  const simulation_api_schema::AttachLidarSensorRequest & req,
+  simulation_api_schema::AttachLidarSensorResponse & res)
 {
-  const auto req =
-    simulation_interface::deserializeFromBinValue<
-    simulation_api_schema::AttachLidarSensorRequest>(param);
   const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
     req.configuration().topic_name(), 1);
   sensor_sim_.attachLidarSensor(req.configuration(), pub);
-  simulation_api_schema::AttachLidarSensorResponse res;
+  res = simulation_api_schema::AttachLidarSensorResponse();
   res.mutable_result()->set_success(true);
-  result = XmlRpc::XmlRpcValue();
-  result[0] = simulation_interface::serializeToBinValue(res);
 }
 
+/*
 void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcValue & result)
 {
   sensor_sim_.updateSensorFrame(current_time_, entity_status_);
@@ -215,15 +214,6 @@ void ScenarioSimulator::updateSensorFrame(XmlRpc::XmlRpcValue &, XmlRpc::XmlRpcV
   res.mutable_result()->set_success(true);
   result = XmlRpc::XmlRpcValue();
   result[0] = simulation_interface::serializeToBinValue(res);
-}
-
-void ScenarioSimulator::addMethod(
-  std::string name, std::function<void(XmlRpc::XmlRpcValue &,
-  XmlRpc::XmlRpcValue &)> func)
-{
-  auto method_ptr = std::make_shared<scenario_simulator::XmlRpcMethod>(name, &server_);
-  method_ptr->setFunction(func);
-  methods_[name] = method_ptr;
 }
 */
 }  // namespace scenario_simulator

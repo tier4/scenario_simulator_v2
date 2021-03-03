@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_server.hpp>
 #include <simulation_interface/zmq_client.hpp>
 
@@ -23,16 +24,15 @@
 #include <memory>
 
 void callback(
-  const simulation_api_schema::InitializeRequest & req,
-  simulation_api_schema::InitializeResponse & res)
+  const simulation_api_schema::UpdateEntityStatusRequest & req,
+  simulation_api_schema::UpdateEntityStatusResponse & res)
 {
+  std::cout << "------ Request ------" << std::endl;
   req.PrintDebugString();
-  res = simulation_api_schema::InitializeResponse();
+  res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description(
-    "realtime factor : " +
-    std::to_string(req.realtime_factor()));
-  // res.PrintDebugString();
+  std::cout << "------ Response ------" << std::endl;
+  res.PrintDebugString();
 }
 
 class ExampleNode : public rclcpp::Node
@@ -50,27 +50,29 @@ public:
   }
   void sendRequest()
   {
-    simulation_api_schema::InitializeRequest request;
-    request.set_realtime_factor(1.0);
-    request.set_step_time(0.1);
-    simulation_api_schema::InitializeResponse response;
+    simulation_api_schema::UpdateEntityStatusRequest request;
+    openscenario_msgs::msg::EntityStatus status;
+    status.name = "test";
+    status.type.type = openscenario_msgs::msg::EntityType::EGO;
+    openscenario_msgs::EntityStatus proto;
+    simulation_interface::toProto(status, proto);
+    simulation_api_schema::UpdateEntityStatusResponse response;
+    *request.add_status() = proto;
+    *request.add_status() = proto;
+    *request.add_status() = proto;
+    *request.add_status() = proto;
+    *request.add_status() = proto;
     client_.call(request, response);
-    if (response.result().success()) {
-      std::cout << "success" << std::endl;
-    } else {
-      std::cout << "fail" << std::endl;
-    }
-    response.PrintDebugString();
   }
 
 private:
   rclcpp::TimerBase::SharedPtr update_timer_;
   zeromq::Server<
-    simulation_api_schema::InitializeRequest,
-    simulation_api_schema::InitializeResponse> server_;
+    simulation_api_schema::UpdateEntityStatusRequest,
+    simulation_api_schema::UpdateEntityStatusResponse> server_;
   zeromq::Client<
-    simulation_api_schema::InitializeRequest,
-    simulation_api_schema::InitializeResponse> client_;
+    simulation_api_schema::UpdateEntityStatusRequest,
+    simulation_api_schema::UpdateEntityStatusResponse> client_;
 };
 
 int main(int argc, char * argv[])

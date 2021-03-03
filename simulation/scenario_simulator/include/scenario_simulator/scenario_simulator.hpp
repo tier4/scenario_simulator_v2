@@ -113,18 +113,33 @@ private:
   void spawnVehicleEntity(
     const simulation_api_schema::SpawnVehicleEntityRequest & req,
     simulation_api_schema::SpawnVehicleEntityResponse & res);
+  zeromq::Server<
+    simulation_api_schema::SpawnPedestrianEntityRequest,
+    simulation_api_schema::SpawnPedestrianEntityResponse> spawn_pedestrian_entity_server_;
+  void spawnPedestrianEntity(
+    const simulation_api_schema::SpawnPedestrianEntityRequest & req,
+    simulation_api_schema::SpawnPedestrianEntityResponse & res);
+  zeromq::Server<
+    simulation_api_schema::DespawnEntityRequest,
+    simulation_api_schema::DespawnEntityResponse> despawn_entity_server_;
+  void despawnEntity(
+    const simulation_api_schema::DespawnEntityRequest & req,
+    simulation_api_schema::DespawnEntityResponse & res);
+  zeromq::Server<
+    simulation_api_schema::AttachDetectionSensorRequest,
+    simulation_api_schema::AttachDetectionSensorResponse> attach_detection_sensor_server_;
+  void attachDetectionSensor(
+    const simulation_api_schema::AttachDetectionSensorRequest & req,
+    simulation_api_schema::AttachDetectionSensorResponse & res);
+  zeromq::Server<
+    simulation_api_schema::AttachLidarSensorRequest,
+    simulation_api_schema::AttachLidarSensorResponse> attach_lidar_sensor_server_;
+  void attachLidarSensor(
+    const simulation_api_schema::AttachLidarSensorRequest & req,
+    simulation_api_schema::AttachLidarSensorResponse & res);
+  // void updateSensorFrame()
   /*
-  void spawnVehicleEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void spawnPedestrianEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void updateEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void attachLidarSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void attachDetectionSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
   void updateSensorFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void addMethod(
-    std::string name, std::function<void(XmlRpc::XmlRpcValue &,
-    XmlRpc::XmlRpcValue &)> func);
-  void runXmlRpc();
   */
   std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
   std::vector<openscenario_msgs::VehicleParameters> vehicles_;
