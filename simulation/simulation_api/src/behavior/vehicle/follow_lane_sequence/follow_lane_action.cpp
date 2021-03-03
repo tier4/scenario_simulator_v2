@@ -15,6 +15,7 @@
 #include <simulation_api/behavior/vehicle/behavior_tree.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_lane_action.hpp>
 #include <simulation_api/math/catmull_rom_spline.hpp>
+#include <simulation_api/helper/stop_watch.hpp>
 
 #include <string>
 #include <vector>
@@ -44,12 +45,10 @@ const openscenario_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoint
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     openscenario_msgs::msg::WaypointsArray waypoints;
-    double horizon =
-      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s,
-      entity_status.lanelet_pose.s + horizon, 1.0);
+      entity_status.lanelet_pose.s + getHorizon(), 1.0);
     return waypoints;
   } else {
     return openscenario_msgs::msg::WaypointsArray();
@@ -73,8 +72,16 @@ BT::NodeStatus FollowLaneAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
+  if (!entity_status.lanelet_pose_valid) {
+    setOutput(
+      "updated_status",
+      stopAtEndOfRoad());
+    return BT::NodeStatus::RUNNING;
+  }
+  const auto following_lanelets = hdmap_utils->getFollowingLanelets(
+    entity_status.lanelet_pose.lanelet_id, route_lanelets, getHorizon());
   if (driver_model.see_around) {
-    if (getRightOfWayEntities(route_lanelets).size() != 0) {
+    if (getRightOfWayEntities(following_lanelets).size() != 0) {
       return BT::NodeStatus::FAILURE;
     }
     auto distance_to_front_entity = getDistanceToFrontEntity();
@@ -88,8 +95,8 @@ BT::NodeStatus FollowLaneAction::tick()
     }
     const auto waypoints = calculateWaypoints();
     auto distance_to_stopline =
-      hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets);
+      hdmap_utils->getDistanceToStopLine(following_lanelets, waypoints.waypoints);
+    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
     if (distance_to_stopline) {
       if (distance_to_stopline.get() <=
         calculateStopDistance() +
@@ -106,15 +113,9 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
   }
-  if (!entity_status.lanelet_pose_valid) {
-    setOutput(
-      "updated_status",
-      stopAtEndOfRoad());
-    return BT::NodeStatus::RUNNING;
-  }
 
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
   }
   auto updated_status = calculateEntityStatusUpdated(target_speed.get());
   setOutput("updated_status", updated_status);

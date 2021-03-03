@@ -682,11 +682,7 @@ void EntityManager::update(
     }
     if (it->second.type() == typeid(VehicleEntity)) {
       boost::any_cast<VehicleEntity &>(it->second).setEntityTypeList(type_list);
-      helper::StopWatch<std::chrono::milliseconds> watch("update vehicle " + it->first);
-      watch.start();
       boost::any_cast<VehicleEntity &>(it->second).onUpdate(current_time, step_time);
-      watch.stop();
-      watch.print();
       if (boost::any_cast<VehicleEntity &>(it->second).statusSetted()) {
         auto status = boost::any_cast<VehicleEntity &>(it->second).getStatus();
         all_status[boost::any_cast<VehicleEntity &>(it->second).name] = status;

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <simulation_api/helper/stop_watch.hpp>
 #include <simulation_api/color_utils/color_utils.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_api/math/catmull_rom_spline.hpp>
@@ -154,11 +155,13 @@ boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
 std::vector<std::int64_t> HdMapUtils::getConflictingCrosswalkIds(
   std::vector<std::int64_t> lanelet_ids) const
 {
+  simulation_api::helper::StopWatch<std::chrono::milliseconds> watch("conflicting");
   std::vector<std::int64_t> ret;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
   graphs.emplace_back(vehicle_routing_graph_ptr_);
   graphs.emplace_back(pedestrian_routing_graph_ptr_);
   lanelet::routing::RoutingGraphContainer container(graphs);
+  watch.start();
   for (const auto & lanelet_id : lanelet_ids) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
     double height_clearance = 4;
@@ -170,6 +173,8 @@ std::vector<std::int64_t> HdMapUtils::getConflictingCrosswalkIds(
       ret.emplace_back(crosswalk.id());
     }
   }
+  watch.stop();
+  watch.print();
   return ret;
 }
 

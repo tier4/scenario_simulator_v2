@@ -18,6 +18,7 @@
 #include <boost/optional.hpp>
 #include <chrono>
 #include <string>
+#include <iostream>
 
 namespace simulation_api
 {

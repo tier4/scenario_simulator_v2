@@ -72,6 +72,11 @@ void ActionNode::getBlackBoardValues()
   }
 }
 
+double ActionNode::getHorizon() const
+{
+  return boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
+}
+
 openscenario_msgs::msg::EntityStatus ActionNode::stopAtEndOfRoad()
 {
   openscenario_msgs::msg::EntityStatus entity_status_updated = entity_status;
@@ -232,6 +237,7 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & following_lanelets) const
 {
+
   auto conflicting_entity_status = getConflictingEntityStatus(following_lanelets);
   if (!conflicting_entity_status) {
     return boost::none;

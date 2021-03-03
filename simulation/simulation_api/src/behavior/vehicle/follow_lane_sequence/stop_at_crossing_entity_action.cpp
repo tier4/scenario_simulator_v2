@@ -58,12 +58,10 @@ const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calcula
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     openscenario_msgs::msg::WaypointsArray waypoints;
-    double horizon =
-      boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     simulation_api::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
       entity_status.lanelet_pose.s,
-      entity_status.lanelet_pose.s + horizon, 1.0);
+      entity_status.lanelet_pose.s + getHorizon(), 1.0);
     return waypoints;
   } else {
     return openscenario_msgs::msg::WaypointsArray();
@@ -94,15 +92,20 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (request != "none" && request != "follow_lane") {
     return BT::NodeStatus::FAILURE;
   }
+  if (!entity_status.lanelet_pose_valid) {
+    return BT::NodeStatus::FAILURE;
+  }
   if (!driver_model.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
+  const auto following_lanelets = hdmap_utils->getFollowingLanelets(
+    entity_status.lanelet_pose.lanelet_id, route_lanelets, getHorizon());
+  if (getRightOfWayEntities(following_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
   const auto spline = simulation_api::math::CatmullRomSpline(waypoints.waypoints);
-  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
+  distance_to_stop_target_ = getDistanceToConflictingEntity(following_lanelets, spline);
   boost::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
