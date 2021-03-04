@@ -25,32 +25,36 @@
 #include <memory>
 
 void initialize_callback(
-  const simulation_api_schema::InitializeRequest & req,
-  simulation_api_schema::InitializeResponse & res) {}
+  const simulation_api_schema::InitializeRequest &,
+  simulation_api_schema::InitializeResponse &) {}
 
 void update_frame_callback(
-  const simulation_api_schema::UpdateFrameRequest & req,
-  simulation_api_schema::UpdateFrameResponse & res) {}
+  const simulation_api_schema::UpdateFrameRequest &,
+  simulation_api_schema::UpdateFrameResponse &) {}
 
 void update_sensor_frame_callback(
-  const simulation_api_schema::UpdateSensorFrameRequest & req,
-  simulation_api_schema::UpdateSensorFrameResponse & res) {}
+  const simulation_api_schema::UpdateSensorFrameRequest &,
+  simulation_api_schema::UpdateSensorFrameResponse &) {}
 
 void spawn_vehicle_entity_callback(
-  const simulation_api_schema::SpawnVehicleEntityRequest & req,
-  simulation_api_schema::SpawnVehicleEntityResponse & res) {}
+  const simulation_api_schema::SpawnVehicleEntityRequest &,
+  simulation_api_schema::SpawnVehicleEntityResponse &) {}
 
 void spawn_pedestrian_entity_callback(
-  const simulation_api_schema::SpawnPedestrianEntityRequest & req,
-  simulation_api_schema::SpawnPedestrianEntityResponse & res) {}
+  const simulation_api_schema::SpawnPedestrianEntityRequest &,
+  simulation_api_schema::SpawnPedestrianEntityResponse &) {}
 
 void despawn_entity_callback(
-  const simulation_api_schema::DespawnEntityRequest & req,
-  simulation_api_schema::DespawnEntityResponse & res) {}
+  const simulation_api_schema::DespawnEntityRequest &,
+  simulation_api_schema::DespawnEntityResponse &) {}
 
 void attach_lidar_sensor_callback(
-  const simulation_api_schema::AttachLidarSensorRequest & req,
-  simulation_api_schema::AttachLidarSensorResponse & res) {}
+  const simulation_api_schema::AttachLidarSensorRequest &,
+  simulation_api_schema::AttachLidarSensorResponse &) {}
+
+void attach_detection_sensor_callback(
+  const simulation_api_schema::AttachDetectionSensorRequest &,
+  simulation_api_schema::AttachDetectionSensorResponse &) {}
 
 void update_entity_status_callback(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
@@ -78,7 +82,8 @@ public:
       spawn_pedestrian_entity_callback,
       despawn_entity_callback,
       update_entity_status_callback,
-      attach_lidar_sensor_callback),
+      attach_lidar_sensor_callback,
+      attach_detection_sensor_callback),
     client_(simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::update_entity_status),

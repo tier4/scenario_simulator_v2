@@ -46,7 +46,9 @@ public:
     std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
     simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func,
     std::function<void(const simulation_api_schema::AttachLidarSensorRequest &,
-    simulation_api_schema::AttachLidarSensorResponse &)> attach_lidar_sensor_func);
+    simulation_api_schema::AttachLidarSensorResponse &)> attach_lidar_sensor_func,
+    std::function<void(const simulation_api_schema::AttachDetectionSensorRequest &,
+    simulation_api_schema::AttachDetectionSensorResponse &)> attach_detection_sensor_func);
 
 private:
   void poll();
@@ -79,6 +81,9 @@ private:
   zmqpp::socket attach_lidar_sensor_sock_;
   std::function<void(const simulation_api_schema::AttachLidarSensorRequest &,
     simulation_api_schema::AttachLidarSensorResponse &)> attach_lidar_sensor_func_;
+  zmqpp::socket attach_detection_sensor_sock_;
+  std::function<void(const simulation_api_schema::AttachDetectionSensorRequest &,
+    simulation_api_schema::AttachDetectionSensorResponse &)> attach_detection_sensor_func_;
 };
 }  // namespace zeromq
 
