@@ -17,13 +17,21 @@
 
 namespace simulation_interface
 {
+std::string getEndPoint(
+  const TransportProtocol & protocol,
+  const HostName & hostname,
+  const unsigned int & port)
+{
+  return simulation_interface::enumToString(protocol) +
+         "://" + simulation_interface::enumToString(hostname) +
+         ":" + std::to_string(port);
+}
+
 std::string enumToString(const TransportProtocol & protocol)
 {
   switch (protocol) {
     case TransportProtocol::TCP:
       return "tcp";
-    case TransportProtocol::UDP:
-      return "udp";
   }
   return "";
 }

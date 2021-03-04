@@ -21,8 +21,7 @@ namespace simulation_interface
 {
 enum class TransportProtocol
 {
-  TCP,
-  UDP
+  TCP
 };
 
 std::string enumToString(const TransportProtocol & protocol);
@@ -49,6 +48,11 @@ const unsigned int update_entity_status = 5561;
 const unsigned int attach_lidar_sensor = 5562;
 const unsigned int attach_detection_sensor = 5563;
 }  // namespace ports
+
+std::string getEndPoint(
+  const TransportProtocol & protocol,
+  const HostName & hostname,
+  const unsigned int & port);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONSTANTS_HPP_

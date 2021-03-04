@@ -34,9 +34,7 @@ public:
     const unsigned int & port,
     std::function<void(const ReqType &, ResType &)> func)
   : Server(
-      simulation_interface::enumToString(protocol) +
-      "://" + simulation_interface::enumToString(hostname) +
-      ":" + std::to_string(port), func) {}
+      simulation_interface::getEndPoint(protocol, hostname, port), func) {}
   explicit Server(
     const simulation_interface::TransportProtocol & protocol,
     const std::string & ip_address, const unsigned int & port,

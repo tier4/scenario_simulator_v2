@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_interface/conversions.hpp>
+#include <simulation_interface/zmq_multi_server.hpp>
 #include <simulation_interface/zmq_server.hpp>
 #include <simulation_interface/zmq_client.hpp>
 
@@ -23,7 +24,7 @@
 #include <chrono>
 #include <memory>
 
-void callback(
+void update_entity_status_callback(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
@@ -35,15 +36,25 @@ void callback(
   res.PrintDebugString();
 }
 
+void initialize_callback(
+  const simulation_api_schema::InitializeRequest & req,
+  simulation_api_schema::InitializeResponse & res)
+{
+
+}
+
 class ExampleNode : public rclcpp::Node
 {
 public:
   explicit ExampleNode(const rclcpp::NodeOptions & option)
   : Node("example", option),
     server_(simulation_interface::TransportProtocol::TCP,
-      simulation_interface::HostName::ANY, 5555, callback),
+      simulation_interface::HostName::ANY,
+      initialize_callback,
+      update_entity_status_callback),
     client_(simulation_interface::TransportProtocol::TCP,
-      simulation_interface::HostName::LOCLHOST, 5555)
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::update_entity_status)
   {
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(250ms, std::bind(&ExampleNode::sendRequest, this));
@@ -67,9 +78,7 @@ public:
 
 private:
   rclcpp::TimerBase::SharedPtr update_timer_;
-  zeromq::Server<
-    simulation_api_schema::UpdateEntityStatusRequest,
-    simulation_api_schema::UpdateEntityStatusResponse> server_;
+  zeromq::MultiServer server_;
   zeromq::Client<
     simulation_api_schema::UpdateEntityStatusRequest,
     simulation_api_schema::UpdateEntityStatusResponse> client_;
