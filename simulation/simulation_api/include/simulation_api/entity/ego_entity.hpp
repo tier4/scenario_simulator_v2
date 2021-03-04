@@ -138,12 +138,12 @@ public:
     const openscenario_msgs::msg::VehicleParameters & parameters)
   : VehicleEntity(name, parameters)
   {
-    DEBUG_VALUE(lanelet2_map_osm);
-
     // XXX(yamacir-kit) UGLY CODE!!!
     auto launch_autoware =
       [&]()
       {
+        DEBUG_VALUE(lanelet2_map_osm);
+
         autoware_process_id = fork();
 
         const std::vector<std::string> argv {
@@ -221,18 +221,18 @@ public:
   {
     if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
       accessor_status->set_value();
-      std::cout << "ACCESSOR TERMINATING" << std::endl;
+      // std::cout << "ACCESSOR TERMINATING" << std::endl;
       accessor_spinner->join();
-      std::cout << "ACCESSOR TERMINATED" << std::endl;
+      // std::cout << "ACCESSOR TERMINATED" << std::endl;
 
       autowares.erase(name);
 
-      std::cout << "KILLING PID: " << autoware_process_id << std::endl;
+      // std::cout << "KILLING PID: " << autoware_process_id << std::endl;
       kill(autoware_process_id, SIGINT);
-      std::cout << "WAITING" << std::endl;
+      // std::cout << "WAITING" << std::endl;
       int status = 0;
       ::waitpid(autoware_process_id, &status, WUNTRACED);
-      std::cout << "KILL END" << std::endl;
+      // std::cout << "KILL END" << std::endl;
     }
   }
 
@@ -241,15 +241,6 @@ public:
   {
     waitForAutowareStateToBeWaitingForRoute([]() {});
 
-    // for (
-    //   rclcpp::WallRate rate {std::chrono::seconds(1)};
-    //   std::atomic_load(&autowares.at(name))->isWaitingForRoute();
-    //   rate.sleep())
-    // {
-    //   std::cout << "SEND GOAL-POSE!" << std::endl;
-    //   std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
-    // }
-
     waitForAutowareStateToBePlanning(
       [&]()
       {
@@ -257,17 +248,6 @@ public:
       });
 
     waitForAutowareStateToBeWaitingForEngage([]() {});
-
-    // for (
-    //   rclcpp::WallRate rate {std::chrono::seconds(1)};
-    //   std::atomic_load(&autowares.at(name))->isWaitingForEngage();
-    //   rate.sleep())
-    // {
-    //   std::cout << "ENGAGE!" << std::endl;
-    //   std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
-    // }
-    //
-    // waitForAutowareStateToBeDriving([]() {});
 
     waitForAutowareStateToBeDriving(
       [&]()
@@ -341,21 +321,6 @@ private:
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
 
 # undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
-
-  void waitForAutowareToBeReady() const
-  {
-    std::size_t count = 0;
-
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autowares.at(name))->isNotReady();
-      rate.sleep())
-    {
-      std::cout << "[accessor] Waiting for Autoware to be ready. (" << ++count << ")" << std::endl;
-    }
-
-    std::cout << "[accessor] Autoware is ready." << std::endl;
-  }
 
   void updateAutoware(
     const geometry_msgs::msg::Pose & current_pose)
