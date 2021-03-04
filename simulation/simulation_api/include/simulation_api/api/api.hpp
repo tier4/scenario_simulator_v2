@@ -25,9 +25,7 @@
 #include <simulation_api/metrics/metrics_manager.hpp>
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api_schema.pb.h>
-#include <xmlrpcpp/XmlRpcClient.h>
-#include <xmlrpcpp/XmlRpcException.h>
-#include <xmlrpcpp/XmlRpcValue.h>
+#include <simulation_interface/zmq_client.hpp>
 
 #include <memory>
 #include <string>
@@ -38,9 +36,6 @@ namespace scenario_simulator
 class ExecutionFailedError : public std::runtime_error
 {
 public:
-  explicit ExecutionFailedError(XmlRpc::XmlRpcValue value)
-  : runtime_error(value["message"]) {}
-
   explicit ExecutionFailedError(const char * message)
   : runtime_error(message) {}
 
@@ -73,18 +68,46 @@ public:
   : lanelet2_map_osm(lanelet2_map_osm),
     standalone_mode(standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
-    metrics_manager_(verbose, metrics_logfile_path)
+    metrics_manager_(verbose, metrics_logfile_path),
+    initialize_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::initialize),
+    update_frame_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::update_frame),
+    update_sensor_frame_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::update_sensor_frame),
+    spawn_vehicle_entity_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::spawn_vehicle_entity),
+    spawn_pedestrian_entity_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::spawn_pedestrian_entity),
+    despawn_entity_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::despawn_entity),
+    update_entity_status_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::update_entity_status),
+    attach_lidar_sensor_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::attach_lidar_sensor),
+    attach_detection_sensor_client_(
+      simulation_interface::protocol,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::attach_detection_sensor)
   {
     static const std::string address = "127.0.0.1";
-
-    int port = 8080;
-    {
-      node->declare_parameter("port", port);
-      node->get_parameter("port", port);
-      node->undeclare_parameter("port");
-    }
-
-    client_ptr_ = std::make_shared<XmlRpc::XmlRpcClient>(address.c_str(), port);
+    // client_ptr_ = std::make_shared<XmlRpc::XmlRpcClient>(address.c_str(), port);
 
     metrics_manager_.setEntityManager(entity_manager_ptr_);
 
@@ -257,15 +280,34 @@ private:
     return spawn(is_ego, parameters.toXml(), status);
   }
 
-  openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
-  XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
+  // openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
+  // XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
 
-  std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
+  // std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
   double step_time_;
   double current_time_;
 
   metrics::MetricsManager metrics_manager_;
+
+  zeromq::Client<simulation_api_schema::InitializeRequest,
+    simulation_api_schema::InitializeResponse> initialize_client_;
+  zeromq::Client<simulation_api_schema::UpdateFrameRequest,
+    simulation_api_schema::UpdateFrameResponse> update_frame_client_;
+  zeromq::Client<simulation_api_schema::UpdateSensorFrameRequest,
+    simulation_api_schema::UpdateSensorFrameResponse> update_sensor_frame_client_;
+  zeromq::Client<simulation_api_schema::SpawnVehicleEntityRequest,
+    simulation_api_schema::SpawnVehicleEntityResponse> spawn_vehicle_entity_client_;
+  zeromq::Client<simulation_api_schema::SpawnPedestrianEntityRequest,
+    simulation_api_schema::SpawnPedestrianEntityResponse> spawn_pedestrian_entity_client_;
+  zeromq::Client<simulation_api_schema::DespawnEntityRequest,
+    simulation_api_schema::DespawnEntityResponse> despawn_entity_client_;
+  zeromq::Client<simulation_api_schema::UpdateEntityStatusRequest,
+    simulation_api_schema::UpdateEntityStatusResponse> update_entity_status_client_;
+  zeromq::Client<simulation_api_schema::AttachLidarSensorRequest,
+    simulation_api_schema::AttachLidarSensorResponse> attach_lidar_sensor_client_;
+  zeromq::Client<simulation_api_schema::AttachDetectionSensorRequest,
+    simulation_api_schema::AttachDetectionSensorResponse> attach_detection_sensor_client_;
 };
 }  // namespace scenario_simulator
 

@@ -39,7 +39,6 @@
 #include <openscenario_msgs/msg/entity_type.hpp>
 
 #include <simulation_api_schema.pb.h>
-#include <xmlrpcpp/XmlRpc.h>
 
 #include <string>
 #include <vector>
@@ -160,57 +159,6 @@ void toProto(
 void toMsg(
   const openscenario_msgs::EntityStatus & proto,
   openscenario_msgs::msg::EntityStatus & status);
-
-template<typename T>
-T getXmlValue(const XmlRpc::XmlRpcValue & xml, const std::string & key)
-{
-  if (!xml.hasMember(key)) {
-    THROW_XML_PARAMETER_NOT_DEFINED_ERROR(key);
-  }
-  if (typeid(T) == typeid(double)) {
-    if (xml[key].getType() == XmlRpc::XmlRpcValue::TypeDouble) {
-      return xml[key];
-    }
-    THROW_XML_PARAMETER_ERROR("param : " + key + " is does not double type");
-  }
-  if (typeid(T) == typeid(bool)) {
-    if (xml[key].getType() == XmlRpc::XmlRpcValue::TypeBoolean) {
-      return xml[key];
-    }
-    THROW_XML_PARAMETER_ERROR("param : " + key + " is does not bool type");
-  }
-  if (typeid(T) == typeid(std::string)) {
-    if (xml[key].getType() == XmlRpc::XmlRpcValue::TypeString) {
-      return xml[key];
-    }
-    THROW_XML_PARAMETER_ERROR("param : " + key + " is does not string type");
-  }
-  THROW_XML_PARAMETER_ERROR("type of the param : " + key + " does not supported yet");
-}
-
-template<typename T>
-const XmlRpc::XmlRpcValue serializeToBinValue(const T & data)
-{
-  size_t size = data.ByteSizeLong();
-  void * buffer = malloc(size);
-  data.SerializeToArray(buffer, size);
-  const auto val = XmlRpc::XmlRpcValue(buffer, size);
-  free(buffer);
-  return val;
-}
-
-template<typename T>
-const T deserializeFromBinValue(const XmlRpc::XmlRpcValue & data)
-{
-  if (data[0].getType() != XmlRpc::XmlRpcValue::TypeBase64) {
-    THROW_XML_PARAMETER_ERROR("data is not a binary type");
-  }
-  std::vector<char> bin = data[0];
-  T ret;
-  ret.ParseFromArray(bin.data(), bin.size());
-  return ret;
-}
 }  // namespace simulation_interface
-
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

@@ -34,9 +34,7 @@ public:
     const unsigned int & port,
     std::function<void(const ReqType &, ResType &)> func)
   : Server(
-      simulation_interface::enumToString(protocol) +
-      "://" + simulation_interface::enumToString(hostname) +
-      ":" + std::to_string(port), func) {}
+      simulation_interface::getEndPoint(protocol, hostname, port), func) {}
   explicit Server(
     const simulation_interface::TransportProtocol & protocol,
     const std::string & ip_address, const unsigned int & port,
@@ -64,30 +62,34 @@ public:
   {
     socket_.bind(endpoint_);
     poller_.add(socket_);
-    thread_ = std::thread(&Server::poll, this);
+    thread_ = std::thread(&Server::start_poll, this);
   }
 
 private:
   void poll()
   {
-    while (rclcpp::ok()) {
-      poller_.poll(0.01);
-      if (poller_.has_input(socket_)) {
-        zmqpp::message request;
-        socket_.receive(request);
-        std::string serialized_str = request.get(0);
-        ReqType req_proto;
-        req_proto.ParseFromString(serialized_str);
-        ResType res_proto;
-        func_(req_proto, res_proto);
-        std::string res_serialized_str;
-        if (!res_proto.SerializeToString(&res_serialized_str)) {
-          throw std::runtime_error("failed to serialize from proto");
-        }
-        zmqpp::message response;
-        response << res_serialized_str;
-        socket_.send(response);
+    poller_.poll(0.01);
+    if (poller_.has_input(socket_)) {
+      zmqpp::message request;
+      socket_.receive(request);
+      std::string serialized_str = request.get(0);
+      ReqType req_proto;
+      req_proto.ParseFromString(serialized_str);
+      ResType res_proto;
+      func_(req_proto, res_proto);
+      std::string res_serialized_str;
+      if (!res_proto.SerializeToString(&res_serialized_str)) {
+        throw std::runtime_error("failed to serialize from proto");
       }
+      zmqpp::message response;
+      response << res_serialized_str;
+      socket_.send(response);
+    }
+  }
+  void start_poll()
+  {
+    while (rclcpp::ok()) {
+      poll();
     }
   }
   const std::string endpoint_;
