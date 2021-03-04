@@ -35,12 +35,17 @@ include_directories(
 )
 
 ament_auto_add_library(simulation_interface SHARED
+  src/zmq_multi_server.cpp
   src/conversions.cpp
   src/constants.cpp
   ${PROTO_SRCS}
 )
 target_link_libraries(simulation_interface
   ${PROTOBUF_LIBRARY}
+  pthread
+  sodium
+  zmqpp
+  zmq
 )
 
 ament_auto_add_executable(example
@@ -64,6 +69,7 @@ install(TARGETS
 )
 
 install(TARGETS simulation_interface
+  EXPORT export_simulation_interface
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

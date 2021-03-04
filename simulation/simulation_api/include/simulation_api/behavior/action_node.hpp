@@ -67,6 +67,7 @@ public:
     const std::vector<std::int64_t> & following_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> getOtherEntityStatus(std::int64_t lanelet_id);
   openscenario_msgs::msg::EntityStatus stopAtEndOfRoad();
+  double getHorizon() const;
 
   /// throws if the derived class return RUNNING.
   BT::NodeStatus executeTick() override;

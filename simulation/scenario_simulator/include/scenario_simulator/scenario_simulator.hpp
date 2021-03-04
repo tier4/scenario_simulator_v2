@@ -15,15 +15,15 @@
 #ifndef SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 #define SCENARIO_SIMULATOR__SCENARIO_SIMULATOR_HPP_
 
-#include <scenario_simulator/xmlrpc_method.hpp>
-
 #include <scenario_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <scenario_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 
+#include <simulation_interface/zmq_server.hpp>
+#include <simulation_interface/zmq_multi_server.hpp>
+
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <xmlrpcpp/XmlRpc.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/msg/transform_stamped.hpp>
@@ -88,23 +88,34 @@ public:
   ~ScenarioSimulator();
 
 private:
-  XmlRpc::XmlRpcServer server_;
-  int port_;
-  std::map<std::string, std::shared_ptr<scenario_simulator::XmlRpcMethod>> methods_;
-  void updateFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void initialize(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void spawnVehicleEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void spawnPedestrianEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void despawnEntity(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void updateEntityStatus(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void attachLidarSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void attachDetectionSensor(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void updateSensorFrame(XmlRpc::XmlRpcValue & param, XmlRpc::XmlRpcValue & result);
-  void addMethod(
-    std::string name, std::function<void(XmlRpc::XmlRpcValue &,
-    XmlRpc::XmlRpcValue &)> func);
-  void runXmlRpc();
-  std::thread xmlrpc_thread_;
+  SensorSimulation sensor_sim_;
+  void initialize(
+    const simulation_api_schema::InitializeRequest & req,
+    simulation_api_schema::InitializeResponse & res);
+  void updateFrame(
+    const simulation_api_schema::UpdateFrameRequest & req,
+    simulation_api_schema::UpdateFrameResponse & res);
+  void updateEntityStatus(
+    const simulation_api_schema::UpdateEntityStatusRequest & req,
+    simulation_api_schema::UpdateEntityStatusResponse & res);
+  void spawnVehicleEntity(
+    const simulation_api_schema::SpawnVehicleEntityRequest & req,
+    simulation_api_schema::SpawnVehicleEntityResponse & res);
+  void spawnPedestrianEntity(
+    const simulation_api_schema::SpawnPedestrianEntityRequest & req,
+    simulation_api_schema::SpawnPedestrianEntityResponse & res);
+  void despawnEntity(
+    const simulation_api_schema::DespawnEntityRequest & req,
+    simulation_api_schema::DespawnEntityResponse & res);
+  void attachDetectionSensor(
+    const simulation_api_schema::AttachDetectionSensorRequest & req,
+    simulation_api_schema::AttachDetectionSensorResponse & res);
+  void attachLidarSensor(
+    const simulation_api_schema::AttachLidarSensorRequest & req,
+    simulation_api_schema::AttachLidarSensorResponse & res);
+  void updateSensorFrame(
+    const simulation_api_schema::UpdateSensorFrameRequest & req,
+    simulation_api_schema::UpdateSensorFrameResponse & res);
   std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
   std::vector<openscenario_msgs::VehicleParameters> vehicles_;
   std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;
@@ -113,7 +124,7 @@ private:
   double current_time_;
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
-  SensorSimulation sensor_sim_;
+  zeromq::MultiServer server_;
 };
 }  // namespace scenario_simulator
 

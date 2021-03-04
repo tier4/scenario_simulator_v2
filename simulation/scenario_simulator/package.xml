@@ -33,7 +33,6 @@
   <depend>visualization_msgs</depend>
   <depend>eigen</depend>
   <depend>quaternion_operation</depend>
-  <depend>xmlrpcpp</depend>
   <depend>simulation_interface</depend>
   <depend>openscenario_msgs</depend>
   <depend>embree</depend>
