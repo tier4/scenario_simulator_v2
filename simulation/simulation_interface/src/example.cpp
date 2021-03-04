@@ -29,7 +29,9 @@ void callback(
   req.PrintDebugString();
   res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("test");
+  res.mutable_result()->set_description(
+    "realtime factor : " +
+    std::to_string(req.realtime_factor()));
   // res.PrintDebugString();
 }
 
@@ -38,8 +40,10 @@ class ExampleNode : public rclcpp::Node
 public:
   explicit ExampleNode(const rclcpp::NodeOptions & option)
   : Node("example", option),
-    server_("tcp://*:5555", callback),
-    client_("tcp://localhost:5555")
+    server_(simulation_interface::TransportProtocol::TCP,
+      simulation_interface::HostName::ANY, 5555, callback),
+    client_(simulation_interface::TransportProtocol::TCP,
+      simulation_interface::HostName::LOCLHOST, 5555)
   {
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(250ms, std::bind(&ExampleNode::sendRequest, this));
