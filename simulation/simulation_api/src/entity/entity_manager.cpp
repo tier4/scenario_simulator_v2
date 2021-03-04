@@ -14,7 +14,6 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
-#include <simulation_api/helper/stop_watch.hpp>
 #include <simulation_api/math/collision.hpp>
 
 #include <limits>
