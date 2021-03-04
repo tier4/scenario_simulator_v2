@@ -22,12 +22,12 @@
 #ifdef AUTOWARE_IV
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
-#include <autoware_control_msgs/msg/engage_mode.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
+#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
@@ -50,6 +50,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <cassert>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -89,7 +90,7 @@ public:
    *    setAutowareEngage(const bool) const
    *
    * ------------------------------------------------------------------------ */
-  using AutowareEngage = autoware_control_msgs::msg::EngageMode;
+  using AutowareEngage = autoware_vehicle_msgs::msg::Engage;
 
   DEFINE_PUBLISHER(AutowareEngage);
 
@@ -448,26 +449,24 @@ public:
   DEFINE_SUBSCRIPTION(VehicleCommand);
 
 public:
-  auto isWaitingForRoute() const noexcept
-  {
-    using autoware_system_msgs::msg::AutowareState;
+# define DEFINE_STATE_PREDICATE(NAME, VALUE) \
+  auto is ## NAME() const noexcept \
+  { \
+    using autoware_system_msgs::msg::AutowareState; \
+    assert(AutowareState::VALUE == #NAME); \
+    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
+  } static_assert(true, "")
 
-    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::WAITING_FOR_ROUTE;
-  }
+  DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
+  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
+  DEFINE_STATE_PREDICATE(Planning, PLANNING);
+  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
+  DEFINE_STATE_PREDICATE(Driving, DRIVING);
+  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
+  DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
+  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
-  auto isEmergency() const noexcept
-  {
-    using autoware_system_msgs::msg::AutowareState;
-
-    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::EMERGENCY;
-  }
-
-  auto isWaitingForEngage() const noexcept
-  {
-    using autoware_system_msgs::msg::AutowareState;
-
-    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::WAITING_FOR_ENGAGE;
-  }
+# undef DEFINE_STATE_PREDICATE
 
   bool ready = false;
 
@@ -526,20 +525,20 @@ public:
     INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),
 #endif
     // AWAPI topics (lexicographically sorted)
-    INIT_PUBLISHER(AutowareEngage, "/autoware/put/engage"),
-    INIT_PUBLISHER(AutowareRoute, "/autoware/put/route"),
-    INIT_PUBLISHER(LaneChangeApproval, "/lane_change/put/approval"),
-    INIT_PUBLISHER(LaneChangeForce, "/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficLightStateArray, "/traffic_light/put/traffic_light"),
-    INIT_PUBLISHER(VehicleVelocity, "/vehicle/put/velocity"),
-    INIT_SUBSCRIPTION(AutowareStatus, "/autoware/get/status", checkAutowareState),
-    INIT_SUBSCRIPTION(TrafficLightStatus, "/traffic_light/get/status", []() {}),
-    INIT_SUBSCRIPTION(VehicleStatus, "/vehicle/get/status", []() {}),
+    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+    INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
+    INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
+    INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
+    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
+    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
 
     // Simulation specific topics (lexicographically sorted)
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentPose, "/current_pose"),
+    INIT_PUBLISHER(CurrentPose, "current_pose"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),

@@ -31,6 +31,7 @@
 #include <cstdlib>
 #include <future>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -65,6 +66,12 @@ class EgoEntity : public VehicleEntity
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
   std::shared_ptr<std::thread> accessor_spinner;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  If you can't explain the difference between char * and char [], don't
+   *  edit this function even if it looks strange.
+   *
+   * ------------------------------------------------------------------------ */
   auto execute(const std::vector<std::string> & f_xs)
   {
     std::vector<std::vector<char>> buffer {};
@@ -232,13 +239,7 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
-    std::cout << "REQUEST ACQUIRE-POSITION" << std::endl;
-
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      !std::atomic_load(&autowares.at(name))->isWaitingForRoute();
-      rate.sleep())
-    {}
+    waitForAutowareStateToBeWaitingForRoute();
 
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
@@ -249,13 +250,8 @@ public:
       std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
     }
 
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      !std::atomic_load(&autowares.at(name))->isWaitingForEngage();
-      rate.sleep())
-    {}
+    waitForAutowareStateToBeWaitingForEngage();
 
-    DEBUG_LINE();
     for (
       rclcpp::WallRate rate {std::chrono::seconds(1)};
       std::atomic_load(&autowares.at(name))->isWaitingForEngage();
@@ -265,7 +261,7 @@ public:
       std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
     }
 
-    std::cout << "REQUEST END" << std::endl;
+    waitForAutowareStateToBeDriving();
   }
 
   const std::string getCurrentAction() const
@@ -285,6 +281,53 @@ public:
   openscenario_msgs::msg::WaypointsArray getWaypoints() const;
 
 private:
+  // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
+# define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
+  void waitForAutowareStateToBe ## STATE(const std::size_t count_max = 10) const \
+  { \
+    std::size_t count = 0; \
+    for ( \
+      rclcpp::WallRate rate {std::chrono::seconds(1)}; \
+      !std::atomic_load(&autowares.at(name))->is ## STATE(); \
+      rate.sleep()) \
+    { \
+      if (count < count_max) { \
+        RCLCPP_INFO_STREAM( \
+          std::atomic_load(&autowares.at(name))->get_logger(), \
+          "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
+      } else { \
+        const auto current_state = \
+          std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state; \
+        std::stringstream ss {}; \
+        ss << "The simulator waited " \
+           << count \
+           << " seconds, expecting the Autoware state to transitioning to " \
+           << #STATE \
+           << ", but there was no change. The current Autoware state is " \
+           << (current_state.empty() ? "NOT PUBLISHED YET" : current_state) \
+           << ". This error is most likely due to the Autoware state transition " \
+           << "conditions changing with the update. Please report this error to " \
+           << "the developer. This error message was written by @yamacir-kit."; \
+        using AutowareError = std::runtime_error; \
+        throw AutowareError(ss.str()); \
+      } \
+    } \
+    RCLCPP_INFO_STREAM( \
+      std::atomic_load(&autowares.at(name))->get_logger(), \
+      "Autoware is " #STATE " now."); \
+  } static_assert(true, "")
+
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(InitializingVehicle);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForRoute);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Planning);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForEngage);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Driving);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(ArrivedGoal);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Emergency);
+  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
+
+# undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
+
   void waitForAutowareToBeReady() const
   {
     std::size_t count = 0;
