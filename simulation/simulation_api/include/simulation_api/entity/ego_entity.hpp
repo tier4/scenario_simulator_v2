@@ -239,29 +239,41 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
-    waitForAutowareStateToBeWaitingForRoute();
+    waitForAutowareStateToBeWaitingForRoute([]() {});
 
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autowares.at(name))->isWaitingForRoute();
-      rate.sleep())
-    {
-      std::cout << "SEND GOAL-POSE!" << std::endl;
-      std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
-    }
+    // for (
+    //   rclcpp::WallRate rate {std::chrono::seconds(1)};
+    //   std::atomic_load(&autowares.at(name))->isWaitingForRoute();
+    //   rate.sleep())
+    // {
+    //   std::cout << "SEND GOAL-POSE!" << std::endl;
+    //   std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
+    // }
 
-    waitForAutowareStateToBeWaitingForEngage();
+    waitForAutowareStateToBePlanning(
+      [&]()
+      {
+        return std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
+      });
 
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autowares.at(name))->isWaitingForEngage();
-      rate.sleep())
-    {
-      std::cout << "ENGAGE!" << std::endl;
-      std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
-    }
+    waitForAutowareStateToBeWaitingForEngage([]() {});
 
-    waitForAutowareStateToBeDriving();
+    // for (
+    //   rclcpp::WallRate rate {std::chrono::seconds(1)};
+    //   std::atomic_load(&autowares.at(name))->isWaitingForEngage();
+    //   rate.sleep())
+    // {
+    //   std::cout << "ENGAGE!" << std::endl;
+    //   std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+    // }
+    //
+    // waitForAutowareStateToBeDriving([]() {});
+
+    waitForAutowareStateToBeDriving(
+      [&]()
+      {
+        return std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+      });
   }
 
   const std::string getCurrentAction() const
@@ -283,7 +295,8 @@ public:
 private:
   // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
 # define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
-  void waitForAutowareStateToBe ## STATE(const std::size_t count_max = 10) const \
+  template<typename Thunk> \
+  void waitForAutowareStateToBe ## STATE(Thunk thunk) const \
   { \
     std::size_t count = 0; \
     for ( \
@@ -291,10 +304,11 @@ private:
       !std::atomic_load(&autowares.at(name))->is ## STATE(); \
       rate.sleep()) \
     { \
-      if (count < count_max) { \
+      if (count < 10) { \
         RCLCPP_INFO_STREAM( \
           std::atomic_load(&autowares.at(name))->get_logger(), \
           "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
+        thunk(); \
       } else { \
         const auto current_state = \
           std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state; \
