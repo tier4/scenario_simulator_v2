@@ -26,12 +26,20 @@ MultiServer::MultiServer(
   const simulation_interface::HostName & hostname,
   std::function<void(const simulation_api_schema::InitializeRequest &,
   simulation_api_schema::InitializeResponse &)> initialize_func,
+  std::function<void(const simulation_api_schema::UpdateFrameRequest &,
+  simulation_api_schema::UpdateFrameResponse &)> update_frame_func,
+  std::function<void(const simulation_api_schema::UpdateSensorFrameRequest &,
+  simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func,
   std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
   simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func)
 : context_(zmqpp::context()),
   type_(zmqpp::socket_type::reply),
   initialize_sock_(context_, type_),
   initialize_func_(initialize_func),
+  update_frame_sock_(context_, type_),
+  update_frame_func_(update_frame_func),
+  update_sensor_frame_sock_(context_, type_),
+  update_sensor_frame_func_(update_sensor_frame_func),
   update_entity_status_sock_(context_, type_),
   update_entity_status_func_(update_entity_status_func)
 {
@@ -43,14 +51,24 @@ MultiServer::MultiServer(
     simulation_interface::getEndPoint(
       protocol, hostname,
       simulation_interface::ports::update_entity_status));
+  update_frame_sock_.bind(
+    simulation_interface::getEndPoint(
+      protocol, hostname,
+      simulation_interface::ports::update_frame));
+  update_sensor_frame_sock_.bind(
+    simulation_interface::getEndPoint(
+      protocol, hostname,
+      simulation_interface::ports::update_sensor_frame));
   poller_.add(initialize_sock_);
+  poller_.add(update_frame_sock_);
+  poller_.add(update_sensor_frame_sock_);
   poller_.add(update_entity_status_sock_);
   thread_ = std::thread(&MultiServer::start_poll, this);
 }
 
 void MultiServer::poll()
 {
-  poller_.poll(0.01);
+  poller_.poll(0.0001);
   if (poller_.has_input(initialize_sock_)) {
     zmqpp::message request;
     initialize_sock_.receive(request);
@@ -58,6 +76,26 @@ void MultiServer::poll()
     initialize_func_(toProto<simulation_api_schema::InitializeRequest>(request), response);
     auto msg = toZMQ(response);
     initialize_sock_.send(msg);
+  }
+  if (poller_.has_input(update_frame_sock_)) {
+    zmqpp::message request;
+    update_frame_sock_.receive(request);
+    simulation_api_schema::UpdateFrameResponse response;
+    update_frame_func_(
+      toProto<simulation_api_schema::UpdateFrameRequest>(
+        request), response);
+    auto msg = toZMQ(response);
+    update_frame_sock_.send(msg);
+  }
+  if (poller_.has_input(update_sensor_frame_sock_)) {
+    zmqpp::message request;
+    update_sensor_frame_sock_.receive(request);
+    simulation_api_schema::UpdateSensorFrameResponse response;
+    update_sensor_frame_func_(
+      toProto<simulation_api_schema::UpdateSensorFrameRequest>(
+        request), response);
+    auto msg = toZMQ(response);
+    update_sensor_frame_sock_.send(msg);
   }
   if (poller_.has_input(update_entity_status_sock_)) {
     zmqpp::message request;

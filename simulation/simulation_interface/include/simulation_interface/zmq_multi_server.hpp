@@ -33,6 +33,10 @@ public:
     const simulation_interface::HostName & hostname,
     std::function<void(const simulation_api_schema::InitializeRequest &,
     simulation_api_schema::InitializeResponse &)> initialize_func,
+    std::function<void(const simulation_api_schema::UpdateFrameRequest &,
+    simulation_api_schema::UpdateFrameResponse &)> update_frame_func,
+    std::function<void(const simulation_api_schema::UpdateSensorFrameRequest &,
+    simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func,
     std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
     simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func);
 
@@ -46,6 +50,12 @@ private:
   zmqpp::socket initialize_sock_;
   std::function<void(const simulation_api_schema::InitializeRequest &,
     simulation_api_schema::InitializeResponse &)> initialize_func_;
+  zmqpp::socket update_frame_sock_;
+  std::function<void(const simulation_api_schema::UpdateFrameRequest &,
+    simulation_api_schema::UpdateFrameResponse &)> update_frame_func_;
+  zmqpp::socket update_sensor_frame_sock_;
+  std::function<void(const simulation_api_schema::UpdateSensorFrameRequest &,
+    simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func_;
   zmqpp::socket update_entity_status_sock_;
   std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
     simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func_;

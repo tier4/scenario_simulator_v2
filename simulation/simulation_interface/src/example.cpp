@@ -24,6 +24,18 @@
 #include <chrono>
 #include <memory>
 
+void initialize_callback(
+  const simulation_api_schema::InitializeRequest & req,
+  simulation_api_schema::InitializeResponse & res) {}
+
+void update_frame_callback(
+  const simulation_api_schema::UpdateFrameRequest & req,
+  simulation_api_schema::UpdateFrameResponse & res) {}
+
+void update_sensor_frame_callback(
+  const simulation_api_schema::UpdateSensorFrameRequest & req,
+  simulation_api_schema::UpdateSensorFrameResponse & res) {}
+
 void update_entity_status_callback(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
@@ -36,13 +48,6 @@ void update_entity_status_callback(
   res.PrintDebugString();
 }
 
-void initialize_callback(
-  const simulation_api_schema::InitializeRequest & req,
-  simulation_api_schema::InitializeResponse & res)
-{
-
-}
-
 class ExampleNode : public rclcpp::Node
 {
 public:
@@ -51,10 +56,15 @@ public:
     server_(simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::ANY,
       initialize_callback,
+      update_frame_callback,
+      update_sensor_frame_callback,
       update_entity_status_callback),
     client_(simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::LOCLHOST,
-      simulation_interface::ports::update_entity_status)
+      simulation_interface::ports::update_entity_status),
+    init_client_(simulation_interface::TransportProtocol::TCP,
+      simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::initialize)
   {
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(250ms, std::bind(&ExampleNode::sendRequest, this));
@@ -69,11 +79,9 @@ public:
     simulation_interface::toProto(status, proto);
     simulation_api_schema::UpdateEntityStatusResponse response;
     *request.add_status() = proto;
-    *request.add_status() = proto;
-    *request.add_status() = proto;
-    *request.add_status() = proto;
-    *request.add_status() = proto;
     client_.call(request, response);
+    auto init_res = simulation_api_schema::InitializeResponse();
+    init_client_.call(simulation_api_schema::InitializeRequest(), init_res);
   }
 
 private:
@@ -82,6 +90,9 @@ private:
   zeromq::Client<
     simulation_api_schema::UpdateEntityStatusRequest,
     simulation_api_schema::UpdateEntityStatusResponse> client_;
+  zeromq::Client<
+    simulation_api_schema::InitializeRequest,
+    simulation_api_schema::InitializeResponse> init_client_;
 };
 
 int main(int argc, char * argv[])
