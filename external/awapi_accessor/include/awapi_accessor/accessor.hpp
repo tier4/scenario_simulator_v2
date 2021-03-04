@@ -482,7 +482,6 @@ public:
 
   void checkAutowareState()
   {
-    std::cout << "AutowareState = " << CURRENT_VALUE_OF(AutowareStatus).autoware_state << std::endl;
     if (isReady() && isEmergency()) {
       throw AutowareError();
     }
