@@ -36,6 +36,11 @@ void update_sensor_frame_callback(
   const simulation_api_schema::UpdateSensorFrameRequest & req,
   simulation_api_schema::UpdateSensorFrameResponse & res) {}
 
+void spawn_vehicle_entity_callback(
+  const simulation_api_schema::SpawnVehicleEntityRequest & req,
+  simulation_api_schema::SpawnVehicleEntityResponse & res) {}
+
+
 void update_entity_status_callback(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
@@ -58,6 +63,7 @@ public:
       initialize_callback,
       update_frame_callback,
       update_sensor_frame_callback,
+      spawn_vehicle_entity_callback,
       update_entity_status_callback),
     client_(simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::LOCLHOST,
