@@ -35,50 +35,25 @@ namespace scenario_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("scenario_simulator", options), sensor_sim_(get_clock()),
-  initialize_server_(simulation_interface::protocol,
+  server_(simulation_interface::protocol,
     simulation_interface::HostName::ANY,
-    simulation_interface::ports::initialize,
     std::bind(&ScenarioSimulator::initialize, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  update_frame_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::update_frame,
+    std::placeholders::_1, std::placeholders::_2),
     std::bind(&ScenarioSimulator::updateFrame, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  update_entity_status_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::update_entity_status,
-    std::bind(&ScenarioSimulator::updateEntityStatus, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  spawn_vehicle_entity_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::spawn_vehicle_entity,
-    std::bind(&ScenarioSimulator::spawnVehicleEntity, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  spawn_pedestrian_entity_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::spawn_pedestrian_entity,
-    std::bind(&ScenarioSimulator::spawnPedestrianEntity, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  despawn_entity_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::despawn_entity,
-    std::bind(&ScenarioSimulator::despawnEntity, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  attach_detection_sensor_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::attach_detection_sensor,
-    std::bind(&ScenarioSimulator::attachDetectionSensor, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  attach_lidar_sensor_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::attach_lidar_sensor,
-    std::bind(&ScenarioSimulator::attachLidarSensor, this,
-    std::placeholders::_1, std::placeholders::_2)),
-  update_sensor_frame_server_(simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    simulation_interface::ports::update_sensor_frame,
+    std::placeholders::_1, std::placeholders::_2),
     std::bind(&ScenarioSimulator::updateSensorFrame, this,
+    std::placeholders::_1, std::placeholders::_2),
+    std::bind(&ScenarioSimulator::spawnVehicleEntity, this,
+    std::placeholders::_1, std::placeholders::_2),
+    std::bind(&ScenarioSimulator::spawnPedestrianEntity, this,
+    std::placeholders::_1, std::placeholders::_2),
+    std::bind(&ScenarioSimulator::despawnEntity, this,
+    std::placeholders::_1, std::placeholders::_2),
+    std::bind(&ScenarioSimulator::updateEntityStatus, this,
+    std::placeholders::_1, std::placeholders::_2),
+    std::bind(&ScenarioSimulator::attachLidarSensor, this,
+    std::placeholders::_1, std::placeholders::_2),
+    std::bind(&ScenarioSimulator::attachDetectionSensor, this,
     std::placeholders::_1, std::placeholders::_2))
 {
 }
@@ -120,11 +95,9 @@ void ScenarioSimulator::updateEntityStatus(
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
   entity_status_ = {};
-  /*
   for (const auto proto : req.status()) {
     entity_status_.emplace_back(proto);
   }
-  */
   res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");

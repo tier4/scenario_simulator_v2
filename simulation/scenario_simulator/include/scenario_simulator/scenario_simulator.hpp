@@ -20,6 +20,7 @@
 #include <scenario_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 
 #include <simulation_interface/zmq_server.hpp>
+#include <simulation_interface/zmq_multi_server.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -88,58 +89,30 @@ public:
 
 private:
   SensorSimulation sensor_sim_;
-  int port_;
-  zeromq::Server<
-    simulation_api_schema::InitializeRequest,
-    simulation_api_schema::InitializeResponse> initialize_server_;
   void initialize(
     const simulation_api_schema::InitializeRequest & req,
     simulation_api_schema::InitializeResponse & res);
-  zeromq::Server<
-    simulation_api_schema::UpdateFrameRequest,
-    simulation_api_schema::UpdateFrameResponse> update_frame_server_;
   void updateFrame(
     const simulation_api_schema::UpdateFrameRequest & req,
     simulation_api_schema::UpdateFrameResponse & res);
-  zeromq::Server<
-    simulation_api_schema::UpdateEntityStatusRequest,
-    simulation_api_schema::UpdateEntityStatusResponse> update_entity_status_server_;
   void updateEntityStatus(
     const simulation_api_schema::UpdateEntityStatusRequest & req,
     simulation_api_schema::UpdateEntityStatusResponse & res);
-  zeromq::Server<
-    simulation_api_schema::SpawnVehicleEntityRequest,
-    simulation_api_schema::SpawnVehicleEntityResponse> spawn_vehicle_entity_server_;
   void spawnVehicleEntity(
     const simulation_api_schema::SpawnVehicleEntityRequest & req,
     simulation_api_schema::SpawnVehicleEntityResponse & res);
-  zeromq::Server<
-    simulation_api_schema::SpawnPedestrianEntityRequest,
-    simulation_api_schema::SpawnPedestrianEntityResponse> spawn_pedestrian_entity_server_;
   void spawnPedestrianEntity(
     const simulation_api_schema::SpawnPedestrianEntityRequest & req,
     simulation_api_schema::SpawnPedestrianEntityResponse & res);
-  zeromq::Server<
-    simulation_api_schema::DespawnEntityRequest,
-    simulation_api_schema::DespawnEntityResponse> despawn_entity_server_;
   void despawnEntity(
     const simulation_api_schema::DespawnEntityRequest & req,
     simulation_api_schema::DespawnEntityResponse & res);
-  zeromq::Server<
-    simulation_api_schema::AttachDetectionSensorRequest,
-    simulation_api_schema::AttachDetectionSensorResponse> attach_detection_sensor_server_;
   void attachDetectionSensor(
     const simulation_api_schema::AttachDetectionSensorRequest & req,
     simulation_api_schema::AttachDetectionSensorResponse & res);
-  zeromq::Server<
-    simulation_api_schema::AttachLidarSensorRequest,
-    simulation_api_schema::AttachLidarSensorResponse> attach_lidar_sensor_server_;
   void attachLidarSensor(
     const simulation_api_schema::AttachLidarSensorRequest & req,
     simulation_api_schema::AttachLidarSensorResponse & res);
-  zeromq::Server<
-    simulation_api_schema::UpdateSensorFrameRequest,
-    simulation_api_schema::UpdateSensorFrameResponse> update_sensor_frame_server_;
   void updateSensorFrame(
     const simulation_api_schema::UpdateSensorFrameRequest & req,
     simulation_api_schema::UpdateSensorFrameResponse & res);
@@ -151,6 +124,7 @@ private:
   double current_time_;
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
+  zeromq::MultiServer server_;
 };
 }  // namespace scenario_simulator
 
