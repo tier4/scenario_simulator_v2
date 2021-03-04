@@ -59,12 +59,23 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   const auto current_entity_status = getStatus();
 
   if (std::exchange(autoware_uninitialized, false)) {
-    waitForAutowareToBeReady();
     std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autowares.at(name))->setInitialTwist();
-  }
 
-  updateAutoware(current_entity_status.pose);
+    updateAutoware(current_entity_status.pose);
+
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
+     *  to be published. Member function EgoEntity::waitForAutowareToBe* are
+     *  depends a topic '/awapi/autoware/get/status' published by
+     *  awapi_awiv_adapter.
+     *
+     * ---------------------------------------------------------------------- */
+    waitForAutowareStateToBeInitializingVehicle();
+  } else {
+    updateAutoware(current_entity_status.pose);
+  }
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   {

@@ -17,7 +17,7 @@
 
 // NOTE: headers are lexicographically sorted.
 
-#include <autoware_control_msgs/msg/engage_mode.hpp>
+#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <boost/mpl/and.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
@@ -81,16 +81,16 @@ struct converter<From, std_msgs::msg::Float32>
 };
 
 template<typename From>
-struct converter<From, autoware_control_msgs::msg::EngageMode>
+struct converter<From, autoware_vehicle_msgs::msg::Engage>
 {
-  using result_type = autoware_control_msgs::msg::EngageMode;
+  using result_type = autoware_vehicle_msgs::msg::Engage;
 
   template<REQUIRES(std::is_convertible<From, bool>)>
   result_type operator()(const From & from)
   {
     result_type to;
     {
-      to.is_engaged = from;
+      to.engage = from;
     }
 
     return to;
