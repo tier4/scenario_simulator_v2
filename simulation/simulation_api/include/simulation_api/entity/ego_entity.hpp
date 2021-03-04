@@ -285,6 +285,35 @@ public:
   openscenario_msgs::msg::WaypointsArray getWaypoints() const;
 
 private:
+# define DEFINE_WAIT_FOR_AUTOWARE_TO_BE(STATE) \
+  void waitForAutowareToBe ## STATE() const \
+  { \
+    std::size_t count = 0; \
+    for ( \
+      rclcpp::WallRate rate {std::chrono::seconds(1)}; \
+      std::atomic_load(&autowares.at(name))->is ## STATE(); \
+      rate.sleep()) \
+    { \
+      RCLCPP_INFO_STREAM( \
+        std::atomic_load(&autowares.at(name))->get_logger(), \
+        "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
+    } \
+    RCLCPP_INFO_STREAM( \
+      std::atomic_load(&autowares.at(name))->get_logger(), \
+      "Autoware is  " #STATE " now."); \
+  } static_assert(true, "")
+
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(InitializingVehicle);
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(WaitingForRoute);
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(Planning);
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(WaitingForEngage);
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(Driving);
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(ArrivedGoal);
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(Emergency);
+  DEFINE_WAIT_FOR_AUTOWARE_TO_BE(Finalizing);
+
+# undef DEFINE_WAIT_FOR_AUTOWARE_TO_BE
+
   void waitForAutowareToBeReady() const
   {
     std::size_t count = 0;
