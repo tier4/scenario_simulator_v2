@@ -288,7 +288,7 @@ private:
     std::size_t count = 0; \
     for ( \
       rclcpp::WallRate rate {std::chrono::seconds(1)}; \
-      std::atomic_load(&autowares.at(name))->is ## STATE(); \
+      !std::atomic_load(&autowares.at(name))->is ## STATE(); \
       rate.sleep()) \
     { \
       if (count < count_max) { \
@@ -296,13 +296,15 @@ private:
           std::atomic_load(&autowares.at(name))->get_logger(), \
           "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
       } else { \
+        const auto current_state = \
+          std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state; \
         std::stringstream ss {}; \
         ss << "The simulator waited " \
            << count \
            << " seconds, expecting the Autoware state to transitioning to " \
            << #STATE \
-           << ", but there was no change. The current Autoware state is" \
-           << std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state \
+           << ", but there was no change. The current Autoware state is " \
+           << (current_state.empty() ? "NOT PUBLISHED YET" : current_state) \
            << ". This error is most likely due to the Autoware state transition " \
            << "conditions changing with the update. Please report this error to " \
            << "the developer. This error message was written by @yamacir-kit."; \
