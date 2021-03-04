@@ -483,6 +483,7 @@ public:
 
   void checkAutowareState()
   {
+    std::cout << "AutowareState = " << CURRENT_VALUE_OF(AutowareStatus).autoware_state << std::endl;
     if (isReady() && isEmergency()) {
       throw AutowareError();
     }
@@ -526,20 +527,20 @@ public:
     INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),
 #endif
     // AWAPI topics (lexicographically sorted)
-    INIT_PUBLISHER(AutowareEngage, "/autoware/put/engage"),
-    INIT_PUBLISHER(AutowareRoute, "/autoware/put/route"),
-    INIT_PUBLISHER(LaneChangeApproval, "/lane_change/put/approval"),
-    INIT_PUBLISHER(LaneChangeForce, "/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficLightStateArray, "/traffic_light/put/traffic_light"),
-    INIT_PUBLISHER(VehicleVelocity, "/vehicle/put/velocity"),
-    INIT_SUBSCRIPTION(AutowareStatus, "/autoware/get/status", checkAutowareState),
-    INIT_SUBSCRIPTION(TrafficLightStatus, "/traffic_light/get/status", []() {}),
-    INIT_SUBSCRIPTION(VehicleStatus, "/vehicle/get/status", []() {}),
+    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+    INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
+    INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
+    INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
+    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
+    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
 
     // Simulation specific topics (lexicographically sorted)
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentPose, "/current_pose"),
+    INIT_PUBLISHER(CurrentPose, "current_pose"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),
