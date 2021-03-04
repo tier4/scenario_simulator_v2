@@ -58,7 +58,7 @@ public:
   void call(const ReqType & req, ResType & res)
   {
     std::chrono::system_clock::time_point  start, end;
-    // start = std::chrono::system_clock::now();
+    start = std::chrono::system_clock::now();
     std::string request_string;
     req.SerializeToString(&request_string);
     zmqpp::message message;
@@ -68,9 +68,10 @@ public:
     socket_.receive(buffer);
     std::string recieved_string = buffer.get(0);
     res.ParseFromString(recieved_string);
-    // end = std::chrono::system_clock::now();
-    // double elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
-    // std::cout << "transport delay : " << elapsed << " micro seconds" << std::endl;
+    end = std::chrono::system_clock::now();
+    double elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+    std::cout << "endpoint : " << endpoint_ << std::endl;
+    std::cout << "transport delay : " << elapsed << " micro seconds" << std::endl;
   }
 
 private:
