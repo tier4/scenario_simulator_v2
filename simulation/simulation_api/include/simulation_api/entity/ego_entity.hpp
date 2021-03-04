@@ -346,8 +346,6 @@ private:
   }
 
 private:
-  autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
-
   const openscenario_msgs::msg::EntityStatus getEntityStatus(
     const double time,
     const double step_time) const;

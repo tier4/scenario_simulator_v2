@@ -29,14 +29,6 @@ std::unordered_map<
   std::string, std::shared_ptr<autoware_api::Accessor>
 > EgoEntity::autowares {};
 
-autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
-{
-  autoware_auto_msgs::msg::Complex32 heading;
-  heading.real = static_cast<decltype(heading.real)>(std::cos(yaw * 0.5));
-  heading.imag = static_cast<decltype(heading.imag)>(std::sin(yaw * 0.5));
-  return heading;
-}
-
 openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
 {
   openscenario_msgs::msg::WaypointsArray waypoints {};
@@ -81,11 +73,19 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   {
+    autoware_auto_msgs::msg::Complex32 heading;
+    {
+      const auto yaw =
+        quaternion_operation::convertQuaternionToEulerAngle(
+          current_entity_status.pose.orientation).z;
+
+      heading.real = static_cast<decltype(heading.real)>(std::cos(yaw * 0.5));
+      heading.imag = static_cast<decltype(heading.imag)>(std::sin(yaw * 0.5));
+    }
+
     state.state.x = current_entity_status.pose.position.x;
     state.state.y = current_entity_status.pose.position.y;
-    state.state.heading = toHeading(
-      quaternion_operation::convertQuaternionToEulerAngle(
-        current_entity_status.pose.orientation).z);
+    state.state.heading = heading;
     state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
     state.state.lateral_velocity_mps = 0;
     state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;
