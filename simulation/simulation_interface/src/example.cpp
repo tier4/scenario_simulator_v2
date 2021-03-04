@@ -48,6 +48,10 @@ void despawn_entity_callback(
   const simulation_api_schema::DespawnEntityRequest & req,
   simulation_api_schema::DespawnEntityResponse & res) {}
 
+void attach_lidar_sensor_callback(
+  const simulation_api_schema::AttachLidarSensorRequest & req,
+  simulation_api_schema::AttachLidarSensorResponse & res) {}
+
 void update_entity_status_callback(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
@@ -73,7 +77,8 @@ public:
       spawn_vehicle_entity_callback,
       spawn_pedestrian_entity_callback,
       despawn_entity_callback,
-      update_entity_status_callback),
+      update_entity_status_callback,
+      attach_lidar_sensor_callback),
     client_(simulation_interface::TransportProtocol::TCP,
       simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::update_entity_status),

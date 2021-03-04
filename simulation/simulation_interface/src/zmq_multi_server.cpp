@@ -37,7 +37,9 @@ MultiServer::MultiServer(
   std::function<void(const simulation_api_schema::DespawnEntityRequest &,
   simulation_api_schema::DespawnEntityResponse &)> despawn_entity_func,
   std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
-  simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func)
+  simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func,
+  std::function<void(const simulation_api_schema::AttachLidarSensorRequest &,
+  simulation_api_schema::AttachLidarSensorResponse &)> attach_lidar_sensor_func)
 : context_(zmqpp::context()),
   type_(zmqpp::socket_type::reply),
   initialize_sock_(context_, type_),
@@ -53,7 +55,9 @@ MultiServer::MultiServer(
   despawn_entity_sock_(context_, type_),
   despawn_entity_func_(despawn_entity_func),
   update_entity_status_sock_(context_, type_),
-  update_entity_status_func_(update_entity_status_func)
+  update_entity_status_func_(update_entity_status_func),
+  attach_lidar_sensor_sock_(context_, type_),
+  attach_lidar_sensor_func_(attach_lidar_sensor_func)
 {
   initialize_sock_.bind(
     simulation_interface::getEndPoint(
@@ -83,6 +87,10 @@ MultiServer::MultiServer(
     simulation_interface::getEndPoint(
       protocol, hostname,
       simulation_interface::ports::update_sensor_frame));
+  attach_lidar_sensor_sock_.bind(
+    simulation_interface::getEndPoint(
+      protocol, hostname,
+      simulation_interface::ports::attach_lidar_sensor));
   poller_.add(initialize_sock_);
   poller_.add(update_frame_sock_);
   poller_.add(update_sensor_frame_sock_);
@@ -90,6 +98,7 @@ MultiServer::MultiServer(
   poller_.add(spawn_pedestrian_entity_sock_);
   poller_.add(despawn_entity_sock_);
   poller_.add(update_entity_status_sock_);
+  poller_.add(attach_lidar_sensor_sock_);
   thread_ = std::thread(&MultiServer::start_poll, this);
 }
 
@@ -163,6 +172,16 @@ void MultiServer::poll()
         request), response);
     auto msg = toZMQ(response);
     update_entity_status_sock_.send(msg);
+  }
+  if (poller_.has_input(attach_lidar_sensor_sock_)) {
+    zmqpp::message request;
+    attach_lidar_sensor_sock_.receive(request);
+    simulation_api_schema::AttachLidarSensorResponse response;
+    attach_lidar_sensor_func_(
+      toProto<simulation_api_schema::AttachLidarSensorRequest>(
+        request), response);
+    auto msg = toZMQ(response);
+    attach_lidar_sensor_sock_.send(msg);
   }
 }
 void MultiServer::start_poll()
