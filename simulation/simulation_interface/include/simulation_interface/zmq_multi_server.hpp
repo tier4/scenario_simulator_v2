@@ -39,6 +39,8 @@ public:
     simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func,
     std::function<void(const simulation_api_schema::SpawnVehicleEntityRequest &,
     simulation_api_schema::SpawnVehicleEntityResponse &)> spawn_vehicle_entity_func,
+    std::function<void(const simulation_api_schema::SpawnPedestrianEntityRequest &,
+    simulation_api_schema::SpawnPedestrianEntityResponse &)> spawn_pedestrian_entity_func,
     std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
     simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func);
 
@@ -61,6 +63,9 @@ private:
   zmqpp::socket spawn_vehicle_entity_sock_;
   std::function<void(const simulation_api_schema::SpawnVehicleEntityRequest &,
     simulation_api_schema::SpawnVehicleEntityResponse &)> spawn_vehicle_entity_func_;
+  zmqpp::socket spawn_pedestrian_entity_sock_;
+  std::function<void(const simulation_api_schema::SpawnPedestrianEntityRequest &,
+    simulation_api_schema::SpawnPedestrianEntityResponse &)> spawn_pedestrian_entity_func_;
   zmqpp::socket update_entity_status_sock_;
   std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
     simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func_;

@@ -32,6 +32,8 @@ MultiServer::MultiServer(
   simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func,
   std::function<void(const simulation_api_schema::SpawnVehicleEntityRequest &,
   simulation_api_schema::SpawnVehicleEntityResponse &)> spawn_vehicle_entity_func,
+  std::function<void(const simulation_api_schema::SpawnPedestrianEntityRequest &,
+    simulation_api_schema::SpawnPedestrianEntityResponse &)> spawn_pedestrian_entity_func,
   std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
   simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func)
 : context_(zmqpp::context()),
@@ -44,6 +46,8 @@ MultiServer::MultiServer(
   update_sensor_frame_func_(update_sensor_frame_func),
   spawn_vehicle_entity_sock_(context_, type_),
   spawn_vehicle_entity_func_(spawn_vehicle_entity_func),
+  spawn_pedestrian_entity_sock_(context_, type_),
+  spawn_pedestrian_entity_func_(spawn_pedestrian_entity_func),
   update_entity_status_sock_(context_, type_),
   update_entity_status_func_(update_entity_status_func)
 {
@@ -63,6 +67,10 @@ MultiServer::MultiServer(
     simulation_interface::getEndPoint(
       protocol, hostname,
       simulation_interface::ports::spawn_vehicle_entity));
+  spawn_pedestrian_entity_sock_.bind(
+    simulation_interface::getEndPoint(
+      protocol, hostname,
+      simulation_interface::ports::spawn_pedestrian_entity));
   update_sensor_frame_sock_.bind(
     simulation_interface::getEndPoint(
       protocol, hostname,
@@ -71,6 +79,7 @@ MultiServer::MultiServer(
   poller_.add(update_frame_sock_);
   poller_.add(update_sensor_frame_sock_);
   poller_.add(spawn_vehicle_entity_sock_);
+  poller_.add(spawn_pedestrian_entity_sock_);
   poller_.add(update_entity_status_sock_);
   thread_ = std::thread(&MultiServer::start_poll, this);
 }
@@ -115,6 +124,16 @@ void MultiServer::poll()
         request), response);
     auto msg = toZMQ(response);
     spawn_vehicle_entity_sock_.send(msg);
+  }
+  if (poller_.has_input(spawn_pedestrian_entity_sock_)) {
+    zmqpp::message request;
+    spawn_pedestrian_entity_sock_.receive(request);
+    simulation_api_schema::SpawnPedestrianEntityResponse response;
+    spawn_pedestrian_entity_func_(
+      toProto<simulation_api_schema::SpawnPedestrianEntityRequest>(
+        request), response);
+    auto msg = toZMQ(response);
+    spawn_pedestrian_entity_sock_.send(msg);
   }
   if (poller_.has_input(update_entity_status_sock_)) {
     zmqpp::message request;
