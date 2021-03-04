@@ -50,6 +50,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <cassert>
 #include <memory>
 #include <mutex>
 #include <utility>
@@ -448,26 +449,24 @@ public:
   DEFINE_SUBSCRIPTION(VehicleCommand);
 
 public:
-  auto isWaitingForRoute() const noexcept
-  {
-    using autoware_system_msgs::msg::AutowareState;
+# define DEFINE_STATE_PREDICATE(NAME, VALUE) \
+  auto is ## NAME() const noexcept \
+  { \
+    using autoware_system_msgs::msg::AutowareState; \
+    assert(AutowareState::VALUE == #NAME); \
+    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
+  } static_assert(true, "")
 
-    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::WAITING_FOR_ROUTE;
-  }
+  DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
+  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
+  DEFINE_STATE_PREDICATE(Planning, PLANNING);
+  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
+  DEFINE_STATE_PREDICATE(Driving, DRIVING);
+  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
+  DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
+  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
-  auto isEmergency() const noexcept
-  {
-    using autoware_system_msgs::msg::AutowareState;
-
-    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::EMERGENCY;
-  }
-
-  auto isWaitingForEngage() const noexcept
-  {
-    using autoware_system_msgs::msg::AutowareState;
-
-    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::WAITING_FOR_ENGAGE;
-  }
+# undef DEFINE_STATE_PREDICATE
 
   bool ready = false;
 

@@ -59,12 +59,13 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   const auto current_entity_status = getStatus();
 
   if (std::exchange(autoware_uninitialized, false)) {
-    waitForAutowareToBeReady();
     std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autowares.at(name))->setInitialTwist();
   }
 
   updateAutoware(current_entity_status.pose);
+
+  // waitForAutowareToBeReady();
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   {
