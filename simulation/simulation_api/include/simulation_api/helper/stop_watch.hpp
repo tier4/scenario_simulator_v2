@@ -43,6 +43,10 @@ public:
   {
     if (start_time && end_time) {
       double elapsed = std::chrono::duration_cast<T>(end_time.get() - start_time.get()).count();
+      if (typeid(T) == typeid(std::chrono::microseconds)) {
+        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds" <<
+          std::endl;
+      }
       if (typeid(T) == typeid(std::chrono::milliseconds)) {
         std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " milliseconds" <<
           std::endl;
