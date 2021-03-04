@@ -237,7 +237,6 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & following_lanelets) const
 {
-
   auto conflicting_entity_status = getConflictingEntityStatus(following_lanelets);
   if (!conflicting_entity_status) {
     return boost::none;

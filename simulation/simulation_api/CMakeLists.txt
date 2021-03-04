@@ -59,7 +59,7 @@ ament_auto_add_library(simulation_api SHARED
   src/api/api.cpp
 )
 
-target_link_libraries(simulation_api 
+target_link_libraries(simulation_api
   pugixml
   pthread
   sodium
