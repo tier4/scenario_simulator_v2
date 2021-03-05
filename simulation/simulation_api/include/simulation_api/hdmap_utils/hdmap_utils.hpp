@@ -146,8 +146,8 @@ public:
     const std::vector<geometry_msgs::msg::Point> & waypoints,
     const std::int64_t & traffic_light_id) const;
   const boost::optional<double> getDistanceToTrafficLightStopLine(
-    const std::vector<geometry_msgs::msg::Point> & waypoints,
-    const std::vector<std::int64_t> & route_lanelets) const;
+    const std::vector<std::int64_t> & route_lanelets,
+    const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   const std::vector<std::int64_t> getTrafficLightIdsOnPath(
     const std::vector<std::int64_t> & route_lanelets);
 

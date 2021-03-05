@@ -1073,8 +1073,8 @@ const std::vector<std::int64_t> HdMapUtils::getTrafficLightIdsOnPath(
 }
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
-  const std::vector<geometry_msgs::msg::Point> & waypoints,
-  const std::vector<std::int64_t> & route_lanelets) const
+  const std::vector<std::int64_t> & route_lanelets,
+  const std::vector<geometry_msgs::msg::Point> & waypoints) const
 {
   auto traffic_lights = getTrafficLightRegElementsOnPath(route_lanelets);
   if (traffic_lights.size() == 0) {

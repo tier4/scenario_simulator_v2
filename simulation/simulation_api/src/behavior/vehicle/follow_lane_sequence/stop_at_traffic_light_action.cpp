@@ -103,7 +103,12 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   }
   const auto waypoints = calculateWaypoints();
   const auto spline = simulation_api::math::CatmullRomSpline(waypoints.waypoints);
-  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
+  const auto distance_to_traffic_stop_line = hdmap_utils->getDistanceToTrafficLightStopLine(
+    route_lanelets, waypoints.waypoints);
+  if (!distance_to_traffic_stop_line) {
+    return BT::NodeStatus::FAILURE;
+  }
+  distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);
   boost::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
