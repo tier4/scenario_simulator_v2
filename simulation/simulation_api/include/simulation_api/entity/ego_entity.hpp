@@ -239,7 +239,7 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
-    waitForAutowareStateToBeWaitingForRoute([]() {});
+    waitForAutowareStateToBeWaitingForRoute([]() {});  // NOTE: is assertion.
 
     waitForAutowareStateToBePlanning(
       [&]()
@@ -284,7 +284,7 @@ private:
       !std::atomic_load(&autowares.at(name))->is ## STATE(); \
       rate.sleep()) \
     { \
-      if (count < 10) { \
+      if (count < 30) { \
         RCLCPP_INFO_STREAM( \
           std::atomic_load(&autowares.at(name))->get_logger(), \
           "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
