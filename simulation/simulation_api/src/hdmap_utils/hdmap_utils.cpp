@@ -1062,12 +1062,19 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
 }
 
 const std::vector<std::int64_t> HdMapUtils::getTrafficLightIdsOnPath(
-  const std::vector<std::int64_t> & route_lanelets)
+  const std::vector<std::int64_t> & route_lanelets) const
 {
   std::vector<std::int64_t> ret;
   auto traffic_lights = getTrafficLightRegElementsOnPath(route_lanelets);
   for (const auto traffic_light : traffic_lights) {
-    ret.emplace_back(traffic_light->id());
+    for (auto light_string : traffic_light->lightBulbs()) {
+      if (light_string.hasAttribute("traffic_light_id")) {
+        auto id = light_string.attribute("traffic_light_id").asId();
+        if (id) {
+          ret.emplace_back(id.get());
+        }
+      }
+    }
   }
   return ret;
 }
@@ -1076,13 +1083,13 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<std::int64_t> & route_lanelets,
   const std::vector<geometry_msgs::msg::Point> & waypoints) const
 {
-  auto traffic_lights = getTrafficLightRegElementsOnPath(route_lanelets);
-  if (traffic_lights.size() == 0) {
+  auto traffic_light_ids = getTrafficLightIdsOnPath(route_lanelets);
+  if (traffic_light_ids.size() == 0) {
     return boost::none;
   }
   std::set<double> collision_points;
-  for (const auto traffic_light : traffic_lights) {
-    const auto collision_point = getDistanceToTrafficLightStopLine(waypoints, traffic_light->id());
+  for (const auto id : traffic_light_ids) {
+    const auto collision_point = getDistanceToTrafficLightStopLine(waypoints, id);
     if (collision_point) {
       collision_points.insert(collision_point.get());
     }

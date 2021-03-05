@@ -149,7 +149,7 @@ public:
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   const std::vector<std::int64_t> getTrafficLightIdsOnPath(
-    const std::vector<std::int64_t> & route_lanelets);
+    const std::vector<std::int64_t> & route_lanelets) const;
 
 private:
   lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;

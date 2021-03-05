@@ -48,12 +48,14 @@ void ActionNode::getBlackBoardValues()
   if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
     throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in ActionNode");
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (!getInput<std::shared_ptr<simulation_api::TrafficLightManager>>(
       "traffic_light_manager",
       traffic_light_manager))
   {
     throw BehaviorTreeRuntimeError("failed to get input traffic_light_manager in ActionNode");
   }
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   if (!getInput<openscenario_msgs::msg::EntityStatus>("entity_status", entity_status)) {
     throw BehaviorTreeRuntimeError("failed to get input entity_status in ActionNode");
   }
@@ -174,14 +176,9 @@ boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   if (traffic_light_ids.empty()) {
     return boost::none;
   }
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   std::set<double> collision_points = {};
-  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   for (const auto id : traffic_light_ids) {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
-    std::cout << id << std::endl;
     const auto color = traffic_light_manager->getColor(id);
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     if (color == simulation_api::TrafficLightColor::RED ||
       color == simulation_api::TrafficLightColor::YELLOW)
     {
