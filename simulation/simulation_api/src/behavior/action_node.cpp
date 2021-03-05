@@ -161,6 +161,19 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
   return ret;
 }
 
+boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
+  const std::vector<std::int64_t> & route_lanelets,
+  const std::vector<geometry_msgs::msg::Point> & waypoints)
+{
+  const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
+  if (traffic_light_ids.empty()) {
+    return boost::none;
+  }
+  for (const auto id : traffic_light_ids) {
+
+  }
+}
+
 boost::optional<double> ActionNode::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
   const std::vector<geometry_msgs::msg::Point> & waypoints)

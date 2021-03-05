@@ -19,6 +19,7 @@
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 #include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/entity/entity_base.hpp>
+#include <simulation_api/traffic_lights/traffic_light_manager.hpp>
 
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <openscenario_msgs/msg/obstacle.hpp>
@@ -60,6 +61,9 @@ public:
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
+  boost::optional<double> getDistanceToTrafficLightStopLine(
+    const std::vector<std::int64_t> & route_lanelets,
+    const std::vector<geometry_msgs::msg::Point> & waypoints);
   std::vector<openscenario_msgs::msg::EntityStatus> getRightOfWayEntities();
   std::vector<openscenario_msgs::msg::EntityStatus> getRightOfWayEntities(
     const std::vector<std::int64_t> & following_lanelets);
@@ -95,6 +99,7 @@ public:
         BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
           "entity_type_list"),
         BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
+        BT::InputPort<std::shared_ptr<simulation_api::TrafficLightManager>>("traffic_light_manager"),
         BT::OutputPort<boost::optional<openscenario_msgs::msg::Obstacle>>(
           "obstacle"),
         BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
@@ -104,6 +109,7 @@ public:
   void getBlackBoardValues();
   std::string request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  std::shared_ptr<simulation_api::TrafficLightManager> traffic_light_manager;
   openscenario_msgs::msg::EntityStatus entity_status;
   double current_time;
   double step_time;

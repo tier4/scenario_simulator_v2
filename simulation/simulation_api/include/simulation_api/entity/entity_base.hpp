@@ -17,6 +17,7 @@
 
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/entity_status.hpp>
+#include <simulation_api/traffic_lights/traffic_light_manager.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
@@ -57,6 +58,10 @@ public:
   {
     hdmap_utils_ptr_ = ptr;
   }
+  void setTrafficLightManager(std::shared_ptr<simulation_api::TrafficLightManager> ptr)
+  {
+    traffic_light_manager_ = ptr;
+  }
   virtual void onUpdate(double current_time, double step_time) = 0;
   bool statusSetted() const
   {
@@ -93,6 +98,7 @@ protected:
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;
   boost::optional<double> linear_jerk_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  std::shared_ptr<simulation_api::TrafficLightManager> traffic_light_manager_;
   bool verbose_;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;

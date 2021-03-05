@@ -1061,6 +1061,17 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
   return points;
 }
 
+const std::vector<std::int64_t> HdMapUtils::getTrafficLightIdsOnPath(
+  const std::vector<std::int64_t> & route_lanelets)
+{
+  std::vector<std::int64_t> ret;
+  auto traffic_lights = getTrafficLightRegElementsOnPath(route_lanelets);
+  for (const auto traffic_light : traffic_lights) {
+    ret.emplace_back(traffic_light->id());
+  }
+  return ret;
+}
+
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<geometry_msgs::msg::Point> & waypoints,
   const std::vector<std::int64_t> & route_lanelets) const
