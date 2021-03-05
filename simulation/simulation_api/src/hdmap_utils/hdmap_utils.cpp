@@ -968,6 +968,21 @@ HdMapUtils::getTrafficSignRegElementsOnPath(std::vector<std::int64_t> lanelet_id
   return ret;
 }
 
+std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
+HdMapUtils::getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & lanelet_ids) const
+{
+  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto traffic_lights =
+      lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
+    for (const auto traffic_light : traffic_lights) {
+      ret.push_back(traffic_light);
+    }
+  }
+  return ret;
+}
+
 std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   std::vector<std::int64_t> lanelet_ids)
 {
@@ -1048,6 +1063,27 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
 
 const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<geometry_msgs::msg::Point> & waypoints,
+  const std::vector<std::int64_t> & route_lanelets) const
+{
+  auto traffic_lights = getTrafficLightRegElementsOnPath(route_lanelets);
+  if (traffic_lights.size() == 0) {
+    return boost::none;
+  }
+  std::set<double> collision_points;
+  for (const auto traffic_light : traffic_lights) {
+    const auto collision_point = getDistanceToTrafficLightStopLine(waypoints, traffic_light->id());
+    if (collision_point) {
+      collision_points.insert(collision_point.get());
+    }
+  }
+  if (collision_points.empty()) {
+    return boost::none;
+  }
+  return *collision_points.begin();
+}
+
+const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
+  const std::vector<geometry_msgs::msg::Point> & waypoints,
   const std::int64_t & traffic_light_id) const
 {
   if (waypoints.empty()) {
@@ -1055,7 +1091,7 @@ const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
   }
   simulation_api::math::CatmullRomSpline spline(waypoints);
   const auto stop_line = getTrafficLightStopLinePoints(traffic_light_id);
-  if(stop_line.size() <= 1) {
+  if (stop_line.size() <= 1) {
     return boost::none;
   }
   const auto collision_point = spline.getCollisionPointIn2D(stop_line);
