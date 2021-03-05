@@ -169,9 +169,22 @@ boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   if (traffic_light_ids.empty()) {
     return boost::none;
   }
+  std::set<double> collision_points = {};
   for (const auto id : traffic_light_ids) {
-
+    const auto color = traffic_light_manager->getColor(id);
+    if (color == simulation_api::TrafficLightColor::RED ||
+      color == simulation_api::TrafficLightColor::YELLOW)
+    {
+      const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(waypoints, id);
+      if (collision_point) {
+        collision_points.insert(collision_point.get());
+      }
+    }
   }
+  if (collision_points.empty()) {
+    return boost::none;
+  }
+  return *collision_points.begin();
 }
 
 boost::optional<double> ActionNode::getDistanceToStopLine(
