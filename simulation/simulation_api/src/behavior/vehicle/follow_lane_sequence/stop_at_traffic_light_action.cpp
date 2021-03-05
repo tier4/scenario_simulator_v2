@@ -111,7 +111,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);
   boost::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
-    if(distance_to_stop_target_.get() > getHorizon()) {
+    if (distance_to_stop_target_.get() > getHorizon()) {
       return BT::NodeStatus::FAILURE;
     }
     target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);

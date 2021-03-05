@@ -48,7 +48,12 @@ void ActionNode::getBlackBoardValues()
   if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
     throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in ActionNode");
   }
-
+  if (!getInput<std::shared_ptr<simulation_api::TrafficLightManager>>(
+      "traffic_light_manager",
+      traffic_light_manager))
+  {
+    throw BehaviorTreeRuntimeError("failed to get input traffic_light_manager in ActionNode");
+  }
   if (!getInput<openscenario_msgs::msg::EntityStatus>("entity_status", entity_status)) {
     throw BehaviorTreeRuntimeError("failed to get input entity_status in ActionNode");
   }

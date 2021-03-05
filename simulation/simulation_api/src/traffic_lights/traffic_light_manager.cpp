@@ -59,7 +59,7 @@ TrafficLightManager::TrafficLightManager(
 std::vector<std::int64_t> TrafficLightManager::getIds() const
 {
   std::vector<std::int64_t> ret;
-  for(const auto traffic_light : traffic_lights_) {
+  for (const auto traffic_light : traffic_lights_) {
     ret.emplace_back(traffic_light.first);
   }
   return ret;
