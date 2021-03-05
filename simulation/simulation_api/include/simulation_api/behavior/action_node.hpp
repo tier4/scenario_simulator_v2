@@ -99,7 +99,8 @@ public:
         BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
           "entity_type_list"),
         BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
-        BT::InputPort<std::shared_ptr<simulation_api::TrafficLightManager>>("traffic_light_manager"),
+        BT::InputPort<std::shared_ptr<simulation_api::TrafficLightManager>>(
+          "traffic_light_manager"),
         BT::OutputPort<boost::optional<openscenario_msgs::msg::Obstacle>>(
           "obstacle"),
         BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
