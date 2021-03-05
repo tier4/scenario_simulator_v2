@@ -1014,7 +1014,7 @@ const boost::optional<std::int64_t> HdMapUtils::getTrafficLightStopLineId(
 }
 
 const std::vector<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightStopLinePoints(
-  std::int64_t traffic_light_id)
+  std::int64_t traffic_light_id) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
   const auto traffic_light = getTrafficLight(traffic_light_id);
@@ -1046,10 +1046,29 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getStopLinePolygon(
   return points;
 }
 
+const boost::optional<double> HdMapUtils::getDistanceToTrafficLightStopLine(
+  const std::vector<geometry_msgs::msg::Point> & waypoints,
+  const std::int64_t & traffic_light_id) const
+{
+  if (waypoints.empty()) {
+    return boost::none;
+  }
+  simulation_api::math::CatmullRomSpline spline(waypoints);
+  const auto stop_line = getTrafficLightStopLinePoints(traffic_light_id);
+  if(stop_line.size() <= 1) {
+    return boost::none;
+  }
+  const auto collision_point = spline.getCollisionPointIn2D(stop_line);
+  return collision_point;
+}
+
 boost::optional<double> HdMapUtils::getDistanceToStopLine(
   const std::vector<std::int64_t> & route_lanelets,
   const std::vector<geometry_msgs::msg::Point> & waypoints)
 {
+  if (waypoints.empty()) {
+    return boost::none;
+  }
   std::set<double> collision_points;
   if (waypoints.empty()) {
     return boost::none;

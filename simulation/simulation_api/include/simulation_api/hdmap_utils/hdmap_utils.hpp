@@ -141,7 +141,10 @@ public:
   const boost::optional<std::int64_t> getTrafficLightStopLineId(
     const std::int64_t & traffic_light_id) const;
   const std::vector<geometry_msgs::msg::Point> getTrafficLightStopLinePoints(
-    std::int64_t traffic_light_id);
+    std::int64_t traffic_light_id) const;
+  const boost::optional<double> getDistanceToTrafficLightStopLine(
+    const std::vector<geometry_msgs::msg::Point> & waypoints,
+    const std::int64_t & traffic_light_id) const;
 
 private:
   lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;

@@ -98,14 +98,12 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (!driver_model.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto following_lanelets = hdmap_utils->getFollowingLanelets(
-    entity_status.lanelet_pose.lanelet_id, route_lanelets, getHorizon());
-  if (getRightOfWayEntities(following_lanelets).size() != 0) {
+  if (getRightOfWayEntities(route_lanelets).size() != 0) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
   const auto spline = simulation_api::math::CatmullRomSpline(waypoints.waypoints);
-  distance_to_stop_target_ = getDistanceToConflictingEntity(following_lanelets, spline);
+  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
   boost::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
