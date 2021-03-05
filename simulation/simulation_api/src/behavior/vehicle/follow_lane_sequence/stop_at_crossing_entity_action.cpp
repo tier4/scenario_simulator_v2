@@ -114,19 +114,17 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   auto distance_to_stopline =
     hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
   const auto distance_to_front_entity = getDistanceToFrontEntity();
-  if((distance_to_front_entity || distance_to_stopline) && distance_to_stop_target_) {
-    if(distance_to_front_entity.get() <= distance_to_stop_target_.get())
-    {
+  if ((distance_to_front_entity || distance_to_stopline) && distance_to_stop_target_) {
+    if (distance_to_front_entity.get() <= distance_to_stop_target_.get()) {
       in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
-    if(distance_to_stopline.get() <= distance_to_stop_target_.get())
-    {
+    if (distance_to_stopline.get() <= distance_to_stop_target_.get()) {
       in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
     }
   }
-  if((distance_to_front_entity || distance_to_stopline) && !distance_to_stop_target_) {
+  if ((distance_to_front_entity || distance_to_stopline) && !distance_to_stop_target_) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }

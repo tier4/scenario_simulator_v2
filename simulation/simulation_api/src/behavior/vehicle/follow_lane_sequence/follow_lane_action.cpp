@@ -91,8 +91,8 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     const auto waypoints = calculateWaypoints();
-    const auto distance_to_traffic_stop_line = hdmap_utils->getDistanceToTrafficLightStopLine(
-      route_lanelets, waypoints.waypoints);
+    const auto distance_to_traffic_stop_line =
+      getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.get() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;
