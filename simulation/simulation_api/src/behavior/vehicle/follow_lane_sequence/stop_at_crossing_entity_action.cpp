@@ -29,7 +29,10 @@ namespace follow_lane_sequence
 StopAtCrossingEntityAction::StopAtCrossingEntityAction(
   const std::string & name,
   const BT::NodeConfiguration & config)
-: entity_behavior::VehicleActionNode(name, config) {}
+: entity_behavior::VehicleActionNode(name, config)
+{
+  in_stop_sequence_ = false;
+}
 
 const boost::optional<openscenario_msgs::msg::Obstacle>
 StopAtCrossingEntityAction::calculateObstacle(
@@ -90,20 +93,43 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
 {
   getBlackBoardValues();
   if (request != "none" && request != "follow_lane") {
+    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {
+    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (!driver_model.see_around) {
+    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   if (getRightOfWayEntities(route_lanelets).size() != 0) {
+    in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
   const auto spline = simulation_api::math::CatmullRomSpline(waypoints.waypoints);
   distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
+  auto distance_to_stopline =
+    hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
+  const auto distance_to_front_entity = getDistanceToFrontEntity();
+  if((distance_to_front_entity || distance_to_stopline) && distance_to_stop_target_) {
+    if(distance_to_front_entity.get() <= distance_to_stop_target_.get())
+    {
+      in_stop_sequence_ = false;
+      return BT::NodeStatus::FAILURE;
+    }
+    if(distance_to_stopline.get() <= distance_to_stop_target_.get())
+    {
+      in_stop_sequence_ = false;
+      return BT::NodeStatus::FAILURE;
+    }
+  }
+  if((distance_to_front_entity || distance_to_stopline) && !distance_to_stop_target_) {
+    in_stop_sequence_ = false;
+    return BT::NodeStatus::FAILURE;
+  }
   boost::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
@@ -115,6 +141,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
+    in_stop_sequence_ = false;
     return BT::NodeStatus::SUCCESS;
   }
   if (target_speed) {
@@ -128,6 +155,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);
+  in_stop_sequence_ = true;
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

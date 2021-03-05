@@ -103,8 +103,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
-  auto distance_to_stopline_ =
-    hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
+  distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (distance_to_stopline_) {
       if (distance_to_stopline_.get() <= vehicle_parameters.bounding_box.dimensions.x + 5) {
