@@ -18,6 +18,7 @@
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
 #include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
+#include <simulation_api/behavior/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
 #include <simulation_api/behavior/vehicle/lane_change_action.hpp>
 
 #include <openscenario_msgs/msg/driver_model.hpp>
@@ -45,6 +46,8 @@ BehaviorTree::BehaviorTree()
   <follow_lane_sequence::StopAtCrossingEntityAction>("StopAtCrossingEntity");
   factory_.registerNodeType
   <follow_lane_sequence::StopAtStopLineAction>("StopAtStopLine");
+  factory_.registerNodeType
+  <follow_lane_sequence::StopAtTrafficLightAction>("StopAtTrafficLight");
   factory_.registerNodeType
   <follow_lane_sequence::YieldAction>("Yield");
   factory_.registerNodeType<LaneChangeAction>("LaneChange");
