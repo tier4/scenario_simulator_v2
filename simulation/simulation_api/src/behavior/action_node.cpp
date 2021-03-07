@@ -48,7 +48,12 @@ void ActionNode::getBlackBoardValues()
   if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
     throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in ActionNode");
   }
-
+  if (!getInput<std::shared_ptr<simulation_api::TrafficLightManager>>(
+      "traffic_light_manager",
+      traffic_light_manager))
+  {
+    throw BehaviorTreeRuntimeError("failed to get input traffic_light_manager in ActionNode");
+  }
   if (!getInput<openscenario_msgs::msg::EntityStatus>("entity_status", entity_status)) {
     throw BehaviorTreeRuntimeError("failed to get input entity_status in ActionNode");
   }
@@ -159,6 +164,32 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
     }
   }
   return ret;
+}
+
+boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
+  const std::vector<std::int64_t> & route_lanelets,
+  const std::vector<geometry_msgs::msg::Point> & waypoints)
+{
+  const auto traffic_light_ids = hdmap_utils->getTrafficLightIdsOnPath(route_lanelets);
+  if (traffic_light_ids.empty()) {
+    return boost::none;
+  }
+  std::set<double> collision_points = {};
+  for (const auto id : traffic_light_ids) {
+    const auto color = traffic_light_manager->getColor(id);
+    if (color == simulation_api::TrafficLightColor::RED ||
+      color == simulation_api::TrafficLightColor::YELLOW)
+    {
+      const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(waypoints, id);
+      if (collision_point) {
+        collision_points.insert(collision_point.get());
+      }
+    }
+  }
+  if (collision_points.empty()) {
+    return boost::none;
+  }
+  return *collision_points.begin();
 }
 
 boost::optional<double> ActionNode::getDistanceToStopLine(

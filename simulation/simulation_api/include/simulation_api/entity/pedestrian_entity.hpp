@@ -52,6 +52,11 @@ public:
     route_planner_ptr_ = std::make_shared<simulation_api::RoutePlanner>(ptr);
     tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
+  void setTrafficLightManager(std::shared_ptr<simulation_api::TrafficLightManager> ptr)
+  {
+    traffic_light_manager_ = ptr;
+    tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
+  }
   void setTargetSpeed(double target_speed, bool continuous);
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {

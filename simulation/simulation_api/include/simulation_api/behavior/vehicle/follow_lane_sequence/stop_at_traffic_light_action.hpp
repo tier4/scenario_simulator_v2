@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
-#define SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
+#ifndef SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_TRAFFIC_LIGHT_ACTION_HPP_
+#define SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_TRAFFIC_LIGHT_ACTION_HPP_
 
 #include <simulation_api/entity/entity_base.hpp>
 #include <simulation_api/behavior/vehicle/vehicle_action_node.hpp>
@@ -29,10 +29,10 @@ namespace vehicle
 {
 namespace follow_lane_sequence
 {
-class StopAtCrossingEntityAction : public entity_behavior::VehicleActionNode
+class StopAtTrafficLightAction : public entity_behavior::VehicleActionNode
 {
 public:
-  StopAtCrossingEntityAction(const std::string & name, const BT::NodeConfiguration & config);
+  StopAtTrafficLightAction(const std::string & name, const BT::NodeConfiguration & config);
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
@@ -51,10 +51,9 @@ public:
 
 private:
   boost::optional<double> distance_to_stop_target_;
-  bool in_stop_sequence_;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
+#endif  // SIMULATION_API__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_TRAFFIC_LIGHT_ACTION_HPP_
