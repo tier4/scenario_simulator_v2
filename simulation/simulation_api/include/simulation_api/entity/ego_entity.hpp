@@ -28,6 +28,7 @@
 #include <sys/wait.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
 #include <future>
 #include <memory>
@@ -239,20 +240,32 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
-    waitForAutowareStateToBeWaitingForRoute([]() {});  // NOTE: is assertion.
+    const auto current_pose = getStatus().pose;
+
+    waitForAutowareStateToBeWaitingForRoute(
+      [&]()  // NOTE: This is assertion.
+      {
+        return updateAutoware(current_pose);
+      });
 
     waitForAutowareStateToBePlanning(
       [&]()
       {
-        return std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
+        std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
+        return updateAutoware(current_pose);
       });
 
-    waitForAutowareStateToBeWaitingForEngage([]() {});
+    waitForAutowareStateToBeWaitingForEngage(
+      [&]()
+      {
+        return updateAutoware(current_pose);
+      });
 
     waitForAutowareStateToBeDriving(
       [&]()
       {
-        return std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+        std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+        return updateAutoware(current_pose);
       });
   }
 
@@ -276,7 +289,7 @@ private:
   // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
 # define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
   template<typename Thunk> \
-  void waitForAutowareStateToBe ## STATE(Thunk thunk) const \
+  void waitForAutowareStateToBe ## STATE(Thunk thunk, std::size_t count_max = 300) const \
   { \
     std::size_t count = 0; \
     for ( \
@@ -284,7 +297,7 @@ private:
       !std::atomic_load(&autowares.at(name))->is ## STATE(); \
       rate.sleep()) \
     { \
-      if (count < 30) { \
+      if (count < count_max) { \
         RCLCPP_INFO_STREAM( \
           std::atomic_load(&autowares.at(name))->get_logger(), \
           "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
