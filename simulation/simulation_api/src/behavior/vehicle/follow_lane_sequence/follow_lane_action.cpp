@@ -77,10 +77,8 @@ BT::NodeStatus FollowLaneAction::tick()
       stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }
-  const auto following_lanelets = hdmap_utils->getFollowingLanelets(
-    entity_status.lanelet_pose.lanelet_id, route_lanelets, getHorizon());
   if (driver_model.see_around) {
-    if (getRightOfWayEntities(following_lanelets).size() != 0) {
+    if (getRightOfWayEntities(route_lanelets).size() != 0) {
       return BT::NodeStatus::FAILURE;
     }
     auto distance_to_front_entity = getDistanceToFrontEntity();
@@ -93,9 +91,16 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     const auto waypoints = calculateWaypoints();
+    const auto distance_to_traffic_stop_line =
+      getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);
+    if (distance_to_traffic_stop_line) {
+      if (distance_to_traffic_stop_line.get() <= getHorizon()) {
+        return BT::NodeStatus::FAILURE;
+      }
+    }
     auto distance_to_stopline =
-      hdmap_utils->getDistanceToStopLine(following_lanelets, waypoints.waypoints);
-    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(following_lanelets);
+      hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
+    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets);
     if (distance_to_stopline) {
       if (distance_to_stopline.get() <=
         calculateStopDistance() +
@@ -114,7 +119,7 @@ BT::NodeStatus FollowLaneAction::tick()
   }
 
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   auto updated_status = calculateEntityStatusUpdated(target_speed.get());
   setOutput("updated_status", updated_status);

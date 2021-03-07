@@ -70,9 +70,9 @@ public:
     }
     traffic_lights_.at(lanelet_id)->setArrow(std::forward<Ts>(xs)...);
   }
-  void printState(std::int64_t lanelet_id);
   TrafficLightColor getColor(std::int64_t lanelet_id) const;
   TrafficLightArrow getArrow(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getIds() const;
 
 private:
   void deleteAllMarkers() const;

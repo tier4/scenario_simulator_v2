@@ -16,7 +16,8 @@
             to_lanelet_id="{to_lanelet_id}"
             route_lanelets="{route_lanelets}"
             obstacle="{obstacle}"
-            driver_model="{driver_model}"/>
+            driver_model="{driver_model}"
+            traffic_light_manager="{traffic_light_manager}"/>
         <Fallback name="follow_lane_sequence">
             <FollowLane name="follow_lane"
                 waypoints="{waypoints}"
@@ -32,7 +33,8 @@
                 entity_type_list="{entity_type_list}"
                 route_lanelets="{route_lanelets}"
                 obstacle="{obstacle}"
-                driver_model="{driver_model}"/>
+                driver_model="{driver_model}"
+                traffic_light_manager="{traffic_light_manager}"/>
             <Fallback name="follow_lane_behavior_selector">
                 <FollowFrontEntity name="follow_front_entity"
                     waypoints="{waypoints}"
@@ -48,7 +50,24 @@
                     entity_type_list="{entity_type_list}"
                     route_lanelets="{route_lanelets}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"/>
+                    driver_model="{driver_model}"
+                    traffic_light_manager="{traffic_light_manager}"/>
+                <StopAtTrafficLight name="stop_at_traffic_light"
+                    waypoints="{waypoints}"
+                    request="{request}"
+                    hdmap_utils="{hdmap_utils}"
+                    current_time="{current_time}"
+                    step_time="{step_time}"
+                    entity_status="{entity_status}"
+                    vehicle_parameters="{vehicle_parameters}"
+                    updated_status="{updated_status}"
+                    target_speed="{target_speed}"
+                    other_entity_status="{other_entity_status}"
+                    entity_type_list="{entity_type_list}"
+                    route_lanelets="{route_lanelets}"
+                    obstacle="{obstacle}"
+                    driver_model="{driver_model}"
+                    traffic_light_manager="{traffic_light_manager}"/>
                 <StopAtStopLine name="stop_at_stop_line"
                     waypoints="{waypoints}"
                     request="{request}"
@@ -63,7 +82,8 @@
                     entity_type_list="{entity_type_list}"
                     route_lanelets="{route_lanelets}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"/>
+                    driver_model="{driver_model}"
+                    traffic_light_manager="{traffic_light_manager}"/>
                 <StopAtCrossingEntity name="stop_at_crossing_entity"
                     waypoints="{waypoints}"
                     request="{request}"
@@ -78,7 +98,8 @@
                     entity_type_list="{entity_type_list}"
                     route_lanelets="{route_lanelets}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"/>
+                    driver_model="{driver_model}"
+                    traffic_light_manager="{traffic_light_manager}"/>
                 <Yield name="yield"
                     waypoints="{waypoints}"
                     request="{request}"
@@ -93,7 +114,8 @@
                     entity_type_list="{entity_type_list}"
                     route_lanelets="{route_lanelets}"
                     obstacle="{obstacle}"
-                    driver_model="{driver_model}"/>
+                    driver_model="{driver_model}"
+                    traffic_light_manager="{traffic_light_manager}"/>
             </Fallback>
         </Fallback>
     </Fallback>

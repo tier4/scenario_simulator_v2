@@ -28,6 +28,7 @@ ament_auto_add_library(simulation_api SHARED
   src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
   src/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
   src/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
+  src/behavior/vehicle/follow_lane_sequence/stop_at_traffic_light_action.cpp
   src/behavior/vehicle/follow_lane_sequence/yield_action.cpp
   src/behavior/vehicle/lane_change_action.cpp
   src/behavior/vehicle/vehicle_action_node.cpp

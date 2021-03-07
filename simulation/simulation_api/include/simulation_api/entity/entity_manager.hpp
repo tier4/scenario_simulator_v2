@@ -369,6 +369,7 @@ public:
       throw simulation_api::SimulationRuntimeError("entity " + entity.name + " already exist.");
     } else {
       entity.setHdMapUtils(hdmap_utils_ptr_);
+      entity.setTrafficLightManager(traffic_light_manager_ptr_);
       entities_.emplace(entity.name, std::forward<decltype(entity)>(entity));
       return true;
     }
