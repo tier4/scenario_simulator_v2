@@ -17,6 +17,7 @@
 
 // NOTE: headers are lexicographically sorted.
 
+#include <limits>
 #define AUTOWARE_IV  // or #define AUTOWARE_AUTO
 
 #ifdef AUTOWARE_IV
@@ -171,8 +172,10 @@ public:
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
-  template<typename T, REQUIRES(std::is_floating_point<T>)>
-  decltype(auto) setVehicleVelocity(const T value)
+  template<
+    typename T = decltype(VehicleVelocity::max_velocity),
+    REQUIRES(std::is_floating_point<T>)>
+  decltype(auto) setVehicleVelocity(const T value = std::numeric_limits<T>::max())
   {
     VehicleVelocity vehicle_velocity;
     {
@@ -553,7 +556,7 @@ public:
     INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
@@ -562,7 +565,7 @@ public:
     // Simulation specific topics (lexicographically sorted)
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentPose, "current_pose"),
+    INIT_PUBLISHER(CurrentPose, "/current_pose"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),

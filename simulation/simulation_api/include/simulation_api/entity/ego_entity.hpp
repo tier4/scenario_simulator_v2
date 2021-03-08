@@ -355,7 +355,7 @@ private:
     std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
     std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
     std::atomic_load(&autowares.at(name))->setTransform(current_pose);
-    std::atomic_load(&autowares.at(name))->setVehicleVelocity(current_twist.linear.x);
+    std::atomic_load(&autowares.at(name))->setVehicleVelocity();
   }
 
 private:
