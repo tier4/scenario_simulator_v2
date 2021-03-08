@@ -17,7 +17,12 @@
 
 // NOTE: headers are lexicographically sorted.
 
+#ifdef AUTOWARE_IV
 #include <autoware_vehicle_msgs/msg/engage.hpp>
+#elif AUTOWARE_AUTO
+// TODO(yamacir-kit)
+#endif
+
 #include <boost/mpl/and.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
@@ -67,8 +72,7 @@ struct converter<From, std_msgs::msg::Float32>
 {
   using result_type = std_msgs::msg::Float32;
 
-  template<
-    REQUIRES(std::is_floating_point<From>)>
+  template<REQUIRES(std::is_floating_point<From>)>
   result_type operator()(const From from)
   {
     result_type to;
