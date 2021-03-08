@@ -514,7 +514,7 @@ public:
   void checkAutowareState()
   {
     if (isReady() && isEmergency()) {
-      throw AutowareError();
+      // throw AutowareError();
     }
   }
 

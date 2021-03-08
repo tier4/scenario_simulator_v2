@@ -289,17 +289,19 @@ private:
   // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
 # define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
   template<typename Thunk> \
-  void waitForAutowareStateToBe ## STATE(Thunk thunk, std::size_t count_max = 10) const \
+  void waitForAutowareStateToBe ## STATE(Thunk thunk, std::size_t count_max = 300) const \
   { \
     std::size_t count = 0; \
     for ( \
-      rclcpp::WallRate rate {std::chrono::seconds(1)}; \
+      rclcpp::WallRate rate {std::chrono::milliseconds(100)}; \
       !std::atomic_load(&autowares.at(name))->is ## STATE(); \
       rate.sleep()) \
     { \
       if (count < count_max) { \
-        RCLCPP_INFO_STREAM( \
+        RCLCPP_INFO_STREAM_THROTTLE( \
           std::atomic_load(&autowares.at(name))->get_logger(), \
+          *std::atomic_load(&autowares.at(name))->get_clock(), \
+          1000, \
           "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
         thunk(); \
       } else { \
