@@ -29,14 +29,6 @@ std::unordered_map<
   std::string, std::shared_ptr<autoware_api::Accessor>
 > EgoEntity::autowares {};
 
-autoware_auto_msgs::msg::Complex32 EgoEntity::toHeading(const double yaw)
-{
-  autoware_auto_msgs::msg::Complex32 heading;
-  heading.real = static_cast<decltype(heading.real)>(std::cos(yaw * 0.5));
-  heading.imag = static_cast<decltype(heading.imag)>(std::sin(yaw * 0.5));
-  return heading;
-}
-
 openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
 {
   openscenario_msgs::msg::WaypointsArray waypoints {};
@@ -62,28 +54,38 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
     std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autowares.at(name))->setInitialTwist();
 
-    updateAutoware(current_entity_status.pose);
+    waitForAutowareStateToBeInitializingVehicle(
+      [&]()
+      {
+        return updateAutoware(current_entity_status.pose);
+      });
 
     /* ---- NOTE ---------------------------------------------------------------
      *
      *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
-     *  to be published. Member function EgoEntity::waitForAutowareToBe* are
-     *  depends a topic '/awapi/autoware/get/status' published by
+     *  and tf to be published. Member function EgoEntity::waitForAutowareToBe*
+     *  are depends a topic '/awapi/autoware/get/status' published by
      *  awapi_awiv_adapter.
      *
      * ---------------------------------------------------------------------- */
-    waitForAutowareStateToBeInitializingVehicle();
+    waitForAutowareStateToBeWaitingForRoute(
+      [&]()
+      {
+        return updateAutoware(current_entity_status.pose);
+      });
   } else {
     updateAutoware(current_entity_status.pose);
   }
 
   autoware_auto_msgs::msg::VehicleKinematicState state;
   {
+    const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
+      current_entity_status.pose.orientation).z;
+
     state.state.x = current_entity_status.pose.position.x;
     state.state.y = current_entity_status.pose.position.y;
-    state.state.heading = toHeading(
-      quaternion_operation::convertQuaternionToEulerAngle(
-        current_entity_status.pose.orientation).z);
+    state.state.heading.real = static_cast<decltype(state.state.heading.real)>(std::cos(yaw * 0.5));
+    state.state.heading.imag = static_cast<decltype(state.state.heading.imag)>(std::sin(yaw * 0.5));
     state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
     state.state.lateral_velocity_mps = 0;
     state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;

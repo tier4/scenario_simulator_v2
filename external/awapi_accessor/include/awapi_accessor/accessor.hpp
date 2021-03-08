@@ -17,17 +17,21 @@
 
 // NOTE: headers are lexicographically sorted.
 
+#include <limits>
+#include <type_traits>
 #define AUTOWARE_IV  // or #define AUTOWARE_AUTO
 
 #ifdef AUTOWARE_IV
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_api_msgs/msg/velocity_limit.hpp>
+#include <autoware_debug_msgs/msg/float32_stamped.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
+#include <autoware_planning_msgs/msg/lane_change_command.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
-#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
@@ -43,8 +47,6 @@
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/bool.hpp>
-#include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_broadcaster.h>
@@ -113,13 +115,19 @@ public:
    *  Topic: /awapi/lane_change/put/approval
    *
    * ------------------------------------------------------------------------ */
-  using LaneChangeApproval = std_msgs::msg::Bool;
+  using LaneChangeApproval = autoware_planning_msgs::msg::LaneChangeCommand;
 
   DEFINE_PUBLISHER(LaneChangeApproval);
 
   decltype(auto) setLaneChangeApproval(const bool approve = true)
   {
-    return setLaneChangeApproval(convertTo<LaneChangeApproval>(approve));
+    LaneChangeForce message;
+    {
+      message.stamp = get_clock()->now();
+      message.command = approve;
+    }
+
+    return setLaneChangeApproval(message);
   }
 
   /** ---- LaneChangeForce -----------------------------------------------------
@@ -127,9 +135,20 @@ public:
    *  Topic: /awapi/lane_change/put/force
    *
    * ------------------------------------------------------------------------ */
-  using LaneChangeForce = std_msgs::msg::Bool;
+  using LaneChangeForce = autoware_planning_msgs::msg::LaneChangeCommand;
 
   DEFINE_PUBLISHER(LaneChangeForce);
+
+  decltype(auto) setLaneChangeForce(const bool force = true)
+  {
+    LaneChangeForce message;
+    {
+      message.stamp = get_clock()->now();
+      message.command = force;
+    }
+
+    return setLaneChangeForce(message);
+  }
 
   /** ---- TrafficLightStateArray ----------------------------------------------
    *
@@ -149,14 +168,20 @@ public:
    *  Topic: /awapi/vehicle/put/velocity
    *
    * ------------------------------------------------------------------------ */
-  using VehicleVelocity = std_msgs::msg::Float32;
+  using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
-  template<typename T, REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
   decltype(auto) setVehicleVelocity(const T value)
   {
-    return setVehicleVelocity(convertTo<VehicleVelocity>(value));
+    VehicleVelocity vehicle_velocity;
+    {
+      vehicle_velocity.stamp = get_clock()->now();
+      vehicle_velocity.max_velocity = value;
+    }
+
+    return setVehicleVelocity(vehicle_velocity);
   }
 
   /** ---- AutowareStatus ------------------------------------------------------
@@ -347,14 +372,20 @@ public:
    *  Topic: /vehicle/status/velocity
    *
    * ------------------------------------------------------------------------ */
-  using CurrentVelocity = std_msgs::msg::Float32;
+  using CurrentVelocity = autoware_debug_msgs::msg::Float32Stamped;
 
   DEFINE_PUBLISHER(CurrentVelocity);
 
-  template<typename T, REQUIRES(std::is_floating_point<T>)>
+  template<typename T, REQUIRES(std::is_convertible<T, decltype(CurrentVelocity::data)>)>
   decltype(auto) setCurrentVelocity(const T twist_linear_x)
   {
-    return setCurrentVelocity(convertTo<CurrentVelocity>(twist_linear_x));
+    CurrentVelocity message;
+    {
+      message.stamp = get_clock()->now();
+      message.data = twist_linear_x;
+    }
+
+    return setCurrentVelocity(message);
   }
 
   decltype(auto) setCurrentVelocity(const geometry_msgs::msg::Twist & twist)
@@ -483,7 +514,7 @@ public:
   void checkAutowareState()
   {
     if (isReady() && isEmergency()) {
-      throw AutowareError();
+      // throw AutowareError();
     }
   }
 
@@ -529,7 +560,7 @@ public:
     INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
-    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light"),
+    INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
@@ -538,7 +569,7 @@ public:
     // Simulation specific topics (lexicographically sorted)
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentPose, "current_pose"),
+    INIT_PUBLISHER(CurrentPose, "/current_pose"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),

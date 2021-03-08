@@ -28,6 +28,7 @@
 #include <sys/wait.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
 #include <future>
 #include <memory>
@@ -138,12 +139,12 @@ public:
     const openscenario_msgs::msg::VehicleParameters & parameters)
   : VehicleEntity(name, parameters)
   {
-    DEBUG_VALUE(lanelet2_map_osm);
-
     // XXX(yamacir-kit) UGLY CODE!!!
     auto launch_autoware =
       [&]()
       {
+        DEBUG_VALUE(lanelet2_map_osm);
+
         autoware_process_id = fork();
 
         const std::vector<std::string> argv {
@@ -221,47 +222,51 @@ public:
   {
     if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
       accessor_status->set_value();
-      std::cout << "ACCESSOR TERMINATING" << std::endl;
+      // std::cout << "ACCESSOR TERMINATING" << std::endl;
       accessor_spinner->join();
-      std::cout << "ACCESSOR TERMINATED" << std::endl;
+      // std::cout << "ACCESSOR TERMINATED" << std::endl;
 
       autowares.erase(name);
 
-      std::cout << "KILLING PID: " << autoware_process_id << std::endl;
+      // std::cout << "KILLING PID: " << autoware_process_id << std::endl;
       kill(autoware_process_id, SIGINT);
-      std::cout << "WAITING" << std::endl;
+      // std::cout << "WAITING" << std::endl;
       int status = 0;
       ::waitpid(autoware_process_id, &status, WUNTRACED);
-      std::cout << "KILL END" << std::endl;
+      // std::cout << "KILL END" << std::endl;
     }
   }
 
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
-    waitForAutowareStateToBeWaitingForRoute();
+    const auto current_pose = getStatus().pose;
 
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autowares.at(name))->isWaitingForRoute();
-      rate.sleep())
-    {
-      std::cout << "SEND GOAL-POSE!" << std::endl;
-      std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
-    }
+    waitForAutowareStateToBeWaitingForRoute(
+      [&]()  // NOTE: This is assertion.
+      {
+        return updateAutoware(current_pose);
+      });
 
-    waitForAutowareStateToBeWaitingForEngage();
+    waitForAutowareStateToBePlanning(
+      [&]()
+      {
+        std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
+        return updateAutoware(current_pose);
+      });
 
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autowares.at(name))->isWaitingForEngage();
-      rate.sleep())
-    {
-      std::cout << "ENGAGE!" << std::endl;
-      std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
-    }
+    waitForAutowareStateToBeWaitingForEngage(
+      [&]()
+      {
+        return updateAutoware(current_pose);
+      });
 
-    waitForAutowareStateToBeDriving();
+    waitForAutowareStateToBeDriving(
+      [&]()
+      {
+        std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+        return updateAutoware(current_pose);
+      });
   }
 
   const std::string getCurrentAction() const
@@ -283,18 +288,22 @@ public:
 private:
   // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
 # define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
-  void waitForAutowareStateToBe ## STATE(const std::size_t count_max = 10) const \
+  template<typename Thunk> \
+  void waitForAutowareStateToBe ## STATE(Thunk thunk, std::size_t count_max = 300) const \
   { \
     std::size_t count = 0; \
     for ( \
-      rclcpp::WallRate rate {std::chrono::seconds(1)}; \
+      rclcpp::WallRate rate {std::chrono::milliseconds(100)}; \
       !std::atomic_load(&autowares.at(name))->is ## STATE(); \
       rate.sleep()) \
     { \
       if (count < count_max) { \
-        RCLCPP_INFO_STREAM( \
+        RCLCPP_INFO_STREAM_THROTTLE( \
           std::atomic_load(&autowares.at(name))->get_logger(), \
+          *std::atomic_load(&autowares.at(name))->get_clock(), \
+          1000, \
           "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
+        thunk(); \
       } else { \
         const auto current_state = \
           std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state; \
@@ -328,21 +337,6 @@ private:
 
 # undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 
-  void waitForAutowareToBeReady() const
-  {
-    std::size_t count = 0;
-
-    for (
-      rclcpp::WallRate rate {std::chrono::seconds(1)};
-      std::atomic_load(&autowares.at(name))->isNotReady();
-      rate.sleep())
-    {
-      std::cout << "[accessor] Waiting for Autoware to be ready. (" << ++count << ")" << std::endl;
-    }
-
-    std::cout << "[accessor] Autoware is ready." << std::endl;
-  }
-
   void updateAutoware(
     const geometry_msgs::msg::Pose & current_pose)
   {
@@ -361,14 +355,12 @@ private:
     std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
     std::atomic_load(&autowares.at(name))->setCurrentTwist(current_twist);
     std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
-    std::atomic_load(&autowares.at(name))->setLaneChangeApproval(true);
+    std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
     std::atomic_load(&autowares.at(name))->setTransform(current_pose);
-    std::atomic_load(&autowares.at(name))->setVehicleVelocity(current_twist.linear.x);
+    std::atomic_load(&autowares.at(name))->setVehicleVelocity(50);  // 50[m/s] = 180[km/h]
   }
 
 private:
-  autoware_auto_msgs::msg::Complex32 toHeading(const double yaw);
-
   const openscenario_msgs::msg::EntityStatus getEntityStatus(
     const double time,
     const double step_time) const;

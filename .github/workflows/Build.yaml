@@ -47,6 +47,7 @@ jobs:
           git clone -b ros2 https://github.com/tier4/pilot.auto.git
           mv -v pilot.auto/awapi/autoware_api_msgs              ./
           mv -v pilot.auto/common/msgs/autoware_control_msgs    ./
+          mv -v pilot.auto/common/msgs/autoware_debug_msgs      ./
           mv -v pilot.auto/common/msgs/autoware_perception_msgs ./
           mv -v pilot.auto/common/msgs/autoware_planning_msgs   ./
           mv -v pilot.auto/common/msgs/autoware_system_msgs     ./

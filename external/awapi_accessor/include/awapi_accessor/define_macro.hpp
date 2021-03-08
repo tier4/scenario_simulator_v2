@@ -55,8 +55,6 @@ public: \
 
 #define INIT_PUBLISHER(TYPE, TOPIC) \
   publisher_of_ ## TYPE( \
-    create_publisher<TYPE>( \
-      TOPIC, \
-      rclcpp::QoS(1).reliable().transient_local()))
+    create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))
 
 #endif  // AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
