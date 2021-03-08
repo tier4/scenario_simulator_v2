@@ -32,9 +32,31 @@
   </node>
 
   <!-- System -->
-  <include file="$(find-pkg-share system_launch)/launch/system.launch.xml">
-    <arg name="run_mode" value="planning_simulation"/>
-  </include>
+  <!-- <include file="$(find-pkg-share system_launch)/launch/system.launch.xml"> -->
+  <!--   <arg name="run_mode" value="planning_simulation"/>                      -->
+  <!-- </include>                                                                -->
+  <group>
+    <push-ros-namespace namespace="/system"/>
+
+    <!-- State Monitor -->
+    <include file="$(find-pkg-share autoware_state_monitor)/launch/autoware_state_monitor.launch.xml">
+      <arg name="config_file" value="$(find-pkg-share autoware_state_monitor)/config/autoware_state_monitor.planning_simulation.param.yaml" />
+    </include>
+
+    <!-- Error Monitor -->
+    <include file="$(find-pkg-share autoware_error_monitor)/launch/autoware_error_monitor.launch.xml">
+      <arg name="config_file" value="$(find-pkg-share autoware_error_monitor)/config/autoware_error_monitor.planning_simulation.param.yaml" />
+    </include>
+
+    <!-- Emergency Handler -->
+    <include file="$(find-pkg-share emergency_handler)/launch/emergency_handler.launch.xml">
+      <arg name="config_file" value="$(find-pkg-share emergency_handler)/config/emergency_handler.param.yaml" />
+      <arg name="use_emergency_hold" value="false" />
+    </include>
+
+    <!-- Autoware Version Publisher-->
+    <node pkg="autoware_version" exec="autoware_version" name="autoware_version" output="screen"/>
+  </group>
 
   <!-- Map -->
   <include file="$(find-pkg-share map_launch)/launch/map.launch.xml">
