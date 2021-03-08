@@ -54,6 +54,12 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
     std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
     std::atomic_load(&autowares.at(name))->setInitialTwist();
 
+    waitForAutowareStateToBeInitializingVehicle(
+      [&]()
+      {
+        return updateAutoware(current_entity_status.pose);
+      });
+
     /* ---- NOTE ---------------------------------------------------------------
      *
      *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
