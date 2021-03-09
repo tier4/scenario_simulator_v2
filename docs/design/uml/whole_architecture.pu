@@ -9,13 +9,20 @@ Node openscenario_interpreter_node {
   class TrafficLightManager
   class MetricsManager
   class scenario_simulator::API
-  class zeromq_request_socket
+  class ZeroMQRequestSocket
   scenario_simulator::API o-- EntityManager
   scenario_simulator::API o-- TrafficLightManager
   scenario_simulator::API o-- MetricsManager
-  scenario_simulator::API o-- zeromq_request_socket
   TrafficLightManager -right-> EntityManager
   EntityManager -right-> MetricsManager
+  class EgoEntity
+  class VehicleEntity
+  class PedestrianEntity
+  EntityManager o-- EgoEntity
+  EntityManager o-- VehicleEntity
+  EntityManager o-- PedestrianEntity
+  class AwapiAccessor
+  EgoEntity o-- AwapiAccessor
 }
 
 openscenario_interpreter_node -up-> ros2lifecycle
@@ -30,25 +37,26 @@ test_runner_node -down-> ros2lifecycle
 ros2lifecycle -up-> test_runner_node
 
 Node Autoware {
+  Interface AutowareAPI
 }
 
 interface ros2launch
 
 test_runner_node --left-> ros2launch
-ros2launch -left-> Autoware
+ros2launch -down-> Autoware
 
 interface "ZEROMQ (TCP)"
 
-scenario_simulator::API -down-> zeromq_request_socket
-zeromq_request_socket -up-> scenario_simulator::API
-zeromq_request_socket -left-> "ZEROMQ (TCP)"
-"ZEROMQ (TCP)" -right-> zeromq_request_socket
+scenario_simulator::API -left-> ZeroMQRequestSocket
+ZeroMQRequestSocket -right-> scenario_simulator::API
+ZeroMQRequestSocket -up-> "ZEROMQ (TCP)"
+"ZEROMQ (TCP)" -down-> ZeroMQRequestSocket
 
 Node Simulator {
-  class zeromq_reply_socket
+  class ZeroMQReplySocket
 }
 
-"ZEROMQ (TCP)" -down-> zeromq_reply_socket
-zeromq_reply_socket -up-> "ZEROMQ (TCP)"
+"ZEROMQ (TCP)" -up-> ZeroMQReplySocket
+ZeroMQReplySocket -down-> "ZEROMQ (TCP)"
 
 @enduml
