@@ -5,12 +5,22 @@ title WholeArchitecture
 interface ros2lifecycle
 
 Node openscenario_interpreter_node {
-  class simulation_api
+  class EntityManager
+  class TrafficLightManager
+  class MetricsManager
+  class scenario_simulator::API
+  class zeromq_request_socket
+  scenario_simulator::API o-- EntityManager
+  scenario_simulator::API o-- TrafficLightManager
+  scenario_simulator::API o-- MetricsManager
+  scenario_simulator::API o-- zeromq_request_socket
+  TrafficLightManager -right-> EntityManager
+  EntityManager -right-> MetricsManager
 }
 
 openscenario_interpreter_node -up-> ros2lifecycle
 
-ros2lifecycle -down-> openscenario_interpreter_node
+ros2lifecycle -right-> openscenario_interpreter_node
 
 Node test_runner_node {
 }
@@ -24,19 +34,21 @@ Node Autoware {
 
 interface ros2launch
 
-test_runner_node --down-> ros2launch
-ros2launch -down-> Autoware
+test_runner_node --left-> ros2launch
+ros2launch -left-> Autoware
 
-interface XMLRPCAPI
+interface "ZEROMQ (TCP)"
 
-simulation_api -down-> XMLRPCAPI
-XMLRPCAPI -up-> simulation_api
+scenario_simulator::API -down-> zeromq_request_socket
+zeromq_request_socket -up-> scenario_simulator::API
+zeromq_request_socket -left-> "ZEROMQ (TCP)"
+"ZEROMQ (TCP)" -right-> zeromq_request_socket
 
 Node Simulator {
-  class xmlrpc_server
+  class zeromq_reply_socket
 }
 
-XMLRPCAPI -down-> xmlrpc_server
-xmlrpc_server -up-> XMLRPCAPI
+"ZEROMQ (TCP)" -down-> zeromq_reply_socket
+zeromq_reply_socket -up-> "ZEROMQ (TCP)"
 
 @enduml
