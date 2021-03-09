@@ -13,6 +13,7 @@
   <arg name="perception/enable_detection_failure" default="true"/>
   <arg name="perception/enable_object_recognition" default="true"/>
   <arg name="sensing/visible_range" default="300.0"/>
+  <arg name="output_directory" default="/tmp/scenario_test_runner/rosbag"/>
 
   <!-- Vehicle -->
   <!-- Spliced from vehicle.launch.xml -->
@@ -65,4 +66,10 @@
 
   <!-- Rviz -->
   <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)" />
+  
+  <!-- ROSBAG -->
+  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="screen" />
+
+  <!-- Web Controller -->
+  <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->
 </launch>
