@@ -74,7 +74,7 @@ struct Storyboard
     init.evaluate();   // NOTE RENAME TO 'start'?
   }
 
-  decltype(auto) stopTriggered() const
+  decltype(auto) stopTriggered()
   {
     return stop_trigger.evaluate().as<Boolean>();
   }

@@ -120,9 +120,9 @@ private:
   }
 
   template<typename ... Ts>
-  constexpr decltype(auto) stopTriggered(Ts && ... xs) const
+  constexpr decltype(auto) stopTriggered(Ts && ... xs)
   {
-    return static_cast<const T &>(*this).stopTriggered(std::forward<decltype(xs)>(xs)...);
+    return static_cast<T &>(*this).stopTriggered(std::forward<decltype(xs)>(xs)...);
   }
 
 protected:

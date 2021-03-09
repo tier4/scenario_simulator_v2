@@ -25,10 +25,10 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Boolean ==============================================================
+/* ---- Boolean ----------------------------------------------------------------
  *
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Boolean
 {
   using value_type = bool;
@@ -62,22 +62,20 @@ struct Boolean
   }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Boolean & boolean)
+std::ostream & operator<<(std::ostream & os, const Boolean & boolean)
 {
   boost::io::ios_flags_saver saver {os};
   return os << std::boolalpha << boolean.data;
 }
 
-template<typename ... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Boolean & boolean)
+std::istream & operator>>(std::istream & is, Boolean & boolean)
 {
   boost::io::ios_flags_saver saver {is};
   return is >> std::boolalpha >> boolean.data;
 }
 
-static const auto true_v  {make<Boolean>(true)};
-static const auto false_v {make<Boolean>(false)};
+static const auto true_v = make<Boolean>(true);
+static const auto false_v = make<Boolean>(false);
 
 auto asBoolean(bool value)
 {
