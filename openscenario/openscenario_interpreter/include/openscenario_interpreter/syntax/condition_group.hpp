@@ -49,7 +49,7 @@ struct ConditionGroup
       });
   }
 
-  auto evaluate() const
+  auto evaluate()
   {
     return asBoolean(
       std::all_of(

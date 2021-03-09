@@ -88,6 +88,18 @@ struct ConditionEdge
      *
      * ---------------------------------------------------------------------- */
     none,
+
+    /* ---- Sticky (Tier IV Extension) -----------------------------------------
+     *
+     *  A condition defined by a 'sticky' edge returns true at discrete time
+     *  t + k (0 < k) if its logical expression evaluates to true at discrete
+     *  time t. This edge is provided for simply defining assertions such as
+     *  "Did the Ego car pass over checkpoint X?
+     *
+     *  This edge is a non-OpenSCEANRIO 1.0.0 standard feature.
+     *
+     * ---------------------------------------------------------------------- */
+    sticky,
   }
   value;
 
@@ -117,6 +129,7 @@ std::istream & operator>>(std::istream & is, ConditionEdge & edge)
   BOILERPLATE(falling);
   BOILERPLATE(risingOrFalling);
   BOILERPLATE(none);
+  BOILERPLATE(sticky);
 
   #undef BOILERPLATE
 
@@ -134,6 +147,7 @@ std::ostream & operator<<(std::ostream & os, const ConditionEdge & edge)
     BOILERPLATE(falling);
     BOILERPLATE(risingOrFalling);
     BOILERPLATE(none);
+    BOILERPLATE(sticky);
 
     #undef BOILERPLATE
 

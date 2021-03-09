@@ -32,23 +32,23 @@ inline namespace syntax
 {
 /* ---- EntityCondition --------------------------------------------------------
  *
- * <xsd:complexType name="EntityCondition">
- *   <xsd:choice>
- *     <xsd:element name="EndOfRoadCondition" type="EndOfRoadCondition"/>
- *     <xsd:element name="CollisionCondition" type="CollisionCondition"/>
- *     <xsd:element name="OffroadCondition" type="OffroadCondition"/>
- *     <xsd:element name="TimeHeadwayCondition" type="TimeHeadwayCondition"/>
- *     <xsd:element name="TimeToCollisionCondition" type="TimeToCollisionCondition"/>
- *     <xsd:element name="AccelerationCondition" type="AccelerationCondition"/>
- *     <xsd:element name="StandStillCondition" type="StandStillCondition"/>
- *     <xsd:element name="SpeedCondition" type="SpeedCondition"/>
- *     <xsd:element name="RelativeSpeedCondition" type="RelativeSpeedCondition"/>
- *     <xsd:element name="TraveledDistanceCondition" type="TraveledDistanceCondition"/>
- *     <xsd:element name="ReachPositionCondition" type="ReachPositionCondition"/>
- *     <xsd:element name="DistanceCondition" type="DistanceCondition"/>
- *     <xsd:element name="RelativeDistanceCondition" type="RelativeDistanceCondition"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="EntityCondition">
+ *    <xsd:choice>
+ *      <xsd:element name="EndOfRoadCondition" type="EndOfRoadCondition"/>
+ *      <xsd:element name="CollisionCondition" type="CollisionCondition"/>
+ *      <xsd:element name="OffroadCondition" type="OffroadCondition"/>
+ *      <xsd:element name="TimeHeadwayCondition" type="TimeHeadwayCondition"/>
+ *      <xsd:element name="TimeToCollisionCondition" type="TimeToCollisionCondition"/>
+ *      <xsd:element name="AccelerationCondition" type="AccelerationCondition"/>
+ *      <xsd:element name="StandStillCondition" type="StandStillCondition"/>
+ *      <xsd:element name="SpeedCondition" type="SpeedCondition"/>
+ *      <xsd:element name="RelativeSpeedCondition" type="RelativeSpeedCondition"/>
+ *      <xsd:element name="TraveledDistanceCondition" type="TraveledDistanceCondition"/>
+ *      <xsd:element name="ReachPositionCondition" type="ReachPositionCondition"/>
+ *      <xsd:element name="DistanceCondition" type="DistanceCondition"/>
+ *      <xsd:element name="RelativeDistanceCondition" type="RelativeDistanceCondition"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 #define ELEMENT(TYPENAME) \
@@ -58,14 +58,9 @@ inline namespace syntax
       return make<TYPENAME>(node, std::forward<decltype(xs)>(xs)...); \
     })
 
-struct EntityCondition
-  : public Element
+struct EntityCondition : public Element
 {
-  template
-  <
-    typename Node,
-    typename ... Ts
-  >
+  template<typename Node, typename ... Ts>
   explicit EntityCondition(const Node & node, Ts && ... xs)
   : Element(
       choice(

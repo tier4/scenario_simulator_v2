@@ -27,15 +27,15 @@ inline namespace syntax
 {
 /* ---- Condition --------------------------------------------------------------
  *
- * <xsd:complexType name="Condition">
- *   <xsd:choice>
- *     <xsd:element name="ByEntityCondition" type="ByEntityCondition"/>
- *     <xsd:element name="ByValueCondition" type="ByValueCondition"/>
- *   </xsd:choice>
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="delay" type="Double" use="required"/>
- *   <xsd:attribute name="conditionEdge" type="ConditionEdge" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Condition">
+ *    <xsd:choice>
+ *      <xsd:element name="ByEntityCondition" type="ByEntityCondition"/>
+ *      <xsd:element name="ByValueCondition" type="ByValueCondition"/>
+ *    </xsd:choice>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="delay" type="Double" use="required"/>
+ *    <xsd:attribute name="conditionEdge" type="ConditionEdge" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct Condition
@@ -47,10 +47,7 @@ struct Condition
 
   const ConditionEdge condition_edge;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit Condition(const Node & node, Scope & scope)
   : Element(
       choice(
@@ -72,22 +69,16 @@ struct Condition
       readAttribute<ConditionEdge>("conditionEdge", node, scope))
   {}
 
-  #ifndef NDEBUG
-  decltype(auto) evaluate() const
+  Element result = false_v;
+
+  const auto & evaluate()
   {
-    std::cout << (indent++) << "Condition " << cyan << "\"" << name << "\"" << console::reset <<
-      std::endl;
-
-    BOOST_SCOPE_EXIT_ALL()
-    {
-      --indent;
-    };
-
-    return Element::evaluate();
+    if (condition_edge == ConditionEdge::sticky && result == true_v) {
+      return result;
+    } else {
+      return result = Element::evaluate();
+    }
   }
-  #else
-  using Element::evaluate;
-  #endif
 };
 }
 }  // namespace openscenario_interpreter
