@@ -223,7 +223,6 @@ public:
           {
             rclcpp::spin_some(node);
           }
-          std::cout << "ACCESSOR STOPEED!" << std::endl;
         }, autowares.at(name), std::move(accessor_status->get_future()));
     }
   }
@@ -307,19 +306,14 @@ private:
       !std::atomic_load(&autowares.at(name))->is ## STATE(); \
       rate.sleep()) \
     { \
-      if (count < count_max) { \
-        RCLCPP_INFO_STREAM_THROTTLE( \
-          std::atomic_load(&autowares.at(name))->get_logger(), \
-          *std::atomic_load(&autowares.at(name))->get_clock(), \
-          1000, \
-          "Waiting for Autoware's state to be " #STATE "(" << ++count << ")."); \
+      if (count++ < count_max) { \
         thunk(); \
       } else { \
         const auto current_state = \
           std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state; \
         std::stringstream ss {}; \
         ss << "The simulator waited " \
-           << count \
+           << (count / 10) \
            << " seconds, expecting the Autoware state to transitioning to " \
            << #STATE \
            << ", but there was no change. The current Autoware state is " \

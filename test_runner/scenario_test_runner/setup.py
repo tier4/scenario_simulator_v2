@@ -11,6 +11,7 @@ setup(
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/ament_index/resource_index/packages', ['resource/workflow_schema.yaml']),
         ('share/' + package_name, ['config/workflow_example.yaml']),
+        ('share/' + package_name, ['config/planning_simulator_v2.rviz']),
         ('share/' + package_name, glob('launch/*.launch.*')),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/test/scenario/xosc', glob('test/scenario/xosc/*.xosc')),
