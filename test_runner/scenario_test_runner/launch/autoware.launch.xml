@@ -66,9 +66,9 @@
 
   <!-- Rviz -->
   <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)" />
-  
+
   <!-- ROSBAG -->
-  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="screen" />
+  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="log" />
 
   <!-- Web Controller -->
   <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->
