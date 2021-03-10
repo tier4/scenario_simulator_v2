@@ -80,6 +80,8 @@ public:
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset);
 
+  double getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
+
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
