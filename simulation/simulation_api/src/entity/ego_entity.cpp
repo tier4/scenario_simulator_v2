@@ -179,10 +179,10 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     status.pose.position.z = v(2) + origin_.get().position.z;
 
     simulation_api::math::CatmullRomSpline spline(
-        hdmap_utils_ptr_->getCenterPoints(
+      hdmap_utils_ptr_->getCenterPoints(
         hdmap_utils_ptr_->getClosetLanletId(status.pose)));
     const auto s_value = spline.getSValue(status.pose.position);
-    if(s_value) {
+    if (s_value) {
       status.pose.position.z = spline.getPoint(s_value.get()).z;
     }
 
