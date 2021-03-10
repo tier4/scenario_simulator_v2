@@ -31,10 +31,7 @@ using Group = Element;
 
 using Elements = std::vector<Element>;
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 using IsOptionalElement = std::is_default_constructible<Ts...>;
 
 template<typename T, typename ... Ts>

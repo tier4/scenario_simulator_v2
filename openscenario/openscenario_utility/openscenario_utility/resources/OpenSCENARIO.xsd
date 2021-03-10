@@ -8,11 +8,11 @@ ASAM OpenSCENARIO V1.0.0
 Description of dynamic content in driving simulations
 
 
-Any use is limited to the scope described in the ASAM license terms. 
-This file is distributable in accordance with the ASAM license terms. 
+Any use is limited to the scope described in the ASAM license terms.
+This file is distributable in accordance with the ASAM license terms.
 See www.asam.net/license.html for further details.
 -->
-    <xsd:element name="OpenSCENARIO" type="OpenScenario"/>
+<xsd:element name="OpenSCENARIO" type="OpenScenario"/>
 	<xsd:simpleType name="parameter">
 		<xsd:restriction base="xsd:string">
 			<xsd:pattern value="[$][A-Za-z_][A-Za-z0-9_]*"/>
@@ -63,6 +63,7 @@ See www.asam.net/license.html for further details.
 					<xsd:enumeration value="none"/>
 					<xsd:enumeration value="rising"/>
 					<xsd:enumeration value="risingOrFalling"/>
+					<xsd:enumeration value="sticky"/>
 				</xsd:restriction>
 			</xsd:simpleType>
 			<xsd:simpleType>

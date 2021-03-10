@@ -2,9 +2,8 @@
 <launch>
   <!-- Essential parameters -->
   <arg name="map_path" doc="point cloud and lanelet2 map directory path"/>
-  <arg name="sensor_model" default="aip_xx1"/>
   <arg name="vehicle_model" default="lexus"/>
-  <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
+  <arg name="sensor_model" default="aip_xx1"/>
   <!-- Optional parameters -->
   <arg name="rviz" default="true" doc="launch rviz"/>
   <arg name="lanelet2_map_file" default="lanelet2_map.osm" />
@@ -14,9 +13,11 @@
   <arg name="perception/enable_detection_failure" default="true"/>
   <arg name="perception/enable_object_recognition" default="true"/>
   <arg name="sensing/visible_range" default="300.0"/>
+  <arg name="output_directory" default="/tmp/scenario_test_runner/rosbag"/>
 
-  <!-- Vehicle Description -->
+  <!-- Vehicle -->
   <!-- Spliced from vehicle.launch.xml -->
+  <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
   <group>
     <include file="$(find-pkg-share vehicle_launch)/launch/vehicle_description.launch.xml">
       <arg name="sensor_model" value="$(var sensor_model)"/>
@@ -32,31 +33,9 @@
   </node>
 
   <!-- System -->
-  <!-- <include file="$(find-pkg-share system_launch)/launch/system.launch.xml"> -->
-  <!--   <arg name="run_mode" value="planning_simulation"/>                      -->
-  <!-- </include>                                                                -->
-  <group>
-    <push-ros-namespace namespace="/system"/>
-
-    <!-- State Monitor -->
-    <include file="$(find-pkg-share autoware_state_monitor)/launch/autoware_state_monitor.launch.xml">
-      <arg name="config_file" value="$(find-pkg-share autoware_state_monitor)/config/autoware_state_monitor.planning_simulation.param.yaml" />
-    </include>
-
-    <!-- Error Monitor -->
-    <include file="$(find-pkg-share autoware_error_monitor)/launch/autoware_error_monitor.launch.xml">
-      <arg name="config_file" value="$(find-pkg-share autoware_error_monitor)/config/autoware_error_monitor.planning_simulation.param.yaml" />
-    </include>
-
-    <!-- Emergency Handler -->
-    <include file="$(find-pkg-share emergency_handler)/launch/emergency_handler.launch.xml">
-      <arg name="config_file" value="$(find-pkg-share emergency_handler)/config/emergency_handler.param.yaml" />
-      <arg name="use_emergency_hold" value="false" />
-    </include>
-
-    <!-- Autoware Version Publisher-->
-    <node pkg="autoware_version" exec="autoware_version" name="autoware_version" output="screen"/>
-  </group>
+  <include file="$(find-pkg-share system_launch)/launch/system.launch.xml">
+    <arg name="run_mode" value="planning_simulation"/>
+  </include>
 
   <!-- Map -->
   <include file="$(find-pkg-share map_launch)/launch/map.launch.xml">
@@ -86,7 +65,10 @@
   <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml" />
 
   <!-- Rviz -->
-  <node pkg="rviz2" exec="rviz2" name="rviz2" output="log" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)" />
+  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)" />
+  
+  <!-- ROSBAG -->
+  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="screen" />
 
   <!-- Web Controller -->
   <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->
