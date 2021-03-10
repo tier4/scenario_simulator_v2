@@ -33,7 +33,10 @@ class ScenarioRunnerMoc : public rclcpp::Node
 public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
   : Node("scenario_runner", option),
-    api_(this, ament_index_cpp::get_package_share_directory(
+    api_(
+      this,
+      __FILE__,
+      ament_index_cpp::get_package_share_directory(
         "kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
     api_.setVerbose(true);

@@ -68,10 +68,10 @@ struct Position
 
   geometry_msgs::msg::Pose toPose() const
   {
-    if ((*this).is<WorldPosition>()) {
-      return (*this).as<WorldPosition>();
-    } else if ((*this).is<LanePosition>()) {
-      return (*this).as<LanePosition>();
+    if (is<WorldPosition>()) {
+      return as<WorldPosition>();
+    } else if (is<LanePosition>()) {
+      return as<LanePosition>();
     } else {
       const geometry_msgs::msg::Pose result {};
       return result;
