@@ -5,11 +5,13 @@ title WholeArchitecture
 interface ros2lifecycle
 
 Node openscenario_interpreter_node {
+  class openscenario_interpreter::Interpreter
   class EntityManager
   class TrafficLightManager
   class MetricsManager
   class scenario_simulator::API
   class ZeroMQRequestSocket
+  openscenario_interpreter::Interpreter o-- scenario_simulator::API
   scenario_simulator::API o-- EntityManager
   scenario_simulator::API o-- TrafficLightManager
   scenario_simulator::API o-- MetricsManager
@@ -25,14 +27,13 @@ Node openscenario_interpreter_node {
   EgoEntity o-- AwapiAccessor
 }
 
-openscenario_interpreter_node -up-> ros2lifecycle
+openscenario_interpreter::Interpreter -up-> ros2lifecycle
 
-ros2lifecycle -right-> openscenario_interpreter_node
+ros2lifecycle -down-> openscenario_interpreter::Interpreter
 
 Node test_runner_node {
 }
 
-test_runner_node -down-> openscenario_interpreter_node
 test_runner_node -down-> ros2lifecycle
 ros2lifecycle -up-> test_runner_node
 
@@ -44,6 +45,7 @@ interface ros2launch
 
 test_runner_node --left-> ros2launch
 ros2launch -down-> Autoware
+ros2launch -down-> openscenario_interpreter_node
 
 interface "ZEROMQ (TCP)"
 
@@ -55,6 +57,8 @@ ZeroMQRequestSocket -up-> "ZEROMQ (TCP)"
 Node Simulator {
   class ZeroMQReplySocket
 }
+
+ros2launch -down-> Simulator
 
 "ZEROMQ (TCP)" -up-> ZeroMQReplySocket
 ZeroMQReplySocket -down-> "ZEROMQ (TCP)"
