@@ -41,9 +41,11 @@ Node Autoware {
   Interface AutowareAPI
 }
 
+AwapiAccessor -down-> AutowareAPI
+
 interface ros2launch
 
-test_runner_node --left-> ros2launch
+test_runner_node -down-> ros2launch
 ros2launch -down-> Autoware
 ros2launch -down-> openscenario_interpreter_node
 
@@ -51,8 +53,8 @@ interface "ZEROMQ (TCP)"
 
 scenario_simulator::API -left-> ZeroMQRequestSocket
 ZeroMQRequestSocket -right-> scenario_simulator::API
-ZeroMQRequestSocket -up-> "ZEROMQ (TCP)"
-"ZEROMQ (TCP)" -down-> ZeroMQRequestSocket
+ZeroMQRequestSocket -right-> "ZEROMQ (TCP)"
+"ZEROMQ (TCP)" -left-> ZeroMQRequestSocket
 
 Node Simulator {
   class ZeroMQReplySocket
