@@ -103,6 +103,11 @@ const std::vector<geometry_msgs::msg::Point> HdMapUtils::getLaneletPolygon(std::
   return points;
 }
 
+double HdMapUtils::getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
+{
+  return toMapPose(lanelet_pose).pose.position.z;
+}
+
 boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
   std::int64_t lanelet_id,
   std::int64_t crossing_lanelet_id)
