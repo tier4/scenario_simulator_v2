@@ -27,14 +27,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== TrafficSignalState ===================================================
+/* ---- TrafficSignalState -----------------------------------------------------
  *
- * <xsd:complexType name="TrafficSignalState">
- *   <xsd:attribute name="trafficSignalId" type="String" use="required"/>
- *   <xsd:attribute name="state" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="TrafficSignalState">
+ *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
+ *    <xsd:attribute name="state" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct TrafficSignalState
 {
   const String traffic_signal_id, state;
@@ -46,17 +46,17 @@ struct TrafficSignalState
   {}
 };
 
-/* ==== Phase ================================================================
+/* ---- Phase ------------------------------------------------------------------
  *
- * <xsd:complexType name="Phase">
- *   <xsd:sequence>
- *     <xsd:element name="TrafficSignalState" minOccurs="0" maxOccurs="unbounded" type="TrafficSignalState"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="duration" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Phase">
+ *    <xsd:sequence>
+ *      <xsd:element name="TrafficSignalState" minOccurs="0" maxOccurs="unbounded" type="TrafficSignalState"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="duration" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Phase
 {
   const String name;
@@ -75,18 +75,18 @@ struct Phase
   {}
 };
 
-/* ==== TrafficSignalController ================================================
+/* ---- TrafficSignalController ------------------------------------------------
  *
- * <xsd:complexType name="TrafficSignalController">
- *   <xsd:sequence>
- *     <xsd:element name="Phase" minOccurs="0" maxOccurs="unbounded" type="Phase"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="delay" type="Double" use="optional"/>
- *   <xsd:attribute name="reference" type="String" use="optional"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="TrafficSignalController">
+ *    <xsd:sequence>
+ *      <xsd:element name="Phase" minOccurs="0" maxOccurs="unbounded" type="Phase"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="delay" type="Double" use="optional"/>
+ *    <xsd:attribute name="reference" type="String" use="optional"/>
+ *  </xsd:complexType>
  *
- * ========================================================================== */
+ * -------------------------------------------------------------------------- */
 struct TrafficSignalController
 {
   const String name;
@@ -99,10 +99,10 @@ struct TrafficSignalController
 
   template<typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    delay{readAttribute<Double>("delay", node, outer_scope)},
-    reference{readAttribute<String>("reference", node, outer_scope)},
-    phase{readElement<Phase>("Phase", node, outer_scope)}
+  : name(readAttribute<String>("name", node, outer_scope)),
+    delay(readAttribute<Double>("delay", node, outer_scope, Double())),
+    reference(readAttribute<String>("reference", node, outer_scope, String())),
+    phase(readElement<Phase>("Phase", node, outer_scope))
   {}
 };
 
