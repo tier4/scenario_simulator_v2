@@ -105,7 +105,7 @@ def load_yaml(path):
         with path.open('r') as file:
             return yaml.safe_load(file)
     else:
-        print("No such file or directory: " + path, file=stderr)
+        print("\x1b[31mNo such file or directory: " + str(path) + "\x1b[0m", file=stderr)
         exit()
 
 
