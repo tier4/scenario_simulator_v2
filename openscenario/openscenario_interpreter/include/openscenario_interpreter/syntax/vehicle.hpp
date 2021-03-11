@@ -112,10 +112,7 @@ struct Vehicle
     properties(readElement<Properties>("Properties", node, inner_scope))
   {}
 
-  template
-  <
-    typename ... Ts
-  >
+  template<typename ... Ts>
   decltype(auto) operator[](Ts && ... xs)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);

@@ -28,7 +28,7 @@ OpenSCENARIO:
             Center:
               x: 0
               y: 0
-              z: 0
+              z: 1.25
             Dimensions:
               width: 2.25
               length: 4.77
@@ -62,7 +62,7 @@ OpenSCENARIO:
             Center:
               x: 0
               y: 0
-              z: 0
+              z: 1.25
             Dimensions:
               width: 1.8
               length: 4

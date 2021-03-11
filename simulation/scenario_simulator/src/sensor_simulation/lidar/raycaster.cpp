@@ -86,20 +86,21 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   const rclcpp::Time & stamp,
   geometry_msgs::msg::Pose origin,
   std::vector<geometry_msgs::msg::Quaternion> directions,
-  double max_distance, double min_distance)
+  double max_distance,
+  double min_distance)
 {
   detected_objects_ = {};
   std::vector<unsigned int> detected_ids = {};
   scene_ = rtcNewScene(device_);
   pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>());
-  for (auto && pair : primitive_ptrs_) {
+  for (auto & pair : primitive_ptrs_) {
     auto id = pair.second->addToScene(device_, scene_);
     geometry_ids_.insert({id, pair.first});
   }
   rtcCommitScene(scene_);
   RTCIntersectContext context;
   rtcInitIntersectContext(&context);
-  for (auto direction : directions) {
+  for (const auto & direction : directions) {
     RTCRayHit rayhit;
     rayhit.ray.org_x = origin.position.x;
     rayhit.ray.org_y = origin.position.y;
@@ -109,7 +110,7 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     rayhit.ray.flags = false;
     const auto ray_direction = origin.orientation * direction;
     const auto rotation_mat = quaternion_operation::getRotationMatrix(ray_direction);
-    const auto rotated_direction = rotation_mat * Eigen::Vector3d(1.0f, 0.0f, 0.0f);
+    const Eigen::Vector3d rotated_direction = rotation_mat * Eigen::Vector3d(1.0, 0.0, 0.0);
     rayhit.ray.dir_x = rotated_direction[0];
     rayhit.ray.dir_y = rotated_direction[1];
     rayhit.ray.dir_z = rotated_direction[2];
@@ -117,13 +118,16 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     rtcIntersect1(scene_, &context, &rayhit);
     if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
       double distance = rayhit.ray.tfar;
-      const auto vector =
+      const Eigen::Vector3d vector =
         quaternion_operation::getRotationMatrix(direction) *
-        Eigen::Vector3d(1.0f, 0.0f, 0.0f) * distance;
+        Eigen::Vector3d(1.0, 0.0, 0.0) *
+        distance;
       pcl::PointXYZI p;
-      p.x = vector[0];
-      p.y = vector[1];
-      p.z = vector[2];
+      {
+        p.x = vector[0];
+        p.y = vector[1];
+        p.z = vector[2];
+      }
       cloud->emplace_back(p);
       if (std::count(detected_ids.begin(), detected_ids.end(), rayhit.hit.geomID) == 0) {
         detected_ids.emplace_back(rayhit.hit.geomID);
