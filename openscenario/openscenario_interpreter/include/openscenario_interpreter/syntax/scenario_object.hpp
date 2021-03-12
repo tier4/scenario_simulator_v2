@@ -65,10 +65,7 @@ struct ScenarioObject
 
   static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
   : EntityObject(node, outer_scope),
     name(readAttribute<String>("name", node, outer_scope)),
@@ -86,6 +83,19 @@ struct ScenarioObject
     {
       if (is<Vehicle>()) {
         setController(name, object_controller);
+
+        if (as<Vehicle>()["isEgo"]) {
+          attachLidarSensor(
+            simulation_api::helper::constructLidarConfiguration(
+              simulation_api::helper::LidarType::VLP32,
+              name,
+              "/sensing/lidar/no_ground/pointcloud"));
+          attachDetectionSensor(
+            simulation_api::helper::constructDetectionSensorConfiguration(
+              name,
+              "/perception/object_recognition/objects", 0.1));
+          // /perception/object_recognition/detection/labeled_clusters
+        }
       }
       return unspecified;
     } else {

@@ -36,7 +36,8 @@ namespace scenario_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("scenario_simulator", options), sensor_sim_(get_clock()),
-  server_(simulation_interface::protocol,
+  server_(
+    simulation_interface::protocol,
     simulation_interface::HostName::ANY,
     std::bind(&ScenarioSimulator::initialize, this,
     std::placeholders::_1, std::placeholders::_2),

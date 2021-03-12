@@ -83,7 +83,7 @@ def generate_launch_description():
             executable='scenario_simulator_node',
             namespace='simulation',
             name='sensor_simulator',
-            output='log',
+            output='screen',
             parameters=[{
                 'port': port,
                 }],),
@@ -121,7 +121,7 @@ def generate_launch_description():
             executable='openscenario_visualization_node',
             namespace='simulation',
             name='openscenario_visualizer',
-            output='log',),
+            output='screen',),
 
         # Node(
         #     package='rviz2',

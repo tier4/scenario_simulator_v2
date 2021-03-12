@@ -1,13 +1,10 @@
 ScenarioModifiers:
-  ScenarioModifier:
-    - name: Hoge
-      # list: [1, 2]
-      list: [1]
+  ScenarioModifier: []
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: '2021-02-01T08:31:04.600Z'
+    date: '2021-03-11T00:43:16.316Z'
     description: ''
     author: ''
   ParameterDeclarations:
@@ -16,7 +13,7 @@ OpenSCENARIO:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
+      filepath: /home/yamasa/Documents/AutonomousDrivingScenarios/map/kashiwanoha/lanelet2_map.osm
     SceneGraphFile:
       filepath: lanelet2_map.pcd
     TrafficSignals:
@@ -28,10 +25,16 @@ OpenSCENARIO:
           name: ''
           vehicleCategory: car
           BoundingBox:
-            Center: { x: 0, y: 0, z: 0 }
-            Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 2.25
+              length: 4.77
+              height: 2.5
           Performance:
-            maxSpeed: 30
+            maxSpeed: 60
             maxAcceleration: INF
             maxDeceleration: INF
           Axles:
@@ -49,7 +52,40 @@ OpenSCENARIO:
               positionZ: 0.3
           Properties:
             Property:
-              - { name: isEgo, value: 'true' }
+              - name: isEgo
+                value: 'true'
+      - name: Npc1
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 60
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: 1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: -1
+              positionZ: 0.3
+          Properties:
+            Property: []
   Storyboard:
     Init:
       Actions:
@@ -63,7 +99,11 @@ OpenSCENARIO:
                       laneId: '34513'
                       s: 0
                       offset: 0
-                      Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
               - RoutingAction:
                   AcquirePositionAction:
                     Position:
@@ -72,7 +112,34 @@ OpenSCENARIO:
                         laneId: '34507'
                         s: 50
                         offset: 0
-                        Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: -0.0
+                          r: 0
+          - entityRef: Npc1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 20
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 1
     Story:
       - name: ''
         Act:
@@ -108,8 +175,12 @@ OpenSCENARIO:
                                             laneId: '34507'
                                             s: 50
                                             offset: 0
-                                            Orientation: { type: relative, h: 0, p: 0, r: 0 }
-                                        tolerance: 0.5
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: -0.0
+                                              r: 0
+                                        tolerance: 1
                         Action:
                           - name: ''
                             UserDefinedAction:
@@ -127,6 +198,19 @@ OpenSCENARIO:
                                     SimulationTimeCondition:
                                       value: 180
                                       rule: greaterThan
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Npc1
                         Action:
                           - name: ''
                             UserDefinedAction:

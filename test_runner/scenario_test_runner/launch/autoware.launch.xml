@@ -65,10 +65,10 @@
   <include file="$(find-pkg-share awapi_awiv_adapter)/launch/awapi_awiv_adapter.launch.xml" />
 
   <!-- Rviz -->
-  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(find-pkg-share autoware_launch)/rviz/autoware.rviz -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)" />
-  
+  <node pkg="rviz2" exec="rviz2" name="rviz2" output="log" args="-d $(find-pkg-share scenario_test_runner)/planning_simulator_v2.rviz -s $(find-pkg-share autoware_launch)/rviz/image/autoware.png" if="$(var rviz)" />
+
   <!-- ROSBAG -->
-  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="screen" />
+  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="log" />
 
   <!-- Web Controller -->
   <!-- <include file="$(find-pkg-share autoware_web_controller)/launch/autoware_web_controller.launch.xml"/> -->

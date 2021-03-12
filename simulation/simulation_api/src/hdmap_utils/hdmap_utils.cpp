@@ -263,11 +263,11 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   return lanelet_pose;
 }
 
-int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
+std::int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
 {
   lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 1);
+    lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 3);
   const auto nearest_road_lanelet =
     excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
   if (nearest_road_lanelet.empty()) {
