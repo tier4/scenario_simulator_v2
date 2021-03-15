@@ -61,6 +61,16 @@ struct ObjectController : public ComplexType
         ELEMENT(Controller)))
   {}
 
+  bool isEgo() &
+  {
+    if (is<Unspecified>()) {
+      static auto controller = DefaultController();
+      return controller["isEgo"];
+    } else {
+      return as<Controller>()["isEgo"];
+    }
+  }
+
   operator openscenario_msgs::msg::DriverModel() const
   {
     if (is<Unspecified>()) {
