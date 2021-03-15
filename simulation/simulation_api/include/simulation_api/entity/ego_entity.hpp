@@ -168,11 +168,11 @@ public:
         if (autoware_process_id < 0) {
           throw std::system_error(errno, std::system_category());
         } else if (autoware_process_id == 0) {
-          const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
-          const auto fd = open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-          dup2(fd, 1);
-          dup2(fd, 2);
-          close(fd);
+          // const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
+          // const auto fd = open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+          // dup2(fd, 1);
+          // dup2(fd, 2);
+          // close(fd);
           if (execute(argv) < 0) {
             std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
             std::exit(EXIT_FAILURE);
