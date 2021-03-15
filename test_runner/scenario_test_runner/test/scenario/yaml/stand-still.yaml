@@ -23,7 +23,6 @@ OpenSCENARIO:
             RearAxle:  { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX: -1, positionZ: 0.3 }
           Properties:
             Property: []
-              # - { name: isEgo, value: true }
   Storyboard:
     Init:
       Actions:

@@ -61,7 +61,7 @@ struct ScenarioObject
    *  Controller of the EntityObject instance.
    *
    * ------------------------------------------------------------------------ */
-  const ObjectController object_controller;
+  ObjectController object_controller;
 
   static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
@@ -72,11 +72,11 @@ struct ScenarioObject
     object_controller(readElement<ObjectController>("ObjectController", node, outer_scope))
   {}
 
-  auto evaluate() const
+  auto evaluate()
   {
     if (
       spawn(
-        is<Vehicle>() && as<Vehicle>()["isEgo"],
+        is<Vehicle>() && object_controller.isEgo(),
         name,
         boost::lexical_cast<String>(
           static_cast<const EntityObject &>(*this))))  // XXX UGLY CODE!!!

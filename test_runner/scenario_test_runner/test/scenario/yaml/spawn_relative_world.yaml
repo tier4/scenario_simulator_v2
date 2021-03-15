@@ -59,7 +59,6 @@ OpenSCENARIO:
               positionZ: 0.3
           Properties:
             Property: []
-              # - { name: isEgo, value: 'true' }
       - name: Npc1
         Vehicle:
           name: ''
