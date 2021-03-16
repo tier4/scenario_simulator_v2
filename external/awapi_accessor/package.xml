@@ -3,7 +3,7 @@
 <package format="3">
   <name>awapi_accessor</name>
   <version>0.0.0</version>
-  <description>TODO</description>
+  <description>ROS2 library for accessing Autoware API</description>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
