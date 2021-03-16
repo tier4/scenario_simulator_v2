@@ -5,38 +5,64 @@ title WholeArchitecture
 interface ros2lifecycle
 
 Node openscenario_interpreter_node {
-  class simulation_api
+  class openscenario_interpreter::Interpreter
+  class EntityManager
+  class TrafficLightManager
+  class MetricsManager
+  class scenario_simulator::API
+  class ZeroMQRequestSocket
+  openscenario_interpreter::Interpreter o-- scenario_simulator::API
+  scenario_simulator::API o-- EntityManager
+  scenario_simulator::API o-- TrafficLightManager
+  scenario_simulator::API o-- MetricsManager
+  TrafficLightManager -right-> EntityManager
+  EntityManager -right-> MetricsManager
+  class EgoEntity
+  class VehicleEntity
+  class PedestrianEntity
+  EntityManager o-- EgoEntity
+  EntityManager o-- VehicleEntity
+  EntityManager o-- PedestrianEntity
+  class AwapiAccessor
+  EgoEntity o-- AwapiAccessor
 }
 
-openscenario_interpreter_node -up-> ros2lifecycle
+openscenario_interpreter::Interpreter -up-> ros2lifecycle
 
-ros2lifecycle -down-> openscenario_interpreter_node
+ros2lifecycle -down-> openscenario_interpreter::Interpreter
 
 Node test_runner_node {
 }
 
-test_runner_node -down-> openscenario_interpreter_node
 test_runner_node -down-> ros2lifecycle
 ros2lifecycle -up-> test_runner_node
 
 Node Autoware {
+  Interface AutowareAPI
 }
+
+AwapiAccessor -down-> AutowareAPI
 
 interface ros2launch
 
-test_runner_node --down-> ros2launch
+test_runner_node -down-> ros2launch
 ros2launch -down-> Autoware
+ros2launch -down-> openscenario_interpreter_node
 
-interface XMLRPCAPI
+interface "ZEROMQ (TCP)"
 
-simulation_api -down-> XMLRPCAPI
-XMLRPCAPI -up-> simulation_api
+scenario_simulator::API -left-> ZeroMQRequestSocket
+ZeroMQRequestSocket -right-> scenario_simulator::API
+ZeroMQRequestSocket -right-> "ZEROMQ (TCP)"
+"ZEROMQ (TCP)" -left-> ZeroMQRequestSocket
 
 Node Simulator {
-  class xmlrpc_server
+  class ZeroMQReplySocket
 }
 
-XMLRPCAPI -down-> xmlrpc_server
-xmlrpc_server -up-> XMLRPCAPI
+ros2launch -down-> Simulator
+
+"ZEROMQ (TCP)" -up-> ZeroMQReplySocket
+ZeroMQReplySocket -down-> "ZEROMQ (TCP)"
 
 @enduml
