@@ -3,7 +3,7 @@
 <package format="3">
   <name>openscenario_visualization</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Visualization tools for simulation results</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
 
@@ -13,7 +13,6 @@
   <depend>rclcpp_components</depend>
   <depend>visualization_msgs</depend>
   <depend>openscenario_msgs</depend>
-  <depend>rclcpp_lifecycle</depend>
   <depend>simulation_api</depend>
 
   <test_depend>ament_lint_auto</test_depend>
