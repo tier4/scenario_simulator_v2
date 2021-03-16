@@ -42,20 +42,6 @@ def generate_launch_description():
 
     port = 8080
 
-    interpreter = LifecycleNode(
-        package='openscenario_interpreter',
-        executable='openscenario_interpreter_node',
-        namespace='simulation',
-        name='openscenario_interpreter',
-        output='screen',
-        parameters=[{
-            'map_path': os.path.join(
-                get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
-            'origin_latitude':   34.903555800615614,
-            'origin_longitude': 139.93339979022568,
-            'port': port,
-            }],)
-
     return LaunchDescription([
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
         DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
@@ -90,33 +76,19 @@ def generate_launch_description():
                 'port': port,
                 }],),
 
-        interpreter,
-
-        # launch.actions.RegisterEventHandler(
-        #     launch_ros.event_handlers.OnStateTransition(
-        #         target_lifecycle_node=interpreter,
-        #         goal_state='active',
-        #         entities=[
-        #            launch.actions.LogInfo(msg="activating interpreter"),
-        #            launch_autoware,],)),
-        #
-        #  launch.actions.RegisterEventHandler(
-        #      launch_ros.event_handlers.OnStateTransition(
-        #          target_lifecycle_node=interpreter,
-        #          start_state='deactivating', goal_state='inactive',
-        #          entities=[
-        #                launch.actions.LogInfo(msg="deactivating interpreter"),
-        #                # launch.actions.EmitEvent(event=launch.events.Shutdown()),
-        #                ],
-        #          )),
-        #
-        # launch.actions.RegisterEventHandler(
-        #     launch_ros.event_handlers.OnStateTransition(
-        #         target_lifecycle_node=interpreter,
-        #         goal_state='finalized',
-        #         entities=[
-        #             launch.actions.LogInfo(msg="finalizing interpreter"),
-        #             launch.actions.EmitEvent(event=launch.events.Shutdown()),],)),
+        LifecycleNode(
+            package='openscenario_interpreter',
+            executable='openscenario_interpreter_node',
+            namespace='simulation',
+            name='openscenario_interpreter',
+            output='screen',
+            parameters=[{
+                # 'map_path': os.path.join(
+                #     get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
+                # 'origin_latitude':   34.903555800615614,
+                # 'origin_longitude': 139.93339979022568,
+                'port': port,
+                }],),
 
         Node(
             package='openscenario_visualization',

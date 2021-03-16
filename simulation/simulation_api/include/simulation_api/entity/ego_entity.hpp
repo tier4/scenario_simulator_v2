@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #endif
 
 #include <autoware_auto_msgs/msg/complex32.hpp>
@@ -148,27 +149,26 @@ public:
   : VehicleEntity(name, parameters)
   {
     auto launch_autoware =
-      [&]()
+      [&](
+      const std::string & package = "scenario_test_runner",
+      const std::string & file = "autoware.launch.xml")
       {
         auto child =
           [&]()
           {
+            // NOTE: The command 'ros2' is a Python script.
             const std::vector<std::string> argv {
-              "python3",
-              "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-              "launch",
-              "scenario_test_runner",
-              "autoware.launch.xml",
+              "python3", "/opt/ros/foxy/bin/ros2", "launch", package, file,
               std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
               std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
             };
 
             #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
             const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
-            const auto fd = open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-            dup2(fd, 1);
-            dup2(fd, 2);
-            close(fd);
+            const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            ::dup2(fd, STDOUT_FILENO);
+            ::dup2(fd, STDERR_FILENO);
+            ::close(fd);
             #endif
 
             if (execute(argv) < 0) {
@@ -195,6 +195,7 @@ public:
           "awapi_accessor",
           "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
           rclcpp::NodeOptions().use_global_arguments(false)));
+
       launch_autoware();
     }
 
@@ -245,6 +246,7 @@ public:
         ::waitpid(autoware_process_id, &status, WUNTRACED) < 0)
       {
         std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+        std::exit(EXIT_FAILURE);
       }
     }
   }
