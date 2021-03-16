@@ -48,8 +48,13 @@ OpenSCENARIO:
               positionX: -1
               positionZ: 0.3
           Properties:
-            Property:
-              - { name: isEgo, value: 'true' }
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - { name: isEgo, value: 'true' }
   Storyboard:
     Init:
       Actions:
@@ -109,7 +114,7 @@ OpenSCENARIO:
                                             s: 50
                                             offset: 0
                                             Orientation: { type: relative, h: 0, p: 0, r: 0 }
-                                        tolerance: 3
+                                        tolerance: 0.5
                         Action:
                           - name: ''
                             UserDefinedAction:

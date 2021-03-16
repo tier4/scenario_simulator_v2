@@ -32,74 +32,50 @@ extern scenario_simulator::API & connection;
 //   ~Connector();
 // } connector;
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) connect(Ts && ... xs)
 {
   new (&connection) scenario_simulator::API(std::forward<decltype(xs)>(xs)...);
   return connection;
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) initialize(Ts && ... xs)
 {
   return connection.initialize(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) spawn(Ts && ... xs)
 {
   return connection.spawn(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) despawn(Ts && ... xs)
 {
   return connection.despawn(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) requestLaneChange(Ts && ... xs)
 {
   return connection.requestLaneChange(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) isInLanelet(Ts && ... xs)
 {
   return connection.isInLanelet(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) setTargetSpeed(Ts && ... xs)
 {
   return connection.setTargetSpeed(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) getEntityStatus(Ts && ... xs) try {
   return connection.getEntityStatus(std::forward<decltype(xs)>(xs)...);
 } catch (const simulation_api::SimulationRuntimeError & error) {
@@ -110,28 +86,19 @@ decltype(auto) getEntityStatus(Ts && ... xs) try {
   throw SemanticError(ss.str());
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) setEntityStatus(Ts && ... xs)
 {
   return connection.setEntityStatus(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) getCurrentTime(Ts && ... xs)
 {
   return connection.getCurrentTime(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) isReachedPosition(Ts && ... xs)
 {
   return connection.reachPosition(std::forward<decltype(xs)>(xs)...);
@@ -143,10 +110,7 @@ decltype(auto) isReachedPosition(Ts && ... xs)
 //   return connection.getRelativeDistance(std::forward<decltype(xs)>(xs)...);
 // }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) getRelativePose(Ts && ... xs) try {
   return connection.getRelativePose(std::forward<decltype(xs)>(xs)...);
 } catch (const simulation_api::SimulationRuntimeError &) {
@@ -161,10 +125,7 @@ decltype(auto) getRelativePose(Ts && ... xs) try {
   return result;
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) updateFrame(Ts && ... xs)
 {
   return connection.updateFrame(std::forward<decltype(xs)>(xs)...);
@@ -185,10 +146,7 @@ decltype(auto) updateFrame(Ts && ... xs)
 //   }
 // }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 auto getTimeHeadway(Ts && ... xs)
 {
   const auto result {
@@ -202,19 +160,13 @@ auto getTimeHeadway(Ts && ... xs)
   }
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) requestAcquirePosition(Ts && ... xs)
 {
   return connection.requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 auto getStandStillDuration(Ts && ... xs)
 {
   const auto result {
@@ -227,22 +179,28 @@ auto getStandStillDuration(Ts && ... xs)
   }
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) checkCollision(Ts && ... xs)
 {
   return connection.checkCollision(std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename ... Ts
->
+template<typename ... Ts>
 decltype(auto) setController(Ts && ... xs)
 {
   return connection.setDriverModel(std::forward<decltype(xs)>(xs)...);
+}
+
+template<typename ... Ts>
+decltype(auto) attachLidarSensor(Ts && ... xs)
+{
+  return connection.attachLidarSensor(std::forward<decltype(xs)>(xs)...);
+}
+
+template<typename ... Ts>
+decltype(auto) attachDetectionSensor(Ts && ... xs)
+{
+  return connection.attachDetectionSensor(std::forward<decltype(xs)>(xs)...);
 }
 }  // namespace openscenario_interpreter
 

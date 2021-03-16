@@ -15,6 +15,7 @@
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 // #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
+#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
@@ -64,6 +65,7 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) t
 
   connect(
     shared_from_this(),
+    boost::filesystem::path(osc_path).replace_extension(""),
     script.as<OpenScenario>().scope.logic_file.string());  // NOTE: /path/to/lanelet2_map.osm
   VERBOSE("  connection established");
 

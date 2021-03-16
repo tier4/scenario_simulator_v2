@@ -58,7 +58,7 @@ const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
 {
   Raycaster raycaster;
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
-  for (const auto s : status) {
+  for (const auto & s : status) {
     if (configuration_.entity() == s.name()) {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(s.pose(), pose);

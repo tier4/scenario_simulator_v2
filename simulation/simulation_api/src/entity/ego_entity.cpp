@@ -177,6 +177,15 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     status.pose.position.x = v(0) + origin_.get().position.x;
     status.pose.position.y = v(1) + origin_.get().position.y;
     status.pose.position.z = v(2) + origin_.get().position.z;
+
+    simulation_api::math::CatmullRomSpline spline(
+      hdmap_utils_ptr_->getCenterPoints(
+        hdmap_utils_ptr_->getClosetLanletId(status.pose)));
+    const auto s_value = spline.getSValue(status.pose.position);
+    if (s_value) {
+      status.pose.position.z = spline.getPoint(s_value.get()).z;
+    }
+
     status.pose.orientation = origin_.get().orientation * pose.orientation;
 
     const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);

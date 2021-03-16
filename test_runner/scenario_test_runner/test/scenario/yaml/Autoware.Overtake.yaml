@@ -4,7 +4,7 @@ OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: '2021-02-09T03:12:58.782Z'
+    date: '2021-03-11T00:43:16.316Z'
     description: ''
     author: ''
   ParameterDeclarations:
@@ -13,7 +13,7 @@ OpenSCENARIO:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
+      filepath: /home/yamasa/Documents/AutonomousDrivingScenarios/map/kashiwanoha/lanelet2_map.osm
     SceneGraphFile:
       filepath: lanelet2_map.pcd
     TrafficSignals:
@@ -34,7 +34,7 @@ OpenSCENARIO:
               length: 4.77
               height: 2.5
           Performance:
-            maxSpeed: 30
+            maxSpeed: 60
             maxAcceleration: INF
             maxDeceleration: INF
           Axles:
@@ -57,7 +57,7 @@ OpenSCENARIO:
             name: ''
             Properties:
               Property:
-                - { name: isEgo, value: 'false' }
+                - { name: isEgo, value: 'true' }
       - name: Npc1
         Vehicle:
           name: ''
@@ -72,7 +72,7 @@ OpenSCENARIO:
               length: 4
               height: 2.5
           Performance:
-            maxSpeed: 30
+            maxSpeed: 60
             maxAcceleration: INF
             maxDeceleration: INF
           Axles:
@@ -90,40 +90,11 @@ OpenSCENARIO:
               positionZ: 0.3
           Properties:
             Property: []
-        ObjectController:                          #
-          Controller:                              # 追
-            name: ''                               # 加
-            Properties:                            # 部
-              Property:                            # 分
-                - { name: isBlind, value: 'true' } #
   Storyboard:
     Init:
       Actions:
         Private:
           - entityRef: ego
-            PrivateAction:
-              - TeleportAction:
-                  Position:
-                    LanePosition:
-                      roadId: ''
-                      laneId: '34507'
-                      s: 0
-                      offset: -0.0
-                      Orientation:
-                        type: relative
-                        h: 0
-                        p: -0.0
-                        r: 0
-              - LongitudinalAction:
-                  SpeedAction:
-                    SpeedActionDynamics:
-                      dynamicsDimension: rate
-                      value: 1
-                      dynamicsShape: linear
-                    SpeedActionTarget:
-                      AbsoluteTargetSpeed:
-                        value: 0
-          - entityRef: Npc1
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -143,22 +114,36 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: '34507'
-                        s: 40
+                        s: 50
                         offset: 0
                         Orientation:
                           type: relative
                           h: 0
                           p: -0.0
                           r: 0
+          - entityRef: Npc1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 20
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
               - LongitudinalAction:
                   SpeedAction:
                     SpeedActionDynamics:
-                      dynamicsDimension: rate
-                      value: 1
-                      dynamicsShape: linear
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
-                        value: 10
+                        value: 1
     Story:
       - name: ''
         Act:
@@ -185,11 +170,21 @@ OpenSCENARIO:
                                     TriggeringEntities:
                                       triggeringEntitiesRule: any
                                       EntityRef:
-                                        - entityRef: Npc1
+                                        - entityRef: ego
                                     EntityCondition:
-                                      CollisionCondition:
-                                        EntityRef:
-                                          entityRef: ego
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34507'
+                                            s: 50
+                                            offset: 0
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: -0.0
+                                              r: 0
+                                        tolerance: 1
                         Action:
                           - name: ''
                             UserDefinedAction:

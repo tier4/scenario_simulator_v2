@@ -34,7 +34,12 @@ OpenSCENARIO:
             Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
           Properties:
             Property: []
-              # - { name: isEgo, value: true }
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - { name: isEgo, value: 'false' }
   Storyboard:
     Init:
       Actions:

@@ -51,8 +51,13 @@ OpenSCENARIO:
               positionX: -1
               positionZ: 0.3
           Properties:
-            Property:
-              - { name: isEgo, value: 'false' }
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - { name: isEgo, value: 'false' }
       - name: Npc1
         Vehicle:
           name: ''
@@ -183,7 +188,7 @@ OpenSCENARIO:
                                     name: ''
                                     Properties:
                                       Property:
-                                        - { name: isBlind, value: true }
+                                        - { name: isBlind, value: 'true' }
                                 OverrideControllerValueAction:
                                   Throttle:      { value:  0, active: false }
                                   Brake:         { value:  0, active: false }

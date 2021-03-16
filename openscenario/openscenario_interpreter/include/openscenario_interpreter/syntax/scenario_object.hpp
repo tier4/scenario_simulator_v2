@@ -61,31 +61,41 @@ struct ScenarioObject
    *  Controller of the EntityObject instance.
    *
    * ------------------------------------------------------------------------ */
-  const ObjectController object_controller;
+  ObjectController object_controller;
 
   static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
   : EntityObject(node, outer_scope),
     name(readAttribute<String>("name", node, outer_scope)),
     object_controller(readElement<ObjectController>("ObjectController", node, outer_scope))
   {}
 
-  auto evaluate() const
+  auto evaluate()
   {
     if (
       spawn(
-        is<Vehicle>() && as<Vehicle>()["isEgo"],
+        is<Vehicle>() && object_controller.isEgo(),
         name,
         boost::lexical_cast<String>(
           static_cast<const EntityObject &>(*this))))  // XXX UGLY CODE!!!
     {
       if (is<Vehicle>()) {
         setController(name, object_controller);
+
+        if (as<Vehicle>()["isEgo"]) {
+          attachLidarSensor(
+            simulation_api::helper::constructLidarConfiguration(
+              simulation_api::helper::LidarType::VLP32,
+              name,
+              "/sensing/lidar/no_ground/pointcloud"));
+          attachDetectionSensor(
+            simulation_api::helper::constructDetectionSensorConfiguration(
+              name,
+              "/perception/object_recognition/objects", 0.1));
+          // /perception/object_recognition/detection/labeled_clusters
+        }
       }
       return unspecified;
     } else {

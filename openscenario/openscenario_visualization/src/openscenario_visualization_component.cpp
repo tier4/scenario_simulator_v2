@@ -60,10 +60,10 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
   const rclcpp::NodeOptions & options)
 : Node("openscenario_visualization", options)
 {
-  marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("/entity/marker", 1);
+  marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("entity/marker", 1);
   entity_status_sub_ =
     this->create_subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
-    "/entity/status", 1,
+    "entity/status", 1,
     std::bind(
       &OpenscenarioVisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
 }

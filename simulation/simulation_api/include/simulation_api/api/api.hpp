@@ -18,6 +18,7 @@
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
+#include <boost/filesystem.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_api/entity/entity_manager.hpp>
@@ -61,6 +62,7 @@ public:
     class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node,
+    boost::filesystem::path scenario_path,
     const std::string & lanelet2_map_osm,
     const bool verbose = false,
     const bool standalone_mode = false,
