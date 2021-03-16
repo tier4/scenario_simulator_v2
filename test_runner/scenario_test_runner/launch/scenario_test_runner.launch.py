@@ -15,9 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
@@ -26,29 +23,54 @@ from pathlib import Path
 
 
 def generate_launch_description():
+    # autoware_launch_file = LaunchConfiguration(
+    #     'autoware-launch-file', default='autoware.launch.xml')
+    #
+    # autoware_launch_package = LaunchConfiguration(
+    #     'autoware-launch-package', default='scenario_test_runner')
+
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=180)
     output_directory = LaunchConfiguration('output-directory', default=Path("/tmp"))
-    scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))  # NOTE: DON'T USE 'None'
-    workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))  # NOTE: DON'T USE 'None'
-
-    # autoware = LaunchConfiguration(
-    #     'autoware',
-    #     default=Path(
-    #         get_package_share_directory('scenario_test_runner'))
-    #         / ''
-    #     )  # NOTE: DON'T USE 'None'
+    scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))
+    workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))
 
     port = 8080
 
     return LaunchDescription([
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
-        DeclareLaunchArgument('global-real-time-factor', default_value=global_real_time_factor),
-        DeclareLaunchArgument('global-timeout', default_value=global_timeout),
-        DeclareLaunchArgument('output-directory', default_value=output_directory),
-        DeclareLaunchArgument('scenario', default_value=scenario),
-        DeclareLaunchArgument('workflow', default_value=workflow),
+
+        DeclareLaunchArgument(
+            'global-real-time-factor', default_value=global_real_time_factor,
+            description="Specify the ratio of simulation time to real time. If "
+            "you set a value greater than 1, the simulation will be faster "
+            "than in reality, and if you set a value less than 1, the "
+            "simulation will be slower than in reality."),
+
+        DeclareLaunchArgument(
+            'global-timeout', default_value=global_timeout,
+            description="Specify the simulation time limit. This time limit is "
+            "independent of the simulation playback speed determined by the "
+            "option real_time_factor. It also has nothing to do with "
+            "OpenSCENARIO's SimulationTimeCondition."),
+
+        DeclareLaunchArgument(
+            'output-directory', default_value=output_directory,
+            description="Specify the output destination directory of the "
+            "generated file including the result file."),
+
+        DeclareLaunchArgument(
+            'scenario', default_value=scenario,
+            description="Specify a scenario file (.yaml or .xosc) you want to "
+            "execute. If a workflow file is also specified by the '--workflow' "
+            "option at the same time, this option takes precedence (that is, "
+            "only one scenario passed to the --scenario option will be executed"
+            ")."),
+
+        DeclareLaunchArgument(
+            'workflow', default_value=workflow,
+            description="Specify a workflow file (.yaml) you want to execute."),
 
         Node(
             package='scenario_test_runner',

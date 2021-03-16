@@ -218,50 +218,20 @@ def main():
                     "options described below must be given in the form "
                     "'option:=VALUE' instead of '--option VALUE'.")
 
-    parser.add_argument(
-        '--output-directory',
-        default=Path("/tmp"),
-        type=Path,
-        help="Specify the output destination directory of the generated file "
-             "including the result file.")
+    parser.add_argument('--output-directory', default=Path("/tmp"), type=Path)
 
-    parser.add_argument(
-        '--global-frame-rate',
-        default=30,
-        type=float)
+    parser.add_argument('--global-frame-rate', default=30, type=float)
 
-    parser.add_argument(
-        '-x', '--global-real-time-factor',
-        default=1.0,
-        type=float,
-        help="Specify the ratio of simulation time to real time. If you set a "
-             "value greater than 1, the simulation will be faster than in "
-             "reality, and if you set a value less than 1, the simulation will "
-             "be slower than in reality.")
+    parser.add_argument('-x', '--global-real-time-factor', default=1.0, type=float)
 
-    parser.add_argument(
-        '-t', '--global-timeout',
-        default=180,
-        type=float,
-        help="Specify the simulation time limit. This time limit is independent "
-             "of the simulation playback speed determined by the option "
-             "real_time_factor. It also has nothing to do with OpenSCENARIO's "
-             "SimulationTimeCondition.")
+    parser.add_argument('-t', '--global-timeout', default=180, type=float)
 
-    parser.add_argument(
-        '-s', '--scenario',
-        default="/dev/null",
-        type=Path,
-        help="Specify a scenario file (.yaml or .xosc) you want to execute. If "
-             "a workflow file is also specified by the'--workflow' option at "
-             "the same time, this option takes precedence (that is, only one "
-             "scenario passed to the --scenario option will be executed).")
+    parser.add_argument('-s', '--scenario', default="/dev/null", type=Path)
 
     parser.add_argument(
         '-w', '--workflow',
         default="$(find-pkg-share scenario_test_runner)/workflow_example.yaml",
-        type=Path,
-        help='Specify <workflow>.yaml file you want to execute.')
+        type=Path)
 
     parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
     parser.add_argument('-r', nargs='*')  # XXX DIRTY HACK
