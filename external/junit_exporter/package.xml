@@ -3,7 +3,7 @@
 <package format="3">
   <name>junit_exporter</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>junit export library for ROS2</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
 

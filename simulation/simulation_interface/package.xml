@@ -3,9 +3,9 @@
 <package format="3">
   <name>simulation_interface</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="ms.kataoka@gmail.com">masaya</maintainer>
-  <license>TODO: License declaration</license>
+  <description>packages to define interface between simulator and scenario interpretor</description>
+  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
