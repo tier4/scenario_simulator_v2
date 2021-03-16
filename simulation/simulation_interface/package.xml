@@ -4,7 +4,7 @@
   <name>simulation_interface</name>
   <version>0.0.0</version>
   <description>packages to define interface between simulator and scenario interpretor</description>
-  <maintainer email="ms.kataoka@gmail.com">masaya</maintainer>
+  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
