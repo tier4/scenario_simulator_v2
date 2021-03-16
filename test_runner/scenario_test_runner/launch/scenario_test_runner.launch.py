@@ -33,6 +33,13 @@ def generate_launch_description():
     scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))  # NOTE: DON'T USE 'None'
     workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))  # NOTE: DON'T USE 'None'
 
+    # autoware = LaunchConfiguration(
+    #     'autoware',
+    #     default=Path(
+    #         get_package_share_directory('scenario_test_runner'))
+    #         / ''
+    #     )  # NOTE: DON'T USE 'None'
+
     port = 8080
 
     interpreter = LifecycleNode(
@@ -48,11 +55,6 @@ def generate_launch_description():
             'origin_longitude': 139.93339979022568,
             'port': port,
             }],)
-
-    # launch_autoware = launch.actions.IncludeLaunchDescription(
-    #     launch.launch_description_sources.AnyLaunchDescriptionSource(
-    #         get_package_share_directory('scenario_test_runner') +
-    #         '/autoware.launch.xml'))
 
     return LaunchDescription([
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
@@ -138,8 +140,4 @@ def generate_launch_description():
         #             Path(get_package_share_directory('autoware_launch')) / 'rviz/autoware.rviz')
         #         ],
         #     ),
-
-        # IncludeLaunchDescription(
-        #     AnyLaunchDescriptionSource(
-        #         get_package_share_directory('scenario_test_runner') + '/autoware.launch.xml'))
         ])
