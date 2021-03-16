@@ -160,14 +160,10 @@ public:
           std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
         };
 
-        for (const auto & each : argv) {
-          std::cout << each << " ";
-        }
-        std::cout << std::endl;
-
         if (autoware_process_id < 0) {
           throw std::system_error(errno, std::system_category());
         } else if (autoware_process_id == 0) {
+          // TODO(yamacir-kit)
           // const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
           // const auto fd = open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
           // dup2(fd, 1);
