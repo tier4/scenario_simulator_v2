@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
-// #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
+#define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <boost/filesystem.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
@@ -26,53 +26,49 @@ namespace openscenario_interpreter
 {
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
-  expect("success"),
-  output_directory("/tmp"),
+  intended_result("success"),
+  local_frame_rate(30),
+  local_real_time_factor(1.0),
   osc_path(""),
-  real_time_factor(1.0),
-  frame_rate(30)
+  output_directory("/tmp")
 {
-  declare_parameter<decltype(expect)>("expect", expect);
-  declare_parameter<decltype(frame_rate)>("frame-rate", frame_rate);
-  declare_parameter<decltype(output_directory)>("output_directory", output_directory);
-  declare_parameter<decltype(osc_path)>("osc_path", osc_path);
-  declare_parameter<decltype(real_time_factor)>("real-time-factor", real_time_factor);
+  #define DECLARE_PARAMETER(IDENTIFIER) \
+  declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
+
+  DECLARE_PARAMETER(intended_result);
+  DECLARE_PARAMETER(local_frame_rate);
+  DECLARE_PARAMETER(local_real_time_factor);
+  DECLARE_PARAMETER(osc_path);
+  DECLARE_PARAMETER(output_directory);
+
+  #undef DECLARE_PARAMETER
 }
 
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) try
 {
-  VERBOSE(">>> Configure");
-
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  get_parameter("expect", expect);
-  VERBOSE("  expect: " << expect);
+  #define GET_PARAMETER(IDENTIFIER) \
+  get_parameter(#IDENTIFIER, IDENTIFIER)
 
-  get_parameter("output_directory", output_directory);
-  VERBOSE("  output_directory: " << output_directory);
+  GET_PARAMETER(intended_result);
+  GET_PARAMETER(local_frame_rate);
+  GET_PARAMETER(local_real_time_factor);
+  GET_PARAMETER(osc_path);
+  GET_PARAMETER(output_directory);
 
-  get_parameter("osc_path", osc_path);
-  VERBOSE("  osc_path: " << osc_path);
+  #undef GET_PARAMETER
 
-  get_parameter("real-time-factor", real_time_factor);
-  VERBOSE("  real-time-factor: " << real_time_factor);
-
-  get_parameter("frame-rate", frame_rate);
-  VERBOSE("  frame-rate: " << frame_rate);
-
-  VERBOSE("  Loading scenario " << osc_path);
   script.rebind<OpenScenario>(osc_path);
 
   connect(
     shared_from_this(),
     boost::filesystem::path(osc_path).replace_extension(""),
     script.as<OpenScenario>().scope.logic_file.string());  // NOTE: /path/to/lanelet2_map.osm
-  VERBOSE("  connection established");
 
-  initialize(real_time_factor, (1 / frame_rate) * real_time_factor);
-  VERBOSE("  simulator initialized");
+  const auto interval_upper_bound = 1 / local_frame_rate * local_real_time_factor;
 
-  VERBOSE("<<< Configure");
+  initialize(local_real_time_factor, interval_upper_bound);
 
   return Interpreter::Result::SUCCESS;
 } catch (const openscenario_interpreter::SyntaxError & error) {
@@ -85,7 +81,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   VERBOSE(">>> Activate");
 
   timer = create_wall_timer(
-    std::chrono::milliseconds(static_cast<unsigned int>(1 / frame_rate * 1000)),  // XXX ???
+    std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000)),
     [this]()
     {
       withExceptionHandler(
@@ -110,10 +106,10 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
                 openscenario_interpreter::complete_state.use_count() - 1);
               #endif
             } else {
-              if (expect == "success") {
+              if (intended_result == "success") {
                 report(SUCCESS, "intended-success");
               } else {
-                report(FAILURE, "unintended-success", "expected " + expect);
+                report(FAILURE, "unintended-success", "expected " + intended_result);
               }
             }
           }

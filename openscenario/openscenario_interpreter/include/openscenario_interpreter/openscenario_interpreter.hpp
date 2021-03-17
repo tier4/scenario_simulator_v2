@@ -33,15 +33,22 @@ namespace openscenario_interpreter
 class Interpreter
   : public rclcpp_lifecycle::LifecycleNode
 {
-  std::string expect;
-
-  std::string output_directory;
-
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  ROS Parameters
+   *
+   *    - intended_result
+   *    - local_frame_rate
+   *    - local_real_time_factor
+   *    - osc_path
+   *    - output_directory
+   *
+   * ------------------------------------------------------------------------ */
+  std::string intended_result;
+  double local_frame_rate;
+  double local_real_time_factor;
   std::string osc_path;
-
-  double real_time_factor;
-
-  double frame_rate;
+  std::string output_directory;
 
   Element script;
 
@@ -104,18 +111,18 @@ class Interpreter
   } catch (const int command) {
     switch (command) {
       case EXIT_SUCCESS:
-        if (expect == "success") {
+        if (intended_result == "success") {
           report(SUCCESS, "intended-success");
         } else {
-          report(FAILURE, "unintended-success", "expected " + expect);
+          report(FAILURE, "unintended-success", "expected " + intended_result);
         }
         break;
 
       case EXIT_FAILURE:
-        if (expect == "failure") {
+        if (intended_result == "failure") {
           report(SUCCESS, "intended-failure");
         } else {
-          report(FAILURE, "unintended-failure", "expected " + expect);
+          report(FAILURE, "unintended-failure", "expected " + intended_result);
         }
         break;
 
@@ -124,21 +131,21 @@ class Interpreter
     }
   } catch (const openscenario_interpreter::SemanticError & error) {
     VERBOSE("  caught semantic-error");
-    if (expect == "error") {
+    if (intended_result == "error") {
       report(SUCCESS, "intended-error");
     } else {
       report(ERROR, "semantic-error", error.what());
     }
   } catch (const openscenario_interpreter::ImplementationFault & error) {
     VERBOSE("  caught implementation-fault");
-    if (expect == "error") {
+    if (intended_result == "error") {
       report(SUCCESS, "intended-error");
     } else {
       report(ERROR, "implementation-fault", error.what());
     }
   } catch (const std::exception & error) {
     VERBOSE(" caught standard exception");
-    if (expect == "error") {
+    if (intended_result == "error") {
       report(SUCCESS, "intended-error");
     } else {
       report(ERROR, "unexpected-standard-exception", error.what());

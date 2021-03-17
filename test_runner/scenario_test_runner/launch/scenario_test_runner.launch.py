@@ -97,7 +97,7 @@ def generate_launch_description():
             name='sensor_simulator',
             output='screen',
             parameters=[
-                { 'port': port, }
+                {'port': port,}
                 ],),
 
         LifecycleNode(
@@ -111,9 +111,9 @@ def generate_launch_description():
                 #     get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
                 # 'origin_latitude':   34.903555800615614,
                 # 'origin_longitude': 139.93339979022568,
-                { 'autoware_launch_file': autoware_launch_file },
-                { 'autoware_launch_package': autoware_launch_package },
-                { 'port': port },
+                {'autoware_launch_file': autoware_launch_file},
+                {'autoware_launch_package': autoware_launch_package},
+                {'port': port},
                 ],),
 
         Node(
