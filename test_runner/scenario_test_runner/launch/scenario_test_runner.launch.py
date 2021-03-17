@@ -97,7 +97,7 @@ def generate_launch_description():
             name='sensor_simulator',
             output='screen',
             parameters=[
-                {'port': port,}
+                {'port': port},
                 ],),
 
         LifecycleNode(

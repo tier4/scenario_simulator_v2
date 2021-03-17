@@ -78,8 +78,6 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) t
 
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
-  VERBOSE(">>> Activate");
-
   timer = create_wall_timer(
     std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000)),
     [this]()
@@ -89,12 +87,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
         {
           if (script) {
             if (!script.as<OpenScenario>().complete()) {
-              VERBOSE(">>> Evaluate");
-              const auto result {
-                script.as<OpenScenario>().evaluate()
-              };
-              VERBOSE("<<< Evaluate");
-              VERBOSE("[Storyboard: " << boost::lexical_cast<std::string>(result) << "]");
+              script.as<OpenScenario>().evaluate();
               #ifndef NDEBUG
               RCLCPP_INFO(
                 get_logger(),
@@ -116,40 +109,30 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
         });
     });
 
-  VERBOSE("<<< Activate");
-
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 {
-  VERBOSE(">>> Deactivate");
   timer.reset();
-  VERBOSE("<<< Deactivate");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
-  VERBOSE(">>> Cleanup");
   connection.~API();
-  VERBOSE("<<< Cleanup");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
 {
-  VERBOSE(">>> Shutdown");
   timer.reset();
-  VERBOSE("<<< Shutdown");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_error(const rclcpp_lifecycle::State &)
 {
-  VERBOSE(">>> Error");
   timer.reset();
-  VERBOSE("<<< Error");
   return Interpreter::Result::SUCCESS;
 }
 }  // namespace openscenario_interpreter
