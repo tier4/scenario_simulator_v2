@@ -23,12 +23,10 @@ from pathlib import Path
 
 
 def generate_launch_description():
-    # autoware_launch_file = LaunchConfiguration(
-    #     'autoware-launch-file', default='autoware.launch.xml')
-    #
-    # autoware_launch_package = LaunchConfiguration(
-    #     'autoware-launch-package', default='scenario_test_runner')
-
+    autoware_launch_file = LaunchConfiguration(
+        'autoware-launch-file', default='autoware.launch.xml')
+    autoware_launch_package = LaunchConfiguration(
+        'autoware-launch-package', default='scenario_test_runner')
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=180)
@@ -39,6 +37,10 @@ def generate_launch_description():
     port = 8080
 
     return LaunchDescription([
+        DeclareLaunchArgument('autoware-launch-file', default_value=autoware_launch_file),
+
+        DeclareLaunchArgument('autoware-launch-package', default_value=autoware_launch_package),
+
         DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
 
         DeclareLaunchArgument(
@@ -94,9 +96,9 @@ def generate_launch_description():
             namespace='simulation',
             name='sensor_simulator',
             output='screen',
-            parameters=[{
-                'port': port,
-                }],),
+            parameters=[
+                { 'port': port, }
+                ],),
 
         LifecycleNode(
             package='openscenario_interpreter',
@@ -104,13 +106,15 @@ def generate_launch_description():
             namespace='simulation',
             name='openscenario_interpreter',
             output='screen',
-            parameters=[{
+            parameters=[
                 # 'map_path': os.path.join(
                 #     get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
                 # 'origin_latitude':   34.903555800615614,
                 # 'origin_longitude': 139.93339979022568,
-                'port': port,
-                }],),
+                { 'autoware_launch_file': autoware_launch_file },
+                { 'autoware_launch_package': autoware_launch_package },
+                { 'port': port },
+                ],),
 
         Node(
             package='openscenario_visualization',

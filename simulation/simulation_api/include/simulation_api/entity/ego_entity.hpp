@@ -149,19 +149,55 @@ public:
   : VehicleEntity(name, parameters)
   {
     auto launch_autoware =
-      [&](
-      const std::string & package = "scenario_test_runner",
-      const std::string & file = "autoware.launch.xml")
+      [&]()
       {
+        auto get_parameter =
+          [](const std::string & name, const auto & alternate)
+          {
+            rclcpp::Node node {
+              "get_parameter", "simulation"
+            };
+
+            auto value = alternate;
+
+            using value_type = typename std::decay<decltype(value)>::type;
+
+            node.declare_parameter<value_type>(name, value);
+            node.get_parameter<value_type>(name, value);
+
+            return value;
+          };
+
+        /* ---- NOTE -----------------------------------------------------------
+         *
+         *  The actual values of these parameters are set by
+         *  scenario_test_runner.launch.py as parameters of
+         *  openscenario_interpreter_node.
+         *
+         * ------------------------------------------------------------------ */
+        const auto autoware_launch_package =
+          get_parameter("autoware_launch_package", std::string(""));
+        const auto autoware_launch_file =
+          get_parameter("autoware_launch_file", std::string(""));
+
         auto child =
           [&]()
           {
-            // NOTE: The command 'ros2' is a Python script.
+            DEBUG_VALUE(lanelet2_map_osm);
+
             const std::vector<std::string> argv {
-              "python3", "/opt/ros/foxy/bin/ros2", "launch", package, file,
+              "python3",
+              "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
+              "launch",
+              autoware_launch_package,
+              autoware_launch_file,
               std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
               std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
             };
+
+            for (const auto & each : argv) {
+              std::cout << each << (&each != &argv.back() ? ' ' : '\n');
+            }
 
             #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
             const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
@@ -176,8 +212,6 @@ public:
               std::exit(EXIT_FAILURE);
             }
           };
-
-        DEBUG_VALUE(lanelet2_map_osm);
 
         if ((autoware_process_id = fork()) < 0) {
           throw std::system_error(errno, std::system_category());
@@ -356,6 +390,13 @@ private:
       current_twist.angular.z =
         std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
     }
+
+    // DEBUG_VALUE(current_twist.linear.x);
+    // DEBUG_VALUE(current_twist.angular.z);
+    //
+    // DEBUG_VALUE(current_pose.position.x);
+    // DEBUG_VALUE(current_pose.position.y);
+    // DEBUG_VALUE(current_pose.position.z);
 
     std::atomic_load(&autowares.at(name))->setCurrentControlMode();
     std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);

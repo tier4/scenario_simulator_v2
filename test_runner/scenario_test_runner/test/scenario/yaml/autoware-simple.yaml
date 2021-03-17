@@ -1,8 +1,8 @@
 ScenarioModifiers:
   ScenarioModifier:
     - name: Hoge
-      # list: [1, 2]
-      list: [1]
+      list: [1, 2]
+      # list: [1]
 OpenSCENARIO:
   FileHeader:
     revMajor: 1

@@ -209,14 +209,7 @@ class ScenarioTestRunner(LifecycleController):
 def main():
     rclpy.init(args='scenario_test_runner')
 
-    parser = argparse.ArgumentParser(
-        description="This provides batch processing of scenarios for Tier IV "
-                    "Scenario Simulator.\nThis program doesn't work on its own "
-                    "and he needs to be called via ROS2 launch as 'ros2 launch "
-                    "scenario_test_runner scenario_test_runner.launch.py'. "
-                    "When calling 'scenario_test_runner.launch.py', the "
-                    "options described below must be given in the form "
-                    "'option:=VALUE' instead of '--option VALUE'.")
+    parser = argparse.ArgumentParser()
 
     parser.add_argument('--output-directory', default=Path("/tmp"), type=Path)
 
@@ -228,10 +221,8 @@ def main():
 
     parser.add_argument('-s', '--scenario', default="/dev/null", type=Path)
 
-    parser.add_argument(
-        '-w', '--workflow',
-        default="$(find-pkg-share scenario_test_runner)/workflow_example.yaml",
-        type=Path)
+    parser.add_argument('-w', '--workflow', type=Path,
+                        default="$(find-pkg-share scenario_test_runner)/workflow_example.yaml")
 
     parser.add_argument('--ros-args', nargs='*')  # XXX DIRTY HACK
     parser.add_argument('-r', nargs='*')  # XXX DIRTY HACK
