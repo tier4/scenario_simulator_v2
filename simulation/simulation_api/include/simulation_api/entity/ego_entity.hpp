@@ -15,6 +15,15 @@
 #ifndef SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 #define SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 
+#undef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
+
+#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 #include <autoware_auto_msgs/msg/complex32.hpp>
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
@@ -22,12 +31,9 @@
 #include <awapi_accessor/accessor.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <fcntl.h>
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/vehicle_model/sim_model.hpp>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 
 #include <algorithm>
@@ -62,7 +68,7 @@ class EgoEntity : public VehicleEntity
 
   bool autoware_uninitialized = true;
 
-  int autoware_process_id = 0;
+  decltype(fork()) autoware_process_id = 0;
 
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
   std::shared_ptr<std::promise<void>> accessor_status;
@@ -142,41 +148,75 @@ public:
     const openscenario_msgs::msg::VehicleParameters & parameters)
   : VehicleEntity(name, parameters)
   {
-    // XXX(yamacir-kit) UGLY CODE!!!
     auto launch_autoware =
       [&]()
       {
-        DEBUG_VALUE(lanelet2_map_osm);
+        auto get_parameter =
+          [](const std::string & name, const auto & alternate)
+          {
+            rclcpp::Node node {
+              "get_parameter", "simulation"
+            };
 
-        autoware_process_id = fork();
+            auto value = alternate;
 
-        const std::vector<std::string> argv {
-          "python3",
-          "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-          "launch",
-          "scenario_test_runner",
-          "autoware.launch.xml",
-          std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
-          std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
-        };
+            using value_type = typename std::decay<decltype(value)>::type;
 
-        for (const auto & each : argv) {
-          std::cout << each << " ";
-        }
-        std::cout << std::endl;
+            node.declare_parameter<value_type>(name, value);
+            node.get_parameter<value_type>(name, value);
 
-        if (autoware_process_id < 0) {
+            return value;
+          };
+
+        /* ---- NOTE -----------------------------------------------------------
+         *
+         *  The actual values of these parameters are set by
+         *  scenario_test_runner.launch.py as parameters of
+         *  openscenario_interpreter_node.
+         *
+         * ------------------------------------------------------------------ */
+        const auto autoware_launch_package =
+          get_parameter("autoware_launch_package", std::string(""));
+        const auto autoware_launch_file =
+          get_parameter("autoware_launch_file", std::string(""));
+
+        auto child =
+          [&]()
+          {
+            DEBUG_VALUE(lanelet2_map_osm);
+
+            const std::vector<std::string> argv {
+              "python3",
+              "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
+              "launch",
+              autoware_launch_package,
+              autoware_launch_file,
+              std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
+              std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
+            };
+
+            for (const auto & each : argv) {
+              std::cout << each << (&each != &argv.back() ? ' ' : '\n');
+            }
+
+            #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
+            const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
+            const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            ::dup2(fd, STDOUT_FILENO);
+            ::dup2(fd, STDERR_FILENO);
+            ::close(fd);
+            #endif
+
+            if (execute(argv) < 0) {
+              std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+              std::exit(EXIT_FAILURE);
+            }
+          };
+
+        if ((autoware_process_id = fork()) < 0) {
           throw std::system_error(errno, std::system_category());
         } else if (autoware_process_id == 0) {
-          // const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
-          // const auto fd = open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-          // dup2(fd, 1);
-          // dup2(fd, 2);
-          // close(fd);
-          if (execute(argv) < 0) {
-            std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-            std::exit(EXIT_FAILURE);
-          }
+          return child();
         }
       };
 
@@ -189,6 +229,7 @@ public:
           "awapi_accessor",
           "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
           rclcpp::NodeOptions().use_global_arguments(false)));
+
       launch_autoware();
     }
 
@@ -231,18 +272,16 @@ public:
   {
     if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
       accessor_status->set_value();
-      // std::cout << "ACCESSOR TERMINATING" << std::endl;
       accessor_spinner->join();
-      // std::cout << "ACCESSOR TERMINATED" << std::endl;
-
       autowares.erase(name);
-
-      // std::cout << "KILLING PID: " << autoware_process_id << std::endl;
-      kill(autoware_process_id, SIGINT);
-      // std::cout << "WAITING" << std::endl;
       int status = 0;
-      ::waitpid(autoware_process_id, &status, WUNTRACED);
-      // std::cout << "KILL END" << std::endl;
+      if (
+        ::kill(autoware_process_id, SIGINT) < 0 ||
+        ::waitpid(autoware_process_id, &status, WUNTRACED) < 0)
+      {
+        std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
     }
   }
 
@@ -351,6 +390,13 @@ private:
       current_twist.angular.z =
         std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
     }
+
+    // DEBUG_VALUE(current_twist.linear.x);
+    // DEBUG_VALUE(current_twist.angular.z);
+    //
+    // DEBUG_VALUE(current_pose.position.x);
+    // DEBUG_VALUE(current_pose.position.y);
+    // DEBUG_VALUE(current_pose.position.z);
 
     std::atomic_load(&autowares.at(name))->setCurrentControlMode();
     std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);

@@ -33,15 +33,22 @@ namespace openscenario_interpreter
 class Interpreter
   : public rclcpp_lifecycle::LifecycleNode
 {
-  std::string expect;
-
-  std::string output_directory;
-
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  ROS Parameters
+   *
+   *    - intended_result
+   *    - local_frame_rate
+   *    - local_real_time_factor
+   *    - osc_path
+   *    - output_directory
+   *
+   * ------------------------------------------------------------------------ */
+  std::string intended_result;
+  double local_frame_rate;
+  double local_real_time_factor;
   std::string osc_path;
-
-  double real_time_factor;
-
-  double frame_rate;
+  std::string output_directory;
 
   Element script;
 
@@ -58,7 +65,6 @@ class Interpreter
     const std::string & type,
     const std::string & what = "")
   {
-    VERBOSE("  appending current test case result");
     exporter.addTestCase(
       script.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
       "scenario_testing", 0, result, type, what);
@@ -83,14 +89,12 @@ class Interpreter
         }
         break;
     }
-    VERBOSE("");
 
     exporter.write(output_directory + "/result.junit.xml");
 
     script.reset();
 
     while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
-      VERBOSE("  waiting for change current state " << get_current_state().id() << " to active");
       std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
@@ -98,54 +102,52 @@ class Interpreter
   }
 
   template<typename Thunk>
-  void withExceptionHandler(Thunk && thunk) try
+  void withExceptionHandler(Thunk && thunk)
   {
-    return thunk();
-  } catch (const int command) {
-    switch (command) {
-      case EXIT_SUCCESS:
-        if (expect == "success") {
-          report(SUCCESS, "intended-success");
-        } else {
-          report(FAILURE, "unintended-success", "expected " + expect);
-        }
-        break;
+    try {
+      return thunk();
+    } catch (const int command) {
+      switch (command) {
+        case EXIT_SUCCESS:
+          if (intended_result == "success") {
+            report(SUCCESS, "intended-success");
+          } else {
+            report(FAILURE, "unintended-success", "expected " + intended_result);
+          }
+          break;
 
-      case EXIT_FAILURE:
-        if (expect == "failure") {
-          report(SUCCESS, "intended-failure");
-        } else {
-          report(FAILURE, "unintended-failure", "expected " + expect);
-        }
-        break;
+        case EXIT_FAILURE:
+          if (intended_result == "failure") {
+            report(SUCCESS, "intended-failure");
+          } else {
+            report(FAILURE, "unintended-failure", "expected " + intended_result);
+          }
+          break;
 
-      default:
-        break;
+        default:
+          break;
+      }
+    } catch (const openscenario_interpreter::SemanticError & error) {
+      if (intended_result == "error") {
+        report(SUCCESS, "intended-error");
+      } else {
+        report(ERROR, "semantic-error", error.what());
+      }
+    } catch (const openscenario_interpreter::ImplementationFault & error) {
+      if (intended_result == "error") {
+        report(SUCCESS, "intended-error");
+      } else {
+        report(ERROR, "implementation-fault", error.what());
+      }
+    } catch (const std::exception & error) {
+      if (intended_result == "error") {
+        report(SUCCESS, "intended-error");
+      } else {
+        report(ERROR, "unexpected-standard-exception", error.what());
+      }
+    } catch (...) {
+      report(ERROR, "unexpected-unknown-exception");
     }
-  } catch (const openscenario_interpreter::SemanticError & error) {
-    VERBOSE("  caught semantic-error");
-    if (expect == "error") {
-      report(SUCCESS, "intended-error");
-    } else {
-      report(ERROR, "semantic-error", error.what());
-    }
-  } catch (const openscenario_interpreter::ImplementationFault & error) {
-    VERBOSE("  caught implementation-fault");
-    if (expect == "error") {
-      report(SUCCESS, "intended-error");
-    } else {
-      report(ERROR, "implementation-fault", error.what());
-    }
-  } catch (const std::exception & error) {
-    VERBOSE(" caught standard exception");
-    if (expect == "error") {
-      report(SUCCESS, "intended-error");
-    } else {
-      report(ERROR, "unexpected-standard-exception", error.what());
-    }
-  } catch (...) {
-    VERBOSE(" caught unknown exception");
-    report(ERROR, "unexpected-unknown-exception");
   }
 
 public:

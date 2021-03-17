@@ -62,7 +62,7 @@ public:
     class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node,
-    boost::filesystem::path scenario_path,
+    boost::filesystem::path,
     const std::string & lanelet2_map_osm,
     const bool verbose = false,
     const bool standalone_mode = false,

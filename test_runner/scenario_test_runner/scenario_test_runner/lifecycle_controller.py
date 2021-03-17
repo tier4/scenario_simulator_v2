@@ -72,7 +72,7 @@ class LifecycleController(Node):
 
         request.parameters = [
             Parameter(
-                name="expect",
+                name="intended_result",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
                     string_value=str(expect.name))),
@@ -84,19 +84,19 @@ class LifecycleController(Node):
                     string_value=str(scenario))),
 
             Parameter(
-                name="output_directory",
+                name='output_directory',
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
                     string_value=str(output_directory))),
 
             Parameter(
-                name="real-time-factor",
+                name='local_real_time_factor',
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_DOUBLE,
                     double_value=real_time_factor)),
 
             Parameter(
-                name='frame-rate',
+                name='local_frame_rate',
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_DOUBLE,
                     double_value=frame_rate)),
