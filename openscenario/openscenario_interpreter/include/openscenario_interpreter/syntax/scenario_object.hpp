@@ -84,7 +84,7 @@ struct ScenarioObject
       if (is<Vehicle>()) {
         setController(name, object_controller);
 
-        if (as<Vehicle>()["isEgo"]) {
+        if (object_controller.isEgo()) {
           attachLidarSensor(
             simulation_api::helper::constructLidarConfiguration(
               simulation_api::helper::LidarType::VLP32,
