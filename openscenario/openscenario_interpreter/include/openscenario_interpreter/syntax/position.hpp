@@ -71,7 +71,7 @@ struct Position
     if (is<WorldPosition>()) {
       return as<WorldPosition>();
     } else if (is<LanePosition>()) {
-      return as<LanePosition>();
+      return {};
     } else {
       const geometry_msgs::msg::Pose result {};
       return result;

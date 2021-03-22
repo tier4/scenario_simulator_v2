@@ -56,10 +56,7 @@ struct ReachPositionCondition
     if (position.is<WorldPosition>()) {
       return isReachedPosition(name, position.as<WorldPosition>(), tolerance);
     } else if (position.is<LanePosition>()) {
-      return isReachedPosition(
-        name,
-        static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()),
-        tolerance);
+      return isReachedPosition(name, position.as<LanePosition>(), tolerance);
     } else {
       THROW(ImplementationFault);
     }

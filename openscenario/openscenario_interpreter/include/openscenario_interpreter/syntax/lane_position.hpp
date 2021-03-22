@@ -52,13 +52,6 @@ struct LanePosition
     orientation(readElement<Orientation>("Orientation", node, scope))
   {}
 
-  [[deprecated]]
-  operator geometry_msgs::msg::Pose() const
-  {
-    const geometry_msgs::msg::Pose result {};
-    return result;
-  }
-
   operator openscenario_msgs::msg::LaneletPose() const
   {
     return simulation_api::helper::constructLaneletPose(
