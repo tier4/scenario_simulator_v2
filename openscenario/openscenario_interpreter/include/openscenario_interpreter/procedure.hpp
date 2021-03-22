@@ -202,6 +202,17 @@ decltype(auto) attachDetectionSensor(Ts && ... xs)
 {
   return connection.attachDetectionSensor(std::forward<decltype(xs)>(xs)...);
 }
+
+#define FORWARD_TO_SIMULATION_API(IDENTIFIER) \
+  template<typename ... Ts> \
+  decltype(auto) IDENTIFIER(Ts && ... xs) \
+  { \
+    return connection.IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
+
+FORWARD_TO_SIMULATION_API(toMapPose);
+
+#undef DEFINE_FORWARD
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_

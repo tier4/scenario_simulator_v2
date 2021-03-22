@@ -66,6 +66,7 @@ struct Position
         std::make_pair("RoutePosition", UNSUPPORTED())))
   {}
 
+  [[deprecated]]
   geometry_msgs::msg::Pose toPose() const
   {
     if (is<WorldPosition>()) {
@@ -75,6 +76,17 @@ struct Position
     } else {
       const geometry_msgs::msg::Pose result {};
       return result;
+    }
+  }
+
+  explicit operator geometry_msgs::msg::Pose() const
+  {
+    if (is<WorldPosition>()) {
+      return static_cast<geometry_msgs::msg::Pose>(as<WorldPosition>());
+    } else if (is<LanePosition>()) {
+      return static_cast<geometry_msgs::msg::Pose>(as<LanePosition>());
+    } else {
+      THROW(ImplementationFault);
     }
   }
 };

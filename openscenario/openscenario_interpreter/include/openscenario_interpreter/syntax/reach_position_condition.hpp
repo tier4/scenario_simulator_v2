@@ -62,6 +62,13 @@ struct ReachPositionCondition
     }
   }
 
+  auto distance(const TriggeringEntities::value_type & name)
+  {
+    const auto pose = getRelativePose(
+      name, static_cast<geometry_msgs::msg::Pose>(position));
+    return std::hypot(pose.position.x, pose.position.y);
+  }
+
   auto evaluate()
   {
     #ifndef NDEBUG
@@ -76,7 +83,8 @@ struct ReachPositionCondition
           #ifndef NDEBUG
           std::cout << indent << "  " << triggering_entity << ": ";
           std::cout << std::boolalpha << result;
-          std::cout << " (tolerance = " << tolerance << ")" << std::endl;
+          std::cout << " (distance = " << distance(triggering_entity);
+          std::cout << " < " << tolerance << ")" << std::endl;
           #endif
           return result;
         }));
