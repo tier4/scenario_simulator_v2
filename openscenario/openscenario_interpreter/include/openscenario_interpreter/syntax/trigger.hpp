@@ -35,10 +35,7 @@ inline namespace syntax
 struct Trigger
   : public std::vector<ConditionGroup>
 {
-  template
-  <
-    typename Node, typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit Trigger(const Node & node, Scope & scope)
   {
     callWithElements(
@@ -60,9 +57,9 @@ struct Trigger
      * -------------------------------------------------------------------- */
     return asBoolean(
       std::any_of(
-        std::begin(*this), std::end(*this), [&](auto && each)
+        std::begin(*this), std::end(*this), [&](ConditionGroup & each)
         {
-          return each.evaluate().template as<Boolean>(__FILE__, __LINE__);
+          return each.evaluate().as<Boolean>(__FILE__, __LINE__);
         }));
   }
 };

@@ -71,8 +71,10 @@ struct StoryboardElement
   {
     if (test) {
       #ifndef NDEBUG
-      std::cout << indent << typeid(T).name() << "::evaluate [" << current_state << " => " <<
-        consequent_state << "]" << std::endl;
+      std::cout << indent;
+      std::cout << typeid(T).name();
+      std::cout << "::evaluate [" << current_state << " => " << consequent_state << "]";
+      std::cout << std::endl;
       #endif
       return current_state = consequent_state;
     } else {
@@ -80,17 +82,13 @@ struct StoryboardElement
     }
   }
 
-  template<
-    typename Boolean,
-    typename = typename std::enable_if<std::is_convertible<Boolean, bool>::value>::type>
+  template<typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
   decltype(auto) changeStateIf(Boolean && test, const Element & consequent_state)
   {
     return changeStateIf(test, consequent_state, current_state);
   }
 
-  template<
-    typename Predicate, typename ... Ts,
-    typename = typename std::enable_if<std::is_function<Predicate>::value>::type>
+  template<typename Predicate, typename ... Ts, REQUIRES(std::is_function<Predicate>)>
   decltype(auto) changeStateIf(Predicate && predicate, Ts && ... xs)
   {
     return changeStateIf(predicate(), std::forward<decltype(xs)>(xs)...);
@@ -112,17 +110,19 @@ struct StoryboardElement
   {}
 
 private:
-  template<typename ... Ts>
-  constexpr decltype(auto) accomplished(Ts && ... xs) const
-  {
-    return static_cast<const T &>(*this).accomplished(std::forward<decltype(xs)>(xs)...);
-  }
+  #define DEFINE_PERFECT_FORWARD(IDENTIFIER, CONST) \
+  template<typename ... Ts> \
+  constexpr decltype(auto) IDENTIFIER(Ts && ... xs) CONST \
+  { \
+    return static_cast<CONST T &>(*this).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
 
-  template<typename ... Ts>
-  constexpr decltype(auto) stopTriggered(Ts && ... xs)
-  {
-    return static_cast<T &>(*this).stopTriggered(std::forward<decltype(xs)>(xs)...);
-  }
+  DEFINE_PERFECT_FORWARD(accomplished, const);
+  DEFINE_PERFECT_FORWARD(ready, );
+  DEFINE_PERFECT_FORWARD(start, );
+  DEFINE_PERFECT_FORWARD(stopTriggered, );
+
+  #undef DEFINE_PERFECT_FORWARD
 
 protected:
   auto rename(const std::string & name) const
@@ -194,7 +194,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::standbyState:
 
-        return changeStateIf(static_cast<const T &>(*this).ready(), start_transition);
+        return changeStateIf(ready(), start_transition);
 
       /* ---- Start ------------------------------------------------------------
        *
@@ -205,7 +205,7 @@ public:
        * -------------------------------------------------------------------- */
       case StoryboardElementState::startTransition:
 
-        static_cast<T &>(*this).start();
+        start();
 
         ++current_execution_count;
 
