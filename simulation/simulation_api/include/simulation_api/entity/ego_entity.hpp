@@ -335,7 +335,7 @@ public:
 
 private:
   // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
-# define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
+  #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
   template<typename Thunk> \
   void waitForAutowareStateToBe ## STATE(Thunk thunk, std::size_t count_max = 300) const \
   { \
@@ -378,7 +378,7 @@ private:
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Emergency);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
 
-# undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
+  #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 
   void updateAutoware(
     const geometry_msgs::msg::Pose & current_pose)

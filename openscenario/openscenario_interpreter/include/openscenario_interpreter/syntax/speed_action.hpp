@@ -53,59 +53,86 @@ struct SpeedAction
     speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
   {}
 
-  std::unordered_map<std::string, Boolean> accomplishments;
+  std::unordered_map<String, Boolean> accomplishments;
 
-  auto start()  // XXX UGLY CODE
+  auto reset()
+  {
+    accomplishments.clear();
+    for (const auto & actor : inner_scope.actors) {
+      accomplishments.emplace(actor, false);
+    }
+  }
+
+  template<typename T>
+  decltype(auto) setLinearTransition(const String & actor, const T value) const
+  {
+    return setTargetSpeed(actor, value, true);
+  }
+
+  template<typename T>
+  decltype(auto) setStepTransition(const String & actor, const T value) const
+  {
+    auto status = getEntityStatus(actor);
+    status.action_status.twist.linear.x = value;
+    setEntityStatus(actor, status);
+    return setTargetSpeed(actor, status.action_status.twist.linear.x, true);
+  }
+
+  decltype(auto) request(const String & actor) const
   {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      for (const auto & each : inner_scope.actors) {
-        accomplishments.emplace(each, false);
-        switch (speed_action_dynamics.dynamics_shape) {
-          case DynamicsShape::linear:
-            setTargetSpeed(each, speed_action_target.as<AbsoluteTargetSpeed>().value, true);
-            break;
-
-          case DynamicsShape::step:
-            // XXX UGLY CODE
-            {
-              auto status = getEntityStatus(each);
-              status.action_status.twist.linear.x =
-                speed_action_target.as<AbsoluteTargetSpeed>().value;
-              setEntityStatus(each, status);
-              setTargetSpeed(each, status.action_status.twist.linear.x, true);
-            }
-            break;
-
-          default:
-            THROW(ImplementationFault);
-        }
+      switch (speed_action_dynamics.dynamics_shape) {
+        case DynamicsShape::linear:
+          return setLinearTransition(
+            actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
+        case DynamicsShape::step:
+          return setStepTransition(
+            actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
+        default:
+          THROW(ImplementationFault);
       }
-      return unspecified;
     } else {
       THROW(ImplementationFault);
     }
   }
 
-  auto accomplished()
+  auto start()
   {
+    reset();
+
+    for (const auto & actor : inner_scope.actors) {
+      request(actor);
+    }
+
+    return unspecified;
+  }
+
+  auto check(const String & actor) try
+  {
+    const auto compare = Rule(Rule::equalTo);
+
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      for (auto && each : accomplishments) {
-        if (!cdr(each)) {
-          try {
-            cdr(each) = Rule(Rule::equalTo)(
-              getEntityStatus(
-                car(each)).action_status.twist.linear.x,
-              speed_action_target.as<AbsoluteTargetSpeed>().value);
-          } catch (const SemanticError &) {  // XXX DIRTY HACK!!!
-            // NOTE maybe lane-changing
-            cdr(each) = false;
-          }
-        }
-      }
-      return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
+      return compare(
+        getEntityStatus(actor).action_status.twist.linear.x,
+        speed_action_target.as<AbsoluteTargetSpeed>().value);
     } else {
       THROW(ImplementationFault);
     }
+  } catch (const SemanticError &) {
+    return false;  // NOTE: The actor is maybe lane-changing now.
+  }
+
+  auto update()
+  {
+    for (auto && each : accomplishments) {
+      each.second = each.second || check(each.first);
+    }
+  }
+
+  auto accomplished()
+  {
+    update();
+    return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
   }
 };
 }
