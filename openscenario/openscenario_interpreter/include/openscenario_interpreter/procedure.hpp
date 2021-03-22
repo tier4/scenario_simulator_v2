@@ -40,42 +40,6 @@ decltype(auto) connect(Ts && ... xs)
 }
 
 template<typename ... Ts>
-decltype(auto) initialize(Ts && ... xs)
-{
-  return connection.initialize(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) spawn(Ts && ... xs)
-{
-  return connection.spawn(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) despawn(Ts && ... xs)
-{
-  return connection.despawn(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) requestLaneChange(Ts && ... xs)
-{
-  return connection.requestLaneChange(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) isInLanelet(Ts && ... xs)
-{
-  return connection.isInLanelet(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) setTargetSpeed(Ts && ... xs)
-{
-  return connection.setTargetSpeed(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
 decltype(auto) getEntityStatus(Ts && ... xs) try {
   return connection.getEntityStatus(std::forward<decltype(xs)>(xs)...);
 } catch (const simulation_api::SimulationRuntimeError & error) {
@@ -84,18 +48,6 @@ decltype(auto) getEntityStatus(Ts && ... xs) try {
   ss << "Possible causes:\n";
   ss << "  (1) The position of the corresponding entity is not specified by Teleport Action";
   throw SemanticError(ss.str());
-}
-
-template<typename ... Ts>
-decltype(auto) setEntityStatus(Ts && ... xs)
-{
-  return connection.setEntityStatus(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) getCurrentTime(Ts && ... xs)
-{
-  return connection.getCurrentTime(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
@@ -125,12 +77,6 @@ decltype(auto) getRelativePose(Ts && ... xs) try {
   return result;
 }
 
-template<typename ... Ts>
-decltype(auto) updateFrame(Ts && ... xs)
-{
-  return connection.updateFrame(std::forward<decltype(xs)>(xs)...);
-}
-
 // template <typename... Ts>
 // auto getDistanceAlongRoute(Ts&&... xs)
 // {
@@ -149,9 +95,7 @@ decltype(auto) updateFrame(Ts && ... xs)
 template<typename ... Ts>
 auto getTimeHeadway(Ts && ... xs)
 {
-  const auto result {
-    connection.getTimeHeadway(std::forward<decltype(xs)>(xs)...)
-  };
+  const auto result = connection.getTimeHeadway(std::forward<decltype(xs)>(xs)...);
   if (result) {
     return result.get();
   } else {
@@ -161,46 +105,21 @@ auto getTimeHeadway(Ts && ... xs)
 }
 
 template<typename ... Ts>
-decltype(auto) requestAcquirePosition(Ts && ... xs)
-{
-  return connection.requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
 auto getStandStillDuration(Ts && ... xs)
 {
-  const auto result {
-    connection.getStandStillDuration(std::forward<decltype(xs)>(xs)...)
-  };
+  const auto result = connection.getStandStillDuration(std::forward<decltype(xs)>(xs)...);
   if (result) {
     return result.get();
   } else {
-    return static_cast<typename std::decay<decltype(result.get())>::type>(0);
+    using value_type = typename std::decay<decltype(result)>::type::value_type;
+    return static_cast<value_type>(0);
   }
-}
-
-template<typename ... Ts>
-decltype(auto) checkCollision(Ts && ... xs)
-{
-  return connection.checkCollision(std::forward<decltype(xs)>(xs)...);
 }
 
 template<typename ... Ts>
 decltype(auto) setController(Ts && ... xs)
 {
   return connection.setDriverModel(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) attachLidarSensor(Ts && ... xs)
-{
-  return connection.attachLidarSensor(std::forward<decltype(xs)>(xs)...);
-}
-
-template<typename ... Ts>
-decltype(auto) attachDetectionSensor(Ts && ... xs)
-{
-  return connection.attachDetectionSensor(std::forward<decltype(xs)>(xs)...);
 }
 
 #define FORWARD_TO_SIMULATION_API(IDENTIFIER) \
@@ -210,7 +129,20 @@ decltype(auto) attachDetectionSensor(Ts && ... xs)
     return connection.IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
   } static_assert(true, "")
 
+FORWARD_TO_SIMULATION_API(attachDetectionSensor);
+FORWARD_TO_SIMULATION_API(attachLidarSensor);
+FORWARD_TO_SIMULATION_API(checkCollision);
+FORWARD_TO_SIMULATION_API(despawn);
+FORWARD_TO_SIMULATION_API(getCurrentTime);
+FORWARD_TO_SIMULATION_API(initialize);
+FORWARD_TO_SIMULATION_API(isInLanelet);
+FORWARD_TO_SIMULATION_API(requestAcquirePosition);
+FORWARD_TO_SIMULATION_API(requestLaneChange);
+FORWARD_TO_SIMULATION_API(setEntityStatus);
+FORWARD_TO_SIMULATION_API(setTargetSpeed);
+FORWARD_TO_SIMULATION_API(spawn);
 FORWARD_TO_SIMULATION_API(toMapPose);
+FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef DEFINE_FORWARD
 }  // namespace openscenario_interpreter

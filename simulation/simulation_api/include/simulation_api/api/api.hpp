@@ -270,8 +270,7 @@ private:
     const std::string & catalog_xml,
     const openscenario_msgs::msg::EntityStatus & status);
 
-  template
-  <
+  template<
     typename Parameters  // Maybe, VehicleParameters or PedestrianParameters
   >
   bool spawn(
