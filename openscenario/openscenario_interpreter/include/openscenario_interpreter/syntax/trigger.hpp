@@ -47,19 +47,19 @@ struct Trigger
 
   auto evaluate()
   {
-    /* -----------------------------------------------------------------------
+    /* -------------------------------------------------------------------------
      *
      *  A trigger is then defined as an association of condition groups. A
      *  trigger evaluates to true if at least one of the associated condition
      *  groups evaluates to true, otherwise it evaluates to false (OR
      *  operation).
      *
-     * -------------------------------------------------------------------- */
+     * ---------------------------------------------------------------------- */
     return asBoolean(
       std::any_of(
         std::begin(*this), std::end(*this), [&](ConditionGroup & each)
         {
-          return each.evaluate().as<Boolean>(__FILE__, __LINE__);
+          return each.evaluate().as<Boolean>();
         }));
   }
 };

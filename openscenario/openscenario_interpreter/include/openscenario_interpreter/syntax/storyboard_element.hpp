@@ -29,8 +29,9 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 template<typename T>
-struct StoryboardElement
+class StoryboardElement
 {
+public:
   const std::size_t maximum_execution_count;
 
   std::size_t current_execution_count;
@@ -51,8 +52,7 @@ struct StoryboardElement
   #define BOILERPLATE(NAME, STATE) \
   constexpr auto NAME() const noexcept \
   { \
-    return state().template as<StoryboardElementState>( \
-      __FILE__, __LINE__) == StoryboardElementState::STATE; \
+    return state().template as<StoryboardElementState>() == StoryboardElementState::STATE; \
   } static_assert(true, "")
 
   BOILERPLATE(standby, standbyState);
@@ -106,10 +106,10 @@ struct StoryboardElement
     }
   }
 
+private:
   static constexpr void start() noexcept
   {}
 
-private:
   #define DEFINE_PERFECT_FORWARD(IDENTIFIER, CONST) \
   template<typename ... Ts> \
   constexpr decltype(auto) IDENTIFIER(Ts && ... xs) CONST \
@@ -119,7 +119,8 @@ private:
 
   DEFINE_PERFECT_FORWARD(accomplished, const);
   DEFINE_PERFECT_FORWARD(ready, );
-  DEFINE_PERFECT_FORWARD(start, );
+  DEFINE_PERFECT_FORWARD(run, );
+  DEFINE_PERFECT_FORWARD(stop, );
   DEFINE_PERFECT_FORWARD(stopTriggered, );
 
   #undef DEFINE_PERFECT_FORWARD
@@ -169,7 +170,7 @@ public:
 
     #ifndef NDEBUG
     std::cout << (indent++);
-    std::cout << "evaluating \x1b[36m";
+    std::cout << "- evaluate: \x1b[36m";
     std::cout << std::quoted(static_cast<const T &>(*this).name);
     std::cout << "\x1b[0m";
     std::cout << " [" << current_state << "] ";
@@ -193,7 +194,6 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::standbyState:
-
         return changeStateIf(ready(), start_transition);
 
       /* ---- Start ------------------------------------------------------------
@@ -204,11 +204,8 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::startTransition:
-
-        start();
-
+        static_cast<T &>(*this).start();  // NOTE: DON'T USE MACRO DEFINE_PERFECT_FORWARD FOR THIS!
         ++current_execution_count;
-
         return changeStateIf(std::true_type(), running_state);
 
       /* ---- Running ----------------------------------------------------------
@@ -251,9 +248,7 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::runningState:
-
-        static_cast<T &>(*this).run();
-
+        run();
         return changeStateIf(accomplished(), end_transition);
 
       /* ---- End --------------------------------------------------------------
@@ -267,7 +262,6 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::endTransition:
-
         return changeStateIf(
           current_execution_count < maximum_execution_count, standby_state, complete_state);
 
@@ -293,7 +287,6 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::completeState:
-
         return current_state;
 
       /* ---- Skip -------------------------------------------------------------
@@ -305,7 +298,6 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::skipTransition:
-
         return current_state;
 
       /* ---- Stop -------------------------------------------------------------
@@ -324,9 +316,8 @@ public:
        * -------------------------------------------------------------------- */
       default:
       case StoryboardElementState::stopTransition:
-
         if (!accomplished()) {
-          static_cast<T &>(*this).stop();
+          stop();
           return current_state;
         } else {
           #ifndef NDEBUG
@@ -335,7 +326,6 @@ public:
           std::cout << "::stop [" << current_state << " => " << complete_state << "]";
           std::cout << std::endl;
           #endif
-
           return current_state = complete_state;
         }
     }

@@ -68,7 +68,7 @@ struct Event
 
   auto ready()
   {
-    return start_trigger.evaluate().as<Boolean>(__FILE__, __LINE__);
+    return start_trigger.evaluate().as<Boolean>();
   }
 
   static constexpr auto stopTriggered() noexcept
