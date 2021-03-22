@@ -43,10 +43,7 @@ struct ReachPositionCondition
 
   const TriggeringEntities trigger;
 
-  template
-  <
-    typename Node
-  >
+  template<typename Node>
   explicit ReachPositionCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
   : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
