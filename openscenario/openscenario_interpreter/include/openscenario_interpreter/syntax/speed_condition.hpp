@@ -37,28 +37,41 @@ struct SpeedCondition
 
   const Rule compare;
 
-  const TriggeringEntities trigger;
-
-  template
-  <
-    typename Node
-  >
+  template<typename AST>
   explicit SpeedCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+    const AST & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
-    trigger(trigger)
+    for_each(triggering_entities)
   {}
+
+  const TriggeringEntities for_each;
 
   auto evaluate()
   {
-    return asBoolean(
-      trigger(
-        [&](auto && entity)
+    #ifndef NDEBUG
+    std::cout << (indent++) << "- BEC.SC:\n";
+    #endif
+
+    const auto result = asBoolean(
+      for_each(
+        [&](auto && triggering_entity)
         {
-          return compare(
-            getEntityStatus(entity).action_status.twist.linear.x, value);
+          const auto result = compare(
+            getEntityStatus(triggering_entity).action_status.twist.linear.x, value);
+          #ifndef NDEBUG
+          std::cout << indent << "  " << triggering_entity << "'s speed = ";
+          std::cout << getEntityStatus(triggering_entity).action_status.twist.linear.x;
+          std::cout << " " << compare << " " << value << "? => " << result << std::endl;
+          #endif
+          return result;
         }));
+
+    #ifndef NDEBUG
+    --indent;
+    #endif
+
+    return result;
   }
 };
 }  // namespace syntax
