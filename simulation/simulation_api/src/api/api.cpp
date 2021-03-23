@@ -16,6 +16,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 
+#include <stdexcept>
 #include <string>
 #include <limits>
 #include <memory>
@@ -216,22 +217,14 @@ void API::requestLaneChange(
   const std::string & name,
   const simulation_api::entity::Direction & direction)
 {
-  if (!entity_manager_ptr_->isEgo(name)) {
-    entity_manager_ptr_->requestLaneChange(name, direction);
-  }
-}
-
-void API::setTargetSpeed(
-  const std::string & name,
-  const double target_speed,
-  const bool continuous)
-{
   if (entity_manager_ptr_->isEgo(name)) {
-    std_msgs::msg::Float32 msg;
-    msg.data = target_speed;
-    // TODO(yamacir-kit): setVehicleVelocity(msg);
+    // TODO(yamacir-kit): => Use SemanticError!
+    throw std::runtime_error(
+            "From the scenario, a lane change was requested for the Ego car. "
+            "In general, such a request to Ego is an error, since Ego cars "
+            "make autonomous decisions about everything but their destination.");
   } else {
-    entity_manager_ptr_->setTargetSpeed(name, target_speed, continuous);
+    entity_manager_ptr_->requestLaneChange(name, direction);
   }
 }
 

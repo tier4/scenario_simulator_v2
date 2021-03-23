@@ -37,8 +37,10 @@ namespace scenario_simulator
 class ExecutionFailedError : public std::runtime_error
 {
 public:
-  explicit ExecutionFailedError(const char * message)
-  : runtime_error(message) {}
+  template<typename ... Ts>
+  explicit ExecutionFailedError(Ts && ... xs)
+  : runtime_error(std::forward<decltype(xs)>(xs)...)
+  {}
 
   virtual ~ExecutionFailedError() = default;
 };
@@ -62,7 +64,7 @@ public:
     class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node,
-    boost::filesystem::path,
+    const boost::filesystem::path,
     const std::string & lanelet2_map_osm,
     const bool verbose = false,
     const bool standalone_mode = false,
@@ -109,7 +111,6 @@ public:
       simulation_interface::ports::attach_detection_sensor)
   {
     static const std::string address = "127.0.0.1";
-    // client_ptr_ = std::make_shared<XmlRpc::XmlRpcClient>(address.c_str(), port);
 
     metrics_manager_.setEntityManager(entity_manager_ptr_);
 
@@ -140,8 +141,7 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::PedestrianParameters & params);
 
-  template
-  <
+  template<
     typename ... Ts  // Arguments for setEntityStatus
   >
   decltype(auto) spawn(
@@ -155,16 +155,14 @@ public:
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
-  template
-  <
+  template<
     typename Parameters,  // Maybe, VehicleParameters or PedestrianParameters
     typename ... Ts  // Arguments for setEntityStatus
   >
   decltype(auto) spawn(
     const bool is_ego,
     const std::string & name,
-    const Parameters & params,
-    Ts && ... xs)
+    const Parameters & params, Ts && ... xs)
   {
     return
       spawn(is_ego, name, params) &&
@@ -210,11 +208,6 @@ public:
     const std::string & name,
     const simulation_api::entity::Direction & direction);
 
-  void setTargetSpeed(
-    const std::string & name,
-    const double target_speed,
-    const bool continuous);
-
   bool reachPosition(
     const std::string & name,
     const geometry_msgs::msg::Pose & target_pose,
@@ -227,16 +220,16 @@ public:
     const std::string & name,
     const std::string & target_name,
     const double tolerance) const;
+
   bool attachLidarSensor(
-    simulation_api_schema::LidarConfiguration configuration
-  );
+    simulation_api_schema::LidarConfiguration configuration);
   bool attachDetectionSensor(
-    simulation_api_schema::DetectionSensorConfiguration configuration
-  );
-  bool updateSensorFrame();
+    simulation_api_schema::DetectionSensorConfiguration configuration);
 
   bool initialize(double realtime_factor, double step_time);
+
   bool updateFrame();
+  bool updateSensorFrame();
 
   double getCurrentTime() const noexcept
   {
@@ -256,6 +249,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
+  FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
