@@ -434,32 +434,34 @@ public:
    *  Topic: /initialtwist
    *
    * ------------------------------------------------------------------------ */
-  // using InitialTwist = geometry_msgs::msg::TwistStamped;
-  //
-  // DEFINE_PUBLISHER(InitialTwist);
-  //
-  // decltype(auto) setInitialTwist(const geometry_msgs::msg::Twist & twist = {})
-  // {
-  //   autoware_api::Accessor::InitialTwist initial_twist {};
-  //   {
-  //     initial_twist.header.stamp = get_clock()->now();
-  //     initial_twist.header.frame_id = "map";
-  //     initial_twist.twist = twist;
-  //   }
-  //
-  //   return setInitialTwist(initial_twist);
-  // }
-  //
-  // decltype(auto) setInitialTwist(const double linear_x, const double angular_z = 0)
-  // {
-  //   geometry_msgs::msg::Twist twist {};
-  //   {
-  //     twist.linear.x = linear_x;
-  //     twist.angular.z = angular_z;
-  //   }
-  //
-  //   return setInitialTwist(twist);
-  // }
+  using InitialTwist = geometry_msgs::msg::TwistStamped;
+
+  DEFINE_PUBLISHER(InitialTwist);
+
+  decltype(auto) setInitialTwist(const geometry_msgs::msg::Twist & twist = {})
+  {
+    autoware_api::Accessor::InitialTwist initial_twist {};
+    {
+      initial_twist.header.stamp = get_clock()->now();
+      initial_twist.header.frame_id = "map";
+      initial_twist.twist = twist;
+    }
+
+    CURRENT_VALUE_OF(VehicleCommand).control.velocity = initial_twist.twist.linear.x;
+
+    return setInitialTwist(initial_twist);
+  }
+
+  decltype(auto) setInitialTwist(const double linear_x, const double angular_z = 0)
+  {
+    geometry_msgs::msg::Twist twist {};
+    {
+      twist.linear.x = linear_x;
+      twist.angular.z = angular_z;
+    }
+
+    return setInitialTwist(twist);
+  }
 
   /** ---- Trajectory ----------------------------------------------------------
    *
@@ -489,12 +491,6 @@ public:
   using VehicleCommand = autoware_vehicle_msgs::msg::VehicleCommand;
 
   DEFINE_SUBSCRIPTION(VehicleCommand);
-
-  // XXX DIRTY HACK
-  decltype(auto) setInitialVelocity(const double velocity)
-  {
-    return CURRENT_VALUE_OF(VehicleCommand).control.velocity = velocity;
-  }
 
 public:
 # define DEFINE_STATE_PREDICATE(NAME, VALUE) \
@@ -594,7 +590,7 @@ public:
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
-    // INIT_PUBLISHER(InitialTwist, "/initialtwist"),
+    INIT_PUBLISHER(InitialTwist, "/initialtwist"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),

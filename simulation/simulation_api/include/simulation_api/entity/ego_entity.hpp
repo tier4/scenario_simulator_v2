@@ -66,8 +66,6 @@ class EgoEntity : public VehicleEntity
     std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
   > autowares;
 
-  bool autoware_uninitialized = true;
-
   decltype(fork()) autoware_process_id = 0;
 
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
@@ -285,6 +283,37 @@ public:
     }
   }
 
+  bool autoware_initialized = false;
+
+  auto initializeAutoware()
+  {
+    const auto current_entity_status = getStatus();
+
+    if (!std::exchange(autoware_initialized, true)) {
+      std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
+
+      waitForAutowareStateToBeInitializingVehicle(
+        [&]()
+        {
+          return updateAutoware(current_entity_status.pose);
+        });
+
+      /* ---- NOTE ---------------------------------------------------------------
+       *
+       *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
+       *  and tf to be published. Member function EgoEntity::waitForAutowareToBe*
+       *  are depends a topic '/awapi/autoware/get/status' published by
+       *  awapi_awiv_adapter.
+       *
+       * ---------------------------------------------------------------------- */
+      waitForAutowareStateToBeWaitingForRoute(
+        [&]()
+        {
+          return updateAutoware(current_entity_status.pose);
+        });
+    }
+  }
+
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
@@ -320,7 +349,7 @@ public:
   decltype(auto) setTargetSpeed(const double value, const bool)
   {
     std::cout << "\x1b[31mEgo::setTargetSpeed " << value << "\x1b[0m" << std::endl;
-    return std::atomic_load(&autowares.at(name))->setInitialVelocity(value);
+    // std::atomic_load(&autowares.at(name))->setInitialTwist(value);
   }
 
   const std::string getCurrentAction() const
@@ -397,7 +426,7 @@ private:
         std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
     }
 
-    // DEBUG_VALUE(current_twist.linear.x);
+    DEBUG_VALUE(current_twist.linear.x);
     // DEBUG_VALUE(current_twist.angular.z);
     //
     // DEBUG_VALUE(current_pose.position.x);
