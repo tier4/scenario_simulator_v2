@@ -199,40 +199,12 @@ bool API::setEntityStatus(
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
-void API::requestLaneChange(
-  const std::string & name,
-  const std::int64_t to_lanelet_id)
-{
-  if (entity_manager_ptr_->isEgo(name)) {
-    std_msgs::msg::Bool msg;
-    msg.data = true;
-    // TODO(yamacir-kit): setLaneChangeApproval(msg);
-    // TODO(yamacir-kit): setLaneChangeForce(msg);
-  } else {
-    entity_manager_ptr_->requestLaneChange(name, to_lanelet_id);
-  }
-}
-
-void API::requestLaneChange(
-  const std::string & name,
-  const simulation_api::entity::Direction & direction)
-{
-  if (entity_manager_ptr_->isEgo(name)) {
-    // TODO(yamacir-kit): => Use SemanticError!
-    throw std::runtime_error(
-            "From the scenario, a lane change was requested for the Ego car. "
-            "In general, such a request to Ego is an error, since Ego cars "
-            "make autonomous decisions about everything but their destination.");
-  } else {
-    entity_manager_ptr_->requestLaneChange(name, direction);
-  }
-}
-
 boost::optional<double> API::getTimeHeadway(
   const std::string & from,
   const std::string & to)
 {
-  if (!entity_manager_ptr_->entityStatusSetted(from) ||
+  if (
+    !entity_manager_ptr_->entityStatusSetted(from) ||
     !entity_manager_ptr_->entityStatusSetted(to))
   {
     return boost::none;

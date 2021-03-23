@@ -200,8 +200,7 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
   }
   if (direction == Direction::LEFT) {
     auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
-      status->lanelet_pose.lanelet_id,
-      "left");
+      status->lanelet_pose.lanelet_id, "left");
     if (target) {
       requestLaneChange(name, target.get());
       return;

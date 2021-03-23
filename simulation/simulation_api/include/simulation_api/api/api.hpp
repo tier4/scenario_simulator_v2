@@ -201,13 +201,6 @@ public:
     const std::string & from,
     const std::string & to);
 
-  void requestLaneChange(
-    const std::string & name,
-    const std::int64_t to_lanelet_id);
-  void requestLaneChange(
-    const std::string & name,
-    const simulation_api::entity::Direction & direction);
-
   bool reachPosition(
     const std::string & name,
     const geometry_msgs::msg::Pose & target_pose,
@@ -248,6 +241,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
+  FORWARD_TO_ENTITY_MANAGER(requestLaneChange);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
   FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
