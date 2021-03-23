@@ -15,7 +15,7 @@
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
-#undef NDEBUG
+// #undef NDEBUG
 
 #include <boost/filesystem.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>

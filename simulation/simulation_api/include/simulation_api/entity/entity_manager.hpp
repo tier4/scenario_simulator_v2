@@ -392,7 +392,7 @@ public:
       std::stringstream ss {};
       ss << "Unknown entity '" << name << "' has been referenced.";
       ss << "Check the scenario.";
-      throw std::runtime_error(ss.str());  // TODO(yamacir-kit): Use SemanticError!
+      throw SimulationRuntimeError(ss.str());
     }
   }
 };

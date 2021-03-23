@@ -317,6 +317,12 @@ public:
       });
   }
 
+  decltype(auto) setTargetSpeed(const double value, const bool)
+  {
+    std::cout << "\x1b[31mEgo::setTargetSpeed " << value << "\x1b[0m" << std::endl;
+    return std::atomic_load(&autowares.at(name))->setInitialVelocity(value);
+  }
+
   const std::string getCurrentAction() const
   {
     return "none";

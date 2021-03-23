@@ -52,7 +52,6 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   if (std::exchange(autoware_uninitialized, false)) {
     std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
-    std::atomic_load(&autowares.at(name))->setInitialTwist();
 
     waitForAutowareStateToBeInitializingVehicle(
       [&]()
@@ -109,8 +108,12 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
   }
 
+  DEBUG_VALUE(input(0));
+
   vehicle_model_ptr_->setInput(input);
   vehicle_model_ptr_->update(step_time);
+
+  DEBUG_VALUE(vehicle_model_ptr_->getVx());
 
   setStatus(getEntityStatus(current_time + step_time, step_time));
 

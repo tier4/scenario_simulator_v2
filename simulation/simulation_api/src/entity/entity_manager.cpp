@@ -598,15 +598,18 @@ void EntityManager::setTargetSpeed(
   const double target_speed,
   const bool continuous)
 {
-  const auto it = entities_.find(name);
-  if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).setTargetSpeed(target_speed, continuous);
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).setTargetSpeed(target_speed, continuous);
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(it->second).setTargetSpeed(target_speed, continuous);
+  auto & entity = reference(name);
+  if (entity.type() == typeid(VehicleEntity)) {
+    boost::any_cast<VehicleEntity &>(entity).setTargetSpeed(target_speed, continuous);
+  } else if (entity.type() == typeid(EgoEntity)) {
+    boost::any_cast<EgoEntity &>(entity).setTargetSpeed(target_speed, continuous);
+  } else if (entity.type() == typeid(PedestrianEntity)) {
+    boost::any_cast<PedestrianEntity &>(entity).setTargetSpeed(target_speed, continuous);
+  } else {
+    std::stringstream what {};
+    what << "Entity '" << name << "' is typed with the unexpected type '";
+    what << entity.type().name() << "'.";
+    throw SimulationRuntimeError(what.str());
   }
 }
 
@@ -614,23 +617,19 @@ std::vector<std::int64_t> EntityManager::getRouteLanelets(
   const std::string & name,
   const double horizon)
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    throw SimulationRuntimeError("entity " + name + " does not exist");
+  auto & entity = reference(name);
+  if (entity.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<VehicleEntity &>(entity).getRouteLanelets(horizon);
+  } else if (entity.type() == typeid(EgoEntity)) {
+    return boost::any_cast<EgoEntity &>(entity).getRouteLanelets(horizon);
+  } else if (entity.type() == typeid(PedestrianEntity)) {
+    return boost::any_cast<PedestrianEntity &>(entity).getRouteLanelets(horizon);
+  } else {
+    std::stringstream what {};
+    what << "Entity '" << name << "' is typed with the unexpected type '";
+    what << entity.type().name() << "'.";
+    throw SimulationRuntimeError(what.str());
   }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelets(horizon);
-    return route;
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelets(horizon);
-    return route;
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelets(horizon);
-    return route;
-  }
-  throw SimulationRuntimeError("entity " + name + " does not matches to entity type.");
 }
 
 std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
