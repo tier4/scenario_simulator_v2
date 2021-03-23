@@ -17,6 +17,7 @@
 #include <simulation_api/math/collision.hpp>
 
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -183,39 +184,37 @@ void EntityManager::requestAcquirePosition(
 
 void EntityManager::requestLaneChange(const std::string & name, const std::int64_t to_lanelet_id)
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).requestLaneChange(to_lanelet_id);
+  auto & entity = reference(name);
+
+  if (entity.type() == typeid(VehicleEntity)) {
+    boost::any_cast<VehicleEntity &>(entity).requestLaneChange(to_lanelet_id);
+  } else if (entity.type() == typeid(EgoEntity)) {
+    std::stringstream what {};
+    what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. ";
+    what << "In general, such a request is an error, ";
+    what << "since Ego cars make autonomous decisions about everything but their destination.";
+    throw std::runtime_error(what.str());
   }
 }
 
 void EntityManager::requestLaneChange(const std::string & name, const Direction & direction)
 {
   auto status = getEntityStatus(name);
-  if (!status) {
-    return;
-  }
-  if (direction == Direction::LEFT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
-      status->lanelet_pose.lanelet_id, "left");
-    if (target) {
-      requestLaneChange(name, target.get());
-      return;
+
+  if (status) {
+    if (direction == Direction::LEFT) {
+      const auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
+        status->lanelet_pose.lanelet_id, "left");
+      if (target) {
+        requestLaneChange(name, target.get());
+      }
+    } else if (direction == Direction::RIGHT) {
+      const auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
+        status->lanelet_pose.lanelet_id, "right");
+      if (target) {
+        requestLaneChange(name, target.get());
+      }
     }
-    return;
-  }
-  if (direction == Direction::RIGHT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
-      status->lanelet_pose.lanelet_id,
-      "right");
-    if (target) {
-      requestLaneChange(name, target.get());
-      return;
-    }
-    return;
   }
 }
 

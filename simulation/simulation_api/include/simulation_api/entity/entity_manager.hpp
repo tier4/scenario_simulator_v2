@@ -387,7 +387,7 @@ public:
     const auto iter = entities_.find(name);
 
     if (iter != std::end(entities_)) {
-      return (*iter).second;
+      return std::get<1>(*iter);
     } else {
       std::stringstream ss {};
       ss << "Unknown entity '" << name << "' has been referenced.";
