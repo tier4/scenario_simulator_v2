@@ -317,6 +317,8 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
+    initializeAutoware();
+
     const auto current_pose = getStatus().pose;
 
     waitForAutowareStateToBeWaitingForRoute(

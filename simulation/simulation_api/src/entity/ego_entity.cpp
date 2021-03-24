@@ -50,8 +50,6 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   const auto current_entity_status = getStatus();
 
-  initializeAutoware();
-
   if (autoware_initialized) {
     updateAutoware(current_entity_status.pose);
   }
