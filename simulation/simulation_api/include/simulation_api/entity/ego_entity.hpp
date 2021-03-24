@@ -33,8 +33,8 @@
 #include <boost/optional.hpp>
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
-#include <simulation_api/vehicle_model/sim_model.hpp>
-#include <sys/wait.h>
+#include <simulation_api/vehicle_model/sim_model_ideal.hpp>  // NOTE: Copy from ArchitectureProposal.iv
+#include <sys/wait.h>  // for EgoEntity::~EgoEntity
 
 #include <algorithm>
 #include <chrono>

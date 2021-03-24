@@ -42,7 +42,7 @@ openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteerVel>(
+  vehicle_model_ptr_ = std::make_shared<SimModelIdealSteer>(
     parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
 
   // NOTE Currently, setStatus always succeeds.

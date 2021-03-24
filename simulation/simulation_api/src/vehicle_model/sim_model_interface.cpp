@@ -1,10 +1,10 @@
-// Copyright 2020 The Tier IV, Inc.
+// Copyright 2015-2020 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "simulation_api/vehicle_model/sim_model_interface.hpp"
+#include <simulation_api/vehicle_model/sim_model_interface.hpp>
 
 SimModelInterface::SimModelInterface(int dim_x, int dim_u)
-: dim_x_(dim_x), dim_u_(dim_u), gear_(GEAR::DRIVE)
+: dim_x_(dim_x), dim_u_(dim_u)
 {
   state_ = Eigen::VectorXd::Zero(dim_x_);
   input_ = Eigen::VectorXd::Zero(dim_u_);
@@ -38,4 +38,3 @@ void SimModelInterface::getState(Eigen::VectorXd & state) {state = state_;}
 void SimModelInterface::getInput(Eigen::VectorXd & input) {input = input_;}
 void SimModelInterface::setState(const Eigen::VectorXd & state) {state_ = state;}
 void SimModelInterface::setInput(const Eigen::VectorXd & input) {input_ = input;}
-void SimModelInterface::setGear(const int gear) {gear_ = gear;}

@@ -18,11 +18,16 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
+file(GLOB ${PROJECT_NAME}_BEHAVIOR_SOURCES      ${CMAKE_CURRENT_SOURCE_DIR}/behavior/*.cpp)
+file(GLOB ${PROJECT_NAME}_VEHICLE_MODEL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_model/*.cpp)
+
 ament_auto_add_library(simulation_api SHARED
+  src/api/api.cpp
   src/behavior/action_node.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp
+  src/behavior/route_planner.cpp
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
@@ -32,7 +37,6 @@ ament_auto_add_library(simulation_api SHARED
   src/behavior/vehicle/follow_lane_sequence/yield_action.cpp
   src/behavior/vehicle/lane_change_action.cpp
   src/behavior/vehicle/vehicle_action_node.cpp
-  src/behavior/route_planner.cpp
   src/color_utils/color_utils.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
@@ -45,19 +49,15 @@ ament_auto_add_library(simulation_api SHARED
   src/math/collision.cpp
   src/math/hermite_curve.cpp
   src/math/polynomial_solver.cpp
-  src/vehicle_model/sim_model_delay_steer_acc.cpp
-  src/vehicle_model/sim_model_ideal_steer_acc.cpp
-  src/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
-  src/vehicle_model/sim_model_ideal_steer_vel.cpp
-  src/vehicle_model/sim_model_interface.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
-  src/metrics/traveled_distance_metric.cpp
   src/metrics/momentary_stop_metric.cpp
   src/metrics/reaction_time_metric.cpp
+  src/metrics/traveled_distance_metric.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
-  src/api/api.cpp
+  src/vehicle_model/sim_model_ideal.cpp
+  src/vehicle_model/sim_model_interface.cpp
 )
 
 target_link_libraries(simulation_api
