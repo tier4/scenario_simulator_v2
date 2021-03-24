@@ -54,23 +54,25 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
     updateAutoware(current_entity_status.pose);
   }
 
-  autoware_auto_msgs::msg::VehicleKinematicState state;
-  {
-    const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
-      current_entity_status.pose.orientation).z;
-
-    state.state.x = current_entity_status.pose.position.x;
-    state.state.y = current_entity_status.pose.position.y;
-    state.state.heading.real = static_cast<decltype(state.state.heading.real)>(std::cos(yaw * 0.5));
-    state.state.heading.imag = static_cast<decltype(state.state.heading.imag)>(std::sin(yaw * 0.5));
-    state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
-    state.state.lateral_velocity_mps = 0;
-    state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;
-    state.state.front_wheel_angle_rad = 0;
-    state.state.rear_wheel_angle_rad = 0;
-  }
-
-  current_kinematic_state_ = state;
+  // autoware_auto_msgs::msg::VehicleKinematicState state;
+  // {
+  //   const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
+  //     current_entity_status.pose.orientation).z;
+  //
+  //   state.state.x = current_entity_status.pose.position.x;
+  //   state.state.y = current_entity_status.pose.position.y;
+  //   state.state.heading.real =
+  //     static_cast<decltype(state.state.heading.real)>(std::cos(yaw * 0.5));
+  //   state.state.heading.imag =
+  //     static_cast<decltype(state.state.heading.imag)>(std::sin(yaw * 0.5));
+  //   state.state.longitudinal_velocity_mps = current_entity_status.action_status.twist.linear.x;
+  //   state.state.lateral_velocity_mps = 0;
+  //   state.state.heading_rate_rps = current_entity_status.action_status.twist.angular.z;
+  //   state.state.front_wheel_angle_rad = 0;
+  //   state.state.rear_wheel_angle_rad = 0;
+  // }
+  //
+  // current_kinematic_state_ = state;
 
   origin_ = current_entity_status.pose;
 

@@ -16,7 +16,9 @@
 
 
 SimModelIdealSteerVel::SimModelIdealSteerVel(double wheelbase)
-: SimModelInterface(3 /* dim x */, 2 /* dim u */), wheelbase_(wheelbase) {}
+: SimModelInterface(3 /* dim x */, 2 /* dim u */),
+  wheelbase_(wheelbase)
+{}
 
 double SimModelIdealSteerVel::getX() {return state_(IDX::X);}
 double SimModelIdealSteerVel::getY() {return state_(IDX::Y);}

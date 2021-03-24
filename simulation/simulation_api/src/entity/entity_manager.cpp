@@ -686,15 +686,15 @@ void EntityManager::update(
     }
     if (it->second.type() == typeid(EgoEntity)) {
       boost::any_cast<EgoEntity &>(it->second).setEntityTypeList(type_list);
-      auto kinematic_state =
-        boost::any_cast<EgoEntity &>(it->second).getCurrentKinematicState();
-      if (kinematic_state) {
-        autoware_auto_msgs::msg::VehicleKinematicState msg;
-        msg = kinematic_state.get();
-        msg.header.frame_id = "map";
-        msg.header.stamp = clock_ptr_->now();
-        kinematic_state_pub_ptr_->publish(msg);
-      }
+      // auto kinematic_state =
+      //   boost::any_cast<EgoEntity &>(it->second).getCurrentKinematicState();
+      // if (kinematic_state) {
+      //   autoware_auto_msgs::msg::VehicleKinematicState msg;
+      //   msg = kinematic_state.get();
+      //   msg.header.frame_id = "map";
+      //   msg.header.stamp = clock_ptr_->now();
+      //   kinematic_state_pub_ptr_->publish(msg);
+      // }
       boost::any_cast<EgoEntity &>(it->second).onUpdate(current_time, step_time);
       if (boost::any_cast<EgoEntity &>(it->second).statusSetted()) {
         auto status = boost::any_cast<EgoEntity &>(it->second).getStatus();

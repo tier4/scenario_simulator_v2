@@ -120,6 +120,10 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
   : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
+    // ,
+    // vehicle_model_ptr_(
+    //   std::make_shared<SimModelIdealSteerVel>(
+    //     parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
   {
     setStatus(initial_state);
   }
@@ -145,6 +149,10 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::VehicleParameters & parameters)
   : VehicleEntity(name, parameters)
+    // ,
+    // vehicle_model_ptr_(
+    //   std::make_shared<SimModelIdealSteerVel>(
+    //     parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
   {
     auto launch_autoware =
       [&]()
@@ -363,10 +371,10 @@ public:
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
-  const auto & getCurrentKinematicState() const noexcept
-  {
-    return current_kinematic_state_;
-  }
+  // const auto & getCurrentKinematicState() const noexcept
+  // {
+  //   return current_kinematic_state_;
+  // }
 
   openscenario_msgs::msg::WaypointsArray getWaypoints() const;
 
@@ -428,7 +436,7 @@ private:
         std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
     }
 
-    DEBUG_VALUE(current_twist.linear.x);
+    // DEBUG_VALUE(current_twist.linear.x);
     // DEBUG_VALUE(current_twist.angular.z);
     //
     // DEBUG_VALUE(current_pose.position.x);
@@ -453,9 +461,10 @@ private:
     const double step_time) const;
 
   boost::optional<geometry_msgs::msg::Pose> origin_;
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
-  boost::optional<autoware_auto_msgs::msg::VehicleKinematicState> current_kinematic_state_;
+
+  // boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
+  // boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
+  // boost::optional<autoware_auto_msgs::msg::VehicleKinematicState> current_kinematic_state_;
 
   std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
