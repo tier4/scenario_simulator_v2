@@ -18,9 +18,6 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-file(GLOB ${PROJECT_NAME}_BEHAVIOR_SOURCES      ${CMAKE_CURRENT_SOURCE_DIR}/behavior/*.cpp)
-file(GLOB ${PROJECT_NAME}_VEHICLE_MODEL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_model/*.cpp)
-
 ament_auto_add_library(simulation_api SHARED
   src/api/api.cpp
   src/behavior/action_node.cpp

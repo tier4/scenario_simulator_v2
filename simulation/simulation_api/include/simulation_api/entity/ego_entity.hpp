@@ -119,11 +119,10 @@ public:
   explicit EgoEntity(
     const std::string & name,
     const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
-  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
-    // ,
-    // vehicle_model_ptr_(
-    //   std::make_shared<SimModelIdealSteerVel>(
-    //     parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
+  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
+    vehicle_model_ptr_(
+      std::make_shared<SimModelIdealSteer>(
+        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
   {
     setStatus(initial_state);
   }
@@ -148,11 +147,10 @@ public:
     const boost::filesystem::path & lanelet2_map_osm,
     const std::string & name,
     const openscenario_msgs::msg::VehicleParameters & parameters)
-  : VehicleEntity(name, parameters)
-    // ,
-    // vehicle_model_ptr_(
-    //   std::make_shared<SimModelIdealSteerVel>(
-    //     parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
+  : VehicleEntity(name, parameters),
+    vehicle_model_ptr_(
+      std::make_shared<SimModelIdealSteer>(
+        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
   {
     auto launch_autoware =
       [&]()
@@ -325,7 +323,9 @@ public:
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
-    initializeAutoware();
+    if (!autoware_initialized) {
+      initializeAutoware();
+    }
 
     const auto current_pose = getStatus().pose;
 
@@ -370,11 +370,6 @@ public:
   void onUpdate(double current_time, double step_time) override;
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
-
-  // const auto & getCurrentKinematicState() const noexcept
-  // {
-  //   return current_kinematic_state_;
-  // }
 
   openscenario_msgs::msg::WaypointsArray getWaypoints() const;
 
@@ -460,13 +455,9 @@ private:
     const double time,
     const double step_time) const;
 
-  boost::optional<geometry_msgs::msg::Pose> origin_;
+  boost::optional<geometry_msgs::msg::Pose> initial_pose_;
 
-  // boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
-  // boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
-  // boost::optional<autoware_auto_msgs::msg::VehicleKinematicState> current_kinematic_state_;
-
-  std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
+  const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
   boost::optional<double> previous_velocity_;
   boost::optional<double> previous_angular_velocity_;
