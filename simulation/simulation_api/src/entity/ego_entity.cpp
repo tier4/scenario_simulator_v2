@@ -72,13 +72,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   setStatus(getEntityStatus(current_time + step_time, step_time));
 
-  if (previous_velocity_) {
-    linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_velocity_.get()) / step_time;
+  if (previous_linear_velocity_) {
+    linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
   } else {
     linear_jerk_ = 0;
   }
 
-  previous_velocity_ = vehicle_model_ptr_->getVx();
+  previous_linear_velocity_ = vehicle_model_ptr_->getVx();
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
 
@@ -109,8 +109,8 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
 
   geometry_msgs::msg::Accel accel;
   {
-    if (previous_angular_velocity_ && previous_velocity_) {
-      accel.linear.x = (twist.linear.x - previous_velocity_.get()) / step_time;
+    if (previous_angular_velocity_ && previous_linear_velocity_) {
+      accel.linear.x = (twist.linear.x - previous_linear_velocity_.get()) / step_time;
       accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
     }
   }
@@ -121,9 +121,7 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     v(1) = pose.position.y;
     v(2) = pose.position.z;
 
-    const auto rotation_mat = quaternion_operation::getRotationMatrix(
-      initial_pose_.get().orientation);
-    v = rotation_mat * v;
+    v = quaternion_operation::getRotationMatrix((*initial_pose_).orientation) * v;
   }
 
   openscenario_msgs::msg::EntityStatus status;

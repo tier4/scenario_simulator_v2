@@ -459,7 +459,7 @@ private:
 
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
-  boost::optional<double> previous_velocity_;
+  boost::optional<double> previous_linear_velocity_;
   boost::optional<double> previous_angular_velocity_;
 };
 }      // namespace entity
