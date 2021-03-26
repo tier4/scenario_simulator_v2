@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
+#ifndef SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
+#define SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
 
 #include <math.h>
 
@@ -23,4 +23,4 @@ double getDummySteerCommandWithFriction(
   const double steer, const double steer_command, const double deadzone_delta_steer);
 }
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_
+#endif  // SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_UTIL_HPP_

@@ -163,8 +163,7 @@ public:
         0.3,  // steer_time_delay,
         0.3,  // steer_time_constant,
         0.0  // deadzone_delta_steer
-        )
-      )
+    ))
   {
     auto launch_autoware =
       [&]()
@@ -379,17 +378,10 @@ public:
 
     Eigen::VectorXd v(5);
     {
-      v <<
-        0,  // x
-        0,  // y
-        0,  // yaw
-        value,  // v_x
-        0;  // w_z
+      v << 0, 0, 0, value, 0;
     }
 
     (*vehicle_model_ptr_).setState(v);
-
-    DEBUG_VALUE((*vehicle_model_ptr_).getVx());
 
     return updateAutoware(current.pose);
   }
@@ -461,7 +453,7 @@ private:
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    DEBUG_VALUE(current_twist.linear.x);
+    // DEBUG_VALUE(current_twist.linear.x);
     // DEBUG_VALUE(current_twist.angular.z);
     //
     // DEBUG_VALUE(current_pose.position.x);
