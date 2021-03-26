@@ -53,8 +53,9 @@ ament_auto_add_library(simulation_api SHARED
   src/metrics/traveled_distance_metric.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
-  src/vehicle_model/sim_model_ideal.cpp
   src/vehicle_model/sim_model_interface.cpp
+  src/vehicle_model/sim_model_time_delay.cpp
+  src/vehicle_model/sim_model_util.cpp
 )
 
 target_link_libraries(simulation_api

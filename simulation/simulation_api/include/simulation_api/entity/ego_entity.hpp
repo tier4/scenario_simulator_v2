@@ -33,8 +33,10 @@
 #include <boost/optional.hpp>
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
-#include <simulation_api/vehicle_model/sim_model_ideal.hpp>  // NOTE: Copy from ArchitectureProposal.iv
+#include <simulation_api/vehicle_model/sim_model_ideal.hpp>
+#include <simulation_api/vehicle_model/sim_model_time_delay.hpp>
 #include <sys/wait.h>  // for EgoEntity::~EgoEntity
+#include <tf2/utils.h>
 
 #include <algorithm>
 #include <chrono>
@@ -149,8 +151,20 @@ public:
     const openscenario_msgs::msg::VehicleParameters & parameters)
   : VehicleEntity(name, parameters),
     vehicle_model_ptr_(
-      std::make_shared<SimModelIdealSteer>(
-        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
+      std::make_shared<SimModelTimeDelaySteer>(
+        50.0,  // vel_lim,
+        1.0,  // steer_lim,
+        10.0,  // accel_rate,
+        5.0,  // steer_rate_lim,
+        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
+        0.03,  // dt,
+        0.25,  // vel_time_delay,
+        0.5,  // vel_time_constant,
+        0.3,  // steer_time_delay,
+        0.3,  // steer_time_constant,
+        0.0  // deadzone_delta_steer
+        )
+      )
   {
     auto launch_autoware =
       [&]()
@@ -360,6 +374,24 @@ public:
   {
     std::cout << "\x1b[31mEgo::setTargetSpeed " << value << "\x1b[0m" << std::endl;
     // std::atomic_load(&autowares.at(name))->setInitialTwist(value);
+
+    const auto current = getStatus();
+
+    Eigen::VectorXd v(5);
+    {
+      v <<
+        0,  // x
+        0,  // y
+        0,  // yaw
+        value,  // v_x
+        0;  // w_z
+    }
+
+    (*vehicle_model_ptr_).setState(v);
+
+    DEBUG_VALUE((*vehicle_model_ptr_).getVx());
+
+    return updateAutoware(current.pose);
   }
 
   const std::string getCurrentAction() const
@@ -425,13 +457,11 @@ private:
   {
     geometry_msgs::msg::Twist current_twist;
     {
-      current_twist.linear.x =
-        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity;
-      current_twist.angular.z =
-        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
+      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
+      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    // DEBUG_VALUE(current_twist.linear.x);
+    DEBUG_VALUE(current_twist.linear.x);
     // DEBUG_VALUE(current_twist.angular.z);
     //
     // DEBUG_VALUE(current_pose.position.x);

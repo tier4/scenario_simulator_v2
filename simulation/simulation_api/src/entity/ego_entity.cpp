@@ -45,14 +45,14 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   // NOTE Currently, setStatus always succeeds.
   const bool success = VehicleEntity::setStatus(status);
 
-  const auto current_entity_status = getStatus();
+  const auto current = getStatus();
 
   if (autoware_initialized) {
-    updateAutoware(current_entity_status.pose);
+    updateAutoware(current.pose);
   }
 
   if (!initial_pose_) {
-    initial_pose_ = current_entity_status.pose;
+    initial_pose_ = current.pose;
   }
 
   return success;
@@ -67,8 +67,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
   }
 
-  vehicle_model_ptr_->setInput(input);
-  vehicle_model_ptr_->update(step_time);
+  (*vehicle_model_ptr_).setInput(input);
+  (*vehicle_model_ptr_).update(step_time);
 
   setStatus(getEntityStatus(current_time + step_time, step_time));
 
