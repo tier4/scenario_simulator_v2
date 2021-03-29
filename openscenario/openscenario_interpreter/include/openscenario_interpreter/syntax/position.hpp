@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
 
+#include <unordered_map>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -51,8 +52,8 @@ inline namespace syntax
 struct Position
   : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit Position(const Node & node, Ts && ... xs)
+  template<typename XML, typename ... Ts>
+  explicit Position(const XML & node, Ts && ... xs)
   : Element(
       choice(
         node,
@@ -79,6 +80,38 @@ struct Position
 };
 
 #undef ELEMENT
+
+template<typename F, typename ... Ts>
+decltype(auto) apply(F && f, const Position & position, Ts && ... xs)
+{
+  #define BOILERPLATE(TYPE) \
+  { \
+    typeid(TYPE), [](F && f, const Position & position, Ts && ... xs) \
+    { \
+      return f(position.as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
+    } \
+  }
+
+  static const std::unordered_map<
+    std::type_index,
+    std::function<void(F && f, const Position & position, Ts && ... xs)>>
+  overloads
+  {
+    BOILERPLATE(WorldPosition),
+    BOILERPLATE(RelativeWorldPosition),
+    // BOILERPLATE(RelativeObjectPosition),
+    // BOILERPLATE(RoadPosition),
+    // BOILERPLATE(RelativeRoadPosition),
+    BOILERPLATE(LanePosition),
+    // BOILERPLATE(RelativeLanePosition),
+    // BOILERPLATE(RoutePosition),
+  };
+
+  #undef BOILERPLATE
+
+  return overloads.at(position.type())(
+    std::forward<decltype(f)>(f), position, std::forward<decltype(xs)>(xs)...);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

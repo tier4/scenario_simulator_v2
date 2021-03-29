@@ -135,9 +135,7 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::PedestrianParameters & params);
 
-  template<
-    typename ... Ts  // Arguments for setEntityStatus
-  >
+  template<typename ... Ts>
   decltype(auto) spawn(
     const bool is_ego,
     const std::string & name,
@@ -174,22 +172,26 @@ public:
   bool setEntityStatus(
     const std::string & name,
     const geometry_msgs::msg::Pose & map_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const std::string & reference_entity_name,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
 
   boost::optional<double> getTimeHeadway(
     const std::string & from,
