@@ -54,7 +54,8 @@ struct ReachPositionCondition
   auto check(const TriggeringEntities::value_type & name)
   {
     if (position.is<WorldPosition>()) {
-      return isReachedPosition(name, position.as<WorldPosition>(), tolerance);
+      return isReachedPosition(
+        name, static_cast<geometry_msgs::msg::Pose>(position.as<WorldPosition>()), tolerance);
     } else if (position.is<LanePosition>()) {
       return isReachedPosition(name, position.as<LanePosition>(), tolerance);
     } else {

@@ -51,9 +51,8 @@ struct TeleportAction
     const WorldPosition & world_position,
     const Scope::Actor & actor) const
   {
-    // return setEntityStatus(
-    //   );
-    THROW(ImplementationFault);
+    return setEntityStatus(
+      actor, static_cast<geometry_msgs::msg::Pose>(world_position));
   }
 
   decltype(auto) operator()(
