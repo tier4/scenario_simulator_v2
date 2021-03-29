@@ -117,17 +117,17 @@ public:
    *  It is mainly used when writing scenarios in C++.
    *
    * ------------------------------------------------------------------------ */
-  template<typename ... Ts>
-  explicit EgoEntity(
-    const std::string & name,
-    const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
-  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
-    vehicle_model_ptr_(
-      std::make_shared<SimModelIdealSteer>(
-        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
-  {
-    setStatus(initial_state);
-  }
+  // template<typename ... Ts>
+  // explicit EgoEntity(
+  //   const std::string & name,
+  //   const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
+  // : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
+  //   vehicle_model_ptr_(
+  //     std::make_shared<SimModelIdealSteer>(
+  //       parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
+  // {
+  //   setStatus(initial_state);
+  // }
 
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -146,18 +146,19 @@ public:
    *
    * ------------------------------------------------------------------------ */
   explicit EgoEntity(
-    const boost::filesystem::path & lanelet2_map_osm,
     const std::string & name,
+    const boost::filesystem::path & lanelet2_map_osm,
+    const double step_time,
     const openscenario_msgs::msg::VehicleParameters & parameters)
   : VehicleEntity(name, parameters),
     vehicle_model_ptr_(
       std::make_shared<SimModelTimeDelaySteer>(
-        50.0,  // vel_lim,
-        1.0,  // steer_lim,
-        10.0,  // accel_rate,
+        parameters.performance.max_speed,  // vel_lim,
+        parameters.axles.front_axle.max_steering,  // steer_lim,
+        parameters.performance.max_acceleration,  // accel_rate,
         5.0,  // steer_rate_lim,
         parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
-        0.03,  // dt,
+        step_time,  // dt,
         0.25,  // vel_time_delay,
         0.5,  // vel_time_constant,
         0.3,  // steer_time_delay,
@@ -371,9 +372,6 @@ public:
 
   decltype(auto) setTargetSpeed(const double value, const bool)
   {
-    std::cout << "\x1b[31mEgo::setTargetSpeed " << value << "\x1b[0m" << std::endl;
-    // std::atomic_load(&autowares.at(name))->setInitialTwist(value);
-
     const auto current = getStatus();
 
     Eigen::VectorXd v(5);
@@ -382,8 +380,6 @@ public:
     }
 
     (*vehicle_model_ptr_).setState(v);
-
-    return updateAutoware(current.pose);
   }
 
   const std::string getCurrentAction() const
@@ -469,7 +465,7 @@ private:
     std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
     std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
     std::atomic_load(&autowares.at(name))->setTransform(current_pose);
-    std::atomic_load(&autowares.at(name))->setVehicleVelocity(50);  // 50[m/s] = 180[km/h]
+    std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
   }
 
 private:
