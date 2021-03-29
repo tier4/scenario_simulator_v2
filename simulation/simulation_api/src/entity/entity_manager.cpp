@@ -272,9 +272,7 @@ geometry_msgs::msg::Pose EntityManager::getRelativePose(
     throw simulation_api::SimulationRuntimeError(
             "failed to get status of " + to + " entity in getRelativePose");
   }
-  const auto from_pose = from_status->pose;
-  const auto to_pose = to_status->pose;
-  return getRelativePose(from_pose, to_pose);
+  return getRelativePose(from_status->pose, to_status->pose);
 }
 
 geometry_msgs::msg::Pose EntityManager::getRelativePose(

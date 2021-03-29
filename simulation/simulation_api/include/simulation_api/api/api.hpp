@@ -28,6 +28,7 @@
 #include <simulation_api_schema.pb.h>
 #include <simulation_interface/zmq_client.hpp>
 
+#include <cassert>
 #include <memory>
 #include <string>
 #include <utility>
@@ -48,13 +49,6 @@ public:
 class API
 {
   using EntityManager = simulation_api::entity::EntityManager;
-
-#define FORWARD_TO_ENTITY_MANAGER(NAME) \
-  template<typename ... Ts> \
-  decltype(auto) NAME(Ts && ... xs) \
-  { \
-    return entity_manager_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
-  } static_assert(true, "")
 
 public:
   const std::string lanelet2_map_osm;
@@ -231,6 +225,14 @@ public:
 
   const bool standalone_mode;
 
+  #define FORWARD_TO_ENTITY_MANAGER(NAME) \
+  template<typename ... Ts> \
+  decltype(auto) NAME(Ts && ... xs) \
+  { \
+    assert(entity_manager_ptr_); \
+    return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
+
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
@@ -250,6 +252,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
+
+  #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
   bool updateEntityStatusInSim();
