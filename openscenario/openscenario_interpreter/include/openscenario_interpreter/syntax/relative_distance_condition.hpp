@@ -44,6 +44,12 @@ struct RelativeDistanceCondition
 
   const Double value;
 
+  /* ---- freespace ------------------------------------------------------------
+   *
+   *  True: distance is measured between closest bounding box points.
+   *  False: reference point distance is used.
+   *
+   * ------------------------------------------------------------------------ */
   const Boolean freespace;
 
   const Rule compare;

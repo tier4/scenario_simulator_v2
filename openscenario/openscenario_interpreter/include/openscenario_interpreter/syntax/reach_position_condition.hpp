@@ -51,23 +51,43 @@ struct ReachPositionCondition
 
   const TriggeringEntities for_each;
 
-  auto check(const TriggeringEntities::value_type & name)
+  using TriggeringEntity = TriggeringEntities::value_type;
+
+  decltype(auto) operator()(
+    const WorldPosition & world_position,
+    const TriggeringEntity & triggering_entity) const
   {
-    if (position.is<WorldPosition>()) {
-      return isReachedPosition(name, position.as<WorldPosition>(), tolerance);
-    } else if (position.is<LanePosition>()) {
-      return isReachedPosition(name, position.as<LanePosition>(), tolerance);
-    } else {
-      THROW(ImplementationFault);
-    }
+    return isReachedPosition(
+      triggering_entity,
+      static_cast<geometry_msgs::msg::Pose>(world_position),
+      tolerance);
   }
 
-  auto distance(const TriggeringEntities::value_type & name)
+  bool operator()(
+    const RelativeWorldPosition &,
+    const TriggeringEntity &) const
+  {
+    THROW(ImplementationFault);
+  }
+
+  decltype(auto) operator()(
+    const LanePosition & lane_position,
+    const TriggeringEntity & triggering_entity) const
+  {
+    return isReachedPosition(
+      triggering_entity,
+      static_cast<openscenario_msgs::msg::LaneletPose>(lane_position),
+      tolerance);
+  }
+
+  #ifndef NDEBUG
+  auto distance(const TriggeringEntity & name)
   {
     const auto pose = getRelativePose(
       name, static_cast<geometry_msgs::msg::Pose>(position));
     return std::hypot(pose.position.x, pose.position.y);
   }
+  #endif
 
   auto evaluate()
   {
@@ -77,9 +97,9 @@ struct ReachPositionCondition
 
     const auto result = asBoolean(
       for_each(
-        [&](auto && triggering_entity)
+        [&](const auto & triggering_entity)
         {
-          const auto result = check(triggering_entity);
+          const bool result = apply<bool>(*this, position, triggering_entity);
           #ifndef NDEBUG
           std::cout << indent << "  " << triggering_entity << ": ";
           std::cout << std::boolalpha << result;

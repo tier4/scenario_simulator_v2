@@ -39,11 +39,7 @@ struct WorldPosition
 {
   const Double x, y, z, h, p, r;
 
-  template
-  <
-    typename Node,
-    typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit WorldPosition(const Node & node, Scope & scope)
   : x(readAttribute<Double>("x", node, scope)),
     y(readAttribute<Double>("y", node, scope)),
@@ -53,7 +49,7 @@ struct WorldPosition
     r(readAttribute<Double>("r", node, scope, Double()))
   {}
 
-  operator geometry_msgs::msg::Pose() const
+  explicit operator geometry_msgs::msg::Pose() const
   {
     geometry_msgs::msg::Vector3 vector {};
     vector.x = r;

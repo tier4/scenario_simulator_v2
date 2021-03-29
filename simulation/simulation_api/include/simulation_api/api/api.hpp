@@ -28,6 +28,7 @@
 #include <simulation_api_schema.pb.h>
 #include <simulation_interface/zmq_client.hpp>
 
+#include <cassert>
 #include <memory>
 #include <string>
 #include <utility>
@@ -48,13 +49,6 @@ public:
 class API
 {
   using EntityManager = simulation_api::entity::EntityManager;
-
-#define FORWARD_TO_ENTITY_MANAGER(NAME) \
-  template<typename ... Ts> \
-  decltype(auto) NAME(Ts && ... xs) \
-  { \
-    return entity_manager_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
-  } static_assert(true, "")
 
 public:
   const std::string lanelet2_map_osm;
@@ -141,9 +135,7 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::PedestrianParameters & params);
 
-  template<
-    typename ... Ts  // Arguments for setEntityStatus
-  >
+  template<typename ... Ts>
   decltype(auto) spawn(
     const bool is_ego,
     const std::string & name,
@@ -180,22 +172,26 @@ public:
   bool setEntityStatus(
     const std::string & name,
     const geometry_msgs::msg::Pose & map_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const std::string & reference_entity_name,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
 
   boost::optional<double> getTimeHeadway(
     const std::string & from,
@@ -231,6 +227,14 @@ public:
 
   const bool standalone_mode;
 
+  #define FORWARD_TO_ENTITY_MANAGER(NAME) \
+  template<typename ... Ts> \
+  decltype(auto) NAME(Ts && ... xs) \
+  { \
+    assert(entity_manager_ptr_); \
+    return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
+
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
@@ -250,6 +254,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
+
+  #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
   bool updateEntityStatusInSim();

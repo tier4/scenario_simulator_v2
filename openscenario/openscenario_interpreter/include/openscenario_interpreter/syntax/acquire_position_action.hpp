@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-
 #include <simulation_api/helper/helper.hpp>
 
 #include <string>
@@ -29,13 +28,13 @@ inline namespace syntax
 {
 /* ---- AcquirePositionAction --------------------------------------------------
  *
- * <xsd:complexType name="AcquirePositionAction">
- *   <xsd:all>
- *     <xsd:element name="Position" type="Position"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="AcquirePositionAction">
+ *    <xsd:all>
+ *      <xsd:element name="Position" type="Position"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
- * TODO REMOVE EXTENSION
+ *  TODO REMOVE EXTENSION
  *
  * -------------------------------------------------------------------------- */
 struct AcquirePositionAction
@@ -59,11 +58,8 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
-        auto lanelet_pose = simulation_api::helper::constructLaneletPose(
-          Integer(position.as<LanePosition>().lane_id),
-          position.as<LanePosition>().s,
-          position.as<LanePosition>().offset);
-        requestAcquirePosition(actor, lanelet_pose);
+        requestAcquirePosition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
       }
     } else {
       THROW(ImplementationFault);
@@ -76,13 +72,9 @@ struct AcquirePositionAction
     if (position.is<LanePosition>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          auto lanelet_pose = simulation_api::helper::constructLaneletPose(
-            Integer(position.as<LanePosition>().lane_id),
-            position.as<LanePosition>().s,
-            position.as<LanePosition>().offset);
           cdr(each) = isReachedPosition(
             car(each),
-            lanelet_pose,
+            static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()),
             5.0);
         }
       }
