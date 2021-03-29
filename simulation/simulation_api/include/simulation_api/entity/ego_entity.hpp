@@ -33,8 +33,10 @@
 #include <boost/optional.hpp>
 #include <pugixml.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
-#include <simulation_api/vehicle_model/sim_model.hpp>
-#include <sys/wait.h>
+#include <simulation_api/vehicle_model/sim_model_ideal.hpp>
+#include <simulation_api/vehicle_model/sim_model_time_delay.hpp>
+#include <sys/wait.h>  // for EgoEntity::~EgoEntity
+#include <tf2/utils.h>
 
 #include <algorithm>
 #include <chrono>
@@ -65,8 +67,6 @@ class EgoEntity : public VehicleEntity
   static std::unordered_map<
     std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
   > autowares;
-
-  bool autoware_uninitialized = true;
 
   decltype(fork()) autoware_process_id = 0;
 
@@ -117,14 +117,17 @@ public:
    *  It is mainly used when writing scenarios in C++.
    *
    * ------------------------------------------------------------------------ */
-  template<typename ... Ts>
-  explicit EgoEntity(
-    const std::string & name,
-    const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
-  : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...)
-  {
-    setStatus(initial_state);
-  }
+  // template<typename ... Ts>
+  // explicit EgoEntity(
+  //   const std::string & name,
+  //   const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
+  // : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
+  //   vehicle_model_ptr_(
+  //     std::make_shared<SimModelIdealSteer>(
+  //       parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
+  // {
+  //   setStatus(initial_state);
+  // }
 
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -143,10 +146,25 @@ public:
    *
    * ------------------------------------------------------------------------ */
   explicit EgoEntity(
-    const boost::filesystem::path & lanelet2_map_osm,
     const std::string & name,
+    const boost::filesystem::path & lanelet2_map_osm,
+    const double step_time,
     const openscenario_msgs::msg::VehicleParameters & parameters)
-  : VehicleEntity(name, parameters)
+  : VehicleEntity(name, parameters),
+    vehicle_model_ptr_(
+      std::make_shared<SimModelTimeDelaySteer>(
+        parameters.performance.max_speed,  // vel_lim,
+        parameters.axles.front_axle.max_steering,  // steer_lim,
+        parameters.performance.max_acceleration,  // accel_rate,
+        5.0,  // steer_rate_lim,
+        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
+        step_time,  // dt,
+        0.25,  // vel_time_delay,
+        0.5,  // vel_time_constant,
+        0.3,  // steer_time_delay,
+        0.3,  // steer_time_constant,
+        0.0  // deadzone_delta_steer
+    ))
   {
     auto launch_autoware =
       [&]()
@@ -285,9 +303,44 @@ public:
     }
   }
 
+  bool autoware_initialized = false;
+
+  auto initializeAutoware()
+  {
+    const auto current_entity_status = getStatus();
+
+    if (!std::exchange(autoware_initialized, true)) {
+      std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
+
+      waitForAutowareStateToBeInitializingVehicle(
+        [&]()
+        {
+          return updateAutoware(current_entity_status.pose);
+        });
+
+      /* ---- NOTE ---------------------------------------------------------------
+       *
+       *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
+       *  and tf to be published. Member function EgoEntity::waitForAutowareToBe*
+       *  are depends a topic '/awapi/autoware/get/status' published by
+       *  awapi_awiv_adapter.
+       *
+       * ---------------------------------------------------------------------- */
+      waitForAutowareStateToBeWaitingForRoute(
+        [&]()
+        {
+          return updateAutoware(current_entity_status.pose);
+        });
+    }
+  }
+
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & map_pose)
   {
+    if (!autoware_initialized) {
+      initializeAutoware();
+    }
+
     const auto current_pose = getStatus().pose;
 
     waitForAutowareStateToBeWaitingForRoute(
@@ -317,6 +370,18 @@ public:
       });
   }
 
+  decltype(auto) setTargetSpeed(const double value, const bool)
+  {
+    const auto current = getStatus();
+
+    Eigen::VectorXd v(5);
+    {
+      v << 0, 0, 0, value, 0;
+    }
+
+    (*vehicle_model_ptr_).setState(v);
+  }
+
   const std::string getCurrentAction() const
   {
     return "none";
@@ -326,16 +391,11 @@ public:
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
-  const auto & getCurrentKinematicState() const noexcept
-  {
-    return current_kinematic_state_;
-  }
-
   openscenario_msgs::msg::WaypointsArray getWaypoints() const;
 
 private:
   // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
-# define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
+  #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
   template<typename Thunk> \
   void waitForAutowareStateToBe ## STATE(Thunk thunk, std::size_t count_max = 300) const \
   { \
@@ -378,17 +438,15 @@ private:
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Emergency);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
 
-# undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
+  #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 
   void updateAutoware(
     const geometry_msgs::msg::Pose & current_pose)
   {
     geometry_msgs::msg::Twist current_twist;
     {
-      current_twist.linear.x =
-        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity;
-      current_twist.angular.z =
-        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
+      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
+      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
     // DEBUG_VALUE(current_twist.linear.x);
@@ -407,7 +465,7 @@ private:
     std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
     std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
     std::atomic_load(&autowares.at(name))->setTransform(current_pose);
-    std::atomic_load(&autowares.at(name))->setVehicleVelocity(50);  // 50[m/s] = 180[km/h]
+    std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
   }
 
 private:
@@ -415,14 +473,11 @@ private:
     const double time,
     const double step_time) const;
 
-  boost::optional<geometry_msgs::msg::Pose> origin_;
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
-  boost::optional<autoware_auto_msgs::msg::VehicleKinematicState> current_kinematic_state_;
+  boost::optional<geometry_msgs::msg::Pose> initial_pose_;
 
-  std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
+  const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
-  boost::optional<double> previous_velocity_;
+  boost::optional<double> previous_linear_velocity_;
   boost::optional<double> previous_angular_velocity_;
 };
 }      // namespace entity

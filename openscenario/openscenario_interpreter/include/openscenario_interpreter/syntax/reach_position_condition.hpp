@@ -27,12 +27,12 @@ inline namespace syntax
 {
 /* ---- ReachPositionCondition -------------------------------------------------
  *
- * <xsd:complexType name="ReachPositionCondition">
- *   <xsd:all>
- *     <xsd:element name="Position" type="Position"/>
- *   </xsd:all>
- *   <xsd:attribute name="tolerance" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ReachPositionCondition">
+ *    <xsd:all>
+ *      <xsd:element name="Position" type="Position"/>
+ *    </xsd:all>
+ *    <xsd:attribute name="tolerance" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ReachPositionCondition
@@ -41,44 +41,79 @@ struct ReachPositionCondition
 
   const Position position;
 
-  const TriggeringEntities trigger;
-
-  template
-  <
-    typename Node
-  >
+  template<typename Node>
   explicit ReachPositionCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
     position(readElement<Position>("Position", node, outer_scope)),
-    trigger(trigger)
+    for_each(triggering_entities)
   {}
+
+  const TriggeringEntities for_each;
+
+  using TriggeringEntity = TriggeringEntities::value_type;
+
+  decltype(auto) operator()(
+    const WorldPosition & world_position,
+    const TriggeringEntity & triggering_entity) const
+  {
+    return isReachedPosition(
+      triggering_entity,
+      static_cast<geometry_msgs::msg::Pose>(world_position),
+      tolerance);
+  }
+
+  bool operator()(
+    const RelativeWorldPosition &,
+    const TriggeringEntity &) const
+  {
+    THROW(ImplementationFault);
+  }
+
+  decltype(auto) operator()(
+    const LanePosition & lane_position,
+    const TriggeringEntity & triggering_entity) const
+  {
+    return isReachedPosition(
+      triggering_entity,
+      static_cast<openscenario_msgs::msg::LaneletPose>(lane_position),
+      tolerance);
+  }
+
+  #ifndef NDEBUG
+  auto distance(const TriggeringEntity & name)
+  {
+    const auto pose = getRelativePose(
+      name, static_cast<geometry_msgs::msg::Pose>(position));
+    return std::hypot(pose.position.x, pose.position.y);
+  }
+  #endif
 
   auto evaluate()
   {
-    if (position.is<WorldPosition>()) {
-      return asBoolean(
-        trigger(
-          [&](auto && entity)
-          {
-            return isReachedPosition(entity, position.as<WorldPosition>(), tolerance);
-          }));
-    } else if (position.is<LanePosition>()) {
-      return asBoolean(
-        trigger(
-          [&](auto && entity)
-          {
-            return isReachedPosition(
-              entity,
-              simulation_api::helper::constructLaneletPose(
-                static_cast<Integer>(position.as<LanePosition>().lane_id),
-                position.as<LanePosition>().s,
-                position.as<LanePosition>().offset),
-              tolerance);
-          }));
-    } else {
-      THROW(ImplementationFault);
-    }
+    #ifndef NDEBUG
+    std::cout << (indent++) << "- BEC.RPC:\n";
+    #endif
+
+    const auto result = asBoolean(
+      for_each(
+        [&](const auto & triggering_entity)
+        {
+          const bool result = apply<bool>(*this, position, triggering_entity);
+          #ifndef NDEBUG
+          std::cout << indent << "  " << triggering_entity << ": ";
+          std::cout << std::boolalpha << result;
+          std::cout << " (distance = " << distance(triggering_entity);
+          std::cout << " < " << tolerance << ")" << std::endl;
+          #endif
+          return result;
+        }));
+
+    #ifndef NDEBUG
+    --indent;
+    #endif
+
+    return result;
   }
 };
 }

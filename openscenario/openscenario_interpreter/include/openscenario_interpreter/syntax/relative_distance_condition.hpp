@@ -19,19 +19,21 @@
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
+#include <utility>
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
 /* ---- RelativeDistanceCondition ----------------------------------------------
  *
- * <xsd:complexType name="RelativeDistanceCondition">
- *   <xsd:attribute name="entityRef" type="String" use="required"/>
- *   <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
- *   <xsd:attribute name="value" type="Double" use="required"/>
- *   <xsd:attribute name="freespace" type="Boolean" use="required"/>
- *   <xsd:attribute name="rule" type="Rule" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="RelativeDistanceCondition">
+ *    <xsd:attribute name="entityRef" type="String" use="required"/>
+ *    <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
+ *    <xsd:attribute name="value" type="Double" use="required"/>
+ *    <xsd:attribute name="freespace" type="Boolean" use="required"/>
+ *    <xsd:attribute name="rule" type="Rule" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct RelativeDistanceCondition
@@ -42,11 +44,15 @@ struct RelativeDistanceCondition
 
   const Double value;
 
+  /* ---- freespace ------------------------------------------------------------
+   *
+   *  True: distance is measured between closest bounding box points.
+   *  False: reference point distance is used.
+   *
+   * ------------------------------------------------------------------------ */
   const Boolean freespace;
 
   const Rule compare;
-
-  const TriggeringEntities for_each;
 
   template<typename Node, typename Scope>
   explicit RelativeDistanceCondition(
@@ -60,47 +66,54 @@ struct RelativeDistanceCondition
     for_each(triggering_entities)
   {}
 
-  auto evaluate()
+  const TriggeringEntities for_each;
+
+  auto distance(const TriggeringEntities::value_type & triggering_entity)
   {
     switch (relative_distance_type) {
       case RelativeDistanceType::longitudinal:
-
-        return asBoolean(
-          for_each(
-            [&](auto && triggering_entity)
-            {
-              return compare(
-                std::fabs(getRelativePose(triggering_entity, entity_ref).position.x),
-                value);
-            }));
-
+        return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
       case RelativeDistanceType::lateral:
-
-        return asBoolean(
-          for_each(
-            [&](auto && triggering_entity)
-            {
-              return compare(
-                std::fabs(getRelativePose(triggering_entity, entity_ref).position.y),
-                value);
-            }));
-
+        return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
       case RelativeDistanceType::cartesianDistance:
-
-        return asBoolean(
-          for_each(
-            [&](auto && triggering_entity)
-            {
-              return compare(
-                std::hypot(
-                  getRelativePose(triggering_entity, entity_ref).position.x,
-                  getRelativePose(triggering_entity, entity_ref).position.y),
-                value);
-            }));
-
+        return std::hypot(
+          getRelativePose(triggering_entity, entity_ref).position.x,
+          getRelativePose(triggering_entity, entity_ref).position.y);
       default:
         THROW(ImplementationFault);
     }
+  }
+
+  template<typename ... Ts>
+  auto operator()(Ts && ... xs)
+  {
+    return compare(distance(std::forward<decltype(xs)>(xs)...), value);
+  }
+
+  auto evaluate()
+  {
+    #ifndef NDEBUG
+    std::cout << (indent++) << "- BEC.RDC:\n";
+    #endif
+
+    const auto result = asBoolean(
+      for_each(
+        [&](auto && triggering_entity)
+        {
+          const auto result = (*this)(triggering_entity);
+          #ifndef NDEBUG
+          std::cout << indent << "  " << triggering_entity << ": ";
+          std::cout << "distance = " << distance(triggering_entity);
+          std::cout << " " << compare << " " << value << "? => " << result << std::endl;
+          #endif
+          return result;
+        }));
+
+    #ifndef NDEBUG
+    --indent;
+    #endif
+
+    return result;
   }
 };
 }

@@ -86,10 +86,7 @@ struct DistanceCondition
    * ------------------------------------------------------------------------ */
   const Position position;
 
-  template
-  <
-    typename Node
-  >
+  template<typename Node>
   explicit DistanceCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),
@@ -108,9 +105,9 @@ struct DistanceCondition
       for_each(
         [&](auto && triggering_entity)
         {
-          const auto pose {
-            getRelativePose(triggering_entity, position.toPose())
-          };
+          const auto pose = getRelativePose(
+            triggering_entity,
+            static_cast<geometry_msgs::msg::Pose>(position));
           return compare(std::hypot(pose.position.x, pose.position.y), value);
         }));
   }

@@ -2,7 +2,7 @@
 <launch>
   <!-- Essential parameters -->
   <arg name="map_path" doc="point cloud and lanelet2 map directory path"/>
-  <arg name="vehicle_model" default="lexus"/>
+  <arg name="vehicle_model" default="ymc_golfcart_proto2"/>
   <arg name="sensor_model" default="aip_xx1"/>
   <!-- Optional parameters -->
   <arg name="rviz" default="true" doc="launch rviz"/>

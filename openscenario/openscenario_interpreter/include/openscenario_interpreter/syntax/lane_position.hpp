@@ -24,15 +24,15 @@ inline namespace syntax
 {
 /* ---- LanePosition -----------------------------------------------------------
  *
- * <xsd:complexType name="LanePosition">
- *   <xsd:all>
- *     <xsd:element name="Orientation" type="Orientation" minOccurs="0"/>
- *   </xsd:all>
- *   <xsd:attribute name="roadId" type="String" use="required"/>
- *   <xsd:attribute name="laneId" type="String" use="required"/>
- *   <xsd:attribute name="offset" type="Double" use="optional"/>
- *   <xsd:attribute name="s" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="LanePosition">
+ *    <xsd:all>
+ *      <xsd:element name="Orientation" type="Orientation" minOccurs="0"/>
+ *    </xsd:all>
+ *    <xsd:attribute name="roadId" type="String" use="required"/>
+ *    <xsd:attribute name="laneId" type="String" use="required"/>
+ *    <xsd:attribute name="offset" type="Double" use="optional"/>
+ *    <xsd:attribute name="s" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct LanePosition
@@ -52,10 +52,17 @@ struct LanePosition
     orientation(readElement<Orientation>("Orientation", node, scope))
   {}
 
-  operator geometry_msgs::msg::Pose() const
+  explicit operator openscenario_msgs::msg::LaneletPose() const
   {
-    const geometry_msgs::msg::Pose result {};
-    return result;
+    const geometry_msgs::msg::Vector3 rpy = orientation;
+    return simulation_api::helper::constructLaneletPose(
+      static_cast<Integer>(lane_id), s, offset, rpy.x, rpy.y, rpy.z);
+  }
+
+  explicit operator geometry_msgs::msg::Pose() const
+  {
+    return toMapPose(
+      static_cast<openscenario_msgs::msg::LaneletPose>(*this));
   }
 };
 }

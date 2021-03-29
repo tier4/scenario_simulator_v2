@@ -28,6 +28,7 @@
 #include <simulation_api_schema.pb.h>
 #include <simulation_interface/zmq_client.hpp>
 
+#include <cassert>
 #include <memory>
 #include <string>
 #include <utility>
@@ -37,8 +38,10 @@ namespace scenario_simulator
 class ExecutionFailedError : public std::runtime_error
 {
 public:
-  explicit ExecutionFailedError(const char * message)
-  : runtime_error(message) {}
+  template<typename ... Ts>
+  explicit ExecutionFailedError(Ts && ... xs)
+  : runtime_error(std::forward<decltype(xs)>(xs)...)
+  {}
 
   virtual ~ExecutionFailedError() = default;
 };
@@ -46,13 +49,6 @@ public:
 class API
 {
   using EntityManager = simulation_api::entity::EntityManager;
-
-#define FORWARD_TO_ENTITY_MANAGER(NAME) \
-  template<typename ... Ts> \
-  decltype(auto) NAME(Ts && ... xs) \
-  { \
-    return entity_manager_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
-  } static_assert(true, "")
 
 public:
   const std::string lanelet2_map_osm;
@@ -62,7 +58,7 @@ public:
     class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node,
-    boost::filesystem::path,
+    const boost::filesystem::path,
     const std::string & lanelet2_map_osm,
     const bool verbose = false,
     const bool standalone_mode = false,
@@ -109,7 +105,6 @@ public:
       simulation_interface::ports::attach_detection_sensor)
   {
     static const std::string address = "127.0.0.1";
-    // client_ptr_ = std::make_shared<XmlRpc::XmlRpcClient>(address.c_str(), port);
 
     metrics_manager_.setEntityManager(entity_manager_ptr_);
 
@@ -140,10 +135,7 @@ public:
     const std::string & name,
     const openscenario_msgs::msg::PedestrianParameters & params);
 
-  template
-  <
-    typename ... Ts  // Arguments for setEntityStatus
-  >
+  template<typename ... Ts>
   decltype(auto) spawn(
     const bool is_ego,
     const std::string & name,
@@ -155,16 +147,14 @@ public:
       setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
 
-  template
-  <
+  template<
     typename Parameters,  // Maybe, VehicleParameters or PedestrianParameters
     typename ... Ts  // Arguments for setEntityStatus
   >
   decltype(auto) spawn(
     const bool is_ego,
     const std::string & name,
-    const Parameters & params,
-    Ts && ... xs)
+    const Parameters & params, Ts && ... xs)
   {
     return
       spawn(is_ego, name, params) &&
@@ -182,38 +172,30 @@ public:
   bool setEntityStatus(
     const std::string & name,
     const geometry_msgs::msg::Pose & map_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const std::string & reference_entity_name,
     const geometry_msgs::msg::Pose & relative_pose,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
   bool setEntityStatus(
     const std::string & name,
     const std::string & reference_entity_name,
     const geometry_msgs::msg::Point & relative_position,
     const geometry_msgs::msg::Vector3 & relative_rpy,
-    const openscenario_msgs::msg::ActionStatus & action_status);
+    const openscenario_msgs::msg::ActionStatus & action_status =
+    simulation_api::helper::constructActionStatus());
 
   boost::optional<double> getTimeHeadway(
     const std::string & from,
     const std::string & to);
-
-  void requestLaneChange(
-    const std::string & name,
-    const std::int64_t to_lanelet_id);
-  void requestLaneChange(
-    const std::string & name,
-    const simulation_api::entity::Direction & direction);
-
-  void setTargetSpeed(
-    const std::string & name,
-    const double target_speed,
-    const bool continuous);
 
   bool reachPosition(
     const std::string & name,
@@ -227,16 +209,16 @@ public:
     const std::string & name,
     const std::string & target_name,
     const double tolerance) const;
+
   bool attachLidarSensor(
-    simulation_api_schema::LidarConfiguration configuration
-  );
+    simulation_api_schema::LidarConfiguration configuration);
   bool attachDetectionSensor(
-    simulation_api_schema::DetectionSensorConfiguration configuration
-  );
-  bool updateSensorFrame();
+    simulation_api_schema::DetectionSensorConfiguration configuration);
 
   bool initialize(double realtime_factor, double step_time);
+
   bool updateFrame();
+  bool updateSensorFrame();
 
   double getCurrentTime() const noexcept
   {
@@ -244,6 +226,14 @@ public:
   }
 
   const bool standalone_mode;
+
+  #define FORWARD_TO_ENTITY_MANAGER(NAME) \
+  template<typename ... Ts> \
+  decltype(auto) NAME(Ts && ... xs) \
+  { \
+    assert(entity_manager_ptr_); \
+    return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
+  } static_assert(true, "")
 
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
@@ -255,13 +245,17 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
+  FORWARD_TO_ENTITY_MANAGER(requestLaneChange);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
+  FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrowPhase);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
+
+  #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
   bool updateEntityStatusInSim();
@@ -270,8 +264,7 @@ private:
     const std::string & catalog_xml,
     const openscenario_msgs::msg::EntityStatus & status);
 
-  template
-  <
+  template<
     typename Parameters  // Maybe, VehicleParameters or PedestrianParameters
   >
   bool spawn(

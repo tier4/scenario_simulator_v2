@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 
-#include <simulation_api/helper/helper.hpp>
+#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -39,45 +39,45 @@ struct TeleportAction
 
   const Position position;
 
-  const std::true_type accomplished {};
-
-  template
-  <
-    typename Node
-  >
+  template<typename Node>
   explicit TeleportAction(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
     position(readElement<Position>("Position", node, inner_scope))
   {}
 
+  const std::true_type accomplished {};
+
+  decltype(auto) operator()(
+    const WorldPosition & world_position,
+    const Scope::Actor & actor) const
+  {
+    return setEntityStatus(
+      actor, static_cast<geometry_msgs::msg::Pose>(world_position));
+  }
+
+  decltype(auto) operator()(
+    const LanePosition & lane_position,
+    const Scope::Actor & actor) const
+  {
+    return setEntityStatus(
+      actor, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position));
+  }
+
+  decltype(auto) operator()(
+    const RelativeWorldPosition & relative_world_position,
+    const Scope::Actor & actor) const
+  {
+    return setEntityStatus(
+      actor,
+      relative_world_position.reference,  // name
+      relative_world_position,  // geometry_msgs::msg::Point
+      relative_world_position.orientation);
+  }
+
   void start() const
   {
-    if (position.is<LanePosition>()) {
-      geometry_msgs::msg::Vector3 rpy = position.as<LanePosition>().orientation;
-
-      for (const auto & each : inner_scope.actors) {
-        setEntityStatus(
-          each,
-          simulation_api::helper::constructLaneletPose(
-            Integer(position.as<LanePosition>().lane_id),
-            position.as<LanePosition>().s,
-            position.as<LanePosition>().offset,
-            rpy.x,
-            rpy.y,
-            rpy.z),
-          simulation_api::helper::constructActionStatus());
-      }
-    } else if (position.is<RelativeWorldPosition>()) {
-      for (const auto & each : inner_scope.actors) {
-        setEntityStatus(
-          each,
-          position.as<RelativeWorldPosition>().reference,
-          position.as<RelativeWorldPosition>(),  // geometry_msgs::msg::Point
-          position.as<RelativeWorldPosition>().orientation,  // geometry_msgs::msg::Vector3
-          simulation_api::helper::constructActionStatus());
-      }
-    } else {
-      THROW(ImplementationFault);
+    for (const auto & actor : inner_scope.actors) {
+      apply(*this, position, actor);
     }
   }
 };

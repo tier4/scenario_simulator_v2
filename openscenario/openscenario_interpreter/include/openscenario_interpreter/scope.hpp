@@ -33,7 +33,11 @@ struct Scope
   std::unordered_map<String, Element> entities;
   std::unordered_map<String, Element> storyboard_elements;
 
-  std::vector<EntityRef> actors;
+  using Actor = EntityRef;
+
+  using Actors = std::vector<Actor>;
+
+  Actors actors;
 
   boost::filesystem::path logic_file;
   boost::filesystem::path scene_graph_file;

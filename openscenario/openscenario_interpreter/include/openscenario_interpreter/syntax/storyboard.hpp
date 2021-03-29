@@ -60,10 +60,7 @@ struct Storyboard
       });
   }
 
-  auto ready() const noexcept
-  {
-    return true;
-  }
+  const std::true_type ready {};
 
   void start()
   {

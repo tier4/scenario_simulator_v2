@@ -61,15 +61,15 @@ void callWithElements(
   if (const auto size = iterator::size(children)) {
     if (min_occurs != 0 && size < min_occurs) {
       std::stringstream ss {};
-      ss << parent.name() << " requires class " << name <<
-        " at least " << min_occurs << " element" << (1 < min_occurs ? "s" : "") <<
-        ", but " << size << " element" << (1 < size ? "s" : "") << " specified";
+      ss << parent.name() << " requires class " << name;
+      ss << " at least " << min_occurs << " element" << (1 < min_occurs ? "s" : "");
+      ss << ", but " << size << " element" << (1 < size ? "s" : "") << " specified";
       throw SyntaxError(ss.str());
     } else if (max_occurs < size) {
       std::stringstream ss {};
-      ss << parent.name() << " requires class " << name <<
-        " at most " << max_occurs << " element" << (1 < max_occurs ? "s" : "") <<
-        ", but " << size << " element" << (1 < size ? "s" : "") << " specified";
+      ss << parent.name() << " requires class " << name;
+      ss << " at most " << max_occurs << " element" << (1 < max_occurs ? "s" : "");
+      ss << ", but " << size << " element" << (1 < size ? "s" : "") << " specified";
       throw SyntaxError(ss.str());
     } else {
       for (const auto & child : children) {
@@ -78,17 +78,14 @@ void callWithElements(
     }
   } else if (min_occurs != 0) {
     std::stringstream ss {};
-    ss << parent.name() << " requires class " << name <<
-      " at least " << min_occurs << " element" << (1 < min_occurs ? "s" : "") <<
-      ", but there is no specification";
+    ss << parent.name() << " requires class " << name;
+    ss << " at least " << min_occurs << " element" << (1 < min_occurs ? "s" : "");
+    ss << ", but there is no specification";
     throw SyntaxError(ss.str());
   }
 }
 
-template
-<
-  typename Node, typename ... Ts
->
+template<typename Node, typename ... Ts>
 decltype(auto) choice(const Node & node, Ts && ... xs)
 {
   const std::unordered_map<
@@ -133,27 +130,17 @@ decltype(auto) choice(const Node & node, Ts && ... xs)
 
   if (specs.empty()) {
     std::stringstream ss {};
-
     ss << "Class " << node.name() << " requires one of following elements: ";
-
     print_keys_to(ss, callees);
-
     ss << ". But no element specified";
-
     throw SyntaxError(ss.str());
   } else if (1 < specs.size()) {
     std::stringstream ss {};
-
     ss << "Class " << node.name() << " requires just one of following elements: ";
-
     print_keys_to(ss, callees);
-
     ss << ". But " << specs.size() << " element" << (1 < specs.size() ? "s" : "") << " (";
-
     print_keys_to(ss, specs);
-
     ss << ") specified";
-
     throw SyntaxError(ss.str());
   } else {
     const auto iter {std::cbegin(specs)};
@@ -161,10 +148,7 @@ decltype(auto) choice(const Node & node, Ts && ... xs)
   }
 }
 
-template
-<
-  typename Callee
->
+template<typename Callee>
 decltype(auto) callWithElement(
   const pugi::xml_node & parent, const std::string & name, Callee && call_with)
 {

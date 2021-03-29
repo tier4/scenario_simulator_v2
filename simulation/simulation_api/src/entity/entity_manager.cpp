@@ -17,6 +17,7 @@
 #include <simulation_api/math/collision.hpp>
 
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -183,40 +184,37 @@ void EntityManager::requestAcquirePosition(
 
 void EntityManager::requestLaneChange(const std::string & name, const std::int64_t to_lanelet_id)
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).requestLaneChange(to_lanelet_id);
+  auto & entity = reference(name);
+
+  if (entity.type() == typeid(VehicleEntity)) {
+    boost::any_cast<VehicleEntity &>(entity).requestLaneChange(to_lanelet_id);
+  } else if (entity.type() == typeid(EgoEntity)) {
+    std::stringstream what {};
+    what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. ";
+    what << "In general, such a request is an error, ";
+    what << "since Ego cars make autonomous decisions about everything but their destination.";
+    throw std::runtime_error(what.str());
   }
 }
 
 void EntityManager::requestLaneChange(const std::string & name, const Direction & direction)
 {
   auto status = getEntityStatus(name);
-  if (!status) {
-    return;
-  }
-  if (direction == Direction::LEFT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
-      status->lanelet_pose.lanelet_id,
-      "left");
-    if (target) {
-      requestLaneChange(name, target.get());
-      return;
+
+  if (status) {
+    if (direction == Direction::LEFT) {
+      const auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
+        status->lanelet_pose.lanelet_id, "left");
+      if (target) {
+        requestLaneChange(name, target.get());
+      }
+    } else if (direction == Direction::RIGHT) {
+      const auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
+        status->lanelet_pose.lanelet_id, "right");
+      if (target) {
+        requestLaneChange(name, target.get());
+      }
     }
-    return;
-  }
-  if (direction == Direction::RIGHT) {
-    auto target = hdmap_utils_ptr_->getLaneChangeableLenletId(
-      status->lanelet_pose.lanelet_id,
-      "right");
-    if (target) {
-      requestLaneChange(name, target.get());
-      return;
-    }
-    return;
   }
 }
 
@@ -274,9 +272,7 @@ geometry_msgs::msg::Pose EntityManager::getRelativePose(
     throw simulation_api::SimulationRuntimeError(
             "failed to get status of " + to + " entity in getRelativePose");
   }
-  const auto from_pose = from_status->pose;
-  const auto to_pose = to_status->pose;
-  return getRelativePose(from_pose, to_pose);
+  return getRelativePose(from_status->pose, to_status->pose);
 }
 
 geometry_msgs::msg::Pose EntityManager::getRelativePose(
@@ -600,15 +596,18 @@ void EntityManager::setTargetSpeed(
   const double target_speed,
   const bool continuous)
 {
-  const auto it = entities_.find(name);
-  if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).setTargetSpeed(target_speed, continuous);
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).setTargetSpeed(target_speed, continuous);
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(it->second).setTargetSpeed(target_speed, continuous);
+  auto & entity = reference(name);
+  if (entity.type() == typeid(VehicleEntity)) {
+    boost::any_cast<VehicleEntity &>(entity).setTargetSpeed(target_speed, continuous);
+  } else if (entity.type() == typeid(EgoEntity)) {
+    boost::any_cast<EgoEntity &>(entity).setTargetSpeed(target_speed, continuous);
+  } else if (entity.type() == typeid(PedestrianEntity)) {
+    boost::any_cast<PedestrianEntity &>(entity).setTargetSpeed(target_speed, continuous);
+  } else {
+    std::stringstream what {};
+    what << "Entity '" << name << "' is typed with the unexpected type '";
+    what << entity.type().name() << "'.";
+    throw SimulationRuntimeError(what.str());
   }
 }
 
@@ -616,23 +615,19 @@ std::vector<std::int64_t> EntityManager::getRouteLanelets(
   const std::string & name,
   const double horizon)
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    throw SimulationRuntimeError("entity " + name + " does not exist");
+  auto & entity = reference(name);
+  if (entity.type() == typeid(VehicleEntity)) {
+    return boost::any_cast<VehicleEntity &>(entity).getRouteLanelets(horizon);
+  } else if (entity.type() == typeid(EgoEntity)) {
+    return boost::any_cast<EgoEntity &>(entity).getRouteLanelets(horizon);
+  } else if (entity.type() == typeid(PedestrianEntity)) {
+    return boost::any_cast<PedestrianEntity &>(entity).getRouteLanelets(horizon);
+  } else {
+    std::stringstream what {};
+    what << "Entity '" << name << "' is typed with the unexpected type '";
+    what << entity.type().name() << "'.";
+    throw SimulationRuntimeError(what.str());
   }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    const auto route = boost::any_cast<VehicleEntity &>(it->second).getRouteLanelets(horizon);
-    return route;
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    const auto route = boost::any_cast<EgoEntity &>(it->second).getRouteLanelets(horizon);
-    return route;
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    const auto route = boost::any_cast<PedestrianEntity &>(it->second).getRouteLanelets(horizon);
-    return route;
-  }
-  throw SimulationRuntimeError("entity " + name + " does not matches to entity type.");
 }
 
 std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
@@ -689,15 +684,6 @@ void EntityManager::update(
     }
     if (it->second.type() == typeid(EgoEntity)) {
       boost::any_cast<EgoEntity &>(it->second).setEntityTypeList(type_list);
-      auto kinematic_state =
-        boost::any_cast<EgoEntity &>(it->second).getCurrentKinematicState();
-      if (kinematic_state) {
-        autoware_auto_msgs::msg::VehicleKinematicState msg;
-        msg = kinematic_state.get();
-        msg.header.frame_id = "map";
-        msg.header.stamp = clock_ptr_->now();
-        kinematic_state_pub_ptr_->publish(msg);
-      }
       boost::any_cast<EgoEntity &>(it->second).onUpdate(current_time, step_time);
       if (boost::any_cast<EgoEntity &>(it->second).statusSetted()) {
         auto status = boost::any_cast<EgoEntity &>(it->second).getStatus();

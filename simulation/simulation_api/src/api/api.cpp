@@ -16,6 +16,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 
+#include <stdexcept>
 #include <string>
 #include <limits>
 #include <memory>
@@ -73,7 +74,7 @@ bool API::spawn(
     if (
       !entity_manager_ptr_->entityExists(name) &&
       !entity_manager_ptr_->spawnEntity(
-        simulation_api::entity::EgoEntity(lanelet2_map_osm, name, params)))
+        simulation_api::entity::EgoEntity(name, lanelet2_map_osm, step_time_, params)))
     {
       return false;
     }
@@ -198,48 +199,12 @@ bool API::setEntityStatus(
   return entity_manager_ptr_->setEntityStatus(name, status);
 }
 
-void API::requestLaneChange(
-  const std::string & name,
-  const std::int64_t to_lanelet_id)
-{
-  if (entity_manager_ptr_->isEgo(name)) {
-    std_msgs::msg::Bool msg;
-    msg.data = true;
-    // TODO(yamacir-kit): setLaneChangeApproval(msg);
-    // TODO(yamacir-kit): setLaneChangeForce(msg);
-  } else {
-    entity_manager_ptr_->requestLaneChange(name, to_lanelet_id);
-  }
-}
-
-void API::requestLaneChange(
-  const std::string & name,
-  const simulation_api::entity::Direction & direction)
-{
-  if (!entity_manager_ptr_->isEgo(name)) {
-    entity_manager_ptr_->requestLaneChange(name, direction);
-  }
-}
-
-void API::setTargetSpeed(
-  const std::string & name,
-  const double target_speed,
-  const bool continuous)
-{
-  if (entity_manager_ptr_->isEgo(name)) {
-    std_msgs::msg::Float32 msg;
-    msg.data = target_speed;
-    // TODO(yamacir-kit): setVehicleVelocity(msg);
-  } else {
-    entity_manager_ptr_->setTargetSpeed(name, target_speed, continuous);
-  }
-}
-
 boost::optional<double> API::getTimeHeadway(
   const std::string & from,
   const std::string & to)
 {
-  if (!entity_manager_ptr_->entityStatusSetted(from) ||
+  if (
+    !entity_manager_ptr_->entityStatusSetted(from) ||
     !entity_manager_ptr_->entityStatusSetted(to))
   {
     return boost::none;
@@ -275,6 +240,8 @@ bool API::reachPosition(
     entity_manager_ptr_->entityStatusSetted(name) &&
     entity_manager_ptr_->reachPosition(
     name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
+
+  // NOTE: ^ ament_uncrustify says above indentation is so beautiful.
 }
 
 bool API::reachPosition(

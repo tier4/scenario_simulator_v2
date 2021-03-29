@@ -1,10 +1,10 @@
-// Copyright 2020 The Tier IV, Inc.
+// Copyright 2015-2020 Autoware Foundation. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,13 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @file sim_model_interface.hpp
+ * @brief simple planning simulator model interface class
+ * @author Takamasa Horibe
+ * @date 2019.08.17
+ */
+
 #ifndef SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_INTERFACE_HPP_
 #define SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_INTERFACE_HPP_
 
 #include <eigen3/Eigen/Core>
+#include <rclcpp/rclcpp.hpp>
 
 /**
- * @class simple_simulation_api vehicle model class
+ * @class simple_planning_simulator vehicle model class
  * @brief calculate vehicle dynamics
  */
 class SimModelInterface
@@ -29,16 +37,7 @@ protected:
   Eigen::VectorXd state_;  //!< @brief vehicle state vector
   Eigen::VectorXd input_;  //!< @brief vehicle input vector
 
-  int gear_;
-
 public:
-  enum GEAR
-  {
-    DRIVE = 0,
-    REVERSE = 1,
-    PARKING = 2,
-  };
-
   /**
    * @brief constructor
    * @param [in] dim_x dimension of state x
@@ -74,12 +73,6 @@ public:
    * @param [in] input input vector
    */
   void setInput(const Eigen::VectorXd & input);
-
-  /**
-   * @brief set gear
-   * @param [in] input gear command
-   */
-  void setGear(const int gear);
 
   /**
    * @brief update vehicle states with Runge-Kutta methods
@@ -120,16 +113,6 @@ public:
    * @brief get vehicle velocity vx
    */
   virtual double getVx() = 0;
-
-  /**
-   * @brief get vehicle lateral velocity
-   */
-  virtual double getVy() = 0;
-
-  /**
-   * @brief get vehicle longiudinal acceleration
-   */
-  virtual double getAx() = 0;
 
   /**
    * @brief get vehicle angular-velocity wz

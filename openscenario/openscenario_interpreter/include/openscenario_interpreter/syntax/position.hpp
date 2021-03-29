@@ -15,10 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 
+#include <boost/function_types/result_type.hpp>
 #include <openscenario_interpreter/syntax/lane_position.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
 
+#include <unordered_map>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -51,8 +53,8 @@ inline namespace syntax
 struct Position
   : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit Position(const Node & node, Ts && ... xs)
+  template<typename XML, typename ... Ts>
+  explicit Position(const XML & node, Ts && ... xs)
   : Element(
       choice(
         node,
@@ -66,20 +68,50 @@ struct Position
         std::make_pair("RoutePosition", UNSUPPORTED())))
   {}
 
-  geometry_msgs::msg::Pose toPose() const
+  explicit operator geometry_msgs::msg::Pose() const
   {
     if (is<WorldPosition>()) {
-      return as<WorldPosition>();
+      return static_cast<geometry_msgs::msg::Pose>(as<WorldPosition>());
     } else if (is<LanePosition>()) {
-      return as<LanePosition>();
+      return static_cast<geometry_msgs::msg::Pose>(as<LanePosition>());
     } else {
-      const geometry_msgs::msg::Pose result {};
-      return result;
+      THROW(ImplementationFault);
     }
   }
 };
 
 #undef ELEMENT
+
+template<typename R = void, typename F, typename ... Ts>
+decltype(auto) apply(F && f, const Position & position, Ts && ... xs)
+{
+  #define BOILERPLATE(TYPE) \
+  { \
+    typeid(TYPE), [](F && f, const Position & position, Ts && ... xs) \
+    { \
+      return f(position.as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
+    } \
+  }
+
+  static const std::unordered_map<
+    std::type_index,
+    std::function<R(F && f, const Position & position, Ts && ... xs)>> overloads
+  {
+    BOILERPLATE(WorldPosition),
+    BOILERPLATE(RelativeWorldPosition),
+    // BOILERPLATE(RelativeObjectPosition),
+    // BOILERPLATE(RoadPosition),
+    // BOILERPLATE(RelativeRoadPosition),
+    BOILERPLATE(LanePosition),
+    // BOILERPLATE(RelativeLanePosition),
+    // BOILERPLATE(RoutePosition),
+  };
+
+  #undef BOILERPLATE
+
+  return overloads.at(position.type())(
+    std::forward<decltype(f)>(f), position, std::forward<decltype(xs)>(xs)...);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
