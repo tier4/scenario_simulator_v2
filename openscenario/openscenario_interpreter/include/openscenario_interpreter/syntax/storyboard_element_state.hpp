@@ -23,28 +23,28 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== StoryboardElementState ===============================================
+/* ---- StoryboardElementState -------------------------------------------------
  *
- * <xsd:simpleType name="StoryboardElementState">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="startTransition"/>
- *         <xsd:enumeration value="endTransition"/>
- *         <xsd:enumeration value="stopTransition"/>
- *         <xsd:enumeration value="skipTransition"/>
- *         <xsd:enumeration value="completeState"/>
- *         <xsd:enumeration value="runningState"/>
- *         <xsd:enumeration value="standbyState"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="StoryboardElementState">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="startTransition"/>
+ *          <xsd:enumeration value="endTransition"/>
+ *          <xsd:enumeration value="stopTransition"/>
+ *          <xsd:enumeration value="skipTransition"/>
+ *          <xsd:enumeration value="completeState"/>
+ *          <xsd:enumeration value="runningState"/>
+ *          <xsd:enumeration value="standbyState"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct StoryboardElementState
 {
   enum value_type

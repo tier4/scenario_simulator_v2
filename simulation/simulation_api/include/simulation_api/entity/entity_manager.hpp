@@ -15,40 +15,37 @@
 #ifndef  SIMULATION_API__ENTITY__ENTITY_MANAGER_HPP_
 #define  SIMULATION_API__ENTITY__ENTITY_MANAGER_HPP_
 
-#include <simulation_api/entity/ego_entity.hpp>
-#include <simulation_api/entity/vehicle_entity.hpp>
-#include <simulation_api/entity/pedestrian_entity.hpp>
-#include <simulation_api/entity/exception.hpp>
-#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
-#include <simulation_api/traffic_lights/traffic_light_manager.hpp>
-
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
-#include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <openscenario_msgs/msg/bounding_box.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
-
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-
-#include <visualization_msgs/msg/marker_array.hpp>
-
-#include <tf2_ros/static_transform_broadcaster.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <rclcpp/rclcpp.hpp>
-
+#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <boost/any.hpp>
 #include <boost/optional.hpp>
-#include <type_traits>
-#include <typeinfo>
+#include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
+#include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <simulation_api/entity/ego_entity.hpp>
+#include <simulation_api/entity/exception.hpp>
+#include <simulation_api/entity/pedestrian_entity.hpp>
+#include <simulation_api/entity/vehicle_entity.hpp>
+#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_api/traffic_lights/traffic_light_manager.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <visualization_msgs/msg/marker_array.hpp>
+
 #include <map>
 #include <memory>
+#include <stdexcept>  // TODO(yamacir-kit): Remove this!
 #include <string>
-#include <vector>
+#include <type_traits>
+#include <typeinfo>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace simulation_api
 {
@@ -109,7 +106,7 @@ private:
   std::size_t getNumberOfEgo() const;
 
 public:
-# define DEFINE_SET_TRAFFIC_LIGHT(NAME) \
+  #define DEFINE_SET_TRAFFIC_LIGHT(NAME) \
   template<typename ... Ts> \
   decltype(auto) setTrafficLight ## NAME(Ts && ... xs) \
   { \
@@ -121,9 +118,9 @@ public:
   DEFINE_SET_TRAFFIC_LIGHT(Color);
   DEFINE_SET_TRAFFIC_LIGHT(ColorPhase);
 
-# undef DEFINE_SET_TRAFFIC_LIGHT
+  #undef DEFINE_SET_TRAFFIC_LIGHT
 
-# define DEFINE_GET_TRAFFIC_LIGHT(NAME) \
+  #define DEFINE_GET_TRAFFIC_LIGHT(NAME) \
   template<typename ... Ts> \
   decltype(auto) getTrafficLight ## NAME(Ts && ... xs) \
   { \
@@ -133,9 +130,9 @@ public:
   DEFINE_GET_TRAFFIC_LIGHT(Color);
   DEFINE_GET_TRAFFIC_LIGHT(Arrow);
 
-# undef DEFINE_GET_TRAFFIC_LIGHT
+  #undef DEFINE_GET_TRAFFIC_LIGHT
 
-#define FORWARD_TO_HDMAP_UTILS(NAME) \
+  #define FORWARD_TO_HDMAP_UTILS(NAME) \
   template<typename ... Ts> \
   decltype(auto) NAME(Ts && ... xs) const \
   { \
@@ -382,7 +379,21 @@ public:
 
   bool entityExists(const std::string & name)
   {
-    return entities_.count(name) != 0;
+    return entities_.find(name) != std::end(entities_);
+  }
+
+  decltype(auto) reference(const std::string & name)
+  {
+    const auto iter = entities_.find(name);
+
+    if (iter != std::end(entities_)) {
+      return std::get<1>(*iter);
+    } else {
+      std::stringstream ss {};
+      ss << "Unknown entity '" << name << "' has been referenced.";
+      ss << "Check the scenario.";
+      throw SimulationRuntimeError(ss.str());
+    }
   }
 };
 }  // namespace entity

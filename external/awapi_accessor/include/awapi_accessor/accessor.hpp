@@ -438,16 +438,29 @@ public:
 
   DEFINE_PUBLISHER(InitialTwist);
 
-  decltype(auto) setInitialTwist()
+  decltype(auto) setInitialTwist(const geometry_msgs::msg::Twist & twist = {})
   {
     autoware_api::Accessor::InitialTwist initial_twist {};
     {
       initial_twist.header.stamp = get_clock()->now();
       initial_twist.header.frame_id = "map";
-      initial_twist.twist = geometry_msgs::msg::Twist();
+      initial_twist.twist = twist;
     }
 
+    CURRENT_VALUE_OF(VehicleCommand).control.velocity = initial_twist.twist.linear.x;
+
     return setInitialTwist(initial_twist);
+  }
+
+  decltype(auto) setInitialTwist(const double linear_x, const double angular_z = 0)
+  {
+    geometry_msgs::msg::Twist twist {};
+    {
+      twist.linear.x = linear_x;
+      twist.angular.z = angular_z;
+    }
+
+    return setInitialTwist(twist);
   }
 
   /** ---- Trajectory ----------------------------------------------------------

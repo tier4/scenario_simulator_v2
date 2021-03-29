@@ -24,10 +24,10 @@ inline namespace syntax
 {
 /* ---- SimulationTimeCondition ------------------------------------------------
  *
- * <xsd:complexType name="SimulationTimeCondition">
- *   <xsd:attribute name="value" type="Double" use="required"/>
- *   <xsd:attribute name="rule" type="Rule" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="SimulationTimeCondition">
+ *    <xsd:attribute name="value" type="Double" use="required"/>
+ *    <xsd:attribute name="rule" type="Rule" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct SimulationTimeCondition
@@ -42,16 +42,29 @@ struct SimulationTimeCondition
     compare(readAttribute<Rule>("rule", node, scope))
   {}
 
-  auto evaluate() const
+  Element result;
+
+  auto evaluate()
   {
-    const auto result {asBoolean(compare(getCurrentTime(), value))};
-
+    result = asBoolean(compare(getCurrentTime(), value));
     #ifndef NDEBUG
-    std::cout << indent << "SimulationTime [" << getCurrentTime() << " is " << compare << " " <<
-      value << "? => " << result << "]" << std::endl;
+    std::cout << *this << std::endl;
     #endif
-
     return result;
+  }
+
+  friend std::ostream & operator<<(std::ostream & os, const SimulationTimeCondition & condition)
+  {
+    os << indent;
+    os << "- BVC.STC: ";
+    os << getCurrentTime();
+    os << " is ";
+    os << condition.compare;
+    os << " ";
+    os << condition.value;
+    os << "? => ";
+    os << condition.result;
+    return os;
   }
 };
 }

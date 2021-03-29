@@ -88,13 +88,10 @@ struct ScenarioObject
           attachLidarSensor(
             simulation_api::helper::constructLidarConfiguration(
               simulation_api::helper::LidarType::VLP32,
-              name,
-              "/sensing/lidar/no_ground/pointcloud"));
+              name, "/sensing/lidar/no_ground/pointcloud"));
           attachDetectionSensor(
             simulation_api::helper::constructDetectionSensorConfiguration(
-              name,
-              "/perception/object_recognition/objects", 0.1));
-          // /perception/object_recognition/detection/labeled_clusters
+              name, "/perception/object_recognition/objects", 0.1));
         }
       }
       return unspecified;

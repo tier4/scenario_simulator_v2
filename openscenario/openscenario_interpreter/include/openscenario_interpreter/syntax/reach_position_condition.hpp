@@ -27,12 +27,12 @@ inline namespace syntax
 {
 /* ---- ReachPositionCondition -------------------------------------------------
  *
- * <xsd:complexType name="ReachPositionCondition">
- *   <xsd:all>
- *     <xsd:element name="Position" type="Position"/>
- *   </xsd:all>
- *   <xsd:attribute name="tolerance" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ReachPositionCondition">
+ *    <xsd:all>
+ *      <xsd:element name="Position" type="Position"/>
+ *    </xsd:all>
+ *    <xsd:attribute name="tolerance" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ReachPositionCondition
@@ -41,44 +41,59 @@ struct ReachPositionCondition
 
   const Position position;
 
-  const TriggeringEntities trigger;
-
-  template
-  <
-    typename Node
-  >
+  template<typename Node>
   explicit ReachPositionCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
     position(readElement<Position>("Position", node, outer_scope)),
-    trigger(trigger)
+    for_each(triggering_entities)
   {}
 
-  auto evaluate()
+  const TriggeringEntities for_each;
+
+  auto check(const TriggeringEntities::value_type & name)
   {
     if (position.is<WorldPosition>()) {
-      return asBoolean(
-        trigger(
-          [&](auto && entity)
-          {
-            return isReachedPosition(entity, position.as<WorldPosition>(), tolerance);
-          }));
+      return isReachedPosition(name, position.as<WorldPosition>(), tolerance);
     } else if (position.is<LanePosition>()) {
-      return asBoolean(
-        trigger(
-          [&](auto && entity)
-          {
-            return isReachedPosition(
-              entity,
-              simulation_api::helper::constructLaneletPose(
-                static_cast<Integer>(position.as<LanePosition>().lane_id),
-                position.as<LanePosition>().s,
-                position.as<LanePosition>().offset),
-              tolerance);
-          }));
+      return isReachedPosition(name, position.as<LanePosition>(), tolerance);
     } else {
       THROW(ImplementationFault);
     }
+  }
+
+  auto distance(const TriggeringEntities::value_type & name)
+  {
+    const auto pose = getRelativePose(
+      name, static_cast<geometry_msgs::msg::Pose>(position));
+    return std::hypot(pose.position.x, pose.position.y);
+  }
+
+  auto evaluate()
+  {
+    #ifndef NDEBUG
+    std::cout << (indent++) << "- BEC.RPC:\n";
+    #endif
+
+    const auto result = asBoolean(
+      for_each(
+        [&](auto && triggering_entity)
+        {
+          const auto result = check(triggering_entity);
+          #ifndef NDEBUG
+          std::cout << indent << "  " << triggering_entity << ": ";
+          std::cout << std::boolalpha << result;
+          std::cout << " (distance = " << distance(triggering_entity);
+          std::cout << " < " << tolerance << ")" << std::endl;
+          #endif
+          return result;
+        }));
+
+    #ifndef NDEBUG
+    --indent;
+    #endif
+
+    return result;
   }
 };
 }
