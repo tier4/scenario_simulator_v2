@@ -39,16 +39,13 @@ struct TeleportAction
 
   const Position position;
 
-  const std::true_type accomplished {};
-
-  template
-  <
-    typename Node
-  >
+  template<typename Node>
   explicit TeleportAction(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
     position(readElement<Position>("Position", node, inner_scope))
   {}
+
+  const std::true_type accomplished {};
 
   void start() const
   {
@@ -58,13 +55,7 @@ struct TeleportAction
       for (const auto & each : inner_scope.actors) {
         setEntityStatus(
           each,
-          simulation_api::helper::constructLaneletPose(
-            Integer(position.as<LanePosition>().lane_id),
-            position.as<LanePosition>().s,
-            position.as<LanePosition>().offset,
-            rpy.x,
-            rpy.y,
-            rpy.z),
+          static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()),
           simulation_api::helper::constructActionStatus());
       }
     } else if (position.is<RelativeWorldPosition>()) {
