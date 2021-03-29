@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__POSITION_HPP_
 
+#include <boost/function_types/result_type.hpp>
 #include <openscenario_interpreter/syntax/lane_position.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
@@ -81,7 +82,7 @@ struct Position
 
 #undef ELEMENT
 
-template<typename F, typename ... Ts>
+template<typename R = void, typename F, typename ... Ts>
 decltype(auto) apply(F && f, const Position & position, Ts && ... xs)
 {
   #define BOILERPLATE(TYPE) \
@@ -94,8 +95,7 @@ decltype(auto) apply(F && f, const Position & position, Ts && ... xs)
 
   static const std::unordered_map<
     std::type_index,
-    std::function<void(F && f, const Position & position, Ts && ... xs)>>
-  overloads
+    std::function<R(F && f, const Position & position, Ts && ... xs)>> overloads
   {
     BOILERPLATE(WorldPosition),
     BOILERPLATE(RelativeWorldPosition),

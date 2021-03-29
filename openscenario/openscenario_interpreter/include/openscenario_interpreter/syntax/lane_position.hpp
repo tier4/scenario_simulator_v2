@@ -52,6 +52,7 @@ struct LanePosition
     orientation(readElement<Orientation>("Orientation", node, scope))
   {}
 
+  // TODO(yamacir-kit): explicit
   operator openscenario_msgs::msg::LaneletPose() const
   {
     const geometry_msgs::msg::Vector3 rpy = orientation;
