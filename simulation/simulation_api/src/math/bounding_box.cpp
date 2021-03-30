@@ -26,8 +26,27 @@ namespace simulation_api
 {
 namespace math
 {
+/**
+ * @brief Get the Polygon Distance object
+ * 
+ * @param pose0 pose of the first bounding box
+ * @param bbox0 size of the first bounding box
+ * @param pose1 pose of the second bounding box
+ * @param bbox1 size of the second bounding box
+ * @retval boost::none bounding box intersects
+ * @retval 0 <= distance between two bounding boxes
+ */
+boost::optional<double> getPolygonDistance(
+  const geometry_msgs::msg::Pose & pose0,
+  const openscenario_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1,
+  const openscenario_msgs::msg::BoundingBox & bbox1)
+{
+  
+}
+
 const boost::geometry::model::polygon<
-  boost::geometry::model::d2::point_xy<double> > get2DPolygon(
+  boost::geometry::model::d2::point_xy<double>> get2DPolygon(
   const geometry_msgs::msg::Pose & pose,
   const openscenario_msgs::msg::BoundingBox & bbox)
 {

@@ -25,6 +25,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
+#include <boost/optional.hpp>
 
 #include <vector>
 
@@ -32,8 +33,13 @@ namespace simulation_api
 {
 namespace math
 {
+boost::optional<double> getPolygonDistance(
+  const geometry_msgs::msg::Pose & pose0,
+  const openscenario_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1,
+  const openscenario_msgs::msg::BoundingBox & bbox1);
 const boost::geometry::model::polygon<
-  boost::geometry::model::d2::point_xy<double> > get2DPolygon(
+  boost::geometry::model::d2::point_xy<double>> get2DPolygon(
   const geometry_msgs::msg::Pose & pose,
   const openscenario_msgs::msg::BoundingBox & bbox);
 std::vector<geometry_msgs::msg::Point> transformPoints(
