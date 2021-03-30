@@ -41,22 +41,10 @@ bool checkCollision2D(
   if (z_diff_pose > (std::fabs(bbox0.dimensions.z + bbox1.dimensions.z) * 0.5) ) {
     return false;
   }
-  auto points0 = transformPoints(pose0, getPointsFromBbox(bbox0));
-  auto points1 = transformPoints(pose1, getPointsFromBbox(bbox1));
   namespace bg = boost::geometry;
   typedef bg::model::d2::point_xy<double> bg_point;
-  bg::model::polygon<bg_point> poly0;
-  poly0.outer().push_back(bg_point(points0[0].x, points0[0].y));
-  poly0.outer().push_back(bg_point(points0[1].x, points0[1].y));
-  poly0.outer().push_back(bg_point(points0[2].x, points0[2].y));
-  poly0.outer().push_back(bg_point(points0[3].x, points0[3].y));
-  poly0.outer().push_back(bg_point(points0[0].x, points0[0].y));
-  bg::model::polygon<bg_point> poly1;
-  poly1.outer().push_back(bg_point(points1[0].x, points1[0].y));
-  poly1.outer().push_back(bg_point(points1[1].x, points1[1].y));
-  poly1.outer().push_back(bg_point(points1[2].x, points1[2].y));
-  poly1.outer().push_back(bg_point(points1[3].x, points1[3].y));
-  poly1.outer().push_back(bg_point(points1[0].x, points1[0].y));
+  const bg::model::polygon<bg_point> poly0 = get2DPolygon(pose0, bbox0);
+  const bg::model::polygon<bg_point> poly1 = get2DPolygon(pose1, bbox1);
   if (bg::intersects(poly0, poly1)) {
     return true;
   }
