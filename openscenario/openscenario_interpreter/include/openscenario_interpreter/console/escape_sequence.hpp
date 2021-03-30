@@ -29,7 +29,7 @@ auto & escape_sequence(std::basic_ostream<Ts...> & os, const std::string & code)
   return is_console(os) ? (os << "\x1b" << code) : os;
 }
 
-  #define BOILERPLATE(CODE, NAME) \
+#define BOILERPLATE(CODE, NAME) \
   auto NAME = [](std::ostream & os) -> decltype(auto) \
   { \
     return escape_sequence(os, CODE); \
@@ -69,7 +69,7 @@ BOILERPLATE("[46m", cyan);
 BOILERPLATE("[47m", white);
 }  // namespace background
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 }
 }  // namespace openscenario_interpreter
 

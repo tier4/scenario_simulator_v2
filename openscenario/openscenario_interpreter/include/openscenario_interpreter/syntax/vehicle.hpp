@@ -116,6 +116,9 @@ struct Vehicle
     {
       parameter.name = name;
       parameter.vehicle_category = boost::lexical_cast<String>(vehicle_category);
+      parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
+      // parameter.performance = static_cast<openscenario_msgs::msg::Performance>(performance);
+      // parameter.axles = static_cast<openscenario_msgs::msg::Axles>(axles);
     }
 
     return parameter;

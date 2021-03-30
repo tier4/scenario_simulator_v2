@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/syntax/center.hpp>
 #include <openscenario_interpreter/syntax/dimensions.hpp>
+#include <openscenario_msgs/msg/bounding_box.hpp>
 
 namespace openscenario_interpreter
 {
@@ -45,6 +46,17 @@ struct BoundingBox
   : center(readElement<Center>("Center", node, scope)),
     dimensions(readElement<Dimensions>("Dimensions", node, scope))
   {}
+
+  explicit operator openscenario_msgs::msg::BoundingBox() const
+  {
+    openscenario_msgs::msg::BoundingBox bounding_box {};
+    {
+      bounding_box.center = static_cast<geometry_msgs::msg::Point>(center);
+      // bounding_box.dimensions = static_cast<geometry_msgs::msg::Vector3>(dimensions);
+    }
+
+    return bounding_box;
+  }
 };
 
 std::ostream & operator<<(std::ostream & os, const BoundingBox & datum)

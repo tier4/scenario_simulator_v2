@@ -16,10 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
 
 #include <boost/lexical_cast.hpp>
+#include <openscenario_interpreter/error.hpp>
 #include <std_msgs/msg/float64.hpp>
 
 #include <limits>
-#include <regex>
 #include <string>
 
 namespace openscenario_interpreter
@@ -42,7 +42,7 @@ struct Double
   } catch (const boost::bad_lexical_cast &) {
     std::stringstream ss {};
     ss << "can't treat value \"" << s << "\" as type Double";
-    throw SyntaxError {ss.str()};
+    throw SyntaxError(ss.str());
   }
 
   constexpr operator value_type() const noexcept
@@ -68,40 +68,8 @@ struct Double
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const Double & rhs)
-{
-  return os << std::fixed << rhs.data;
-}
-
-std::istream & operator>>(std::istream & is, Double & rhs)
-{
-  std::string token {};
-
-  is >> token;
-
-  static const std::regex infinity {R"([+-]?INF)"};
-
-  std::smatch result {};
-
-  if (std::regex_match(token, result, infinity)) {
-      #ifndef OPENSCENARIO_INTERPRETER_ALLOW_INFINITY
-      #define OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY max
-      #else
-      #define OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY infinity
-      #endif
-
-    rhs.data =
-      (result.str(1) ==
-      "-" ? -1 : 1) *
-      std::numeric_limits<Double::value_type>::OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY();
-
-      #undef OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY
-  } else {
-    rhs.data = boost::lexical_cast<Double::value_type>(token);
-  }
-
-  return is;
-}
+std::ostream & operator<<(std::ostream &, const Double &);
+std::istream & operator>>(std::istream &, Double &);
 }
 }  // namespace openscenario_interpreter
 
