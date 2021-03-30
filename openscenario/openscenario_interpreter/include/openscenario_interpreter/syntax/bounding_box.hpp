@@ -39,7 +39,7 @@ struct BoundingBox
 
   const Dimensions dimensions;
 
-  BoundingBox() = default;  // NOTE: BoundingBox is an optional element.
+  BoundingBox() = default;
 
   template<typename Node, typename Scope>
   explicit BoundingBox(const Node & node, Scope & scope)
@@ -59,17 +59,7 @@ struct BoundingBox
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const BoundingBox & datum)
-{
-  os << (indent++);
-  os << blue << "<BoundingBox>\n" << reset;
-  os << datum.center << "\n";
-  os << datum.dimensions << "\n";
-  os << (--indent);
-  os << blue << "</BoundingBox>" << reset;
-
-  return os;
-}
+std::ostream & operator<<(std::ostream &, const BoundingBox &);
 }
 }  // namespace openscenario_interpreter
 
