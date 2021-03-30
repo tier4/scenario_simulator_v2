@@ -27,6 +27,8 @@
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <memory>
+
 namespace lanelet
 {
 namespace utils
@@ -48,7 +50,9 @@ void toBinMsg(const std::unique_ptr<LaneletMap> & map, autoware_auto_msgs::msg::
  * @param map [Converted lanelet2 data]
  */
 void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map);
-void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map);
+void fromBinMsg(
+  const autoware_auto_msgs::msg::HADMapBin & msg,
+  const std::unique_ptr<LaneletMap> & map);
 void fromBinMsg(
   const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,

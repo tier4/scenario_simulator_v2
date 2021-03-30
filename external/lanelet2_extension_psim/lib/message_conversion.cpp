@@ -32,6 +32,7 @@
 
 #include <sstream>
 #include <string>
+#include <memory>
 
 namespace lanelet
 {
@@ -100,7 +101,9 @@ void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::Lanelet
   // *map = std::move(laneletMap);
 }
 
-void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map)
+void fromBinMsg(
+  const autoware_auto_msgs::msg::HADMapBin & msg,
+  const std::unique_ptr<LaneletMap> & map)
 {
   if (!map) {
     std::stringstream sstream;
