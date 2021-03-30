@@ -43,6 +43,7 @@ ament_auto_add_library(simulation_api SHARED
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
+  src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
   src/math/collision.cpp
   src/math/hermite_curve.cpp

@@ -15,6 +15,7 @@
 #ifndef SIMULATION_API__MATH__COLLISION_HPP_
 #define SIMULATION_API__MATH__COLLISION_HPP_
 
+#include <simulation_api/math/bounding_box.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 
@@ -27,11 +28,6 @@ namespace math
 bool checkCollision2D(
   geometry_msgs::msg::Pose pose0, openscenario_msgs::msg::BoundingBox bbox0,
   geometry_msgs::msg::Pose pose1, openscenario_msgs::msg::BoundingBox bbox1);
-std::vector<geometry_msgs::msg::Point> transformPoints(
-  geometry_msgs::msg::Pose pose,
-  std::vector<geometry_msgs::msg::Point> points);
-std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  openscenario_msgs::msg::BoundingBox bbox);
 }  // namespace math
 }  // namespace simulation_api
 
