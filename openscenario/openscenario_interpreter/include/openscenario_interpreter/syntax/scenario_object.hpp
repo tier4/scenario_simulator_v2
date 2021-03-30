@@ -103,10 +103,15 @@ struct ScenarioObject
 
 std::ostream & operator<<(std::ostream & os, const ScenarioObject & datum)
 {
-  return
-    os << (indent++) << blue << "<ScenarioObject" << " " << highlight("name", datum.name) <<
-    blue << ">\n" << reset << static_cast<const EntityObject &>(datum) << "\n" << (--indent) <<
-    blue << "</ScenarioObject>" << reset;
+  os << (indent++);
+  os << blue << "<ScenarioObject ";
+  os << highlight("name", datum.name);
+  os << blue << ">\n" << reset;
+  os << static_cast<const EntityObject &>(datum) << "\n";
+  os << (--indent);
+  os << blue << "</ScenarioObject>" << reset;
+
+  return os;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

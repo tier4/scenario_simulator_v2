@@ -96,10 +96,7 @@ struct Vehicle
    * ------------------------------------------------------------------------ */
   Properties properties;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit Vehicle(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, outer_scope)),
@@ -119,13 +116,20 @@ struct Vehicle
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const Vehicle & rhs)
+std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
 {
-  return
-    os << (indent++) << blue << "<Vehicle" << " " << highlight("name", rhs.name) << " " <<
-    highlight("vehicleCategory", rhs.vehicle_category) << blue << ">\n" << reset <<
-    rhs.parameter_declarations << "\n" << rhs.bounding_box << "\n" << rhs.performance << "\n" <<
-    rhs.axles << "\n" << (--indent) << blue << "</Vehicle>" << reset;
+  os << (indent++);
+  os << blue << "<Vehicle ";
+  os << highlight("name", datum.name);
+  os << " " << highlight("vehicleCategory", datum.vehicle_category);
+  os << blue << ">\n" << reset;
+  os << datum.parameter_declarations << "\n";
+  os << datum.bounding_box << "\n";
+  os << datum.performance << "\n";
+  os << datum.axles << "\n";
+  os << (--indent) << blue << "</Vehicle>" << reset;
+
+  return os;
 }
 }
 }  // namespace openscenario_interpreter

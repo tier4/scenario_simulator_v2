@@ -45,11 +45,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityObject : public Group
 {
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit EntityObject(const Node & node, Ts && ... xs)
+  template<typename XML, typename ... Ts>
+  explicit EntityObject(const XML & node, Ts && ... xs)
   : Group(
       choice(
         node,

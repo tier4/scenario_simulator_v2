@@ -22,38 +22,41 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== BoundingBox ==========================================================
+/* ---- BoundingBox ------------------------------------------------------------
  *
- * <xsd:complexType name="BoundingBox">
- *   <xsd:all>
- *     <xsd:element name="Center" type="Center"/>
- *     <xsd:element name="Dimensions" type="Dimensions"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="BoundingBox">
+ *    <xsd:all>
+ *      <xsd:element name="Center" type="Center"/>
+ *      <xsd:element name="Dimensions" type="Dimensions"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct BoundingBox
 {
   const Center center;
 
   const Dimensions dimensions;
 
-  BoundingBox() = default;
+  BoundingBox() = default;  // NOTE: BoundingBox is an optional element.
 
   template<typename Node, typename Scope>
   explicit BoundingBox(const Node & node, Scope & scope)
-  : center{readElement<Center>("Center", node, scope)},
-    dimensions{readElement<Dimensions>("Dimensions", node, scope)}
+  : center(readElement<Center>("Center", node, scope)),
+    dimensions(readElement<Dimensions>("Dimensions", node, scope))
   {}
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const BoundingBox & rhs)
+std::ostream & operator<<(std::ostream & os, const BoundingBox & datum)
 {
-  return os << (indent++) << blue << "<BoundingBox>\n" << reset <<
-         rhs.center << "\n" <<
-         rhs.dimensions << "\n" <<
-         (--indent) << blue << "</BoundingBox>" << reset;
+  os << (indent++);
+  os << blue << "<BoundingBox>\n" << reset;
+  os << datum.center << "\n";
+  os << datum.dimensions << "\n";
+  os << (--indent);
+  os << blue << "</BoundingBox>" << reset;
+
+  return os;
 }
 }
 }  // namespace openscenario_interpreter
