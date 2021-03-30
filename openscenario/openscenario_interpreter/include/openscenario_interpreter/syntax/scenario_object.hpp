@@ -72,14 +72,35 @@ struct ScenarioObject
     object_controller(readElement<ObjectController>("ObjectController", node, outer_scope))
   {}
 
+  decltype(auto) operator()(const Vehicle & vehicle)
+  {
+    return spawn(
+      object_controller.isEgo(),
+      name,
+      // static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle)
+      boost::lexical_cast<String>(vehicle)
+    );
+  }
+
+  decltype(auto) operator()(const Pedestrian & pedestrian)
+  {
+    return spawn(
+      false,
+      name,
+      // static_cast<openscenario_msgs::msg::PedestrianParameters>(vehicle)
+      boost::lexical_cast<String>(pedestrian)
+    );
+  }
+
   auto evaluate()
   {
     if (
-      spawn(
-        is<Vehicle>() && object_controller.isEgo(),
-        name,
-        boost::lexical_cast<String>(
-          static_cast<const EntityObject &>(*this))))  // XXX UGLY CODE!!!
+      // spawn(
+      //   is<Vehicle>() && object_controller.isEgo(),
+      //   name,
+      //   boost::lexical_cast<String>(
+      //     static_cast<const EntityObject &>(*this)))
+      apply<bool>(*this, static_cast<const EntityObject &>(*this)))  // XXX UGLY CODE!!!
     {
       if (is<Vehicle>()) {
         setController(name, object_controller);

@@ -30,18 +30,15 @@
 
 #include <cassert>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace scenario_simulator
 {
-class ExecutionFailedError : public std::runtime_error
+struct ExecutionFailedError : public std::runtime_error
 {
-public:
-  template<typename ... Ts>
-  explicit ExecutionFailedError(Ts && ... xs)
-  : runtime_error(std::forward<decltype(xs)>(xs)...)
-  {}
+  using std::runtime_error::runtime_error;
 
   virtual ~ExecutionFailedError() = default;
 };
@@ -53,9 +50,7 @@ class API
 public:
   const std::string lanelet2_map_osm;
 
-  template<
-    class NodeT,
-    class AllocatorT = std::allocator<void>>
+  template<class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node,
     const boost::filesystem::path,

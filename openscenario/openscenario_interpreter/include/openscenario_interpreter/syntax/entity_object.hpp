@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 
+#include <unordered_map>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -33,14 +34,14 @@ inline namespace syntax
 
 /* ---- EntityObject -----------------------------------------------------------
  *
- * <xsd:group name="EntityObject">
- *   <xsd:choice>
- *     <xsd:element name="CatalogReference" type="CatalogReference"/>
- *     <xsd:element name="Vehicle" type="Vehicle"/>
- *     <xsd:element name="Pedestrian" type="Pedestrian"/>
- *     <xsd:element name="MiscObject" type="MiscObject"/>
- *   </xsd:choice>
- * </xsd:group>
+ *  <xsd:group name="EntityObject">
+ *    <xsd:choice>
+ *      <xsd:element name="CatalogReference" type="CatalogReference"/>
+ *      <xsd:element name="Vehicle" type="Vehicle"/>
+ *      <xsd:element name="Pedestrian" type="Pedestrian"/>
+ *      <xsd:element name="MiscObject" type="MiscObject"/>
+ *    </xsd:choice>
+ *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
 struct EntityObject : public Group
@@ -58,6 +59,31 @@ struct EntityObject : public Group
 };
 
 #undef ELEMENT
+
+template<typename R = void, typename F, typename ... Ts>
+decltype(auto) apply(F && f, const EntityObject & entity_object, Ts && ... xs)
+{
+  #define BOILERPLATE(TYPE) \
+  { \
+    typeid(TYPE), [](F && f, const EntityObject & entity_object, Ts && ... xs) \
+    { \
+      return f(entity_object.as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
+    } \
+  }
+
+  static const std::unordered_map<
+    std::type_index,
+    std::function<R(F && f, const EntityObject & entity_object, Ts && ... xs)>> overloads
+  {
+    BOILERPLATE(Vehicle),
+    BOILERPLATE(Pedestrian),
+  };
+
+  #undef BOILERPLATE
+
+  return overloads.at(entity_object.type())(
+    std::forward<decltype(f)>(f), entity_object, std::forward<decltype(xs)>(xs)...);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
