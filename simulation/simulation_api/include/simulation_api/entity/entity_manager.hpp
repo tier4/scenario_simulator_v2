@@ -249,6 +249,10 @@ public:
     const std::string & to,
     const double max_distance = 100);
 
+  double getBoundingBoxDistance(
+    const std::string & from,
+    const std::string & to);
+
   geometry_msgs::msg::Pose getRelativePose(
     const std::string & from,
     const std::string & to);

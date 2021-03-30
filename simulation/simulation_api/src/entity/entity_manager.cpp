@@ -218,6 +218,14 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
   }
 }
 
+double EntityManager::getBoundingBoxDistance(
+  const std::string & from,
+  const std::string & to)
+{
+  const auto bbox0 = getBoundingBox(from);
+  const auto bbox1 = getBoundingBox(to);
+}
+
 boost::optional<double> EntityManager::getLongitudinalDistance(
   const std::string & from,
   const std::string & to,
