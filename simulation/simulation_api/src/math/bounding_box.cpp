@@ -42,7 +42,19 @@ boost::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose1,
   const openscenario_msgs::msg::BoundingBox & bbox1)
 {
-  
+  const auto poly0 = get2DPolygon(pose0, bbox0);
+  const auto poly1 = get2DPolygon(pose1, bbox1);
+  namespace bg = boost::geometry;
+  if (bg::intersects(poly0, poly1)) {
+    return boost::none;
+  }
+  if (bg::intersects(poly1, poly0)) {
+    return boost::none;
+  }
+  if (bg::disjoint(poly0, poly1)) {
+    return bg::distance(poly0, poly1);
+  }
+  return boost::none;
 }
 
 const boost::geometry::model::polygon<
