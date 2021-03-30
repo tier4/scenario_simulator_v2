@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_api/math/collision.hpp>
+#ifndef SIMULATION_API__MATH__BOUNDING_BOX_HPP_
+#define SIMULATION_API__MATH__BOUNDING_BOX_HPP_
 
-#include <quaternion_operation/quaternion_operation.h>
+#include <openscenario_msgs/msg/bounding_box.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/geometry.hpp>
@@ -22,39 +24,29 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
+#include <boost/optional.hpp>
 
 #include <vector>
-#include <iostream>
 
 namespace simulation_api
 {
 namespace math
 {
-bool checkCollision2D(
-  geometry_msgs::msg::Pose pose0, openscenario_msgs::msg::BoundingBox bbox0,
-  geometry_msgs::msg::Pose pose1, openscenario_msgs::msg::BoundingBox bbox1)
-{
-  double z_diff_pose =
-    std::fabs(
-    (pose0.position.z + bbox0.center.z) -
-    (pose1.position.z + bbox1.center.z));
-  if (z_diff_pose > (std::fabs(bbox0.dimensions.z + bbox1.dimensions.z) * 0.5) ) {
-    return false;
-  }
-  namespace bg = boost::geometry;
-  typedef bg::model::d2::point_xy<double> bg_point;
-  const bg::model::polygon<bg_point> poly0 = get2DPolygon(pose0, bbox0);
-  const bg::model::polygon<bg_point> poly1 = get2DPolygon(pose1, bbox1);
-  if (bg::intersects(poly0, poly1)) {
-    return true;
-  }
-  if (bg::intersects(poly1, poly0)) {
-    return true;
-  }
-  if (bg::disjoint(poly0, poly1)) {
-    return false;
-  }
-  return true;
-}
+boost::optional<double> getPolygonDistance(
+  const geometry_msgs::msg::Pose & pose0,
+  const openscenario_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1,
+  const openscenario_msgs::msg::BoundingBox & bbox1);
+const boost::geometry::model::polygon<
+  boost::geometry::model::d2::point_xy<double>> get2DPolygon(
+  const geometry_msgs::msg::Pose & pose,
+  const openscenario_msgs::msg::BoundingBox & bbox);
+std::vector<geometry_msgs::msg::Point> transformPoints(
+  geometry_msgs::msg::Pose pose,
+  std::vector<geometry_msgs::msg::Point> points);
+std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
+  openscenario_msgs::msg::BoundingBox bbox);
 }  // namespace math
 }  // namespace simulation_api
+
+#endif  // SIMULATION_API__MATH__BOUNDING_BOX_HPP_

@@ -32,6 +32,7 @@
 
 #include <sstream>
 #include <string>
+#include <memory>
 
 namespace lanelet
 {
@@ -39,6 +40,26 @@ namespace utils
 {
 namespace conversion
 {
+void toBinMsg(const std::unique_ptr<LaneletMap> & map, autoware_auto_msgs::msg::HADMapBin * msg)
+{
+  if (msg == nullptr) {
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "msg is null pointer!";
+    lanelet::HdMapException(sstream.str());
+  }
+
+  std::stringstream ss;
+  boost::archive::binary_oarchive oa(ss);
+  oa << *map;
+  auto id_counter = lanelet::utils::getId();
+  oa << id_counter;
+
+  std::string data_str(ss.str());
+
+  msg->data.clear();
+  msg->data.assign(data_str.begin(), data_str.end());
+}
+
 void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMapBin * msg)
 {
   if (msg == nullptr) {
@@ -60,6 +81,29 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMa
 }
 
 void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map)
+{
+  if (!map) {
+    std::stringstream sstream;
+    sstream << __FUNCTION__ << "msg is null pointer!";
+    lanelet::HdMapException(sstream.str());
+    return;
+  }
+
+  std::string data_str;
+  data_str.assign(msg.data.begin(), msg.data.end());
+  std::stringstream ss;
+  ss << data_str;
+  boost::archive::binary_iarchive oa(ss);
+  oa >> *map;
+  lanelet::Id id_counter;
+  oa >> id_counter;
+  lanelet::utils::registerId(id_counter);
+  // *map = std::move(laneletMap);
+}
+
+void fromBinMsg(
+  const autoware_auto_msgs::msg::HADMapBin & msg,
+  const std::unique_ptr<LaneletMap> & map)
 {
   if (!map) {
     std::stringstream sstream;

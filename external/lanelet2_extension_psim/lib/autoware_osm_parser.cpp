@@ -15,15 +15,22 @@
 // Authors: Ryohsuke Mitsudome
 
 #include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
 
 #include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_io/io_handlers/Factory.h>
 #include <lanelet2_io/io_handlers/OsmFile.h>
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
 #include <memory>
 #include <vector>
 #include <string>
+#include <utility>
 
 namespace lanelet
 {
@@ -84,8 +91,7 @@ struct NonConstConverter
 std::unique_ptr<LaneletMap> AutowareOsmParser::parse(
   const std::string & filename, ErrorMessages & errors) const
 {
-  auto map = OsmParser::parse(filename, errors);
-
+  std::unique_ptr<LaneletMap> map = OsmParser::parse(filename, errors);
   // overwrite x and y values if there are local_x, local_y tags
   for (Point3d point : map->pointLayer) {
     if (point.hasAttribute("local_x")) {
@@ -95,81 +101,9 @@ std::unique_ptr<LaneletMap> AutowareOsmParser::parse(
       point.y() = point.attribute("local_y").asDouble().value();
     }
   }
-
-  // re-construct LaneletMapLayer
-  PointLayer::Map points;
-  LaneletLayer::Map lanelets;
-  AreaLayer::Map areas;
-  RegulatoryElementLayer::Map regulatory_elements;
-  PolygonLayer::Map polygons;
-  LineStringLayer::Map line_strings;
-
-  for (auto && elem : map->pointLayer) {
-    points.emplace(elem.id(), Point3d(elem.id(), elem.basicPoint(), elem.attributes()));
-  }
-
-  for (const auto & elem : map->lineStringLayer) {
-    line_strings.emplace(
-      elem.id(),
-      LineString3d(
-        elem.id(), std::vector<Point3d>(elem.begin(), elem.end()),
-        elem.attributes()));
-  }
-
-  for (const auto & elem : map->polygonLayer) {
-    polygons.emplace(
-      elem.id(),
-      Polygon3d(elem.id(), std::vector<Point3d>(elem.begin(), elem.end()), elem.attributes()));
-  }
-
-  for (auto && elem : map->laneletLayer) {
-    lanelets.emplace(
-      elem.id(),
-      Lanelet(
-        elem.id(), elem.leftBound(), elem.rightBound(), elem.attributes(),
-        elem.regulatoryElements()));
-  }
-
-  for (auto && elem : map->areaLayer) {
-    areas.emplace(
-      elem.id(),
-      Area(
-        elem.id(), elem.outerBound(), elem.innerBounds(), elem.attributes(),
-        elem.regulatoryElements()));
-  }
-
-  for (auto && elem : map->regulatoryElementLayer) {
-    auto parameterMap = RuleParameterMap{};
-    for (const auto & param : elem->getParameters()) {
-      auto rules = RuleParameters{};
-      rules.reserve(param.second.size());
-      for (auto && p : param.second) {
-        auto v = boost::apply_visitor(
-          [](const auto & v) {
-            return RuleParameter(NonConstConverter{} (v));
-          }, p);
-        rules.emplace_back(v);
-      }
-      parameterMap[param.first] = rules;
-    }
-    auto rule = elem->attributes().at(AttributeNamesString::Subtype).value();
-    regulatory_elements.emplace(
-      elem->id(),
-      RegulatoryElementFactory::create(rule, elem->id(), parameterMap, elem->attributes()));
-  }
-
-  map = std::make_unique<LaneletMap>(
-    lanelets, areas, regulatory_elements, polygons, line_strings,
-    points);
-
-  // rerun align function in just in case
-  for (Lanelet & lanelet : map->laneletLayer) {
-    LineString3d new_left, new_right;
-    std::tie(new_left, new_right) = geometry::align(lanelet.leftBound(), lanelet.rightBound());
-    lanelet.setLeftBound(new_left);
-    lanelet.setRightBound(new_right);
-  }
-
+  autoware_auto_msgs::msg::HADMapBin map_bin_msg;
+  lanelet::utils::conversion::toBinMsg(map, &map_bin_msg);
+  lanelet::utils::conversion::fromBinMsg(map_bin_msg, std::move(map));
   return map;
 }
 
