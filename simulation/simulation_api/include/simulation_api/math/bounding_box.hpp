@@ -15,10 +15,23 @@
 #ifndef SIMULATION_API__MATH__BOUNDING_BOX_HPP_
 #define SIMULATION_API__MATH__BOUNDING_BOX_HPP_
 
+#include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/point2_d.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <vector>
+
 namespace simulation_api
 {
 namespace math
 {
+const std::vector<openscenario_msgs::msg::Point2D> get2DPolygon(
+  const geometry_msgs::msg::Pose & pose,
+  const openscenario_msgs::msg::BoundingBox & bbox);
+std::vector<geometry_msgs::msg::Point> transformPoints(
+  geometry_msgs::msg::Pose pose,
+  std::vector<geometry_msgs::msg::Point> points);
+std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
+  openscenario_msgs::msg::BoundingBox bbox);
 }  // namespace math
 }  // namespace simulation_api
 
