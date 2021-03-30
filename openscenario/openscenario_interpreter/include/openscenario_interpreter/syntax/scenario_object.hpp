@@ -94,14 +94,7 @@ struct ScenarioObject
 
   auto evaluate()
   {
-    if (
-      // spawn(
-      //   is<Vehicle>() && object_controller.isEgo(),
-      //   name,
-      //   boost::lexical_cast<String>(
-      //     static_cast<const EntityObject &>(*this)))
-      apply<bool>(*this, static_cast<const EntityObject &>(*this)))  // XXX UGLY CODE!!!
-    {
+    if (apply<bool>(*this, static_cast<const EntityObject &>(*this))) {
       if (is<Vehicle>()) {
         setController(name, object_controller);
 

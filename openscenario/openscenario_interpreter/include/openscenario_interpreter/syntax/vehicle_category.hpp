@@ -17,38 +17,37 @@
 
 #include <openscenario_interpreter/object.hpp>
 
-#include <string>
 #include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== VehicleCategory ======================================================
+/* ---- VehicleCategory --------------------------------------------------------
  *
- * <xsd:simpleType name="VehicleCategory">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="car"/>
- *         <xsd:enumeration value="van"/>
- *         <xsd:enumeration value="truck"/>
- *         <xsd:enumeration value="trailer"/>
- *         <xsd:enumeration value="semitrailer"/>
- *         <xsd:enumeration value="bus"/>
- *         <xsd:enumeration value="motorbike"/>
- *         <xsd:enumeration value="bicycle"/>
- *         <xsd:enumeration value="train"/>
- *         <xsd:enumeration value="tram"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="VehicleCategory">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="car"/>
+ *          <xsd:enumeration value="van"/>
+ *          <xsd:enumeration value="truck"/>
+ *          <xsd:enumeration value="trailer"/>
+ *          <xsd:enumeration value="semitrailer"/>
+ *          <xsd:enumeration value="bus"/>
+ *          <xsd:enumeration value="motorbike"/>
+ *          <xsd:enumeration value="bicycle"/>
+ *          <xsd:enumeration value="train"/>
+ *          <xsd:enumeration value="tram"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct VehicleCategory
 {
   enum value_type
@@ -66,7 +65,7 @@ struct VehicleCategory
   } value;
 
   explicit constexpr VehicleCategory(value_type value = {})
-  : value{value}
+  : value(value)
   {}
 
   constexpr operator value_type() const noexcept
@@ -75,78 +74,9 @@ struct VehicleCategory
   }
 };
 
-template<typename ... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCategory & category)
-{
-  std::string buffer {};
-
-  is >> buffer;
-
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    category.value = VehicleCategory::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
-
-  BOILERPLATE(bicycle);
-  BOILERPLATE(bus);
-  BOILERPLATE(car);
-  BOILERPLATE(motorbike);
-  BOILERPLATE(truck);
-
-  #undef BOILERPLATE
-
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    std::stringstream ss { \
-    }; \
-    ss << "given value \'" << buffer << \
-      "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
-    throw ImplementationFault {ss.str()}; \
-  } static_assert(true, "")
-
-  BOILERPLATE(semitrailer);
-  BOILERPLATE(trailer);
-  BOILERPLATE(train);
-  BOILERPLATE(tram);
-  BOILERPLATE(van);
-
-  #undef BOILERPLATE
-
-  std::stringstream ss {};
-  ss << "unexpected value \'" << buffer << "\' specified as type VehicleCategory";
-  throw SyntaxError {ss.str()};
-}
-
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const VehicleCategory & category)
-{
-  switch (category) {
-    #define BOILERPLATE(NAME) case VehicleCategory::NAME: return os << #NAME;
-
-    BOILERPLATE(bicycle);
-    BOILERPLATE(bus);
-    BOILERPLATE(car);
-    BOILERPLATE(motorbike);
-    BOILERPLATE(semitrailer);
-    BOILERPLATE(trailer);
-    BOILERPLATE(train);
-    BOILERPLATE(tram);
-    BOILERPLATE(truck);
-    BOILERPLATE(van);
-
-    #undef BOILERPLATE
-
-    default:
-      std::stringstream ss {};
-      ss << "enum class VehicleCategory holds unexpected value " <<
-        static_cast<VehicleCategory::value_type>(category);
-      throw ImplementationFault {ss.str()};
-  }
-}
-}
+std::istream & operator>>(std::istream &, VehicleCategory &);
+std::ostream & operator<<(std::ostream &, const VehicleCategory &);
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_

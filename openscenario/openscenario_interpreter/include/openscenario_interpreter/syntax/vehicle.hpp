@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/syntax/performance.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 
 #include <utility>
 
@@ -108,6 +109,17 @@ struct Vehicle
     axles(readElement<Axles>("Axles", node, inner_scope)),
     properties(readElement<Properties>("Properties", node, inner_scope))
   {}
+
+  explicit operator openscenario_msgs::msg::VehicleParameters() const
+  {
+    openscenario_msgs::msg::VehicleParameters parameter {};
+    {
+      parameter.name = name;
+      parameter.vehicle_category = boost::lexical_cast<String>(vehicle_category);
+    }
+
+    return parameter;
+  }
 
   template<typename ... Ts>
   decltype(auto) operator[](Ts && ... xs)

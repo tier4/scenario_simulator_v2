@@ -18,7 +18,10 @@ ament_auto_find_build_dependencies()
 #  libopenscenario_interpreter
 # ------------------------------------------------------------------------------
 
+file(GLOB ${PROJECT_NAME}_SYNTAX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/*.cpp)
+
 ament_auto_add_library(${PROJECT_NAME} SHARED
+  ${${PROJECT_NAME}_SYNTAX_SOURCES}
   src/object.cpp
   src/openscenario_interpreter.cpp
   src/procedure.cpp)
