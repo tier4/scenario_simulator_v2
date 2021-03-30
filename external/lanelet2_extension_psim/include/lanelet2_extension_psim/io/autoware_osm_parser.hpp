@@ -20,7 +20,7 @@
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 
 #include <memory>
-#include <utility
+#include <utility>
 #include <string>
 
 namespace lanelet
