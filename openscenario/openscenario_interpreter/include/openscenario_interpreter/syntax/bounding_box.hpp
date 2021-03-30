@@ -52,7 +52,7 @@ struct BoundingBox
     openscenario_msgs::msg::BoundingBox bounding_box {};
     {
       bounding_box.center = static_cast<geometry_msgs::msg::Point>(center);
-      // bounding_box.dimensions = static_cast<geometry_msgs::msg::Vector3>(dimensions);
+      bounding_box.dimensions = static_cast<geometry_msgs::msg::Vector3>(dimensions);
     }
 
     return bounding_box;

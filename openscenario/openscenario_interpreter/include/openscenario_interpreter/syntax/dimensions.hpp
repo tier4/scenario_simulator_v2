@@ -15,22 +15,25 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DIMENSIONS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DIMENSIONS_HPP_
 
+#include <geometry_msgs/msg/vector3.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+
+#include <ostream>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Dimensions ===========================================================
+/* ---- Dimensions -------------------------------------------------------------
  *
- * <xsd:complexType name="Dimensionss">
- *   <xsd:attribute name="width" type="Double" use="required"/>
- *   <xsd:attribute name="length" type="Double" use="required"/>
- *   <xsd:attribute name="height" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Dimensionss">
+ *    <xsd:attribute name="width"  type="Double" use="required"/>
+ *    <xsd:attribute name="length" type="Double" use="required"/>
+ *    <xsd:attribute name="height" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * ------------------------------------------------------------------------ */
 struct Dimensions
 {
   const Double width, length, height;
@@ -39,19 +42,25 @@ struct Dimensions
 
   template<typename Node, typename Scope>
   explicit Dimensions(const Node & node, Scope & scope)
-  : width{readAttribute<Double>("width", node, scope)},
-    length{readAttribute<Double>("length", node, scope)},
-    height{readAttribute<Double>("height", node, scope)}
+  : width(readAttribute<Double>("width", node, scope)),
+    length(readAttribute<Double>("length", node, scope)),
+    height(readAttribute<Double>("height", node, scope))
   {}
+
+  explicit operator geometry_msgs::msg::Vector3() const
+  {
+    geometry_msgs::msg::Vector3 vector3 {};
+    {
+      vector3.x = length;
+      vector3.y = width;
+      vector3.z = height;
+    }
+
+    return vector3;
+  }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Dimensions & rhs)
-{
-  return os << indent << blue << "<Dimensions" << " " << highlight("width", rhs.width) <<
-         " " << highlight("length", rhs.length) <<
-         " " << highlight("height", rhs.height) << blue << "/>" << reset;
-}
+std::ostream & operator<<(std::ostream &, const Dimensions &);
 }
 }  // namespace openscenario_interpreter
 
