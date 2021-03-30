@@ -40,7 +40,7 @@ namespace conversion
  * @param msg [converted ROS message. Only "data" field is filled]
  */
 void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMapBin * msg);
-
+void toBinMsg(const std::unique_ptr<LaneletMap> & map, autoware_auto_msgs::msg::HADMapBin * msg);
 /**
  * [fromBinMsg converts ROS message into lanelet2 data. Similar implementation
  * to lanelet::io_handlers::BinHandler::parse()]
@@ -48,6 +48,7 @@ void toBinMsg(const lanelet::LaneletMapPtr & map, autoware_auto_msgs::msg::HADMa
  * @param map [Converted lanelet2 data]
  */
 void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map);
+void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map);
 void fromBinMsg(
   const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,
