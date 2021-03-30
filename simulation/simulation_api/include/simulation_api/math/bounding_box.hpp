@@ -16,7 +16,6 @@
 #define SIMULATION_API__MATH__BOUNDING_BOX_HPP_
 
 #include <openscenario_msgs/msg/bounding_box.hpp>
-#include <openscenario_msgs/msg/point2_d.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 
 #include <boost/assert.hpp>
