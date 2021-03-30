@@ -14,6 +14,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(openscenario_msgs REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -42,6 +43,7 @@ ament_auto_add_library(simulation_api SHARED
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
+  src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
   src/math/collision.cpp
   src/math/hermite_curve.cpp
