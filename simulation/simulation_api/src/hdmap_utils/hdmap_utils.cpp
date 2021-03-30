@@ -949,7 +949,6 @@ const std::vector<std::int64_t> HdMapUtils::getRightOfWayLaneletIds(std::int64_t
 {
   std::vector<std::int64_t> ret;
   const auto & assigned_lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  std::cout << "id : " << lanelet_id << std::endl;
   const auto right_of_ways = assigned_lanelet.regulatoryElementsAs<lanelet::RightOfWay>();
   for (const auto & right_of_way : right_of_ways) {
     const auto right_of_Way_lanelets = right_of_way->rightOfWayLanelets();
