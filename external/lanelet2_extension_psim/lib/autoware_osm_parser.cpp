@@ -22,6 +22,7 @@
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 
 #include <memory>
+#include <vector>
 #include <string>
 
 namespace lanelet
@@ -30,43 +31,51 @@ namespace io_handlers
 {
 
 // non-const converter for const lanelet primitive types
-struct NonConstConverter {
-  auto operator()(const ConstPoint3d& c) {
+struct NonConstConverter
+{
+  auto operator()(const ConstPoint3d & c)
+  {
     return Point3d(c.id(), c.basicPoint(), c.attributes());
   }
 
-  auto operator()(const ConstLineString3d& c) {
+  auto operator()(const ConstLineString3d & c)
+  {
     return LineString3d(c.id(), std::vector<Point3d>(c.begin(), c.end()), c.attributes());
   }
 
-  auto operator()(const ConstLineStrings3d& cs) {
+  auto operator()(const ConstLineStrings3d & cs)
+  {
     auto ls = LineStrings3d{};
     ls.reserve(cs.size());
-    for (auto&& c: cs) {
+    for (auto && c : cs) {
       ls.emplace_back(NonConstConverter()(c));
     }
     return ls;
   }
 
-  auto operator()(const ConstInnerBounds& cs) {
+  auto operator()(const ConstInnerBounds & cs)
+  {
     auto ib = InnerBounds{};
     ib.reserve(cs.size());
-    for (auto&& c: cs) {
+    for (auto && c : cs) {
       ib.emplace_back(NonConstConverter()(c));
     }
     return ib;
   }
 
-  auto operator()(const ConstPolygon3d& c) {
+  auto operator()(const ConstPolygon3d & c)
+  {
     return Polygon3d(c.id(), std::vector<Point3d>(c.begin(), c.end()), c.attributes());
   }
 
-  auto operator()(const ConstWeakArea& e) {
+  auto operator()(const ConstWeakArea & e)
+  {
     auto c = e.lock();
     return WeakArea(Area(std::const_pointer_cast<AreaData>(c.constData())));
   }
 
-  auto operator()(const ConstWeakLanelet& e) {
+  auto operator()(const ConstWeakLanelet & e)
+  {
     auto c = e.lock();
     return WeakLanelet(Lanelet(std::const_pointer_cast<LaneletData>(c.constData())));
   }
@@ -95,42 +104,63 @@ std::unique_ptr<LaneletMap> AutowareOsmParser::parse(
   PolygonLayer::Map polygons;
   LineStringLayer::Map line_strings;
 
-  for(auto&& elem: map->pointLayer) {
+  for (auto && elem : map->pointLayer) {
     points.emplace(elem.id(), Point3d(elem.id(), elem.basicPoint(), elem.attributes()));
   }
 
-  for(const auto& elem: map->lineStringLayer) {
-    line_strings.emplace(elem.id(), LineString3d(elem.id(), std::vector<Point3d>(elem.begin(), elem.end()), elem.attributes()));
+  for (const auto & elem : map->lineStringLayer) {
+    line_strings.emplace(
+      elem.id(),
+      LineString3d(
+        elem.id(), std::vector<Point3d>(elem.begin(), elem.end()),
+        elem.attributes()));
   }
 
-  for(const auto& elem: map->polygonLayer) {
-    polygons.emplace(elem.id(), Polygon3d(elem.id(), std::vector<Point3d>(elem.begin(), elem.end()), elem.attributes()));
+  for (const auto & elem : map->polygonLayer) {
+    polygons.emplace(
+      elem.id(),
+      Polygon3d(elem.id(), std::vector<Point3d>(elem.begin(), elem.end()), elem.attributes()));
   }
 
-  for(auto&& elem: map->laneletLayer) {
-    lanelets.emplace(elem.id(), Lanelet(elem.id(), elem.leftBound(), elem.rightBound(), elem.attributes(), elem.regulatoryElements()));
+  for (auto && elem : map->laneletLayer) {
+    lanelets.emplace(
+      elem.id(),
+      Lanelet(
+        elem.id(), elem.leftBound(), elem.rightBound(), elem.attributes(),
+        elem.regulatoryElements()));
   }
 
-  for(auto&& elem: map->areaLayer) {
-    areas.emplace(elem.id(), Area(elem.id(), elem.outerBound(), elem.innerBounds(), elem.attributes(), elem.regulatoryElements()));
+  for (auto && elem : map->areaLayer) {
+    areas.emplace(
+      elem.id(),
+      Area(
+        elem.id(), elem.outerBound(), elem.innerBounds(), elem.attributes(),
+        elem.regulatoryElements()));
   }
 
-  for(auto&& elem: map->regulatoryElementLayer) {
+  for (auto && elem : map->regulatoryElementLayer) {
     auto parameterMap = RuleParameterMap{};
-    for(const auto& param: elem->getParameters()) {
+    for (const auto & param : elem->getParameters()) {
       auto rules = RuleParameters{};
       rules.reserve(param.second.size());
-      for (auto&& p: param.second) {
-        auto v = boost::apply_visitor([](const auto& v){ return RuleParameter(NonConstConverter{}(v)); }, p);
+      for (auto && p : param.second) {
+        auto v = boost::apply_visitor(
+          [](const auto & v) {
+            return RuleParameter(NonConstConverter{} (v));
+          }, p);
         rules.emplace_back(v);
       }
       parameterMap[param.first] = rules;
     }
     auto rule = elem->attributes().at(AttributeNamesString::Subtype).value();
-    regulatory_elements.emplace(elem->id(), RegulatoryElementFactory::create(rule, elem->id(), parameterMap, elem->attributes()));
+    regulatory_elements.emplace(
+      elem->id(),
+      RegulatoryElementFactory::create(rule, elem->id(), parameterMap, elem->attributes()));
   }
 
-  map = std::make_unique<LaneletMap>(lanelets, areas, regulatory_elements, polygons, line_strings, points);
+  map = std::make_unique<LaneletMap>(
+    lanelets, areas, regulatory_elements, polygons, line_strings,
+    points);
 
   // rerun align function in just in case
   for (Lanelet & lanelet : map->laneletLayer) {
