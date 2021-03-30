@@ -24,12 +24,23 @@ namespace simulation_api
 {
 namespace math
 {
-const std::vector<openscenario_msgs::msg::Point2D> get2DPolygon(
+const boost::geometry::model::polygon<
+  boost::geometry::model::d2::point_xy<double> > get2DPolygon(
   const geometry_msgs::msg::Pose & pose,
   const openscenario_msgs::msg::BoundingBox & bbox)
 {
-
+  auto points = transformPoints(pose, getPointsFromBbox(bbox));
+  namespace bg = boost::geometry;
+  typedef bg::model::d2::point_xy<double> bg_point;
+  bg::model::polygon<bg_point> poly;
+  poly.outer().push_back(bg_point(points[0].x, points[0].y));
+  poly.outer().push_back(bg_point(points[1].x, points[1].y));
+  poly.outer().push_back(bg_point(points[2].x, points[2].y));
+  poly.outer().push_back(bg_point(points[3].x, points[3].y));
+  poly.outer().push_back(bg_point(points[0].x, points[0].y));
+  return poly;
 }
+
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   openscenario_msgs::msg::BoundingBox bbox)
 {

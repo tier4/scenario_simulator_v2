@@ -20,11 +20,19 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <vector>
 
+#include <boost/assert.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/linestring.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/geometry/algorithms/disjoint.hpp>
+
 namespace simulation_api
 {
 namespace math
 {
-const std::vector<openscenario_msgs::msg::Point2D> get2DPolygon(
+const boost::geometry::model::polygon<
+  boost::geometry::model::d2::point_xy<double> > get2DPolygon(
   const geometry_msgs::msg::Pose & pose,
   const openscenario_msgs::msg::BoundingBox & bbox);
 std::vector<geometry_msgs::msg::Point> transformPoints(

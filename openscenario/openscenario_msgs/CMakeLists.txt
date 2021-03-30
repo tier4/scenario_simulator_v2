@@ -27,7 +27,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Property.msg
   msg/VehicleParameters.msg
   msg/PedestrianParameters.msg
-  msg/Point2D.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 
