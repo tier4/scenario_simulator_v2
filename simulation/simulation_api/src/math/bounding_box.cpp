@@ -28,7 +28,7 @@ namespace math
 {
 /**
  * @brief Get the Polygon Distance object
- * 
+ *
  * @param pose0 pose of the first bounding box
  * @param bbox0 size of the first bounding box
  * @param pose1 pose of the second bounding box

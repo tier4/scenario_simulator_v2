@@ -250,6 +250,22 @@ TEST(Math, CatmullRomSpline7)
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
 }
 
+TEST(Math, BoundingBox0)
+{
+  geometry_msgs::msg::Pose pose0;
+  openscenario_msgs::msg::BoundingBox bbox0;
+  bbox0.dimensions.x = 3;
+  bbox0.dimensions.y = 3;
+  bbox0.dimensions.z = 3;
+  geometry_msgs::msg::Pose pose1;
+  openscenario_msgs::msg::BoundingBox bbox1;
+  bbox1.dimensions.x = 1;
+  bbox1.dimensions.y = 1;
+  bbox1.dimensions.z = 1;
+  EXPECT_EQ(
+    simulation_api::math::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
