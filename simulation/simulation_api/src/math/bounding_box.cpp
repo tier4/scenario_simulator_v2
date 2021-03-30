@@ -14,6 +14,12 @@
 
 #include <simulation_api/math/bounding_box.hpp>
 
+#include <quaternion_operation/quaternion_operation.h>
+
+// headers in Eigen
+#define EIGEN_MPL2_ONLY
+#include <Eigen/Core>
+
 namespace simulation_api
 {
 namespace math

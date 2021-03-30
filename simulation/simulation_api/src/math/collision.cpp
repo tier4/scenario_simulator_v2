@@ -23,10 +23,6 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
 
-// headers in Eigen
-#define EIGEN_MPL2_ONLY
-#include <Eigen/Core>
-
 #include <vector>
 #include <iostream>
 
