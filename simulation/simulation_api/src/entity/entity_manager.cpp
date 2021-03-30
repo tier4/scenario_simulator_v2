@@ -14,6 +14,7 @@
 
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
+#include <simulation_api/math/bounding_box.hpp>
 #include <simulation_api/math/collision.hpp>
 
 #include <limits>
@@ -218,12 +219,23 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
   }
 }
 
-double EntityManager::getBoundingBoxDistance(
+/**
+ * @brief
+ *
+ * @param from from entity name
+ * @param to to entity name
+ * @retval boost::none bounding box is intersects
+ * @retval 0 <= distance between two bounding box
+ */
+boost::optional<double> EntityManager::getBoundingBoxDistance(
   const std::string & from,
   const std::string & to)
 {
   const auto bbox0 = getBoundingBox(from);
+  const auto pose0 = getMapPose(from);
   const auto bbox1 = getBoundingBox(to);
+  const auto pose1 = getMapPose(to);
+  return math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
 }
 
 boost::optional<double> EntityManager::getLongitudinalDistance(
@@ -247,6 +259,17 @@ boost::optional<double> EntityManager::getLongitudinalDistance(
       return boost::none;
     }
   }
+}
+
+geometry_msgs::msg::Pose EntityManager::getMapPose(
+  const std::string & entity_name)
+{
+  const auto status = getEntityStatus(entity_name);
+  if (!status) {
+    throw simulation_api::SimulationRuntimeError(
+            "failed to get status of " + entity_name + " entity in getMapPose");
+  }
+  return status->pose;
 }
 
 geometry_msgs::msg::Pose EntityManager::getMapPose(

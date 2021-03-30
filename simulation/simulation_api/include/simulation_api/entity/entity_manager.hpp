@@ -249,7 +249,7 @@ public:
     const std::string & to,
     const double max_distance = 100);
 
-  double getBoundingBoxDistance(
+  boost::optional<double> getBoundingBoxDistance(
     const std::string & from,
     const std::string & to);
 
@@ -268,6 +268,9 @@ public:
   geometry_msgs::msg::Pose getRelativePose(
     const geometry_msgs::msg::Pose & from,
     const geometry_msgs::msg::Pose & to) const;
+
+  geometry_msgs::msg::Pose getMapPose(
+    const std::string & entity_name);
 
   geometry_msgs::msg::Pose getMapPose(
     const std::string & reference_entity_name,
