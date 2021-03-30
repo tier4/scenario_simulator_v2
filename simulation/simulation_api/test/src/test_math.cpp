@@ -266,6 +266,25 @@ TEST(Math, BoundingBox0)
     simulation_api::math::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
 }
 
+TEST(Math, BoundingBox1)
+{
+  geometry_msgs::msg::Pose pose0;
+  openscenario_msgs::msg::BoundingBox bbox0;
+  bbox0.dimensions.x = 3;
+  bbox0.dimensions.y = 3;
+  bbox0.dimensions.z = 3;
+  geometry_msgs::msg::Pose pose1;
+  pose1.position.y = 5;
+  openscenario_msgs::msg::BoundingBox bbox1;
+  bbox1.dimensions.x = 1;
+  bbox1.dimensions.y = 1;
+  bbox1.dimensions.z = 1;
+  EXPECT_TRUE(
+    simulation_api::math::getPolygonDistance(pose0, bbox0, pose1, bbox1));
+  EXPECT_DOUBLE_EQ(
+    simulation_api::math::getPolygonDistance(pose0, bbox0, pose1, bbox1).get(), 3.0);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
