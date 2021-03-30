@@ -18,7 +18,6 @@
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/point2_d.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <vector>
 
 #include <boost/assert.hpp>
 #include <boost/geometry.hpp>
@@ -26,6 +25,8 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
+
+#include <vector>
 
 namespace simulation_api
 {
