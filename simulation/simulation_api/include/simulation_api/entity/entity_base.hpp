@@ -28,6 +28,8 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <vector>
+#include <queue>
 
 namespace simulation_api
 {
@@ -92,9 +94,13 @@ public:
   {
     return linear_jerk_;
   }
+  virtual void requestAssignRoute(
+    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) = 0;
 
 protected:
   bool visibility_;
+  boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
+  std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;
   boost::optional<double> linear_jerk_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;

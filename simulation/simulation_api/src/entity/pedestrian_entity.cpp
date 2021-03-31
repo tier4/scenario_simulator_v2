@@ -45,6 +45,18 @@ PedestrianEntity::PedestrianEntity(
   tree_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
 }
 
+void PedestrianEntity::requestAssignRoute(
+  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+{
+  if (!status_) {
+    return;
+  }
+  if (!status_->lanelet_pose_valid) {
+    return;
+  }
+  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
+}
+
 void PedestrianEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
   if (!status_) {

@@ -39,6 +39,18 @@ VehicleEntity::VehicleEntity(
   tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
+void VehicleEntity::requestAssignRoute(
+  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+{
+  if (!status_) {
+    return;
+  }
+  if (!status_->lanelet_pose_valid) {
+    return;
+  }
+  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
+}
+
 VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters params)
 : EntityBase(params.name, name),
   parameters(params)

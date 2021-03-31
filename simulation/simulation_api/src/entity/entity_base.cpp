@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <limits>
 #include <string>
+#include <queue>
+#include <vector>
 
 namespace simulation_api
 {

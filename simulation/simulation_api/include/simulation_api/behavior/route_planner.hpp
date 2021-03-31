@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <vector>
+#include <queue>
 
 namespace simulation_api
 {
@@ -26,6 +27,10 @@ class RoutePlanner
 {
 public:
   explicit RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
+  std::vector<std::int64_t> getRouteLanelets(
+    openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
+    std::vector<openscenario_msgs::msg::LaneletPose> waypoints,
+    double horizon = 100);
   std::vector<std::int64_t> getRouteLanelets(
     openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
     openscenario_msgs::msg::LaneletPose target_lanelet_pose,
@@ -36,11 +41,13 @@ public:
   void cancelGoal();
 
 private:
+  void cancelGoal(const openscenario_msgs::msg::LaneletPose & entity_lanelet_pose);
   void plan(
-    openscenario_msgs::msg::LaneletPose target_lanelet_pose,
-    openscenario_msgs::msg::LaneletPose entity_lanelet_pose);
+    openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
+    openscenario_msgs::msg::LaneletPose target_lanelet_pose);
   boost::optional<std::vector<std::int64_t>> whole_route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  std::queue<openscenario_msgs::msg::LaneletPose> waypoint_queue_;
 };
 }  // namespace simulation_api
 

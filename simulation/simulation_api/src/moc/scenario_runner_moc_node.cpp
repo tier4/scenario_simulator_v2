@@ -78,12 +78,16 @@ public:
       simulation_api::helper::constructLaneletPose(34606, 20.0),
       simulation_api::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
-    api_.requestAcquirePosition(
+    api_.requestAssignRoute(
       "ego",
-      simulation_api::helper::constructLaneletPose(34675, 0.0) );
+      std::vector<openscenario_msgs::msg::LaneletPose>{
+      simulation_api::helper::constructLaneletPose(34675, 0.0),
+      simulation_api::helper::constructLaneletPose(34690, 0.0)
+    });
     api_.requestAcquirePosition(
       "npc1",
       simulation_api::helper::constructLaneletPose(34675, 0.0) );
+    /*
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
     api_.addMetric<metrics::MomentaryStopMetric>(
       "ego_momentary_stop0", "ego",
@@ -97,6 +101,7 @@ public:
       "ego_momentary_stop_crosswalk", "ego",
       -10, 10, 34378, metrics::MomentaryStopMetric::StopTargetLaneletType::CROSSWALK,
       30, 1, 0.05);
+    */
     std::vector<std::pair<double, simulation_api::TrafficLightColor>> phase;
     phase = {
       {10, simulation_api::TrafficLightColor::GREEN},
