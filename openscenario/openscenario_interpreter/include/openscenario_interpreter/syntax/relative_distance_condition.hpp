@@ -68,19 +68,30 @@ struct RelativeDistanceCondition
 
   const TriggeringEntities for_each;
 
-  auto distance(const TriggeringEntities::value_type & triggering_entity)
+  using TriggeringEntity = TriggeringEntities::value_type;
+
+  auto distance(const TriggeringEntity & triggering_entity)
   {
-    switch (relative_distance_type) {
-      case RelativeDistanceType::longitudinal:
-        return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
-      case RelativeDistanceType::lateral:
-        return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
-      case RelativeDistanceType::cartesianDistance:
-        return std::hypot(
-          getRelativePose(triggering_entity, entity_ref).position.x,
-          getRelativePose(triggering_entity, entity_ref).position.y);
-      default:
-        THROW(ImplementationFault);
+    if (freespace) {
+      switch (relative_distance_type) {
+        case RelativeDistanceType::cartesianDistance:
+          return getBoundingBoxDistance(entity_ref, triggering_entity);
+        default:
+          THROW(ImplementationFault);
+      }
+    } else {
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:
+          return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
+        case RelativeDistanceType::lateral:
+          return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
+        case RelativeDistanceType::cartesianDistance:
+          return std::hypot(
+            getRelativePose(triggering_entity, entity_ref).position.x,
+            getRelativePose(triggering_entity, entity_ref).position.y);
+        default:
+          THROW(ImplementationFault);
+      }
     }
   }
 
