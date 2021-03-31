@@ -110,7 +110,7 @@ void RoutePlanner::plan(
   if (target_lanelet_pose.lanelet_id == entity_lanelet_pose.lanelet_id &&
     target_lanelet_pose.s <= entity_lanelet_pose.s)
   {
-    cancelGoal(target_lanelet_pose);
+    cancelGoal(entity_lanelet_pose);
     if (waypoint_queue_.empty()) {
       return;
     }
