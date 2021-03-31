@@ -78,9 +78,13 @@ public:
       simulation_api::helper::constructLaneletPose(34606, 20.0),
       simulation_api::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
-    api_.requestAcquirePosition(
+    api_.requestAssignRoute(
       "ego",
-      simulation_api::helper::constructLaneletPose(34675, 0.0) );
+      std::vector<openscenario_msgs::msg::LaneletPose>{
+      simulation_api::helper::constructLaneletPose(34675, 0.0),
+      simulation_api::helper::constructLaneletPose(34690, 0.0)
+    });
+    // 34690
     api_.requestAcquirePosition(
       "npc1",
       simulation_api::helper::constructLaneletPose(34675, 0.0) );
