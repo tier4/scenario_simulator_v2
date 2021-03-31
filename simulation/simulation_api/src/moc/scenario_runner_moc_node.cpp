@@ -84,7 +84,6 @@ public:
       simulation_api::helper::constructLaneletPose(34675, 0.0),
       simulation_api::helper::constructLaneletPose(34690, 0.0)
     });
-    // 34690
     api_.requestAcquirePosition(
       "npc1",
       simulation_api::helper::constructLaneletPose(34675, 0.0) );
