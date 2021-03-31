@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/syntax/condition.hpp>
 
+#include <numeric>
 #include <vector>
 
 namespace openscenario_interpreter
@@ -52,10 +53,11 @@ struct ConditionGroup
   auto evaluate()
   {
     return asBoolean(
-      std::all_of(
-        std::begin(*this), std::end(*this), [&](auto && each)
+      // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
+      std::accumulate(
+        std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & rhs)
         {
-          return each.evaluate().template as<Boolean>(__FILE__, __LINE__);
+          return lhs && rhs.evaluate().as<Boolean>();
         }));
   }
 };

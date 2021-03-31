@@ -135,7 +135,7 @@ std::istream & operator>>(std::istream & is, ConditionEdge & edge)
 
   std::stringstream ss {};
   ss << "unexpected value \'" << buffer << "\' specified as type ConditionEdge";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError(ss.str());
 }
 
 std::ostream & operator<<(std::ostream & os, const ConditionEdge & edge)
@@ -155,7 +155,7 @@ std::ostream & operator<<(std::ostream & os, const ConditionEdge & edge)
       std::stringstream ss {};
       ss << "enum class ConditionEdge holds unexpected value " <<
         static_cast<ConditionEdge::value_type>(edge.value);
-      throw ImplementationFault {ss.str()};
+      throw ImplementationFault(ss.str());
   }
 }
 }  // namespace syntax

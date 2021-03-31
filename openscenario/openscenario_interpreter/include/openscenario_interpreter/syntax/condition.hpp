@@ -61,12 +61,9 @@ struct Condition
           "ByValueCondition", [&](auto && node) {
             return make<ByValueCondition>(node, scope);
           }))),
-    name(
-      readAttribute<String>("name", node, scope)),
-    delay(
-      readAttribute<Double>("delay", node, scope, Double())),
-    condition_edge(
-      readAttribute<ConditionEdge>("conditionEdge", node, scope))
+    name(readAttribute<String>("name", node, scope)),
+    delay(readAttribute<Double>("delay", node, scope, Double())),
+    condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope))
   {}
 
   Element result = false_v;

@@ -56,10 +56,11 @@ struct Trigger
      *
      * ---------------------------------------------------------------------- */
     return asBoolean(
-      std::any_of(
-        std::begin(*this), std::end(*this), [&](ConditionGroup & each)
+      // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
+      std::accumulate(
+        std::begin(*this), std::end(*this), false, [&](auto && lhs, ConditionGroup & rhs)
         {
-          return each.evaluate().as<Boolean>();
+          return lhs || rhs.evaluate().as<Boolean>();
         }));
   }
 };

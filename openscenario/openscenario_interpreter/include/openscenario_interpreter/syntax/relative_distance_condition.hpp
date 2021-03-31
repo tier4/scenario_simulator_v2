@@ -115,7 +115,8 @@ struct RelativeDistanceCondition
           #ifndef NDEBUG
           std::cout << indent << "  " << triggering_entity << ": ";
           std::cout << "distance = " << distance(triggering_entity);
-          std::cout << " " << compare << " " << value << "? => " << result << std::endl;
+          std::cout << " " << compare << " " << value << "? => " << std::boolalpha << result;
+          std::cout << std::endl;
           #endif
           return result;
         }));
