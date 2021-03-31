@@ -26,6 +26,21 @@ RoutePlanner::RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_
 
 std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
   openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
+  std::vector<openscenario_msgs::msg::LaneletPose> waypoints,
+  double horizon)
+{
+  waypoint_queue_ = {};
+  if (waypoints.empty()) {
+    return getRouteLanelets(entity_lanelet_pose, horizon);
+  }
+  for (const auto & waypoint : waypoints) {
+    waypoint_queue_.push(waypoint);
+  }
+  return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
+}
+
+std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
+  openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
   double horizon)
 {
   if (!whole_route_) {
@@ -42,9 +57,12 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
       whole_route_.get(), horizon, true);
   }
   cancelGoal();
-  return hdmap_utils_ptr_->getFollowingLanelets(
-    entity_lanelet_pose.lanelet_id,
-    horizon, true);
+  if (waypoint_queue_.empty()) {
+    return hdmap_utils_ptr_->getFollowingLanelets(
+      entity_lanelet_pose.lanelet_id,
+      horizon, true);
+  }
+  return getRouteLanelets(entity_lanelet_pose, waypoint_queue_.front(), horizon);
 }
 
 std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
@@ -68,6 +86,23 @@ void RoutePlanner::cancelGoal()
   whole_route_ = boost::none;
 }
 
+void RoutePlanner::cancelGoal(
+  const openscenario_msgs::msg::LaneletPose & entity_lanelet_pose)
+{
+  while (true) {
+    if (waypoint_queue_.empty()) {
+      cancelGoal();
+      break;
+    }
+    if (waypoint_queue_.front().lanelet_id == entity_lanelet_pose.lanelet_id) {
+      waypoint_queue_.pop();
+      continue;
+    } else {
+      break;
+    }
+  }
+}
+
 void RoutePlanner::plan(
   openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
   openscenario_msgs::msg::LaneletPose target_lanelet_pose)
@@ -75,8 +110,10 @@ void RoutePlanner::plan(
   if (target_lanelet_pose.lanelet_id == entity_lanelet_pose.lanelet_id &&
     target_lanelet_pose.s <= entity_lanelet_pose.s)
   {
-    cancelGoal();
-    return;
+    cancelGoal(target_lanelet_pose);
+    if (waypoint_queue_.empty()) {
+      return;
+    }
   }
   if (!whole_route_) {
     whole_route_ = hdmap_utils_ptr_->getRoute(

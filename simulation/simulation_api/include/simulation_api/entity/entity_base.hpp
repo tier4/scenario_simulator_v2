@@ -93,7 +93,6 @@ public:
     return linear_jerk_;
   }
   void assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints);
-  void clearWaypoints();
 
 protected:
   bool visibility_;

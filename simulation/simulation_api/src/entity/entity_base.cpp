@@ -42,19 +42,6 @@ EntityBase::EntityBase(std::string type, std::string name)
   verbose_ = true;
 }
 
-void EntityBase::assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
-{
-  clearWaypoints();
-  for (const auto waypoint : waypoints) {
-    waypoints_.push(waypoint);
-  }
-}
-
-void EntityBase::clearWaypoints()
-{
-  waypoints_ = {};
-}
-
 boost::optional<double> EntityBase::getStandStillDuration() const
 {
   return stand_still_duration_;
