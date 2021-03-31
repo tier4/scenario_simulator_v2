@@ -58,9 +58,10 @@ struct Trigger
     return asBoolean(
       // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
       std::accumulate(
-        std::begin(*this), std::end(*this), false, [&](auto && lhs, ConditionGroup & rhs)
+        std::begin(*this), std::end(*this), false, [&](auto && lhs, ConditionGroup & condition_group)
         {
-          return lhs || rhs.evaluate().as<Boolean>();
+          const auto rhs = condition_group.evaluate();
+          return lhs || rhs.as<Boolean>();
         }));
   }
 };

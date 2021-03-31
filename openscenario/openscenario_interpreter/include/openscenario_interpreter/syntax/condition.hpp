@@ -70,7 +70,7 @@ struct Condition
 
   const auto & evaluate()
   {
-    if (condition_edge == ConditionEdge::sticky && result == true_v) {
+    if (condition_edge == ConditionEdge::sticky && result.as<Boolean>()) {
       return result;
     } else {
       return result = Element::evaluate();

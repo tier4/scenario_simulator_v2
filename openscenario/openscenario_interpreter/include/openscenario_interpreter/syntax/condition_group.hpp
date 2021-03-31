@@ -55,9 +55,10 @@ struct ConditionGroup
     return asBoolean(
       // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
       std::accumulate(
-        std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & rhs)
+        std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition)
         {
-          return lhs && rhs.evaluate().as<Boolean>();
+          const auto rhs = condition.evaluate();
+          return lhs && rhs.as<Boolean>();
         }));
   }
 };
