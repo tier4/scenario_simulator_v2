@@ -15,6 +15,10 @@
 #ifndef SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 #define SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 
+#include <simulation_api/entity/vehicle_entity.hpp>
+#include <simulation_api/vehicle_model/sim_model_ideal.hpp>
+#include <simulation_api/vehicle_model/sim_model_time_delay.hpp>
+
 #undef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
 
 #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
@@ -32,9 +36,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <pugixml.hpp>
-#include <simulation_api/entity/vehicle_entity.hpp>
-#include <simulation_api/vehicle_model/sim_model_ideal.hpp>
-#include <simulation_api/vehicle_model/sim_model_time_delay.hpp>
 #include <sys/wait.h>  // for EgoEntity::~EgoEntity
 #include <tf2/utils.h>
 

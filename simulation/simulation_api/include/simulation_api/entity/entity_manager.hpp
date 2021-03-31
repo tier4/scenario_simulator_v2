@@ -15,6 +15,14 @@
 #ifndef  SIMULATION_API__ENTITY__ENTITY_MANAGER_HPP_
 #define  SIMULATION_API__ENTITY__ENTITY_MANAGER_HPP_
 
+#include <simulation_api/entity/ego_entity.hpp>
+#include <simulation_api/entity/exception.hpp>
+#include <simulation_api/entity/pedestrian_entity.hpp>
+#include <simulation_api/entity/vehicle_entity.hpp>
+#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_api/traffic/traffic_base.hpp>
+#include <simulation_api/traffic_lights/traffic_light_manager.hpp>
+
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
@@ -25,12 +33,6 @@
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <simulation_api/entity/ego_entity.hpp>
-#include <simulation_api/entity/exception.hpp>
-#include <simulation_api/entity/pedestrian_entity.hpp>
-#include <simulation_api/entity/vehicle_entity.hpp>
-#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
-#include <simulation_api/traffic_lights/traffic_light_manager.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/static_transform_broadcaster.h>
