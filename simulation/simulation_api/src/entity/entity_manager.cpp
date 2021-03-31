@@ -165,7 +165,6 @@ boost::optional<double> EntityManager::getDistanceToStopLine(
 
 void EntityManager::requestAssignRoute(
   const std::string & name,
-
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
   auto it = entities_.find(name);
@@ -179,7 +178,7 @@ void EntityManager::requestAssignRoute(
     boost::any_cast<EgoEntity &>(it->second).requestAssignRoute(waypoints);
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(waypoints);
+    boost::any_cast<PedestrianEntity &>(it->second).requestAssignRoute(waypoints);
   }
 }
 
