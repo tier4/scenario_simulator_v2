@@ -93,34 +93,29 @@ decltype(auto) getRelativePose(Ts && ... xs) try {
 // }
 
 template<typename ... Ts>
-auto getTimeHeadway(Ts && ... xs)
-{
-  const auto result = connection.getTimeHeadway(std::forward<decltype(xs)>(xs)...);
-  if (result) {
-    return result.get();
-  } else {
-    using value_type = typename std::decay<decltype(result)>::type::value_type;
-    return std::numeric_limits<value_type>::quiet_NaN();
-  }
-}
-
-template<typename ... Ts>
-auto getStandStillDuration(Ts && ... xs)
-{
-  const auto result = connection.getStandStillDuration(std::forward<decltype(xs)>(xs)...);
-  if (result) {
-    return result.get();
-  } else {
-    using value_type = typename std::decay<decltype(result)>::type::value_type;
-    return static_cast<value_type>(0);
-  }
-}
-
-template<typename ... Ts>
 decltype(auto) setController(Ts && ... xs)
 {
   return connection.setDriverModel(std::forward<decltype(xs)>(xs)...);
 }
+
+#define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE) \
+  template<typename ... Ts> \
+  auto IDENTIFIER(Ts && ... xs) \
+  { \
+    const auto result = connection.IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+    if (result) { \
+      return result.get(); \
+    } else { \
+      using value_type = typename std::decay<decltype(result)>::type::value_type; \
+      return ALTERNATE; \
+    } \
+  } static_assert(true, "")
+
+STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
+STRIP_OPTIONAL(getStandStillDuration, static_cast<value_type>(0));
+STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
+
+#undef STRIP_OPTIONAL
 
 #define FORWARD_TO_SIMULATION_API(IDENTIFIER) \
   template<typename ... Ts> \
