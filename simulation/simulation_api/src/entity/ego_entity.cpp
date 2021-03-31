@@ -29,7 +29,8 @@ std::unordered_map<
   std::string, std::shared_ptr<autoware_api::Accessor>
 > EgoEntity::autowares {};
 
-void EgoEntity::assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+void EgoEntity::requestAssignRoute(
+  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
   /**
    * @todo implement assign route action for ego

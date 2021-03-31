@@ -62,7 +62,8 @@ public:
   {
     return parameters.bounding_box;
   }
-  void assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
+  void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+  override;
   const std::string getCurrentAction() const
   {
     return tree_ptr_->getCurrentAction();

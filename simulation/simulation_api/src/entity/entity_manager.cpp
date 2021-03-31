@@ -163,6 +163,26 @@ boost::optional<double> EntityManager::getDistanceToStopLine(
   return spline.getCollisionPointIn2D(polygon);
 }
 
+void EntityManager::requestAssignRoute(
+  const std::string & name,
+
+  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+{
+  auto it = entities_.find(name);
+  if (it == entities_.end()) {
+    return;
+  }
+  if (it->second.type() == typeid(VehicleEntity)) {
+    boost::any_cast<VehicleEntity &>(it->second).requestAssignRoute(waypoints);
+  }
+  if (it->second.type() == typeid(EgoEntity)) {
+    boost::any_cast<EgoEntity &>(it->second).requestAssignRoute(waypoints);
+  }
+  if (it->second.type() == typeid(PedestrianEntity)) {
+    boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(waypoints);
+  }
+}
+
 void EntityManager::requestAcquirePosition(
   const std::string & name,
   const openscenario_msgs::msg::LaneletPose & lanelet_pose)
