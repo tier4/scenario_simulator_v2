@@ -62,7 +62,7 @@ public:
   {
     traffic_light_manager_ = ptr;
   }
-  void onUpdate(double current_time, double step_time);
+  virtual void onUpdate(double current_time, double step_time) = 0;
   bool statusSetted() const
   {
     if (status_) {
@@ -97,6 +97,7 @@ public:
 
 protected:
   bool visibility_;
+  boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
   std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;
   boost::optional<double> linear_jerk_;

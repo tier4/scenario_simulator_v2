@@ -42,7 +42,7 @@ public:
     openscenario_msgs::msg::PedestrianParameters parameters);
   PedestrianEntity(std::string name, openscenario_msgs::msg::PedestrianParameters parameters);
   const openscenario_msgs::msg::PedestrianParameters parameters;
-  void onUpdate(double current_time, double step_time);
+  void onUpdate(double current_time, double step_time) override;
   void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   // void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();
