@@ -92,7 +92,7 @@ public:
   {
     return linear_jerk_;
   }
-  void assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints);
+  virtual void assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) = 0;
 
 protected:
   bool visibility_;
