@@ -92,9 +92,12 @@ public:
   {
     return linear_jerk_;
   }
+  void assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints);
+  void clearWaypoints();
 
 protected:
   bool visibility_;
+  std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;
   boost::optional<double> linear_jerk_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;

@@ -172,6 +172,7 @@ void EntityManager::requestAcquirePosition(
     return;
   }
   if (it->second.type() == typeid(VehicleEntity)) {
+    boost::any_cast<VehicleEntity &>(it->second).clearWaypoints();
     boost::any_cast<VehicleEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
   if (it->second.type() == typeid(EgoEntity)) {
@@ -179,6 +180,7 @@ void EntityManager::requestAcquirePosition(
       (*hdmap_utils_ptr_).toMapPose(lanelet_pose));
   }
   if (it->second.type() == typeid(PedestrianEntity)) {
+    boost::any_cast<PedestrianEntity &>(it->second).clearWaypoints();
     boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_pose);
   }
 }
