@@ -61,19 +61,16 @@ struct Condition
           "ByValueCondition", [&](auto && node) {
             return make<ByValueCondition>(node, scope);
           }))),
-    name(
-      readAttribute<String>("name", node, scope)),
-    delay(
-      readAttribute<Double>("delay", node, scope, Double())),
-    condition_edge(
-      readAttribute<ConditionEdge>("conditionEdge", node, scope))
+    name(readAttribute<String>("name", node, scope)),
+    delay(readAttribute<Double>("delay", node, scope, Double())),
+    condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope))
   {}
 
   Element result = false_v;
 
   const auto & evaluate()
   {
-    if (condition_edge == ConditionEdge::sticky && result == true_v) {
+    if (condition_edge == ConditionEdge::sticky && result.as<Boolean>()) {
       return result;
     } else {
       return result = Element::evaluate();
