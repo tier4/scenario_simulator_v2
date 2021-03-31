@@ -15,16 +15,17 @@
 #ifndef SIMULATION_API__API__API_HPP_
 #define SIMULATION_API__API__API_HPP_
 
+#include <simulation_api/entity/entity_manager.hpp>
+#include <simulation_api/helper/helper.hpp>
+#include <simulation_api/metrics/metrics_manager.hpp>
+#include <simulation_api/traffic_lights/traffic_light.hpp>
+
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
 #include <boost/filesystem.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <simulation_api/entity/entity_manager.hpp>
-#include <simulation_api/helper/helper.hpp>
-#include <simulation_api/metrics/metrics_manager.hpp>
-#include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api_schema.pb.h>
 #include <simulation_interface/zmq_client.hpp>
 
@@ -165,6 +166,7 @@ public:
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     const std::string & name);
+  geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
   bool setEntityStatus(
     const std::string & name,

@@ -147,6 +147,12 @@ bool API::spawn(
   return true;
 }
 
+geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
+{
+  auto status = getEntityStatus(name);
+  return status.pose;
+}
+
 openscenario_msgs::msg::EntityStatus API::getEntityStatus(
   const std::string & name)
 {

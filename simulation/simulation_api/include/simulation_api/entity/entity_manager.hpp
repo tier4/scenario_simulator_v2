@@ -20,7 +20,7 @@
 #include <simulation_api/entity/pedestrian_entity.hpp>
 #include <simulation_api/entity/vehicle_entity.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
-#include <simulation_api/traffic/traffic_base.hpp>
+#include <simulation_api/traffic/traffic_sink.hpp>
 #include <simulation_api/traffic_lights/traffic_light_manager.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
