@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <simulation_api/math/uuid.hpp>
 #include <simulation_api/math/bounding_box.hpp>
 #include <simulation_api/math/catmull_rom_spline.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
@@ -283,6 +284,13 @@ TEST(Math, BoundingBox1)
     simulation_api::math::getPolygonDistance(pose0, bbox0, pose1, bbox1));
   EXPECT_DOUBLE_EQ(
     simulation_api::math::getPolygonDistance(pose0, bbox0, pose1, bbox1).get(), 3.0);
+}
+
+TEST(Math, UUID)
+{
+  EXPECT_STREQ(
+    simulation_api::math::generateUUID("test").c_str(),
+    simulation_api::math::generateUUID("test").c_str());
 }
 
 int main(int argc, char ** argv)
