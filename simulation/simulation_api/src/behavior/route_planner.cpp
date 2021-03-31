@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <vector>
+#include <queue>
 
 namespace simulation_api
 {
@@ -48,15 +49,21 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
       entity_lanelet_pose.lanelet_id,
       horizon, true);
   }
-  if (hdmap_utils_ptr_->isInRoute(
-      entity_lanelet_pose.lanelet_id, whole_route_.get()
-  ))
-  {
-    return hdmap_utils_ptr_->getFollowingLanelets(
-      entity_lanelet_pose.lanelet_id,
-      whole_route_.get(), horizon, true);
+  if (!waypoint_queue_.empty()) {
+    if (waypoint_queue_.front().lanelet_id == entity_lanelet_pose.lanelet_id) {
+      cancelGoal(entity_lanelet_pose);
+    }
+  } else {
+    if (hdmap_utils_ptr_->isInRoute(
+        entity_lanelet_pose.lanelet_id, whole_route_.get()
+    ))
+    {
+      return hdmap_utils_ptr_->getFollowingLanelets(
+        entity_lanelet_pose.lanelet_id,
+        whole_route_.get(), horizon, true);
+    }
   }
-  cancelGoal();
+  cancelGoal(entity_lanelet_pose);
   if (waypoint_queue_.empty()) {
     return hdmap_utils_ptr_->getFollowingLanelets(
       entity_lanelet_pose.lanelet_id,

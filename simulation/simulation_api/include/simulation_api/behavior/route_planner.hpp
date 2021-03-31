@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <vector>
+#include <queue>
 
 namespace simulation_api
 {

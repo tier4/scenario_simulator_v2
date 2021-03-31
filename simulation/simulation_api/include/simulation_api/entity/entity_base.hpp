@@ -28,6 +28,8 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <vector>
+#include <queue>
 
 namespace simulation_api
 {
