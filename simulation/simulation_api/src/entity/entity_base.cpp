@@ -42,10 +42,18 @@ EntityBase::EntityBase(std::string type, std::string name)
   verbose_ = true;
 }
 
+void EntityBase::onUpdate(double current_time, double step_time)
+{
+  if (waypoints_.empty()) {
+    return;
+  }
+  // geometry_msgs::msg::Point
+}
+
 void EntityBase::assignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
   clearWaypoints();
-  for(const auto waypoint : waypoints) {
+  for (const auto waypoint : waypoints) {
     waypoints_.push(waypoint);
   }
 }

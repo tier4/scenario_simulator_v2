@@ -47,7 +47,7 @@ public:
     openscenario_msgs::msg::VehicleParameters parameters);
   VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters parameters);
   const openscenario_msgs::msg::VehicleParameters parameters;
-  void onUpdate(double current_time, double step_time) override;
+  void onUpdate(double current_time, double step_time);
   void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
   void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();

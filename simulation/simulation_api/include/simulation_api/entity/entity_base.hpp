@@ -62,7 +62,7 @@ public:
   {
     traffic_light_manager_ = ptr;
   }
-  virtual void onUpdate(double current_time, double step_time) = 0;
+  void onUpdate(double current_time, double step_time);
   bool statusSetted() const
   {
     if (status_) {

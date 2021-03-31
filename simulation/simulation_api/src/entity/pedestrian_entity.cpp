@@ -75,6 +75,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   if (!status_) {
     return;
   }
+  EntityBase::onUpdate(current_time, step_time);
   tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
   tree_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
   tree_ptr_->setValueToBlackBoard("entity_status", status_.get());

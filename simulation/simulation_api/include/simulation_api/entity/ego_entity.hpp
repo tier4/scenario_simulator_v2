@@ -387,7 +387,7 @@ public:
     return "none";
   }
 
-  void onUpdate(double current_time, double step_time) override;
+  void onUpdate(double current_time, double step_time);
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
