@@ -48,6 +48,7 @@ ament_auto_add_library(simulation_api SHARED
   src/math/collision.cpp
   src/math/hermite_curve.cpp
   src/math/polynomial_solver.cpp
+  src/math/uuid.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
   src/metrics/momentary_stop_metric.cpp
