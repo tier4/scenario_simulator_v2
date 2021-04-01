@@ -26,6 +26,8 @@
 #ifndef SIMULATION_API__TRAFFIC__TRAFFIC_SINK_HPP_
 #define SIMULATION_API__TRAFFIC__TRAFFIC_SINK_HPP_
 
+#include <simulation_api/traffic/traffic_module_base.hpp>
+
 #include <geometry_msgs/msg/point.hpp>
 
 #include <functional>
@@ -35,7 +37,7 @@ namespace simulation_api
 {
 namespace traffic
 {
-class TrafficSink
+class TrafficSink : TraffiModuleBase
 {
 public:
   explicit TrafficSink(
@@ -46,6 +48,7 @@ public:
     const std::function<void(std::string)> & despawn_function);
   const double radius;
   const geometry_msgs::msg::Point position;
+  void execute() override;
 
 private:
   const std::function<std::vector<std::string>(void)> & get_entity_names_function;

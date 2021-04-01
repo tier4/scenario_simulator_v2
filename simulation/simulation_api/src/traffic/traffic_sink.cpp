@@ -24,6 +24,7 @@
 // limitations under the License.
 
 #include <simulation_api/traffic/traffic_sink.hpp>
+#include <simulation_api/math/distance.hpp>
 
 #include <geometry_msgs/msg/pose.hpp>
 
@@ -46,6 +47,17 @@ TrafficSink::TrafficSink(
   get_entity_pose_function(get_entity_pose_function),
   despawn_function(despawn_function)
 {
+}
+
+void TrafficSink::execute()
+{
+  const auto names = get_entity_names_function();
+  for(const auto & name : names) {
+    const auto pose = get_entity_pose_function(name);
+    if(simulation_api::math::getDistance(position, pose) <= radius) {
+      despawn_function(name);
+    }
+  }
 }
 }  // namespace traffic
 }  // namespace simulation_api
