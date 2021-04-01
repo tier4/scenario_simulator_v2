@@ -1,7 +1,7 @@
 /**
- * @file traffic_MODULE_base.hpp
+ * @file traffic_controller.hpp
  * @author Masaya Kataoka (masaya.kataoka@tier4.jp)
- * @brief base class for traffic module
+ * @brief class definition for the traffic controller
  * @version 0.1
  * @date 2021-04-01
  *
@@ -23,20 +23,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
-#define SIMULATION_API__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
+#ifndef SIMULATION_API__TRAFFIC__TRAFFIC_CONTROLLER_HPP_
+#define SIMULATION_API__TRAFFIC__TRAFFIC_CONTROLLER_HPP_
+
+#include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+
+#include <memory>
 
 namespace simulation_api
 {
 namespace traffic
 {
-class TraffiModuleBase
+class TrafficController
 {
 public:
-  TraffiModuleBase() {}
-  virtual void execute() = 0;
+  explicit TrafficController(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
+
+private:
 };
 }  // namespace traffic
 }  // namespace simulation_api
 
-#endif  // SIMULATION_API__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
+#endif  // SIMULATION_API__TRAFFIC__TRAFFIC_CONTROLLER_HPP_

@@ -28,7 +28,7 @@
 
 #include <simulation_api/traffic/traffic_module_base.hpp>
 
-#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 
 #include <functional>
 #include <string>
@@ -37,7 +37,7 @@ namespace simulation_api
 {
 namespace traffic
 {
-class TrafficSink : TraffiModuleBase
+class TrafficSink : public TraffiModuleBase
 {
 public:
   explicit TrafficSink(

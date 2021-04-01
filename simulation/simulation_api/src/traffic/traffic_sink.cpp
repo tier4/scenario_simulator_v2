@@ -26,8 +26,6 @@
 #include <simulation_api/traffic/traffic_sink.hpp>
 #include <simulation_api/math/distance.hpp>
 
-#include <geometry_msgs/msg/pose.hpp>
-
 #include <functional>
 #include <string>
 
@@ -41,7 +39,8 @@ TrafficSink::TrafficSink(
   const std::function<std::vector<std::string>(void)> & get_entity_names_function,
   const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
   const std::function<void(std::string)> & despawn_function)
-: radius(radius),
+: TraffiModuleBase(),
+  radius(radius),
   position(position),
   get_entity_names_function(get_entity_names_function),
   get_entity_pose_function(get_entity_pose_function),
@@ -52,9 +51,9 @@ TrafficSink::TrafficSink(
 void TrafficSink::execute()
 {
   const auto names = get_entity_names_function();
-  for(const auto & name : names) {
+  for (const auto & name : names) {
     const auto pose = get_entity_pose_function(name);
-    if(simulation_api::math::getDistance(position, pose) <= radius) {
+    if (simulation_api::math::getDistance(position, pose) <= radius) {
       despawn_function(name);
     }
   }

@@ -55,6 +55,8 @@ ament_auto_add_library(simulation_api SHARED
   src/metrics/momentary_stop_metric.cpp
   src/metrics/reaction_time_metric.cpp
   src/metrics/traveled_distance_metric.cpp
+  src/traffic/traffic_controller.cpp
+  src/traffic/traffic_sink.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
   src/vehicle_model/sim_model_interface.cpp
