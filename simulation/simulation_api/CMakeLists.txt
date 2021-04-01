@@ -46,6 +46,7 @@ ament_auto_add_library(simulation_api SHARED
   src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
   src/math/collision.cpp
+  src/math/distance.cpp
   src/math/hermite_curve.cpp
   src/math/polynomial_solver.cpp
   src/math/uuid.cpp

@@ -1,7 +1,7 @@
 /**
- * @file traffic_sink.cpp
+ * @file distance.hpp
  * @author Masaya Kataoka (masaya.kataoka@tier4.jp)
- * @brief implementation of the TrafficSink class
+ * @brief functions for calculating distance
  * @version 0.1
  * @date 2021-04-01
  *
@@ -23,27 +23,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_api/traffic/traffic_sink.hpp>
+#ifndef SIMULATION_API__MATH__DISTANCE_HPP_
+#define SIMULATION_API__MATH__DISTANCE_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
 
-#include <functional>
-#include <string>
-
 namespace simulation_api
 {
-namespace traffic
+namespace math
 {
-TrafficSink::TrafficSink(
-  double radius,
-  const geometry_msgs::msg::Point & position,
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function,
-  const std::function<void(std::string)> despawn_function)
-: radius(radius),
-  position(position),
-  get_entity_pose_function(get_entity_pose_function),
-  despawn_function(despawn_function)
-{
-}
-}  // namespace traffic
+double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1);
+}  // namespace math
 }  // namespace simulation_api
+
+#endif  // SIMULATION_API__MATH__DISTANCE_HPP_

@@ -41,7 +41,14 @@ public:
   explicit TrafficSink(
     double radius,
     const geometry_msgs::msg::Point & position,
+    const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function,
     const std::function<void(std::string)> despawn_function);
+  const double radius;
+  const geometry_msgs::msg::Point position;
+
+private:
+  const std::function<void(const std::string &)> despawn_function;
+  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
 };
 }  // namespace traffic
 }  // namespace simulation_api
