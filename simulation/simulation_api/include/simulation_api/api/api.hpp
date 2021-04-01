@@ -69,7 +69,6 @@ public:
   : lanelet2_map_osm(lanelet2_map_osm),
     standalone_mode(standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
-    traffic_controller_(entity_manager_ptr_->getHdmapUtils(), auto_sink),
     metrics_manager_(verbose, metrics_logfile_path),
     initialize_client_(
       simulation_interface::protocol,
@@ -110,6 +109,22 @@ public:
   {
     static const std::string address = "127.0.0.1";
 
+    // std::bind(&API::getEntityNames, this);
+    traffic_controller_ptr_ = std::make_shared<simulation_api::traffic::TrafficController>(
+      entity_manager_ptr_->getHdmapUtils(),
+      [this]()
+      {
+        return API::getEntityNames();
+      },
+      [this](const auto & name)
+      {
+        return API::getEntityPose(name);
+      },
+      [this](const auto & name)
+      {
+        return API::despawn(name);
+      },
+      auto_sink);
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(verbose);
   }
@@ -287,7 +302,7 @@ private:
 
   // std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
-  simulation_api::traffic::TrafficController traffic_controller_;
+  std::shared_ptr<simulation_api::traffic::TrafficController> traffic_controller_ptr_;
   double step_time_;
   double current_time_;
 
