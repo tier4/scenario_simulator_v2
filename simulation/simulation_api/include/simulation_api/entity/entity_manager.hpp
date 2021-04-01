@@ -205,6 +205,8 @@ public:
     lanelet_marker_pub_ptr_->publish(markers);
   }
 
+  const std::shared_ptr<hdmap_utils::HdMapUtils> getHdmapUtils();
+
   boost::optional<double> getLinearJerk(
     const std::string & name) const;
 

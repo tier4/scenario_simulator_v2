@@ -64,6 +64,11 @@ const geometry_msgs::msg::Pose EntityManager::toMapPose(
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
 
+const std::shared_ptr<hdmap_utils::HdMapUtils> EntityManager::getHdmapUtils()
+{
+  return hdmap_utils_ptr_;
+}
+
 void EntityManager::setVerbose(bool verbose)
 {
   verbose_ = verbose;

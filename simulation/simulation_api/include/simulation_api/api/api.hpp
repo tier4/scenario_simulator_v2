@@ -18,6 +18,7 @@
 #include <simulation_api/entity/entity_manager.hpp>
 #include <simulation_api/helper/helper.hpp>
 #include <simulation_api/metrics/metrics_manager.hpp>
+#include <simulation_api/traffic/traffic_controller.hpp>
 #include <simulation_api/traffic_lights/traffic_light.hpp>
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
@@ -67,6 +68,7 @@ public:
   : lanelet2_map_osm(lanelet2_map_osm),
     standalone_mode(standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
+    traffic_controller_(entity_manager_ptr_->getHdmapUtils(), true),
     metrics_manager_(verbose, metrics_logfile_path),
     initialize_client_(
       simulation_interface::protocol,
@@ -108,7 +110,6 @@ public:
     static const std::string address = "127.0.0.1";
 
     metrics_manager_.setEntityManager(entity_manager_ptr_);
-
     setVerbose(verbose);
   }
 
@@ -279,6 +280,8 @@ private:
   {
     return spawn(is_ego, parameters.toXml(), status);
   }
+
+  simulation_api::traffic::TrafficController traffic_controller_;
 
   // openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
   // XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
