@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <vector>
 #include <queue>
+#include <memory>
 
 namespace simulation_api
 {

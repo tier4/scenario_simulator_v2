@@ -12,6 +12,11 @@
 #include <simulation_api/traffic/traffic_controller.hpp>
 #include <simulation_api/traffic/traffic_sink.hpp>
 
+#include <string>
+#include <vector>
+#include <memory>
+#include <utility>
+
 namespace simulation_api
 {
 namespace traffic

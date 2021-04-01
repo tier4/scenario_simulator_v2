@@ -91,7 +91,7 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
 const std::vector<std::int64_t> HdMapUtils::getLaneletIds()
 {
   std::vector<std::int64_t> ret;
-  for (const auto & lanelet: lanelet_map_ptr_->laneletLayer) {
+  for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
     ret.emplace_back(lanelet.id());
   }
   return ret;

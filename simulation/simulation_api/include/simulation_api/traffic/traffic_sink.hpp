@@ -32,6 +32,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 namespace simulation_api
 {
