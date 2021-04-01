@@ -62,13 +62,14 @@ public:
     NodeT && node,
     const boost::filesystem::path,
     const std::string & lanelet2_map_osm,
+    const bool auto_sink = true,
     const bool verbose = false,
     const bool standalone_mode = false,
     const std::string & metrics_logfile_path = "/tmp/metrics.json")
   : lanelet2_map_osm(lanelet2_map_osm),
     standalone_mode(standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
-    traffic_controller_(entity_manager_ptr_->getHdmapUtils(), true),
+    traffic_controller_(entity_manager_ptr_->getHdmapUtils(), auto_sink),
     metrics_manager_(verbose, metrics_logfile_path),
     initialize_client_(
       simulation_interface::protocol,
@@ -281,13 +282,12 @@ private:
     return spawn(is_ego, parameters.toXml(), status);
   }
 
-  simulation_api::traffic::TrafficController traffic_controller_;
-
   // openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
   // XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
 
   // std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
+  simulation_api::traffic::TrafficController traffic_controller_;
   double step_time_;
   double current_time_;
 

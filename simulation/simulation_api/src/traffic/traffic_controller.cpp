@@ -19,7 +19,10 @@ TrafficController::TrafficController(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   bool auto_sink)
 : hdmap_utils_(hdmap_utils),
-  auto_sink(auto_sink) {}
+  auto_sink(auto_sink) 
+  {
+    
+  }
 
 void TrafficController::execute()
 {
