@@ -232,6 +232,7 @@ public:
 
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
@@ -240,6 +241,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
+  FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestLaneChange);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
   FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
@@ -249,7 +251,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightColorPhase);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
-  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
 
   #undef FORWARD_TO_ENTITY_MANAGER
 

@@ -228,6 +228,9 @@ public:
   void requestAcquirePosition(
     const std::string & name,
     const openscenario_msgs::msg::LaneletPose & lanelet_pose);
+  void requestAssignRoute(
+    const std::string & name,
+    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints);
 
   void requestLaneChange(const std::string & name, std::int64_t to_lanelet_id);
   void requestLaneChange(const std::string & name, const Direction & direction);
