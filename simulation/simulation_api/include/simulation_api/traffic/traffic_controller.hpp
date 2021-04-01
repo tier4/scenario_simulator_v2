@@ -27,6 +27,7 @@
 #define SIMULATION_API__TRAFFIC__TRAFFIC_CONTROLLER_HPP_
 
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_api/traffic/traffic_module_base.hpp>
 
 #include <memory>
 
@@ -37,9 +38,21 @@ namespace traffic
 class TrafficController
 {
 public:
-  explicit TrafficController(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
+  explicit TrafficController(
+    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
+    bool auto_sink = false);
+  template<typename T, typename ... Ts>
+  void addModule(const std::string & name, Ts && ... xs)
+  {
+    auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
+    modules_.emplace_back(module_ptr);
+  }
+  const bool auto_sink;
+  void execute();
 
 private:
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+  std::vector<std::shared_ptr<simulation_api::traffic::TraffiModuleBase>> modules_;
 };
 }  // namespace traffic
 }  // namespace simulation_api
