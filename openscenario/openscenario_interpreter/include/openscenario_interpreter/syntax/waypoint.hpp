@@ -24,16 +24,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Waypoint =============================================================
+/* ---- Waypoint ---------------------------------------------------------------
  *
- * <xsd:complexType name="Waypoint">
- *   <xsd:sequence>
- *     <xsd:element name="Position" type="Position"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="routeStrategy" type="RouteStrategy" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Waypoint">
+ *    <xsd:sequence>
+ *      <xsd:element name="Position" type="Position"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="routeStrategy" type="RouteStrategy" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Waypoint
 {
   const RouteStrategy route_strategy;
@@ -42,11 +42,14 @@ struct Waypoint
 
   template<typename Node, typename Scope>
   explicit Waypoint(const Node & node, Scope & outer_scope)
-  : route_strategy{
-      readAttribute<RouteStrategy>("routeStrategy", node, outer_scope)},
-    position{
-      readElement<Position>("Position", node, outer_scope)}
+  : route_strategy(readAttribute<RouteStrategy>("routeStrategy", node, outer_scope)),
+    position(readElement<Position>("Position", node, outer_scope))
   {}
+
+  explicit operator geometry_msgs::msg::Pose() const
+  {
+    return static_cast<geometry_msgs::msg::Pose>(position);
+  }
 };
 }
 }  // namespace openscenario_interpreter

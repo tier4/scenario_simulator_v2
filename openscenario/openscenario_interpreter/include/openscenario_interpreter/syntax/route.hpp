@@ -26,18 +26,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Route ================================================================
+/* ---- Route ------------------------------------------------------------------
  *
- * <xsd:complexType name="Route">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="Waypoint" minOccurs="2" maxOccurs="unbounded" type="Waypoint"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="closed" type="Boolean" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Route">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
+ *      <xsd:element name="Waypoint" minOccurs="2" maxOccurs="unbounded" type="Waypoint"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="closed" type="Boolean" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Route
 {
   const String name;
@@ -50,9 +50,9 @@ struct Route
 
   template<typename Node, typename Scope>
   explicit Route(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    closed{readAttribute<Boolean>("closed", node, outer_scope, Boolean())},
-    inner_scope{outer_scope}
+  : name(readAttribute<String>("name", node, outer_scope)),
+    closed(readAttribute<Boolean>("closed", node, outer_scope, Boolean())),
+    inner_scope(outer_scope)
   {
     callWithElements(
       node, "ParameterDeclarations", 0, 1,
@@ -69,7 +69,7 @@ struct Route
       });
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_HPP_

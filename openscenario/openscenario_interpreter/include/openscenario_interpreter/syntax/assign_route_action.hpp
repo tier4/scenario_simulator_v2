@@ -23,18 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== AssignRouteAction ====================================================
+/* ---- AssignRouteAction ------------------------------------------------------
  *
- * <xsd:complexType name="AssignRouteAction">
- *   <xsd:choice>
- *     <xsd:element name="Route" type="Route"/>
- *     <xsd:element name="CatalogReference" type="CatalogReference"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="AssignRouteAction">
+ *    <xsd:choice>
+ *      <xsd:element name="Route" type="Route"/>
+ *      <xsd:element name="CatalogReference" type="CatalogReference"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
-struct AssignRouteAction
-  : public Element
+ * -------------------------------------------------------------------------- */
+struct AssignRouteAction : public ComplexType
 {
   template<typename Node, typename ... Ts>
   explicit AssignRouteAction(const Node & node, Ts && ... xs)
