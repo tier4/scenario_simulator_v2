@@ -23,6 +23,9 @@ TrafficController::TrafficController(
   const std::function<void(std::string)> & despawn_function,
   bool auto_sink)
 : hdmap_utils_(hdmap_utils),
+  get_entity_names_function(get_entity_names_function),
+  get_entity_pose_function(get_entity_pose_function),
+  despawn_function(despawn_function),
   auto_sink(auto_sink)
 {
   if (auto_sink) {
@@ -38,7 +41,12 @@ void TrafficController::autoSink()
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = hdmap_utils_->getLaneletLength(lanelet_id);
       const auto pose = hdmap_utils_->toMapPose(lanelet_pose);
-      // addModule<simulation_api::traffic::TrafficSink>(5, pose.pose.position);
+      addModule<simulation_api::traffic::TrafficSink>(
+        5,
+        pose.pose.position,
+        get_entity_names_function,
+        get_entity_pose_function,
+        despawn_function);
     }
   }
 }

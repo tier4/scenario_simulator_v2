@@ -108,8 +108,6 @@ public:
       simulation_interface::ports::attach_detection_sensor)
   {
     static const std::string address = "127.0.0.1";
-
-    // std::bind(&API::getEntityNames, this);
     traffic_controller_ptr_ = std::make_shared<simulation_api::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(),
       [this]()
