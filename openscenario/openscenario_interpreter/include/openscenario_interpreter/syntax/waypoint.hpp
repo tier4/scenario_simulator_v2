@@ -46,9 +46,18 @@ struct Waypoint
     position(readElement<Position>("Position", node, outer_scope))
   {}
 
-  explicit operator geometry_msgs::msg::Pose() const
+  explicit operator openscenario_msgs::msg::LaneletPose() const
   {
-    return static_cast<geometry_msgs::msg::Pose>(position);
+    // auto convert =
+    //   [](auto && ... xs)
+    //   {
+    //     return static_cast<openscenario_msgs::msg::LaneletPose>(
+    //       std::forward<decltype(xs)>(xs)...);
+    //   };
+    //
+    // return apply<openscenario_msgs::msg::LaneletPose>(convert, position);
+
+    return {};
   }
 };
 }
