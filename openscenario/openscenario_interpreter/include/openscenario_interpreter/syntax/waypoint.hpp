@@ -48,16 +48,13 @@ struct Waypoint
 
   explicit operator openscenario_msgs::msg::LaneletPose() const
   {
-    // auto convert =
-    //   [](auto && ... xs)
-    //   {
-    //     return static_cast<openscenario_msgs::msg::LaneletPose>(
-    //       std::forward<decltype(xs)>(xs)...);
-    //   };
-    //
-    // return apply<openscenario_msgs::msg::LaneletPose>(convert, position);
+    auto convert =
+      [](auto && position)
+      {
+        return static_cast<openscenario_msgs::msg::LaneletPose>(position);
+      };
 
-    return {};
+    return apply<openscenario_msgs::msg::LaneletPose>(convert, position);
   }
 };
 }
