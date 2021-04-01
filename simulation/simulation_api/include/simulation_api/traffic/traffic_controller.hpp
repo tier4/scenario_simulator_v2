@@ -51,6 +51,7 @@ public:
   void execute();
 
 private:
+  void autoSink();
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::vector<std::shared_ptr<simulation_api::traffic::TraffiModuleBase>> modules_;
 };
