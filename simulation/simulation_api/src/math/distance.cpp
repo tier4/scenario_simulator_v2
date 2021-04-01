@@ -35,5 +35,20 @@ double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::ms
 {
   return std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
 }
+
+double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Point & p1)
+{
+  return getDistance(p0.position, p1);
+}
+
+double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Pose & p1)
+{
+  return getDistance(p0, p1.position);
+}
+
+double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Pose & p1)
+{
+  return getDistance(p0.position, p1.position);
+}
 }  // namespace math
 }  // namespace simulation_api

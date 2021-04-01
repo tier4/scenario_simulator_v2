@@ -33,6 +33,9 @@ namespace simulation_api
 namespace math
 {
 double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1);
+double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Point & p1);
+double getDistance(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Pose & p1);
+double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg::Pose & p1);
 }  // namespace math
 }  // namespace simulation_api
 

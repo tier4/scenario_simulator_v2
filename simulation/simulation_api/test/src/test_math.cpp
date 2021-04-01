@@ -294,13 +294,45 @@ TEST(Math, UUID)
     simulation_api::math::generateUUID("test").c_str());
 }
 
-TEST(Math, Distance)
+TEST(Math, Distance0)
 {
   geometry_msgs::msg::Point p0, p1;
   EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
   p1.x = 1;
   EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
   p0.y = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
+}
+
+TEST(Math, Distance1)
+{
+  geometry_msgs::msg::Pose p0, p1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
+  p1.position.x = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
+  p0.position.y = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
+}
+
+TEST(Math, Distance2)
+{
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Pose p1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
+  p1.position.x = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
+  p0.y = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
+}
+
+TEST(Math, Distance3)
+{
+  geometry_msgs::msg::Pose p0;
+  geometry_msgs::msg::Point p1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
+  p1.x = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
+  p0.position.y = 1;
   EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
 }
 
