@@ -28,6 +28,7 @@
 
 #include <functional>
 #include <string>
+#include <iostream>
 
 namespace simulation_api
 {

@@ -50,16 +50,17 @@ public:
     auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
     modules_.emplace_back(module_ptr);
   }
-  const bool auto_sink;
   void execute();
 
 private:
   void autoSink();
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::vector<std::shared_ptr<simulation_api::traffic::TraffiModuleBase>> modules_;
-  const std::function<std::vector<std::string>(void)> & get_entity_names_function;
+  const std::function<std::vector<std::string>(void)> get_entity_names_function;
   const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
   const std::function<void(const std::string &)> despawn_function;
+public:
+  const bool auto_sink;
 };
 }  // namespace traffic
 }  // namespace simulation_api

@@ -87,6 +87,11 @@ public:
     api_.requestAcquirePosition(
       "npc1",
       simulation_api::helper::constructLaneletPose(34675, 0.0) );
+    api_.spawn(false, "npc3", vehicle_params);
+    api_.setEntityStatus(
+      "npc3",
+      simulation_api::helper::constructLaneletPose(34468, 0),
+      simulation_api::helper::constructActionStatus(10));
     /*
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
     api_.addMetric<metrics::MomentaryStopMetric>(
