@@ -45,12 +45,6 @@ BT::NodeStatus WalkStraightAction::tick()
   if (request != "walk_straight") {
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status.lanelet_pose_valid) {
-    setOutput(
-      "updated_status",
-      stopAtEndOfRoad());
-    return BT::NodeStatus::RUNNING;
-  }
   if (!target_speed) {
     target_speed = 1.111;
   }
