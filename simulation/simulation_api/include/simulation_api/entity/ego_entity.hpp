@@ -303,9 +303,6 @@ public:
     }
   }
 
-  void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
-  override;
-
   bool autoware_initialized = false;
 
   auto initializeAutoware()
@@ -338,7 +335,8 @@ public:
   }
 
   void requestAcquirePosition(
-    const geometry_msgs::msg::PoseStamped & map_pose)
+    const geometry_msgs::msg::PoseStamped & goal_pose,
+    const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
   {
     if (!autoware_initialized) {
       initializeAutoware();
@@ -355,7 +353,12 @@ public:
     waitForAutowareStateToBePlanning(
       [&]()
       {
-        std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
+        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
+
+        for (const auto & constraint : constraints) {
+          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
+        }
+
         return updateAutoware(current_pose);
       });
 
@@ -372,6 +375,9 @@ public:
         return updateAutoware(current_pose);
       });
   }
+
+  void requestAssignRoute(
+    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
   decltype(auto) setTargetSpeed(const double value, const bool)
   {

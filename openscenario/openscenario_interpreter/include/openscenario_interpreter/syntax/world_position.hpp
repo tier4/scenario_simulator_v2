@@ -17,6 +17,7 @@
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 
 namespace openscenario_interpreter
@@ -66,6 +67,11 @@ struct WorldPosition
     pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
 
     return pose;
+  }
+
+  explicit operator openscenario_msgs::msg::LaneletPose() const
+  {
+    THROW(ImplementationFault);
   }
 };
 }

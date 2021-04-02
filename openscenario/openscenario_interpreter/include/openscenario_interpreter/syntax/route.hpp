@@ -26,18 +26,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Route ================================================================
+/* ---- Route ------------------------------------------------------------------
  *
- * <xsd:complexType name="Route">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="Waypoint" minOccurs="2" maxOccurs="unbounded" type="Waypoint"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="closed" type="Boolean" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Route">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
+ *      <xsd:element name="Waypoint" minOccurs="2" maxOccurs="unbounded" type="Waypoint"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="closed" type="Boolean" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Route
 {
   const String name;
@@ -48,28 +48,38 @@ struct Route
 
   std::vector<Waypoint> waypoints;
 
-  template<typename Node, typename Scope>
+  template<typename Node>
   explicit Route(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    closed{readAttribute<Boolean>("closed", node, outer_scope, Boolean())},
-    inner_scope{outer_scope}
+  : name(readAttribute<String>("name", node, outer_scope)),
+    closed(readAttribute<Boolean>("closed", node, outer_scope, Boolean())),
+    inner_scope(outer_scope)
   {
     callWithElements(
-      node, "ParameterDeclarations", 0, 1,
-      [&](auto && node)
+      node, "ParameterDeclarations", 0, 1, [&](auto && node)
       {
         return ParameterDeclarations(node, inner_scope);
       });
 
     callWithElements(
-      node, "Waypoint", 2, unbounded,
-      [&](auto && node)
+      node, "Waypoint", 2, unbounded, [&](auto && node)
       {
         return waypoints.emplace_back(node, inner_scope);
       });
   }
+
+  explicit operator std::vector<openscenario_msgs::msg::LaneletPose>() const
+  {
+    std::vector<openscenario_msgs::msg::LaneletPose> lanelet_poses {};
+
+    for (const auto & waypoint : waypoints) {
+      lanelet_poses.emplace_back(
+        static_cast<openscenario_msgs::msg::LaneletPose>(waypoint));
+    }
+
+    return lanelet_poses;
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_HPP_

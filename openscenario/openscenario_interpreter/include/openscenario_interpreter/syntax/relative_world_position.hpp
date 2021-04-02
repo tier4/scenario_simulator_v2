@@ -16,8 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
-#include <quaternion_operation/quaternion_operation.h>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_msgs/msg/lanelet_pose.hpp>
+#include <quaternion_operation/quaternion_operation.h>
 
 namespace openscenario_interpreter
 {
@@ -44,22 +45,13 @@ struct RelativeWorldPosition
 
   const Double dx, dy, dz;
 
-  template
-  <
-    typename Node,
-    typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit RelativeWorldPosition(const Node & node, Scope & scope)
-  : orientation(
-      readElement<Orientation>("Orientation", node, scope)),
-    reference(
-      readAttribute<EntityRef>("entityRef", node, scope)),
-    dx(
-      readAttribute<Double>("dx", node, scope)),
-    dy(
-      readAttribute<Double>("dy", node, scope)),
-    dz(
-      readAttribute<Double>("dz", node, scope, Double()))
+  : orientation(readElement<Orientation>("Orientation", node, scope)),
+    reference(readAttribute<EntityRef>("entityRef", node, scope)),
+    dx(readAttribute<Double>("dx", node, scope)),
+    dy(readAttribute<Double>("dy", node, scope)),
+    dz(readAttribute<Double>("dz", node, scope, Double()))
   {}
 
   operator geometry_msgs::msg::Point() const
@@ -71,6 +63,11 @@ struct RelativeWorldPosition
     result.z = dz;
 
     return result;
+  }
+
+  explicit operator openscenario_msgs::msg::LaneletPose() const
+  {
+    THROW(ImplementationFault);
   }
 };
 }

@@ -17,37 +17,62 @@
 
 #include <openscenario_interpreter/syntax/route.hpp>
 
+#include <type_traits>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== AssignRouteAction ====================================================
+/* ---- AssignRouteAction ------------------------------------------------------
  *
- * <xsd:complexType name="AssignRouteAction">
- *   <xsd:choice>
- *     <xsd:element name="Route" type="Route"/>
- *     <xsd:element name="CatalogReference" type="CatalogReference"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="AssignRouteAction">
+ *    <xsd:choice>
+ *      <xsd:element name="Route" type="Route"/>
+ *      <xsd:element name="CatalogReference" type="CatalogReference"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct AssignRouteAction
-  : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit AssignRouteAction(const Node & node, Ts && ... xs)
-  : Element(
+  Scope inner_scope;
+
+  Element route_or_catalog_reference;
+
+  template<typename Node>
+  explicit AssignRouteAction(const Node & node, Scope & outer_scope)
+  : inner_scope(outer_scope),
+    route_or_catalog_reference(
       choice(
         node,
         std::make_pair("Route", [&](auto && node) {
-          return make<Route>(node, std::forward<decltype(xs)>(xs)...);
+          return make<Route>(node, inner_scope);
         }),
         std::make_pair("CatalogReference", UNSUPPORTED())))
   {}
+
+  const std::true_type accomplished {};
+
+  decltype(auto) operator()(const Scope::Actor & actor)
+  {
+    return requestAssignRoute(
+      actor,
+      static_cast<
+        std::vector<openscenario_msgs::msg::LaneletPose>
+      >(route_or_catalog_reference.as<const Route>()));
+  }
+
+  auto start()
+  {
+    for (const auto & actor : inner_scope.actors) {
+      (*this)(actor);
+    }
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
