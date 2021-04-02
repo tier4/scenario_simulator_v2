@@ -266,6 +266,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestLaneChange);
+  FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(setDriverModel);
   FORWARD_TO_ENTITY_MANAGER(setTargetSpeed);
   FORWARD_TO_ENTITY_MANAGER(setTrafficLightArrow);

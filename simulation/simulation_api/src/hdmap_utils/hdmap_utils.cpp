@@ -251,8 +251,11 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
 boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose)
 {
-  int64_t lanelet_id = getClosetLanletId(pose);
-  const auto center_points = getCenterPoints(lanelet_id);
+  const auto lanelet_id = getClosetLanletId(pose);
+  if (!lanelet_id) {
+    return boost::none;
+  }
+  const auto center_points = getCenterPoints(lanelet_id.get());
   simulation_api::math::CatmullRomSpline spline(center_points);
   const auto s = spline.getSValue(pose.position);
   if (!s) {
@@ -265,14 +268,16 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
       pose_on_centerline.orientation, pose.orientation));
   double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
   openscenario_msgs::msg::LaneletPose lanelet_pose;
-  lanelet_pose.lanelet_id = lanelet_id;
+  lanelet_pose.lanelet_id = lanelet_id.get();
   lanelet_pose.s = s.get();
   lanelet_pose.offset = offset;
   lanelet_pose.rpy = rpy;
   return lanelet_pose;
 }
 
-std::int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
+boost::optional<std::int64_t> HdMapUtils::getClosetLanletId(
+  geometry_msgs::msg::Pose pose,
+  double distance_thresh)
 {
   lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
@@ -280,10 +285,10 @@ std::int64_t HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double
   const auto nearest_road_lanelet =
     excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
   if (nearest_road_lanelet.empty()) {
-    throw HdMapError("failed to calculate closest lanlet id");
+    return boost::none;
   }
   if (nearest_road_lanelet.front().first > distance_thresh) {
-    throw HdMapError("closest lane is too far away!");
+    return boost::none;
   }
   lanelet::Lanelet closest_lanelet;
   closest_lanelet = nearest_road_lanelet.front().second;
