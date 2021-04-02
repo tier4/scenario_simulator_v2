@@ -65,11 +65,12 @@ struct AssignRouteAction
       >(route_or_catalog_reference.as<const Route>()));
   }
 
-  // auto start()
-  // {
-  //   for (const auto & actor : inner_scope.actors) {
-  //   }
-  // }
+  auto start()
+  {
+    for (const auto & actor : inner_scope.actors) {
+      (*this)(actor);
+    }
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
