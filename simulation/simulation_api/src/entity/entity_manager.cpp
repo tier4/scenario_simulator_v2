@@ -224,6 +224,14 @@ void EntityManager::requestLaneChange(const std::string & name, const std::int64
   }
 }
 
+void EntityManager::requestWalkStraight(const std::string & name)
+{
+  auto & entity = reference(name);
+  if (entity.type() == typeid(PedestrianEntity)) {
+    boost::any_cast<PedestrianEntity &>(entity).requestWalkStraight();
+  }
+}
+
 void EntityManager::requestLaneChange(const std::string & name, const Direction & direction)
 {
   auto status = getEntityStatus(name);

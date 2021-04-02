@@ -42,7 +42,7 @@ void WalkStraightAction::getBlackBoardValues()
 BT::NodeStatus WalkStraightAction::tick()
 {
   getBlackBoardValues();
-  if (request != "none" && request != "follow_lane") {
+  if (request != "walk_straight") {
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {
@@ -51,52 +51,11 @@ BT::NodeStatus WalkStraightAction::tick()
       stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets =
-    hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id);
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(following_lanelets);
+    target_speed = 1.111;
   }
-  geometry_msgs::msg::Accel accel_new;
-  accel_new = entity_status.action_status.accel;
-
-  double target_accel = (target_speed.get() - entity_status.action_status.twist.linear.x) /
-    step_time;
-  if (entity_status.action_status.twist.linear.x > target_speed.get()) {
-    target_accel = boost::algorithm::clamp(target_accel, -5, 0);
-    /*　target_accel = boost::algorithm::clamp(target_accel,
-      -1*vehicle_param_ptr->performance.max_deceleration, vehicle_param_ptr->performance.max_acceleration);
-      */
-  } else {
-    target_accel = boost::algorithm::clamp(target_accel, 0, 3);
-    /* target_accel = boost::algorithm::clamp(target_accel,
-      -1*vehicle_param_ptr->performance.max_deceleration, vehicle_param_ptr->performance.max_acceleration);*/
-  }
-  accel_new.linear.x = target_accel;
-  geometry_msgs::msg::Twist twist_new;
-  twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time,
-    0, 5.0);
-  twist_new.linear.y = 0.0;
-  twist_new.linear.z = 0.0;
-  twist_new.angular.x = 0.0;
-  twist_new.angular.y = 0.0;
-  twist_new.angular.z = 0.0;
-
-  double new_s = entity_status.lanelet_pose.s +
-    (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 *
-    step_time;
-  geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;
-
-  openscenario_msgs::msg::EntityStatus entity_status_updated;
-  entity_status_updated.time = current_time + step_time;
-  entity_status_updated.lanelet_pose.lanelet_id = entity_status.lanelet_pose.lanelet_id;
-  entity_status_updated.lanelet_pose.s = new_s;
-  entity_status_updated.lanelet_pose.offset = entity_status.lanelet_pose.offset;
-  entity_status_updated.lanelet_pose.rpy = rpy;
-  entity_status_updated.action_status.twist = twist_new;
-  entity_status_updated.action_status.accel = accel_new;
-  entity_status_updated.pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
-  setOutput("updated_status", entity_status_updated);
+  auto updated_status = calculateEntityStatusUpdatedInWorldFrame(target_speed.get());
+  setOutput("updated_status", updated_status);
   return BT::NodeStatus::RUNNING;
 }
 }      // namespace pedestrian

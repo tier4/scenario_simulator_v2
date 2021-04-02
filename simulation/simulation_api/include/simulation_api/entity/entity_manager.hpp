@@ -239,6 +239,8 @@ public:
   void requestLaneChange(const std::string & name, std::int64_t to_lanelet_id);
   void requestLaneChange(const std::string & name, const Direction & direction);
 
+  void requestWalkStraight(const std::string & name);
+
   std::vector<std::int64_t> getConflictingEntityOnRouteLanelets(
     const std::string & name, const double horizon);
 
