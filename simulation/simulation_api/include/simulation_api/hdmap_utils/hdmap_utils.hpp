@@ -82,6 +82,7 @@ public:
 
   double getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
 
+  const std::vector<std::int64_t> getLaneletIds();
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(

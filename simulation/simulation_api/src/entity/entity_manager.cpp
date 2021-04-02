@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <vector>
 #include <queue>
+#include <memory>
 
 namespace simulation_api
 {
@@ -62,6 +63,11 @@ const geometry_msgs::msg::Pose EntityManager::toMapPose(
   const openscenario_msgs::msg::LaneletPose & lanelet_pose) const
 {
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
+}
+
+const std::shared_ptr<hdmap_utils::HdMapUtils> EntityManager::getHdmapUtils()
+{
+  return hdmap_utils_ptr_;
 }
 
 void EntityManager::setVerbose(bool verbose)

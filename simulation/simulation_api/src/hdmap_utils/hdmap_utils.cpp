@@ -88,6 +88,15 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
   all_graphs.push_back(pedestrian_routing_graph_ptr_);
 }
 
+const std::vector<std::int64_t> HdMapUtils::getLaneletIds()
+{
+  std::vector<std::int64_t> ret;
+  for (const auto & lanelet : lanelet_map_ptr_->laneletLayer) {
+    ret.emplace_back(lanelet.id());
+  }
+  return ret;
+}
+
 const std::vector<geometry_msgs::msg::Point> HdMapUtils::getLaneletPolygon(std::int64_t lanelet_id)
 {
   std::vector<geometry_msgs::msg::Point> points;
