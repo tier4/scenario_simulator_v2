@@ -15,6 +15,10 @@
 #ifndef SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 #define SIMULATION_API__ENTITY__EGO_ENTITY_HPP_
 
+#include <simulation_api/entity/vehicle_entity.hpp>
+#include <simulation_api/vehicle_model/sim_model_ideal.hpp>
+#include <simulation_api/vehicle_model/sim_model_time_delay.hpp>
+
 #undef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
 
 #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
@@ -32,9 +36,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <pugixml.hpp>
-#include <simulation_api/entity/vehicle_entity.hpp>
-#include <simulation_api/vehicle_model/sim_model_ideal.hpp>
-#include <simulation_api/vehicle_model/sim_model_time_delay.hpp>
 #include <sys/wait.h>  // for EgoEntity::~EgoEntity
 #include <tf2/utils.h>
 
@@ -303,9 +304,6 @@ public:
     }
   }
 
-  void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
-  override;
-
   bool autoware_initialized = false;
 
   auto initializeAutoware()
@@ -338,7 +336,8 @@ public:
   }
 
   void requestAcquirePosition(
-    const geometry_msgs::msg::PoseStamped & map_pose)
+    const geometry_msgs::msg::PoseStamped & goal_pose,
+    const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
   {
     if (!autoware_initialized) {
       initializeAutoware();
@@ -355,7 +354,12 @@ public:
     waitForAutowareStateToBePlanning(
       [&]()
       {
-        std::atomic_load(&autowares.at(name))->setGoalPose(map_pose);
+        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
+
+        for (const auto & constraint : constraints) {
+          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
+        }
+
         return updateAutoware(current_pose);
       });
 
@@ -372,6 +376,9 @@ public:
         return updateAutoware(current_pose);
       });
   }
+
+  void requestAssignRoute(
+    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
   decltype(auto) setTargetSpeed(const double value, const bool)
   {

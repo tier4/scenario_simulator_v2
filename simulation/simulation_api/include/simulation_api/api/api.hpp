@@ -15,16 +15,18 @@
 #ifndef SIMULATION_API__API__API_HPP_
 #define SIMULATION_API__API__API_HPP_
 
+#include <simulation_api/entity/entity_manager.hpp>
+#include <simulation_api/helper/helper.hpp>
+#include <simulation_api/metrics/metrics_manager.hpp>
+#include <simulation_api/traffic/traffic_controller.hpp>
+#include <simulation_api/traffic_lights/traffic_light.hpp>
+
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
 #include <boost/filesystem.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <simulation_api/entity/entity_manager.hpp>
-#include <simulation_api/helper/helper.hpp>
-#include <simulation_api/metrics/metrics_manager.hpp>
-#include <simulation_api/traffic_lights/traffic_light.hpp>
 #include <simulation_api_schema.pb.h>
 #include <simulation_interface/zmq_client.hpp>
 
@@ -60,6 +62,7 @@ public:
     NodeT && node,
     const boost::filesystem::path,
     const std::string & lanelet2_map_osm,
+    const bool auto_sink = true,
     const bool verbose = false,
     const bool standalone_mode = false,
     const std::string & metrics_logfile_path = "/tmp/metrics.json")
@@ -105,9 +108,22 @@ public:
       simulation_interface::ports::attach_detection_sensor)
   {
     static const std::string address = "127.0.0.1";
-
+    traffic_controller_ptr_ = std::make_shared<simulation_api::traffic::TrafficController>(
+      entity_manager_ptr_->getHdmapUtils(),
+      [this]()
+      {
+        return API::getEntityNames();
+      },
+      [this](const auto & name)
+      {
+        return API::getEntityPose(name);
+      },
+      [this](const auto & name)
+      {
+        return API::despawn(name);
+      },
+      auto_sink);
     metrics_manager_.setEntityManager(entity_manager_ptr_);
-
     setVerbose(verbose);
   }
 
@@ -165,6 +181,7 @@ public:
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(
     const std::string & name);
+  geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
   bool setEntityStatus(
     const std::string & name,
@@ -238,6 +255,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
+  FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
@@ -282,6 +300,7 @@ private:
 
   // std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
   std::shared_ptr<simulation_api::entity::EntityManager> entity_manager_ptr_;
+  std::shared_ptr<simulation_api::traffic::TrafficController> traffic_controller_ptr_;
   double step_time_;
   double current_time_;
 

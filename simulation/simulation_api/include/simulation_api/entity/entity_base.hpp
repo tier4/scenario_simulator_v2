@@ -15,10 +15,11 @@
 #ifndef SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
 #define SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
 
-#include <openscenario_msgs/msg/bounding_box.hpp>
-#include <openscenario_msgs/msg/entity_status.hpp>
 #include <simulation_api/traffic_lights/traffic_light_manager.hpp>
 #include <simulation_api/hdmap_utils/hdmap_utils.hpp>
+
+#include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/entity_status.hpp>
 
 #include <visualization_msgs/msg/marker_array.hpp>
 

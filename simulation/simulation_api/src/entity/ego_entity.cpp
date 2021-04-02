@@ -33,9 +33,17 @@ std::unordered_map<
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  /**
-   * @todo implement assign route action for ego
-   */
+  assert(1 < waypoints.size());
+
+  const auto destination = (*hdmap_utils_ptr_).toMapPose(waypoints.back());
+
+  std::vector<geometry_msgs::msg::PoseStamped> constraints {};
+
+  for (auto iter = std::cbegin(waypoints); std::next(iter) != std::cend(waypoints); ++iter) {
+    constraints.push_back((*hdmap_utils_ptr_).toMapPose(*iter));
+  }
+
+  return requestAcquirePosition(destination, constraints);
 }
 
 openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
