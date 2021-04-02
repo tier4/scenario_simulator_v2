@@ -25,6 +25,8 @@
 
 #include <simulation_api/behavior/pedestrian/walk_straight_action.hpp>
 
+#include <string>
+
 namespace entity_behavior
 {
 namespace pedestrian

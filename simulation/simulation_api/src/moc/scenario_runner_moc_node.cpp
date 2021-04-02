@@ -123,6 +123,9 @@ public:
 private:
   void update()
   {
+    if (api_.getCurrentTime() >= 4 && api_.entityExists("tom")) {
+      api_.despawn("tom");
+    }
     /*
     if (api_.getLinearJerk("ego")) {
       std::cout << "ego linear jerk :" << api_.getLinearJerk("ego").get() << std::endl;
