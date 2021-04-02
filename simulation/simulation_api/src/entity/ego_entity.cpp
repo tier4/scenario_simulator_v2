@@ -143,10 +143,12 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     status.pose.position.x = v(0) + initial_pose_.get().position.x;
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
-
+    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLanletId(status.pose);
+    if(!closest_lanelet_id) {
+      throw SimulationRuntimeError("failed to closest lane.");
+    }
     simulation_api::math::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(
-        hdmap_utils_ptr_->getClosetLanletId(status.pose)));
+      hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
     const auto s_value = spline.getSValue(status.pose.position);
     if (s_value) {
       status.pose.position.z = spline.getPoint(s_value.get()).z;
