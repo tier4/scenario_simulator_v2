@@ -58,8 +58,9 @@ public:
     api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus(
       "tom", "ego",
-      simulation_api::helper::constructPose(10, 3, 0, 0, 0, 1.57),
+      simulation_api::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       simulation_api::helper::constructActionStatus());
+    api_.requestWalkStraight("tom");
     api_.spawn(
       false, "bob", pedestrian_params,
       simulation_api::helper::constructLaneletPose(34378, 0.0),
