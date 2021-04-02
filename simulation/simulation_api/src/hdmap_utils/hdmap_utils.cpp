@@ -243,7 +243,7 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose)
 {
   const auto lanelet_id = getClosetLanletId(pose);
-  if(!lanelet_id) {
+  if (!lanelet_id) {
     return boost::none;
   }
   const auto center_points = getCenterPoints(lanelet_id.get());
@@ -266,7 +266,9 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   return lanelet_pose;
 }
 
-boost::optional<std::int64_t> HdMapUtils::getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh)
+boost::optional<std::int64_t> HdMapUtils::getClosetLanletId(
+  geometry_msgs::msg::Pose pose,
+  double distance_thresh)
 {
   lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =

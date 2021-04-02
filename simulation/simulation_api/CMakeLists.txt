@@ -24,6 +24,7 @@ ament_auto_add_library(simulation_api SHARED
   src/behavior/action_node.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
+  src/behavior/pedestrian/walk_straight_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp
   src/behavior/route_planner.cpp
   src/behavior/vehicle/behavior_tree.cpp

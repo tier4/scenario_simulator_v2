@@ -30,6 +30,7 @@ BehaviorTree::BehaviorTree()
   std::string path = ament_index_cpp::get_package_share_directory("simulation_api") +
     "/resource/pedestrian_entity_behavior.xml";
   factory_.registerNodeType<entity_behavior::pedestrian::FollowLaneAction>("FollowLane");
+  factory_.registerNodeType<entity_behavior::pedestrian::WalkStraightAction>("WalkStraightAction");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
   // logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);
