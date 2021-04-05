@@ -6,7 +6,7 @@ syntax = "proto3";
 package geometry_msgs;
 
 /**
- * Protobuf definiciton of geometry_msgs/msg/Point type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Point.msg)
+ * Protobuf definiciton of [geometry_msgs/msg/Point type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Point.msg)
 **/
 message Point {
     double x = 1; // x value in a cartesian coordinate.
@@ -15,7 +15,7 @@ message Point {
 }
 
 /**
- * Protobuf definiciton of geometry_msgs/msg/Quaternion type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Quaternion.msg)
+ * Protobuf definiciton of [geometry_msgs/msg/Quaternion type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Quaternion.msg)
 **/
 message Quaternion {
     double x = 1; // x value in a quaternion (0 <= x <= 1)
@@ -25,7 +25,7 @@ message Quaternion {
 }
 
 /**
- * Protobuf definiciton of geometry_msgs/msg/Pose type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Pose.msg)
+ * Protobuf definiciton of [geometry_msgs/msg/Pose type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Pose.msg)
 **/
 message Pose {
     Point position = 1;
@@ -33,7 +33,7 @@ message Pose {
 }
 
 /**
- * Protobuf definiciton of geometry_msgs/msg/Vector3 type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Vector3.msg)
+ * Protobuf definiciton of [geometry_msgs/msg/Vector3 type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Vector3.msg)
 **/
 message Vector3 {
     double x = 1; // first variable in vector
@@ -42,7 +42,7 @@ message Vector3 {
 }
 
 /**
- * Protobuf definiciton of geometry_msgs/msg/Twist type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Twist.msg)
+ * Protobuf definiciton of [geometry_msgs/msg/Twist type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Twist.msg)
 **/
 message Twist {
     Vector3 linear = 1; // linear velocity
@@ -50,7 +50,7 @@ message Twist {
 }
 
 /**
- * Protobuf definiciton of geometry_msgs/msg/Accel type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Accel.msg)
+ * Protobuf definiciton of [geometry_msgs/msg/Accel type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Accel.msg)
 **/
 message Accel {
     Vector3 linear = 1; // linear acceleration
