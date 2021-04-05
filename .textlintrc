@@ -4,6 +4,8 @@
         "skipPatterns": 
             [
               ":fa-chrome:",
+              ":fa-envelope:",
+              ":fa-github:",
               "gt",
               "StoryBoard",
               "SimulationTime",
@@ -13,7 +15,9 @@
               "osm",
               "yaml",
               "rviz",
-              "lx"
+              "lx",
+              "github",
+              "yamacir-kit"
             ]
     }
   }
