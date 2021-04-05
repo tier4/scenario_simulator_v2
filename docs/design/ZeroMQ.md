@@ -1,4 +1,5 @@
-# ZeroMQ Inter-Process Comunication
+# Communication with simulator and interpreter
+zeroMQ Inter-Process Comunication
 ## What is ZeroMQ
 [ZeroMQ](https://zeromq.org/) is an open-source messaging library, it supports TCP/UDP/Intra-Process messaging communication.  
 We use [ZeroMQ](https://zeromq.org/) in order to communicate with the simulator and interpreter.
