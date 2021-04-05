@@ -4,90 +4,127 @@ import "geometry_msgs.proto";
 
 package openscenario_msgs;
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/ActionStatus type in ROS2.
+**/
 message ActionStatus
 {
-    string current_action = 1;
-    geometry_msgs.Twist twist = 2;
-    geometry_msgs.Accel accel = 3;
+    string current_action = 1; // current acttion of the entity.
+    geometry_msgs.Twist twist = 2; // velocity of the entity.
+    geometry_msgs.Accel accel = 3; // acceleration of the entity.
 }
 
+
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/BoundingBox type in ROS2.
+**/
 message BoundingBox
 {
-    geometry_msgs.Point center = 1;
-    geometry_msgs.Vector3 dimensions = 2;
+    geometry_msgs.Point center = 1; // center point of the bounding box.
+    geometry_msgs.Vector3 dimensions = 2; // size of the bounding box.
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/LaneletPose type in ROS2.
+**/
 message LaneletPose
 {
-    int64 lanlet_id = 1;
-    double s = 2;
-    double offset = 3;
-    geometry_msgs.Vector3 rpy = 4;
+    int64 lanlet_id = 1; // lanelet id of the entity.
+    double s = 2; // s value in the lane coordinate.
+    double offset = 3; // offset value in the lane coordinate.
+    geometry_msgs.Vector3 rpy = 4; // roll/pitch/yaw value in the lane coordinate.
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/EntityType type in ROS2.
+**/
 enum EntityType
 {
-    EGO = 0;
-    VEHICLE = 1;
-    PEDESTRIAN = 2;
+    EGO = 0; // Ego Vehicle (Autoware Vehicle)
+    VEHICLE = 1; // Vehicle Entity (NPC Vehicle)
+    PEDESTRIAN = 2; // Pedestrian Entity (NPC Pedestrian)
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/EntityStatus type in ROS2.
+**/
 message EntityStatus
 {
-    EntityType type = 1;
-    double time = 2;
-    string name = 3;
-    BoundingBox bounding_box = 4;
-    ActionStatus action_status = 5;
-    geometry_msgs.Pose pose = 6;
-    LaneletPose lanelet_pose = 7;
-    bool lanelet_pose_valid = 8;
+    EntityType type = 1; // type of the entity.
+    double time = 2; // current simulation time.
+    string name = 3; // name of the entity.
+    BoundingBox bounding_box = 4; // bounding box of the entity.
+    ActionStatus action_status = 5; // action status of the entity.
+    geometry_msgs.Pose pose = 6; // pose in map coordinate of the entity.
+    LaneletPose lanelet_pose = 7; // pose in lane coordinate of the entity.
+    bool lanelet_pose_valid = 8; // if true, the lane matching of the entity is succeeded.
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/Performance type in ROS2.
+**/
 message Performance
 {
-    double max_speed = 1;
-    double max_acceleration = 2;
-    double max_deceleration = 3;
+    double max_speed = 1; // max speed of the entity.
+    double max_acceleration = 2; // max acceleration of the entity.
+    double max_deceleration = 3; // max deceleration of the entity.
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/Axle type in ROS2.
+**/
 message Axle
 {
-    double max_steering = 1;
-    double wheel_diameter = 2;
-    double track_width = 3;
-    double position_x = 4;
-    double position_z = 5;
+    double max_steering = 1; // max steering of the entity axle.
+    double wheel_diameter = 2; // wheel diameter of the entity axle.
+    double track_width = 3; // track width of the entity axle.
+    double position_x = 4; // position x of the entity axle.(longitudinal)
+    double position_z = 5; // position z of the entity axle.(lateral)
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/Axles type in ROS2.
+**/
 message Axles
 {
-    Axle front_axle = 1;
-    Axle rear_axle = 2;
+    Axle front_axle = 1; // parameters of the front axle of the entity.
+    Axle rear_axle = 2; // parameters of rear axle of the entity.
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/Property type in ROS2.
+**/
 message Property
 {
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/VehicleParameters type in ROS2.
+**/
 message VehicleParameters
 {
-    string name = 1;
-    string vehicle_category = 2;
-    Performance performance = 3;
-    BoundingBox bounding_box = 4;
-    Axles axles = 5;
-    Property property = 6;
+    string name = 1; // name of the vehicle entity
+    string vehicle_category = 2; // category of the vehicle entity.
+    Performance performance = 3; // performance parameter of vehicle entity.
+    BoundingBox bounding_box = 4; // bounding box of the vehicle entity.
+    Axles axles = 5; // axles of the vehicle entity.
+    Property property = 6; // other parameters of the vehicle entity.
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/PedestrianParameters type in ROS2.
+**/
 message PedestrianParameters
 {
-    string name = 1;
-    string pedestrian_category = 2;
-    BoundingBox bounding_box = 3;
+    string name = 1; // name of the pedestrian entity.
+    string pedestrian_category = 2; // category of pedestrian entity.
+    BoundingBox bounding_box = 3; // bounding box of the pedestrian entity.
 }
 
+/**
+ * Protobuf definiciton of openscenario_msgs/msg/Waypoints type in ROS2.
+**/
 message Waypoints
 {
-    repeated geometry_msgs.Point waypoints = 1;
+    repeated geometry_msgs.Point waypoints = 1; // waypoints of the entity.
 }
