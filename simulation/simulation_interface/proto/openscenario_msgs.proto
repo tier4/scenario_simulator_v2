@@ -87,7 +87,7 @@ message PedestrianParameters
     BoundingBox bounding_box = 3;
 }
 
-message WayPoints
+message Waypoints
 {
     repeated geometry_msgs.Point waypoints = 1;
 }

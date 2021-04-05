@@ -2,12 +2,17 @@
   "rules": {
     "textlint-rule-ginger": {
       "skipPatterns": [
+        "LaneletPose",
+        "PedestrianParameters",
+        "VehicleParameters",
         "...",
         ":fa-chrome:",
         ":fa-envelope:",
         ":fa-github:",
+        "Accel",
         "Autoware",
         "CatalogLocations",
+        "EntityStatus",
         "LaneChangeTarget",
         "LanePosition",
         "OpenSCENARIO",
