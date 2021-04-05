@@ -24,9 +24,7 @@ The supported functions and their behavior are shown below.
 
 Equivalent to the following description given in ROS 2 Design (unless we made a mistake in our implementation).
 
-> Substituted by the install prefix path of the given package. Forward and
-> backwards slashes will be resolved to the local filesystem convention.
-> Substitution will fail if the package cannot be found.
+> Substituted by the install prefix path of the given package. Forward and backwards slashes will be resolved to the local filesystem convention. Substitution will fail if the package cannot be found.
 
 The package specified must be a ROS 2 package.
 
@@ -66,9 +64,7 @@ OpenSCENARIO has the function that the detailed behavior is left to the decision
 
 The OpenSCENARIO standard does not define what to do if the name cannot be resolved, as quoted below.
 
-> If a reference cannot be resolved uniquely, for example if too few name
-> prefixes have been specified to disambiguate fully, the result of the lookup
-> is undefined.
+> If a reference cannot be resolved uniquely, for example if too few name prefixes have been specified to disambiguate fully, the result of the lookup is undefined.
 
 In our interpreter, the names of the Element and Parameter are lexically scoped.
 
@@ -79,9 +75,7 @@ In our interpreter, the names of the Element and Parameter are lexically scoped.
 ### CustomCommandAction
 
 This Action is specified in the standard as follows.
-> Used to either issue a command to the simulation environment or start an
-> external script. Allows the user to activate custom actions in their
-> simulation tool.
+> Used to either issue a command to the simulation environment or start an external script. Allows the user to activate custom actions in their simulation tool.
 
 For OpenSCENARIO interpreters implemented in scripting languages such as Python, this Action is often implemented as a call to an external script file written in the same language as the host language.
 However, our interpreter is implemented in C ++ and we cannot simply implement such a feature.
