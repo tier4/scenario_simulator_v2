@@ -269,8 +269,7 @@ OpenSCENARIO standards.
 
 ### StoryboardElementStateCondition
 
-- Currently, a feature called "name prefix"
-  (in [OpenSCENARIO User Guide 3.1.2. Naming](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_general_concepts)) is unsupported.
+- Currently, a feature called "name prefix" (in [OpenSCENARIO User Guide 3.1.2. Naming](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_general_concepts)) is unsupported.
 
 Instead, our interpreter implements lexical scoping.
 See also section [Scoping](#scoping).
