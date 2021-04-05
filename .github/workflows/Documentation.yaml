@@ -13,7 +13,7 @@ jobs:
         - uses: actions/checkout@v2-beta
         - uses: docker-practice/actions-setup-docker@master
         - name: run protoc-gen-doc
-          run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc
+          run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
         - name: Set up Python
           uses: actions/setup-python@v1
           with:
