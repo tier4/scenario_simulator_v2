@@ -24,23 +24,35 @@ message Quaternion {
     double w = 4; // w value in a quaternion (0 <= w <= 1)
 }
 
+/**
+ * Protobuf definiciton of geometry_msgs/msg/Pose type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Pose.msg)
+**/
 message Pose {
     Point position = 1;
     Quaternion orientation = 2;
 }
 
+/**
+ * Protobuf definiciton of geometry_msgs/msg/Vector3 type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Vector3.msg)
+**/
 message Vector3 {
-    double x = 1;
-    double y = 2;
-    double z = 3;
+    double x = 1; // first variable in vector
+    double y = 2; // second variable in vector
+    double z = 3; // third variable in vector
 }
 
+/**
+ * Protobuf definiciton of geometry_msgs/msg/Twist type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Twist.msg)
+**/
 message Twist {
-    Vector3 linear = 1;
-    Vector3 angular = 2;
+    Vector3 linear = 1; // linear velocity
+    Vector3 angular = 2; // angular velocity
 }
 
+/**
+ * Protobuf definiciton of geometry_msgs/msg/Accel type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Accel.msg)
+**/
 message Accel {
-    Vector3 linear = 1;
-    Vector3 angular = 2;
+    Vector3 linear = 1; // linear acceleration
+    Vector3 angular = 2; // angular acceleration
 }
