@@ -2,10 +2,10 @@
   "rules": {
     "textlint-rule-ginger": {
       "skipPatterns": [
-        "LaneletPose",
-        "PedestrianParameters",
-        "VehicleParameters",
         "...",
+        "/Configuration/",
+        "/Request/",
+        "/Response/",
         ":fa-chrome:",
         ":fa-envelope:",
         ":fa-github:",
@@ -15,11 +15,14 @@
         "EntityStatus",
         "LaneChangeTarget",
         "LanePosition",
+        "LaneletPose",
         "OpenSCENARIO",
+        "PedestrianParameters",
         "SimulationTime",
         "StoryBoard",
         "SyntaxError",
         "TierIV",
+        "VehicleParameters",
         "WorldPosition",
         "ZeroMQ",
         "alongRoute",
