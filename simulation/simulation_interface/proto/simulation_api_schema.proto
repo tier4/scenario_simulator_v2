@@ -177,7 +177,7 @@ message AttachDetectionSensorResponse
 }
 
 /**
- * Requests updating sensor simulation frame.
+ * Requests updating a frame of sensor simulation.
 **/
 message UpdateSensorFrameRequest
 {
@@ -185,7 +185,7 @@ message UpdateSensorFrameRequest
 }
 
 /**
- * Response of updating sensor simulation frame.
+ * Response of updating a frame of sensor simulation.
 **/
 message UpdateSensorFrameResponse
 {
