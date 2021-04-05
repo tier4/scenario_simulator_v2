@@ -116,8 +116,7 @@ Therefore, if you call a command that has a destructive effect on the system, th
 
 #### NullAction
 
-In particular, the following usages that achieve "do nothing action" are worth
-special mention.
+In particular, the following usages that achieve "do nothing action" are worth special mention.
 Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` command is known by the name of the null-command.
 
 ``` XML
