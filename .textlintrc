@@ -3,7 +3,8 @@
     "textlint-rule-ginger": {
         "skipPatterns": 
             [
-                "CatalogLocations"
+                "CatalogLocations",
+                "xosc"
             ]
     }
   }
