@@ -438,7 +438,8 @@ public:
 
   DEFINE_PUBLISHER(InitialTwist);
 
-  decltype(auto) setInitialTwist(const geometry_msgs::msg::Twist & twist = {})
+  decltype(auto) setInitialTwist(
+    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
   {
     autoware_api::Accessor::InitialTwist initial_twist {};
     {
