@@ -1,18 +1,27 @@
 syntax = "proto3";
 
+/**
+ * Protobuf package to define geometry_msgs in ROS2.(https://github.com/ros2/common_interfaces/tree/master/geometry_msgs)
+*/
 package geometry_msgs;
 
+/**
+ * Protobuf definiciton of geometry_msgs/msg/Point type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Point.msg)
+**/
 message Point {
-    double x = 1;
-    double y = 2;
-    double z = 3;
+    double x = 1; // x value in a cartesian coordinate.
+    double y = 2; // y value in a cartesian coordinate.
+    double z = 3; // z value in a cartesian coordinate.
 }
 
+/**
+ * Protobuf definiciton of geometry_msgs/msg/Quaternion type in ROS2.(https://github.com/ros2/common_interfaces/blob/master/geometry_msgs/msg/Quaternion.msg)
+**/
 message Quaternion {
-    double x = 1;
-    double y = 2;
-    double z = 3;
-    double w = 4;
+    double x = 1; // x value in a quaternion (0 <= x <= 1)
+    double y = 2; // y value in a quaternion (0 <= y <= 1)
+    double z = 3; // z value in a quaternion (0 <= z <= 1)
+    double w = 4; // w value in a quaternion (0 <= w <= 1)
 }
 
 message Pose {
