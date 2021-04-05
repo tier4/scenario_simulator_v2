@@ -36,7 +36,7 @@ Package for parsing .xosc file and send command to the simulator via Simulation 
 - [Examples](/package/openscenario_interpreter/markdown/Examples)
 
 ### OpenSCENARIO Visualization Package
-Package for visualize the result of the simulation.
+Package for visualizing the result of the simulation.
 
 - [Classes](/package/openscenario_visualization/markdown/Classes)
 - [Namespaces](/package/openscenario_visualization/markdown/Namespaces)

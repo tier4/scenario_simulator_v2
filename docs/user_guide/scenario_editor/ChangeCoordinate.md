@@ -16,10 +16,10 @@ The position of the displayed object in "Position" on the right side of the scre
 
 ## Lane select when lanes overlap
 
-When you placed an object on a place where the lanes overlap on the lane coordinate, you can select an appropriate lane by following steps.
+When you placed an object in a place where the lanes overlap on the lane coordinate, you can select an appropriate lane by following steps.
 
 1. "MAP" on the menu -> "Coordinate" -> Select "Lane"
-1. Place an object on the place the lanes overlap （e.g. intersection in a below figure).
+1. Place an object in the place the lanes overlap (e.g. intersection in a below figure).
 1. Click "position" row in "Position" window on the right side of the screen.
 1. Click a pencil icon on the right side of "lane" field.
 1. Select an appropriate lane from a selectable lane list.

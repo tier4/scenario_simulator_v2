@@ -16,7 +16,7 @@ The map opens and you can see a screen like a following figure.
 You can place Ego car on the map by following steps.
 
 1. "EDIT" on the menu -> "Ego" -> Select "Set ego car"
-2. Click where you would like to place Ego car on the lane in the map.
+2. Click where you would like to place Ego car on the lane on the map.
 
 ![](screenshot10.png)
 

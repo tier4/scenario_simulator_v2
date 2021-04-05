@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "textlint-rule-ginger": {
+      "skipPatterns": [
+        "...",
+        ":fa-chrome:",
+        ":fa-envelope:",
+        ":fa-github:",
+        "Autoware",
+        "CatalogLocations",
+        "LaneChangeTarget",
+        "LanePosition",
+        "OpenSCENARIO",
+        "SimulationTime",
+        "StoryBoard",
+        "SyntaxError",
+        "TierIV",
+        "WorldPosition",
+        "ZeroMQ",
+        "alongRoute",
+        "dynamicsDimention",
+        "dynamicsShape",
+        "freespace",
+        "github",
+        "gt",
+        "lx",
+        "osm",
+        "protobuf",
+        "rviz",
+        "sh",
+        "type",
+        "xosc",
+        "yamacir-kit",
+        "yaml"
+      ]
+    }
+  }
+}
