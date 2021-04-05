@@ -5,7 +5,7 @@ The ROS2 package `openscenario_interpreter` provides scenario-based simulation o
 This section describes the differences between our OpenSCENARIO Interpreter and
 the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by
 other companies and organizations.
-If you want to know about OpenSCENARIO itself, refer to the link below.
+If you want to know about OpenSCENARIO, refer to the link below.
 
 - [ASAM OpenSCENARIO: User Guide](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html)
 - [OpenSCENARIO 1.0.0 XSD documentation](https://releases.asam.net/OpenSCENARIO/1.0.0/Model-Documentation/index.html)
@@ -21,16 +21,13 @@ Our interpreter supports some of the substitution syntax of
 The substitution syntax works with any attribute string in OpenSCENARIO XML.
 
 This substitution is done only once when reading the attribute.
-Note that the substituion result is finalized before the simulation starts, so
-it is not affected by the `ParameterModifyAction`, etc. that takes effect during
-the simulation.
+Note that the substitution result is finalized before the simulation starts, so it is not affected by the `ParameterModifyAction`, etc. that takes effect during the simulation.
 
 The supported functions and their behavior are shown below.
 
 #### `$(find-pkg-prefix <package-name>)`
 
-Equivalent to the following description given in ROS 2 Design (unless we made a
-mistake in our implementation).
+Equivalent to the following description given in ROS 2 Design (unless we made a mistake in our implementation).
 
 > Substituted by the install prefix path of the given package. Forward and
 > backwards slashes will be resolved to the local filesystem convention.
@@ -47,8 +44,7 @@ The parameters you specify must be declared by ParameterDeclarations before
 
 #### `$(dirname)`
 
-Substitute with the path to the directory where the running scenario script is
-located.
+Substitute the path to the directory where the running scenario script is located.
 
 #### Evaluation of nested substitution syntax
 
@@ -69,29 +65,21 @@ An example is shown below.
 ## Implementation Dependent Behaviors
 ---
 
-OpenSCENARIO has the function that the detailed behavior is left to the decision
-of the implementation side, which is defined as "subject of a contract between
-simulation environment provider and scenario author".
+OpenSCENARIO has the function that the detailed behavior is left to the decision of the implementation side, which is defined as "subject of a contract between simulation environment provider and scenario author".
 
 ### Scoping
 
-The OpenSCENARIO standard does not define what to do if the name cannot be
-resolved, as quoted below.
+The OpenSCENARIO standard does not define what to do if the name cannot be resolved, as quoted below.
 
 > If a reference cannot be resolved uniquely, for example if too few name
 > prefixes have been specified to disambiguate fully, the result of the lookup
 > is undefined.
 
-In our interpreter, the names of Element and Parameter are lexically scoped.
+In our interpreter, the names of the Element and Parameter are lexically scoped.
 
-- If you refer to an identifier that does not exist, the simulation will stop as
-  an error.
-- If multiple identifiers with the same name are defined, the identifier
-  reference is chosen that is closest to the lexical position where the
-  reference occurred.
-- Defining a StoryboardElement with the same name at the same level is treated
-  as a syntax error (In normal lexical scoping, this should be handled by
-  shadowing, but in scenario languages it is likely a copy-and-paste mistake).
+- If you refer to an identifier that does not exist, the simulation will stop with an error.
+- If multiple identifiers with the same name are defined, the identifier reference is chosen that is closest to the lexical position where the reference occurred.
+- Defining a StoryboardElement with the same name at the same level is treated as a syntax error (In normal lexical scoping, this should be handled by shadowing, but in scenario languages it is likely a copy-and-paste mistake).
 
 ### CustomCommandAction
 
@@ -100,13 +88,9 @@ This Action is specified in the standard as follows.
 > external script. Allows the user to activate custom actions in their
 > simulation tool.
 
-For OpenSCENARIO interpreters implemented in scripting languages such as Python,
-this Action is often implemented as a call to an external script file written in
-the same language as the host language.
-However, our interpreter is implemented in C ++ and we cannot simply implement
-such a feature.
-Therefore, our interpreter treats the string given in CustomCommandAction.type
-as a command and executes it on a subprocess, as `sh` does.
+For OpenSCENARIO interpreters implemented in scripting languages such as Python, this Action is often implemented as a call to an external script file written in the same language as the host language.
+However, our interpreter is implemented in C ++ and we cannot simply implement such a feature.
+Therefore, our interpreter treats the string given in CustomCommandAction.type as a command and executes it on a subprocess, as `sh` does.
 
 For example, the `echo` command can be written as follows:
 ``` XML
@@ -115,8 +99,7 @@ For example, the `echo` command can be written as follows:
   </UserDefinedAction>
 ```
 
-The string given to attribute `type` of CustomCommandAction and the string given
-to its content are concatenated with whitespace and passed to the subprocess.
+The string given to attribute `type` of CustomCommandAction and the string given to its content are concatenated with whitespace and passed to the subprocess.
 Therefore, the following two cases have the same effect.
 
 ``` XML

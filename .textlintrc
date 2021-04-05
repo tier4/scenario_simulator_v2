@@ -21,6 +21,7 @@
         "SyntaxError",
         "ZeroMQ",
         "protobuf",
+        "sh",
         "xosc",
         "osm",
         "yaml",
@@ -29,7 +30,8 @@
         "github",
         "yamacir-kit",
         "TierIV",
-        "Autoware"
+        "Autoware",
+        "..."
       ]
     }
   }
