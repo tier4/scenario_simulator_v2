@@ -3,7 +3,7 @@
     "textlint-rule-ginger": {
         "skipPatterns": 
             [
-              ":fa-*:",
+              ":fa-chrome:",
               "gt",
               "StoryBoard",
               "SimulationTime",
