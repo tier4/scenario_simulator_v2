@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="simulation"/>
+  <arg name="vehicle_model"/>
+  <arg name="vehicle_param_file" />
+  <arg name="vehicle_id"/>
+  <arg name="initial_engage_state" default="true"/>
+
+  <arg name="vehicle_model_pkg" default="$(find-pkg-share $(var vehicle_model)_description)"/>
+
+
+  <!-- simulation mode -->
+  <group if="$(var simulation)">
+    <arg name="simulator_model" default="$(var vehicle_model_pkg)/config/simulator_model.param.yaml" />
+    <include file="$(find-pkg-share scenario_test_runner)/launch/simple_planning_simulator.launch.xml">
+      <arg name="simulator_model" value="$(var simulator_model)"/>
+      <arg name="vehicle_param_file" value="$(var vehicle_param_file)"/>
+      <arg name="initial_engage_state" value="$(var initial_engage_state)"/>
+    </include>
+  </group>
+
+  <!-- real mode -->
+  <group unless="$(var simulation)">
+    <include file="$(find-pkg-share g30esli_interface)/launch/g30esli_interface.launch.xml">
+      <arg name="g30esli_interface_param_file" value="$(find-pkg-share individual_params)/config/$(var vehicle_id)/aip_x1/g30esli_interface.param.yaml" />
+      <arg name="initial_engage_state" value="$(var initial_engage_state)"/>
+      <arg name="use_support_low_speed_engage" value="true" />
+    </include>
+    <include file="$(find-pkg-share g30esli_interface_awiv_adapter)/launch/g30esli_interface_awiv_adapter.launch.xml"/>
+  </group>
+</launch>
