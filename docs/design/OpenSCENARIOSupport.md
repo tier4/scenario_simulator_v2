@@ -1,9 +1,7 @@
 # OpenSCENARIO Support
 
-The ROS2 package `openscenario_interpreter` provides scenario-based simulation on
-[ASAM OpenSCENARIO 1.0](https://www.asam.net/standards/detail/openscenario/).
-This section describes the differences between our OpenSCENARIO Interpreter and
-the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by
+The ROS2 package `openscenario_interpreter` provides scenario-based simulation on [ASAM OpenSCENARIO 1.0](https://www.asam.net/standards/detail/openscenario/).
+This section describes the differences between our OpenSCENARIO Interpreter and the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by
 other companies and organizations.
 If you want to know about OpenSCENARIO, refer to the link below.
 
@@ -15,9 +13,7 @@ If you want to know about OpenSCENARIO, refer to the link below.
 
 ### ROS 2 Launch-like substitution syntax
 
-Our interpreter supports some of the substitution syntax of
-[the ROS 2 Launch system](https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration)
-(a.k.a string-interpolation).
+Our interpreter supports some of the substitution syntax of [the ROS 2 Launch system](https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration) (a.k.a string-interpolation).
 The substitution syntax works with any attribute string in OpenSCENARIO XML.
 
 This substitution is done only once when reading the attribute.
