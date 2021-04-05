@@ -1,8 +1,7 @@
 # OpenSCENARIO Support
 
 The ROS2 package `openscenario_interpreter` provides scenario-based simulation on [ASAM OpenSCENARIO 1.0](https://www.asam.net/standards/detail/openscenario/).
-This section describes the differences between our OpenSCENARIO Interpreter and the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by
-other companies and organizations.
+This section describes the differences between our OpenSCENARIO Interpreter and the OpenSCENARIO standard set by ASAM, and the OpenSCENARIO implementation by other companies and organizations.
 If you want to know about OpenSCENARIO, refer to the link below.
 
 - [ASAM OpenSCENARIO: User Guide](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html)
