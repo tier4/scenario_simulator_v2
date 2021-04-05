@@ -82,6 +82,7 @@ public:
 
   double getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
 
+  const std::vector<std::int64_t> getLaneletIds();
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
@@ -134,7 +135,9 @@ public:
   const std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
   const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     std::vector<std::int64_t> lanelet_ids) const;
-  int64_t getClosetLanletId(geometry_msgs::msg::Pose pose, double distance_thresh = 30.0);
+  boost::optional<std::int64_t> getClosetLanletId(
+    geometry_msgs::msg::Pose pose,
+    double distance_thresh = 30.0);
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;

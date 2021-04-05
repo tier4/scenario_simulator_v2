@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <vector>
 #include <queue>
+#include <memory>
 
 namespace simulation_api
 {
@@ -62,6 +63,11 @@ const geometry_msgs::msg::Pose EntityManager::toMapPose(
   const openscenario_msgs::msg::LaneletPose & lanelet_pose) const
 {
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
+}
+
+const std::shared_ptr<hdmap_utils::HdMapUtils> EntityManager::getHdmapUtils()
+{
+  return hdmap_utils_ptr_;
 }
 
 void EntityManager::setVerbose(bool verbose)
@@ -215,6 +221,16 @@ void EntityManager::requestLaneChange(const std::string & name, const std::int64
     what << "In general, such a request is an error, ";
     what << "since Ego cars make autonomous decisions about everything but their destination.";
     throw std::runtime_error(what.str());
+  }
+}
+
+void EntityManager::requestWalkStraight(const std::string & name)
+{
+  auto & entity = reference(name);
+  if (entity.type() == typeid(PedestrianEntity)) {
+    boost::any_cast<PedestrianEntity &>(entity).requestWalkStraight();
+  } else {
+    throw std::runtime_error("target of requestWalkStaraight function should be pedestrian.");
   }
 }
 

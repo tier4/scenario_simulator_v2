@@ -14,11 +14,12 @@
 
 #include <gtest/gtest.h>
 
-#include <simulation_api/math/uuid.hpp>
 #include <simulation_api/math/bounding_box.hpp>
 #include <simulation_api/math/catmull_rom_spline.hpp>
+#include <simulation_api/math/distance.hpp>
 #include <simulation_api/math/hermite_curve.hpp>
 #include <simulation_api/math/polynomial_solver.hpp>
+#include <simulation_api/math/uuid.hpp>
 
 TEST(Math, PolynomialSolver1)
 {
@@ -291,6 +292,48 @@ TEST(Math, UUID)
   EXPECT_STREQ(
     simulation_api::math::generateUUID("test").c_str(),
     simulation_api::math::generateUUID("test").c_str());
+}
+
+TEST(Math, Distance0)
+{
+  geometry_msgs::msg::Point p0, p1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
+  p1.x = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
+  p0.y = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
+}
+
+TEST(Math, Distance1)
+{
+  geometry_msgs::msg::Pose p0, p1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
+  p1.position.x = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
+  p0.position.y = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
+}
+
+TEST(Math, Distance2)
+{
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Pose p1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
+  p1.position.x = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
+  p0.y = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
+}
+
+TEST(Math, Distance3)
+{
+  geometry_msgs::msg::Pose p0;
+  geometry_msgs::msg::Point p1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 0);
+  p1.x = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), 1);
+  p0.position.y = 1;
+  EXPECT_DOUBLE_EQ(simulation_api::math::getDistance(p0, p1), std::sqrt(2));
 }
 
 int main(int argc, char ** argv)

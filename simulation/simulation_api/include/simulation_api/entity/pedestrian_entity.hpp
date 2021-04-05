@@ -44,6 +44,7 @@ public:
   const openscenario_msgs::msg::PedestrianParameters parameters;
   void onUpdate(double current_time, double step_time) override;
   void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
+  void requestWalkStraight();
   // void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)

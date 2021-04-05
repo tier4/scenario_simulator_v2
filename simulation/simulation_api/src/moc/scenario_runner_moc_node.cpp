@@ -58,8 +58,10 @@ public:
     api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus(
       "tom", "ego",
-      simulation_api::helper::constructPose(10, 3, 0, 0, 0, 1.57),
+      simulation_api::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       simulation_api::helper::constructActionStatus());
+    api_.requestWalkStraight("tom");
+    api_.setTargetSpeed("tom", 3, true);
     api_.spawn(
       false, "bob", pedestrian_params,
       simulation_api::helper::constructLaneletPose(34378, 0.0),
@@ -87,6 +89,11 @@ public:
     api_.requestAcquirePosition(
       "npc1",
       simulation_api::helper::constructLaneletPose(34675, 0.0) );
+    api_.spawn(false, "npc3", vehicle_params);
+    api_.setEntityStatus(
+      "npc3",
+      simulation_api::helper::constructLaneletPose(34468, 0),
+      simulation_api::helper::constructActionStatus(10));
     /*
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
     api_.addMetric<metrics::MomentaryStopMetric>(
@@ -116,6 +123,9 @@ public:
 private:
   void update()
   {
+    if (api_.getCurrentTime() >= 4 && api_.entityExists("tom")) {
+      api_.despawn("tom");
+    }
     /*
     if (api_.getLinearJerk("ego")) {
       std::cout << "ego linear jerk :" << api_.getLinearJerk("ego").get() << std::endl;

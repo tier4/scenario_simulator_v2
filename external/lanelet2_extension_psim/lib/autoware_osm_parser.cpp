@@ -103,7 +103,7 @@ std::unique_ptr<LaneletMap> AutowareOsmParser::parse(
   }
   autoware_auto_msgs::msg::HADMapBin map_bin_msg;
   lanelet::utils::conversion::toBinMsg(map, &map_bin_msg);
-  lanelet::utils::conversion::fromBinMsg(map_bin_msg, std::move(map));
+  lanelet::utils::conversion::fromBinMsg(map_bin_msg, map);
   return map;
 }
 

@@ -24,6 +24,7 @@ ament_auto_add_library(simulation_api SHARED
   src/behavior/action_node.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
+  src/behavior/pedestrian/walk_straight_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp
   src/behavior/route_planner.cpp
   src/behavior/vehicle/behavior_tree.cpp
@@ -46,6 +47,7 @@ ament_auto_add_library(simulation_api SHARED
   src/math/bounding_box.cpp
   src/math/catmull_rom_spline.cpp
   src/math/collision.cpp
+  src/math/distance.cpp
   src/math/hermite_curve.cpp
   src/math/polynomial_solver.cpp
   src/math/uuid.cpp
@@ -54,6 +56,8 @@ ament_auto_add_library(simulation_api SHARED
   src/metrics/momentary_stop_metric.cpp
   src/metrics/reaction_time_metric.cpp
   src/metrics/traveled_distance_metric.cpp
+  src/traffic/traffic_controller.cpp
+  src/traffic/traffic_sink.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
   src/vehicle_model/sim_model_interface.cpp

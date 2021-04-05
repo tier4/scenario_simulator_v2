@@ -64,13 +64,13 @@ struct SpeedAction
   }
 
   template<typename T>
-  decltype(auto) setLinearTransition(const String & actor, const T value) const
+  decltype(auto) setLinearTransition(const Scope::Actor & actor, const T value) const
   {
     return setTargetSpeed(actor, value, true);
   }
 
   template<typename T>
-  decltype(auto) setStepTransition(const String & actor, const T value) const
+  decltype(auto) setStepTransition(const Scope::Actor & actor, const T value) const
   {
     auto status = getEntityStatus(actor);
     status.action_status.twist.linear.x = value;
@@ -78,7 +78,7 @@ struct SpeedAction
     return setTargetSpeed(actor, status.action_status.twist.linear.x, true);
   }
 
-  decltype(auto) request(const String & actor) const
+  decltype(auto) operator()(const Scope::Actor & actor) const
   {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       switch (speed_action_dynamics.dynamics_shape) {
@@ -101,7 +101,7 @@ struct SpeedAction
     reset();
 
     for (const auto & actor : inner_scope.actors) {
-      request(actor);
+      (*this)(actor);
     }
 
     return unspecified;

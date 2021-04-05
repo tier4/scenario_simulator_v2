@@ -48,6 +48,7 @@ PedestrianEntity::PedestrianEntity(
 void PedestrianEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
+  tree_ptr_->setRequest("follow_lane");
   if (!status_) {
     return;
   }
@@ -57,8 +58,14 @@ void PedestrianEntity::requestAssignRoute(
   route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
 }
 
+void PedestrianEntity::requestWalkStraight()
+{
+  tree_ptr_->setRequest("walk_straight");
+}
+
 void PedestrianEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
+  tree_ptr_->setRequest("follow_lane");
   if (!status_) {
     return;
   }
