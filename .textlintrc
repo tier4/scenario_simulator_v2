@@ -8,9 +8,12 @@
               "StoryBoard",
               "SimulationTime",
               "CatalogLocations",
+              "OpenSCENARIO",
               "xosc",
               "osm",
-              "yaml"
+              "yaml",
+              "rviz",
+              "lx"
             ]
     }
   }
