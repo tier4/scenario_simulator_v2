@@ -19,11 +19,11 @@ You can add a Pedestrian in a scenario by following steps.
 1. "EDIT" on the menu -> "Pedestrian" -> Select "Add pedestrian"
 2. Click where you would like to add a pedestrian on the map.
 3. Adjust the pedestrian direction by dragging an arrow of the pedestrian object on the map.
-4. As same as "Velocity designation of Ego car" in [Create a simple map](CreateSimpleScenario 'CreateSimpleScenario'), designate the velocity of the pedestrian. As an example, set 0 m/s not to walk at an initial state.
+4. As same as "Velocity designation of Ego car" in [Create a simple map](CreateSimpleScenario 'CreateSimpleScenario'), designate the velocity of the pedestrian. As an example, set 0 m/s not to walk in an initial state.
 
 ![](screenshot04.png)
 
-In the figure above, you can see that the pedestrian is placed in front of a crosswalk, faces toward the crosswalk and a pedestrian's target velocity is set as 0 m/s. 
+In the figure above, you can see that the pedestrian is placed in front of a crosswalk, faces toward the crosswalk and a pedestrian's target velocity is set at 0 m/s. 
 
 ## Add a Point
 
