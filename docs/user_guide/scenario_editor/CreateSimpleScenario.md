@@ -6,7 +6,7 @@ You can launch a scenario editor and open a map by following steps.
 
 1. Open https://scenario.tier4.jp/scenario_editor/restricted/ on Google Chrome
 1. "MAP" on the menu -> Select "Load map"
-1. Select .osm file (Lanelet2) and click "Import" button
+1. Select osm file (Lanelet2) and click "Import" button
 
 The map opens and you can see a screen like a following figure.
 ![](screenshot00.png)
@@ -18,9 +18,9 @@ You can zoom in/out with mouse wheel on the map, move the map by dragging with r
 You can place Ego car and set the destination on the map by following steps.
 
 1. "EDIT" on the menu -> "Ego" -> Select "Set ego car"
-2. Click where you would like to place Ego car on the lane in the map.
+2. Click where you would like to place the Ego car on the lane on the map.
 3. "EDIT" on the menu -> "Ego" -> Select "Set ego car destination"
-4. Click where you would like to set as a destination of Ego car on the lane in the map.
+4. Click where you would like to set as a destination of the Ego car on the lane on the map.
 
 Objects which show Ego car and the destination are displayed on the map like a following figure.
 ![](screenshot01.png)
@@ -29,7 +29,7 @@ You can see that a condition to judge if Ego car arrived at the destination as a
 
 ## Velocity designation of Ego car
 
-You can designate the target velocity of Ego car by following steps.
+You can designate the target velocity of the Ego car by following steps.
 
 1. Click "Speed" in "Entity" window on the bottom left of the screen.
 2. Input the velocity value (m/s) in the form.
@@ -41,7 +41,7 @@ You can designate the target velocity of Ego car by following steps.
 
 You can see a scenario under editing as a text by following steps.
 
-1. "SCENARIO" on the manu -> Select "Open text editor"
+1. "SCENARIO" on the menu -> Select "Open text editor"
 
 A window like a following figure is shown and the scenario is displayed as a text.
 
