@@ -226,14 +226,12 @@ OpenSCENARIO standards.
 
 ### SpeedAction
 
-- The implementation of type [TransitionDynamics](#transitiondynamics) for
-  element `SpeedActionDynamics` is incomplete and
+- The implementation of type [TransitionDynamics](#transitiondynamics) for element `SpeedActionDynamics` is incomplete and
   **SpeedActionDynamics.dynamicsDimention is ignored**.
 
 ### LaneChangeAction
 
-- The implementation of type [TransitionDynamics](#transitiondynamics) for
-  element `LaneChangeActionDynamics` and type [LaneChangeTarget](#lanechangetarget) for element `LaneChangeTarget` are incomplete.
+- The implementation of type [TransitionDynamics](#transitiondynamics) for element `LaneChangeActionDynamics` and type [LaneChangeTarget](#lanechangetarget) for element `LaneChangeTarget` are incomplete.
 
 ### TeleportAction
 
