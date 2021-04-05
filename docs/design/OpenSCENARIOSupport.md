@@ -187,12 +187,9 @@ It is unlikely that you will need these commands for normal scenario creation.
 
 ### Success/failure judgment
 
-Our interpreters have been developed with the intention of incorporating them
-into the CI / CD pipeline of autonomous driving systems.
+Our interpreters have been developed with the intention of incorporating them into the CI / CD pipelines in autonomous driving systems.
 Therefore, executing a scenario can result in success, failure, or error.
-Note that "error" means a flaw in the scenario itself, such as a syntax error,
-or an internal error, not an "error in an automated driving system" such as "a
-vehicle accident occurred in a simulation".
+Note that "error" means a flaw in the scenario, such as a syntax error, or an internal error, not an "error in an automated driving system" such as "a vehicle accident occurred in a simulation".
 In such cases, you will be notified of a "failure".
 
 ## Supporting Status
@@ -271,9 +268,7 @@ OpenSCENARIO standards.
 ### LaneChangeAction
 
 - The implementation of type [TransitionDynamics](#transitiondynamics) for
-  element `LaneChangeActionDynamics` and type
-  [LaneChangeTarget](#lanechangetarget) for element `LaneChangeTarget` are
-  incomplete.
+  element `LaneChangeActionDynamics` and type [LaneChangeTarget](#lanechangetarget) for element `LaneChangeTarget` are incomplete.
 
 ### TeleportAction
 
@@ -292,41 +287,32 @@ OpenSCENARIO standards.
 
 ### TimeHeadwayCondition
 
-- Currently, the values of attribute "freespace" and "alongRoute" are ignored
-  and always behave as if freespace="false" and alongRoute="true" were
-  specified.
+- Currently, the values of attribute "freespace" and "alongRoute" are ignored and always behave as if freespace="false" and alongRoute="true" were specified.
 
 ### ReachPositionCondition
 
-- Currently, **only LanePosition and WorldPosition** can be specified for element
-  of ReachPositionCondition.
+- Currently, **only LanePosition and WorldPosition** can be specified for the element of ReachPositionCondition.
 
 ### DistanceCondition
 
-- Currently, the values of attribute "freespace" and "alongRoute" are ignored
-  and always behave as if freespace="false" and alongRoute="false" were
-  specified.
-- Currently, **only LanePosition and WorldPosition** can be specified for
-  element of Position of DistanceCondition.
+- Currently, the values of attribute "freespace" and "alongRoute" are ignored and always behave as if freespace="false" and alongRoute="false" were specified.
+- Currently, **only LanePosition and WorldPosition** can be specified for the element of Position of DistanceCondition.
 
 ### RelativeDistanceCondition
 
-- Currently, the values of attribute "freespace" is ignored and always behave as
-  if freespace="false" was specified.
+- Currently, the values of attribute "freespace" is ignored and always behave as if freespace="false" was specified.
 
 ### StoryboardElementStateCondition
 
 - Currently, a feature called "name prefix"
-  (in [OpenSCENARIO User Guide 3.1.2. Naming](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_general_concepts))
-  is unsupported.
+  (in [OpenSCENARIO User Guide 3.1.2. Naming](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_general_concepts)) is unsupported.
 
 Instead, our interpreter implements lexical scoping.
 See also section [Scoping](#scoping).
 
 ### TransitionDynamics
 
-- The implementation of type [DynamicsShape](#dynamicsshape) for attribute
-  dynamicsShape is incomplete.
+- The implementation of type [DynamicsShape](#dynamicsshape) for attribute dynamicsShape is incomplete.
 
 | Name              | Type                            | Status
 |:------------------|:--------------------------------|:------:
@@ -336,8 +322,7 @@ See also section [Scoping](#scoping).
 
 ### DynamicsShape
 
-- Currently, only `linear` and `step` are implemented for values of this
-  enumeration.
+- Currently, only `linear` and `step` are implemented for values of this enumeration.
   If you specify `cubic` and `sinusoidal`, you will get an ImplementationFault.
 
 | Value      | Status      |
@@ -350,7 +335,7 @@ See also section [Scoping](#scoping).
 ### LaneChangeTarget
 
 - Currently, only AbsoluteTargetLane is implemented for element of this type.
-  If you specify RelativeTargetLane, you will get an SyntaxError.
+  If you specify RelativeTargetLane, you will get a SyntaxError.
 
 | Element            | Status      |
 |:-------------------|:-----------:|
@@ -359,8 +344,7 @@ See also section [Scoping](#scoping).
 
 ### Position
 
-- Currently, only WorldPosition and LanePosition are implemented for element of
-  this type.
+- Currently, only WorldPosition and LanePosition are implemented for an element of this type.
 
 | Element                | Status      |
 |:-----------------------|:-----------:|
