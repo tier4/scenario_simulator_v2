@@ -1,6 +1,7 @@
 {
-  "rule": {
-    "ginger": {
+  "rules": {
+    "textlint-rule-ginger": {
+        "skipPatterns": ["CatalogLocations"]
     }
   }
 }

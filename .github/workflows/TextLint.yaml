@@ -18,4 +18,4 @@ jobs:
         - name: install rule-ginger
           run: npm install --g textlint-rule-ginger
         - name: run textlint in docs directory
-          run: textlint --rule textlint-rule-ginger docs/*
+          run: textlint docs/*
