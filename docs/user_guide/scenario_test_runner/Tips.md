@@ -1,8 +1,8 @@
 # Tips about writing scenarios
 
 ### Required Scenario Tags
-CatalogLocations and other Tags inside OpenSCENARIO is defined structure below.
-CatalogLocations should be exists in OpenSCENARIO specification.
+CatalogLocations inside OpenSCENARIO is defined structure below.
+CatalogLocations in OpenSCENARIO specification must exist.
 
 ```yaml
 CatalogLocations:
