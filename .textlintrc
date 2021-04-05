@@ -1,37 +1,36 @@
 {
   "rules": {
     "textlint-rule-ginger": {
-        "skipPatterns": 
-            [
-              ":fa-chrome:",
-              ":fa-envelope:",
-              ":fa-github:",
-              "gt",
-              "dynamicsDimention",
-              "alongRoute",
-              "freespace",
-              "dynamicsShape",
-              "StoryBoard",
-              "LaneChangeTarget",
-              "LanePosition",
-              "WorldPosition",
-              "SimulationTime",
-              "CatalogLocations",
-              "type",
-              "OpenSCENARIO",
-              "SyntaxError",
-              "ZeroMQ",
-              "protobuf",
-              "xosc",
-              "osm",
-              "yaml",
-              "rviz",
-              "lx",
-              "github",
-              "yamacir-kit",
-              "TierIV",
-              "Autoware"
-            ]
+      "skipPatterns": [
+        ":fa-chrome:",
+        ":fa-envelope:",
+        ":fa-github:",
+        "gt",
+        "dynamicsDimention",
+        "alongRoute",
+        "freespace",
+        "dynamicsShape",
+        "StoryBoard",
+        "LaneChangeTarget",
+        "LanePosition",
+        "WorldPosition",
+        "SimulationTime",
+        "CatalogLocations",
+        "type",
+        "OpenSCENARIO",
+        "SyntaxError",
+        "ZeroMQ",
+        "protobuf",
+        "xosc",
+        "osm",
+        "yaml",
+        "rviz",
+        "lx",
+        "github",
+        "yamacir-kit",
+        "TierIV",
+        "Autoware"
+      ]
     }
   }
 }
