@@ -34,10 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Entities
 {
-  template
-  <
-    typename Node, typename Scope
-  >
+  template<typename Node, typename Scope>
   explicit Entities(const Node & node, Scope & outer_scope)
   {
     callWithElements(

@@ -45,42 +45,57 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct CustomCommandAction
 {
+  Scope inner_scope;
+
   const String type;
 
   const String content;
 
-  template
-  <
-    typename Node, typename Scope
-  >
-  explicit CustomCommandAction(const Node & node, Scope & scope)
-  : type(readAttribute<String>("type", node, scope)),
-    content(readContent<String>(node, scope))
+  template<typename Node>
+  explicit CustomCommandAction(const Node & node, const Scope & outer_scope)
+  : inner_scope(outer_scope),
+    type(readAttribute<String>("type", node, inner_scope)),
+    content(readContent<String>(node, inner_scope))
   {}
 
   const std::true_type accomplished {};
 
-  static int exitSuccess(const std::vector<std::string> &)
+  static int walkStraightAction(
+    const std::vector<std::string> &, const Scope & current_scope)
+  {
+    for (const auto actor : current_scope.actors) {
+      requestWalkStraight(actor);
+    }
+
+    return current_scope.actors.size();
+  }
+
+  static int exitSuccess(
+    const std::vector<std::string> &, const Scope &)
   {
     throw EXIT_SUCCESS;
   }
 
-  static int exitFailure(const std::vector<std::string> &)
+  static int exitFailure(
+    const std::vector<std::string> &, const Scope &)
   {
     throw EXIT_FAILURE;
   }
 
-  static int error(const std::vector<std::string> &)
+  static int error(
+    const std::vector<std::string> &, const Scope &)
   {
     throw std::runtime_error(cat(__FILE__, ":", __LINE__));
   }
 
-  static int segv(const std::vector<std::string> &)
+  static int segv(
+    const std::vector<std::string> &, const Scope &)
   {
     return *reinterpret_cast<std::add_pointer<int>::type>(0);
   }
 
-  static int test(const std::vector<std::string> & args)
+  static int test(
+    const std::vector<std::string> & args, const Scope &)
   {
     std::cout << "test" << std::endl;
 
@@ -93,14 +108,15 @@ struct CustomCommandAction
   }
 
   const std::unordered_map<
-    std::string, std::function<int(const std::vector<std::string> &)>
-  >
-  builtins
+    std::string,
+    std::function<
+      int(const std::vector<std::string> &, const Scope &)>> builtins
   {
+    std::make_pair("WalkStraightAction", walkStraightAction),
     std::make_pair("error", error),
     std::make_pair("exitFailure", exitFailure),
     std::make_pair("exitSuccess", exitSuccess),
-    std::make_pair("sigsegv", segv),
+    std::make_pair("sigsegv", segv),  // Deprecated
     std::make_pair("test", test),
   };
 
@@ -112,10 +128,7 @@ struct CustomCommandAction
 
     std::vector<std::string> args {};
 
-    for (std::sregex_iterator iter {
-          std::cbegin(s), std::cend(s), pattern
-        }, end; iter != end; ++iter)
-    {
+    for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
       args.emplace_back((*iter)[1]);
     }
 
@@ -124,7 +137,7 @@ struct CustomCommandAction
 
   auto evaluate()
   {
-    /* -------------------------------------------------------------------------
+    /* ---- NOTE ---------------------------------------------------------------
      *
      *  <CustomCommandAction type="function(hoge, &quot;hello, world!&quot;, 3.14)"/>
      *
@@ -143,7 +156,7 @@ struct CustomCommandAction
     if (
       std::regex_match(type, result, pattern) && builtins.find(result[1]) != std::end(builtins))
     {
-      builtins.at(result[1])(split(result[3]));
+      builtins.at(result[1])(split(result[3]), inner_scope);
     } else {
       fork_exec(type, content);
     }
