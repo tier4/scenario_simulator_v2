@@ -83,6 +83,12 @@ jobs:
             name: site
             path: site
             retention-days: 1
+        - name: Publish Report
+          if: ${{ github.event.pull_request.merged == true }}
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: site
         - name: Slack Notification
           uses: 8398a7/action-slack@v2
           if: failure()
