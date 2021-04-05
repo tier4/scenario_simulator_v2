@@ -9,9 +9,9 @@ package openscenario_msgs;
 **/
 message ActionStatus
 {
-    string current_action = 1; // current acttion of the entity.
-    geometry_msgs.Twist twist = 2; // velocity of the entity.
-    geometry_msgs.Accel accel = 3; // acceleration of the entity.
+    string current_action = 1; // Current acttion of the entity.
+    geometry_msgs.Twist twist = 2; // Velocity of the entity.
+    geometry_msgs.Accel accel = 3; // Acceleration of the entity.
 }
 
 
@@ -20,8 +20,8 @@ message ActionStatus
 **/
 message BoundingBox
 {
-    geometry_msgs.Point center = 1; // center point of the bounding box.
-    geometry_msgs.Vector3 dimensions = 2; // size of the bounding box.
+    geometry_msgs.Point center = 1; // Center point of the bounding box.
+    geometry_msgs.Vector3 dimensions = 2; // Size of the bounding box.
 }
 
 /**
@@ -29,10 +29,10 @@ message BoundingBox
 **/
 message LaneletPose
 {
-    int64 lanlet_id = 1; // lanelet id of the entity.
-    double s = 2; // s value in the lane coordinate.
-    double offset = 3; // offset value in the lane coordinate.
-    geometry_msgs.Vector3 rpy = 4; // roll/pitch/yaw value in the lane coordinate.
+    int64 lanlet_id = 1; // Lanelet id of the entity exists.
+    double s = 2; // S value in the lane coordinate.
+    double offset = 3; // Offset value in the lane coordinate.
+    geometry_msgs.Vector3 rpy = 4; // RPY(roll/pitch/yaw) value in the lane coordinate.
 }
 
 /**
@@ -50,14 +50,14 @@ enum EntityType
 **/
 message EntityStatus
 {
-    EntityType type = 1; // type of the entity.
-    double time = 2; // current simulation time.
-    string name = 3; // name of the entity.
-    BoundingBox bounding_box = 4; // bounding box of the entity.
-    ActionStatus action_status = 5; // action status of the entity.
-    geometry_msgs.Pose pose = 6; // pose in map coordinate of the entity.
-    LaneletPose lanelet_pose = 7; // pose in lane coordinate of the entity.
-    bool lanelet_pose_valid = 8; // if true, the lane matching of the entity is succeeded.
+    EntityType type = 1; // Type of the entity.
+    double time = 2; // Current simulation time.
+    string name = 3; // Name of the entity.
+    BoundingBox bounding_box = 4; // Bounding box of the entity.
+    ActionStatus action_status = 5; // Action status of the entity.
+    geometry_msgs.Pose pose = 6; // Pose in map coordinate of the entity.
+    LaneletPose lanelet_pose = 7; // Pose in lane coordinate of the entity.
+    bool lanelet_pose_valid = 8; // If true, the lane matching of the entity is succeeded.
 }
 
 /**
@@ -65,9 +65,9 @@ message EntityStatus
 **/
 message Performance
 {
-    double max_speed = 1; // max speed of the entity.
-    double max_acceleration = 2; // max acceleration of the entity.
-    double max_deceleration = 3; // max deceleration of the entity.
+    double max_speed = 1; // Max speed of the entity.
+    double max_acceleration = 2; // Max acceleration of the entity.
+    double max_deceleration = 3; // Max deceleration of the entity.
 }
 
 /**
@@ -75,11 +75,11 @@ message Performance
 **/
 message Axle
 {
-    double max_steering = 1; // max steering of the entity axle.
-    double wheel_diameter = 2; // wheel diameter of the entity axle.
-    double track_width = 3; // track width of the entity axle.
-    double position_x = 4; // position x of the entity axle.(longitudinal)
-    double position_z = 5; // position z of the entity axle.(lateral)
+    double max_steering = 1; // Max steering of the entity axle.
+    double wheel_diameter = 2; // Wheel diameter of the entity axle.
+    double track_width = 3; // Track width of the entity axle.
+    double position_x = 4; // Position x of the entity axle.(longitudinal)
+    double position_z = 5; // Position z of the entity axle.(lateral)
 }
 
 /**
@@ -87,8 +87,8 @@ message Axle
 **/
 message Axles
 {
-    Axle front_axle = 1; // parameters of the front axle of the entity.
-    Axle rear_axle = 2; // parameters of rear axle of the entity.
+    Axle front_axle = 1; // Parameters of the front axle of the entity.
+    Axle rear_axle = 2; // Parameters of rear axle of the entity.
 }
 
 /**
@@ -103,12 +103,12 @@ message Property
 **/
 message VehicleParameters
 {
-    string name = 1; // name of the vehicle entity
-    string vehicle_category = 2; // category of the vehicle entity.
-    Performance performance = 3; // performance parameter of vehicle entity.
-    BoundingBox bounding_box = 4; // bounding box of the vehicle entity.
-    Axles axles = 5; // axles of the vehicle entity.
-    Property property = 6; // other parameters of the vehicle entity.
+    string name = 1; // Name of the vehicle entity
+    string vehicle_category = 2; // Category of the vehicle entity.
+    Performance performance = 3; // Performance parameter of vehicle entity.
+    BoundingBox bounding_box = 4; // Bounding box of the vehicle entity.
+    Axles axles = 5; // Axles of the vehicle entity.
+    Property property = 6; // Other parameters of the vehicle entity.
 }
 
 /**
@@ -116,9 +116,9 @@ message VehicleParameters
 **/
 message PedestrianParameters
 {
-    string name = 1; // name of the pedestrian entity.
-    string pedestrian_category = 2; // category of pedestrian entity.
-    BoundingBox bounding_box = 3; // bounding box of the pedestrian entity.
+    string name = 1; // Name of the pedestrian entity.
+    string pedestrian_category = 2; // Category of pedestrian entity.
+    BoundingBox bounding_box = 3; // Bounding box of the pedestrian entity.
 }
 
 /**
@@ -126,5 +126,5 @@ message PedestrianParameters
 **/
 message Waypoints
 {
-    repeated geometry_msgs.Point waypoints = 1; // waypoints of the entity.
+    repeated geometry_msgs.Point waypoints = 1; // Waypoints of the entity.
 }

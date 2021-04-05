@@ -4,61 +4,87 @@ import "geometry_msgs.proto";
 import "openscenario_msgs.proto";
 package simulation_api_schema;
 
+/**
+ * Result of the request
+**/
 message Result
 {
-    bool success = 1;
-    string description = 2;
+    bool success = 1; // If true, the request was succeeded
+    string description = 2; // Description of why the request was failed.
 }
 
+/**
+ * Parameter configuration of the lidar sensor
+**/
 message LidarConfiguration
 {
-    string entity = 1;
-    double horizontal_resolution = 2;
-    repeated double vertical_angles = 3;
-    double scan_duration = 4;
-    string topic_name = 5;
+    string entity = 1; // Name of the eneity which you want to attach lidar.
+    double horizontal_resolution = 2; // Horizontal resolutions of the lidar.
+    repeated double vertical_angles = 3; // Vertical resolutions of the lidar.
+    double scan_duration = 4; // Scan duration of the lidar.
+    string topic_name = 5; // Topic name of the lidar pointcloud.
 }
 
+/**
+ * Parameter configuration of the detection sensor
+**/
 message DetectionSensorConfiguration
 {
-    string entity = 1;
-    double update_duration = 2;
-    string topic_name = 3;
+    string entity = 1; // Name of the eneity which you want to attach detection sensor.
+    double update_duration = 2; // Update duration of the detection sensor.
+    string topic_name = 3; // Topic name of the detection result.
 }
 
+/**
+ * Updated entity status by the simulator.
+**/
 message UpdatedEntityStatus
 {
-    string name = 1;
-    openscenario_msgs.ActionStatus action_status = 2;
-    geometry_msgs.Pose pose = 3;
+    string name = 1; // Name og the eneity.
+    openscenario_msgs.ActionStatus action_status = 2; // Action status of the entity.
+    geometry_msgs.Pose pose = 3; // Pose of the entity in the map coordinate.
 }
 
-// Requests and Responses
+/**
+ * Requests initializing simulation.
+**/
 message InitializeRequest
 {
-    double realtime_factor = 1;
-    double step_time = 2;
+    double realtime_factor = 1; // Realtime factor of the simulation.
+    double step_time = 2; // Step time of the simulation.
 }
 
+/**
+ * Result of initializing simulation.
+**/
 message InitializeResponse
 {
-    Result result = 1;
+    Result result = 1; // Result
 }
 
+/**
+ * Requests updating simulation frame.
+**/
 message UpdateFrameRequest
 {
-    double current_time = 1;
+    double current_time = 1; // Current simulation time
 }
 
+/**
+ * Response of updating simulation frame.
+**/
 message UpdateFrameResponse
 {
-    Result result = 1;
+    Result result = 1; // Result
 }
 
+/**
+ * Requests spawning vehicle entity.
+**/
 message SpawnVehicleEntityRequest
 {
-    openscenario_msgs.VehicleParameters parameters = 1;
-    bool is_ego = 2;
+    openscenario_msgs.VehicleParameters parameters = 1; // Parameters of vehicle entity.
+    bool is_ego = 2; // If true, the entity is Ego vehicle. (Autoware vehicle.)
 }
 
 message SpawnVehicleEntityResponse
