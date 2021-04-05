@@ -131,20 +131,17 @@ Therefore, the following two cases have the same effect.
   </UserDefinedAction>
 ```
 
-The effect of calling a command with `CustomCommandAction` is outside the
-control of the interpreter.
-Therefore, if you call a command that has a destructive effect on the system,
-there is no guarantee that scenario execution can continue normally.
+The effect of calling a command with `CustomCommandAction` is outside the control of the interpreter.
+Therefore, if you call a command that has a destructive effect on the system, there is no guarantee that the scenario execution can continue normally.
 
-**For portable scenarios, the use of CustomCommandAction should be avoided as
-much as possible or limited to the scope of POSIX.**
+**For portable scenarios, the use of CustomCommandAction should be avoided as much as possible or limited to the scope of POSIX.**
 
 #### NullAction
 
 In particular, the following usages that achieve "do nothing action" are worth
 special mention.
-Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh`
-command known by the name of the null-command.
+Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` command is known by the name of the null-command.
+
 ``` XML
   <UserDefinedAction>
     <CustomCommandAction type=":"/>
@@ -159,22 +156,13 @@ command known by the name of the null-command.
 | exitFailure | Immediately terminates the simulation as a failure.  |
 
 These built-in commands force the simulation to terminate.
-This termination ignores the StoryboardElement's lifecycle transition (that is,
-it means that `StoryboardElementStateCondition` cannot be used to prevent or
-detect the execution of this command).
+This termination ignores the StoryboardElement's lifecycle transition (that is, it means that `StoryboardElementStateCondition` cannot be used to prevent or detect the execution of this command).
 
-The terminated scenario determines the final success / failure / error by
-collating the called command with the expected simulation result specified in
-`expect` of the
-[workflow file](../user_guide/scenario_test_runner/HowToWriteWorkflowFile.md)
-.
+The terminated scenario determines the final success / failure / error by collating the called command with the expected simulation result specified in `expect` of the [workflow file](../user_guide/scenario_test_runner/HowToWriteWorkflowFile.md).
 
-**Currently, simulation results are notified by simply writing to standard
-output as text. This notification method is temporary and will change in the
-near future.**
+**Currently, simulation results are notified by simply writing to standard output as text. This notification method is temporary and will change in the near future.**
 
-The following built-in commands are debug commands for interpreter developers,
-not scenario creators.
+The following built-in commands are debug commands for interpreter developers, not scenario creators.
 It is unlikely that you will need these commands for normal scenario creation.
 
 | Name    | Effect |

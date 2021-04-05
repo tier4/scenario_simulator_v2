@@ -17,6 +17,7 @@
               "WorldPosition",
               "SimulationTime",
               "CatalogLocations",
+              "type",
               "OpenSCENARIO",
               "SyntaxError",
               "ZeroMQ",
