@@ -11,6 +11,8 @@
               "SimulationTime",
               "CatalogLocations",
               "OpenSCENARIO",
+              "ZeroMQ",
+              "protobuf",
               "xosc",
               "osm",
               "yaml",
