@@ -8,3 +8,5 @@ We use Request/Reply socket in order to run the simulator synchronously.
 scenario_simulator::API send the request to the simulator, Requests are serialized by using [protobuf](https://developers.google.com/protocol-buffers) and use different port in order to communicate with the simulator.  
 
 Ports and protobuf schemas are below.  
+
+[Protobuf Definition](../proto_doc/protobuf.md)
