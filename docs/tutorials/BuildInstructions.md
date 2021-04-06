@@ -41,3 +41,8 @@ source /opt/ros/foxy/setup.bash
 vcs import src < src/scenario_simulator_v2/dependency.repos
 rosdep install -iry --from-paths src --rosdistro foxy
 ```
+
+## build scenario_simulator_vs
+```
+colcon build --symlink-install
+```
