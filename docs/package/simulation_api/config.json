@@ -1,5 +1,5 @@
 {
-    "baseUrl": "/package/simulation_api/markdown/",
+    "baseUrl": "/package/traffic_simulator/markdown/",
     "indexInFolders": true,
     "indexClassesName": "index",
     "indexFilesName": "index",

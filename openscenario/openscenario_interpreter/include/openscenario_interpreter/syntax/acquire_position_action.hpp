@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-#include <simulation_api/helper/helper.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 
 #include <string>
 #include <unordered_map>

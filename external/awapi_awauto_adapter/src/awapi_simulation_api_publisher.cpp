@@ -20,7 +20,7 @@ namespace autoware_api
 {
 AutowareSimulationAPIPublisher::AutowareSimulationAPIPublisher(
   const rclcpp::NodeOptions & options)
-: rclcpp::Node("awapi_simulation_api_publisher", options)
+: rclcpp::Node("awapi_traffic_simulator_publisher", options)
 {
   // subscriber
   sub_initial_pose_ptr_ = create_subscription<PoseStamped>(

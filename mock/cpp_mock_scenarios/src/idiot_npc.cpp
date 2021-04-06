@@ -16,7 +16,7 @@
 
 #include <openscenario_msgs/msg/driver_model.hpp>
 
-#include <simulation_api/api/api.hpp>
+#include <traffic_simulator/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -47,23 +47,23 @@ public:
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
     api_.spawn(
-      false, "idiot", simulation_api::entity::VehicleParameters(
+      false, "idiot", traffic_simulator::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "idiot",
-      simulation_api::helper::constructLaneletPose(34741, 0, 0),
-      simulation_api::helper::constructActionStatus(0));
+      traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+      traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("idiot", 15, true);
     openscenario_msgs::msg::DriverModel driver_model;
     driver_model.see_around = false;
     api_.setDriverModel("idiot", driver_model);
     api_.spawn(
-      false, "npc", simulation_api::entity::VehicleParameters(
+      false, "npc", traffic_simulator::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
-      simulation_api::helper::constructLaneletPose(34741, 10, 0),
-      simulation_api::helper::constructActionStatus(0));
+      traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
+      traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("npc", 5, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));

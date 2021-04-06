@@ -14,7 +14,7 @@
 
 #include <cpp_mock_scenarios/catalogs.hpp>
 
-#include <simulation_api/api/api.hpp>
+#include <traffic_simulator/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -45,29 +45,29 @@ public:
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
     api_.spawn(
-      false, "ego", simulation_api::entity::VehicleParameters(
+      false, "ego", traffic_simulator::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "ego",
-      simulation_api::helper::constructLaneletPose(35026, 0, -0.591),
-      simulation_api::helper::constructActionStatus(0));
+      traffic_simulator::helper::constructLaneletPose(35026, 0, -0.591),
+      traffic_simulator::helper::constructActionStatus(0));
     api_.spawn(
-      false, "npc", simulation_api::entity::VehicleParameters(
+      false, "npc", traffic_simulator::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "npc",
-      simulation_api::helper::constructLaneletPose(35026, 10, 0.0),
-      simulation_api::helper::constructActionStatus(10));
+      traffic_simulator::helper::constructLaneletPose(35026, 10, 0.0),
+      traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("npc", 5, true);
     /*
     api_.attachLidarSensor(
-      simulation_api::helper::constructLidarConfiguration(
-        simulation_api::helper::LidarType::VLP32,
+      traffic_simulator::helper::constructLidarConfiguration(
+        traffic_simulator::helper::LidarType::VLP32,
         "ego",
         "points_raw")
     );
     api_.attachDetectionSensor(
-      simulation_api::helper::constructDetectionSensorConfiguration("ego", "/detection", 0.1));
+      traffic_simulator::helper::constructDetectionSensorConfiguration("ego", "/detection", 0.1));
     */
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));

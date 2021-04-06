@@ -19,7 +19,7 @@
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
-#include <simulation_api/helper/helper.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 
 namespace openscenario_interpreter
 {

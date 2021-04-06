@@ -10,7 +10,7 @@ Do you want to know how to do that, please refer [this documentation](BuildInstr
 Only you have to do is type this command in your terminal.
 
 ```bash
-ros2 launch simulation_api mock_test.launch.py
+ros2 launch traffic_simulator mock_test.launch.py
 ```
 
 You can see ego vehicle runnig in kashiwanoha.

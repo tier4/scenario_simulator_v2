@@ -10,7 +10,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>cargo_delivery</depend>
-  <depend>simulation_api</depend>
+  <depend>traffic_simulator</depend>
   <depend>scenario_simulator</depend>
   <depend>joy_to_vehicle_cmd</depend>
 

@@ -68,7 +68,7 @@ extern "C" {
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <simulation_api/color_utils/color_utils.hpp>
+#include <traffic_simulator/color_utils/color_utils.hpp>
 
 #include <unordered_map>
 #include <string>

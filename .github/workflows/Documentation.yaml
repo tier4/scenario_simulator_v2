@@ -36,15 +36,15 @@ jobs:
             cd ~/doxybook2
             unzip doxybook2-linux-amd64-v1.2.3.zip
 
-        # generating simulation_api package documentation
-        - name: Generate doxygen for simulation_api package
+        # generating traffic_simulator package documentation
+        - name: Generate doxygen for traffic_simulator package
           run: |
-            cd docs/package/simulation_api
+            cd docs/package/traffic_simulator
             doxygen Doxyfile
-        - name: Generate markdown for simulation_api package
+        - name: Generate markdown for traffic_simulator package
           run: |
             export PATH="$PATH:~/doxybook2/bin"
-            cd docs/package/simulation_api
+            cd docs/package/traffic_simulator
             mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
 

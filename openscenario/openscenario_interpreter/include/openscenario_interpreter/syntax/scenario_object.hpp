@@ -86,11 +86,11 @@ struct ScenarioObject
 
         if (object_controller.isEgo()) {
           attachLidarSensor(
-            simulation_api::helper::constructLidarConfiguration(
-              simulation_api::helper::LidarType::VLP32,
+            traffic_simulator::helper::constructLidarConfiguration(
+              traffic_simulator::helper::LidarType::VLP32,
               name, "/sensing/lidar/no_ground/pointcloud"));
           attachDetectionSensor(
-            simulation_api::helper::constructDetectionSensorConfiguration(
+            traffic_simulator::helper::constructDetectionSensorConfiguration(
               name, "/perception/object_recognition/objects", 0.1));
         }
       }

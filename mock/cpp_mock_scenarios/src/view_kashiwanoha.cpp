@@ -14,7 +14,7 @@
 
 #include <cpp_mock_scenarios/catalogs.hpp>
 
-#include <simulation_api/api/api.hpp>
+#include <traffic_simulator/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -45,15 +45,15 @@ public:
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
     api_.spawn(
-      false, "ego", simulation_api::entity::VehicleParameters(
+      false, "ego", traffic_simulator::entity::VehicleParameters(
         vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
       "ego",
-      simulation_api::helper::constructLaneletPose(120684, 5.5361, -0.591),
-      simulation_api::helper::constructActionStatus(0));
+      traffic_simulator::helper::constructLaneletPose(120684, 5.5361, -0.591),
+      traffic_simulator::helper::constructActionStatus(0));
     api_.requestAcquirePosition(
       "ego",
-      simulation_api::helper::constructLaneletPose(120684, 35.1072, -0.6315) );
+      traffic_simulator::helper::constructLaneletPose(120684, 35.1072, -0.6315) );
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }

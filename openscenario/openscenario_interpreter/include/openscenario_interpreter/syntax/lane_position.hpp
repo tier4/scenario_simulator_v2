@@ -55,7 +55,7 @@ struct LanePosition
   explicit operator openscenario_msgs::msg::LaneletPose() const
   {
     const geometry_msgs::msg::Vector3 rpy = orientation;
-    return simulation_api::helper::constructLaneletPose(
+    return traffic_simulator::helper::constructLaneletPose(
       static_cast<Integer>(lane_id), s, offset, rpy.x, rpy.y, rpy.z);
   }
 
