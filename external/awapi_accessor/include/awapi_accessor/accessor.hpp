@@ -494,7 +494,7 @@ public:
   DEFINE_SUBSCRIPTION(VehicleCommand);
 
 public:
-# define DEFINE_STATE_PREDICATE(NAME, VALUE) \
+  #define DEFINE_STATE_PREDICATE(NAME, VALUE) \
   auto is ## NAME() const noexcept \
   { \
     using autoware_system_msgs::msg::AutowareState; \
@@ -511,7 +511,7 @@ public:
   DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
   DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
-# undef DEFINE_STATE_PREDICATE
+  #undef DEFINE_STATE_PREDICATE
 
   bool ready = false;
 
