@@ -2,7 +2,7 @@
 
 Scenario Simulator V2 is a scenario testing framework for Autoware.
 
-![Scenario Testing Framework](image/what_is_scenario_testing_framework.svg "what is scenario testing framework")
+![Scenario Testing Framework](image/what_is_scenario_testing_framework.png "what is scenario testing framework")
 
 It eables us to write scenario at once and run in various kinds of simulator.  
 
