@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
-#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
+#ifndef SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
+#define SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
 
 #include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <simulation_api_schema.pb.h>
@@ -35,4 +35,4 @@ public:
 }  // namespace primitives
 }  // namespace sensor_simulator
 
-#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
+#endif  // SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_

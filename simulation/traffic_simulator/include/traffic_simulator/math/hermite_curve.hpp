@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__MATH__HERMITE_CURVE_HPP_
-#define SIMULATION_API__MATH__HERMITE_CURVE_HPP_
+#ifndef TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
+#define TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
 
 #include <traffic_simulator/math/polynomial_solver.hpp>
 
@@ -102,4 +102,4 @@ private:
 }  // namespace math
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__MATH__HERMITE_CURVE_HPP_
+#endif  // TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__CONSTANTS_HPP_
-#define SCENARIO_SIMULATOR__CONSTANTS_HPP_
+#ifndef SENSOR_SIMULATOR__CONSTANTS_HPP_
+#define SENSOR_SIMULATOR__CONSTANTS_HPP_
 
 namespace sensor_simulator
 {
@@ -24,4 +24,4 @@ constexpr int FAIL = 1;
 }
 }  // namespace sensor_simulator
 
-#endif  // SCENARIO_SIMULATOR__CONSTANTS_HPP_
+#endif  // SENSOR_SIMULATOR__CONSTANTS_HPP_

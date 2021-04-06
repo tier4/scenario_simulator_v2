@@ -20,8 +20,8 @@
  * @brief Preset Color names
  */
 
-#ifndef SIMULATION_API__COLOR_UTILS__COLOR_UTILS_HPP_
-#define SIMULATION_API__COLOR_UTILS__COLOR_UTILS_HPP_
+#ifndef TRAFFIC_SIMULATOR__COLOR_UTILS__COLOR_UTILS_HPP_
+#define TRAFFIC_SIMULATOR__COLOR_UTILS__COLOR_UTILS_HPP_
 
 #include <std_msgs/msg/color_rgba.hpp>
 
@@ -196,4 +196,4 @@ const std::map<std::string, std::array<float, 3>> COLOR_NAME_DICT{
 
 }  // namespace color_utils
 
-#endif  // SIMULATION_API__COLOR_UTILS__COLOR_UTILS_HPP_
+#endif  // TRAFFIC_SIMULATOR__COLOR_UTILS__COLOR_UTILS_HPP_

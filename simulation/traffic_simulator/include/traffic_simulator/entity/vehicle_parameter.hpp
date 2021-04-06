@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
-#define SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
+#ifndef TRAFFIC_SIMULATOR__ENTITY__VEHICLE_PARAMETER_HPP_
+#define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_PARAMETER_HPP_
 
 // headers in pugixml
 #include <openscenario_msgs.pb.h>
@@ -248,4 +248,4 @@ struct VehicleParameters
 }  // namespace entity
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__ENTITY__VEHICLE_PARAMETER_HPP_
+#endif  // TRAFFIC_SIMULATOR__ENTITY__VEHICLE_PARAMETER_HPP_

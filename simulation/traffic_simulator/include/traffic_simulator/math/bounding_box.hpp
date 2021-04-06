@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__MATH__BOUNDING_BOX_HPP_
-#define SIMULATION_API__MATH__BOUNDING_BOX_HPP_
+#ifndef TRAFFIC_SIMULATOR__MATH__BOUNDING_BOX_HPP_
+#define TRAFFIC_SIMULATOR__MATH__BOUNDING_BOX_HPP_
 
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -49,4 +49,4 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
 }  // namespace math
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__MATH__BOUNDING_BOX_HPP_
+#endif  // TRAFFIC_SIMULATOR__MATH__BOUNDING_BOX_HPP_

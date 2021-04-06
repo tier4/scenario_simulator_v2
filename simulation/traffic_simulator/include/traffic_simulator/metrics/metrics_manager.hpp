@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
-#define SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
+#ifndef TRAFFIC_SIMULATOR__METRICS__METRICS_MANAGER_HPP_
+#define TRAFFIC_SIMULATOR__METRICS__METRICS_MANAGER_HPP_
 
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/metrics/metric_base.hpp>
@@ -38,7 +38,8 @@ public:
     file << log_;
   }
   void setVerbose(bool verbose);
-  void setEntityManager(std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
+  void setEntityManager(
+    std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
   template<typename T, typename ... Ts>
   void addMetric(std::string name, Ts && ... xs)
   {
@@ -57,4 +58,4 @@ private:
 };
 }  // namespace metrics
 
-#endif  // SIMULATION_API__METRICS__METRICS_MANAGER_HPP_
+#endif  // TRAFFIC_SIMULATOR__METRICS__METRICS_MANAGER_HPP_

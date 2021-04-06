@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
-#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
+#ifndef SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
+#define SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
 
@@ -63,4 +63,4 @@ private:
 }  // namespace primitives
 }  // namespace sensor_simulator
 
-#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
+#endif  // SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_

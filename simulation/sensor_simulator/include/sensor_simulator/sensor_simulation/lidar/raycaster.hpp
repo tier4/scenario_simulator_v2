@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
-#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
+#ifndef SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
+#define SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
 #include <sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
@@ -80,4 +80,4 @@ private:
 };
 }  // namespace sensor_simulator
 
-#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
+#endif  // SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_

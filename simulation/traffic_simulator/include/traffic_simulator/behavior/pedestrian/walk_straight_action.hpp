@@ -23,8 +23,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__BEHAVIOR__PEDESTRIAN__WALK_STRAIGHT_ACTION_HPP_
-#define SIMULATION_API__BEHAVIOR__PEDESTRIAN__WALK_STRAIGHT_ACTION_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__WALK_STRAIGHT_ACTION_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__WALK_STRAIGHT_ACTION_HPP_
 
 #include <traffic_simulator/behavior/pedestrian/pedestrian_action_node.hpp>
 #include <traffic_simulator/entity/pedestrian_parameter.hpp>
@@ -62,4 +62,4 @@ public:
 }  // namespace pedestrian
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_API__BEHAVIOR__PEDESTRIAN__WALK_STRAIGHT_ACTION_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__WALK_STRAIGHT_ACTION_HPP_

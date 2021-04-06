@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
-#define SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#ifndef TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#define TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
 
 #include <traffic_simulator/metrics/metric_base.hpp>
 
@@ -36,4 +36,4 @@ private:
 };
 }  // namespace metrics
 
-#endif  // SIMULATION_API__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#endif  // TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_

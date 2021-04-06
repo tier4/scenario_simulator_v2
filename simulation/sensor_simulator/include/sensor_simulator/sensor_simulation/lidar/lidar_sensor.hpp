@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
-#define SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
+#ifndef SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
+#define SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 
 #include <simulation_api_schema.pb.h>
 
@@ -49,4 +49,4 @@ private:
 };
 }  // namespace sensor_simulator
 
-#endif  // SCENARIO_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
+#endif  // SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_

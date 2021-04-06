@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
-#define SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
+#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
 
 namespace traffic_simulator
 {
@@ -34,4 +34,4 @@ enum class TrafficLightArrow
 };
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_

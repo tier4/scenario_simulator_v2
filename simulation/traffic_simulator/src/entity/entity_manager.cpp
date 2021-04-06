@@ -576,7 +576,8 @@ const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(
   if (it->second.type() == typeid(PedestrianEntity)) {
     return boost::any_cast<const PedestrianEntity &>(it->second).getBoundingBox();
   }
-  throw traffic_simulator::SimulationRuntimeError("error occurs while getting bounding box : " + name);
+  throw traffic_simulator::SimulationRuntimeError(
+          "error occurs while getting bounding box : " + name);
 }
 
 boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(

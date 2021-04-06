@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__ENTITY__VEHICLE_ENTITY_HPP_
-#define SIMULATION_API__ENTITY__VEHICLE_ENTITY_HPP_
+#ifndef TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
+#define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/vehicle_parameter.hpp>
@@ -106,4 +106,4 @@ private:
 }  // namespace entity
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__ENTITY__VEHICLE_ENTITY_HPP_
+#endif  // TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_

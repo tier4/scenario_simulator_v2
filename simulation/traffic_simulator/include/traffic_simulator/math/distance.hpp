@@ -23,8 +23,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__MATH__DISTANCE_HPP_
-#define SIMULATION_API__MATH__DISTANCE_HPP_
+#ifndef TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_
+#define TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_
 
 #include <geometry_msgs/msg/pose.hpp>
 
@@ -39,4 +39,4 @@ double getDistance(const geometry_msgs::msg::Pose & p0, const geometry_msgs::msg
 }  // namespace math
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__MATH__DISTANCE_HPP_
+#endif  // TRAFFIC_SIMULATOR__MATH__DISTANCE_HPP_

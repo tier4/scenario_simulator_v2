@@ -13,7 +13,8 @@
 // limitations under the License.
 
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
-#include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
+#include \
+  <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 
 #include <string>

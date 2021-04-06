@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
-#define SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
+#ifndef TRAFFIC_SIMULATOR__HDMAP_UTILS__HDMAP_UTILS_HPP_
+#define TRAFFIC_SIMULATOR__HDMAP_UTILS__HDMAP_UTILS_HPP_
 
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
@@ -187,4 +187,4 @@ private:
 };
 }  // namespace hdmap_utils
 
-#endif  // SIMULATION_API__HDMAP_UTILS__HDMAP_UTILS_HPP_
+#endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__HDMAP_UTILS_HPP_

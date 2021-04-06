@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__HELPER__STOP_WATCH_HPP_
-#define SIMULATION_API__HELPER__STOP_WATCH_HPP_
+#ifndef TRAFFIC_SIMULATOR__HELPER__STOP_WATCH_HPP_
+#define TRAFFIC_SIMULATOR__HELPER__STOP_WATCH_HPP_
 
 #include <boost/optional.hpp>
 #include <chrono>
@@ -65,4 +65,4 @@ private:
 }  // namespace helper
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__HELPER__STOP_WATCH_HPP_
+#endif  // TRAFFIC_SIMULATOR__HELPER__STOP_WATCH_HPP_

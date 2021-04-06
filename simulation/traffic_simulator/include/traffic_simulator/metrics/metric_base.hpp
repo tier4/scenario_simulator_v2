@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__METRICS__METRIC_BASE_HPP_
-#define SIMULATION_API__METRICS__METRIC_BASE_HPP_
+#ifndef TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
+#define TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
 
 #include <traffic_simulator/entity/entity_manager.hpp>
 
@@ -83,7 +83,8 @@ public:
   void activate();
   virtual nlohmann::json to_json() = 0;
   nlohmann::json to_base_json();
-  void setEntityManager(std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
+  void setEntityManager(
+    std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
   const std::string metrics_type;
   MetricLifecycle getLifecycle()
   {
@@ -100,4 +101,4 @@ private:
 };
 }  // namespace metrics
 
-#endif  // SIMULATION_API__METRICS__METRIC_BASE_HPP_
+#endif  // TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_

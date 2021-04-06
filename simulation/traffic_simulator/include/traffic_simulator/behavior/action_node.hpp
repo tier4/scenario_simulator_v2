@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__BEHAVIOR__ACTION_NODE_HPP_
-#define SIMULATION_API__BEHAVIOR__ACTION_NODE_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__ACTION_NODE_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -122,4 +122,4 @@ public:
 };
 }  // namespace entity_behavior
 
-#endif  // SIMULATION_API__BEHAVIOR__ACTION_NODE_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__ACTION_NODE_HPP_

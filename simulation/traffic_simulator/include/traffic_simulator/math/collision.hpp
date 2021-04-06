@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__MATH__COLLISION_HPP_
-#define SIMULATION_API__MATH__COLLISION_HPP_
+#ifndef TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_
+#define TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_
 
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
@@ -31,4 +31,4 @@ bool checkCollision2D(
 }  // namespace math
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__MATH__COLLISION_HPP_
+#endif  // TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_

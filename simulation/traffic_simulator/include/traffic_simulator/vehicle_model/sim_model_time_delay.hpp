@@ -19,8 +19,8 @@
  * @date 2019.08.17
  */
 
-#ifndef SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_TIME_DELAY_HPP_
-#define SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_TIME_DELAY_HPP_
+#ifndef TRAFFIC_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_TIME_DELAY_HPP_
+#define TRAFFIC_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_TIME_DELAY_HPP_
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>
@@ -360,4 +360,4 @@ private:
   Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
 };
 
-#endif  // SIMULATION_API__VEHICLE_MODEL__SIM_MODEL_TIME_DELAY_HPP_
+#endif  // TRAFFIC_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_TIME_DELAY_HPP_

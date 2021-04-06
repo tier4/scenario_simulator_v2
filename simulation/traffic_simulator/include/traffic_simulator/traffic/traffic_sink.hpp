@@ -23,8 +23,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__TRAFFIC__TRAFFIC_SINK_HPP_
-#define SIMULATION_API__TRAFFIC__TRAFFIC_SINK_HPP_
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
+#define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
 
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
 
@@ -59,4 +59,4 @@ private:
 }  // namespace traffic
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__TRAFFIC__TRAFFIC_SINK_HPP_
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_

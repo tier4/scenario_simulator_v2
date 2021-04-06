@@ -23,8 +23,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__MATH__UUID_HPP_
-#define SIMULATION_API__MATH__UUID_HPP_
+#ifndef TRAFFIC_SIMULATOR__MATH__UUID_HPP_
+#define TRAFFIC_SIMULATOR__MATH__UUID_HPP_
 
 #include <string>
 
@@ -36,4 +36,4 @@ std::string generateUUID(const std::string & seed);
 }  // namespace math
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__MATH__UUID_HPP_
+#endif  // TRAFFIC_SIMULATOR__MATH__UUID_HPP_

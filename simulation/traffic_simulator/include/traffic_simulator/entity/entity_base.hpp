@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
-#define SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
+#ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
+#define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -115,4 +115,4 @@ protected:
 }  // namespace entity
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__ENTITY__ENTITY_BASE_HPP_
+#endif  // TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_

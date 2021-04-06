@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
-#define SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
+#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_phase.hpp>
@@ -67,4 +67,4 @@ private:
 };
 }  // namespace traffic_simulator
 
-#endif  // SIMULATION_API__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_

@@ -16,7 +16,8 @@
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/yield_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/follow_lane_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
-#include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
+#include \
+  <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
 #include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
