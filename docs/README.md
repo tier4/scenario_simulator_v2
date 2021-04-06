@@ -21,7 +21,7 @@ This package is re-designed [scenario runner](https://github.com/tier4/scenario_
 ### How to build scenario simulator
 See [Build Instruction](tutorials/BuildInstructions.md)
 
-### Run Simple Demo
+### Run simple demo
 See [Simple Demo](tutorials/SimpleDemo.md)
 
 ### How to use scenario editor
@@ -33,6 +33,6 @@ See [Scenario Test Runner](user_guide/scenario_test_runner/ScenarioTestRunner.md
 ### Architecture documentation
 See [Architecture Documentation](./design/SystemArchitecture.md)
 
-## Contact Information
+## Contact information of the maintainer
 See [Contact Information](./etc/ContactUs.md)
 
