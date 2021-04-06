@@ -138,7 +138,9 @@ private:
       api_.requestAcquirePosition(
         "ego",
         simulation_api::helper::constructLaneletPose(35026, 0.0) );
-      api_.setTargetSpeed("npc2", 13, true);
+      if (api_.entityExists("npc2")) {
+        api_.setTargetSpeed("npc2", 13, true);
+      }
     }
     if (api_.reachPosition(
         "ego",
@@ -147,7 +149,9 @@ private:
       api_.requestAcquirePosition(
         "ego",
         simulation_api::helper::constructLaneletPose(34675, 0.0) );
-      api_.setTargetSpeed("npc2", 3, true);
+      if (api_.entityExists("npc2")) {
+        api_.setTargetSpeed("npc2", 3, true);
+      }
     }
     if (api_.reachPosition(
         "npc2",
