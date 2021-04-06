@@ -10,5 +10,9 @@ Do you want to know how to do that, please refer [this documentation](BuildInstr
 Only you have to do is type this command in your terminal.
 
 ```bash
-ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share cenario_test_runner)/workflow_example.yaml'
+ros2 launch simulation_api mock_test.launch.py
 ```
+
+You can see ego vehicle runnig in a kashiwanoha map.
+
+![Simple Demo](../image/simple_demo.png "simple demo")
