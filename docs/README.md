@@ -1,8 +1,10 @@
-# ScenarioSimulator
+# ScenarioSimulator V2
 
-OpenSCENARIO interpreter and simple simulator for Autoware
+Scenario Simulator V2 is a scenario testing framework for Autoware.
 
-![rviz](image/rviz.png "rviz")
+![Scenario Testing Framework](image/what_is_scenario_testing_framework.svg "what is scenario testing framework")
+
+It eables us to write scenario at once and run in various kinds of simulator.  
 
 ## Purpose of this package
 Currently, various kinds of simulators and scenario formats are developed all over the world.
