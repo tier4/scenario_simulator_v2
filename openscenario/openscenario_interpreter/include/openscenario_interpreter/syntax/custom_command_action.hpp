@@ -61,8 +61,12 @@ struct CustomCommandAction
   const std::true_type accomplished {};
 
   static int walkStraightAction(
-    const std::vector<std::string> &, const Scope & current_scope)
+    const std::vector<std::string> & actors, const Scope & current_scope)
   {
+    for (const auto & actor : actors) {
+      requestWalkStraight(actor);
+    }
+
     for (const auto actor : current_scope.actors) {
       requestWalkStraight(actor);
     }
