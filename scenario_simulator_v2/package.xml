@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>scenario_simulator_v2</name>
+  <version>0.0.0</version>
+  <description>scenario testing framework for Autoware</description>
+  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>openscenario_interpreter</exec_depend>
+  <exec_depend>openscenario_msgs</exec_depend>
+  <exec_depend>openscenario_utility</exec_depend>
+  <exec_depend>openscenario_visualization</exec_depend>
+  <exec_depend>simple_sensor_simulator</exec_depend>
+  <exec_depend>simulation_interface</exec_depend>
+  <exec_depend>traffic_simulator</exec_depend>
+  <exec_depend>scenario_test_runner</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
