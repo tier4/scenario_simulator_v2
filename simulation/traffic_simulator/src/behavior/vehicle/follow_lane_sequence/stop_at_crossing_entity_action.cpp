@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
-#include \
-  <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-
 #include <string>
-#include <vector>
+#include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
+#include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
+#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <utility>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -28,8 +26,7 @@ namespace vehicle
 namespace follow_lane_sequence
 {
 StopAtCrossingEntityAction::StopAtCrossingEntityAction(
-  const std::string & name,
-  const BT::NodeConfiguration & config)
+  const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
   in_stop_sequence_ = false;
@@ -64,22 +61,20 @@ const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calcula
     openscenario_msgs::msg::WaypointsArray waypoints;
     traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
-      entity_status.lanelet_pose.s,
-      entity_status.lanelet_pose.s + getHorizon(), 1.0);
+      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0);
     return waypoints;
   } else {
     return openscenario_msgs::msg::WaypointsArray();
   }
 }
 
-boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(
-  double current_velocity)
+boost::optional<double> StopAtCrossingEntityAction::calculateTargetSpeed(double current_velocity)
 {
   if (!distance_to_stop_target_) {
     return boost::none;
   }
-  double rest_distance = distance_to_stop_target_.get() -
-    (vehicle_parameters.bounding_box.dimensions.x + 3);
+  double rest_distance =
+    distance_to_stop_target_.get() - (vehicle_parameters.bounding_box.dimensions.x + 3);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
       return std::sqrt(2 * 5 * rest_distance);

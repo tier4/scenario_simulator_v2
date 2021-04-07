@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/entity/exception.hpp>
-
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/algorithm/clamp.hpp>
-
 #include <memory>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <string>
+#include <traffic_simulator/entity/exception.hpp>
+#include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -32,8 +29,7 @@ namespace entity
 VehicleEntity::VehicleEntity(
   std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
   openscenario_msgs::msg::VehicleParameters params)
-: EntityBase(params.name, name, initial_state),
-  parameters(params)
+: EntityBase(params.name, name, initial_state), parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
@@ -52,8 +48,7 @@ void VehicleEntity::requestAssignRoute(
 }
 
 VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters params)
-: EntityBase(params.name, name),
-  parameters(params)
+: EntityBase(params.name, name), parameters(params)
 {
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
@@ -76,10 +71,7 @@ void VehicleEntity::requestLaneChange(std::int64_t to_lanelet_id)
   tree_ptr_->setValueToBlackBoard("to_lanelet_id", to_lanelet_id);
 }
 
-void VehicleEntity::cancelRequest()
-{
-  tree_ptr_->setRequest("none");
-}
+void VehicleEntity::cancelRequest() { tree_ptr_->setRequest("none"); }
 
 void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
 {
@@ -100,8 +92,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   tree_ptr_->setValueToBlackBoard("entity_status", status_.get());
   if (status_->lanelet_pose_valid) {
     tree_ptr_->setValueToBlackBoard(
-      "route_lanelets",
-      route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
+      "route_lanelets", route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
   } else {
     std::vector<std::int64_t> empty = {};
     tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
@@ -112,8 +103,8 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   }
   auto status_updated = tree_ptr_->getUpdatedStatus();
   if (status_updated.lanelet_pose_valid) {
-    auto following_lanelets = hdmap_utils_ptr_->getFollowingLanelets(
-      status_updated.lanelet_pose.lanelet_id);
+    auto following_lanelets =
+      hdmap_utils_ptr_->getFollowingLanelets(status_updated.lanelet_pose.lanelet_id);
     auto l = hdmap_utils_ptr_->getLaneletLength(status_updated.lanelet_pose.lanelet_id);
     if (following_lanelets.size() == 1 && l <= status_updated.lanelet_pose.s) {
       stopAtEndOfRoad();
@@ -130,8 +121,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     linear_jerk_ = 0;
   } else {
     linear_jerk_ =
-      (status_updated.action_status.accel.linear.x -
-      status_->action_status.accel.linear.x) /
+      (status_updated.action_status.accel.linear.x - status_->action_status.accel.linear.x) /
       step_time;
   }
   setStatus(status_updated);

@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ASSIGN_ROUTE_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/route.hpp>
-
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
@@ -42,27 +41,22 @@ struct AssignRouteAction
 
   Element route_or_catalog_reference;
 
-  template<typename Node>
+  template <typename Node>
   explicit AssignRouteAction(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
-    route_or_catalog_reference(
-      choice(
-        node,
-        std::make_pair("Route", [&](auto && node) {
-          return make<Route>(node, inner_scope);
-        }),
-        std::make_pair("CatalogReference", UNSUPPORTED())))
-  {}
+    route_or_catalog_reference(choice(
+      node, std::make_pair("Route", [&](auto && node) { return make<Route>(node, inner_scope); }),
+      std::make_pair("CatalogReference", UNSUPPORTED())))
+  {
+  }
 
-  const std::true_type accomplished {};
+  const std::true_type accomplished{};
 
   decltype(auto) operator()(const Scope::Actor & actor)
   {
     return requestAssignRoute(
-      actor,
-      static_cast<
-        std::vector<openscenario_msgs::msg::LaneletPose>
-      >(route_or_catalog_reference.as<const Route>()));
+      actor, static_cast<std::vector<openscenario_msgs::msg::LaneletPose> >(
+               route_or_catalog_reference.as<const Route>()));
   }
 
   auto start()

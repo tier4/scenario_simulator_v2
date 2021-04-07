@@ -35,12 +35,13 @@ struct CatalogLocation
 {
   const Directory directory;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit CatalogLocation(const Node & node, Scope & outer_scope)
   : directory{readElement<Directory>("Directory", node, outer_scope)}
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATION_HPP_

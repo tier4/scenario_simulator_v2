@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/color_utils/color_utils.hpp>
-
 #include <iostream>
 #include <string>
+#include <traffic_simulator/color_utils/color_utils.hpp>
 
 namespace color_utils
 {
@@ -140,8 +139,12 @@ const std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alph
 {
   std_msgs::msg::ColorRGBA c_msg;
   c_msg.a = alpha;
-  if (c_msg.a < 0.) {c_msg.a = 0.;}
-  if (c_msg.a > 1.) {c_msg.a = 1.;}
+  if (c_msg.a < 0.) {
+    c_msg.a = 0.;
+  }
+  if (c_msg.a > 1.) {
+    c_msg.a = 1.;
+  }
 
   auto found_itr = COLOR_NAME_DICT.find(preset_name);
   if (found_itr != COLOR_NAME_DICT.end()) {

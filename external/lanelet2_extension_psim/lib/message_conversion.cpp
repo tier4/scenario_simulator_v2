@@ -14,10 +14,6 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
-#include <lanelet2_extension_psim/exception.hpp>
-#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
-#include <lanelet2_extension_psim/utility/message_conversion.hpp>
-
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_io/Exceptions.h>
 #include <lanelet2_io/Projection.h>
@@ -25,14 +21,16 @@
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
 #include <lanelet2_projection/UTM.h>
-#include <rclcpp/rclcpp.hpp>
 
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-
+#include <lanelet2_extension_psim/exception.hpp>
+#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
+#include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <sstream>
 #include <string>
-#include <memory>
 
 namespace lanelet
 {
@@ -102,8 +100,7 @@ void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::Lanelet
 }
 
 void fromBinMsg(
-  const autoware_auto_msgs::msg::HADMapBin & msg,
-  const std::unique_ptr<LaneletMap> & map)
+  const autoware_auto_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map)
 {
   if (!map) {
     std::stringstream sstream;

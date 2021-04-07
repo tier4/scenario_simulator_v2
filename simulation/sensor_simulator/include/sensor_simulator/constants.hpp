@@ -21,7 +21,7 @@ namespace return_code
 {
 constexpr int SUCCESS = 0;
 constexpr int FAIL = 1;
-}
+}  // namespace return_code
 }  // namespace sensor_simulator
 
 #endif  // SENSOR_SIMULATOR__CONSTANTS_HPP_

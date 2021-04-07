@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/pedestrian/follow_lane_action.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/algorithm/clamp.hpp>
-
 #include <iostream>
-#include <string>
 #include <memory>
+#include <string>
+#include <traffic_simulator/behavior/pedestrian/follow_lane_action.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -27,12 +26,11 @@ namespace entity_behavior
 namespace pedestrian
 {
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
-: entity_behavior::PedestrianActionNode(name, config) {}
-
-void FollowLaneAction::getBlackBoardValues()
+: entity_behavior::PedestrianActionNode(name, config)
 {
-  PedestrianActionNode::getBlackBoardValues();
 }
+
+void FollowLaneAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
 BT::NodeStatus FollowLaneAction::tick()
 {
@@ -41,9 +39,7 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!entity_status.lanelet_pose_valid) {
-    setOutput(
-      "updated_status",
-      stopAtEndOfRoad());
+    setOutput("updated_status", stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }
   auto following_lanelets =
@@ -54,8 +50,8 @@ BT::NodeStatus FollowLaneAction::tick()
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
 
-  double target_accel = (target_speed.get() - entity_status.action_status.twist.linear.x) /
-    step_time;
+  double target_accel =
+    (target_speed.get() - entity_status.action_status.twist.linear.x) / step_time;
   if (entity_status.action_status.twist.linear.x > target_speed.get()) {
     target_accel = boost::algorithm::clamp(target_accel, -5, 0);
     /*　target_accel = boost::algorithm::clamp(target_accel,
@@ -69,17 +65,16 @@ BT::NodeStatus FollowLaneAction::tick()
   accel_new.linear.x = target_accel;
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = boost::algorithm::clamp(
-    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time,
-    0, 5.0);
+    entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, 0, 5.0);
   twist_new.linear.y = 0.0;
   twist_new.linear.z = 0.0;
   twist_new.angular.x = 0.0;
   twist_new.angular.y = 0.0;
   twist_new.angular.z = 0.0;
 
-  double new_s = entity_status.lanelet_pose.s +
-    (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 *
-    step_time;
+  double new_s =
+    entity_status.lanelet_pose.s +
+    (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 * step_time;
   geometry_msgs::msg::Vector3 rpy = entity_status.lanelet_pose.rpy;
 
   openscenario_msgs::msg::EntityStatus entity_status_updated;
@@ -94,5 +89,5 @@ BT::NodeStatus FollowLaneAction::tick()
   setOutput("updated_status", entity_status_updated);
   return BT::NodeStatus::RUNNING;
 }
-}      // namespace pedestrian
+}  // namespace pedestrian
 }  // namespace entity_behavior

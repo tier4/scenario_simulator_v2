@@ -34,21 +34,19 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Entities
 {
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Entities(const Node & node, Scope & outer_scope)
   {
-    callWithElements(
-      node, "ScenarioObject", 0, unbounded, [&](auto && node)
-      {
-        outer_scope.entities.emplace(
-          readAttribute<ScenarioObject::Name>("name", node, outer_scope),
-          make<ScenarioObject>(node, outer_scope));
-      });
+    callWithElements(node, "ScenarioObject", 0, unbounded, [&](auto && node) {
+      outer_scope.entities.emplace(
+        readAttribute<ScenarioObject::Name>("name", node, outer_scope),
+        make<ScenarioObject>(node, outer_scope));
+    });
 
     callWithElements(node, "EntitySelection", 0, unbounded, UNSUPPORTED());
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ENTITIES_HPP_

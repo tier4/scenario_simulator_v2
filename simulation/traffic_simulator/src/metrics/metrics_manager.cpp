@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/metrics/metrics_manager.hpp>
-#include <traffic_simulator/metrics/metric_base.hpp>
-
-#include <memory>
-#include <vector>
-#include <string>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <traffic_simulator/metrics/metric_base.hpp>
+#include <traffic_simulator/metrics/metrics_manager.hpp>
+#include <vector>
 
 namespace metrics
 {
@@ -28,10 +27,7 @@ MetricsManager::MetricsManager(bool verbose, const std::string & logfile_path)
   verbose_ = verbose;
 }
 
-void MetricsManager::setVerbose(bool verbose)
-{
-  verbose_ = verbose;
-}
+void MetricsManager::setVerbose(bool verbose) { verbose_ = verbose; }
 
 void MetricsManager::calculate()
 {
@@ -50,9 +46,9 @@ void MetricsManager::calculate()
     if (verbose_) {
       std::cout << "metric : " << metric.first << " => " << log[metric.first] << std::endl;
     }
-    if (metric.second->getLifecycle() == MetricLifecycle::SUCCESS ||
-      metric.second->getLifecycle() == MetricLifecycle::FAILURE)
-    {
+    if (
+      metric.second->getLifecycle() == MetricLifecycle::SUCCESS ||
+      metric.second->getLifecycle() == MetricLifecycle::FAILURE) {
       disable_metrics_list.emplace_back(metric.first);
     }
   }

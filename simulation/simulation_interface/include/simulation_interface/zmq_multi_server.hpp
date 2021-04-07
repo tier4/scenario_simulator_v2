@@ -15,13 +15,14 @@
 #ifndef SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 #define SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 
-#include <simulation_interface/constants.hpp>
 #include <simulation_api_schema.pb.h>
-#include <zmqpp/zmqpp.hpp>
+
+#include <functional>
 #include <rclcpp/rclcpp.hpp>
+#include <simulation_interface/constants.hpp>
 #include <string>
 #include <thread>
-#include <functional>
+#include <zmqpp/zmqpp.hpp>
 
 namespace zeromq
 {
@@ -31,24 +32,42 @@ public:
   explicit MultiServer(
     const simulation_interface::TransportProtocol & protocol,
     const simulation_interface::HostName & hostname,
-    std::function<void(const simulation_api_schema::InitializeRequest &,
-    simulation_api_schema::InitializeResponse &)> initialize_func,
-    std::function<void(const simulation_api_schema::UpdateFrameRequest &,
-    simulation_api_schema::UpdateFrameResponse &)> update_frame_func,
-    std::function<void(const simulation_api_schema::UpdateSensorFrameRequest &,
-    simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func,
-    std::function<void(const simulation_api_schema::SpawnVehicleEntityRequest &,
-    simulation_api_schema::SpawnVehicleEntityResponse &)> spawn_vehicle_entity_func,
-    std::function<void(const simulation_api_schema::SpawnPedestrianEntityRequest &,
-    simulation_api_schema::SpawnPedestrianEntityResponse &)> spawn_pedestrian_entity_func,
-    std::function<void(const simulation_api_schema::DespawnEntityRequest &,
-    simulation_api_schema::DespawnEntityResponse &)> despawn_entity_func,
-    std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
-    simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func,
-    std::function<void(const simulation_api_schema::AttachLidarSensorRequest &,
-    simulation_api_schema::AttachLidarSensorResponse &)> attach_lidar_sensor_func,
-    std::function<void(const simulation_api_schema::AttachDetectionSensorRequest &,
-    simulation_api_schema::AttachDetectionSensorResponse &)> attach_detection_sensor_func);
+    std::function<void(
+      const simulation_api_schema::InitializeRequest &,
+      simulation_api_schema::InitializeResponse &)>
+      initialize_func,
+    std::function<void(
+      const simulation_api_schema::UpdateFrameRequest &,
+      simulation_api_schema::UpdateFrameResponse &)>
+      update_frame_func,
+    std::function<void(
+      const simulation_api_schema::UpdateSensorFrameRequest &,
+      simulation_api_schema::UpdateSensorFrameResponse &)>
+      update_sensor_frame_func,
+    std::function<void(
+      const simulation_api_schema::SpawnVehicleEntityRequest &,
+      simulation_api_schema::SpawnVehicleEntityResponse &)>
+      spawn_vehicle_entity_func,
+    std::function<void(
+      const simulation_api_schema::SpawnPedestrianEntityRequest &,
+      simulation_api_schema::SpawnPedestrianEntityResponse &)>
+      spawn_pedestrian_entity_func,
+    std::function<void(
+      const simulation_api_schema::DespawnEntityRequest &,
+      simulation_api_schema::DespawnEntityResponse &)>
+      despawn_entity_func,
+    std::function<void(
+      const simulation_api_schema::UpdateEntityStatusRequest &,
+      simulation_api_schema::UpdateEntityStatusResponse &)>
+      update_entity_status_func,
+    std::function<void(
+      const simulation_api_schema::AttachLidarSensorRequest &,
+      simulation_api_schema::AttachLidarSensorResponse &)>
+      attach_lidar_sensor_func,
+    std::function<void(
+      const simulation_api_schema::AttachDetectionSensorRequest &,
+      simulation_api_schema::AttachDetectionSensorResponse &)>
+      attach_detection_sensor_func);
 
 private:
   void poll();
@@ -58,32 +77,49 @@ private:
   const zmqpp::socket_type type_;
   zmqpp::poller poller_;
   zmqpp::socket initialize_sock_;
-  std::function<void(const simulation_api_schema::InitializeRequest &,
-    simulation_api_schema::InitializeResponse &)> initialize_func_;
+  std::function<void(
+    const simulation_api_schema::InitializeRequest &, simulation_api_schema::InitializeResponse &)>
+    initialize_func_;
   zmqpp::socket update_frame_sock_;
-  std::function<void(const simulation_api_schema::UpdateFrameRequest &,
-    simulation_api_schema::UpdateFrameResponse &)> update_frame_func_;
+  std::function<void(
+    const simulation_api_schema::UpdateFrameRequest &,
+    simulation_api_schema::UpdateFrameResponse &)>
+    update_frame_func_;
   zmqpp::socket update_sensor_frame_sock_;
-  std::function<void(const simulation_api_schema::UpdateSensorFrameRequest &,
-    simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func_;
+  std::function<void(
+    const simulation_api_schema::UpdateSensorFrameRequest &,
+    simulation_api_schema::UpdateSensorFrameResponse &)>
+    update_sensor_frame_func_;
   zmqpp::socket spawn_vehicle_entity_sock_;
-  std::function<void(const simulation_api_schema::SpawnVehicleEntityRequest &,
-    simulation_api_schema::SpawnVehicleEntityResponse &)> spawn_vehicle_entity_func_;
+  std::function<void(
+    const simulation_api_schema::SpawnVehicleEntityRequest &,
+    simulation_api_schema::SpawnVehicleEntityResponse &)>
+    spawn_vehicle_entity_func_;
   zmqpp::socket spawn_pedestrian_entity_sock_;
-  std::function<void(const simulation_api_schema::SpawnPedestrianEntityRequest &,
-    simulation_api_schema::SpawnPedestrianEntityResponse &)> spawn_pedestrian_entity_func_;
+  std::function<void(
+    const simulation_api_schema::SpawnPedestrianEntityRequest &,
+    simulation_api_schema::SpawnPedestrianEntityResponse &)>
+    spawn_pedestrian_entity_func_;
   zmqpp::socket despawn_entity_sock_;
-  std::function<void(const simulation_api_schema::DespawnEntityRequest &,
-    simulation_api_schema::DespawnEntityResponse &)> despawn_entity_func_;
+  std::function<void(
+    const simulation_api_schema::DespawnEntityRequest &,
+    simulation_api_schema::DespawnEntityResponse &)>
+    despawn_entity_func_;
   zmqpp::socket update_entity_status_sock_;
-  std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
-    simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func_;
+  std::function<void(
+    const simulation_api_schema::UpdateEntityStatusRequest &,
+    simulation_api_schema::UpdateEntityStatusResponse &)>
+    update_entity_status_func_;
   zmqpp::socket attach_lidar_sensor_sock_;
-  std::function<void(const simulation_api_schema::AttachLidarSensorRequest &,
-    simulation_api_schema::AttachLidarSensorResponse &)> attach_lidar_sensor_func_;
+  std::function<void(
+    const simulation_api_schema::AttachLidarSensorRequest &,
+    simulation_api_schema::AttachLidarSensorResponse &)>
+    attach_lidar_sensor_func_;
   zmqpp::socket attach_detection_sensor_sock_;
-  std::function<void(const simulation_api_schema::AttachDetectionSensorRequest &,
-    simulation_api_schema::AttachDetectionSensorResponse &)> attach_detection_sensor_func_;
+  std::function<void(
+    const simulation_api_schema::AttachDetectionSensorRequest &,
+    simulation_api_schema::AttachDetectionSensorResponse &)>
+    attach_detection_sensor_func_;
 };
 }  // namespace zeromq
 

@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
+#include <memory>
+#include <string>
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
 #include <traffic_simulator/entity/vehicle_parameter.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
-
-#include <string>
-#include <memory>
-#include <algorithm>
 #include <vector>
 
 namespace entity_behavior
 {
 namespace vehicle
 {
-LaneChangeAction::LaneChangeAction(
-  const std::string & name,
-  const BT::NodeConfiguration & config)
-: entity_behavior::VehicleActionNode(name, config) {}
+LaneChangeAction::LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config)
+: entity_behavior::VehicleActionNode(name, config)
+{
+}
 
 const boost::optional<openscenario_msgs::msg::Obstacle> LaneChangeAction::calculateObstacle(
   const openscenario_msgs::msg::WaypointsArray &)
@@ -49,8 +48,7 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
     openscenario_msgs::msg::WaypointsArray waypoints;
     double horizon =
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
-    auto following_lanelets = hdmap_utils->getFollowingLanelets(
-      to_lanelet_id_.get(), 0);
+    auto following_lanelets = hdmap_utils->getFollowingLanelets(to_lanelet_id_.get(), 0);
     double l = curve_->getLength();
     double rest_s = current_s_ + horizon - l;
     if (rest_s < 0) {
@@ -58,8 +56,8 @@ const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoint
         curve_->getTrajectory(current_s_, current_s_ + horizon, 1.0, true);
       waypoints.waypoints = curve_waypoints;
     } else {
-      std::vector<geometry_msgs::msg::Point> center_points = hdmap_utils->getCenterPoints(
-        following_lanelets);
+      std::vector<geometry_msgs::msg::Point> center_points =
+        hdmap_utils->getCenterPoints(following_lanelets);
       traffic_simulator::math::CatmullRomSpline spline(center_points);
       const auto straight_waypoints = spline.getTrajectory(target_s_, target_s_ + rest_s, 1.0);
       waypoints.waypoints = straight_waypoints;
@@ -102,9 +100,7 @@ BT::NodeStatus LaneChangeAction::tick()
   if (!curve_) {
     if (request == "lane_change") {
       if (!hdmap_utils->canChangeLane(
-          entity_status.lanelet_pose.lanelet_id,
-          to_lanelet_id_.get()))
-      {
+            entity_status.lanelet_pose.lanelet_id, to_lanelet_id_.get())) {
         return BT::NodeStatus::FAILURE;
       }
       auto from_pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
@@ -159,5 +155,5 @@ BT::NodeStatus LaneChangeAction::tick()
   }
   return BT::NodeStatus::FAILURE;
 }
-}      // namespace vehicle
+}  // namespace vehicle
 }  // namespace entity_behavior

@@ -15,22 +15,20 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PHASE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PHASE_HPP_
 
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/entity/exception.hpp>
-
-#include <vector>
 #include <limits>
+#include <traffic_simulator/entity/exception.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <utility>
+#include <vector>
 
 namespace traffic_simulator
 {
-template<typename T>
+template <typename T>
 class TrafficLightPhase
 {
 public:
-  TrafficLightPhase() {phase_ = {};}
-  explicit TrafficLightPhase(const std::vector<std::pair<double, T>> & phase)
-  : phase_(phase) {}
+  TrafficLightPhase() { phase_ = {}; }
+  explicit TrafficLightPhase(const std::vector<std::pair<double, T>> & phase) : phase_(phase) {}
   double getPhaseLength() const
   {
     if (phase_.empty()) {
@@ -70,7 +68,7 @@ public:
   void setState(const T & state)
   {
     phase_ = {};
-    phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), state) );
+    phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), state));
     elapsed_time_ = 0;
   }
   void setPhase(const std::vector<std::pair<double, T>> & phase, double time_offset = 0)
@@ -78,10 +76,7 @@ public:
     phase_ = phase;
     elapsed_time_ = time_offset;
   }
-  const std::vector<std::pair<double, T>> getPhase() const
-  {
-    return phase_;
-  }
+  const std::vector<std::pair<double, T>> getPhase() const { return phase_; }
 
 private:
   std::vector<std::pair<double, T>> phase_;

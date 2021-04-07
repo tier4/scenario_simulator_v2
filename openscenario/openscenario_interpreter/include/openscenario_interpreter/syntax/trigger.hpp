@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGER_HPP_
 
 #include <openscenario_interpreter/syntax/condition_group.hpp>
-
 #include <vector>
 
 namespace openscenario_interpreter
@@ -32,17 +31,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Trigger
-  : public std::vector<ConditionGroup>
+struct Trigger : public std::vector<ConditionGroup>
 {
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Trigger(const Node & node, Scope & scope)
   {
     callWithElements(
-      node, "ConditionGroup", 0, unbounded, [&](auto && node)
-      {
-        emplace_back(node, scope);
-      });
+      node, "ConditionGroup", 0, unbounded, [&](auto && node) { emplace_back(node, scope); });
   }
 
   auto evaluate()
@@ -59,14 +54,13 @@ struct Trigger
       // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
       std::accumulate(
         std::begin(*this), std::end(*this), false,
-        [&](auto && lhs, ConditionGroup & condition_group)
-        {
+        [&](auto && lhs, ConditionGroup & condition_group) {
           const auto rhs = condition_group.evaluate();
           return lhs || rhs.as<Boolean>();
         }));
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGER_HPP_

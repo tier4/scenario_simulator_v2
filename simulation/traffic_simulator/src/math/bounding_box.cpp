@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/math/bounding_box.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
+
+#include <traffic_simulator/math/bounding_box.hpp>
 
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
 #include <Eigen/Core>
-
 #include <vector>
 
 namespace traffic_simulator
@@ -37,10 +36,8 @@ namespace math
  * @retval 0 <= distance between two bounding boxes
  */
 boost::optional<double> getPolygonDistance(
-  const geometry_msgs::msg::Pose & pose0,
-  const openscenario_msgs::msg::BoundingBox & bbox0,
-  const geometry_msgs::msg::Pose & pose1,
-  const openscenario_msgs::msg::BoundingBox & bbox1)
+  const geometry_msgs::msg::Pose & pose0, const openscenario_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1, const openscenario_msgs::msg::BoundingBox & bbox1)
 {
   const auto poly0 = get2DPolygon(pose0, bbox0);
   const auto poly1 = get2DPolygon(pose1, bbox1);
@@ -57,10 +54,8 @@ boost::optional<double> getPolygonDistance(
   return boost::none;
 }
 
-const boost::geometry::model::polygon<
-  boost::geometry::model::d2::point_xy<double>> get2DPolygon(
-  const geometry_msgs::msg::Pose & pose,
-  const openscenario_msgs::msg::BoundingBox & bbox)
+const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> get2DPolygon(
+  const geometry_msgs::msg::Pose & pose, const openscenario_msgs::msg::BoundingBox & bbox)
 {
   auto points = transformPoints(pose, getPointsFromBbox(bbox));
   namespace bg = boost::geometry;
@@ -74,8 +69,7 @@ const boost::geometry::model::polygon<
   return poly;
 }
 
-std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  openscenario_msgs::msg::BoundingBox bbox)
+std::vector<geometry_msgs::msg::Point> getPointsFromBbox(openscenario_msgs::msg::BoundingBox bbox)
 {
   std::vector<geometry_msgs::msg::Point> points;
   geometry_msgs::msg::Point p0;
@@ -102,8 +96,7 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
 }
 
 std::vector<geometry_msgs::msg::Point> transformPoints(
-  geometry_msgs::msg::Pose pose,
-  std::vector<geometry_msgs::msg::Point> points)
+  geometry_msgs::msg::Pose pose, std::vector<geometry_msgs::msg::Point> points)
 {
   auto mat = quaternion_operation::getRotationMatrix(pose.orientation);
   std::vector<geometry_msgs::msg::Point> ret;

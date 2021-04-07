@@ -28,6 +28,10 @@
 #include <unistd.h>
 #endif
 
+#include <sys/wait.h>  // for EgoEntity::~EgoEntity
+#include <tf2/utils.h>
+
+#include <algorithm>
 #include <autoware_auto_msgs/msg/complex32.hpp>
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
@@ -35,15 +39,11 @@
 #include <awapi_accessor/accessor.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <pugixml.hpp>
-#include <sys/wait.h>  // for EgoEntity::~EgoEntity
-#include <tf2/utils.h>
-
-#include <algorithm>
 #include <chrono>
 #include <cstdlib>
 #include <future>
 #include <memory>
+#include <pugixml.hpp>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -67,7 +67,8 @@ class EgoEntity : public VehicleEntity
   // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
   static std::unordered_map<
     std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
-  > autowares;
+    >
+    autowares;
 
   decltype(fork()) autoware_process_id = 0;
 
@@ -85,11 +86,11 @@ class EgoEntity : public VehicleEntity
    * ------------------------------------------------------------------------ */
   auto execute(const std::vector<std::string> & f_xs)
   {
-    std::vector<std::vector<char>> buffer {};
+    std::vector<std::vector<char>> buffer{};
 
     buffer.resize(f_xs.size());
 
-    std::vector<std::add_pointer<char>::type> argv {};
+    std::vector<std::add_pointer<char>::type> argv{};
 
     argv.reserve(f_xs.size());
 
@@ -147,107 +148,93 @@ public:
    *
    * ------------------------------------------------------------------------ */
   explicit EgoEntity(
-    const std::string & name,
-    const boost::filesystem::path & lanelet2_map_osm,
-    const double step_time,
-    const openscenario_msgs::msg::VehicleParameters & parameters)
+    const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
+    const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
   : VehicleEntity(name, parameters),
-    vehicle_model_ptr_(
-      std::make_shared<SimModelTimeDelaySteer>(
-        parameters.performance.max_speed,  // vel_lim,
-        parameters.axles.front_axle.max_steering,  // steer_lim,
-        parameters.performance.max_acceleration,  // accel_rate,
-        5.0,  // steer_rate_lim,
-        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
-        step_time,  // dt,
-        0.25,  // vel_time_delay,
-        0.5,  // vel_time_constant,
-        0.3,  // steer_time_delay,
-        0.3,  // steer_time_constant,
-        0.0  // deadzone_delta_steer
-    ))
+    vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(
+      parameters.performance.max_speed,          // vel_lim,
+      parameters.axles.front_axle.max_steering,  // steer_lim,
+      parameters.performance.max_acceleration,   // accel_rate,
+      5.0,                                       // steer_rate_lim,
+      parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
+      step_time,  // dt,
+      0.25,       // vel_time_delay,
+      0.5,        // vel_time_constant,
+      0.3,        // steer_time_delay,
+      0.3,        // steer_time_constant,
+      0.0         // deadzone_delta_steer
+      ))
   {
-    auto launch_autoware =
-      [&]()
-      {
-        auto get_parameter =
-          [](const std::string & name, const auto & alternate)
-          {
-            rclcpp::Node node {
-              "get_parameter", "simulation"
-            };
+    auto launch_autoware = [&]() {
+      auto get_parameter = [](const std::string & name, const auto & alternate) {
+        rclcpp::Node node{"get_parameter", "simulation"};
 
-            auto value = alternate;
+        auto value = alternate;
 
-            using value_type = typename std::decay<decltype(value)>::type;
+        using value_type = typename std::decay<decltype(value)>::type;
 
-            node.declare_parameter<value_type>(name, value);
-            node.get_parameter<value_type>(name, value);
+        node.declare_parameter<value_type>(name, value);
+        node.get_parameter<value_type>(name, value);
 
-            return value;
-          };
+        return value;
+      };
 
-        /* ---- NOTE -----------------------------------------------------------
+      /* ---- NOTE -----------------------------------------------------------
          *
          *  The actual values of these parameters are set by
          *  scenario_test_runner.launch.py as parameters of
          *  openscenario_interpreter_node.
          *
          * ------------------------------------------------------------------ */
-        const auto autoware_launch_package =
-          get_parameter("autoware_launch_package", std::string(""));
-        const auto autoware_launch_file =
-          get_parameter("autoware_launch_file", std::string(""));
+      const auto autoware_launch_package =
+        get_parameter("autoware_launch_package", std::string(""));
+      const auto autoware_launch_file = get_parameter("autoware_launch_file", std::string(""));
 
-        auto child =
-          [&]()
-          {
-            // DEBUG_VALUE(lanelet2_map_osm);
+      auto child = [&]() {
+        // DEBUG_VALUE(lanelet2_map_osm);
 
-            const std::vector<std::string> argv {
-              "python3",
-              "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-              "launch",
-              autoware_launch_package,
-              autoware_launch_file,
-              std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
-              std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
-            };
+        const std::vector<std::string> argv{
+          "python3",
+          "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
+          "launch",
+          autoware_launch_package,
+          autoware_launch_file,
+          std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
+          std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()};
 
-            // for (const auto & each : argv) {
-            //   std::cout << each << (&each != &argv.back() ? ' ' : '\n');
-            // }
+        // for (const auto & each : argv) {
+        //   std::cout << each << (&each != &argv.back() ? ' ' : '\n');
+        // }
 
-            #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-            const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
-            const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-            ::dup2(fd, STDOUT_FILENO);
-            ::dup2(fd, STDERR_FILENO);
-            ::close(fd);
-            #endif
+#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
+        const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
+        const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        ::dup2(fd, STDOUT_FILENO);
+        ::dup2(fd, STDERR_FILENO);
+        ::close(fd);
+#endif
 
-            if (execute(argv) < 0) {
-              std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-              std::exit(EXIT_FAILURE);
-            }
-          };
-
-        if ((autoware_process_id = fork()) < 0) {
-          throw std::system_error(errno, std::system_category());
-        } else if (autoware_process_id == 0) {
-          return child();
+        if (execute(argv) < 0) {
+          std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+          std::exit(EXIT_FAILURE);
         }
       };
+
+      if ((autoware_process_id = fork()) < 0) {
+        throw std::system_error(errno, std::system_category());
+      } else if (autoware_process_id == 0) {
+        return child();
+      }
+    };
 
     if (autowares.find(name) == std::end(autowares)) {
       auto my_name = name;
       std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
       autowares.emplace(
-        name,
-        std::make_shared<autoware_api::Accessor>(
-          "awapi_accessor",
-          "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
-          rclcpp::NodeOptions().use_global_arguments(false)));
+        name, std::make_shared<autoware_api::Accessor>(
+                "awapi_accessor",
+                "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
+                rclcpp::NodeOptions().use_global_arguments(false)));
 
       launch_autoware();
     }
@@ -277,13 +264,12 @@ public:
       accessor_spinner = std::make_shared<std::thread>(
         [](const auto node, auto status)  // NOTE: This copy increments use_count to 2 from 1.
         {
-          while (
-            rclcpp::ok() &&
-            status.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout)
-          {
+          while (rclcpp::ok() &&
+                 status.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
             rclcpp::spin_some(node);
           }
-        }, autowares.at(name), std::move(accessor_status->get_future()));
+        },
+        autowares.at(name), std::move(accessor_status->get_future()));
     }
   }
 
@@ -296,8 +282,7 @@ public:
       int status = 0;
       if (
         ::kill(autoware_process_id, SIGINT) < 0 ||
-        ::waitpid(autoware_process_id, &status, WUNTRACED) < 0)
-      {
+        ::waitpid(autoware_process_id, &status, WUNTRACED) < 0) {
         std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
         std::exit(EXIT_FAILURE);
       }
@@ -312,10 +297,7 @@ public:
 
     if (!std::exchange(autoware_initialized, true)) {
       waitForAutowareStateToBeInitializingVehicle(
-        [&]()
-        {
-          return updateAutoware(current_entity_status.pose);
-        });
+        [&]() { return updateAutoware(current_entity_status.pose); });
 
       /* ---- NOTE ---------------------------------------------------------------
        *
@@ -325,12 +307,10 @@ public:
        *  awapi_awiv_adapter.
        *
        * ---------------------------------------------------------------------- */
-      waitForAutowareStateToBeWaitingForRoute(
-        [&]()
-        {
-          std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
-          return updateAutoware(current_entity_status.pose);
-        });
+      waitForAutowareStateToBeWaitingForRoute([&]() {
+        std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
+        return updateAutoware(current_entity_status.pose);
+      });
     }
   }
 
@@ -344,36 +324,25 @@ public:
 
     const auto current_pose = getStatus().pose;
 
-    waitForAutowareStateToBeWaitingForRoute(
-      [&]()  // NOTE: This is assertion.
-      {
-        return updateAutoware(current_pose);
-      });
+    waitForAutowareStateToBeWaitingForRoute([&]()  // NOTE: This is assertion.
+                                            { return updateAutoware(current_pose); });
 
-    waitForAutowareStateToBePlanning(
-      [&]()
-      {
-        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
+    waitForAutowareStateToBePlanning([&]() {
+      std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
 
-        for (const auto & constraint : constraints) {
-          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
-        }
+      for (const auto & constraint : constraints) {
+        std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
+      }
 
-        return updateAutoware(current_pose);
-      });
+      return updateAutoware(current_pose);
+    });
 
-    waitForAutowareStateToBeWaitingForEngage(
-      [&]()
-      {
-        return updateAutoware(current_pose);
-      });
+    waitForAutowareStateToBeWaitingForEngage([&]() { return updateAutoware(current_pose); });
 
-    waitForAutowareStateToBeDriving(
-      [&]()
-      {
-        std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
-        return updateAutoware(current_pose);
-      });
+    waitForAutowareStateToBeDriving([&]() {
+      std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+      return updateAutoware(current_pose);
+    });
   }
 
   void requestAssignRoute(
@@ -403,40 +372,35 @@ public:
   openscenario_msgs::msg::WaypointsArray getWaypoints() const;
 
 private:
-  // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
-  #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE) \
-  template<typename Thunk> \
-  void waitForAutowareStateToBe ## STATE(Thunk thunk, std::size_t count_max = 300) const \
-  { \
-    std::size_t count = 0; \
-    for ( \
-      rclcpp::WallRate rate {std::chrono::milliseconds(100)}; \
-      !std::atomic_load(&autowares.at(name))->is ## STATE(); \
-      rate.sleep()) \
-    { \
-      if (count++ < count_max) { \
-        thunk(); \
-      } else { \
-        const auto current_state = \
-          std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state; \
-        std::stringstream ss {}; \
-        ss << "The simulator waited " \
-           << (count / 10) \
-           << " seconds, expecting the Autoware state to transitioning to " \
-           << #STATE \
-           << ", but there was no change. The current Autoware state is " \
-           << (current_state.empty() ? "NOT PUBLISHED YET" : current_state) \
-           << ". This error is most likely due to the Autoware state transition " \
-           << "conditions changing with the update. Please report this error to " \
-           << "the developer. This error message was written by @yamacir-kit."; \
-        using AutowareError = std::runtime_error; \
-        throw AutowareError(ss.str()); \
-      } \
-    } \
-    RCLCPP_INFO_STREAM( \
-      std::atomic_load(&autowares.at(name))->get_logger(), \
-      "Autoware is " #STATE " now."); \
-  } static_assert(true, "")
+// TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                        \
+  template <typename Thunk>                                                                \
+  void waitForAutowareStateToBe##STATE(Thunk thunk, std::size_t count_max = 300) const     \
+  {                                                                                        \
+    std::size_t count = 0;                                                                 \
+    for (rclcpp::WallRate rate{std::chrono::milliseconds(100)};                            \
+         !std::atomic_load(&autowares.at(name))->is##STATE(); rate.sleep()) {              \
+      if (count++ < count_max) {                                                           \
+        thunk();                                                                           \
+      } else {                                                                             \
+        const auto current_state =                                                         \
+          std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;       \
+        std::stringstream ss{};                                                            \
+        ss << "The simulator waited " << (count / 10)                                      \
+           << " seconds, expecting the Autoware state to transitioning to " << #STATE      \
+           << ", but there was no change. The current Autoware state is "                  \
+           << (current_state.empty() ? "NOT PUBLISHED YET" : current_state)                \
+           << ". This error is most likely due to the Autoware state transition "          \
+           << "conditions changing with the update. Please report this error to "          \
+           << "the developer. This error message was written by @yamacir-kit.";            \
+        using AutowareError = std::runtime_error;                                          \
+        throw AutowareError(ss.str());                                                     \
+      }                                                                                    \
+    }                                                                                      \
+    RCLCPP_INFO_STREAM(                                                                    \
+      std::atomic_load(&autowares.at(name))->get_logger(), "Autoware is " #STATE " now."); \
+  }                                                                                        \
+  static_assert(true, "")
 
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(InitializingVehicle);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForRoute);
@@ -447,10 +411,9 @@ private:
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Emergency);
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
 
-  #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
+#undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 
-  void updateAutoware(
-    const geometry_msgs::msg::Pose & current_pose)
+  void updateAutoware(const geometry_msgs::msg::Pose & current_pose)
   {
     geometry_msgs::msg::Twist current_twist;
     {
@@ -479,8 +442,7 @@ private:
 
 private:
   const openscenario_msgs::msg::EntityStatus getEntityStatus(
-    const double time,
-    const double step_time) const;
+    const double time, const double step_time) const;
 
   boost::optional<geometry_msgs::msg::Pose> initial_pose_;
 
@@ -489,7 +451,7 @@ private:
   boost::optional<double> previous_linear_velocity_;
   boost::optional<double> previous_angular_velocity_;
 };
-}      // namespace entity
+}  // namespace entity
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_

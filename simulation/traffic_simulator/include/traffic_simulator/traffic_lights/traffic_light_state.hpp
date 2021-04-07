@@ -17,21 +17,9 @@
 
 namespace traffic_simulator
 {
-enum class TrafficLightColor
-{
-  NONE,
-  RED,
-  GREEN,
-  YELLOW
-};
+enum class TrafficLightColor { NONE, RED, GREEN, YELLOW };
 
-enum class TrafficLightArrow
-{
-  NONE,
-  STRAIGHT,
-  LEFT,
-  RIGHT
-};
+enum class TrafficLightArrow { NONE, STRAIGHT, LEFT, RIGHT };
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_

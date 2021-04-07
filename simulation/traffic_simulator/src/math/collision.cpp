@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/math/collision.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/assert.hpp>
+#include <boost/assign/list_of.hpp>
 #include <boost/geometry.hpp>
+#include <boost/geometry/algorithms/disjoint.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/geometry/algorithms/disjoint.hpp>
-
-#include <vector>
 #include <iostream>
+#include <traffic_simulator/math/collision.hpp>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -35,10 +33,8 @@ bool checkCollision2D(
   geometry_msgs::msg::Pose pose1, openscenario_msgs::msg::BoundingBox bbox1)
 {
   double z_diff_pose =
-    std::fabs(
-    (pose0.position.z + bbox0.center.z) -
-    (pose1.position.z + bbox1.center.z));
-  if (z_diff_pose > (std::fabs(bbox0.dimensions.z + bbox1.dimensions.z) * 0.5) ) {
+    std::fabs((pose0.position.z + bbox0.center.z) - (pose1.position.z + bbox1.center.z));
+  if (z_diff_pose > (std::fabs(bbox0.dimensions.z + bbox1.dimensions.z) * 0.5)) {
     return false;
   }
   namespace bg = boost::geometry;

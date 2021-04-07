@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/lane_change_target.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
-
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -48,18 +47,15 @@ struct LaneChangeAction
 
   const LaneChangeTarget lane_change_target;
 
-  template
-  <
-    typename Node
-  >
+  template <typename Node>
   explicit LaneChangeAction(const Node & node, Scope & outer_scope)
-  : target_lane_offset(
-      readAttribute<Double>("targetLaneOffset", node, outer_scope, Double())),
+  : target_lane_offset(readAttribute<Double>("targetLaneOffset", node, outer_scope, Double())),
     inner_scope(outer_scope),
     lane_change_action_dynamics(
       readElement<TransitionDynamics>("LaneChangeActionDynamics", node, inner_scope)),
     lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, inner_scope))
-  {}
+  {
+  }
 
   std::unordered_map<std::string, Boolean> accomplishments;
 
@@ -70,8 +66,7 @@ struct LaneChangeAction
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       for (const auto & actor : inner_scope.actors) {
         accomplishments.emplace(actor, false);
-        requestLaneChange(
-          actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
+        requestLaneChange(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
       }
     } else {
       THROW(ImplementationFault);
@@ -83,8 +78,8 @@ struct LaneChangeAction
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       for (auto && each : accomplishments) {
         if (!cdr(each)) {
-          cdr(each) = isInLanelet(
-            car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 0.1);
+          cdr(each) =
+            isInLanelet(car(each), Integer(lane_change_target.as<AbsoluteTargetLane>().value), 0.1);
         }
       }
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
@@ -93,7 +88,7 @@ struct LaneChangeAction
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_ACTION_HPP_

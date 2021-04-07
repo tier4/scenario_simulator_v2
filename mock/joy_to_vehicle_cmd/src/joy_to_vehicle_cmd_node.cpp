@@ -13,9 +13,8 @@
 // limitations under the License.
 
 #include <joy_to_vehicle_cmd/joy_to_vehicle_cmd_component.hpp>
-
-#include <rclcpp/rclcpp.hpp>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char * argv[])
 {

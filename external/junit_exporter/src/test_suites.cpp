@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <junit_exporter/test_suites.hpp>
-
 #include <string>
 #include <vector>
-#include <algorithm>
 
 namespace junit_exporter
 {
 TestSuites::TestSuites() {}
 
-void TestSuites::addTestCase(const TestCase & test_case)
-{
-  test_cases_.emplace_back(test_case);
-}
+void TestSuites::addTestCase(const TestCase & test_case) { test_cases_.emplace_back(test_case); }
 
 double TestSuites::getTime() const
 {
@@ -58,10 +54,7 @@ std::vector<TestCase> TestSuites::getTestSuite(const std::string & test_suite)
   return ret;
 }
 
-bool TestSuites::testCaseExists(
-  const std::string & name,
-  const std::string & test_suite
-)
+bool TestSuites::testCaseExists(const std::string & name, const std::string & test_suite)
 {
   for (const auto & test_case : test_cases_) {
     if (test_case.test_suite == test_suite && test_case.name == name) {

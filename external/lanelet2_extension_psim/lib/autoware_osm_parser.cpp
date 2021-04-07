@@ -14,29 +14,26 @@
 
 // Authors: Ryohsuke Mitsudome
 
-#include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
-#include <lanelet2_extension_psim/utility/message_conversion.hpp>
-
 #include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_io/io_handlers/Factory.h>
 #include <lanelet2_io/io_handlers/OsmFile.h>
 #include <lanelet2_io/io_handlers/OsmHandler.h>
 
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/string.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-
+#include <lanelet2_extension_psim/io/autoware_osm_parser.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <memory>
-#include <vector>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace lanelet
 {
 namespace io_handlers
 {
-
 // non-const converter for const lanelet primitive types
 struct NonConstConverter
 {
@@ -124,7 +121,7 @@ void AutowareOsmParser::parseVersions(
   auto result = doc.load_file(filename.c_str());
   if (!result) {
     throw lanelet::ParseError(
-            std::string("Errors occured while parsing osm file: ") + result.description());
+      std::string("Errors occured while parsing osm file: ") + result.description());
   }
 
   auto osmNode = doc.child("osm");

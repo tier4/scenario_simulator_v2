@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
 #include <openscenario_interpreter/expression.hpp>
-
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -31,16 +30,16 @@ using Group = Element;
 
 using Elements = std::vector<Element>;
 
-template<typename ... Ts>
+template <typename... Ts>
 using IsOptionalElement = std::is_default_constructible<Ts...>;
 
-template<typename T, typename ... Ts>
-inline constexpr decltype(auto) make(Ts && ... xs)
+template <typename T, typename... Ts>
+inline constexpr decltype(auto) make(Ts &&... xs)
 {
   return Element::bind<T>(std::forward<decltype(xs)>(xs)...);
 }
 
-template<typename T>
+template <typename T>
 inline constexpr decltype(auto) make(T && x)
 {
   return Element::bind<typename std::decay<decltype(x)>::type>(std::forward<decltype(x)>(x));

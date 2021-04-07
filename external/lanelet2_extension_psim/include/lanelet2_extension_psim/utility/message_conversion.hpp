@@ -18,16 +18,15 @@
 #define LANELET2_EXTENSION_PSIM__UTILITY__MESSAGE_CONVERSION_HPP_
 
 #include <lanelet2_core/LaneletMap.h>
+#include <lanelet2_routing/RoutingGraph.h>
+#include <lanelet2_traffic_rules/TrafficRulesFactory.h>
+
 #include <autoware_auto_msgs/msg/had_map_bin.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/point32.hpp>
 #include <geometry_msgs/msg/polygon.hpp>
-#include <rclcpp/rclcpp.hpp>
-
-#include <lanelet2_routing/RoutingGraph.h>
-#include <lanelet2_traffic_rules/TrafficRulesFactory.h>
-
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 
 namespace lanelet
 {
@@ -51,8 +50,7 @@ void toBinMsg(const std::unique_ptr<LaneletMap> & map, autoware_auto_msgs::msg::
  */
 void fromBinMsg(const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map);
 void fromBinMsg(
-  const autoware_auto_msgs::msg::HADMapBin & msg,
-  const std::unique_ptr<LaneletMap> & map);
+  const autoware_auto_msgs::msg::HADMapBin & msg, const std::unique_ptr<LaneletMap> & map);
 void fromBinMsg(
   const autoware_auto_msgs::msg::HADMapBin & msg, lanelet::LaneletMapPtr map,
   lanelet::traffic_rules::TrafficRulesPtr * traffic_rules,

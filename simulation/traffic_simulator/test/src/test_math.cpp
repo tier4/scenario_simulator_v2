@@ -52,8 +52,7 @@ TEST(Math, HermiteCurve1)
   goal_pose.position.x = 1;
   start_vec.x = 1;
   goal_vec.x = 1;
-  traffic_simulator::math::HermiteCurve curve
-    (start_pose, goal_pose, start_vec, goal_vec);
+  traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
   EXPECT_DOUBLE_EQ(curve.getLength(), 1);
   EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
@@ -63,9 +62,7 @@ TEST(Math, HermiteCurve1)
   p.y = 0;
   p.z = 0;
   EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE(
-    (curve.getSValue(p, true).get() > 0.099) &&
-    (curve.getSValue(p, true).get() < 0.101));
+  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) && (curve.getSValue(p, true).get() < 0.101));
   geometry_msgs::msg::Point start;
   start.x = 0.1;
   start.y = 1.0;
@@ -86,8 +83,7 @@ TEST(Math, HermiteCurve2)
   goal_pose.position.x = 1;
   start_vec.x = 1;
   goal_vec.x = 1;
-  traffic_simulator::math::HermiteCurve curve
-    (start_pose, goal_pose, start_vec, goal_vec);
+  traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
   EXPECT_DOUBLE_EQ(curve.getLength(), 1);
   EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
@@ -97,9 +93,7 @@ TEST(Math, HermiteCurve2)
   p.y = 0;
   p.z = 0;
   EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE(
-    (curve.getSValue(p, true).get() > 0.099) &&
-    (curve.getSValue(p, true).get() < 0.101));
+  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) && (curve.getSValue(p, true).get() < 0.101));
   geometry_msgs::msg::Point start;
   start.x = 0.1;
   start.y = 1.0;
@@ -264,8 +258,7 @@ TEST(Math, BoundingBox0)
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;
-  EXPECT_EQ(
-    traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
+  EXPECT_EQ(traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
 }
 
 TEST(Math, BoundingBox1)
@@ -281,8 +274,7 @@ TEST(Math, BoundingBox1)
   bbox1.dimensions.x = 1;
   bbox1.dimensions.y = 1;
   bbox1.dimensions.z = 1;
-  EXPECT_TRUE(
-    traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1));
+  EXPECT_TRUE(traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1));
   EXPECT_DOUBLE_EQ(
     traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1).get(), 3.0);
 }

@@ -15,16 +15,15 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
-#include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_phase.hpp>
+#include <iostream>
+#include <limits>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/entity/exception.hpp>
-
-#include <vector>
-#include <limits>
-#include <utility>
-#include <iostream>
+#include <traffic_simulator/traffic_lights/traffic_light_phase.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -38,11 +37,9 @@ public:
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
   void setColorPhase(
-    const std::vector<std::pair<Duration, TrafficLightColor>> & phase,
-    double time_offset = 0);
+    const std::vector<std::pair<Duration, TrafficLightColor>> & phase, double time_offset = 0);
   void setArrowPhase(
-    const std::vector<std::pair<Duration, TrafficLightArrow>> & phase,
-    double time_offset = 0);
+    const std::vector<std::pair<Duration, TrafficLightArrow>> & phase, double time_offset = 0);
   void setColor(TrafficLightColor color);
   void setArrow(TrafficLightArrow arrow);
   double getColorPhaseLength() const;

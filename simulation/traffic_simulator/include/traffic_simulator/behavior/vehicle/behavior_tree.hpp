@@ -15,21 +15,19 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__BEHAVIOR_TREE_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__BEHAVIOR_TREE_HPP_
 
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
-#include <openscenario_msgs/msg/entity_status.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
-#include <openscenario_msgs/msg/obstacle.hpp>
-
-#include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
 #include <functional>
+#include <geometry_msgs/msg/point.hpp>
 #include <map>
-#include <vector>
-#include <string>
 #include <memory>
+#include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <string>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -40,27 +38,28 @@ class BehaviorTree
 public:
   BehaviorTree();
   BT::NodeStatus tick(double current_time, double step_time);
-  const std::string getCurrentAction() const
-  {
-    return current_action_;
-  }
-  template<typename T>
+  const std::string getCurrentAction() const { return current_action_; }
+
+  template <typename T>
   void setValueToBlackBoard(std::string key, T value)
   {
     tree_.rootBlackboard()->set(key, value);
   }
+
   openscenario_msgs::msg::EntityStatus getUpdatedStatus()
   {
     openscenario_msgs::msg::EntityStatus status;
     tree_.rootBlackboard()->get("updated_status", status);
     return status;
   }
+
   openscenario_msgs::msg::WaypointsArray getWaypoints()
   {
     openscenario_msgs::msg::WaypointsArray waypoints;
     tree_.rootBlackboard()->get("waypoints", waypoints);
     return waypoints;
   }
+
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle()
   {
     boost::optional<openscenario_msgs::msg::Obstacle> obstacle;

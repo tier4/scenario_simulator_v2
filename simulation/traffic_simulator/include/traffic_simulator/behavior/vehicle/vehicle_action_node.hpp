@@ -16,18 +16,17 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__VEHICLE_ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
-#include <traffic_simulator/entity/vehicle_parameter.hpp>
-#include <traffic_simulator/behavior/action_node.hpp>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 
-#include <openscenario_msgs/msg/entity_trajectory.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
-#include <openscenario_msgs/msg/obstacle.hpp>
-#include <openscenario_msgs/msg/driver_model.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
-
-#include <string>
 #include <memory>
+#include <openscenario_msgs/msg/driver_model.hpp>
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <string>
+#include <traffic_simulator/behavior/action_node.hpp>
+#include <traffic_simulator/entity/vehicle_parameter.hpp>
+#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -42,9 +41,7 @@ public:
   {
     BT::PortsList ports = {
       BT::InputPort<openscenario_msgs::msg::DriverModel>("driver_model"),
-      BT::InputPort<openscenario_msgs::msg::VehicleParameters>(
-        "vehicle_parameters")
-    };
+      BT::InputPort<openscenario_msgs::msg::VehicleParameters>("vehicle_parameters")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
@@ -54,8 +51,7 @@ public:
   openscenario_msgs::msg::VehicleParameters vehicle_parameters;
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(
-    double target_speed,
-    const std::vector<std::int64_t> & following_lanelets);
+    double target_speed, const std::vector<std::int64_t> & following_lanelets);
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
   virtual const openscenario_msgs::msg::WaypointsArray calculateWaypoints() = 0;

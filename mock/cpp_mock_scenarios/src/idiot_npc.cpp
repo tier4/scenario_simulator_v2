@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cpp_mock_scenarios/catalogs.hpp>
-
-#include <openscenario_msgs/msg/driver_model.hpp>
-
-#include <traffic_simulator/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
-#include <ament_index_cpp/get_package_share_directory.hpp>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <cpp_mock_scenarios/catalogs.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <traffic_simulator/api/api.hpp>
 
 // headers in STL
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 // headers in pugixml
 #include "pugixml.hpp"
@@ -36,10 +34,9 @@ public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
   : Node("scenario_runner", option),
     api_(
-      this,
-      __FILE__,
-      ament_index_cpp::get_package_share_directory(
-        "cargo_delivery") + "/maps/kashiwa/lanelet2_map_with_private_road_and_walkway_ele_fix.osm")
+      this, __FILE__,
+      ament_index_cpp::get_package_share_directory("cargo_delivery") +
+        "/maps/kashiwa/lanelet2_map_with_private_road_and_walkway_ele_fix.osm")
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
@@ -47,22 +44,20 @@ public:
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
     api_.spawn(
-      false, "idiot", traffic_simulator::entity::VehicleParameters(
-        vehicle_catalog_xml_doc).toRosMsg());
+      false, "idiot",
+      traffic_simulator::entity::VehicleParameters(vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
-      "idiot",
-      traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+      "idiot", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("idiot", 15, true);
     openscenario_msgs::msg::DriverModel driver_model;
     driver_model.see_around = false;
     api_.setDriverModel("idiot", driver_model);
     api_.spawn(
-      false, "npc", traffic_simulator::entity::VehicleParameters(
-        vehicle_catalog_xml_doc).toRosMsg());
+      false, "npc",
+      traffic_simulator::entity::VehicleParameters(vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
-      "npc",
-      traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
+      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("npc", 5, true);
     using namespace std::chrono_literals;

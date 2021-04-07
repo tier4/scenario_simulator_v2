@@ -12,43 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <traffic_simulator/entity/exception.hpp>
-
 #include <memory>
-#include <vector>
-#include <utility>
 #include <string>
+#include <traffic_simulator/entity/exception.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <utility>
+#include <vector>
 
 namespace traffic_simulator
 {
 TrafficLightManager::TrafficLightManager(
   std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher,
-  const std::shared_ptr<rclcpp::Clock> & clock_ptr,
-  const std::string & map_frame)
+  const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame)
 : marker_pub_(publisher), clock_ptr_(clock_ptr), map_frame_(map_frame)
 {
   traffic_lights_ = {};
   const auto ids = hdmap_utils_ptr->getTrafficLightIds();
   for (const auto id : ids) {
     std::shared_ptr<TrafficLight> light_ptr = std::make_shared<TrafficLight>(id);
-    auto red_position = hdmap_utils_ptr->getTrafficLightBulbPosition(
-      id,
-      TrafficLightColor::RED);
+    auto red_position = hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::RED);
     if (red_position) {
       light_ptr->setPosition(TrafficLightColor::RED, red_position.get());
     }
-    auto yellow_position = hdmap_utils_ptr->getTrafficLightBulbPosition(
-      id,
-      TrafficLightColor::YELLOW);
+    auto yellow_position =
+      hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW);
     if (yellow_position) {
       light_ptr->setPosition(TrafficLightColor::YELLOW, yellow_position.get());
     }
     auto green_position =
-      hdmap_utils_ptr->getTrafficLightBulbPosition(
-      id,
-      TrafficLightColor::GREEN);
+      hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::GREEN);
     if (green_position) {
       light_ptr->setPosition(TrafficLightColor::GREEN, green_position.get());
     }

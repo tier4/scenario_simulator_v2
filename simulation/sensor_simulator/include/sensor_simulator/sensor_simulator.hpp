@@ -15,25 +15,23 @@
 #ifndef SENSOR_SIMULATOR__SENSOR_SIMULATOR_HPP_
 #define SENSOR_SIMULATOR__SENSOR_SIMULATOR_HPP_
 
-#include <sensor_simulator/sensor_simulation/sensor_simulation.hpp>
-#include <sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
-#include <sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
-
-#include <simulation_interface/zmq_server.hpp>
-#include <simulation_interface/zmq_multi_server.hpp>
-
-#include <visualization_msgs/msg/marker_array.hpp>
-#include <rclcpp/rclcpp.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/msg/transform_stamped.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
 
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <map>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+#include <sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <sensor_simulator/sensor_simulation/sensor_simulation.hpp>
+#include <simulation_interface/zmq_multi_server.hpp>
+#include <simulation_interface/zmq_server.hpp>
+#include <string>
 #include <thread>
 #include <vector>
-#include <string>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #if __cplusplus
 extern "C" {
@@ -60,14 +58,11 @@ extern "C" {
   SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_PUBLIC
 #define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_LOCAL
 #else
-#define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_EXPORT \
-  __attribute__((visibility("default")))
+#define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_EXPORT __attribute__((visibility("default")))
 #define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_IMPORT
 #if __GNUC__ >= 4
-#define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_PUBLIC \
-  __attribute__((visibility("default")))
-#define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_LOCAL \
-  __attribute__((visibility("hidden")))
+#define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_PUBLIC __attribute__((visibility("default")))
+#define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_LOCAL __attribute__((visibility("hidden")))
 #else
 #define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_PUBLIC
 #define SENSOR_SIMULATOR_SENSOR_SIMULATOR_COMPONENT_LOCAL

@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/helper/helper.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <string>
+#include <traffic_simulator/helper/helper.hpp>
 
 namespace traffic_simulator
 {
 namespace helper
 {
 openscenario_msgs::msg::ActionStatus constructActionStatus(
-  double linear_vel,
-  double angular_vel,
-  double linear_accel,
-  double angular_accel)
+  double linear_vel, double angular_vel, double linear_accel, double angular_accel)
 {
   openscenario_msgs::msg::ActionStatus status;
   geometry_msgs::msg::Twist twist;
@@ -41,9 +37,7 @@ openscenario_msgs::msg::ActionStatus constructActionStatus(
 }
 
 openscenario_msgs::msg::LaneletPose constructLaneletPose(
-  std::int64_t lanelet_id, double s,
-  double offset, double roll,
-  double pitch, double yaw)
+  std::int64_t lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
   openscenario_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
@@ -70,8 +64,7 @@ geometry_msgs::msg::Vector3 constructRPYfronQuaternion(geometry_msgs::msg::Quate
 }
 
 geometry_msgs::msg::Pose constructPose(
-  double x, double y, double z, double roll, double pitch,
-  double yaw)
+  double x, double y, double z, double roll, double pitch, double yaw)
 {
   geometry_msgs::msg::Pose pose;
   pose.position.x = x;
@@ -99,8 +92,7 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
-  LidarType type, std::string entity, std::string topic_name,
-  double horizontal_resolution)
+  LidarType type, std::string entity, std::string topic_name, double horizontal_resolution)
 {
   simulation_api_schema::LidarConfiguration configuration;
   configuration.set_horizontal_resolution(horizontal_resolution);

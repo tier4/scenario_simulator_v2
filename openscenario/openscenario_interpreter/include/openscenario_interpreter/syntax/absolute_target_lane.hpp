@@ -32,12 +32,13 @@ struct AbsoluteTargetLane
 {
   const String value;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit AbsoluteTargetLane(const Node & node, Scope & scope)
   : value{readAttribute<String>("value", node, scope)}
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_LANE_HPP_

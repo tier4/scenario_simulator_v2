@@ -16,13 +16,12 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__PEDESTRIAN_ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
-#include <traffic_simulator/entity/pedestrian_parameter.hpp>
-#include <traffic_simulator/behavior/action_node.hpp>
 
-#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
-
-#include <string>
 #include <memory>
+#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <string>
+#include <traffic_simulator/behavior/action_node.hpp>
+#include <traffic_simulator/entity/pedestrian_parameter.hpp>
 
 namespace entity_behavior
 {
@@ -34,9 +33,7 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
-      BT::InputPort<openscenario_msgs::msg::PedestrianParameters>(
-        "pedestrian_parameters")
-    };
+      BT::InputPort<openscenario_msgs::msg::PedestrianParameters>("pedestrian_parameters")};
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
@@ -46,8 +43,7 @@ public:
   openscenario_msgs::msg::PedestrianParameters pedestrian_parameters;
   openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdatedInWorldFrame(
     double target_speed);
-  openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(
-    double target_speed);
+  openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(double target_speed);
 };
 }  // namespace entity_behavior
 

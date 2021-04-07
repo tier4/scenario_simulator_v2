@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_simulator/sensor_simulator.hpp>
-
-#include <memory>
 #include <string>
 
 int main(int argc, char * argv[])

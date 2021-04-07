@@ -23,23 +23,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/pedestrian/walk_straight_action.hpp>
-
 #include <string>
+#include <traffic_simulator/behavior/pedestrian/walk_straight_action.hpp>
 
 namespace entity_behavior
 {
 namespace pedestrian
 {
 WalkStraightAction::WalkStraightAction(
-  const std::string & name,
-  const BT::NodeConfiguration & config)
-: entity_behavior::PedestrianActionNode(name, config) {}
-
-void WalkStraightAction::getBlackBoardValues()
+  const std::string & name, const BT::NodeConfiguration & config)
+: entity_behavior::PedestrianActionNode(name, config)
 {
-  PedestrianActionNode::getBlackBoardValues();
 }
+
+void WalkStraightAction::getBlackBoardValues() { PedestrianActionNode::getBlackBoardValues(); }
 
 BT::NodeStatus WalkStraightAction::tick()
 {
@@ -54,5 +51,5 @@ BT::NodeStatus WalkStraightAction::tick()
   setOutput("updated_status", updated_status);
   return BT::NodeStatus::RUNNING;
 }
-}      // namespace pedestrian
+}  // namespace pedestrian
 }  // namespace entity_behavior

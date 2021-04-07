@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry_msgs.pb.h>
 #include <gtest/gtest.h>
 
-#include <geometry_msgs.pb.h>
-#include <geometry_msgs/msg/vector3.hpp>
-#include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-
+#include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <simulation_interface/conversions.hpp>
-
 #include <string>
 
 TEST(Conversion, ConvertPoint)

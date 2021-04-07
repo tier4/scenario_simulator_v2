@@ -12,51 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sensor_simulator/sensor_simulator.hpp>
-#include <sensor_simulator/exception.hpp>
-
-#include <rclcpp_components/register_node_macro.hpp>
-
-#include <simulation_interface/conversions.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <pugixml.hpp>
-
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <rclcpp/rclcpp.hpp>
-
 #include <limits>
 #include <memory>
+#include <pugixml.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
+#include <sensor_simulator/exception.hpp>
+#include <sensor_simulator/sensor_simulator.hpp>
+#include <simulation_interface/conversions.hpp>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 namespace sensor_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
-: Node("sensor_simulator", options), sensor_sim_(get_clock()),
+: Node("sensor_simulator", options),
+  sensor_sim_(get_clock()),
   server_(
-    simulation_interface::protocol,
-    simulation_interface::HostName::ANY,
-    std::bind(&ScenarioSimulator::initialize, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::updateFrame, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::updateSensorFrame, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::spawnVehicleEntity, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::spawnPedestrianEntity, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::despawnEntity, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::updateEntityStatus, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::attachLidarSensor, this,
-    std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::attachDetectionSensor, this,
-    std::placeholders::_1, std::placeholders::_2))
+    simulation_interface::protocol, simulation_interface::HostName::ANY,
+    std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::updateSensorFrame, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::spawnVehicleEntity, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::spawnPedestrianEntity, this, std::placeholders::_1,
+      std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::despawnEntity, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::updateEntityStatus, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
+      std::placeholders::_2))
 {
 }
 
@@ -167,8 +162,7 @@ void ScenarioSimulator::attachDetectionSensor(
   const simulation_api_schema::AttachDetectionSensorRequest & req,
   simulation_api_schema::AttachDetectionSensorResponse & res)
 {
-  const auto pub = this->create_publisher<
-    autoware_perception_msgs::msg::DynamicObjectArray>(
+  const auto pub = this->create_publisher<autoware_perception_msgs::msg::DynamicObjectArray>(
     req.configuration().topic_name(), 1);
   sensor_sim_.attachDetectionSensor(req.configuration(), pub);
   res = simulation_api_schema::AttachDetectionSensorResponse();
@@ -179,13 +173,12 @@ void ScenarioSimulator::attachLidarSensor(
   const simulation_api_schema::AttachLidarSensorRequest & req,
   simulation_api_schema::AttachLidarSensorResponse & res)
 {
-  const auto pub = this->create_publisher<sensor_msgs::msg::PointCloud2>(
-    req.configuration().topic_name(), 1);
+  const auto pub =
+    this->create_publisher<sensor_msgs::msg::PointCloud2>(req.configuration().topic_name(), 1);
   sensor_sim_.attachLidarSensor(req.configuration(), pub);
   res = simulation_api_schema::AttachLidarSensorResponse();
   res.mutable_result()->set_success(true);
 }
-
 
 void ScenarioSimulator::updateSensorFrame(
   const simulation_api_schema::UpdateSensorFrameRequest & req,

@@ -39,34 +39,34 @@ struct Axle
 
   Axle() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Axle(const Node & node, Scope & scope)
   : max_steering{readAttribute<Double>("maxSteering", node, scope)},
     wheel_diameter{readAttribute<Double>("wheelDiameter", node, scope)},
     track_width{readAttribute<Double>("trackWidth", node, scope)},
     position_x{readAttribute<Double>("positionX", node, scope)},
     position_z{readAttribute<Double>("positionZ", node, scope)}
-  {}
+  {
+  }
 };
 
-#define BOILERPLATE(TYPENAME) \
-  template<typename ... Ts> \
+#define BOILERPLATE(TYPENAME)                                                                  \
+  template <typename... Ts>                                                                    \
   std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const TYPENAME & rhs) \
-  { \
-    return os << indent << blue << "<" #TYPENAME << " " << \
-           highlight("maxSteering", rhs.max_steering) \
-              << " " << highlight("wheelDiameter", rhs.wheel_diameter) \
-              << " " << highlight("trackWidth", rhs.track_width) \
-              << " " << highlight("positionX", rhs.position_x) \
-              << " " << highlight("positionZ", rhs.position_z) << blue << "/>" << reset; \
-  } \
+  {                                                                                            \
+    return os << indent << blue << "<" #TYPENAME << " "                                        \
+              << highlight("maxSteering", rhs.max_steering) << " "                             \
+              << highlight("wheelDiameter", rhs.wheel_diameter) << " "                         \
+              << highlight("trackWidth", rhs.track_width) << " "                               \
+              << highlight("positionX", rhs.position_x) << " "                                 \
+              << highlight("positionZ", rhs.position_z) << blue << "/>" << reset;              \
+  }                                                                                            \
   static_assert(true, "")
 
 BOILERPLATE(Axle);
 
 // NOTE: DON'T REWRITE THIS STRUCT LIKE `using FrontAxle = Axle` (for Clang)
-struct FrontAxle
-  : public Axle
+struct FrontAxle : public Axle
 {
   using Axle::Axle;
 };
@@ -74,8 +74,7 @@ struct FrontAxle
 BOILERPLATE(FrontAxle);
 
 // NOTE: DON'T REWRITE THIS STRUCT LIKE `using RearAxle = Axle` (for Clang)
-struct RearAxle
-  : public Axle
+struct RearAxle : public Axle
 {
   using Axle::Axle;
 };
@@ -83,16 +82,15 @@ struct RearAxle
 BOILERPLATE(RearAxle);
 
 // NOTE: DON'T REWRITE THIS STRUCT LIKE `using AdditionalAxle = Axle` (for Clang)
-struct AdditionalAxle
-  : public Axle
+struct AdditionalAxle : public Axle
 {
   using Axle::Axle;
 };
 
 BOILERPLATE(AdditionalAxle);
 
-  #undef BOILERPLATE
-}
+#undef BOILERPLATE
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__AXLE_HPP_

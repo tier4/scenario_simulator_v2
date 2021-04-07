@@ -16,20 +16,16 @@
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_PARAMETER_HPP_
 
 // headers in pugixml
-#include <pugixml.hpp>
-
-#include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
-
+#include <boost/foreach.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/foreach.hpp>
-#include <traffic_simulator/entity/vehicle_parameter.hpp>
-
+#include <geometry_msgs/msg/vector3.hpp>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
-
-#include <string>
+#include <pugixml.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <sstream>
+#include <string>
+#include <traffic_simulator/entity/vehicle_parameter.hpp>
 
 namespace traffic_simulator
 {
@@ -41,14 +37,12 @@ struct PedestrianParameters
   : name(xml.child("Pedestrian").attribute("name").as_string()),
     pedestrian_category(xml.child("Pedestrian").attribute("pedestrianCategory").as_string()),
     bounding_box(xml.child("Pedestrian"))
-  {}
-  PedestrianParameters(
-    std::string name,
-    std::string pedestrian_category, BoundingBox bounding_box)
-  : name(name),
-    pedestrian_category(pedestrian_category),
-    bounding_box(bounding_box)
-  {}
+  {
+  }
+  PedestrianParameters(std::string name, std::string pedestrian_category, BoundingBox bounding_box)
+  : name(name), pedestrian_category(pedestrian_category), bounding_box(bounding_box)
+  {
+  }
   const std::string name;
   const std::string pedestrian_category;
   const BoundingBox bounding_box;

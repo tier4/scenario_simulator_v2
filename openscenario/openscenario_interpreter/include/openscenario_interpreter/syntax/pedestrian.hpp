@@ -57,34 +57,33 @@ struct Pedestrian
 
   const Properties properties;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Pedestrian(const Node & node, Scope & outer_scope)
   : name{readAttribute<String>("name", node, outer_scope)},
     mass{readAttribute<Double>("mass", node, outer_scope)},
     model{readAttribute<String>("model", node, outer_scope)},
-    pedestrian_category{
-      readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)},
+    pedestrian_category{readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)},
     inner_scope{outer_scope},
     parameter_declarations{
       readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)},
     bounding_box{readElement<BoundingBox>("BoundingBox", node, inner_scope)},
     properties{readElement<Properties>("Properties", node, inner_scope)}
-  {}
+  {
+  }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Pedestrian & rhs)
 {
-  return os << (indent++) << blue << "<Pedestrian" << " " << highlight("name", rhs.name) <<
-         " " << highlight("mass", rhs.mass) <<
-         " " << highlight("model", rhs.model) <<
-         " " <<
-         highlight("pedestrianCategory", rhs.pedestrian_category) << blue << ">\n" << reset <<
-         rhs.parameter_declarations << "\n" <<
-         rhs.bounding_box << "\n" <<
-         (--indent) << blue << "</Pedestrian>" << reset;
+  return os << (indent++) << blue << "<Pedestrian"
+            << " " << highlight("name", rhs.name) << " " << highlight("mass", rhs.mass) << " "
+            << highlight("model", rhs.model) << " "
+            << highlight("pedestrianCategory", rhs.pedestrian_category) << blue << ">\n"
+            << reset << rhs.parameter_declarations << "\n"
+            << rhs.bounding_box << "\n"
+            << (--indent) << blue << "</Pedestrian>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PEDESTRIAN_HPP_

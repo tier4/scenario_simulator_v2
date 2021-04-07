@@ -44,8 +44,7 @@ inline namespace syntax
  * ========================================================================== */
 struct StoryboardElementType
 {
-  enum value_type
-  {
+  enum value_type {
     act,
     action,
     event,
@@ -54,28 +53,24 @@ struct StoryboardElementType
     story,
   } value;
 
-  explicit constexpr StoryboardElementType(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr StoryboardElementType(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, StoryboardElementType & type)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                     \
+  if (buffer == #IDENTIFIER) {                      \
     type.value = StoryboardElementType::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                      \
+  }                                                 \
+  static_assert(true, "")
 
   BOILERPLATE(act);
   BOILERPLATE(action);
@@ -84,20 +79,21 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Storyboar
   BOILERPLATE(maneuverGroup);
   BOILERPLATE(story);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type StoryboardElementType";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const StoryboardElementType & type)
+  std::basic_ostream<Ts...> & os, const StoryboardElementType & type)
 {
   switch (type) {
-    #define BOILERPLATE(ID) case StoryboardElementType::ID: return os << #ID;
+#define BOILERPLATE(ID)           \
+  case StoryboardElementType::ID: \
+    return os << #ID;
 
     BOILERPLATE(act);
     BOILERPLATE(action);
@@ -106,16 +102,16 @@ std::basic_ostream<Ts...> & operator<<(
     BOILERPLATE(maneuverGroup);
     BOILERPLATE(story);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class StoryboardElementType holds unexpected value " <<
-        static_cast<StoryboardElementType::value_type>(type.value);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class StoryboardElementType holds unexpected value "
+         << static_cast<StoryboardElementType::value_type>(type.value);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_

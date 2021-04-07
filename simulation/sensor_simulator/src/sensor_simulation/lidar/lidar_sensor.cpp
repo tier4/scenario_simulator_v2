@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <boost/optional.hpp>
+#include <memory>
 #include <sensor_simulator/exception.hpp>
 #include <sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simulation_interface/conversions.hpp>
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <boost/optional.hpp>
-
-#include <vector>
-#include <memory>
 #include <string>
+#include <vector>
 
 namespace sensor_simulator
 {
@@ -40,8 +39,7 @@ const std::vector<std::string> & LidarSensor::getDetectedObjects() const
 }
 
 void LidarSensor::update(
-  double current_time,
-  const std::vector<openscenario_msgs::EntityStatus> & status,
+  double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
   if ((current_time - last_update_stamp_) >= configuration_.scan_duration()) {
@@ -53,8 +51,7 @@ void LidarSensor::update(
 }
 
 const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
-  const std::vector<openscenario_msgs::EntityStatus> & status,
-  const rclcpp::Time & stamp)
+  const std::vector<openscenario_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
 {
   Raycaster raycaster;
   boost::optional<geometry_msgs::msg::Pose> ego_pose;
@@ -66,8 +63,7 @@ const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
     } else {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(s.pose(), pose);
-      auto rotation =
-        quaternion_operation::getRotationMatrix(pose.orientation);
+      auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
       geometry_msgs::msg::Point center_point;
       simulation_interface::toMsg(s.bounding_box().center(), center_point);
       Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
@@ -76,11 +72,8 @@ const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
       raycaster.addPrimitive<sensor_simulator::primitives::Box>(
-        s.name(),
-        s.bounding_box().dimensions().x(),
-        s.bounding_box().dimensions().y(),
-        s.bounding_box().dimensions().z(),
-        pose);
+        s.name(), s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
+        s.bounding_box().dimensions().z(), pose);
     }
   }
   if (ego_pose) {
@@ -89,10 +82,7 @@ const sensor_msgs::msg::PointCloud2 LidarSensor::raycast(
       vertical_angles.emplace_back(v);
     }
     const auto poincloud = raycaster.raycast(
-      configuration_.entity(),
-      stamp,
-      ego_pose.get(),
-      configuration_.horizontal_resolution(),
+      configuration_.entity(), stamp, ego_pose.get(), configuration_.horizontal_resolution(),
       vertical_angles);
     detected_objects_ = raycaster.getDetectedObject();
     return poincloud;

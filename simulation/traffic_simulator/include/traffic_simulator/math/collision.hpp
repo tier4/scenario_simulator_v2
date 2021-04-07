@@ -15,10 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_
 #define TRAFFIC_SIMULATOR__MATH__COLLISION_HPP_
 
-#include <traffic_simulator/math/bounding_box.hpp>
-#include <openscenario_msgs/msg/bounding_box.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-
+#include <openscenario_msgs/msg/bounding_box.hpp>
+#include <traffic_simulator/math/bounding_box.hpp>
 #include <vector>
 
 namespace traffic_simulator

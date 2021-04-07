@@ -15,21 +15,19 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_HPP_
 
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/behavior/pedestrian/follow_lane_action.hpp>
-#include <traffic_simulator/behavior/pedestrian/walk_straight_action.hpp>
-
-#include <openscenario_msgs/msg/entity_status.hpp>
-
-#include <geometry_msgs/msg/point.hpp>
 #include <behaviortree_cpp_v3/bt_factory.h>
 #include <behaviortree_cpp_v3/loggers/bt_cout_logger.h>
 
-#include <memory>
 #include <functional>
+#include <geometry_msgs/msg/point.hpp>
 #include <map>
-#include <vector>
+#include <memory>
+#include <openscenario_msgs/msg/entity_status.hpp>
 #include <string>
+#include <traffic_simulator/behavior/pedestrian/follow_lane_action.hpp>
+#include <traffic_simulator/behavior/pedestrian/walk_straight_action.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -40,11 +38,8 @@ class BehaviorTree
 public:
   BehaviorTree();
   BT::NodeStatus tick(double current_time, double step_time);
-  const std::string getCurrentAction() const
-  {
-    return current_action_;
-  }
-  template<typename T>
+  const std::string getCurrentAction() const { return current_action_; }
+  template <typename T>
   void setValueToBlackBoard(std::string key, T value)
   {
     tree_.rootBlackboard()->set(key, value);
@@ -71,7 +66,7 @@ private:
   std::vector<BT::TreeNode::StatusChangeSubscriber> subscribers_;
   std::string current_action_;
 };
-}      // namespace pedestrian
+}  // namespace pedestrian
 }  // namespace entity_behavior
 
 #endif  // TRAFFIC_SIMULATOR__BEHAVIOR__PEDESTRIAN__BEHAVIOR_TREE_HPP_

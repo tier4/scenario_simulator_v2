@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__STRING__SPLIT_HPP_
 
 #include <boost/algorithm/string.hpp>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -27,7 +26,7 @@ inline namespace string
 {
 auto split(const std::string & target)
 {
-  std::vector<std::string> result {};
+  std::vector<std::string> result{};
   boost::split(result, target, boost::is_space());
   return result;
 }

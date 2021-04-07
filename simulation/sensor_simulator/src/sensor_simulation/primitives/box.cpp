@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sensor_simulator/sensor_simulation/primitives/box.hpp>
-
-#include <vector>
-#include <string>
 #include <iostream>
+#include <sensor_simulator/sensor_simulation/primitives/box.hpp>
+#include <string>
+#include <vector>
 
 namespace sensor_simulator
 {

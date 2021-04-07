@@ -15,16 +15,14 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__METRICS_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__METRICS_MANAGER_HPP_
 
+#include <fstream>
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/metrics/metric_base.hpp>
-
-#include <nlohmann/json.hpp>
-
 #include <unordered_map>
-#include <memory>
-#include <string>
 #include <utility>
-#include <fstream>
 
 namespace metrics
 {
@@ -40,8 +38,8 @@ public:
   void setVerbose(bool verbose);
   void setEntityManager(
     std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
-  template<typename T, typename ... Ts>
-  void addMetric(std::string name, Ts && ... xs)
+  template <typename T, typename... Ts>
+  void addMetric(std::string name, Ts &&... xs)
   {
     auto metric_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
     metric_ptr->setEntityManager(this->entity_manager_ptr_);

@@ -15,27 +15,23 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EXCEPTION_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EXCEPTION_HPP_
 
-#include <string>
 #include <exception>
+#include <string>
 
 namespace traffic_simulator
 {
 class SimulationRuntimeError : public std::runtime_error
 {
 public:
-  explicit SimulationRuntimeError(const char * message)
-  : runtime_error(message) {}
-  explicit SimulationRuntimeError(std::string message)
-  : runtime_error(message.c_str()) {}
+  explicit SimulationRuntimeError(const char * message) : runtime_error(message) {}
+  explicit SimulationRuntimeError(std::string message) : runtime_error(message.c_str()) {}
 };
 
 class SplineInterpolationError : public std::runtime_error
 {
 public:
-  explicit SplineInterpolationError(const char * message)
-  : runtime_error(message) {}
+  explicit SplineInterpolationError(const char * message) : runtime_error(message) {}
 };
 }  // namespace traffic_simulator
-
 
 #endif  // TRAFFIC_SIMULATOR__ENTITY__EXCEPTION_HPP_

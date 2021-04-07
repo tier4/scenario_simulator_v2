@@ -15,35 +15,31 @@
 #ifndef SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 #define SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
-#include <sensor_simulator/sensor_simulation/primitives/box.hpp>
-#include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
-
 #include <embree3/rtcore.h>
-
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
-
-#include <unordered_map>
-#include <vector>
-#include <string>
 #include <memory>
-#include <utility>
 #include <random>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_simulator/sensor_simulation/primitives/box.hpp>
+#include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace sensor_simulator
 {
-
 class Raycaster
 {
 public:
   Raycaster();
   explicit Raycaster(std::string embree_config);
   ~Raycaster();
-  template<typename T, typename ... Ts>
-  void addPrimitive(std::string name, Ts && ... xs)
+  template <typename T, typename... Ts>
+  void addPrimitive(std::string name, Ts &&... xs)
   {
     if (primitive_ptrs_.count(name) != 0) {
       throw std::runtime_error("primitive " + name + " already exist.");
@@ -52,15 +48,10 @@ public:
     primitive_ptrs_.emplace(name, std::move(primitive_ptr));
   }
   const sensor_msgs::msg::PointCloud2 raycast(
-    std::string frame_id,
-    const rclcpp::Time & stamp,
-    geometry_msgs::msg::Pose origin,
-    double horizontal_resolution,
-    std::vector<double> vertical_angles,
-    double horizontal_angle_start = 0,
-    double horizontal_angle_end = 2 * M_PI,
-    double max_distance = 100, double min_distance = 0
-  );
+    std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
+    double horizontal_resolution, std::vector<double> vertical_angles,
+    double horizontal_angle_start = 0, double horizontal_angle_end = 2 * M_PI,
+    double max_distance = 100, double min_distance = 0);
   const std::vector<std::string> & getDetectedObject() const;
 
 private:
@@ -70,11 +61,9 @@ private:
   std::random_device seed_gen_;
   std::default_random_engine engine_;
   const sensor_msgs::msg::PointCloud2 raycast(
-    std::string frame_id,
-    const rclcpp::Time & stamp,
-    geometry_msgs::msg::Pose origin,
-    std::vector<geometry_msgs::msg::Quaternion> directions,
-    double max_distance = 100, double min_distance = 0);
+    std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
+    std::vector<geometry_msgs::msg::Quaternion> directions, double max_distance = 100,
+    double min_distance = 0);
   std::vector<std::string> detected_objects_;
   std::unordered_map<unsigned int, std::string> geometry_ids_;
 };

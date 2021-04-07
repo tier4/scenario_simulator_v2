@@ -38,8 +38,9 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct ObjectType
-{};
-}
+{
+};
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_TYPE_HPP_

@@ -15,25 +15,22 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__VEHICLE_ENTITY_HPP_
 
-#include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/vehicle_parameter.hpp>
-#include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
-#include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
-#include <traffic_simulator/behavior/route_planner.hpp>
-
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
-
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <traffic_simulator/behavior/route_planner.hpp>
+#include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
+#include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/entity/vehicle_parameter.hpp>
 
 // headers in pugixml
-#include <pugixml.hpp>
-
 #include <boost/optional.hpp>
 #include <memory>
-#include <vector>
+#include <pugixml.hpp>
 #include <string>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -71,16 +68,10 @@ public:
   {
     return parameters.bounding_box;
   }
-  void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
-  override;
-  const std::string getCurrentAction() const
-  {
-    return tree_ptr_->getCurrentAction();
-  }
-  openscenario_msgs::msg::WaypointsArray getWaypoints()
-  {
-    return tree_ptr_->getWaypoints();
-  }
+  void requestAssignRoute(
+    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
+  const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
+  openscenario_msgs::msg::WaypointsArray getWaypoints() { return tree_ptr_->getWaypoints(); }
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle()
   {
     return tree_ptr_->getObstacle();

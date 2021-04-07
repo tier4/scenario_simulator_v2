@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_SPEED_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_SPEED_HPP_
 
-#include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,17 +42,17 @@ struct RelativeTargetSpeed
 
   const Boolean continuous;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit RelativeTargetSpeed(const Node & node, Scope & scope)
   : entity_ref{readAttribute<String>("entityRef", node, scope)},
     value{readAttribute<Double>("value", node, scope)},
-    speed_target_value_type{
-      readAttribute<SpeedTargetValueType>(
-        "speedTargetValueType", node, scope, SpeedTargetValueType())},
+    speed_target_value_type{readAttribute<SpeedTargetValueType>(
+      "speedTargetValueType", node, scope, SpeedTargetValueType())},
     continuous{readAttribute<Boolean>("continuous", node, scope, Boolean())}
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_SPEED_HPP_

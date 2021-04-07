@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/metrics/traveled_distance_metric.hpp>
-
 #include <string>
+#include <traffic_simulator/metrics/traveled_distance_metric.hpp>
 
 namespace metrics
 {
@@ -24,18 +23,15 @@ TraveledDistanceMetric::TraveledDistanceMetric(std::string target_entity)
   traveled_distance = 0;
 }
 
-bool TraveledDistanceMetric::activateTrigger()
-{
-  return true;
-}
+bool TraveledDistanceMetric::activateTrigger() { return true; }
 
 void TraveledDistanceMetric::update()
 {
   double step_time = entity_manager_ptr_->getStepTime();
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (status) {
-    traveled_distance = traveled_distance +
-      std::fabs(status.get().action_status.twist.linear.x) * step_time;
+    traveled_distance =
+      traveled_distance + std::fabs(status.get().action_status.twist.linear.x) * step_time;
   }
 }
 

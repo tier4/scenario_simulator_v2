@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -34,21 +33,17 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * ======================================================================== */
-struct TrafficSignalAction
-  : public Element
+struct TrafficSignalAction : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit TrafficSignalAction(const Node & node, Ts && ...)
-  : Element(
-      choice(
-        node,
-        std::make_pair("TrafficSignalControllerAction", [&](auto &&) {
-          return unspecified;
-        }),
-        std::make_pair("TrafficSignalStateAction", UNSUPPORTED())))
-  {}
+  template <typename Node, typename... Ts>
+  explicit TrafficSignalAction(const Node & node, Ts &&...)
+  : Element(choice(
+      node, std::make_pair("TrafficSignalControllerAction", [&](auto &&) { return unspecified; }),
+      std::make_pair("TrafficSignalStateAction", UNSUPPORTED())))
+  {
+  }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_

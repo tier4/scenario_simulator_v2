@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_STATE_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -47,8 +46,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct StoryboardElementState
 {
-  enum value_type
-  {
+  enum value_type {
     /* ---- StandBy ----------------------------------------------------------
      *
      * This is the default initialization state of a StoryboardElement. When
@@ -172,30 +170,25 @@ struct StoryboardElementState
     skipTransition,
   } value;
 
-  explicit constexpr StoryboardElementState(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr StoryboardElementState(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(
-  std::basic_istream<Ts...> & is,
-  StoryboardElementState & state)
+  std::basic_istream<Ts...> & is, StoryboardElementState & state)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                       \
+  if (buffer == #IDENTIFIER) {                        \
     state.value = StoryboardElementState::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                        \
+  }                                                   \
+  static_assert(true, "")
 
   BOILERPLATE(startTransition);
   BOILERPLATE(endTransition);
@@ -205,20 +198,21 @@ std::basic_istream<Ts...> & operator>>(
   BOILERPLATE(runningState);
   BOILERPLATE(standbyState);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type StoryboardElementState";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const StoryboardElementState & state)
+  std::basic_ostream<Ts...> & os, const StoryboardElementState & state)
 {
   switch (state) {
-    #define BOILERPLATE(ID) case StoryboardElementState::ID: return os << #ID;
+#define BOILERPLATE(ID)            \
+  case StoryboardElementState::ID: \
+    return os << #ID;
 
     BOILERPLATE(startTransition);
     BOILERPLATE(endTransition);
@@ -228,32 +222,30 @@ std::basic_ostream<Ts...> & operator<<(
     BOILERPLATE(runningState);
     BOILERPLATE(standbyState);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class StoryboardElementState holds unexpected value " <<
-        static_cast<StoryboardElementState::value_type>(state.value);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class StoryboardElementState holds unexpected value "
+         << static_cast<StoryboardElementState::value_type>(state.value);
+      throw ImplementationFault{ss.str()};
   }
 }
 
-static const auto standby_state {
-  make<StoryboardElementState>(StoryboardElementState::standbyState)};
-static const auto running_state {
-  make<StoryboardElementState>(StoryboardElementState::runningState)};
-static const auto complete_state {
+static const auto standby_state{make<StoryboardElementState>(StoryboardElementState::standbyState)};
+static const auto running_state{make<StoryboardElementState>(StoryboardElementState::runningState)};
+static const auto complete_state{
   make<StoryboardElementState>(StoryboardElementState::completeState)};
 
-static const auto start_transition {make<StoryboardElementState>(
-    StoryboardElementState::startTransition)};
-static const auto end_transition {make<StoryboardElementState>(
-    StoryboardElementState::endTransition)};
-static const auto stop_transition {make<StoryboardElementState>(
-    StoryboardElementState::stopTransition)};
-static const auto skip_transition {make<StoryboardElementState>(
-    StoryboardElementState::skipTransition)};
-}
+static const auto start_transition{
+  make<StoryboardElementState>(StoryboardElementState::startTransition)};
+static const auto end_transition{
+  make<StoryboardElementState>(StoryboardElementState::endTransition)};
+static const auto stop_transition{
+  make<StoryboardElementState>(StoryboardElementState::stopTransition)};
+static const auto skip_transition{
+  make<StoryboardElementState>(StoryboardElementState::skipTransition)};
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_STATE_HPP_

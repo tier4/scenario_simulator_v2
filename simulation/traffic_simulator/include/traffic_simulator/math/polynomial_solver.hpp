@@ -24,7 +24,7 @@ namespace math
 class PolynomialSolver
 {
 public:
-/**
+  /**
  * @brief solve linear equation a*x + b = 0
  *
  * @param a
@@ -32,9 +32,8 @@ public:
  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
  */
   std::vector<double> solveLinearEquation(
-    double a, double b, double min_value = 0,
-    double max_value = 1) const;
-/**
+    double a, double b, double min_value = 0, double max_value = 1) const;
+  /**
  * @brief solve quadratic equation a*x^2 + b*x + c = 0
  *
  * @param a
@@ -42,9 +41,8 @@ public:
  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
  */
   std::vector<double> solveQuadraticEquation(
-    double a, double b, double c, double min_value = 0,
-    double max_value = 1) const;
-/**
+    double a, double b, double c, double min_value = 0, double max_value = 1) const;
+  /**
  * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
  *
  * @param a
@@ -54,9 +52,8 @@ public:
  * @return std::vector<double> real root of the cubic functions (from 0 to 1)
  */
   std::vector<double> solveCubicEquation(
-    double a, double b, double c, double d,
-    double min_value = 0, double max_value = 1) const;
-/**
+    double a, double b, double c, double d, double min_value = 0, double max_value = 1) const;
+  /**
  * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
  *
  * @param a
@@ -67,7 +64,7 @@ public:
  * @return double result of cubic function
  */
   double cubicFunction(double a, double b, double c, double d, double t) const;
-/**
+  /**
  * @brief calculate result of quadratic function a*t^2 + b*t + c
  *
  * @param a
@@ -79,7 +76,7 @@ public:
   double quadraticFunction(double a, double b, double c, double t) const;
 
 private:
-/**
+  /**
  * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0, this code is public domain
  * @sa http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html
  * @param x

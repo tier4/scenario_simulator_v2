@@ -15,20 +15,18 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
-#include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/pedestrian_parameter.hpp>
+#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
 #include <traffic_simulator/behavior/pedestrian/behavior_tree.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
-
-#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/entity/pedestrian_parameter.hpp>
 
 // headers in pugixml
-#include <pugixml.hpp>
-
 #include <boost/optional.hpp>
 #include <memory>
-#include <vector>
+#include <pugixml.hpp>
 #include <string>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -63,12 +61,9 @@ public:
   {
     return parameters.bounding_box;
   }
-  void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
-  override;
-  const std::string getCurrentAction() const
-  {
-    return tree_ptr_->getCurrentAction();
-  }
+  void requestAssignRoute(
+    const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
+  const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100)
   {
     if (!status_) {

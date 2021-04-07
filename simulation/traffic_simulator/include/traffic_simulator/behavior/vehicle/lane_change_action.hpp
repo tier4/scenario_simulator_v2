@@ -15,20 +15,17 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_
 
-#include <traffic_simulator/math/hermite_curve.hpp>
-#include <traffic_simulator/entity/vehicle_parameter.hpp>
-#include <traffic_simulator/behavior/vehicle/vehicle_action_node.hpp>
-
-#include <openscenario_msgs/msg/entity_status.hpp>
-#include <openscenario_msgs/msg/entity_trajectory.hpp>
-
 #include <behaviortree_cpp_v3/behavior_tree.h>
 #include <behaviortree_cpp_v3/bt_factory.h>
 
 #include <boost/optional.hpp>
-
-#include <string>
 #include <memory>
+#include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/entity_trajectory.hpp>
+#include <string>
+#include <traffic_simulator/behavior/vehicle/vehicle_action_node.hpp>
+#include <traffic_simulator/entity/vehicle_parameter.hpp>
+#include <traffic_simulator/math/hermite_curve.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -42,9 +39,7 @@ public:
   BT::NodeStatus tick() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {
-      BT::InputPort<std::int64_t>("to_lanelet_id")
-    };
+    BT::PortsList ports = {BT::InputPort<std::int64_t>("to_lanelet_id")};
     BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
@@ -62,7 +57,7 @@ private:
   double target_s_;
   boost::optional<std::int64_t> to_lanelet_id_;
 };
-}      // namespace vehicle
+}  // namespace vehicle
 }  // namespace entity_behavior
 
 #endif  // TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__LANE_CHANGE_ACTION_HPP_

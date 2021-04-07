@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
 #define OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_
 
-#include <traffic_simulator/api/api.hpp>
-#include <openscenario_interpreter/error.hpp>
-
 #include <limits>
 #include <memory>
+#include <openscenario_interpreter/error.hpp>
+#include <traffic_simulator/api/api.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -32,26 +31,27 @@ extern scenario_simulator::API & connection;
 //   ~Connector();
 // } connector;
 
-template<typename ... Ts>
-decltype(auto) connect(Ts && ... xs)
+template <typename... Ts>
+decltype(auto) connect(Ts &&... xs)
 {
   new (&connection) scenario_simulator::API(std::forward<decltype(xs)>(xs)...);
   return connection;
 }
 
-template<typename ... Ts>
-decltype(auto) getEntityStatus(Ts && ... xs) try {
+template <typename... Ts>
+decltype(auto) getEntityStatus(Ts &&... xs)
+try {
   return connection.getEntityStatus(std::forward<decltype(xs)>(xs)...);
 } catch (const traffic_simulator::SimulationRuntimeError & error) {
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << error.what() << ".\n";
   ss << "Possible causes:\n";
   ss << "  (1) The position of the corresponding entity is not specified by Teleport Action";
   throw SemanticError(ss.str());
 }
 
-template<typename ... Ts>
-decltype(auto) isReachedPosition(Ts && ... xs)
+template <typename... Ts>
+decltype(auto) isReachedPosition(Ts &&... xs)
 {
   return connection.reachPosition(std::forward<decltype(xs)>(xs)...);
 }
@@ -62,11 +62,12 @@ decltype(auto) isReachedPosition(Ts && ... xs)
 //   return connection.getRelativeDistance(std::forward<decltype(xs)>(xs)...);
 // }
 
-template<typename ... Ts>
-decltype(auto) getRelativePose(Ts && ... xs) try {
+template <typename... Ts>
+decltype(auto) getRelativePose(Ts &&... xs)
+try {
   return connection.getRelativePose(std::forward<decltype(xs)>(xs)...);
 } catch (const traffic_simulator::SimulationRuntimeError &) {
-  geometry_msgs::msg::Pose result {};
+  geometry_msgs::msg::Pose result{};
   result.position.x = std::numeric_limits<double>::quiet_NaN();
   result.position.y = std::numeric_limits<double>::quiet_NaN();
   result.position.z = std::numeric_limits<double>::quiet_NaN();
@@ -92,24 +93,25 @@ decltype(auto) getRelativePose(Ts && ... xs) try {
 //   }
 // }
 
-template<typename ... Ts>
-decltype(auto) setController(Ts && ... xs)
+template <typename... Ts>
+decltype(auto) setController(Ts &&... xs)
 {
   return connection.setDriverModel(std::forward<decltype(xs)>(xs)...);
 }
 
-#define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE) \
-  template<typename ... Ts> \
-  auto IDENTIFIER(Ts && ... xs) \
-  { \
+#define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                     \
+  template <typename... Ts>                                                       \
+  auto IDENTIFIER(Ts &&... xs)                                                    \
+  {                                                                               \
     const auto result = connection.IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-    if (result) { \
-      return result.get(); \
-    } else { \
+    if (result) {                                                                 \
+      return result.get();                                                        \
+    } else {                                                                      \
       using value_type = typename std::decay<decltype(result)>::type::value_type; \
-      return ALTERNATE; \
-    } \
-  } static_assert(true, "")
+      return ALTERNATE;                                                           \
+    }                                                                             \
+  }                                                                               \
+  static_assert(true, "")
 
 STRIP_OPTIONAL(getBoundingBoxDistance, static_cast<value_type>(0));
 STRIP_OPTIONAL(getStandStillDuration, static_cast<value_type>(0));
@@ -117,12 +119,13 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 #undef STRIP_OPTIONAL
 
-#define FORWARD_TO_SIMULATION_API(IDENTIFIER) \
-  template<typename ... Ts> \
-  decltype(auto) IDENTIFIER(Ts && ... xs) \
-  { \
+#define FORWARD_TO_SIMULATION_API(IDENTIFIER)                        \
+  template <typename... Ts>                                          \
+  decltype(auto) IDENTIFIER(Ts &&... xs)                             \
+  {                                                                  \
     return connection.IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-  } static_assert(true, "")
+  }                                                                  \
+  static_assert(true, "")
 
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);

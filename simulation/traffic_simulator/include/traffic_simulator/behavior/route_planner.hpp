@@ -15,11 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__ROUTE_PLANNER_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__ROUTE_PLANNER_HPP_
 
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
 #include <memory>
-#include <vector>
 #include <queue>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -29,15 +28,12 @@ public:
   explicit RoutePlanner(std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr);
   std::vector<std::int64_t> getRouteLanelets(
     openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
-    std::vector<openscenario_msgs::msg::LaneletPose> waypoints,
-    double horizon = 100);
+    std::vector<openscenario_msgs::msg::LaneletPose> waypoints, double horizon = 100);
   std::vector<std::int64_t> getRouteLanelets(
     openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
-    openscenario_msgs::msg::LaneletPose target_lanelet_pose,
-    double horizon = 100);
+    openscenario_msgs::msg::LaneletPose target_lanelet_pose, double horizon = 100);
   std::vector<std::int64_t> getRouteLanelets(
-    openscenario_msgs::msg::LaneletPose entity_lanelet_pose,
-    double horizon = 100);
+    openscenario_msgs::msg::LaneletPose entity_lanelet_pose, double horizon = 100);
   void cancelGoal();
 
 private:

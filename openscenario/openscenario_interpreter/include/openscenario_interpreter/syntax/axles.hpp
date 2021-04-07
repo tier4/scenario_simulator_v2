@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_
 
 #include <openscenario_interpreter/syntax/axle.hpp>
-
 #include <vector>
 
 namespace openscenario_interpreter
@@ -44,25 +43,23 @@ struct Axles
 
   Axles() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Axles(const Node & node, Scope & scope)
   : front_axle{readElement<FrontAxle>("FrontAxle", node, scope)},
     rear_axle{readElement<RearAxle>("RearAxle", node, scope)}
   {
-    callWithElements(
-      node, "AdditionalAxle", 0, unbounded, [&](auto && node)
-      {
-        additional_axles.emplace_back(node, scope);
-      });
+    callWithElements(node, "AdditionalAxle", 0, unbounded, [&](auto && node) {
+      additional_axles.emplace_back(node, scope);
+    });
   }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Axles & rhs)
 {
-  os << (indent++) << blue << "<Axles>\n" << reset <<
-    rhs.front_axle << "\n" <<
-    rhs.rear_axle << "\n";
+  os << (indent++) << blue << "<Axles>\n"
+     << reset << rhs.front_axle << "\n"
+     << rhs.rear_axle << "\n";
 
   for (const auto & each : rhs.additional_axles) {
     os << each << "\n";
@@ -70,7 +67,7 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Axl
 
   return os << (--indent) << blue << "</Axles>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_

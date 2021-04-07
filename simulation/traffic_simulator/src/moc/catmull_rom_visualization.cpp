@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/point_stamped.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
-
-#include <string>
 #include <vector>
-#include <memory>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 class CatmullRomSplineVisualization : public rclcpp::Node
 {
@@ -32,16 +31,13 @@ public:
     marker_pub_ptr_ = create_publisher<visualization_msgs::msg::MarkerArray>("/spline/marker", 1);
     clicked_points_sub_ptr_ = create_subscription<geometry_msgs::msg::PoseStamped>(
       "/move_base_simple/goal", 1,
-      std::bind(
-        &CatmullRomSplineVisualization::goalPoseCallback, this,
-        std::placeholders::_1));
+      std::bind(&CatmullRomSplineVisualization::goalPoseCallback, this, std::placeholders::_1));
   }
 
 private:
   std::string frame_;
   std::vector<geometry_msgs::msg::Point> points_;
-  void goalPoseCallback(
-    const geometry_msgs::msg::PoseStamped::SharedPtr msg)
+  void goalPoseCallback(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
     if (frame_ == "") {
       frame_ = msg->header.frame_id;
@@ -58,8 +54,7 @@ private:
       marker_pub_ptr_->publish(generateSplineMarker());
     }
   }
-  const visualization_msgs::msg::MarkerArray
-  generateDeleteMarker() const
+  const visualization_msgs::msg::MarkerArray generateDeleteMarker() const
   {
     visualization_msgs::msg::MarkerArray ret;
     visualization_msgs::msg::Marker marker;
@@ -67,8 +62,7 @@ private:
     ret.markers.push_back(marker);
     return ret;
   }
-  const visualization_msgs::msg::MarkerArray
-  generateSplineMarker() const
+  const visualization_msgs::msg::MarkerArray generateSplineMarker() const
   {
     visualization_msgs::msg::MarkerArray ret;
     visualization_msgs::msg::Marker marker;

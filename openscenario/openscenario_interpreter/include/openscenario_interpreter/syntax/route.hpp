@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/waypoint.hpp>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -48,32 +47,27 @@ struct Route
 
   std::vector<Waypoint> waypoints;
 
-  template<typename Node>
+  template <typename Node>
   explicit Route(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     closed(readAttribute<Boolean>("closed", node, outer_scope, Boolean())),
     inner_scope(outer_scope)
   {
-    callWithElements(
-      node, "ParameterDeclarations", 0, 1, [&](auto && node)
-      {
-        return ParameterDeclarations(node, inner_scope);
-      });
+    callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
+      return ParameterDeclarations(node, inner_scope);
+    });
 
-    callWithElements(
-      node, "Waypoint", 2, unbounded, [&](auto && node)
-      {
-        return waypoints.emplace_back(node, inner_scope);
-      });
+    callWithElements(node, "Waypoint", 2, unbounded, [&](auto && node) {
+      return waypoints.emplace_back(node, inner_scope);
+    });
   }
 
   explicit operator std::vector<openscenario_msgs::msg::LaneletPose>() const
   {
-    std::vector<openscenario_msgs::msg::LaneletPose> lanelet_poses {};
+    std::vector<openscenario_msgs::msg::LaneletPose> lanelet_poses{};
 
     for (const auto & waypoint : waypoints) {
-      lanelet_poses.emplace_back(
-        static_cast<openscenario_msgs::msg::LaneletPose>(waypoint));
+      lanelet_poses.emplace_back(static_cast<openscenario_msgs::msg::LaneletPose>(waypoint));
     }
 
     return lanelet_poses;

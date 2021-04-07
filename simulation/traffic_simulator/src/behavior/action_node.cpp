@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/action_node.hpp>
-
-#include <string>
-#include <memory>
-#include <unordered_map>
-#include <vector>
-#include <utility>
 #include <algorithm>
+#include <memory>
 #include <set>
+#include <string>
+#include <traffic_simulator/behavior/action_node.hpp>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace entity_behavior
 {
-
 ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & config)
 : BT::ActionNodeBase(name, config)
-{}
-
-BT::NodeStatus ActionNode::executeTick()
 {
-  return BT::ActionNodeBase::executeTick();
 }
+
+BT::NodeStatus ActionNode::executeTick() { return BT::ActionNodeBase::executeTick(); }
 
 void ActionNode::getBlackBoardValues()
 {
@@ -49,9 +45,7 @@ void ActionNode::getBlackBoardValues()
     throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in ActionNode");
   }
   if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
-      "traffic_light_manager",
-      traffic_light_manager))
-  {
+        "traffic_light_manager", traffic_light_manager)) {
     throw BehaviorTreeRuntimeError("failed to get input traffic_light_manager in ActionNode");
   }
   if (!getInput<openscenario_msgs::msg::EntityStatus>("entity_status", entity_status)) {
@@ -62,14 +56,12 @@ void ActionNode::getBlackBoardValues()
     target_speed = boost::none;
   }
 
-  if (!getInput<std::unordered_map<std::string,
-    openscenario_msgs::msg::EntityStatus>>("other_entity_status", other_entity_status))
-  {
+  if (!getInput<std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus>>(
+        "other_entity_status", other_entity_status)) {
     throw BehaviorTreeRuntimeError("failed to get input other_entity_status in ActionNode");
   }
-  if (!getInput<std::unordered_map<std::string,
-    openscenario_msgs::msg::EntityType>>("entity_type_list", entity_type_list))
-  {
+  if (!getInput<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
+        "entity_type_list", entity_type_list)) {
     throw BehaviorTreeRuntimeError("failed to get input entity_type_list in ActionNode");
   }
   if (!getInput<std::vector<std::int64_t>>("route_lanelets", route_lanelets)) {
@@ -115,10 +107,7 @@ boost::optional<double> ActionNode::getYieldStopDistance(
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (other_status.size() != 0) {
         auto distance = hdmap_utils->getLongitudinalDistance(
-          entity_status.lanelet_pose.lanelet_id,
-          entity_status.lanelet_pose.s,
-          lanelet,
-          0);
+          entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s, lanelet, 0);
         if (distance) {
           dists.insert(distance.get());
         }
@@ -151,8 +140,8 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntit
 std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getRightOfWayEntities()
 {
   std::vector<openscenario_msgs::msg::EntityStatus> ret;
-  const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(
-    entity_status.lanelet_pose.lanelet_id);
+  const auto lanelet_ids =
+    hdmap_utils->getRightOfWayLaneletIds(entity_status.lanelet_pose.lanelet_id);
   if (lanelet_ids.empty()) {
     return ret;
   }
@@ -177,9 +166,9 @@ boost::optional<double> ActionNode::getDistanceToTrafficLightStopLine(
   std::set<double> collision_points = {};
   for (const auto id : traffic_light_ids) {
     const auto color = traffic_light_manager->getColor(id);
-    if (color == traffic_simulator::TrafficLightColor::RED ||
-      color == traffic_simulator::TrafficLightColor::YELLOW)
-    {
+    if (
+      color == traffic_simulator::TrafficLightColor::RED ||
+      color == traffic_simulator::TrafficLightColor::YELLOW) {
       const auto collision_point = hdmap_utils->getDistanceToTrafficLightStopLine(waypoints, id);
       if (collision_point) {
         collision_points.insert(collision_point.get());
@@ -216,9 +205,8 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
     if (!entity_status.lanelet_pose_valid || !each.second.lanelet_pose_valid) {
       continue;
     }
-    boost::optional<double> distance = hdmap_utils->getLongitudinalDistance(
-      entity_status.lanelet_pose,
-      each.second.lanelet_pose);
+    boost::optional<double> distance =
+      hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, each.second.lanelet_pose);
     if (distance) {
       if (distance.get() < 40) {
         if (!front_entity_distance && !front_entity_speed) {
@@ -276,13 +264,11 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   std::vector<std::pair<int, double>> collision_points;
   for (const auto & lanelet_id : following_lanelets) {
     auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(
-      lanelet_id,
-      conflicting_entity_status->lanelet_pose.lanelet_id);
+      lanelet_id, conflicting_entity_status->lanelet_pose.lanelet_id);
     if (stop_position_s) {
       auto dist = hdmap_utils->getLongitudinalDistance(
-        entity_status.lanelet_pose.lanelet_id,
-        entity_status.lanelet_pose.s,
-        lanelet_id, stop_position_s.get());
+        entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s, lanelet_id,
+        stop_position_s.get());
       if (dist) {
         dists.push_back(dist.get());
         collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
@@ -317,10 +303,10 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEnti
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
   for (const auto & status : other_entity_status) {
-    if (std::count(
+    if (
+      std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1)
-    {
+        status.second.lanelet_pose.lanelet_id) >= 1) {
       conflicting_entity_status.push_back(status.second);
     }
   }
@@ -333,10 +319,10 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
   for (const auto & status : other_entity_status) {
-    if (std::count(
+    if (
+      std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1)
-    {
+        status.second.lanelet_pose.lanelet_id) >= 1) {
       conflicting_entity_status.push_back(status.second);
     }
   }
@@ -344,14 +330,12 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
   std::vector<std::pair<int, double>> collision_points;
   for (const auto & status : conflicting_entity_status) {
     for (const auto & lanelet_id : following_lanelets) {
-      auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(
-        lanelet_id,
-        status.lanelet_pose.lanelet_id);
+      auto stop_position_s =
+        hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id, status.lanelet_pose.lanelet_id);
       if (stop_position_s) {
         auto dist = hdmap_utils->getLongitudinalDistance(
-          entity_status.lanelet_pose.lanelet_id,
-          entity_status.lanelet_pose.s,
-          lanelet_id, stop_position_s.get());
+          entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s, lanelet_id,
+          stop_position_s.get());
         if (dist) {
           dists.push_back(dist.get());
           collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
@@ -385,10 +369,10 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   for (const auto & status : other_entity_status) {
-    if (std::count(
+    if (
+      std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1)
-    {
+        status.second.lanelet_pose.lanelet_id) >= 1) {
       return true;
     }
   }

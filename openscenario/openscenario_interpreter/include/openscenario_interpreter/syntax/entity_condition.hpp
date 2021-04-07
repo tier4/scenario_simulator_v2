@@ -23,7 +23,6 @@
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/syntax/stand_still_condition.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -51,38 +50,29 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPENAME) \
-  std::make_pair( \
-    #TYPENAME, \
-    [&](auto && node) { \
-      return make<TYPENAME>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+#define ELEMENT(TYPENAME)                                           \
+  std::make_pair(#TYPENAME, [&](auto && node) {                     \
+    return make<TYPENAME>(node, std::forward<decltype(xs)>(xs)...); \
+  })
 
 struct EntityCondition : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit EntityCondition(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        std::make_pair("EndOfRoadCondition", UNSUPPORTED()),
-        ELEMENT(CollisionCondition),
-        std::make_pair("OffroadCondition", UNSUPPORTED()),
-        ELEMENT(TimeHeadwayCondition),
-        std::make_pair("TimeToCollisionCondition", UNSUPPORTED()),
-        ELEMENT(AccelerationCondition),
-        ELEMENT(StandStillCondition),
-        ELEMENT(SpeedCondition),
-        std::make_pair("RelativeSpeedCondition", UNSUPPORTED()),
-        std::make_pair("TraveledDistanceCondition", UNSUPPORTED()),
-        ELEMENT(ReachPositionCondition),
-        ELEMENT(DistanceCondition),
-        ELEMENT(RelativeDistanceCondition)))
-  {}
+  template <typename Node, typename... Ts>
+  explicit EntityCondition(const Node & node, Ts &&... xs)
+  : Element(choice(
+      node, std::make_pair("EndOfRoadCondition", UNSUPPORTED()), ELEMENT(CollisionCondition),
+      std::make_pair("OffroadCondition", UNSUPPORTED()), ELEMENT(TimeHeadwayCondition),
+      std::make_pair("TimeToCollisionCondition", UNSUPPORTED()), ELEMENT(AccelerationCondition),
+      ELEMENT(StandStillCondition), ELEMENT(SpeedCondition),
+      std::make_pair("RelativeSpeedCondition", UNSUPPORTED()),
+      std::make_pair("TraveledDistanceCondition", UNSUPPORTED()), ELEMENT(ReachPositionCondition),
+      ELEMENT(DistanceCondition), ELEMENT(RelativeDistanceCondition)))
+  {
+  }
 };
 
 #undef ELEMENT
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_CONDITION_HPP_

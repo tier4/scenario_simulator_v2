@@ -17,9 +17,6 @@
 #ifndef LANELET2_EXTENSION_PSIM__UTILITY__QUERY_HPP_
 #define LANELET2_EXTENSION_PSIM__UTILITY__QUERY_HPP_
 
-#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
-#include <lanelet2_extension_psim/regulatory_elements/detection_area.hpp>
-
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_routing/RoutingGraph.h>
@@ -27,7 +24,8 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/polygon_stamped.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-
+#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/detection_area.hpp>
 #include <memory>
 #include <string>
 #include <vector>

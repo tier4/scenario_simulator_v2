@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
-
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -39,35 +38,23 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      push_back(make<TYPE>(node, scope)); \
-    })
+  std::make_pair(#TYPE, [&](auto && node) { push_back(make<TYPE>(node, scope)); })
 
-struct InitActions
-  : public Elements
+struct InitActions : public Elements
 {
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit InitActions(const Node & node, Scope & scope)
   {
-    std::unordered_map<
-      std::string, std::function<void(const Node & node)>> dispatcher
-    {
+    std::unordered_map<std::string, std::function<void(const Node & node)>> dispatcher{
       ELEMENT(GlobalAction),
       ELEMENT(UserDefinedAction),
       ELEMENT(Private),
     };
 
     for (const auto & each : node.children()) {
-      const auto iter {
-        dispatcher.find(each.name())
-      };
+      const auto iter{dispatcher.find(each.name())};
       if (iter != std::end(dispatcher)) {
-        std::get<1>(* iter)(each);
+        std::get<1> (*iter)(each);
       }
     }
   }

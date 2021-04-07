@@ -16,42 +16,41 @@
 #define AWAPI_ACCESSOR__UTILITY__VISIBILITY_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 // This logic was borrowed (then namespaced) from the examples on the gcc wiki:
 //     https://gcc.gnu.org/wiki/Visibility
 #if defined _WIN32 || defined __CYGWIN__
-#  ifdef __GNUC__
-#    define AWAPI_ACCESSOR_EXPORT __attribute__ ((dllexport))
-#    define AWAPI_ACCESSOR_IMPORT __attribute__ ((dllimport))
-#  else
-#    define AWAPI_ACCESSOR_EXPORT __declspec(dllexport)
-#    define AWAPI_ACCESSOR_IMPORT __declspec(dllimport)
-#  endif
-
-#  ifdef AWAPI_ACCESSOR_BUILDING_DLL
-#    define AWAPI_ACCESSOR_PUBLIC AWAPI_ACCESSOR_EXPORT
-#  else
-#    define AWAPI_ACCESSOR_PUBLIC AWAPI_ACCESSOR_IMPORT
-#  endif
-
-#  define AWAPI_ACCESSOR_PUBLIC_TYPE AWAPI_ACCESSOR_PUBLIC
-#  define AWAPI_ACCESSOR_LOCAL
+#ifdef __GNUC__
+#define AWAPI_ACCESSOR_EXPORT __attribute__((dllexport))
+#define AWAPI_ACCESSOR_IMPORT __attribute__((dllimport))
 #else
-#  define AWAPI_ACCESSOR_EXPORT __attribute__ ((visibility("default")))
-#  define AWAPI_ACCESSOR_IMPORT
+#define AWAPI_ACCESSOR_EXPORT __declspec(dllexport)
+#define AWAPI_ACCESSOR_IMPORT __declspec(dllimport)
+#endif
 
-#  if __GNUC__ >= 4
-#    define AWAPI_ACCESSOR_PUBLIC __attribute__ ((visibility("default")))
-#    define AWAPI_ACCESSOR_LOCAL __attribute__ ((visibility("hidden")))
-#  else
-#    define AWAPI_ACCESSOR_PUBLIC
-#    define AWAPI_ACCESSOR_LOCAL
-#  endif
+#ifdef AWAPI_ACCESSOR_BUILDING_DLL
+#define AWAPI_ACCESSOR_PUBLIC AWAPI_ACCESSOR_EXPORT
+#else
+#define AWAPI_ACCESSOR_PUBLIC AWAPI_ACCESSOR_IMPORT
+#endif
 
-#  define AWAPI_ACCESSOR_PUBLIC_TYPE
+#define AWAPI_ACCESSOR_PUBLIC_TYPE AWAPI_ACCESSOR_PUBLIC
+#define AWAPI_ACCESSOR_LOCAL
+#else
+#define AWAPI_ACCESSOR_EXPORT __attribute__((visibility("default")))
+#define AWAPI_ACCESSOR_IMPORT
+
+#if __GNUC__ >= 4
+#define AWAPI_ACCESSOR_PUBLIC __attribute__((visibility("default")))
+#define AWAPI_ACCESSOR_LOCAL __attribute__((visibility("hidden")))
+#else
+#define AWAPI_ACCESSOR_PUBLIC
+#define AWAPI_ACCESSOR_LOCAL
+#endif
+
+#define AWAPI_ACCESSOR_PUBLIC_TYPE
 #endif
 
 #ifdef __cplusplus

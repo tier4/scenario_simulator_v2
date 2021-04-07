@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/metrics/metric_base.hpp>
-
-#include <string>
 #include <memory>
+#include <string>
+#include <traffic_simulator/metrics/metric_base.hpp>
 
 namespace metrics
 {
-MetricBase::MetricBase(std::string metrics_type)
-: metrics_type(metrics_type)
+MetricBase::MetricBase(std::string metrics_type) : metrics_type(metrics_type)
 {
   lifecycle_ = MetricLifecycle::INACTIVE;
   error_ = boost::none;

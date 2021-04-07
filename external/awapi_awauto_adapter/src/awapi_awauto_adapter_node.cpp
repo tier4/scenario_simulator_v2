@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <awapi_awauto_adapter/autoware_auto_adapter.hpp>
-
 #include <cstdlib>
 #include <memory>
 
@@ -21,16 +20,13 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
 
-  rclcpp::executors::SingleThreadedExecutor executor {};
+  rclcpp::executors::SingleThreadedExecutor executor{};
 
-  rclcpp::NodeOptions options {};
+  rclcpp::NodeOptions options{};
 
-  auto node {
-    std::make_shared<autoware_api::AutowareAutoAdapter>(options)
-  };
+  auto node{std::make_shared<autoware_api::AutowareAutoAdapter>(options)};
 
-  executor.add_node(
-    (*node).get_node_base_interface());
+  executor.add_node((*node).get_node_base_interface());
 
   executor.spin();
 

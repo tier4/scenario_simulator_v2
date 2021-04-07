@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <limits>
+#include <queue>
+#include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/exception.hpp>
-
-#include <rclcpp/rclcpp.hpp>
 #include <unordered_map>
-#include <limits>
-#include <string>
-#include <queue>
 #include <vector>
 
 namespace traffic_simulator
@@ -27,8 +26,7 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  std::string type, std::string name,
-  const openscenario_msgs::msg::EntityStatus & initial_state)
+  std::string type, std::string name, const openscenario_msgs::msg::EntityStatus & initial_state)
 : type(type), name(name)
 {
   status_ = initial_state;
@@ -36,18 +34,14 @@ EntityBase::EntityBase(
   verbose_ = true;
 }
 
-EntityBase::EntityBase(std::string type, std::string name)
-: type(type), name(name)
+EntityBase::EntityBase(std::string type, std::string name) : type(type), name(name)
 {
   status_ = boost::none;
   visibility_ = true;
   verbose_ = true;
 }
 
-boost::optional<double> EntityBase::getStandStillDuration() const
-{
-  return stand_still_duration_;
-}
+boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
 void EntityBase::updateStandStillDuration(double step_time)
 {
@@ -57,9 +51,8 @@ void EntityBase::updateStandStillDuration(double step_time)
     if (!stand_still_duration_) {
       stand_still_duration_ = 0;
     }
-    if (std::fabs(status_->action_status.twist.linear.x) <=
-      std::numeric_limits<double>::epsilon())
-    {
+    if (
+      std::fabs(status_->action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
       stand_still_duration_ = step_time + stand_still_duration_.get();
     } else {
       stand_still_duration_ = 0;
@@ -100,10 +93,7 @@ bool EntityBase::setVisibility(bool visibility)
   return visibility_;
 }
 
-bool EntityBase::getVisibility()
-{
-  return visibility_;
-}
+bool EntityBase::getVisibility() { return visibility_; }
 
 void EntityBase::stopAtEndOfRoad()
 {

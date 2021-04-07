@@ -24,10 +24,8 @@ JoyToVehicleCommandComponent::JoyToVehicleCommandComponent(const rclcpp::NodeOpt
   get_parameter("velocity_axes_index", velocity_axes_index_);
   declare_parameter("angluar_axes_index", 3);
   get_parameter("angluar_axes_index", angluar_axes_index_);
-  joy_sub_ =
-    this->create_subscription<sensor_msgs::msg::Joy>(
-    "joy", 1,
-    std::bind(&JoyToVehicleCommandComponent::JoyCallback, this, std::placeholders::_1));
+  joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>(
+    "joy", 1, std::bind(&JoyToVehicleCommandComponent::JoyCallback, this, std::placeholders::_1));
   cmd_pub_ = this->create_publisher<autoware_auto_msgs::msg::VehicleControlCommand>(
     "input/vehicle_control_command", 1);
 }

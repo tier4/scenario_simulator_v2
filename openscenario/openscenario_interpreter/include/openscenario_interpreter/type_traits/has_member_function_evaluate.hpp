@@ -21,17 +21,17 @@ namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
-template<typename T, typename = void>
-struct HasMemberFunctionEvaluate
-  : public std::false_type
-{};
+template <typename T, typename = void>
+struct HasMemberFunctionEvaluate : public std::false_type
+{
+};
 
-template<typename T>
-struct HasMemberFunctionEvaluate<T,
-  void_t<decltype(std::declval<T>().evaluate())>>
-  : public std::true_type
-{};
-}
+template <typename T>
+struct HasMemberFunctionEvaluate<T, void_t<decltype(std::declval<T>().evaluate())>>
+: public std::true_type
+{
+};
+}  // namespace type_traits
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_EVALUATE_HPP_

@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_STRATEGY_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -44,8 +43,7 @@ inline namespace syntax
  * ======================================================================== */
 struct RouteStrategy
 {
-  enum value_type
-  {
+  enum value_type {
     // Fastest route.
     fastest,
 
@@ -57,79 +55,75 @@ struct RouteStrategy
 
     // Random route.
     random,
-  }
-  value;
+  } value;
 
-  explicit constexpr RouteStrategy(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr RouteStrategy(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RouteStrategy & strategy)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                 \
+  if (buffer == #IDENTIFIER) {                  \
     strategy.value = RouteStrategy::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                  \
+  }                                             \
+  static_assert(true, "")
 
   BOILERPLATE(shortest);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    std::stringstream ss { \
-    }; \
-    ss << "given value \'" << buffer << \
-      "\' is valid OpenSCENARIO value of type RouteStrategy, but it is not supported"; \
-    throw ImplementationFault {ss.str()}; \
-  } static_assert(true, "")
+#define BOILERPLATE(IDENTIFIER)                                                            \
+  if (buffer == #IDENTIFIER) {                                                             \
+    std::stringstream ss{};                                                                \
+    ss << "given value \'" << buffer                                                       \
+       << "\' is valid OpenSCENARIO value of type RouteStrategy, but it is not supported"; \
+    throw ImplementationFault{ss.str()};                                                   \
+  }                                                                                        \
+  static_assert(true, "")
 
   BOILERPLATE(fastest);
   BOILERPLATE(leastIntersections);
   BOILERPLATE(random);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type RouteStrategy";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const RouteStrategy & strategy)
+  std::basic_ostream<Ts...> & os, const RouteStrategy & strategy)
 {
   switch (strategy) {
-    #define BOILERPLATE(NAME) case RouteStrategy::NAME: return os << #NAME;
+#define BOILERPLATE(NAME)   \
+  case RouteStrategy::NAME: \
+    return os << #NAME;
 
     BOILERPLATE(fastest);
     BOILERPLATE(shortest);
     BOILERPLATE(leastIntersections);
     BOILERPLATE(random);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class RouteStrategy holds unexpected value " <<
-        static_cast<RouteStrategy::value_type>(strategy);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class RouteStrategy holds unexpected value "
+         << static_cast<RouteStrategy::value_type>(strategy);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_STRATEGY_HPP_

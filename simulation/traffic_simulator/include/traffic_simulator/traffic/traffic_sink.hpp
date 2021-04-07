@@ -26,12 +26,10 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
 
-#include <traffic_simulator/traffic/traffic_module_base.hpp>
-
-#include <geometry_msgs/msg/pose.hpp>
-
 #include <functional>
+#include <geometry_msgs/msg/pose.hpp>
 #include <string>
+#include <traffic_simulator/traffic/traffic_module_base.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -42,8 +40,7 @@ class TrafficSink : public TraffiModuleBase
 {
 public:
   explicit TrafficSink(
-    double radius,
-    const geometry_msgs::msg::Point & position,
+    double radius, const geometry_msgs::msg::Point & position,
     const std::function<std::vector<std::string>(void)> & get_entity_names_function,
     const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
     const std::function<void(std::string)> & despawn_function);

@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_DIMENSION_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -43,8 +42,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct DynamicsDimension
 {
-  enum value_type
-  {
+  enum value_type {
     // A predefined constant rate is used to acquire the target value.
     rate,
 
@@ -55,75 +53,71 @@ struct DynamicsDimension
     distance,
   } value;
 
-  constexpr DynamicsDimension(value_type value = {})
-  : value{value}
-  {}
+  constexpr DynamicsDimension(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(
-  std::basic_istream<Ts...> & is,
-  DynamicsDimension & dimension)
+  std::basic_istream<Ts...> & is, DynamicsDimension & dimension)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                \
+  if (buffer == #IDENTIFIER) {                 \
     dimension = DynamicsDimension::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                 \
+  }                                            \
+  static_assert(true, "")
 
   BOILERPLATE(rate);
   BOILERPLATE(time);
   BOILERPLATE(distance);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    std::stringstream ss { \
-    }; \
-    ss << "given value \'" << buffer << \
-      "\' is valid OpenSCENARIO value of type DynamicsDimension, but it is not supported"; \
-    throw ImplementationFault {ss.str()}; \
-  } static_assert(true, "")
+#define BOILERPLATE(IDENTIFIER)                                                                \
+  if (buffer == #IDENTIFIER) {                                                                 \
+    std::stringstream ss{};                                                                    \
+    ss << "given value \'" << buffer                                                           \
+       << "\' is valid OpenSCENARIO value of type DynamicsDimension, but it is not supported"; \
+    throw ImplementationFault{ss.str()};                                                       \
+  }                                                                                            \
+  static_assert(true, "")
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type DynamicsDimension";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const DynamicsDimension & dimension)
+  std::basic_ostream<Ts...> & os, const DynamicsDimension & dimension)
 {
   switch (dimension) {
-    #define BOILERPLATE(NAME) case DynamicsDimension::NAME: return os << #NAME;
+#define BOILERPLATE(NAME)       \
+  case DynamicsDimension::NAME: \
+    return os << #NAME;
 
     BOILERPLATE(rate);
     BOILERPLATE(time);
     BOILERPLATE(distance);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class DynamicsDimension holds unexpected value " <<
-        static_cast<DynamicsDimension::value_type>(dimension);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class DynamicsDimension holds unexpected value "
+         << static_cast<DynamicsDimension::value_type>(dimension);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_DIMENSION_HPP_

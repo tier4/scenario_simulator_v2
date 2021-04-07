@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/parameter_add_value_rule.hpp>
 #include <openscenario_interpreter/syntax/parameter_multiply_by_value_rule.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -35,31 +34,22 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<Parameter ## TYPE ## Rule>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+#define ELEMENT(TYPE)                                                            \
+  std::make_pair(#TYPE, [&](auto && node) {                                      \
+    return make<Parameter##TYPE##Rule>(node, std::forward<decltype(xs)>(xs)...); \
+  })
 
-struct ModifyRule
-  : public Element
+struct ModifyRule : public Element
 {
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit ModifyRule(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        ELEMENT(AddValue),
-        ELEMENT(MultiplyByValue)))
-  {}
+  template <typename Node, typename... Ts>
+  explicit ModifyRule(const Node & node, Ts &&... xs)
+  : Element(choice(node, ELEMENT(AddValue), ELEMENT(MultiplyByValue)))
+  {
+  }
 };
 
 #undef ELEMENT
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__MODIFY_RULE_HPP_

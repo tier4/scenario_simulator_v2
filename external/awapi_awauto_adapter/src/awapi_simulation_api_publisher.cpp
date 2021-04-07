@@ -13,30 +13,19 @@
 // limitations under the License.
 
 #include <awapi_awauto_adapter/awapi_simulation_api_publisher.hpp>
-
 #include <string>
 
 namespace autoware_api
 {
-AutowareSimulationAPIPublisher::AutowareSimulationAPIPublisher(
-  const rclcpp::NodeOptions & options)
+AutowareSimulationAPIPublisher::AutowareSimulationAPIPublisher(const rclcpp::NodeOptions & options)
 : rclcpp::Node("awapi_traffic_simulator_publisher", options)
 {
   // subscriber
   sub_initial_pose_ptr_ = create_subscription<PoseStamped>(
-    "/initialpose",
-    1,
-    [&](const PoseStamped::SharedPtr msg_ptr)
-    {
-      initial_pose_ptr_ = msg_ptr;
-    });
+    "/initialpose", 1, [&](const PoseStamped::SharedPtr msg_ptr) { initial_pose_ptr_ = msg_ptr; });
 
   sub_goal_pose_ptr_ = create_subscription<PoseStamped>(
-    "/move_base_simple/goal",
-    1,
-    [&](const PoseStamped::SharedPtr msg_ptr)
-    {
-      goal_pose_ptr_ = msg_ptr;
-    });
+    "/move_base_simple/goal", 1,
+    [&](const PoseStamped::SharedPtr msg_ptr) { goal_pose_ptr_ = msg_ptr; });
 }
 }  // namespace autoware_api

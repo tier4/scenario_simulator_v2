@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #ifndef SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
 #define SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
 
-#include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <simulation_api_schema.pb.h>
+
+#include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 
 namespace sensor_simulator
 {

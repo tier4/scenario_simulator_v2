@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/metrics/momentary_stop_metric.hpp>
-
 #include <string>
+#include <traffic_simulator/metrics/momentary_stop_metric.hpp>
 
 namespace metrics
 {
@@ -28,14 +27,10 @@ void MomentaryStopMetric::update()
   boost::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:
-      distance = entity_manager_ptr_->getDistanceToStopLine(
-        target_entity,
-        stop_target_lanelet_id);
+      distance = entity_manager_ptr_->getDistanceToStopLine(target_entity, stop_target_lanelet_id);
       break;
     case StopTargetLaneletType::CROSSWALK:
-      distance = entity_manager_ptr_->getDistanceToCrosswalk(
-        target_entity,
-        stop_target_lanelet_id);
+      distance = entity_manager_ptr_->getDistanceToCrosswalk(target_entity, stop_target_lanelet_id);
       break;
     default:
       THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");
@@ -52,9 +47,9 @@ void MomentaryStopMetric::update()
       THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
     }
     standstill_duration_ = standstill_duration.get();
-    if (entity_manager_ptr_->isStopping(target_entity) &&
-      standstill_duration.get() >= stop_duration)
-    {
+    if (
+      entity_manager_ptr_->isStopping(target_entity) &&
+      standstill_duration.get() >= stop_duration) {
       success();
     }
     if (distance.get() <= stop_sequence_end_distance) {
@@ -75,14 +70,10 @@ bool MomentaryStopMetric::activateTrigger()
   boost::optional<double> distance;
   switch (stop_target_lanelet_type) {
     case StopTargetLaneletType::STOP_LINE:
-      distance = entity_manager_ptr_->getDistanceToStopLine(
-        target_entity,
-        stop_target_lanelet_id);
+      distance = entity_manager_ptr_->getDistanceToStopLine(target_entity, stop_target_lanelet_id);
       break;
     case StopTargetLaneletType::CROSSWALK:
-      distance = entity_manager_ptr_->getDistanceToCrosswalk(
-        target_entity,
-        stop_target_lanelet_id);
+      distance = entity_manager_ptr_->getDistanceToCrosswalk(target_entity, stop_target_lanelet_id);
       break;
     default:
       THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");

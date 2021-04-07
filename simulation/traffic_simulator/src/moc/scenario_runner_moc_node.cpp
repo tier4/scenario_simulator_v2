@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/metrics/metrics.hpp>
-#include <quaternion_operation/quaternion_operation.h>
-#include <ament_index_cpp/get_package_share_directory.hpp>
-
-#include <rclcpp/rclcpp.hpp>
 
 // headers in STL
 #include <memory>
-#include <vector>
-#include <utility>
 #include <string>
+#include <utility>
+#include <vector>
 
 // headers in pugixml
 #include "pugixml.hpp"
@@ -34,10 +34,8 @@ public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
   : Node("scenario_runner", option),
     api_(
-      this,
-      __FILE__,
-      ament_index_cpp::get_package_share_directory(
-        "kashiwanoha_map") + "/map/lanelet2_map.osm")
+      this, __FILE__,
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm")
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
@@ -47,8 +45,7 @@ public:
     vehicle_params.name = "ego";
     api_.spawn(false, "ego", vehicle_params);
     api_.setEntityStatus(
-      "ego",
-      traffic_simulator::helper::constructLaneletPose(120545, 0),
+      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 15, true);
     pugi::xml_document pedestrian_xml_doc;
@@ -57,42 +54,34 @@ public:
       traffic_simulator::entity::PedestrianParameters(pedestrian_xml_doc).toRosMsg();
     api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus(
-      "tom", "ego",
-      traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
+      "tom", "ego", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
     api_.requestWalkStraight("tom");
     api_.setTargetSpeed("tom", 3, true);
     api_.spawn(
-      false, "bob", pedestrian_params,
-      traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      false, "bob", pedestrian_params, traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     vehicle_params.name = "npc1";
     api_.spawn(
-      false, "npc1", vehicle_params,
-      traffic_simulator::helper::constructLaneletPose(34579, 20.0),
+      false, "npc1", vehicle_params, traffic_simulator::helper::constructLaneletPose(34579, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
     lanechange_excuted_ = false;
     vehicle_params.name = "npc2";
     api_.spawn(
-      false, "npc2", vehicle_params,
-      traffic_simulator::helper::constructLaneletPose(34606, 20.0),
+      false, "npc2", vehicle_params, traffic_simulator::helper::constructLaneletPose(34606, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
     api_.requestAssignRoute(
-      "ego",
-      std::vector<openscenario_msgs::msg::LaneletPose>{
-      traffic_simulator::helper::constructLaneletPose(34675, 0.0),
-      traffic_simulator::helper::constructLaneletPose(34690, 0.0)
-    });
+      "ego", std::vector<openscenario_msgs::msg::LaneletPose>{
+               traffic_simulator::helper::constructLaneletPose(34675, 0.0),
+               traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
     api_.requestAcquirePosition(
-      "npc1",
-      traffic_simulator::helper::constructLaneletPose(34675, 0.0) );
+      "npc1", traffic_simulator::helper::constructLaneletPose(34675, 0.0));
     api_.spawn(false, "npc3", vehicle_params);
     api_.setEntityStatus(
-      "npc3",
-      traffic_simulator::helper::constructLaneletPose(34468, 0),
+      "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
       traffic_simulator::helper::constructActionStatus(10));
     /*
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
@@ -113,8 +102,7 @@ public:
     phase = {
       {10, traffic_simulator::TrafficLightColor::GREEN},
       {10, traffic_simulator::TrafficLightColor::YELLOW},
-      {10, traffic_simulator::TrafficLightColor::RED}
-    };
+      {10, traffic_simulator::TrafficLightColor::RED}};
     api_.setTrafficLightColorPhase(34802, phase);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
@@ -132,34 +120,24 @@ private:
     }
     */
     if (api_.reachPosition(
-        "ego",
-        traffic_simulator::helper::constructLaneletPose(34615, 10.0), 5))
-    {
+          "ego", traffic_simulator::helper::constructLaneletPose(34615, 10.0), 5)) {
       api_.requestAcquirePosition(
-        "ego",
-        traffic_simulator::helper::constructLaneletPose(35026, 0.0) );
+        "ego", traffic_simulator::helper::constructLaneletPose(35026, 0.0));
       if (api_.entityExists("npc2")) {
         api_.setTargetSpeed("npc2", 13, true);
       }
     }
-    if (api_.reachPosition(
-        "ego",
-        traffic_simulator::helper::constructLaneletPose(34579, 0.0), 5))
-    {
+    if (api_.reachPosition("ego", traffic_simulator::helper::constructLaneletPose(34579, 0.0), 5)) {
       api_.requestAcquirePosition(
-        "ego",
-        traffic_simulator::helper::constructLaneletPose(34675, 0.0) );
+        "ego", traffic_simulator::helper::constructLaneletPose(34675, 0.0));
       if (api_.entityExists("npc2")) {
         api_.setTargetSpeed("npc2", 3, true);
       }
     }
     if (api_.reachPosition(
-        "npc2",
-        traffic_simulator::helper::constructLaneletPose(34513, 0.0), 5))
-    {
+          "npc2", traffic_simulator::helper::constructLaneletPose(34513, 0.0), 5)) {
       api_.requestAcquirePosition(
-        "npc2",
-        traffic_simulator::helper::constructLaneletPose(34630, 0.0) );
+        "npc2", traffic_simulator::helper::constructLaneletPose(34630, 0.0));
       api_.setTargetSpeed("npc2", 13, true);
     }
     /*

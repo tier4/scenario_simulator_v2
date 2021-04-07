@@ -12,52 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
-#include <sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <unordered_map>
-#include <string>
 #include <algorithm>
-#include <vector>
-#include <utility>
 #include <iostream>
+#include <sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
+#include <sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace sensor_simulator
 {
-Raycaster::Raycaster()
-: primitive_ptrs_(0),
-  device_(nullptr),
-  scene_(nullptr),
-  engine_(seed_gen_())
+Raycaster::Raycaster() : primitive_ptrs_(0), device_(nullptr), scene_(nullptr), engine_(seed_gen_())
 {
   device_ = rtcNewDevice(nullptr);
 }
 
 Raycaster::Raycaster(std::string embree_config)
-: primitive_ptrs_(0),
-  device_(nullptr),
-  scene_(nullptr),
-  engine_(seed_gen_())
+: primitive_ptrs_(0), device_(nullptr), scene_(nullptr), engine_(seed_gen_())
 {
   device_ = rtcNewDevice(embree_config.c_str());
 }
 
-Raycaster::~Raycaster()
-{
-  rtcReleaseDevice(device_);
-}
+Raycaster::~Raycaster() { rtcReleaseDevice(device_); }
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
-  std::string frame_id,
-  const rclcpp::Time & stamp,
-  geometry_msgs::msg::Pose origin,
-  double horizontal_resolution,
-  std::vector<double> vertical_angles,
-  double horizontal_angle_start,
-  double horizontal_angle_end,
-  double max_distance, double min_distance)
+  std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
+  double horizontal_resolution, std::vector<double> vertical_angles, double horizontal_angle_start,
+  double horizontal_angle_end, double max_distance, double min_distance)
 {
   std::vector<geometry_msgs::msg::Quaternion> directions;
   double horizontal_angle = horizontal_angle_start;
@@ -72,22 +56,14 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
       directions.emplace_back(quat);
     }
   }
-  return raycast(
-    frame_id, stamp, origin, directions, max_distance, min_distance);
+  return raycast(frame_id, stamp, origin, directions, max_distance, min_distance);
 }
 
-const std::vector<std::string> & Raycaster::getDetectedObject() const
-{
-  return detected_objects_;
-}
+const std::vector<std::string> & Raycaster::getDetectedObject() const { return detected_objects_; }
 
 const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
-  std::string frame_id,
-  const rclcpp::Time & stamp,
-  geometry_msgs::msg::Pose origin,
-  std::vector<geometry_msgs::msg::Quaternion> directions,
-  double max_distance,
-  double min_distance)
+  std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
+  std::vector<geometry_msgs::msg::Quaternion> directions, double max_distance, double min_distance)
 {
   detected_objects_ = {};
   std::vector<unsigned int> detected_ids = {};
@@ -118,10 +94,8 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
     rtcIntersect1(scene_, &context, &rayhit);
     if (rayhit.hit.geomID != RTC_INVALID_GEOMETRY_ID) {
       double distance = rayhit.ray.tfar;
-      const Eigen::Vector3d vector =
-        quaternion_operation::getRotationMatrix(direction) *
-        Eigen::Vector3d(1.0, 0.0, 0.0) *
-        distance;
+      const Eigen::Vector3d vector = quaternion_operation::getRotationMatrix(direction) *
+                                     Eigen::Vector3d(1.0, 0.0, 0.0) * distance;
       pcl::PointXYZI p;
       {
         p.x = vector[0];

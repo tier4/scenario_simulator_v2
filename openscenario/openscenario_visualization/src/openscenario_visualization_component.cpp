@@ -42,16 +42,14 @@
   </table>
  */
 
-#include <openscenario_visualization/openscenario_visualization_component.hpp>
-
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
-#include <rclcpp_components/register_node_macro.hpp>
 
 #include <algorithm>
 #include <cmath>
+#include <openscenario_visualization/openscenario_visualization_component.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 #include <string>
+#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 
 namespace openscenario_visualization
@@ -63,9 +61,9 @@ OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
   marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("entity/marker", 1);
   entity_status_sub_ =
     this->create_subscription<openscenario_msgs::msg::EntityStatusWithTrajectoryArray>(
-    "entity/status", 1,
-    std::bind(
-      &OpenscenarioVisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
+      "entity/status", 1,
+      std::bind(
+        &OpenscenarioVisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
 }
 
 void OpenscenarioVisualizationComponent::entityStatusCallback(
@@ -82,8 +80,7 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     if (itr == entity_name_lists.end()) {
       auto delete_marker = generateDeleteMarker(marker.first);
       std::copy(
-        delete_marker.markers.begin(),
-        delete_marker.markers.end(),
+        delete_marker.markers.begin(), delete_marker.markers.end(),
         std::back_inserter(current_marker.markers));
       erase_names.emplace_back(marker.first);
     }
@@ -95,8 +92,7 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     auto marker_array =
       generateMarker(data.status, data.waypoint, data.obstacle, data.obstacle_find);
     std::copy(
-      marker_array.markers.begin(),
-      marker_array.markers.end(),
+      marker_array.markers.begin(), marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
     markers_[data.name] = marker_array;
   }
@@ -123,8 +119,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
 const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
   const openscenario_msgs::msg::EntityStatus & status,
   const openscenario_msgs::msg::WaypointsArray & waypoints,
-  const openscenario_msgs::msg::Obstacle & obstacle,
-  bool obstacle_find)
+  const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find)
 {
   auto ret = visualization_msgs::msg::MarkerArray();
   auto stamp = get_clock()->now();
@@ -248,8 +243,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.action = text.ADD;
   text.pose.position.x = status.bounding_box.center.x;
   text.pose.position.y = status.bounding_box.center.y;
-  text.pose.position.z = status.bounding_box.center.z +
-    status.bounding_box.dimensions.z * 0.5 + 1.0;
+  text.pose.position.z =
+    status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5 + 1.0;
   text.pose.orientation.x = 0.0;
   text.pose.orientation.y = 0.0;
   text.pose.orientation.z = 0.0;
@@ -278,13 +273,13 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   pf.y = status.bounding_box.center.y;
   pf.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
 
-  pl.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size *
-    arrow_ratio;
+  pl.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 -
+         arrow_size * arrow_ratio;
   pl.y = status.bounding_box.center.y + arrow_size;
   pl.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
 
-  pr.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 - arrow_size *
-    arrow_ratio;
+  pr.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5 + 1.0 -
+         arrow_size * arrow_ratio;
   pr.y = status.bounding_box.center.y - arrow_size;
   pr.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
   arrow.points = {pf, pl, pr};
@@ -307,11 +302,11 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.ns = status.name;
   text_action.id = 3;
   text_action.action = text_action.ADD;
-  text_action.pose.position.x = status.bounding_box.center.x +
-    status.bounding_box.dimensions.x * 0.5;
+  text_action.pose.position.x =
+    status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
   text_action.pose.position.y = status.bounding_box.center.y;
-  text_action.pose.position.z = status.bounding_box.center.z +
-    status.bounding_box.dimensions.z * 0.5 + 0.5;
+  text_action.pose.position.z =
+    status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5 + 0.5;
   text_action.pose.orientation.x = 0.0;
   text_action.pose.orientation.y = 0.0;
   text_action.pose.orientation.z = 0.0;
@@ -339,8 +334,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     waypoints_marker.action = waypoints_marker.ADD;
     waypoints_marker.type = waypoints_marker.TRIANGLE_LIST;
     size_t num_points = 20;
-    waypoints_marker.points = spline.getPolygon(
-      status.bounding_box.dimensions.y, num_points);
+    waypoints_marker.points = spline.getPolygon(status.bounding_box.dimensions.y, num_points);
     waypoints_marker.color = color;
     waypoints_marker.color.a = 0.8;
     waypoints_marker.colors =
@@ -361,8 +355,8 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       obstacle_marker.action = obstacle_marker.ADD;
       obstacle_marker.type = obstacle_marker.CUBE;
       obstacle_marker.pose = spline.getPose(obstacle.s);
-      obstacle_marker.pose.position.z = obstacle_marker.pose.position.z +
-        status.bounding_box.dimensions.z * 0.5;
+      obstacle_marker.pose.position.z =
+        obstacle_marker.pose.position.z + status.bounding_box.dimensions.z * 0.5;
       obstacle_marker.color = color_utils::makeColorMsg("red", 0.5);
       obstacle_marker.scale.x = 0.3;
       obstacle_marker.scale.y = status.bounding_box.dimensions.y + 0.3;

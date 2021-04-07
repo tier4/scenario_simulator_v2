@@ -16,42 +16,41 @@
 #define OPENSCENARIO_INTERPRETER__UTILITY__VISIBILITY_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 // This logic was borrowed (then namespaced) from the examples on the gcc wiki:
 //     https://gcc.gnu.org/wiki/Visibility
 #if defined _WIN32 || defined __CYGWIN__
-#  ifdef __GNUC__
-#    define OPENSCENARIO_INTERPRETER_EXPORT __attribute__ ((dllexport))
-#    define OPENSCENARIO_INTERPRETER_IMPORT __attribute__ ((dllimport))
-#  else
-#    define OPENSCENARIO_INTERPRETER_EXPORT __declspec(dllexport)
-#    define OPENSCENARIO_INTERPRETER_IMPORT __declspec(dllimport)
-#  endif
-
-#  ifdef OPENSCENARIO_INTERPRETER_BUILDING_DLL
-#    define OPENSCENARIO_INTERPRETER_PUBLIC OPENSCENARIO_INTERPRETER_EXPORT
-#  else
-#    define OPENSCENARIO_INTERPRETER_PUBLIC OPENSCENARIO_INTERPRETER_IMPORT
-#  endif
-
-#  define OPENSCENARIO_INTERPRETER_PUBLIC_TYPE OPENSCENARIO_INTERPRETER_PUBLIC
-#  define OPENSCENARIO_INTERPRETER_LOCAL
+#ifdef __GNUC__
+#define OPENSCENARIO_INTERPRETER_EXPORT __attribute__((dllexport))
+#define OPENSCENARIO_INTERPRETER_IMPORT __attribute__((dllimport))
 #else
-#  define OPENSCENARIO_INTERPRETER_EXPORT __attribute__ ((visibility("default")))
-#  define OPENSCENARIO_INTERPRETER_IMPORT
+#define OPENSCENARIO_INTERPRETER_EXPORT __declspec(dllexport)
+#define OPENSCENARIO_INTERPRETER_IMPORT __declspec(dllimport)
+#endif
 
-#  if __GNUC__ >= 4
-#    define OPENSCENARIO_INTERPRETER_PUBLIC __attribute__ ((visibility("default")))
-#    define OPENSCENARIO_INTERPRETER_LOCAL __attribute__ ((visibility("hidden")))
-#  else
-#    define OPENSCENARIO_INTERPRETER_PUBLIC
-#    define OPENSCENARIO_INTERPRETER_LOCAL
-#  endif
+#ifdef OPENSCENARIO_INTERPRETER_BUILDING_DLL
+#define OPENSCENARIO_INTERPRETER_PUBLIC OPENSCENARIO_INTERPRETER_EXPORT
+#else
+#define OPENSCENARIO_INTERPRETER_PUBLIC OPENSCENARIO_INTERPRETER_IMPORT
+#endif
 
-#  define OPENSCENARIO_INTERPRETER_PUBLIC_TYPE
+#define OPENSCENARIO_INTERPRETER_PUBLIC_TYPE OPENSCENARIO_INTERPRETER_PUBLIC
+#define OPENSCENARIO_INTERPRETER_LOCAL
+#else
+#define OPENSCENARIO_INTERPRETER_EXPORT __attribute__((visibility("default")))
+#define OPENSCENARIO_INTERPRETER_IMPORT
+
+#if __GNUC__ >= 4
+#define OPENSCENARIO_INTERPRETER_PUBLIC __attribute__((visibility("default")))
+#define OPENSCENARIO_INTERPRETER_LOCAL __attribute__((visibility("hidden")))
+#else
+#define OPENSCENARIO_INTERPRETER_PUBLIC
+#define OPENSCENARIO_INTERPRETER_LOCAL
+#endif
+
+#define OPENSCENARIO_INTERPRETER_PUBLIC_TYPE
 #endif
 
 #ifdef __cplusplus

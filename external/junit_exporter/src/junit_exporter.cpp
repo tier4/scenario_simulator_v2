@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <junit_exporter/junit_exporter.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-#include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
-
+#include <boost/filesystem/path.hpp>
+#include <junit_exporter/junit_exporter.hpp>
 #include <string>
 
 namespace junit_exporter
@@ -53,26 +51,25 @@ void JunitExporter::write(const std::string & path)
       testcase_node.append_attribute("name") = test_case.name.c_str();
       testcase_node.append_attribute("time") = test_case.time;
       switch (test_case.result) {
-        case TestResult::SUCCESS:
-          {
-            break;
-          }
-        case TestResult::FAILURE:
-          {
-            testcase_node.append_child("failure");
-            testcase_node.child("failure").append_attribute("message") = "failure detected";
-            testcase_node.child("failure").append_child(pugi::node_pcdata)
+        case TestResult::SUCCESS: {
+          break;
+        }
+        case TestResult::FAILURE: {
+          testcase_node.append_child("failure");
+          testcase_node.child("failure").append_attribute("message") = "failure detected";
+          testcase_node.child("failure")
+            .append_child(pugi::node_pcdata)
             .set_value(test_case.description.c_str());
-            break;
-          }
-        case TestResult::ERROR:
-          {
-            testcase_node.append_child("error");
-            testcase_node.child("error").append_attribute("message") = "error detected";
-            testcase_node.child("error").append_child(pugi::node_pcdata)
+          break;
+        }
+        case TestResult::ERROR: {
+          testcase_node.append_child("error");
+          testcase_node.child("error").append_attribute("message") = "error detected";
+          testcase_node.child("error")
+            .append_child(pugi::node_pcdata)
             .set_value(test_case.description.c_str());
-            break;
-          }
+          break;
+        }
       }
     }
   }
@@ -80,9 +77,7 @@ void JunitExporter::write(const std::string & path)
 }
 
 void JunitExporter::addTestCase(
-  const std::string & name,
-  const std::string & test_suite,
-  const double & time,
+  const std::string & name, const std::string & test_suite, const double & time,
   const TestResult & result)
 {
   if (test_suites_.testCaseExists(name, test_suite)) {
@@ -93,12 +88,8 @@ void JunitExporter::addTestCase(
 }
 
 void JunitExporter::addTestCase(
-  const std::string & name,
-  const std::string & test_suite,
-  const double & time,
-  const TestResult & result,
-  const std::string & type,
-  const std::string & description)
+  const std::string & name, const std::string & test_suite, const double & time,
+  const TestResult & result, const std::string & type, const std::string & description)
 {
   if (test_suites_.testCaseExists(name, test_suite)) {
     return;

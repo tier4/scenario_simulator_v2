@@ -15,15 +15,14 @@
 #ifndef TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 #define TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 
-#include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/quaternion.hpp>
-#include <openscenario_msgs/msg/lanelet_pose.hpp>
-#include <openscenario_msgs/msg/action_status.hpp>
-
 #include <simulation_api_schema.pb.h>
 
-#include <iostream>
 #include <cmath>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
+#include <iostream>
+#include <openscenario_msgs/msg/action_status.hpp>
+#include <openscenario_msgs/msg/lanelet_pose.hpp>
 #include <string>
 
 namespace traffic_simulator
@@ -40,10 +39,7 @@ namespace helper
  * @return openscenario_msgs::msg::ActionStatus
  */
 openscenario_msgs::msg::ActionStatus constructActionStatus(
-  double linear_vel = 0,
-  double angular_vel = 0,
-  double linear_accel = 0,
-  double angular_accel = 0);
+  double linear_vel = 0, double angular_vel = 0, double linear_accel = 0, double angular_accel = 0);
 
 /**
  * @brief helper function for constructing lanelet pose
@@ -57,9 +53,8 @@ openscenario_msgs::msg::ActionStatus constructActionStatus(
  * @return openscenario_msgs::msg::LaneletPose
  */
 openscenario_msgs::msg::LaneletPose constructLaneletPose(
-  std::int64_t lanelet_id, double s,
-  double offset = 0, double roll = 0,
-  double pitch = 0, double yaw = 0);
+  std::int64_t lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
+  double yaw = 0);
 
 /**
  * @brief helper function for constructing rpy
@@ -91,16 +86,11 @@ geometry_msgs::msg::Vector3 constructRPYfronQuaternion(geometry_msgs::msg::Quate
  * @return geometry_msgs::msg::Pose
  */
 geometry_msgs::msg::Pose constructPose(
-  double x, double y, double z, double roll, double pitch,
-  double yaw);
+  double x, double y, double z, double roll, double pitch, double yaw);
 
 std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose);
 
-enum class LidarType
-{
-  VLP16,
-  VLP32
-};
+enum class LidarType { VLP16, VLP32 };
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   LidarType type, std::string entity, std::string topic_name,

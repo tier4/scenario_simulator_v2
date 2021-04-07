@@ -29,12 +29,10 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct DeleteEntityAction
 {
-  template
-  <
-    typename ... Ts
-  >
-  explicit DeleteEntityAction(Ts && ...)
-  {}
+  template <typename... Ts>
+  explicit DeleteEntityAction(Ts &&...)
+  {
+  }
 
   decltype(auto) operator()(const String & entity_ref) const
   {
@@ -42,7 +40,7 @@ struct DeleteEntityAction
     return unspecified;
   }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_

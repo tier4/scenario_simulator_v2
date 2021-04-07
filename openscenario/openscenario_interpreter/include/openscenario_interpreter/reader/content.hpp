@@ -18,20 +18,19 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/utility/pugi_extension.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace reader
 {
-template<typename T, typename Node, typename Scope>
+template <typename T, typename Node, typename Scope>
 T readContent(const Node & node, const Scope &)
 {
-  const std::string text {node.text().get()};
+  const std::string text{node.text().get()};
   return boost::lexical_cast<T>(boost::algorithm::trim_copy(text));
 }
-}
+}  // namespace reader
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__READER__CONTENT_HPP_

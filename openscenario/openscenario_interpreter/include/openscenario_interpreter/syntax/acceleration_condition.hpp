@@ -39,26 +39,23 @@ struct AccelerationCondition
 
   const TriggeringEntities trigger;
 
-  template<typename Node>
+  template <typename Node>
   explicit AccelerationCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
   : value(readAttribute<Double>("value", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
     trigger(trigger)
-  {}
+  {
+  }
 
   auto evaluate() const
   {
-    return asBoolean(
-      trigger(
-        [&](auto && entity)
-        {
-          return compare(
-            getEntityStatus(entity).action_status.accel.linear.x, value);
-        }));
+    return asBoolean(trigger([&](auto && entity) {
+      return compare(getEntityStatus(entity).action_status.accel.linear.x, value);
+    }));
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ACCELERATION_CONDITION_HPP_

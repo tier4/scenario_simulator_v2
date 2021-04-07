@@ -12,49 +12,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simulation_interface/conversions.hpp>
-#include <simulation_interface/zmq_multi_server.hpp>
-#include <simulation_interface/zmq_server.hpp>
-#include <simulation_interface/zmq_client.hpp>
-
-#include <rclcpp/rclcpp.hpp>
-
 #include <simulation_api_schema.pb.h>
-#include <string>
+
 #include <chrono>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <simulation_interface/conversions.hpp>
+#include <simulation_interface/zmq_client.hpp>
+#include <simulation_interface/zmq_multi_server.hpp>
+#include <simulation_interface/zmq_server.hpp>
+#include <string>
 
 void initialize_callback(
-  const simulation_api_schema::InitializeRequest &,
-  simulation_api_schema::InitializeResponse &) {}
+  const simulation_api_schema::InitializeRequest &, simulation_api_schema::InitializeResponse &)
+{
+}
 
 void update_frame_callback(
-  const simulation_api_schema::UpdateFrameRequest &,
-  simulation_api_schema::UpdateFrameResponse &) {}
+  const simulation_api_schema::UpdateFrameRequest &, simulation_api_schema::UpdateFrameResponse &)
+{
+}
 
 void update_sensor_frame_callback(
   const simulation_api_schema::UpdateSensorFrameRequest &,
-  simulation_api_schema::UpdateSensorFrameResponse &) {}
+  simulation_api_schema::UpdateSensorFrameResponse &)
+{
+}
 
 void spawn_vehicle_entity_callback(
   const simulation_api_schema::SpawnVehicleEntityRequest &,
-  simulation_api_schema::SpawnVehicleEntityResponse &) {}
+  simulation_api_schema::SpawnVehicleEntityResponse &)
+{
+}
 
 void spawn_pedestrian_entity_callback(
   const simulation_api_schema::SpawnPedestrianEntityRequest &,
-  simulation_api_schema::SpawnPedestrianEntityResponse &) {}
+  simulation_api_schema::SpawnPedestrianEntityResponse &)
+{
+}
 
 void despawn_entity_callback(
   const simulation_api_schema::DespawnEntityRequest &,
-  simulation_api_schema::DespawnEntityResponse &) {}
+  simulation_api_schema::DespawnEntityResponse &)
+{
+}
 
 void attach_lidar_sensor_callback(
   const simulation_api_schema::AttachLidarSensorRequest &,
-  simulation_api_schema::AttachLidarSensorResponse &) {}
+  simulation_api_schema::AttachLidarSensorResponse &)
+{
+}
 
 void attach_detection_sensor_callback(
   const simulation_api_schema::AttachDetectionSensorRequest &,
-  simulation_api_schema::AttachDetectionSensorResponse &) {}
+  simulation_api_schema::AttachDetectionSensorResponse &)
+{
+}
 
 void update_entity_status_callback(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
@@ -73,22 +86,17 @@ class ExampleNode : public rclcpp::Node
 public:
   explicit ExampleNode(const rclcpp::NodeOptions & option)
   : Node("example", option),
-    server_(simulation_interface::TransportProtocol::TCP,
-      simulation_interface::HostName::ANY,
-      initialize_callback,
-      update_frame_callback,
-      update_sensor_frame_callback,
-      spawn_vehicle_entity_callback,
-      spawn_pedestrian_entity_callback,
-      despawn_entity_callback,
-      update_entity_status_callback,
-      attach_lidar_sensor_callback,
+    server_(
+      simulation_interface::TransportProtocol::TCP, simulation_interface::HostName::ANY,
+      initialize_callback, update_frame_callback, update_sensor_frame_callback,
+      spawn_vehicle_entity_callback, spawn_pedestrian_entity_callback, despawn_entity_callback,
+      update_entity_status_callback, attach_lidar_sensor_callback,
       attach_detection_sensor_callback),
-    client_(simulation_interface::TransportProtocol::TCP,
-      simulation_interface::HostName::LOCLHOST,
+    client_(
+      simulation_interface::TransportProtocol::TCP, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::update_entity_status),
-    init_client_(simulation_interface::TransportProtocol::TCP,
-      simulation_interface::HostName::LOCLHOST,
+    init_client_(
+      simulation_interface::TransportProtocol::TCP, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::initialize)
   {
     using namespace std::chrono_literals;
@@ -114,10 +122,11 @@ private:
   zeromq::MultiServer server_;
   zeromq::Client<
     simulation_api_schema::UpdateEntityStatusRequest,
-    simulation_api_schema::UpdateEntityStatusResponse> client_;
+    simulation_api_schema::UpdateEntityStatusResponse>
+    client_;
   zeromq::Client<
-    simulation_api_schema::InitializeRequest,
-    simulation_api_schema::InitializeResponse> init_client_;
+    simulation_api_schema::InitializeRequest, simulation_api_schema::InitializeResponse>
+    init_client_;
 };
 
 int main(int argc, char * argv[])

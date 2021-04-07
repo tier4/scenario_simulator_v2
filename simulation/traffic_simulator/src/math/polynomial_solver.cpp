@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/math/polynomial_solver.hpp>
-
-#include <vector>
 #include <cmath>
-#include <limits>
 #include <iostream>
+#include <limits>
+#include <traffic_simulator/math/polynomial_solver.hpp>
+#include <vector>
 
 namespace traffic_simulator
 {
 namespace math
 {
-double PolynomialSolver::cubicFunction(
-  double a, double b, double c, double d,
-  double t) const
+double PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
 {
   return a * t * t * t + b * t * t + c * t + d;
 }
@@ -36,8 +33,7 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 }
 
 std::vector<double> PolynomialSolver::solveLinearEquation(
-  double a, double b, double min_value,
-  double max_value) const
+  double a, double b, double min_value, double max_value) const
 {
   constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::fabs(a) < e) {
@@ -56,9 +52,7 @@ std::vector<double> PolynomialSolver::solveLinearEquation(
 }
 
 std::vector<double> PolynomialSolver::solveQuadraticEquation(
-  double a, double b, double c,
-  double min_value,
-  double max_value) const
+  double a, double b, double c, double min_value, double max_value) const
 {
   std::vector<double> candidates, ret;
   constexpr double e = std::numeric_limits<float>::epsilon();
@@ -105,8 +99,7 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
   return ret;
 }
 
-int PolynomialSolver::solveP3(
-  std::vector<double> & x, double a, double b, double c) const
+int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, double c) const
 {
   x = std::vector<double>(3);
   const double eps = 1e-14;
@@ -117,12 +110,17 @@ int PolynomialSolver::solveP3(
   double r2 = r * r;
   double q3 = q * q * q;
   double A, B;
-  if (r2 <= (q3 + eps)) {      //<<-- FIXED!
+  if (r2 <= (q3 + eps)) {  //<<-- FIXED!
     double t = r / sqrt(q3);
-    if (t < -1) {t = -1;}
-    if (t > 1) {t = 1;}
+    if (t < -1) {
+      t = -1;
+    }
+    if (t > 1) {
+      t = 1;
+    }
     t = acos(t);
-    a /= 3; q = -2 * sqrt(q);
+    a /= 3;
+    q = -2 * sqrt(q);
     x[0] = q * cos(t / 3) - a;
     x[1] = q * cos((t + M_PI * 2) / 3) - a;
     x[2] = q * cos((t - M_PI * 2) / 3) - a;
@@ -130,7 +128,9 @@ int PolynomialSolver::solveP3(
   } else {
     // A =-pow(fabs(r)+sqrt(r2-q3),1./3);
     A = -root3(fabs(r) + sqrt(r2 - q3));
-    if (r < 0) {A = -A;}
+    if (r < 0) {
+      A = -A;
+    }
     if (A == 0) {
       B = 0;
     } else {
@@ -161,18 +161,22 @@ double PolynomialSolver::_root3(double x) const
     s *= 2.;
   }
   double r = 1.5;
-  r -= 1. / 3. * ( r - x / ( r * r ) );
-  r -= 1. / 3. * ( r - x / ( r * r ) );
-  r -= 1. / 3. * ( r - x / ( r * r ) );
-  r -= 1. / 3. * ( r - x / ( r * r ) );
-  r -= 1. / 3. * ( r - x / ( r * r ) );
-  r -= 1. / 3. * ( r - x / ( r * r ) );
+  r -= 1. / 3. * (r - x / (r * r));
+  r -= 1. / 3. * (r - x / (r * r));
+  r -= 1. / 3. * (r - x / (r * r));
+  r -= 1. / 3. * (r - x / (r * r));
+  r -= 1. / 3. * (r - x / (r * r));
+  r -= 1. / 3. * (r - x / (r * r));
   return r * s;
 }
 
 double PolynomialSolver::root3(double x) const
 {
-  if (x > 0) {return _root3(x);} else if (x < 0) {return -_root3(-x);} else {
+  if (x > 0) {
+    return _root3(x);
+  } else if (x < 0) {
+    return -_root3(-x);
+  } else {
     return 0.;
   }
 }

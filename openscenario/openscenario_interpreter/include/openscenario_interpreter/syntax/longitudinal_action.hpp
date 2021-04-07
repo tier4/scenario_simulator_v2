@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LONGITUDINAL_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/speed_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -33,21 +32,20 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * ======================================================================== */
-struct LongitudinalAction
-  : public Element
+struct LongitudinalAction : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit LongitudinalAction(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        std::make_pair("SpeedAction", [&](auto && node) {
-          return make<SpeedAction>(node, std::forward<decltype(xs)>(xs)...);
-        }),
-        std::make_pair("LongitudinalDistanceAction", UNSUPPORTED())))
-  {}
+  template <typename Node, typename... Ts>
+  explicit LongitudinalAction(const Node & node, Ts &&... xs)
+  : Element(choice(
+      node,
+      std::make_pair(
+        "SpeedAction",
+        [&](auto && node) { return make<SpeedAction>(node, std::forward<decltype(xs)>(xs)...); }),
+      std::make_pair("LongitudinalDistanceAction", UNSUPPORTED())))
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__LONGITUDINAL_ACTION_HPP_

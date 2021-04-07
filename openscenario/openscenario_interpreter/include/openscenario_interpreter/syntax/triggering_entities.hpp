@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities_rule.hpp>
-
 #include <utility>
 #include <vector>
 
@@ -35,29 +34,25 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * ======================================================================== */
-struct TriggeringEntities
-  : public std::vector<EntityRef>
+struct TriggeringEntities : public std::vector<EntityRef>
 {
   const TriggeringEntitiesRule verify;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit TriggeringEntities(const Node & node, Scope & scope)
   : verify{readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)}
   {
     callWithElements(
-      node, "EntityRef", 1, unbounded, [&](auto && node)
-      {
-        emplace_back(node, scope);
-      });
+      node, "EntityRef", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
   }
 
-  template<typename ... Ts>
-  constexpr decltype(auto) operator()(Ts && ... xs) const
+  template <typename... Ts>
+  constexpr decltype(auto) operator()(Ts &&... xs) const
   {
     return verify(std::begin(*this), std::end(*this), std::forward<decltype(xs)>(xs)...);
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_HPP_

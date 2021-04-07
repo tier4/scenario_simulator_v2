@@ -15,40 +15,31 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
+#include <boost/optional.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/entity_status.hpp>
-
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
-#include <boost/optional.hpp>
-
 // headers in STL
-#include <string>
 #include <memory>
+#include <queue>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <queue>
 
 namespace traffic_simulator
 {
 namespace entity
 {
-enum class Direction
-{
-  STRAIGHT = 0,
-  LEFT = 1,
-  RIGHT = 2
-};
+enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
 
 class EntityBase
 {
 public:
   EntityBase(
-    std::string type, std::string name,
-    const openscenario_msgs::msg::EntityStatus & initial_state);
+    std::string type, std::string name, const openscenario_msgs::msg::EntityStatus & initial_state);
   EntityBase(std::string type, std::string name);
   virtual ~EntityBase() = default;
   const std::string type;
@@ -57,10 +48,7 @@ public:
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
   bool setVisibility(bool visibility);
   bool getVisibility();
-  void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
-  {
-    hdmap_utils_ptr_ = ptr;
-  }
+  void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr) { hdmap_utils_ptr_ = ptr; }
   void setTrafficLightManager(std::shared_ptr<traffic_simulator::TrafficLightManager> ptr)
   {
     traffic_light_manager_ = ptr;
@@ -73,28 +61,20 @@ public:
     }
     return false;
   }
-  void setVerbose(bool verbose)
-  {
-    verbose_ = verbose;
-  }
+  void setVerbose(bool verbose) { verbose_ = verbose; }
   void setEntityTypeList(
-    const std::unordered_map<std::string,
-    openscenario_msgs::msg::EntityType> & entity_type_list)
+    const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & entity_type_list)
   {
     entity_type_list_ = entity_type_list;
   }
   void setOtherStatus(
-    const std::unordered_map<std::string,
-    openscenario_msgs::msg::EntityStatus> & status);
+    const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status);
   void updateStandStillDuration(double step_time);
   boost::optional<double> getStandStillDuration() const;
   virtual const openscenario_msgs::msg::BoundingBox getBoundingBox() const = 0;
   virtual const std::string getCurrentAction() const = 0;
   void stopAtEndOfRoad();
-  boost::optional<double> getLinearJerk() const
-  {
-    return linear_jerk_;
-  }
+  boost::optional<double> getLinearJerk() const { return linear_jerk_; }
   virtual void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) = 0;
 

@@ -16,9 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BOOLEAN_HPP_
 
 #include <boost/io/ios_state.hpp>
-#include <openscenario_interpreter/object.hpp>
-
 #include <iomanip>
+#include <openscenario_interpreter/object.hpp>
 #include <string>
 
 namespace openscenario_interpreter
@@ -35,18 +34,16 @@ struct Boolean
 
   value_type data;
 
-  explicit constexpr Boolean(value_type value = false) noexcept
-  : data{value}
-  {}
+  explicit constexpr Boolean(value_type value = false) noexcept : data{value} {}
 
   explicit Boolean(const std::string & target)
   {
-    std::stringstream interpreter {};
+    std::stringstream interpreter{};
 
     if (!(interpreter << target && interpreter >> std::boolalpha >> data)) {
-      std::stringstream ss {};
+      std::stringstream ss{};
       ss << "can't treat value " << std::quoted(target) << " as type Boolean";
-      throw SyntaxError {ss.str()};
+      throw SyntaxError{ss.str()};
     }
   }
 
@@ -56,32 +53,26 @@ struct Boolean
     return *this;
   }
 
-  constexpr operator value_type() const noexcept
-  {
-    return data;
-  }
+  constexpr operator value_type() const noexcept { return data; }
 };
 
 std::ostream & operator<<(std::ostream & os, const Boolean & boolean)
 {
-  boost::io::ios_flags_saver saver {os};
+  boost::io::ios_flags_saver saver{os};
   return os << std::boolalpha << boolean.data;
 }
 
 std::istream & operator>>(std::istream & is, Boolean & boolean)
 {
-  boost::io::ios_flags_saver saver {is};
+  boost::io::ios_flags_saver saver{is};
   return is >> std::boolalpha >> boolean.data;
 }
 
 static const auto true_v = make<Boolean>(true);
 static const auto false_v = make<Boolean>(false);
 
-auto asBoolean(bool value)
-{
-  return value ? true_v : false_v;
-}
-}
+auto asBoolean(bool value) { return value ? true_v : false_v; }
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BOOLEAN_HPP_

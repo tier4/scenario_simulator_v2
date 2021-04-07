@@ -12,36 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
-
-#include <simulation_interface/conversions.hpp>
-
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-
-#include <memory>
-#include <string>
 #include <algorithm>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <memory>
+#include <sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
+#include <simulation_interface/conversions.hpp>
+#include <string>
 #include <vector>
 
 namespace sensor_simulator
 {
 DetectionSensor::DetectionSensor(
   const simulation_api_schema::DetectionSensorConfiguration & configuration,
-  std::shared_ptr<
-    rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>> publisher_ptr)
+  std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
+    publisher_ptr)
 : configuration_(configuration), publisher_ptr_(publisher_ptr)
 {
   last_update_stamp_ = 0;
 }
 
-
 void DetectionSensor::update(
-  double current_time,
-  const std::vector<openscenario_msgs::EntityStatus> & status,
-  const rclcpp::Time & stamp,
-  const std::vector<std::string> & detected_objects)
+  double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
+  const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects)
 {
   if ((current_time - last_update_stamp_) >= configuration_.update_duration()) {
     autoware_perception_msgs::msg::DynamicObjectArray msg;

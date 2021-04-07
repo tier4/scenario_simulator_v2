@@ -23,13 +23,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+#include <string>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
-
-#include <string>
-#include <vector>
-#include <memory>
 #include <utility>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -39,8 +38,7 @@ TrafficController::TrafficController(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   const std::function<std::vector<std::string>(void)> & get_entity_names_function,
   const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-  const std::function<void(std::string)> & despawn_function,
-  bool auto_sink)
+  const std::function<void(std::string)> & despawn_function, bool auto_sink)
 : hdmap_utils_(hdmap_utils),
   get_entity_names_function(get_entity_names_function),
   get_entity_pose_function(get_entity_pose_function),
@@ -61,10 +59,7 @@ void TrafficController::autoSink()
       lanelet_pose.s = hdmap_utils_->getLaneletLength(lanelet_id);
       const auto pose = hdmap_utils_->toMapPose(lanelet_pose);
       addModule<traffic_simulator::traffic::TrafficSink>(
-        1,
-        pose.pose.position,
-        get_entity_names_function,
-        get_entity_pose_function,
+        1, pose.pose.position, get_entity_names_function, get_entity_pose_function,
         despawn_function);
     }
   }

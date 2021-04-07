@@ -22,48 +22,28 @@ namespace openscenario_interpreter
 {
 inline namespace functional
 {
-template
-<
-  typename F,
-  typename T
->
+template <typename F, typename T>
 constexpr decltype(auto) fold_left(F &&, T && x)
 {
   return std::forward<decltype(x)>(x);
 }
 
-template
-<
-  typename F,
-  typename T,
-  typename U,
-  typename ... Ts
->
-constexpr decltype(auto) fold_left(F && f, T && x, U && y, Ts && ... xs)
+template <typename F, typename T, typename U, typename... Ts>
+constexpr decltype(auto) fold_left(F && f, T && x, U && y, Ts &&... xs)
 {
   return fold_left(
-    f,
-    f(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y)),
+    f, f(std::forward<decltype(x)>(x), std::forward<decltype(y)>(y)),
     std::forward<decltype(xs)>(xs)...);
 }
 
-template
-<
-  typename F,
-  typename T
->
+template <typename F, typename T>
 constexpr decltype(auto) fold_right(F &&, T && x)
 {
   return std::forward<decltype(x)>(x);
 }
 
-template
-<
-  typename F,
-  typename T,
-  typename ... Ts
->
-constexpr decltype(auto) fold_right(F && f, T && x, Ts && ... xs)
+template <typename F, typename T, typename... Ts>
+constexpr decltype(auto) fold_right(F && f, T && x, Ts &&... xs)
 {
   return f(std::forward<decltype(x)>(x), fold_right(f, std::forward<decltype(xs)>(xs)...));
 }

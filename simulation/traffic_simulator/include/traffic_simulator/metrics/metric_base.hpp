@@ -15,61 +15,44 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__METRIC_BASE_HPP_
 
-#include <traffic_simulator/entity/entity_manager.hpp>
-
-#include <nlohmann/json.hpp>
-
 #include <boost/optional.hpp>
-
+#include <memory>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
-#include <memory>
+#include <traffic_simulator/entity/entity_manager.hpp>
 
 namespace metrics
 {
 class SpecificationViolationError : public std::runtime_error
 {
 public:
-  explicit SpecificationViolationError(const char * message)
-  : runtime_error(message) {}
-  explicit SpecificationViolationError(std::string message)
-  : runtime_error(message.c_str()) {}
-  explicit SpecificationViolationError(
-    std::string message,
-    const char * file,
-    int line)
-  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line)) {}
+  explicit SpecificationViolationError(const char * message) : runtime_error(message) {}
+  explicit SpecificationViolationError(std::string message) : runtime_error(message.c_str()) {}
+  explicit SpecificationViolationError(std::string message, const char * file, int line)
+  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line))
+  {
+  }
 };
 
 class MetricsCalculationError : public std::runtime_error
 {
 public:
-  explicit MetricsCalculationError(const char * message)
-  : runtime_error(message) {}
-  explicit MetricsCalculationError(std::string message)
-  : runtime_error(message.c_str()) {}
-  explicit MetricsCalculationError(
-    std::string message,
-    const char * file,
-    int line)
-  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line)) {}
+  explicit MetricsCalculationError(const char * message) : runtime_error(message) {}
+  explicit MetricsCalculationError(std::string message) : runtime_error(message.c_str()) {}
+  explicit MetricsCalculationError(std::string message, const char * file, int line)
+  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line))
+  {
+  }
 };
 
 #define SPECIFICATION_VIOLATION_ERROR(description) \
-  SpecificationViolationError( \
-    description, __FILE__, __LINE__)
+  SpecificationViolationError(description, __FILE__, __LINE__)
 
 #define THROW_METRICS_CALCULATION_ERROR(description) \
-  throw MetricsCalculationError( \
-    description, __FILE__, __LINE__);
+  throw MetricsCalculationError(description, __FILE__, __LINE__);
 
-enum class MetricLifecycle
-{
-  INACTIVE,
-  ACTIVE,
-  FAILURE,
-  SUCCESS
-};
+enum class MetricLifecycle { INACTIVE, ACTIVE, FAILURE, SUCCESS };
 
 class MetricBase
 {
@@ -86,10 +69,7 @@ public:
   void setEntityManager(
     std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
   const std::string metrics_type;
-  MetricLifecycle getLifecycle()
-  {
-    return lifecycle_;
-  }
+  MetricLifecycle getLifecycle() { return lifecycle_; }
   void throwException();
 
 protected:

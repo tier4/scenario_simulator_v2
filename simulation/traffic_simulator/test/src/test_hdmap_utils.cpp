@@ -15,13 +15,13 @@
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <string>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
 TEST(HdMapUtils, HdMapUtils1)
 {
-  std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-    "/map/lanelet2_map.osm";
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;

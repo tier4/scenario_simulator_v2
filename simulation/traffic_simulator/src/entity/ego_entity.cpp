@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <awapi_accessor/accessor.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <quaternion_operation/quaternion_operation.h>
-#include <traffic_simulator/entity/ego_entity.hpp>
 
+#include <awapi_accessor/accessor.hpp>
 #include <memory>
-#include <vector>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
+#include <traffic_simulator/entity/ego_entity.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<
-  std::string, std::shared_ptr<autoware_api::Accessor>
-> EgoEntity::autowares {};
+std::unordered_map<std::string, std::shared_ptr<autoware_api::Accessor> > EgoEntity::autowares{};
 
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
@@ -37,7 +35,7 @@ void EgoEntity::requestAssignRoute(
 
   const auto destination = (*hdmap_utils_ptr_).toMapPose(waypoints.back());
 
-  std::vector<geometry_msgs::msg::PoseStamped> constraints {};
+  std::vector<geometry_msgs::msg::PoseStamped> constraints{};
 
   for (auto iter = std::cbegin(waypoints); std::next(iter) != std::cend(waypoints); ++iter) {
     constraints.push_back((*hdmap_utils_ptr_).toMapPose(*iter));
@@ -48,7 +46,7 @@ void EgoEntity::requestAssignRoute(
 
 openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
 {
-  openscenario_msgs::msg::WaypointsArray waypoints {};
+  openscenario_msgs::msg::WaypointsArray waypoints{};
 
   for (const auto & point : std::atomic_load(&autowares.at(name))->getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);
@@ -79,8 +77,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 {
   Eigen::VectorXd input(2);
   {
-    input <<
-      std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity,
+    input << std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity,
       std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
   }
 
@@ -100,8 +97,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 }
 
 const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
-  const double time,
-  const double step_time) const
+  const double time, const double step_time) const
 {
   geometry_msgs::msg::Vector3 rpy;
   {

@@ -16,7 +16,6 @@
 
 #include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
 #include <rclcpp/rclcpp.hpp>
-
 #include <set>
 #include <string>
 #include <utility>
@@ -26,10 +25,7 @@ namespace lanelet
 {
 namespace projection
 {
-MGRSProjector::MGRSProjector(Origin origin)
-: Projector(origin)
-{
-}
+MGRSProjector::MGRSProjector(Origin origin) : Projector(origin) {}
 
 BasicPoint3d MGRSProjector::forward(const GPSPoint & gps) const
 {
@@ -111,7 +107,7 @@ GPSPoint MGRSProjector::reverse(
   return gps;
 }
 
-void MGRSProjector::setMGRSCode(const std::string & mgrs_code) {mgrs_code_ = mgrs_code;}
+void MGRSProjector::setMGRSCode(const std::string & mgrs_code) { mgrs_code_ = mgrs_code; }
 
 void MGRSProjector::setMGRSCode(const GPSPoint & gps, const int precision)
 {

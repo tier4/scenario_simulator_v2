@@ -22,8 +22,7 @@ namespace sensor_simulator
 class SimulationRuntimeError : public std::runtime_error
 {
 public:
-  explicit SimulationRuntimeError(const char * message)
-  : runtime_error(message) {}
+  explicit SimulationRuntimeError(const char * message) : runtime_error(message) {}
 
 private:
 };

@@ -17,18 +17,15 @@
 
 // headers in pugixml
 #include <openscenario_msgs.pb.h>
-#include <openscenario_msgs/msg/bounding_box.hpp>
-#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 
-#include <pugixml.hpp>
-
-#include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
-
+#include <boost/foreach.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include <boost/foreach.hpp>
-
+#include <geometry_msgs/msg/vector3.hpp>
+#include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
+#include <pugixml.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <sstream>
 #include <string>
 
@@ -41,12 +38,13 @@ struct Performance
   explicit Performance(const pugi::xml_node & xml)
   : max_speed(xml.child("Performance").attribute("maxSpeed").as_double()),
     max_acceleration(xml.child("Performance").attribute("maxAcceleration").as_double()),
-    max_deceleration(xml.child("Performance").attribute("maxDeceleration").as_double()) {}
+    max_deceleration(xml.child("Performance").attribute("maxDeceleration").as_double())
+  {
+  }
   Performance(double max_speed, double max_acceleration, double max_deceleration)
-  : max_speed(max_speed),
-    max_acceleration(max_acceleration),
-    max_deceleration(max_deceleration)
-  {}
+  : max_speed(max_speed), max_acceleration(max_acceleration), max_deceleration(max_deceleration)
+  {
+  }
   const double max_speed;
   const double max_acceleration;
   const double max_deceleration;
@@ -66,10 +64,9 @@ struct Center
   : x(xml.child("BoundingBox").child("Center").attribute("x").as_double()),
     y(xml.child("BoundingBox").child("Center").attribute("y").as_double()),
     z(xml.child("BoundingBox").child("Center").attribute("z").as_double())
-  {}
-  Center(double x, double y, double z)
-  : x(x), y(y), z(z)
-  {}
+  {
+  }
+  Center(double x, double y, double z) : x(x), y(y), z(z) {}
   const double x;
   const double y;
   const double z;
@@ -81,10 +78,12 @@ struct Dimensions
   : width(xml.child("BoundingBox").child("Dimensions").attribute("width").as_double()),
     length(xml.child("BoundingBox").child("Dimensions").attribute("length").as_double()),
     height(xml.child("BoundingBox").child("Dimensions").attribute("height").as_double())
-  {}
+  {
+  }
   Dimensions(double width, double length, double height)
   : width(width), length(length), height(height)
-  {}
+  {
+  }
   const double width;
   const double length;
   const double height;
@@ -92,12 +91,8 @@ struct Dimensions
 
 struct BoundingBox
 {
-  explicit BoundingBox(const pugi::xml_node & xml)
-  : center(xml), dimensions(xml)
-  {}
-  BoundingBox(Center center, Dimensions dimensions)
-  : center(center), dimensions(dimensions)
-  {}
+  explicit BoundingBox(const pugi::xml_node & xml) : center(xml), dimensions(xml) {}
+  BoundingBox(Center center, Dimensions dimensions) : center(center), dimensions(dimensions) {}
   const Center center;
   const Dimensions dimensions;
   const openscenario_msgs::msg::BoundingBox toRosMsg() const
@@ -121,19 +116,18 @@ struct Axle
     track_width(xml.attribute("trackWidth").as_double()),
     position_x(xml.attribute("positionX").as_double()),
     position_z(xml.attribute("positionZ").as_double())
-  {}
+  {
+  }
   Axle(
-    double max_steering,
-    double wheel_diameter,
-    double track_width,
-    double position_x,
+    double max_steering, double wheel_diameter, double track_width, double position_x,
     double position_z)
   : max_steering(max_steering),
     wheel_diameter(wheel_diameter),
     track_width(track_width),
     position_x(position_x),
     position_z(position_z)
-  {}
+  {
+  }
   const double max_steering;
   const double wheel_diameter;
   const double track_width;
@@ -156,10 +150,9 @@ struct Axles
   explicit Axles(const pugi::xml_node & xml)
   : front_axle(xml.child("Axles").child("FrontAxle")),
     rear_axle(xml.child("Axles").child("RearAxle"))
-  {}
-  Axles(Axle front_axle, Axle rear_axle)
-  : front_axle(front_axle), rear_axle(rear_axle)
-  {}
+  {
+  }
+  Axles(Axle front_axle, Axle rear_axle) : front_axle(front_axle), rear_axle(rear_axle) {}
   const Axle front_axle;
   const Axle rear_axle;
   const openscenario_msgs::msg::Axles toRosMsg() const
@@ -179,19 +172,18 @@ struct VehicleParameters
     axles(xml.child("Vehicle")),
     name(xml.attribute("name").as_string()),
     vehicle_categoly(xml.attribute("vehicleCategory").as_string())
-  {}
+  {
+  }
   VehicleParameters(
-    std::string name,
-    std::string vehicle_categoly,
-    Performance performance,
-    BoundingBox bounding_box,
-    Axles axles)
+    std::string name, std::string vehicle_categoly, Performance performance,
+    BoundingBox bounding_box, Axles axles)
   : performance(performance),
     bounding_box(bounding_box),
     axles(axles),
     name(name),
     vehicle_categoly(vehicle_categoly)
-  {}
+  {
+  }
   const Performance performance;
   const BoundingBox bounding_box;
   const Axles axles;

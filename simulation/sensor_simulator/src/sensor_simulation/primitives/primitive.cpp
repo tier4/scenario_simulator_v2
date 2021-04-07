@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
+#include <iostream>
+#include <sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 #include <string>
 #include <vector>
-#include <iostream>
 
 namespace sensor_simulator
 {
 namespace primitives
 {
-Primitive::Primitive(std::string type, geometry_msgs::msg::Pose pose)
-: type(type), pose(pose) {}
+Primitive::Primitive(std::string type, geometry_msgs::msg::Pose pose) : type(type), pose(pose) {}
 
 Vertex Primitive::transform(Vertex v) const
 {
@@ -55,30 +53,22 @@ std::vector<Vertex> Primitive::transform() const
   return ret;
 }
 
-std::vector<Vertex> Primitive::getVertex() const
-{
-  return transform();
-}
+std::vector<Vertex> Primitive::getVertex() const { return transform(); }
 
-std::vector<Triangle> Primitive::getTriangles() const
-{
-  return triangles_;
-}
+std::vector<Triangle> Primitive::getTriangles() const { return triangles_; }
 
 unsigned int Primitive::addToScene(RTCDevice device, RTCScene scene)
 {
   RTCGeometry mesh = rtcNewGeometry(device, RTC_GEOMETRY_TYPE_TRIANGLE);
   const auto transformed_vertices = transform();
   Vertex * vertices = static_cast<Vertex *>(rtcSetNewGeometryBuffer(
-      mesh, RTC_BUFFER_TYPE_VERTEX, 0,
-      RTC_FORMAT_FLOAT3, sizeof(Vertex), transformed_vertices.size()));
+    mesh, RTC_BUFFER_TYPE_VERTEX, 0, RTC_FORMAT_FLOAT3, sizeof(Vertex),
+    transformed_vertices.size()));
   for (size_t i = 0; i < transformed_vertices.size(); i++) {
     vertices[i] = transformed_vertices[i];
   }
   Triangle * triangles = static_cast<Triangle *>(rtcSetNewGeometryBuffer(
-      mesh, RTC_BUFFER_TYPE_INDEX, 0,
-      RTC_FORMAT_UINT3, sizeof(Triangle),
-      triangles_.size()));
+    mesh, RTC_BUFFER_TYPE_INDEX, 0, RTC_FORMAT_UINT3, sizeof(Triangle), triangles_.size()));
   for (size_t i = 0; i < triangles_.size(); i++) {
     triangles[i] = triangles_[i];
   }

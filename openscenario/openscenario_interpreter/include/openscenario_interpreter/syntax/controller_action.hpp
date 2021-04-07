@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/assign_controller_action.hpp>
 #include <openscenario_interpreter/syntax/override_controller_value_action.hpp>
-
 #include <type_traits>
 #include <utility>
 
@@ -55,25 +54,18 @@ struct ControllerAction
    * ------------------------------------------------------------------------ */
   const OverrideControllerValueAction override_controller_value_action;
 
-  template
-  <
-    typename Node,
-    typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit ControllerAction(const Node & node, Scope & outer_scope)
   : assignController(
       readElement<AssignControllerAction>("AssignControllerAction", node, outer_scope)),
-    override_controller_value_action(
-      readElement<OverrideControllerValueAction>(
-        "OverrideControllerValueAction", node, outer_scope))  // NOTE: DUMMY IMPLEMENTAION
-  {}
-
-  void start() const
+    override_controller_value_action(readElement<OverrideControllerValueAction>(
+      "OverrideControllerValueAction", node, outer_scope))  // NOTE: DUMMY IMPLEMENTAION
   {
-    assignController();
   }
 
-  const std::true_type accomplished {};
+  void start() const { assignController(); }
+
+  const std::true_type accomplished{};
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

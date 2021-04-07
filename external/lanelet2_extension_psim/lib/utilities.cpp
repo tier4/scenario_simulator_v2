@@ -14,19 +14,17 @@
 
 // Authors: Kenji Miyake, Ryohsuke Mitsudome
 
-#include <lanelet2_extension_psim/exception.hpp>
-#include <lanelet2_extension_psim/utility/message_conversion.hpp>
-#include <lanelet2_extension_psim/utility/query.hpp>
-#include <lanelet2_extension_psim/utility/utilities.hpp>
-
+#include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_traffic_rules/TrafficRules.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
-#include <lanelet2_core/geometry/Lanelet.h>
-
 #include <algorithm>
+#include <lanelet2_extension_psim/exception.hpp>
+#include <lanelet2_extension_psim/utility/message_conversion.hpp>
+#include <lanelet2_extension_psim/utility/query.hpp>
+#include <lanelet2_extension_psim/utility/utilities.hpp>
 #include <limits>
 #include <map>
 #include <utility>
@@ -128,8 +126,7 @@ std::pair<size_t, size_t> findNearestIndexPair(
   for (size_t i = 1; i < N; ++i) {
     if (
       accumulated_lengths.at(i - 1) <= target_length &&
-      target_length <= accumulated_lengths.at(i))
-    {
+      target_length <= accumulated_lengths.at(i)) {
       return std::make_pair(i - 1, i);
     }
   }
@@ -313,16 +310,16 @@ bool lineStringWithWidthToPolygon(
   }
   if (linestring.size() != 2) {
     std::stringstream sstream;
-    sstream << __func__ << ": linestring" << linestring.id() << " must have 2 points! (" <<
-      linestring.size() << " != 2)" << std::endl <<
-      "Failed to convert to polygon.";
+    sstream << __func__ << ": linestring" << linestring.id() << " must have 2 points! ("
+            << linestring.size() << " != 2)" << std::endl
+            << "Failed to convert to polygon.";
     lanelet::HdMapException(sstream.str());
     return false;
   }
   if (!linestring.hasAttribute("width")) {
     std::stringstream sstream;
-    sstream << __func__ << ": linestring" << linestring.id() <<
-      " does not have width tag. Failed to convert to polygon.";
+    sstream << __func__ << ": linestring" << linestring.id()
+            << " does not have width tag. Failed to convert to polygon.";
     lanelet::HdMapException(sstream.str());
     return false;
   }

@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
-
 #include <string>
 #include <unordered_map>
 
@@ -45,13 +44,14 @@ struct SpeedAction
 
   const SpeedActionTarget speed_action_target;
 
-  template<typename Node>
+  template <typename Node>
   explicit SpeedAction(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
     speed_action_dynamics(
       readElement<TransitionDynamics>("SpeedActionDynamics", node, inner_scope)),
     speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
-  {}
+  {
+  }
 
   std::unordered_map<String, Boolean> accomplishments;
 
@@ -63,13 +63,13 @@ struct SpeedAction
     }
   }
 
-  template<typename T>
+  template <typename T>
   decltype(auto) setLinearTransition(const Scope::Actor & actor, const T value) const
   {
     return setTargetSpeed(actor, value, true);
   }
 
-  template<typename T>
+  template <typename T>
   decltype(auto) setStepTransition(const Scope::Actor & actor, const T value) const
   {
     auto status = getEntityStatus(actor);
@@ -83,11 +83,9 @@ struct SpeedAction
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       switch (speed_action_dynamics.dynamics_shape) {
         case DynamicsShape::linear:
-          return setLinearTransition(
-            actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
+          return setLinearTransition(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
         case DynamicsShape::step:
-          return setStepTransition(
-            actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
+          return setStepTransition(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
         default:
           THROW(ImplementationFault);
       }
@@ -107,8 +105,8 @@ struct SpeedAction
     return unspecified;
   }
 
-  auto check(const String & actor) try
-  {
+  auto check(const String & actor)
+  try {
     const auto compare = Rule(Rule::equalTo);
 
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
@@ -135,7 +133,7 @@ struct SpeedAction
     return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_

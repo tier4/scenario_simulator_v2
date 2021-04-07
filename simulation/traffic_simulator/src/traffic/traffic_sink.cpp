@@ -23,22 +23,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/traffic/traffic_sink.hpp>
-#include <traffic_simulator/math/distance.hpp>
-
 #include <functional>
-#include <string>
-#include <vector>
-#include <memory>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <traffic_simulator/math/distance.hpp>
+#include <traffic_simulator/traffic/traffic_sink.hpp>
+#include <vector>
 
 namespace traffic_simulator
 {
 namespace traffic
 {
 TrafficSink::TrafficSink(
-  double radius,
-  const geometry_msgs::msg::Point & position,
+  double radius, const geometry_msgs::msg::Point & position,
   const std::function<std::vector<std::string>(void)> & get_entity_names_function,
   const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
   const std::function<void(std::string)> & despawn_function)

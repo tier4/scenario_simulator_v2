@@ -15,9 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
 
-#include <traffic_simulator/metrics/metric_base.hpp>
-
 #include <string>
+#include <traffic_simulator/metrics/metric_base.hpp>
 
 namespace metrics
 {

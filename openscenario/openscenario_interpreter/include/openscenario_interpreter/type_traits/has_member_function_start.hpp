@@ -21,16 +21,17 @@ namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
-template<typename T, typename = void>
-struct HasMemberFunctionStart
-  : public std::false_type
-{};
+template <typename T, typename = void>
+struct HasMemberFunctionStart : public std::false_type
+{
+};
 
-template<typename T>
+template <typename T>
 struct HasMemberFunctionStart<T, void_t<decltype(std::declval<T>().start())>>
-  : public std::true_type
-{};
-}
+: public std::true_type
+{
+};
+}  // namespace type_traits
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_START_HPP_

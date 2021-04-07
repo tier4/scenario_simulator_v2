@@ -34,40 +34,28 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * ======================================================================== */
-struct Maneuver
-  : public StoryboardElement<Maneuver>, public Elements
+struct Maneuver : public StoryboardElement<Maneuver>, public Elements
 {
   const String name;
 
   Scope inner_scope;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Maneuver(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    inner_scope{outer_scope}
+  : name{readAttribute<String>("name", node, outer_scope)}, inner_scope{outer_scope}
   {
-    callWithElements(
-      node, "ParameterDeclarations", 0, 1, [&](auto && node)
-      {
-        return make<ParameterDeclarations>(node, inner_scope);
-      });
+    callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
+      return make<ParameterDeclarations>(node, inner_scope);
+    });
 
-    callWithElements(
-      node, "Event", 1, unbounded, [&](auto && node)
-      {
-        return push_back(readStoryboardElement<Event>(node, inner_scope));
-      });
+    callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
+      return push_back(readStoryboardElement<Event>(node, inner_scope));
+    });
   }
 
-  static constexpr auto ready() noexcept
-  {
-    return true;
-  }
+  static constexpr auto ready() noexcept { return true; }
 
-  static constexpr auto stopTriggered() noexcept
-  {
-    return false;
-  }
+  static constexpr auto stopTriggered() noexcept { return false; }
 
   /* -------------------------------------------------------------------------
    *
@@ -78,11 +66,9 @@ struct Maneuver
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(
-      std::begin(*this), std::end(*this), [](auto && each)
-      {
-        return each.template as<Event>().complete();
-      });
+    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+      return each.template as<Event>().complete();
+    });
   }
 
   using StoryboardElement::evaluate;
@@ -90,7 +76,7 @@ struct Maneuver
   void stop()
   {
     for (auto && each : *this) {
-      each.as<Event>().override ();
+      each.as<Event>().override();
       each.evaluate();
     }
   }
@@ -102,7 +88,7 @@ struct Maneuver
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_HPP_

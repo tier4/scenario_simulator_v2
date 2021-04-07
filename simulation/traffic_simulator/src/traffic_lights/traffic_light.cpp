@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <limits>
+#include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/entity/exception.hpp>
-
-#include <vector>
-#include <limits>
-#include <utility>
+#include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <unordered_map>
-#include <string>
+#include <utility>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -37,65 +36,38 @@ TrafficLight::TrafficLight(
 }
 
 void TrafficLight::setPosition(
-  const TrafficLightColor & color,
-  const geometry_msgs::msg::Point & position)
+  const TrafficLightColor & color, const geometry_msgs::msg::Point & position)
 {
   color_positions_.insert({color, position});
 }
 
 void TrafficLight::setColorPhase(
-  const std::vector<std::pair<double, TrafficLightColor>> & phase,
-  double time_offset)
+  const std::vector<std::pair<double, TrafficLightColor>> & phase, double time_offset)
 {
   color_phase_.setPhase(phase, time_offset);
 }
 
 void TrafficLight::setArrowPhase(
-  const std::vector<std::pair<double, TrafficLightArrow>> & phase,
-  double time_offset)
+  const std::vector<std::pair<double, TrafficLightArrow>> & phase, double time_offset)
 {
   arrow_phase_.setPhase(phase, time_offset);
 }
 
-void TrafficLight::setColor(TrafficLightColor color)
-{
-  color_phase_.setState(color);
-}
+void TrafficLight::setColor(TrafficLightColor color) { color_phase_.setState(color); }
 
-void TrafficLight::setArrow(TrafficLightArrow arrow)
-{
-  arrow_phase_.setState(arrow);
-}
+void TrafficLight::setArrow(TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
 
-double TrafficLight::getColorPhaseLength() const
-{
-  return color_phase_.getPhaseLength();
-}
+double TrafficLight::getColorPhaseLength() const { return color_phase_.getPhaseLength(); }
 
-double TrafficLight::getArrowPhaseLength() const
-{
-  return arrow_phase_.getPhaseLength();
-}
+double TrafficLight::getArrowPhaseLength() const { return arrow_phase_.getPhaseLength(); }
 
-TrafficLightArrow TrafficLight::getArrow() const
-{
-  return arrow_phase_.getState();
-}
+TrafficLightArrow TrafficLight::getArrow() const { return arrow_phase_.getState(); }
 
-TrafficLightColor TrafficLight::getColor() const
-{
-  return color_phase_.getState();
-}
+TrafficLightColor TrafficLight::getColor() const { return color_phase_.getState(); }
 
-bool TrafficLight::colorChanged() const
-{
-  return color_changed_;
-}
+bool TrafficLight::colorChanged() const { return color_changed_; }
 
-bool TrafficLight::arrowChanged() const
-{
-  return arrow_changed_;
-}
+bool TrafficLight::arrowChanged() const { return arrow_changed_; }
 
 void TrafficLight::update(double step_time)
 {

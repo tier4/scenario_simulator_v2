@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -25,11 +24,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
 /* ---- EntityObject -----------------------------------------------------------
  *
@@ -45,19 +41,13 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityObject : public Group
 {
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit EntityObject(const Node & node, Ts && ... xs)
-  : Group(
-      choice(
-        node,
-        std::make_pair("CatalogReference", UNSUPPORTED()),
-        ELEMENT(Vehicle),
-        ELEMENT(Pedestrian),
-        std::make_pair("MiscObject", UNSUPPORTED())))
-  {}
+  template <typename Node, typename... Ts>
+  explicit EntityObject(const Node & node, Ts &&... xs)
+  : Group(choice(
+      node, std::make_pair("CatalogReference", UNSUPPORTED()), ELEMENT(Vehicle),
+      ELEMENT(Pedestrian), std::make_pair("MiscObject", UNSUPPORTED())))
+  {
+  }
 };
 
 #undef ELEMENT

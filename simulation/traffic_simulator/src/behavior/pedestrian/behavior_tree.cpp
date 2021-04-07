@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/pedestrian/behavior_tree.hpp>
-
-#include <ament_index_cpp/get_package_share_directory.hpp>
-
-#include <iostream>
-#include <utility>
-#include <string>
 #include <algorithm>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <iostream>
+#include <string>
+#include <traffic_simulator/behavior/pedestrian/behavior_tree.hpp>
+#include <utility>
 
 namespace entity_behavior
 {
@@ -28,7 +26,7 @@ namespace pedestrian
 BehaviorTree::BehaviorTree()
 {
   std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-    "/resource/pedestrian_entity_behavior.xml";
+                     "/resource/pedestrian_entity_behavior.xml";
   factory_.registerNodeType<entity_behavior::pedestrian::FollowLaneAction>("FollowLane");
   factory_.registerNodeType<entity_behavior::pedestrian::WalkStraightAction>("WalkStraightAction");
   tree_ = factory_.createTreeFromFile(path);
@@ -47,21 +45,20 @@ void BehaviorTree::setRequest(std::string request)
 void BehaviorTree::setupLogger()
 {
   first_timestamp_ = std::chrono::high_resolution_clock::now();
-  auto subscribeCallback =
-    [this](BT::TimePoint timestamp, const BT::TreeNode & node, BT::NodeStatus prev,
-      BT::NodeStatus status)
-    {
-      if (status != BT::NodeStatus::IDLE) {
-        if (type_ == BT::TimestampType::ABSOLUTE) {
-          this->callback(timestamp.time_since_epoch(), node, prev, status);
-        } else {
-          this->callback(timestamp - first_timestamp_, node, prev, status);
-        }
+  auto subscribeCallback = [this](
+                             BT::TimePoint timestamp, const BT::TreeNode & node,
+                             BT::NodeStatus prev, BT::NodeStatus status) {
+    if (status != BT::NodeStatus::IDLE) {
+      if (type_ == BT::TimestampType::ABSOLUTE) {
+        this->callback(timestamp.time_since_epoch(), node, prev, status);
+      } else {
+        this->callback(timestamp - first_timestamp_, node, prev, status);
       }
-    };
+    }
+  };
   auto visitor = [this, subscribeCallback](BT::TreeNode * node) {
-      subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
-    };
+    subscribers_.push_back(node->subscribeToStatusChange(std::move(subscribeCallback)));
+  };
   BT::applyRecursiveVisitor(tree_.rootNode(), visitor);
 }
 
@@ -74,18 +71,16 @@ BT::NodeStatus BehaviorTree::tick(double current_time, double step_time)
 }
 
 void BehaviorTree::callback(
-  BT::Duration timestamp, const BT::TreeNode & node,
-  BT::NodeStatus prev_status, BT::NodeStatus status)
+  BT::Duration timestamp, const BT::TreeNode & node, BT::NodeStatus prev_status,
+  BT::NodeStatus status)
 {
   constexpr const char * whitespaces = "                         ";
   constexpr const size_t ws_count = 25;
   double since_epoch = std::chrono::duration<double>(timestamp).count();
   printf(
-    "[%.3f]: %s%s %s -> %s",
-    since_epoch, node.name().c_str(),
-    &whitespaces[std::min(ws_count, node.name().size())],
-    toStr(prev_status, true).c_str(),
-    toStr(status, true).c_str() );
+    "[%.3f]: %s%s %s -> %s", since_epoch, node.name().c_str(),
+    &whitespaces[std::min(ws_count, node.name().size())], toStr(prev_status, true).c_str(),
+    toStr(status, true).c_str());
   std::cout << std::endl;
   if (status != BT::NodeStatus::SUCCESS) {
     current_action_ = node.name();

@@ -16,10 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
 #include <boost/filesystem.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
-
 #include <limits>
 #include <memory>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -50,10 +49,10 @@ struct Scope
   explicit Scope(Scope &) = default;
   explicit Scope(const Scope &) = default;
 
-  template<typename ... Ts>
-  explicit Scope(const std::string & scenario, Ts && ... xs)
-  : scenario(scenario)
-  {}
+  template <typename... Ts>
+  explicit Scope(const std::string & scenario, Ts &&... xs) : scenario(scenario)
+  {
+  }
 };
 }  // namespace openscenario_interpreter
 

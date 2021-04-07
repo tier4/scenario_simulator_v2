@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/behavior/pedestrian/pedestrian_action_node.hpp>
-
 #include <memory>
 #include <string>
+#include <traffic_simulator/behavior/pedestrian/pedestrian_action_node.hpp>
 
 namespace entity_behavior
 {
 PedestrianActionNode::PedestrianActionNode(
-  const std::string & name,
-  const BT::NodeConfiguration & config)
-: ActionNode(name, config) {}
+  const std::string & name, const BT::NodeConfiguration & config)
+: ActionNode(name, config)
+{
+}
 
 void PedestrianActionNode::getBlackBoardValues()
 {
   ActionNode::getBlackBoardValues();
   if (!getInput<openscenario_msgs::msg::PedestrianParameters>(
-      "pedestrian_parameters", pedestrian_parameters))
-  {
+        "pedestrian_parameters", pedestrian_parameters)) {
     throw BehaviorTreeRuntimeError(
-            "failed to get input pedestrian_parameters in PedestrianActionNode");
+      "failed to get input pedestrian_parameters in PedestrianActionNode");
   }
 }
 
@@ -56,12 +55,12 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
   twist_new.angular.y = 0.0;
   twist_new.angular.z = 0.0;
   std::int64_t new_lanelet_id = entity_status.lanelet_pose.lanelet_id;
-  double new_s = entity_status.lanelet_pose.s +
-    (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 *
-    step_time;
+  double new_s =
+    entity_status.lanelet_pose.s +
+    (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 * step_time;
   if (new_s < 0) {
-    auto previous_lanlet_ids = hdmap_utils->getPreviousLaneletIds(
-      entity_status.lanelet_pose.lanelet_id);
+    auto previous_lanlet_ids =
+      hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_pose.lanelet_id);
     new_lanelet_id = previous_lanlet_ids[0];
     new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id) - 0.01;
     openscenario_msgs::msg::EntityStatus entity_status_updated;
@@ -99,7 +98,7 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
     }
     if (!calculation_success) {
       throw BehaviorTreeRuntimeError(
-              "failed to calculate next status calculateEntityStatusUpdated function");
+        "failed to calculate next status calculateEntityStatusUpdated function");
     }
     openscenario_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;
@@ -113,7 +112,7 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
     return entity_status_updated;
   }
   throw BehaviorTreeRuntimeError(
-          "failed to calculate next status calculateEntityStatusUpdated function");
+    "failed to calculate next status calculateEntityStatusUpdated function");
 }
 
 openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(
@@ -131,17 +130,17 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
 
   geometry_msgs::msg::Twist twist_new;
   twist_new.linear.x = entity_status.action_status.twist.linear.x +
-    entity_status.action_status.accel.linear.x * step_time;
+                       entity_status.action_status.accel.linear.x * step_time;
   twist_new.linear.y = entity_status.action_status.twist.linear.y +
-    entity_status.action_status.accel.linear.y * step_time;
+                       entity_status.action_status.accel.linear.y * step_time;
   twist_new.linear.z = entity_status.action_status.twist.linear.z +
-    entity_status.action_status.accel.linear.z * step_time;
+                       entity_status.action_status.accel.linear.z * step_time;
   twist_new.angular.x = entity_status.action_status.twist.angular.x +
-    entity_status.action_status.accel.angular.x * step_time;
+                        entity_status.action_status.accel.angular.x * step_time;
   twist_new.angular.y = entity_status.action_status.twist.angular.y +
-    entity_status.action_status.accel.angular.y * step_time;
+                        entity_status.action_status.accel.angular.y * step_time;
   twist_new.angular.z = entity_status.action_status.twist.angular.z +
-    entity_status.action_status.accel.angular.z * step_time;
+                        entity_status.action_status.accel.angular.z * step_time;
 
   geometry_msgs::msg::Pose pose_new;
   geometry_msgs::msg::Vector3 angular_trans_vec;

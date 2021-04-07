@@ -38,21 +38,20 @@ struct ParameterModifyAction
 
   const ModifyRule rule;
 
-  const std::true_type accomplished {};
+  const std::true_type accomplished{};
 
-  template<typename Node>
+  template <typename Node>
   explicit ParameterModifyAction(
     const Node & node, Scope & outer_scope, const String & parameter_ref)
   : inner_scope(outer_scope),
     parameter_ref(parameter_ref),
     rule(readElement<ModifyRule>("Rule", node, inner_scope))
-  {}
-
-  auto evaluate() try
   {
-    const auto target {
-      inner_scope.parameters.at(parameter_ref)
-    };
+  }
+
+  auto evaluate()
+  try {
+    const auto target{inner_scope.parameters.at(parameter_ref)};
     if (rule.is<ParameterAddValueRule>()) {
       return rule.as<ParameterAddValueRule>()(target);
     } else if (rule.is<ParameterMultiplyByValueRule>()) {
@@ -65,7 +64,7 @@ struct ParameterModifyAction
     throw SemanticError("No such parameter '" + parameter_ref + "'");
   }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_MODIFY_ACTION_HPP_

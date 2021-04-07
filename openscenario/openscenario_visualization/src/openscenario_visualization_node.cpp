@@ -41,16 +41,16 @@
   </table>
  */
 
+#include <memory>
 #include <openscenario_visualization/openscenario_visualization_component.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <memory>
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<openscenario_visualization::OpenscenarioVisualizationComponent>(
-    options);
+  auto component =
+    std::make_shared<openscenario_visualization::OpenscenarioVisualizationComponent>(options);
   rclcpp::spin(component->get_node_base_interface());
   rclcpp::shutdown();
   return 0;

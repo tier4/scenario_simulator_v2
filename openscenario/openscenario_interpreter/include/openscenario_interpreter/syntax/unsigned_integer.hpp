@@ -17,36 +17,28 @@
 
 #include <boost/lexical_cast.hpp>
 #include <std_msgs/msg/u_int64.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct UnsignedInteger
-  : public std_msgs::msg::UInt64
+struct UnsignedInteger : public std_msgs::msg::UInt64
 {
   using value_type = decltype(std_msgs::msg::UInt64::data);
 
-  explicit UnsignedInteger(value_type value = {})
-  {
-    data = value;
-  }
+  explicit UnsignedInteger(value_type value = {}) { data = value; }
 
-  explicit UnsignedInteger(const std::string & s) try
-  {
+  explicit UnsignedInteger(const std::string & s)
+  try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss {};
+    std::stringstream ss{};
     ss << "can't treat value \"" << s << "\" as type UnsignedInteger";
-    throw SyntaxError {ss.str()};
+    throw SyntaxError{ss.str()};
   }
 
-  constexpr operator value_type() const noexcept
-  {
-    return data;
-  }
+  constexpr operator value_type() const noexcept { return data; }
 
   decltype(auto) operator++() noexcept
   {
@@ -67,20 +59,20 @@ struct UnsignedInteger
   }
 };
 
-template<typename ... Ts>
-decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const UnsignedInteger & rhs)
+template <typename... Ts>
+decltype(auto) operator<<(std::basic_ostream<Ts...> & os, const UnsignedInteger & rhs)
 {
   return os << rhs.data;
 }
 
-template<typename ... Ts>
-decltype(auto) operator>>(std::basic_istream<Ts...>&is, UnsignedInteger & rhs)
+template <typename... Ts>
+decltype(auto) operator>>(std::basic_istream<Ts...> & is, UnsignedInteger & rhs)
 {
   return is >> rhs.data;
 }
 
 using UnsignedInt = UnsignedInteger;
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__UNSIGNED_INTEGER_HPP_

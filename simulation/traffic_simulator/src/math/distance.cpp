@@ -23,9 +23,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/math/distance.hpp>
-
 #include <cmath>
+#include <traffic_simulator/math/distance.hpp>
 
 namespace traffic_simulator
 {

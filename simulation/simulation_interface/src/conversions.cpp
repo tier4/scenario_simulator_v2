@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <simulation_interface/conversions.hpp>
-
 #include <string>
 #include <vector>
 
@@ -100,24 +99,20 @@ void toMsg(const geometry_msgs::Accel & proto, geometry_msgs::msg::Accel & a)
 }
 
 void toProto(
-  const openscenario_msgs::msg::BoundingBox & box,
-  openscenario_msgs::BoundingBox & proto)
+  const openscenario_msgs::msg::BoundingBox & box, openscenario_msgs::BoundingBox & proto)
 {
   toProto(box.center, *proto.mutable_center());
   toProto(box.dimensions, *proto.mutable_dimensions());
 }
 
-void toMsg(
-  const openscenario_msgs::BoundingBox & proto,
-  openscenario_msgs::msg::BoundingBox & box)
+void toMsg(const openscenario_msgs::BoundingBox & proto, openscenario_msgs::msg::BoundingBox & box)
 {
   toMsg(proto.center(), box.center);
   toMsg(proto.dimensions(), box.dimensions);
 }
 
 void toProto(
-  const openscenario_msgs::msg::Performance & performance,
-  openscenario_msgs::Performance & proto)
+  const openscenario_msgs::msg::Performance & performance, openscenario_msgs::Performance & proto)
 {
   proto.set_max_acceleration(performance.max_acceleration);
   proto.set_max_deceleration(performance.max_deceleration);
@@ -125,17 +120,14 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::Performance & proto,
-  openscenario_msgs::msg::Performance & performance)
+  const openscenario_msgs::Performance & proto, openscenario_msgs::msg::Performance & performance)
 {
   performance.max_acceleration = proto.max_acceleration();
   performance.max_deceleration = proto.max_deceleration();
   performance.max_speed = proto.max_speed();
 }
 
-void toProto(
-  const openscenario_msgs::msg::Axle & axle,
-  openscenario_msgs::Axle & proto)
+void toProto(const openscenario_msgs::msg::Axle & axle, openscenario_msgs::Axle & proto)
 {
   proto.set_position_x(axle.position_x);
   proto.set_position_z(axle.position_z);
@@ -144,9 +136,7 @@ void toProto(
   proto.set_max_steering(axle.max_steering);
 }
 
-void toMsg(
-  const openscenario_msgs::Axle & proto,
-  openscenario_msgs::msg::Axle & axle)
+void toMsg(const openscenario_msgs::Axle & proto, openscenario_msgs::msg::Axle & axle)
 {
   axle.position_x = proto.position_x();
   axle.position_z = proto.position_z();
@@ -155,17 +145,13 @@ void toMsg(
   axle.max_steering = proto.max_steering();
 }
 
-void toProto(
-  const openscenario_msgs::msg::Axles & axles,
-  openscenario_msgs::Axles & proto)
+void toProto(const openscenario_msgs::msg::Axles & axles, openscenario_msgs::Axles & proto)
 {
   toProto(axles.front_axle, *proto.mutable_front_axle());
   toProto(axles.rear_axle, *proto.mutable_rear_axle());
 }
 
-void toMsg(
-  const openscenario_msgs::Axles & proto,
-  openscenario_msgs::msg::Axles & axles)
+void toMsg(const openscenario_msgs::Axles & proto, openscenario_msgs::msg::Axles & axles)
 {
   toMsg(proto.front_axle(), axles.front_axle);
   toMsg(proto.rear_axle(), axles.rear_axle);
@@ -188,8 +174,7 @@ void toMsg(
 */
 
 void toProto(
-  const openscenario_msgs::msg::VehicleParameters & p,
-  openscenario_msgs::VehicleParameters & proto)
+  const openscenario_msgs::msg::VehicleParameters & p, openscenario_msgs::VehicleParameters & proto)
 {
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   toProto(p.axles, *proto.mutable_axles());
@@ -200,8 +185,7 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::VehicleParameters & proto,
-  openscenario_msgs::msg::VehicleParameters & p)
+  const openscenario_msgs::VehicleParameters & proto, openscenario_msgs::msg::VehicleParameters & p)
 {
   toMsg(proto.axles(), p.axles);
   toMsg(proto.bounding_box(), p.bounding_box);
@@ -230,17 +214,14 @@ void toMsg(
 }
 
 void toProto(
-  const openscenario_msgs::msg::ActionStatus & s,
-  openscenario_msgs::ActionStatus & proto)
+  const openscenario_msgs::msg::ActionStatus & s, openscenario_msgs::ActionStatus & proto)
 {
   proto.set_current_action(s.current_action);
   toProto(s.twist, *proto.mutable_twist());
   toProto(s.accel, *proto.mutable_accel());
 }
 
-void toMsg(
-  const openscenario_msgs::ActionStatus & proto,
-  openscenario_msgs::msg::ActionStatus & s)
+void toMsg(const openscenario_msgs::ActionStatus & proto, openscenario_msgs::msg::ActionStatus & s)
 {
   s.current_action = proto.current_action();
   toMsg(proto.twist(), s.twist);
@@ -248,8 +229,7 @@ void toMsg(
 }
 
 void toProto(
-  const openscenario_msgs::msg::LaneletPose & pose,
-  openscenario_msgs::LaneletPose & proto)
+  const openscenario_msgs::msg::LaneletPose & pose, openscenario_msgs::LaneletPose & proto)
 {
   proto.set_lanlet_id(pose.lanelet_id);
   proto.set_s(pose.s);
@@ -257,9 +237,7 @@ void toProto(
   toProto(pose.rpy, *proto.mutable_rpy());
 }
 
-void toMsg(
-  const openscenario_msgs::LaneletPose & proto,
-  openscenario_msgs::msg::LaneletPose & pose)
+void toMsg(const openscenario_msgs::LaneletPose & proto, openscenario_msgs::msg::LaneletPose & pose)
 {
   pose.lanelet_id = proto.lanlet_id();
   pose.s = proto.s();
@@ -267,9 +245,7 @@ void toMsg(
   toMsg(proto.rpy(), pose.rpy);
 }
 
-void toProto(
-  const openscenario_msgs::msg::EntityType & type,
-  openscenario_msgs::EntityType & proto)
+void toProto(const openscenario_msgs::msg::EntityType & type, openscenario_msgs::EntityType & proto)
 {
   if (type.type == openscenario_msgs::msg::EntityType::EGO) {
     proto = openscenario_msgs::EntityType::EGO;
@@ -285,9 +261,7 @@ void toProto(
   THROW_PROTOBUF_PARAMETER_ERROR(message);
 }
 
-void toMsg(
-  const openscenario_msgs::EntityType & proto,
-  openscenario_msgs::msg::EntityType & type)
+void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::EntityType & type)
 {
   if (proto == openscenario_msgs::EntityType::EGO) {
     type.type = openscenario_msgs::msg::EntityType::EGO;
@@ -306,8 +280,7 @@ void toMsg(
 }
 
 void toProto(
-  const openscenario_msgs::msg::EntityStatus & status,
-  openscenario_msgs::EntityStatus & proto)
+  const openscenario_msgs::msg::EntityStatus & status, openscenario_msgs::EntityStatus & proto)
 {
   openscenario_msgs::EntityType type;
   toProto(status.type, type);
@@ -322,8 +295,7 @@ void toProto(
 }
 
 void toMsg(
-  const openscenario_msgs::EntityStatus & proto,
-  openscenario_msgs::msg::EntityStatus & status)
+  const openscenario_msgs::EntityStatus & proto, openscenario_msgs::msg::EntityStatus & status)
 {
   openscenario_msgs::msg::EntityType type;
   toMsg(proto.type(), type);

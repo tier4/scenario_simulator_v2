@@ -15,18 +15,14 @@
 #ifndef TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
 #define TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
 
-#include <traffic_simulator/math/polynomial_solver.hpp>
-
-#include <openscenario_msgs/msg/hermite_curve.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <boost/optional.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-
-#include <boost/optional.hpp>
-
+#include <openscenario_msgs/msg/hermite_curve.hpp>
+#include <traffic_simulator/math/polynomial_solver.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -42,62 +38,39 @@ private:
   traffic_simulator::math::PolynomialSolver solver_;
 
 public:
-  explicit HermiteCurve(
-    const openscenario_msgs::msg::HermiteCurve & curve
-  );
+  explicit HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve);
   HermiteCurve(
     geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
     geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec);
   HermiteCurve(
-    double ax, double bx, double cx, double dx,
-    double ay, double by, double cy, double dy,
+    double ax, double bx, double cx, double dx, double ay, double by, double cy, double dy,
     double az, double bz, double cz, double dz);
   std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 30) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
-    double start_s, double end_s,
-    double resolution, bool autoscale = false) const;
-  const geometry_msgs::msg::Pose getPose(
-    double s,
-    bool autoscale = false) const;
-  const geometry_msgs::msg::Point getPoint(
-    double s,
-    bool autoscale = false) const;
-  const geometry_msgs::msg::Vector3 getTangentVector(
-    double s,
-    bool autoscale = false) const;
-  const geometry_msgs::msg::Vector3 getNormalVector(
-    double s,
-    bool autoscale = false) const;
-  double get2DCurvature(
-    double s,
-    bool autoscale = false) const;
+    double start_s, double end_s, double resolution, bool autoscale = false) const;
+  const geometry_msgs::msg::Pose getPose(double s, bool autoscale = false) const;
+  const geometry_msgs::msg::Point getPoint(double s, bool autoscale = false) const;
+  const geometry_msgs::msg::Vector3 getTangentVector(double s, bool autoscale = false) const;
+  const geometry_msgs::msg::Vector3 getNormalVector(double s, bool autoscale = false) const;
+  double get2DCurvature(double s, bool autoscale = false) const;
   double getMaximu2DCurvature() const;
   double getLength(size_t num_points = 100) const;
   boost::optional<double> getSValue(
-    geometry_msgs::msg::Point position,
-    double threadhold_distance = 1.0,
-    unsigned int initial_resolution = 30,
-    unsigned int max_iteration = 30,
-    double tolerance = 0.001,
+    geometry_msgs::msg::Point position, double threadhold_distance = 1.0,
+    unsigned int initial_resolution = 30, unsigned int max_iteration = 30, double tolerance = 0.001,
     bool autoscale = false) const;
   double getSquaredDistanceIn2D(
-    geometry_msgs::msg::Point point, double s,
-    bool autoscale = false) const;
+    geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
   boost::optional<double> getCollisionPointIn2D(
-    geometry_msgs::msg::Point point0,
-    geometry_msgs::msg::Point point1,
-    bool search_backward = false
-  ) const;
+    geometry_msgs::msg::Point point0, geometry_msgs::msg::Point point1,
+    bool search_backward = false) const;
   boost::optional<double> getCollisionPointIn2D(
-    std::vector<geometry_msgs::msg::Point> polygon,
-    bool search_backward = false
-  ) const;
+    std::vector<geometry_msgs::msg::Point> polygon, bool search_backward = false) const;
   const openscenario_msgs::msg::HermiteCurve toRosMsg() const;
 
 private:
   double getNewtonMethodStepSize(
-    geometry_msgs::msg::Point point, double s,
-    bool autoscale = false) const;
+    geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
 };
 }  // namespace math
 }  // namespace traffic_simulator

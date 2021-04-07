@@ -16,28 +16,25 @@
 #define TRAFFIC_SIMULATOR__BEHAVIOR__ACTION_NODE_HPP_
 
 #include <behaviortree_cpp_v3/action_node.h>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-
-#include <openscenario_msgs/msg/waypoints_array.hpp>
-#include <openscenario_msgs/msg/obstacle.hpp>
 
 #include <boost/algorithm/clamp.hpp>
-
-#include <string>
 #include <memory>
-#include <vector>
+#include <openscenario_msgs/msg/obstacle.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <string>
+#include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/math/catmull_rom_spline.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace entity_behavior
 {
 class BehaviorTreeRuntimeError : public std::runtime_error
 {
 public:
-  explicit BehaviorTreeRuntimeError(const char * message)
-  : runtime_error(message) {}
+  explicit BehaviorTreeRuntimeError(const char * message) : runtime_error(message) {}
 };
 
 class ActionNode : public BT::ActionNodeBase
@@ -77,35 +74,28 @@ public:
   BT::NodeStatus executeTick() override;
 
   /// You don't need to override this
-  void halt() override
-  {
-    setStatus(BT::NodeStatus::IDLE);
-  }
+  void halt() override { setStatus(BT::NodeStatus::IDLE); }
 
   static BT::PortsList providedPorts()
   {
-    return
-      {
-        BT::InputPort<std::string>("request"),
-        BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
-        BT::InputPort<openscenario_msgs::msg::EntityStatus>("entity_status"),
-        BT::InputPort<double>("current_time"),
-        BT::InputPort<double>("step_time"),
-        BT::InputPort<boost::optional<double>>("target_speed"),
-        BT::OutputPort<openscenario_msgs::msg::EntityStatus>("updated_status"),
-        BT::OutputPort<std::string>("request"),
-        BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus>>(
-          "other_entity_status"),
-        BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
-          "entity_type_list"),
-        BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
-        BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
-          "traffic_light_manager"),
-        BT::OutputPort<boost::optional<openscenario_msgs::msg::Obstacle>>(
-          "obstacle"),
-        BT::OutputPort<openscenario_msgs::msg::WaypointsArray>(
-          "waypoints")
-      };
+    return {
+      BT::InputPort<std::string>("request"),
+      BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
+      BT::InputPort<openscenario_msgs::msg::EntityStatus>("entity_status"),
+      BT::InputPort<double>("current_time"),
+      BT::InputPort<double>("step_time"),
+      BT::InputPort<boost::optional<double>>("target_speed"),
+      BT::OutputPort<openscenario_msgs::msg::EntityStatus>("updated_status"),
+      BT::OutputPort<std::string>("request"),
+      BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus>>(
+        "other_entity_status"),
+      BT::InputPort<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
+        "entity_type_list"),
+      BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
+        "traffic_light_manager"),
+      BT::OutputPort<boost::optional<openscenario_msgs::msg::Obstacle>>("obstacle"),
+      BT::OutputPort<openscenario_msgs::msg::WaypointsArray>("waypoints")};
   }
   void getBlackBoardValues();
   std::string request;

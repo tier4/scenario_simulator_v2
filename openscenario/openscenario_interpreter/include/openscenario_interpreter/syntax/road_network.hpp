@@ -45,7 +45,7 @@ struct RoadNetwork
 
   const TrafficSignals traffic_signals;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit RoadNetwork(const Node & node, Scope & outer_scope)
   : logic_file(readElement<File>("LogicFile", node, outer_scope)),
     scene_graph_file(readElement<File>("SceneGraphFile", node, outer_scope)),
@@ -55,7 +55,7 @@ struct RoadNetwork
     outer_scope.scene_graph_file = scene_graph_file;
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ROAD_NETWORK_HPP_

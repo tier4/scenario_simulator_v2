@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sensor_simulator/sensor_simulation/sensor_simulation.hpp>
-
 #include <memory>
-#include <vector>
+#include <sensor_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <string>
+#include <vector>
 
 namespace sensor_simulator
 {
 SensorSimulation::SensorSimulation(const std::shared_ptr<rclcpp::Clock> & clock_ptr)
-: clock_ptr_(clock_ptr) {}
+: clock_ptr_(clock_ptr)
+{
+}
 
 void SensorSimulation::attachLidarSensor(
   const simulation_api_schema::LidarConfiguration & configuration,
@@ -33,16 +34,15 @@ void SensorSimulation::attachLidarSensor(
 
 void SensorSimulation::attachDetectionSensor(
   const simulation_api_schema::DetectionSensorConfiguration & configuration,
-  std::shared_ptr<
-    rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>> publisher_ptr)
+  std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
+    publisher_ptr)
 {
   DetectionSensor detection_sensor(configuration, publisher_ptr);
   detection_sensors_.push_back(detection_sensor);
 }
 
 void SensorSimulation::updateSensorFrame(
-  double current_time,
-  const std::vector<openscenario_msgs::EntityStatus> & status)
+  double current_time, const std::vector<openscenario_msgs::EntityStatus> & status)
 {
   std::vector<std::string> detected_objects = {};
   const auto now = clock_ptr_->now();

@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <gtest/gtest.h>
-#include <openscenario_interpreter/syntax/openscenario.hpp>
-#include <rclcpp/rclcpp.hpp>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <chrono>
 #include <cstdlib>
 #include <memory>
+#include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <thread>
 
-TEST(syntax, dummy)
-{
-  ASSERT_TRUE(true);
-}
+TEST(syntax, dummy) { ASSERT_TRUE(true); }
 
 // TEST(Syntax, LexicalScope)
 // {

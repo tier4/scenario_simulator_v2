@@ -21,7 +21,6 @@
 #include <openscenario_interpreter/syntax/performance.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -96,10 +95,7 @@ struct Vehicle
    * ------------------------------------------------------------------------ */
   Properties properties;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit Vehicle(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, outer_scope)),
@@ -110,10 +106,11 @@ struct Vehicle
     performance(readElement<Performance>("Performance", node, inner_scope)),
     axles(readElement<Axles>("Axles", node, inner_scope)),
     properties(readElement<Properties>("Properties", node, inner_scope))
-  {}
+  {
+  }
 
-  template<typename ... Ts>
-  decltype(auto) operator[](Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) operator[](Ts &&... xs)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);
   }
@@ -121,13 +118,16 @@ struct Vehicle
 
 std::ostream & operator<<(std::ostream & os, const Vehicle & rhs)
 {
-  return
-    os << (indent++) << blue << "<Vehicle" << " " << highlight("name", rhs.name) << " " <<
-    highlight("vehicleCategory", rhs.vehicle_category) << blue << ">\n" << reset <<
-    rhs.parameter_declarations << "\n" << rhs.bounding_box << "\n" << rhs.performance << "\n" <<
-    rhs.axles << "\n" << (--indent) << blue << "</Vehicle>" << reset;
+  return os << (indent++) << blue << "<Vehicle"
+            << " " << highlight("name", rhs.name) << " "
+            << highlight("vehicleCategory", rhs.vehicle_category) << blue << ">\n"
+            << reset << rhs.parameter_declarations << "\n"
+            << rhs.bounding_box << "\n"
+            << rhs.performance << "\n"
+            << rhs.axles << "\n"
+            << (--indent) << blue << "</Vehicle>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_HPP_

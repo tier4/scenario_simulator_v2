@@ -18,10 +18,9 @@
 #undef NDEBUG
 
 #include <boost/filesystem.hpp>
+#include <memory>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-
-#include <memory>
 #include <string>
 
 namespace openscenario_interpreter
@@ -34,7 +33,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp")
 {
-  #define DECLARE_PARAMETER(IDENTIFIER) \
+#define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
 
   DECLARE_PARAMETER(intended_result);
@@ -43,15 +42,14 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
 
-  #undef DECLARE_PARAMETER
+#undef DECLARE_PARAMETER
 }
 
-Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) try
-{
+Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
+try {
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  #define GET_PARAMETER(IDENTIFIER) \
-  get_parameter(#IDENTIFIER, IDENTIFIER)
+#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
 
   GET_PARAMETER(intended_result);
   GET_PARAMETER(local_frame_rate);
@@ -59,13 +57,12 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) t
   GET_PARAMETER(osc_path);
   GET_PARAMETER(output_directory);
 
-  #undef GET_PARAMETER
+#undef GET_PARAMETER
 
   script.rebind<OpenScenario>(osc_path);
 
   connect(
-    shared_from_this(),
-    boost::filesystem::path(osc_path).replace_extension(""),
+    shared_from_this(), boost::filesystem::path(osc_path).replace_extension(""),
     script.as<OpenScenario>().scope.logic_file.string());  // NOTE: /path/to/lanelet2_map.osm
 
   const auto interval_upper_bound = 1 / local_frame_rate * local_real_time_factor;
@@ -81,34 +78,29 @@ Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &) t
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
   timer = create_wall_timer(
-    std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000)),
-    [this]()
-    {
-      withExceptionHandler(
-        [this]()
-        {
-          if (script) {
-            if (!script.as<OpenScenario>().complete()) {
-              script.as<OpenScenario>().evaluate();
-              #ifndef NDEBUG
-              RCLCPP_INFO(
-                get_logger(),
-                "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
-                openscenario_interpreter::standby_state.use_count() - 1,
-                openscenario_interpreter::start_transition.use_count() - 1,
-                openscenario_interpreter::running_state.use_count() - 1,
-                openscenario_interpreter::stop_transition.use_count() - 1,
-                openscenario_interpreter::complete_state.use_count() - 1);
-              #endif
+    std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000)), [this]() {
+      withExceptionHandler([this]() {
+        if (script) {
+          if (!script.as<OpenScenario>().complete()) {
+            script.as<OpenScenario>().evaluate();
+#ifndef NDEBUG
+            RCLCPP_INFO(
+              get_logger(), "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
+              openscenario_interpreter::standby_state.use_count() - 1,
+              openscenario_interpreter::start_transition.use_count() - 1,
+              openscenario_interpreter::running_state.use_count() - 1,
+              openscenario_interpreter::stop_transition.use_count() - 1,
+              openscenario_interpreter::complete_state.use_count() - 1);
+#endif
+          } else {
+            if (intended_result == "success") {
+              report(SUCCESS, "intended-success");
             } else {
-              if (intended_result == "success") {
-                report(SUCCESS, "intended-success");
-              } else {
-                report(FAILURE, "unintended-success", "expected " + intended_result);
-              }
+              report(FAILURE, "unintended-success", "expected " + intended_result);
             }
           }
-        });
+        }
+      });
     });
 
   return Interpreter::Result::SUCCESS;

@@ -23,12 +23,11 @@
 #ifndef TRAFFIC_SIMULATOR__COLOR_UTILS__COLOR_UTILS_HPP_
 #define TRAFFIC_SIMULATOR__COLOR_UTILS__COLOR_UTILS_HPP_
 
-#include <std_msgs/msg/color_rgba.hpp>
-
 #include <stdio.h>
 
 #include <cassert>
 #include <map>
+#include <std_msgs/msg/color_rgba.hpp>
 #include <string>
 
 namespace color_utils

@@ -16,34 +16,30 @@
 #define OPENSCENARIO_INTERPRETER__CONSOLE__ESCAPE_SEQUENCE_HPP_
 
 #include <openscenario_interpreter/console/is_console.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace console
 {
-template<typename ... Ts>
+template <typename... Ts>
 auto & escape_sequence(std::basic_ostream<Ts...> & os, const std::string & code)
 {
   return is_console(os) ? (os << "\x1b" << code) : os;
 }
 
-  #define BOILERPLATE(CODE, NAME) \
-  auto NAME = [](std::ostream & os) -> decltype(auto) \
-  { \
-    return escape_sequence(os, CODE); \
-  }
+#define BOILERPLATE(CODE, NAME) \
+  auto NAME = [](std::ostream & os) -> decltype(auto) { return escape_sequence(os, CODE); }
 
 BOILERPLATE("[0m", reset);
 BOILERPLATE("[1m", bold);
 BOILERPLATE("[2m", faint);
-BOILERPLATE("[3m", italic);   // Not widely supported. Sometimes treated as inverse.
+BOILERPLATE("[3m", italic);  // Not widely supported. Sometimes treated as inverse.
 BOILERPLATE("[4m", underline);
 BOILERPLATE("[5m", slow_blink);   // Less than 150 per minite.
-BOILERPLATE("[6m", rapid_blink);   // More than 150 per minite. Not widely supported.
+BOILERPLATE("[6m", rapid_blink);  // More than 150 per minite. Not widely supported.
 BOILERPLATE("[7m", reverse);
-BOILERPLATE("[8m", conceal);   // Not widely supported.
+BOILERPLATE("[8m", conceal);  // Not widely supported.
 
 inline namespace foreground
 {
@@ -69,8 +65,8 @@ BOILERPLATE("[46m", cyan);
 BOILERPLATE("[47m", white);
 }  // namespace background
 
-  #undef BOILERPLATE
-}
+#undef BOILERPLATE
+}  // namespace console
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__CONSOLE__ESCAPE_SEQUENCE_HPP_

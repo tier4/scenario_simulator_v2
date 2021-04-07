@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/metrics/reaction_time_metric.hpp>
-
 #include <string>
+#include <traffic_simulator/metrics/reaction_time_metric.hpp>
 
 namespace metrics
 {
 ReactionTimeMetric::ReactionTimeMetric(
-  std::string target_entity,
-  double maximum_reaction_time,
-  double jerk_upper_threashold,
-  double jerk_lower_threashold,
-  bool check_upper_threashold,
-  bool check_lower_threashold)
+  std::string target_entity, double maximum_reaction_time, double jerk_upper_threashold,
+  double jerk_lower_threashold, bool check_upper_threashold, bool check_lower_threashold)
 : MetricBase("ReactionTime"),
   target_entity(target_entity),
   maximum_reaction_time(maximum_reaction_time),
@@ -36,10 +31,7 @@ ReactionTimeMetric::ReactionTimeMetric(
   elapsed_duration_ = 0;
 }
 
-bool ReactionTimeMetric::activateTrigger()
-{
-  return true;
-}
+bool ReactionTimeMetric::activateTrigger() { return true; }
 
 void ReactionTimeMetric::update()
 {

@@ -17,12 +17,11 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
-
-#include <vector>
 #include <string>
-#include <memory>
+#include <vector>
 
 namespace sensor_simulator
 {
@@ -33,8 +32,7 @@ public:
     const simulation_api_schema::LidarConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
   void update(
-    double current_time,
-    const std::vector<openscenario_msgs::EntityStatus> & status,
+    double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
     const rclcpp::Time & stamp);
   const std::vector<std::string> & getDetectedObjects() const;
 
@@ -42,8 +40,7 @@ private:
   simulation_api_schema::LidarConfiguration configuration_;
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr_;
   const sensor_msgs::msg::PointCloud2 raycast(
-    const std::vector<openscenario_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp);
+    const std::vector<openscenario_msgs::EntityStatus> & status, const rclcpp::Time & stamp);
   double last_update_stamp_;
   std::vector<std::string> detected_objects_;
 };

@@ -17,43 +17,39 @@
 
 #include <boost/optional.hpp>
 #include <chrono>
-#include <string>
 #include <iostream>
+#include <string>
 
 namespace traffic_simulator
 {
 namespace helper
 {
-template<typename T>
+template <typename T>
 class StopWatch
 {
 public:
-  explicit StopWatch(const std::string & name)
-  : name(name) {}
+  explicit StopWatch(const std::string & name) : name(name) {}
   void start()
   {
     end_time = boost::none;
     start_time = std::chrono::system_clock::now();
   }
-  void stop()
-  {
-    end_time = std::chrono::system_clock::now();
-  }
+  void stop() { end_time = std::chrono::system_clock::now(); }
   void print()
   {
     if (start_time && end_time) {
       double elapsed = std::chrono::duration_cast<T>(end_time.get() - start_time.get()).count();
       if (typeid(T) == typeid(std::chrono::microseconds)) {
-        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds" <<
-          std::endl;
+        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds"
+                  << std::endl;
       }
       if (typeid(T) == typeid(std::chrono::milliseconds)) {
-        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " milliseconds" <<
-          std::endl;
+        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " milliseconds"
+                  << std::endl;
       }
       if (typeid(T) == typeid(std::chrono::seconds)) {
-        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " seconds" <<
-          std::endl;
+        std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " seconds"
+                  << std::endl;
       }
     }
   }

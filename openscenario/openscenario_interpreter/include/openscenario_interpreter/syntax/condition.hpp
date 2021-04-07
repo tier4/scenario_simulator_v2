@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/syntax/by_entity_condition.hpp>
 #include <openscenario_interpreter/syntax/by_value_condition.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -38,8 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Condition
-  : public Element
+struct Condition : public Element
 {
   const String name;
 
@@ -47,24 +45,19 @@ struct Condition
 
   const ConditionEdge condition_edge;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Condition(const Node & node, Scope & scope)
-  : Element(
-      choice(
-        node,
-        std::make_pair(
-          "ByEntityCondition", [&](auto && node)
-          {
-            return make<ByEntityCondition>(node, scope);
-          }),
-        std::make_pair(
-          "ByValueCondition", [&](auto && node) {
-            return make<ByValueCondition>(node, scope);
-          }))),
+  : Element(choice(
+      node,
+      std::make_pair(
+        "ByEntityCondition", [&](auto && node) { return make<ByEntityCondition>(node, scope); }),
+      std::make_pair(
+        "ByValueCondition", [&](auto && node) { return make<ByValueCondition>(node, scope); }))),
     name(readAttribute<String>("name", node, scope)),
     delay(readAttribute<Double>("delay", node, scope, Double())),
     condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope))
-  {}
+  {
+  }
 
   Element result = false_v;
 
@@ -77,7 +70,7 @@ struct Condition
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_

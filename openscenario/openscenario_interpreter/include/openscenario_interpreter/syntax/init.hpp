@@ -30,18 +30,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Init
-  : public InitActions
+struct Init : public InitActions
 {
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit Init(const Node & node, Scope & scope)
   : InitActions(readElement<InitActions>("Actions", node, scope))
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__INIT_HPP_

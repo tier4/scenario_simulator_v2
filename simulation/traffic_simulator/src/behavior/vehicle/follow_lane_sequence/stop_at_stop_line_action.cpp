@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
-
-#include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace entity_behavior
 {
@@ -27,8 +26,7 @@ namespace vehicle
 namespace follow_lane_sequence
 {
 StopAtStopLineAction::StopAtStopLineAction(
-  const std::string & name,
-  const BT::NodeConfiguration & config)
+  const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
   stopped_ = false;
@@ -64,8 +62,7 @@ const openscenario_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWayp
       boost::algorithm::clamp(entity_status.action_status.twist.linear.x * 5, 20, 50);
     traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(route_lanelets));
     waypoints.waypoints = spline.getTrajectory(
-      entity_status.lanelet_pose.s,
-      entity_status.lanelet_pose.s + horizon, 1.0);
+      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + horizon, 1.0);
     return waypoints;
   } else {
     return openscenario_msgs::msg::WaypointsArray();
@@ -77,8 +74,8 @@ boost::optional<double> StopAtStopLineAction::calculateTargetSpeed(double curren
   if (!distance_to_stopline_) {
     return boost::none;
   }
-  double rest_distance = distance_to_stopline_.get() -
-    (vehicle_parameters.bounding_box.dimensions.x);
+  double rest_distance =
+    distance_to_stopline_.get() - (vehicle_parameters.bounding_box.dimensions.x);
   if (rest_distance < calculateStopDistance()) {
     if (rest_distance > 0) {
       return std::sqrt(2 * 5 * rest_distance);
@@ -129,8 +126,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   }
-  auto target_linear_speed =
-    calculateTargetSpeed(entity_status.action_status.twist.linear.x);
+  auto target_linear_speed = calculateTargetSpeed(entity_status.action_status.twist.linear.x);
   if (!target_linear_speed) {
     stopped_ = false;
     return BT::NodeStatus::FAILURE;

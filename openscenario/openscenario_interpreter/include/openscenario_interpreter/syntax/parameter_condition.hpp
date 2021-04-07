@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 
 #include <openscenario_interpreter/syntax/rule.hpp>
-
 #include <string>
 #include <typeindex>
 #include <unordered_map>
@@ -45,98 +44,81 @@ struct ParameterCondition
 
   Scope inner_scope;
 
-  template<typename Node>
+  template <typename Node>
   explicit ParameterCondition(const Node & node, Scope & outer_scope)
   : parameter_ref(readAttribute<String>("parameterRef", node, outer_scope)),
     value(readAttribute<String>("value", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
     inner_scope(outer_scope)
-  {}
+  {
+  }
 
   auto evaluate() const
   {
     static const std::unordered_map<
-      std::type_index,
-      std::function<bool(const Rule, const Element &, const String &)>
-    >
-    overloads
-    {
-      {
-        typeid(Integer), [](auto && compare, auto && lhs, auto && rhs)
-        {
-          return compare(lhs.template as<Integer>(), boost::lexical_cast<Integer>(rhs));
-        }
-      },
+      std::type_index, std::function<bool(const Rule, const Element &, const String &)> >
+      overloads{
+        {typeid(Integer),
+         [](auto && compare, auto && lhs, auto && rhs) {
+           return compare(lhs.template as<Integer>(), boost::lexical_cast<Integer>(rhs));
+         }},
 
-      {
-        typeid(Double), [](auto && compare, auto && lhs, auto && rhs)
-        {
-          return compare(lhs.template as<Double>(), boost::lexical_cast<Double>(rhs));
-        }
-      },
+        {typeid(Double),
+         [](auto && compare, auto && lhs, auto && rhs) {
+           return compare(lhs.template as<Double>(), boost::lexical_cast<Double>(rhs));
+         }},
 
-      {
-        typeid(String), [](auto && compare, auto && lhs, auto && rhs)
-        {
-          return compare(lhs.template as<String>(), rhs);
-        }
-      },
+        {typeid(String),
+         [](auto && compare, auto && lhs, auto && rhs) {
+           return compare(lhs.template as<String>(), rhs);
+         }},
 
-      {
-        typeid(UnsignedInteger), [](auto && compare, auto && lhs, auto && rhs)
-        {
-          return compare(
-            lhs.template as<UnsignedInteger>(), boost::lexical_cast<UnsignedInteger>(rhs));
-        }
-      },
+        {typeid(UnsignedInteger),
+         [](auto && compare, auto && lhs, auto && rhs) {
+           return compare(
+             lhs.template as<UnsignedInteger>(), boost::lexical_cast<UnsignedInteger>(rhs));
+         }},
 
-      {
-        typeid(UnsignedShort), [](auto && compare, auto && lhs, auto && rhs)
-        {
-          return compare(lhs.template as<UnsignedShort>(), boost::lexical_cast<UnsignedShort>(rhs));
-        }
-      },
+        {typeid(UnsignedShort),
+         [](auto && compare, auto && lhs, auto && rhs) {
+           return compare(
+             lhs.template as<UnsignedShort>(), boost::lexical_cast<UnsignedShort>(rhs));
+         }},
 
-      {
-        typeid(Boolean), [](auto && compare, auto && lhs, auto && rhs)
-        {
-          return compare(lhs.template as<Boolean>(), boost::lexical_cast<Boolean>(rhs));
-        }
-      },
-    };
-
-    const auto target {
-      inner_scope.parameters.find(parameter_ref)
-    };
-
-    if (target != std::end(inner_scope.parameters)) {
-      const auto iter {
-        overloads.find(std::get<1>(*target).type())
+        {typeid(Boolean),
+         [](auto && compare, auto && lhs, auto && rhs) {
+           return compare(lhs.template as<Boolean>(), boost::lexical_cast<Boolean>(rhs));
+         }},
       };
 
+    const auto target{inner_scope.parameters.find(parameter_ref)};
+
+    if (target != std::end(inner_scope.parameters)) {
+      const auto iter{overloads.find(std::get<1>(*target).type())};
+
       if (iter != std::end(overloads)) {
-        #ifndef NDEBUG
-        std::cout << "ParameterCondition: " << std::get<1>(*target) << " " << compare << " " <<
-          value << " => ";
-        #endif
+#ifndef NDEBUG
+        std::cout << "ParameterCondition: " << std::get<1>(*target) << " " << compare << " "
+                  << value << " => ";
+#endif
         const auto result =
-          std::get<1>(* iter)(compare, std::get<1>(*target), value) ? true_v : false_v;
-        #ifndef NDEBUG
+          std::get<1>(*iter)(compare, std::get<1>(*target), value) ? true_v : false_v;
+#ifndef NDEBUG
         std::cout << result << std::endl;
-        #endif
+#endif
         return result;
       } else {
         throw SemanticError(
-                "No viable operation '" + boost::lexical_cast<std::string>(compare) +
-                "' with parameter '" + parameter_ref +
-                "' and value '" + boost::lexical_cast<std::string>(value) + "'");
+          "No viable operation '" + boost::lexical_cast<std::string>(compare) +
+          "' with parameter '" + parameter_ref + "' and value '" +
+          boost::lexical_cast<std::string>(value) + "'");
       }
     } else {
       throw SemanticError("No such parameter '" + parameter_ref + "'");
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_

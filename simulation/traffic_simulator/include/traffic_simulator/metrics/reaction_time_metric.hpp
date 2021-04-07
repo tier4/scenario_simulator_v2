@@ -15,9 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__REACTION_TIME_METRIC_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__REACTION_TIME_METRIC_HPP_
 
-#include <traffic_simulator/metrics/metric_base.hpp>
-
 #include <string>
+#include <traffic_simulator/metrics/metric_base.hpp>
 
 namespace metrics
 {
@@ -25,11 +24,8 @@ class ReactionTimeMetric : public MetricBase
 {
 public:
   explicit ReactionTimeMetric(
-    std::string target_entity,
-    double maximum_reaction_time,
-    double jerk_upper_threashold,
-    double jerk_lower_threashold,
-    bool check_upper_threashold = true,
+    std::string target_entity, double maximum_reaction_time, double jerk_upper_threashold,
+    double jerk_lower_threashold, bool check_upper_threashold = true,
     bool check_lower_threashold = true);
   ~ReactionTimeMetric() override = default;
   void update() override;

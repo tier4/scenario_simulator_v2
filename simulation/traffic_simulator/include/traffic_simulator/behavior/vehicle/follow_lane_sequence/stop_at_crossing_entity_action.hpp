@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef \
-  TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
-#define \
-  TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
-
-#include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/behavior/vehicle/vehicle_action_node.hpp>
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__STOP_AT_CROSSING_ENTITY_ACTION_HPP_
 
 #include <openscenario_msgs/msg/entity_trajectory.hpp>
-
 #include <string>
+#include <traffic_simulator/behavior/vehicle/vehicle_action_node.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -45,8 +41,7 @@ public:
     }
     return ports;
   }
-  boost::optional<double> calculateTargetSpeed(
-    double current_velocity);
+  boost::optional<double> calculateTargetSpeed(double current_velocity);
   const openscenario_msgs::msg::WaypointsArray calculateWaypoints() override;
   const boost::optional<openscenario_msgs::msg::Obstacle> calculateObstacle(
     const openscenario_msgs::msg::WaypointsArray & waypoints) override;

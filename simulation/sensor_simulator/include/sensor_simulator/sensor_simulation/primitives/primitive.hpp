@@ -15,13 +15,12 @@
 #ifndef SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
 #define SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
 
-#include <geometry_msgs/msg/pose.hpp>
-
 #include <embree3/rtcore.h>
 
+#include <algorithm>
+#include <geometry_msgs/msg/pose.hpp>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 namespace sensor_simulator
 {
