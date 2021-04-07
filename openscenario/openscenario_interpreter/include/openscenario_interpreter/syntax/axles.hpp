@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_
 
 #include <openscenario_interpreter/syntax/axle.hpp>
+#include <openscenario_msgs/msg/axles.hpp>
 
 #include <vector>
 
@@ -23,7 +24,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Axles ================================================================
+/* ---- Axles ------------------------------------------------------------------
  *
  * <xsd:complexType name="Axles">
  *   <xsd:sequence>
@@ -33,7 +34,7 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Axles
 {
   const FrontAxle front_axle;
@@ -46,8 +47,8 @@ struct Axles
 
   template<typename Node, typename Scope>
   explicit Axles(const Node & node, Scope & scope)
-  : front_axle{readElement<FrontAxle>("FrontAxle", node, scope)},
-    rear_axle{readElement<RearAxle>("RearAxle", node, scope)}
+  : front_axle(readElement<FrontAxle>("FrontAxle", node, scope)),
+    rear_axle(readElement<RearAxle>("RearAxle", node, scope))
   {
     callWithElements(
       node, "AdditionalAxle", 0, unbounded, [&](auto && node)
@@ -55,22 +56,21 @@ struct Axles
         additional_axles.emplace_back(node, scope);
       });
   }
+
+  explicit operator openscenario_msgs::msg::Axles() const
+  {
+    openscenario_msgs::msg::Axles axles {};
+    {
+      axles.front_axle = static_cast<openscenario_msgs::msg::Axle>(front_axle);
+      axles.rear_axle = static_cast<openscenario_msgs::msg::Axle>(rear_axle);
+    }
+
+    return axles;
+  }
 };
 
-template<typename ... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Axles & rhs)
-{
-  os << (indent++) << blue << "<Axles>\n" << reset <<
-    rhs.front_axle << "\n" <<
-    rhs.rear_axle << "\n";
-
-  for (const auto & each : rhs.additional_axles) {
-    os << each << "\n";
-  }
-
-  return os << (--indent) << blue << "</Axles>" << reset;
-}
-}
+std::ostream & operator<<(std::ostream &, const Axles &);
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__AXLES_HPP_

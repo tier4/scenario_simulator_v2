@@ -17,22 +17,23 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_msgs/msg/axle.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Axle =================================================================
+/* ---- Axle -------------------------------------------------------------------
  *
- * <xsd:complexType name="Axle">
- *   <xsd:attribute name="maxSteering" type="Double" use="required"/>
- *   <xsd:attribute name="wheelDiameter" type="Double" use="required"/>
- *   <xsd:attribute name="trackWidth" type="Double" use="required"/>
- *   <xsd:attribute name="positionX" type="Double" use="required"/>
- *   <xsd:attribute name="positionZ" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Axle">
+ *    <xsd:attribute name="maxSteering" type="Double" use="required"/>
+ *    <xsd:attribute name="wheelDiameter" type="Double" use="required"/>
+ *    <xsd:attribute name="trackWidth" type="Double" use="required"/>
+ *    <xsd:attribute name="positionX" type="Double" use="required"/>
+ *    <xsd:attribute name="positionZ" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Axle
 {
   const Double max_steering, wheel_diameter, track_width, position_x, position_z;
@@ -41,28 +42,29 @@ struct Axle
 
   template<typename Node, typename Scope>
   explicit Axle(const Node & node, Scope & scope)
-  : max_steering{readAttribute<Double>("maxSteering", node, scope)},
-    wheel_diameter{readAttribute<Double>("wheelDiameter", node, scope)},
-    track_width{readAttribute<Double>("trackWidth", node, scope)},
-    position_x{readAttribute<Double>("positionX", node, scope)},
-    position_z{readAttribute<Double>("positionZ", node, scope)}
+  : max_steering(readAttribute<Double>("maxSteering", node, scope)),
+    wheel_diameter(readAttribute<Double>("wheelDiameter", node, scope)),
+    track_width(readAttribute<Double>("trackWidth", node, scope)),
+    position_x(readAttribute<Double>("positionX", node, scope)),
+    position_z(readAttribute<Double>("positionZ", node, scope))
   {}
+
+  explicit operator openscenario_msgs::msg::Axle() const
+  {
+    openscenario_msgs::msg::Axle axle {};
+    {
+      axle.max_steering = max_steering;
+      axle.wheel_diameter = wheel_diameter;
+      axle.track_width = track_width;
+      axle.position_x = position_x;
+      axle.position_z = position_z;
+    }
+
+    return axle;
+  }
 };
 
-#define BOILERPLATE(TYPENAME) \
-  template<typename ... Ts> \
-  std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const TYPENAME & rhs) \
-  { \
-    return os << indent << blue << "<" #TYPENAME << " " << \
-           highlight("maxSteering", rhs.max_steering) \
-              << " " << highlight("wheelDiameter", rhs.wheel_diameter) \
-              << " " << highlight("trackWidth", rhs.track_width) \
-              << " " << highlight("positionX", rhs.position_x) \
-              << " " << highlight("positionZ", rhs.position_z) << blue << "/>" << reset; \
-  } \
-  static_assert(true, "")
-
-BOILERPLATE(Axle);
+std::ostream & operator<<(std::ostream &, const Axle &);
 
 // NOTE: DON'T REWRITE THIS STRUCT LIKE `using FrontAxle = Axle` (for Clang)
 struct FrontAxle
@@ -71,7 +73,7 @@ struct FrontAxle
   using Axle::Axle;
 };
 
-BOILERPLATE(FrontAxle);
+std::ostream & operator<<(std::ostream &, const FrontAxle &);
 
 // NOTE: DON'T REWRITE THIS STRUCT LIKE `using RearAxle = Axle` (for Clang)
 struct RearAxle
@@ -80,7 +82,7 @@ struct RearAxle
   using Axle::Axle;
 };
 
-BOILERPLATE(RearAxle);
+std::ostream & operator<<(std::ostream &, const RearAxle &);
 
 // NOTE: DON'T REWRITE THIS STRUCT LIKE `using AdditionalAxle = Axle` (for Clang)
 struct AdditionalAxle
@@ -89,9 +91,7 @@ struct AdditionalAxle
   using Axle::Axle;
 };
 
-BOILERPLATE(AdditionalAxle);
-
-  #undef BOILERPLATE
+std::ostream & operator<<(std::ostream &, const AdditionalAxle &);
 }
 }  // namespace openscenario_interpreter
 
