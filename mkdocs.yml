@@ -38,6 +38,9 @@ extra_javascript:
 
 nav:
   - Home: README.md
+  - Tutorials:
+    - tutorials/BuildInstructions.md
+    - tutorials/SimpleDemo.md
   - User Guide:
     - Scenario Editor:
       - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md

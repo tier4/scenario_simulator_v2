@@ -1,6 +1,7 @@
 name: ROS2-Foxy
 
 on:
+  workflow_dispatch:
   schedule:
   - cron: 0 0 * * *
   pull_request:
@@ -29,8 +30,8 @@ jobs:
 
       - name: Copy repository
         run: |
-          mkdir -p ~/ros2_ws/src/scenario_simulator.auto
-          cp -rf . ~/ros2_ws/src/scenario_simulator.auto
+          mkdir -p ~/ros2_ws/src/scenario_simulator_v2
+          cp -rf . ~/ros2_ws/src/scenario_simulator_v2
 
       - name: Install dependencies
         run: |
@@ -38,7 +39,7 @@ jobs:
           sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
           cd ~/ros2_ws
-          vcs import src < src/scenario_simulator.auto/dependency.repos
+          vcs import src < src/scenario_simulator_v2/dependency.repos
           rosdep install -iry --from-paths src --rosdistro foxy
 
       - name: Dirty Hacks

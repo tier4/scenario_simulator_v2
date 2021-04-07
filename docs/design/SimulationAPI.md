@@ -1,7 +1,7 @@
 # Simulation API
 
-Simulation API provides C++ API to control NPC behavior in simulation.
-Sample code is below.
+Simulation API provides an C++ API to control NPC behavior in simulation.
+The sample code is below.
 
 ## minimal example
 ```c++

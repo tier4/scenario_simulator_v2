@@ -1,16 +1,25 @@
 name: Documentation
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: 0 0 * * *
   push:
-
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+    
 jobs:
     job1:
         name: Generate Documentation
         runs-on: ubuntu-18.04
         steps:
         - uses: actions/checkout@v2-beta
+        - uses: docker-practice/actions-setup-docker@master
+        - name: run protoc-gen-doc
+          run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
         - name: Set up Python
           uses: actions/setup-python@v1
           with:
@@ -83,6 +92,12 @@ jobs:
             name: site
             path: site
             retention-days: 1
+        - name: Publish Report
+          if: ${{ github.event_name == 'push' || github.event_name == 'schedule'}}
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: site
         - name: Slack Notification
           uses: 8398a7/action-slack@v2
           if: failure()

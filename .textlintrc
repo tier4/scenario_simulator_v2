@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "textlint-rule-ginger": {
+      "skipPatterns": [
+        "...",
+        "/Configuration/",
+        "/Request/",
+        "/Response/",
+        ":fa-chrome:",
+        ":fa-envelope:",
+        ":fa-github:",
+        "Accel",
+        "Autoware",
+        "CatalogLocations",
+        "EntityStatus",
+        "LaneChangeTarget",
+        "LanePosition",
+        "LaneletPose",
+        "OpenSCENARIO",
+        "PedestrianParameters",
+        "SimulationTime",
+        "StoryBoard",
+        "SyntaxError",
+        "TierIV",
+        "VehicleParameters",
+        "WorldPosition",
+        "ZeroMQ",
+        "alongRoute",
+        "despawning",
+        "dynamicsDimention",
+        "dynamicsShape",
+        "freespace",
+        "github",
+        "gt",
+        "kashiwanoha",
+        "lidar",
+        "lx",
+        "osm",
+        "protobuf",
+        "rviz",
+        "sh",
+        "type",
+        "xosc",
+        "yamacir-kit",
+        "yaml"
+      ]
+    }
+  }
+}

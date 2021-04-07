@@ -26,7 +26,6 @@ set(PROTO_FILES
   "proto/geometry_msgs.proto"
   "proto/openscenario_msgs.proto"
   "proto/simulation_api_schema.proto"
-  "proto/test.proto"
 )
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
 include_directories(

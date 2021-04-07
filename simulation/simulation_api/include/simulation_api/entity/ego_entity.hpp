@@ -202,7 +202,7 @@ public:
         auto child =
           [&]()
           {
-            DEBUG_VALUE(lanelet2_map_osm);
+            // DEBUG_VALUE(lanelet2_map_osm);
 
             const std::vector<std::string> argv {
               "python3",
@@ -214,9 +214,9 @@ public:
               std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()
             };
 
-            for (const auto & each : argv) {
-              std::cout << each << (&each != &argv.back() ? ' ' : '\n');
-            }
+            // for (const auto & each : argv) {
+            //   std::cout << each << (&each != &argv.back() ? ' ' : '\n');
+            // }
 
             #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
             const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
@@ -311,8 +311,6 @@ public:
     const auto current_entity_status = getStatus();
 
     if (!std::exchange(autoware_initialized, true)) {
-      std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
-
       waitForAutowareStateToBeInitializingVehicle(
         [&]()
         {
@@ -330,6 +328,7 @@ public:
       waitForAutowareStateToBeWaitingForRoute(
         [&]()
         {
+          std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
           return updateAutoware(current_entity_status.pose);
         });
     }
@@ -394,7 +393,7 @@ public:
 
   const std::string getCurrentAction() const
   {
-    return "none";
+    return std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;
   }
 
   void onUpdate(double current_time, double step_time);
