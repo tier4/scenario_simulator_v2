@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 #include <utility>
 
@@ -51,8 +50,7 @@ inline namespace syntax
  * ======================================================================== */
 struct VehicleCategory
 {
-  enum value_type
-  {
+  enum value_type {
     bicycle,
     bus,
     car,
@@ -65,28 +63,24 @@ struct VehicleCategory
     van,
   } value;
 
-  explicit constexpr VehicleCategory(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr VehicleCategory(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCategory & category)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                   \
+  if (buffer == #IDENTIFIER) {                    \
     category.value = VehicleCategory::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                    \
+  }                                               \
+  static_assert(true, "")
 
   BOILERPLATE(bicycle);
   BOILERPLATE(bus);
@@ -94,16 +88,16 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
   BOILERPLATE(motorbike);
   BOILERPLATE(truck);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    std::stringstream ss { \
-    }; \
-    ss << "given value \'" << buffer << \
-      "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
-    throw ImplementationFault {ss.str()}; \
-  } static_assert(true, "")
+#define BOILERPLATE(IDENTIFIER)                                                              \
+  if (buffer == #IDENTIFIER) {                                                               \
+    std::stringstream ss{};                                                                  \
+    ss << "given value \'" << buffer                                                         \
+       << "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
+    throw ImplementationFault{ss.str()};                                                     \
+  }                                                                                          \
+  static_assert(true, "")
 
   BOILERPLATE(semitrailer);
   BOILERPLATE(trailer);
@@ -111,20 +105,21 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, VehicleCa
   BOILERPLATE(tram);
   BOILERPLATE(van);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type VehicleCategory";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const VehicleCategory & category)
+  std::basic_ostream<Ts...> & os, const VehicleCategory & category)
 {
   switch (category) {
-    #define BOILERPLATE(NAME) case VehicleCategory::NAME: return os << #NAME;
+#define BOILERPLATE(NAME)     \
+  case VehicleCategory::NAME: \
+    return os << #NAME;
 
     BOILERPLATE(bicycle);
     BOILERPLATE(bus);
@@ -137,16 +132,16 @@ std::basic_ostream<Ts...> & operator<<(
     BOILERPLATE(truck);
     BOILERPLATE(van);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class VehicleCategory holds unexpected value " <<
-        static_cast<VehicleCategory::value_type>(category);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class VehicleCategory holds unexpected value "
+         << static_cast<VehicleCategory::value_type>(category);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_

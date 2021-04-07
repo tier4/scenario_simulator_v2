@@ -62,14 +62,12 @@ struct Property
    * ------------------------------------------------------------------------ */
   Property() = default;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit Property(const Node & node, Scope & outer_scope)
   : name(readAttribute<Name>("name", node, outer_scope)),
     value(readAttribute<Value>("value", node, outer_scope))
-  {}
+  {
+  }
 
   operator bool() const
   {

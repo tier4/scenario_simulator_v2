@@ -15,14 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTANCE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DISTANCE_CONDITION_HPP_
 
+#include <cmath>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-
-#include <cmath>
 
 namespace openscenario_interpreter
 {
@@ -86,7 +85,7 @@ struct DistanceCondition
    * ------------------------------------------------------------------------ */
   const Position position;
 
-  template<typename Node>
+  template <typename Node>
   explicit DistanceCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),
@@ -95,21 +94,18 @@ struct DistanceCondition
     compare(readAttribute<Rule>("rule", node, outer_scope)),
     position(readElement<Position>("Position", node, outer_scope)),
     for_each(triggering_entities)
-  {}
+  {
+  }
 
   const TriggeringEntities for_each;
 
   auto evaluate()
   {
-    return asBoolean(
-      for_each(
-        [&](auto && triggering_entity)
-        {
-          const auto pose = getRelativePose(
-            triggering_entity,
-            static_cast<geometry_msgs::msg::Pose>(position));
-          return compare(std::hypot(pose.position.x, pose.position.y), value);
-        }));
+    return asBoolean(for_each([&](auto && triggering_entity) {
+      const auto pose =
+        getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      return compare(std::hypot(pose.position.x, pose.position.y), value);
+    }));
   }
 };
 }  // namespace syntax

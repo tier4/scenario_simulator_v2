@@ -5,22 +5,22 @@
 ### Simulation API Package
 Provide simulator API for scenario testing.
 
-- [Classes](/package/simulation_api/markdown/Classes)
-- [Namespaces](/package/simulation_api/markdown/Namespaces)
-- [Modules](/package/simulation_api/markdown/Modules)
-- [Files](/package/simulation_api/markdown/Files)
-- [Pages](/package/simulation_api/markdown/Pages)
-- [Examples](/package/simulation_api/markdown/Examples)
+- [Classes](/package/traffic_simulator/markdown/Classes)
+- [Namespaces](/package/traffic_simulator/markdown/Namespaces)
+- [Modules](/package/traffic_simulator/markdown/Modules)
+- [Files](/package/traffic_simulator/markdown/Files)
+- [Pages](/package/traffic_simulator/markdown/Pages)
+- [Examples](/package/traffic_simulator/markdown/Examples)
 
-### Scenario Simulator Package
-Simulator for scenario testing.
+### Simple Sensor Simulator Package
+Reference implementation of the simulator integrated with this package.
 
-- [Classes](/package/scenario_simulator/markdown/Classes)
-- [Namespaces](/package/scenario_simulator/markdown/Namespaces)
-- [Modules](/package/scenario_simulator/markdown/Modules)
-- [Files](/package/scenario_simulator/markdown/Files)
-- [Pages](/package/scenario_simulator/markdown/Pages)
-- [Examples](/package/scenario_simulator/markdown/Examples)
+- [Classes](/package/simple_sensor_simulator/markdown/Classes)
+- [Namespaces](/package/simple_sensor_simulator/markdown/Namespaces)
+- [Modules](/package/simple_sensor_simulator/markdown/Modules)
+- [Files](/package/simple_sensor_simulator/markdown/Files)
+- [Pages](/package/simple_sensor_simulator/markdown/Pages)
+- [Examples](/package/simple_sensor_simulator/markdown/Examples)
 
 ## OpenSCENARIO Packages
 ---

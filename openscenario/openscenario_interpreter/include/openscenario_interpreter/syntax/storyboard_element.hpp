@@ -18,7 +18,6 @@
 #include <boost/mpl/and.hpp>
 #include <boost/scope_exit.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
-
 #include <string>
 #include <type_traits>
 #include <unordered_set>
@@ -28,7 +27,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-template<typename T>
+template <typename T>
 class StoryboardElement
 {
 public:
@@ -42,18 +41,17 @@ public:
   : maximum_execution_count(maximum_execution_count),
     current_execution_count(0),
     current_state(standby_state)
-  {}
-
-  const auto & state() const
   {
-    return current_state;
   }
 
-  #define BOILERPLATE(NAME, STATE) \
-  constexpr auto NAME() const noexcept \
-  { \
+  const auto & state() const { return current_state; }
+
+#define BOILERPLATE(NAME, STATE)                                                           \
+  constexpr auto NAME() const noexcept                                                     \
+  {                                                                                        \
     return state().template as<StoryboardElementState>() == StoryboardElementState::STATE; \
-  } static_assert(true, "")
+  }                                                                                        \
+  static_assert(true, "")
 
   BOILERPLATE(standby, standbyState);
   BOILERPLATE(starting, startTransition);
@@ -63,42 +61,42 @@ public:
   BOILERPLATE(stopping, stopTransition);
   BOILERPLATE(skipping, skipTransition);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  template<typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
+  template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
   auto changeStateIf(
     Boolean && test, const Element & consequent_state, const Element & alternate_state)
   {
     if (test) {
-      #ifndef NDEBUG
+#ifndef NDEBUG
       std::cout << indent;
       std::cout << typeid(T).name();
       std::cout << "::evaluate [" << current_state << " => " << consequent_state << "]";
       std::cout << std::endl;
-      #endif
+#endif
       return current_state = consequent_state;
     } else {
       return current_state = alternate_state;
     }
   }
 
-  template<typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
+  template <typename Boolean, REQUIRES(std::is_convertible<Boolean, bool>)>
   decltype(auto) changeStateIf(Boolean && test, const Element & consequent_state)
   {
     return changeStateIf(test, consequent_state, current_state);
   }
 
-  template<typename Predicate, typename ... Ts, REQUIRES(std::is_function<Predicate>)>
-  decltype(auto) changeStateIf(Predicate && predicate, Ts && ... xs)
+  template <typename Predicate, typename... Ts, REQUIRES(std::is_function<Predicate>)>
+  decltype(auto) changeStateIf(Predicate && predicate, Ts &&... xs)
   {
     return changeStateIf(predicate(), std::forward<decltype(xs)>(xs)...);
   }
 
-  Element override ()
+  Element override()
   {
-    #ifndef NDEBUG
+#ifndef NDEBUG
     std::cout << state() << std::endl;
-    #endif
+#endif
     if (!complete() && !stopping()) {
       return current_state = stop_transition;
     } else {
@@ -107,15 +105,15 @@ public:
   }
 
 private:
-  static constexpr void start() noexcept
-  {}
+  static constexpr void start() noexcept {}
 
-  #define DEFINE_PERFECT_FORWARD(IDENTIFIER, CONST) \
-  template<typename ... Ts> \
-  constexpr decltype(auto) IDENTIFIER(Ts && ... xs) CONST \
-  { \
+#define DEFINE_PERFECT_FORWARD(IDENTIFIER, CONST)                                       \
+  template <typename... Ts>                                                             \
+  constexpr decltype(auto) IDENTIFIER(Ts &&... xs) CONST                                \
+  {                                                                                     \
     return static_cast<CONST T &>(*this).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-  } static_assert(true, "")
+  }                                                                                     \
+  static_assert(true, "")
 
   DEFINE_PERFECT_FORWARD(accomplished, const);
   DEFINE_PERFECT_FORWARD(ready, );
@@ -123,7 +121,7 @@ private:
   DEFINE_PERFECT_FORWARD(stop, );
   DEFINE_PERFECT_FORWARD(stopTriggered, );
 
-  #undef DEFINE_PERFECT_FORWARD
+#undef DEFINE_PERFECT_FORWARD
 
 protected:
   auto rename(const std::string & name) const
@@ -134,22 +132,18 @@ protected:
 
   std::unordered_set<std::string> names;
 
-  auto unique(const std::string & name)
-  {
-    return cdr(names.emplace(name));
-  }
+  auto unique(const std::string & name) { return cdr(names.emplace(name)); }
 
-  template<typename U, typename Node, typename Scope, typename ... Ts>
-  decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope, Ts && ... xs)
+  template <typename U, typename Node, typename Scope, typename... Ts>
+  decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
     const auto name = rename(readAttribute<String>("name", node, inner_scope));
 
     if (unique(name)) {
-      return
-        inner_scope.storyboard_elements[name] =
-          make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
+      return inner_scope.storyboard_elements[name] =
+               make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
     } else {
-      std::stringstream ss {};
+      std::stringstream ss{};
       ss << "detected redefinition of StoryboardElement named \'" << name << "\' ";
       ss << "(class " << typeid(U).name() << ")";
       throw SyntaxError(ss.str());
@@ -165,22 +159,19 @@ public:
   auto evaluate()
   {
     if (stopTriggered()) {
-      override ();
+      override();
     }
 
-    #ifndef NDEBUG
+#ifndef NDEBUG
     std::cout << (indent++);
     std::cout << "- evaluate: \x1b[36m";
     std::cout << std::quoted(static_cast<const T &>(*this).name);
     std::cout << "\x1b[0m";
     std::cout << " [" << current_state << "] ";
     std::cout << std::endl;
-    #endif
+#endif
 
-    BOOST_SCOPE_EXIT_ALL()
-    {
-      --indent;
-    };
+    BOOST_SCOPE_EXIT_ALL() { --indent; };
 
     switch (state().template as<StoryboardElementState>(__FILE__, __LINE__)) {
       /* ---- StandBy ----------------------------------------------------------
@@ -320,18 +311,18 @@ public:
           stop();
           return current_state;
         } else {
-          #ifndef NDEBUG
+#ifndef NDEBUG
           std::cout << indent;
           std::cout << typeid(T).name();
           std::cout << "::stop [" << current_state << " => " << complete_state << "]";
           std::cout << std::endl;
-          #endif
+#endif
           return current_state = complete_state;
         }
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_

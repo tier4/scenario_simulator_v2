@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/route_strategy.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -40,24 +39,23 @@ struct Waypoint
 
   const Position position;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Waypoint(const Node & node, Scope & outer_scope)
   : route_strategy(readAttribute<RouteStrategy>("routeStrategy", node, outer_scope)),
     position(readElement<Position>("Position", node, outer_scope))
-  {}
+  {
+  }
 
   explicit operator openscenario_msgs::msg::LaneletPose() const
   {
-    auto convert =
-      [](auto && position)
-      {
-        return static_cast<openscenario_msgs::msg::LaneletPose>(position);
-      };
+    auto convert = [](auto && position) {
+      return static_cast<openscenario_msgs::msg::LaneletPose>(position);
+    };
 
     return apply<openscenario_msgs::msg::LaneletPose>(convert, position);
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__WAYPOINT_HPP_

@@ -32,12 +32,13 @@ struct AbsoluteTargetSpeed
 {
   const Double value;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit AbsoluteTargetSpeed(const Node & node, Scope & scope)
   : value{readAttribute<Double>("value", node, scope)}
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_SPEED_HPP_

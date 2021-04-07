@@ -14,13 +14,11 @@
 
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <awapi_awauto_adapter/awapi_awauto_status_publisher.hpp>
-
 #include <string>
 
 namespace autoware_api
 {
-AutowareAutoStatusPublisher::AutowareAutoStatusPublisher(
-  const rclcpp::NodeOptions & options)
+AutowareAutoStatusPublisher::AutowareAutoStatusPublisher(const rclcpp::NodeOptions & options)
 : rclcpp::Node("awapi_awauto_state_pubrlisher", options)
 {
   // publisher
@@ -35,9 +33,7 @@ void AutowareAutoStatusPublisher::publish_autoware_status()
   autoware_status.control_mode = get_control_mode_info();
   autoware_status.gate_mode = get_gate_mode_info();
   autoware_status.emergency_stopped = get_emergency_info();
-  RCLCPP_INFO(
-    this->get_logger(), "AutowareStatus %i",
-    autoware_status.header.stamp);
+  RCLCPP_INFO(this->get_logger(), "AutowareStatus %i", autoware_status.header.stamp);
   pub_autoware_status_->publish(autoware_status);
 }
 std::string AutowareAutoStatusPublisher::get_autoware_state_info()

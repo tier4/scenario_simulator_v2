@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__COMMAND_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -30,23 +29,16 @@ inline namespace syntax
  * ======================================================================== */
 struct Command
 {
-  enum value_type
-  {
+  enum value_type {
     exitFailure,
     exitSuccess,
     nop,
     print,
-  }
-  value;
+  } value;
 
-  explicit constexpr Command(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr Command(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 
   decltype(auto) operator=(const value_type & rhs)
   {
@@ -55,17 +47,17 @@ struct Command
   }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command & command)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)    \
+  if (buffer == #IDENTIFIER) {     \
     command = Command::IDENTIFIER; \
-    return is; \
+    return is;                     \
   }
 
   BOILERPLATE(exitFailure);
@@ -73,34 +65,36 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command &
   BOILERPLATE(nop);
   BOILERPLATE(print);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type Command";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Command & command)
 {
   switch (command) {
-    #define BOILERPLATE(NAME) case Command::NAME: return os << #NAME;
+#define BOILERPLATE(NAME) \
+  case Command::NAME:     \
+    return os << #NAME;
 
     BOILERPLATE(exitFailure);
     BOILERPLATE(exitSuccess);
     BOILERPLATE(nop);
     BOILERPLATE(print);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class Command holds unexpected value " <<
-        static_cast<Command::value_type>(command);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class Command holds unexpected value "
+         << static_cast<Command::value_type>(command);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__COMMAND_HPP_

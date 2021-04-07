@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -39,38 +38,31 @@ struct TeleportAction
 
   const Position position;
 
-  template<typename Node>
+  template <typename Node>
   explicit TeleportAction(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope),
-    position(readElement<Position>("Position", node, inner_scope))
-  {}
-
-  const std::true_type accomplished {};
-
-  decltype(auto) operator()(
-    const WorldPosition & world_position,
-    const Scope::Actor & actor) const
+  : inner_scope(outer_scope), position(readElement<Position>("Position", node, inner_scope))
   {
-    return setEntityStatus(
-      actor, static_cast<geometry_msgs::msg::Pose>(world_position));
+  }
+
+  const std::true_type accomplished{};
+
+  decltype(auto) operator()(const WorldPosition & world_position, const Scope::Actor & actor) const
+  {
+    return setEntityStatus(actor, static_cast<geometry_msgs::msg::Pose>(world_position));
+  }
+
+  decltype(auto) operator()(const LanePosition & lane_position, const Scope::Actor & actor) const
+  {
+    return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position));
   }
 
   decltype(auto) operator()(
-    const LanePosition & lane_position,
-    const Scope::Actor & actor) const
-  {
-    return setEntityStatus(
-      actor, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position));
-  }
-
-  decltype(auto) operator()(
-    const RelativeWorldPosition & relative_world_position,
-    const Scope::Actor & actor) const
+    const RelativeWorldPosition & relative_world_position, const Scope::Actor & actor) const
   {
     return setEntityStatus(
       actor,
       relative_world_position.reference,  // name
-      relative_world_position,  // geometry_msgs::msg::Point
+      relative_world_position,            // geometry_msgs::msg::Point
       relative_world_position.orientation);
   }
 
@@ -81,7 +73,7 @@ struct TeleportAction
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_

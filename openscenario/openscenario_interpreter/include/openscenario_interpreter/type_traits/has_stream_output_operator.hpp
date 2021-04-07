@@ -15,25 +15,25 @@
 #ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_STREAM_OUTPUT_OPERATOR_HPP_
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_STREAM_OUTPUT_OPERATOR_HPP_
 
-#include <openscenario_interpreter/type_traits/void_t.hpp>
-
 #include <iostream>
+#include <openscenario_interpreter/type_traits/void_t.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace concepts
 {
-template<typename T, typename = void>
-struct HasStreamOutputOperator
-  : public std::false_type
-{};
+template <typename T, typename = void>
+struct HasStreamOutputOperator : public std::false_type
+{
+};
 
-template<typename T>
-struct HasStreamOutputOperator<T,
-  void_t<decltype(std::declval<std::ostream &>() << std::declval<const T &>())>>
-  : public std::true_type
-{};
-}
+template <typename T>
+struct HasStreamOutputOperator<
+  T, void_t<decltype(std::declval<std::ostream &>() << std::declval<const T &>())>>
+: public std::true_type
+{
+};
+}  // namespace concepts
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_STREAM_OUTPUT_OPERATOR_HPP_

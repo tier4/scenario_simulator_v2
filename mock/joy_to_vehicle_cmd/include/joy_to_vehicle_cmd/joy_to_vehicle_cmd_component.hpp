@@ -46,8 +46,7 @@ extern "C" {
 #if __GNUC__ >= 4
 #define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC \
   __attribute__((visibility("default")))
-#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_LOCAL \
-  __attribute__((visibility("hidden")))
+#define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_LOCAL __attribute__((visibility("hidden")))
 #else
 #define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_PUBLIC
 #define JOY_TO_VEHICLE_CMD_JOY_TO_VEHICLE_CMD_COMPONENT_LOCAL
@@ -58,10 +57,9 @@ extern "C" {
 }  // extern "C"
 #endif
 
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joy.hpp>
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-
 #include <vector>
 
 namespace joy_to_vehicle_cmd

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <awapi_awauto_adapter/awapi_obstacle_avoidance_status_publisher.hpp>
-
 #include <string>
 using ObstacleAvoidanceStatus = autoware_api_msgs::msg::ObstacleAvoidanceStatus;
 

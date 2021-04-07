@@ -37,22 +37,23 @@ struct Dimensions
 
   Dimensions() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Dimensions(const Node & node, Scope & scope)
   : width{readAttribute<Double>("width", node, scope)},
     length{readAttribute<Double>("length", node, scope)},
     height{readAttribute<Double>("height", node, scope)}
-  {}
+  {
+  }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Dimensions & rhs)
 {
-  return os << indent << blue << "<Dimensions" << " " << highlight("width", rhs.width) <<
-         " " << highlight("length", rhs.length) <<
-         " " << highlight("height", rhs.height) << blue << "/>" << reset;
+  return os << indent << blue << "<Dimensions"
+            << " " << highlight("width", rhs.width) << " " << highlight("length", rhs.length) << " "
+            << highlight("height", rhs.height) << blue << "/>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DIMENSIONS_HPP_

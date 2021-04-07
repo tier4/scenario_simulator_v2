@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/acquire_position_action.hpp>
 #include <openscenario_interpreter/syntax/assign_route_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -36,24 +35,18 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
-struct RoutingAction
-  : public Element
+struct RoutingAction : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit RoutingAction(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        ELEMENT(AssignRouteAction),
-        std::make_pair("FollowTrajectoryAction", UNSUPPORTED()),
-        ELEMENT(AcquirePositionAction)))
-  {}
+  template <typename Node, typename... Ts>
+  explicit RoutingAction(const Node & node, Ts &&... xs)
+  : Element(choice(
+      node, ELEMENT(AssignRouteAction), std::make_pair("FollowTrajectoryAction", UNSUPPORTED()),
+      ELEMENT(AcquirePositionAction)))
+  {
+  }
 };
 
 #undef ELEMENT

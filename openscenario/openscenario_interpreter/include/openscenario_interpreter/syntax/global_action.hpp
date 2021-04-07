@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/syntax/entity_action.hpp>
 #include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -39,33 +38,23 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
-struct GlobalAction
-  : public Element
+struct GlobalAction : public Element
 {
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit GlobalAction(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        std::make_pair("EnvironmentAction", UNSUPPORTED()),
-        ELEMENT(EntityAction),
-        ELEMENT(ParameterAction),
-        std::make_pair("InfrastructureAction", UNSUPPORTED()),
-        std::make_pair("TrafficAction", UNSUPPORTED())))
-  {}
+  template <typename Node, typename... Ts>
+  explicit GlobalAction(const Node & node, Ts &&... xs)
+  : Element(choice(
+      node, std::make_pair("EnvironmentAction", UNSUPPORTED()), ELEMENT(EntityAction),
+      ELEMENT(ParameterAction), std::make_pair("InfrastructureAction", UNSUPPORTED()),
+      std::make_pair("TrafficAction", UNSUPPORTED())))
+  {
+  }
 };
 
 #undef ELEMENT
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__GLOBAL_ACTION_HPP_

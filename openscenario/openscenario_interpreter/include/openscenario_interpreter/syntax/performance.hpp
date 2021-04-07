@@ -39,22 +39,24 @@ struct Performance
 
   Performance() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Performance(const Node & node, Scope & scope)
   : max_speed{readAttribute<Double>("maxSpeed", node, scope)},
     max_acceleration{readAttribute<Double>("maxAcceleration", node, scope)},
     max_deceleration{readAttribute<Double>("maxDeceleration", node, scope)}
-  {}
+  {
+  }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Performance & rhs)
 {
-  return os << indent << blue << "<Performance" << " " << highlight("maxSpeed", rhs.max_speed) <<
-         " " << highlight("maxAcceleration", rhs.max_acceleration) <<
-         " " << highlight("maxDeceleration", rhs.max_deceleration) << blue << "/>" << reset;
+  return os << indent << blue << "<Performance"
+            << " " << highlight("maxSpeed", rhs.max_speed) << " "
+            << highlight("maxAcceleration", rhs.max_acceleration) << " "
+            << highlight("maxDeceleration", rhs.max_deceleration) << blue << "/>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PERFORMANCE_HPP_

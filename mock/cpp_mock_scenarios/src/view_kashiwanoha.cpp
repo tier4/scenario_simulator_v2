@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cpp_mock_scenarios/catalogs.hpp>
-
-#include <simulation_api/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
-#include <ament_index_cpp/get_package_share_directory.hpp>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <cpp_mock_scenarios/catalogs.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <traffic_simulator/api/api.hpp>
 
 // headers in STL
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 // headers in pugixml
 #include "pugixml.hpp"
@@ -34,10 +33,9 @@ public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
   : Node("scenario_runner", option),
     api_(
-      this,
-      __FILE__,
-      ament_index_cpp::get_package_share_directory(
-        "cargo_delivery") + "/maps/kashiwa/lanelet2_map_with_private_road_and_walkway_ele_fix.osm")
+      this, __FILE__,
+      ament_index_cpp::get_package_share_directory("cargo_delivery") +
+        "/maps/kashiwa/lanelet2_map_with_private_road_and_walkway_ele_fix.osm")
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
@@ -45,15 +43,13 @@ public:
     Catalog catalog;
     vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
     api_.spawn(
-      false, "ego", simulation_api::entity::VehicleParameters(
-        vehicle_catalog_xml_doc).toRosMsg());
+      false, "ego",
+      traffic_simulator::entity::VehicleParameters(vehicle_catalog_xml_doc).toRosMsg());
     api_.setEntityStatus(
-      "ego",
-      simulation_api::helper::constructLaneletPose(120684, 5.5361, -0.591),
-      simulation_api::helper::constructActionStatus(0));
+      "ego", traffic_simulator::helper::constructLaneletPose(120684, 5.5361, -0.591),
+      traffic_simulator::helper::constructActionStatus(0));
     api_.requestAcquirePosition(
-      "ego",
-      simulation_api::helper::constructLaneletPose(120684, 35.1072, -0.6315) );
+      "ego", traffic_simulator::helper::constructLaneletPose(120684, 35.1072, -0.6315));
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
@@ -69,7 +65,7 @@ private:
   bool bob_spawned_;
   double current_time_;
   int port_;
-  scenario_simulator::API api_;
+  traffic_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 };
 

@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/private_action.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -38,42 +37,24 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(NAME) \
-  std::make_pair( \
-    #NAME, [&](auto && node) \
-    { \
-      return make<NAME>(node, scope); \
-    })
+#define ELEMENT(NAME) std::make_pair(#NAME, [&](auto && node) { return make<NAME>(node, scope); })
 
-struct Action
-  : public StoryboardElement<Action>, public Element
+struct Action : public StoryboardElement<Action>, public Element
 {
   const String name;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit Action(const Node & node, Scope & scope, std::size_t maximum_execution_count)
   : StoryboardElement(maximum_execution_count),
     Element(
-      choice(
-        node,
-        ELEMENT(GlobalAction),
-        ELEMENT(UserDefinedAction),
-        ELEMENT(PrivateAction))),
+      choice(node, ELEMENT(GlobalAction), ELEMENT(UserDefinedAction), ELEMENT(PrivateAction))),
     name(readAttribute<String>("name", node, scope))
-  {}
-
-  auto ready() const
   {
-    return static_cast<bool>(*this);
   }
 
-  static constexpr auto stopTriggered() noexcept
-  {
-    return false;
-  }
+  auto ready() const { return static_cast<bool>(*this); }
+
+  static constexpr auto stopTriggered() noexcept { return false; }
 
   using Element::start;
 
@@ -93,7 +74,7 @@ struct Action
 
   using StoryboardElement::evaluate;
 
-  Boolean overridden {false};
+  Boolean overridden{false};
 
   void stop()
   {
@@ -104,8 +85,8 @@ struct Action
     }
   }
 
-  template<typename ... Ts>
-  decltype(auto) run(Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) run(Ts &&... xs)
   {
     return Element::evaluate(std::forward<decltype(xs)>(xs)...);
   }

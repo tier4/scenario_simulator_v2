@@ -40,28 +40,27 @@
 // TODO(yamacir-kit)
 #endif
 
-#include <awapi_accessor/conversion.hpp>
-#include <awapi_accessor/define_macro.hpp>
 #include <awapi_accessor/utility/visibility.h>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <awapi_accessor/conversion.hpp>
+#include <awapi_accessor/define_macro.hpp>
 #include <cassert>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <memory>
 #include <mutex>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <utility>
 
 // #define DEBUG_VALUE(...) std::cout << #__VA_ARGS__ " = " << (__VA_ARGS__) << std::endl
 
 namespace autoware_api
 {
-
 struct AutowareError
 {
 };
@@ -172,7 +171,7 @@ public:
 
   DEFINE_PUBLISHER(VehicleVelocity);
 
-  template<typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
+  template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
   decltype(auto) setVehicleVelocity(const T value)
   {
     VehicleVelocity vehicle_velocity;
@@ -234,7 +233,7 @@ public:
 
   decltype(auto) setCurrentControlMode(const std::uint8_t mode = CurrentControlMode::AUTO)
   {
-    CurrentControlMode current_control_mode {};
+    CurrentControlMode current_control_mode{};
     {
       current_control_mode.data = mode;
     }
@@ -253,7 +252,7 @@ public:
 
   decltype(auto) setCurrentPose(const geometry_msgs::msg::Pose & pose)
   {
-    geometry_msgs::msg::PoseStamped current_pose {};
+    geometry_msgs::msg::PoseStamped current_pose{};
     {
       current_pose.header.stamp = get_clock()->now();
       current_pose.header.frame_id = "map";
@@ -276,10 +275,10 @@ public:
 
   DEFINE_PUBLISHER(CurrentShift);
 
-  template<typename T, REQUIRES(std::is_floating_point<T>)>
+  template <typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentShift(const T twist_linear_x)
   {
-    CurrentShift current_shift {};
+    CurrentShift current_shift{};
     {
       using autoware_vehicle_msgs::msg::Shift;
 
@@ -305,10 +304,10 @@ public:
 
   DEFINE_PUBLISHER(CurrentSteering);
 
-  template<typename T, REQUIRES(std::is_floating_point<T>)>
+  template <typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentSteering(const T value)
   {
-    CurrentSteering current_steering {};
+    CurrentSteering current_steering{};
     {
       current_steering.header.stamp = get_clock()->now();
       current_steering.header.frame_id = "base_link";
@@ -334,7 +333,7 @@ public:
 
   decltype(auto) setCurrentTurnSignal()
   {
-    CurrentTurnSignal current_turn_signal {};
+    CurrentTurnSignal current_turn_signal{};
     {
       current_turn_signal.header.stamp = get_clock()->now();
       current_turn_signal.header.frame_id = "map";
@@ -357,7 +356,7 @@ public:
 
   decltype(auto) setCurrentTwist(const geometry_msgs::msg::Twist & twist)
   {
-    geometry_msgs::msg::TwistStamped current_twist {};
+    geometry_msgs::msg::TwistStamped current_twist{};
     {
       current_twist.header.stamp = get_clock()->now();
       current_twist.header.frame_id = "map";
@@ -376,7 +375,7 @@ public:
 
   DEFINE_PUBLISHER(CurrentVelocity);
 
-  template<typename T, REQUIRES(std::is_convertible<T, decltype(CurrentVelocity::data)>)>
+  template <typename T, REQUIRES(std::is_convertible<T, decltype(CurrentVelocity::data)>)>
   decltype(auto) setCurrentVelocity(const T twist_linear_x)
   {
     CurrentVelocity message;
@@ -417,7 +416,7 @@ public:
 
   decltype(auto) setInitialPose(const geometry_msgs::msg::Pose & pose)
   {
-    autoware_api::Accessor::InitialPose initial_pose {};
+    autoware_api::Accessor::InitialPose initial_pose{};
     {
       initial_pose.header.stamp = get_clock()->now();
       initial_pose.header.frame_id = "map";
@@ -441,7 +440,7 @@ public:
   decltype(auto) setInitialTwist(
     const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
   {
-    autoware_api::Accessor::InitialTwist initial_twist {};
+    autoware_api::Accessor::InitialTwist initial_twist{};
     {
       initial_twist.header.stamp = get_clock()->now();
       initial_twist.header.frame_id = "map";
@@ -455,7 +454,7 @@ public:
 
   decltype(auto) setInitialTwist(const double linear_x, const double angular_z = 0)
   {
-    geometry_msgs::msg::Twist twist {};
+    geometry_msgs::msg::Twist twist{};
     {
       twist.linear.x = linear_x;
       twist.angular.z = angular_z;
@@ -494,13 +493,14 @@ public:
   DEFINE_SUBSCRIPTION(VehicleCommand);
 
 public:
-  #define DEFINE_STATE_PREDICATE(NAME, VALUE) \
-  auto is ## NAME() const noexcept \
-  { \
-    using autoware_system_msgs::msg::AutowareState; \
-    assert(AutowareState::VALUE == #NAME); \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                         \
+  auto is##NAME() const noexcept                                                    \
+  {                                                                                 \
+    using autoware_system_msgs::msg::AutowareState;                                 \
+    assert(AutowareState::VALUE == #NAME);                                          \
     return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
-  } static_assert(true, "")
+  }                                                                                 \
+  static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
   DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
@@ -511,19 +511,13 @@ public:
   DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
   DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
-  #undef DEFINE_STATE_PREDICATE
+#undef DEFINE_STATE_PREDICATE
 
   bool ready = false;
 
-  auto isReady() noexcept
-  {
-    return ready || (ready = isWaitingForRoute());
-  }
+  auto isReady() noexcept { return ready || (ready = isWaitingForRoute()); }
 
-  auto isNotReady() noexcept
-  {
-    return !isReady();
-  }
+  auto isNotReady() noexcept { return !isReady(); }
 
   void checkAutowareState()
   {
@@ -561,13 +555,12 @@ public:
   }
 
 public:
-  template<typename ... Ts>
-  AWAPI_ACCESSOR_PUBLIC
-  explicit Accessor(Ts && ... xs)
+  template <typename... Ts>
+  AWAPI_ACCESSOR_PUBLIC explicit Accessor(Ts &&... xs)
   : rclcpp::Node(std::forward<decltype(xs)>(xs)...),
 #ifndef NDEBUG
     INIT_PUBLISHER(DebugString, "debug/string"),
-    INIT_SUBSCRIPTION(DebugString, "debug/string", []() {}),
+    INIT_SUBSCRIPTION(DebugString, "debug/string", [](){}),
 #endif
     // AWAPI topics (lexicographically sorted)
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
@@ -597,16 +590,11 @@ public:
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
 
     transform_buffer(get_clock()),
-    transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto && ...) {})),
+    transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto &&...) {})),
 
-    timer(
-      create_wall_timer(
-        std::chrono::milliseconds(5),
-        [this]()
-        {
-          return updateTransform();
-        }))
-  {}
+    timer(create_wall_timer(std::chrono::milliseconds(5), [this]() { return updateTransform(); }))
+  {
+  }
 };
 
 }  // namespace autoware_api

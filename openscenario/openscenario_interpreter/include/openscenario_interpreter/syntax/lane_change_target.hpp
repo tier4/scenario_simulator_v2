@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_TARGET_HPP_
 
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -33,21 +32,19 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LaneChangeTarget
-  : public Element
+struct LaneChangeTarget : public Element
 {
-  template<typename Node, typename ... Ts>
-  explicit LaneChangeTarget(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        std::make_pair("RelativeTargetLane", UNSUPPORTED()),
-        std::make_pair("AbsoluteTargetLane", [&](auto && node) {
-          return make<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...);
-        })))
-  {}
+  template <typename Node, typename... Ts>
+  explicit LaneChangeTarget(const Node & node, Ts &&... xs)
+  : Element(choice(
+      node, std::make_pair("RelativeTargetLane", UNSUPPORTED()),
+      std::make_pair("AbsoluteTargetLane", [&](auto && node) {
+        return make<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...);
+      })))
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__LANE_CHANGE_TARGET_HPP_

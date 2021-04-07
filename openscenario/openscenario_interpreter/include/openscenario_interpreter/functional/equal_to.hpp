@@ -24,12 +24,12 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-template<typename T, typename = void>
-struct equal_to
-  : public std::equal_to<T>
-{};
+template <typename T, typename = void>
+struct equal_to : public std::equal_to<T>
+{
+};
 
-template<typename T>
+template <typename T>
 struct equal_to<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
 {
   constexpr auto operator()(const T & lhs, const T & rhs) const noexcept

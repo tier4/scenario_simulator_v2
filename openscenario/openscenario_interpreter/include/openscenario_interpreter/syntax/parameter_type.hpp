@@ -21,7 +21,6 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/syntax/unsigned_short.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -52,8 +51,7 @@ inline namespace syntax
  * ======================================================================== */
 struct ParameterType
 {
-  enum value_type
-  {
+  enum value_type {
     INTEGER,
     DOUBLE,
     STRING,
@@ -63,28 +61,24 @@ struct ParameterType
     DATE_TIME,
   } value;
 
-  explicit constexpr ParameterType(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr ParameterType(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, ParameterType & type)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(NAME, IDENTIFIER) \
-  if (buffer == NAME) { \
+#define BOILERPLATE(NAME, IDENTIFIER)       \
+  if (buffer == NAME) {                     \
     type.value = ParameterType::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                              \
+  }                                         \
+  static_assert(true, "")
 
   BOILERPLATE("integer", INTEGER);
   BOILERPLATE("double", DOUBLE);
@@ -94,18 +88,20 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Parameter
   BOILERPLATE("boolean", BOOLEAN);
   BOILERPLATE("dateTime", DATE_TIME);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type ParameterType";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const ParameterType & type)
 {
   switch (type) {
-    #define BOILERPLATE(NAME, ID) case ParameterType::ID: return os << NAME;
+#define BOILERPLATE(NAME, ID) \
+  case ParameterType::ID:     \
+    return os << NAME;
 
     BOILERPLATE("integer", INTEGER);
     BOILERPLATE("double", DOUBLE);
@@ -115,16 +111,16 @@ std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Par
     BOILERPLATE("boolean", BOOLEAN);
     BOILERPLATE("dateTime", DATE_TIME);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class ParameterType holds unexpected value " <<
-        static_cast<ParameterType::value_type>(type.value);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class ParameterType holds unexpected value "
+         << static_cast<ParameterType::value_type>(type.value);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_TYPE_HPP_

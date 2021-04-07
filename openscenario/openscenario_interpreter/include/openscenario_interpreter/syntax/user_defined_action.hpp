@@ -30,20 +30,17 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * ======================================================================== */
-struct UserDefinedAction
-  : public Element
+struct UserDefinedAction : public Element
 {
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit UserDefinedAction(const Node & node, Scope & scope)
   {
-    callWithElements(
-      node, "CustomCommandAction", 1, 1, [&](auto && node)
-      {
-        return rebind<CustomCommandAction>(node, scope);
-      });
+    callWithElements(node, "CustomCommandAction", 1, 1, [&](auto && node) {
+      return rebind<CustomCommandAction>(node, scope);
+    });
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_ACTION_HPP_

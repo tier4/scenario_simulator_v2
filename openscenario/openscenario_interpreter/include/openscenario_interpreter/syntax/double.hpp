@@ -16,39 +16,31 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
 
 #include <boost/lexical_cast.hpp>
-#include <std_msgs/msg/float64.hpp>
-
 #include <limits>
 #include <regex>
+#include <std_msgs/msg/float64.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct Double
-  : public std_msgs::msg::Float64
+struct Double : public std_msgs::msg::Float64
 {
   using value_type = decltype(std_msgs::msg::Float64::data);
 
-  explicit Double(value_type value = {})
-  {
-    data = value;
-  }
+  explicit Double(value_type value = {}) { data = value; }
 
-  explicit Double(const std::string & s) try
-  {
+  explicit Double(const std::string & s)
+  try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss {};
+    std::stringstream ss{};
     ss << "can't treat value \"" << s << "\" as type Double";
-    throw SyntaxError {ss.str()};
+    throw SyntaxError{ss.str()};
   }
 
-  constexpr operator value_type() const noexcept
-  {
-    return data;
-  }
+  constexpr operator value_type() const noexcept { return data; }
 
   static auto infinity() noexcept
   {
@@ -75,34 +67,32 @@ std::ostream & operator<<(std::ostream & os, const Double & rhs)
 
 std::istream & operator>>(std::istream & is, Double & rhs)
 {
-  std::string token {};
+  std::string token{};
 
   is >> token;
 
-  static const std::regex infinity {R"([+-]?INF)"};
+  static const std::regex infinity{R"([+-]?INF)"};
 
-  std::smatch result {};
+  std::smatch result{};
 
   if (std::regex_match(token, result, infinity)) {
-      #ifndef OPENSCENARIO_INTERPRETER_ALLOW_INFINITY
-      #define OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY max
-      #else
-      #define OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY infinity
-      #endif
+#ifndef OPENSCENARIO_INTERPRETER_ALLOW_INFINITY
+#define OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY max
+#else
+#define OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY infinity
+#endif
 
-    rhs.data =
-      (result.str(1) ==
-      "-" ? -1 : 1) *
-      std::numeric_limits<Double::value_type>::OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY();
+    rhs.data = (result.str(1) == "-" ? -1 : 1) *
+               std::numeric_limits<Double::value_type>::OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY();
 
-      #undef OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY
+#undef OPENSCENARIO_INTERPRETER_DOUBLE_INFINITY
   } else {
     rhs.data = boost::lexical_cast<Double::value_type>(token);
   }
 
   return is;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_

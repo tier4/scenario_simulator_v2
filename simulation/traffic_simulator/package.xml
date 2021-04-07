@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>traffic_simulator</name>
+  <version>0.0.0</version>
+  <description>control traffic flow</description>
+
+  <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
+
+  <license>Apache 2</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+  <depend>ament_index_cpp</depend>
+  <depend>autoware_auto_msgs</depend>
+  <depend>awapi_accessor</depend>
+  <depend>behaviortree_cpp_v3</depend>
+  <depend>geographic_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>lanelet2_core</depend>
+  <depend>lanelet2_extension_psim</depend>
+  <depend>lanelet2_io</depend>
+  <depend>lanelet2_projection</depend>
+  <depend>lanelet2_routing</depend>
+  <depend>openscenario_msgs</depend>
+  <depend>pugixml-dev</depend>
+  <depend>quaternion_operation</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+  <depend>rviz2</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>visualization_msgs</depend>
+  <depend>simulation_interface</depend>
+  <depend>nlohmann-json-dev</depend>
+
+  <!--<exec_depend>lexus_rx_450h_description</exec_depend> -->
+  <exec_depend>kashiwanoha_map</exec_depend>
+
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_clang_format</test_depend>
+  <test_depend>ament_cmake_copyright</test_depend>
+  <test_depend>ament_cmake_flake8</test_depend>
+  <test_depend>ament_cmake_lint_cmake</test_depend>
+  <test_depend>ament_cmake_pep257</test_depend>
+  <test_depend>ament_cmake_xmllint</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -20,7 +20,6 @@
 #include <openscenario_interpreter/syntax/longitudinal_action.hpp>
 #include <openscenario_interpreter/syntax/routing_action.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -28,11 +27,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
 /* ---- PrivateAction ----------------------------------------------------------
  *
@@ -52,23 +48,16 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct PrivateAction : public ComplexType
 {
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit PrivateAction(const Node & node, Ts && ... xs)
-  : ComplexType(
-      choice(
-        node,
-        ELEMENT(LongitudinalAction),
-        ELEMENT(LateralAction),
-        std::make_pair("VisibilityAction", UNSUPPORTED()),
-        std::make_pair("SynchronizeAction", UNSUPPORTED()),
-        std::make_pair("ActivateControllerAction", UNSUPPORTED()),
-        ELEMENT(ControllerAction),
-        ELEMENT(TeleportAction),
-        ELEMENT(RoutingAction)))
-  {}
+  template <typename Node, typename... Ts>
+  explicit PrivateAction(const Node & node, Ts &&... xs)
+  : ComplexType(choice(
+      node, ELEMENT(LongitudinalAction), ELEMENT(LateralAction),
+      std::make_pair("VisibilityAction", UNSUPPORTED()),
+      std::make_pair("SynchronizeAction", UNSUPPORTED()),
+      std::make_pair("ActivateControllerAction", UNSUPPORTED()), ELEMENT(ControllerAction),
+      ELEMENT(TeleportAction), ELEMENT(RoutingAction)))
+  {
+  }
 };
 
 #undef ELEMENT

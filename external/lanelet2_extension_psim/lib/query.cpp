@@ -14,24 +14,20 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
+#include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_routing/RoutingGraph.h>
+#include <tf2/utils.h>
+
+#include <Eigen/Eigen>
+#include <deque>
 #include <lanelet2_extension_psim/exception.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/query.hpp>
 #include <lanelet2_extension_psim/utility/utilities.hpp>
-
-#include <rclcpp/rclcpp.hpp>
-
-#include <Eigen/Eigen>
-
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_routing/RoutingGraph.h>
-
-#include <tf2/utils.h>
-
-#include <deque>
 #include <limits>
 #include <memory>
 #include <queue>
+#include <rclcpp/rclcpp.hpp>
 #include <set>
 #include <string>
 #include <vector>
@@ -592,8 +588,8 @@ ConstLanelets query::getAllNeighborsRight(
     (!!graph->right(lanelet)) ? graph->right(lanelet) : graph->adjacentRight(lanelet);
   while (!!right_lane) {
     lanelets.push_back(right_lane.get());
-    right_lane = (!!graph->right(right_lane.get())) ? graph->right(right_lane.get()) :
-      graph->adjacentRight(right_lane.get());
+    right_lane = (!!graph->right(right_lane.get())) ? graph->right(right_lane.get())
+                                                    : graph->adjacentRight(right_lane.get());
   }
   return lanelets;
 }
@@ -605,8 +601,8 @@ ConstLanelets query::getAllNeighborsLeft(
   auto left_lane = (!!graph->left(lanelet)) ? graph->left(lanelet) : graph->adjacentLeft(lanelet);
   while (!!left_lane) {
     lanelets.push_back(left_lane.get());
-    left_lane = (!!graph->left(left_lane.get())) ? graph->left(left_lane.get()) :
-      graph->adjacentLeft(left_lane.get());
+    left_lane = (!!graph->left(left_lane.get())) ? graph->left(left_lane.get())
+                                                 : graph->adjacentLeft(left_lane.get());
   }
   return lanelets;
 }

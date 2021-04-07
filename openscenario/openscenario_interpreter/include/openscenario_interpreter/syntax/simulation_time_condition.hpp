@@ -36,20 +36,21 @@ struct SimulationTimeCondition
 
   const Rule compare;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit SimulationTimeCondition(const Node & node, Scope & scope)
   : value(readAttribute<Double>("value", node, scope)),
     compare(readAttribute<Rule>("rule", node, scope))
-  {}
+  {
+  }
 
   Element result;
 
   auto evaluate()
   {
     result = asBoolean(compare(getCurrentTime(), value));
-    #ifndef NDEBUG
+#ifndef NDEBUG
     std::cout << *this << std::endl;
-    #endif
+#endif
     return result;
   }
 
@@ -67,7 +68,7 @@ struct SimulationTimeCondition
     return os;
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SIMULATION_TIME_CONDITION_HPP_

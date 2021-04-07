@@ -13,12 +13,11 @@
 // limitations under the License.
 
 #include <simulation_interface/zmq_multi_server.hpp>
-
 #include <string>
 
 namespace zeromq
 {
-template<typename Proto>
+template <typename Proto>
 zmqpp::message toZMQ(const Proto & proto)
 {
   zmqpp::message msg;
@@ -28,7 +27,7 @@ zmqpp::message toZMQ(const Proto & proto)
   return msg;
 }
 
-template<typename Proto>
+template <typename Proto>
 Proto toProto(const zmqpp::message & msg)
 {
   std::string serialized_str = msg.get(0);
@@ -40,24 +39,41 @@ Proto toProto(const zmqpp::message & msg)
 MultiServer::MultiServer(
   const simulation_interface::TransportProtocol & protocol,
   const simulation_interface::HostName & hostname,
-  std::function<void(const simulation_api_schema::InitializeRequest &,
-  simulation_api_schema::InitializeResponse &)> initialize_func,
-  std::function<void(const simulation_api_schema::UpdateFrameRequest &,
-  simulation_api_schema::UpdateFrameResponse &)> update_frame_func,
-  std::function<void(const simulation_api_schema::UpdateSensorFrameRequest &,
-  simulation_api_schema::UpdateSensorFrameResponse &)> update_sensor_frame_func,
-  std::function<void(const simulation_api_schema::SpawnVehicleEntityRequest &,
-  simulation_api_schema::SpawnVehicleEntityResponse &)> spawn_vehicle_entity_func,
-  std::function<void(const simulation_api_schema::SpawnPedestrianEntityRequest &,
-  simulation_api_schema::SpawnPedestrianEntityResponse &)> spawn_pedestrian_entity_func,
-  std::function<void(const simulation_api_schema::DespawnEntityRequest &,
-  simulation_api_schema::DespawnEntityResponse &)> despawn_entity_func,
-  std::function<void(const simulation_api_schema::UpdateEntityStatusRequest &,
-  simulation_api_schema::UpdateEntityStatusResponse &)> update_entity_status_func,
-  std::function<void(const simulation_api_schema::AttachLidarSensorRequest &,
-  simulation_api_schema::AttachLidarSensorResponse &)> attach_lidar_sensor_func,
-  std::function<void(const simulation_api_schema::AttachDetectionSensorRequest &,
-  simulation_api_schema::AttachDetectionSensorResponse &)> attach_detection_sensor_func)
+  std::function<void(
+    const simulation_api_schema::InitializeRequest &, simulation_api_schema::InitializeResponse &)>
+    initialize_func,
+  std::function<void(
+    const simulation_api_schema::UpdateFrameRequest &,
+    simulation_api_schema::UpdateFrameResponse &)>
+    update_frame_func,
+  std::function<void(
+    const simulation_api_schema::UpdateSensorFrameRequest &,
+    simulation_api_schema::UpdateSensorFrameResponse &)>
+    update_sensor_frame_func,
+  std::function<void(
+    const simulation_api_schema::SpawnVehicleEntityRequest &,
+    simulation_api_schema::SpawnVehicleEntityResponse &)>
+    spawn_vehicle_entity_func,
+  std::function<void(
+    const simulation_api_schema::SpawnPedestrianEntityRequest &,
+    simulation_api_schema::SpawnPedestrianEntityResponse &)>
+    spawn_pedestrian_entity_func,
+  std::function<void(
+    const simulation_api_schema::DespawnEntityRequest &,
+    simulation_api_schema::DespawnEntityResponse &)>
+    despawn_entity_func,
+  std::function<void(
+    const simulation_api_schema::UpdateEntityStatusRequest &,
+    simulation_api_schema::UpdateEntityStatusResponse &)>
+    update_entity_status_func,
+  std::function<void(
+    const simulation_api_schema::AttachLidarSensorRequest &,
+    simulation_api_schema::AttachLidarSensorResponse &)>
+    attach_lidar_sensor_func,
+  std::function<void(
+    const simulation_api_schema::AttachDetectionSensorRequest &,
+    simulation_api_schema::AttachDetectionSensorResponse &)>
+    attach_detection_sensor_func)
 : context_(zmqpp::context()),
   type_(zmqpp::socket_type::reply),
   initialize_sock_(context_, type_),
@@ -80,41 +96,23 @@ MultiServer::MultiServer(
   attach_detection_sensor_func_(attach_detection_sensor_func)
 {
   initialize_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::initialize));
-  update_entity_status_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::update_entity_status));
-  update_frame_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::update_frame));
-  spawn_vehicle_entity_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::spawn_vehicle_entity));
-  spawn_pedestrian_entity_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::spawn_pedestrian_entity));
-  despawn_entity_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::despawn_entity));
-  update_sensor_frame_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::update_sensor_frame));
-  attach_lidar_sensor_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::attach_lidar_sensor));
-  attach_detection_sensor_sock_.bind(
-    simulation_interface::getEndPoint(
-      protocol, hostname,
-      simulation_interface::ports::attach_detection_sensor));
+    simulation_interface::getEndPoint(protocol, hostname, simulation_interface::ports::initialize));
+  update_entity_status_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::update_entity_status));
+  update_frame_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::update_frame));
+  spawn_vehicle_entity_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::spawn_vehicle_entity));
+  spawn_pedestrian_entity_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::spawn_pedestrian_entity));
+  despawn_entity_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::despawn_entity));
+  update_sensor_frame_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::update_sensor_frame));
+  attach_lidar_sensor_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::attach_lidar_sensor));
+  attach_detection_sensor_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::attach_detection_sensor));
   poller_.add(initialize_sock_);
   poller_.add(update_frame_sock_);
   poller_.add(update_sensor_frame_sock_);
@@ -142,9 +140,7 @@ void MultiServer::poll()
     zmqpp::message request;
     update_frame_sock_.receive(request);
     simulation_api_schema::UpdateFrameResponse response;
-    update_frame_func_(
-      toProto<simulation_api_schema::UpdateFrameRequest>(
-        request), response);
+    update_frame_func_(toProto<simulation_api_schema::UpdateFrameRequest>(request), response);
     auto msg = toZMQ(response);
     update_frame_sock_.send(msg);
   }
@@ -153,8 +149,7 @@ void MultiServer::poll()
     update_sensor_frame_sock_.receive(request);
     simulation_api_schema::UpdateSensorFrameResponse response;
     update_sensor_frame_func_(
-      toProto<simulation_api_schema::UpdateSensorFrameRequest>(
-        request), response);
+      toProto<simulation_api_schema::UpdateSensorFrameRequest>(request), response);
     auto msg = toZMQ(response);
     update_sensor_frame_sock_.send(msg);
   }
@@ -163,8 +158,7 @@ void MultiServer::poll()
     spawn_vehicle_entity_sock_.receive(request);
     simulation_api_schema::SpawnVehicleEntityResponse response;
     spawn_vehicle_entity_func_(
-      toProto<simulation_api_schema::SpawnVehicleEntityRequest>(
-        request), response);
+      toProto<simulation_api_schema::SpawnVehicleEntityRequest>(request), response);
     auto msg = toZMQ(response);
     spawn_vehicle_entity_sock_.send(msg);
   }
@@ -173,8 +167,7 @@ void MultiServer::poll()
     spawn_pedestrian_entity_sock_.receive(request);
     simulation_api_schema::SpawnPedestrianEntityResponse response;
     spawn_pedestrian_entity_func_(
-      toProto<simulation_api_schema::SpawnPedestrianEntityRequest>(
-        request), response);
+      toProto<simulation_api_schema::SpawnPedestrianEntityRequest>(request), response);
     auto msg = toZMQ(response);
     spawn_pedestrian_entity_sock_.send(msg);
   }
@@ -182,9 +175,7 @@ void MultiServer::poll()
     zmqpp::message request;
     despawn_entity_sock_.receive(request);
     simulation_api_schema::DespawnEntityResponse response;
-    despawn_entity_func_(
-      toProto<simulation_api_schema::DespawnEntityRequest>(
-        request), response);
+    despawn_entity_func_(toProto<simulation_api_schema::DespawnEntityRequest>(request), response);
     auto msg = toZMQ(response);
     despawn_entity_sock_.send(msg);
   }
@@ -193,8 +184,7 @@ void MultiServer::poll()
     update_entity_status_sock_.receive(request);
     simulation_api_schema::UpdateEntityStatusResponse response;
     update_entity_status_func_(
-      toProto<simulation_api_schema::UpdateEntityStatusRequest>(
-        request), response);
+      toProto<simulation_api_schema::UpdateEntityStatusRequest>(request), response);
     auto msg = toZMQ(response);
     update_entity_status_sock_.send(msg);
   }
@@ -203,8 +193,7 @@ void MultiServer::poll()
     attach_lidar_sensor_sock_.receive(request);
     simulation_api_schema::AttachLidarSensorResponse response;
     attach_lidar_sensor_func_(
-      toProto<simulation_api_schema::AttachLidarSensorRequest>(
-        request), response);
+      toProto<simulation_api_schema::AttachLidarSensorRequest>(request), response);
     auto msg = toZMQ(response);
     attach_lidar_sensor_sock_.send(msg);
   }
@@ -213,8 +202,7 @@ void MultiServer::poll()
     attach_detection_sensor_sock_.receive(request);
     simulation_api_schema::AttachDetectionSensorResponse response;
     attach_detection_sensor_func_(
-      toProto<simulation_api_schema::AttachDetectionSensorRequest>(
-        request), response);
+      toProto<simulation_api_schema::AttachDetectionSensorRequest>(request), response);
     auto msg = toZMQ(response);
     attach_detection_sensor_sock_.send(msg);
   }

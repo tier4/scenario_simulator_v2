@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <awapi_awauto_adapter/awapi_lane_change_status_publisher.hpp>
-
 #include <string>
 using LaneChangeStatus = autoware_api_msgs::msg::LaneChangeStatus;
 
@@ -34,8 +33,7 @@ void AutowareLaneChangeStatusPublisher::publish_lane_change_status()
   lane_change_status.header.stamp = get_clock()->now();
   lane_change_status.force_lane_change_available = true;
   lane_change_status.lane_change_ready = true;
-  RCLCPP_INFO(
-    this->get_logger(), "LaneChangeStatus %i", lane_change_status.header.stamp);
+  RCLCPP_INFO(this->get_logger(), "LaneChangeStatus %i", lane_change_status.header.stamp);
   pub_lane_change_status_->publish(lane_change_status);
 }
 

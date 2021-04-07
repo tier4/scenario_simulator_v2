@@ -37,22 +37,23 @@ struct Center
 
   Center() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Center(const Node & node, Scope & scope)
   : x{readAttribute<Double>("x", node, scope)},
     y{readAttribute<Double>("y", node, scope)},
     z{readAttribute<Double>("z", node, scope)}
-  {}
+  {
+  }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Center & rhs)
 {
-  return os << indent << blue << "<Center" << " " << highlight("x", rhs.x) <<
-         " " << highlight("y", rhs.y) <<
-         " " << highlight("z", rhs.z) << blue << "/>" << reset;
+  return os << indent << blue << "<Center"
+            << " " << highlight("x", rhs.x) << " " << highlight("y", rhs.y) << " "
+            << highlight("z", rhs.z) << blue << "/>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CENTER_HPP_

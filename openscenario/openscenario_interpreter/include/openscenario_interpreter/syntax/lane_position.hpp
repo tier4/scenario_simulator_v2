@@ -43,29 +43,29 @@ struct LanePosition
 
   const Orientation orientation;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit LanePosition(const Node & node, Scope & scope)
   : road_id(readAttribute<String>("roadId", node, scope, "none")),
     lane_id(readAttribute<String>("laneId", node, scope)),
     offset(readAttribute<Double>("offset", node, scope, Double())),
     s(readAttribute<Double>("s", node, scope)),
     orientation(readElement<Orientation>("Orientation", node, scope))
-  {}
+  {
+  }
 
   explicit operator openscenario_msgs::msg::LaneletPose() const
   {
     const geometry_msgs::msg::Vector3 rpy = orientation;
-    return simulation_api::helper::constructLaneletPose(
+    return traffic_simulator::helper::constructLaneletPose(
       static_cast<Integer>(lane_id), s, offset, rpy.x, rpy.y, rpy.z);
   }
 
   explicit operator geometry_msgs::msg::Pose() const
   {
-    return toMapPose(
-      static_cast<openscenario_msgs::msg::LaneletPose>(*this));
+    return toMapPose(static_cast<openscenario_msgs::msg::LaneletPose>(*this));
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__LANE_POSITION_HPP_

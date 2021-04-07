@@ -16,36 +16,33 @@
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_EVALUATE_HPP_
 
 #include <openscenario_interpreter/type_traits/has_member_function_evaluate.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
-template<typename T, typename = void>
+template <typename T, typename = void>
 struct IfHasMemberFunctionEvaluate
 {
-  template<typename Result>
+  template <typename Result>
   static constexpr Result callIt(T &, const Result & as_self_evaluating)
   {
     return as_self_evaluating;
   }
 };
 
-template<typename T>
-struct IfHasMemberFunctionEvaluate<T,
-  typename std::enable_if<
-    HasMemberFunctionEvaluate<T>::value
-  >::type>
+template <typename T>
+struct IfHasMemberFunctionEvaluate<
+  T, typename std::enable_if<HasMemberFunctionEvaluate<T>::value>::type>
 {
-  template<typename Result>
+  template <typename Result>
   static constexpr Result callIt(T & then, const Result &)
   {
     return then.evaluate();
   }
 };
-}
+}  // namespace type_traits
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_EVALUATE_HPP_

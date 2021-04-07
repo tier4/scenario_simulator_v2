@@ -79,13 +79,10 @@ struct OverrideControllerValueAction
    * ------------------------------------------------------------------------ */
   // TODO(yamacir-kit): const OverrideGearAction overrideGear;
 
-  template
-  <
-    typename Node,
-    typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit OverrideControllerValueAction(const Node &, Scope &)
-  {}
+  {
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
-template<typename ...>
+template <typename...>
 using void_t = void;
 }
 }  // namespace openscenario_interpreter

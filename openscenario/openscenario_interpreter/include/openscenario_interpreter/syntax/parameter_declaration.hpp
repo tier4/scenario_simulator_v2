@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATION_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-
 #include <string>
 #include <vector>
 
@@ -53,27 +52,23 @@ struct ParameterDeclaration
 
   ParameterDeclaration() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit ParameterDeclaration(const Node & node, Scope & scope)
   : name{readAttribute<String>("name", node, scope)},
     parameter_type{readAttribute<ParameterType>("parameterType", node, scope)},
     value{readAttribute<String>("value", node, scope)}
   {
     if (name.substr(0, 3) == "OSC") {
-      throw
-        SyntaxError {
-          "Parameter names starting with \"OSC\" are reserved for special use in future versions "
-          "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix."
-        };
+      throw SyntaxError{
+        "Parameter names starting with \"OSC\" are reserved for special use in future versions "
+        "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix."};
     } else if (includes(name, {' ', '$', '\'', '"'})) {
-      throw
-        SyntaxError {
-          "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
-          "  - \" \" (blank space)\n"
-          "  - $\n"
-          "  - \'\n"
-          "  - \"\n"
-        };
+      throw SyntaxError{
+        "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
+        "  - \" \" (blank space)\n"
+        "  - $\n"
+        "  - \'\n"
+        "  - \"\n"};
     } else {
       scope.parameters.emplace(name, evaluate());
     }
@@ -111,15 +106,12 @@ struct ParameterDeclaration
 
 std::ostream & operator<<(std::ostream & os, const ParameterDeclaration & declaration)
 {
-  return os << indent <<
-         blue << "<ParameterDeclaration" <<
-         " " << highlight("name", declaration.name) <<
-         " " << highlight("parameterType", declaration.parameter_type) <<
-         " " << highlight("value", declaration.value) <<
-         blue << "/>" <<
-         reset;
+  return os << indent << blue << "<ParameterDeclaration"
+            << " " << highlight("name", declaration.name) << " "
+            << highlight("parameterType", declaration.parameter_type) << " "
+            << highlight("value", declaration.value) << blue << "/>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATION_HPP_

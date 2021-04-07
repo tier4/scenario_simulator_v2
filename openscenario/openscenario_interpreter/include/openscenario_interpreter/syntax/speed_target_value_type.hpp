@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_TARGET_VALUE_TYPE_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -42,8 +41,7 @@ inline namespace syntax
  * ======================================================================== */
 struct SpeedTargetValueType
 {
-  enum value_type
-  {
+  enum value_type {
     // The relative value is interpreted as a difference to a referenced value.
     // Unit: m/s. As an example, a speed value of 10 equals a speed that's 10m/s
     // faster than the reference speed.
@@ -55,73 +53,69 @@ struct SpeedTargetValueType
     factor,
   } value;
 
-  explicit constexpr SpeedTargetValueType(value_type value = delta)
-  : value{value}
-  {}
+  explicit constexpr SpeedTargetValueType(value_type value = delta) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTargetValueType & type)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                    \
+  if (buffer == #IDENTIFIER) {                     \
     type.value = SpeedTargetValueType::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                     \
+  }                                                \
+  static_assert(true, "")
 
   BOILERPLATE(delta);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    std::stringstream ss { \
-    }; \
-    ss << "given value \'" \
-       << buffer \
+#define BOILERPLATE(IDENTIFIER)                                                                   \
+  if (buffer == #IDENTIFIER) {                                                                    \
+    std::stringstream ss{};                                                                       \
+    ss << "given value \'" << buffer                                                              \
        << "\' is valid OpenSCENARIO value of type SpeedTargetValueType, but it is not supported"; \
-    throw ImplementationFault {ss.str()}; \
-  } static_assert(true, "")
+    throw ImplementationFault{ss.str()};                                                          \
+  }                                                                                               \
+  static_assert(true, "")
 
   BOILERPLATE(factor);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type SpeedTargetValueType";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const SpeedTargetValueType & type)
+  std::basic_ostream<Ts...> & os, const SpeedTargetValueType & type)
 {
   switch (type) {
-    #define BOILERPLATE(NAME) case SpeedTargetValueType::NAME: return os << #NAME;
+#define BOILERPLATE(NAME)          \
+  case SpeedTargetValueType::NAME: \
+    return os << #NAME;
 
     BOILERPLATE(delta);
     BOILERPLATE(factor);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class SpeedTargetValueType holds unexpected value " <<
-        static_cast<SpeedTargetValueType::value_type>(type);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class SpeedTargetValueType holds unexpected value "
+         << static_cast<SpeedTargetValueType::value_type>(type);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_TARGET_VALUE_TYPE_HPP_

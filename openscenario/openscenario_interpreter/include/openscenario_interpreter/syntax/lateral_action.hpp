@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LATERAL_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -36,21 +35,16 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct LateralAction : public ComplexType
 {
-  template
-  <
-    typename Node,
-    typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit LateralAction(const Node & node, Scope & scope)
-  : ComplexType(
-      choice(
-        node,
-        std::make_pair("LaneChangeAction", [&](auto && node) {
-          return make<LaneChangeAction>(node, scope);
-        }),
-        std::make_pair("LaneOffsetAction", UNSUPPORTED()),
-        std::make_pair("LateralDistanceAction", UNSUPPORTED())))
-  {}
+  : ComplexType(choice(
+      node,
+      std::make_pair(
+        "LaneChangeAction", [&](auto && node) { return make<LaneChangeAction>(node, scope); }),
+      std::make_pair("LaneOffsetAction", UNSUPPORTED()),
+      std::make_pair("LateralDistanceAction", UNSUPPORTED())))
+  {
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

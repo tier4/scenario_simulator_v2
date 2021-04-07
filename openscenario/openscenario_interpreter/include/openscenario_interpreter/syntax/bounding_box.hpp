@@ -40,22 +40,23 @@ struct BoundingBox
 
   BoundingBox() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit BoundingBox(const Node & node, Scope & scope)
   : center{readElement<Center>("Center", node, scope)},
     dimensions{readElement<Dimensions>("Dimensions", node, scope)}
-  {}
+  {
+  }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const BoundingBox & rhs)
 {
-  return os << (indent++) << blue << "<BoundingBox>\n" << reset <<
-         rhs.center << "\n" <<
-         rhs.dimensions << "\n" <<
-         (--indent) << blue << "</BoundingBox>" << reset;
+  return os << (indent++) << blue << "<BoundingBox>\n"
+            << reset << rhs.center << "\n"
+            << rhs.dimensions << "\n"
+            << (--indent) << blue << "</BoundingBox>" << reset;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BOUNDING_BOX_HPP_

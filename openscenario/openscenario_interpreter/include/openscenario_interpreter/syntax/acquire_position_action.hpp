@@ -17,9 +17,8 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-#include <simulation_api/helper/helper.hpp>
-
 #include <string>
+#include <traffic_simulator/helper/helper.hpp>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -43,11 +42,11 @@ struct AcquirePositionAction
 
   const Position position;
 
-  template<typename Node>
+  template <typename Node>
   explicit AcquirePositionAction(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope),
-    position(readElement<Position>("Position", node, inner_scope))
-  {}
+  : inner_scope(outer_scope), position(readElement<Position>("Position", node, inner_scope))
+  {
+  }
 
   std::unordered_map<std::string, Boolean> accomplishments;
 
@@ -66,7 +65,7 @@ struct AcquirePositionAction
     }
   }
 
-  #ifndef OPENSCENARIO_INTERPRETER_NO_EXTENSION
+#ifndef OPENSCENARIO_INTERPRETER_NO_EXTENSION
   auto accomplished()
   {
     if (position.is<LanePosition>()) {
@@ -74,8 +73,7 @@ struct AcquirePositionAction
         if (!cdr(each)) {
           cdr(each) = isReachedPosition(
             car(each),
-            static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()),
-            5.0);
+            static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()), 5.0);
         }
       }
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
@@ -83,11 +81,11 @@ struct AcquirePositionAction
       THROW(ImplementationFault);
     }
   }
-  #else
-  const std::true_type accomplished {};
-  #endif
+#else
+  const std::true_type accomplished{};
+#endif
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ACQUIRE_POSITION_ACTION_HPP_

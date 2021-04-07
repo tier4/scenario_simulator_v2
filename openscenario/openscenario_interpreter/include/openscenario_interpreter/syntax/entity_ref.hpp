@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -30,24 +29,18 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct EntityRef
-  : public String
+struct EntityRef : public String
 {
-  template
-  <
-    typename ... Ts
-  >
-  explicit constexpr EntityRef(Ts && ... xs)
-  : String(std::forward<decltype(xs)>(xs)...)
-  {}
+  template <typename... Ts>
+  explicit constexpr EntityRef(Ts &&... xs) : String(std::forward<decltype(xs)>(xs)...)
+  {
+  }
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit EntityRef(const Node & node, Scope & scope)
   : String(readAttribute<String>("entityRef", node, scope))
-  {}
+  {
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

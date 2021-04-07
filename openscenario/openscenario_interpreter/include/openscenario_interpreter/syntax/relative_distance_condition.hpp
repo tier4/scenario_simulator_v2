@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -54,7 +53,7 @@ struct RelativeDistanceCondition
 
   const Rule compare;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit RelativeDistanceCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : entity_ref(readAttribute<String>("entityRef", node, outer_scope)),
@@ -64,7 +63,8 @@ struct RelativeDistanceCondition
     freespace(readAttribute<Boolean>("freespace", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
     for_each(triggering_entities)
-  {}
+  {
+  }
 
   const TriggeringEntities for_each;
 
@@ -95,40 +95,37 @@ struct RelativeDistanceCondition
     }
   }
 
-  template<typename ... Ts>
-  auto operator()(Ts && ... xs)
+  template <typename... Ts>
+  auto operator()(Ts &&... xs)
   {
     return compare(distance(std::forward<decltype(xs)>(xs)...), value);
   }
 
   auto evaluate()
   {
-    #ifndef NDEBUG
+#ifndef NDEBUG
     std::cout << (indent++) << "- BEC.RDC:\n";
-    #endif
+#endif
 
-    const auto result = asBoolean(
-      for_each(
-        [&](auto && triggering_entity)
-        {
-          const auto result = (*this)(triggering_entity);
-          #ifndef NDEBUG
-          std::cout << indent << "  " << triggering_entity << ": ";
-          std::cout << "distance = " << distance(triggering_entity);
-          std::cout << " " << compare << " " << value << "? => " << std::boolalpha << result;
-          std::cout << std::endl;
-          #endif
-          return result;
-        }));
+    const auto result = asBoolean(for_each([&](auto && triggering_entity) {
+      const auto result = (*this)(triggering_entity);
+#ifndef NDEBUG
+      std::cout << indent << "  " << triggering_entity << ": ";
+      std::cout << "distance = " << distance(triggering_entity);
+      std::cout << " " << compare << " " << value << "? => " << std::boolalpha << result;
+      std::cout << std::endl;
+#endif
+      return result;
+    }));
 
-    #ifndef NDEBUG
+#ifndef NDEBUG
     --indent;
-    #endif
+#endif
 
     return result;
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_

@@ -15,15 +15,15 @@
 #ifndef AWAPI_AWAUTO_ADAPTER__AWAPI_VEHICLE_STATUS_PUBLISHER_HPP_
 #define AWAPI_AWAUTO_ADAPTER__AWAPI_VEHICLE_STATUS_PUBLISHER_HPP_
 #include <awapi_awauto_adapter/utility/visibility.h>
+
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <chrono>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
-
-#include <chrono>
 
 namespace autoware_api
 {

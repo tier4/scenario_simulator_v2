@@ -16,10 +16,9 @@
 #define JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_
 
 #include <junit_exporter/test_suites.hpp>
-
 #include <pugixml.hpp>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace junit_exporter
 {
@@ -29,17 +28,11 @@ public:
   JunitExporter();
   void write(const std::string & path);
   void addTestCase(
-    const std::string & name,
-    const std::string & test_suite,
-    const double & time,
+    const std::string & name, const std::string & test_suite, const double & time,
     const TestResult & result);
   void addTestCase(
-    const std::string & name,
-    const std::string & test_suite,
-    const double & time,
-    const TestResult & result,
-    const std::string & type,
-    const std::string & description);
+    const std::string & name, const std::string & test_suite, const double & time,
+    const TestResult & result, const std::string & type, const std::string & description);
 
 private:
   std::string timestamp_;

@@ -8,7 +8,7 @@ We use [ZeroMQ](https://zeromq.org/) in order to communicate with the simulator 
 We use Request/Reply socket in order to run the simulator synchronously.  
 
 ## Schema of the message
-scenario_simulator::API send the request to the simulator, Requests are serialized by using [protobuf](https://developers.google.com/protocol-buffers) and use different port in order to communicate with the simulator.  
+traffic_simulatorr::API send the request to the simulator, Requests are serialized by using [protobuf](https://developers.google.com/protocol-buffers) and use different port in order to communicate with the simulator.  
 
 ### Protobuf Definition
 [Protobuf Definition](../proto_doc/protobuf.md) is here. all datas are serialized as string and send via TCP by using ZeroMQ.

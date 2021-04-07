@@ -19,9 +19,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <openscenario_interpreter/string/split.hpp>
-
 #include <iostream>
+#include <openscenario_interpreter/string/split.hpp>
 #include <string>
 #include <system_error>
 #include <vector>
@@ -32,18 +31,18 @@ inline namespace posix
 {
 auto execvp(const std::vector<std::string> & f_xs)
 {
-  std::vector<std::vector<char>> buffer {};
+  std::vector<std::vector<char>> buffer{};
 
   buffer.resize(f_xs.size());
 
-  std::vector<std::add_pointer<char>::type> argv {};
+  std::vector<std::add_pointer<char>::type> argv{};
 
   argv.reserve(f_xs.size());
 
   for (const auto & each : f_xs) {
-    #ifndef NDEBUG
+#ifndef NDEBUG
     std::cout << std::quoted(each) << std::endl;
-    #endif
+#endif
     buffer.emplace_back(std::begin(each), std::end(each));
     buffer.back().push_back('\0');
 
@@ -82,10 +81,7 @@ auto fork_exec(const std::vector<std::string> & f_xs)
   }
 }
 
-auto fork_exec(const std::string & f_xs)
-{
-  return fork_exec(split(f_xs));
-}
+auto fork_exec(const std::string & f_xs) { return fork_exec(split(f_xs)); }
 
 auto fork_exec(const std::string & f, const std::string & xs)
 {

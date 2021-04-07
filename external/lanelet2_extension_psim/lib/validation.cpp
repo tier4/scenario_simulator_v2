@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <lanelet2_extension_psim/exception.hpp>
-#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
-#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
-
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_io/Io.h>
@@ -25,9 +21,11 @@
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
-#include <pugixml.hpp>
-
 #include <iostream>
+#include <lanelet2_extension_psim/exception.hpp>
+#include <lanelet2_extension_psim/projection/mgrs_projector.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
+#include <pugixml.hpp>
 #include <string>
 
 namespace lanelet
@@ -54,8 +52,7 @@ void validateElevationTag(const std::string filename)
 
   auto osmNode = doc.child("osm");
   for (auto node = osmNode.child(keyword::Node); node;  // NOLINT
-    node = node.next_sibling(keyword::Node))
-  {
+       node = node.next_sibling(keyword::Node)) {
     const auto id = node.attribute(keyword::Id).as_llong(lanelet::InvalId);
     if (!node.find_child_by_attribute(keyword::Tag, keyword::Key, keyword::Elevation)) {
       std::stringstream sstream;
@@ -80,9 +77,9 @@ void validateTrafficLight(const lanelet::LaneletMapPtr lanelet_map)
     for (auto light : autoware_traffic_lights) {
       if (light->lightBulbs().empty()) {
         std::stringstream sstream;
-        sstream << "regulatory element traffic light " << light->id() <<
-          " is missing optional light_bulb member. You won't "
-          "be able to use region_tlr node with this map";
+        sstream << "regulatory element traffic light " << light->id()
+                << " is missing optional light_bulb member. You won't "
+                   "be able to use region_tlr node with this map";
         throw lanelet::HdMapFormatException(sstream.str());
       }
       for (auto light_string : light->lightBulbs()) {
@@ -95,9 +92,9 @@ void validateTrafficLight(const lanelet::LaneletMapPtr lanelet_map)
       for (auto base_string_or_poly : light->trafficLights()) {
         if (!base_string_or_poly.isLineString()) {
           std::stringstream sstream;
-          sstream << "traffic_light " << base_string_or_poly.id() <<
-            " is polygon, and only linestring class is currently supported for "
-            "traffic lights";
+          sstream << "traffic_light " << base_string_or_poly.id()
+                  << " is polygon, and only linestring class is currently supported for "
+                     "traffic lights";
           throw lanelet::HdMapFormatException(sstream.str());
         }
         auto base_string = static_cast<lanelet::LineString3d>(base_string_or_poly);
@@ -119,7 +116,7 @@ void validateTurnDirection(const lanelet::LaneletMapPtr lanelet_map)
 
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules =
     lanelet::traffic_rules::TrafficRulesFactory::create(
-    lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+      lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   lanelet::routing::RoutingGraphPtr vehicle_graph =
     lanelet::routing::RoutingGraph::build(*lanelet_map, *traffic_rules);
 
@@ -134,9 +131,9 @@ void validateTurnDirection(const lanelet::LaneletMapPtr lanelet_map)
     }
     if (!lanelet.hasAttribute("turn_direction")) {
       std::stringstream sstream;
-      sstream << "lanelet " << lanelet.id() <<
-        " seems to be intersecting other lanelet, but does "
-        "not have turn_direction tagging.";
+      sstream << "lanelet " << lanelet.id()
+              << " seems to be intersecting other lanelet, but does "
+                 "not have turn_direction tagging.";
       throw lanelet::HdMapFormatException(sstream.str());
     }
   }

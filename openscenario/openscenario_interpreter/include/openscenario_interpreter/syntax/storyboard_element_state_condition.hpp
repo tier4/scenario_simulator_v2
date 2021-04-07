@@ -41,13 +41,14 @@ struct StoryboardElementStateCondition
 
   Scope inner_scope;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit StoryboardElementStateCondition(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("storyboardElementRef", node, outer_scope)),
     type(readAttribute<StoryboardElementType>("storyboardElementType", node, outer_scope)),
     state(readAttribute<StoryboardElementState>("state", node, outer_scope)),
     inner_scope(outer_scope)
-  {}
+  {
+  }
 
   auto compare(const Element & lhs, StoryboardElementState rhs) const
   {
@@ -56,17 +57,17 @@ struct StoryboardElementStateCondition
 
   auto evaluate() const
   {
-    const auto result {compare(inner_scope.storyboard_elements.at(name).state(), state)};
+    const auto result{compare(inner_scope.storyboard_elements.at(name).state(), state)};
 
-    #ifndef NDEBUG
-    std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" <<
-      reset << " in " << state << "? => " << result << "]" << std::endl;
-    #endif
+#ifndef NDEBUG
+    std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" << reset
+              << " in " << state << "? => " << result << "]" << std::endl;
+#endif
 
     return result;
   }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_STATE_CONDITION_HPP_

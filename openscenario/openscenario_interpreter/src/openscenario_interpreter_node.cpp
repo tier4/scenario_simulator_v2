@@ -13,10 +13,10 @@
 // limitations under the License.
 
 #include <glog/logging.h>
-#include <openscenario_interpreter/openscenario_interpreter.hpp>
 
 #include <cstdlib>
 #include <memory>
+#include <openscenario_interpreter/openscenario_interpreter.hpp>
 
 int main(const int argc, char const * const * const argv)
 {
@@ -25,9 +25,9 @@ int main(const int argc, char const * const * const argv)
 
   rclcpp::init(argc, argv);
 
-  rclcpp::executors::SingleThreadedExecutor executor {};
+  rclcpp::executors::SingleThreadedExecutor executor{};
 
-  rclcpp::NodeOptions options {};
+  rclcpp::NodeOptions options{};
 
   const auto node = std::make_shared<openscenario_interpreter::Interpreter>(options);
 

@@ -15,13 +15,12 @@
 #ifndef JUNIT_EXPORTER__TEST_SUITES_HPP_
 #define JUNIT_EXPORTER__TEST_SUITES_HPP_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace junit_exporter
 {
-enum class TestResult
-{
+enum class TestResult {
   SUCCESS,
   FAILURE,
   ERROR,
@@ -30,25 +29,20 @@ enum class TestResult
 struct TestCase
 {
   TestCase(
-    const std::string & name,
-    const std::string & test_suite,
-    const std::string & classname,
-    const double & time,
-    const TestResult & result)
+    const std::string & name, const std::string & test_suite, const std::string & classname,
+    const double & time, const TestResult & result)
   : name(name),
     test_suite(test_suite),
     classname(classname),
     time(time),
     result(result),
     type("type"),
-    description("") {}
+    description("")
+  {
+  }
   TestCase(
-    const std::string & name,
-    const std::string & test_suite,
-    const std::string & classname,
-    const double & time,
-    const TestResult & result,
-    const std::string & type,
+    const std::string & name, const std::string & test_suite, const std::string & classname,
+    const double & time, const TestResult & result, const std::string & type,
     const std::string & description)
   : name(name),
     test_suite(test_suite),
@@ -56,7 +50,9 @@ struct TestCase
     time(time),
     result(result),
     type(type),
-    description(description) {}
+    description(description)
+  {
+  }
   const std::string name;
   const std::string test_suite;
   const std::string classname;
@@ -74,10 +70,7 @@ public:
   double getTime() const;
   std::vector<std::string> getTestSuites() const;
   std::vector<TestCase> getTestSuite(const std::string & test_suite);
-  bool testCaseExists(
-    const std::string & name,
-    const std::string & test_suite
-  );
+  bool testCaseExists(const std::string & name, const std::string & test_suite);
 
 private:
   std::vector<TestCase> test_cases_;

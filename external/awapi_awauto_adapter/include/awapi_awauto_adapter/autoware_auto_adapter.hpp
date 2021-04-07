@@ -16,6 +16,7 @@
 #define AWAPI_AWAUTO_ADAPTER__AUTOWARE_AUTO_ADAPTER_HPP_
 #include <awapi_awauto_adapter/utility/visibility.h>
 #include <tf2_ros/transform_listener.h>
+
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/lane_change_status.hpp>
@@ -23,21 +24,20 @@
 #include <autoware_perception_msgs/msg/dynamic_object_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <autoware_planning_msgs/msg/route.hpp>
-#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <awapi_awauto_adapter/awapi_awauto_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_lane_change_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_obstacle_avoidance_status_publisher.hpp>
 #include <awapi_awauto_adapter/awapi_vehicle_status_publisher.hpp>
+#include <chrono>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/empty.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <std_msgs/msg/string.hpp>
-
-#include <chrono>
-#include <memory>
 
 namespace autoware_api
 {

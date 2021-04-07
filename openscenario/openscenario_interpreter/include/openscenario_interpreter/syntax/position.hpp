@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/lane_position.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
-
 #include <unordered_map>
 #include <utility>
 
@@ -44,29 +43,22 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
-struct Position
-  : public Element
+struct Position : public Element
 {
-  template<typename XML, typename ... Ts>
-  explicit Position(const XML & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        ELEMENT(/*   */ WorldPosition),
-        ELEMENT(RelativeWorldPosition),
-        std::make_pair("RelativeObjectPosition", UNSUPPORTED()),
-        std::make_pair("RoadPosition", UNSUPPORTED()),
-        std::make_pair("RelativeRoadPosition", UNSUPPORTED()),
-        ELEMENT(LanePosition),
-        std::make_pair("RelativeLanePosition", UNSUPPORTED()),
-        std::make_pair("RoutePosition", UNSUPPORTED())))
-  {}
+  template <typename XML, typename... Ts>
+  explicit Position(const XML & node, Ts &&... xs)
+  : Element(choice(
+      node, ELEMENT(/*   */ WorldPosition), ELEMENT(RelativeWorldPosition),
+      std::make_pair("RelativeObjectPosition", UNSUPPORTED()),
+      std::make_pair("RoadPosition", UNSUPPORTED()),
+      std::make_pair("RelativeRoadPosition", UNSUPPORTED()), ELEMENT(LanePosition),
+      std::make_pair("RelativeLanePosition", UNSUPPORTED()),
+      std::make_pair("RoutePosition", UNSUPPORTED())))
+  {
+  }
 
   explicit operator geometry_msgs::msg::Pose() const
   {
@@ -82,32 +74,29 @@ struct Position
 
 #undef ELEMENT
 
-template<typename R = void, typename F, typename ... Ts>
-decltype(auto) apply(F && f, const Position & position, Ts && ... xs)
+template <typename R = void, typename F, typename... Ts>
+decltype(auto) apply(F && f, const Position & position, Ts &&... xs)
 {
-  #define BOILERPLATE(TYPE) \
-  { \
-    typeid(TYPE), [](F && f, const Position & position, Ts && ... xs) \
-    { \
+#define BOILERPLATE(TYPE)                                               \
+  {                                                                     \
+    typeid(TYPE), [](F && f, const Position & position, Ts &&... xs) {  \
       return f(position.as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
-    } \
+    }                                                                   \
   }
 
   static const std::unordered_map<
-    std::type_index,
-    std::function<R(F && f, const Position & position, Ts && ... xs)>> overloads
-  {
-    BOILERPLATE(WorldPosition),
-    BOILERPLATE(RelativeWorldPosition),
-    // BOILERPLATE(RelativeObjectPosition),
-    // BOILERPLATE(RoadPosition),
-    // BOILERPLATE(RelativeRoadPosition),
-    BOILERPLATE(LanePosition),
-    // BOILERPLATE(RelativeLanePosition),
-    // BOILERPLATE(RoutePosition),
-  };
+    std::type_index, std::function<R(F && f, const Position & position, Ts &&... xs)>>
+    overloads{
+      BOILERPLATE(WorldPosition), BOILERPLATE(RelativeWorldPosition),
+      // BOILERPLATE(RelativeObjectPosition),
+      // BOILERPLATE(RoadPosition),
+      // BOILERPLATE(RelativeRoadPosition),
+      BOILERPLATE(LanePosition),
+      // BOILERPLATE(RelativeLanePosition),
+      // BOILERPLATE(RoutePosition),
+    };
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
   return overloads.at(position.type())(
     std::forward<decltype(f)>(f), position, std::forward<decltype(xs)>(xs)...);

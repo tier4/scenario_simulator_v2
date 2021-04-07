@@ -15,45 +15,47 @@
 #ifndef SIMULATION_INTERFACE__ZMQ_SERVER_HPP_
 #define SIMULATION_INTERFACE__ZMQ_SERVER_HPP_
 
-#include <simulation_interface/constants.hpp>
-#include <zmqpp/zmqpp.hpp>
+#include <functional>
 #include <rclcpp/rclcpp.hpp>
+#include <simulation_interface/constants.hpp>
 #include <string>
 #include <thread>
-#include <functional>
+#include <zmqpp/zmqpp.hpp>
 
 namespace zeromq
 {
-template<typename ReqType, typename ResType>
+template <typename ReqType, typename ResType>
 class Server
 {
 public:
   explicit Server(
     const simulation_interface::TransportProtocol & protocol,
-    const simulation_interface::HostName & hostname,
-    const unsigned int & port,
+    const simulation_interface::HostName & hostname, const unsigned int & port,
     std::function<void(const ReqType &, ResType &)> func)
-  : Server(
-      simulation_interface::getEndPoint(protocol, hostname, port), func) {}
+  : Server(simulation_interface::getEndPoint(protocol, hostname, port), func)
+  {
+  }
   explicit Server(
-    const simulation_interface::TransportProtocol & protocol,
+    const simulation_interface::TransportProtocol & protocol, const std::string & ip_address,
+    const unsigned int & port, std::function<void(const ReqType &, ResType &)> func)
+  : Server(
+      simulation_interface::enumToString(protocol) + "://" + ip_address + ":" +
+        std::to_string(port),
+      func)
+  {
+  }
+  explicit Server(
     const std::string & ip_address, const unsigned int & port,
     std::function<void(const ReqType &, ResType &)> func)
-  : Server(
-      simulation_interface::enumToString(protocol) +
-      "://" + ip_address + ":" + std::to_string(port), func) {}
+  : Server("tcp://" + ip_address + ":" + std::to_string(port), func)
+  {
+  }
+  explicit Server(const unsigned int & port, std::function<void(const ReqType &, ResType &)> func)
+  : Server("tcp://*:" + std::to_string(port), func)
+  {
+  }
   explicit Server(
-    const std::string & ip_address,
-    const unsigned int & port,
-    std::function<void(const ReqType &, ResType &)> func)
-  : Server("tcp://" + ip_address + ":" + std::to_string(port), func) {}
-  explicit Server(
-    const unsigned int & port,
-    std::function<void(const ReqType &, ResType &)> func)
-  : Server("tcp://*:" + std::to_string(port), func) {}
-  explicit Server(
-    const std::string & endpoint,
-    std::function<void(const ReqType &, ResType &)> func)
+    const std::string & endpoint, std::function<void(const ReqType &, ResType &)> func)
   : endpoint_(endpoint),
     context_(zmqpp::context()),
     type_(zmqpp::socket_type::reply),

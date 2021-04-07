@@ -21,7 +21,6 @@
 #include <openscenario_interpreter/syntax/file_header.hpp>
 #include <openscenario_interpreter/syntax/road_network.hpp>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -47,16 +46,14 @@ struct ScenarioDefinition
 {
   Element storyboard;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
   {
     // std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
 
-    callWithElements(
-      node, "ParameterDeclarations", 0, unbounded, [&](auto && each)
-      {
-        return make<ParameterDeclarations>(each, outer_scope);
-      });
+    callWithElements(node, "ParameterDeclarations", 0, unbounded, [&](auto && each) {
+      return make<ParameterDeclarations>(each, outer_scope);
+    });
 
     // for (const auto & each : outer_scope.parameters) {
     //   std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
@@ -65,23 +62,16 @@ struct ScenarioDefinition
     //     " -->" << std::endl;
     // }
 
-    callWithElements(
-      node, "CatalogLocations", 0, 1, [&](auto && node)
-      {
-        return make<CatalogLocations>(node, outer_scope);
-      });
+    callWithElements(node, "CatalogLocations", 0, 1, [&](auto && node) {
+      return make<CatalogLocations>(node, outer_scope);
+    });
 
-    callWithElements(
-      node, "RoadNetwork", 1, 1, [&](auto && node)
-      {
-        return make<RoadNetwork>(node, outer_scope);
-      });
+    callWithElements(node, "RoadNetwork", 1, 1, [&](auto && node) {
+      return make<RoadNetwork>(node, outer_scope);
+    });
 
     callWithElement(
-      node, "Entities", [&](auto && node)
-      {
-        return make<Entities>(node, outer_scope);
-      });
+      node, "Entities", [&](auto && node) { return make<Entities>(node, outer_scope); });
 
     // std::cout << (indent++) << "<Entities>" << std::endl;
     //
@@ -91,27 +81,23 @@ struct ScenarioDefinition
     //
     // std::cout << (--indent) << "</Entities>" << std::endl;
 
-    callWithElement(
-      node, "Storyboard", [&](auto && node)
-      {
-        return storyboard = make<Storyboard>(node, outer_scope);
-      });
+    callWithElement(node, "Storyboard", [&](auto && node) {
+      return storyboard = make<Storyboard>(node, outer_scope);
+    });
 
     // std::cout << (--indent) << "</OpenSCENARIO>" << std::endl;
   }
 
-  template<typename ... Ts>
-  decltype(auto) complete(Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) complete(Ts &&... xs)
   {
     return storyboard.as<Storyboard>().complete(std::forward<decltype(xs)>(xs)...);
   }
 
-  template<typename ... Ts>
-  auto evaluate(Ts && ... xs)
+  template <typename... Ts>
+  auto evaluate(Ts &&... xs)
   {
-    const auto result {
-      storyboard.evaluate()
-    };
+    const auto result{storyboard.evaluate()};
 
     updateFrame();
 
@@ -147,8 +133,7 @@ std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
  * </xsd:group>
  *
  * -------------------------------------------------------------------------- */
-struct OpenScenario
-  : public pugi::xml_document
+struct OpenScenario : public pugi::xml_document
 {
   Element category;
 
@@ -156,12 +141,10 @@ struct OpenScenario
 
   const auto & load(const std::string & scenario)
   {
-    const auto result {
-      load_file(scenario.c_str())
-    };
+    const auto result{load_file(scenario.c_str())};
 
     if (!result) {
-      std::stringstream ss {};
+      std::stringstream ss{};
       ss << "while loading scenario \"" << scenario << "\" => " << result.description();
       throw SyntaxError(ss.str());
     } else {
@@ -169,14 +152,10 @@ struct OpenScenario
     }
   }
 
-  decltype(auto) load(const boost::filesystem::path & scenario)
-  {
-    return load(scenario.string());
-  }
+  decltype(auto) load(const boost::filesystem::path & scenario) { return load(scenario.string()); }
 
-  template<typename ... Ts>
-  explicit OpenScenario(Ts && ... xs)
-  : scope(std::forward<decltype(xs)>(xs)...)
+  template <typename... Ts>
+  explicit OpenScenario(Ts &&... xs) : scope(std::forward<decltype(xs)>(xs)...)
   {
     if (load(scope.scenario).child("OpenSCENARIO").child("Catalog")) {
       THROW_IMPLEMENTATION_FAULT();
@@ -185,8 +164,8 @@ struct OpenScenario
     }
   }
 
-  template<typename ... Ts>
-  decltype(auto) complete(Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) complete(Ts &&... xs)
   {
     if (category.is<ScenarioDefinition>()) {
       return category.as<ScenarioDefinition>().complete(std::forward<decltype(xs)>(xs)...);
@@ -195,25 +174,25 @@ struct OpenScenario
     }
   }
 
-  template<typename ... Ts>
-  decltype(auto) evaluate(Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) evaluate(Ts &&... xs)
   {
     return category.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 
-  template<typename ... Ts>
-  decltype(auto) operator()(Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) operator()(Ts &&... xs)
   {
     return evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const OpenScenario &)
 {
   return os << unspecified;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_

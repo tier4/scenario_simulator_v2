@@ -37,8 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Event
-  : public StoryboardElement<Event>, public Elements
+struct Event : public StoryboardElement<Event>, public Elements
 {
   // Name of the event.
   const String name;
@@ -50,7 +49,7 @@ struct Event
 
   Trigger start_trigger;
 
-  template<typename XML>
+  template <typename XML>
   explicit Event(const XML & node, Scope & outer_scope)
   : StoryboardElement(
       readAttribute<UnsignedInt>("maximumExecutionCount", node, outer_scope, UnsignedInt(1))),
@@ -59,22 +58,14 @@ struct Event
     inner_scope(outer_scope),
     start_trigger(readElement<Trigger>("StartTrigger", node, inner_scope))
   {
-    callWithElements(
-      node, "Action", 1, unbounded, [&](auto && node)
-      {
-        return push_back(readStoryboardElement<Action>(node, inner_scope, maximum_execution_count));
-      });
+    callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
+      return push_back(readStoryboardElement<Action>(node, inner_scope, maximum_execution_count));
+    });
   }
 
-  auto ready()
-  {
-    return start_trigger.evaluate().as<Boolean>();
-  }
+  auto ready() { return start_trigger.evaluate().as<Boolean>(); }
 
-  static constexpr auto stopTriggered() noexcept
-  {
-    return false;
-  }
+  static constexpr auto stopTriggered() noexcept { return false; }
 
   /* -------------------------------------------------------------------------
    *
@@ -84,11 +75,9 @@ struct Event
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(
-      std::begin(*this), std::end(*this), [](auto && each)
-      {
-        return each.template as<Action>().complete();
-      });
+    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+      return each.template as<Action>().complete();
+    });
   }
 
   using StoryboardElement::evaluate;
@@ -96,7 +85,7 @@ struct Event
   void stop()
   {
     for (auto && each : *this) {
-      each.as<Action>().override ();
+      each.as<Action>().override();
       each.evaluate();
     }
   }
@@ -108,7 +97,7 @@ struct Event
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_

@@ -21,22 +21,18 @@ namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
-template<typename T, typename = void>
+template <typename T, typename = void>
 struct IfHasMemberFunctionStart
 {
-  static constexpr void callIt(const T &) noexcept
-  {}
+  static constexpr void callIt(const T &) noexcept {}
 };
 
-template<typename T>
+template <typename T>
 struct IfHasMemberFunctionStart<T, typename std::enable_if<HasMemberFunctionStart<T>::value>::type>
 {
-  static constexpr decltype(auto) callIt(T & then)
-  {
-    return then.start();
-  }
+  static constexpr decltype(auto) callIt(T & then) { return then.start(); }
 };
-}
+}  // namespace type_traits
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_START_HPP_

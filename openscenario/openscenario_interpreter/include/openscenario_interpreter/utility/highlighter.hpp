@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__UTILITY__HIGHLIGHTER_HPP_
 #define OPENSCENARIO_INTERPRETER__UTILITY__HIGHLIGHTER_HPP_
 
-#include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
-
 #include <iostream>
+#include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
 #include <string>
 #include <utility>
 
@@ -29,34 +28,25 @@ struct AttributeHighlighter
 {
   const std::string name, value;
 
-  template<typename ... Ts>
-  decltype(auto) operator()(std::basic_ostream<Ts...>&os) const
+  template <typename... Ts>
+  decltype(auto) operator()(std::basic_ostream<Ts...> & os) const
   {
     return os << yellow << name << reset << "=" << cyan << "\"" << value << "\"" << reset;
   }
 };
 
-template
-<
-  typename ... Ts
->
-decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const AttributeHighlighter & highlight)
+template <typename... Ts>
+decltype(auto) operator<<(std::basic_ostream<Ts...> & os, const AttributeHighlighter & highlight)
 {
   return highlight(os);
 }
 
-template
-<
-  typename T,
-  typename = typename std::enable_if<HasStreamOutputOperator<T>::value>::type
->
+template <typename T, typename = typename std::enable_if<HasStreamOutputOperator<T>::value>::type>
 auto highlight(const std::string & name, const T & value)
 {
-  return AttributeHighlighter {
-    name, boost::lexical_cast<std::string>(value)
-  };
+  return AttributeHighlighter{name, boost::lexical_cast<std::string>(value)};
 }
-}
+}  // namespace utility
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__UTILITY__HIGHLIGHTER_HPP_

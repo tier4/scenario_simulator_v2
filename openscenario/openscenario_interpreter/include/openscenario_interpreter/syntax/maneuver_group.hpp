@@ -36,8 +36,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * ======================================================================== */
-struct ManeuverGroup
-  : public StoryboardElement<ManeuverGroup>, public Elements
+struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
 {
   const String name;
 
@@ -45,33 +44,24 @@ struct ManeuverGroup
 
   const Actors actors;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit ManeuverGroup(const Node & node, Scope & outer_scope)
-  : StoryboardElement{
-      readAttribute<UnsignedInteger>(
-        "maximumExecutionCount", node, outer_scope, UnsignedInteger())},
+  : StoryboardElement{readAttribute<UnsignedInteger>(
+      "maximumExecutionCount", node, outer_scope, UnsignedInteger())},
     name{readAttribute<String>("name", node, outer_scope)},
     inner_scope{outer_scope},
     actors{readElement<Actors>("Actors", node, inner_scope)}
   {
     callWithElements(node, "CatalogReference", 0, unbounded, THROW_UNSUPPORTED_ERROR(node));
 
-    callWithElements(
-      node, "Maneuver", 0, unbounded, [&](auto && node)
-      {
-        return push_back(readStoryboardElement<Maneuver>(node, inner_scope));
-      });
+    callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
+      return push_back(readStoryboardElement<Maneuver>(node, inner_scope));
+    });
   }
 
-  static constexpr auto ready() noexcept
-  {
-    return true;
-  }
+  static constexpr auto ready() noexcept { return true; }
 
-  static constexpr auto stopTriggered() noexcept
-  {
-    return false;
-  }
+  static constexpr auto stopTriggered() noexcept { return false; }
 
   /* -------------------------------------------------------------------------
    *
@@ -82,11 +72,9 @@ struct ManeuverGroup
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(
-      std::begin(*this), std::end(*this), [&](auto && each)
-      {
-        return each.template as<Maneuver>().complete();
-      });
+    return std::all_of(std::begin(*this), std::end(*this), [&](auto && each) {
+      return each.template as<Maneuver>().complete();
+    });
   }
 
   using StoryboardElement::evaluate;
@@ -94,7 +82,7 @@ struct ManeuverGroup
   void stop()
   {
     for (auto && each : *this) {
-      each.as<Maneuver>().override ();
+      each.as<Maneuver>().override();
       each.evaluate();
     }
   }
@@ -106,7 +94,7 @@ struct ManeuverGroup
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_GROUP_HPP_

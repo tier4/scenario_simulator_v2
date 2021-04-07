@@ -15,10 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
+#include <limits>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-
-#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -39,11 +38,12 @@ struct TrafficSignalState
 {
   const String traffic_signal_id, state;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit TrafficSignalState(const Node & node, Scope & scope)
   : traffic_signal_id{readAttribute<String>("trafficSignalId", node, scope)},
     state{readAttribute<String>("state", node, scope)}
-  {}
+  {
+  }
 };
 
 /* ---- Phase ------------------------------------------------------------------
@@ -65,14 +65,13 @@ struct Phase
 
   const TrafficSignalState state;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Phase(const Node & node, Scope & outer_scope)
   : name{readAttribute<String>("name", node, outer_scope)},
-    duration{
-      readAttribute<Double>(
-        "duration", node, outer_scope, Double::infinity())},
+    duration{readAttribute<Double>("duration", node, outer_scope, Double::infinity())},
     state{readElement<TrafficSignalState>("TrafficSignalState", node, outer_scope)}
-  {}
+  {
+  }
 };
 
 /* ---- TrafficSignalController ------------------------------------------------
@@ -97,13 +96,14 @@ struct TrafficSignalController
 
   const Phase phase;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     delay(readAttribute<Double>("delay", node, outer_scope, Double())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
     phase(readElement<Phase>("Phase", node, outer_scope))
-  {}
+  {
+  }
 };
 
 /* ==== TrafficSignals =========================================================
@@ -115,22 +115,19 @@ struct TrafficSignalController
  * </xsd:complexType>
  *
  * ========================================================================== */
-struct TrafficSignals
-  : public std::vector<TrafficSignalController>
+struct TrafficSignals : public std::vector<TrafficSignalController>
 {
   TrafficSignals() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit TrafficSignals(const Node & node, Scope & outer_scope)
   {
-    callWithElements(
-      node, "TrafficSignalController", 0, unbounded, [&](auto && node)
-      {
-        emplace_back(node, outer_scope);
-      });
+    callWithElements(node, "TrafficSignalController", 0, unbounded, [&](auto && node) {
+      emplace_back(node, outer_scope);
+    });
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_

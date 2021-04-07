@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_
 
 #include <openscenario_interpreter/syntax/private_action.hpp>
-
 #include <vector>
 
 namespace openscenario_interpreter
@@ -33,26 +32,17 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Private
-  : public std::vector<PrivateAction>
+struct Private : public std::vector<PrivateAction>
 {
   Scope inner_scope;
 
-  template
-  <
-    typename Node
-  >
-  explicit Private(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope)
+  template <typename Node>
+  explicit Private(const Node & node, Scope & outer_scope) : inner_scope(outer_scope)
   {
-    inner_scope.actors.emplace_back(
-      readAttribute<String>("entityRef", node, inner_scope));
+    inner_scope.actors.emplace_back(readAttribute<String>("entityRef", node, inner_scope));
 
     callWithElements(
-      node, "PrivateAction", 1, unbounded, [&](auto && node)
-      {
-        emplace_back(node, inner_scope);
-      });
+      node, "PrivateAction", 1, unbounded, [&](auto && node) { emplace_back(node, inner_scope); });
   }
 
   auto evaluate()
@@ -64,7 +54,7 @@ struct Private
     return unspecified;
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_

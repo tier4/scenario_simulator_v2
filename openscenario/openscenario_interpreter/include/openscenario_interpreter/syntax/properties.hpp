@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/property.hpp>
-
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -63,33 +62,23 @@ struct Properties
 
   Properties() = default;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit Properties(const Node & node, Scope & outer_scope)
   {
-    callWithElements(
-      node, "Property", 0, unbounded, [&](auto && node)
-      {
-        return properties.emplace(
-          std::piecewise_construct,
-          std::forward_as_tuple(readAttribute<Property::Name>("name", node, outer_scope)),
-          std::forward_as_tuple(node, outer_scope));
-      });
+    callWithElements(node, "Property", 0, unbounded, [&](auto && node) {
+      return properties.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(readAttribute<Property::Name>("name", node, outer_scope)),
+        std::forward_as_tuple(node, outer_scope));
+    });
 
-    callWithElements(
-      node, "File", 0, unbounded, [&](auto && node)
-      {
-        return files.emplace_back(std::forward<decltype(node)>(node), outer_scope);
-      });
+    callWithElements(node, "File", 0, unbounded, [&](auto && node) {
+      return files.emplace_back(std::forward<decltype(node)>(node), outer_scope);
+    });
   }
 
-  template
-  <
-    typename ... Ts
-  >
-  decltype(auto) operator[](Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) operator[](Ts &&... xs)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);
   }

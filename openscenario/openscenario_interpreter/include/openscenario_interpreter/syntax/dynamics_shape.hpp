@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_SHAPE_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -44,8 +43,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct DynamicsShape
 {
-  enum value_type
-  {
+  enum value_type {
     // Value changes in a linear function: f(x) = f_0 + rate * x.
     linear,
 
@@ -61,74 +59,72 @@ struct DynamicsShape
     step,
   } value;
 
-  constexpr DynamicsShape(value_type value = {})
-  : value{value}
-  {}
+  constexpr DynamicsShape(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, DynamicsShape & shape)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)        \
+  if (buffer == #IDENTIFIER) {         \
     shape = DynamicsShape::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                         \
+  }                                    \
+  static_assert(true, "")
 
   BOILERPLATE(linear);
   BOILERPLATE(step);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    std::stringstream ss { \
-    }; \
-    ss << "given value \'" << buffer << \
-      "\' is valid OpenSCENARIO value of type DynamicsShape, but it is not supported"; \
-    throw ImplementationFault {ss.str()}; \
-  } static_assert(true, "")
+#define BOILERPLATE(IDENTIFIER)                                                            \
+  if (buffer == #IDENTIFIER) {                                                             \
+    std::stringstream ss{};                                                                \
+    ss << "given value \'" << buffer                                                       \
+       << "\' is valid OpenSCENARIO value of type DynamicsShape, but it is not supported"; \
+    throw ImplementationFault{ss.str()};                                                   \
+  }                                                                                        \
+  static_assert(true, "")
 
   BOILERPLATE(cubic);
   BOILERPLATE(sinusoidal);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type DynamicsShape";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const DynamicsShape & shape)
 {
   switch (shape) {
-    #define BOILERPLATE(NAME) case DynamicsShape::NAME: return os << #NAME;
+#define BOILERPLATE(NAME)   \
+  case DynamicsShape::NAME: \
+    return os << #NAME;
 
     BOILERPLATE(linear);
     BOILERPLATE(cubic);
     BOILERPLATE(sinusoidal);
     BOILERPLATE(step);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class DynamicsShape holds unexpected value " <<
-        static_cast<DynamicsShape::value_type>(shape);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class DynamicsShape holds unexpected value "
+         << static_cast<DynamicsShape::value_type>(shape);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_SHAPE_HPP_

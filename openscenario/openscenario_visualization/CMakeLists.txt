@@ -21,7 +21,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(visualization_msgs REQUIRED)
-find_package(simulation_api REQUIRED)
+find_package(traffic_simulator REQUIRED)
 find_package(openscenario_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -38,7 +38,7 @@ ament_target_dependencies(openscenario_visualization_component
   rclcpp
   rclcpp_components
   rclcpp_lifecycle
-  simulation_api
+  traffic_simulator
   visualization_msgs
   openscenario_msgs
   quaternion_operation
@@ -51,7 +51,7 @@ ament_target_dependencies(openscenario_visualization_node
   rclcpp
   rclcpp_components
   rclcpp_lifecycle
-  simulation_api
+  traffic_simulator
   visualization_msgs
   openscenario_msgs
   quaternion_operation

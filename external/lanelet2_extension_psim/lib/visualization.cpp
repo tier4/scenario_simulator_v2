@@ -14,26 +14,23 @@
 
 // Authors: Simon Thompson, Ryohsuke Mitsudome
 
+#include <Eigen/Eigen>
+#include <algorithm>
 #include <lanelet2_extension_psim/exception.hpp>
 #include <lanelet2_extension_psim/utility/message_conversion.hpp>
 #include <lanelet2_extension_psim/utility/query.hpp>
 #include <lanelet2_extension_psim/utility/utilities.hpp>
 #include <lanelet2_extension_psim/visualization/visualization.hpp>
-
 #include <rclcpp/rclcpp.hpp>
-#include <visualization_msgs/msg/marker.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
-
-#include <Eigen/Eigen>
-
-#include <algorithm>
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace
 {
-template<typename T>
+template <typename T>
 bool exists(const std::unordered_set<T> & set, const T & element)
 {
   return std::find(set.begin(), set.end(), element) != set.end();
@@ -211,7 +208,7 @@ void laneletDirectionAsMarker(
     c.b = 1.0;
   }
 
-  for (size_t ci = 0; ci < center_ls.size() - 1; ) {
+  for (size_t ci = 0; ci < center_ls.size() - 1;) {
     pc = center_ls[ci];
     if (center_ls.size() > 1) {
       pc2 = center_ls[ci + 1];
@@ -876,9 +873,7 @@ void visualization::lineString2Marker(
 }
 
 visualization_msgs::msg::MarkerArray visualization::generateLaneletIdMarker(
-  const lanelet::ConstLanelets road_lanelets,
-  const std_msgs::msg::ColorRGBA c,
-  const double scale)
+  const lanelet::ConstLanelets road_lanelets, const std_msgs::msg::ColorRGBA c, const double scale)
 {
   visualization_msgs::msg::MarkerArray markers;
   for (const auto & ll : road_lanelets) {

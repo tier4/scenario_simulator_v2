@@ -24,9 +24,9 @@ inline namespace utility
 {
 struct Indent
 {
-  std::size_t depth {0};
+  std::size_t depth{0};
 
-  std::size_t width {2};
+  std::size_t width{2};
 
   auto & reset()
   {
@@ -48,25 +48,25 @@ struct Indent
 
   auto operator++(int)
   {
-    Indent result {*this};
+    Indent result{*this};
     ++depth;
     return result;
   }
 
   auto operator--(int)
   {
-    Indent result {*this};
+    Indent result{*this};
     depth && --depth;
     return result;
   }
 } static indent;
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Indent & indent)
 {
   return os << std::string(indent.depth * 2, ' ');
 }
-}
+}  // namespace utility
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__UTILITY__INDENT_HPP_

@@ -35,13 +35,14 @@ struct TrafficSignalCondition
 
   const String state;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit TrafficSignalCondition(const Node & node, Scope & scope)
   : name{readAttribute<String>("name", node, scope)},
     state{readAttribute<String>("state", node, scope)}
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONDITION_HPP_
