@@ -45,9 +45,9 @@ def generate_launch_description():
                 'port': 8080}],
             arguments=[('__log_level:=info')]),
         Node(
-            package='scenario_simulator',
-            executable='scenario_simulator_node',
-            name='scenario_simulator_node',
+            package='simple_sensor_simulator',
+            executable='simple_sensor_simulator_node',
+            name='simple_sensor_simulator_node',
             output='screen',
             parameters=[{
                 'port': 8080

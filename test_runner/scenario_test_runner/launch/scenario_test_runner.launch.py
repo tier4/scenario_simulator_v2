@@ -91,8 +91,8 @@ def generate_launch_description():
                 ],),
 
         Node(
-            package='scenario_simulator',
-            executable='scenario_simulator_node',
+            package='simple_sensor_simulator',
+            executable='simple_sensor_simulator_node',
             namespace='simulation',
             name='simple_sensor_simulator',
             output='screen',
