@@ -24,15 +24,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ParameterDeclaration =================================================
+/* ---- ParameterDeclaration ---------------------------------------------------
  *
- * <xsd:complexType name="ParameterDeclaration">
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="parameterType" type="ParameterType" use="required"/>
- *   <xsd:attribute name="value" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterDeclaration">
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="parameterType" type="ParameterType" use="required"/>
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ParameterDeclaration
 {
   const String name;
@@ -43,12 +43,11 @@ struct ParameterDeclaration
 
   auto includes(const std::string & name, const std::vector<char> & chars)
   {
-    for (const auto & each : chars) {
-      if (name.find(each) != std::string::npos) {
-        return true;
-      }
-    }
-    return false;
+    return std::any_of(
+      std::begin(chars), std::end(chars), [&](const auto & each)
+      {
+        return name.find(each) != std::string::npos;
+      });
   }
 
   ParameterDeclaration() = default;
@@ -109,16 +108,7 @@ struct ParameterDeclaration
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const ParameterDeclaration & declaration)
-{
-  return os << indent <<
-         blue << "<ParameterDeclaration" <<
-         " " << highlight("name", declaration.name) <<
-         " " << highlight("parameterType", declaration.parameter_type) <<
-         " " << highlight("value", declaration.value) <<
-         blue << "/>" <<
-         reset;
-}
+std::ostream & operator<<(std::ostream &, const ParameterDeclaration &);
 }
 }  // namespace openscenario_interpreter
 

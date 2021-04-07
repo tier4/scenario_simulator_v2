@@ -53,12 +53,7 @@ struct ParameterDeclarations
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const ParameterDeclarations &)
-{
-  return os <<
-         (indent++) << blue << "<ParameterDeclarations>" << reset << "\n" <<
-         (--indent) << blue << "</ParameterDeclarations>";
-}
+std::ostream & operator<<(std::ostream &, const ParameterDeclarations &);
 }
 }  // namespace openscenario_interpreter
 

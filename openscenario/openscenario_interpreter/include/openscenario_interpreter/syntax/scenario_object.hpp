@@ -77,19 +77,15 @@ struct ScenarioObject
     return spawn(
       object_controller.isEgo(),
       name,
-      // static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle)
-      boost::lexical_cast<String>(vehicle)
-    );
+      static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
   }
 
-  decltype(auto) operator()(const Pedestrian & pedestrian)
+  decltype(auto) operator()(const Pedestrian & pedestrian) const
   {
     return spawn(
       false,
       name,
-      // static_cast<openscenario_msgs::msg::PedestrianParameters>(vehicle)
-      boost::lexical_cast<String>(pedestrian)
-    );
+      static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
   }
 
   auto evaluate()
