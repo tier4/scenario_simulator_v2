@@ -13,7 +13,7 @@ Provide simulator API for scenario testing.
 - [Examples](/package/traffic_simulator/markdown/Examples)
 
 ### Simple Sensor Simulator Package
-Simulator for scenario testing.
+Reference implementation of the simulator integrated with this package.
 
 - [Classes](/package/simple_sensor_simulator/markdown/Classes)
 - [Namespaces](/package/simple_sensor_simulator/markdown/Namespaces)
