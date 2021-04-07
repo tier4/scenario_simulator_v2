@@ -36,13 +36,11 @@ struct AddEntityAction
 {
   const Position position;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit AddEntityAction(const Node & node, Scope & outer_scope)
   : position(readElement<Position>("Position", node, outer_scope))
-  {}
+  {
+  }
 
   decltype(auto) operator()(const String & entity_ref) const
   {
@@ -50,7 +48,7 @@ struct AddEntityAction
     return unspecified;
   }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_

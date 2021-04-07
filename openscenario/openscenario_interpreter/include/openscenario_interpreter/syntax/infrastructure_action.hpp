@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INFRASTRUCTURE_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/traffic_signal_action.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -32,16 +31,15 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct InfrastructureAction
-  : public Element
+struct InfrastructureAction : public Element
 {
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit InfrastructureAction(const Node & node, Scope & outer_scope)
-  : Element(
-      readElement<TrafficSignalAction>("TrafficSignalAction", node, outer_scope))
-  {}
+  : Element(readElement<TrafficSignalAction>("TrafficSignalAction", node, outer_scope))
+  {
+  }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__INFRASTRUCTURE_ACTION_HPP_

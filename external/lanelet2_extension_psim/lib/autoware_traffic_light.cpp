@@ -14,12 +14,11 @@
 
 // Authors: Ryohsuke Mitsudome
 
-#include <boost/variant.hpp>
-#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
-
 #include <lanelet2_core/primitives/RegulatoryElement.h>
 
 #include <algorithm>
+#include <boost/variant.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -30,7 +29,7 @@ namespace autoware
 {
 namespace
 {
-template<typename T>
+template <typename T>
 bool findAndErase(const T & primitive, RuleParameters * member)
 {
   if (member == nullptr) {
@@ -45,17 +44,17 @@ bool findAndErase(const T & primitive, RuleParameters * member)
   return true;
 }
 
-template<typename T>
+template <typename T>
 RuleParameters toRuleParameters(const std::vector<T> & primitives)
 {
-  auto cast_func = [](const auto & elem) {return static_cast<RuleParameter>(elem);};
+  auto cast_func = [](const auto & elem) { return static_cast<RuleParameter>(elem); };
   return utils::transform(primitives, cast_func);
 }
 
-template<>
+template <>
 RuleParameters toRuleParameters(const std::vector<LineStringOrPolygon3d> & primitives)
 {
-  auto cast_func = [](const auto & elem) {return elem.asRuleParameter();};
+  auto cast_func = [](const auto & elem) { return elem.asRuleParameter(); };
   return utils::transform(primitives, cast_func);
 }
 
@@ -82,8 +81,8 @@ LineStringsOrPolygons3d getLsOrPoly(const RuleParameterMap & paramsMap, RoleName
 ConstLineStringsOrPolygons3d getConstLsOrPoly(const RuleParameterMap & params, RoleName role)
 {
   auto cast_func = [](auto & lsOrPoly) {
-      return static_cast<ConstLineStringOrPolygon3d>(lsOrPoly);
-    };
+    return static_cast<ConstLineStringOrPolygon3d>(lsOrPoly);
+  };
   return utils::transform(getLsOrPoly(params, role), cast_func);
 }
 

@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_TARGET_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_TARGET_HPP_
 
-#include <openscenario_interpreter/syntax/relative_target_speed.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_speed.hpp>
-
+#include <openscenario_interpreter/syntax/relative_target_speed.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -35,26 +34,16 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
-struct SpeedActionTarget
-  : public Element
+struct SpeedActionTarget : public Element
 {
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit SpeedActionTarget(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        ELEMENT(RelativeTargetSpeed),
-        ELEMENT(AbsoluteTargetSpeed)))
-  {}
+  template <typename Node, typename... Ts>
+  explicit SpeedActionTarget(const Node & node, Ts &&... xs)
+  : Element(choice(node, ELEMENT(RelativeTargetSpeed), ELEMENT(AbsoluteTargetSpeed)))
+  {
+  }
 };
 
 #undef ELEMENT

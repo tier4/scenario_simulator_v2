@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/act.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
-
 #include <string>
 #include <vector>
 
@@ -36,35 +35,26 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * ======================================================================== */
-struct Story
-  : public StoryboardElement<Story>, public Elements
+struct Story : public StoryboardElement<Story>, public Elements
 {
   const String name;
 
   Scope inner_scope;
 
-  template<typename Node>
+  template <typename Node>
   explicit Story(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    inner_scope{outer_scope}
+  : name{readAttribute<String>("name", node, outer_scope)}, inner_scope{outer_scope}
   {
-    callWithElements(
-      node, "ParameterDeclarations", 0, 1, [&](auto && node)
-      {
-        return make<ParameterDeclarations>(node, inner_scope);
-      });
+    callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
+      return make<ParameterDeclarations>(node, inner_scope);
+    });
 
-    callWithElements(
-      node, "Act", 1, unbounded, [&](auto && node)
-      {
-        return push_back(readStoryboardElement<Act>(node, inner_scope));
-      });
+    callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
+      return push_back(readStoryboardElement<Act>(node, inner_scope));
+    });
   }
 
-  static constexpr auto ready() noexcept
-  {
-    return true;
-  }
+  static constexpr auto ready() noexcept { return true; }
 
   /* -------------------------------------------------------------------------
    *
@@ -75,22 +65,17 @@ struct Story
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(
-      std::begin(*this), std::end(*this), [](auto && each)
-      {
-        return each.template as<Act>().complete();
-      });
+    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+      return each.template as<Act>().complete();
+    });
   }
 
-  static constexpr auto stopTriggered() noexcept
-  {
-    return false;
-  }
+  static constexpr auto stopTriggered() noexcept { return false; }
 
   auto stop()
   {
     for (auto && each : *this) {
-      each.as<Act>().override ();
+      each.as<Act>().override();
       each.evaluate();
     }
   }
@@ -104,7 +89,7 @@ struct Story
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STORY_HPP_

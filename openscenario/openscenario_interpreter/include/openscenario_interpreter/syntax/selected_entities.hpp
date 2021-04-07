@@ -33,8 +33,9 @@ inline namespace syntax
  *
  * ======================================================================== */
 struct SelectedEntities
-{};
-}
+{
+};
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_

@@ -13,13 +13,11 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-
 #include <lanelet2_core/Attribute.h>
 #include <lanelet2_core/LaneletMap.h>
+#include <math.h>
 
 #include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
-
-#include <math.h>
 #include <vector>
 
 using lanelet::LineString3d;
@@ -30,7 +28,7 @@ using lanelet::utils::getId;
 
 namespace
 {
-template<typename T>
+template <typename T>
 std::vector<T> convertToVector(T item)
 {
   std::vector<T> vector = {item};

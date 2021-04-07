@@ -20,15 +20,11 @@
 #include <utility>
 
 #include "lifecycle_msgs/msg/transition.hpp"
-
-#include "rclcpp/rclcpp.hpp"
 #include "rclcpp/publisher.hpp"
-
+#include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "rclcpp_lifecycle/lifecycle_publisher.hpp"
-
 #include "rcutils/logging_macros.h"
-
 #include "std_msgs/msg/string.hpp"
 
 using namespace std::chrono_literals;
@@ -36,15 +32,11 @@ using namespace std::chrono_literals;
 class ScenarioRunnerMock : public rclcpp_lifecycle::LifecycleNode
 {
 public:
-  explicit ScenarioRunnerMock(
-    const std::string & node_name,
-    bool intra_process_comms = false)
+  explicit ScenarioRunnerMock(const std::string & node_name, bool intra_process_comms = false)
   : rclcpp_lifecycle::LifecycleNode(
-      node_name, rclcpp::NodeOptions().use_intra_process_comms(
-        intra_process_comms))
+      node_name, rclcpp::NodeOptions().use_intra_process_comms(intra_process_comms))
   {
   }
-
 
   void publish()
   {
@@ -61,17 +53,16 @@ public:
     pub_->publish(std::move(msg));
   }
 
-
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_configure(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(
+    const rclcpp_lifecycle::State &)
   {
     RCLCPP_INFO(get_logger(), "on_configure() is called.");
     auto timer_ = this->create_wall_timer(1s, std::bind(&ScenarioRunnerMock::publish, this));
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_activate(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
+    const rclcpp_lifecycle::State &)
   {
     RCUTILS_LOG_INFO_NAMED(get_name(), "on_activate() is called.");
     pub_ = this->create_publisher<std_msgs::msg::String>("lifecycle_chatter", 10);
@@ -81,29 +72,27 @@ public:
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_deactivate(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(
+    const rclcpp_lifecycle::State &)
   {
     pub_->on_deactivate();
     RCUTILS_LOG_INFO_NAMED(get_name(), "on_deactivate() is called.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
 
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_cleanup(const rclcpp_lifecycle::State &)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(
+    const rclcpp_lifecycle::State &)
   {
     RCUTILS_LOG_INFO_NAMED(get_name(), "on cleanup is called.");
     timer_.reset();
     pub_.reset();
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
   }
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_shutdown(const rclcpp_lifecycle::State & state)
+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_shutdown(
+    const rclcpp_lifecycle::State & state)
   {
     RCUTILS_LOG_INFO_NAMED(
-      get_name(),
-      "on shutdown is called from state %s.",
-      state.label().c_str());
+      get_name(), "on shutdown is called from state %s.", state.label().c_str());
     timer_.reset();
     pub_.reset();
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;

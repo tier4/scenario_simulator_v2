@@ -20,12 +20,13 @@ inline namespace syntax
 {
 std::ostream & operator<<(std::ostream & os, const ParameterDeclaration & datum)
 {
-  return os << indent <<
-         blue << "<ParameterDeclaration" <<
-         " " << highlight("name", datum.name) <<
-         " " << highlight("parameterType", datum.parameter_type) <<
-         " " << highlight("value", datum.value) <<
-         blue << "/>" << reset;
+  // clang-format off
+
+  return os << indent << blue << "<ParameterDeclaration " << highlight("name", datum.name)
+                                                   << " " << highlight("parameterType", datum.parameter_type)
+                                                   << " " << highlight("value", datum.value) << blue << "/>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

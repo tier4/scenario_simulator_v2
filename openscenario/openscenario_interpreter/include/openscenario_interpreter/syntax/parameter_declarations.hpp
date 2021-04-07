@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_declaration.hpp>
-
 #include <vector>
 
 namespace openscenario_interpreter
@@ -34,27 +33,21 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterDeclarations
-  : public std::vector<ParameterDeclaration>
+struct ParameterDeclarations : public std::vector<ParameterDeclaration>
 {
   ParameterDeclarations() = default;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit ParameterDeclarations(const Node & node, Scope & outer_scope)
   {
-    callWithElements(
-      node, "ParameterDeclaration", 0, unbounded, [&](auto && each)
-      {
-        return emplace_back(each, outer_scope);
-      });
+    callWithElements(node, "ParameterDeclaration", 0, unbounded, [&](auto && each) {
+      return emplace_back(each, outer_scope);
+    });
   }
 };
 
 std::ostream & operator<<(std::ostream &, const ParameterDeclarations &);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATIONS_HPP_

@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STRING_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -29,7 +28,7 @@ inline namespace syntax
  *
  * ======================================================================== */
 using String = std::string;
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STRING_HPP_

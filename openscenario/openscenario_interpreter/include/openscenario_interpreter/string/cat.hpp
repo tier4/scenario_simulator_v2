@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__STRING__CAT_HPP_
 
 #include <openscenario_interpreter/functional/fold.hpp>
-
 #include <sstream>
 #include <string>
 #include <utility>
@@ -25,22 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace string
 {
-auto cat =
-  [](auto && ... xs)
-  {
-    std::stringstream ss {};
+auto cat = [](auto &&... xs) {
+  std::stringstream ss{};
 
-    auto write =
-      [](auto && os, auto && x)
-      {
-        os.get() << x;
-        return std::forward<decltype(os)>(os);
-      };
-
-    fold_left(write, std::ref(ss), std::forward<decltype(xs)>(xs)...);
-
-    return ss.str();
+  auto write = [](auto && os, auto && x) {
+    os.get() << x;
+    return std::forward<decltype(os)>(os);
   };
+
+  fold_left(write, std::ref(ss), std::forward<decltype(xs)>(xs)...);
+
+  return ss.str();
+};
 }  // namespace string
 }  // namespace openscenario_interpreter
 

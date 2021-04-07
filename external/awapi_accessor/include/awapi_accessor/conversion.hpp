@@ -26,36 +26,34 @@
 #include <boost/mpl/and.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>
-
 #include <type_traits>
 #include <utility>
 
 namespace autoware_api
 {
-#define REQUIRES(...) \
-  typename = typename std::enable_if<__VA_ARGS__::value>::type
+#define REQUIRES(...) typename = typename std::enable_if<__VA_ARGS__::value>::type
 
 #define REQUIRES_VA(...) \
   typename = typename std::enable_if<boost::mpl::and_<__VA_ARGS__>::value>::type
 
-template<typename From, typename To>
+template <typename From, typename To>
 struct converter
-{};
+{
+};
 
-template<typename To, typename From>
+template <typename To, typename From>
 decltype(auto) convertTo(From && from)
 {
-  return converter<
-    typename std::decay<From>::type, typename std::decay<To>::type
-  >()(std::forward<decltype(from)>(from));
+  return converter<typename std::decay<From>::type, typename std::decay<To>::type>()(
+    std::forward<decltype(from)>(from));
 }
 
-template<typename From>
+template <typename From>
 struct converter<From, std_msgs::msg::Bool>
 {
   using result_type = std_msgs::msg::Bool;
 
-  template<REQUIRES(std::is_convertible<From, bool>)>
+  template <REQUIRES(std::is_convertible<From, bool>)>
   result_type operator()(const From & from)
   {
     result_type to;
@@ -67,12 +65,12 @@ struct converter<From, std_msgs::msg::Bool>
   }
 };
 
-template<typename From>
+template <typename From>
 struct converter<From, std_msgs::msg::Float32>
 {
   using result_type = std_msgs::msg::Float32;
 
-  template<REQUIRES(std::is_floating_point<From>)>
+  template <REQUIRES(std::is_floating_point<From>)>
   result_type operator()(const From from)
   {
     result_type to;
@@ -84,12 +82,12 @@ struct converter<From, std_msgs::msg::Float32>
   }
 };
 
-template<typename From>
+template <typename From>
 struct converter<From, autoware_vehicle_msgs::msg::Engage>
 {
   using result_type = autoware_vehicle_msgs::msg::Engage;
 
-  template<REQUIRES(std::is_convertible<From, bool>)>
+  template <REQUIRES(std::is_convertible<From, bool>)>
   result_type operator()(const From & from)
   {
     result_type to;

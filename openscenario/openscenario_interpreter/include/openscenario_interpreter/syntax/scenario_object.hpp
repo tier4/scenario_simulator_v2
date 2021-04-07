@@ -45,7 +45,7 @@ struct ScenarioObject
  *  NOTE: This framework expresses xsd:group as mixin.
  *
  * ------------------------------------------------------------------------- */
-  : public EntityObject
+: public EntityObject
 {
   /* ---- name -----------------------------------------------------------------
    *
@@ -65,27 +65,25 @@ struct ScenarioObject
 
   static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
   : EntityObject(node, outer_scope),
     name(readAttribute<String>("name", node, outer_scope)),
     object_controller(readElement<ObjectController>("ObjectController", node, outer_scope))
-  {}
+  {
+  }
 
   decltype(auto) operator()(const Vehicle & vehicle)
   {
     return spawn(
-      object_controller.isEgo(),
-      name,
+      object_controller.isEgo(), name,
       static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
   }
 
   decltype(auto) operator()(const Pedestrian & pedestrian) const
   {
     return spawn(
-      false,
-      name,
-      static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+      false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
   }
 
   auto evaluate()
@@ -95,13 +93,11 @@ struct ScenarioObject
         setController(name, object_controller);
 
         if (object_controller.isEgo()) {
-          attachLidarSensor(
-            simulation_api::helper::constructLidarConfiguration(
-              simulation_api::helper::LidarType::VLP32,
-              name, "/sensing/lidar/no_ground/pointcloud"));
-          attachDetectionSensor(
-            simulation_api::helper::constructDetectionSensorConfiguration(
-              name, "/perception/object_recognition/objects", 0.1));
+          attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+            traffic_simulator::helper::LidarType::VLP32, name,
+            "/sensing/lidar/no_ground/pointcloud"));
+          attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+            name, "/perception/object_recognition/objects", 0.1));
         }
       }
       return unspecified;
@@ -113,15 +109,13 @@ struct ScenarioObject
 
 std::ostream & operator<<(std::ostream & os, const ScenarioObject & datum)
 {
-  os << (indent++);
-  os << blue << "<ScenarioObject ";
-  os << highlight("name", datum.name);
-  os << blue << ">\n" << reset;
-  os << static_cast<const EntityObject &>(datum) << "\n";
-  os << (--indent);
-  os << blue << "</ScenarioObject>" << reset;
+  // clang-format off
 
-  return os;
+  return os << (indent++) << blue << "<ScenarioObject " << highlight("name", datum.name) << blue << ">\n" << reset
+            << static_cast<const EntityObject &>(datum) << "\n"
+            << (--indent) << blue << "</ScenarioObject>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

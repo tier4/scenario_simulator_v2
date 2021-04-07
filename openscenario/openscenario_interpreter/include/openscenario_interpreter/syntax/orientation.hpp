@@ -41,25 +41,18 @@ struct Orientation
 
   Orientation() = default;
 
-  template
-  <
-    typename Node,
-    typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit Orientation(const Node & node, Scope & scope)
-  : type(
-      readAttribute<ReferenceContext>("type", node, scope, ReferenceContext::relative)),
-    h(
-      readAttribute<Double>("h", node, scope, Double())),
-    p(
-      readAttribute<Double>("p", node, scope, Double())),
-    r(
-      readAttribute<Double>("r", node, scope, Double()))
-  {}
+  : type(readAttribute<ReferenceContext>("type", node, scope, ReferenceContext::relative)),
+    h(readAttribute<Double>("h", node, scope, Double())),
+    p(readAttribute<Double>("p", node, scope, Double())),
+    r(readAttribute<Double>("r", node, scope, Double()))
+  {
+  }
 
   operator geometry_msgs::msg::Vector3() const
   {
-    geometry_msgs::msg::Vector3 result {};
+    geometry_msgs::msg::Vector3 result{};
 
     switch (type) {
       case ReferenceContext::relative:
@@ -69,7 +62,7 @@ struct Orientation
         break;
 
       case ReferenceContext::absolute:
-      // Jumps can never reach here (see ReferenceContext::operator >>).
+        // Jumps can never reach here (see ReferenceContext::operator >>).
 
       default:
         break;
@@ -78,7 +71,7 @@ struct Orientation
     return result;
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ORIENTATION_HPP_

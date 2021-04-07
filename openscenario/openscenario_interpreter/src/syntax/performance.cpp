@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/performance.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -22,9 +21,13 @@ inline namespace syntax
 {
 std::ostream & operator<<(std::ostream & os, const Performance & datum)
 {
-  return os << indent << blue << "<Performance" << " " << highlight("maxSpeed", datum.max_speed) <<
-         " " << highlight("maxAcceleration", datum.max_acceleration) <<
-         " " << highlight("maxDeceleration", datum.max_deceleration) << blue << "/>" << reset;
+  // clang-format off
+
+  return os << indent << blue << "<Performance " << highlight("maxSpeed", datum.max_speed)
+                                          << " " << highlight("maxAcceleration", datum.max_acceleration)
+                                          << " " << highlight("maxDeceleration", datum.max_deceleration) << blue << "/>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

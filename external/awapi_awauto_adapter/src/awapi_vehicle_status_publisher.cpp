@@ -12,30 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
-#include <awapi_awauto_adapter/awapi_vehicle_status_publisher.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <string>
+#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <awapi_awauto_adapter/awapi_vehicle_status_publisher.hpp>
 #include <limits>
+#include <string>
 using VehicleStatus = autoware_api_msgs::msg::AwapiVehicleStatus;
 
 namespace autoware_api
 {
-AutowareVehicleStatusPublisher::AutowareVehicleStatusPublisher(
-  const rclcpp::NodeOptions & options)
+AutowareVehicleStatusPublisher::AutowareVehicleStatusPublisher(const rclcpp::NodeOptions & options)
 : rclcpp::Node("awapi_vehicle_status_publisher", options)
 {
   // publisher
   pub_vehicle_status_ = this->create_publisher<VehicleStatus>("/awapi/vehicle/get/status", 1);
 
   sub_twist_ = create_subscription<TwistStamped>(
-    "/localization/twist",
-    1,
-    [&](const TwistStamped::SharedPtr msg_ptr)
-    {
-      twist_ptr_ = msg_ptr;
-    });
+    "/localization/twist", 1, [&](const TwistStamped::SharedPtr msg_ptr) { twist_ptr_ = msg_ptr; });
 }
 void AutowareVehicleStatusPublisher::publish_vehicle_status()
 {

@@ -37,39 +37,37 @@ struct SpeedCondition
 
   const Rule compare;
 
-  template<typename AST>
+  template <typename AST>
   explicit SpeedCondition(
     const AST & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
     for_each(triggering_entities)
-  {}
+  {
+  }
 
   const TriggeringEntities for_each;
 
   auto evaluate()
   {
-    #ifndef NDEBUG
+#ifndef NDEBUG
     std::cout << (indent++) << "- BEC.SC:\n";
-    #endif
+#endif
 
-    const auto result = asBoolean(
-      for_each(
-        [&](auto && triggering_entity)
-        {
-          const auto result = compare(
-            getEntityStatus(triggering_entity).action_status.twist.linear.x, value);
-          #ifndef NDEBUG
-          std::cout << indent << "  " << triggering_entity << "'s speed = ";
-          std::cout << getEntityStatus(triggering_entity).action_status.twist.linear.x;
-          std::cout << " " << compare << " " << value << "? => " << result << std::endl;
-          #endif
-          return result;
-        }));
+    const auto result = asBoolean(for_each([&](auto && triggering_entity) {
+      const auto result =
+        compare(getEntityStatus(triggering_entity).action_status.twist.linear.x, value);
+#ifndef NDEBUG
+      std::cout << indent << "  " << triggering_entity << "'s speed = ";
+      std::cout << getEntityStatus(triggering_entity).action_status.twist.linear.x;
+      std::cout << " " << compare << " " << value << "? => " << result << std::endl;
+#endif
+      return result;
+    }));
 
-    #ifndef NDEBUG
+#ifndef NDEBUG
     --indent;
-    #endif
+#endif
 
     return result;
   }

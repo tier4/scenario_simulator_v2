@@ -47,5 +47,4 @@ struct Catalog
         </Pedestrian>)";
 };
 
-
 #endif  // CPP_MOCK_SCENARIOS__CATALOGS_HPP_

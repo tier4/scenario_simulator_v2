@@ -15,14 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_
 
+#include <functional>
+#include <iterator>
+#include <limits>
 #include <openscenario_interpreter/iterator/size.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/type_traits/if_not_default_constructible.hpp>
 #include <openscenario_interpreter/utility/pugi_extension.hpp>
-
-#include <functional>
-#include <iterator>
-#include <limits>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -31,16 +30,11 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
-constexpr auto unbounded {
-  std::numeric_limits<
-    typename std::iterator_traits<
-      typename pugi::xml_node::iterator
-    >::difference_type
-  >::max()
-};
+constexpr auto unbounded{std::numeric_limits<
+  typename std::iterator_traits<typename pugi::xml_node::iterator>::difference_type>::max()};
 
-template<typename T, typename Node, typename ... Ts>
-auto readElement(const std::string & name, const Node & parent, Ts && ... xs)
+template <typename T, typename Node, typename... Ts>
+auto readElement(const std::string & name, const Node & parent, Ts &&... xs)
 {
   if (const auto child = parent.child(name.c_str())) {
     return T(child, std::forward<decltype(xs)>(xs)...);
@@ -49,10 +43,9 @@ auto readElement(const std::string & name, const Node & parent, Ts && ... xs)
   }
 }
 
-template<typename Node, typename Callee>
+template <typename Node, typename Callee>
 void callWithElements(
-  const Node & parent,
-  const std::string & name,
+  const Node & parent, const std::string & name,
   typename std::iterator_traits<typename Node::iterator>::difference_type min_occurs,
   typename std::iterator_traits<typename Node::iterator>::difference_type max_occurs,
   Callee && call_with)
@@ -60,13 +53,13 @@ void callWithElements(
   const auto children = parent.children(name.c_str());
   if (const auto size = iterator::size(children)) {
     if (min_occurs != 0 && size < min_occurs) {
-      std::stringstream ss {};
+      std::stringstream ss{};
       ss << parent.name() << " requires class " << name;
       ss << " at least " << min_occurs << " element" << (1 < min_occurs ? "s" : "");
       ss << ", but " << size << " element" << (1 < size ? "s" : "") << " specified";
       throw SyntaxError(ss.str());
     } else if (max_occurs < size) {
-      std::stringstream ss {};
+      std::stringstream ss{};
       ss << parent.name() << " requires class " << name;
       ss << " at most " << max_occurs << " element" << (1 < max_occurs ? "s" : "");
       ss << ", but " << size << " element" << (1 < size ? "s" : "") << " specified";
@@ -77,7 +70,7 @@ void callWithElements(
       }
     }
   } else if (min_occurs != 0) {
-    std::stringstream ss {};
+    std::stringstream ss{};
     ss << parent.name() << " requires class " << name;
     ss << " at least " << min_occurs << " element" << (1 < min_occurs ? "s" : "");
     ss << ", but there is no specification";
@@ -85,29 +78,23 @@ void callWithElements(
   }
 }
 
-template<typename Node, typename ... Ts>
-decltype(auto) choice(const Node & node, Ts && ... xs)
+template <typename Node, typename... Ts>
+decltype(auto) choice(const Node & node, Ts &&... xs)
 {
-  const std::unordered_map<
-    std::string,
-    std::function<Element(const Node &)>>
-  callees
-  {
-    std::forward<decltype(xs)>(xs)...
-  };
+  const std::unordered_map<std::string, std::function<Element(const Node &)>> callees{
+    std::forward<decltype(xs)>(xs)...};
 
-  std::unordered_map<std::string, Node> specs {};
+  std::unordered_map<std::string, Node> specs{};
 
   for (const auto & each : callees) {
-    if (const auto child {node.child(std::get<0>(each).c_str())}) {
+    if (const auto child{node.child(std::get<0>(each).c_str())}) {
       specs.emplace(std::get<0>(each), child);
     }
   }
 
-  auto print_keys_to = [&](auto & os, const auto & xs) -> decltype(auto)
-  {
+  auto print_keys_to = [&](auto & os, const auto & xs) -> decltype(auto) {
     if (!xs.empty()) {
-      for (auto iter {std::begin(xs)}; iter != std::end(xs); ++iter) {
+      for (auto iter{std::begin(xs)}; iter != std::end(xs); ++iter) {
         os << std::get<0>(*iter);
 
         switch (std::distance(iter, std::end(xs))) {
@@ -129,13 +116,13 @@ decltype(auto) choice(const Node & node, Ts && ... xs)
   };
 
   if (specs.empty()) {
-    std::stringstream ss {};
+    std::stringstream ss{};
     ss << "Class " << node.name() << " requires one of following elements: ";
     print_keys_to(ss, callees);
     ss << ". But no element specified";
     throw SyntaxError(ss.str());
   } else if (1 < specs.size()) {
-    std::stringstream ss {};
+    std::stringstream ss{};
     ss << "Class " << node.name() << " requires just one of following elements: ";
     print_keys_to(ss, callees);
     ss << ". But " << specs.size() << " element" << (1 < specs.size() ? "s" : "") << " (";
@@ -143,18 +130,18 @@ decltype(auto) choice(const Node & node, Ts && ... xs)
     ss << ") specified";
     throw SyntaxError(ss.str());
   } else {
-    const auto iter {std::cbegin(specs)};
+    const auto iter{std::cbegin(specs)};
     return callees.at(std::get<0>(*iter))(std::get<1>(*iter));
   }
 }
 
-template<typename Callee>
+template <typename Callee>
 decltype(auto) callWithElement(
   const pugi::xml_node & parent, const std::string & name, Callee && call_with)
 {
   return callWithElements(parent, name, 1, 1, std::forward<decltype(call_with)>(call_with));
 }
-}
+}  // namespace reader
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__READER__ELEMENT_HPP_

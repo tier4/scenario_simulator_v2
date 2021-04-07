@@ -32,12 +32,13 @@ struct Directory
 {
   const String path;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Directory(const Node & node, Scope & outer_scope)
   : path{readAttribute<String>("path", node, outer_scope)}
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DIRECTORY_HPP_

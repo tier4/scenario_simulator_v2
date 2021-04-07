@@ -91,10 +91,10 @@ def generate_launch_description():
                 ],),
 
         Node(
-            package='scenario_simulator',
-            executable='scenario_simulator_node',
+            package='simple_sensor_simulator',
+            executable='simple_sensor_simulator_node',
             namespace='simulation',
-            name='sensor_simulator',
+            name='simple_sensor_simulator',
             output='screen',
             parameters=[
                 {'port': port},
@@ -133,7 +133,7 @@ def generate_launch_description():
         #         },
         #     arguments=[
         #         # '-d', os.path.join(
-        #         #     get_package_share_directory('simulation_api'), 'config/moc_test.rviz')
+        #         #     get_package_share_directory('traffic_simulator'), 'config/moc_test.rviz')
         #         '-d', str(
         #             Path(get_package_share_directory('autoware_launch')) / 'rviz/autoware.rviz')
         #         ],

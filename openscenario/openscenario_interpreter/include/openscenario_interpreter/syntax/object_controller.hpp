@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
 #include <openscenario_interpreter/syntax/controller.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -24,11 +23,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
 /* ---- ObjectController -------------------------------------------------------
  *
@@ -47,19 +43,15 @@ struct ObjectController : public ComplexType
 {
   explicit ObjectController()  // ObjectController is optional element.
   : ComplexType(unspecified)
-  {}
+  {
+  }
 
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit ObjectController(const Node & node, Ts && ... xs)
+  template <typename Node, typename... Ts>
+  explicit ObjectController(const Node & node, Ts &&... xs)
   : ComplexType(
-      choice(
-        node,
-        std::make_pair("CatalogReference", UNSUPPORTED()),
-        ELEMENT(Controller)))
-  {}
+      choice(node, std::make_pair("CatalogReference", UNSUPPORTED()), ELEMENT(Controller)))
+  {
+  }
 
   bool isEgo() &
   {

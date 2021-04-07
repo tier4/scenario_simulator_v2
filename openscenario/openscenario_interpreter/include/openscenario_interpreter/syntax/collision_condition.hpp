@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -44,31 +43,22 @@ struct CollisionCondition
 
   const TriggeringEntities for_each;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit CollisionCondition(
     const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  : given(
-      choice(
-        node,
-        std::make_pair("EntityRef", [&](auto && node) {
-          return make<EntityRef>(node, scope);
-        }),
-        std::make_pair("ByType", UNSUPPORTED()))),
+  : given(choice(
+      node, std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
+      std::make_pair("ByType", UNSUPPORTED()))),
     for_each(triggering_entities)
-  {}
+  {
+  }
 
   auto evaluate() const noexcept
   {
     if (given.is<EntityRef>()) {
-      return asBoolean(
-        for_each(
-          [&](auto && triggering_entity)
-          {
-            return checkCollision(triggering_entity, given.as<EntityRef>());
-          }));
+      return asBoolean(for_each([&](auto && triggering_entity) {
+        return checkCollision(triggering_entity, given.as<EntityRef>());
+      }));
     } else {
       return false_v;
     }

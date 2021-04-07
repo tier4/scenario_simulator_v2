@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -74,23 +73,18 @@ struct Controller
    * ------------------------------------------------------------------------ */
   Properties properties;
 
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit Controller(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     inner_scope(outer_scope),
     parameter_declarations(
       readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)),
     properties(readElement<Properties>("Properties", node, inner_scope))
-  {}
+  {
+  }
 
-  template
-  <
-    typename ... Ts
-  >
-  decltype(auto) operator[](Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) operator[](Ts &&... xs)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);
   }

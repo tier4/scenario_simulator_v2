@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/double.hpp>
-
 #include <iomanip>
 #include <limits>
+#include <openscenario_interpreter/syntax/double.hpp>
 #include <regex>
 #include <string>
 
@@ -30,19 +29,19 @@ std::ostream & operator<<(std::ostream & os, const Double & datum)
 
 std::istream & operator>>(std::istream & is, Double & datum)
 {
-  std::string token {};
+  std::string token{};
 
   is >> token;
 
-  static const std::regex infinity {R"([+-]?INF)"};
+  static const std::regex infinity{R"([+-]?INF)"};
 
-  std::smatch result {};
+  std::smatch result{};
 
-  #ifndef OPENSCENARIO_INTERPRETER_ALLOW_INFINITY
+#ifndef OPENSCENARIO_INTERPRETER_ALLOW_INFINITY
   constexpr auto upper_bound_value = std::numeric_limits<Double::value_type>::max();
-  #else
+#else
   constexpr auto upper_bound_value = std::numeric_limits<Double::value_type>::infinity();
-  #endif
+#endif
 
   if (std::regex_match(token, result, infinity)) {
     datum.data = (result.str(1) == "-" ? -1 : 1) * upper_bound_value;

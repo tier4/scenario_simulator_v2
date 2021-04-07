@@ -17,18 +17,16 @@
 #ifndef LANELET2_EXTENSION_PSIM__VISUALIZATION__VISUALIZATION_HPP_
 #define LANELET2_EXTENSION_PSIM__VISUALIZATION__VISUALIZATION_HPP_
 
-#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
-#include <lanelet2_extension_psim/utility/query.hpp>
-
-#include <geometry_msgs/msg/polygon_stamped.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
-
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/primitives/Lanelet.h>
 
+#include <geometry_msgs/msg/polygon_stamped.hpp>
+#include <lanelet2_extension_psim/regulatory_elements/autoware_traffic_light.hpp>
+#include <lanelet2_extension_psim/utility/query.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <vector>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace lanelet
 {
@@ -178,8 +176,7 @@ visualization_msgs::msg::MarkerArray parkingSpacesAsMarkerArray(
  * @return visualization_msgs::MarkerArray
  */
 visualization_msgs::msg::MarkerArray generateLaneletIdMarker(
-  const lanelet::ConstLanelets road_lanelets,
-  const std_msgs::msg::ColorRGBA c,
+  const lanelet::ConstLanelets road_lanelets, const std_msgs::msg::ColorRGBA c,
   const double scale = 0.5);
 }  // namespace visualization
 }  // namespace lanelet

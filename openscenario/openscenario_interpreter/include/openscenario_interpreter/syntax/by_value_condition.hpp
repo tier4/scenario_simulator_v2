@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__BY_VALUE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BY_VALUE_CONDITION_HPP_
 
+#include <openscenario_interpreter/syntax/parameter_condition.hpp>
 #include <openscenario_interpreter/syntax/simulation_time_condition.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state_condition.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_condition.hpp>
-#include <openscenario_interpreter/syntax/parameter_condition.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -42,31 +41,20 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 #define ELEMENT(TYPE) \
-  std::make_pair( \
-    #TYPE, [&](auto && node) \
-    { \
-      return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); \
-    })
+  std::make_pair(     \
+    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
 
-struct ByValueCondition
-  : public Element
+struct ByValueCondition : public Element
 {
-  template
-  <
-    typename Node, typename ... Ts
-  >
-  explicit ByValueCondition(const Node & node, Ts && ... xs)
-  : Element(
-      choice(
-        node,
-        ELEMENT(ParameterCondition),
-        std::make_pair("TimeOfDayCondition", UNSUPPORTED()),
-        ELEMENT(SimulationTimeCondition),
-        ELEMENT(StoryboardElementStateCondition),
-        std::make_pair("UserDefinedValueCondition", UNSUPPORTED()),
-        ELEMENT(TrafficSignalCondition),
-        std::make_pair("TrafficSignalControllerCondition", UNSUPPORTED())))
-  {}
+  template <typename Node, typename... Ts>
+  explicit ByValueCondition(const Node & node, Ts &&... xs)
+  : Element(choice(
+      node, ELEMENT(ParameterCondition), std::make_pair("TimeOfDayCondition", UNSUPPORTED()),
+      ELEMENT(SimulationTimeCondition), ELEMENT(StoryboardElementStateCondition),
+      std::make_pair("UserDefinedValueCondition", UNSUPPORTED()), ELEMENT(TrafficSignalCondition),
+      std::make_pair("TrafficSignalControllerCondition", UNSUPPORTED())))
+  {
+  }
 };
 
 #undef ELEMENT

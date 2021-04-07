@@ -21,15 +21,16 @@ namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
-template<typename T, typename = void>
-struct HasMemberFunctionAccomplished
-  : public std::false_type
-{};
+template <typename T, typename = void>
+struct HasMemberFunctionAccomplished : public std::false_type
+{
+};
 
-template<typename T>
+template <typename T>
 struct HasMemberFunctionAccomplished<T, void_t<decltype(std::declval<T>().accomplished())>>
-  : public std::true_type
-{};
+: public std::true_type
+{
+};
 }  // namespace type_traits
 }  // namespace openscenario_interpreter
 

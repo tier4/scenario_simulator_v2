@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATIONS_HPP_
 
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
-
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -39,20 +38,14 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  callWithElements( \
-    node, #TYPE "Catalog", 0, 1, [&](auto && node) \
-    { \
-      return emplace(#TYPE "Catalog", CatalogLocation(node, outer_scope)); \
-    })
+#define ELEMENT(TYPE)                                                    \
+  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {      \
+    return emplace(#TYPE "Catalog", CatalogLocation(node, outer_scope)); \
+  })
 
-struct CatalogLocations
-  : public std::unordered_map<String, CatalogLocation>
+struct CatalogLocations : public std::unordered_map<String, CatalogLocation>
 {
-  template
-  <
-    typename Node, typename Scope
-  >
+  template <typename Node, typename Scope>
   explicit CatalogLocations(const Node & node, Scope & outer_scope)
   {
     ELEMENT(Vehicle);
@@ -67,7 +60,7 @@ struct CatalogLocations
 };
 
 #undef ELEMENT
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATIONS_HPP_

@@ -17,36 +17,28 @@
 
 #include <boost/lexical_cast.hpp>
 #include <std_msgs/msg/u_int16.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct UnsignedShort
-  : public std_msgs::msg::UInt16
+struct UnsignedShort : public std_msgs::msg::UInt16
 {
   using value_type = decltype(std_msgs::msg::UInt16::data);
 
-  explicit UnsignedShort(value_type value = {})
-  {
-    data = value;
-  }
+  explicit UnsignedShort(value_type value = {}) { data = value; }
 
-  explicit UnsignedShort(const std::string & s) try
-  {
+  explicit UnsignedShort(const std::string & s)
+  try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss {};
+    std::stringstream ss{};
     ss << "can't treat value \"" << s << "\" as type UnsignedShort";
-    throw SyntaxError {ss.str()};
+    throw SyntaxError{ss.str()};
   }
 
-  constexpr operator value_type() const noexcept
-  {
-    return data;
-  }
+  constexpr operator value_type() const noexcept { return data; }
 
   decltype(auto) operator++() noexcept
   {
@@ -67,18 +59,18 @@ struct UnsignedShort
   }
 };
 
-template<typename ... Ts>
-decltype(auto) operator<<(std::basic_ostream<Ts...>&os, const UnsignedShort & rhs)
+template <typename... Ts>
+decltype(auto) operator<<(std::basic_ostream<Ts...> & os, const UnsignedShort & rhs)
 {
   return os << rhs.data;
 }
 
-template<typename ... Ts>
-decltype(auto) operator>>(std::basic_istream<Ts...>&is, UnsignedShort & rhs)
+template <typename... Ts>
+decltype(auto) operator>>(std::basic_istream<Ts...> & is, UnsignedShort & rhs)
 {
   return is >> rhs.data;
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__UNSIGNED_SHORT_HPP_

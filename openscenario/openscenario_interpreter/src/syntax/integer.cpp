@@ -13,21 +13,17 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/integer.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Integer & datum)
-{
-  return os << datum.data;
-}
+std::ostream & operator<<(std::ostream & os, const Integer & datum) { return os << datum.data; }
 
 std::istream & operator>>(std::istream & is, Integer & datum)
 {
-  std::string token {};
+  std::string token;
 
   is >> token;
 

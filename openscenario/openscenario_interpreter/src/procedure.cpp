@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/procedure.hpp>
-
 #include <memory>
+#include <openscenario_interpreter/procedure.hpp>
 
 namespace openscenario_interpreter
 {
 static typename std::aligned_storage<
-  sizeof(scenario_simulator::API),
-  alignof(scenario_simulator::API)
->::type memory;
+  sizeof(traffic_simulator::API), alignof(traffic_simulator::API)>::type memory;
 
-scenario_simulator::API & connection {
-  reinterpret_cast<scenario_simulator::API &>(memory)
-};
+traffic_simulator::API & connection{reinterpret_cast<traffic_simulator::API &>(memory)};
 
 // static int schwarz_counter { 0 };
 //
@@ -33,7 +28,7 @@ scenario_simulator::API & connection {
 // {
 //   if (schwarz_counter++ == 0)
 //   {
-//     new (&connection) scenario_simulator::API();
+//     new (&connection) traffic_simulator::API();
 //   }
 // }
 //

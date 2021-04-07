@@ -34,8 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act
-  : public StoryboardElement<Act>, public Elements
+struct Act : public StoryboardElement<Act>, public Elements
 {
   const String name;
 
@@ -43,40 +42,26 @@ struct Act
 
   Element start_trigger, stop_trigger;
 
-  template<typename Node>
+  template <typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
-  : name(
-      readAttribute<String>("name", node, outer_scope)),
-    inner_scope(outer_scope)
+  : name(readAttribute<String>("name", node, outer_scope)), inner_scope(outer_scope)
   {
-    callWithElements(
-      node, "ManeuverGroup", 1, unbounded, [&](auto && node)
-      {
-        return push_back(readStoryboardElement<ManeuverGroup>(node, inner_scope));
-      });
+    callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
+      return push_back(readStoryboardElement<ManeuverGroup>(node, inner_scope));
+    });
 
-    callWithElements(
-      node, "StartTrigger", 1, 1, [&](auto && node)
-      {
-        return start_trigger.rebind<Trigger>(node, inner_scope);
-      });
+    callWithElements(node, "StartTrigger", 1, 1, [&](auto && node) {
+      return start_trigger.rebind<Trigger>(node, inner_scope);
+    });
 
-    callWithElements(
-      node, "StopTrigger", 0, 1, [&](auto && node)
-      {
-        return stop_trigger.rebind<Trigger>(node, inner_scope);
-      });
+    callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
+      return stop_trigger.rebind<Trigger>(node, inner_scope);
+    });
   }
 
-  auto ready() const
-  {
-    return start_trigger.evaluate().as<Boolean>();
-  }
+  auto ready() const { return start_trigger.evaluate().as<Boolean>(); }
 
-  auto stopTriggered() const
-  {
-    return stop_trigger && stop_trigger.evaluate().as<Boolean>();
-  }
+  auto stopTriggered() const { return stop_trigger && stop_trigger.evaluate().as<Boolean>(); }
 
   /* -------------------------------------------------------------------------
    *
@@ -86,17 +71,15 @@ struct Act
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(
-      std::begin(*this), std::end(*this), [&](const Element & each)
-      {
-        return each.as<ManeuverGroup>().complete();
-      });
+    return std::all_of(std::begin(*this), std::end(*this), [&](const Element & each) {
+      return each.as<ManeuverGroup>().complete();
+    });
   }
 
   void stop()
   {
     for (auto && each : *this) {
-      each.as<ManeuverGroup>().override ();
+      each.as<ManeuverGroup>().override();
       each.evaluate();
     }
   }
@@ -110,7 +93,7 @@ struct Act
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_

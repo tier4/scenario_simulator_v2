@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_SET_ACTION_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
@@ -40,88 +39,70 @@ struct ParameterSetAction
 
   const String value;
 
-  const std::true_type accomplished {};
+  const std::true_type accomplished{};
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit ParameterSetAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
   : inner_scope(outer_scope),
     parameter_ref(parameter_ref),
     value(readAttribute<String>("value", node, inner_scope))
-  {}
+  {
+  }
 
   auto evaluate() const noexcept(false)
   {
     static const std::unordered_map<
-      std::type_index,
-      std::function<Element(const Element &, const String &)>
-    >
-    overloads
-    {
-      {
-        typeid(Integer), [](auto && target, auto && value)
-        {
-          target.template as<Integer>() = boost::lexical_cast<Integer>(value);
-          return target;
-        }
-      },
+      std::type_index, std::function<Element(const Element &, const String &)> >
+      overloads{
+        {typeid(Integer),
+         [](auto && target, auto && value) {
+           target.template as<Integer>() = boost::lexical_cast<Integer>(value);
+           return target;
+         }},
 
-      {
-        typeid(Double), [](auto && target, auto && value)
-        {
-          target.template as<Double>() = boost::lexical_cast<Double>(value);
-          return target;
-        }
-      },
+        {typeid(Double),
+         [](auto && target, auto && value) {
+           target.template as<Double>() = boost::lexical_cast<Double>(value);
+           return target;
+         }},
 
-      {
-        typeid(String), [](auto && target, auto && value)
-        {
-          target.template as<String>() = value;
-          return target;
-        }
-      },
+        {typeid(String),
+         [](auto && target, auto && value) {
+           target.template as<String>() = value;
+           return target;
+         }},
 
-      {
-        typeid(UnsignedInteger), [](auto && target, auto && value)
-        {
-          target.template as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value);
-          return target;
-        }
-      },
+        {typeid(UnsignedInteger),
+         [](auto && target, auto && value) {
+           target.template as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value);
+           return target;
+         }},
 
-      {
-        typeid(UnsignedShort), [](auto && target, auto && value)
-        {
-          target.template as<UnsignedShort>() = boost::lexical_cast<UnsignedShort>(value);
-          return target;
-        }
-      },
+        {typeid(UnsignedShort),
+         [](auto && target, auto && value) {
+           target.template as<UnsignedShort>() = boost::lexical_cast<UnsignedShort>(value);
+           return target;
+         }},
 
-      {
-        typeid(Boolean), [](auto && target, auto && value)
-        {
-          target.template as<Boolean>() = boost::lexical_cast<Boolean>(value);
-          return target;
-        }
-      },
-    };
+        {typeid(Boolean),
+         [](auto && target, auto && value) {
+           target.template as<Boolean>() = boost::lexical_cast<Boolean>(value);
+           return target;
+         }},
+      };
 
-    const auto target {
-      inner_scope.parameters.at(parameter_ref)
-    };
+    const auto target{inner_scope.parameters.at(parameter_ref)};
 
-    const auto iter {
-      overloads.find(target.type())
-    };
+    const auto iter{overloads.find(target.type())};
 
     if (iter != std::end(overloads)) {
-      return std::get<1>(* iter)(target, value);
+      return std::get<1>(*iter)(target, value);
     } else {
       THROW_IMPLEMENTATION_FAULT();
     }
   }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_SET_ACTION_HPP_

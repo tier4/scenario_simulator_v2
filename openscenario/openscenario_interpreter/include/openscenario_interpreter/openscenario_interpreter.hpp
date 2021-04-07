@@ -15,23 +15,22 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
+#include <openscenario_interpreter/utility/visibility.h>
+
 #include <junit_exporter/junit_exporter.hpp>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
+#include <memory>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <openscenario_interpreter/utility/verbose.hpp>
-#include <openscenario_interpreter/utility/visibility.h>
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <rclcpp/rclcpp.hpp>
-
-#include <memory>
+#include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <string>
 #include <utility>
 
 namespace openscenario_interpreter
 {
-class Interpreter
-  : public rclcpp_lifecycle::LifecycleNode
+class Interpreter : public rclcpp_lifecycle::LifecycleNode
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -61,8 +60,7 @@ class Interpreter
   const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
 
   decltype(auto) report(
-    const junit_exporter::TestResult & result,
-    const std::string & type,
+    const junit_exporter::TestResult & result, const std::string & type,
     const std::string & what = "")
   {
     exporter.addTestCase(
@@ -75,8 +73,8 @@ class Interpreter
         if (what.empty()) {
           std::cout << "\x1b[1;31mYield " << type.c_str() << "\x1b[0m" << std::endl;
         } else {
-          std::cout << "\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m" <<
-            std::endl;
+          std::cout << "\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
+                    << std::endl;
         }
         break;
 
@@ -84,8 +82,8 @@ class Interpreter
         if (what.empty()) {
           std::cout << "\x1b[32mYield " << type.c_str() << "\x1b[0m" << std::endl;
         } else {
-          std::cout << "\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m" <<
-            std::endl;
+          std::cout << "\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
+                    << std::endl;
         }
         break;
     }
@@ -101,7 +99,7 @@ class Interpreter
     deactivate();
   }
 
-  template<typename Thunk>
+  template <typename Thunk>
   void withExceptionHandler(Thunk && thunk)
   {
     try {

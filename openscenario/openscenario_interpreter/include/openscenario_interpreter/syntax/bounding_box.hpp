@@ -41,15 +41,16 @@ struct BoundingBox
 
   BoundingBox() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit BoundingBox(const Node & node, Scope & scope)
   : center(readElement<Center>("Center", node, scope)),
     dimensions(readElement<Dimensions>("Dimensions", node, scope))
-  {}
+  {
+  }
 
   explicit operator openscenario_msgs::msg::BoundingBox() const
   {
-    openscenario_msgs::msg::BoundingBox bounding_box {};
+    openscenario_msgs::msg::BoundingBox bounding_box;
     {
       bounding_box.center = static_cast<geometry_msgs::msg::Point>(center);
       bounding_box.dimensions = static_cast<geometry_msgs::msg::Vector3>(dimensions);
@@ -60,7 +61,7 @@ struct BoundingBox
 };
 
 std::ostream & operator<<(std::ostream &, const BoundingBox &);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BOUNDING_BOX_HPP_

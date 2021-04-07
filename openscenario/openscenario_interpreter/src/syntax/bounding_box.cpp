@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -24,14 +23,14 @@ static_assert(IsOptionalElement<BoundingBox>::value, "BoundingBox must be an opt
 
 std::ostream & operator<<(std::ostream & os, const BoundingBox & datum)
 {
-  os << (indent++);
-  os << blue << "<BoundingBox>\n" << reset;
-  os << datum.center << "\n";
-  os << datum.dimensions << "\n";
-  os << (--indent);
-  os << blue << "</BoundingBox>" << reset;
+  // clang-format off
 
-  return os;
+  return os << (indent++) << blue << "<BoundingBox>\n" << reset
+            << datum.center << "\n"
+            << datum.dimensions << "\n"
+            << (--indent) << blue << "</BoundingBox>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

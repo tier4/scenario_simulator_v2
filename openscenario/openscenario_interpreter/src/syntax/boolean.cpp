@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/boolean.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -22,22 +21,19 @@ inline namespace syntax
 {
 std::ostream & operator<<(std::ostream & os, const Boolean & datum)
 {
-  boost::io::ios_flags_saver saver {os};
+  boost::io::ios_flags_saver saver{os};
   return os << std::boolalpha << datum.data;
 }
 
 std::istream & operator>>(std::istream & is, Boolean & datum)
 {
-  boost::io::ios_flags_saver saver {is};
+  boost::io::ios_flags_saver saver{is};
   return is >> std::boolalpha >> datum.data;
 }
 
 const Element true_v = make<Boolean>(true);
 const Element false_v = make<Boolean>(false);
 
-const Element & asBoolean(bool value)
-{
-  return value ? true_v : false_v;
-}
+const Element & asBoolean(bool value) { return value ? true_v : false_v; }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

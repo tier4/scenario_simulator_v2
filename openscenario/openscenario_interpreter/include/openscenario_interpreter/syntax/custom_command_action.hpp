@@ -15,12 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
+#include <iterator>  // std::distance
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/string/cat.hpp>
-
-#include <iterator>  // std::distance
 #include <stdexcept>  // std::runtime_error
 #include <string>
 #include <type_traits>  // std::true_type
@@ -51,14 +50,15 @@ struct CustomCommandAction
 
   const String content;
 
-  template<typename Node>
+  template <typename Node>
   explicit CustomCommandAction(const Node & node, const Scope & outer_scope)
   : inner_scope(outer_scope),
     type(readAttribute<String>("type", node, inner_scope)),
     content(readContent<String>(node, inner_scope))
-  {}
+  {
+  }
 
-  const std::true_type accomplished {};
+  const std::true_type accomplished{};
 
   static int walkStraightAction(
     const std::vector<std::string> & actors, const Scope & current_scope)
@@ -74,63 +74,48 @@ struct CustomCommandAction
     return current_scope.actors.size();
   }
 
-  static int exitSuccess(
-    const std::vector<std::string> &, const Scope &)
-  {
-    throw EXIT_SUCCESS;
-  }
+  static int exitSuccess(const std::vector<std::string> &, const Scope &) { throw EXIT_SUCCESS; }
 
-  static int exitFailure(
-    const std::vector<std::string> &, const Scope &)
-  {
-    throw EXIT_FAILURE;
-  }
+  static int exitFailure(const std::vector<std::string> &, const Scope &) { throw EXIT_FAILURE; }
 
-  static int error(
-    const std::vector<std::string> &, const Scope &)
+  static int error(const std::vector<std::string> &, const Scope &)
   {
     throw std::runtime_error(cat(__FILE__, ":", __LINE__));
   }
 
-  static int segv(
-    const std::vector<std::string> &, const Scope &)
+  static int segv(const std::vector<std::string> &, const Scope &)
   {
     return *reinterpret_cast<std::add_pointer<int>::type>(0);
   }
 
-  static int test(
-    const std::vector<std::string> & args, const Scope &)
+  static int test(const std::vector<std::string> & args, const Scope &)
   {
     std::cout << "test" << std::endl;
 
     for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
-      std::cout << "  args[" <<
-        std::distance(std::cbegin(args), iter) << "] = " << *iter << std::endl;
+      std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter
+                << std::endl;
     }
 
     return args.size();
   }
 
   const std::unordered_map<
-    std::string,
-    std::function<
-      int(const std::vector<std::string> &, const Scope &)>> builtins
-  {
-    std::make_pair("WalkStraightAction", walkStraightAction),
-    std::make_pair("error", error),
-    std::make_pair("exitFailure", exitFailure),
-    std::make_pair("exitSuccess", exitSuccess),
-    std::make_pair("sigsegv", segv),  // Deprecated
-    std::make_pair("test", test),
-  };
+    std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
+    builtins{
+      std::make_pair("WalkStraightAction", walkStraightAction),
+      std::make_pair("error", error),
+      std::make_pair("exitFailure", exitFailure),
+      std::make_pair("exitSuccess", exitSuccess),
+      std::make_pair("sigsegv", segv),  // Deprecated
+      std::make_pair("test", test),
+    };
 
   static auto split(const std::string & s)
   {
-    static const std::regex pattern {
-      R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"
-    };
+    static const std::regex pattern{R"(([^\("\s,\)]+|\"[^"]*\"),?\s*)"};
 
-    std::vector<std::string> args {};
+    std::vector<std::string> args{};
 
     for (std::sregex_iterator iter{std::begin(s), std::end(s), pattern}, end; iter != end; ++iter) {
       args.emplace_back((*iter)[1]);
@@ -151,15 +136,11 @@ struct CustomCommandAction
      *  result[3] = hoge, "hello, world!", 3.14
      *
      * ---------------------------------------------------------------------- */
-    static const std::regex pattern {
-      R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"
-    };
+    static const std::regex pattern{R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"};
 
-    std::smatch result {};
+    std::smatch result{};
 
-    if (
-      std::regex_match(type, result, pattern) && builtins.find(result[1]) != std::end(builtins))
-    {
+    if (std::regex_match(type, result, pattern) && builtins.find(result[1]) != std::end(builtins)) {
       builtins.at(result[1])(split(result[3]), inner_scope);
     } else {
       fork_exec(type, content);
@@ -170,17 +151,18 @@ struct CustomCommandAction
 
   friend std::ostream & operator<<(std::ostream & os, const CustomCommandAction & action)
   {
-    os << indent << blue << "<CustomCommandAction" << " " << highlight("type", action.type);
+    os << indent << blue << "<CustomCommandAction"
+       << " " << highlight("type", action.type);
 
     if (action.content.empty()) {
       return os << blue << "/>" << reset;
     } else {
-      return
-        os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>" << reset;
+      return os << blue << ">" << reset << action.content << blue << "</CustomCommandAction>"
+                << reset;
     }
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_

@@ -5,7 +5,7 @@ The sample code is below.
 
 ## minimal example
 ```c++
-#include <simulation_api/api/api.hpp>
+#include <traffic_simulator/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -31,31 +31,31 @@ public:
     api_.initialize(1.0, 0.02);
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
-    simulation_api::entity::VehicleParameters params(catalog_xml_doc);
+    traffic_simulator::entity::VehicleParameters params(catalog_xml_doc);
     api_.spawn(false, "ego", params);
     api_.setEntityStatus("ego",
-      simulation_api::helper::constructLaneletPose(120545, 0),
-      simulation_api::helper::constructActionStatus(10));
+      traffic_simulator::helper::constructLaneletPose(120545, 0),
+      traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 15, true);
     pugi::xml_document pedestrian_xml_doc;
     pedestrian_xml_doc.load_string(pedestrian_xml.c_str());
-    simulation_api::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
+    traffic_simulator::entity::PedestrianParameters pedestrian_params(pedestrian_xml_doc);
     api_.spawn(false, "tom", pedestrian_params);
     api_.setEntityStatus("tom", "ego",
-      simulation_api::helper::constructPose(10, 3, 0, 0, 0, 1.57),
-      simulation_api::helper::constructActionStatus());
+      traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, 1.57),
+      traffic_simulator::helper::constructActionStatus());
     api_.spawn(false, "bob", pedestrian_params,
-      simulation_api::helper::constructLaneletPose(34378, 0.0),
-      simulation_api::helper::constructActionStatus(1));
+      traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      traffic_simulator::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     api_.spawn(false, "npc1", params,
-      simulation_api::helper::constructLaneletPose(34579, 20.0),
-      simulation_api::helper::constructActionStatus(5));
+      traffic_simulator::helper::constructLaneletPose(34579, 20.0),
+      traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
     lanechange_excuted_ = false;
     api_.spawn(false, "npc2", params,
-      simulation_api::helper::constructLaneletPose(34606, 20.0),
-      simulation_api::helper::constructActionStatus(5));
+      traffic_simulator::helper::constructLaneletPose(34606, 20.0),
+      traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
     using namespace std::chrono_literals;
     update_timer_ = this->create_wall_timer(20ms, std::bind(&ScenarioRunnerMoc::update, this));
@@ -65,14 +65,14 @@ private:
   void update()
   {
     if (api_.reachPosition("ego",
-      simulation_api::helper::constructLaneletPose(34615, 10.0), 5))
+      traffic_simulator::helper::constructLaneletPose(34615, 10.0), 5))
     {
       api_.requestAcquirePosition("ego",
-        simulation_api::helper::constructLaneletPose(35026, 0.0) );
+        traffic_simulator::helper::constructLaneletPose(35026, 0.0) );
       api_.setTargetSpeed("npc2", 13, true);
     }
     if (api_.reachPosition("ego",
-      simulation_api::helper::constructLaneletPose(34579, 0.0), 5))
+      traffic_simulator::helper::constructLaneletPose(34579, 0.0), 5))
     {
       api_.setTargetSpeed("npc2", 3, true);
     }
@@ -90,7 +90,7 @@ private:
   bool bob_spawned_;
   double current_time_;
   int port_;
-  scenario_simulator::API api_;
+  traffic_simulatorr::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 
   std::string catalog_xml =

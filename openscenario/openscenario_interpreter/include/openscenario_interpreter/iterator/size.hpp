@@ -21,12 +21,12 @@ namespace openscenario_interpreter
 {
 inline namespace iterator
 {
-template<typename T>
+template <typename T>
 auto size(const T & range)
 {
   return std::distance(std::begin(range), std::end(range));
 }
-}
+}  // namespace iterator
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__ITERATOR__SIZE_HPP_

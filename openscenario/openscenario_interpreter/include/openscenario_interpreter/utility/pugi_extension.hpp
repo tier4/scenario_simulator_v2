@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
 #define OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
 
-#include <pugixml.hpp>
-
 #include <ostream>
+#include <pugixml.hpp>
 
 std::ostream & operator<<(std::ostream &, const pugi::xml_node &);
 

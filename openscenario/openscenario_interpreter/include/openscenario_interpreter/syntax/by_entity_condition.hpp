@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BY_ENTITY_CONDITION_HPP_
 
 #include <openscenario_interpreter/syntax/entity_condition.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -39,22 +38,22 @@ struct ByEntityCondition
 
   const EntityCondition entity_condition;
 
-  template<typename Node>
+  template <typename Node>
   explicit ByEntityCondition(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
-    entity_condition(
-      readElement<EntityCondition>(
-        "EntityCondition", node, inner_scope,
-        readElement<TriggeringEntities>("TriggeringEntities", node, inner_scope)))
-  {}
+    entity_condition(readElement<EntityCondition>(
+      "EntityCondition", node, inner_scope,
+      readElement<TriggeringEntities>("TriggeringEntities", node, inner_scope)))
+  {
+  }
 
-  template<typename ... Ts>
-  auto evaluate(Ts && ... xs) const
+  template <typename... Ts>
+  auto evaluate(Ts &&... xs) const
   {
     return entity_condition.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BY_ENTITY_CONDITION_HPP_

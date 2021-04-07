@@ -18,7 +18,6 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-
 #include <ostream>
 
 namespace openscenario_interpreter
@@ -40,16 +39,17 @@ struct Dimensions
 
   Dimensions() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Dimensions(const Node & node, Scope & scope)
   : width(readAttribute<Double>("width", node, scope)),
     length(readAttribute<Double>("length", node, scope)),
     height(readAttribute<Double>("height", node, scope))
-  {}
+  {
+  }
 
   explicit operator geometry_msgs::msg::Vector3() const
   {
-    geometry_msgs::msg::Vector3 vector3 {};
+    geometry_msgs::msg::Vector3 vector3;
     {
       vector3.x = length;
       vector3.y = width;
@@ -61,7 +61,7 @@ struct Dimensions
 };
 
 std::ostream & operator<<(std::ostream &, const Dimensions &);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DIMENSIONS_HPP_

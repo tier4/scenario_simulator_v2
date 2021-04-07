@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_GROUP_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_GROUP_HPP_
 
-#include <openscenario_interpreter/syntax/condition.hpp>
-
 #include <numeric>
+#include <openscenario_interpreter/syntax/condition.hpp>
 #include <vector>
 
 namespace openscenario_interpreter
@@ -37,17 +36,13 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ConditionGroup
-  : public std::vector<Condition>
+struct ConditionGroup : public std::vector<Condition>
 {
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit ConditionGroup(const Node & node, Scope & scope)
   {
     callWithElements(
-      node, "Condition", 1, unbounded, [&](auto && node)
-      {
-        emplace_back(node, scope);
-      });
+      node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
   }
 
   auto evaluate()
@@ -55,15 +50,13 @@ struct ConditionGroup
     return asBoolean(
       // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
       std::accumulate(
-        std::begin(*this), std::end(*this), true,
-        [&](auto && lhs, Condition & condition)
-        {
+        std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
           const auto rhs = condition.evaluate();
           return lhs && rhs.as<Boolean>();
         }));
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_GROUP_HPP_

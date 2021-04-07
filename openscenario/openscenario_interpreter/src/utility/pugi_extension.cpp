@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iomanip>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/utility/pugi_extension.hpp>
-
-#include <iomanip>
 #include <string>
 
 namespace openscenario_interpreter
@@ -29,8 +28,8 @@ std::ostream & operator<<(std::ostream & os, const pugi::xml_node & datum)
   os << indent << blue << "<" << bold << datum.name() << reset;
 
   for (const auto & attribute : datum.attributes()) {
-    os << " " << yellow << attribute.name() << reset;
-    os << "=" << cyan << std::quoted(attribute.value()) << reset;
+    os << " " << yellow << attribute.name() << reset << "=" << cyan
+       << std::quoted(attribute.value()) << reset;
   }
 
   if (datum.first_child().empty()) {

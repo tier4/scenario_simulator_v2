@@ -22,7 +22,6 @@
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
-
 #include <utility>
 
 namespace openscenario_interpreter
@@ -97,7 +96,7 @@ struct Vehicle
    * ------------------------------------------------------------------------ */
   Properties properties;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Vehicle(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, outer_scope)),
@@ -108,11 +107,12 @@ struct Vehicle
     performance(readElement<Performance>("Performance", node, inner_scope)),
     axles(readElement<Axles>("Axles", node, inner_scope)),
     properties(readElement<Properties>("Properties", node, inner_scope))
-  {}
+  {
+  }
 
   explicit operator openscenario_msgs::msg::VehicleParameters() const
   {
-    openscenario_msgs::msg::VehicleParameters parameter {};
+    openscenario_msgs::msg::VehicleParameters parameter;
     {
       parameter.name = name;
       parameter.vehicle_category = boost::lexical_cast<String>(vehicle_category);
@@ -124,8 +124,8 @@ struct Vehicle
     return parameter;
   }
 
-  template<typename ... Ts>
-  decltype(auto) operator[](Ts && ... xs)
+  template <typename... Ts>
+  decltype(auto) operator[](Ts &&... xs)
   {
     return properties.operator[](std::forward<decltype(xs)>(xs)...);
   }
@@ -133,20 +133,19 @@ struct Vehicle
 
 std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
 {
-  os << (indent++);
-  os << blue << "<Vehicle ";
-  os << highlight("name", datum.name);
-  os << " " << highlight("vehicleCategory", datum.vehicle_category);
-  os << blue << ">\n" << reset;
-  os << datum.parameter_declarations << "\n";
-  os << datum.bounding_box << "\n";
-  os << datum.performance << "\n";
-  os << datum.axles << "\n";
-  os << (--indent) << blue << "</Vehicle>" << reset;
+  // clang-format off
 
-  return os;
+  return os << (indent++) << blue << "<Vehicle" << " " << highlight("name", datum.name)
+                                                << " " << highlight("vehicleCategory", datum.vehicle_category) << blue << ">\n" << reset
+            << datum.parameter_declarations << "\n"
+            << datum.bounding_box           << "\n"
+            << datum.performance            << "\n"
+            << datum.axles                  << "\n"
+            << (--indent) << blue << "</Vehicle>" << reset;
+
+  // clang-format on
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_HPP_

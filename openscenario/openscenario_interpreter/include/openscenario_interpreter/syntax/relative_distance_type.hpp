@@ -41,70 +41,65 @@ inline namespace syntax
  * ======================================================================== */
 struct RelativeDistanceType
 {
-  enum value_type
-  {
+  enum value_type {
     longitudinal,
     lateral,
     cartesianDistance,
-  }
-  value;
+  } value;
 
-  explicit constexpr RelativeDistanceType(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr RelativeDistanceType(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RelativeDistanceType & type)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                    \
+  if (buffer == #IDENTIFIER) {                     \
     type.value = RelativeDistanceType::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                     \
+  }                                                \
+  static_assert(true, "")
 
   BOILERPLATE(longitudinal);
   BOILERPLATE(lateral);
   BOILERPLATE(cartesianDistance);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type RelativeDistanceType";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const RelativeDistanceType & type)
+  std::basic_ostream<Ts...> & os, const RelativeDistanceType & type)
 {
   switch (type) {
-    #define BOILERPLATE(ID) case RelativeDistanceType::ID: return os << #ID;
+#define BOILERPLATE(ID)          \
+  case RelativeDistanceType::ID: \
+    return os << #ID;
 
     BOILERPLATE(longitudinal);
     BOILERPLATE(lateral);
     BOILERPLATE(cartesianDistance);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class RelativeDistanceType holds unexpected value " <<
-        static_cast<RelativeDistanceType::value_type>(type.value);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class RelativeDistanceType holds unexpected value "
+         << static_cast<RelativeDistanceType::value_type>(type.value);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_

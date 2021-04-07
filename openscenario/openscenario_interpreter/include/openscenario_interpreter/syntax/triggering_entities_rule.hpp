@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_RULE_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
 #include <string>
 #include <utility>
 #include <vector>
@@ -44,22 +43,18 @@ inline namespace syntax
  * ======================================================================== */
 struct TriggeringEntitiesRule
 {
-  enum value_type
-  {
-    all, any, none,
+  enum value_type {
+    all,
+    any,
+    none,
   } value;
 
-  explicit constexpr TriggeringEntitiesRule(value_type value = {})
-  : value{value}
-  {}
+  explicit constexpr TriggeringEntitiesRule(value_type value = {}) : value{value} {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 
-  template<typename ... Ts>
-  constexpr decltype(auto) operator()(Ts && ... xs) const
+  template <typename... Ts>
+  constexpr decltype(auto) operator()(Ts &&... xs) const
   {
     switch (value) {
       case all:
@@ -77,52 +72,53 @@ struct TriggeringEntitiesRule
   }
 };
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_istream<Ts...> & operator>>(
-  std::basic_istream<Ts...> & is,
-  TriggeringEntitiesRule & rule)
+  std::basic_istream<Ts...> & is, TriggeringEntitiesRule & rule)
 {
-  std::string buffer {};
+  std::string buffer{};
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                      \
+  if (buffer == #IDENTIFIER) {                       \
     rule.value = TriggeringEntitiesRule::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                       \
+  }                                                  \
+  static_assert(true, "")
 
   BOILERPLATE(all);
   BOILERPLATE(any);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type TriggeringEntitiesRule";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
-template<typename ... Ts>
+template <typename... Ts>
 std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os,
-  const TriggeringEntitiesRule & rule)
+  std::basic_ostream<Ts...> & os, const TriggeringEntitiesRule & rule)
 {
   switch (rule) {
-    #define BOILERPLATE(ID) case TriggeringEntitiesRule::ID: return os << #ID;
+#define BOILERPLATE(ID)            \
+  case TriggeringEntitiesRule::ID: \
+    return os << #ID;
 
     BOILERPLATE(all);
     BOILERPLATE(any);
 
-    #undef BOILERPLATE
+#undef BOILERPLATE
 
     default:
-      std::stringstream ss {};
-      ss << "enum class TriggeringEntitiesRule holds unexpected value " <<
-        static_cast<TriggeringEntitiesRule::value_type>(rule.value);
-      throw ImplementationFault {ss.str()};
+      std::stringstream ss{};
+      ss << "enum class TriggeringEntitiesRule holds unexpected value "
+         << static_cast<TriggeringEntitiesRule::value_type>(rule.value);
+      throw ImplementationFault{ss.str()};
   }
 }
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_RULE_HPP_

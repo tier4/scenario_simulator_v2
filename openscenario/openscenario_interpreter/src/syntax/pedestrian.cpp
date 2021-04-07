@@ -20,15 +20,17 @@ inline namespace syntax
 {
 std::ostream & operator<<(std::ostream & os, const Pedestrian & datum)
 {
-  return os << (indent++) << blue << "<Pedestrian" <<
-         " " << highlight("name", datum.name) <<
-         " " << highlight("mass", datum.mass) <<
-         " " << highlight("model", datum.model) <<
-         " " << highlight("pedestrianCategory", datum.pedestrian_category) <<
-         blue << ">\n" << reset <<
-         datum.parameter_declarations << "\n" <<
-         datum.bounding_box << "\n" <<
-         (--indent) << blue << "</Pedestrian>" << reset;
+  // clang-format off
+
+  return os << (indent++) << blue << "<Pedestrian " << highlight("name", datum.name)
+                                             << " " << highlight("mass", datum.mass)
+                                             << " " << highlight("model", datum.model)
+                                             << " " << highlight("pedestrianCategory", datum.pedestrian_category) << blue << ">\n" << reset
+            << datum.parameter_declarations << "\n"
+            << datum.bounding_box << "\n"
+            << (--indent) << blue << "</Pedestrian>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__VEHICLE_CATEGORY_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-
+#include <string>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -50,8 +50,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct VehicleCategory
 {
-  enum value_type
-  {
+  enum value_type {
     bicycle,
     bus,
     car,
@@ -64,14 +63,9 @@ struct VehicleCategory
     van,
   } value;
 
-  explicit constexpr VehicleCategory(value_type value = {})
-  : value(value)
-  {}
+  explicit constexpr VehicleCategory(value_type value = {}) : value(value) {}
 
-  constexpr operator value_type() const noexcept
-  {
-    return value;
-  }
+  constexpr operator value_type() const noexcept { return value; }
 };
 
 std::istream & operator>>(std::istream &, VehicleCategory &);

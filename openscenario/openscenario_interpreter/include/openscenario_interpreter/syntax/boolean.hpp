@@ -16,10 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__BOOLEAN_HPP_
 
 #include <boost/io/ios_state.hpp>
+#include <iomanip>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/object.hpp>
-
-#include <iomanip>
 #include <string>
 
 namespace openscenario_interpreter
@@ -36,16 +35,14 @@ struct Boolean
 
   value_type data;
 
-  explicit constexpr Boolean(value_type value = false) noexcept
-  : data(value)
-  {}
+  explicit constexpr Boolean(value_type value = false) noexcept : data(value) {}
 
   explicit Boolean(const std::string & target)
   {
-    std::stringstream interpreter {};
+    std::stringstream interpreter{};
 
     if (!(interpreter << target && interpreter >> std::boolalpha >> data)) {
-      std::stringstream ss {};
+      std::stringstream ss{};
       ss << "can't treat value " << std::quoted(target) << " as type Boolean";
       throw SyntaxError(ss.str());
     }
@@ -57,10 +54,7 @@ struct Boolean
     return *this;
   }
 
-  constexpr operator value_type() const noexcept
-  {
-    return data;
-  }
+  constexpr operator value_type() const noexcept { return data; }
 };
 
 std::istream & operator>>(std::istream &, Boolean &);
@@ -70,7 +64,7 @@ extern const Element true_v;
 extern const Element false_v;
 
 const Element & asBoolean(bool);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__BOOLEAN_HPP_

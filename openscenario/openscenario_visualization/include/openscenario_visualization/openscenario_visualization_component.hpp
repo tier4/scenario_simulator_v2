@@ -27,10 +27,10 @@ extern "C" {
 // demos/composition/include/composition/visibility_control.h at https://github.com/ros2/demos
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef __GNUC__
-#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_EXPORT __attribute__(( \
-      dllexport))
-#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_IMPORT __attribute__(( \
-      dllimport))
+#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_EXPORT \
+  __attribute__((dllexport))
+#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_IMPORT \
+  __attribute__((dllimport))
 #else
 #define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_EXPORT __declspec(dllexport)
 #define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_IMPORT __declspec(dllimport)
@@ -46,14 +46,14 @@ extern "C" {
   OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_PUBLIC
 #define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_LOCAL
 #else
-#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_EXPORT __attribute__(( \
-      visibility("default")))
+#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_EXPORT \
+  __attribute__((visibility("default")))
 #define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_IMPORT
 #if __GNUC__ >= 4
-#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_PUBLIC __attribute__(( \
-      visibility("default")))
-#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_LOCAL __attribute__(( \
-      visibility("hidden")))
+#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_PUBLIC \
+  __attribute__((visibility("default")))
+#define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_LOCAL \
+  __attribute__((visibility("hidden")))
 #else
 #define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_PUBLIC
 #define OPENSCENARIO_VISUALIZATION_OPENSCENARIO_VISUALIZATION_COMPONENT_LOCAL
@@ -66,12 +66,11 @@ extern "C" {
 #endif
 
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <simulation_api/color_utils/color_utils.hpp>
-
-#include <unordered_map>
 #include <string>
+#include <traffic_simulator/color_utils/color_utils.hpp>
+#include <unordered_map>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace openscenario_visualization
 {
@@ -112,8 +111,7 @@ private:
   const visualization_msgs::msg::MarkerArray generateMarker(
     const openscenario_msgs::msg::EntityStatus & status,
     const openscenario_msgs::msg::WaypointsArray & waypoints,
-    const openscenario_msgs::msg::Obstacle & obstacle,
-    bool obstacle_find);
+    const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find);
   /**
    * @brief publisher of marker topic.
    */

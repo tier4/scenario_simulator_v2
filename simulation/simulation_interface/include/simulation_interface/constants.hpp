@@ -19,19 +19,11 @@
 
 namespace simulation_interface
 {
-enum class TransportProtocol
-{
-  TCP,
-  UDP
-};
+enum class TransportProtocol { TCP, UDP };
 
 std::string enumToString(const TransportProtocol & protocol);
 
-enum class HostName
-{
-  LOCLHOST,
-  ANY
-};
+enum class HostName { LOCLHOST, ANY };
 
 std::string enumToString(const HostName & hostname);
 
@@ -51,9 +43,7 @@ const unsigned int attach_detection_sensor = 5563;
 }  // namespace ports
 
 std::string getEndPoint(
-  const TransportProtocol & protocol,
-  const HostName & hostname,
-  const unsigned int & port);
+  const TransportProtocol & protocol, const HostName & hostname, const unsigned int & port);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONSTANTS_HPP_

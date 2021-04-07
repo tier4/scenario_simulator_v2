@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/axle.hpp>
 #include <openscenario_msgs/msg/axles.hpp>
-
 #include <vector>
 
 namespace openscenario_interpreter
@@ -45,21 +44,19 @@ struct Axles
 
   Axles() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Axles(const Node & node, Scope & scope)
   : front_axle(readElement<FrontAxle>("FrontAxle", node, scope)),
     rear_axle(readElement<RearAxle>("RearAxle", node, scope))
   {
-    callWithElements(
-      node, "AdditionalAxle", 0, unbounded, [&](auto && node)
-      {
-        additional_axles.emplace_back(node, scope);
-      });
+    callWithElements(node, "AdditionalAxle", 0, unbounded, [&](auto && node) {
+      additional_axles.emplace_back(node, scope);
+    });
   }
 
   explicit operator openscenario_msgs::msg::Axles() const
   {
-    openscenario_msgs::msg::Axles axles {};
+    openscenario_msgs::msg::Axles axles;
     {
       axles.front_axle = static_cast<openscenario_msgs::msg::Axle>(front_axle);
       axles.rear_axle = static_cast<openscenario_msgs::msg::Axle>(rear_axle);

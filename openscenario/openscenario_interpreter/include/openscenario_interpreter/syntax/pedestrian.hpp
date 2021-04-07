@@ -58,23 +58,23 @@ struct Pedestrian
 
   const Properties properties;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Pedestrian(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     mass(readAttribute<Double>("mass", node, outer_scope)),
     model(readAttribute<String>("model", node, outer_scope)),
-    pedestrian_category(
-      readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)),
+    pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)),
     inner_scope(outer_scope),
     parameter_declarations(
       readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)),
     bounding_box(readElement<BoundingBox>("BoundingBox", node, inner_scope)),
     properties(readElement<Properties>("Properties", node, inner_scope))
-  {}
+  {
+  }
 
   explicit operator openscenario_msgs::msg::PedestrianParameters() const
   {
-    openscenario_msgs::msg::PedestrianParameters parameter {};
+    openscenario_msgs::msg::PedestrianParameters parameter;
     {
       parameter.name = name;
       parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
@@ -86,7 +86,7 @@ struct Pedestrian
 };
 
 std::ostream & operator<<(std::ostream &, const Pedestrian &);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PEDESTRIAN_HPP_

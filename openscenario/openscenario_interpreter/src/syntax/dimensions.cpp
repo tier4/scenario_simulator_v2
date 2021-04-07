@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/dimensions.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -24,14 +23,13 @@ static_assert(IsOptionalElement<Dimensions>::value, "Dimensions must be an optio
 
 std::ostream & operator<<(std::ostream & os, const Dimensions & datum)
 {
-  os << indent;
-  os << blue << "<Dimensions";
-  os << " " << highlight("width", datum.width);
-  os << " " << highlight("length", datum.length);
-  os << " " << highlight("height", datum.height);
-  os << blue << "/>" << reset;
+  // clang-format off
 
-  return os;
+  return os << indent << blue << "<Dimensions " << highlight("width", datum.width)
+                                         << " " << highlight("length", datum.length)
+                                         << " " << highlight("height", datum.height) << blue << "/>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

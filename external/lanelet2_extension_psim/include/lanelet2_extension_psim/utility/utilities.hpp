@@ -17,12 +17,11 @@
 #ifndef LANELET2_EXTENSION_PSIM__UTILITY__UTILITIES_HPP_
 #define LANELET2_EXTENSION_PSIM__UTILITY__UTILITIES_HPP_
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-
 #include <lanelet2_routing/Route.h>
 #include <lanelet2_routing/RoutingGraph.h>
 
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <map>
 
 namespace lanelet

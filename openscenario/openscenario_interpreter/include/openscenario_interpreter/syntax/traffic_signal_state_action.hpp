@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -37,13 +36,14 @@ struct TrafficSignalStateAction
 
   const String state;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit TrafficSignalStateAction(const Node & node, Scope & scope)
   : name{readAttribute<String>("name", node, scope)},
     state{readAttribute<String>("state", node, scope)}
-  {}
+  {
+  }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_

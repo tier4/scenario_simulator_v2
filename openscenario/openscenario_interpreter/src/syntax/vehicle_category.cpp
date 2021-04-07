@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
-
 #include <sstream>
 #include <string>
 
@@ -23,15 +22,16 @@ inline namespace syntax
 {
 std::istream & operator>>(std::istream & is, VehicleCategory & category)
 {
-  std::string buffer {};
+  std::string buffer;
 
   is >> buffer;
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
+#define BOILERPLATE(IDENTIFIER)                   \
+  if (buffer == #IDENTIFIER) {                    \
     category.value = VehicleCategory::IDENTIFIER; \
-    return is; \
-  } static_assert(true, "")
+    return is;                                    \
+  }                                               \
+  static_assert(true, "")
 
   BOILERPLATE(bicycle);
   BOILERPLATE(bus);
@@ -39,16 +39,17 @@ std::istream & operator>>(std::istream & is, VehicleCategory & category)
   BOILERPLATE(motorbike);
   BOILERPLATE(truck);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  #define BOILERPLATE(IDENTIFIER) \
-  if (buffer == #IDENTIFIER) { \
-    std::stringstream ss; \
-    ss << "given value \'"; \
-    ss << buffer; \
+#define BOILERPLATE(IDENTIFIER)                                                              \
+  if (buffer == #IDENTIFIER) {                                                               \
+    std::stringstream ss;                                                                    \
+    ss << "given value \'";                                                                  \
+    ss << buffer;                                                                            \
     ss << "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
-    throw ImplementationFault(ss.str()); \
-  } static_assert(true, "")
+    throw ImplementationFault(ss.str());                                                     \
+  }                                                                                          \
+  static_assert(true, "")
 
   BOILERPLATE(semitrailer);
   BOILERPLATE(trailer);
@@ -56,18 +57,20 @@ std::istream & operator>>(std::istream & is, VehicleCategory & category)
   BOILERPLATE(tram);
   BOILERPLATE(van);
 
-  #undef BOILERPLATE
+#undef BOILERPLATE
 
-  std::stringstream ss {};
+  std::stringstream ss{};
   ss << "unexpected value \'" << buffer << "\' specified as type VehicleCategory";
-  throw SyntaxError {ss.str()};
+  throw SyntaxError{ss.str()};
 }
 
 std::ostream & operator<<(std::ostream & os, const VehicleCategory & category)
 {
-  switch (category) {
-    #define BOILERPLATE(NAME) case VehicleCategory::NAME: return os << #NAME;
+#define BOILERPLATE(NAME)     \
+  case VehicleCategory::NAME: \
+    return os << #NAME;
 
+  switch (category) {
     BOILERPLATE(bicycle);
     BOILERPLATE(bus);
     BOILERPLATE(car);
@@ -79,14 +82,14 @@ std::ostream & operator<<(std::ostream & os, const VehicleCategory & category)
     BOILERPLATE(truck);
     BOILERPLATE(van);
 
-    #undef BOILERPLATE
-
     default:
-      std::stringstream ss {};
-      ss << "enum class VehicleCategory holds unexpected value ";
-      ss << static_cast<VehicleCategory::value_type>(category);
+      std::stringstream ss;
+      ss << "enum class VehicleCategory holds unexpected value "
+         << static_cast<VehicleCategory::value_type>(category);
       throw ImplementationFault(ss.str());
   }
+
+#undef BOILERPLATE
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

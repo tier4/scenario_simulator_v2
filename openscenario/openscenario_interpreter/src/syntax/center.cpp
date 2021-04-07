@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/center.hpp>
-
 #include <string>
 
 namespace openscenario_interpreter
@@ -22,14 +21,13 @@ inline namespace syntax
 {
 std::ostream & operator<<(std::ostream & os, const Center & datum)
 {
-  os << indent;
-  os << blue << "<Center ";
-  os << highlight("x", datum.x) << " ";
-  os << highlight("y", datum.y) << " ";
-  os << highlight("z", datum.z);
-  os << blue << "/>" << reset;
+  // clang-format off
 
-  return os;
+  return os << indent << blue << "<Center " << highlight("x", datum.x)
+                                     << " " << highlight("y", datum.y)
+                                     << " " << highlight("z", datum.z) << blue << "/>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

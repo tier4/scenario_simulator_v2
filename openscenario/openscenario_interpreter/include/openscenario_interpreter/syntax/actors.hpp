@@ -36,19 +36,17 @@ struct Actors
   // Indicates whether the triggering entities are considered actors.
   const Boolean select_triggering_entities;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Actors(const Node & node, Scope & scope)
   : select_triggering_entities{
       readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean())}
   {
-    callWithElements(
-      node, "EntityRef", 0, unbounded, [&](auto && node)
-      {
-        scope.actors.emplace_back(node, scope);
-      });
+    callWithElements(node, "EntityRef", 0, unbounded, [&](auto && node) {
+      scope.actors.emplace_back(node, scope);
+    });
   }
 };
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ACTORS_HPP_

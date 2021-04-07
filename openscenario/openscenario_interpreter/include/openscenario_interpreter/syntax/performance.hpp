@@ -40,16 +40,17 @@ struct Performance
 
   Performance() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Performance(const Node & node, Scope & scope)
   : max_speed(readAttribute<Double>("maxSpeed", node, scope)),
     max_acceleration(readAttribute<Double>("maxAcceleration", node, scope)),
     max_deceleration(readAttribute<Double>("maxDeceleration", node, scope))
-  {}
+  {
+  }
 
   explicit operator openscenario_msgs::msg::Performance() const
   {
-    openscenario_msgs::msg::Performance performance {};
+    openscenario_msgs::msg::Performance performance;
     {
       performance.max_speed = max_speed;
       performance.max_acceleration = max_acceleration;
@@ -61,7 +62,7 @@ struct Performance
 };
 
 std::ostream & operator<<(std::ostream &, const Performance &);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PERFORMANCE_HPP_

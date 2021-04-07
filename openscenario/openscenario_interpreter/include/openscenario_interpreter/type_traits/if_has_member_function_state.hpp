@@ -16,35 +16,34 @@
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
 
 #include <openscenario_interpreter/type_traits/has_member_function_state.hpp>
-
 #include <sstream>
 
 namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
-template<typename T, typename = void>
+template <typename T, typename = void>
 struct IfHasMemberFunctionState
 {
-  template<typename Result>
+  template <typename Result>
   static const Result & callIt(const T &)
   {
-    std::stringstream ss {};
+    std::stringstream ss{};
     ss << "class " << typeid(T).name() << " is not has member function 'state'";
-    throw ImplementationFault {ss.str()};
+    throw ImplementationFault{ss.str()};
   }
 };
 
-template<typename T>
+template <typename T>
 struct IfHasMemberFunctionState<T, typename std::enable_if<HasMemberFunctionState<T>::value>::type>
 {
-  template<typename Result>
+  template <typename Result>
   static const Result & callIt(const T & callee)
   {
     return callee.state();
   }
 };
-}
+}  // namespace type_traits
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_

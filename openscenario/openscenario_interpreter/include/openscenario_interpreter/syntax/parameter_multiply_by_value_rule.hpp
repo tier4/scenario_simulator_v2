@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_MULTIPLY_BY_VALUE_RULE_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
@@ -36,58 +35,48 @@ struct ParameterMultiplyByValueRule
 {
   const Double value;
 
-  template<typename ... Ts>
-  explicit ParameterMultiplyByValueRule(Ts && ... xs)
+  template <typename... Ts>
+  explicit ParameterMultiplyByValueRule(Ts &&... xs)
   : value(readAttribute<Double>("value", std::forward<decltype(xs)>(xs)...))
-  {}
+  {
+  }
 
   auto operator()(const Element & target) const
   {
     static const std::unordered_map<
-      std::type_index,
-      std::function<Element(const Element &, const Double &)>
-    >
-    overloads
-    {
-      {
-        typeid(Integer), [](auto && target, auto && value)
-        {
-          target.template as<Integer>() *= value;
-          return target;
-        }
-      },
+      std::type_index, std::function<Element(const Element &, const Double &)> >
+      overloads{
+        {typeid(Integer),
+         [](auto && target, auto && value) {
+           target.template as<Integer>() *= value;
+           return target;
+         }},
 
-      {
-        typeid(Double), [](auto && target, auto && value)
-        {
-          target.template as<Double>() *= value;
-          return target;
-        }
-      },
+        {typeid(Double),
+         [](auto && target, auto && value) {
+           target.template as<Double>() *= value;
+           return target;
+         }},
 
-      {
-        typeid(UnsignedInteger), [](auto && target, auto && value)
-        {
-          target.template as<UnsignedInteger>() *= value;
-          return target;
-        }
-      },
+        {typeid(UnsignedInteger),
+         [](auto && target, auto && value) {
+           target.template as<UnsignedInteger>() *= value;
+           return target;
+         }},
 
-      {
-        typeid(UnsignedShort), [](auto && target, auto && value)
-        {
-          target.template as<UnsignedShort>() *= value;
-          return target;
-        }
-      },
-    };
+        {typeid(UnsignedShort),
+         [](auto && target, auto && value) {
+           target.template as<UnsignedShort>() *= value;
+           return target;
+         }},
+      };
 
-    const auto iter {overloads.find(target.type())};
+    const auto iter{overloads.find(target.type())};
 
     if (iter != std::end(overloads)) {
-      return std::get<1>(* iter)(target, value);
+      return std::get<1>(*iter)(target, value);
     } else {
-      std::stringstream ss {};
+      std::stringstream ss{};
       ss << "The parameter specified by attrribute 'parameterRef' of type 'ParameterAction' ";
       ss << "must be numeric type (double, integer, unsignedInteger or unsignedShort), but ";
       ss << target << " (type " << target.type().name() << ") specified";
@@ -95,7 +84,7 @@ struct ParameterMultiplyByValueRule
     }
   }
 };
-}  // inline namespace syntax
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_MULTIPLY_BY_VALUE_RULE_HPP_

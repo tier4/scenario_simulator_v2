@@ -16,10 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CENTER_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
+#include <iostream>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-
-#include <iostream>
 
 namespace openscenario_interpreter
 {
@@ -40,16 +39,17 @@ struct Center
 
   Center() = default;
 
-  template<typename Node, typename Scope>
+  template <typename Node, typename Scope>
   explicit Center(const Node & node, Scope & scope)
   : x(readAttribute<Double>("x", node, scope)),
     y(readAttribute<Double>("y", node, scope)),
     z(readAttribute<Double>("z", node, scope))
-  {}
+  {
+  }
 
   explicit operator geometry_msgs::msg::Point() const
   {
-    geometry_msgs::msg::Point point {};
+    geometry_msgs::msg::Point point;
     {
       point.x = x;
       point.y = y;
@@ -61,7 +61,7 @@ struct Center
 };
 
 std::ostream & operator<<(std::ostream &, const Center &);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__CENTER_HPP_

@@ -21,12 +21,13 @@ namespace openscenario_interpreter
 {
 inline namespace utility
 {
-#define ASSERT_DEFAULT_CONSTRUCTIBLE(TYPE) \
-  static_assert( \
-    std::is_default_constructible<TYPE>::value, \
-    "OpenSCENARIO specification uses type '" #TYPE "' as optional element (as minOccurs=\"0\"), " \
+#define ASSERT_DEFAULT_CONSTRUCTIBLE(TYPE)         \
+  static_assert(                                   \
+    std::is_default_constructible<TYPE>::value,    \
+    "OpenSCENARIO specification uses type '" #TYPE \
+    "' as optional element (as minOccurs=\"0\"), " \
     "thus type '" #TYPE "' must be met concept DefaultConstructible.")
-}
+}  // namespace utility
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__UTILITY__ASSERTION_AUXILIARY_HPP_

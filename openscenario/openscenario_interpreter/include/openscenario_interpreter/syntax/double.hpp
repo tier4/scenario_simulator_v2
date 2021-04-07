@@ -16,39 +16,32 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
 
 #include <boost/lexical_cast.hpp>
-#include <openscenario_interpreter/error.hpp>
-#include <std_msgs/msg/float64.hpp>
-
 #include <limits>
+#include <openscenario_interpreter/error.hpp>
+#include <regex>
+#include <std_msgs/msg/float64.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct Double
-  : public std_msgs::msg::Float64
+struct Double : public std_msgs::msg::Float64
 {
   using value_type = decltype(std_msgs::msg::Float64::data);
 
-  explicit Double(value_type value = {})
-  {
-    data = value;
-  }
+  explicit Double(value_type value = {}) { data = value; }
 
-  explicit Double(const std::string & s) try
-  {
+  explicit Double(const std::string & s)
+  try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss {};
+    std::stringstream ss;
     ss << "can't treat value \"" << s << "\" as type Double";
     throw SyntaxError(ss.str());
   }
 
-  constexpr operator value_type() const noexcept
-  {
-    return data;
-  }
+  constexpr operator value_type() const noexcept { return data; }
 
   static auto infinity() noexcept
   {
@@ -70,7 +63,7 @@ struct Double
 
 std::ostream & operator<<(std::ostream &, const Double &);
 std::istream & operator>>(std::istream &, Double &);
-}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
