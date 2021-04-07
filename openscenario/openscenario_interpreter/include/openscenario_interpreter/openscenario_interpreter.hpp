@@ -71,18 +71,18 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       case junit_exporter::TestResult::ERROR:
       case junit_exporter::TestResult::FAILURE:
         if (what.empty()) {
-          std::cout << "\x1b[1;31mYield " << type.c_str() << "\x1b[0m" << std::endl;
+          std::cout << "\x1b[1;31m" << type.c_str() << "\x1b[0m" << std::endl;
         } else {
-          std::cout << "\x1b[1;31mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
+          std::cout << "\x1b[1;31m" << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
                     << std::endl;
         }
         break;
 
       case junit_exporter::TestResult::SUCCESS:
         if (what.empty()) {
-          std::cout << "\x1b[32mYield " << type.c_str() << "\x1b[0m" << std::endl;
+          std::cout << "\x1b[32m" << type.c_str() << "\x1b[0m" << std::endl;
         } else {
-          std::cout << "\x1b[32mYield " << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
+          std::cout << "\x1b[32m" << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
                     << std::endl;
         }
         break;
@@ -108,43 +108,49 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       switch (command) {
         case EXIT_SUCCESS:
           if (intended_result == "success") {
-            report(SUCCESS, "intended-success");
+            report(SUCCESS, "Success (intended)");
           } else {
-            report(FAILURE, "unintended-success", "expected " + intended_result);
+            report(FAILURE, "Success (unintended)", "expected " + intended_result);
           }
           break;
 
         case EXIT_FAILURE:
           if (intended_result == "failure") {
-            report(SUCCESS, "intended-failure");
+            report(SUCCESS, "Failure (intended)");
           } else {
-            report(FAILURE, "unintended-failure", "expected " + intended_result);
+            report(FAILURE, "Failure (unintended)", "expected " + intended_result);
           }
           break;
 
         default:
           break;
       }
+    } catch (const autoware_api::AutowareError & error) {
+      if (intended_result == "error") {
+        report(SUCCESS, "Error (intended)");
+      } else {
+        report(ERROR, "AutowareError", error.what());
+      }
     } catch (const openscenario_interpreter::SemanticError & error) {
       if (intended_result == "error") {
-        report(SUCCESS, "intended-error");
+        report(SUCCESS, "Error (intended)");
       } else {
-        report(ERROR, "semantic-error", error.what());
+        report(ERROR, "SemanticError", error.what());
       }
     } catch (const openscenario_interpreter::ImplementationFault & error) {
       if (intended_result == "error") {
-        report(SUCCESS, "intended-error");
+        report(SUCCESS, "Error (intended)");
       } else {
-        report(ERROR, "implementation-fault", error.what());
+        report(ERROR, "ImplementationFault", error.what());
       }
     } catch (const std::exception & error) {
       if (intended_result == "error") {
-        report(SUCCESS, "intended-error");
+        report(SUCCESS, "Error (intended)");
       } else {
-        report(ERROR, "unexpected-standard-exception", error.what());
+        report(ERROR, "Exception (unexpected)", error.what());
       }
     } catch (...) {
-      report(ERROR, "unexpected-unknown-exception");
+      report(ERROR, "UnknownException (unexpected)");
     }
   }
 
