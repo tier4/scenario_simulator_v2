@@ -93,8 +93,7 @@ struct CustomCommandAction
     std::cout << "test" << std::endl;
 
     for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
-      std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter
-                << std::endl;
+      std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter << "\n";
     }
 
     return args.size();

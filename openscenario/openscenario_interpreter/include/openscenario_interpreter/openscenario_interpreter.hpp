@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/utility/visibility.h>
 
+#include <exception>
 #include <junit_exporter/junit_exporter.hpp>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
@@ -99,9 +100,25 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     deactivate();
   }
 
+#define CATCH(TYPE)                         \
+  catch (const TYPE & error)                \
+  {                                         \
+    if (intended_result == "error") {       \
+      report(SUCCESS, #TYPE " (intended)"); \
+    } else {                                \
+      report(ERROR, #TYPE, error.what());   \
+    }                                       \
+  }
+
   template <typename Thunk>
   void withExceptionHandler(Thunk && thunk)
   {
+    using autoware_api::AutowareError;
+    using openscenario_interpreter::ImplementationFault;
+    using openscenario_interpreter::SemanticError;
+
+    using StandardException = std::exception;
+
     try {
       return thunk();
     } catch (const int command) {
@@ -125,34 +142,17 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
         default:
           break;
       }
-    } catch (const autoware_api::AutowareError & error) {
-      if (intended_result == "error") {
-        report(SUCCESS, "Error (intended)");
-      } else {
-        report(ERROR, "AutowareError", error.what());
-      }
-    } catch (const openscenario_interpreter::SemanticError & error) {
-      if (intended_result == "error") {
-        report(SUCCESS, "Error (intended)");
-      } else {
-        report(ERROR, "SemanticError", error.what());
-      }
-    } catch (const openscenario_interpreter::ImplementationFault & error) {
-      if (intended_result == "error") {
-        report(SUCCESS, "Error (intended)");
-      } else {
-        report(ERROR, "ImplementationFault", error.what());
-      }
-    } catch (const std::exception & error) {
-      if (intended_result == "error") {
-        report(SUCCESS, "Error (intended)");
-      } else {
-        report(ERROR, "Exception (unexpected)", error.what());
-      }
-    } catch (...) {
-      report(ERROR, "UnknownException (unexpected)");
     }
+
+    CATCH(AutowareError)
+    CATCH(ImplementationFault)
+    CATCH(SemanticError)
+    CATCH(StandardException)
+
+    catch (...) { report(ERROR, "UnknownException (unexpected)"); }
   }
+
+#undef CATCH
 
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
