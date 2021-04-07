@@ -20,8 +20,8 @@ When the test runner launched, ths test runner configures openscenario_interpret
 After the, the test runner activates openscenario_interpretor and move the state into "Active".
 When the exception was thrown in openscenario interpretor, the openscenario interpretor moves into "Inactive" state.
 
-1. sensor_simulator
-sensor_simulator communicates with openscenario_interpretor by using XMLRPC API.
+1. simple_sensor_simulator
+simple_sensor_simulator communicates with openscenario_interpretor by using XMLRPC API.
 You can use any times of simulator by adapting this API.
 
 # Execution sequence of scenario testing.

@@ -94,7 +94,7 @@ def generate_launch_description():
             package='scenario_simulator',
             executable='scenario_simulator_node',
             namespace='simulation',
-            name='sensor_simulator',
+            name='simple_sensor_simulator',
             output='screen',
             parameters=[
                 {'port': port},

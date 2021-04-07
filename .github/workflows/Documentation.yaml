@@ -48,15 +48,15 @@ jobs:
             mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
 
-        # generating sensor_simulator package documentation
-        - name: Generate doxygen for sensor_simulator package
+        # generating simple_sensor_simulator package documentation
+        - name: Generate doxygen for simple_sensor_simulator package
           run: |
-            cd docs/package/sensor_simulator
+            cd docs/package/simple_sensor_simulator
             doxygen Doxyfile
-        - name: Generate markdown for sensor_simulator package
+        - name: Generate markdown for simple_sensor_simulator package
           run: |
             export PATH="$PATH:~/doxybook2/bin"
-            cd docs/package/sensor_simulator
+            cd docs/package/simple_sensor_simulator
             mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
 
