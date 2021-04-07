@@ -58,26 +58,11 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       script.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
       "scenario_testing", 0, result, type, what);
 
-    switch (result) {
-      case junit_exporter::TestResult::ERROR:
-      case junit_exporter::TestResult::FAILURE:
-        if (what.empty()) {
-          std::cout << "\x1b[1;31m" << type.c_str() << "\x1b[0m" << std::endl;
-        } else {
-          std::cout << "\x1b[1;31m" << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
-                    << std::endl;
-        }
-        break;
-
-      case junit_exporter::TestResult::SUCCESS:
-        if (what.empty()) {
-          std::cout << "\x1b[32m" << type.c_str() << "\x1b[0m" << std::endl;
-        } else {
-          std::cout << "\x1b[32m" << type.c_str() << " (" << what.c_str() << ")\x1b[0m"
-                    << std::endl;
-        }
-        break;
+    std::cout << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
+    if (not what.empty()) {
+      std::cout << " (" << what.c_str() << ")";
     }
+    std::cout << "\x1b[0m" << std::endl;
 
     exporter.write(output_directory + "/result.junit.xml");
 
