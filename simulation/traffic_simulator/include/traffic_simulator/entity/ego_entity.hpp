@@ -393,7 +393,7 @@ public:
 
   const std::string getCurrentAction() const
   {
-    return "none";
+    return std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;
   }
 
   void onUpdate(double current_time, double step_time);
