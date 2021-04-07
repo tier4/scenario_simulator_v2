@@ -23,7 +23,7 @@
 
 namespace openscenario_interpreter
 {
-extern scenario_simulator::API & connection;
+extern traffic_simulator::API & connection;
 
 // static struct Connector
 // {
@@ -34,7 +34,7 @@ extern scenario_simulator::API & connection;
 template <typename... Ts>
 decltype(auto) connect(Ts &&... xs)
 {
-  new (&connection) scenario_simulator::API(std::forward<decltype(xs)>(xs)...);
+  new (&connection) traffic_simulator::API(std::forward<decltype(xs)>(xs)...);
   return connection;
 }
 

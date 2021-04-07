@@ -158,7 +158,7 @@ private:
   bool target_speed_setted_;
   double current_time_;
   int port_;
-  scenario_simulator::API api_;
+  traffic_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 
   std::string catalog_xml =

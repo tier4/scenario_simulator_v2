@@ -12,15 +12,15 @@ Provide simulator API for scenario testing.
 - [Pages](/package/traffic_simulator/markdown/Pages)
 - [Examples](/package/traffic_simulator/markdown/Examples)
 
-### Scenario Simulator Package
+### Simple Sensor Simulator Package
 Simulator for scenario testing.
 
-- [Classes](/package/scenario_simulator/markdown/Classes)
-- [Namespaces](/package/scenario_simulator/markdown/Namespaces)
-- [Modules](/package/scenario_simulator/markdown/Modules)
-- [Files](/package/scenario_simulator/markdown/Files)
-- [Pages](/package/scenario_simulator/markdown/Pages)
-- [Examples](/package/scenario_simulator/markdown/Examples)
+- [Classes](/package/simple_sensor_simulator/markdown/Classes)
+- [Namespaces](/package/simple_sensor_simulator/markdown/Namespaces)
+- [Modules](/package/simple_sensor_simulator/markdown/Modules)
+- [Files](/package/simple_sensor_simulator/markdown/Files)
+- [Pages](/package/simple_sensor_simulator/markdown/Pages)
+- [Examples](/package/simple_sensor_simulator/markdown/Examples)
 
 ## OpenSCENARIO Packages
 ---

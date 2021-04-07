@@ -90,7 +90,7 @@ private:
   bool bob_spawned_;
   double current_time_;
   int port_;
-  scenario_simulator::API api_;
+  traffic_simulatorr::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 
   std::string catalog_xml =

@@ -21,7 +21,7 @@
 #include <string>
 #include <traffic_simulator/api/api.hpp>
 
-namespace scenario_simulator
+namespace traffic_simulator
 {
 void API::setVerbose(bool verbose)
 {
@@ -391,4 +391,4 @@ bool API::updateFrame()
   metrics_manager_.calculate();
   return true;
 }
-}  // namespace scenario_simulator
+}  // namespace traffic_simulator

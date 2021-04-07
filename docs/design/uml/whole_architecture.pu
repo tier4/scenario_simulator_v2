@@ -9,12 +9,12 @@ Node openscenario_interpreter_node {
   class EntityManager
   class TrafficLightManager
   class MetricsManager
-  class scenario_simulator::API
+  class traffic_simulatorr::API
   class ZeroMQRequestSocket
-  openscenario_interpreter::Interpreter o-- scenario_simulator::API
-  scenario_simulator::API o-- EntityManager
-  scenario_simulator::API o-- TrafficLightManager
-  scenario_simulator::API o-- MetricsManager
+  openscenario_interpreter::Interpreter o-- traffic_simulatorr::API
+  traffic_simulatorr::API o-- EntityManager
+  traffic_simulatorr::API o-- TrafficLightManager
+  traffic_simulatorr::API o-- MetricsManager
   TrafficLightManager -right-> EntityManager
   EntityManager -right-> MetricsManager
   class EgoEntity
@@ -51,8 +51,8 @@ ros2launch -down-> openscenario_interpreter_node
 
 interface "ZEROMQ (TCP)"
 
-scenario_simulator::API -left-> ZeroMQRequestSocket
-ZeroMQRequestSocket -right-> scenario_simulator::API
+traffic_simulatorr::API -left-> ZeroMQRequestSocket
+ZeroMQRequestSocket -right-> traffic_simulatorr::API
 ZeroMQRequestSocket -right-> "ZEROMQ (TCP)"
 "ZEROMQ (TCP)" -left-> ZeroMQRequestSocket
 

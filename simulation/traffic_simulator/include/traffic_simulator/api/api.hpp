@@ -34,7 +34,7 @@
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <utility>
 
-namespace scenario_simulator
+namespace traffic_simulator
 {
 class ExecutionFailedError : public std::runtime_error
 {
@@ -281,6 +281,6 @@ private:
     simulation_api_schema::AttachDetectionSensorResponse>
     attach_detection_sensor_client_;
 };
-}  // namespace scenario_simulator
+}  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__API__API_HPP_
