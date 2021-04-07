@@ -46,25 +46,6 @@ bool API::despawn(const std::string & name)
 }
 
 bool API::spawn(
-  const bool is_ego, const std::string & catalog_xml,
-  const openscenario_msgs::msg::EntityStatus & status)
-{
-  pugi::xml_document catalog_xml_doc;
-  catalog_xml_doc.load_string(catalog_xml.c_str());
-  pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
-  if (vehicle_node != nullptr) {
-    const auto params = traffic_simulator::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
-    return spawn(is_ego, status.name, params);
-  }
-  pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
-  if (pedestrian_node != nullptr) {
-    const auto params = traffic_simulator::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
-    return spawn(is_ego, status.name, params);
-  }
-  return false;
-}
-
-bool API::spawn(
   const bool is_ego, const std::string & name,
   const openscenario_msgs::msg::VehicleParameters & params)
 {
@@ -121,23 +102,6 @@ bool API::spawn(
   simulation_interface::toProto(params, *req.mutable_parameters());
   spawn_pedestrian_entity_client_.call(req, res);
   return res.result().success();
-}
-
-bool API::spawn(const bool is_ego, const std::string & name, const std::string & catalog_xml)
-{
-  pugi::xml_document catalog_xml_doc;
-  catalog_xml_doc.load_string(catalog_xml.c_str());
-  pugi::xml_node vehicle_node = catalog_xml_doc.child("Vehicle");
-  if (vehicle_node != NULL) {
-    const auto params = traffic_simulator::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
-    spawn(is_ego, name, params);
-  }
-  pugi::xml_node pedestrian_node = catalog_xml_doc.child("Pedestrian");
-  if (pedestrian_node != NULL) {
-    const auto params = traffic_simulator::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
-    spawn(false, name, params);
-  }
-  return true;
 }
 
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
