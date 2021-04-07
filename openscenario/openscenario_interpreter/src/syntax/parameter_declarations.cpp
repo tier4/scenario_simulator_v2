@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
-#define OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+#include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 
-#include <ostream>
-#include <pugixml.hpp>
-
-std::ostream & operator<<(std::ostream &, const pugi::xml_node &);
-
-#endif  // OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+namespace openscenario_interpreter
+{
+inline namespace syntax
+{
+std::ostream & operator<<(std::ostream & os, const ParameterDeclarations &)
+{
+  return os << (indent++) << blue << "<ParameterDeclarations>" << reset << "\n"
+            << (--indent) << blue << "</ParameterDeclarations>";
+}
+}  // namespace syntax
+}  // namespace openscenario_interpreter

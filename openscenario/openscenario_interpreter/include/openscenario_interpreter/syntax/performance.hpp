@@ -17,20 +17,21 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_msgs/msg/performance.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Performance ==========================================================
+/* ---- Performance ------------------------------------------------------------
  *
- * <xsd:complexType name="Performance">
- *   <xsd:attribute name="maxSpeed" type="Double" use="required"/>
- *   <xsd:attribute name="maxAcceleration" type="Double" use="required"/>
- *   <xsd:attribute name="maxDeceleration" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Performance">
+ *    <xsd:attribute name="maxSpeed" type="Double" use="required"/>
+ *    <xsd:attribute name="maxAcceleration" type="Double" use="required"/>
+ *    <xsd:attribute name="maxDeceleration" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Performance
 {
   const Double max_speed;
@@ -41,21 +42,26 @@ struct Performance
 
   template <typename Node, typename Scope>
   explicit Performance(const Node & node, Scope & scope)
-  : max_speed{readAttribute<Double>("maxSpeed", node, scope)},
-    max_acceleration{readAttribute<Double>("maxAcceleration", node, scope)},
-    max_deceleration{readAttribute<Double>("maxDeceleration", node, scope)}
+  : max_speed(readAttribute<Double>("maxSpeed", node, scope)),
+    max_acceleration(readAttribute<Double>("maxAcceleration", node, scope)),
+    max_deceleration(readAttribute<Double>("maxDeceleration", node, scope))
   {
+  }
+
+  explicit operator openscenario_msgs::msg::Performance() const
+  {
+    openscenario_msgs::msg::Performance performance;
+    {
+      performance.max_speed = max_speed;
+      performance.max_acceleration = max_acceleration;
+      performance.max_deceleration = max_deceleration;
+    }
+
+    return performance;
   }
 };
 
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Performance & rhs)
-{
-  return os << indent << blue << "<Performance"
-            << " " << highlight("maxSpeed", rhs.max_speed) << " "
-            << highlight("maxAcceleration", rhs.max_acceleration) << " "
-            << highlight("maxDeceleration", rhs.max_deceleration) << blue << "/>" << reset;
-}
+std::ostream & operator<<(std::ostream &, const Performance &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

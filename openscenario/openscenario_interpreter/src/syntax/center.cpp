@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
-#define OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+#include <openscenario_interpreter/syntax/center.hpp>
+#include <string>
 
-#include <ostream>
-#include <pugixml.hpp>
+namespace openscenario_interpreter
+{
+inline namespace syntax
+{
+std::ostream & operator<<(std::ostream & os, const Center & datum)
+{
+  // clang-format off
 
-std::ostream & operator<<(std::ostream &, const pugi::xml_node &);
+  return os << indent << blue << "<Center " << highlight("x", datum.x)
+                                     << " " << highlight("y", datum.y)
+                                     << " " << highlight("z", datum.z) << blue << "/>" << reset;
 
-#endif  // OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+  // clang-format on
+}
+}  // namespace syntax
+}  // namespace openscenario_interpreter

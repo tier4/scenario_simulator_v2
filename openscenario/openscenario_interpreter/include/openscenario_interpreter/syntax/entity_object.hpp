@@ -17,40 +17,64 @@
 
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
+#include <unordered_map>
 #include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#define ELEMENT(TYPE) \
-  std::make_pair(     \
-    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
-
 /* ---- EntityObject -----------------------------------------------------------
  *
- * <xsd:group name="EntityObject">
- *   <xsd:choice>
- *     <xsd:element name="CatalogReference" type="CatalogReference"/>
- *     <xsd:element name="Vehicle" type="Vehicle"/>
- *     <xsd:element name="Pedestrian" type="Pedestrian"/>
- *     <xsd:element name="MiscObject" type="MiscObject"/>
- *   </xsd:choice>
- * </xsd:group>
+ *  <xsd:group name="EntityObject">
+ *    <xsd:choice>
+ *      <xsd:element name="CatalogReference" type="CatalogReference"/>
+ *      <xsd:element name="Vehicle" type="Vehicle"/>
+ *      <xsd:element name="Pedestrian" type="Pedestrian"/>
+ *      <xsd:element name="MiscObject" type="MiscObject"/>
+ *    </xsd:choice>
+ *  </xsd:group>
  *
  * -------------------------------------------------------------------------- */
 struct EntityObject : public Group
 {
-  template <typename Node, typename... Ts>
-  explicit EntityObject(const Node & node, Ts &&... xs)
-  : Group(choice(
-      node, std::make_pair("CatalogReference", UNSUPPORTED()), ELEMENT(Vehicle),
-      ELEMENT(Pedestrian), std::make_pair("MiscObject", UNSUPPORTED())))
+  template <typename XML, typename... Ts>
+  explicit EntityObject(const XML & node, Ts &&... xs)
+  // clang-format off
+  : Group(
+      choice(
+        node,
+        std::make_pair("CatalogReference", UNSUPPORTED()),
+        std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>   (node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("MiscObject",       UNSUPPORTED())))
+  // clang-format on
   {
   }
 };
 
-#undef ELEMENT
+template <typename R = void, typename F, typename... Ts>
+decltype(auto) apply(F && f, const EntityObject & entity_object, Ts &&... xs)
+{
+#define BOILERPLATE(TYPE)                                                       \
+  {                                                                             \
+    typeid(TYPE), [](F && f, const EntityObject & entity_object, Ts &&... xs) { \
+      return f(entity_object.as<TYPE>(), std::forward<decltype(xs)>(xs)...);    \
+    }                                                                           \
+  }
+
+  static const std::unordered_map<
+    std::type_index, std::function<R(F && f, const EntityObject & entity_object, Ts &&... xs)>>
+    overloads{
+      BOILERPLATE(Vehicle),
+      BOILERPLATE(Pedestrian),
+    };
+
+#undef BOILERPLATE
+
+  return overloads.at(entity_object.type())(
+    std::forward<decltype(f)>(f), entity_object, std::forward<decltype(xs)>(xs)...);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
-#define OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+#include <openscenario_interpreter/syntax/axles.hpp>
 
-#include <ostream>
-#include <pugixml.hpp>
+namespace openscenario_interpreter
+{
+inline namespace syntax
+{
+std::ostream & operator<<(std::ostream & os, const Axles & datum)
+{
+  os << (indent++) << blue << "<Axles>\n" << reset;
+  os << datum.front_axle << "\n";
+  os << datum.rear_axle << "\n";
 
-std::ostream & operator<<(std::ostream &, const pugi::xml_node &);
+  for (const auto & each : datum.additional_axles) {
+    os << each << "\n";
+  }
 
-#endif  // OPENSCENARIO_INTERPRETER__UTILITY__PUGI_EXTENSION_HPP_
+  return os << (--indent) << blue << "</Axles>" << reset;
+}
+}  // namespace syntax
+}  // namespace openscenario_interpreter
