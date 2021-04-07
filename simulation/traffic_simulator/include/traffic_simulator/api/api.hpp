@@ -26,6 +26,7 @@
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/zmq_client.hpp>
+#include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -36,13 +37,9 @@
 
 namespace traffic_simulator
 {
-class ExecutionFailedError : public std::runtime_error
+struct ExecutionFailedError : public std::runtime_error
 {
-public:
-  template <typename... Ts>
-  explicit ExecutionFailedError(Ts &&... xs) : runtime_error(std::forward<decltype(xs)>(xs)...)
-  {
-  }
+  using std::runtime_error::runtime_error;
 
   virtual ~ExecutionFailedError() = default;
 };
@@ -108,9 +105,6 @@ public:
 
   void setVerbose(const bool verbose);
 
-  [[deprecated("catalog_xml will be removed in the near future")]] bool spawn(
-    const bool is_ego, const std::string & name, const std::string & catalog_xml);
-
   bool spawn(
     const bool is_ego, const std::string & name,
     const openscenario_msgs::msg::VehicleParameters & params);
@@ -118,14 +112,6 @@ public:
   bool spawn(
     const bool is_ego, const std::string & name,
     const openscenario_msgs::msg::PedestrianParameters & params);
-
-  template <typename... Ts>
-  decltype(auto) spawn(
-    const bool is_ego, const std::string & name, const std::string & catalog_xml, Ts &&... xs)
-  {
-    return spawn(is_ego, name, catalog_xml) &&
-           setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
-  }
 
   template <
     typename Parameters,  // Maybe, VehicleParameters or PedestrianParameters

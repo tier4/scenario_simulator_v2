@@ -19,26 +19,27 @@
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/pedestrian_category.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
+#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Pedestrian ===========================================================
+/* ---- Pedestrian -------------------------------------------------------------
  *
- * <xsd:complexType name="Pedestrian">
- *   <xsd:all>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="BoundingBox" type="BoundingBox"/>
- *     <xsd:element name="Properties" type="Properties"/>
- *   </xsd:all>
- *   <xsd:attribute name="model" type="String" use="required"/>
- *   <xsd:attribute name="mass" type="Double" use="required"/>
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="pedestrianCategory" type="PedestrianCategory" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Pedestrian">
+ *    <xsd:all>
+ *      <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
+ *      <xsd:element name="BoundingBox" type="BoundingBox"/>
+ *      <xsd:element name="Properties" type="Properties"/>
+ *    </xsd:all>
+ *    <xsd:attribute name="model" type="String" use="required"/>
+ *    <xsd:attribute name="mass" type="Double" use="required"/>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="pedestrianCategory" type="PedestrianCategory" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Pedestrian
 {
   const String name;
@@ -59,30 +60,32 @@ struct Pedestrian
 
   template <typename Node, typename Scope>
   explicit Pedestrian(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    mass{readAttribute<Double>("mass", node, outer_scope)},
-    model{readAttribute<String>("model", node, outer_scope)},
-    pedestrian_category{readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)},
-    inner_scope{outer_scope},
-    parameter_declarations{
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)},
-    bounding_box{readElement<BoundingBox>("BoundingBox", node, inner_scope)},
-    properties{readElement<Properties>("Properties", node, inner_scope)}
+  : name(readAttribute<String>("name", node, outer_scope)),
+    mass(readAttribute<Double>("mass", node, outer_scope)),
+    model(readAttribute<String>("model", node, outer_scope)),
+    pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)),
+    inner_scope(outer_scope),
+    parameter_declarations(
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)),
+    bounding_box(readElement<BoundingBox>("BoundingBox", node, inner_scope)),
+    properties(readElement<Properties>("Properties", node, inner_scope))
   {
+  }
+
+  explicit operator openscenario_msgs::msg::PedestrianParameters() const
+  {
+    openscenario_msgs::msg::PedestrianParameters parameter;
+    {
+      parameter.name = name;
+      parameter.pedestrian_category = boost::lexical_cast<String>(pedestrian_category);
+      parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
+    }
+
+    return parameter;
   }
 };
 
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Pedestrian & rhs)
-{
-  return os << (indent++) << blue << "<Pedestrian"
-            << " " << highlight("name", rhs.name) << " " << highlight("mass", rhs.mass) << " "
-            << highlight("model", rhs.model) << " "
-            << highlight("pedestrianCategory", rhs.pedestrian_category) << blue << ">\n"
-            << reset << rhs.parameter_declarations << "\n"
-            << rhs.bounding_box << "\n"
-            << (--indent) << blue << "</Pedestrian>" << reset;
-}
+std::ostream & operator<<(std::ostream &, const Pedestrian &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

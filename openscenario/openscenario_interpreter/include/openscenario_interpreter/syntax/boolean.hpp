@@ -17,6 +17,7 @@
 
 #include <boost/io/ios_state.hpp>
 #include <iomanip>
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <string>
 
@@ -34,7 +35,7 @@ struct Boolean
 
   value_type data;
 
-  explicit constexpr Boolean(value_type value = false) noexcept : data{value} {}
+  explicit constexpr Boolean(value_type value = false) noexcept : data(value) {}
 
   explicit Boolean(const std::string & target)
   {
@@ -43,7 +44,7 @@ struct Boolean
     if (!(interpreter << target && interpreter >> std::boolalpha >> data)) {
       std::stringstream ss{};
       ss << "can't treat value " << std::quoted(target) << " as type Boolean";
-      throw SyntaxError{ss.str()};
+      throw SyntaxError(ss.str());
     }
   }
 
@@ -56,22 +57,13 @@ struct Boolean
   constexpr operator value_type() const noexcept { return data; }
 };
 
-std::ostream & operator<<(std::ostream & os, const Boolean & boolean)
-{
-  boost::io::ios_flags_saver saver{os};
-  return os << std::boolalpha << boolean.data;
-}
+std::istream & operator>>(std::istream &, Boolean &);
+std::ostream & operator<<(std::ostream &, const Boolean &);
 
-std::istream & operator>>(std::istream & is, Boolean & boolean)
-{
-  boost::io::ios_flags_saver saver{is};
-  return is >> std::boolalpha >> boolean.data;
-}
+extern const Element true_v;
+extern const Element false_v;
 
-static const auto true_v = make<Boolean>(true);
-static const auto false_v = make<Boolean>(false);
-
-auto asBoolean(bool value) { return value ? true_v : false_v; }
+const Element & asBoolean(bool);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

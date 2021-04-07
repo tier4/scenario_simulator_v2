@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/syntax/performance.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/vehicle_category.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -109,6 +110,20 @@ struct Vehicle
   {
   }
 
+  explicit operator openscenario_msgs::msg::VehicleParameters() const
+  {
+    openscenario_msgs::msg::VehicleParameters parameter;
+    {
+      parameter.name = name;
+      parameter.vehicle_category = boost::lexical_cast<String>(vehicle_category);
+      parameter.bounding_box = static_cast<openscenario_msgs::msg::BoundingBox>(bounding_box);
+      parameter.performance = static_cast<openscenario_msgs::msg::Performance>(performance);
+      parameter.axles = static_cast<openscenario_msgs::msg::Axles>(axles);
+    }
+
+    return parameter;
+  }
+
   template <typename... Ts>
   decltype(auto) operator[](Ts &&... xs)
   {
@@ -116,16 +131,19 @@ struct Vehicle
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const Vehicle & rhs)
+std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
 {
-  return os << (indent++) << blue << "<Vehicle"
-            << " " << highlight("name", rhs.name) << " "
-            << highlight("vehicleCategory", rhs.vehicle_category) << blue << ">\n"
-            << reset << rhs.parameter_declarations << "\n"
-            << rhs.bounding_box << "\n"
-            << rhs.performance << "\n"
-            << rhs.axles << "\n"
+  // clang-format off
+
+  return os << (indent++) << blue << "<Vehicle" << " " << highlight("name", datum.name)
+                                                << " " << highlight("vehicleCategory", datum.vehicle_category) << blue << ">\n" << reset
+            << datum.parameter_declarations << "\n"
+            << datum.bounding_box           << "\n"
+            << datum.performance            << "\n"
+            << datum.axles                  << "\n"
             << (--indent) << blue << "</Vehicle>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -73,13 +73,22 @@ struct ScenarioObject
   {
   }
 
+  decltype(auto) operator()(const Vehicle & vehicle)
+  {
+    return spawn(
+      object_controller.isEgo(), name,
+      static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
+  }
+
+  decltype(auto) operator()(const Pedestrian & pedestrian) const
+  {
+    return spawn(
+      false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+  }
+
   auto evaluate()
   {
-    if (spawn(
-          is<Vehicle>() && object_controller.isEgo(), name,
-          boost::lexical_cast<String>(
-            static_cast<const EntityObject &>(*this))))  // XXX UGLY CODE!!!
-    {
+    if (apply<bool>(*this, static_cast<const EntityObject &>(*this))) {
       if (is<Vehicle>()) {
         setController(name, object_controller);
 
@@ -100,10 +109,13 @@ struct ScenarioObject
 
 std::ostream & operator<<(std::ostream & os, const ScenarioObject & datum)
 {
-  return os << (indent++) << blue << "<ScenarioObject"
-            << " " << highlight("name", datum.name) << blue << ">\n"
-            << reset << static_cast<const EntityObject &>(datum) << "\n"
+  // clang-format off
+
+  return os << (indent++) << blue << "<ScenarioObject " << highlight("name", datum.name) << blue << ">\n" << reset
+            << static_cast<const EntityObject &>(datum) << "\n"
             << (--indent) << blue << "</ScenarioObject>" << reset;
+
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

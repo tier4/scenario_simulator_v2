@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CENTER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CENTER_HPP_
 
+#include <geometry_msgs/msg/point.hpp>
+#include <iostream>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 
@@ -22,15 +24,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Center ===============================================================
+/* ---- Center -----------------------------------------------------------------
  *
- * <xsd:complexType name="Center">
- *   <xsd:attribute name="x" type="Double" use="required"/>
- *   <xsd:attribute name="y" type="Double" use="required"/>
- *   <xsd:attribute name="z" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Center">
+ *    <xsd:attribute name="x" type="Double" use="required"/>
+ *    <xsd:attribute name="y" type="Double" use="required"/>
+ *    <xsd:attribute name="z" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Center
 {
   const Double x, y, z;
@@ -39,20 +41,26 @@ struct Center
 
   template <typename Node, typename Scope>
   explicit Center(const Node & node, Scope & scope)
-  : x{readAttribute<Double>("x", node, scope)},
-    y{readAttribute<Double>("y", node, scope)},
-    z{readAttribute<Double>("z", node, scope)}
+  : x(readAttribute<Double>("x", node, scope)),
+    y(readAttribute<Double>("y", node, scope)),
+    z(readAttribute<Double>("z", node, scope))
   {
+  }
+
+  explicit operator geometry_msgs::msg::Point() const
+  {
+    geometry_msgs::msg::Point point;
+    {
+      point.x = x;
+      point.y = y;
+      point.z = z;
+    }
+
+    return point;
   }
 };
 
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Center & rhs)
-{
-  return os << indent << blue << "<Center"
-            << " " << highlight("x", rhs.x) << " " << highlight("y", rhs.y) << " "
-            << highlight("z", rhs.z) << blue << "/>" << reset;
-}
+std::ostream & operator<<(std::ostream &, const Center &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

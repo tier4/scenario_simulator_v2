@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INTEGER_HPP_
 
 #include <boost/lexical_cast.hpp>
+#include <openscenario_interpreter/error.hpp>
 #include <std_msgs/msg/int64.hpp>
 #include <string>
 
@@ -33,9 +34,9 @@ struct Integer : public std_msgs::msg::Int64
   try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss{};
-    ss << "can't treat value \"" << s << "\" as type Integer";
-    throw SyntaxError{ss.str()};
+    std::stringstream ss;
+    ss << "Can't treat value \"" << s << "\" as type Integer";
+    throw SyntaxError(ss.str());
   }
 
   constexpr operator value_type() const noexcept { return data; }
@@ -53,18 +54,8 @@ struct Integer : public std_msgs::msg::Int64
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const Integer & rhs) { return os << rhs.data; }
-
-std::istream & operator>>(std::istream & is, Integer & rhs)
-{
-  std::string token{};
-
-  is >> token;
-
-  rhs.data = boost::lexical_cast<Integer::value_type>(token);
-
-  return is;
-}
+std::ostream & operator<<(std::ostream &, const Integer &);
+std::istream & operator>>(std::istream &, Integer &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
