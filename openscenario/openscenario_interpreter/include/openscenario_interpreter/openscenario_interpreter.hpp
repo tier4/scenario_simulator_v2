@@ -22,6 +22,7 @@
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
+#include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <openscenario_interpreter/utility/verbose.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -33,17 +34,6 @@ namespace openscenario_interpreter
 {
 class Interpreter : public rclcpp_lifecycle::LifecycleNode
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  ROS Parameters
-   *
-   *    - intended_result
-   *    - local_frame_rate
-   *    - local_real_time_factor
-   *    - osc_path
-   *    - output_directory
-   *
-   * ------------------------------------------------------------------------ */
   std::string intended_result;
   double local_frame_rate;
   double local_real_time_factor;
@@ -114,33 +104,30 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   void withExceptionHandler(Thunk && thunk)
   {
     using autoware_api::AutowareError;
+
     using openscenario_interpreter::ImplementationFault;
+
     using openscenario_interpreter::SemanticError;
 
     using StandardException = std::exception;
 
     try {
       return thunk();
-    } catch (const int command) {
-      switch (command) {
-        case EXIT_SUCCESS:
-          if (intended_result == "success") {
-            report(SUCCESS, "Success (intended)");
-          } else {
-            report(FAILURE, "Success (unintended)", "expected " + intended_result);
-          }
-          break;
+    }
 
-        case EXIT_FAILURE:
-          if (intended_result == "failure") {
-            report(SUCCESS, "Failure (intended)");
-          } else {
-            report(FAILURE, "Failure (unintended)", "expected " + intended_result);
-          }
-          break;
+    catch (const SpecialAction<EXIT_SUCCESS> &) {
+      if (intended_result == "success") {
+        report(SUCCESS, "Success (intended)");
+      } else {
+        report(FAILURE, "Success (unintended)", "expected " + intended_result);
+      }
+    }
 
-        default:
-          break;
+    catch (const SpecialAction<EXIT_FAILURE> &) {
+      if (intended_result == "failure") {
+        report(SUCCESS, "Failure (intended)");
+      } else {
+        report(FAILURE, "Failure (unintended)", "expected " + intended_result);
       }
     }
 
