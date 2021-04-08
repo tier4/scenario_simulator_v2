@@ -24,32 +24,31 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== TriggeringEntities ===================================================
+/* ---- TriggeringEntities -----------------------------------------------------
  *
- * <xsd:complexType name="TriggeringEntities">
- *   <xsd:sequence>
- *     <xsd:element name="EntityRef" maxOccurs="unbounded" type="EntityRef"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="triggeringEntitiesRule" type="TriggeringEntitiesRule" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="TriggeringEntities">
+ *    <xsd:sequence>
+ *      <xsd:element name="EntityRef" maxOccurs="unbounded" type="EntityRef"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="triggeringEntitiesRule" type="TriggeringEntitiesRule" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct TriggeringEntities : public std::vector<EntityRef>
 {
-  const TriggeringEntitiesRule verify;
+  const TriggeringEntitiesRule quantify;
 
   template <typename Node, typename Scope>
   explicit TriggeringEntities(const Node & node, Scope & scope)
-  : verify{readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)}
+  : std::vector<EntityRef>(readElements<EntityRef, 1>("EntityRef", node, scope)),
+    quantify(readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope))
   {
-    callWithElements(
-      node, "EntityRef", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
   }
 
   template <typename... Ts>
   constexpr decltype(auto) operator()(Ts &&... xs) const
   {
-    return verify(std::begin(*this), std::end(*this), std::forward<decltype(xs)>(xs)...);
+    return quantify(std::begin(*this), std::end(*this), std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace syntax
