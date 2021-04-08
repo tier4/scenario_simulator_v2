@@ -20,18 +20,27 @@
 #include <limits>
 #include <openscenario_interpreter/iterator/size.hpp>
 #include <openscenario_interpreter/object.hpp>
-#include <openscenario_interpreter/type_traits/if_not_default_constructible.hpp>
+#include <openscenario_interpreter/type_traits/must_be_default_constructible.hpp>
 #include <openscenario_interpreter/utility/pugi_extension.hpp>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  The functions in the reader header only deal with XML parsing and should
+ *  not have any prerequisite knowledge about OpenSCENARIO data structures.
+ *
+ * -------------------------------------------------------------------------- */
+
 namespace openscenario_interpreter
 {
 inline namespace reader
 {
-constexpr auto unbounded{std::numeric_limits<
-  typename std::iterator_traits<typename pugi::xml_node::iterator>::difference_type>::max()};
+using XML = pugi::xml_node;
+
+constexpr auto unbounded = std::numeric_limits<
+  typename std::iterator_traits<typename pugi::xml_node::iterator>::difference_type>::max();
 
 template <typename T, typename Node, typename... Ts>
 auto readElement(const std::string & name, const Node & parent, Ts &&... xs)
@@ -39,7 +48,15 @@ auto readElement(const std::string & name, const Node & parent, Ts &&... xs)
   if (const auto child = parent.child(name.c_str())) {
     return T(child, std::forward<decltype(xs)>(xs)...);
   } else {
-    return IfNotDefaultConstructible<T>::error(parent.name(), name);
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  If the given XML node does not have a child element (T type) with the
+     *  specified name, it assumes that the T type is an optional element and
+     *  attempts to build a default T type.
+     *
+     * ---------------------------------------------------------------------- */
+    return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
+      parent.name(), " requires class ", name, " as element, but there is no specification"));
   }
 }
 

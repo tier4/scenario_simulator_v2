@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_NOT_DEFAULT_CONSTRUCTIBLE_HPP_
-#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_NOT_DEFAULT_CONSTRUCTIBLE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__MUST_BE_DEFAULT_CONSTRUCTIBLE_HPP_
+#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__MUST_BE_DEFAULT_CONSTRUCTIBLE_HPP_
 
-#include <string>
+#include <openscenario_interpreter/error.hpp>
 #include <type_traits>
 
 namespace openscenario_interpreter
@@ -23,28 +23,26 @@ namespace openscenario_interpreter
 inline namespace type_traits
 {
 template <typename T, typename = void>
-struct IfNotDefaultConstructible
+struct MustBeDefaultConstructible
 {
-  static T error(const std::string & parent_name, const std::string & child_name)
+  template <typename Error>
+  static T makeItOrThrow(Error && error)
   {
-    std::stringstream ss{};
-    ss << parent_name << " requires class " << child_name
-       << " as element, but there is no specification";
-    throw SyntaxError{ss.str()};
+    throw error;
   }
 };
 
 template <typename T>
-struct IfNotDefaultConstructible<
+struct MustBeDefaultConstructible<
   T, typename std::enable_if<std::is_default_constructible<T>::value>::type>
 {
   template <typename... Ts>
-  static T error(Ts &&...)
+  static T makeItOrThrow(Ts &&...)
   {
-    return T{};
+    return T();
   }
 };
 }  // namespace type_traits
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_NOT_DEFAULT_CONSTRUCTIBLE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__MUST_BE_DEFAULT_CONSTRUCTIBLE_HPP_
