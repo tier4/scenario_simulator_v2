@@ -36,19 +36,23 @@ struct Private : public std::vector<PrivateAction>
 {
   Scope inner_scope;
 
+  std::vector<PrivateAction> private_actions;
+
   template <typename Node>
-  explicit Private(const Node & node, Scope & outer_scope) : inner_scope(outer_scope)
+  explicit Private(const Node & node, Scope & outer_scope)
+  : inner_scope(outer_scope),
+    private_actions(readElements<PrivateAction, 1>("PrivateAction", node, inner_scope))
   {
     inner_scope.actors.emplace_back(readAttribute<String>("entityRef", node, inner_scope));
 
-    callWithElements(
-      node, "PrivateAction", 1, unbounded, [&](auto && node) { emplace_back(node, inner_scope); });
+    // callWithElements(
+    //   node, "PrivateAction", 1, unbounded, [&](auto && node) { emplace_back(node, inner_scope); });
   }
 
   auto evaluate()
   {
-    for (auto && each : *this) {
-      each.start();
+    for (auto && private_action : private_actions) {
+      private_action.start();
     }
 
     return unspecified;

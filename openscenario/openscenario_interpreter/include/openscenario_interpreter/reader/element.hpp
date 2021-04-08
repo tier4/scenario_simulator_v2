@@ -44,24 +44,6 @@ using Cardinality =
 
 constexpr auto unbounded = std::numeric_limits<Cardinality>::max();
 
-template <typename T, typename... Ts>
-auto readElement(const std::string & name, const XML & parent, Ts &&... xs)
-{
-  if (const auto child = parent.child(name.c_str())) {
-    return T(child, std::forward<decltype(xs)>(xs)...);
-  } else {
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  If the given XML node does not have a child element (T type) with the
-     *  specified name, it assumes that the T type is an optional element and
-     *  attempts to build a default T type.
-     *
-     * ---------------------------------------------------------------------- */
-    return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
-      parent.name(), " requires class ", name, " as element, but there is no specification"));
-  }
-}
-
 template <typename Callee>
 void callWithElements(
   const XML & parent, const std::string & name, const Cardinality min_occurs,
@@ -93,9 +75,40 @@ void callWithElements(
 }
 
 template <typename Callee>
-decltype(auto) callWithElement(const XML & parent, const std::string & name, Callee && call_with)
+[[deprecated]] decltype(auto) callWithElement(
+  const XML & parent, const std::string & name, Callee && call_with)
 {
   return callWithElements(parent, name, 1, 1, std::forward<decltype(call_with)>(call_with));
+}
+
+template <typename T, typename... Ts>
+auto readElement(const std::string & name, const XML & parent, Ts &&... xs)
+{
+  if (const auto child = parent.child(name.c_str())) {
+    return T(child, std::forward<decltype(xs)>(xs)...);
+  } else {
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  If the given XML node does not have a child element (T type) with the
+     *  specified name, it assumes that the T type is an optional element and
+     *  attempts to build a default T type.
+     *
+     * ---------------------------------------------------------------------- */
+    return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
+      parent.name(), " requires class ", name, " as element, but there is no specification"));
+  }
+}
+
+template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
+auto readElements(const std::string & name, const XML & node, Ts &&... xs)
+{
+  std::vector<T> elements;
+
+  callWithElements(node, name, MinOccurs, MaxOccurs, [&](auto && x) {
+    elements.emplace_back(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...);
+  });
+
+  return elements;
 }
 
 template <typename... Ts>
