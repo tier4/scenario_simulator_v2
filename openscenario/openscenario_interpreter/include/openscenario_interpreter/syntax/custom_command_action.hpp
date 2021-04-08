@@ -31,6 +31,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+template <int Value>
+struct SpecialAction : public std::integral_constant<int, Value>
+{
+};
+
 /* ---- CustomCommandAction ----------------------------------------------------
  *
  *  <xsd:complexType name="CustomCommandAction">
@@ -74,9 +79,15 @@ struct CustomCommandAction
     return current_scope.actors.size();
   }
 
-  static int exitSuccess(const std::vector<std::string> &, const Scope &) { throw EXIT_SUCCESS; }
+  static int exitSuccess(const std::vector<std::string> &, const Scope &)
+  {
+    throw SpecialAction<EXIT_SUCCESS>();
+  }
 
-  static int exitFailure(const std::vector<std::string> &, const Scope &) { throw EXIT_FAILURE; }
+  static int exitFailure(const std::vector<std::string> &, const Scope &)
+  {
+    throw SpecialAction<EXIT_FAILURE>();
+  }
 
   static int error(const std::vector<std::string> &, const Scope &)
   {
@@ -93,8 +104,7 @@ struct CustomCommandAction
     std::cout << "test" << std::endl;
 
     for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
-      std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter
-                << std::endl;
+      std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter << "\n";
     }
 
     return args.size();

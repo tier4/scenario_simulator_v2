@@ -77,7 +77,7 @@ Without modifier element case
 ```
 ScenarioModifiers:
 or
-ScenarioModifiers:{}
+ScenarioModifiers: {}
 ```
 
 ### NG
@@ -89,7 +89,7 @@ ScenarioModifiers:
 or
 
 ScenarioModifiers:
-  ScenarioModifier:[]
+  ScenarioModifier: []
 ```
 
 
@@ -105,14 +105,14 @@ Optional
 ```
 Scenario:
   - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/xosc/simple.xosc
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/simple.xosc
     }
   - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/failure.yaml,
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/failure.yaml,
       expect: failure
     }
   - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/success.yaml,
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/success.yaml,
       expect: success,
       frame-rate: 30
     }

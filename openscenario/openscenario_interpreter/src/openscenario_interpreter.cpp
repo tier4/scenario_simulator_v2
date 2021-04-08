@@ -15,7 +15,7 @@
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
-#undef NDEBUG
+// #undef NDEBUG
 
 #include <boost/filesystem.hpp>
 #include <memory>
@@ -92,13 +92,14 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
               openscenario_interpreter::stop_transition.use_count() - 1,
               openscenario_interpreter::complete_state.use_count() - 1);
 #endif
-          } else {
-            if (intended_result == "success") {
-              report(SUCCESS, "intended-success");
-            } else {
-              report(FAILURE, "unintended-success", "expected " + intended_result);
-            }
           }
+          // else {
+          //   if (intended_result == "success") {
+          //     report(SUCCESS, "intended-success");
+          //   } else {
+          //     report(FAILURE, "unintended-success", "expected " + intended_result);
+          //   }
+          // }
         }
       });
     });

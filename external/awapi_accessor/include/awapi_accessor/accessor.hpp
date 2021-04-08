@@ -15,11 +15,26 @@
 #ifndef AWAPI_ACCESSOR__ACCESSOR_HPP_
 #define AWAPI_ACCESSOR__ACCESSOR_HPP_
 
-// NOTE: headers are lexicographically sorted.
-
-#include <limits>
-#include <type_traits>
 #define AUTOWARE_IV  // or #define AUTOWARE_AUTO
+
+#include <awapi_accessor/utility/visibility.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2_ros/transform_listener.h>
+
+#include <awapi_accessor/conversion.hpp>
+#include <awapi_accessor/define_macro.hpp>
+#include <cassert>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <limits>
+#include <memory>
+#include <mutex>
+#include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <type_traits>
+#include <utility>
 
 #ifdef AUTOWARE_IV
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
@@ -40,29 +55,15 @@
 // TODO(yamacir-kit)
 #endif
 
-#include <awapi_accessor/utility/visibility.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <tf2_ros/transform_listener.h>
-
-#include <awapi_accessor/conversion.hpp>
-#include <awapi_accessor/define_macro.hpp>
-#include <cassert>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
-#include <memory>
-#include <mutex>
-#include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
-#include <utility>
-
 // #define DEBUG_VALUE(...) std::cout << #__VA_ARGS__ " = " << (__VA_ARGS__) << std::endl
 
 namespace autoware_api
 {
-struct AutowareError
+struct AutowareError : public std::runtime_error
 {
+  using std::runtime_error::runtime_error;
+
+  ~AutowareError() = default;
 };
 
 class Accessor : public rclcpp::Node
@@ -252,7 +253,7 @@ public:
 
   decltype(auto) setCurrentPose(const geometry_msgs::msg::Pose & pose)
   {
-    geometry_msgs::msg::PoseStamped current_pose{};
+    geometry_msgs::msg::PoseStamped current_pose;
     {
       current_pose.header.stamp = get_clock()->now();
       current_pose.header.frame_id = "map";
@@ -278,7 +279,7 @@ public:
   template <typename T, REQUIRES(std::is_floating_point<T>)>
   decltype(auto) setCurrentShift(const T twist_linear_x)
   {
-    CurrentShift current_shift{};
+    CurrentShift current_shift;
     {
       using autoware_vehicle_msgs::msg::Shift;
 
@@ -416,7 +417,7 @@ public:
 
   decltype(auto) setInitialPose(const geometry_msgs::msg::Pose & pose)
   {
-    autoware_api::Accessor::InitialPose initial_pose{};
+    autoware_api::Accessor::InitialPose initial_pose;
     {
       initial_pose.header.stamp = get_clock()->now();
       initial_pose.header.frame_id = "map";
@@ -440,7 +441,7 @@ public:
   decltype(auto) setInitialTwist(
     const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
   {
-    autoware_api::Accessor::InitialTwist initial_twist{};
+    autoware_api::Accessor::InitialTwist initial_twist;
     {
       initial_twist.header.stamp = get_clock()->now();
       initial_twist.header.frame_id = "map";
@@ -454,7 +455,7 @@ public:
 
   decltype(auto) setInitialTwist(const double linear_x, const double angular_z = 0)
   {
-    geometry_msgs::msg::Twist twist{};
+    geometry_msgs::msg::Twist twist;
     {
       twist.linear.x = linear_x;
       twist.angular.z = angular_z;
@@ -515,14 +516,14 @@ public:
 
   bool ready = false;
 
-  auto isReady() noexcept { return ready || (ready = isWaitingForRoute()); }
+  auto isReady() noexcept { return ready or (ready = isWaitingForRoute()); }
 
-  auto isNotReady() noexcept { return !isReady(); }
+  auto isNotReady() noexcept { return not isReady(); }
 
   void checkAutowareState()
   {
-    if (isReady() && isEmergency()) {
-      // throw AutowareError();
+    if (isReady() and isEmergency()) {
+      throw AutowareError("Autoware is in emergency state now");
     }
   }
 
