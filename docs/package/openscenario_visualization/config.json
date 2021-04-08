@@ -1,5 +1,5 @@
 {
-    "baseUrl": "/package/openscenario_visualization/markdown/",
+    "baseUrl": "/scenario_simulator_v2/package/openscenario_visualization/markdown/",
     "indexInFolders": true,
     "indexClassesName": "index",
     "indexFilesName": "index",
