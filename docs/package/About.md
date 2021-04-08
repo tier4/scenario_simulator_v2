@@ -5,22 +5,22 @@
 ### Simulation API Package
 Provide simulator API for scenario testing.
 
-- [Classes](/package/traffic_simulator/markdown/Classes)
-- [Namespaces](/package/traffic_simulator/markdown/Namespaces)
-- [Modules](/package/traffic_simulator/markdown/Modules)
-- [Files](/package/traffic_simulator/markdown/Files)
-- [Pages](/package/traffic_simulator/markdown/Pages)
-- [Examples](/package/traffic_simulator/markdown/Examples)
+- [Classes](/scenario_simulator_v2/package/traffic_simulator/markdown/Classes)
+- [Namespaces](/scenario_simulator_v2/package/traffic_simulator/markdown/Namespaces)
+- [Modules](/scenario_simulator_v2/package/traffic_simulator/markdown/Modules)
+- [Files](/scenario_simulator_v2/package/traffic_simulator/markdown/Files)
+- [Pages](/scenario_simulator_v2/package/traffic_simulator/markdown/Pages)
+- [Examples](/scenario_simulator_v2/package/traffic_simulator/markdown/Examples)
 
 ### Simple Sensor Simulator Package
 Reference implementation of the simulator integrated with this package.
 
-- [Classes](/package/simple_sensor_simulator/markdown/Classes)
-- [Namespaces](/package/simple_sensor_simulator/markdown/Namespaces)
-- [Modules](/package/simple_sensor_simulator/markdown/Modules)
-- [Files](/package/simple_sensor_simulator/markdown/Files)
-- [Pages](/package/simple_sensor_simulator/markdown/Pages)
-- [Examples](/package/simple_sensor_simulator/markdown/Examples)
+- [Classes](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Classes)
+- [Namespaces](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Namespaces)
+- [Modules](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Modules)
+- [Files](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Files)
+- [Pages](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Pages)
+- [Examples](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Examples)
 
 ## OpenSCENARIO Packages
 ---
@@ -28,19 +28,19 @@ Reference implementation of the simulator integrated with this package.
 ### OpenSCENARIO Interpreter Package
 Package for parsing .xosc file and send command to the simulator via Simulation API.
 
-- [Classes](/package/openscenario_interpreter/markdown/Classes)
-- [Namespaces](/package/openscenario_interpreter/markdown/Namespaces)
-- [Modules](/package/openscenario_interpreter/markdown/Modules)
-- [Files](/package/openscenario_interpreter/markdown/Files)
-- [Pages](/package/openscenario_interpreter/markdown/Pages)
-- [Examples](/package/openscenario_interpreter/markdown/Examples)
+- [Classes](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Classes)
+- [Namespaces](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Namespaces)
+- [Modules](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Modules)
+- [Files](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Files)
+- [Pages](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Pages)
+- [Examples](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Examples)
 
 ### OpenSCENARIO Visualization Package
 Package for visualizing the result of the simulation.
 
-- [Classes](/package/openscenario_visualization/markdown/Classes)
-- [Namespaces](/package/openscenario_visualization/markdown/Namespaces)
-- [Modules](/package/openscenario_visualization/markdown/Modules)
-- [Files](/package/openscenario_visualization/markdown/Files)
-- [Pages](/package/openscenario_visualization/markdown/Pages)
-- [Examples](/package/openscenario_visualization/markdown/Examples)
+- [Classes](/scenario_simulator_v2/package/openscenario_visualization/markdown/Classes)
+- [Namespaces](/scenario_simulator_v2/package/openscenario_visualization/markdown/Namespaces)
+- [Modules](/scenario_simulator_v2/package/openscenario_visualization/markdown/Modules)
+- [Files](/scenario_simulator_v2/package/openscenario_visualization/markdown/Files)
+- [Pages](/scenario_simulator_v2/package/openscenario_visualization/markdown/Pages)
+- [Examples](/scenario_simulator_v2/package/openscenario_visualization/markdown/Examples)
