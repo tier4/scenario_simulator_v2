@@ -32,21 +32,20 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Private : public std::vector<PrivateAction>
+struct Private
 {
   Scope inner_scope;
 
   std::vector<PrivateAction> private_actions;
 
   template <typename Node>
-  explicit Private(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope),
-    private_actions(readElements<PrivateAction, 1>("PrivateAction", node, inner_scope))
+  explicit Private(const Node & node, Scope & outer_scope) : inner_scope(outer_scope)
   {
     inner_scope.actors.emplace_back(readAttribute<String>("entityRef", node, inner_scope));
 
-    // callWithElements(
-    //   node, "PrivateAction", 1, unbounded, [&](auto && node) { emplace_back(node, inner_scope); });
+    callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
+      return private_actions.emplace_back(node, inner_scope);
+    });
   }
 
   auto evaluate()
