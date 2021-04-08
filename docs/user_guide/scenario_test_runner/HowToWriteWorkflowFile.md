@@ -14,7 +14,7 @@ The workflow file defines how to execute scenarios and its expected results.
 
 You can solve relative path from the "share" directories in your ROS2 packages.
 ```yaml
-path: $(find-pkg-share PACKAGE_NAME)/test/scenario/xosc/simple.xosc
+path: $(find-pkg-share PACKAGE_NAME)/test/scenario/simple.xosc
 ```
 Or, you can solve absolute path like this way.
 ```yaml
@@ -24,23 +24,23 @@ path: /tmp/simple.xosc
 ### expect
 
 ```yaml
-success: Simulation terminated by success condition action.  
-failure: Simulation terminated by failure condition action.  
-exception: Simulation terminated by exceptions in openscenario_intertretor component.  
+success: Simulation terminated by success condition action.
+failure: Simulation terminated by failure condition action.
+exception: Simulation terminated by exceptions in openscenario_intertretor component.
 ```
 
 ## Examples
 ```yaml
 Scenario:
   - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/xosc/simple.xosc
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/simple.xosc
     }
   - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/failure.yaml,
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/failure.yaml,
       expect: failure
     }
   - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/yaml/success.yaml,
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/success.yaml,
       expect: success,
       step_time_ms: 2
     }

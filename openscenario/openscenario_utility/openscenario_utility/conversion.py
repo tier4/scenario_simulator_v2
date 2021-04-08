@@ -23,19 +23,19 @@ from re import sub
 from sys import exit, stderr
 from pkg_resources import resource_string
 
-import numpy
+import math
 import xmlschema
 import yaml
 
 
-def iota(start: float, step: float, stop: float) -> numpy.ndarray:
-
-    if step < 1:
-        return numpy.linspace(start, stop, 1, endpoint=True)
-
-    else:
-        return numpy.linspace(
-            start, stop, int((stop - start) // step) + 1)
+def iota(start, step, stop):
+    tol = 1e-10
+    if math.isclose(step, 0.0, abs_tol=tol):
+        yield start
+        return
+    while (start < stop if step > 0 else start > stop) or math.isclose(start, stop, abs_tol=tol):
+        yield start
+        start = start + step
 
 
 class MacroExpander:
@@ -55,9 +55,9 @@ class MacroExpander:
                     self.specs.append(list(map(
                         lambda x: (name, x), each['list'])))
                 else:
-                    self.specs.append(list(map(
-                        lambda x: (name, x),
-                        iota(each['start'], each['step'], each['stop']))))
+                    self.specs.append(list(
+                        map(lambda x: (name, x),
+                            iota(each['start'], each['step'], each['stop']))))
 
     def __call__(self, xosc: str, output: Path, basename: str):
 
@@ -100,7 +100,6 @@ class MacroExpander:
 
 
 def load_yaml(path):
-
     if path.exists():
         with path.open('r') as file:
             return yaml.safe_load(file)

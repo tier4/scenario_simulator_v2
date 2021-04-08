@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
@@ -132,10 +133,9 @@ def generate_launch_description():
         #         'stdout': 'log',
         #         },
         #     arguments=[
-        #         # '-d', os.path.join(
-        #         #     get_package_share_directory('traffic_simulator'), 'config/moc_test.rviz')
         #         '-d', str(
-        #             Path(get_package_share_directory('autoware_launch')) / 'rviz/autoware.rviz')
+        #             Path(get_package_share_directory('scenario_test_runner')) /
+        #             'planning_simulator_v2.rviz')
         #         ],
         #     ),
         ])
