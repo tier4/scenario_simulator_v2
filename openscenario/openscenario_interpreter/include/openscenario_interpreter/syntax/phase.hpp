@@ -15,33 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TrafficSignalState -----------------------------------------------------
- *
- *  <xsd:complexType name="TrafficSignalState">
- *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
- *    <xsd:attribute name="state" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct TrafficSignalState
-{
-  const String traffic_signal_id, state;
-
-  template <typename Node, typename Scope>
-  explicit TrafficSignalState(const Node & node, Scope & scope)
-  : traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
-    state(readAttribute<String>("state", node, scope))
-  {
-  }
-};
-
 /* ---- Phase ------------------------------------------------------------------
  *
  *  <xsd:complexType name="Phase">
