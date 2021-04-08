@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
 
+#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <utility>
