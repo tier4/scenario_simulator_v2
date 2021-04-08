@@ -16,6 +16,8 @@ extra:
     language: en
 plugins:
   - search
+palette:
+  scheme: slate
 
 copyright: 'Copyright &copy; 2020- Tier IV, Inc.'
 
@@ -33,6 +35,7 @@ markdown_extensions:
 
 extra_css:
   - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
+  - stylesheet/tierivcolor.css
 extra_javascript:
   - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
 
@@ -55,12 +58,13 @@ nav:
       - user_guide/scenario_test_runner/Tips.md
   - Design:
     - About: design/About.md
+    - design/SimpleSensorSimulator.md
+    - design/TrafficSimulator.md
+    - design/ZeroMQ.md
+    - design/AutowareAPI.md
     - design/SystemArchitecture.md
     - design/Tier4ScenarioFormatVersion2.md
     - design/OpenSCENARIOSupport.md
-    - design/SimulationAPI.md
-    - design/ZeroMQ.md
-    - design/AutowareAPI.md
   - Package Details: package/About.md
   - Contact Infomation: etc/ContactUs.md
   - LICENSE: LICENSE.md
