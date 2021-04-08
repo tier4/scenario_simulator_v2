@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace string
 {
 auto cat = [](auto &&... xs) {
-  std::stringstream ss{};
+  std::stringstream ss;
 
   auto write = [](auto && os, auto && x) {
     os.get() << x;
