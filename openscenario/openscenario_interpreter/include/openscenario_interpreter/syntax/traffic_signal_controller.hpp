@@ -15,64 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 
-#include <limits>
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
-#include <string>
-#include <utility>
+#include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/phase.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TrafficSignalState -----------------------------------------------------
- *
- *  <xsd:complexType name="TrafficSignalState">
- *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
- *    <xsd:attribute name="state" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct TrafficSignalState
-{
-  const String traffic_signal_id, state;
-
-  template <typename Node, typename Scope>
-  explicit TrafficSignalState(const Node & node, Scope & scope)
-  : traffic_signal_id{readAttribute<String>("trafficSignalId", node, scope)},
-    state{readAttribute<String>("state", node, scope)}
-  {
-  }
-};
-
-/* ---- Phase ------------------------------------------------------------------
- *
- *  <xsd:complexType name="Phase">
- *    <xsd:sequence>
- *      <xsd:element name="TrafficSignalState" minOccurs="0" maxOccurs="unbounded" type="TrafficSignalState"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="name" type="String" use="required"/>
- *    <xsd:attribute name="duration" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct Phase
-{
-  const String name;
-
-  const Double duration;
-
-  const TrafficSignalState state;
-
-  template <typename Node, typename Scope>
-  explicit Phase(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    duration{readAttribute<Double>("duration", node, outer_scope, Double::infinity())},
-    state{readElement<TrafficSignalState>("TrafficSignalState", node, outer_scope)}
-  {
-  }
-};
-
 /* ---- TrafficSignalController ------------------------------------------------
  *
  *  <xsd:complexType name="TrafficSignalController">
