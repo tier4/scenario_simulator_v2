@@ -134,7 +134,8 @@ def generate_launch_description():
         #         },
         #     arguments=[
         #         '-d', str(
-        #             Path(get_package_share_directory('scenario_test_runner')) / 'planning_simulator_v2.rviz')
+        #             Path(get_package_share_directory('scenario_test_runner')) /
+        #             'planning_simulator_v2.rviz')
         #         ],
         #     ),
         ])
