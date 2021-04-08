@@ -19,14 +19,14 @@ loop run single test case
     openscenario_interpretor_node -> openscenario_interpretor_node: resolve path of the\nlanlet2 map and load it.
     openscenario_interpretor_node -> Autoware : send lanlet2 map via ROS2 topic.
 
-    openscenario_interpretor_node -> simulator: initialize via XMLRPC API
-    simulator -> openscenario_interpretor_node: response to initialize\nvia XMLRPC API
+    openscenario_interpretor_node -> simulator: initialize via ZeroMQ
+    simulator -> openscenario_interpretor_node: response to initialize\nvia ZeroMQ
 
     loop until the simulation was finished
-        openscenario_interpretor_node -> simulator: update simulation frame\nvia XMLRPC API
+        openscenario_interpretor_node -> simulator: update simulation frame\nvia ZeroMQ
         simulator -> Autoware: send sensor data via ROS2 topic.
         Autoware -> simulator: send vehicle command via ROS2 topic.
-        openscenario_interpretor_node <-- simulator: response to update simulation\nframe via XMLRPC API
+        openscenario_interpretor_node <-- simulator: response to update simulation\nframe via ZeroMQ
     end
     openscenario_interpretor_node -> scenario_writer : output test result as junit file
 end

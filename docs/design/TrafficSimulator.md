@@ -1,9 +1,15 @@
-# Simulation API
+# Traffic simulatior
 
-Simulation API provides an C++ API to control NPC behavior in simulation.
+![Simple Demo](../image/simple_demo.png "traffic simulator")
+
+The traffic simulator simulates a traffic flow in urban area.
+Each NPC has a behavior tree and follow user's command.
+
+## C++ API
+The traffic simulator provides an C++ API to control NPC behavior in simulation.
 The sample code is below.
 
-## minimal example
+### minimal example
 ```c++
 #include <traffic_simulator/api/api.hpp>
 #include <quaternion_operation/quaternion_operation.h>
@@ -131,7 +137,3 @@ int main(int argc, char * argv[])
   return 0;
 }
 ```
-
-## API Documentation
-
-See [package details](../package/About.md).
