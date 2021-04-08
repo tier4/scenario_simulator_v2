@@ -1,8 +1,7 @@
 ScenarioModifiers:
   ScenarioModifier:
-    - name: Hoge
-      list: [1, 2]
-      # list: [1]
+    - { name: HOGE, start: 0, step: 2, stop: 5 }
+    - { name: FUGA, start: 1, step: 0.5, stop: 2 }
 OpenSCENARIO:
   FileHeader:
     revMajor: 1

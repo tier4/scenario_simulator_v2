@@ -17,7 +17,7 @@
 
 from pathlib import Path
 from pkg_resources import resource_string
-from sys import exit, stderr
+from sys import exit
 
 import argparse
 import xmlschema
@@ -76,4 +76,3 @@ def main():
 if __name__ == '__main__':
     """Entrypoint."""
     main()
-
