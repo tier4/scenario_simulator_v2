@@ -55,14 +55,9 @@ class MacroExpander:
                     self.specs.append(list(map(
                         lambda x: (name, x), each['list'])))
                 else:
-                    self.specs.append(
-                        list(
-                            map(
-                                lambda x: (name, x),
-                                iota(each['start'], each['step'], each['stop'])
-                                )
-                            )
-                            )
+                    self.specs.append(list(
+                        map(lambda x: (name, x),
+                            iota(each['start'], each['step'], each['stop']))))
 
     def __call__(self, xosc: str, output: Path, basename: str):
 
