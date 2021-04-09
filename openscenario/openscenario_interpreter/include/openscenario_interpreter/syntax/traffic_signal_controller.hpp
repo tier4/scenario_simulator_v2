@@ -41,9 +41,6 @@ struct TrafficSignalController
    *
    *  ID of the traffic signal controller in the road network.
    *
-   *  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive
-   *  integer) of the traffic light.
-   *
    * ------------------------------------------------------------------------ */
   const String name;
 
