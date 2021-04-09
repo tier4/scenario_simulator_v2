@@ -25,8 +25,8 @@ inline namespace syntax
 struct Arrow
 {
   enum value_type {
+    blank,
     left,
-    none,
     right,
     straight,
   } value;
@@ -41,7 +41,7 @@ struct Arrow
       case left:
         return traffic_simulator::TrafficLightArrow::LEFT;
 
-      case none:
+      case blank:
         return traffic_simulator::TrafficLightArrow::NONE;
 
       case right:

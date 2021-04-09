@@ -25,8 +25,8 @@ inline namespace syntax
 struct Color
 {
   enum value_type {
+    blank,
     green,
-    none,
     red,
     yellow,
   } value;
@@ -41,7 +41,7 @@ struct Color
       case green:
         return traffic_simulator::TrafficLightColor::GREEN;
 
-      case none:
+      case blank:
         return traffic_simulator::TrafficLightColor::NONE;
 
       case red:
