@@ -37,21 +37,56 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalController
 {
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  ID of the traffic signal controller in the road network.
+   *
+   *  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive
+   *  integer) of the traffic light.
+   *
+   * ------------------------------------------------------------------------ */
   const String name;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  The delay to the controller in the reference property. A controller
+   *  having a delay to another one means that its first phase virtually starts
+   *  delaytime seconds after the start of the reference's first phase. This
+   *  can be used to define a progressive signal system, but only makes sense,
+   *  if the total times of all connected controllers are the same. If delay is
+   *  set, reference is required. Unit: s; Range: [0..inf[.
+   *
+   * ------------------------------------------------------------------------ */
   const Double delay;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  A reference (ID) to the connected controller in the road network. If
+   *  reference is set, a delay is required.
+   *
+   * ------------------------------------------------------------------------ */
   const String reference;
 
-  const Phase phase;
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Phases of a TrafficSignalController.
+   *
+   * ------------------------------------------------------------------------ */
+  const std::vector<Phase> phases;
 
   template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     delay(readAttribute<Double>("delay", node, outer_scope, Double())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
-    phase(readElement<Phase>("Phase", node, outer_scope))
+    phases(readElements<Phase, 0>("Phase", node, outer_scope))
   {
+  }
+
+  auto evaluate() const
+  {
+    // setTrafficLightColorPhase()
+    return unspecified;
   }
 };
 }  // namespace syntax

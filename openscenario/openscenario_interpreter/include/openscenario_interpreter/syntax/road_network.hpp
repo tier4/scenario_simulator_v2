@@ -39,10 +39,27 @@ ASSERT_IS_OPTIONAL_ELEMENT(TrafficSignals);
 
 struct RoadNetwork
 {
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  File path of the road network file (e.g. an ASAM OpenDRIVE file).
+   *
+   * ------------------------------------------------------------------------ */
   const File logic_file;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  File path of a 3D model representing the virtual environment. This may be
+   *  used for visual representation (rendering).
+   *
+   * ------------------------------------------------------------------------ */
   const File scene_graph_file;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Name references and description of dynamic behavior for traffic signals
+   *  defined in the road network file.
+   *
+   * ------------------------------------------------------------------------ */
   const TrafficSignals traffic_signals;
 
   template <typename Node, typename Scope>
@@ -53,6 +70,12 @@ struct RoadNetwork
   {
     outer_scope.logic_file = logic_file;
     outer_scope.scene_graph_file = scene_graph_file;
+  }
+
+  template <typename... Ts>
+  decltype(auto) evaluate(Ts &&... xs) const
+  {
+    return traffic_signals.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace syntax
