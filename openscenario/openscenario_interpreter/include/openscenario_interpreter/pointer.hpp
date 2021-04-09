@@ -40,7 +40,7 @@ class Pointer : public std::shared_ptr<T>
     using top = T;
 
     template <typename... Ts>
-    explicit constexpr Binder(Ts &&... xs) : Bound{std::forward<decltype(xs)>(xs)...}
+    explicit constexpr Binder(Ts &&... xs) : Bound(std::forward<decltype(xs)>(xs)...)
     {
     }
 

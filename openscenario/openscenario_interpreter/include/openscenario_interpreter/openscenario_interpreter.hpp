@@ -94,7 +94,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     using openscenario_interpreter::SemanticError;
 
-    using StandardException = std::exception;
+    using InternalError = std::exception;
 
     try {
       return thunk();
@@ -118,8 +118,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     CATCH(AutowareError)
     CATCH(ImplementationFault)
+    CATCH(InternalError)
     CATCH(SemanticError)
-    CATCH(StandardException)
 
     catch (...) { report(ERROR, "UnknownException (unexpected)"); }
   }

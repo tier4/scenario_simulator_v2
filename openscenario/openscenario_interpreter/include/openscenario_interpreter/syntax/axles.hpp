@@ -47,11 +47,9 @@ struct Axles
   template <typename Node, typename Scope>
   explicit Axles(const Node & node, Scope & scope)
   : front_axle(readElement<FrontAxle>("FrontAxle", node, scope)),
-    rear_axle(readElement<RearAxle>("RearAxle", node, scope))
+    rear_axle(readElement<RearAxle>("RearAxle", node, scope)),
+    additional_axles(readElements<AdditionalAxle, 0>("AdditionalAxle", node, scope))
   {
-    callWithElements(node, "AdditionalAxle", 0, unbounded, [&](auto && node) {
-      additional_axles.emplace_back(node, scope);
-    });
   }
 
   explicit operator openscenario_msgs::msg::Axles() const

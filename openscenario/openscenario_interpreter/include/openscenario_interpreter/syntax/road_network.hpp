@@ -25,17 +25,17 @@ inline namespace syntax
 {
 /* ---- RoadNetwork ------------------------------------------------------------
  *
- * <xsd:complexType name="RoadNetwork">
- *   <xsd:sequence>
- *     <xsd:element name="LogicFile" type="File" minOccurs="0"/>
- *     <xsd:element name="SceneGraphFile" type="File" minOccurs="0"/>
- *     <xsd:element name="TrafficSignals" minOccurs="0" type="TrafficSignals"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="RoadNetwork">
+ *    <xsd:sequence>
+ *      <xsd:element name="LogicFile" type="File" minOccurs="0"/>
+ *      <xsd:element name="SceneGraphFile" type="File" minOccurs="0"/>
+ *      <xsd:element name="TrafficSignals" minOccurs="0" type="TrafficSignals"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-ASSERT_DEFAULT_CONSTRUCTIBLE(File);
-ASSERT_DEFAULT_CONSTRUCTIBLE(TrafficSignals);
+ASSERT_IS_OPTIONAL_ELEMENT(File);
+ASSERT_IS_OPTIONAL_ELEMENT(TrafficSignals);
 
 struct RoadNetwork
 {

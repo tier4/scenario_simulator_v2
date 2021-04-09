@@ -15,115 +15,33 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
-#include <limits>
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
-#include <string>
-#include <utility>
+#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <vector>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TrafficSignalState -----------------------------------------------------
+/* ---- TrafficSignals ---------------------------------------------------------
  *
- *  <xsd:complexType name="TrafficSignalState">
- *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
- *    <xsd:attribute name="state" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct TrafficSignalState
-{
-  const String traffic_signal_id, state;
-
-  template <typename Node, typename Scope>
-  explicit TrafficSignalState(const Node & node, Scope & scope)
-  : traffic_signal_id{readAttribute<String>("trafficSignalId", node, scope)},
-    state{readAttribute<String>("state", node, scope)}
-  {
-  }
-};
-
-/* ---- Phase ------------------------------------------------------------------
- *
- *  <xsd:complexType name="Phase">
+ *  <xsd:complexType name="TrafficSignals">
  *    <xsd:sequence>
- *      <xsd:element name="TrafficSignalState" minOccurs="0" maxOccurs="unbounded" type="TrafficSignalState"/>
+ *      <xsd:element name="TrafficSignalController" minOccurs="0" maxOccurs="unbounded" type="TrafficSignalController"/>
  *    </xsd:sequence>
- *    <xsd:attribute name="name" type="String" use="required"/>
- *    <xsd:attribute name="duration" type="Double" use="required"/>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Phase
+struct TrafficSignals
 {
-  const String name;
+  std::vector<TrafficSignalController> traffic_signal_controllers;
 
-  const Double duration;
-
-  const TrafficSignalState state;
-
-  template <typename Node, typename Scope>
-  explicit Phase(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)},
-    duration{readAttribute<Double>("duration", node, outer_scope, Double::infinity())},
-    state{readElement<TrafficSignalState>("TrafficSignalState", node, outer_scope)}
-  {
-  }
-};
-
-/* ---- TrafficSignalController ------------------------------------------------
- *
- *  <xsd:complexType name="TrafficSignalController">
- *    <xsd:sequence>
- *      <xsd:element name="Phase" minOccurs="0" maxOccurs="unbounded" type="Phase"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="name" type="String" use="required"/>
- *    <xsd:attribute name="delay" type="Double" use="optional"/>
- *    <xsd:attribute name="reference" type="String" use="optional"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct TrafficSignalController
-{
-  const String name;
-
-  const Double delay;
-
-  const String reference;
-
-  const Phase phase;
-
-  template <typename Node, typename Scope>
-  explicit TrafficSignalController(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
-    delay(readAttribute<Double>("delay", node, outer_scope, Double())),
-    reference(readAttribute<String>("reference", node, outer_scope, String())),
-    phase(readElement<Phase>("Phase", node, outer_scope))
-  {
-  }
-};
-
-/* ==== TrafficSignals =========================================================
- *
- * <xsd:complexType name="TrafficSignals">
- *   <xsd:sequence>
- *     <xsd:element name="TrafficSignalController" minOccurs="0" maxOccurs="unbounded" type="TrafficSignalController"/>
- *   </xsd:sequence>
- * </xsd:complexType>
- *
- * ========================================================================== */
-struct TrafficSignals : public std::vector<TrafficSignalController>
-{
   TrafficSignals() = default;
 
   template <typename Node, typename Scope>
   explicit TrafficSignals(const Node & node, Scope & outer_scope)
   {
     callWithElements(node, "TrafficSignalController", 0, unbounded, [&](auto && node) {
-      emplace_back(node, outer_scope);
+      return traffic_signal_controllers.emplace_back(node, outer_scope);
     });
   }
 };

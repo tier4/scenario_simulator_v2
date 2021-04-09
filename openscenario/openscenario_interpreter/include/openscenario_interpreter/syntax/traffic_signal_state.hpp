@@ -12,42 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 
-#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- File -------------------------------------------------------------------
+/* ---- TrafficSignalState -----------------------------------------------------
  *
- * <xsd:complexType name="File">
- *   <xsd:attribute name="filepath" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="TrafficSignalState">
+ *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
+ *    <xsd:attribute name="state" type="String" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct File
+struct TrafficSignalState
 {
-  using FilePath = String;
+  const String traffic_signal_id;
 
-  const FilePath filepath;
+  const String state;
 
-  File() : filepath("./") {}
-
-  template <typename... Ts>
-  explicit File(Ts &&... xs)
-  : filepath(readAttribute<FilePath>("filepath", std::forward<decltype(xs)>(xs)...))
+  template <typename Node, typename Scope>
+  explicit TrafficSignalState(const Node & node, Scope & scope)
+  : traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
+    state(readAttribute<String>("state", node, scope))
   {
   }
-
-  operator String() const noexcept { return filepath; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_

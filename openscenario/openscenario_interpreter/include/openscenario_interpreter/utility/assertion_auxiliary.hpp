@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace utility
 {
-#define ASSERT_DEFAULT_CONSTRUCTIBLE(TYPE)         \
+#define ASSERT_IS_OPTIONAL_ELEMENT(TYPE)           \
   static_assert(                                   \
     std::is_default_constructible<TYPE>::value,    \
     "OpenSCENARIO specification uses type '" #TYPE \
