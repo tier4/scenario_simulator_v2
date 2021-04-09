@@ -37,11 +37,9 @@ decltype(auto) getEntityStatus(Ts &&... xs)
 try {
   return connection.getEntityStatus(std::forward<decltype(xs)>(xs)...);
 } catch (const traffic_simulator::SimulationRuntimeError & error) {
-  std::stringstream ss{};
-  ss << error.what() << ".\n";
-  ss << "Possible causes:\n";
-  ss << "  (1) The position of the corresponding entity is not specified by Teleport Action";
-  throw SemanticError(ss.str());
+  throw SemanticError(
+    error.what(), ".\n", "Possible causes:\n",
+    "  (1) The position of the corresponding entity is not specified by Teleport Action");
 }
 
 template <typename... Ts>
@@ -137,7 +135,7 @@ FORWARD_TO_SIMULATION_API(updateFrame);
   static_assert(true, "")
 
 RENAME(reachPosition, isReachedPosition);
-RENAME(setDriverModel, setController);
+RENAME(setDriverModel, assignController);
 
 #undef RENAME
 }  // namespace openscenario_interpreter
