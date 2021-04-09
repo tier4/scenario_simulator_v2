@@ -163,37 +163,36 @@ private:
 
   std::string catalog_xml =
     R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
-            <ParameterDeclarations/>
-            <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
-            <BoundingBox>
-                <Center x='1.5' y='0.0' z='0.9'/>
-                <Dimensions width='2.1' length='4.5' height='1.8'/>
-            </BoundingBox>
-            <Axles>
-                <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
-                <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>
-            </Axles>
-            <Properties>
-                <Property name='type' value='ego_vehicle'/>
-            </Properties>
-        </Vehicle>)";
+         <ParameterDeclarations/>
+         <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
+         <BoundingBox>
+           <Center x='1.5' y='0.0' z='0.9'/>
+           <Dimensions width='2.1' length='4.5' height='1.8'/>
+         </BoundingBox>
+         <Axles>
+           <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
+           <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>
+         </Axles>
+         <Properties>
+           <Property name='type' value='ego_vehicle'/>
+         </Properties>
+       </Vehicle>)";
 
   std::string pedestrian_xml =
-    R"(
-    <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
-            <BoundingBox>
-                <Center x='0.0' y='0.0' z='0.5'/>
-                <Dimensions width='1.0' length='1.0' height='2.0'/>
-            </BoundingBox>
-            <Properties/>
-        </Pedestrian>)";
+    R"(<Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
+         <BoundingBox>
+           <Center x='0.0' y='0.0' z='0.5'/>
+           <Dimensions width='1.0' length='1.0' height='2.0'/>
+         </BoundingBox>
+         <Properties/>
+       </Pedestrian>)";
 };
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<ScenarioRunnerMoc>(options);
+  const auto component = std::make_shared<ScenarioRunnerMoc>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
