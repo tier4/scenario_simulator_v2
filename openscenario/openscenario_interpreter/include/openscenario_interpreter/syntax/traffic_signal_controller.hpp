@@ -84,17 +84,26 @@ struct TrafficSignalController
   {
   }
 
-  // void advance()
-  // {
-  //   if (++current_phase == std::end(phases)) {
-  //     current_phase = std::begin(phases);
-  //   }
-  // }
+  decltype(getCurrentTime()) current_phase_started_at = {};
+
+  auto theDurationExeeded() const
+  {
+    return (*current_phase).duration < getCurrentTime() - current_phase_started_at;
+  }
 
   auto evaluate()
   {
-    if ((*current_phase).evaluate().as<Boolean>()) {
+    if (theDurationExeeded()) {
+      std::cout << "\x1b[31mTHE DURATION EXEEDED!\x1b[0m" << std::endl;
+
       std::advance(current_phase, 1);
+      std::cout << "\x1b[31mADVANCE CURSOR\x1b[0m" << std::endl;
+
+      std::cout << "\x1b[31mRESET START TIME\x1b[0m" << std::endl;
+      current_phase_started_at = getCurrentTime();
+
+      std::cout << "\x1b[31mOVERWRITE CURRENT PHASE WITH THE NEXT PHASE!\x1b[0m" << std::endl;
+      (*current_phase).evaluate();
     }
 
     return unspecified;

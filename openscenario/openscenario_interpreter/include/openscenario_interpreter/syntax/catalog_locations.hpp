@@ -16,7 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_LOCATIONS_HPP_
 
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
+#include <tuple>
 #include <unordered_map>
+#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -24,27 +26,31 @@ inline namespace syntax
 {
 /* ---- CatalogLocations -------------------------------------------------------
  *
- * <xsd:complexType name="CatalogLocations">
- *   <xsd:all>
- *     <xsd:element name="VehicleCatalog" minOccurs="0" type="VehicleCatalogLocation"/>
- *     <xsd:element name="ControllerCatalog" minOccurs="0" type="ControllerCatalogLocation"/>
- *     <xsd:element name="PedestrianCatalog" minOccurs="0" type="PedestrianCatalogLocation"/>
- *     <xsd:element name="MiscObjectCatalog" minOccurs="0" type="MiscObjectCatalogLocation"/>
- *     <xsd:element name="EnvironmentCatalog" minOccurs="0" type="EnvironmentCatalogLocation"/>
- *     <xsd:element name="ManeuverCatalog" minOccurs="0" type="ManeuverCatalogLocation"/>
- *     <xsd:element name="TrajectoryCatalog" minOccurs="0" type="TrajectoryCatalogLocation"/>
- *     <xsd:element name="RouteCatalog" minOccurs="0" type="RouteCatalogLocation"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="CatalogLocations">
+ *    <xsd:all>
+ *      <xsd:element name="VehicleCatalog" minOccurs="0" type="VehicleCatalogLocation"/>
+ *      <xsd:element name="ControllerCatalog" minOccurs="0" type="ControllerCatalogLocation"/>
+ *      <xsd:element name="PedestrianCatalog" minOccurs="0" type="PedestrianCatalogLocation"/>
+ *      <xsd:element name="MiscObjectCatalog" minOccurs="0" type="MiscObjectCatalogLocation"/>
+ *      <xsd:element name="EnvironmentCatalog" minOccurs="0" type="EnvironmentCatalogLocation"/>
+ *      <xsd:element name="ManeuverCatalog" minOccurs="0" type="ManeuverCatalogLocation"/>
+ *      <xsd:element name="TrajectoryCatalog" minOccurs="0" type="TrajectoryCatalogLocation"/>
+ *      <xsd:element name="RouteCatalog" minOccurs="0" type="RouteCatalogLocation"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE)                                                    \
-  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {      \
-    return emplace(#TYPE "Catalog", CatalogLocation(node, outer_scope)); \
+#define ELEMENT(TYPE)                                                   \
+  callWithElements(node, #TYPE "Catalog", 0, 1, [&](auto && node) {     \
+    return emplace(                                                     \
+      std::piecewise_construct, std::forward_as_tuple(#TYPE "Catalog"), \
+      std::forward_as_tuple(node, outer_scope));                        \
   })
 
 struct CatalogLocations : public std::unordered_map<String, CatalogLocation>
 {
+  explicit CatalogLocations() = default;
+
   template <typename Node, typename Scope>
   explicit CatalogLocations(const Node & node, Scope & outer_scope)
   {

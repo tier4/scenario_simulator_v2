@@ -97,7 +97,7 @@ struct ScenarioDefinition
   template <typename... Ts>
   auto evaluate(Ts &&... xs)
   {
-    const auto result{storyboard.evaluate()};
+    const auto result = storyboard.evaluate();
 
     updateFrame();
 

@@ -70,15 +70,13 @@ struct Phase
   {
   }
 
-  double start_time = 0;
-
-  auto evaluate()
+  auto evaluate() const
   {
     for (const auto & state : traffic_signal_states) {
       state.evaluate();
     }
 
-    return asBoolean(false);
+    return unspecified;
   }
 };
 }  // namespace syntax

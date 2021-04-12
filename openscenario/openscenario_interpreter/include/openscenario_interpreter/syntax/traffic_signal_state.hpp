@@ -45,6 +45,12 @@ struct TrafficSignalState
    * ------------------------------------------------------------------------ */
   const String traffic_signal_id;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  State of the signal. The available states are listed in the TrafficSignal
+   *  list of the RoadNetwork.
+   *
+   * ------------------------------------------------------------------------ */
   const String state;
 
   template <typename Node, typename Scope>

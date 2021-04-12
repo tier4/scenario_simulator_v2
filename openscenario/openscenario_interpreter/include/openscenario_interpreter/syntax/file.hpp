@@ -33,15 +33,13 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct File
 {
-  using FilePath = String;
+  const String filepath;
 
-  const FilePath filepath;
-
-  File() : filepath("./") {}
+  explicit File() : filepath("./") {}
 
   template <typename... Ts>
   explicit File(Ts &&... xs)
-  : filepath(readAttribute<FilePath>("filepath", std::forward<decltype(xs)>(xs)...))
+  : filepath(readAttribute<String>("filepath", std::forward<decltype(xs)>(xs)...))
   {
   }
 
