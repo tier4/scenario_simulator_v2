@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 
+#include <openscenario_interpreter/iterator/circular_iterator.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -71,7 +72,7 @@ struct TrafficSignalController
    * ------------------------------------------------------------------------ */
   std::vector<Phase> phases;
 
-  decltype(phases)::iterator current_phase;
+  CircularIterator<decltype(phases)::iterator> current_phase;
 
   template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
@@ -79,21 +80,21 @@ struct TrafficSignalController
     delay(readAttribute<Double>("delay", node, outer_scope, Double())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
-    current_phase(std::begin(phases))
+    current_phase(std::begin(phases), std::end(phases))
   {
   }
 
-  void advance()
-  {
-    if (++current_phase == std::end(phases)) {
-      current_phase = std::begin(phases);
-    }
-  }
+  // void advance()
+  // {
+  //   if (++current_phase == std::end(phases)) {
+  //     current_phase = std::begin(phases);
+  //   }
+  // }
 
   auto evaluate()
   {
     if ((*current_phase).evaluate().as<Boolean>()) {
-      advance();
+      std::advance(current_phase, 1);
     }
 
     return unspecified;

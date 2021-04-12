@@ -47,7 +47,14 @@ public:
 
   reference operator*() const { return *current; }
 
-  auto operator++() { return ++current == end ? (current = begin) : current; }
+  auto & operator++()
+  {
+    if (++current == end) {
+      current = begin;
+    }
+
+    return *this;
+  }
 
   auto operator++(int)
   {
