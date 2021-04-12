@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/arrow.hpp>
+#include <unordered_map>
 
 namespace openscenario_interpreter
 {
@@ -25,11 +26,11 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
 
   is >> value;
 
-  static const std::unordered_map<std::string, value_type> conversions{
-    std::make_pair("blank", blank),
-    std::make_pair("left", left),
-    std::make_pair("right", right),
-    std::make_pair("straight", straight),
+  static const std::unordered_map<std::string, Arrow::value_type> conversions{
+    std::make_pair("blank", Arrow::blank),
+    std::make_pair("left", Arrow::left),
+    std::make_pair("right", Arrow::right),
+    std::make_pair("straight", Arrow::straight),
   };
 
   try {

@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/color.hpp>
+#include <unordered_map>
 
 namespace openscenario_interpreter
 {
@@ -25,11 +26,11 @@ std::istream & operator>>(std::istream & is, Color & datum)
 
   is >> value;
 
-  static const std::unordered_map<std::string, value_type> conversions{
-    std::make_pair("blank", blank),
-    std::make_pair("green", green),
-    std::make_pair("red", red),
-    std::make_pair("yellow", yellow),
+  static const std::unordered_map<std::string, Color::value_type> conversions{
+    std::make_pair("blank", Color::blank),
+    std::make_pair("green", Color::green),
+    std::make_pair("red", Color::red),
+    std::make_pair("yellow", Color::yellow),
   };
 
   try {
