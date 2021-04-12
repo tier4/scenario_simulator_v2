@@ -25,24 +25,24 @@ inline namespace syntax
 struct Color
 {
   enum value_type {
-    blank,
+    noColor,
     green,
     red,
     yellow,
   } value;
 
-  explicit constexpr Color(value_type value = {}) : value(value) {}
+  explicit constexpr Color(value_type value = noColor) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 
   operator traffic_simulator::TrafficLightColor() const
   {
     switch (value) {
+      case noColor:
+        return traffic_simulator::TrafficLightColor::NONE;
+
       case green:
         return traffic_simulator::TrafficLightColor::GREEN;
-
-      case blank:
-        return traffic_simulator::TrafficLightColor::NONE;
 
       case red:
         return traffic_simulator::TrafficLightColor::RED;

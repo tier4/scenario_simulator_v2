@@ -60,7 +60,7 @@ struct RoadNetwork
    *  defined in the road network file.
    *
    * ------------------------------------------------------------------------ */
-  const TrafficSignals traffic_signals;
+  TrafficSignals traffic_signals;
 
   template <typename Node, typename Scope>
   explicit RoadNetwork(const Node & node, Scope & outer_scope)
@@ -73,7 +73,7 @@ struct RoadNetwork
   }
 
   template <typename... Ts>
-  decltype(auto) evaluate(Ts &&... xs) const
+  decltype(auto) evaluate(Ts &&... xs)
   {
     return traffic_signals.evaluate(std::forward<decltype(xs)>(xs)...);
   }

@@ -27,7 +27,7 @@ std::istream & operator>>(std::istream & is, Color & datum)
   is >> value;
 
   static const std::unordered_map<std::string, Color::value_type> conversions{
-    std::make_pair("blank", Color::blank),
+    std::make_pair("noColor", Color::noColor),
     std::make_pair("green", Color::green),
     std::make_pair("red", Color::red),
     std::make_pair("yellow", Color::yellow),
@@ -45,8 +45,8 @@ std::istream & operator>>(std::istream & is, Color & datum)
 std::ostream & operator<<(std::ostream & os, const Color & datum)
 {
   switch (datum.value) {
-    case Color::blank:
-      return os << "blank";
+    case Color::noColor:
+      return os << "noColor";
 
     case Color::green:
       return os << "green";

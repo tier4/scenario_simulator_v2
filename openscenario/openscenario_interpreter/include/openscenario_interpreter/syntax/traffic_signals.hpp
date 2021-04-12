@@ -33,7 +33,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignals
 {
-  const std::vector<TrafficSignalController> traffic_signal_controllers;
+  std::vector<TrafficSignalController> traffic_signal_controllers;
 
   TrafficSignals() = default;
 
@@ -44,9 +44,9 @@ struct TrafficSignals
   {
   }
 
-  auto evaluate() const
+  auto evaluate()
   {
-    for (const auto & controller : traffic_signal_controllers) {
+    for (auto && controller : traffic_signal_controllers) {
       controller.evaluate();
     }
 

@@ -25,24 +25,24 @@ inline namespace syntax
 struct Arrow
 {
   enum value_type {
-    blank,
+    noArrow,
     left,
     right,
     straight,
   } value;
 
-  explicit constexpr Arrow(value_type value = {}) : value(value) {}
+  explicit constexpr Arrow(value_type value = noArrow) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 
   operator traffic_simulator::TrafficLightArrow() const
   {
     switch (value) {
+      case noArrow:
+        return traffic_simulator::TrafficLightArrow::NONE;
+
       case left:
         return traffic_simulator::TrafficLightArrow::LEFT;
-
-      case blank:
-        return traffic_simulator::TrafficLightArrow::NONE;
 
       case right:
         return traffic_simulator::TrafficLightArrow::RIGHT;

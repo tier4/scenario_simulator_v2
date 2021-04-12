@@ -27,7 +27,7 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
   is >> value;
 
   static const std::unordered_map<std::string, Arrow::value_type> conversions{
-    std::make_pair("blank", Arrow::blank),
+    std::make_pair("noArrow", Arrow::noArrow),
     std::make_pair("left", Arrow::left),
     std::make_pair("right", Arrow::right),
     std::make_pair("straight", Arrow::straight),
@@ -45,8 +45,8 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
 std::ostream & operator<<(std::ostream & os, const Arrow & datum)
 {
   switch (datum.value) {
-    case Arrow::blank:
-      return os << "blank";
+    case Arrow::noArrow:
+      return os << "noArrow";
 
     case Arrow::left:
       return os << "left";

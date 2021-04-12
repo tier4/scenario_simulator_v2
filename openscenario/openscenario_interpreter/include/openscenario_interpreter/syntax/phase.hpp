@@ -69,6 +69,17 @@ struct Phase
       readElements<TrafficSignalState, 0>("TrafficSignalState", node, outer_scope))
   {
   }
+
+  double start_time = 0;
+
+  auto evaluate()
+  {
+    for (const auto & state : traffic_signal_states) {
+      state.evaluate();
+    }
+
+    return asBoolean(false);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -54,7 +54,18 @@ struct TrafficSignalState
   {
   }
 
-  decltype(auto) id() const { return boost::lexical_cast<std::uint64_t>(traffic_signal_id); }
+  decltype(auto) id() const { return boost::lexical_cast<std::int64_t>(traffic_signal_id); }
+
+  auto evaluate() const  // XXX DIRTY HACK
+  {
+    // try {
+    setTrafficLightColor(id(), boost::lexical_cast<Color>(state));
+    // } catch (...) {
+    //   setTrafficLightArrow(boost::lexical_cast<Arrow>(state));
+    // }
+
+    return unspecified;
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

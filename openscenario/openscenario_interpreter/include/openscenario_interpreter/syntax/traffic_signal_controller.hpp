@@ -69,20 +69,33 @@ struct TrafficSignalController
    *  Phases of a TrafficSignalController.
    *
    * ------------------------------------------------------------------------ */
-  const std::vector<Phase> phases;
+  std::vector<Phase> phases;
+
+  decltype(phases)::iterator current_phase;
 
   template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     delay(readAttribute<Double>("delay", node, outer_scope, Double())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
-    phases(readElements<Phase, 0>("Phase", node, outer_scope))
+    phases(readElements<Phase, 0>("Phase", node, outer_scope)),
+    current_phase(std::begin(phases))
   {
   }
 
-  auto evaluate() const
+  void advance()
   {
-    // setTrafficLightColorPhase()
+    if (++current_phase == std::end(phases)) {
+      current_phase = std::begin(phases);
+    }
+  }
+
+  auto evaluate()
+  {
+    if ((*current_phase).evaluate().as<Boolean>()) {
+      advance();
+    }
+
     return unspecified;
   }
 };
