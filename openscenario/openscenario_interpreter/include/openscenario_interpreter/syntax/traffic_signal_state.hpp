@@ -64,11 +64,12 @@ struct TrafficSignalState
 
   auto evaluate() const  // XXX DIRTY HACK
   {
-    // try {
-    setTrafficLightColor(id(), boost::lexical_cast<Color>(state));
-    // } catch (...) {
-    //   setTrafficLightArrow(boost::lexical_cast<Arrow>(state));
-    // }
+    try {
+      setTrafficLightColor(id(), boost::lexical_cast<Color>(state));
+    } catch (...) {
+      // setTrafficLightArrow(boost::lexical_cast<Arrow>(state));
+      boost::lexical_cast<Arrow>(state);  // NOTE: Currently ignored.
+    }
 
     return unspecified;
   }
