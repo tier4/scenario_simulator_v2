@@ -34,9 +34,6 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-ASSERT_IS_OPTIONAL_ELEMENT(File);
-ASSERT_IS_OPTIONAL_ELEMENT(TrafficSignals);
-
 struct RoadNetwork
 {
   /* ---- NOTE -----------------------------------------------------------------
@@ -44,6 +41,7 @@ struct RoadNetwork
    *  File path of the road network file (e.g. an ASAM OpenDRIVE file).
    *
    * ------------------------------------------------------------------------ */
+  ASSERT_IS_OPTIONAL_ELEMENT(File);
   const File logic_file;
 
   /* ---- NOTE -----------------------------------------------------------------
@@ -52,6 +50,7 @@ struct RoadNetwork
    *  used for visual representation (rendering).
    *
    * ------------------------------------------------------------------------ */
+  ASSERT_IS_OPTIONAL_ELEMENT(File);
   const File scene_graph_file;
 
   /* ---- NOTE -----------------------------------------------------------------
@@ -60,6 +59,7 @@ struct RoadNetwork
    *  defined in the road network file.
    *
    * ------------------------------------------------------------------------ */
+  ASSERT_IS_OPTIONAL_ELEMENT(TrafficSignals);
   TrafficSignals traffic_signals;
 
   template <typename Node, typename Scope>
