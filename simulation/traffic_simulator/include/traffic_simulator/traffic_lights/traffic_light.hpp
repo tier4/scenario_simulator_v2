@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <iostream>
 #include <limits>
 #include <traffic_simulator/color_utils/color_utils.hpp>
@@ -73,6 +74,17 @@ public:
 
   auto colorChanged() const { return color_changed_; }
   auto arrowChanged() const { return arrow_changed_; }
+
+  explicit operator autoware_perception_msgs::msg::TrafficLightState() const noexcept(false)
+  {
+    autoware_perception_msgs::msg::TrafficLightState traffic_light_state;
+    {
+      traffic_light_state.id = id;
+      // traffic_light_state. =
+    }
+
+    return traffic_light_state;
+  }
 
 private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;

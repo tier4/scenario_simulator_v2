@@ -73,6 +73,32 @@ private:
 
   void drawMarkers() const;
 
+  decltype(auto) publishTrafficLightStateArray() const
+  {
+    autoware_perception_msgs::msg::TrafficLightStateArray traffic_light_state_array;
+    {
+      traffic_light_state_array.header.frame_id = "camera_link";  // XXX DIRTY HACK!!!
+      traffic_light_state_array.header.stamp = (*clock_ptr_).now();
+
+      for (const auto & each : traffic_lights_) {
+        try {
+          // static_assert(
+          //   std::is_same<
+          //     typename std::decay<decltype(each)>::type,
+          //     typename
+          //   >::value, "");
+          traffic_light_state_array.states.push_back(
+            static_cast<autoware_perception_msgs::msg::TrafficLightState>(
+              *std::get<1>(each)));
+        } catch (const std::out_of_range &) {
+          // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
+        }
+      }
+    }
+
+    return (*traffic_light_state_array_publisher_).publish(traffic_light_state_array);
+  }
+
   std::unordered_map<std::int64_t, std::shared_ptr<TrafficLight>> traffic_lights_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;

@@ -15,7 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_
 
+#include <autoware_perception_msgs/msg/lamp_state.hpp>
 #include <iostream>
+#include <stdexcept>
 
 namespace traffic_simulator
 {
@@ -24,6 +26,8 @@ enum class TrafficLightColor { NONE, RED, GREEN, YELLOW };
 std::istream & operator>>(std::istream &, TrafficLightColor &);
 
 std::ostream & operator<<(std::ostream &, const TrafficLightColor &);
+
+autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightColor & datum);
 
 enum class TrafficLightArrow { NONE, STRAIGHT, LEFT, RIGHT };
 
