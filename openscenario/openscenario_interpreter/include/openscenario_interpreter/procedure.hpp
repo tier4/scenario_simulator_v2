@@ -25,12 +25,6 @@ namespace openscenario_interpreter
 {
 extern traffic_simulator::API & connection;
 
-// static struct Connector
-// {
-//   Connector();
-//   ~Connector();
-// } connector;
-
 template <typename... Ts>
 decltype(auto) connect(Ts &&... xs)
 {
@@ -43,24 +37,10 @@ decltype(auto) getEntityStatus(Ts &&... xs)
 try {
   return connection.getEntityStatus(std::forward<decltype(xs)>(xs)...);
 } catch (const traffic_simulator::SimulationRuntimeError & error) {
-  std::stringstream ss{};
-  ss << error.what() << ".\n";
-  ss << "Possible causes:\n";
-  ss << "  (1) The position of the corresponding entity is not specified by Teleport Action";
-  throw SemanticError(ss.str());
+  throw SemanticError(
+    error.what(), ".\n", "Possible causes:\n",
+    "  (1) The position of the corresponding entity is not specified by Teleport Action");
 }
-
-template <typename... Ts>
-decltype(auto) isReachedPosition(Ts &&... xs)
-{
-  return connection.reachPosition(std::forward<decltype(xs)>(xs)...);
-}
-
-// template<typename ... Ts>
-// decltype(auto) getRelativeDistance(Ts && ... xs)
-// {
-//   return connection.getRelativeDistance(std::forward<decltype(xs)>(xs)...);
-// }
 
 template <typename... Ts>
 decltype(auto) getRelativePose(Ts &&... xs)
@@ -92,12 +72,6 @@ try {
 //     return std::numeric_limits<value_type>::infinity();
 //   }
 // }
-
-template <typename... Ts>
-decltype(auto) setController(Ts &&... xs)
-{
-  return connection.setDriverModel(std::forward<decltype(xs)>(xs)...);
-}
 
 #define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                     \
   template <typename... Ts>                                                       \
@@ -132,6 +106,8 @@ FORWARD_TO_SIMULATION_API(attachLidarSensor);
 FORWARD_TO_SIMULATION_API(checkCollision);
 FORWARD_TO_SIMULATION_API(despawn);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
+FORWARD_TO_SIMULATION_API(getTrafficLightArrow);
+FORWARD_TO_SIMULATION_API(getTrafficLightColor);
 FORWARD_TO_SIMULATION_API(initialize);
 FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(requestAcquirePosition);
@@ -140,11 +116,28 @@ FORWARD_TO_SIMULATION_API(requestLaneChange);
 FORWARD_TO_SIMULATION_API(requestWalkStraight);
 FORWARD_TO_SIMULATION_API(setEntityStatus);
 FORWARD_TO_SIMULATION_API(setTargetSpeed);
+FORWARD_TO_SIMULATION_API(setTrafficLightArrow);
+FORWARD_TO_SIMULATION_API(setTrafficLightArrowPhase);
+FORWARD_TO_SIMULATION_API(setTrafficLightColor);
+FORWARD_TO_SIMULATION_API(setTrafficLightColorPhase);
 FORWARD_TO_SIMULATION_API(spawn);
 FORWARD_TO_SIMULATION_API(toMapPose);
 FORWARD_TO_SIMULATION_API(updateFrame);
 
-#undef DEFINE_FORWARD
+#undef FORWARD_TO_SIMULATION_API
+
+#define RENAME(FROM, TO)                                       \
+  template <typename... Ts>                                    \
+  decltype(auto) TO(Ts &&... xs)                               \
+  {                                                            \
+    return connection.FROM(std::forward<decltype(xs)>(xs)...); \
+  }                                                            \
+  static_assert(true, "")
+
+RENAME(reachPosition, isReachedPosition);
+RENAME(setDriverModel, assignController);
+
+#undef RENAME
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__PROCEDURE_HPP_

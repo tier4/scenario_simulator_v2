@@ -22,10 +22,11 @@
 
 namespace openscenario_interpreter
 {
-/* ---- Error ------------------------------------------------------------------
+/* ---- NOTE -------------------------------------------------------------------
  *
  *  -- Error
  *      |-- SyntaxError
+ *      |    `-- InvalidEnumeration
  *      |-- ConnectionError
  *      |-- SemanticError
  *      `-- ImplementationFault
@@ -34,7 +35,8 @@ namespace openscenario_interpreter
 struct Error : public std::runtime_error
 {
   template <typename... Ts>
-  explicit Error(Ts &&... xs) : std::runtime_error(cat(std::forward<decltype(xs)>(xs)...))
+  explicit constexpr Error(Ts &&... xs)
+  : std::runtime_error(cat(std::forward<decltype(xs)>(xs)..., "."))
   {
   }
 };
@@ -42,33 +44,36 @@ struct Error : public std::runtime_error
 struct SyntaxError : public Error
 {
   template <typename... Ts>
-  explicit SyntaxError(Ts &&... xs) : Error("syntax-error: ", std::forward<decltype(xs)>(xs)...)
+  explicit constexpr SyntaxError(Ts &&... xs)
+  : Error("SyntaxError: ", std::forward<decltype(xs)>(xs)...)
   {
   }
+
+  static decltype(auto) invalidValue(const std::string & type, const std::string & value)
+  {
+    return SyntaxError("An invalid value '", value, "' was specified for type '", type);
+  };
 };
 
 struct SemanticError : public Error
 {
   template <typename... Ts>
-  explicit SemanticError(Ts &&... xs) : Error("semantic-error: ", std::forward<decltype(xs)>(xs)...)
+  explicit SemanticError(Ts &&... xs) : Error("SemanticError: ", std::forward<decltype(xs)>(xs)...)
   {
   }
 };
 
-struct ConnectionError : public Error
-{
+struct [[deprecated]] ConnectionError : public Error{
   template <typename... Ts>
-  explicit ConnectionError(Ts &&... xs)
-  : Error("connection-error: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
+  explicit ConnectionError(Ts && ... xs) :
+    Error("connection-error: ", std::forward<decltype(xs)>(xs)...){}
 };
 
 struct ImplementationFault : public Error
 {
   template <typename... Ts>
   explicit ImplementationFault(Ts &&... xs)
-  : Error("implementation-fault: ", std::forward<decltype(xs)>(xs)...)
+  : Error("ImplementationFault: ", std::forward<decltype(xs)>(xs)...)
   {
   }
 };

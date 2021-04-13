@@ -44,63 +44,40 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ScenarioDefinition
 {
-  Element storyboard;
+  ASSERT_IS_OPTIONAL_ELEMENT(ParameterDeclarations);
+  const ParameterDeclarations parameter_declarations;
+
+  const CatalogLocations catalog_locations;
+
+  RoadNetwork road_network;
+
+  const Entities entities;
+
+  Storyboard storyboard;
 
   template <typename Node, typename Scope>
   explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
+  : parameter_declarations(
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, outer_scope)),
+    catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, outer_scope)),
+    road_network(readElement<RoadNetwork>("RoadNetwork", node, outer_scope)),
+    entities(readElement<Entities>("Entities", node, outer_scope)),
+    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope))
   {
-    // std::cout << (indent++) << "<OpenSCENARIO>" << std::endl;
-
-    callWithElements(node, "ParameterDeclarations", 0, unbounded, [&](auto && each) {
-      return make<ParameterDeclarations>(each, outer_scope);
-    });
-
-    // for (const auto & each : outer_scope.parameters) {
-    //   std::cout << indent << "<!-- Parameter " << cyan << "\'" << std::get<0>(each) << "\'" <<
-    //     reset << " of type " << green << std::get<1>(each).type().name() << reset <<
-    //     " declared as value " << cyan << "\"" << std::get<1>(each) << cyan << "\"" << reset <<
-    //     " -->" << std::endl;
-    // }
-
-    callWithElements(node, "CatalogLocations", 0, 1, [&](auto && node) {
-      return make<CatalogLocations>(node, outer_scope);
-    });
-
-    callWithElements(node, "RoadNetwork", 1, 1, [&](auto && node) {
-      return make<RoadNetwork>(node, outer_scope);
-    });
-
-    callWithElement(
-      node, "Entities", [&](auto && node) { return make<Entities>(node, outer_scope); });
-
-    // std::cout << (indent++) << "<Entities>" << std::endl;
-    //
-    // for (const auto & each : outer_scope.entities) {
-    //   std::cout << std::get<1>(each) << std::endl;
-    // }
-    //
-    // std::cout << (--indent) << "</Entities>" << std::endl;
-
-    callWithElement(node, "Storyboard", [&](auto && node) {
-      return storyboard = make<Storyboard>(node, outer_scope);
-    });
-
-    // std::cout << (--indent) << "</OpenSCENARIO>" << std::endl;
   }
 
   template <typename... Ts>
   decltype(auto) complete(Ts &&... xs)
   {
-    return storyboard.as<Storyboard>().complete(std::forward<decltype(xs)>(xs)...);
+    return storyboard.complete(std::forward<decltype(xs)>(xs)...);
   }
 
   template <typename... Ts>
   auto evaluate(Ts &&... xs)
   {
-    const auto result{storyboard.evaluate()};
-
+    road_network.evaluate();
+    const auto result = storyboard.evaluate();
     updateFrame();
-
     return result;
   }
 };

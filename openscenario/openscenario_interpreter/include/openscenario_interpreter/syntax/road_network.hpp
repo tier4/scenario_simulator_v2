@@ -34,16 +34,33 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-ASSERT_IS_OPTIONAL_ELEMENT(File);
-ASSERT_IS_OPTIONAL_ELEMENT(TrafficSignals);
-
 struct RoadNetwork
 {
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  File path of the road network file (e.g. an ASAM OpenDRIVE file).
+   *
+   * ------------------------------------------------------------------------ */
+  ASSERT_IS_OPTIONAL_ELEMENT(File);
   const File logic_file;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  File path of a 3D model representing the virtual environment. This may be
+   *  used for visual representation (rendering).
+   *
+   * ------------------------------------------------------------------------ */
+  ASSERT_IS_OPTIONAL_ELEMENT(File);
   const File scene_graph_file;
 
-  const TrafficSignals traffic_signals;
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Name references and description of dynamic behavior for traffic signals
+   *  defined in the road network file.
+   *
+   * ------------------------------------------------------------------------ */
+  ASSERT_IS_OPTIONAL_ELEMENT(TrafficSignals);
+  TrafficSignals traffic_signals;
 
   template <typename Node, typename Scope>
   explicit RoadNetwork(const Node & node, Scope & outer_scope)
@@ -53,6 +70,12 @@ struct RoadNetwork
   {
     outer_scope.logic_file = logic_file;
     outer_scope.scene_graph_file = scene_graph_file;
+  }
+
+  template <typename... Ts>
+  decltype(auto) evaluate(Ts &&... xs)
+  {
+    return traffic_signals.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace syntax

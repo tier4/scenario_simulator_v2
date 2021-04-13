@@ -39,10 +39,18 @@ struct TrafficSignals
 
   template <typename Node, typename Scope>
   explicit TrafficSignals(const Node & node, Scope & outer_scope)
+  : traffic_signal_controllers(
+      readElements<TrafficSignalController, 0>("TrafficSignalController", node, outer_scope))
   {
-    callWithElements(node, "TrafficSignalController", 0, unbounded, [&](auto && node) {
-      return traffic_signal_controllers.emplace_back(node, outer_scope);
-    });
+  }
+
+  auto evaluate()
+  {
+    for (auto && controller : traffic_signal_controllers) {
+      controller.evaluate();
+    }
+
+    return unspecified;
   }
 };
 }  // namespace syntax
