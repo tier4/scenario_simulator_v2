@@ -39,12 +39,17 @@ public:
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
 
-  void setColorPhase(
-    const std::vector<std::pair<Duration, TrafficLightColor>> & phase,
-    const double time_offset = 0);
-  void setArrowPhase(
-    const std::vector<std::pair<Duration, TrafficLightArrow>> & phase,
-    const double time_offset = 0);
+  template <typename... Ts>
+  decltype(auto) setColorPhase(Ts &&... xs)
+  {
+    return color_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
+  }
+
+  template <typename... Ts>
+  decltype(auto) setArrowPhase(Ts &&... xs)
+  {
+    return arrow_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
+  }
 
   void setColor(TrafficLightColor color);
   void setArrow(TrafficLightArrow arrow);
@@ -60,16 +65,22 @@ public:
   const geometry_msgs::msg::Point getPosition(const TrafficLightColor & color);
   const geometry_msgs::msg::Point getPosition(const TrafficLightArrow & arrow);
 
-  void setPosition(const TrafficLightColor & color, const geometry_msgs::msg::Point & position);
+  template <typename... Ts>
+  decltype(auto) setPosition(Ts &&... xs)
+  {
+    return color_positions_.emplace(std::forward<decltype(xs)>(xs)...);
+  }
 
-  bool colorChanged() const;
-  bool arrowChanged() const;
+  auto colorChanged() const { return color_changed_; }
+  auto arrowChanged() const { return arrow_changed_; }
 
 private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;
   std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions_;
+
   TrafficLightPhase<TrafficLightColor> color_phase_;
   TrafficLightPhase<TrafficLightArrow> arrow_phase_;
+
   bool color_changed_;
   bool arrow_changed_;
 };

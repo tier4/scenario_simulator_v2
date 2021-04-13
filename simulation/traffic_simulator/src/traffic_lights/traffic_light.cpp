@@ -37,24 +37,6 @@ TrafficLight::TrafficLight(
   arrow_phase_.setState(TrafficLightArrow::NONE);
 }
 
-void TrafficLight::setPosition(
-  const TrafficLightColor & color, const geometry_msgs::msg::Point & position)
-{
-  color_positions_.emplace(color, position);
-}
-
-void TrafficLight::setColorPhase(
-  const std::vector<std::pair<double, TrafficLightColor>> & phase, const double time_offset)
-{
-  color_phase_.setPhase(phase, time_offset);
-}
-
-void TrafficLight::setArrowPhase(
-  const std::vector<std::pair<double, TrafficLightArrow>> & phase, const double time_offset)
-{
-  arrow_phase_.setPhase(phase, time_offset);
-}
-
 void TrafficLight::setColor(TrafficLightColor color) { color_phase_.setState(color); }
 void TrafficLight::setArrow(TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
 
@@ -63,9 +45,6 @@ double TrafficLight::getArrowPhaseDuration() const { return arrow_phase_.getPhas
 
 TrafficLightArrow TrafficLight::getArrow() const { return arrow_phase_.getState(); }
 TrafficLightColor TrafficLight::getColor() const { return color_phase_.getState(); }
-
-bool TrafficLight::colorChanged() const { return color_changed_; }
-bool TrafficLight::arrowChanged() const { return arrow_changed_; }
 
 void TrafficLight::update(const double step_time)
 {
