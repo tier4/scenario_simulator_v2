@@ -36,18 +36,47 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Phase
 {
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Name of the phase.
+   *
+   * ------------------------------------------------------------------------ */
   const String name;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Duration of the phase. Unit: s; Range: [0..inf[.
+   *
+   * ------------------------------------------------------------------------ */
   const Double duration;
 
-  const TrafficSignalState state;
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Each phase has multiple TrafficSignalStates. One for each TrafficSignal
+   *  that is controlled.
+   *
+   *  E.g. phase1 (trafficSignal1: true; false; false,
+   *               trafficSignal2: false; false; true).
+   *
+   * ------------------------------------------------------------------------ */
+  const std::vector<TrafficSignalState> traffic_signal_states;
 
   template <typename Node, typename Scope>
   explicit Phase(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     duration(readAttribute<Double>("duration", node, outer_scope, Double::infinity())),
-    state(readElement<TrafficSignalState>("TrafficSignalState", node, outer_scope))
+    traffic_signal_states(
+      readElements<TrafficSignalState, 0>("TrafficSignalState", node, outer_scope))
   {
+  }
+
+  auto evaluate() const
+  {
+    for (const auto & state : traffic_signal_states) {
+      state.evaluate();
+    }
+
+    return unspecified;
   }
 };
 }  // namespace syntax

@@ -22,22 +22,22 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== CatalogLocation ======================================================
+/* ---- CatalogLocation --------------------------------------------------------
  *
- * <xsd:complexType name="VehicleCatalogLocation">
- *   <xsd:all>
- *     <xsd:element name="Directory" type="Directory"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="VehicleCatalogLocation">
+ *    <xsd:all>
+ *      <xsd:element name="Directory" type="Directory"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct CatalogLocation
 {
   const Directory directory;
 
   template <typename Node, typename Scope>
   explicit CatalogLocation(const Node & node, Scope & outer_scope)
-  : directory{readElement<Directory>("Directory", node, outer_scope)}
+  : directory(readElement<Directory>("Directory", node, outer_scope))
   {
   }
 };

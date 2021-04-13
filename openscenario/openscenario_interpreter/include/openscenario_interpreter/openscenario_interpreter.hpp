@@ -118,8 +118,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     CATCH(AutowareError)
     CATCH(ImplementationFault)
-    CATCH(InternalError)
     CATCH(SemanticError)
+
+    CATCH(InternalError)
 
     catch (...) { report(ERROR, "UnknownException (unexpected)"); }
   }

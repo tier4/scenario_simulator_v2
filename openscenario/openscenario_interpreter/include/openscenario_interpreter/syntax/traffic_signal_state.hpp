@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/arrow.hpp>
+#include <openscenario_interpreter/syntax/color.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
@@ -32,8 +34,23 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalState
 {
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  ID of the referenced signal in a road network. The signal ID must be
+   *  listed in TrafficSignal list of the RoadNetwork.
+   *
+   *  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive
+   *  integer) of the traffic light.
+   *
+   * ------------------------------------------------------------------------ */
   const String traffic_signal_id;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  State of the signal. The available states are listed in the TrafficSignal
+   *  list of the RoadNetwork.
+   *
+   * ------------------------------------------------------------------------ */
   const String state;
 
   template <typename Node, typename Scope>
@@ -41,6 +58,20 @@ struct TrafficSignalState
   : traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
     state(readAttribute<String>("state", node, scope))
   {
+  }
+
+  decltype(auto) id() const { return boost::lexical_cast<std::int64_t>(traffic_signal_id); }
+
+  auto evaluate() const  // XXX DIRTY HACK
+  {
+    try {
+      setTrafficLightColor(id(), boost::lexical_cast<Color>(state));
+    } catch (...) {
+      // setTrafficLightArrow(boost::lexical_cast<Arrow>(state));
+      boost::lexical_cast<Arrow>(state);  // NOTE: Currently ignored.
+    }
+
+    return unspecified;
   }
 };
 }  // namespace syntax

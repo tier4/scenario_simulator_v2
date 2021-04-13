@@ -213,8 +213,7 @@ private:
     const bool is_ego, const std::string & catalog_xml,
     const openscenario_msgs::msg::EntityStatus & status);
 
-  template <typename Parameters  // Maybe, VehicleParameters or PedestrianParameters
-            >
+  template <typename Parameters>
   bool spawn(
     const bool is_ego, const Parameters & parameters,
     const openscenario_msgs::msg::EntityStatus & status)

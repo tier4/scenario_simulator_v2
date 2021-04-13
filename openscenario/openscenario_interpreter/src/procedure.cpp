@@ -20,24 +20,5 @@ namespace openscenario_interpreter
 static typename std::aligned_storage<
   sizeof(traffic_simulator::API), alignof(traffic_simulator::API)>::type memory;
 
-traffic_simulator::API & connection{reinterpret_cast<traffic_simulator::API &>(memory)};
-
-// static int schwarz_counter { 0 };
-//
-// Connector::Connector()
-// {
-//   if (schwarz_counter++ == 0)
-//   {
-//     new (&connection) traffic_simulator::API();
-//   }
-// }
-//
-// Connector::~Connector()
-// {
-//   if (--schwarz_counter == 0)
-//   {
-//     connection.~API();
-//   }
-// }
-
+traffic_simulator::API & connection = reinterpret_cast<traffic_simulator::API &>(memory);
 }  // namespace openscenario_interpreter

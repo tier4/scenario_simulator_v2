@@ -47,16 +47,20 @@ struct AssignControllerAction : public ComplexType
 
   template <typename Node>
   explicit AssignControllerAction(const Node & node, Scope & outer_scope)
+  // clang-format off
   : ComplexType(
-      choice(node, ELEMENT(Controller), std::make_pair("CatalogReference", UNSUPPORTED()))),
+      choice(node,
+        ELEMENT(Controller),
+        std::make_pair("CatalogReference", UNSUPPORTED()))),
     inner_scope(outer_scope)
+  // clang-format on
   {
   }
 
   void operator()() const
   {
     for (const auto & actor : inner_scope.actors) {
-      setController(actor, (*this).as<Controller>());
+      assignController(actor, (*this).as<Controller>());
     }
   }
 };
