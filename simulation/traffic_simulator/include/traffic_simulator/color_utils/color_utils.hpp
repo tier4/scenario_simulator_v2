@@ -40,7 +40,8 @@ void printMagenta(const std::string & text);
 void printCyan(const std::string & text);
 void printWhite(const std::string & text);
 
-const std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha = 1.0);
+const std_msgs::msg::ColorRGBA makeColorMsg(
+  const std::string & preset_name, const double alpha = 1.0);
 /**
    * @brief 0 <= h <= 1.0,0 <= s <= 1.0,0 <= v <= 1.0
    */

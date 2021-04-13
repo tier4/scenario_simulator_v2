@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iterator>
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -55,19 +57,24 @@ TrafficLightManager::TrafficLightManager(
 
 std::vector<std::int64_t> TrafficLightManager::getIds() const
 {
-  std::vector<std::int64_t> ret;
-  for (const auto & traffic_light : traffic_lights_) {
-    ret.push_back(traffic_light.first);
-  }
-  return ret;
+  std::vector<std::int64_t> result;
+
+  std::transform(
+    std::begin(traffic_lights_), std::end(traffic_lights_), std::back_inserter(result),
+    [](const auto & each) { return std::get<0>(each); });
+
+  return result;
 }
 
 void TrafficLightManager::deleteAllMarkers() const
 {
   visualization_msgs::msg::MarkerArray msg;
-  visualization_msgs::msg::Marker marker;
-  marker.action = marker.DELETEALL;
-  msg.markers.push_back(marker);
+  {
+    visualization_msgs::msg::Marker marker;
+    marker.action = marker.DELETEALL;
+    msg.markers.push_back(marker);
+  }
+
   marker_pub_->publish(msg);
 }
 
@@ -90,15 +97,7 @@ void TrafficLightManager::drawMarkers() const
       marker.scale.x = 0.3;
       marker.scale.y = 0.3;
       marker.scale.z = 0.3;
-      if (color == TrafficLightColor::GREEN) {
-        marker.color = color_utils::makeColorMsg("green");
-      }
-      if (color == TrafficLightColor::YELLOW) {
-        marker.color = color_utils::makeColorMsg("yellow");
-      }
-      if (color == TrafficLightColor::RED) {
-        marker.color = color_utils::makeColorMsg("red");
-      }
+      marker.color = color_utils::makeColorMsg(boost::lexical_cast<std::string>(color));
       msg.markers.push_back(marker);
     }
   }
@@ -107,13 +106,12 @@ void TrafficLightManager::drawMarkers() const
 
 void TrafficLightManager::update(const double step_time)
 {
-  auto colorChanged = [](const auto & traffic_light) {
-    return (*traffic_light.second).colorChanged();
-  };
-
-  if (std::any_of(std::begin(traffic_lights_), std::end(traffic_lights_), colorChanged)) {
+  if (std::any_of(
+        std::begin(traffic_lights_), std::end(traffic_lights_),
+        [](const auto & traffic_light) { return (*traffic_light.second).colorChanged(); })) {
     deleteAllMarkers();
   }
+
   drawMarkers();
 }
 }  // namespace traffic_simulator

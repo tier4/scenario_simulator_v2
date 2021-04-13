@@ -66,9 +66,6 @@ public:
 
 #undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 
-  // TrafficLightColor getColor(const std::int64_t lanelet_id) const;
-  // TrafficLightArrow getArrow(const std::int64_t lanelet_id) const;
-
   std::vector<std::int64_t> getIds() const;
 
 private:
