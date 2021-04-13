@@ -18,6 +18,7 @@
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <stdexcept>  // std::out_of_range
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
@@ -42,44 +43,31 @@ public:
 
   void update(const double step_time);
 
-  template <typename... Ts>
-  void setColorPhase(std::int64_t lanelet_id, Ts &&... xs)
-  {
-    if (traffic_lights_.count(lanelet_id) == 0) {
-      throw SimulationRuntimeError("lanelet id does not match");
-    }
-    traffic_lights_.at(lanelet_id)->setColorPhase(std::forward<Ts>(xs)...);
-  }
+#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                          \
+  template <typename... Ts>                                                                 \
+  decltype(auto) IDENTIFIER(const std::int64_t lanelet_id, Ts &&... xs)                     \
+  {                                                                                         \
+    try {                                                                                   \
+      return traffic_lights_.at(lanelet_id)->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+    } catch (const std::out_of_range &) {                                                   \
+      std::stringstream what;                                                               \
+      what << "Given lanelet ID '" << lanelet_id << "' is not a valid traffic-light ID.";   \
+      throw SimulationRuntimeError(what.str());                                             \
+    }                                                                                       \
+  }                                                                                         \
+  static_assert(true, "")
 
-  template <typename... Ts>
-  void setArrowPhase(std::int64_t lanelet_id, Ts &&... xs)
-  {
-    if (traffic_lights_.count(lanelet_id) == 0) {
-      throw SimulationRuntimeError("lanelet id does not match");
-    }
-    traffic_lights_.at(lanelet_id)->setArrowPhase(std::forward<Ts>(xs)...);
-  }
+  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getArrow);
+  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getColor);
+  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrow);
+  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setArrowPhase);
+  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColor);
+  FORWARD_TO_GIVEN_TRAFFIC_LIGHT(setColorPhase);
 
-  template <typename... Ts>
-  void setColor(std::int64_t lanelet_id, Ts &&... xs)
-  {
-    if (traffic_lights_.count(lanelet_id) == 0) {
-      throw SimulationRuntimeError("lanelet id does not match");
-    }
-    traffic_lights_.at(lanelet_id)->setColor(std::forward<Ts>(xs)...);
-  }
+#undef FORWARD_TO_GIVEN_TRAFFIC_LIGHT
 
-  template <typename... Ts>
-  void setArrow(std::int64_t lanelet_id, Ts &&... xs)
-  {
-    if (traffic_lights_.count(lanelet_id) == 0) {
-      throw SimulationRuntimeError("lanelet id does not match");
-    }
-    traffic_lights_.at(lanelet_id)->setArrow(std::forward<Ts>(xs)...);
-  }
-
-  TrafficLightColor getColor(const std::int64_t lanelet_id) const;
-  TrafficLightArrow getArrow(const std::int64_t lanelet_id) const;
+  // TrafficLightColor getColor(const std::int64_t lanelet_id) const;
+  // TrafficLightArrow getArrow(const std::int64_t lanelet_id) const;
 
   std::vector<std::int64_t> getIds() const;
 

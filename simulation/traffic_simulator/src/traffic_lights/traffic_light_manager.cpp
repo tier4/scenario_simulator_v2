@@ -28,13 +28,12 @@ TrafficLightManager::TrafficLightManager(
     traffic_light_state_array_publisher,
   const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame)
 : traffic_light_state_array_publisher_(traffic_light_state_array_publisher),
+  traffic_lights_(),
   marker_pub_(publisher),
   clock_ptr_(clock_ptr),
   map_frame_(map_frame)
 {
-  traffic_lights_ = {};
-  const auto ids = hdmap_utils_ptr->getTrafficLightIds();
-  for (const auto id : ids) {
+  for (const auto id : (*hdmap_utils_ptr).getTrafficLightIds()) {
     std::shared_ptr<TrafficLight> light_ptr = std::make_shared<TrafficLight>(id);
     auto red_position = hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::RED);
     if (red_position) {
@@ -116,21 +115,5 @@ void TrafficLightManager::update(const double step_time)
     deleteAllMarkers();
   }
   drawMarkers();
-}
-
-TrafficLightArrow TrafficLightManager::getArrow(const std::int64_t lanelet_id) const
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  return traffic_lights_.at(lanelet_id)->getArrow();
-}
-
-TrafficLightColor TrafficLightManager::getColor(const std::int64_t lanelet_id) const
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  return traffic_lights_.at(lanelet_id)->getColor();
 }
 }  // namespace traffic_simulator
