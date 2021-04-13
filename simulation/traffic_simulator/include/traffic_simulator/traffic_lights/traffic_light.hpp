@@ -32,25 +32,36 @@ class TrafficLight
   using Duration = double;
 
 public:
+  const std::int64_t id;
+
   explicit TrafficLight(
     std::int64_t id,
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
+
   void setColorPhase(
-    const std::vector<std::pair<Duration, TrafficLightColor>> & phase, double time_offset = 0);
+    const std::vector<std::pair<Duration, TrafficLightColor>> & phase,
+    const double time_offset = 0);
   void setArrowPhase(
-    const std::vector<std::pair<Duration, TrafficLightArrow>> & phase, double time_offset = 0);
+    const std::vector<std::pair<Duration, TrafficLightArrow>> & phase,
+    const double time_offset = 0);
+
   void setColor(TrafficLightColor color);
   void setArrow(TrafficLightArrow arrow);
-  double getColorPhaseLength() const;
-  double getArrowPhaseLength() const;
-  void update(double step_time);
+
+  double getColorPhaseDuration() const;
+  double getArrowPhaseDuration() const;
+
+  void update(const double step_time);
+
   TrafficLightArrow getArrow() const;
   TrafficLightColor getColor() const;
-  const std::int64_t id;
+
   const geometry_msgs::msg::Point getPosition(const TrafficLightColor & color);
-  void setPosition(const TrafficLightColor & color, const geometry_msgs::msg::Point & position);
   const geometry_msgs::msg::Point getPosition(const TrafficLightArrow & arrow);
+
+  void setPosition(const TrafficLightColor & color, const geometry_msgs::msg::Point & position);
+
   bool colorChanged() const;
   bool arrowChanged() const;
 
