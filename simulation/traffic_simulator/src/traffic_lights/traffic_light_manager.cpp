@@ -24,8 +24,13 @@ namespace traffic_simulator
 TrafficLightManager::TrafficLightManager(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
+  const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr &
+    traffic_light_state_array_publisher,
   const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame)
-: marker_pub_(publisher), clock_ptr_(clock_ptr), map_frame_(map_frame)
+: traffic_light_state_array_publisher_(traffic_light_state_array_publisher),
+  marker_pub_(publisher),
+  clock_ptr_(clock_ptr),
+  map_frame_(map_frame)
 {
   traffic_lights_ = {};
   const auto ids = hdmap_utils_ptr->getTrafficLightIds();
@@ -70,11 +75,12 @@ void TrafficLightManager::deleteAllMarkers() const
 void TrafficLightManager::drawMarkers() const
 {
   visualization_msgs::msg::MarkerArray msg;
+  const auto now = (*clock_ptr_).now();
   for (const auto & light : traffic_lights_) {
     const auto color = light.second->getColor();
     if (color != TrafficLightColor::NONE) {
       visualization_msgs::msg::Marker marker;
-      marker.header.stamp = (*clock_ptr_).now();
+      marker.header.stamp = now;
       marker.header.frame_id = map_frame_;
       marker.action = marker.ADD;
       marker.ns = "bulb";

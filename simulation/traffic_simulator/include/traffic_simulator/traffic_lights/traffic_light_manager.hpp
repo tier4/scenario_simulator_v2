@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 
+#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -29,10 +30,14 @@ namespace traffic_simulator
 {
 class TrafficLightManager
 {
+  const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr
+    traffic_light_state_array_publisher_;
+
 public:
   explicit TrafficLightManager(
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
     const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
+    const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr &,
     const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame = "map");
 
   void update(const double step_time);

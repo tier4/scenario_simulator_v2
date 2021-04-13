@@ -176,12 +176,13 @@ public:
 
     updateHdmapMarker();
 
-    const auto traffic_light_marker_pub = rclcpp::create_publisher<MarkerArray>(
-      node, "traffic_light/marker", LaneletMarkerQoS(),
-      rclcpp::PublisherOptionsWithAllocator<AllocatorT>());
-
-    traffic_light_manager_ptr_ =
-      std::make_shared<TrafficLightManager>(hdmap_utils_ptr_, traffic_light_marker_pub, clock_ptr_);
+    traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(
+      hdmap_utils_ptr_,
+      rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
+      rclcpp::create_publisher<autoware_perception_msgs::msg::TrafficLightStateArray>(
+        node, "/perception/traffic_light_recognition/traffic_light_states",
+        rclcpp::QoS(10).transient_local()),
+      clock_ptr_);
   }
 
   ~EntityManager() = default;
