@@ -31,10 +31,12 @@ class TrafficLightManager
 {
 public:
   explicit TrafficLightManager(
-    std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+    const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
     const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame = "map");
-  void update(double step_time);
+
+  void update(const double step_time);
+
   template <typename... Ts>
   void setColorPhase(std::int64_t lanelet_id, Ts &&... xs)
   {
@@ -43,6 +45,7 @@ public:
     }
     traffic_lights_.at(lanelet_id)->setColorPhase(std::forward<Ts>(xs)...);
   }
+
   template <typename... Ts>
   void setArrowPhase(std::int64_t lanelet_id, Ts &&... xs)
   {
@@ -51,6 +54,7 @@ public:
     }
     traffic_lights_.at(lanelet_id)->setArrowPhase(std::forward<Ts>(xs)...);
   }
+
   template <typename... Ts>
   void setColor(std::int64_t lanelet_id, Ts &&... xs)
   {
@@ -59,6 +63,7 @@ public:
     }
     traffic_lights_.at(lanelet_id)->setColor(std::forward<Ts>(xs)...);
   }
+
   template <typename... Ts>
   void setArrow(std::int64_t lanelet_id, Ts &&... xs)
   {
@@ -67,16 +72,23 @@ public:
     }
     traffic_lights_.at(lanelet_id)->setArrow(std::forward<Ts>(xs)...);
   }
-  TrafficLightColor getColor(std::int64_t lanelet_id) const;
-  TrafficLightArrow getArrow(std::int64_t lanelet_id) const;
+
+  TrafficLightColor getColor(const std::int64_t lanelet_id) const;
+  TrafficLightArrow getArrow(const std::int64_t lanelet_id) const;
+
   std::vector<std::int64_t> getIds() const;
 
 private:
   void deleteAllMarkers() const;
+
   void drawMarkers() const;
+
   std::unordered_map<std::int64_t, std::shared_ptr<TrafficLight>> traffic_lights_;
+
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+
   const std::shared_ptr<rclcpp::Clock> clock_ptr_;
+
   const std::string map_frame_;
 };
 }  // namespace traffic_simulator

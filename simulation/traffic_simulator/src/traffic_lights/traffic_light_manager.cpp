@@ -22,8 +22,8 @@
 namespace traffic_simulator
 {
 TrafficLightManager::TrafficLightManager(
-  std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
   const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame)
 : marker_pub_(publisher), clock_ptr_(clock_ptr), map_frame_(map_frame)
 {
@@ -52,8 +52,8 @@ TrafficLightManager::TrafficLightManager(
 std::vector<std::int64_t> TrafficLightManager::getIds() const
 {
   std::vector<std::int64_t> ret;
-  for (const auto traffic_light : traffic_lights_) {
-    ret.emplace_back(traffic_light.first);
+  for (const auto & traffic_light : traffic_lights_) {
+    ret.push_back(traffic_light.first);
   }
   return ret;
 }
@@ -70,14 +70,11 @@ void TrafficLightManager::deleteAllMarkers() const
 void TrafficLightManager::drawMarkers() const
 {
   visualization_msgs::msg::MarkerArray msg;
-  const auto now = clock_ptr_->now();
-  for (const auto light : traffic_lights_) {
+  for (const auto & light : traffic_lights_) {
     const auto color = light.second->getColor();
-    if (color == TrafficLightColor::NONE) {
-      continue;
-    } else {
+    if (color != TrafficLightColor::NONE) {
       visualization_msgs::msg::Marker marker;
-      marker.header.stamp = now;
+      marker.header.stamp = (*clock_ptr_).now();
       marker.header.frame_id = map_frame_;
       marker.action = marker.ADD;
       marker.ns = "bulb";
@@ -103,22 +100,19 @@ void TrafficLightManager::drawMarkers() const
   marker_pub_->publish(msg);
 }
 
-void TrafficLightManager::update(double step_time)
+void TrafficLightManager::update(const double step_time)
 {
-  bool color_changed = false;
-  for (const auto light : traffic_lights_) {
-    light.second->update(step_time);
-    if (light.second->colorChanged()) {
-      color_changed = true;
-    }
-  }
-  if (color_changed) {
+  auto colorChanged = [](const auto & traffic_light) {
+    return (*traffic_light.second).colorChanged();
+  };
+
+  if (std::any_of(std::begin(traffic_lights_), std::end(traffic_lights_), colorChanged)) {
     deleteAllMarkers();
   }
   drawMarkers();
 }
 
-TrafficLightArrow TrafficLightManager::getArrow(std::int64_t lanelet_id) const
+TrafficLightArrow TrafficLightManager::getArrow(const std::int64_t lanelet_id) const
 {
   if (traffic_lights_.count(lanelet_id) == 0) {
     throw SimulationRuntimeError("lanelet id does not match");
@@ -126,7 +120,7 @@ TrafficLightArrow TrafficLightManager::getArrow(std::int64_t lanelet_id) const
   return traffic_lights_.at(lanelet_id)->getArrow();
 }
 
-TrafficLightColor TrafficLightManager::getColor(std::int64_t lanelet_id) const
+TrafficLightColor TrafficLightManager::getColor(const std::int64_t lanelet_id) const
 {
   if (traffic_lights_.count(lanelet_id) == 0) {
     throw SimulationRuntimeError("lanelet id does not match");
