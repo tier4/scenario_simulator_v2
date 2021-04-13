@@ -82,14 +82,8 @@ private:
 
       for (const auto & each : traffic_lights_) {
         try {
-          // static_assert(
-          //   std::is_same<
-          //     typename std::decay<decltype(each)>::type,
-          //     typename
-          //   >::value, "");
           traffic_light_state_array.states.push_back(
-            static_cast<autoware_perception_msgs::msg::TrafficLightState>(
-              *std::get<1>(each)));
+            static_cast<autoware_perception_msgs::msg::TrafficLightState>(*std::get<1>(each)));
         } catch (const std::out_of_range &) {
           // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
         }
