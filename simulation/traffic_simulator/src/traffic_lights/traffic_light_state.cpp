@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <unordered_map>
@@ -79,7 +80,7 @@ autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightColor &
 
       default:
         std::stringstream what;
-        what << "Cast TrafficLightColor::" << datum
+        what << "Casting TrafficLightColor::" << datum
              << " to autoware_perception_msgs::msg::LampState is not supported.";
         throw std::out_of_range(what.str());
     }
@@ -125,5 +126,35 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightArrow & datum)
     case TrafficLightArrow::RIGHT:    return os << "right";
   }
   // clang-format on
+}
+
+autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightArrow & datum)
+{
+  autoware_perception_msgs::msg::LampState lamp_state;
+  {
+    lamp_state.confidence = 1.0;
+
+    switch (datum) {
+      case TrafficLightArrow::STRAIGHT:
+        lamp_state.type = autoware_perception_msgs::msg::LampState::UP;
+        break;
+
+      case TrafficLightArrow::LEFT:
+        lamp_state.type = autoware_perception_msgs::msg::LampState::LEFT;
+        break;
+
+      case TrafficLightArrow::RIGHT:
+        lamp_state.type = autoware_perception_msgs::msg::LampState::RIGHT;
+        break;
+
+      default:
+        std::stringstream what;
+        what << "Casting TrafficLightArrow::" << datum
+             << " to autoware_perception_msgs::msg::LampState is not supported.";
+        throw std::out_of_range(what.str());
+    }
+  }
+
+  return lamp_state;
 }
 }  // namespace traffic_simulator

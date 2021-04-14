@@ -27,13 +27,15 @@ std::istream & operator>>(std::istream &, TrafficLightColor &);
 
 std::ostream & operator<<(std::ostream &, const TrafficLightColor &);
 
-autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightColor & datum);
+autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightColor &);
 
 enum class TrafficLightArrow { NONE, STRAIGHT, LEFT, RIGHT };
 
 std::istream & operator>>(std::istream &, TrafficLightArrow &);
 
 std::ostream & operator<<(std::ostream &, const TrafficLightArrow &);
+
+autoware_perception_msgs::msg::LampState makeLampState(const TrafficLightArrow &);
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_STATE_HPP_

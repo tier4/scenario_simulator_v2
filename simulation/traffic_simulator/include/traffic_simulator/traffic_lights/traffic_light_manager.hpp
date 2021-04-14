@@ -81,12 +81,8 @@ private:
       traffic_light_state_array.header.stamp = (*clock_ptr_).now();
 
       for (const auto & each : traffic_lights_) {
-        try {
-          traffic_light_state_array.states.push_back(
-            static_cast<autoware_perception_msgs::msg::TrafficLightState>(*std::get<1>(each)));
-        } catch (const std::out_of_range &) {
-          // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
-        }
+        traffic_light_state_array.states.push_back(
+          static_cast<autoware_perception_msgs::msg::TrafficLightState>(*std::get<1>(each)));
       }
     }
 

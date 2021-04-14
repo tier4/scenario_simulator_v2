@@ -18,6 +18,7 @@
 #include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_phase.hpp>
@@ -80,7 +81,18 @@ public:
     autoware_perception_msgs::msg::TrafficLightState traffic_light_state;
     {
       traffic_light_state.id = id;
-      // traffic_light_state. =
+
+      try {
+        traffic_light_state.lamp_states.push_back(makeLampState(getArrow()));
+      } catch (const std::out_of_range &) {
+        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
+      }
+
+      try {
+        traffic_light_state.lamp_states.push_back(makeLampState(getColor()));
+      } catch (const std::out_of_range &) {
+        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
+      }
     }
 
     return traffic_light_state;
