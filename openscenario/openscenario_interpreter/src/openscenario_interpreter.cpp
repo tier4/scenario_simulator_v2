@@ -63,7 +63,7 @@ try {
 
   connect(
     shared_from_this(), boost::filesystem::path(osc_path).replace_extension(""),
-    script.as<OpenScenario>().scope.logic_file.string());  // NOTE: /path/to/lanelet2_map.osm
+    script.as<OpenScenario>().scope.logic_file.string(), true, true);  // NOTE: /path/to/lanelet2_map.osm
 
   const auto interval_upper_bound = 1 / local_frame_rate * local_real_time_factor;
 
