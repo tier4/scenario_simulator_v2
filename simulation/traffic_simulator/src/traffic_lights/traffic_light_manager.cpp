@@ -92,7 +92,7 @@ void TrafficLightManager::drawMarkers() const
       marker.ns = "bulb";
       marker.id = light.first;
       marker.type = marker.SPHERE;
-      marker.pose.position = light.second->getPosition(light.second->getColor());
+      marker.pose.position = light.second->getPosition(color);
       marker.pose.orientation = geometry_msgs::msg::Quaternion();
       marker.scale.x = 0.3;
       marker.scale.y = 0.3;
@@ -104,8 +104,10 @@ void TrafficLightManager::drawMarkers() const
   marker_pub_->publish(msg);
 }
 
-void TrafficLightManager::update(const double step_time)
+void TrafficLightManager::update(const double)
 {
+  publishTrafficLightStateArray();
+
   if (std::any_of(
         std::begin(traffic_lights_), std::end(traffic_lights_),
         [](const auto & traffic_light) { return (*traffic_light.second).colorChanged(); })) {

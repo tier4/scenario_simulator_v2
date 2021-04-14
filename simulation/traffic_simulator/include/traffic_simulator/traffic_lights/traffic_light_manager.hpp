@@ -41,7 +41,7 @@ public:
     const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr &,
     const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame = "map");
 
-  void update(const double step_time);
+  void update(const double);
 
 #define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                          \
   template <typename... Ts>                                                                 \
