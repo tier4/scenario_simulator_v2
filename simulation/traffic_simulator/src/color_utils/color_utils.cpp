@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/algorithm/clamp.hpp>
 #include <iostream>
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
@@ -135,16 +136,10 @@ const std_msgs::msg::ColorRGBA fromHsv(double h, double s, double v, double alph
  * @param alpha alpha value of the color
  * @return std_msgs::msg::ColorRGBA
  */
-const std_msgs::msg::ColorRGBA makeColorMsg(std::string preset_name, double alpha)
+const std_msgs::msg::ColorRGBA makeColorMsg(const std::string & preset_name, const double alpha)
 {
   std_msgs::msg::ColorRGBA c_msg;
-  c_msg.a = alpha;
-  if (c_msg.a < 0.) {
-    c_msg.a = 0.;
-  }
-  if (c_msg.a > 1.) {
-    c_msg.a = 1.;
-  }
+  c_msg.a = boost::algorithm::clamp(alpha, 0.0, 1.0);
 
   auto found_itr = COLOR_NAME_DICT.find(preset_name);
   if (found_itr != COLOR_NAME_DICT.end()) {

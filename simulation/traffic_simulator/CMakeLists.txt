@@ -24,8 +24,8 @@ ament_auto_add_library(traffic_simulator SHARED
   src/behavior/action_node.cpp
   src/behavior/pedestrian/behavior_tree.cpp
   src/behavior/pedestrian/follow_lane_action.cpp
-  src/behavior/pedestrian/walk_straight_action.cpp
   src/behavior/pedestrian/pedestrian_action_node.cpp
+  src/behavior/pedestrian/walk_straight_action.cpp
   src/behavior/route_planner.cpp
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
@@ -60,6 +60,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic/traffic_sink.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
+  src/traffic_lights/traffic_light_state.cpp
   src/vehicle_model/sim_model_interface.cpp
   src/vehicle_model/sim_model_time_delay.cpp
   src/vehicle_model/sim_model_util.cpp
