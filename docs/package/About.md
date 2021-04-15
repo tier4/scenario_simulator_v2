@@ -16,10 +16,9 @@ This package includes NPC logic, API etc...
 - [Examples](/scenario_simulator_v2/package/traffic_simulator/markdown/Examples)
 
 ### Simple Sensor Simulator Package
+Reference implementation of the simulator integrated with this package.
 
 ![simple sensor simulator](../../image/simple_sensor_simulator.png "simple sensor simulator")
-
-Reference implementation of the simulator integrated with this package.
 
 - [Classes](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Namespaces)
