@@ -15,31 +15,36 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_controller_action.hpp>
+// #include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== TrafficSignalAction ==================================================
+/* ---- NOTE -------------------------------------------------------------------
  *
- * <xsd:complexType name="TrafficSignalAction">
- *   <xsd:choice>
- *     <xsd:element name="TrafficSignalControllerAction" type="TrafficSignalControllerAction"/>
- *     <xsd:element name="TrafficSignalStateAction" type="TrafficSignalStateAction"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="TrafficSignalAction">
+ *    <xsd:choice>
+ *      <xsd:element name="TrafficSignalControllerAction" type="TrafficSignalControllerAction"/>
+ *      <xsd:element name="TrafficSignalStateAction" type="TrafficSignalStateAction"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
-struct TrafficSignalAction : public Element
+ * -------------------------------------------------------------------------- */
+struct TrafficSignalAction : public ComplexType
 {
   template <typename Node, typename... Ts>
-  explicit TrafficSignalAction(const Node & node, Ts &&...)
-  : Element(choice(
-      node, std::make_pair("TrafficSignalControllerAction", [&](auto &&) { return unspecified; }),
-      std::make_pair("TrafficSignalStateAction", UNSUPPORTED())))
+  explicit TrafficSignalAction(const Node & node, Ts &&... xs)
+  // clang-format off
+  : ComplexType(
+      choice(node,
+        std::make_pair("TrafficSignalControllerAction", [&](auto && x) { return make<TrafficSignalControllerAction>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...); })
+        // std::make_pair("TrafficSignalStateAction",      [&](auto && x) { return make<TrafficSignalStateAction     >(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...); })
+        )
+      )
+  // clang-format on
   {
   }
 };
