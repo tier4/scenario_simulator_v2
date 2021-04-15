@@ -15,33 +15,53 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <string>
+#include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== TrafficSignalStateAction =============================================
+/* ---- NOTE -------------------------------------------------------------------
  *
- * <xsd:complexType name="TrafficSignalStateAction">
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="state" type="String" use="required"/>
- * </xsd:complexType>
+ *  Controls the state of a traffic signal.
  *
- * ======================================================================== */
-struct TrafficSignalStateAction
+ *  <xsd:complexType name="TrafficSignalStateAction">
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="state" type="String" use="required"/>
+ *  </xsd:complexType>
+ *
+ * -------------------------------------------------------------------------- */
+struct TrafficSignalStateAction : private Scope
 {
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  ID of a signal in a road network. The signal ID must be listed in the
+   *  TrafficSignal list of the RoadNetwork.
+   *
+   * ------------------------------------------------------------------------ */
   const String name;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Targeted state of the signal. The available states are listed in the
+   *  TrafficSignal list of the RoadNetwork.
+   *
+   * ------------------------------------------------------------------------ */
   const String state;
 
-  template <typename Node, typename Scope>
-  explicit TrafficSignalStateAction(const Node & node, Scope & scope)
-  : name{readAttribute<String>("name", node, scope)},
-    state{readAttribute<String>("state", node, scope)}
+  template <typename Node>
+  explicit TrafficSignalStateAction(const Node & node, Scope & current_scope)
+  : Scope(current_scope),
+    name(readAttribute<String>("name", node, static_cast<Scope &>(*this))),
+    state(readAttribute<String>("state", node, static_cast<Scope &>(*this)))
   {
   }
+
+  const std::true_type accomplished{};
+
+  auto start() const { return unspecified; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

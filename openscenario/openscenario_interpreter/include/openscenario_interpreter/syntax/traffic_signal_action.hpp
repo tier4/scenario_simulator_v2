@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_ACTION_HPP_
 
 #include <openscenario_interpreter/syntax/traffic_signal_controller_action.hpp>
-// #include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -40,10 +40,8 @@ struct TrafficSignalAction : public ComplexType
   // clang-format off
   : ComplexType(
       choice(node,
-        std::make_pair("TrafficSignalControllerAction", [&](auto && x) { return make<TrafficSignalControllerAction>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...); })
-        // std::make_pair("TrafficSignalStateAction",      [&](auto && x) { return make<TrafficSignalStateAction     >(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...); })
-        )
-      )
+        std::make_pair("TrafficSignalControllerAction", [&](auto && x) { return make<TrafficSignalControllerAction>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("TrafficSignalStateAction",      [&](auto && x) { return make<TrafficSignalStateAction     >(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {
   }
