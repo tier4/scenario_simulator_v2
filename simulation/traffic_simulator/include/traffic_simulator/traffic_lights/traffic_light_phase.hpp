@@ -27,19 +27,21 @@ template <typename T>
 class TrafficLightPhase
 {
 public:
-  TrafficLightPhase() { phase_ = {}; }
+  TrafficLightPhase() = default;
+
   explicit TrafficLightPhase(const std::vector<std::pair<double, T>> & phase) : phase_(phase) {}
-  double getPhaseLength() const
+
+  double getPhaseDuration() const
   {
     if (phase_.empty()) {
       throw SimulationRuntimeError("phase is empty");
+    } else {
+      return std::accumulate(
+        std::begin(phase_), std::end(phase_), 0,
+        [](const auto & lhs, const auto & rhs) { return lhs + rhs.first; });
     }
-    double l = 0;
-    for (const auto p : phase_) {
-      l = l + p.first;
-    }
-    return l;
   }
+
   const T getState() const
   {
     if (phase_.empty()) {
@@ -54,6 +56,7 @@ public:
     }
     throw SimulationRuntimeError("failed to get state in phase");
   }
+
   void update(double step_time)
   {
     if (phase_.empty()) {
@@ -61,22 +64,25 @@ public:
       return;
     }
     elapsed_time_ = elapsed_time_ + step_time;
-    if (elapsed_time_ > getPhaseLength()) {
-      elapsed_time_ = elapsed_time_ - getPhaseLength();
+    if (elapsed_time_ > getPhaseDuration()) {
+      elapsed_time_ = elapsed_time_ - getPhaseDuration();
     }
   }
+
   void setState(const T & state)
   {
-    phase_ = {};
-    phase_.emplace_back(std::make_pair(std::numeric_limits<double>::infinity(), state));
+    phase_.clear();
+    phase_.emplace_back(std::numeric_limits<double>::infinity(), state);
     elapsed_time_ = 0;
   }
+
   void setPhase(const std::vector<std::pair<double, T>> & phase, double time_offset = 0)
   {
     phase_ = phase;
     elapsed_time_ = time_offset;
   }
-  const std::vector<std::pair<double, T>> getPhase() const { return phase_; }
+
+  const auto & getPhase() const { return phase_; }
 
 private:
   std::vector<std::pair<double, T>> phase_;

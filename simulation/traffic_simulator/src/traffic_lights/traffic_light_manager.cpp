@@ -12,24 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iterator>
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace traffic_simulator
 {
 TrafficLightManager::TrafficLightManager(
-  std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
+  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr & publisher,
+  const rclcpp::Publisher<autoware_perception_msgs::msg::TrafficLightStateArray>::SharedPtr &
+    traffic_light_state_array_publisher,
   const std::shared_ptr<rclcpp::Clock> & clock_ptr, const std::string & map_frame)
-: marker_pub_(publisher), clock_ptr_(clock_ptr), map_frame_(map_frame)
+: traffic_light_state_array_publisher_(traffic_light_state_array_publisher),
+  traffic_lights_(),
+  marker_pub_(publisher),
+  clock_ptr_(clock_ptr),
+  map_frame_(map_frame)
 {
-  traffic_lights_ = {};
-  const auto ids = hdmap_utils_ptr->getTrafficLightIds();
-  for (const auto id : ids) {
+  for (const auto id : (*hdmap_utils_ptr).getTrafficLightIds()) {
     std::shared_ptr<TrafficLight> light_ptr = std::make_shared<TrafficLight>(id);
     auto red_position = hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::RED);
     if (red_position) {
@@ -51,31 +57,34 @@ TrafficLightManager::TrafficLightManager(
 
 std::vector<std::int64_t> TrafficLightManager::getIds() const
 {
-  std::vector<std::int64_t> ret;
-  for (const auto traffic_light : traffic_lights_) {
-    ret.emplace_back(traffic_light.first);
-  }
-  return ret;
+  std::vector<std::int64_t> result;
+
+  std::transform(
+    std::begin(traffic_lights_), std::end(traffic_lights_), std::back_inserter(result),
+    [](const auto & each) { return std::get<0>(each); });
+
+  return result;
 }
 
 void TrafficLightManager::deleteAllMarkers() const
 {
   visualization_msgs::msg::MarkerArray msg;
-  visualization_msgs::msg::Marker marker;
-  marker.action = marker.DELETEALL;
-  msg.markers.push_back(marker);
+  {
+    visualization_msgs::msg::Marker marker;
+    marker.action = marker.DELETEALL;
+    msg.markers.push_back(marker);
+  }
+
   marker_pub_->publish(msg);
 }
 
 void TrafficLightManager::drawMarkers() const
 {
   visualization_msgs::msg::MarkerArray msg;
-  const auto now = clock_ptr_->now();
-  for (const auto light : traffic_lights_) {
+  const auto now = (*clock_ptr_).now();
+  for (const auto & light : traffic_lights_) {
     const auto color = light.second->getColor();
-    if (color == TrafficLightColor::NONE) {
-      continue;
-    } else {
+    if (color != TrafficLightColor::NONE) {
       visualization_msgs::msg::Marker marker;
       marker.header.stamp = now;
       marker.header.frame_id = map_frame_;
@@ -83,54 +92,28 @@ void TrafficLightManager::drawMarkers() const
       marker.ns = "bulb";
       marker.id = light.first;
       marker.type = marker.SPHERE;
-      marker.pose.position = light.second->getPosition(light.second->getColor());
+      marker.pose.position = light.second->getPosition(color);
       marker.pose.orientation = geometry_msgs::msg::Quaternion();
       marker.scale.x = 0.3;
       marker.scale.y = 0.3;
       marker.scale.z = 0.3;
-      if (color == TrafficLightColor::GREEN) {
-        marker.color = color_utils::makeColorMsg("green");
-      }
-      if (color == TrafficLightColor::YELLOW) {
-        marker.color = color_utils::makeColorMsg("yellow");
-      }
-      if (color == TrafficLightColor::RED) {
-        marker.color = color_utils::makeColorMsg("red");
-      }
+      marker.color = color_utils::makeColorMsg(boost::lexical_cast<std::string>(color));
       msg.markers.push_back(marker);
     }
   }
   marker_pub_->publish(msg);
 }
 
-void TrafficLightManager::update(double step_time)
+void TrafficLightManager::update(const double)
 {
-  bool color_changed = false;
-  for (const auto light : traffic_lights_) {
-    light.second->update(step_time);
-    if (light.second->colorChanged()) {
-      color_changed = true;
-    }
-  }
-  if (color_changed) {
+  publishTrafficLightStateArray();
+
+  if (std::any_of(
+        std::begin(traffic_lights_), std::end(traffic_lights_),
+        [](const auto & traffic_light) { return (*traffic_light.second).colorChanged(); })) {
     deleteAllMarkers();
   }
+
   drawMarkers();
-}
-
-TrafficLightArrow TrafficLightManager::getArrow(std::int64_t lanelet_id) const
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  return traffic_lights_.at(lanelet_id)->getArrow();
-}
-
-TrafficLightColor TrafficLightManager::getColor(std::int64_t lanelet_id) const
-{
-  if (traffic_lights_.count(lanelet_id) == 0) {
-    throw SimulationRuntimeError("lanelet id does not match");
-  }
-  return traffic_lights_.at(lanelet_id)->getColor();
 }
 }  // namespace traffic_simulator

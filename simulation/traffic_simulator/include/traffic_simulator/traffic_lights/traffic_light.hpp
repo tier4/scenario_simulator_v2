@@ -15,8 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <autoware_perception_msgs/msg/traffic_light_state.hpp>
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_phase.hpp>
@@ -32,33 +34,77 @@ class TrafficLight
   using Duration = double;
 
 public:
+  const std::int64_t id;
+
   explicit TrafficLight(
     std::int64_t id,
     const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions = {},
     const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions = {});
-  void setColorPhase(
-    const std::vector<std::pair<Duration, TrafficLightColor>> & phase, double time_offset = 0);
-  void setArrowPhase(
-    const std::vector<std::pair<Duration, TrafficLightArrow>> & phase, double time_offset = 0);
+
+  template <typename... Ts>
+  decltype(auto) setColorPhase(Ts &&... xs)
+  {
+    return color_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
+  }
+
+  template <typename... Ts>
+  decltype(auto) setArrowPhase(Ts &&... xs)
+  {
+    return arrow_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
+  }
+
   void setColor(TrafficLightColor color);
   void setArrow(TrafficLightArrow arrow);
-  double getColorPhaseLength() const;
-  double getArrowPhaseLength() const;
-  void update(double step_time);
+
+  double getColorPhaseDuration() const;
+  double getArrowPhaseDuration() const;
+
+  void update(const double step_time);
+
   TrafficLightArrow getArrow() const;
   TrafficLightColor getColor() const;
-  const std::int64_t id;
+
   const geometry_msgs::msg::Point getPosition(const TrafficLightColor & color);
-  void setPosition(const TrafficLightColor & color, const geometry_msgs::msg::Point & position);
   const geometry_msgs::msg::Point getPosition(const TrafficLightArrow & arrow);
-  bool colorChanged() const;
-  bool arrowChanged() const;
+
+  template <typename... Ts>
+  decltype(auto) setPosition(Ts &&... xs)
+  {
+    return color_positions_.emplace(std::forward<decltype(xs)>(xs)...);
+  }
+
+  auto colorChanged() const { return color_changed_; }
+  auto arrowChanged() const { return arrow_changed_; }
+
+  explicit operator autoware_perception_msgs::msg::TrafficLightState() const noexcept(false)
+  {
+    autoware_perception_msgs::msg::TrafficLightState traffic_light_state;
+    {
+      traffic_light_state.id = id;
+
+      try {
+        traffic_light_state.lamp_states.push_back(makeLampState(getArrow()));
+      } catch (const std::out_of_range &) {
+        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
+      }
+
+      try {
+        traffic_light_state.lamp_states.push_back(makeLampState(getColor()));
+      } catch (const std::out_of_range &) {
+        // NOTE: The traffic light is in Autoware-incompatible state; ignore it.
+      }
+    }
+
+    return traffic_light_state;
+  }
 
 private:
   std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions_;
   std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> arrow_positions_;
+
   TrafficLightPhase<TrafficLightColor> color_phase_;
   TrafficLightPhase<TrafficLightArrow> arrow_phase_;
+
   bool color_changed_;
   bool arrow_changed_;
 };
