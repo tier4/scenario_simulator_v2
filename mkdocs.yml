@@ -32,12 +32,19 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences
   - toc: { permalink: "#" }
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
 
 extra_css:
   - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
   - stylesheet/tierivcolor.css
+  - https://unpkg.com/mermaid@8.0.0/dist/mermaid.css
 extra_javascript:
   - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
+  - https://unpkg.com/mermaid/dist/mermaid.min.js
 
 nav:
   - Home: README.md

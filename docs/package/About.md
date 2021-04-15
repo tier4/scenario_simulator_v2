@@ -2,8 +2,11 @@
 ## Simulation Packages
 ---
 
-### Simulation API Package
-Provide simulator API for scenario testing.
+### Traffic Simulator Package
+Traffic simulator for scenario testing.  
+This package includes NPC logic, API etc...
+
+![traffic simulator](../../image/simple_demo.png "traffic simulator")
 
 - [Classes](/scenario_simulator_v2/package/traffic_simulator/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2/package/traffic_simulator/markdown/Namespaces)
@@ -15,6 +18,8 @@ Provide simulator API for scenario testing.
 ### Simple Sensor Simulator Package
 Reference implementation of the simulator integrated with this package.
 
+![simple sensor simulator](../../image/simple_sensor_simulator.png "simple sensor simulator")
+
 - [Classes](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Namespaces)
 - [Modules](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Modules)
@@ -22,11 +27,21 @@ Reference implementation of the simulator integrated with this package.
 - [Pages](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Pages)
 - [Examples](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Examples)
 
+### Simulation Interface Package
+Packages provide interface between traffic simulator and sensor simulator.
+
+- [Classes](/scenario_simulator_v2/package/simulation_interface/markdown/Classes)
+- [Namespaces](/scenario_simulator_v2/package/simulation_interface/markdown/Namespaces)
+- [Modules](/scenario_simulator_v2/package/simulation_interface/markdown/Modules)
+- [Files](/scenario_simulator_v2/package/simulation_interface/markdown/Files)
+- [Pages](/scenario_simulator_v2/package/simulation_interface/markdown/Pages)
+- [Examples](/scenario_simulator_v2/package/simulation_interface/markdown/Examples)
+
 ## OpenSCENARIO Packages
 ---
 
 ### OpenSCENARIO Interpreter Package
-Package for parsing .xosc file and send command to the simulator via Simulation API.
+Package for parsing .xosc file and send command to the simulator via Traffic simulator.
 
 - [Classes](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Namespaces)
