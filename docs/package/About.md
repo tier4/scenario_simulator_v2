@@ -22,6 +22,15 @@ Reference implementation of the simulator integrated with this package.
 - [Pages](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Pages)
 - [Examples](/scenario_simulator_v2/package/simple_sensor_simulator/markdown/Examples)
 
+### Simulation Interface Package
+Packages provide interface between traffic simulator and sensor simulator.
+- [Classes](/scenario_simulator_v2/package/simulation_interface/markdown/Classes)
+- [Namespaces](/scenario_simulator_v2/package/simulation_interface/markdown/Namespaces)
+- [Modules](/scenario_simulator_v2/package/simulation_interface/markdown/Modules)
+- [Files](/scenario_simulator_v2/package/simulation_interface/markdown/Files)
+- [Pages](/scenario_simulator_v2/package/simulation_interface/markdown/Pages)
+- [Examples](/scenario_simulator_v2/package/simulation_interface/markdown/Examples)
+
 ## OpenSCENARIO Packages
 ---
 
