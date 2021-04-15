@@ -2,7 +2,7 @@
 ## Simulation Packages
 ---
 
-### Simulation API Package
+### Traffic Simulator Package
 Provide simulator API for scenario testing.
 
 - [Classes](/scenario_simulator_v2/package/traffic_simulator/markdown/Classes)
@@ -26,7 +26,7 @@ Reference implementation of the simulator integrated with this package.
 ---
 
 ### OpenSCENARIO Interpreter Package
-Package for parsing .xosc file and send command to the simulator via Simulation API.
+Package for parsing .xosc file and send command to the simulator via Traffic simulator.
 
 - [Classes](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2/package/openscenario_interpreter/markdown/Namespaces)
