@@ -20,12 +20,6 @@
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
-#define DEBUG_VALUE(...) \
-  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
-
-#define DEBUG_LINE() \
-  std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
-
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -60,6 +54,8 @@ struct TrafficSignalController
    *  if the total times of all connected controllers are the same. If delay is
    *  set, reference is required. Unit: s; Range: [0..inf[.
    *
+   *  CURRENTLY, IGNORED!!!
+   *
    * ------------------------------------------------------------------------ */
   const Double delay;
 
@@ -67,6 +63,8 @@ struct TrafficSignalController
    *
    *  A reference (ID) to the connected controller in the road network. If
    *  reference is set, a delay is required.
+   *
+   *  CURRENTLY, IGNORED!!!
    *
    * ------------------------------------------------------------------------ */
   const String reference;

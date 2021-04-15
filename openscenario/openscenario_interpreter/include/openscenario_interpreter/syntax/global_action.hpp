@@ -41,7 +41,7 @@ struct GlobalAction : public Element
 {
   template <typename Node, typename... Ts>
   explicit GlobalAction(const Node & node, Ts &&... xs)
-  // clang-format on
+  // clang-format off
   : Element(
       choice(node,
         std::make_pair(   "EnvironmentAction", UNSUPPORTED()),
@@ -49,7 +49,7 @@ struct GlobalAction : public Element
         std::make_pair(     "ParameterAction", [&](auto && node) { return make<ParameterAction>(node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("InfrastructureAction", UNSUPPORTED()),
         std::make_pair(       "TrafficAction", UNSUPPORTED())))
-  // clang-format off
+  // clang-format on
   {
   }
 };
