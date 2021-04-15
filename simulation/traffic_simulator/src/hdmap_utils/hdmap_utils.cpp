@@ -471,6 +471,18 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
     p.z = point.z();
     ret.push_back(p);
   }
+  if (static_cast<int>(ret.size()) == 2) {
+    const auto p0 = ret[0];
+    const auto p2 = ret[1];
+    geometry_msgs::msg::Point p1;
+    p1.x = (p0.x + p2.x) * 0.5;
+    p1.y = (p0.y + p2.y) * 0.5;
+    p1.z = (p0.z + p2.z) * 0.5;
+    ret.clear();
+    ret.push_back(p0);
+    ret.push_back(p1);
+    ret.push_back(p2);
+  }
   return ret;
 }
 
