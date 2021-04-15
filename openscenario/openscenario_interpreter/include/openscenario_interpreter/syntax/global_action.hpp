@@ -45,9 +45,9 @@ struct GlobalAction : public Element
   : Element(
       choice(node,
         std::make_pair(   "EnvironmentAction", UNSUPPORTED()),
-        std::make_pair(        "EntityAction", [&](auto && node) { return make<   EntityAction>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(     "ParameterAction", [&](auto && node) { return make<ParameterAction>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("InfrastructureAction", UNSUPPORTED()),
+        std::make_pair(        "EntityAction", [&](auto && node) { return make<        EntityAction>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair(     "ParameterAction", [&](auto && node) { return make<     ParameterAction>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("InfrastructureAction", [&](auto && node) { return make<InfrastructureAction>(node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair(       "TrafficAction", UNSUPPORTED())))
   // clang-format on
   {

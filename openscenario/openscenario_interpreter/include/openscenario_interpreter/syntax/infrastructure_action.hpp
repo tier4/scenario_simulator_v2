@@ -24,18 +24,19 @@ inline namespace syntax
 {
 /* ---- InfrastructureAction ---------------------------------------------------
  *
- * <xsd:complexType name="InfrastructureAction">
- *   <xsd:all>
- *     <xsd:element name="TrafficSignalAction" type="TrafficSignalAction"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="InfrastructureAction">
+ *    <xsd:all>
+ *      <xsd:element name="TrafficSignalAction" type="TrafficSignalAction"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct InfrastructureAction : public Element
+struct InfrastructureAction : public ComplexType
 {
-  template <typename Node, typename Scope>
-  explicit InfrastructureAction(const Node & node, Scope & outer_scope)
-  : Element(readElement<TrafficSignalAction>("TrafficSignalAction", node, outer_scope))
+  template <typename... Ts>
+  explicit InfrastructureAction(Ts &&... xs)
+  : ComplexType(
+      readElement<TrafficSignalAction>("TrafficSignalAction", std::forward<decltype(xs)>(xs)...))
   {
   }
 };
