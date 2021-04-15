@@ -45,7 +45,7 @@ struct Route
 
   Scope inner_scope;
 
-  std::vector<Waypoint> waypoints;
+  std::list<Waypoint> waypoints;
 
   template <typename Node>
   explicit Route(const Node & node, Scope & outer_scope)

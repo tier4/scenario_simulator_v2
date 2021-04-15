@@ -58,7 +58,7 @@ struct Properties
    *  Note: currently ignored.
    *
    * ------------------------------------------------------------------------ */
-  std::vector<File> files;
+  std::list<File> files;
 
   Properties() = default;
 

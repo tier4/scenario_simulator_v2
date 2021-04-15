@@ -37,6 +37,8 @@ OpenSCENARIO:
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'red' }
                 - { trafficSignalId: '34802', state: 'left' }
+        - name: empty-controller (for debugging corner case)
+          Phase: []
   Entities:
     ScenarioObject:
       - name: ego

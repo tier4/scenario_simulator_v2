@@ -34,13 +34,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TriggeringEntities : public std::vector<EntityRef>
+struct TriggeringEntities : public std::list<EntityRef>
 {
   const TriggeringEntitiesRule quantify;
 
   template <typename Node, typename Scope>
   explicit TriggeringEntities(const Node & node, Scope & scope)
-  : std::vector<EntityRef>(readElements<EntityRef, 1>("EntityRef", node, scope)),
+  : std::list<EntityRef>(readElements<EntityRef, 1>("EntityRef", node, scope)),
     quantify(readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope))
   {
   }

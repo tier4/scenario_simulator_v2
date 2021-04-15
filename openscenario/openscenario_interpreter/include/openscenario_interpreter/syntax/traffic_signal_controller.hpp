@@ -74,9 +74,15 @@ struct TrafficSignalController
    *  Phases of a TrafficSignalController.
    *
    * ------------------------------------------------------------------------ */
-  std::vector<Phase> phases;
+  std::list<Phase> phases;
 
   CircularIterator<decltype(phases)::iterator> current_phase;
+
+  decltype(getCurrentTime()) current_phase_started_at;
+
+  TrafficSignalController() = delete;
+  TrafficSignalController(TrafficSignalController &&) = delete;
+  TrafficSignalController(const TrafficSignalController &) = delete;
 
   template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
@@ -84,15 +90,26 @@ struct TrafficSignalController
     delay(readAttribute<Double>("delay", node, outer_scope, Double())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
-    current_phase(std::begin(phases), std::end(phases))
+    current_phase(std::begin(phases), std::end(phases)),
+    current_phase_started_at(getCurrentTime())
   {
-  }
+    std::cout << "TrafficSignalController " << this << std::endl;
+    std::cout << "  phases-size: " << phases.size() << std::endl;
 
-  decltype(getCurrentTime()) current_phase_started_at = {};
+    if (not phases.empty()) {
+      std::cout << "  current-phase: " << (*current_phase).name << std::endl;
+    } else {
+      std::cout << "  current-phase: unavailable" << std::endl;
+    }
+  }
 
   auto theDurationExeeded() const
   {
-    return (*current_phase).duration < getCurrentTime() - current_phase_started_at;
+    if (not phases.empty()) {
+      return (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
+    } else {
+      return false;
+    }
   }
 
   auto evaluate()
@@ -100,10 +117,10 @@ struct TrafficSignalController
     if (theDurationExeeded()) {
       std::advance(current_phase, 1);
       current_phase_started_at = getCurrentTime();
-      (*current_phase).evaluate();
+      return (*current_phase).evaluate();
+    } else {
+      return unspecified;
     }
-
-    return unspecified;
   }
 };
 }  // namespace syntax
