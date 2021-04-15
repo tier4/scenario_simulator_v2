@@ -90,17 +90,9 @@ struct TrafficSignalController
     delay(readAttribute<Double>("delay", node, outer_scope, Double())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
-    current_phase(std::begin(phases), std::end(phases)),
-    current_phase_started_at(getCurrentTime())
+    current_phase(std::begin(phases), std::end(phases), std::end(phases)),
+    current_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min())
   {
-    std::cout << "TrafficSignalController " << this << std::endl;
-    std::cout << "  phases-size: " << phases.size() << std::endl;
-
-    if (not phases.empty()) {
-      std::cout << "  current-phase: " << (*current_phase).name << std::endl;
-    } else {
-      std::cout << "  current-phase: unavailable" << std::endl;
-    }
   }
 
   auto theDurationExeeded() const
@@ -115,9 +107,8 @@ struct TrafficSignalController
   auto evaluate()
   {
     if (theDurationExeeded()) {
-      std::advance(current_phase, 1);
       current_phase_started_at = getCurrentTime();
-      return (*current_phase).evaluate();
+      return (*++current_phase).evaluate();
     } else {
       return unspecified;
     }
