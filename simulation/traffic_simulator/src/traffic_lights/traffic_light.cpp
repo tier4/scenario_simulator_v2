@@ -24,69 +24,37 @@
 namespace traffic_simulator
 {
 TrafficLight::TrafficLight(
-  std::int64_t id,
+  const std::int64_t id,
   const std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> & color_positions,
   const std::unordered_map<TrafficLightArrow, geometry_msgs::msg::Point> & arrow_positions)
-: id(id), color_positions_(color_positions), arrow_positions_(arrow_positions)
+: id(id),
+  color_positions_(color_positions),
+  arrow_positions_(arrow_positions),
+  color_changed_(true),
+  arrow_changed_(true)
 {
-  color_changed_ = true;
   color_phase_.setState(TrafficLightColor::NONE);
-  arrow_changed_ = true;
   arrow_phase_.setState(TrafficLightArrow::NONE);
 }
 
-void TrafficLight::setPosition(
-  const TrafficLightColor & color, const geometry_msgs::msg::Point & position)
-{
-  color_positions_.insert({color, position});
-}
-
-void TrafficLight::setColorPhase(
-  const std::vector<std::pair<double, TrafficLightColor>> & phase, double time_offset)
-{
-  color_phase_.setPhase(phase, time_offset);
-}
-
-void TrafficLight::setArrowPhase(
-  const std::vector<std::pair<double, TrafficLightArrow>> & phase, double time_offset)
-{
-  arrow_phase_.setPhase(phase, time_offset);
-}
-
 void TrafficLight::setColor(TrafficLightColor color) { color_phase_.setState(color); }
-
 void TrafficLight::setArrow(TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
 
-double TrafficLight::getColorPhaseLength() const { return color_phase_.getPhaseLength(); }
-
-double TrafficLight::getArrowPhaseLength() const { return arrow_phase_.getPhaseLength(); }
+double TrafficLight::getColorPhaseDuration() const { return color_phase_.getPhaseDuration(); }
+double TrafficLight::getArrowPhaseDuration() const { return arrow_phase_.getPhaseDuration(); }
 
 TrafficLightArrow TrafficLight::getArrow() const { return arrow_phase_.getState(); }
-
 TrafficLightColor TrafficLight::getColor() const { return color_phase_.getState(); }
 
-bool TrafficLight::colorChanged() const { return color_changed_; }
-
-bool TrafficLight::arrowChanged() const { return arrow_changed_; }
-
-void TrafficLight::update(double step_time)
+void TrafficLight::update(const double step_time)
 {
   const auto previous_arrow = getArrow();
   arrow_phase_.update(step_time);
-  const auto arrow = getArrow();
-  if (previous_arrow == arrow) {
-    arrow_changed_ = false;
-  } else {
-    arrow_changed_ = true;
-  }
+  arrow_changed_ = (previous_arrow != getArrow());
+
   const auto previous_color = getColor();
   color_phase_.update(step_time);
-  const auto color = getColor();
-  if (previous_color == color) {
-    color_changed_ = false;
-  } else {
-    color_changed_ = true;
-  }
+  color_changed_ = (previous_color != getColor());
 }
 
 const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor & color)
