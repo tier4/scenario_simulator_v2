@@ -40,7 +40,7 @@ public:
   explicit CatmullRomSpline(const openscenario_msgs::msg::CatmullRomSpline & spline);
   explicit CatmullRomSpline(
     const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves);
-  explicit CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points);
+  explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   double getLength() const { return total_length_; }
   double getMaximum2DCurventure() const;
   const geometry_msgs::msg::Point getPoint(double s) const;
@@ -81,7 +81,7 @@ private:
   std::vector<double> length_list_;
   std::vector<double> maximum_2d_curvatures_;
   double total_length_;
-  std::vector<geometry_msgs::msg::Point> control_points_;
+  const std::vector<geometry_msgs::msg::Point> control_points;
 };
 }  // namespace math
 }  // namespace traffic_simulator

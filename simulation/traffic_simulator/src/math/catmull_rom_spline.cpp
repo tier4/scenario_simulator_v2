@@ -132,39 +132,27 @@ CatmullRomSpline::CatmullRomSpline(const openscenario_msgs::msg::CatmullRomSplin
   }
 }
 
-CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> control_points)
-: control_points_(control_points)
+CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
+: control_points(control_points)
 {
-  size_t n = control_points_.size() - 1;
-  if (control_points_.size() <= 1) {
+  size_t n = control_points.size() - 1;
+  if (control_points.size() <= 2) {
     throw SplineInterpolationError("numbers of control points are not enough.");
-  }
-  if (control_points_.size() == 2) {
-    const auto p0 = control_points_[0];
-    const auto p1 = control_points_[1];
-    geometry_msgs::msg::Point p2;
-    p2.x = (p0.x + p1.x) * 0.5;
-    p2.y = (p0.y + p1.y) * 0.5;
-    p2.z = (p0.z + p1.z) * 0.5;
-    control_points_.clear();
-    control_points_.emplace_back(p0);
-    control_points_.emplace_back(p2);
-    control_points_.emplace_back(p1);
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {
       double ax = 0;
-      double bx = control_points_[0].x - 2 * control_points_[1].x + control_points_[2].x;
-      double cx = -3 * control_points_[0].x + 4 * control_points_[1].x - control_points_[2].x;
-      double dx = 2 * control_points_[0].x;
+      double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
+      double cx = -3 * control_points[0].x + 4 * control_points[1].x - control_points[2].x;
+      double dx = 2 * control_points[0].x;
       double ay = 0;
-      double by = control_points_[0].y - 2 * control_points_[1].y + control_points_[2].y;
-      double cy = -3 * control_points_[0].y + 4 * control_points_[1].y - control_points_[2].y;
-      double dy = 2 * control_points_[0].y;
+      double by = control_points[0].y - 2 * control_points[1].y + control_points[2].y;
+      double cy = -3 * control_points[0].y + 4 * control_points[1].y - control_points[2].y;
+      double dy = 2 * control_points[0].y;
       double az = 0;
-      double bz = control_points_[0].z - 2 * control_points_[1].z + control_points_[2].z;
-      double cz = -3 * control_points_[0].z + 4 * control_points_[1].z - control_points_[2].z;
-      double dz = 2 * control_points_[0].z;
+      double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
+      double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
+      double dz = 2 * control_points[0].z;
       ax = ax * 0.5;
       bx = bx * 0.5;
       cx = cx * 0.5;
@@ -180,17 +168,17 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
       curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
     } else if (i == (n - 1)) {
       double ax = 0;
-      double bx = control_points_[i - 1].x - 2 * control_points_[i].x + control_points_[i + 1].x;
-      double cx = -1 * control_points_[i - 1].x + control_points_[i + 1].x;
-      double dx = 2 * control_points_[i].x;
+      double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
+      double cx = -1 * control_points[i - 1].x + control_points[i + 1].x;
+      double dx = 2 * control_points[i].x;
       double ay = 0;
-      double by = control_points_[i - 1].y - 2 * control_points_[i].y + control_points_[i + 1].y;
-      double cy = -1 * control_points_[i - 1].y + control_points_[i + 1].y;
-      double dy = 2 * control_points_[i].y;
+      double by = control_points[i - 1].y - 2 * control_points[i].y + control_points[i + 1].y;
+      double cy = -1 * control_points[i - 1].y + control_points[i + 1].y;
+      double dy = 2 * control_points[i].y;
       double az = 0;
-      double bz = control_points_[i - 1].z - 2 * control_points_[i].z + control_points_[i + 1].z;
-      double cz = -1 * control_points_[i - 1].z + control_points_[i + 1].z;
-      double dz = 2 * control_points_[i].z;
+      double bz = control_points[i - 1].z - 2 * control_points[i].z + control_points[i + 1].z;
+      double cz = -1 * control_points[i - 1].z + control_points[i + 1].z;
+      double dz = 2 * control_points[i].z;
       ax = ax * 0.5;
       bx = bx * 0.5;
       cx = cx * 0.5;
@@ -205,24 +193,24 @@ CatmullRomSpline::CatmullRomSpline(std::vector<geometry_msgs::msg::Point> contro
       dz = dz * 0.5;
       curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
     } else {
-      double ax = -1 * control_points_[i - 1].x + 3 * control_points_[i].x -
-                  3 * control_points_[i + 1].x + control_points_[i + 2].x;
-      double bx = 2 * control_points_[i - 1].x - 5 * control_points_[i].x +
-                  4 * control_points_[i + 1].x - control_points_[i + 2].x;
-      double cx = -control_points_[i - 1].x + control_points_[i + 1].x;
-      double dx = 2 * control_points_[i].x;
-      double ay = -1 * control_points_[i - 1].y + 3 * control_points_[i].y -
-                  3 * control_points_[i + 1].y + control_points_[i + 2].y;
-      double by = 2 * control_points_[i - 1].y - 5 * control_points_[i].y +
-                  4 * control_points_[i + 1].y - control_points_[i + 2].y;
-      double cy = -control_points_[i - 1].y + control_points_[i + 1].y;
-      double dy = 2 * control_points_[i].y;
-      double az = -1 * control_points_[i - 1].z + 3 * control_points_[i].z -
-                  3 * control_points_[i + 1].z + control_points_[i + 2].z;
-      double bz = 2 * control_points_[i - 1].z - 5 * control_points_[i].z +
-                  4 * control_points_[i + 1].z - control_points_[i + 2].z;
-      double cz = -control_points_[i - 1].z + control_points_[i + 1].z;
-      double dz = 2 * control_points_[i].z;
+      double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
+                  3 * control_points[i + 1].x + control_points[i + 2].x;
+      double bx = 2 * control_points[i - 1].x - 5 * control_points[i].x +
+                  4 * control_points[i + 1].x - control_points[i + 2].x;
+      double cx = -control_points[i - 1].x + control_points[i + 1].x;
+      double dx = 2 * control_points[i].x;
+      double ay = -1 * control_points[i - 1].y + 3 * control_points[i].y -
+                  3 * control_points[i + 1].y + control_points[i + 2].y;
+      double by = 2 * control_points[i - 1].y - 5 * control_points[i].y +
+                  4 * control_points[i + 1].y - control_points[i + 2].y;
+      double cy = -control_points[i - 1].y + control_points[i + 1].y;
+      double dy = 2 * control_points[i].y;
+      double az = -1 * control_points[i - 1].z + 3 * control_points[i].z -
+                  3 * control_points[i + 1].z + control_points[i + 2].z;
+      double bz = 2 * control_points[i - 1].z - 5 * control_points[i].z +
+                  4 * control_points[i + 1].z - control_points[i + 2].z;
+      double cz = -control_points[i - 1].z + control_points[i + 1].z;
+      double dz = 2 * control_points[i].z;
       ax = ax * 0.5;
       bx = bx * 0.5;
       cx = cx * 0.5;
@@ -435,9 +423,12 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
 
 bool CatmullRomSpline::checkConnection() const
 {
+  if (control_points.size() != (curves_.size() + 1)) {
+    throw SplineInterpolationError("number of control points and curves does not match.");
+  }
   for (size_t i = 0; i < curves_.size(); i++) {
-    const auto control_point0 = control_points_[i];
-    const auto control_point1 = control_points_[i + 1];
+    const auto control_point0 = control_points[i];
+    const auto control_point1 = control_points[i + 1];
     const auto p0 = curves_[i].getPoint(0, false);
     const auto p1 = curves_[i].getPoint(1, false);
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
