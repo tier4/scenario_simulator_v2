@@ -4,12 +4,10 @@ If you have some question about this package, please post issue or contact us!
 
 ## Maintainers
 
-### Masaya Kataoka
-[:fa-github: hakuturu583](https://github.com/hakuturu583)  
-Software Engineer @ [Tier IV, Inc.](https://tier4.jp/en/)  
-[:fa-envelope: masaya.kataoka@tier4.jp](mailto:masaya.kataoka@tier4.jp)  
+<a href="https://github.com/hakuturu583">
+  <img align="center" src="https://github-readme-stats.vercel.app/api?username=hakuturu583&show_icons=true&title_color=22A3CD&icon_color=06579E" />
+</a>  
 
-### Tatsuya Yamasaki
-[:fa-github: yamacir-kit](https://github.com/yamacir-kit)  
-Software Engineer @ [Tier IV, Inc.](https://tier4.jp/en/)  
-[:fa-envelope: tatsuya.yamasaki@tier4.jp](mailto:tatsuya.yamasaki@tier4.jp)  
+<a href="https://github.com/yamacir-kit">
+  <img align="center" src="https://github-readme-stats.vercel.app/api?username=yamacir-kit&show_icons=true&title_color=22A3CD&icon_color=06579E" />
+</a>
