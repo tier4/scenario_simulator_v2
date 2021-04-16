@@ -1,0 +1,36 @@
+name: Push Docker Image
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: 0 0 * * *
+  pull_request:
+  release:
+    types: [published]
+
+jobs:
+  job1:
+    name: Build Docker Image
+    runs-on: ubuntu-20.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v2-beta
+      - name: Build and Push
+        uses: docker/build-push-action@v1
+        env:
+          DOCKER_BUILDKIT: 1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: tier4/scenario_simulator_v2
+          tags: latest
+          cache_froms: tier4/scenario_simulator_v2:latest
+          build_args: BUILDKIT_INLINE_CACHE=1
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v2
+        if: failure()
+        with:
+          status: ${{ job.status }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
