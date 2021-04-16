@@ -1,4 +1,4 @@
-FROM tiryoh/ros2-desktop-vnc:foxy
+FROM ros:foxy
 SHELL ["/bin/bash", "-c"]
 
 RUN sudo apt-get update && sudo apt-get -y install python3-pip python3-rospkg python3-rosdep
