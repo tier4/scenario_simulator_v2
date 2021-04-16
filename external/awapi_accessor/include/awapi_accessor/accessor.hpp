@@ -464,6 +464,28 @@ public:
     return setInitialTwist(twist);
   }
 
+  /* ---- LocalizationTwist ----------------------------------------------------
+   *
+   *  Topic: /localization/twist
+   *
+   * ------------------------------------------------------------------------ */
+  using LocalizationTwist = CurrentTwist;
+
+  DEFINE_PUBLISHER(LocalizationTwist);
+
+  decltype(auto) setLocalizationTwist(
+    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
+  {
+    autoware_api::Accessor::InitialTwist localization_twist;
+    {
+      localization_twist.header.stamp = get_clock()->now();
+      localization_twist.header.frame_id = "map";
+      localization_twist.twist = twist;
+    }
+
+    return setLocalizationTwist(localization_twist);
+  }
+
   /** ---- Trajectory ----------------------------------------------------------
    *
    *  Topic: /planning/scenario_planning/trajectory
@@ -586,6 +608,7 @@ public:
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(InitialTwist, "/initialtwist"),
+    INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),

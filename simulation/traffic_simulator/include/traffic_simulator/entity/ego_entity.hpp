@@ -330,20 +330,23 @@ public:
 
     const auto current_pose = getStatus().pose;
 
-    waitForAutowareStateToBeWaitingForRoute([&]()  // NOTE: This is assertion.
-                                            { return updateAutoware(current_pose); });
+    // NOTE: This is assertion.
+    waitForAutowareStateToBeWaitingForRoute([&]() { return updateAutoware(current_pose); });
 
-    waitForAutowareStateToBePlanning([&]() {
-      std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
+    waitForAutowareStateToBePlanning(
+      [&]() {
+        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
 
-      for (const auto & constraint : constraints) {
-        std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
-      }
+        for (const auto & constraint : constraints) {
+          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
+        }
 
-      return updateAutoware(current_pose);
-    });
+        return updateAutoware(current_pose);
+      },
+      std::chrono::seconds(5));
 
-    waitForAutowareStateToBeWaitingForEngage([&]() { return updateAutoware(current_pose); });
+    waitForAutowareStateToBeWaitingForEngage(
+      [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
 
     waitForAutowareStateToBeDriving([&]() {
       std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
@@ -379,33 +382,35 @@ public:
 
 private:
 // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                        \
-  template <typename Thunk>                                                                \
-  void waitForAutowareStateToBe##STATE(Thunk thunk, std::size_t count_max = 300) const     \
-  {                                                                                        \
-    std::size_t count = 0;                                                                 \
-    for (rclcpp::WallRate rate{std::chrono::milliseconds(100)};                            \
-         !std::atomic_load(&autowares.at(name))->is##STATE(); rate.sleep()) {              \
-      if (count++ < count_max) {                                                           \
-        thunk();                                                                           \
-      } else {                                                                             \
-        const auto current_state =                                                         \
-          std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;       \
-        std::stringstream ss{};                                                            \
-        ss << "The simulator waited " << (count / 10)                                      \
-           << " seconds, expecting the Autoware state to transitioning to " << #STATE      \
-           << ", but there was no change. The current Autoware state is "                  \
-           << (current_state.empty() ? "NOT PUBLISHED YET" : current_state)                \
-           << ". This error is most likely due to the Autoware state transition "          \
-           << "conditions changing with the update. Please report this error to "          \
-           << "the developer. This error message was written by @yamacir-kit.";            \
-        using AutowareError = std::runtime_error;                                          \
-        throw AutowareError(ss.str());                                                     \
-      }                                                                                    \
-    }                                                                                      \
-    RCLCPP_INFO_STREAM(                                                                    \
-      std::atomic_load(&autowares.at(name))->get_logger(), "Autoware is " #STATE " now."); \
-  }                                                                                        \
+#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                             \
+  template <typename Thunk, typename Seconds = std::chrono::seconds>                            \
+  void waitForAutowareStateToBe##STATE(Thunk thunk, Seconds interval = std::chrono::seconds(1)) \
+    const                                                                                       \
+  {                                                                                             \
+    static const auto duration_max = std::chrono::seconds(30);                                  \
+    Seconds duration{0};                                                                        \
+    for (rclcpp::WallRate rate{interval}; !std::atomic_load(&autowares.at(name))->is##STATE();  \
+         rate.sleep()) {                                                                        \
+      if ((duration += interval) < duration_max) {                                              \
+        thunk();                                                                                \
+      } else {                                                                                  \
+        const auto current_state =                                                              \
+          std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;            \
+        std::stringstream ss{};                                                                 \
+        ss << "The simulator waited " << duration_max.count()                                   \
+           << " seconds, expecting the Autoware state to transitioning to " << #STATE           \
+           << ", but there was no change. The current Autoware state is "                       \
+           << (current_state.empty() ? "NOT PUBLISHED YET" : current_state)                     \
+           << ". This error is most likely due to the Autoware state transition "               \
+           << "conditions changing with the update. Please report this error to "               \
+           << "the developer. This error message was written by @yamacir-kit.";                 \
+        using AutowareError = std::runtime_error;                                               \
+        throw AutowareError(ss.str());                                                          \
+      }                                                                                         \
+    }                                                                                           \
+    RCLCPP_INFO_STREAM(                                                                         \
+      std::atomic_load(&autowares.at(name))->get_logger(), "Autoware is " #STATE " now.");      \
+  }                                                                                             \
   static_assert(true, "")
 
   DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(InitializingVehicle);
@@ -442,6 +447,7 @@ private:
     std::atomic_load(&autowares.at(name))->setCurrentTwist(current_twist);
     std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
     std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
+    std::atomic_load(&autowares.at(name))->setLocalizationTwist(current_twist);
     std::atomic_load(&autowares.at(name))->setTransform(current_pose);
     std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
   }
