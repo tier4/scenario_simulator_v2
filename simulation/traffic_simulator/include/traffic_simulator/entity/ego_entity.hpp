@@ -32,6 +32,7 @@
 #include <tf2/utils.h>
 
 #include <algorithm>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <autoware_auto_msgs/msg/complex32.hpp>
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
@@ -200,7 +201,12 @@ public:
           autoware_launch_package,
           autoware_launch_file,
           std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
-          std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string()};
+          std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string(),
+          "vehicle_model:=ymc_golfcart_proto2",
+          "sensor_model:=aip_x1",
+          "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
+            "/planning_simulator_v2.rviz",
+          "scenario_simulation:=true"};
 
         // for (const auto & each : argv) {
         //   std::cout << each << (&each != &argv.back() ? ' ' : '\n');

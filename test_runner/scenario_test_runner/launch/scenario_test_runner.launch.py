@@ -25,9 +25,9 @@ from pathlib import Path
 
 def generate_launch_description():
     autoware_launch_file = LaunchConfiguration(
-        'autoware-launch-file', default='autoware.launch.xml')
+        'autoware-launch-file', default='planning_simulator.launch.xml')
     autoware_launch_package = LaunchConfiguration(
-        'autoware-launch-package', default='scenario_test_runner')
+        'autoware-launch-package', default='autoware_launch')
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
     global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=180)
