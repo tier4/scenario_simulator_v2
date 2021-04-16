@@ -26,3 +26,11 @@ jobs:
           tags: latest
           cache_froms: tier4/scenario_simulator_v2:latest
           build_args: BUILDKIT_INLINE_CACHE=1
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v2
+        if: failure()
+        with:
+          status: ${{ job.status }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
