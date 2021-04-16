@@ -60,6 +60,18 @@ jobs:
             mkdir -p ./markdown/Classes
             doxybook2 --input ./build/ --output ./markdown -c config.json
 
+        # generating simulation_interface package documentation
+        - name: Generate doxygen for simulation_interface package
+          run: |
+            cd docs/package/simulation_interface
+            doxygen Doxyfile
+        - name: Generate markdown for simulation_interface package
+          run: |
+            export PATH="$PATH:~/doxybook2/bin"
+            cd docs/package/simulation_interface
+            mkdir -p ./markdown/Classes
+            doxybook2 --input ./build/ --output ./markdown -c config.json
+
         # generating openscenario_interpreter package documentation
         - name: Generate doxygen for openscenario_interpreter package
           run: |
