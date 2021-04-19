@@ -31,7 +31,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Trigger : public std::vector<ConditionGroup>
+struct Trigger : public std::list<ConditionGroup>
 {
   template <typename Node, typename Scope>
   explicit Trigger(const Node & node, Scope & scope)

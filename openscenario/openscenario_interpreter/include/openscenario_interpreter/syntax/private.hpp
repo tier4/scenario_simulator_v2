@@ -36,7 +36,7 @@ struct Private
 {
   Scope inner_scope;
 
-  std::vector<PrivateAction> private_actions;
+  std::list<PrivateAction> private_actions;
 
   template <typename Node>
   explicit Private(const Node & node, Scope & outer_scope) : inner_scope(outer_scope)

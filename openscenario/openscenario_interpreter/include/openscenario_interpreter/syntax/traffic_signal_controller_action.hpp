@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_ACTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_ACTION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
@@ -25,37 +25,38 @@ inline namespace syntax
 {
 /* ---- NOTE -------------------------------------------------------------------
  *
- *  Controls the state of a traffic signal.
+ *  Sets a specific phase of a traffic signal controller, typically affecting a
+ *  collection of signals.
  *
- *  <xsd:complexType name="TrafficSignalStateAction">
- *    <xsd:attribute name="name" type="String" use="required"/>
- *    <xsd:attribute name="state" type="String" use="required"/>
+ *  <xsd:complexType name="TrafficSignalControllerAction">
+ *    <xsd:attribute name="trafficSignalControllerRef" type="String" use="required"/>
+ *    <xsd:attribute name="phase" type="String" use="required"/>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalStateAction : private Scope
+struct TrafficSignalControllerAction : private Scope
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
-   *  ID of a signal in a road network. The signal ID must be listed in the
-   *  TrafficSignal list of the RoadNetwork.
+   *  ID of the signal controller in a road network.
    *
    * ------------------------------------------------------------------------ */
-  const String name;
+  const String traffic_signal_controller_ref;
 
   /* ---- NOTE -----------------------------------------------------------------
    *
-   *  Targeted state of the signal. The available states are listed in the
-   *  TrafficSignal list of the RoadNetwork.
+   *  Targeted phase of the signal controller. The available phases are defined
+   *  in type RoadNetwork under the property trafficSignalControllers.
    *
    * ------------------------------------------------------------------------ */
-  const String state;
+  const String phase;
 
   template <typename Node>
-  explicit TrafficSignalStateAction(const Node & node, Scope & current_scope)
+  explicit TrafficSignalControllerAction(const Node & node, const Scope & current_scope)
   : Scope(current_scope),
-    name(readAttribute<String>("name", node, static_cast<Scope &>(*this))),
-    state(readAttribute<String>("state", node, static_cast<Scope &>(*this)))
+    traffic_signal_controller_ref(
+      readAttribute<String>("trafficSignalControllerRef", node, static_cast<Scope &>(*this))),
+    phase(readAttribute<String>("phase", node, static_cast<Scope &>(*this)))
   {
   }
 
@@ -66,4 +67,4 @@ struct TrafficSignalStateAction : private Scope
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_ACTION_HPP_
