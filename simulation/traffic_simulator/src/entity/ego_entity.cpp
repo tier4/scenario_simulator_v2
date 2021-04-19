@@ -75,7 +75,7 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  if (current_time > 0) {
+  if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
     Eigen::VectorXd input(2);

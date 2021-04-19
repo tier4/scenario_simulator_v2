@@ -574,7 +574,8 @@ openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(const std::st
       "error occurs while getting wayoints : " + name);
   }
   if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<VehicleEntity &>(it->second).getWaypoints();
+    const auto waypoints = boost::any_cast<VehicleEntity &>(it->second).getWaypoints();
+    return waypoints;
   }
   if (it->second.type() == typeid(EgoEntity)) {
     return boost::any_cast<EgoEntity &>(it->second).getWaypoints();
@@ -683,6 +684,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
+    std::cout << "current_time : " << current_time_ << std::endl;
   }
   if (getNumberOfEgo() >= 2) {
     throw SimulationRuntimeError("multi ego simulation does not support yet.");

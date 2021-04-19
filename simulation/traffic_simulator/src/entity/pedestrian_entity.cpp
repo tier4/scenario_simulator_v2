@@ -85,7 +85,7 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
   if (!status_) {
     return;
   }
-  if (current_time > 0) {
+  if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
   } else {
     tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
