@@ -40,8 +40,8 @@ public:
 
   using difference_type = typename std::iterator_traits<ForwardIterator>::difference_type;
 
-  explicit CircularIterator(ForwardIterator begin, ForwardIterator end)
-  : begin(begin), current(begin), end(end)
+  explicit CircularIterator(ForwardIterator begin, ForwardIterator end, ForwardIterator current)
+  : begin(begin), current(current), end(end)
   {
   }
 

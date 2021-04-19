@@ -25,15 +25,20 @@ OpenSCENARIO:
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'green' }
                 - { trafficSignalId: '34802', state: 'noArrow' }
-            - name: phase-1
+            - name: phase-2
               duration: 10
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'yellow' }
-            - name: phase-1
+            - name: dummy-phase (for debugging corner case)
+              duration: 0
+              TrafficSignalState: []
+            - name: phase-3
               duration: 60
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'red' }
                 - { trafficSignalId: '34802', state: 'left' }
+        - name: empty-controller (for debugging corner case)
+          Phase: []
   Entities:
     ScenarioObject:
       - name: ego
@@ -81,6 +86,53 @@ OpenSCENARIO:
     Story:
       - name: ''
         Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 10
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalControllerAction:
+                                    trafficSignalControllerRef: controller-1
+                                    phase: phase-3
+                          - name: ''
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalStateAction:
+                                    name: '34802'
+                                    state: red
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1

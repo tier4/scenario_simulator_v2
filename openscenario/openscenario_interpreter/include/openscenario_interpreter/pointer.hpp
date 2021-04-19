@@ -112,17 +112,15 @@ public:
   }
 
   template <typename U>
-  decltype(auto) as() const
+  U & as() const
   {
-    const auto bound{std::dynamic_pointer_cast<U>(*this)};
-
-    if (bound) {
+    if (const auto bound = std::dynamic_pointer_cast<U>(*this)) {
       return *bound;
     } else {
-      std::stringstream ss{};
-      ss << "type-error: can't treat " << binding().type().name() << " as type "
-         << typeid(U).name();
-      throw std::runtime_error{ss.str()};
+      std::stringstream what;
+      what << "type-error: can't treat " << binding().type().name() << " as type "
+           << typeid(U).name();
+      throw std::runtime_error(what.str());
     }
   }
 

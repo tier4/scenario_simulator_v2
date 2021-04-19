@@ -33,7 +33,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignals
 {
-  std::vector<TrafficSignalController> traffic_signal_controllers;
+  std::list<TrafficSignalController> traffic_signal_controllers;
 
   TrafficSignals() = default;
 

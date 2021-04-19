@@ -102,7 +102,7 @@ auto readElement(const std::string & name, const XML & parent, Ts &&... xs)
 template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
 auto readElements(const std::string & name, const XML & node, Ts &&... xs)
 {
-  std::vector<T> elements;
+  std::list<T> elements;
 
   callWithElements(node, name, MinOccurs, MaxOccurs, [&](auto && x) {
     elements.emplace_back(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...);

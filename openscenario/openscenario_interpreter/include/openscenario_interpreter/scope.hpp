@@ -34,7 +34,7 @@ struct Scope
 
   using Actor = EntityRef;
 
-  using Actors = std::vector<Actor>;
+  using Actors = std::list<Actor>;
 
   Actors actors;
 
