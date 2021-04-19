@@ -23,7 +23,6 @@
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
-#include <boost/any.hpp>
 #include <boost/optional.hpp>
 #include <map>
 #include <memory>
@@ -271,7 +270,7 @@ public:
 
   bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);
 
-  bool entityStatusSetted(const std::string & name) const;
+  bool entityStatusSet(const std::string & name) const;
 
   void setTargetSpeed(const std::string & name, const double target_speed, const bool continuous);
 

@@ -30,6 +30,7 @@ PedestrianEntity::PedestrianEntity(
   openscenario_msgs::msg::PedestrianParameters params)
 : EntityBase(params.name, name, initial_state), parameters(params)
 {
+  entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
   tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
 }
@@ -38,6 +39,7 @@ PedestrianEntity::PedestrianEntity(
   std::string name, openscenario_msgs::msg::PedestrianParameters params)
 : EntityBase(params.name, name), parameters(params)
 {
+  entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
   tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
 }
@@ -57,7 +59,8 @@ void PedestrianEntity::requestAssignRoute(
 
 void PedestrianEntity::requestWalkStraight() { tree_ptr_->setRequest("walk_straight"); }
 
-void PedestrianEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
+void PedestrianEntity::requestAcquirePosition(
+  const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
   tree_ptr_->setRequest("follow_lane");
   if (!status_) {

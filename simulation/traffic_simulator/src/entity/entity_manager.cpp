@@ -41,7 +41,7 @@ bool EntityManager::isStopping(const std::string & name) const
 void EntityManager::setDriverModel(
   const std::string & name, const openscenario_msgs::msg::DriverModel & model)
 {
-  entities_[name]->setDriverModel(model);
+  entities_.at(name)->setDriverModel(model);
 }
 
 const geometry_msgs::msg::Pose EntityManager::toMapPose(
@@ -58,16 +58,8 @@ const std::shared_ptr<hdmap_utils::HdMapUtils> EntityManager::getHdmapUtils()
 void EntityManager::setVerbose(bool verbose)
 {
   verbose_ = verbose;
-  for (auto & each : entities_) {
-    if (each.second.type() == typeid(VehicleEntity)) {
-      boost::any_cast<VehicleEntity &>(each.second).setVerbose(verbose);
-    }
-    if (each.second.type() == typeid(EgoEntity)) {
-      boost::any_cast<EgoEntity &>(each.second).setVerbose(verbose);
-    }
-    if (each.second.type() == typeid(PedestrianEntity)) {
-      boost::any_cast<PedestrianEntity &>(each.second).setVerbose(verbose);
-    }
+  for (auto & entity : entities_) {
+    entity.second->setVerbose(verbose);
   }
 }
 
@@ -78,9 +70,13 @@ bool EntityManager::isEgo(const std::string & name) const
 
 std::size_t EntityManager::getNumberOfEgo() const
 {
-  return std::count_if(std::begin(entities_), std::end(entities_), [](const auto & each) {
-    return each.second.type() == typeid(EgoEntity);
-  });
+  std::size_t count = 0;
+  for (auto & entity : entities_) {
+    if (isEgo(entity.first)) {
+      ++count;
+    }
+  }
+  return count;
 }
 
 boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPose(
@@ -152,63 +148,23 @@ boost::optional<double> EntityManager::getDistanceToStopLine(
 void EntityManager::requestAssignRoute(
   const std::string & name, const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).requestAssignRoute(waypoints);
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second).requestAssignRoute(waypoints);
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(it->second).requestAssignRoute(waypoints);
-  }
+  entities_.at(name)->requestAssignRoute(waypoints);
 }
 
 void EntityManager::requestAcquirePosition(
   const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).requestAcquirePosition(lanelet_pose);
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(it->second)
-      .requestAcquirePosition((*hdmap_utils_ptr_).toMapPose(lanelet_pose));
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(it->second).requestAcquirePosition(lanelet_pose);
-  }
+  entities_.at(name)->requestAcquirePosition(lanelet_pose);
 }
 
 void EntityManager::requestLaneChange(const std::string & name, const std::int64_t to_lanelet_id)
 {
-  auto & entity = reference(name);
-
-  if (entity.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(entity).requestLaneChange(to_lanelet_id);
-  } else if (entity.type() == typeid(EgoEntity)) {
-    std::stringstream what{};
-    what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. ";
-    what << "In general, such a request is an error, ";
-    what << "since Ego cars make autonomous decisions about everything but their destination.";
-    throw std::runtime_error(what.str());
-  }
+  entities_.at(name)->requestLaneChange(to_lanelet_id);
 }
 
 void EntityManager::requestWalkStraight(const std::string & name)
 {
-  auto & entity = reference(name);
-  if (entity.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(entity).requestWalkStraight();
-  } else {
-    throw std::runtime_error("target of requestWalkStaraight function should be pedestrian.");
-  }
+  entities_.at(name)->requestWalkStraight();
 }
 
 void EntityManager::requestLaneChange(const std::string & name, const Direction & direction)
@@ -253,7 +209,7 @@ boost::optional<double> EntityManager::getBoundingBoxDistance(
 boost::optional<double> EntityManager::getLongitudinalDistance(
   const std::string & from, const std::string & to, const double max_distance)
 {
-  if (!entityStatusSetted(from) || !entityStatusSetted(to)) {
+  if (!entityStatusSet(from) || !entityStatusSet(to)) {
     return boost::none;
   } else {
     const auto from_status = getEntityStatus(from);
@@ -375,23 +331,13 @@ geometry_msgs::msg::Pose EntityManager::getRelativePose(
 const boost::optional<openscenario_msgs::msg::VehicleParameters>
 EntityManager::getVehicleParameters(const std::string & name) const
 {
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return boost::none;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).parameters;
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).parameters;
-  }
-  return boost::none;
+  return entities_.at(name)->getVehicleParameters();
 }
 
 bool EntityManager::isInLanelet(
   const std::string & name, const std::int64_t lanelet_id, const double tolerance)
 {
-  if (!entityStatusSetted(name)) {
+  if (!entityStatusSet(name)) {
     return false;
   }
   double l = hdmap_utils_ptr_->getLaneletLength(lanelet_id);
@@ -436,21 +382,7 @@ bool EntityManager::setEntityStatus(
   const std::string & name, openscenario_msgs::msg::EntityStatus status)
 {
   status.name = name;  // XXX UGLY CODE
-
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return false;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<VehicleEntity &>(it->second).setStatus(status);
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<EgoEntity &>(it->second).setStatus(status);
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<PedestrianEntity &>(it->second).setStatus(status);
-  }
-  return false;
+  return entities_.at(name)->setStatus(status);
 }
 
 const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEntityStatus(
@@ -461,15 +393,7 @@ const boost::optional<openscenario_msgs::msg::EntityStatus> EntityManager::getEn
   if (it == entities_.end()) {
     return boost::none;
   }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    status_msg = boost::any_cast<const VehicleEntity &>(it->second).getStatus();
-  } else if (it->second.type() == typeid(EgoEntity)) {
-    status_msg = boost::any_cast<const EgoEntity &>(it->second).getStatus();
-  } else if (it->second.type() == typeid(PedestrianEntity)) {
-    status_msg = boost::any_cast<const PedestrianEntity &>(it->second).getStatus();
-  } else {
-    return boost::none;
-  }
+  status_msg = it->second->getStatus();
   status_msg.bounding_box = getBoundingBox(name);
   status_msg.action_status.current_action = getCurrentAction(name);
   switch (getEntityType(name).type) {
@@ -493,10 +417,10 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   if (name0 == name1) {
     return false;
   }
-  if (!entityStatusSetted(name0)) {
+  if (!entityStatusSet(name0)) {
     return false;
   }
-  if (!entityStatusSetted(name1)) {
+  if (!entityStatusSet(name1)) {
     return false;
   }
   auto status0 = getEntityStatus(name0);
@@ -516,134 +440,40 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
 const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(
   const std::string & name) const
 {
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "error occurs while getting bounding box : " + name);
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).getBoundingBox();
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).getBoundingBox();
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<const PedestrianEntity &>(it->second).getBoundingBox();
-  }
-  throw traffic_simulator::SimulationRuntimeError(
-    "error occurs while getting bounding box : " + name);
+  return entities_.at(name)->getBoundingBox();
 }
 
 boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
   const std::string & name)
 {
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "error occurs while getting obstacle : " + name);
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<VehicleEntity &>(it->second).getObstacle();
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::none;
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::none;
-  }
-  throw traffic_simulator::SimulationRuntimeError("error occurs while getting obstacle : " + name);
+  return entities_.at(name)->getObstacle();
 }
 
 openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(const std::string & name)
 {
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "error occurs while getting wayoints : " + name);
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    const auto waypoints = boost::any_cast<VehicleEntity &>(it->second).getWaypoints();
-    return waypoints;
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<EgoEntity &>(it->second).getWaypoints();
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return openscenario_msgs::msg::WaypointsArray();
-  }
-  throw traffic_simulator::SimulationRuntimeError("error occurs while getting waypoints : " + name);
+  return entities_.at(name)->getWaypoints();
 }
 
 boost::optional<double> EntityManager::getLinearJerk(const std::string & name) const
 {
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    throw traffic_simulator::SimulationRuntimeError("entity " + name + " does not exist");
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).getLinearJerk();
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).getLinearJerk();
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<const PedestrianEntity &>(it->second).getLinearJerk();
-  }
-  return boost::none;
+  return entities_.at(name)->getLinearJerk();
 }
 
-bool EntityManager::entityStatusSetted(const std::string & name) const
+bool EntityManager::entityStatusSet(const std::string & name) const
 {
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return false;
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).statusSetted();
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).statusSetted();
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<const PedestrianEntity &>(it->second).statusSetted();
-  }
-  return false;
+  return entities_.at(name)->statusSet();
 }
 
 void EntityManager::setTargetSpeed(
   const std::string & name, const double target_speed, const bool continuous)
 {
-  auto & entity = reference(name);
-  if (entity.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(entity).setTargetSpeed(target_speed, continuous);
-  } else if (entity.type() == typeid(EgoEntity)) {
-    boost::any_cast<EgoEntity &>(entity).setTargetSpeed(target_speed, continuous);
-  } else if (entity.type() == typeid(PedestrianEntity)) {
-    boost::any_cast<PedestrianEntity &>(entity).setTargetSpeed(target_speed, continuous);
-  } else {
-    std::stringstream what{};
-    what << "Entity '" << name << "' is typed with the unexpected type '";
-    what << entity.type().name() << "'.";
-    throw SimulationRuntimeError(what.str());
-  }
+  return entities_.at(name)->setTargetSpeed(target_speed, continuous);
 }
 
 std::vector<std::int64_t> EntityManager::getRouteLanelets(
   const std::string & name, const double horizon)
 {
-  auto & entity = reference(name);
-  if (entity.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<VehicleEntity &>(entity).getRouteLanelets(horizon);
-  } else if (entity.type() == typeid(EgoEntity)) {
-    return boost::any_cast<EgoEntity &>(entity).getRouteLanelets(horizon);
-  } else if (entity.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<PedestrianEntity &>(entity).getRouteLanelets(horizon);
-  } else {
-    std::stringstream what{};
-    what << "Entity '" << name << "' is typed with the unexpected type '";
-    what << entity.type().name() << "'.";
-    throw SimulationRuntimeError(what.str());
-  }
+  return entities_.at(name)->getRouteLanelets(horizon);
 }
 
 std::vector<std::int64_t> EntityManager::getConflictingEntityOnRouteLanelets(
@@ -684,41 +514,15 @@ void EntityManager::update(const double current_time, const double step_time)
     if (verbose_) {
       std::cout << "update " << it->first << " behavior" << std::endl;
     }
-    if (it->second.type() == typeid(VehicleEntity)) {
-      boost::any_cast<VehicleEntity &>(it->second).setEntityTypeList(type_list);
-      boost::any_cast<VehicleEntity &>(it->second).onUpdate(current_time, step_time);
-      if (boost::any_cast<VehicleEntity &>(it->second).statusSetted()) {
-        auto status = boost::any_cast<VehicleEntity &>(it->second).getStatus();
-        all_status[boost::any_cast<VehicleEntity &>(it->second).name] = status;
-      }
-    }
-    if (it->second.type() == typeid(EgoEntity)) {
-      boost::any_cast<EgoEntity &>(it->second).setEntityTypeList(type_list);
-      boost::any_cast<EgoEntity &>(it->second).onUpdate(current_time, step_time);
-      if (boost::any_cast<EgoEntity &>(it->second).statusSetted()) {
-        auto status = boost::any_cast<EgoEntity &>(it->second).getStatus();
-        all_status[boost::any_cast<EgoEntity &>(it->second).name] = status;
-      }
-    }
-    if (it->second.type() == typeid(PedestrianEntity)) {
-      boost::any_cast<PedestrianEntity &>(it->second).setEntityTypeList(type_list);
-      boost::any_cast<PedestrianEntity &>(it->second).onUpdate(current_time, step_time);
-      if (boost::any_cast<PedestrianEntity &>(it->second).statusSetted()) {
-        auto status = boost::any_cast<PedestrianEntity &>(it->second).getStatus();
-        all_status[boost::any_cast<PedestrianEntity &>(it->second).name] = status;
-      }
+    it->second->setEntityTypeList(type_list);
+    it->second->onUpdate(current_time, step_time);
+    if (it->second->statusSet()) {
+      auto status = it->second->getStatus();
+      all_status.at(it->first) = status;
     }
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (it->second.type() == typeid(VehicleEntity)) {
-      boost::any_cast<VehicleEntity &>(it->second).setOtherStatus(all_status);
-    }
-    if (it->second.type() == typeid(EgoEntity)) {
-      boost::any_cast<EgoEntity &>(it->second).setOtherStatus(all_status);
-    }
-    if (it->second.type() == typeid(PedestrianEntity)) {
-      boost::any_cast<PedestrianEntity &>(it->second).setOtherStatus(all_status);
-    }
+    it->second->setOtherStatus(all_status);
   }
   auto entity_type_list = getEntityTypeList();
   openscenario_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
@@ -845,7 +649,7 @@ void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
   for (auto it = names.begin(); it != names.end(); it++) {
-    if (entityStatusSetted(*it)) {
+    if (entityStatusSet(*it)) {
       auto status = getEntityStatus(*it);
       if (status) {
         geometry_msgs::msg::PoseStamped pose;
@@ -861,53 +665,17 @@ void EntityManager::broadcastEntityTransform()
 
 const boost::optional<double> EntityManager::getStandStillDuration(const std::string & name) const
 {
-  const auto it = entities_.find(name);
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).getStandStillDuration();
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).getStandStillDuration();
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<const PedestrianEntity &>(it->second).getStandStillDuration();
-  }
-  throw traffic_simulator::SimulationRuntimeError("entity " + name + "does not exist");
+  return entities_.at(name)->getStandStillDuration();
 }
 
 const std::string EntityManager::getCurrentAction(const std::string & name) const
 {
-  const auto it = entities_.find(name);
-  if (it->second.type() == typeid(VehicleEntity)) {
-    return boost::any_cast<const VehicleEntity &>(it->second).getCurrentAction();
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return boost::any_cast<const EgoEntity &>(it->second).getCurrentAction();
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    return boost::any_cast<const PedestrianEntity &>(it->second).getCurrentAction();
-  }
-  throw traffic_simulator::SimulationRuntimeError("entity " + name + "does not exist");
+  return entities_.at(name)->getCurrentAction();
 }
 
 openscenario_msgs::msg::EntityType EntityManager::getEntityType(const std::string & name) const
 {
-  const auto it = entities_.find(name);
-  if (it->second.type() == typeid(VehicleEntity)) {
-    openscenario_msgs::msg::EntityType type;
-    type.type = openscenario_msgs::msg::EntityType::VEHICLE;
-    return type;
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    openscenario_msgs::msg::EntityType type;
-    type.type = openscenario_msgs::msg::EntityType::EGO;
-    return type;
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    openscenario_msgs::msg::EntityType type;
-    type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
-    return type;
-  }
-  throw traffic_simulator::SimulationRuntimeError("entity " + name + "does not exist");
+  return entities_.at(name)->getEntityType();
 }
 
 const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>
@@ -915,21 +683,7 @@ EntityManager::getEntityTypeList() const
 {
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> ret;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (it->second.type() == typeid(VehicleEntity)) {
-      openscenario_msgs::msg::EntityType type;
-      type.type = openscenario_msgs::msg::EntityType::VEHICLE;
-      ret[it->first] = type;
-    }
-    if (it->second.type() == typeid(EgoEntity)) {
-      openscenario_msgs::msg::EntityType type;
-      type.type = openscenario_msgs::msg::EntityType::EGO;
-      ret[it->first] = type;
-    }
-    if (it->second.type() == typeid(PedestrianEntity)) {
-      openscenario_msgs::msg::EntityType type;
-      type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
-      ret[it->first] = type;
-    }
+    ret.at(it->first) = it->second->getEntityType();
   }
   return ret;
 }

@@ -44,7 +44,7 @@ void EgoEntity::requestAssignRoute(
   return requestAcquirePosition(destination, constraints);
 }
 
-openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints() const
+const openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()
 {
   openscenario_msgs::msg::WaypointsArray waypoints{};
 
@@ -71,6 +71,15 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   }
 
   return success;
+}
+
+void EgoEntity::requestLaneChange(const std::int64_t to_lanelet_id)
+{
+  std::stringstream what{};
+  what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. ";
+  what << "In general, such a request is an error, ";
+  what << "since Ego cars make autonomous decisions about everything but their destination.";
+  throw std::runtime_error(what.str());
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)

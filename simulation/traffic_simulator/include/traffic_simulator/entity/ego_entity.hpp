@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
+#include <openscenario_msgs/msg/entity_type.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
@@ -165,6 +166,7 @@ public:
       0.0         // deadzone_delta_steer
       ))
   {
+    entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
     auto launch_autoware = [&]() {
       auto get_parameter = [](const std::string & name, const auto & alternate) {
         rclcpp::Node node{"get_parameter", "simulation"};
@@ -314,6 +316,21 @@ public:
     }
   }
 
+  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
+  {
+    requestAcquirePosition(lanelet_pose, {});
+  }
+
+  void requestAcquirePosition(
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
+  {
+    const auto map_pose = hdmap_utils_ptr_->toMapPose(lanelet_pose);
+    requestAcquirePosition(map_pose, constraints);
+  }
+
+  void requestLaneChange(const std::int64_t to_lanelet_id);
+
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped & goal_pose,
     const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
@@ -348,7 +365,7 @@ public:
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
-  decltype(auto) setTargetSpeed(const double value, const bool)
+  void setTargetSpeed(double value, bool) override
   {
     const auto current = getStatus();
 
@@ -369,7 +386,7 @@ public:
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
-  openscenario_msgs::msg::WaypointsArray getWaypoints() const;
+  const openscenario_msgs::msg::WaypointsArray getWaypoints();
 
 private:
 // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error

@@ -31,6 +31,15 @@ VehicleEntity::VehicleEntity(
   openscenario_msgs::msg::VehicleParameters params)
 : EntityBase(params.name, name, initial_state), parameters(params)
 {
+  entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
+  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
+  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
+}
+
+VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters params)
+: EntityBase(params.name, name), parameters(params)
+{
+  entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
   tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
@@ -47,14 +56,7 @@ void VehicleEntity::requestAssignRoute(
   route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
 }
 
-VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters params)
-: EntityBase(params.name, name), parameters(params)
-{
-  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
-}
-
-void VehicleEntity::requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose)
+void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
   if (!status_) {
     return;
