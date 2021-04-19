@@ -12,7 +12,7 @@
   <!-- simulation mode -->
   <group if="$(var simulation)">
     <arg name="simulator_model" default="$(var vehicle_model_pkg)/config/simulator_model.param.yaml" />
-    <include file="$(find-pkg-share scenario_test_runner)/launch/simple_planning_simulator.launch.xml">
+    <include file="$(find-pkg-share scenario_test_runner)/launch/simple_planning_simulator.launch.py">
       <arg name="simulator_model" value="$(var simulator_model)"/>
       <arg name="vehicle_param_file" value="$(var vehicle_param_file)"/>
       <arg name="initial_engage_state" value="$(var initial_engage_state)"/>
