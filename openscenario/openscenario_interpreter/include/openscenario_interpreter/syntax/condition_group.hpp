@@ -36,7 +36,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ConditionGroup : public std::vector<Condition>
+struct ConditionGroup : public std::list<Condition>
 {
   template <typename Node, typename Scope>
   explicit ConditionGroup(const Node & node, Scope & scope)

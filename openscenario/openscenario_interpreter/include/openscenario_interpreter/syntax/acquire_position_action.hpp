@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-#include <string>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <unordered_map>
 
@@ -48,7 +48,7 @@ struct AcquirePositionAction
   {
   }
 
-  std::unordered_map<std::string, Boolean> accomplishments;
+  std::unordered_map<String, Boolean> accomplishments;
 
   auto start()
   {
@@ -61,7 +61,7 @@ struct AcquirePositionAction
           actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
       }
     } else {
-      THROW(ImplementationFault);
+      THROW_IMPLEMENTATION_FAULT();
     }
   }
 
@@ -78,7 +78,7 @@ struct AcquirePositionAction
       }
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
     } else {
-      THROW(ImplementationFault);
+      THROW_IMPLEMENTATION_FAULT();
     }
   }
 #else

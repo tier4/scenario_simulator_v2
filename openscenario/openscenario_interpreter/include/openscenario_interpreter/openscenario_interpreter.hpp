@@ -94,6 +94,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     using openscenario_interpreter::SemanticError;
 
+    using openscenario_interpreter::SyntaxError;
+
     using InternalError = std::exception;
 
     try {
@@ -119,6 +121,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     CATCH(AutowareError)
     CATCH(ImplementationFault)
     CATCH(SemanticError)
+    CATCH(SyntaxError)
 
     CATCH(InternalError)
 
