@@ -71,19 +71,7 @@ class Accessor : public rclcpp::Node
   std::mutex mutex;
 
 public:
-#ifndef NDEBUG
-  /** ---- DummyData -----------------------------------------------------------
-   *
-   *  Topic: ~/dummy
-   *
-   * ------------------------------------------------------------------------ */
-  using DebugString = std_msgs::msg::String;
-
-  DEFINE_PUBLISHER(DebugString);
-  DEFINE_SUBSCRIPTION(DebugString);
-#endif
-
-  /** ---- AutowareEngage ------------------------------------------------------
+  /* ---- AutowareEngage -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage
    *
@@ -101,7 +89,7 @@ public:
     return setAutowareEngage(convertTo<AutowareEngage>(value));
   }
 
-  /** ---- AutowareRoute -------------------------------------------------------
+  /* ---- AutowareRoute --------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/route
    *
@@ -110,7 +98,7 @@ public:
 
   DEFINE_PUBLISHER(AutowareRoute);
 
-  /** ---- LaneChangeApproval --------------------------------------------------
+  /* ---- LaneChangeApproval ---------------------------------------------------
    *
    *  Topic: /awapi/lane_change/put/approval
    *
@@ -130,7 +118,7 @@ public:
     return setLaneChangeApproval(message);
   }
 
-  /** ---- LaneChangeForce -----------------------------------------------------
+  /* ---- LaneChangeForce ------------------------------------------------------
    *
    *  Topic: /awapi/lane_change/put/force
    *
@@ -150,7 +138,7 @@ public:
     return setLaneChangeForce(message);
   }
 
-  /** ---- TrafficLightStateArray ----------------------------------------------
+  /* ---- TrafficLightStateArray -----------------------------------------------
    *
    *  Overwrite the recognition result of traffic light.
    *
@@ -161,7 +149,7 @@ public:
 
   DEFINE_PUBLISHER(TrafficLightStateArray);
 
-  /** ---- VehicleVelocity -----------------------------------------------------
+  /* ---- VehicleVelocity ------------------------------------------------------
    *
    *  Set upper bound of velocity.
    *
@@ -184,7 +172,7 @@ public:
     return setVehicleVelocity(vehicle_velocity);
   }
 
-  /** ---- AutowareStatus ------------------------------------------------------
+  /* ---- AutowareStatus -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/get/status
    *
@@ -193,7 +181,7 @@ public:
 
   DEFINE_SUBSCRIPTION(AutowareStatus);
 
-  /** ---- TrafficLightStatus --------------------------------------------------
+  /* ---- TrafficLightStatus ---------------------------------------------------
    *
    *  Topic: /awapi/traffic_light/get/status
    *
@@ -202,7 +190,7 @@ public:
 
   DEFINE_SUBSCRIPTION(TrafficLightStatus);
 
-  /** ---- VehicleStatus -------------------------------------------------------
+  /* ---- VehicleStatus --------------------------------------------------------
    *
    *  Topic: /awapi/vehicle/get/status
    *
@@ -212,7 +200,7 @@ public:
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
-  /** ---- Checkpoint ----------------------------------------------------------
+  /* ---- Checkpoint -----------------------------------------------------------
    *
    *  Set goal pose of Autoware.
    *
@@ -393,7 +381,7 @@ public:
     return setCurrentVelocity(twist.linear.x);
   }
 
-  /** ---- GoalPose ------------------------------------------------------------
+  /* ---- GoalPose -------------------------------------------------------------
    *
    *  Set goal pose of Autoware.
    *
@@ -404,7 +392,7 @@ public:
 
   DEFINE_PUBLISHER(GoalPose);
 
-  /** ---- InitialPose ---------------------------------------------------------
+  /* ---- InitialPose ----------------------------------------------------------
    *
    *  Set initial pose of Autoware.
    *
@@ -427,7 +415,7 @@ public:
     return setInitialPose(initial_pose);
   }
 
-  /** ---- InitialTwist --------------------------------------------------------
+  /* ---- InitialTwist ---------------------------------------------------------
    *
    *  Set initial velocity of Autoware.
    *
@@ -486,7 +474,7 @@ public:
     return setLocalizationTwist(localization_twist);
   }
 
-  /** ---- Trajectory ----------------------------------------------------------
+  /* ---- Trajectory -----------------------------------------------------------
    *
    *  Topic: /planning/scenario_planning/trajectory
    *
@@ -504,7 +492,7 @@ public:
 
   DEFINE_SUBSCRIPTION(TurnSignalCommand);
 
-  /** ---- InitialTwist --------------------------------------------------------
+  /* ---- InitialTwist ---------------------------------------------------------
    *
    *  Set initial velocity of Autoware.
    *
@@ -581,10 +569,6 @@ public:
   template <typename... Ts>
   AWAPI_ACCESSOR_PUBLIC explicit Accessor(Ts &&... xs)
   : rclcpp::Node(std::forward<decltype(xs)>(xs)...),
-#ifndef NDEBUG
-    INIT_PUBLISHER(DebugString, "debug/string"),
-    INIT_SUBSCRIPTION(DebugString, "debug/string", [](){}),
-#endif
     // AWAPI topics (lexicographically sorted)
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
