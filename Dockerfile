@@ -1,5 +1,7 @@
 FROM ros:foxy
 SHELL ["/bin/bash", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
 
 RUN sudo apt-get update && sudo apt-get -y install python3-pip python3-rospkg python3-rosdep
 
