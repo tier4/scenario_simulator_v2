@@ -6,5 +6,5 @@
     <param name="type" value="geometry_msgs/msg/TwistStamped" />
   </node>
 
-  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="log"/>
+  <executable cmd="ros2 bag record -a --output $(var output_directory)" output="log"/>
 </launch>
