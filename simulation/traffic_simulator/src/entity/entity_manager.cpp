@@ -518,7 +518,7 @@ void EntityManager::update(const double current_time, const double step_time)
     it->second->onUpdate(current_time, step_time);
     if (it->second->statusSet()) {
       auto status = it->second->getStatus();
-      all_status.at(it->first) = status;
+      all_status.emplace(it->first, status);
     }
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
@@ -683,7 +683,7 @@ EntityManager::getEntityTypeList() const
 {
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> ret;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    ret.at(it->first) = it->second->getEntityType();
+    ret.emplace(it->first, it->second->getEntityType());
   }
   return ret;
 }
