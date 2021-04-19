@@ -20,12 +20,6 @@
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
-#define DEBUG_VALUE(...) \
-  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
-
-#define DEBUG_LINE() \
-  std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
-
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -60,6 +54,8 @@ struct TrafficSignalController
    *  if the total times of all connected controllers are the same. If delay is
    *  set, reference is required. Unit: s; Range: [0..inf[.
    *
+   *  CURRENTLY, IGNORED!!!
+   *
    * ------------------------------------------------------------------------ */
   const Double delay;
 
@@ -67,6 +63,8 @@ struct TrafficSignalController
    *
    *  A reference (ID) to the connected controller in the road network. If
    *  reference is set, a delay is required.
+   *
+   *  CURRENTLY, IGNORED!!!
    *
    * ------------------------------------------------------------------------ */
   const String reference;
@@ -76,9 +74,15 @@ struct TrafficSignalController
    *  Phases of a TrafficSignalController.
    *
    * ------------------------------------------------------------------------ */
-  std::vector<Phase> phases;
+  std::list<Phase> phases;
 
   CircularIterator<decltype(phases)::iterator> current_phase;
+
+  decltype(getCurrentTime()) current_phase_started_at;
+
+  TrafficSignalController() = delete;
+  TrafficSignalController(TrafficSignalController &&) = delete;
+  TrafficSignalController(const TrafficSignalController &) = delete;
 
   template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
@@ -86,26 +90,28 @@ struct TrafficSignalController
     delay(readAttribute<Double>("delay", node, outer_scope, Double())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
-    current_phase(std::begin(phases), std::end(phases))
+    current_phase(std::begin(phases), std::end(phases), std::end(phases)),
+    current_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min())
   {
   }
 
-  decltype(getCurrentTime()) current_phase_started_at = {};
-
   auto theDurationExeeded() const
   {
-    return (*current_phase).duration < getCurrentTime() - current_phase_started_at;
+    if (not phases.empty()) {
+      return (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
+    } else {
+      return false;
+    }
   }
 
   auto evaluate()
   {
     if (theDurationExeeded()) {
-      std::advance(current_phase, 1);
       current_phase_started_at = getCurrentTime();
-      (*current_phase).evaluate();
+      return (*++current_phase).evaluate();
+    } else {
+      return unspecified;
     }
-
-    return unspecified;
   }
 };
 }  // namespace syntax

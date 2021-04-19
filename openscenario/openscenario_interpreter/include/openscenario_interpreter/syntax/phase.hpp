@@ -59,7 +59,7 @@ struct Phase
    *               trafficSignal2: false; false; true).
    *
    * ------------------------------------------------------------------------ */
-  const std::vector<TrafficSignalState> traffic_signal_states;
+  const std::list<TrafficSignalState> traffic_signal_states;
 
   template <typename Node, typename Scope>
   explicit Phase(const Node & node, Scope & outer_scope)
