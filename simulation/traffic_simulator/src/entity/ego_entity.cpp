@@ -26,7 +26,131 @@ namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, std::shared_ptr<autoware_api::Accessor> > EgoEntity::autowares{};
+std::unordered_map<std::string, std::shared_ptr<autoware_api::Accessor>> EgoEntity::autowares{};
+
+EgoEntity::EgoEntity(
+  const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
+  const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
+: VehicleEntity(name, parameters),
+  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(
+    parameters.performance.max_speed,          // vel_lim,
+    parameters.axles.front_axle.max_steering,  // steer_lim,
+    parameters.performance.max_acceleration,   // accel_rate,
+    5.0,                                       // steer_rate_lim,
+    parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
+    step_time,  // dt,
+    0.25,       // vel_time_delay,
+    0.5,        // vel_time_constant,
+    0.3,        // steer_time_delay,
+    0.3,        // steer_time_constant,
+    0.0         // deadzone_delta_steer
+    ))
+{
+  auto launch_autoware = [&]() {
+    auto get_parameter = [](const std::string & name, const auto & alternate) {
+      rclcpp::Node node{"get_parameter", "simulation"};
+
+      auto value = alternate;
+
+      using value_type = typename std::decay<decltype(value)>::type;
+
+      node.declare_parameter<value_type>(name, value);
+      node.get_parameter<value_type>(name, value);
+
+      return value;
+    };
+
+    /* ---- NOTE -----------------------------------------------------------
+       *
+       *  The actual values of these parameters are set by
+       *  scenario_test_runner.launch.py as parameters of
+       *  openscenario_interpreter_node.
+       *
+       * ------------------------------------------------------------------ */
+    const auto autoware_launch_package = get_parameter("autoware_launch_package", std::string(""));
+    const auto autoware_launch_file = get_parameter("autoware_launch_file", std::string(""));
+
+    auto child = [&]() {
+      const std::vector<std::string> argv{
+        "python3",
+        "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
+        "launch",
+        autoware_launch_package,
+        autoware_launch_file,
+        std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
+        std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string(),
+        "vehicle_model:=ymc_golfcart_proto2",
+        "sensor_model:=aip_x1",
+        "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
+          "/planning_simulator_v2.rviz",
+        "scenario_simulation:=true"};
+
+#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
+      const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
+      const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+      ::dup2(fd, STDOUT_FILENO);
+      ::dup2(fd, STDERR_FILENO);
+      ::close(fd);
+#endif
+
+      if (execute(argv) < 0) {
+        std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+        std::exit(EXIT_FAILURE);
+      }
+    };
+
+    if ((autoware_process_id = fork()) < 0) {
+      throw std::system_error(errno, std::system_category());
+    } else if (autoware_process_id == 0) {
+      return child();
+    }
+  };
+
+  if (autowares.find(name) == std::end(autowares)) {
+    auto my_name = name;
+    std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
+    autowares.emplace(
+      name, std::make_shared<autoware_api::Accessor>(
+              "awapi_accessor",
+              "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
+              rclcpp::NodeOptions().use_global_arguments(false)));
+
+    launch_autoware();
+  }
+
+  /* ---- NOTE ---------------------------------------------------------------
+   *
+   *  The simulator needs to run in a fixed-cycle loop, but the communication
+   *  part with Autoware needs to run at a higher frequency (e.g. the
+   *  transform in map -> base_link needs to be updated at a higher frequency
+   *  even if the value does not change). We also need to keep collecting the
+   *  latest values of topics from Autoware, independently of the simulator.
+   *
+   *  For this reason, autoware_api::Accessor, which is responsible for
+   *  communication with Autoware, should run in an independent thread. This
+   *  is probably an EXTREMELY DIRTY HACK.
+   *
+   *  Ideally, the constructor caller of traffic_simulator::API should
+   *  provide a std::shared_ptr to autoware_api::Accessor and spin that node
+   *  with MultiThreadedExecutor.
+   *
+   *  If you have a nice idea to solve this, and are interested in improving
+   *  the quality of the Tier IV simulator, please contact @yamacir-kit.
+   *
+   * ---------------------------------------------------------------------- */
+  if (autowares.at(name).use_count() < 2) {
+    accessor_status = std::make_shared<std::promise<void>>();
+    accessor_spinner = std::make_shared<std::thread>(
+      [](const auto node, auto status)  // NOTE: This copy increments use_count to 2 from 1.
+      {
+        while (rclcpp::ok() &&
+               status.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+          rclcpp::spin_some(node);
+        }
+      },
+      autowares.at(name), std::move(accessor_status->get_future()));
+  }
+}
 
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
