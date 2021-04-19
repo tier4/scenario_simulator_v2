@@ -68,6 +68,54 @@ auto execute(const std::vector<std::string> & f_xs)
   return ::execvp(argv[0], argv.data());
 }
 
+void EgoEntity::launchAutoware(const boost::filesystem::path & lanelet2_map)
+{
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  The actual values of these parameters are set by
+   *  scenario_test_runner.launch.py as parameters of
+   *  openscenario_interpreter_node.
+   *
+   * ------------------------------------------------------------------------ */
+  const auto autoware_launch_package = getParameter("autoware_launch_package", std::string(""));
+  const auto autoware_launch_file = getParameter("autoware_launch_file", std::string(""));
+
+  auto child = [&]() {
+    const std::vector<std::string> argv{
+      "python3",
+      "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
+      "launch",
+      autoware_launch_package,
+      autoware_launch_file,
+      std::string("map_path:=") += lanelet2_map.parent_path().string(),
+      std::string("lanelet2_map_file:=") += lanelet2_map.filename().string(),
+      "vehicle_model:=ymc_golfcart_proto2",
+      "sensor_model:=aip_x1",
+      "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
+        "/planning_simulator_v2.rviz",
+      "scenario_simulation:=true"};
+
+#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
+    const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
+    const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    ::dup2(fd, STDOUT_FILENO);
+    ::dup2(fd, STDERR_FILENO);
+    ::close(fd);
+#endif
+
+    if (execute(argv) < 0) {
+      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  };
+
+  if ((autoware_process_id = fork()) < 0) {
+    throw std::system_error(errno, std::system_category());
+  } else if (autoware_process_id == 0) {
+    return child();
+  }  // NOTE if 0 < autoware_process_id, is parent process (fallthrough).
+}
+
 void EgoEntity::initializeAutoware()
 {
   const auto current_entity_status = getStatus();
@@ -91,6 +139,27 @@ void EgoEntity::initializeAutoware()
   }
 }
 
+void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
+{
+  geometry_msgs::msg::Twist current_twist;
+  {
+    current_twist.linear.x = (*vehicle_model_ptr_).getVx();
+    current_twist.angular.z = (*vehicle_model_ptr_).getWz();
+  }
+
+  std::atomic_load(&autowares.at(name))->setCurrentControlMode();
+  std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);
+  std::atomic_load(&autowares.at(name))->setCurrentShift(current_twist);
+  std::atomic_load(&autowares.at(name))->setCurrentSteering(current_twist);
+  std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
+  std::atomic_load(&autowares.at(name))->setCurrentTwist(current_twist);
+  std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
+  std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
+  std::atomic_load(&autowares.at(name))->setLocalizationTwist(current_twist);
+  std::atomic_load(&autowares.at(name))->setTransform(current_pose);
+  std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
+}
+
 EgoEntity::EgoEntity(
   const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
   const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
@@ -107,53 +176,6 @@ EgoEntity::EgoEntity(
     0.0    // deadzone_delta_steer
     ))
 {
-  auto launch_autoware = [&]() {
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  The actual values of these parameters are set by
-     *  scenario_test_runner.launch.py as parameters of
-     *  openscenario_interpreter_node.
-     *
-     * ---------------------------------------------------------------------- */
-    const auto autoware_launch_package = getParameter("autoware_launch_package", std::string(""));
-    const auto autoware_launch_file = getParameter("autoware_launch_file", std::string(""));
-
-    auto child = [&]() {
-      const std::vector<std::string> argv{
-        "python3",
-        "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-        "launch",
-        autoware_launch_package,
-        autoware_launch_file,
-        std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
-        std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string(),
-        "vehicle_model:=ymc_golfcart_proto2",
-        "sensor_model:=aip_x1",
-        "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
-          "/planning_simulator_v2.rviz",
-        "scenario_simulation:=true"};
-
-#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-      const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
-      const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-      ::dup2(fd, STDOUT_FILENO);
-      ::dup2(fd, STDERR_FILENO);
-      ::close(fd);
-#endif
-
-      if (execute(argv) < 0) {
-        std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-        std::exit(EXIT_FAILURE);
-      }
-    };
-
-    if ((autoware_process_id = fork()) < 0) {
-      throw std::system_error(errno, std::system_category());
-    } else if (autoware_process_id == 0) {
-      return child();
-    }
-  };
-
   if (autowares.find(name) == std::end(autowares)) {
     auto my_name = name;
     std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
@@ -163,7 +185,7 @@ EgoEntity::EgoEntity(
               "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
               rclcpp::NodeOptions().use_global_arguments(false)));
 
-    launch_autoware();
+    launchAutoware(lanelet2_map_osm);
   }
 
   /* ---- NOTE ---------------------------------------------------------------

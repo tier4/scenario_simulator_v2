@@ -111,8 +111,6 @@ public:
 
   bool autoware_initialized = false;
 
-  void initializeAutoware();
-
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped &,
     const std::vector<geometry_msgs::msg::PoseStamped> & = {});
@@ -187,26 +185,11 @@ private:
 
 #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 
-  void updateAutoware(const geometry_msgs::msg::Pose & current_pose)
-  {
-    geometry_msgs::msg::Twist current_twist;
-    {
-      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
-      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
-    }
+  void launchAutoware(const boost::filesystem::path &);
 
-    std::atomic_load(&autowares.at(name))->setCurrentControlMode();
-    std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);
-    std::atomic_load(&autowares.at(name))->setCurrentShift(current_twist);
-    std::atomic_load(&autowares.at(name))->setCurrentSteering(current_twist);
-    std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
-    std::atomic_load(&autowares.at(name))->setCurrentTwist(current_twist);
-    std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
-    std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
-    std::atomic_load(&autowares.at(name))->setLocalizationTwist(current_twist);
-    std::atomic_load(&autowares.at(name))->setTransform(current_pose);
-    std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
-  }
+  void initializeAutoware();
+
+  void updateAutoware(const geometry_msgs::msg::Pose &);
 
 private:
   const openscenario_msgs::msg::EntityStatus getEntityStatus(
