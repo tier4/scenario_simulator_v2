@@ -134,21 +134,7 @@ public:
     const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
     const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters);
 
-  ~EgoEntity() override
-  {
-    if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
-      accessor_status->set_value();
-      accessor_spinner->join();
-      autowares.erase(name);
-      int status = 0;
-      if (
-        ::kill(autoware_process_id, SIGINT) < 0 ||
-        ::waitpid(autoware_process_id, &status, WUNTRACED) < 0) {
-        std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-        std::exit(EXIT_FAILURE);
-      }
-    }
-  }
+  ~EgoEntity() override;
 
   bool autoware_initialized = false;
 

@@ -152,6 +152,22 @@ EgoEntity::EgoEntity(
   }
 }
 
+EgoEntity::~EgoEntity()
+{
+  if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
+    accessor_status->set_value();
+    accessor_spinner->join();
+    autowares.erase(name);
+    int status = 0;
+    if (
+      ::kill(autoware_process_id, SIGINT) < 0 ||
+      ::waitpid(autoware_process_id, &status, WUNTRACED) < 0) {
+      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  }
+}
+
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
