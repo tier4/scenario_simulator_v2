@@ -33,17 +33,15 @@ EgoEntity::EgoEntity(
   const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
   vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(
-    parameters.performance.max_speed,          // vel_lim,
-    parameters.axles.front_axle.max_steering,  // steer_lim,
-    parameters.performance.max_acceleration,   // accel_rate,
-    5.0,                                       // steer_rate_lim,
-    parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
-    step_time,  // dt,
-    0.25,       // vel_time_delay,
-    0.5,        // vel_time_constant,
-    0.3,        // steer_time_delay,
-    0.3,        // steer_time_constant,
-    0.0         // deadzone_delta_steer
+    parameters.performance.max_speed, parameters.axles.front_axle.max_steering,
+    parameters.performance.max_acceleration,
+    5.0,  // steer_rate_lim,
+    parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x, step_time,
+    0.25,  // vel_time_delay,
+    0.5,   // vel_time_constant,
+    0.3,   // steer_time_delay,
+    0.3,   // steer_time_constant,
+    0.0    // deadzone_delta_steer
     ))
 {
   auto launch_autoware = [&]() {
@@ -60,13 +58,13 @@ EgoEntity::EgoEntity(
       return value;
     };
 
-    /* ---- NOTE -----------------------------------------------------------
-       *
-       *  The actual values of these parameters are set by
-       *  scenario_test_runner.launch.py as parameters of
-       *  openscenario_interpreter_node.
-       *
-       * ------------------------------------------------------------------ */
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  The actual values of these parameters are set by
+     *  scenario_test_runner.launch.py as parameters of
+     *  openscenario_interpreter_node.
+     *
+     * ---------------------------------------------------------------------- */
     const auto autoware_launch_package = get_parameter("autoware_launch_package", std::string(""));
     const auto autoware_launch_file = get_parameter("autoware_launch_file", std::string(""));
 
@@ -166,6 +164,40 @@ EgoEntity::~EgoEntity()
       std::exit(EXIT_FAILURE);
     }
   }
+}
+
+void EgoEntity::requestAcquirePosition(
+  const geometry_msgs::msg::PoseStamped & goal_pose,
+  const std::vector<geometry_msgs::msg::PoseStamped> & constraints)
+{
+  if (not autoware_initialized) {
+    initializeAutoware();
+  }
+
+  const auto current_pose = getStatus().pose;
+
+  // NOTE: This is assertion.
+  waitForAutowareStateToBeWaitingForRoute([&]() { return updateAutoware(current_pose); });
+
+  waitForAutowareStateToBePlanning(
+    [&]() {
+      std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
+
+      for (const auto & constraint : constraints) {
+        std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
+      }
+
+      return updateAutoware(current_pose);
+    },
+    std::chrono::seconds(5));
+
+  waitForAutowareStateToBeWaitingForEngage(
+    [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
+
+  waitForAutowareStateToBeDriving([&]() {
+    std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+    return updateAutoware(current_pose);
+  });
 }
 
 void EgoEntity::requestAssignRoute(

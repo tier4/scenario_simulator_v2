@@ -162,38 +162,8 @@ public:
   }
 
   void requestAcquirePosition(
-    const geometry_msgs::msg::PoseStamped & goal_pose,
-    const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
-  {
-    if (!autoware_initialized) {
-      initializeAutoware();
-    }
-
-    const auto current_pose = getStatus().pose;
-
-    // NOTE: This is assertion.
-    waitForAutowareStateToBeWaitingForRoute([&]() { return updateAutoware(current_pose); });
-
-    waitForAutowareStateToBePlanning(
-      [&]() {
-        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
-
-        for (const auto & constraint : constraints) {
-          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
-        }
-
-        return updateAutoware(current_pose);
-      },
-      std::chrono::seconds(5));
-
-    waitForAutowareStateToBeWaitingForEngage(
-      [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
-
-    waitForAutowareStateToBeDriving([&]() {
-      std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
-      return updateAutoware(current_pose);
-    });
-  }
+    const geometry_msgs::msg::PoseStamped &,
+    const std::vector<geometry_msgs::msg::PoseStamped> & = {});
 
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
