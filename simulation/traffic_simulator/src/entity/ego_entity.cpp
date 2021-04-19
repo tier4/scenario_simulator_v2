@@ -75,25 +75,29 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  Eigen::VectorXd input(2);
-  {
-    input << std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity,
-      std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
-  }
-
-  (*vehicle_model_ptr_).setInput(input);
-  (*vehicle_model_ptr_).update(step_time);
-
-  setStatus(getEntityStatus(current_time + step_time, step_time));
-
-  if (previous_linear_velocity_) {
-    linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
+  if (current_time > 0) {
+    updateEntityStatusTimestamp(current_time);
   } else {
-    linear_jerk_ = 0;
-  }
+    Eigen::VectorXd input(2);
+    {
+      input << std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity,
+        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
+    }
 
-  previous_linear_velocity_ = vehicle_model_ptr_->getVx();
-  previous_angular_velocity_ = vehicle_model_ptr_->getWz();
+    (*vehicle_model_ptr_).setInput(input);
+    (*vehicle_model_ptr_).update(step_time);
+
+    setStatus(getEntityStatus(current_time + step_time, step_time));
+
+    if (previous_linear_velocity_) {
+      linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
+    } else {
+      linear_jerk_ = 0;
+    }
+
+    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
+    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
+  }
 }
 
 const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(

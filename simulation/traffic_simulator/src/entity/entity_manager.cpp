@@ -677,8 +677,10 @@ void EntityManager::update(const double current_time, const double step_time)
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
-  traffic_light_manager_ptr_->update(step_time_);
   current_time_ = current_time;
+  if (current_time_ >= 0) {
+    traffic_light_manager_ptr_->update(step_time_);
+  }
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
   }

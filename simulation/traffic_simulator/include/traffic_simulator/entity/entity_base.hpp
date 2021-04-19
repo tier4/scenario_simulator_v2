@@ -61,6 +61,7 @@ public:
     }
     return false;
   }
+  void updateEntityStatusTimestamp(double current_time);
   void setVerbose(bool verbose) { verbose_ = verbose; }
   void setEntityTypeList(
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & entity_type_list)

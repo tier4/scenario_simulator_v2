@@ -240,7 +240,7 @@ bool API::setEntityStatus(
 bool API::initialize(double realtime_factor, double step_time)
 {
   step_time_ = step_time;
-  current_time_ = 0.0;
+  current_time_ = initialize_duration;
   if (standalone_mode) {
     return true;
   }

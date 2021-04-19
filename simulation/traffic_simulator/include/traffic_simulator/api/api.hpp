@@ -50,13 +50,16 @@ class API
 
 public:
   const std::string lanelet2_map_osm;
+  const double initialize_duration;
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
     NodeT && node, const boost::filesystem::path, const std::string & lanelet2_map_osm,
-    const bool auto_sink = true, const bool verbose = false, const bool standalone_mode = false,
+    const double initialize_duration = 20, const bool auto_sink = true, const bool verbose = false,
+    const bool standalone_mode = false,
     const std::string & metrics_logfile_path = "/tmp/metrics.json")
   : lanelet2_map_osm(lanelet2_map_osm),
+    initialize_duration(initialize_duration),
     standalone_mode(standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
     metrics_manager_(verbose, metrics_logfile_path),
