@@ -79,33 +79,6 @@ class EgoEntity : public VehicleEntity
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
   std::shared_ptr<std::thread> accessor_spinner;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  If you can't explain the difference between char * and char [], don't
-   *  edit this function even if it looks strange.
-   *
-   * ------------------------------------------------------------------------ */
-  auto execute(const std::vector<std::string> & f_xs)
-  {
-    std::vector<std::vector<char>> buffer{};
-
-    buffer.resize(f_xs.size());
-
-    std::vector<std::add_pointer<char>::type> argv{};
-
-    argv.reserve(f_xs.size());
-
-    for (const auto & each : f_xs) {
-      buffer.emplace_back(std::begin(each), std::end(each));
-      buffer.back().push_back('\0');
-      argv.push_back(buffer.back().data());
-    }
-
-    argv.emplace_back(static_cast<std::add_pointer<char>::type>(0));
-
-    return ::execvp(argv[0], argv.data());
-  }
-
 public:
   EgoEntity() = delete;
 
@@ -138,28 +111,7 @@ public:
 
   bool autoware_initialized = false;
 
-  void initializeAutoware()
-  {
-    const auto current_entity_status = getStatus();
-
-    if (!std::exchange(autoware_initialized, true)) {
-      waitForAutowareStateToBeInitializingVehicle(
-        [&]() { return updateAutoware(current_entity_status.pose); });
-
-      /* ---- NOTE ---------------------------------------------------------------
-       *
-       *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
-       *  and tf to be published. Member function EgoEntity::waitForAutowareToBe*
-       *  are depends a topic '/awapi/autoware/get/status' published by
-       *  awapi_awiv_adapter.
-       *
-       * ---------------------------------------------------------------------- */
-      waitForAutowareStateToBeWaitingForRoute([&]() {
-        std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
-        return updateAutoware(current_entity_status.pose);
-      });
-    }
-  }
+  void initializeAutoware();
 
   void requestAcquirePosition(
     const geometry_msgs::msg::PoseStamped &,

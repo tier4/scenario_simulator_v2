@@ -41,6 +41,56 @@ auto getParameter(const std::string & name, const T & alternate)
   return value;
 }
 
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  If you can't explain the difference between char * and char [], don't edit
+ *  this function even if it looks strange.
+ *
+ * -------------------------------------------------------------------------- */
+auto execute(const std::vector<std::string> & f_xs)
+{
+  std::vector<std::vector<char>> buffer{};
+
+  buffer.resize(f_xs.size());
+
+  std::vector<std::add_pointer<char>::type> argv{};
+
+  argv.reserve(f_xs.size());
+
+  for (const auto & each : f_xs) {
+    buffer.emplace_back(std::begin(each), std::end(each));
+    buffer.back().push_back('\0');
+    argv.push_back(buffer.back().data());
+  }
+
+  argv.emplace_back(static_cast<std::add_pointer<char>::type>(0));
+
+  return ::execvp(argv[0], argv.data());
+}
+
+void EgoEntity::initializeAutoware()
+{
+  const auto current_entity_status = getStatus();
+
+  if (not std::exchange(autoware_initialized, true)) {
+    waitForAutowareStateToBeInitializingVehicle(
+      [&]() { return updateAutoware(current_entity_status.pose); });
+
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
+     *  and tf to be published. Member function EgoEntity::waitForAutowareToBe*
+     *  are depends a topic '/awapi/autoware/get/status' published by
+     *  awapi_awiv_adapter.
+     *
+     * ---------------------------------------------------------------------- */
+    waitForAutowareStateToBeWaitingForRoute([&]() {
+      std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
+      return updateAutoware(current_entity_status.pose);
+    });
+  }
+}
+
 EgoEntity::EgoEntity(
   const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
   const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
