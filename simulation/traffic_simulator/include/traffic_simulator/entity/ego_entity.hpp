@@ -185,7 +185,7 @@ private:
 
 #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 
-  void launchAutoware(const boost::filesystem::path &);
+  void launchAutoware(const std::string &, const std::string &, const std::string &);
 
   void initializeAutoware();
 

@@ -53,7 +53,7 @@ auto execute(const std::vector<std::string> & f_xs)
 
   buffer.resize(f_xs.size());
 
-  std::vector<std::add_pointer<char>::type> argv{};
+  std::vector<std::add_pointer<char>::type> argv;
 
   argv.reserve(f_xs.size());
 
@@ -68,7 +68,9 @@ auto execute(const std::vector<std::string> & f_xs)
   return ::execvp(argv[0], argv.data());
 }
 
-void EgoEntity::launchAutoware(const boost::filesystem::path & lanelet2_map)
+void EgoEntity::launchAutoware(
+  const std::string & map_path, const std::string & lanelet2_map_file = "lanelet2_map.osm",
+  const std::string & pointcloud_map_file = "pointcloud_map.pcd")
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -87,10 +89,11 @@ void EgoEntity::launchAutoware(const boost::filesystem::path & lanelet2_map)
       "launch",
       autoware_launch_package,
       autoware_launch_file,
-      std::string("map_path:=") += lanelet2_map.parent_path().string(),
-      std::string("lanelet2_map_file:=") += lanelet2_map.filename().string(),
-      "vehicle_model:=ymc_golfcart_proto2",
-      "sensor_model:=aip_x1",
+      "map_path:=" + map_path,
+      "lanelet2_map_file:=" + lanelet2_map_file,
+      "pointcloud_map_file:=" + pointcloud_map_file,
+      "vehicle_model:=ymc_golfcart_proto2",  // XXX: HARD CODING!!!
+      "sensor_model:=aip_x1",                // XXX: HARD CODING!!!
       "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
         "/planning_simulator_v2.rviz",
       "scenario_simulation:=true"};
@@ -185,7 +188,7 @@ EgoEntity::EgoEntity(
               "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
               rclcpp::NodeOptions().use_global_arguments(false)));
 
-    launchAutoware(lanelet2_map_osm);
+    launchAutoware(lanelet2_map_osm.parent_path().string(), lanelet2_map_osm.filename().string());
   }
 
   /* ---- NOTE ---------------------------------------------------------------
