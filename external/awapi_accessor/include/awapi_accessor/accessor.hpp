@@ -66,7 +66,8 @@ struct AutowareError : public std::runtime_error
   ~AutowareError() = default;
 };
 
-class Accessor : public rclcpp::Node
+template <typename Node>
+class LowLevelAPI
 {
   std::mutex mutex;
 
@@ -111,7 +112,7 @@ public:
   {
     LaneChangeForce message;
     {
-      message.stamp = get_clock()->now();
+      message.stamp = static_cast<Node &>(*this).get_clock()->now();
       message.command = approve;
     }
 
@@ -131,7 +132,7 @@ public:
   {
     LaneChangeForce message;
     {
-      message.stamp = get_clock()->now();
+      message.stamp = static_cast<Node &>(*this).get_clock()->now();
       message.command = force;
     }
 
@@ -165,7 +166,7 @@ public:
   {
     VehicleVelocity vehicle_velocity;
     {
-      vehicle_velocity.stamp = get_clock()->now();
+      vehicle_velocity.stamp = static_cast<Node &>(*this).get_clock()->now();
       vehicle_velocity.max_velocity = value;
     }
 
@@ -243,7 +244,7 @@ public:
   {
     geometry_msgs::msg::PoseStamped current_pose;
     {
-      current_pose.header.stamp = get_clock()->now();
+      current_pose.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       current_pose.header.frame_id = "map";
       current_pose.pose = pose;
     }
@@ -271,7 +272,7 @@ public:
     {
       using autoware_vehicle_msgs::msg::Shift;
 
-      current_shift.header.stamp = get_clock()->now();
+      current_shift.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       current_shift.header.frame_id = "map";
       current_shift.shift.data = twist_linear_x >= 0 ? Shift::DRIVE : Shift::REVERSE;
     }
@@ -298,7 +299,7 @@ public:
   {
     CurrentSteering current_steering{};
     {
-      current_steering.header.stamp = get_clock()->now();
+      current_steering.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       current_steering.header.frame_id = "base_link";
       current_steering.data = value;
     }
@@ -324,7 +325,7 @@ public:
   {
     CurrentTurnSignal current_turn_signal{};
     {
-      current_turn_signal.header.stamp = get_clock()->now();
+      current_turn_signal.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       current_turn_signal.header.frame_id = "map";
       current_turn_signal.data = autoware_vehicle_msgs::msg::TurnSignal::NONE;
     }
@@ -347,7 +348,7 @@ public:
   {
     geometry_msgs::msg::TwistStamped current_twist{};
     {
-      current_twist.header.stamp = get_clock()->now();
+      current_twist.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       current_twist.header.frame_id = "map";
       current_twist.twist = twist;
     }
@@ -369,7 +370,7 @@ public:
   {
     CurrentVelocity message;
     {
-      message.stamp = get_clock()->now();
+      message.stamp = static_cast<Node &>(*this).get_clock()->now();
       message.data = twist_linear_x;
     }
 
@@ -405,9 +406,9 @@ public:
 
   decltype(auto) setInitialPose(const geometry_msgs::msg::Pose & pose)
   {
-    autoware_api::Accessor::InitialPose initial_pose;
+    InitialPose initial_pose;
     {
-      initial_pose.header.stamp = get_clock()->now();
+      initial_pose.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       initial_pose.header.frame_id = "map";
       initial_pose.pose.pose = pose;
     }
@@ -429,9 +430,9 @@ public:
   decltype(auto) setInitialTwist(
     const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
   {
-    autoware_api::Accessor::InitialTwist initial_twist;
+    InitialTwist initial_twist;
     {
-      initial_twist.header.stamp = get_clock()->now();
+      initial_twist.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       initial_twist.header.frame_id = "map";
       initial_twist.twist = twist;
     }
@@ -464,9 +465,9 @@ public:
   decltype(auto) setLocalizationTwist(
     const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
   {
-    autoware_api::Accessor::InitialTwist localization_twist;
+    InitialTwist localization_twist;
     {
-      localization_twist.header.stamp = get_clock()->now();
+      localization_twist.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       localization_twist.header.frame_id = "map";
       localization_twist.twist = twist;
     }
@@ -544,7 +545,7 @@ public:
 
   const auto & setTransform(const geometry_msgs::msg::Pose & pose)
   {
-    current_transform.header.stamp = get_clock()->now();
+    current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
     current_transform.header.frame_id = "map";
     current_transform.child_frame_id = "base_link";
     current_transform.transform.translation.x = pose.position.x;
@@ -560,16 +561,14 @@ public:
   void updateTransform()
   {
     if (!current_transform.header.frame_id.empty() && !current_transform.child_frame_id.empty()) {
-      current_transform.header.stamp = get_clock()->now();
+      current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       return transform_broadcaster.sendTransform(current_transform);
     }
   }
 
 public:
-  template <typename... Ts>
-  AWAPI_ACCESSOR_PUBLIC explicit Accessor(Ts &&... xs)
-  : rclcpp::Node(std::forward<decltype(xs)>(xs)...),
-    // AWAPI topics (lexicographically sorted)
+  explicit LowLevelAPI()
+  :  // AWAPI topics (lexicographically sorted)
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
@@ -597,14 +596,25 @@ public:
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
 
-    transform_buffer(get_clock()),
-    transform_broadcaster(std::shared_ptr<rclcpp::Node>(this, [](auto &&...) {})),
+    transform_buffer(static_cast<Node &>(*this).get_clock()),
+    transform_broadcaster(static_cast<Node *>(this)),
 
-    timer(create_wall_timer(std::chrono::milliseconds(5), [this]() { return updateTransform(); }))
+    timer(static_cast<Node &>(*this).create_wall_timer(
+      std::chrono::milliseconds(5), [this]() { return updateTransform(); }))
   {
   }
 };
 
+struct Autoware : public rclcpp::Node, public LowLevelAPI<Autoware>
+{
+  template <typename... Ts>
+  AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
+  : rclcpp::Node(std::forward<decltype(xs)>(xs)...)
+  {
+  }
+};
+
+using Accessor = Autoware;  // TODO(yamacir-kit): REMOVE THIS!!!
 }  // namespace autoware_api
 
 #include <awapi_accessor/undefine_macro.hpp>

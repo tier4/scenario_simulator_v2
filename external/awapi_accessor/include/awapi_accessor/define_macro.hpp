@@ -44,15 +44,16 @@ public:                                                              \
   }                                                                  \
   static_assert(true, "")
 
-#define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK)                             \
-  subscription_of_##TYPE(                                                       \
-    create_subscription<TYPE>(TOPIC, 1, [this](const TYPE::SharedPtr message) { \
-      auto lock = std::unique_lock<decltype(mutex)>(mutex);                     \
-      CURRENT_VALUE_OF(TYPE) = *message;                                        \
-      ERROR_CHECK();                                                            \
+#define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK)                                     \
+  subscription_of_##TYPE(static_cast<Node &>(*this).template create_subscription<TYPE>( \
+    TOPIC, 1, [this](const TYPE::SharedPtr message) {                                   \
+      auto lock = std::unique_lock<decltype(mutex)>(mutex);                             \
+      CURRENT_VALUE_OF(TYPE) = *message;                                                \
+      ERROR_CHECK();                                                                    \
     }))
 
 #define INIT_PUBLISHER(TYPE, TOPIC) \
-  publisher_of_##TYPE(create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))
+  publisher_of_##TYPE(              \
+    static_cast<Node &>(*this).template create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))
 
 #endif  // AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
