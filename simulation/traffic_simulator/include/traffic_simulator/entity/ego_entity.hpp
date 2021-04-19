@@ -116,24 +116,6 @@ public:
 
   /* ---- NOTE -----------------------------------------------------------------
    *
-   *  This constructor makes an Ego type entity with the proper initial state.
-   *  It is mainly used when writing scenarios in C++.
-   *
-   * ------------------------------------------------------------------------ */
-  // template<typename ... Ts>
-  // explicit EgoEntity(
-  //   const std::string & name,
-  //   const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
-  // : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
-  //   vehicle_model_ptr_(
-  //     std::make_shared<SimModelIdealSteer>(
-  //       parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
-  // {
-  //   setStatus(initial_state);
-  // }
-
-  /* ---- NOTE -----------------------------------------------------------------
-   *
    *  This constructor builds an Ego-type entity with an ambiguous initial
    *  state. In this case, the values for status_ and current_kinematic_state_
    *  are boost::none, respectively.
@@ -192,8 +174,6 @@ public:
       const auto autoware_launch_file = get_parameter("autoware_launch_file", std::string(""));
 
       auto child = [&]() {
-        // DEBUG_VALUE(lanelet2_map_osm);
-
         const std::vector<std::string> argv{
           "python3",
           "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
@@ -207,10 +187,6 @@ public:
           "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
             "/planning_simulator_v2.rviz",
           "scenario_simulation:=true"};
-
-        // for (const auto & each : argv) {
-        //   std::cout << each << (&each != &argv.back() ? ' ' : '\n');
-        // }
 
 #ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
         const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
@@ -431,13 +407,6 @@ private:
       current_twist.linear.x = (*vehicle_model_ptr_).getVx();
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
-
-    // DEBUG_VALUE(current_twist.linear.x);
-    // DEBUG_VALUE(current_twist.angular.z);
-    //
-    // DEBUG_VALUE(current_pose.position.x);
-    // DEBUG_VALUE(current_pose.position.y);
-    // DEBUG_VALUE(current_pose.position.z);
 
     std::atomic_load(&autowares.at(name))->setCurrentControlMode();
     std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);
