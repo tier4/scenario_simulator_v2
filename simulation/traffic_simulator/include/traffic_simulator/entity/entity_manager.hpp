@@ -35,6 +35,7 @@
 #include <stdexcept>  // TODO(yamacir-kit): Remove this!
 #include <string>
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
@@ -74,7 +75,8 @@ private:
 
   rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, boost::any> entities_;
+  // std::unordered_map<std::string, boost::any> entities_;
+  std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
   // rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
 
@@ -322,7 +324,9 @@ public:
     } else {
       entity.setHdMapUtils(hdmap_utils_ptr_);
       entity.setTrafficLightManager(traffic_light_manager_ptr_);
-      entities_.emplace(entity.name, std::forward<decltype(entity)>(entity));
+      entities_.emplace(
+        entity.name, std::make_unique<typename std::decay<Entity>::type>(
+                       std::forward<decltype(entity)>(entity)));
       return true;
     }
   }

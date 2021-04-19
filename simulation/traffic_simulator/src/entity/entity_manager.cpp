@@ -41,19 +41,7 @@ bool EntityManager::isStopping(const std::string & name) const
 void EntityManager::setDriverModel(
   const std::string & name, const openscenario_msgs::msg::DriverModel & model)
 {
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    throw traffic_simulator::SimulationRuntimeError("entity : " + name + " does not exist");
-  }
-  if (it->second.type() == typeid(VehicleEntity)) {
-    boost::any_cast<VehicleEntity &>(it->second).setDriverModel(model);
-  }
-  if (it->second.type() == typeid(EgoEntity)) {
-    return;
-  }
-  if (it->second.type() == typeid(PedestrianEntity)) {
-    throw traffic_simulator::SimulationRuntimeError("entity : " + name + " pedestrian");
-  }
+  entities_[name]->setDriverModel(model);
 }
 
 const geometry_msgs::msg::Pose EntityManager::toMapPose(
