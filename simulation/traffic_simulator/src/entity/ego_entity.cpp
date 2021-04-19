@@ -28,6 +28,19 @@ namespace entity
 {
 std::unordered_map<std::string, std::shared_ptr<autoware_api::Accessor>> EgoEntity::autowares{};
 
+template <typename T>
+auto getParameter(const std::string & name, const T & alternate)
+{
+  rclcpp::Node node{"get_parameter", "simulation"};
+
+  auto value = alternate;
+
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
+
+  return value;
+}
+
 EgoEntity::EgoEntity(
   const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
   const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
@@ -45,19 +58,6 @@ EgoEntity::EgoEntity(
     ))
 {
   auto launch_autoware = [&]() {
-    auto get_parameter = [](const std::string & name, const auto & alternate) {
-      rclcpp::Node node{"get_parameter", "simulation"};
-
-      auto value = alternate;
-
-      using value_type = typename std::decay<decltype(value)>::type;
-
-      node.declare_parameter<value_type>(name, value);
-      node.get_parameter<value_type>(name, value);
-
-      return value;
-    };
-
     /* ---- NOTE ---------------------------------------------------------------
      *
      *  The actual values of these parameters are set by
@@ -65,8 +65,8 @@ EgoEntity::EgoEntity(
      *  openscenario_interpreter_node.
      *
      * ---------------------------------------------------------------------- */
-    const auto autoware_launch_package = get_parameter("autoware_launch_package", std::string(""));
-    const auto autoware_launch_file = get_parameter("autoware_launch_file", std::string(""));
+    const auto autoware_launch_package = getParameter("autoware_launch_package", std::string(""));
+    const auto autoware_launch_file = getParameter("autoware_launch_file", std::string(""));
 
     auto child = [&]() {
       const std::vector<std::string> argv{

@@ -138,7 +138,7 @@ public:
 
   bool autoware_initialized = false;
 
-  auto initializeAutoware()
+  void initializeAutoware()
   {
     const auto current_entity_status = getStatus();
 
@@ -168,7 +168,7 @@ public:
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
-  decltype(auto) setTargetSpeed(const double value, const bool)
+  void setTargetSpeed(const double value, const bool)
   {
     const auto current = getStatus();
 
