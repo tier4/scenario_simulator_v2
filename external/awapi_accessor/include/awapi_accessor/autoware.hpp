@@ -16,12 +16,15 @@
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
 #include <awapi_accessor/low_level_api.hpp>
+#include <awapi_accessor/miscellaneous_api.hpp>
 #include <awapi_accessor/utility/visibility.hpp>
 #include <mutex>
 
 namespace awapi
 {
-class Autoware : public rclcpp::Node, public LowLevelAPI<Autoware>
+class Autoware : public rclcpp::Node,
+                 public LowLevelAPI<Autoware>,
+                 public MiscellaneousAPI<Autoware>
 {
   std::mutex mutex;
 
