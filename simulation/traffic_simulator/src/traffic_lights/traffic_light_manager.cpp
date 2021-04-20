@@ -104,7 +104,7 @@ void TrafficLightManager::drawMarkers() const
   marker_pub_->publish(msg);
 }
 
-void TrafficLightManager::update(const double)
+void TrafficLightManager::update(const double current_time)
 {
   publishTrafficLightStateArray();
 

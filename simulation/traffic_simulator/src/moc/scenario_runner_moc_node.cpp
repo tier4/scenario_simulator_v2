@@ -35,7 +35,7 @@ public:
   : Node("scenario_runner", option),
     api_(
       this, __FILE__,
-      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm")
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm", 5)
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
@@ -148,15 +148,13 @@ private:
       std::cout << "npc2 collision!" << std::endl;
     }
     */
-    if (current_time_ > 10.0 && api_.entityExists("bob")) {
+    if (api_.getCurrentTime() > 10.0 && api_.entityExists("bob")) {
       api_.despawn("bob");
     }
     api_.updateFrame();
-    current_time_ = current_time_ + 0.05;
   }
   bool lanechange_excuted_;
   bool target_speed_setted_;
-  double current_time_;
   int port_;
   traffic_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
