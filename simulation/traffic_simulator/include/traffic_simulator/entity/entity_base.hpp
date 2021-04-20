@@ -94,7 +94,7 @@ public:
   const openscenario_msgs::msg::EntityType getEntityType() const { return entity_type_; }
   virtual std::vector<std::int64_t> getRouteLanelets(const double horizon = 100) = 0;
   virtual void setTargetSpeed(const double target_speed, const bool continuous) = 0;
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() { return boost::none; }
+  virtual boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() = 0;
   const openscenario_msgs::msg::WaypointsArray getWaypoints()
   {
     return openscenario_msgs::msg::WaypointsArray();

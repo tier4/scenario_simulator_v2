@@ -74,6 +74,7 @@ public:
     }
     return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
   }
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;

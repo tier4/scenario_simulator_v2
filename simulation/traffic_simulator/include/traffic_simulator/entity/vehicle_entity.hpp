@@ -81,7 +81,7 @@ public:
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
   const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
   const openscenario_msgs::msg::WaypointsArray getWaypoints() { return tree_ptr_->getWaypoints(); }
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle()
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
   {
     return tree_ptr_->getObstacle();
   }
