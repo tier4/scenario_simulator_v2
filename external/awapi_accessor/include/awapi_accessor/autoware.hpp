@@ -15,8 +15,13 @@
 #ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
+#undef AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT
+
+#include <sys/wait.h>
+
 #include <awapi_accessor/continuous_transform_broadcaster.hpp>
 #include <awapi_accessor/fundamental_api.hpp>
+#include <awapi_accessor/launch.hpp>
 #include <awapi_accessor/miscellaneous_api.hpp>
 #include <awapi_accessor/transition_assertion.hpp>
 #include <awapi_accessor/utility/visibility.hpp>
@@ -32,11 +37,25 @@ class Autoware : public rclcpp::Node,
 {
   std::mutex mutex;
 
+  const pid_t process_id;
+
 public:
   template <typename... Ts>
   AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
-  : rclcpp::Node(std::forward<decltype(xs)>(xs)...)
+  : rclcpp::Node(
+      "autoware_concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
+  }
+
+  ~Autoware()
+  {
+    int status = 0;
+
+    if (::kill(process_id, SIGINT) < 0 or ::waitpid(process_id, &status, WUNTRACED) < 0) {
+      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
   }
 
   // TODO(yamacir-kit) MOVE INTO PRIVATE THIS!!!

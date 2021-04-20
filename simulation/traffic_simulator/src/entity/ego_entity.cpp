@@ -13,16 +13,8 @@
 // limitations under the License.
 
 #include <quaternion_operation/quaternion_operation.h>
-#include <sys/wait.h>  // for EgoEntity::~EgoEntity
 
-#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
-#include <ament_index_cpp/get_package_share_directory.hpp>  // launchAutoware
+#include <ament_index_cpp/get_package_share_directory.hpp>  // launch
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
@@ -48,84 +40,6 @@ auto getParameter(const std::string & name, const T & alternate)
   node.get_parameter<T>(name, value);
 
   return value;
-}
-
-/* ---- NOTE -------------------------------------------------------------------
- *
- *  If you can't explain the difference between char * and char [], don't edit
- *  this function even if it looks strange.
- *
- * -------------------------------------------------------------------------- */
-auto execute(const std::vector<std::string> & f_xs)
-{
-  std::vector<std::vector<char>> buffer{};
-
-  buffer.resize(f_xs.size());
-
-  std::vector<std::add_pointer<char>::type> argv;
-
-  argv.reserve(f_xs.size());
-
-  for (const auto & each : f_xs) {
-    buffer.emplace_back(std::begin(each), std::end(each));
-    buffer.back().push_back('\0');
-    argv.push_back(buffer.back().data());
-  }
-
-  argv.emplace_back(static_cast<std::add_pointer<char>::type>(0));
-
-  return ::execvp(argv[0], argv.data());
-}
-
-void EgoEntity::launchAutoware(
-  const std::string & map_path, const std::string & lanelet2_map_file = "lanelet2_map.osm",
-  const std::string & pointcloud_map_file = "pointcloud_map.pcd")
-{
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  The actual values of these parameters are set by
-   *  scenario_test_runner.launch.py as parameters of
-   *  openscenario_interpreter_node.
-   *
-   * ------------------------------------------------------------------------ */
-  const auto autoware_launch_package = getParameter("autoware_launch_package", std::string(""));
-  const auto autoware_launch_file = getParameter("autoware_launch_file", std::string(""));
-
-  auto child = [&]() {
-    const std::vector<std::string> argv{
-      "python3",
-      "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-      "launch",
-      autoware_launch_package,
-      autoware_launch_file,
-      "map_path:=" + map_path,
-      "lanelet2_map_file:=" + lanelet2_map_file,
-      "pointcloud_map_file:=" + pointcloud_map_file,
-      "vehicle_model:=ymc_golfcart_proto2",  // XXX: HARD CODING!!!
-      "sensor_model:=aip_x1",                // XXX: HARD CODING!!!
-      "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
-        "/planning_simulator_v2.rviz",
-      "scenario_simulation:=true"};
-
-#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-    const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
-    const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-    ::dup2(fd, STDOUT_FILENO);
-    ::dup2(fd, STDERR_FILENO);
-    ::close(fd);
-#endif
-
-    if (execute(argv) < 0) {
-      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
-  };
-
-  if ((autoware_process_id = fork()) < 0) {
-    throw std::system_error(errno, std::system_category());
-  } else if (autoware_process_id == 0) {
-    return child();
-  }  // NOTE if 0 < autoware_process_id, is parent process (fallthrough).
 }
 
 void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
@@ -159,12 +73,17 @@ EgoEntity::EgoEntity(
     auto my_name = name;
     std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
     autowares.emplace(
-      name, std::make_shared<awapi::Autoware>(
-              "awapi_accessor",
-              "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
-              rclcpp::NodeOptions().use_global_arguments(false)));
-
-    launchAutoware(lanelet2_map_osm.parent_path().string(), lanelet2_map_osm.filename().string());
+      name,
+      std::make_shared<awapi::Autoware>(
+        getParameter("autoware_launch_package", std::string("")),
+        getParameter("autoware_launch_file", std::string("")),
+        "map_path:=" + lanelet2_map_osm.parent_path().string(),
+        "lanelet2_map_file:=" + lanelet2_map_osm.filename().string(),
+        "vehicle_model:=ymc_golfcart_proto2",  // XXX: HARD CODING!!!
+        "sensor_model:=aip_x1",                // XXX: HARD CODING!!!
+        "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
+          "/planning_simulator_v2.rviz",
+        "scenario_simulation:=true"));
   }
 
   /* ---- NOTE ---------------------------------------------------------------
@@ -207,13 +126,6 @@ EgoEntity::~EgoEntity()
     accessor_status->set_value();
     accessor_spinner->join();
     autowares.erase(name);
-    int status = 0;
-    if (
-      ::kill(autoware_process_id, SIGINT) < 0 ||
-      ::waitpid(autoware_process_id, &status, WUNTRACED) < 0) {
-      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
   }
 }
 
