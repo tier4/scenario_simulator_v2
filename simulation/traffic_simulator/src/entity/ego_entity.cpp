@@ -14,7 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <awapi_accessor/accessor.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>  // launchAutoware
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
@@ -26,7 +26,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, std::shared_ptr<autoware_api::Accessor>> EgoEntity::autowares{};
+std::unordered_map<std::string, std::shared_ptr<awapi::Autoware>> EgoEntity::autowares{};
 
 template <typename T>
 auto getParameter(const std::string & name, const T & alternate)
@@ -183,7 +183,7 @@ EgoEntity::EgoEntity(
     auto my_name = name;
     std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
     autowares.emplace(
-      name, std::make_shared<autoware_api::Accessor>(
+      name, std::make_shared<awapi::Autoware>(
               "awapi_accessor",
               "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
               rclcpp::NodeOptions().use_global_arguments(false)));

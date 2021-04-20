@@ -32,11 +32,10 @@
 #include <tf2/utils.h>
 
 #include <algorithm>
-#include <ament_index_cpp/get_package_share_directory.hpp>
-#include <autoware_auto_msgs/msg/complex32.hpp>
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+// #include <autoware_auto_msgs/msg/complex32.hpp>
+// #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+// #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
+// #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
@@ -44,7 +43,6 @@
 #include <cstdlib>
 #include <future>
 #include <memory>
-#include <pugixml.hpp>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -67,7 +65,7 @@ class EgoEntity : public VehicleEntity
 {
   // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
   static std::unordered_map<
-    std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
+    std::string, std::shared_ptr<awapi::Autoware>  // TODO(yamacir-kit): virtualize accessor.
     >
     autowares;
 

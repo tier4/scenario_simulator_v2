@@ -57,7 +57,7 @@
 
 // #define DEBUG_VALUE(...) std::cout << #__VA_ARGS__ " = " << (__VA_ARGS__) << std::endl
 
-namespace autoware_api
+namespace awapi
 {
 struct AutowareError : public std::runtime_error
 {
@@ -615,7 +615,7 @@ struct Autoware : public rclcpp::Node, public LowLevelAPI<Autoware>
 };
 
 using Accessor = Autoware;  // TODO(yamacir-kit): REMOVE THIS!!!
-}  // namespace autoware_api
+}  // namespace awapi
 
 #include <awapi_accessor/undefine_macro.hpp>
 

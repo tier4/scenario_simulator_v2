@@ -29,7 +29,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace autoware_api
+namespace awapi
 {
 #define REQUIRES(...) typename = typename std::enable_if<__VA_ARGS__::value>::type
 
@@ -98,6 +98,6 @@ struct converter<From, autoware_vehicle_msgs::msg::Engage>
     return to;
   }
 };
-}  // namespace autoware_api
+}  // namespace awapi
 
 #endif  // AWAPI_ACCESSOR__CONVERSION_HPP_

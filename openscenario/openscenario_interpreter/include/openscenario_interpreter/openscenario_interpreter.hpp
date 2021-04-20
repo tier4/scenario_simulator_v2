@@ -88,7 +88,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   template <typename Thunk>
   void withExceptionHandler(Thunk && thunk)
   {
-    using autoware_api::AutowareError;
+    using awapi::AutowareError;
 
     using openscenario_interpreter::ImplementationFault;
 
