@@ -222,38 +222,9 @@ public:
     }
   }
 
-  tf2_ros::Buffer transform_buffer;
-  tf2_ros::TransformBroadcaster transform_broadcaster;
-
-  geometry_msgs::msg::TransformStamped current_transform;
-
-  const auto & setTransform(const geometry_msgs::msg::Pose & pose)
-  {
-    current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-    current_transform.header.frame_id = "map";
-    current_transform.child_frame_id = "base_link";
-    current_transform.transform.translation.x = pose.position.x;
-    current_transform.transform.translation.y = pose.position.y;
-    current_transform.transform.translation.z = pose.position.z;
-    current_transform.transform.rotation = pose.orientation;
-
-    return current_transform;
-  }
-
-  const rclcpp::TimerBase::SharedPtr timer;
-
-  void updateTransform()
-  {
-    if (!current_transform.header.frame_id.empty() && !current_transform.child_frame_id.empty()) {
-      current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      return transform_broadcaster.sendTransform(current_transform);
-    }
-  }
-
 public:
   explicit LowLevelAPI()
-  :  // AWAPI topics (lexicographically sorted)
-    INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+  : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
@@ -261,13 +232,7 @@ public:
     INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
-    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {}),
-
-    transform_buffer(static_cast<Node &>(*this).get_clock()),
-    transform_broadcaster(static_cast<Node *>(this)),
-
-    timer(static_cast<Node &>(*this).create_wall_timer(
-      std::chrono::milliseconds(5), [this]() { return updateTransform(); }))
+    INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
   {
   }
 };
