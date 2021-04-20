@@ -457,7 +457,11 @@ private:
     std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
   }
 
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
+  {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    return boost::none;
+  }
 
 private:
   const openscenario_msgs::msg::EntityStatus getEntityStatus(

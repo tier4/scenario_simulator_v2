@@ -74,7 +74,6 @@ private:
 
   rclcpp::Clock::SharedPtr clock_ptr_;
 
-  // std::unordered_map<std::string, boost::any> entities_;
   std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
   // rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
