@@ -16,8 +16,7 @@ WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
 RUN source /opt/ros/foxy/setup.bash && rosdep install -iry --from-paths . --rosdistro foxy
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
-RUN echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
-RUN echo "source /home/ubuntu/Desktop/scenario_simulator_ws/install/local_setup.bash" >> ~/.bashrc
-
-WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
 RUN source /opt/ros/foxy/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+COPY ./docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
