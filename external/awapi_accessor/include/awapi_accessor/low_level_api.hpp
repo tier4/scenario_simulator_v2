@@ -428,7 +428,7 @@ public:
       initial_twist.twist = twist;
     }
 
-    CURRENT_VALUE_OF(VehicleCommand).control.velocity = initial_twist.twist.linear.x;
+    AWAPI_CURRENT_VALUE_OF(VehicleCommand).control.velocity = initial_twist.twist.linear.x;
 
     return setInitialTwist(initial_twist);
   }
@@ -496,13 +496,13 @@ public:
   DEFINE_SUBSCRIPTION(VehicleCommand);
 
 public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                         \
-  auto is##NAME() const noexcept                                                    \
-  {                                                                                 \
-    using autoware_system_msgs::msg::AutowareState;                                 \
-    assert(AutowareState::VALUE == #NAME);                                          \
-    return CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
-  }                                                                                 \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                               \
+  auto is##NAME() const noexcept                                                          \
+  {                                                                                       \
+    using autoware_system_msgs::msg::AutowareState;                                       \
+    assert(AutowareState::VALUE == #NAME);                                                \
+    return AWAPI_CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
+  }                                                                                       \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);

@@ -17,16 +17,22 @@
 
 #include <awapi_accessor/low_level_api.hpp>
 #include <awapi_accessor/utility/visibility.hpp>
+#include <mutex>
 
 namespace awapi
 {
-struct Autoware : public rclcpp::Node, public LowLevelAPI<Autoware>
+class Autoware : public rclcpp::Node, public LowLevelAPI<Autoware>
 {
+  std::mutex mutex;
+
+public:
   template <typename... Ts>
   AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
   : rclcpp::Node(std::forward<decltype(xs)>(xs)...)
   {
   }
+
+  decltype(auto) lock() { return std::unique_lock<std::mutex>(mutex); }
 };
 }  // namespace awapi
 
