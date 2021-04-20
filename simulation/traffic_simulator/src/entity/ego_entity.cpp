@@ -133,8 +133,9 @@ void EgoEntity::initializeAutoware()
   const auto current_entity_status = getStatus();
 
   if (not std::exchange(autoware_initialized, true)) {
-    waitForAutowareStateToBeInitializingVehicle(
-      [&]() { return updateAutoware(current_entity_status.pose); });
+    std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeInitializingVehicle([&]() {
+      return updateAutoware(current_entity_status.pose);
+    });
 
     /* ---- NOTE ---------------------------------------------------------------
      *
@@ -144,7 +145,7 @@ void EgoEntity::initializeAutoware()
      *  awapi_awiv_adapter.
      *
      * ---------------------------------------------------------------------- */
-    waitForAutowareStateToBeWaitingForRoute([&]() {
+    std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeWaitingForRoute([&]() {
       std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
       return updateAutoware(current_entity_status.pose);
     });
@@ -261,24 +262,28 @@ void EgoEntity::requestAcquirePosition(
   const auto current_pose = getStatus().pose;
 
   // NOTE: This is assertion.
-  waitForAutowareStateToBeWaitingForRoute([&]() { return updateAutoware(current_pose); });
+  std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeWaitingForRoute([&]() {
+    return updateAutoware(current_pose);
+  });
 
-  waitForAutowareStateToBePlanning(
-    [&]() {
-      std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
+  std::atomic_load(&autowares.at(name))
+    ->waitForAutowareStateToBePlanning(
+      [&]() {
+        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
 
-      for (const auto & constraint : constraints) {
-        std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
-      }
+        for (const auto & constraint : constraints) {
+          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
+        }
 
-      return updateAutoware(current_pose);
-    },
-    std::chrono::seconds(5));
+        return updateAutoware(current_pose);
+      },
+      std::chrono::seconds(5));
 
-  waitForAutowareStateToBeWaitingForEngage(
-    [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
+  std::atomic_load(&autowares.at(name))
+    ->waitForAutowareStateToBeWaitingForEngage(
+      [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
 
-  waitForAutowareStateToBeDriving([&]() {
+  std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeDriving([&]() {
     std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
     return updateAutoware(current_pose);
   });
