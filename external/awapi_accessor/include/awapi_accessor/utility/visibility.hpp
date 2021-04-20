@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__UTILITY__VISIBILITY_H_
-#define AWAPI_ACCESSOR__UTILITY__VISIBILITY_H_
+#ifndef AWAPI_ACCESSOR__UTILITY__VISIBILITY_HPP_
+#define AWAPI_ACCESSOR__UTILITY__VISIBILITY_HPP_
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,4 +57,4 @@ extern "C" {
 }
 #endif
 
-#endif  // AWAPI_ACCESSOR__UTILITY__VISIBILITY_H_
+#endif  // AWAPI_ACCESSOR__UTILITY__VISIBILITY_HPP_
