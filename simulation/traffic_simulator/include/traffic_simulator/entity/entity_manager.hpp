@@ -23,7 +23,6 @@
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
-#include <boost/any.hpp>
 #include <boost/optional.hpp>
 #include <map>
 #include <memory>
@@ -35,6 +34,7 @@
 #include <stdexcept>  // TODO(yamacir-kit): Remove this!
 #include <string>
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
@@ -74,7 +74,7 @@ private:
 
   rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, boost::any> entities_;
+  std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
   // rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
 
@@ -269,7 +269,7 @@ public:
 
   bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);
 
-  bool entityStatusSetted(const std::string & name) const;
+  bool entityStatusSet(const std::string & name) const;
 
   void setTargetSpeed(const std::string & name, const double target_speed, const bool continuous);
 
@@ -322,7 +322,9 @@ public:
     } else {
       entity.setHdMapUtils(hdmap_utils_ptr_);
       entity.setTrafficLightManager(traffic_light_manager_ptr_);
-      entities_.emplace(entity.name, std::forward<decltype(entity)>(entity));
+      entities_.emplace(
+        entity.name, std::make_unique<typename std::decay<Entity>::type>(
+                       std::forward<decltype(entity)>(entity)));
       return true;
     }
   }

@@ -41,9 +41,9 @@ public:
   PedestrianEntity(std::string name, openscenario_msgs::msg::PedestrianParameters parameters);
   const openscenario_msgs::msg::PedestrianParameters parameters;
   void onUpdate(double current_time, double step_time) override;
-  void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
-  void requestWalkStraight();
-  // void requestLaneChange(std::int64_t to_lanelet_id);
+  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override;
+  void requestWalkStraight() override;
+  void requestLaneChange(std::int64_t to_lanelet_id);
   void cancelRequest();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
   {
@@ -56,7 +56,7 @@ public:
     traffic_light_manager_ = ptr;
     tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
   }
-  void setTargetSpeed(double target_speed, bool continuous);
+  void setTargetSpeed(double target_speed, bool continuous) override;
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
@@ -64,7 +64,7 @@ public:
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
   const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
-  std::vector<std::int64_t> getRouteLanelets(double horizon = 100)
+  std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
     if (!status_) {
       return {};
@@ -74,6 +74,7 @@ public:
     }
     return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
   }
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;
