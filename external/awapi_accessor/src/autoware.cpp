@@ -12,24 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__ACCESSOR_HPP_
-#define AWAPI_ACCESSOR__ACCESSOR_HPP_
-
-#include <awapi_accessor/low_level_api.hpp>
-#include <awapi_accessor/utility/visibility.hpp>
-
-namespace awapi
-{
-struct Autoware : public rclcpp::Node, public LowLevelAPI<Autoware>
-{
-  template <typename... Ts>
-  AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
-  : rclcpp::Node(std::forward<decltype(xs)>(xs)...)
-  {
-  }
-};
-}  // namespace awapi
-
-#include <awapi_accessor/undefine_macro.hpp>
-
-#endif  // AWAPI_ACCESSOR__ACCESSOR_HPP_
+#include <awapi_accessor/autoware.hpp>

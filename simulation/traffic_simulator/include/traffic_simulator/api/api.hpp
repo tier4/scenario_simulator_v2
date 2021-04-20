@@ -19,7 +19,6 @@
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
-#include <awapi_accessor/accessor.hpp>
 #include <boost/filesystem.hpp>
 #include <cassert>
 #include <memory>

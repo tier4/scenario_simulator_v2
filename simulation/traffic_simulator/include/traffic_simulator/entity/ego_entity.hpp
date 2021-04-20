@@ -21,7 +21,7 @@
 #undef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
 
 #include <algorithm>
-#include <awapi_accessor/accessor.hpp>
+#include <awapi_accessor/autoware.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <chrono>
