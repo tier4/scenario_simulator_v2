@@ -50,7 +50,7 @@ public:
   const std::string type;
   const std::string name;
   const openscenario_msgs::msg::EntityStatus getStatus() const;
-  bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  virtual bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
   bool setVisibility(bool visibility);
   bool getVisibility();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr) { hdmap_utils_ptr_ = ptr; }
