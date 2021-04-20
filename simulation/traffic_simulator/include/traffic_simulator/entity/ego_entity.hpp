@@ -16,26 +16,11 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 
 #undef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
 
-#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
-#include <sys/wait.h>  // for EgoEntity::~EgoEntity
-#include <tf2/utils.h>
-
 #include <algorithm>
-// #include <autoware_auto_msgs/msg/complex32.hpp>
-// #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-// #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-// #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <awapi_accessor/accessor.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
@@ -45,7 +30,6 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <system_error>
 #include <thread>
 #include <unordered_map>
 #include <utility>
@@ -155,7 +139,7 @@ private:
       } else {                                                                                  \
         const auto current_state =                                                              \
           std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;            \
-        std::stringstream ss{};                                                                 \
+        std::stringstream ss;                                                                   \
         ss << "The simulator waited " << duration_max.count()                                   \
            << " seconds, expecting the Autoware state to transitioning to " << #STATE           \
            << ", but there was no change. The current Autoware state is "                       \

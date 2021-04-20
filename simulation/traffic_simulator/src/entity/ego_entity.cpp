@@ -13,11 +13,20 @@
 // limitations under the License.
 
 #include <quaternion_operation/quaternion_operation.h>
+#include <sys/wait.h>  // for EgoEntity::~EgoEntity
+
+#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 #include <ament_index_cpp/get_package_share_directory.hpp>  // launchAutoware
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
+#include <system_error>  // std::system_error
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <unordered_map>
 #include <vector>
