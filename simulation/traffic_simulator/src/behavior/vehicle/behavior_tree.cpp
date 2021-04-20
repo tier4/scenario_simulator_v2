@@ -48,6 +48,7 @@ BehaviorTree::BehaviorTree()
   // logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);
   setupLogger();
   setRequest("none");
+  setValueToBlackBoard<boost::optional<openscenario_msgs::msg::Obstacle>>("obstacle", boost::none);
 }
 
 void BehaviorTree::setRequest(std::string request)
@@ -80,6 +81,7 @@ BT::NodeStatus BehaviorTree::tick(double current_time, double step_time)
 {
   setValueToBlackBoard("current_time", current_time);
   setValueToBlackBoard("step_time", step_time);
+  setValueToBlackBoard<boost::optional<openscenario_msgs::msg::Obstacle>>("obstacle", boost::none);
   return tree_.rootNode()->executeTick();
 }
 

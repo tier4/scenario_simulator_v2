@@ -446,9 +446,7 @@ const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(
 boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
   const std::string & name)
 {
-  std::cout << name << std::endl;
-  entities_.at(name)->getObstacle();
-  return boost::none;
+  return entities_.at(name)->getObstacle();
 }
 
 openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(const std::string & name)
