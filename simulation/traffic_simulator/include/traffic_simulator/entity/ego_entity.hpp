@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
+#include <openscenario_msgs/msg/entity_type.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
@@ -115,10 +116,24 @@ public:
     const geometry_msgs::msg::PoseStamped &,
     const std::vector<geometry_msgs::msg::PoseStamped> & = {});
 
+  void requestAcquirePosition(
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
+    const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
+  {
+    requestAcquirePosition((*hdmap_utils_ptr_).toMapPose(lanelet_pose), constraints);
+  }
+
+  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override
+  {
+    requestAcquirePosition(lanelet_pose, {});
+  }
+
+  void requestLaneChange(const std::int64_t to_lanelet_id);
+
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
-  void setTargetSpeed(const double value, const bool)
+  void setTargetSpeed(double value, bool) override
   {
     const auto current = getStatus();
 
@@ -139,7 +154,7 @@ public:
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
-  openscenario_msgs::msg::WaypointsArray getWaypoints() const;
+  const openscenario_msgs::msg::WaypointsArray getWaypoints();
 
 private:
 // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
@@ -190,6 +205,12 @@ private:
   void initializeAutoware();
 
   void updateAutoware(const geometry_msgs::msg::Pose &);
+
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
+  {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    return boost::none;
+  }
 
 private:
   const openscenario_msgs::msg::EntityStatus getEntityStatus(
