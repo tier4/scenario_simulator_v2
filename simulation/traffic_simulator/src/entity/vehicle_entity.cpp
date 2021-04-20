@@ -27,47 +27,42 @@ namespace traffic_simulator
 namespace entity
 {
 VehicleEntity::VehicleEntity(
-  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  openscenario_msgs::msg::VehicleParameters params)
-: EntityBase(params.name, name, initial_state), parameters(params)
+  const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
+  const openscenario_msgs::msg::VehicleParameters & params)
+: EntityBase(params.name, name, initial_state),
+  parameters(params),
+  tree_ptr_(std::make_shared<entity_behavior::vehicle::BehaviorTree>())
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
-  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
-VehicleEntity::VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters params)
-: EntityBase(params.name, name), parameters(params)
+VehicleEntity::VehicleEntity(
+  const std::string & name, const openscenario_msgs::msg::VehicleParameters & params)
+: EntityBase(params.name, name),
+  parameters(params),
+  tree_ptr_(std::make_shared<entity_behavior::vehicle::BehaviorTree>())
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
-  tree_ptr_ = std::make_shared<entity_behavior::vehicle::BehaviorTree>();
   tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
 }
 
 void VehicleEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  if (!status_) {
-    return;
+  if (status_ and status_->lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
   }
-  if (!status_->lanelet_pose_valid) {
-    return;
-  }
-  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
 }
 
 void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
-  if (!status_) {
-    return;
+  if (status_ and status_->lanelet_pose_valid) {
+    route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
   }
-  if (!status_->lanelet_pose_valid) {
-    return;
-  }
-  route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
 }
 
-void VehicleEntity::requestLaneChange(std::int64_t to_lanelet_id)
+void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
   tree_ptr_->setRequest("lane_change");
   tree_ptr_->setValueToBlackBoard("to_lanelet_id", to_lanelet_id);

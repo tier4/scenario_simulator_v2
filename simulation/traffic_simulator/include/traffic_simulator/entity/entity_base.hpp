@@ -58,7 +58,7 @@ public:
   {
     traffic_light_manager_ = ptr;
   }
-  void setDriverModel(const openscenario_msgs::msg::DriverModel &) { return; }
+  virtual void setDriverModel(const openscenario_msgs::msg::DriverModel &) {}
   virtual void onUpdate(double current_time, double step_time) = 0;
   bool statusSet() const
   {
