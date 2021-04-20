@@ -446,6 +446,9 @@ const openscenario_msgs::msg::BoundingBox EntityManager::getBoundingBox(
 boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
   const std::string & name)
 {
+  if (current_time_ < 0) {
+    return boost::none;
+  }
   return entities_.at(name)->getObstacle();
 }
 
