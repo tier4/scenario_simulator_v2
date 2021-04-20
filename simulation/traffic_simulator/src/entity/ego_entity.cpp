@@ -128,30 +128,6 @@ void EgoEntity::launchAutoware(
   }  // NOTE if 0 < autoware_process_id, is parent process (fallthrough).
 }
 
-void EgoEntity::initializeAutoware()
-{
-  const auto current_entity_status = getStatus();
-
-  if (not std::exchange(autoware_initialized, true)) {
-    std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeInitializingVehicle([&]() {
-      return updateAutoware(current_entity_status.pose);
-    });
-
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
-     *  and tf to be published. Member function EgoEntity::waitForAutowareToBe*
-     *  are depends a topic '/awapi/autoware/get/status' published by
-     *  awapi_awiv_adapter.
-     *
-     * ---------------------------------------------------------------------- */
-    std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeWaitingForRoute([&]() {
-      std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
-      return updateAutoware(current_entity_status.pose);
-    });
-  }
-}
-
 void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
 {
   geometry_msgs::msg::Twist current_twist;
@@ -245,8 +221,8 @@ void EgoEntity::requestAcquirePosition(
   const geometry_msgs::msg::PoseStamped & goal_pose,
   const std::vector<geometry_msgs::msg::PoseStamped> & constraints)
 {
-  if (not autoware_initialized) {
-    initializeAutoware();
+  if (not std::exchange(autoware_initialized, true)) {
+    std::atomic_load(&autowares.at(name))->initialize(getStatus().pose);
   }
 
   const auto current_pose = getStatus().pose;

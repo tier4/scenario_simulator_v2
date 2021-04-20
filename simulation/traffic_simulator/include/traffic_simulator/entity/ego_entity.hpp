@@ -139,8 +139,6 @@ public:
 private:
   void launchAutoware(const std::string &, const std::string &, const std::string &);
 
-  void initializeAutoware();
-
   void updateAutoware(const geometry_msgs::msg::Pose &);
 
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }

@@ -39,15 +39,19 @@ public:
   {
   }
 
+  // TODO(yamacir-kit) MOVE INTO PRIVATE THIS!!!
   decltype(auto) lock() { return std::unique_lock<std::mutex>(mutex); }
 
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  Called for each execution frame of the simulator.
    *
+   *  TODO(yamacir-kit) MOVE INTO class VehicleAPI.
+   *
    * ------------------------------------------------------------------------ */
   void update(
-    const geometry_msgs::msg::Pose & current_pose, const geometry_msgs::msg::Twist & current_twist)
+    const geometry_msgs::msg::Pose & current_pose,
+    const geometry_msgs::msg::Twist & current_twist = geometry_msgs::msg::Twist())
   {
     setCurrentControlMode();
     setCurrentPose(current_pose);
@@ -60,6 +64,16 @@ public:
     setLocalizationTwist(current_twist);
     setTransform(current_pose);
     // setVehicleVelocity(parameters.performance.max_speed);
+  }
+
+  void initialize(const geometry_msgs::msg::Pose & initial_pose)
+  {
+    waitForAutowareStateToBeInitializingVehicle([&]() { return update(initial_pose); });
+
+    waitForAutowareStateToBeWaitingForRoute([&]() {
+      setInitialPose(initial_pose);
+      return update(initial_pose);
+    });
   }
 };
 }  // namespace awapi
