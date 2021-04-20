@@ -160,17 +160,7 @@ void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
     current_twist.angular.z = (*vehicle_model_ptr_).getWz();
   }
 
-  std::atomic_load(&autowares.at(name))->setCurrentControlMode();
-  std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);
-  std::atomic_load(&autowares.at(name))->setCurrentShift(current_twist);
-  std::atomic_load(&autowares.at(name))->setCurrentSteering(current_twist);
-  std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
-  std::atomic_load(&autowares.at(name))->setCurrentTwist(current_twist);
-  std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
-  std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
-  std::atomic_load(&autowares.at(name))->setLocalizationTwist(current_twist);
-  std::atomic_load(&autowares.at(name))->setTransform(current_pose);
-  std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
+  std::atomic_load(&autowares.at(name))->update(current_pose, current_twist);
 }
 
 EgoEntity::EgoEntity(

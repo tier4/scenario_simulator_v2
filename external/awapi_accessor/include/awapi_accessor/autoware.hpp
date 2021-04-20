@@ -40,6 +40,27 @@ public:
   }
 
   decltype(auto) lock() { return std::unique_lock<std::mutex>(mutex); }
+
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  Called for each execution frame of the simulator.
+   *
+   * ------------------------------------------------------------------------ */
+  void update(
+    const geometry_msgs::msg::Pose & current_pose, const geometry_msgs::msg::Twist & current_twist)
+  {
+    setCurrentControlMode();
+    setCurrentPose(current_pose);
+    setCurrentShift(current_twist);
+    setCurrentSteering(current_twist);
+    setCurrentTurnSignal();
+    setCurrentTwist(current_twist);
+    setCurrentVelocity(current_twist);
+    setLaneChangeApproval();
+    setLocalizationTwist(current_twist);
+    setTransform(current_pose);
+    // setVehicleVelocity(parameters.performance.max_speed);
+  }
 };
 }  // namespace awapi
 

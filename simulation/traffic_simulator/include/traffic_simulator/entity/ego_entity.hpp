@@ -143,10 +143,7 @@ private:
 
   void updateAutoware(const geometry_msgs::msg::Pose &);
 
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
-  {
-    return boost::none;
-  }
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
 
 private:
   const openscenario_msgs::msg::EntityStatus getEntityStatus(
