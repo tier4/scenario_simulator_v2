@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__LOW_LEVEL_API_HPP_
-#define AWAPI_ACCESSOR__LOW_LEVEL_API_HPP_
+#ifndef AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
+#define AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
 
 #define AUTOWARE_IV  // or #define AUTOWARE_AUTO
 
@@ -53,7 +53,7 @@
 namespace awapi
 {
 template <typename Node>
-class LowLevelAPI
+class FundamentalAPI
 {
 public:
   /* ---- AutowareEngage -------------------------------------------------------
@@ -219,7 +219,7 @@ public:
   }
 
 public:
-  explicit LowLevelAPI()
+  explicit FundamentalAPI()
   : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
@@ -234,4 +234,4 @@ public:
 };
 }  // namespace awapi
 
-#endif  // AWAPI_ACCESSOR__LOW_LEVEL_API_HPP_
+#endif  // AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_

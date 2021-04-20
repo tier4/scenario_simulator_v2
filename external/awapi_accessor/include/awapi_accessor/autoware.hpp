@@ -16,7 +16,7 @@
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
 #include <awapi_accessor/continuous_transform_broadcaster.hpp>
-#include <awapi_accessor/low_level_api.hpp>
+#include <awapi_accessor/fundamental_api.hpp>
 #include <awapi_accessor/miscellaneous_api.hpp>
 #include <awapi_accessor/utility/visibility.hpp>
 #include <mutex>
@@ -25,7 +25,7 @@ namespace awapi
 {
 class Autoware : public rclcpp::Node,
                  public ContinuousTransformBroadcaster<Autoware>,
-                 public LowLevelAPI<Autoware>,
+                 public FundamentalAPI<Autoware>,
                  public MiscellaneousAPI<Autoware>
 {
   std::mutex mutex;
