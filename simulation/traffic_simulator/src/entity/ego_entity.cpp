@@ -14,7 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <ament_index_cpp/get_package_share_directory.hpp>  // launch
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
