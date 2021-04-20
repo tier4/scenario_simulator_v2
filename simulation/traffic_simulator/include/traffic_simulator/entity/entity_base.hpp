@@ -50,7 +50,7 @@ public:
   const std::string type;
   const std::string name;
   const openscenario_msgs::msg::EntityStatus getStatus() const;
-  bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  virtual bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
   bool setVisibility(bool visibility);
   bool getVisibility();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr) { hdmap_utils_ptr_ = ptr; }
@@ -58,7 +58,7 @@ public:
   {
     traffic_light_manager_ = ptr;
   }
-  void setDriverModel(const openscenario_msgs::msg::DriverModel &) { return; }
+  virtual void setDriverModel(const openscenario_msgs::msg::DriverModel &) {}
   virtual void onUpdate(double current_time, double step_time) = 0;
   bool statusSet() const
   {

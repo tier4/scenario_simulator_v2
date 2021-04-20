@@ -134,7 +134,7 @@ public:
 
   void onUpdate(double current_time, double step_time);
 
-  bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  bool setStatus(const openscenario_msgs::msg::EntityStatus & status) override;
 
   const openscenario_msgs::msg::WaypointsArray getWaypoints();
 

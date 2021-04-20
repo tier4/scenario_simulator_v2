@@ -331,7 +331,7 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::requestLaneChange(const std::int64_t)
 {
-  std::stringstream what{};
+  std::stringstream what;
   what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. ";
   what << "In general, such a request is an error, ";
   what << "since Ego cars make autonomous decisions about everything but their destination.";
