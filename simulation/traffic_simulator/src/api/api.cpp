@@ -160,9 +160,7 @@ bool API::setEntityStatus(
 
 boost::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
 {
-  if (
-    !entity_manager_ptr_->entityStatusSetted(from) ||
-    !entity_manager_ptr_->entityStatusSetted(to)) {
+  if (!entity_manager_ptr_->entityStatusSet(from) || !entity_manager_ptr_->entityStatusSet(to)) {
     return boost::none;
   }
   geometry_msgs::msg::Pose pose = getRelativePose(from, to);
@@ -180,7 +178,7 @@ boost::optional<double> API::getTimeHeadway(const std::string & from, const std:
 bool API::reachPosition(
   const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance)
 {
-  return entity_manager_ptr_->entityStatusSetted(name) &&
+  return entity_manager_ptr_->entityStatusSet(name) &&
          entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
 }
 
@@ -188,7 +186,7 @@ bool API::reachPosition(
   const std::string & name, const openscenario_msgs::msg::LaneletPose & target_pose,
   const double tolerance)
 {
-  return entity_manager_ptr_->entityStatusSetted(name) &&
+  return entity_manager_ptr_->entityStatusSet(name) &&
          entity_manager_ptr_->reachPosition(
            name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
 
@@ -198,8 +196,8 @@ bool API::reachPosition(
 bool API::reachPosition(
   const std::string & name, const std::string & target_name, const double tolerance) const
 {
-  return entity_manager_ptr_->entityStatusSetted(name) &&
-         entity_manager_ptr_->entityStatusSetted(target_name) &&
+  return entity_manager_ptr_->entityStatusSet(name) &&
+         entity_manager_ptr_->entityStatusSet(target_name) &&
          entity_manager_ptr_->reachPosition(name, target_name, tolerance);
 }
 
@@ -240,7 +238,7 @@ bool API::setEntityStatus(
 bool API::initialize(double realtime_factor, double step_time)
 {
   step_time_ = step_time;
-  current_time_ = 0.0;
+  current_time_ = -1 * initialize_duration;
   if (standalone_mode) {
     return true;
   }

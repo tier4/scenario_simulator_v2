@@ -27,6 +27,13 @@ public:
   explicit SimulationRuntimeError(std::string message) : runtime_error(message.c_str()) {}
 };
 
+class UnsupportActionError : public std::runtime_error
+{
+public:
+  explicit UnsupportActionError(const char * message) : runtime_error(message) {}
+  explicit UnsupportActionError(std::string message) : runtime_error(message.c_str()) {}
+};
+
 class SplineInterpolationError : public std::runtime_error
 {
 public:

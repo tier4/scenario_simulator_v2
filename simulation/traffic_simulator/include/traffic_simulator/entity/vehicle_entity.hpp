@@ -23,6 +23,7 @@
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/entity/vehicle_parameter.hpp>
 
 // headers in pugixml
@@ -40,43 +41,70 @@ class VehicleEntity : public EntityBase
 {
 public:
   VehicleEntity(
-    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    openscenario_msgs::msg::VehicleParameters parameters);
-  VehicleEntity(std::string name, openscenario_msgs::msg::VehicleParameters parameters);
+    const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    const openscenario_msgs::msg::VehicleParameters & parameters);
+
+  VehicleEntity(
+    const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
+
   const openscenario_msgs::msg::VehicleParameters parameters;
+
   void onUpdate(double current_time, double step_time) override;
-  void requestAcquirePosition(openscenario_msgs::msg::LaneletPose lanelet_pose);
-  void requestLaneChange(std::int64_t to_lanelet_id);
+
+  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
+
+  void requestLaneChange(const std::int64_t to_lanelet_id);
+
   void cancelRequest();
-  void setDriverModel(const openscenario_msgs::msg::DriverModel & model)
+
+  const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters() const
+  {
+    return parameters;
+  }
+
+  void requestWalkStraight() override
+  {
+    throw UnsupportActionError("request walk straight command does not support in vehicle entity.");
+  }
+
+  void setDriverModel(const openscenario_msgs::msg::DriverModel & model) override
   {
     tree_ptr_->setValueToBlackBoard("driver_model", model);
   }
-  void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
+
+  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
   {
     hdmap_utils_ptr_ = ptr;
     route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
     tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
-  void setTrafficLightManager(std::shared_ptr<traffic_simulator::TrafficLightManager> ptr)
+
+  void setTrafficLightManager(const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
   {
     traffic_light_manager_ = ptr;
     tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
   }
-  void setTargetSpeed(double target_speed, bool continuous);
+
+  void setTargetSpeed(double target_speed, bool continuous) override;
+
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
   }
+
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
+
   const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
-  openscenario_msgs::msg::WaypointsArray getWaypoints() { return tree_ptr_->getWaypoints(); }
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle()
+
+  const openscenario_msgs::msg::WaypointsArray getWaypoints() { return tree_ptr_->getWaypoints(); }
+
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
   {
     return tree_ptr_->getObstacle();
   }
-  std::vector<std::int64_t> getRouteLanelets(double horizon = 100)
+
+  std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
     if (!status_) {
       return {};

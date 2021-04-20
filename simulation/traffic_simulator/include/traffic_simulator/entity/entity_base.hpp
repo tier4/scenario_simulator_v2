@@ -17,7 +17,12 @@
 
 #include <boost/optional.hpp>
 #include <openscenario_msgs/msg/bounding_box.hpp>
+#include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/entity_status.hpp>
+#include <openscenario_msgs/msg/entity_type.hpp>
+#include <openscenario_msgs/msg/obstacle.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
@@ -45,7 +50,7 @@ public:
   const std::string type;
   const std::string name;
   const openscenario_msgs::msg::EntityStatus getStatus() const;
-  bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  virtual bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
   bool setVisibility(bool visibility);
   bool getVisibility();
   void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr) { hdmap_utils_ptr_ = ptr; }
@@ -53,14 +58,20 @@ public:
   {
     traffic_light_manager_ = ptr;
   }
+  virtual void setDriverModel(const openscenario_msgs::msg::DriverModel &) {}
   virtual void onUpdate(double current_time, double step_time) = 0;
-  bool statusSetted() const
+  bool statusSet() const
   {
     if (status_) {
       return true;
     }
     return false;
   }
+  const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters() const
+  {
+    return boost::none;
+  }
+  void updateEntityStatusTimestamp(double current_time);
   void setVerbose(bool verbose) { verbose_ = verbose; }
   void setEntityTypeList(
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & entity_type_list)
@@ -77,6 +88,17 @@ public:
   boost::optional<double> getLinearJerk() const { return linear_jerk_; }
   virtual void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) = 0;
+  void requestLaneChange(const std::int64_t) { return; };
+  virtual void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) = 0;
+  virtual void requestWalkStraight() = 0;
+  const openscenario_msgs::msg::EntityType getEntityType() const { return entity_type_; }
+  virtual std::vector<std::int64_t> getRouteLanelets(const double horizon = 100) = 0;
+  virtual void setTargetSpeed(const double target_speed, const bool continuous) = 0;
+  virtual boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() = 0;
+  const openscenario_msgs::msg::WaypointsArray getWaypoints()
+  {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
 
 protected:
   bool visibility_;
@@ -91,6 +113,7 @@ protected:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;
   boost::optional<double> stand_still_duration_;
   visualization_msgs::msg::MarkerArray current_marker_;
+  openscenario_msgs::msg::EntityType entity_type_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

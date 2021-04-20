@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
+#include <openscenario_msgs/msg/entity_type.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
@@ -79,33 +80,6 @@ class EgoEntity : public VehicleEntity
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
   std::shared_ptr<std::thread> accessor_spinner;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  If you can't explain the difference between char * and char [], don't
-   *  edit this function even if it looks strange.
-   *
-   * ------------------------------------------------------------------------ */
-  auto execute(const std::vector<std::string> & f_xs)
-  {
-    std::vector<std::vector<char>> buffer{};
-
-    buffer.resize(f_xs.size());
-
-    std::vector<std::add_pointer<char>::type> argv{};
-
-    argv.reserve(f_xs.size());
-
-    for (const auto & each : f_xs) {
-      buffer.emplace_back(std::begin(each), std::end(each));
-      buffer.back().push_back('\0');
-      argv.push_back(buffer.back().data());
-    }
-
-    argv.emplace_back(static_cast<std::add_pointer<char>::type>(0));
-
-    return ::execvp(argv[0], argv.data());
-  }
-
 public:
   EgoEntity() = delete;
 
@@ -113,24 +87,6 @@ public:
   // TODO(yamacir-kit): EgoEntity(const EgoEntity &) = delete;
   // TODO(yamacir-kit): EgoEntity & operator=(EgoEntity &&) = delete;
   // TODO(yamacir-kit): EgoEntity & operator=(const EgoEntity &) = delete;
-
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  This constructor makes an Ego type entity with the proper initial state.
-   *  It is mainly used when writing scenarios in C++.
-   *
-   * ------------------------------------------------------------------------ */
-  // template<typename ... Ts>
-  // explicit EgoEntity(
-  //   const std::string & name,
-  //   const openscenario_msgs::msg::EntityStatus & initial_state, Ts && ... xs)
-  // : VehicleEntity(name, initial_state, std::forward<decltype(xs)>(xs)...),
-  //   vehicle_model_ptr_(
-  //     std::make_shared<SimModelIdealSteer>(
-  //       parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x))
-  // {
-  //   setStatus(initial_state);
-  // }
 
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -150,214 +106,34 @@ public:
    * ------------------------------------------------------------------------ */
   explicit EgoEntity(
     const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
-    const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
-  : VehicleEntity(name, parameters),
-    vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(
-      parameters.performance.max_speed,          // vel_lim,
-      parameters.axles.front_axle.max_steering,  // steer_lim,
-      parameters.performance.max_acceleration,   // accel_rate,
-      5.0,                                       // steer_rate_lim,
-      parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x,
-      step_time,  // dt,
-      0.25,       // vel_time_delay,
-      0.5,        // vel_time_constant,
-      0.3,        // steer_time_delay,
-      0.3,        // steer_time_constant,
-      0.0         // deadzone_delta_steer
-      ))
-  {
-    auto launch_autoware = [&]() {
-      auto get_parameter = [](const std::string & name, const auto & alternate) {
-        rclcpp::Node node{"get_parameter", "simulation"};
+    const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters);
 
-        auto value = alternate;
-
-        using value_type = typename std::decay<decltype(value)>::type;
-
-        node.declare_parameter<value_type>(name, value);
-        node.get_parameter<value_type>(name, value);
-
-        return value;
-      };
-
-      /* ---- NOTE -----------------------------------------------------------
-         *
-         *  The actual values of these parameters are set by
-         *  scenario_test_runner.launch.py as parameters of
-         *  openscenario_interpreter_node.
-         *
-         * ------------------------------------------------------------------ */
-      const auto autoware_launch_package =
-        get_parameter("autoware_launch_package", std::string(""));
-      const auto autoware_launch_file = get_parameter("autoware_launch_file", std::string(""));
-
-      auto child = [&]() {
-        // DEBUG_VALUE(lanelet2_map_osm);
-
-        const std::vector<std::string> argv{
-          "python3",
-          "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-          "launch",
-          autoware_launch_package,
-          autoware_launch_file,
-          std::string("map_path:=") += lanelet2_map_osm.parent_path().string(),
-          std::string("lanelet2_map_file:=") += lanelet2_map_osm.filename().string(),
-          "vehicle_model:=ymc_golfcart_proto2",
-          "sensor_model:=aip_x1",
-          "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
-            "/planning_simulator_v2.rviz",
-          "scenario_simulation:=true"};
-
-        // for (const auto & each : argv) {
-        //   std::cout << each << (&each != &argv.back() ? ' ' : '\n');
-        // }
-
-#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-        const std::string name = "/tmp/scenario_test_runner/autoware-output.txt";
-        const auto fd = ::open(name.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
-        ::dup2(fd, STDOUT_FILENO);
-        ::dup2(fd, STDERR_FILENO);
-        ::close(fd);
-#endif
-
-        if (execute(argv) < 0) {
-          std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-          std::exit(EXIT_FAILURE);
-        }
-      };
-
-      if ((autoware_process_id = fork()) < 0) {
-        throw std::system_error(errno, std::system_category());
-      } else if (autoware_process_id == 0) {
-        return child();
-      }
-    };
-
-    if (autowares.find(name) == std::end(autowares)) {
-      auto my_name = name;
-      std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
-      autowares.emplace(
-        name, std::make_shared<autoware_api::Accessor>(
-                "awapi_accessor",
-                "simulation/" + my_name,  // NOTE: Specified in scenario_test_runner.launch.py
-                rclcpp::NodeOptions().use_global_arguments(false)));
-
-      launch_autoware();
-    }
-
-    /* ---- NOTE ---------------------------------------------------------------
-     *
-     *  The simulator needs to run in a fixed-cycle loop, but the communication
-     *  part with Autoware needs to run at a higher frequency (e.g. the
-     *  transform in map -> base_link needs to be updated at a higher frequency
-     *  even if the value does not change). We also need to keep collecting the
-     *  latest values of topics from Autoware, independently of the simulator.
-     *
-     *  For this reason, autoware_api::Accessor, which is responsible for
-     *  communication with Autoware, should run in an independent thread. This
-     *  is probably an EXTREMELY DIRTY HACK.
-     *
-     *  Ideally, the constructor caller of traffic_simulator::API should
-     *  provide a std::shared_ptr to autoware_api::Accessor and spin that node
-     *  with MultiThreadedExecutor.
-     *
-     *  If you have a nice idea to solve this, and are interested in improving
-     *  the quality of the Tier IV simulator, please contact @yamacir-kit.
-     *
-     * ---------------------------------------------------------------------- */
-    if (autowares.at(name).use_count() < 2) {
-      accessor_status = std::make_shared<std::promise<void>>();
-      accessor_spinner = std::make_shared<std::thread>(
-        [](const auto node, auto status)  // NOTE: This copy increments use_count to 2 from 1.
-        {
-          while (rclcpp::ok() &&
-                 status.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-            rclcpp::spin_some(node);
-          }
-        },
-        autowares.at(name), std::move(accessor_status->get_future()));
-    }
-  }
-
-  ~EgoEntity() override
-  {
-    if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
-      accessor_status->set_value();
-      accessor_spinner->join();
-      autowares.erase(name);
-      int status = 0;
-      if (
-        ::kill(autoware_process_id, SIGINT) < 0 ||
-        ::waitpid(autoware_process_id, &status, WUNTRACED) < 0) {
-        std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-        std::exit(EXIT_FAILURE);
-      }
-    }
-  }
+  ~EgoEntity() override;
 
   bool autoware_initialized = false;
 
-  auto initializeAutoware()
-  {
-    const auto current_entity_status = getStatus();
-
-    if (!std::exchange(autoware_initialized, true)) {
-      waitForAutowareStateToBeInitializingVehicle(
-        [&]() { return updateAutoware(current_entity_status.pose); });
-
-      /* ---- NOTE ---------------------------------------------------------------
-       *
-       *  awapi_awiv_adapter requires at least 'initialpose' and 'initialtwist'
-       *  and tf to be published. Member function EgoEntity::waitForAutowareToBe*
-       *  are depends a topic '/awapi/autoware/get/status' published by
-       *  awapi_awiv_adapter.
-       *
-       * ---------------------------------------------------------------------- */
-      waitForAutowareStateToBeWaitingForRoute([&]() {
-        std::atomic_load(&autowares.at(name))->setInitialPose(current_entity_status.pose);
-        return updateAutoware(current_entity_status.pose);
-      });
-    }
-  }
+  void requestAcquirePosition(
+    const geometry_msgs::msg::PoseStamped &,
+    const std::vector<geometry_msgs::msg::PoseStamped> & = {});
 
   void requestAcquirePosition(
-    const geometry_msgs::msg::PoseStamped & goal_pose,
+    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
     const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
   {
-    if (!autoware_initialized) {
-      initializeAutoware();
-    }
-
-    const auto current_pose = getStatus().pose;
-
-    // NOTE: This is assertion.
-    waitForAutowareStateToBeWaitingForRoute([&]() { return updateAutoware(current_pose); });
-
-    waitForAutowareStateToBePlanning(
-      [&]() {
-        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
-
-        for (const auto & constraint : constraints) {
-          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
-        }
-
-        return updateAutoware(current_pose);
-      },
-      std::chrono::seconds(5));
-
-    waitForAutowareStateToBeWaitingForEngage(
-      [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
-
-    waitForAutowareStateToBeDriving([&]() {
-      std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
-      return updateAutoware(current_pose);
-    });
+    requestAcquirePosition((*hdmap_utils_ptr_).toMapPose(lanelet_pose), constraints);
   }
+
+  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override
+  {
+    requestAcquirePosition(lanelet_pose, {});
+  }
+
+  void requestLaneChange(const std::int64_t to_lanelet_id);
 
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
-  decltype(auto) setTargetSpeed(const double value, const bool)
+  void setTargetSpeed(double value, bool) override
   {
     const auto current = getStatus();
 
@@ -376,9 +152,9 @@ public:
 
   void onUpdate(double current_time, double step_time);
 
-  bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  bool setStatus(const openscenario_msgs::msg::EntityStatus & status) override;
 
-  openscenario_msgs::msg::WaypointsArray getWaypoints() const;
+  const openscenario_msgs::msg::WaypointsArray getWaypoints();
 
 private:
 // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
@@ -424,32 +200,16 @@ private:
 
 #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
 
-  void updateAutoware(const geometry_msgs::msg::Pose & current_pose)
+  void launchAutoware(const std::string &, const std::string &, const std::string &);
+
+  void initializeAutoware();
+
+  void updateAutoware(const geometry_msgs::msg::Pose &);
+
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
   {
-    geometry_msgs::msg::Twist current_twist;
-    {
-      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
-      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
-    }
-
-    // DEBUG_VALUE(current_twist.linear.x);
-    // DEBUG_VALUE(current_twist.angular.z);
-    //
-    // DEBUG_VALUE(current_pose.position.x);
-    // DEBUG_VALUE(current_pose.position.y);
-    // DEBUG_VALUE(current_pose.position.z);
-
-    std::atomic_load(&autowares.at(name))->setCurrentControlMode();
-    std::atomic_load(&autowares.at(name))->setCurrentPose(current_pose);
-    std::atomic_load(&autowares.at(name))->setCurrentShift(current_twist);
-    std::atomic_load(&autowares.at(name))->setCurrentSteering(current_twist);
-    std::atomic_load(&autowares.at(name))->setCurrentTurnSignal();
-    std::atomic_load(&autowares.at(name))->setCurrentTwist(current_twist);
-    std::atomic_load(&autowares.at(name))->setCurrentVelocity(current_twist);
-    std::atomic_load(&autowares.at(name))->setLaneChangeApproval();
-    std::atomic_load(&autowares.at(name))->setLocalizationTwist(current_twist);
-    std::atomic_load(&autowares.at(name))->setTransform(current_pose);
-    std::atomic_load(&autowares.at(name))->setVehicleVelocity(parameters.performance.max_speed);
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    return boost::none;
   }
 
 private:
