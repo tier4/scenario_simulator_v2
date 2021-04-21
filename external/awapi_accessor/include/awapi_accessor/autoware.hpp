@@ -45,7 +45,6 @@ class Autoware : public rclcpp::Node,
 
   std::mutex mutex;
 
-  // TODO(yamacir-kit) MOVE INTO PRIVATE THIS!!!
   decltype(auto) lock() { return std::unique_lock<std::mutex>(mutex); }
 
   const pid_t process_id;
@@ -59,7 +58,7 @@ public:
   {
   }
 
-  ~Autoware()
+  virtual ~Autoware()
   {
     int status = 0;
 

@@ -70,8 +70,6 @@ EgoEntity::EgoEntity(
     ))
 {
   if (autowares.find(name) == std::end(autowares)) {
-    auto my_name = name;
-    std::replace(std::begin(my_name), std::end(my_name), ' ', '_');
     autowares.emplace(
       name,
       std::make_shared<awapi::Autoware>(
@@ -215,9 +213,9 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 void EgoEntity::requestLaneChange(const std::int64_t)
 {
   std::stringstream what;
-  what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. ";
-  what << "In general, such a request is an error, ";
-  what << "since Ego cars make autonomous decisions about everything but their destination.";
+  what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. "
+       << "In general, such a request is an error, "
+       << "since Ego cars make autonomous decisions about everything but their destination.";
   throw std::runtime_error(what.str());
 }
 

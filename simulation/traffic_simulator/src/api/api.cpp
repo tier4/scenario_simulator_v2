@@ -52,8 +52,8 @@ bool API::spawn(
   if (is_ego) {
     if (
       !entity_manager_ptr_->entityExists(name) &&
-      !entity_manager_ptr_->spawnEntity(
-        traffic_simulator::entity::EgoEntity(name, lanelet2_map_osm, step_time_, params))) {
+      !entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
+        name, lanelet2_map_osm, step_time_, params)) {
       return false;
     }
     if (standalone_mode) {

@@ -15,12 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
-#include <openscenario_msgs/msg/entity_type.hpp>
-#include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
-
-#undef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-
 #include <algorithm>
 #include <awapi_accessor/autoware.hpp>
 #include <boost/filesystem.hpp>
@@ -28,8 +22,11 @@
 #include <cstdlib>
 #include <future>
 #include <memory>
+#include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
 #include <thread>
+#include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -47,10 +44,7 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
   // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
-  static std::unordered_map<
-    std::string, std::shared_ptr<awapi::Autoware>  // TODO(yamacir-kit): virtualize accessor.
-    >
-    autowares;
+  static std::unordered_map<std::string, std::shared_ptr<awapi::Autoware>> autowares;
 
   decltype(fork()) autoware_process_id = 0;
 
@@ -63,10 +57,10 @@ class EgoEntity : public VehicleEntity
 public:
   EgoEntity() = delete;
 
-  // TODO(yamacir-kit): EgoEntity(EgoEntity &&) = delete;
-  // TODO(yamacir-kit): EgoEntity(const EgoEntity &) = delete;
-  // TODO(yamacir-kit): EgoEntity & operator=(EgoEntity &&) = delete;
-  // TODO(yamacir-kit): EgoEntity & operator=(const EgoEntity &) = delete;
+  // EgoEntity(EgoEntity &&) = delete;
+  EgoEntity(const EgoEntity &) = delete;
+  // EgoEntity & operator=(EgoEntity &&) = delete;
+  EgoEntity & operator=(const EgoEntity &) = delete;
 
   /* ---- NOTE -----------------------------------------------------------------
    *

@@ -329,6 +329,21 @@ public:
     }
   }
 
+  template <typename Entity, typename... Ts>
+  auto spawnEntity(const std::string & name, Ts &&... xs)
+  {
+    const auto result =
+      entities_.emplace(name, std::make_unique<Entity>(name, std::forward<decltype(xs)>(xs)...));
+
+    if (result.second) {
+      result.first->second->setHdMapUtils(hdmap_utils_ptr_);
+      result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      return result.second;
+    } else {
+      throw traffic_simulator::SimulationRuntimeError("Entity '" + name + "' is already exists.");
+    }
+  }
+
   bool despawnEntity(const std::string & name)
   {
     return entityExists(name) && entities_.erase(name);
