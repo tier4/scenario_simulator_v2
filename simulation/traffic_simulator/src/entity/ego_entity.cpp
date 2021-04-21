@@ -45,18 +45,6 @@ auto getParameter(const std::string & name, const T & alternate)
   return value;
 }
 
-void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
-{
-  geometry_msgs::msg::Twist current_twist;
-  {
-    current_twist.linear.x = (*vehicle_model_ptr_).getVx();
-    current_twist.angular.z = (*vehicle_model_ptr_).getWz();
-  }
-
-  autowares.at(name).set(current_pose);
-  autowares.at(name).set(current_twist);
-}
-
 EgoEntity::EgoEntity(
   const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
   const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
@@ -91,37 +79,23 @@ EgoEntity::EgoEntity(
 
 EgoEntity::~EgoEntity() { autowares.erase(name); }
 
-void EgoEntity::requestAcquirePosition(
-  const geometry_msgs::msg::PoseStamped & goal_pose,
-  const std::vector<geometry_msgs::msg::PoseStamped> & constraints)
-{
-  if (not std::exchange(autoware_initialized, true)) {
-    autowares.at(name).initialize(getStatus().pose);
-  }
-
-  autowares.at(name).drive(goal_pose, constraints);
-  autowares.at(name).engage();
-}
-
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
   assert(1 < waypoints.size());
 
-  const auto destination = (*hdmap_utils_ptr_).toMapPose(waypoints.back());
-
-  std::vector<geometry_msgs::msg::PoseStamped> constraints{};
+  std::vector<geometry_msgs::msg::PoseStamped> constraints;
 
   for (auto iter = std::cbegin(waypoints); std::next(iter) != std::cend(waypoints); ++iter) {
     constraints.push_back((*hdmap_utils_ptr_).toMapPose(*iter));
   }
 
-  return requestAcquirePosition(destination, constraints);
+  return drive((*hdmap_utils_ptr_).toMapPose(waypoints.back()), constraints);
 }
 
 const openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()
 {
-  openscenario_msgs::msg::WaypointsArray waypoints{};
+  openscenario_msgs::msg::WaypointsArray waypoints;
 
   for (const auto & point : autowares.at(name).getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);
@@ -135,14 +109,21 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   // NOTE Currently, setStatus always succeeds.
   const bool success = VehicleEntity::setStatus(status);
 
-  const auto current = getStatus();
+  const auto current_pose = getStatus().pose;
 
   if (autoware_initialized) {
-    updateAutoware(current.pose);
+    geometry_msgs::msg::Twist current_twist;
+    {
+      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
+      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
+    }
+
+    autowares.at(name).set(current_pose);
+    autowares.at(name).set(current_twist);
   }
 
   if (!initial_pose_) {
-    initial_pose_ = current.pose;
+    initial_pose_ = current_pose;
   }
 
   return success;

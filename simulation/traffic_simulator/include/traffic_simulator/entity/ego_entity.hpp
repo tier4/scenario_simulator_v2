@@ -48,6 +48,8 @@ class EgoEntity : public VehicleEntity
 
   decltype(fork()) autoware_process_id = 0;
 
+  bool autoware_initialized = false;
+
 public:
   EgoEntity() = delete;
 
@@ -77,33 +79,30 @@ public:
 
   ~EgoEntity() override;
 
-  bool autoware_initialized = false;
-
-  void requestAcquirePosition(
-    const geometry_msgs::msg::PoseStamped &,
-    const std::vector<geometry_msgs::msg::PoseStamped> & = {});
-
-  void requestAcquirePosition(
-    const openscenario_msgs::msg::LaneletPose & lanelet_pose,
-    const std::vector<geometry_msgs::msg::PoseStamped> & constraints = {})
+  void drive(
+    const geometry_msgs::msg::PoseStamped & destination,
+    const std::vector<geometry_msgs::msg::PoseStamped> & checkpoints = {})
   {
-    requestAcquirePosition((*hdmap_utils_ptr_).toMapPose(lanelet_pose), constraints);
+    if (not std::exchange(autoware_initialized, true)) {
+      autowares.at(name).initialize(getStatus().pose);
+    }
+
+    autowares.at(name).drive(destination, checkpoints);
+    autowares.at(name).engage();
   }
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override
   {
-    requestAcquirePosition(lanelet_pose, {});
+    drive((*hdmap_utils_ptr_).toMapPose(lanelet_pose));
   }
-
-  void requestLaneChange(const std::int64_t to_lanelet_id);
 
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
+  void requestLaneChange(const std::int64_t to_lanelet_id);
+
   void setTargetSpeed(double value, bool) override
   {
-    const auto current = getStatus();
-
     Eigen::VectorXd v(5);
     {
       v << 0, 0, 0, value, 0;
@@ -112,7 +111,7 @@ public:
     (*vehicle_model_ptr_).setState(v);
   }
 
-  const std::string getCurrentAction() const
+  const std::string getCurrentAction() const override
   {
     return autowares.at(name).getAutowareStatus().autoware_state;
   }
@@ -124,18 +123,14 @@ public:
   const openscenario_msgs::msg::WaypointsArray getWaypoints() override;
 
 private:
-  void updateAutoware(const geometry_msgs::msg::Pose &);
-
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
 
-private:
   const openscenario_msgs::msg::EntityStatus getEntityStatus(
     const double time, const double step_time) const;
 
-  boost::optional<geometry_msgs::msg::Pose> initial_pose_;
-
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
+  boost::optional<geometry_msgs::msg::Pose> initial_pose_;
   boost::optional<double> previous_linear_velocity_;
   boost::optional<double> previous_angular_velocity_;
 };
