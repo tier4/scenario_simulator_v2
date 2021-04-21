@@ -55,7 +55,6 @@ void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
 
   autowares.at(name).set(current_pose);
   autowares.at(name).set(current_twist);
-  autowares.at(name).update();
 }
 
 EgoEntity::EgoEntity(
@@ -74,6 +73,8 @@ EgoEntity::EgoEntity(
     0.0    // deadzone_delta_steer
     ))
 {
+  entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
+
   autowares.emplace(
     std::piecewise_construct, std::forward_as_tuple(name),
     std::forward_as_tuple(
@@ -98,31 +99,8 @@ void EgoEntity::requestAcquirePosition(
     autowares.at(name).initialize(getStatus().pose);
   }
 
-  const auto current_pose = getStatus().pose;
-
-  autowares.at(name).waitForAutowareStateToBeWaitingForRoute([&]() {  // NOTE: This is assertion.
-    return updateAutoware(current_pose);
-  });
-
-  autowares.at(name).waitForAutowareStateToBePlanning(
-    [&]() {
-      autowares.at(name).setGoalPose(goal_pose);
-
-      for (const auto & constraint : constraints) {
-        autowares.at(name).setCheckpoint(constraint);
-      }
-
-      return updateAutoware(current_pose);
-    },
-    std::chrono::seconds(5));
-
-  autowares.at(name).waitForAutowareStateToBeWaitingForEngage(
-    [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
-
-  autowares.at(name).waitForAutowareStateToBeDriving([&]() {
-    autowares.at(name).setAutowareEngage(true);
-    return updateAutoware(current_pose);
-  });
+  autowares.at(name).drive(goal_pose, constraints);
+  autowares.at(name).engage();
 }
 
 void EgoEntity::requestAssignRoute(
@@ -186,7 +164,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   } else {
     Eigen::VectorXd input(2);
     {
-      input << autowares.at(name).getVehicleCommand().control.velocity,
+      input <<  //
+        autowares.at(name).getVehicleCommand().control.velocity,
         autowares.at(name).getVehicleCommand().control.steering_angle;
     }
 
@@ -250,7 +229,7 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
   openscenario_msgs::msg::EntityStatus status;
   {
     status.time = time;
-    status.type.type = openscenario_msgs::msg::EntityType::EGO;
+    status.type.type = entity_type_.type;
     status.bounding_box = getBoundingBox();
     status.action_status.twist = twist;
     status.action_status.accel = accel;

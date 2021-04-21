@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
 #include <boost/optional.hpp>
+#include <memory>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/entity_status.hpp>
@@ -23,16 +24,13 @@
 #include <openscenario_msgs/msg/obstacle.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
-
-// headers in STL
-#include <memory>
 #include <queue>
 #include <string>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <unordered_map>
 #include <vector>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
