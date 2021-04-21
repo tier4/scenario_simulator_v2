@@ -36,45 +36,63 @@ class PedestrianEntity : public EntityBase
 {
 public:
   PedestrianEntity(
-    std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    openscenario_msgs::msg::PedestrianParameters parameters);
-  PedestrianEntity(std::string name, openscenario_msgs::msg::PedestrianParameters parameters);
+    const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    const openscenario_msgs::msg::PedestrianParameters & parameters);
+
+  PedestrianEntity(
+    const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
+
   const openscenario_msgs::msg::PedestrianParameters parameters;
+
   void onUpdate(double current_time, double step_time) override;
+
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override;
+
   void requestWalkStraight() override;
-  void requestLaneChange(std::int64_t to_lanelet_id);
+
   void cancelRequest();
-  void setHdMapUtils(std::shared_ptr<hdmap_utils::HdMapUtils> ptr)
+
+  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
   {
-    hdmap_utils_ptr_ = ptr;
+    EntityBase::setHdMapUtils(ptr);
     route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
     tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
-  void setTrafficLightManager(std::shared_ptr<traffic_simulator::TrafficLightManager> ptr)
+
+  void setTrafficLightManager(
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override
   {
-    traffic_light_manager_ = ptr;
+    EntityBase::setTrafficLightManager(ptr);
     tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
   }
+
   void setTargetSpeed(double target_speed, bool continuous) override;
+
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
   }
+
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
-  const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
+
+  const std::string getCurrentAction() const override { return tree_ptr_->getCurrentAction(); }
+
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
-    if (!status_) {
+    if (status_ and status_->lanelet_pose_valid) {
+      return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
+    } else {
       return {};
     }
-    if (status_->lanelet_pose_valid) {
-      return {};
-    }
-    return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
   }
+
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
+
+  const openscenario_msgs::msg::WaypointsArray getWaypoints() override
+  {
+    return openscenario_msgs::msg::WaypointsArray();
+  };
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;

@@ -312,20 +312,18 @@ public:
 
   boost::optional<openscenario_msgs::msg::LaneletPose> getLaneletPose(const std::string & name);
 
-  template <
-    typename Entity, typename = typename std::enable_if<
-                       std::is_base_of<EntityBase, typename std::decay<Entity>::type>::value>::type>
-  bool spawnEntity(Entity && entity)
+  template <typename Entity, typename... Ts>
+  auto spawnEntity(const std::string & name, Ts &&... xs)
   {
-    if (entities_.count(entity.name) != 0) {
-      throw traffic_simulator::SimulationRuntimeError("entity " + entity.name + " already exist.");
+    const auto result =
+      entities_.emplace(name, std::make_unique<Entity>(name, std::forward<decltype(xs)>(xs)...));
+
+    if (result.second) {
+      result.first->second->setHdMapUtils(hdmap_utils_ptr_);
+      result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      return result.second;
     } else {
-      entity.setHdMapUtils(hdmap_utils_ptr_);
-      entity.setTrafficLightManager(traffic_light_manager_ptr_);
-      entities_.emplace(
-        entity.name, std::make_unique<typename std::decay<Entity>::type>(
-                       std::forward<decltype(entity)>(entity)));
-      return true;
+      throw traffic_simulator::SimulationRuntimeError("Entity '" + name + "' is already exists.");
     }
   }
 

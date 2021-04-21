@@ -47,6 +47,8 @@ public:
   VehicleEntity(
     const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
 
+  ~VehicleEntity() override = default;
+
   const openscenario_msgs::msg::VehicleParameters parameters;
 
   void onUpdate(double current_time, double step_time) override;
@@ -72,16 +74,17 @@ public:
     tree_ptr_->setValueToBlackBoard("driver_model", model);
   }
 
-  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
+  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
   {
-    hdmap_utils_ptr_ = ptr;
+    EntityBase::setHdMapUtils(ptr);
     route_planner_ptr_ = std::make_shared<traffic_simulator::RoutePlanner>(ptr);
     tree_ptr_->setValueToBlackBoard("hdmap_utils", hdmap_utils_ptr_);
   }
 
-  void setTrafficLightManager(const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
+  void setTrafficLightManager(
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override
   {
-    traffic_light_manager_ = ptr;
+    EntityBase::setTrafficLightManager(ptr);
     tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
   }
 

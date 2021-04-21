@@ -15,41 +15,18 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
-#include <openscenario_msgs/msg/entity_type.hpp>
-#include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
-
-#undef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-
-#ifdef TRAFFIC_SIMULATOR_ISOLATE_STANDARD_OUTPUT_FROM_AUTOWARE
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#endif
-
-#include <sys/wait.h>  // for EgoEntity::~EgoEntity
-#include <tf2/utils.h>
-
 #include <algorithm>
-#include <ament_index_cpp/get_package_share_directory.hpp>
-#include <autoware_auto_msgs/msg/complex32.hpp>
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
-#include <awapi_accessor/accessor.hpp>
+#include <awapi_accessor/autoware.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <chrono>
 #include <cstdlib>
 #include <future>
 #include <memory>
-#include <pugixml.hpp>
-#include <stdexcept>
+#include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
-#include <system_error>
 #include <thread>
+#include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -67,26 +44,16 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
   // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
-  static std::unordered_map<
-    std::string, std::shared_ptr<autoware_api::Accessor>  // TODO(yamacir-kit): virtualize accessor.
-    >
-    autowares;
+  static std::unordered_map<std::string, awapi::Autoware> autowares;
 
   decltype(fork()) autoware_process_id = 0;
-
-  // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
-  std::shared_ptr<std::promise<void>> accessor_status;
-
-  // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
-  std::shared_ptr<std::thread> accessor_spinner;
 
 public:
   EgoEntity() = delete;
 
-  // TODO(yamacir-kit): EgoEntity(EgoEntity &&) = delete;
-  // TODO(yamacir-kit): EgoEntity(const EgoEntity &) = delete;
-  // TODO(yamacir-kit): EgoEntity & operator=(EgoEntity &&) = delete;
-  // TODO(yamacir-kit): EgoEntity & operator=(const EgoEntity &) = delete;
+  EgoEntity(const EgoEntity &) = delete;
+
+  EgoEntity & operator=(const EgoEntity &) = delete;
 
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -147,7 +114,7 @@ public:
 
   const std::string getCurrentAction() const
   {
-    return std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;
+    return autowares.at(name).getAutowareStatus().autoware_state;
   }
 
   void onUpdate(double current_time, double step_time);
@@ -157,60 +124,9 @@ public:
   const openscenario_msgs::msg::WaypointsArray getWaypoints();
 
 private:
-// TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error
-#define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                             \
-  template <typename Thunk, typename Seconds = std::chrono::seconds>                            \
-  void waitForAutowareStateToBe##STATE(Thunk thunk, Seconds interval = std::chrono::seconds(1)) \
-    const                                                                                       \
-  {                                                                                             \
-    static const auto duration_max = std::chrono::seconds(30);                                  \
-    Seconds duration{0};                                                                        \
-    for (rclcpp::WallRate rate{interval}; !std::atomic_load(&autowares.at(name))->is##STATE();  \
-         rate.sleep()) {                                                                        \
-      if ((duration += interval) < duration_max) {                                              \
-        thunk();                                                                                \
-      } else {                                                                                  \
-        const auto current_state =                                                              \
-          std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;            \
-        std::stringstream ss{};                                                                 \
-        ss << "The simulator waited " << duration_max.count()                                   \
-           << " seconds, expecting the Autoware state to transitioning to " << #STATE           \
-           << ", but there was no change. The current Autoware state is "                       \
-           << (current_state.empty() ? "NOT PUBLISHED YET" : current_state)                     \
-           << ". This error is most likely due to the Autoware state transition "               \
-           << "conditions changing with the update. Please report this error to "               \
-           << "the developer. This error message was written by @yamacir-kit.";                 \
-        using AutowareError = std::runtime_error;                                               \
-        throw AutowareError(ss.str());                                                          \
-      }                                                                                         \
-    }                                                                                           \
-    RCLCPP_INFO_STREAM(                                                                         \
-      std::atomic_load(&autowares.at(name))->get_logger(), "Autoware is " #STATE " now.");      \
-  }                                                                                             \
-  static_assert(true, "")
-
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(InitializingVehicle);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForRoute);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Planning);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(WaitingForEngage);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Driving);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(ArrivedGoal);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Emergency);
-  DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(Finalizing);
-
-#undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
-
-  void launchAutoware(const std::string &, const std::string &, const std::string &);
-
-  void initializeAutoware();
-
   void updateAutoware(const geometry_msgs::msg::Pose &);
 
-  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
-  {
-    std::cout << __FILE__ << "," << __LINE__ << std::endl;
-    return boost::none;
-  }
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
 
 private:
   const openscenario_msgs::msg::EntityStatus getEntityStatus(

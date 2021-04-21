@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <awapi_accessor/accessor.hpp>
+#ifndef AWAPI_ACCESSOR__EXECUTE_HPP_
+#define AWAPI_ACCESSOR__EXECUTE_HPP_
 
-namespace autoware_api
+#include <string>
+#include <vector>
+
+namespace awapi
 {
-}  // namespace autoware_api
+int execute(const std::vector<std::string> &);
+}  // namespace awapi
+
+#endif  // AWAPI_ACCESSOR__EXECUTE_HPP_

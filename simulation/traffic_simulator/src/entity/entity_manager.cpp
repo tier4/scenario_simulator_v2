@@ -70,13 +70,17 @@ bool EntityManager::isEgo(const std::string & name) const
 
 std::size_t EntityManager::getNumberOfEgo() const
 {
-  std::size_t count = 0;
-  for (auto & entity : entities_) {
-    if (isEgo(entity.first)) {
-      ++count;
-    }
-  }
-  return count;
+  // std::size_t count = 0;
+  // for (auto & entity : entities_) {
+  //   if (isEgo(entity.first)) {
+  //     ++count;
+  //   }
+  // }
+  // return count;
+
+  return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
+    return isEgo(each.first);
+  });
 }
 
 boost::optional<openscenario_msgs::msg::LaneletPose> EntityManager::getLaneletPose(

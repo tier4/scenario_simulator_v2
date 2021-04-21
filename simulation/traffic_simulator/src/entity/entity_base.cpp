@@ -25,25 +25,23 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(
-  std::string type, std::string name, const openscenario_msgs::msg::EntityStatus & initial_state)
-: type(type), name(name)
-{
-  status_ = initial_state;
-  visibility_ = true;
-  verbose_ = true;
-}
-
-EntityBase::EntityBase(std::string type, std::string name) : type(type), name(name)
+EntityBase::EntityBase(const std::string & type, const std::string & name)
+: type(type), name(name), status_(boost::none), verbose_(true), visibility_(true)
 {
   status_ = boost::none;
-  visibility_ = true;
-  verbose_ = true;
+}
+
+EntityBase::EntityBase(
+  const std::string & type, const std::string & name,
+  const openscenario_msgs::msg::EntityStatus & initial_state)
+: EntityBase(type, name)
+{
+  status_ = initial_state;
 }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
-void EntityBase::updateStandStillDuration(double step_time)
+void EntityBase::updateStandStillDuration(const double step_time)
 {
   if (!status_) {
     stand_still_duration_ = boost::none;
@@ -60,46 +58,41 @@ void EntityBase::updateStandStillDuration(double step_time)
   }
 }
 
-void EntityBase::updateEntityStatusTimestamp(double current_time)
+void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  if (!status_) {
-    return;
+  if (status_) {
+    status_->time = current_time;
   }
-  status_->time = current_time;
 }
 
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status)
 {
-  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_status;
+  other_status_.clear();
   for (const auto & each : status) {
     if (each.first != name) {
-      other_status.insert(each);
+      other_status_.insert(each);
     }
   }
-  other_status_ = other_status;
 }
 
 const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
 {
   if (!status_) {
     throw SimulationRuntimeError("status is not set");
+  } else {
+    return this->status_.get();
   }
-  return this->status_.get();
 }
 
 bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  this->status_ = status;
-  this->status_->name = name;
+  status_ = status;
+  status_->name = name;
   return true;
 }
 
-bool EntityBase::setVisibility(bool visibility)
-{
-  visibility_ = visibility;
-  return visibility_;
-}
+bool EntityBase::setVisibility(const bool visibility) { return visibility_ = visibility; }
 
 bool EntityBase::getVisibility() { return visibility_; }
 
@@ -107,9 +100,10 @@ void EntityBase::stopAtEndOfRoad()
 {
   if (!status_) {
     throw SimulationRuntimeError("status is not set");
+  } else {
+    status_.get().action_status.twist = geometry_msgs::msg::Twist();
+    status_.get().action_status.accel = geometry_msgs::msg::Accel();
   }
-  status_.get().action_status.twist = geometry_msgs::msg::Twist();
-  status_.get().action_status.accel = geometry_msgs::msg::Accel();
 }
 }  // namespace entity
 }  // namespace traffic_simulator
