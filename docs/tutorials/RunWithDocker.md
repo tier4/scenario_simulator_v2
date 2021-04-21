@@ -125,6 +125,15 @@ rocker --x11 osrf/ros:crystal-desktop rviz2
 ```
 You can see same result with GPU.
 
+## Build docker image locally (optional)
+
+If you want to build docker image in your local machine, please type commands below in your terminal.
+
+```bash
+cd (path_to_scenario_simulator_v2)
+docker build -t scenario_simulator_v2 .
+```
+
 ## Runnig Simulation with docker.
 
 
