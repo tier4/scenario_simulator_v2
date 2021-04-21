@@ -178,3 +178,13 @@ If your local machine does not have nvidia GPUs,
 ```bash
 rocker --x11 tier4/scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
 ```
+
+<video
+  class="c-video__embed"
+  src="https://user-images.githubusercontent.com/10348912/115502051-44ab8500-a2af-11eb-9244-4a1d0f2a2b2a.mp4"
+  width="100%"
+  loop
+  autoplay
+  muted
+  playsinline>
+</video>
