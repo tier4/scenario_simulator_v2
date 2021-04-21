@@ -24,4 +24,4 @@ If you want to know how we can send command to the Autoware via simulator, pleas
 If you want to know whole system architecture of this framework, please read [this documentation](SystemArchitecture.md).
 
 ## TierIV Scenario Format Version 2.0
-If you want to know Tier IV Scenario format Ver 2.0 , which is a default scenario format of this framework, please read [this documentation](Tier4ScenarioFormatVersion2.md).
+If you want to know Tier IV Scenario format Version 2.0 , which is a default scenario format of this framework, please read [this documentation](Tier4ScenarioFormatVersion2.md).
