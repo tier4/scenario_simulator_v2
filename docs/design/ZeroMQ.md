@@ -11,6 +11,14 @@ We use ZeroMQ Inter-Process communication with your simulator and traffic simula
 We use [ZeroMQ](https://zeromq.org/) in order to communicate with the simulator and interpreter.
 We use Request/Reply socket in order to run the simulator synchronously.  
 
+<iframe 
+  class="hatenablogcard" 
+  style="width:100%;height:155px;max-width:450px;" 
+  title="embree" 
+  src="https://hatenablog-parts.com/embed?url=https://zeromq.org/" 
+  width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
+
 ## Sequence Diagram
 
 Traffic simulator has a zeromq client and sensor simulator has a zeromq server.
