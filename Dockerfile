@@ -18,5 +18,6 @@ RUN source /opt/ros/foxy/setup.bash && rosdep install -iry --from-paths . --rosd
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
 RUN source /opt/ros/foxy/setup.bash && colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 COPY ./docker-entrypoint.sh /
+RUN chmod a+x /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
