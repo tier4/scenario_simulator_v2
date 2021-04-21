@@ -48,8 +48,7 @@ class EgoEntity : public VehicleEntity
 
   decltype(fork()) autoware_process_id = 0;
 
-  // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
-  std::shared_ptr<std::promise<void>> accessor_status;
+  std::promise<void> accessor_status;
 
   // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
   std::shared_ptr<std::thread> accessor_spinner;
@@ -57,9 +56,8 @@ class EgoEntity : public VehicleEntity
 public:
   EgoEntity() = delete;
 
-  // EgoEntity(EgoEntity &&) = delete;
   EgoEntity(const EgoEntity &) = delete;
-  // EgoEntity & operator=(EgoEntity &&) = delete;
+
   EgoEntity & operator=(const EgoEntity &) = delete;
 
   /* ---- NOTE -----------------------------------------------------------------

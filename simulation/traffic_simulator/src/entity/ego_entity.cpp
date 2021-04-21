@@ -105,7 +105,6 @@ EgoEntity::EgoEntity(
    *
    * ---------------------------------------------------------------------- */
   if (autowares.at(name).use_count() < 2) {
-    accessor_status = std::make_shared<std::promise<void>>();
     accessor_spinner = std::make_shared<std::thread>(
       [](const auto node, auto status)  // NOTE: This copy increments use_count to 2 from 1.
       {
@@ -114,14 +113,14 @@ EgoEntity::EgoEntity(
           rclcpp::spin_some(node);
         }
       },
-      autowares.at(name), std::move(accessor_status->get_future()));
+      autowares.at(name), std::move(accessor_status.get_future()));
   }
 }
 
 EgoEntity::~EgoEntity()
 {
   if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
-    accessor_status->set_value();
+    accessor_status.set_value();
     accessor_spinner->join();
     autowares.erase(name);
   }
