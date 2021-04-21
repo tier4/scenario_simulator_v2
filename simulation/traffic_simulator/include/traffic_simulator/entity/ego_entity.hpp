@@ -44,14 +44,9 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
   // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
-  static std::unordered_map<std::string, std::shared_ptr<awapi::Autoware>> autowares;
+  static std::unordered_map<std::string, awapi::Autoware> autowares;
 
   decltype(fork()) autoware_process_id = 0;
-
-  std::promise<void> accessor_status;
-
-  // XXX DIRTY HACK: The EntityManager terribly requires Ego to be Copyable.
-  std::shared_ptr<std::thread> accessor_spinner;
 
 public:
   EgoEntity() = delete;
@@ -119,7 +114,7 @@ public:
 
   const std::string getCurrentAction() const
   {
-    return std::atomic_load(&autowares.at(name))->getAutowareStatus().autoware_state;
+    return autowares.at(name).getAutowareStatus().autoware_state;
   }
 
   void onUpdate(double current_time, double step_time);

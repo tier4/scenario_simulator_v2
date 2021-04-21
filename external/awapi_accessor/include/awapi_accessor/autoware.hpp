@@ -49,17 +49,33 @@ class Autoware : public rclcpp::Node,
 
   const pid_t process_id;
 
+  std::promise<void> promise;
+
+  std::thread spinner;
+
 public:
   template <typename... Ts>
   AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
-  : rclcpp::Node(
-      "autoware_concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
+  : rclcpp::Node("awapi_accessor", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)),
+    spinner(
+      [this](auto future) {
+        while (rclcpp::ok() and
+               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+          rclcpp::spin_some(get_node_base_interface());
+        }
+      },
+      std::move(promise.get_future()))
   {
   }
 
   virtual ~Autoware()
   {
+    if (spinner.joinable()) {
+      promise.set_value();
+      spinner.join();
+    }
+
     int status = 0;
 
     if (::kill(process_id, SIGINT) < 0 or ::waitpid(process_id, &status, WUNTRACED) < 0) {

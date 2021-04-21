@@ -15,19 +15,22 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
 #include <system_error>  // std::system_error
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, std::shared_ptr<awapi::Autoware>> EgoEntity::autowares{};
+std::unordered_map<std::string, awapi::Autoware> EgoEntity::autowares{};
 
 template <typename T>
 auto getParameter(const std::string & name, const T & alternate)
@@ -50,7 +53,7 @@ void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
     current_twist.angular.z = (*vehicle_model_ptr_).getWz();
   }
 
-  std::atomic_load(&autowares.at(name))->update(current_pose, current_twist);
+  autowares.at(name).update(current_pose, current_twist);
 }
 
 EgoEntity::EgoEntity(
@@ -71,8 +74,8 @@ EgoEntity::EgoEntity(
 {
   if (autowares.find(name) == std::end(autowares)) {
     autowares.emplace(
-      name,
-      std::make_shared<awapi::Autoware>(
+      std::piecewise_construct, std::forward_as_tuple(name),
+      std::forward_as_tuple(
         getParameter("autoware_launch_package", std::string("")),
         getParameter("autoware_launch_file", std::string("")),
         "map_path:=" + lanelet2_map_osm.parent_path().string(),
@@ -83,83 +86,41 @@ EgoEntity::EgoEntity(
           "/planning_simulator_v2.rviz",
         "scenario_simulation:=true"));
   }
-
-  /* ---- NOTE ---------------------------------------------------------------
-   *
-   *  The simulator needs to run in a fixed-cycle loop, but the communication
-   *  part with Autoware needs to run at a higher frequency (e.g. the
-   *  transform in map -> base_link needs to be updated at a higher frequency
-   *  even if the value does not change). We also need to keep collecting the
-   *  latest values of topics from Autoware, independently of the simulator.
-   *
-   *  For this reason, autoware_api::Accessor, which is responsible for
-   *  communication with Autoware, should run in an independent thread. This
-   *  is probably an EXTREMELY DIRTY HACK.
-   *
-   *  Ideally, the constructor caller of traffic_simulator::API should
-   *  provide a std::shared_ptr to autoware_api::Accessor and spin that node
-   *  with MultiThreadedExecutor.
-   *
-   *  If you have a nice idea to solve this, and are interested in improving
-   *  the quality of the Tier IV simulator, please contact @yamacir-kit.
-   *
-   * ---------------------------------------------------------------------- */
-  if (autowares.at(name).use_count() < 2) {
-    accessor_spinner = std::make_shared<std::thread>(
-      [](const auto node, auto status)  // NOTE: This copy increments use_count to 2 from 1.
-      {
-        while (rclcpp::ok() &&
-               status.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          rclcpp::spin_some(node);
-        }
-      },
-      autowares.at(name), std::move(accessor_status.get_future()));
-  }
 }
 
-EgoEntity::~EgoEntity()
-{
-  if (accessor_spinner && accessor_spinner.use_count() < 2 && accessor_spinner->joinable()) {
-    accessor_status.set_value();
-    accessor_spinner->join();
-    autowares.erase(name);
-  }
-}
+EgoEntity::~EgoEntity() { autowares.erase(name); }
 
 void EgoEntity::requestAcquirePosition(
   const geometry_msgs::msg::PoseStamped & goal_pose,
   const std::vector<geometry_msgs::msg::PoseStamped> & constraints)
 {
   if (not std::exchange(autoware_initialized, true)) {
-    std::atomic_load(&autowares.at(name))->initialize(getStatus().pose);
+    autowares.at(name).initialize(getStatus().pose);
   }
 
   const auto current_pose = getStatus().pose;
 
-  // NOTE: This is assertion.
-  std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeWaitingForRoute([&]() {
+  autowares.at(name).waitForAutowareStateToBeWaitingForRoute([&]() {  // NOTE: This is assertion.
     return updateAutoware(current_pose);
   });
 
-  std::atomic_load(&autowares.at(name))
-    ->waitForAutowareStateToBePlanning(
-      [&]() {
-        std::atomic_load(&autowares.at(name))->setGoalPose(goal_pose);
+  autowares.at(name).waitForAutowareStateToBePlanning(
+    [&]() {
+      autowares.at(name).setGoalPose(goal_pose);
 
-        for (const auto & constraint : constraints) {
-          std::atomic_load(&autowares.at(name))->setCheckpoint(constraint);
-        }
+      for (const auto & constraint : constraints) {
+        autowares.at(name).setCheckpoint(constraint);
+      }
 
-        return updateAutoware(current_pose);
-      },
-      std::chrono::seconds(5));
+      return updateAutoware(current_pose);
+    },
+    std::chrono::seconds(5));
 
-  std::atomic_load(&autowares.at(name))
-    ->waitForAutowareStateToBeWaitingForEngage(
-      [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
+  autowares.at(name).waitForAutowareStateToBeWaitingForEngage(
+    [&]() { return updateAutoware(current_pose); }, std::chrono::milliseconds(100));
 
-  std::atomic_load(&autowares.at(name))->waitForAutowareStateToBeDriving([&]() {
-    std::atomic_load(&autowares.at(name))->setAutowareEngage(true);
+  autowares.at(name).waitForAutowareStateToBeDriving([&]() {
+    autowares.at(name).setAutowareEngage(true);
     return updateAutoware(current_pose);
   });
 }
@@ -184,7 +145,7 @@ const openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()
 {
   openscenario_msgs::msg::WaypointsArray waypoints{};
 
-  for (const auto & point : std::atomic_load(&autowares.at(name))->getTrajectory().points) {
+  for (const auto & point : autowares.at(name).getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);
   }
 
@@ -225,8 +186,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   } else {
     Eigen::VectorXd input(2);
     {
-      input << std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity,
-        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
+      input << autowares.at(name).getVehicleCommand().control.velocity,
+        autowares.at(name).getVehicleCommand().control.steering_angle;
     }
 
     (*vehicle_model_ptr_).setInput(input);
