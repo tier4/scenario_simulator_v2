@@ -9,6 +9,9 @@ on:
     - "docs/**"
     - "mkdocs.yml"
     - "README.md"
+  push:
+    branches:
+      - master
   release:
     types: [published]
 
