@@ -273,7 +273,8 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
 
     const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
 
-    if (status.lanelet_pose_valid = static_cast<bool>(lanelet_pose)) {
+    status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+    if (status.lanelet_pose_valid) {
       status.lanelet_pose = lanelet_pose.get();
     }
   }
