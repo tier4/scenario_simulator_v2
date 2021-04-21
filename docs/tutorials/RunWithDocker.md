@@ -123,7 +123,7 @@ If your machine has no GPU, please type this commands below.
 ```bash
 rocker --x11 osrf/ros:crystal-desktop rviz2
 ```
-You can see same result with GPU.
+You can see same result with nvidia GPU.
 
 ## Build docker image locally (optional)
 
@@ -138,13 +138,24 @@ docker build -t scenario_simulator_v2 .
 
 ### Runing with docker image in your machine.
 Please type this commands and run [simple demo](SimpleDemo.md) in your local terminal.
+
+If your local machine has nvidia GPUs,
+
 ```bash
 rocker --nvidia --x11 scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
+```
+
+If your local machine does not have nvidia GPUs,
+
+```bash
+rocker --x11 scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
 ```
 
 ### Runing with docker image from dockerhub.
 
 We automatically build docker images of scenario_simulator_v2 by using github actions and put them into our dockerhub.
+
+[![Push Docker Image](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)
 
 <iframe 
   class="hatenablogcard" 
@@ -154,3 +165,16 @@ We automatically build docker images of scenario_simulator_v2 by using github ac
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 
+We can pull docker image from dockerhub and run simulation with scenario_simulator_v2 just typing commands below.
+
+If your local machine has nvidia GPUs,
+
+```bash
+rocker --nvidia --x11 tier4/scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
+```
+
+If your local machine does not have nvidia GPUs,
+
+```bash
+rocker --x11 tier4/scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
+```
