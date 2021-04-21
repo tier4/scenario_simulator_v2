@@ -67,24 +67,32 @@ public:
   }
 
   void setTargetSpeed(double target_speed, bool continuous) override;
+
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {
     return parameters.bounding_box;
   }
+
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
-  const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
+
+  const std::string getCurrentAction() const override { return tree_ptr_->getCurrentAction(); }
+
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
   {
-    if (!status_) {
+    if (status_ and status_->lanelet_pose_valid) {
+      return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
+    } else {
       return {};
     }
-    if (status_->lanelet_pose_valid) {
-      return {};
-    }
-    return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
   }
+
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
+
+  const openscenario_msgs::msg::WaypointsArray getWaypoints() override
+  {
+    return openscenario_msgs::msg::WaypointsArray();
+  };
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;

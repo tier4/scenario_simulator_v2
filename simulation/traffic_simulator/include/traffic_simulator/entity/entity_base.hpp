@@ -78,7 +78,7 @@ public:
 
   virtual void onUpdate(double current_time, double step_time) = 0;
 
-  auto statusSet() const { return static_cast<bool>(status_); }
+  auto statusSet() const noexcept { return static_cast<bool>(status_); }
 
   const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters() const
   {
@@ -127,10 +127,7 @@ public:
 
   virtual boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() = 0;
 
-  const openscenario_msgs::msg::WaypointsArray getWaypoints()
-  {
-    return openscenario_msgs::msg::WaypointsArray();
-  }
+  virtual const openscenario_msgs::msg::WaypointsArray getWaypoints() = 0;
 
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
@@ -138,8 +135,6 @@ protected:
   std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
 
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;
-
-  boost::optional<double> linear_jerk_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
@@ -150,6 +145,7 @@ protected:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list_;
 
+  boost::optional<double> linear_jerk_;
   boost::optional<double> stand_still_duration_;
 
   visualization_msgs::msg::MarkerArray current_marker_;
