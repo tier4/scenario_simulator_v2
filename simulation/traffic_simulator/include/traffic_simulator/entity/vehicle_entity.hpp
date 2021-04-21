@@ -100,7 +100,10 @@ public:
 
   const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
 
-  const openscenario_msgs::msg::WaypointsArray getWaypoints() { return tree_ptr_->getWaypoints(); }
+  const openscenario_msgs::msg::WaypointsArray getWaypoints() override
+  {
+    return tree_ptr_->getWaypoints();
+  }
 
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
   {

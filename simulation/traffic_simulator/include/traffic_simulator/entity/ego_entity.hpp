@@ -121,7 +121,7 @@ public:
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status) override;
 
-  const openscenario_msgs::msg::WaypointsArray getWaypoints();
+  const openscenario_msgs::msg::WaypointsArray getWaypoints() override;
 
 private:
   void updateAutoware(const geometry_msgs::msg::Pose &);

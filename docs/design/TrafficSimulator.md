@@ -7,7 +7,16 @@ Each NPC has a behavior tree and follow user's command.
 
 ## C++ API
 The traffic simulator provides an C++ API to control NPC behavior in simulation.
-The sample code is below.
+The sample code is below.  
+You can also see detailed documentation of API class [here](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classtraffic__simulator_1_1API/).  
+
+<iframe 
+  class="hatenablogcard" 
+  style="width:100%;height:155px;max-width:450px;" 
+  title="embree" 
+  src="https://hatenablog-parts.com/embed?url=https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classtraffic__simulator_1_1API/" 
+  width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
 
 ### minimal example
 ```c++

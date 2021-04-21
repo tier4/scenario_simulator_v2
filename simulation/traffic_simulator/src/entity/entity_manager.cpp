@@ -458,6 +458,9 @@ boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
 
 openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(const std::string & name)
 {
+  if (current_time_ < 0) {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
   return entities_.at(name)->getWaypoints();
 }
 
@@ -534,6 +537,7 @@ void EntityManager::update(const double current_time, const double step_time)
   auto entity_type_list = getEntityTypeList();
   openscenario_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & status : all_status) {
+    // std::cout << "calculating " << status.first << " status" << std::endl;
     openscenario_msgs::msg::EntityStatusWithTrajectory status_with_traj;
     auto status_msg = status.second;
     status_msg.name = status.first;
