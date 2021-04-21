@@ -53,7 +53,9 @@ void EgoEntity::updateAutoware(const geometry_msgs::msg::Pose & current_pose)
     current_twist.angular.z = (*vehicle_model_ptr_).getWz();
   }
 
-  autowares.at(name).update(current_pose, current_twist);
+  autowares.at(name).set(current_pose);
+  autowares.at(name).set(current_twist);
+  autowares.at(name).update();
 }
 
 EgoEntity::EgoEntity(
@@ -72,20 +74,18 @@ EgoEntity::EgoEntity(
     0.0    // deadzone_delta_steer
     ))
 {
-  if (autowares.find(name) == std::end(autowares)) {
-    autowares.emplace(
-      std::piecewise_construct, std::forward_as_tuple(name),
-      std::forward_as_tuple(
-        getParameter("autoware_launch_package", std::string("")),
-        getParameter("autoware_launch_file", std::string("")),
-        "map_path:=" + lanelet2_map_osm.parent_path().string(),
-        "lanelet2_map_file:=" + lanelet2_map_osm.filename().string(),
-        "vehicle_model:=ymc_golfcart_proto2",  // XXX: HARD CODING!!!
-        "sensor_model:=aip_x1",                // XXX: HARD CODING!!!
-        "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
-          "/planning_simulator_v2.rviz",
-        "scenario_simulation:=true"));
-  }
+  autowares.emplace(
+    std::piecewise_construct, std::forward_as_tuple(name),
+    std::forward_as_tuple(
+      getParameter("autoware_launch_package", std::string("")),
+      getParameter("autoware_launch_file", std::string("")),
+      "map_path:=" + lanelet2_map_osm.parent_path().string(),
+      "lanelet2_map_file:=" + lanelet2_map_osm.filename().string(),
+      "vehicle_model:=ymc_golfcart_proto2",  // XXX: HARD CODING!!!
+      "sensor_model:=aip_x1",                // XXX: HARD CODING!!!
+      "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
+        "/planning_simulator_v2.rviz",
+      "scenario_simulation:=true"));
 }
 
 EgoEntity::~EgoEntity() { autowares.erase(name); }
@@ -257,14 +257,15 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     status.pose.position.x = v(0) + initial_pose_.get().position.x;
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
+
     const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLanletId(status.pose);
     if (!closest_lanelet_id) {
       throw SimulationRuntimeError("failed to closest lane.");
     }
+
     traffic_simulator::math::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
-    const auto s_value = spline.getSValue(status.pose.position);
-    if (s_value) {
+    if (const auto s_value = spline.getSValue(status.pose.position)) {
       status.pose.position.z = spline.getPoint(s_value.get()).z;
     }
 
@@ -272,9 +273,7 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
 
     const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
 
-    status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-
-    if (lanelet_pose) {
+    if (status.lanelet_pose_valid = static_cast<bool>(lanelet_pose)) {
       status.lanelet_pose = lanelet_pose.get();
     }
   }

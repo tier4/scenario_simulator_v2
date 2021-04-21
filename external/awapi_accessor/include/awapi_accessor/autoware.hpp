@@ -15,6 +15,7 @@
 #ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
+#include <bits/c++config.h>
 #define AUTOWARE_IV
 // #define AUTOWARE_AUTO
 
@@ -53,8 +54,13 @@ class Autoware : public rclcpp::Node,
 
   std::thread spinner;
 
+  const rclcpp::TimerBase::SharedPtr continuous_update;
+
+  geometry_msgs::msg::Pose current_pose;
+  geometry_msgs::msg::Twist current_twist;
+
 public:
-  template <typename... Ts>
+  template <std::size_t Rate = 5, typename... Ts>
   AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
   : rclcpp::Node("awapi_accessor", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)),
@@ -65,7 +71,9 @@ public:
           rclcpp::spin_some(get_node_base_interface());
         }
       },
-      std::move(promise.get_future()))
+      std::move(promise.get_future())),
+    continuous_update(
+      create_wall_timer(std::chrono::milliseconds(Rate), [this]() { return update(); }))
   {
   }
 
@@ -84,6 +92,10 @@ public:
     }
   }
 
+  const auto & set(const geometry_msgs::msg::Pose & pose) { return current_pose = pose; }
+
+  const auto & set(const geometry_msgs::msg::Twist & twist) { return current_twist = twist; }
+
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  Called for each execution frame of the simulator.
@@ -91,9 +103,7 @@ public:
    *  TODO(yamacir-kit) MOVE INTO class VehicleAPI.
    *
    * ------------------------------------------------------------------------ */
-  void update(
-    const geometry_msgs::msg::Pose & current_pose,
-    const geometry_msgs::msg::Twist & current_twist = geometry_msgs::msg::Twist())
+  void update()
   {
     setCurrentControlMode();
     setCurrentPose(current_pose);
@@ -110,11 +120,12 @@ public:
 
   void initialize(const geometry_msgs::msg::Pose & initial_pose)
   {
-    waitForAutowareStateToBeInitializingVehicle([&]() { return update(initial_pose); });
+    set(initial_pose);
 
-    waitForAutowareStateToBeWaitingForRoute([&]() {
+    waitForAutowareStateToBeInitializingVehicle();
+
+    waitForAutowareStateToBeWaitingForRoute([&]() {  //
       setInitialPose(initial_pose);
-      return update(initial_pose);
     });
   }
 };

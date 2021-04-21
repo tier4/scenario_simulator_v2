@@ -18,9 +18,12 @@
 #include <awapi_accessor/autoware_error.hpp>
 #include <chrono>
 
+auto nop = []() {};
+
 #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                               \
-  template <typename Thunk, typename Seconds = std::chrono::seconds>                              \
-  void waitForAutowareStateToBe##STATE(Thunk thunk, Seconds interval = std::chrono::seconds(1))   \
+  template <typename Thunk = void (*)(), typename Seconds = std::chrono::seconds>                 \
+  void waitForAutowareStateToBe##STATE(                                                           \
+    Thunk thunk = nop, Seconds interval = std::chrono::seconds(1))                                \
   {                                                                                               \
     static const auto duration_max = std::chrono::seconds(30);                                    \
     Seconds duration{0};                                                                          \
