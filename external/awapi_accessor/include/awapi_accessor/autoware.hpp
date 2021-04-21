@@ -15,7 +15,10 @@
 #ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
-#undef AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT
+#define AUTOWARE_IV
+// #define AUTOWARE_AUTO
+
+#define AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT false
 
 #include <sys/wait.h>
 
@@ -35,7 +38,15 @@ class Autoware : public rclcpp::Node,
                  public MiscellaneousAPI<Autoware>,
                  public TransitionAssertion<Autoware>
 {
+  friend class ContinuousTransformBroadcaster<Autoware>;
+  friend class FundamentalAPI<Autoware>;
+  friend class MiscellaneousAPI<Autoware>;
+  friend class TransitionAssertion<Autoware>;
+
   std::mutex mutex;
+
+  // TODO(yamacir-kit) MOVE INTO PRIVATE THIS!!!
+  decltype(auto) lock() { return std::unique_lock<std::mutex>(mutex); }
 
   const pid_t process_id;
 
@@ -57,9 +68,6 @@ public:
       std::exit(EXIT_FAILURE);
     }
   }
-
-  // TODO(yamacir-kit) MOVE INTO PRIVATE THIS!!!
-  decltype(auto) lock() { return std::unique_lock<std::mutex>(mutex); }
 
   /* ---- NOTE -----------------------------------------------------------------
    *

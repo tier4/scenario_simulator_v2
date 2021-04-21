@@ -15,7 +15,7 @@
 #ifndef AWAPI_ACCESSOR__LAUNCH_HPP_
 #define AWAPI_ACCESSOR__LAUNCH_HPP_
 
-#ifdef AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT
+#if AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -47,8 +47,8 @@ static auto ros2_launch(const std::string & package, const std::string & file, T
 
   const std::vector<std::string> argv{
     "python3",
-    "/opt/ros/foxy/bin/ros2",  // NOTE: The command 'ros2' is a Python script.
-    "launch",
+    "/opt/ros/foxy/bin/ros2",
+    "launch",  // NOTE: The command 'ros2' is a Python script.
     package,
     file,
     std::forward<decltype(xs)>(xs)...};

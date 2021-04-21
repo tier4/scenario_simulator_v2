@@ -15,6 +15,16 @@
 #include <awapi_accessor/conversion.hpp>
 #include <awapi_accessor/define_macro.hpp>
 
+#if defined AUTOWARE_IV
+#include <autoware_vehicle_msgs/msg/control_mode.hpp>
+#include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
+#include <autoware_vehicle_msgs/msg/steering.hpp>
+#include <autoware_vehicle_msgs/msg/turn_signal.hpp>
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#elif defined AUTOWARE_AUTO
+// TODO (someone else)
+#endif
+
 namespace awapi
 {
 template <typename Node>

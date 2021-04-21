@@ -17,9 +17,9 @@
 
 // NOTE: headers are lexicographically sorted.
 
-#ifdef AUTOWARE_IV
+#if defined AUTOWARE_IV
 #include <autoware_vehicle_msgs/msg/engage.hpp>
-#elif AUTOWARE_AUTO
+#elif defined AUTOWARE_AUTO
 // TODO(yamacir-kit)
 #endif
 

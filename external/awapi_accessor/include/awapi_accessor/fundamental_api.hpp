@@ -15,9 +15,7 @@
 #ifndef AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
 #define AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
 
-#define AUTOWARE_IV  // or #define AUTOWARE_AUTO
-
-#ifdef AUTOWARE_IV
+#if defined AUTOWARE_IV
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
@@ -27,12 +25,8 @@
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
-#include <autoware_vehicle_msgs/msg/control_mode.hpp>
-#include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
-#include <autoware_vehicle_msgs/msg/steering.hpp>
-#include <autoware_vehicle_msgs/msg/turn_signal.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
-#elif AUTOWARE_AUTO
+#include <autoware_vehicle_msgs/msg/engage.hpp>
+#elif defined AUTOWARE_AUTO
 // TODO(yamacir-kit)
 #endif
 
