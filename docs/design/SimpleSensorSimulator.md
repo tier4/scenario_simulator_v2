@@ -17,7 +17,6 @@ In lidar simulation, we use intel's ray-casting library embree.
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 
-
 <iframe 
   class="hatenablogcard" 
   style="width:100%;height:155px;max-width:450px;" 
