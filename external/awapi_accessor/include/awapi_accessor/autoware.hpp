@@ -137,10 +137,10 @@ public:
       }
     };
 
-    // NOTE: Autoware.IV waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
     waitForAutowareStateToBePlanning(request, std::chrono::seconds(5));
 
-    waitForAutowareStateToBeWaitingForEngage();
+    // NOTE: Autoware.IV waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
+    waitForAutowareStateToBeWaitingForEngage(nop, std::chrono::seconds(4));
   }
 
   void engage()
