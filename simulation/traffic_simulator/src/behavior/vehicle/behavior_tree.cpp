@@ -45,10 +45,8 @@ BehaviorTree::BehaviorTree()
   factory_.registerNodeType<LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
-  // logger_cout_ptr_ = std::make_shared<BT::StdCoutLogger>(tree_);
   setupLogger();
   setRequest("none");
-  // setValueToBlackBoard<boost::optional<openscenario_msgs::msg::Obstacle>>("obstacle", boost::none);
 }
 
 void BehaviorTree::setRequest(std::string request)
