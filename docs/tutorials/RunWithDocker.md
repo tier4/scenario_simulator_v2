@@ -134,6 +134,23 @@ cd (path_to_scenario_simulator_v2)
 docker build -t scenario_simulator_v2 .
 ```
 
-## Runnig Simulation with docker.
+## Runing Simulation with docker.
 
+### Runing with docker image in your machine.
+Please type this commands and run [simple demo](SimpleDemo.md) in your local terminal.
+```bash
+rocker --nvidia --x11 scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
+```
+
+### Runing with docker image from dockerhub.
+
+We automatically build docker images of scenario_simulator_v2 by using github actions and put them into our dockerhub.
+
+<iframe 
+  class="hatenablogcard" 
+  style="width:100%;height:155px;max-width:450px;" 
+  title="rocker" 
+  src="https://hatenablog-parts.com/embed?url=https://hub.docker.com/repository/docker/tier4/scenario_simulator_v2" 
+  width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
 
