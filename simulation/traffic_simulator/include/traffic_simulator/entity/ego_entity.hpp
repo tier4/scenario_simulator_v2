@@ -386,7 +386,7 @@ public:
 
   bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
 
-  const openscenario_msgs::msg::WaypointsArray getWaypoints();
+  const openscenario_msgs::msg::WaypointsArray getWaypoints() override;
 
 private:
 // TODO(yamacir-kit): Define AutowareError type as struct based on std::runtime_error

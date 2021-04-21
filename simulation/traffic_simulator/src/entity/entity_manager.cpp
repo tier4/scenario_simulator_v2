@@ -454,6 +454,9 @@ boost::optional<openscenario_msgs::msg::Obstacle> EntityManager::getObstacle(
 
 openscenario_msgs::msg::WaypointsArray EntityManager::getWaypoints(const std::string & name)
 {
+  if (current_time_ < 0) {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
   return entities_.at(name)->getWaypoints();
 }
 
