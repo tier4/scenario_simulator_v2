@@ -15,11 +15,10 @@
 #ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
-#include <chrono>
 #define AUTOWARE_IV true
-// #define AUTOWARE_AUTO true
+#define AUTOWARE_AUTO false
 
-#define AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT false
+// #define AUTOWARE_CONCEALER_ISOLATE_STANDARD_OUTPUT
 
 #include <sys/wait.h>
 
@@ -29,6 +28,7 @@
 #include <awapi_accessor/miscellaneous_api.hpp>
 #include <awapi_accessor/transition_assertion.hpp>
 #include <awapi_accessor/utility/visibility.hpp>
+#include <chrono>
 #include <future>
 #include <mutex>
 #include <queue>
@@ -59,11 +59,8 @@ public:
         using namespace std::literals::chrono_literals;
         while (rclcpp::ok() and future.wait_for(1ms) == std::future_status::timeout) {
           if (not thunks.empty()) {
-            std::cout << "TASK IS NOT EMPTY => START FRONT TASK" << std::endl;
             std::thread(thunks.front()).join();
-            std::cout << "FRONT TASK FINISHED => POP IT" << std::endl;
             thunks.pop();
-            std::cout << "TASK POPED => REMAINS " << thunks.size() << std::endl;
           } else {
             std::this_thread::sleep_for(100ms);
           }
@@ -204,25 +201,17 @@ public:
 
   virtual ~Autoware()
   {
-    DEBUG_LINE();
     if (spinner.joinable()) {
-      DEBUG_LINE();
       promise.set_value();
-      DEBUG_LINE();
       spinner.join();
     }
 
-    DEBUG_LINE();
     int status = 0;
 
-    DEBUG_LINE();
     if (::kill(process_id, SIGINT) < 0 or ::waitpid(process_id, &status, WUNTRACED) < 0) {
-      DEBUG_LINE();
       std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-      DEBUG_LINE();
       std::exit(EXIT_FAILURE);
     }
-    DEBUG_LINE();
   }
 
   auto readyToEngage() const { return task_queue.exhausted(); }
@@ -259,10 +248,14 @@ public:
 
       waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
 
-      waitForAutowareStateToBePlanning(request, std::chrono::seconds(5));
+      request();
+
+      // waitForAutowareStateToBePlanning(request, std::chrono::seconds(3));
+      waitForAutowareStateToBePlanning();
 
       // NOTE: Autoware.IV waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
-      waitForAutowareStateToBeWaitingForEngage(nop, std::chrono::seconds(4));
+      // waitForAutowareStateToBeWaitingForEngage(nop, std::chrono::seconds(4));
+      waitForAutowareStateToBeWaitingForEngage();
     });
   }
 
