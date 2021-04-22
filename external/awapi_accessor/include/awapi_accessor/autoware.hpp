@@ -15,9 +15,8 @@
 #ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
-#include <bits/c++config.h>
-#define AUTOWARE_IV
-// #define AUTOWARE_AUTO
+#define AUTOWARE_IV true
+// #define AUTOWARE_AUTO true
 
 #define AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT false
 
@@ -33,10 +32,43 @@
 
 namespace awapi
 {
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  The magic class 'Autoware' is a class that makes it easy to work with
+ *  Autoware from C++. The main features of this class are as follows
+ *
+ *    (1) Launch Autoware in an independent process upon instantiation of the
+ *        class.
+ *    (2) Properly terminates the Autoware process started by the constructor
+ *        upon destruction of the class.
+ *    (3) Probably the simplest instructions to Autoware, consisting of
+ *        initialize, plan, and engage.
+ *
+ * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public ContinuousTransformBroadcaster<Autoware>,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public FundamentalAPI<Autoware>,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public MiscellaneousAPI<Autoware>,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public TransitionAssertion<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
@@ -56,11 +88,27 @@ class Autoware : public rclcpp::Node,
 
   const rclcpp::TimerBase::SharedPtr continuous_update;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  For a simple simulator, I believe that most of the information that needs
+   *  to be published could be easily calculated from Twist and Pose. However,
+   *  if the information that the update function wants to use cannot be
+   *  created only from Twist and Pose, you can add it after separating it with
+   *  '#if AUTOWARE_AUTO ... #endif'.
+   *
+   * ------------------------------------------------------------------------ */
   geometry_msgs::msg::Pose current_pose;
   geometry_msgs::msg::Twist current_twist;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  This update function is responsible for mass updates of topics that must
+   *  be continuously updated.
+   *
+   * ------------------------------------------------------------------------ */
   void update()
   {
+#if AUTOWARE_IV
     setCurrentControlMode();
     setCurrentPose(current_pose);
     setCurrentShift(current_twist);
@@ -72,6 +120,9 @@ class Autoware : public rclcpp::Node,
     setLocalizationTwist(current_twist);
     setTransform(current_pose);
     // setVehicleVelocity(parameters.performance.max_speed);
+#elif AUTOWARE_AUTO
+    // TODO (Robotec.ai)
+#endif
   }
 
 public:
@@ -113,16 +164,17 @@ public:
 
   void initialize(const geometry_msgs::msg::Pose & initial_pose)
   {
+#if AUTOWARE_IV
     set(initial_pose);
 
     waitForAutowareStateToBeInitializingVehicle();
 
-    waitForAutowareStateToBeWaitingForRoute([&]() {  //
-      setInitialPose(initial_pose);
-    });
+    waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
+#elif AUTOWARE_AUTO
+    // TODO (Robotec.ai)
+#endif
   }
 
-  // TODO(yamacir-kit) PoseStamped => Pose
   void drive(
     const geometry_msgs::msg::PoseStamped & destination,
     const std::vector<geometry_msgs::msg::PoseStamped> & checkpoints = {})
