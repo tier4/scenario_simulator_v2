@@ -175,7 +175,7 @@ public:
 #endif
   }
 
-  void drive(
+  void plan(
     const geometry_msgs::msg::PoseStamped & destination,
     const std::vector<geometry_msgs::msg::PoseStamped> & checkpoints = {})
   {

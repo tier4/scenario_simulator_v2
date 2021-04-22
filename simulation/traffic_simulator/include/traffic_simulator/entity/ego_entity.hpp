@@ -79,7 +79,7 @@ public:
 
   ~EgoEntity() override;
 
-  void drive(
+  void plan(
     const geometry_msgs::msg::PoseStamped & destination,
     const std::vector<geometry_msgs::msg::PoseStamped> & checkpoints = {})
   {
@@ -87,13 +87,13 @@ public:
       autowares.at(name).initialize(getStatus().pose);
     }
 
-    autowares.at(name).drive(destination, checkpoints);
+    autowares.at(name).plan(destination, checkpoints);
     autowares.at(name).engage();
   }
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override
   {
-    drive((*hdmap_utils_ptr_).toMapPose(lanelet_pose));
+    plan((*hdmap_utils_ptr_).toMapPose(lanelet_pose));
   }
 
   void requestAssignRoute(

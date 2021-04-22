@@ -90,7 +90,7 @@ void EgoEntity::requestAssignRoute(
     constraints.push_back((*hdmap_utils_ptr_).toMapPose(*iter));
   }
 
-  return drive((*hdmap_utils_ptr_).toMapPose(waypoints.back()), constraints);
+  return plan((*hdmap_utils_ptr_).toMapPose(waypoints.back()), constraints);
 }
 
 const openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()
