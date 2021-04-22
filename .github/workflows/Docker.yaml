@@ -32,7 +32,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: tier4/scenario_simulator_v2
           tags: latest
-          cache_froms: tier4/scenario_simulator_v2:latest
+          no-cache: true
           build_args: BUILDKIT_INLINE_CACHE=1
           push: true
       - name: Build Docker Image
@@ -45,7 +45,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: tier4/scenario_simulator_v2
           tags: latest
-          cache_froms: tier4/scenario_simulator_v2:latest
+          no-cache: true
           build_args: BUILDKIT_INLINE_CACHE=1
           push: false
       - name: Notify Slack
