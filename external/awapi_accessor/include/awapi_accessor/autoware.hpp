@@ -165,7 +165,7 @@ class Autoware : public rclcpp::Node,
   {
 #if AUTOWARE_IV
     setCurrentControlMode();
-    setCurrentPose(current_pose);
+    // setCurrentPose(current_pose);
     setCurrentShift(current_twist);
     setCurrentSteering(current_twist);
     setCurrentTurnSignal();
