@@ -138,7 +138,7 @@ def generate_launch_description():
                 'stderr': 'log',
                 'stdout': 'log',
                 },
-            condition= IfCondition(with_simulator_rviz),
+            condition=IfCondition(with_simulator_rviz),
             arguments=[
                 '-d', str(
                     Path(get_package_share_directory('scenario_test_runner')) /
