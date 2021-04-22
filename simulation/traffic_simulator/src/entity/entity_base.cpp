@@ -60,6 +60,14 @@ void EntityBase::updateStandStillDuration(double step_time)
   }
 }
 
+void EntityBase::updateEntityStatusTimestamp(double current_time)
+{
+  if (!status_) {
+    return;
+  }
+  status_->time = current_time;
+}
+
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status)
 {

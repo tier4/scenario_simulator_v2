@@ -15,10 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__OBJECT_HPP_
 
+#include <list>
 #include <openscenario_interpreter/expression.hpp>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -28,7 +28,7 @@ using ComplexType = Element;
 
 using Group = Element;
 
-using Elements = std::vector<Element>;
+using Elements = std::list<Element>;
 
 template <typename... Ts>
 using IsOptionalElement = std::is_default_constructible<Ts...>;

@@ -40,7 +40,7 @@ struct Axles
 
   const RearAxle rear_axle;
 
-  std::vector<AdditionalAxle> additional_axles;
+  std::list<AdditionalAxle> additional_axles;
 
   Axles() = default;
 

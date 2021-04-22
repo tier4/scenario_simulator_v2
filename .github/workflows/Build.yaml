@@ -5,7 +5,11 @@ on:
   schedule:
   - cron: 0 0 * * *
   pull_request:
-
+    paths-ignore:
+    - "docs/**"
+    - "mkdocs.yml"
+    - "README.md"
+    
 jobs:
   job1:
     name: Build

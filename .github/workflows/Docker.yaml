@@ -1,10 +1,17 @@
-name: Push Docker Image
+name: Docker
 
 on:
   workflow_dispatch:
   schedule:
   - cron: 0 0 * * *
   pull_request:
+    paths-ignore:
+    - "docs/**"
+    - "mkdocs.yml"
+    - "README.md"
+  push:
+    branches:
+      - master
   release:
     types: [published]
 
@@ -15,7 +22,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2-beta
-      - name: Build and Push
+      - name: Build and Push Docker Image
+        if: ${{ github.event_name != 'pull_request'}}
         uses: docker/build-push-action@v1
         env:
           DOCKER_BUILDKIT: 1
@@ -24,8 +32,22 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: tier4/scenario_simulator_v2
           tags: latest
-          cache_froms: tier4/scenario_simulator_v2:latest
+          no-cache: true
           build_args: BUILDKIT_INLINE_CACHE=1
+          push: true
+      - name: Build Docker Image
+        if: ${{ github.event_name == 'pull_request'}}
+        uses: docker/build-push-action@v1
+        env:
+          DOCKER_BUILDKIT: 1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: tier4/scenario_simulator_v2
+          tags: latest
+          no-cache: true
+          build_args: BUILDKIT_INLINE_CACHE=1
+          push: false
       - name: Notify Slack
         uses: 8398a7/action-slack@v2
         if: failure()

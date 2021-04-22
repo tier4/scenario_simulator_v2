@@ -51,6 +51,7 @@ nav:
   - Tutorials:
     - tutorials/BuildInstructions.md
     - tutorials/SimpleDemo.md
+    - tutorials/RunWithDocker.md
   - User Guide:
     - Scenario Editor:
       - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
