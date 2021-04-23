@@ -49,7 +49,10 @@ class API
 
 public:
   const std::string lanelet2_map_osm;
+
   const double initialize_duration;
+
+  const bool standalone_mode;
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
@@ -61,6 +64,10 @@ public:
     initialize_duration(initialize_duration),
     standalone_mode(standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
+    traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
+      entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
+      [this](const auto & name) { return API::getEntityPose(name); },
+      [this](const auto & name) { return API::despawn(name); }, auto_sink)),
     metrics_manager_(verbose, metrics_logfile_path),
     initialize_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
@@ -90,11 +97,6 @@ public:
       simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::attach_detection_sensor)
   {
-    static const std::string address = "127.0.0.1";
-    traffic_controller_ptr_ = std::make_shared<traffic_simulator::traffic::TrafficController>(
-      entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
-      [this](const auto & name) { return API::getEntityPose(name); },
-      [this](const auto & name) { return API::despawn(name); }, auto_sink);
     metrics_manager_.setEntityManager(entity_manager_ptr_);
     setVerbose(verbose);
   }
@@ -115,10 +117,7 @@ public:
     const bool is_ego, const std::string & name,
     const openscenario_msgs::msg::PedestrianParameters & params);
 
-  template <
-    typename Parameters,  // Maybe, VehicleParameters or PedestrianParameters
-    typename... Ts        // Arguments for setEntityStatus
-    >
+  template <typename Parameters, typename... Ts>
   decltype(auto) spawn(
     const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
   {
@@ -172,8 +171,6 @@ public:
 
   double getCurrentTime() const noexcept { return current_time_; }
 
-  const bool standalone_mode;
-
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   template <typename... Ts>                                                \
   decltype(auto) NAME(Ts &&... xs)                                         \
@@ -211,9 +208,6 @@ public:
 
 private:
   bool updateEntityStatusInSim();
-  bool spawn(
-    const bool is_ego, const std::string & catalog_xml,
-    const openscenario_msgs::msg::EntityStatus & status);
 
   template <typename Parameters>
   bool spawn(
@@ -223,12 +217,10 @@ private:
     return spawn(is_ego, parameters.toXml(), status);
   }
 
-  // openscenario_msgs::msg::EntityStatus toStatus(XmlRpc::XmlRpcValue param);
-  // XmlRpc::XmlRpcValue toValue(openscenario_msgs::msg::EntityStatus status);
+  const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
-  // std::shared_ptr<XmlRpc::XmlRpcClient> client_ptr_;
-  std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
-  std::shared_ptr<traffic_simulator::traffic::TrafficController> traffic_controller_ptr_;
+  const std::shared_ptr<traffic_simulator::traffic::TrafficController> traffic_controller_ptr_;
+
   double step_time_;
   double current_time_;
 

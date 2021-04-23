@@ -195,13 +195,14 @@ public:
   }                                                                            \
   static_assert(true, "")
 
-  FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
+  FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getVehicleParameters, const);
+  FORWARD_TO_ENTITY(ready, const);
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
@@ -295,10 +296,10 @@ public:
     const double tolerance) const;
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
+
   void requestLaneChange(const std::string & name, const Direction & direction);
 
-  bool setEntityStatus(
-    const std::string & name, const openscenario_msgs::msg::EntityStatus & status);
+  bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
 
   void setVerbose(bool verbose);
 

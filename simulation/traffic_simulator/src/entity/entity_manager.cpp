@@ -538,7 +538,7 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
 }
 
 bool EntityManager::setEntityStatus(
-  const std::string & name, const openscenario_msgs::msg::EntityStatus & status)
+  const std::string & name, openscenario_msgs::msg::EntityStatus status)
 {
   status.name = name;  // XXX UGLY CODE
   return entities_.at(name)->setStatus(status);
