@@ -121,9 +121,7 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 void Autoware::engage()
 {
 #if AUTOWARE_IV
-  task_queue.delay([&] {  // TODO (yamacir-kit) REMOVE THIS DELAY!!!
-    waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); });
-  });
+  waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); });
 #elif AUTOWARE_AUTO
   // TODO (Robotec.ai)
 #else

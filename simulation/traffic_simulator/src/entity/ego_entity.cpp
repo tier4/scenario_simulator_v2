@@ -19,7 +19,8 @@
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
-#include <system_error>  // std::system_error
+#include <system_error>
+#include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <tuple>
 #include <unordered_map>
@@ -216,19 +217,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   }
 }
 
-void EgoEntity::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
-{
-  if (not std::exchange(autoware_initialized, true)) {
-    autowares.at(name).initialize(getStatus().pose);
-  }
-
-  autowares.at(name).plan(route);
-  autowares.at(name).engage();
-}
-
 void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
-  plan({(*hdmap_utils_ptr_).toMapPose(lanelet_pose)});
+  requestAssignRoute({lanelet_pose});
 }
 
 void EgoEntity::requestAssignRoute(
@@ -240,7 +231,19 @@ void EgoEntity::requestAssignRoute(
     route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint));
   }
 
-  return plan(route);
+  assert(0 < route.size());
+
+  if (not std::exchange(autoware_initialized, true)) {
+    autowares.at(name).initialize(getStatus().pose);
+  }
+
+  autowares.at(name).plan(route);
+
+  while (not autowares.at(name).ready()) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  autowares.at(name).engage();
 }
 
 void EgoEntity::requestLaneChange(const std::int64_t)

@@ -88,8 +88,6 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &);
-
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose &) override;
 
   void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> &) override;
