@@ -65,8 +65,10 @@ public:
    *
    * ------------------------------------------------------------------------ */
   explicit EgoEntity(
-    const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
-    const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters);
+    const std::string & name,                          //
+    const boost::filesystem::path & lanelet2_map_osm,  //
+    const double step_time,                            //
+    const openscenario_msgs::msg::VehicleParameters & parameters);
 
   ~EgoEntity() override;
 
@@ -87,6 +89,8 @@ public:
   auto getWaypoints() -> const openscenario_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
+
+  auto ready() const -> bool override;
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose &) override;
 

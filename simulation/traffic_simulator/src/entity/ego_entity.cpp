@@ -217,6 +217,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   }
 }
 
+auto EgoEntity::ready() const -> bool { return autowares.at(name).ready(); }
+
 void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
   requestAssignRoute({lanelet_pose});
@@ -239,7 +241,7 @@ void EgoEntity::requestAssignRoute(
 
   autowares.at(name).plan(route);
 
-  while (not autowares.at(name).ready()) {
+  while (not ready()) {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
