@@ -142,9 +142,7 @@ public:
 
   void initialize(const geometry_msgs::msg::Pose &);
 
-  void plan(
-    const geometry_msgs::msg::PoseStamped &,
-    const std::vector<geometry_msgs::msg::PoseStamped> & = {});
+  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &);
 
   void engage();
 };

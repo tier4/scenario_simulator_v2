@@ -82,15 +82,13 @@ EgoEntity::~EgoEntity() { autowares.erase(name); }
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  assert(1 < waypoints.size());
+  std::vector<geometry_msgs::msg::PoseStamped> route;
 
-  std::vector<geometry_msgs::msg::PoseStamped> constraints;
-
-  for (auto iter = std::cbegin(waypoints); std::next(iter) != std::cend(waypoints); ++iter) {
-    constraints.push_back((*hdmap_utils_ptr_).toMapPose(*iter));
+  for (const auto & waypoint : waypoints) {
+    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint));
   }
 
-  return plan((*hdmap_utils_ptr_).toMapPose(waypoints.back()), constraints);
+  return plan(route);
 }
 
 const openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()

@@ -79,21 +79,19 @@ public:
 
   ~EgoEntity() override;
 
-  void plan(
-    const geometry_msgs::msg::PoseStamped & destination,
-    const std::vector<geometry_msgs::msg::PoseStamped> & checkpoints = {})
+  void plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
   {
     if (not std::exchange(autoware_initialized, true)) {
       autowares.at(name).initialize(getStatus().pose);
     }
 
-    autowares.at(name).plan(destination, checkpoints);
+    autowares.at(name).plan(route);
     autowares.at(name).engage();
   }
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override
   {
-    plan((*hdmap_utils_ptr_).toMapPose(lanelet_pose));
+    plan({(*hdmap_utils_ptr_).toMapPose(lanelet_pose)});
   }
 
   void requestAssignRoute(

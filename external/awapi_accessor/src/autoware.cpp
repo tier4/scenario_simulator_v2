@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <awapi_accessor/autoware.hpp>
+#include <boost/range/adaptor/sliced.hpp>
 
 #define DEBUG_VALUE(...) \
   std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
@@ -75,19 +76,25 @@ void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 #endif
 }
 
-void Autoware::plan(
-  const geometry_msgs::msg::PoseStamped & destination,
-  const std::vector<geometry_msgs::msg::PoseStamped> & checkpoints)
+void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 {
-  task_queue.delay([this, destination, checkpoints] {
+  assert(0 < route.size());
+
+#if AUTOWARE_IV
+  task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
-    setGoalPose(destination);
-    for (const auto & checkpoint : checkpoints) {
-      setCheckpoint(checkpoint);
+    setGoalPose(route.back());
+    for (const auto & each : route | boost::adaptors::sliced(0, route.size())) {
+      setCheckpoint(each);
     }
     waitForAutowareStateToBePlanning();
     waitForAutowareStateToBeWaitingForEngage();  // NOTE: Autoware.IV 0.11.1 waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
   });
+#elif AUTOWARE_AUTO
+  // TODO (Robotec.ai)
+#else
+  static_assert(false, "");
+#endif
 }
 
 void Autoware::engage()
