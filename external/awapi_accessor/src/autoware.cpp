@@ -59,6 +59,11 @@ void Autoware::update()
 #endif
 }
 
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  Send initial_pose to Autoware.
+ *
+ * -------------------------------------------------------------------------- */
 void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 {
 #if AUTOWARE_IV
@@ -76,6 +81,16 @@ void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 #endif
 }
 
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  Send the destination and route constraint points to Autoware. The argument
+ *  route is guaranteed to be size 1 or greater, and its last element is the
+ *  destination. When the size of a route is 2 or greater, the non-last element
+ *  is the route constraint. That is, Autoware must go through the element
+ *  points on the given'route' starting at index 0 and stop at index
+ *  route.size() - 1.
+ *
+ * -------------------------------------------------------------------------- */
 void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 {
   assert(0 < route.size());
@@ -97,6 +112,12 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 #endif
 }
 
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  Send an engagement request to Autoware. If Autoware does not have an
+ *  engagement equivalent, this operation can be nop (No operation).
+ *
+ * -------------------------------------------------------------------------- */
 void Autoware::engage()
 {
 #if AUTOWARE_IV
