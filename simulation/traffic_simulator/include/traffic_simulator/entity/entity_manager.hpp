@@ -24,14 +24,12 @@
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <boost/optional.hpp>
-#include <map>
 #include <memory>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <stdexcept>  // TODO(yamacir-kit): Remove this!
 #include <string>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -42,7 +40,6 @@
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <type_traits>
-#include <typeinfo>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -75,8 +72,6 @@ class EntityManager
 
   std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
-  // rclcpp::TimerBase::SharedPtr hdmap_marker_timer_;
-
   boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
   boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
 
@@ -88,16 +83,36 @@ class EntityManager
 
   using MarkerArray = visualization_msgs::msg::MarkerArray;
   rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-  MarkerArray markers_raw_;
 
   using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
   rclcpp::Publisher<VehicleKinematicState>::SharedPtr kinematic_state_pub_ptr_;
 
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
-  std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
+  MarkerArray markers_raw_;
+
+  const std::shared_ptr<TrafficLightManager> traffic_light_manager_ptr_;
 
 public:
+  template <typename Node>
+  auto getOrigin(Node & node) const
+  {
+    geographic_msgs::msg::GeoPoint origin;
+    {
+      node.declare_parameter("origin_latitude", 0.0);
+      node.declare_parameter("origin_longitude", 0.0);
+      // node.declare_parameter("origin_altitude", 0.0);
+      node.get_parameter("origin_latitude", origin.latitude);
+      node.get_parameter("origin_longitude", origin.longitude);
+      // node.get_parameter("origin_altitude", origin.altitude);
+      node.undeclare_parameter("origin_latitude");
+      node.undeclare_parameter("origin_longitude");
+      // node.undeclare_parameter("origin_altitude");
+    }
+
+    return origin;
+  }
+
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const std::string & map_path)
   : verbose_(false),
@@ -112,33 +127,17 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     kinematic_state_pub_ptr_(rclcpp::create_publisher<VehicleKinematicState>(
       node, "output/kinematic_state", LaneletMarkerQoS(),
-      rclcpp::PublisherOptionsWithAllocator<AllocatorT>()))
-  {
-    geographic_msgs::msg::GeoPoint origin;
-    {
-      node->declare_parameter("origin_latitude", 0.0);
-      node->declare_parameter("origin_longitude", 0.0);
-      // node->declare_parameter("origin_altitude", 0.0);
-      node->get_parameter("origin_latitude", origin.latitude);
-      node->get_parameter("origin_longitude", origin.longitude);
-      // node->get_parameter("origin_altitude", origin.altitude);
-      node->undeclare_parameter("origin_latitude");
-      node->undeclare_parameter("origin_longitude");
-      // node->undeclare_parameter("origin_altitude");
-    }
-
-    hdmap_utils_ptr_ = std::make_shared<hdmap_utils::HdMapUtils>(map_path, origin);
-
-    markers_raw_ = hdmap_utils_ptr_->generateMarker();
-
-    updateHdmapMarker();
-
-    traffic_light_manager_ptr_ = std::make_shared<TrafficLightManager>(
+      rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(map_path, getOrigin(*node))),
+    markers_raw_(hdmap_utils_ptr_->generateMarker()),
+    traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(
       hdmap_utils_ptr_,
       rclcpp::create_publisher<MarkerArray>(node, "traffic_light/marker", LaneletMarkerQoS()),
       rclcpp::create_publisher<autoware_perception_msgs::msg::TrafficLightStateArray>(
         node, "/awapi/traffic_light/put/traffic_light_status", rclcpp::QoS(10).transient_local()),
-      clock_ptr_);
+      clock_ptr_))
+  {
+    updateHdmapMarker();
   }
 
   ~EntityManager() = default;
