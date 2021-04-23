@@ -30,6 +30,7 @@
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -184,6 +185,32 @@ public:
 
 #undef FORWARD_TO_HDMAP_UTILS
 
+#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                     \
+  template <typename... Ts>                                                    \
+  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__ \
+  try {                                                                        \
+    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);  \
+  } catch (const std::out_of_range &) {                                        \
+    throw SimulationRuntimeError("Unknown entity " + name + " was specified"); \
+  }                                                                            \
+  static_assert(true, "")
+
+  FORWARD_TO_ENTITY(getCurrentAction, const);
+  FORWARD_TO_ENTITY(getBoundingBox, const);
+  FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getLinearJerk, const);
+  FORWARD_TO_ENTITY(getRouteLanelets, );
+  FORWARD_TO_ENTITY(getStandStillDuration, const);
+  FORWARD_TO_ENTITY(getVehicleParameters, const);
+  FORWARD_TO_ENTITY(requestAcquirePosition, );
+  FORWARD_TO_ENTITY(requestAssignRoute, );
+  FORWARD_TO_ENTITY(requestLaneChange, );
+  FORWARD_TO_ENTITY(requestWalkStraight, );
+  FORWARD_TO_ENTITY(setDriverModel, );
+  FORWARD_TO_ENTITY(setTargetSpeed, );
+
+#undef FORWARD_TO_SPECIFIED_ENTITY
+
   void broadcastBaseLinkTransform();
 
   void broadcastEntityTransform();
@@ -200,15 +227,11 @@ public:
   // TODO (yamacir-kit) Rename to 'hasEntityStatus'
   bool entityStatusSet(const std::string & name) const;
 
-  auto getBoundingBox(const std::string & name) const -> const openscenario_msgs::msg::BoundingBox;
-
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;
 
   auto getConflictingEntityOnRouteLanelets(const std::string & name, const double horizon)
     -> std::vector<std::int64_t>;
-
-  auto getCurrentAction(const std::string & name) const -> const std::string;
 
   auto getCurrentTime() const noexcept -> double;
 
@@ -223,8 +246,6 @@ public:
   auto getEntityStatus(const std::string & name) const
     -> const boost::optional<openscenario_msgs::msg::EntityStatus>;
 
-  auto getEntityType(const std::string & name) const -> openscenario_msgs::msg::EntityType;
-
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>;
 
@@ -232,8 +253,6 @@ public:
 
   auto getLaneletPose(const std::string & name)
     -> boost::optional<openscenario_msgs::msg::LaneletPose>;
-
-  auto getLinearJerk(const std::string & name) const -> boost::optional<double>;
 
   auto getLongitudinalDistance(
     const std::string & from, const std::string & to, const double max_distance = 100)
@@ -255,18 +274,10 @@ public:
   auto getRelativePose(const std::string              & from, const std::string              & to)       -> geometry_msgs::msg::Pose;
   // clang-format on
 
-  auto getRouteLanelets(const std::string & name, const double horizon)
-    -> std::vector<std::int64_t>;
-
-  auto getStandStillDuration(const std::string & name) const -> const boost::optional<double>;
-
   auto getStepTime() const noexcept -> double;
 
   auto getSValueInRoute(const std::string & name, const std::vector<std::int64_t> & route)
     -> boost::optional<double>;
-
-  auto getVehicleParameters(const std::string & name) const
-    -> const boost::optional<openscenario_msgs::msg::VehicleParameters>;
 
   auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
 
@@ -284,22 +295,10 @@ public:
     const double tolerance) const;
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
-
-  void requestAcquirePosition(const std::string &, const openscenario_msgs::msg::LaneletPose &);
-
-  void requestAssignRoute(
-    const std::string & name, const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints);
-
-  void requestLaneChange(const std::string & name, std::int64_t to_lanelet_id);
   void requestLaneChange(const std::string & name, const Direction & direction);
 
-  void requestWalkStraight(const std::string & name);
-
-  void setDriverModel(const std::string & name, const openscenario_msgs::msg::DriverModel & model);
-
-  bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
-
-  void setTargetSpeed(const std::string & name, const double target_speed, const bool continuous);
+  bool setEntityStatus(
+    const std::string & name, const openscenario_msgs::msg::EntityStatus & status);
 
   void setVerbose(bool verbose);
 

@@ -126,12 +126,6 @@ bool EntityManager::entityStatusSet(const std::string & name) const
   return entities_.at(name)->statusSet();
 }
 
-auto EntityManager::getBoundingBox(const std::string & name) const
-  -> const openscenario_msgs::msg::BoundingBox
-{
-  return entities_.at(name)->getBoundingBox();
-}
-
 auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::string & to)
   -> boost::optional<double>
 {
@@ -151,11 +145,6 @@ auto EntityManager::getConflictingEntityOnRouteLanelets(
   }
   const auto route = getRouteLanelets(name, horizon);
   return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
-}
-
-auto EntityManager::getCurrentAction(const std::string & name) const -> const std::string
-{
-  return entities_.at(name)->getCurrentAction();
 }
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
@@ -226,12 +215,6 @@ auto EntityManager::getEntityStatus(const std::string & name) const
   return status_msg;
 }
 
-auto EntityManager::getEntityType(const std::string & name) const
-  -> openscenario_msgs::msg::EntityType
-{
-  return entities_.at(name)->getEntityType();
-}
-
 auto EntityManager::getEntityTypeList() const
   -> const std::unordered_map<std::string, openscenario_msgs::msg::EntityType>
 {
@@ -258,11 +241,6 @@ auto EntityManager::getLaneletPose(const std::string & name)
     return status->lanelet_pose;
   }
   return toLaneletPose(status->pose);
-}
-
-auto EntityManager::getLinearJerk(const std::string & name) const -> boost::optional<double>
-{
-  return entities_.at(name)->getLinearJerk();
 }
 
 auto EntityManager::getLongitudinalDistance(
@@ -321,14 +299,6 @@ geometry_msgs::msg::Pose EntityManager::getMapPose(
 
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
-  // std::size_t count = 0;
-  // for (auto & entity : entities_) {
-  //   if (isEgo(entity.first)) {
-  //     ++count;
-  //   }
-  // }
-  // return count;
-
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
     return isEgo(each.first);
   });
@@ -421,18 +391,6 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
   return getRelativePose(from_status->pose, to_status->pose);
 }
 
-auto EntityManager::getRouteLanelets(const std::string & name, const double horizon)
-  -> std::vector<std::int64_t>
-{
-  return entities_.at(name)->getRouteLanelets(horizon);
-}
-
-auto EntityManager::getStandStillDuration(const std::string & name) const
-  -> const boost::optional<double>
-{
-  return entities_.at(name)->getStandStillDuration();
-}
-
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
 auto EntityManager::getSValueInRoute(
@@ -456,12 +414,6 @@ auto EntityManager::getSValueInRoute(
     }
   }
   return boost::none;
-}
-
-auto EntityManager::getVehicleParameters(const std::string & name) const
-  -> const boost::optional<openscenario_msgs::msg::VehicleParameters>
-{
-  return entities_.at(name)->getVehicleParameters();
 }
 
 auto EntityManager::getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray
@@ -564,23 +516,6 @@ bool EntityManager::reachPosition(
   return reachPosition(name, target_pose.pose, tolerance);
 }
 
-void EntityManager::requestAcquirePosition(
-  const std::string & name, const openscenario_msgs::msg::LaneletPose & lanelet_pose)
-{
-  entities_.at(name)->requestAcquirePosition(lanelet_pose);
-}
-
-void EntityManager::requestAssignRoute(
-  const std::string & name, const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
-{
-  entities_.at(name)->requestAssignRoute(waypoints);
-}
-
-void EntityManager::requestLaneChange(const std::string & name, const std::int64_t to_lanelet_id)
-{
-  entities_.at(name)->requestLaneChange(to_lanelet_id);
-}
-
 void EntityManager::requestLaneChange(const std::string & name, const Direction & direction)
 {
   auto status = getEntityStatus(name);
@@ -602,28 +537,11 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
   }
 }
 
-void EntityManager::requestWalkStraight(const std::string & name)
-{
-  entities_.at(name)->requestWalkStraight();
-}
-
-void EntityManager::setDriverModel(
-  const std::string & name, const openscenario_msgs::msg::DriverModel & model)
-{
-  entities_.at(name)->setDriverModel(model);
-}
-
 bool EntityManager::setEntityStatus(
-  const std::string & name, openscenario_msgs::msg::EntityStatus status)
+  const std::string & name, const openscenario_msgs::msg::EntityStatus & status)
 {
   status.name = name;  // XXX UGLY CODE
   return entities_.at(name)->setStatus(status);
-}
-
-void EntityManager::setTargetSpeed(
-  const std::string & name, const double target_speed, const bool continuous)
-{
-  return entities_.at(name)->setTargetSpeed(target_speed, continuous);
 }
 
 void EntityManager::setVerbose(bool verbose)
