@@ -42,6 +42,12 @@ public:
 
   const openscenario_msgs::msg::PedestrianParameters parameters;
 
+  auto getEntityTypename() const -> const std::string & override
+  {
+    static const std::string result = "PedestrianEntity";
+    return result;
+  }
+
   void onUpdate(double current_time, double step_time) override;
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override;

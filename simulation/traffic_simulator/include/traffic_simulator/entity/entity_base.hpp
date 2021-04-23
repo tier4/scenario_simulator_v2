@@ -58,7 +58,9 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
-  /*   */ auto getEntityType() const & -> const auto & { return entity_type_; }
+  /*   */ auto getEntityType() const -> const auto & { return entity_type_; }
+
+  virtual auto getEntityTypename() const -> const std::string & = 0;
 
   /*   */ auto getLinearJerk() const { return linear_jerk_; }
 
@@ -124,7 +126,7 @@ public:
   virtual void requestWalkStraight()
   {
     std::stringstream what;
-    what << type << " type entities do not support WalkStraightAction";
+    what << getEntityTypename() << " type entities do not support WalkStraightAction";
     throw UnsupportedActionError(what.str());
   }
 

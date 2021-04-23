@@ -79,6 +79,12 @@ public:
 
   ~EgoEntity() override;
 
+  auto getEntityTypename() const -> const std::string & override
+  {
+    static const std::string result = "EgoEntity";
+    return result;
+  }
+
   void plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
   {
     if (not std::exchange(autoware_initialized, true)) {

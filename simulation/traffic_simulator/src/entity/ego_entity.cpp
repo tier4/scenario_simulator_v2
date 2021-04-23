@@ -26,12 +26,6 @@
 #include <utility>
 #include <vector>
 
-namespace traffic_simulator
-{
-namespace entity
-{
-std::unordered_map<std::string, awapi::Autoware> EgoEntity::autowares{};
-
 template <typename T>
 auto getParameter(const std::string & name, const T & alternate)
 {
@@ -45,11 +39,17 @@ auto getParameter(const std::string & name, const T & alternate)
   return value;
 }
 
+namespace traffic_simulator
+{
+namespace entity
+{
+std::unordered_map<std::string, awapi::Autoware> EgoEntity::autowares{};
+
 EgoEntity::EgoEntity(
   const std::string & name, const boost::filesystem::path & lanelet2_map_osm,
   const double step_time, const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
-  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(
+  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(  // XXX: HARD CODING!!!
     parameters.performance.max_speed, parameters.axles.front_axle.max_steering,
     parameters.performance.max_acceleration,
     5.0,  // steer_rate_lim,
