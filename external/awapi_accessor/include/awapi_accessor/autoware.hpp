@@ -15,8 +15,8 @@
 #ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
-#define AUTOWARE_IV true
 #define AUTOWARE_AUTO false
+#define AUTOWARE_IV true
 
 // #define AUTOWARE_CONCEALER_ISOLATE_STANDARD_OUTPUT
 
@@ -26,61 +26,17 @@
 #include <awapi_accessor/fundamental_api.hpp>
 #include <awapi_accessor/launch.hpp>
 #include <awapi_accessor/miscellaneous_api.hpp>
+#include <awapi_accessor/task_queue.hpp>
 #include <awapi_accessor/transition_assertion.hpp>
 #include <awapi_accessor/utility/visibility.hpp>
 #include <chrono>
 #include <future>
 #include <mutex>
-#include <queue>
 #include <thread>
+#include <utility>
 
 namespace awapi
 {
-class TaskQueue
-{
-  using Thunk = std::function<void()>;
-
-  std::queue<Thunk> thunks;
-
-  std::promise<void> promise;
-
-  std::thread worker;
-
-public:
-  explicit TaskQueue()
-  : worker(
-      [this](auto future) {
-        using namespace std::literals::chrono_literals;
-        while (rclcpp::ok() and future.wait_for(1ms) == std::future_status::timeout) {
-          if (not thunks.empty()) {
-            std::thread(thunks.front()).join();
-            thunks.pop();
-          } else {
-            std::this_thread::sleep_for(100ms);
-          }
-        }
-      },
-      std::move(promise.get_future()))
-  {
-  }
-
-  ~TaskQueue()
-  {
-    if (worker.joinable()) {
-      promise.set_value();
-      worker.join();
-    }
-  }
-
-  template <typename... Ts>
-  decltype(auto) delay(Ts &&... xs)
-  {
-    return thunks.emplace(std::forward<decltype(xs)>(xs)...);
-  }
-
-  auto exhausted() const noexcept { return thunks.empty(); }
-};
-
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  The magic class 'Autoware' is a class that makes it easy to work with
@@ -161,7 +117,7 @@ class Autoware : public rclcpp::Node,
 
 public:
   template <std::size_t Rate = 5, typename... Ts>
-  AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
+  AWAPI_ACCESSOR_PUBLIC explicit Autoware(Ts &&... xs)
   : rclcpp::Node("awapi_accessor", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)),
     spinner(

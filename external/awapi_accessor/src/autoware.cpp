@@ -53,6 +53,8 @@ void Autoware::update()
   // setVehicleVelocity(parameters.performance.max_speed);
 #elif AUTOWARE_AUTO
   // TODO (Robotec.ai)
+#else
+  static_assert(false, "");
 #endif
 }
 
@@ -68,6 +70,8 @@ void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
   task_queue.delay([&]() {
     // TODO (Robotec.ai)
   });
+#else
+  static_assert(false, "");
 #endif
 }
 
@@ -88,8 +92,14 @@ void Autoware::plan(
 
 void Autoware::engage()
 {
+#if AUTOWARE_IV
   task_queue.delay([&] {  // TODO (yamacir-kit) REMOVE THIS DELAY!!!
     waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); });
   });
+#elif AUTOWARE_AUTO
+  // TODO (Robotec.ai)
+#else
+  static_assert(false, "");
+#endif
 }
 }  // namespace awapi
