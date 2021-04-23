@@ -64,11 +64,6 @@ public:
     return parameters;
   }
 
-  void requestWalkStraight() override
-  {
-    throw UnsupportActionError("request walk straight command does not support in vehicle entity.");
-  }
-
   void setDriverModel(const openscenario_msgs::msg::DriverModel & model) override
   {
     tree_ptr_->setValueToBlackBoard("driver_model", model);

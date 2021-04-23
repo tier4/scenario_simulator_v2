@@ -112,6 +112,8 @@ public:
 
   virtual void onUpdate(double current_time, double step_time) = 0;
 
+  virtual auto ready() const -> bool { return static_cast<bool>(status_); }
+
   virtual void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) = 0;
 
   virtual void requestAssignRoute(
@@ -119,7 +121,12 @@ public:
 
   virtual void requestLaneChange(const std::int64_t){};
 
-  virtual void requestWalkStraight() = 0;
+  virtual void requestWalkStraight()
+  {
+    std::stringstream what;
+    what << type << " type entities do not support WalkStraightAction";
+    throw UnsupportedActionError(what.str());
+  }
 
   /*   */ auto statusSet() const noexcept { return static_cast<bool>(status_); }
 

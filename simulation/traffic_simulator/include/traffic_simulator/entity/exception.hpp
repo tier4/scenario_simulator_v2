@@ -20,24 +20,19 @@
 
 namespace traffic_simulator
 {
-class SimulationRuntimeError : public std::runtime_error
+struct SimulationRuntimeError : public std::runtime_error
 {
-public:
-  explicit SimulationRuntimeError(const char * message) : runtime_error(message) {}
-  explicit SimulationRuntimeError(std::string message) : runtime_error(message.c_str()) {}
+  using std::runtime_error::runtime_error;
 };
 
-class UnsupportActionError : public std::runtime_error
+struct UnsupportedActionError : public std::runtime_error
 {
-public:
-  explicit UnsupportActionError(const char * message) : runtime_error(message) {}
-  explicit UnsupportActionError(std::string message) : runtime_error(message.c_str()) {}
+  using std::runtime_error::runtime_error;
 };
 
-class SplineInterpolationError : public std::runtime_error
+struct SplineInterpolationError : public std::runtime_error
 {
-public:
-  explicit SplineInterpolationError(const char * message) : runtime_error(message) {}
+  using std::runtime_error::runtime_error;
 };
 }  // namespace traffic_simulator
 
