@@ -195,6 +195,7 @@ public:
   }                                                                            \
   static_assert(true, "")
 
+  FORWARD_TO_ENTITY(engage, );
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getEntityType, const);

@@ -181,6 +181,7 @@ public:
   static_assert(true, "")
 
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
+  FORWARD_TO_ENTITY_MANAGER(engage);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
@@ -191,6 +192,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
+  FORWARD_TO_ENTITY_MANAGER(ready);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestLaneChange);

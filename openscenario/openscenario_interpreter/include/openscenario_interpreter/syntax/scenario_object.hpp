@@ -91,7 +91,6 @@ struct ScenarioObject
     if (apply<bool>(*this, static_cast<const EntityObject &>(*this))) {
       if (is<Vehicle>()) {
         assignController(name, object_controller);
-
         if (object_controller.isEgo()) {
           attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
             traffic_simulator::helper::LidarType::VLP32, name,

@@ -54,6 +54,8 @@ public:
   virtual ~EntityBase() = default;
 
 public:
+  virtual void engage() {}
+
   virtual auto getBoundingBox() const -> const openscenario_msgs::msg::BoundingBox = 0;
 
   virtual auto getCurrentAction() const -> const std::string = 0;

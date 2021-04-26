@@ -77,6 +77,8 @@ public:
   EgoEntity & operator=(const EgoEntity &) = delete;
 
 public:
+  void engage() override;
+
   auto getCurrentAction() const -> const std::string override;
 
   auto getEntityStatus(const double, const double) const

@@ -88,6 +88,15 @@ EgoEntity::EgoEntity(
 
 EgoEntity::~EgoEntity() { autowares.erase(name); }
 
+void EgoEntity::engage()
+{
+  while (not ready()) {  // guard
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  autowares.at(name).engage();
+}
+
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   return autowares.at(name).getAutowareStatus().autoware_state;
@@ -195,6 +204,33 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 {
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
+
+    geometry_msgs::msg::Pose current_pose;
+    {
+      geometry_msgs::msg::Vector3 rpy;
+      {
+        rpy.x = 0;
+        rpy.y = 0;
+        rpy.z = vehicle_model_ptr_->getYaw();
+      }
+
+      current_pose.position.x = (*vehicle_model_ptr_).getX() + initial_pose_.get().position.x;
+      current_pose.position.y = (*vehicle_model_ptr_).getY() + initial_pose_.get().position.y;
+      current_pose.position.z = /*                          */ initial_pose_.get().position.z;
+
+      current_pose.orientation =
+        initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
+    }
+
+    autowares.at(name).set(current_pose);
+
+    geometry_msgs::msg::Twist current_twist;
+    {
+      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
+      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
+    }
+
+    autowares.at(name).set(current_twist);
   } else {
     Eigen::VectorXd input(2);
     {
@@ -242,12 +278,6 @@ void EgoEntity::requestAssignRoute(
   }
 
   autowares.at(name).plan(route);
-
-  while (not ready()) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-  }
-
-  autowares.at(name).engage();
 }
 
 void EgoEntity::requestLaneChange(const std::int64_t)
