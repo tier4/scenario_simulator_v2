@@ -27,7 +27,7 @@
       },                                                                                          \
     Seconds interval = std::chrono::seconds(1))                                                   \
   {                                                                                               \
-    static const auto duration_max = std::chrono::seconds(30);                                    \
+    static const auto duration_max = std::chrono::seconds(10);                                    \
     Seconds duration{0};                                                                          \
     for (rclcpp::WallRate rate{interval}; not static_cast<Node &>(*this).is##STATE();             \
          rate.sleep()) {                                                                          \
@@ -43,7 +43,7 @@
              << ". This error is most likely due to the Autoware state transition "               \
              << "conditions changing with the update. Please report this error to "               \
              << "the developer. This error message was written by @yamacir-kit.";                 \
-        AutowareError(what.str());                                                                \
+        throw AutowareError(what.str());                                                          \
       }                                                                                           \
     }                                                                                             \
     RCLCPP_INFO_STREAM(static_cast<Node &>(*this).get_logger(), "Autoware is " #STATE " now.");   \

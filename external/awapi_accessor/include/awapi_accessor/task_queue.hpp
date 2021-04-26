@@ -15,11 +15,27 @@
 #ifndef AWAPI_ACCESSOR__TASK_QUEUE_HPP_
 #define AWAPI_ACCESSOR__TASK_QUEUE_HPP_
 
+#include <exception>
 #include <functional>
 #include <future>
 #include <queue>
 #include <thread>
+#include <tuple>
 #include <utility>
+
+template <typename F, typename Tuple, std::size_t... I>
+constexpr decltype(auto) apply_aux(F && f, Tuple && tuple, std::index_sequence<I...>)
+{
+  return std::forward<F>(f)(std::get<I>(std::forward<Tuple>(tuple))...);
+}
+
+template <typename F, typename Tuple>
+constexpr decltype(auto) apply(F && f, Tuple && tuple)
+{
+  return apply_aux(
+    std::forward<F>(f), std::forward<Tuple>(tuple),
+    std::make_index_sequence<std::tuple_size<std::remove_reference_t<Tuple>>::value>());
+}
 
 namespace awapi
 {
@@ -32,6 +48,8 @@ class TaskQueue
   std::promise<void> promise;
 
   std::thread worker;
+
+  std::string what;
 
 public:
   explicit TaskQueue()
@@ -53,16 +71,24 @@ public:
 
   ~TaskQueue()
   {
+    std::cout << "DESTROYING TaskQueue BEGIN" << std::endl;
     if (worker.joinable()) {
       promise.set_value();
       worker.join();
     }
+    std::cout << "DESTROYING TaskQueue END" << std::endl;
   }
 
-  template <typename... Ts>
-  decltype(auto) delay(Ts &&... xs)
+  template <typename F>
+  decltype(auto) delay(F && f)
   {
-    return thunks.emplace(std::forward<decltype(xs)>(xs)...);
+    return thunks.emplace([this, f]() {
+      try {
+        return f();
+      } catch (const std::exception & error) {
+        what = error.what();
+      }
+    });
   }
 
   auto exhausted() const noexcept { return thunks.empty(); }
