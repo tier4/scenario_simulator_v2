@@ -42,10 +42,10 @@ void Autoware::update()
 {
 #if AUTOWARE_IV
   setCurrentControlMode();
-  // setCurrentPose(current_pose);
+  // setCurrentPose(current_pose); TODO (yamacir-kit) REMOVE THIS!!!
   setCurrentShift(current_twist);
   setCurrentSteering(current_twist);
-  setCurrentTurnSignal();
+  // setCurrentTurnSignal();
   setCurrentTwist(current_twist);
   setCurrentVelocity(current_twist);
   setLaneChangeApproval();

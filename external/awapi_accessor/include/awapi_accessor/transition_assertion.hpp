@@ -43,7 +43,7 @@
              << ". This error is most likely due to the Autoware state transition "               \
              << "conditions changing with the update. Please report this error to "               \
              << "the developer. This error message was written by @yamacir-kit.";                 \
-        throw AutowareError(what.str());                                                          \
+        AutowareError(what.str());                                                                \
       }                                                                                           \
     }                                                                                             \
     RCLCPP_INFO_STREAM(static_cast<Node &>(*this).get_logger(), "Autoware is " #STATE " now.");   \

@@ -266,7 +266,7 @@ class MiscellaneousAPI
       initial_twist.twist = twist;
     }
 
-    AWAPI_CURRENT_VALUE_OF(VehicleCommand).control.velocity = initial_twist.twist.linear.x;
+    // AWAPI_CURRENT_VALUE_OF(VehicleCommand).control.velocity = initial_twist.twist.linear.x;
 
     return setInitialTwist(initial_twist);
   }
