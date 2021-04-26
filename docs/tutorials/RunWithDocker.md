@@ -1,5 +1,10 @@
 # Run with docker
 
+You can use this scenario_simulator_v2 with docker.
+We automatically build docker images by using github actions and push them into dockerhub.
+
+If you want to run scenario_simulator_v2 with docker, please follow instructions below.
+
 ## Install docker
 
 Please follow instructions below.
@@ -157,26 +162,22 @@ We automatically build docker images of scenario_simulator_v2 by using github ac
 
 [![Push Docker Image](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)
 
-<iframe 
-  class="hatenablogcard" 
-  style="width:100%;height:155px;max-width:450px;" 
-  title="rocker" 
-  src="https://hatenablog-parts.com/embed?url=https://hub.docker.com/repository/docker/tier4/scenario_simulator_v2" 
-  width="300" height="150" frameborder="0" scrolling="no">
-</iframe>
+[![dockeri.co](https://dockeri.co/image/tier4/scenario_simulator_v2)](https://hub.docker.com/r/tier4/scenario_simulator_v2)
 
 We can pull docker image from dockerhub and run simulation with scenario_simulator_v2 just typing commands below.
 
 If your local machine has nvidia GPUs,
 
 ```bash
-rocker --nvidia --x11 tier4/scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
+docker pull tier4/scenario_simulator_v2:latest
+rocker --nvidia --x11 tier4/scenario_simulator_v2:latest ros2 launch traffic_simulator mock_test.launch.py
 ```
 
 If your local machine does not have nvidia GPUs,
 
 ```bash
-rocker --x11 tier4/scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
+docker pull tier4/scenario_simulator_v2:latest
+rocker --x11 tier4/scenario_simulator_v2:latest ros2 launch traffic_simulator mock_test.launch.py
 ```
 
 <video
