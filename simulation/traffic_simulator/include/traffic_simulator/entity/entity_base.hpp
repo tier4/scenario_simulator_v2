@@ -41,6 +41,10 @@ enum class Direction { STRAIGHT = 0, LEFT = 1, RIGHT = 2 };
 class EntityBase
 {
 public:
+  const std::string type;
+
+  const std::string name;
+
   EntityBase(const std::string & type, const std::string & name);
 
   EntityBase(
@@ -49,22 +53,56 @@ public:
 
   virtual ~EntityBase() = default;
 
-  const std::string type;
+public:
+  virtual void engage() {}
 
-  const std::string name;
+  virtual auto getBoundingBox() const -> const openscenario_msgs::msg::BoundingBox = 0;
 
-  const openscenario_msgs::msg::EntityStatus getStatus() const;
+  virtual auto getCurrentAction() const -> const std::string = 0;
 
-  virtual bool setStatus(const openscenario_msgs::msg::EntityStatus & status);
+  /*   */ auto getEntityType() const -> const auto & { return entity_type_; }
 
-  bool setVisibility(const bool visibility);
+  virtual auto getEntityTypename() const -> const std::string & = 0;
 
-  bool getVisibility();
+  /*   */ auto getLinearJerk() const { return linear_jerk_; }
+
+  virtual auto getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacle> = 0;
+
+  virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
+
+  /*   */ auto getStatus() const -> const openscenario_msgs::msg::EntityStatus;
+
+  /*   */ auto getStandStillDuration() const -> boost::optional<double>;
+
+  /*   */ auto getVisibility() { return visibility_; }
+
+  /*   */ auto getVehicleParameters() const
+    -> const boost::optional<openscenario_msgs::msg::VehicleParameters>
+  {
+    return boost::none;
+  }
+
+  virtual auto getWaypoints() -> const openscenario_msgs::msg::WaypointsArray = 0;
+
+  virtual void setDriverModel(const openscenario_msgs::msg::DriverModel &) {}
+
+  /*   */ void setEntityTypeList(
+    const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & entity_type_list)
+  {
+    entity_type_list_ = entity_type_list;
+  }
 
   virtual void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
   {
     hdmap_utils_ptr_ = ptr;
   }
+
+  /*   */ void setOtherStatus(
+    const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status);
+
+  virtual auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool;
+
+  virtual void setTargetSpeed(const double target_speed, const bool continuous) = 0;
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
@@ -72,67 +110,41 @@ public:
     traffic_light_manager_ = ptr;
   }
 
-  virtual void setDriverModel(const openscenario_msgs::msg::DriverModel &) {}
+  /*   */ void setVerbose(bool verbose) { verbose_ = verbose; }
+
+  /*   */ auto setVisibility(const bool visibility) { return visibility_ = visibility; }
 
   virtual void onUpdate(double current_time, double step_time) = 0;
 
-  auto statusSet() const noexcept { return static_cast<bool>(status_); }
+  virtual auto ready() const -> bool { return static_cast<bool>(status_); }
 
-  const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters() const
-  {
-    return boost::none;
-  }
-
-  void updateEntityStatusTimestamp(const double current_time);
-
-  void setVerbose(bool verbose) { verbose_ = verbose; }
-
-  void setEntityTypeList(
-    const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & entity_type_list)
-  {
-    entity_type_list_ = entity_type_list;
-  }
-
-  void setOtherStatus(
-    const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status);
-
-  void updateStandStillDuration(const double step_time);
-
-  boost::optional<double> getStandStillDuration() const;
-
-  virtual const openscenario_msgs::msg::BoundingBox getBoundingBox() const = 0;
-
-  virtual const std::string getCurrentAction() const = 0;
-
-  void stopAtEndOfRoad();
-
-  boost::optional<double> getLinearJerk() const { return linear_jerk_; }
+  virtual void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) = 0;
 
   virtual void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) = 0;
 
   virtual void requestLaneChange(const std::int64_t){};
 
-  virtual void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) = 0;
+  virtual void requestWalkStraight()
+  {
+    std::stringstream what;
+    what << getEntityTypename() << " type entities do not support WalkStraightAction";
+    throw UnsupportedActionError(what.str());
+  }
 
-  virtual void requestWalkStraight() = 0;
+  /*   */ auto statusSet() const noexcept { return static_cast<bool>(status_); }
 
-  const openscenario_msgs::msg::EntityType getEntityType() const { return entity_type_; }
+  /*   */ void stopAtEndOfRoad();
 
-  virtual std::vector<std::int64_t> getRouteLanelets(const double horizon = 100) = 0;
+  /*   */ void updateEntityStatusTimestamp(const double current_time);
 
-  virtual void setTargetSpeed(const double target_speed, const bool continuous) = 0;
-
-  virtual boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() = 0;
-
-  virtual const openscenario_msgs::msg::WaypointsArray getWaypoints() = 0;
+  /*   */ void updateStandStillDuration(const double step_time);
 
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
+  boost::optional<openscenario_msgs::msg::EntityStatus> status_;
 
   std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
-
-  boost::optional<openscenario_msgs::msg::EntityStatus> status_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;

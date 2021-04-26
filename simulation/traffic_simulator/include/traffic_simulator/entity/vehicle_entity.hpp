@@ -51,6 +51,12 @@ public:
 
   const openscenario_msgs::msg::VehicleParameters parameters;
 
+  auto getEntityTypename() const -> const std::string & override
+  {
+    static const std::string result = "VehicleEntity";
+    return result;
+  }
+
   void onUpdate(double current_time, double step_time) override;
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
@@ -62,11 +68,6 @@ public:
   const boost::optional<openscenario_msgs::msg::VehicleParameters> getVehicleParameters() const
   {
     return parameters;
-  }
-
-  void requestWalkStraight() override
-  {
-    throw UnsupportActionError("request walk straight command does not support in vehicle entity.");
   }
 
   void setDriverModel(const openscenario_msgs::msg::DriverModel & model) override

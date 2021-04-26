@@ -15,12 +15,12 @@
 #ifndef AWAPI_ACCESSOR__LAUNCH_HPP_
 #define AWAPI_ACCESSOR__LAUNCH_HPP_
 
-#if AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT
+#ifdef AUTOWARE_CONCEALER_ISOLATE_STANDARD_OUTPUT
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#endif  // AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT
+#endif
 
 #include <awapi_accessor/execute.hpp>
 #include <cstdlib>

@@ -15,11 +15,10 @@
 #ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
 #define AWAPI_ACCESSOR__AUTOWARE_HPP_
 
-#include <bits/c++config.h>
-#define AUTOWARE_IV
-// #define AUTOWARE_AUTO
+#define AUTOWARE_AUTO false
+#define AUTOWARE_IV true
 
-#define AWAPI_CONCEALER_ISOLATE_STANDARD_OUTPUT false
+// #define AUTOWARE_CONCEALER_ISOLATE_STANDARD_OUTPUT
 
 #include <sys/wait.h>
 
@@ -27,16 +26,54 @@
 #include <awapi_accessor/fundamental_api.hpp>
 #include <awapi_accessor/launch.hpp>
 #include <awapi_accessor/miscellaneous_api.hpp>
+#include <awapi_accessor/task_queue.hpp>
 #include <awapi_accessor/transition_assertion.hpp>
 #include <awapi_accessor/utility/visibility.hpp>
+#include <chrono>
+#include <future>
 #include <mutex>
+#include <thread>
+#include <utility>
 
 namespace awapi
 {
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  The magic class 'Autoware' is a class that makes it easy to work with
+ *  Autoware from C++. The main features of this class are as follows
+ *
+ *    (1) Launch Autoware in an independent process upon instantiation of the
+ *        class.
+ *    (2) Properly terminates the Autoware process started by the constructor
+ *        upon destruction of the class.
+ *    (3) Probably the simplest instructions to Autoware, consisting of
+ *        initialize, plan, and engage.
+ *
+ * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public ContinuousTransformBroadcaster<Autoware>,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public FundamentalAPI<Autoware>,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public MiscellaneousAPI<Autoware>,
+
+                 /* ---- NOTE --------------------------------------------------
+                  *
+                  *
+                  * --------------------------------------------------------- */
                  public TransitionAssertion<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
@@ -54,29 +91,33 @@ class Autoware : public rclcpp::Node,
 
   std::thread spinner;
 
-  const rclcpp::TimerBase::SharedPtr continuous_update;
+  const rclcpp::TimerBase::SharedPtr updater;
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  For a simple simulator, I believe that most of the information that needs
+   *  to be published could be easily calculated from Twist and Pose. However,
+   *  if the information that the update function wants to use cannot be
+   *  created only from Twist and Pose, you can add it after separating it with
+   *  '#if AUTOWARE_AUTO ... #endif'.
+   *
+   * ------------------------------------------------------------------------ */
   geometry_msgs::msg::Pose current_pose;
   geometry_msgs::msg::Twist current_twist;
 
-  void update()
-  {
-    setCurrentControlMode();
-    setCurrentPose(current_pose);
-    setCurrentShift(current_twist);
-    setCurrentSteering(current_twist);
-    setCurrentTurnSignal();
-    setCurrentTwist(current_twist);
-    setCurrentVelocity(current_twist);
-    setLaneChangeApproval();
-    setLocalizationTwist(current_twist);
-    setTransform(current_pose);
-    // setVehicleVelocity(parameters.performance.max_speed);
-  }
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  This update function is responsible for mass updates of topics that must
+   *  be continuously updated.
+   *
+   * ------------------------------------------------------------------------ */
+  void update();
+
+  TaskQueue task_queue;
 
 public:
   template <std::size_t Rate = 5, typename... Ts>
-  AWAPI_ACCESSOR_PUBLIC explicit constexpr Autoware(Ts &&... xs)
+  AWAPI_ACCESSOR_PUBLIC explicit Autoware(Ts &&... xs)
   : rclcpp::Node("awapi_accessor", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)),
     spinner(
@@ -87,66 +128,23 @@ public:
         }
       },
       std::move(promise.get_future())),
-    continuous_update(
-      create_wall_timer(std::chrono::milliseconds(Rate), [this]() { return update(); }))
+    updater(create_wall_timer(std::chrono::milliseconds(Rate), [this]() { return update(); }))
   {
   }
 
-  virtual ~Autoware()
-  {
-    if (spinner.joinable()) {
-      promise.set_value();
-      spinner.join();
-    }
+  virtual ~Autoware();
 
-    int status = 0;
-
-    if (::kill(process_id, SIGINT) < 0 or ::waitpid(process_id, &status, WUNTRACED) < 0) {
-      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
-  }
+  auto ready() const { return task_queue.exhausted(); }
 
   const auto & set(const geometry_msgs::msg::Pose & pose) { return current_pose = pose; }
 
   const auto & set(const geometry_msgs::msg::Twist & twist) { return current_twist = twist; }
 
-  void initialize(const geometry_msgs::msg::Pose & initial_pose)
-  {
-    set(initial_pose);
+  void initialize(const geometry_msgs::msg::Pose &);
 
-    waitForAutowareStateToBeInitializingVehicle();
+  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &);
 
-    waitForAutowareStateToBeWaitingForRoute([&]() {  //
-      setInitialPose(initial_pose);
-    });
-  }
-
-  // TODO(yamacir-kit) PoseStamped => Pose
-  void drive(
-    const geometry_msgs::msg::PoseStamped & destination,
-    const std::vector<geometry_msgs::msg::PoseStamped> & checkpoints = {})
-  {
-    // NOTE: This is assertion.
-    waitForAutowareStateToBeWaitingForRoute();
-
-    auto request = [&]() {
-      setGoalPose(destination);
-      for (const auto & checkpoint : checkpoints) {
-        setCheckpoint(checkpoint);
-      }
-    };
-
-    // NOTE: Autoware.IV waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
-    waitForAutowareStateToBePlanning(request, std::chrono::seconds(5));
-
-    waitForAutowareStateToBeWaitingForEngage();
-  }
-
-  void engage()
-  {
-    waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); });
-  }
+  void engage();
 };
 }  // namespace awapi
 

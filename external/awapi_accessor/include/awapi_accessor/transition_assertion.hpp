@@ -18,12 +18,14 @@
 #include <awapi_accessor/autoware_error.hpp>
 #include <chrono>
 
-auto nop = []() {};
-
 #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                               \
   template <typename Thunk = void (*)(), typename Seconds = std::chrono::seconds>                 \
   void waitForAutowareStateToBe##STATE(                                                           \
-    Thunk thunk = nop, Seconds interval = std::chrono::seconds(1))                                \
+    Thunk thunk =                                                                                 \
+      []() {                                                                                      \
+        std::cout << "Simulator waiting for Autoware state to be " #STATE "." << std::endl;       \
+      },                                                                                          \
+    Seconds interval = std::chrono::seconds(1))                                                   \
   {                                                                                               \
     static const auto duration_max = std::chrono::seconds(30);                                    \
     Seconds duration{0};                                                                          \
@@ -34,7 +36,7 @@ auto nop = []() {};
       } else {                                                                                    \
         const auto current_state = static_cast<Node &>(*this).getAutowareStatus().autoware_state; \
         std::stringstream what;                                                                   \
-        what << "The simulator waited " << duration_max.count()                                   \
+        what << "Simulator waited " << duration_max.count()                                       \
              << " seconds, expecting the Autoware state to transitioning to " << #STATE           \
              << ", but there was no change. The current Autoware state is "                       \
              << (current_state.empty() ? "NOT PUBLISHED YET" : current_state)                     \

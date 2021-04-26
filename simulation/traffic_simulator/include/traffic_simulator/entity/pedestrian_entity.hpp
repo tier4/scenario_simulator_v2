@@ -15,17 +15,15 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__PEDESTRIAN_ENTITY_HPP_
 
+#include <boost/optional.hpp>
+#include <memory>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <pugixml.hpp>
+#include <string>
 #include <traffic_simulator/behavior/pedestrian/behavior_tree.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/pedestrian_parameter.hpp>
-
-// headers in pugixml
-#include <boost/optional.hpp>
-#include <memory>
-#include <pugixml.hpp>
-#include <string>
 #include <vector>
 
 namespace traffic_simulator
@@ -43,6 +41,12 @@ public:
     const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
 
   const openscenario_msgs::msg::PedestrianParameters parameters;
+
+  auto getEntityTypename() const -> const std::string & override
+  {
+    static const std::string result = "PedestrianEntity";
+    return result;
+  }
 
   void onUpdate(double current_time, double step_time) override;
 

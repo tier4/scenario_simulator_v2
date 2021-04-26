@@ -188,8 +188,6 @@ bool API::reachPosition(
   return entity_manager_ptr_->entityStatusSet(name) &&
          entity_manager_ptr_->reachPosition(
            name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
-
-  // NOTE: ^ ament_uncrustify says above indentation is so beautiful.
 }
 
 bool API::reachPosition(

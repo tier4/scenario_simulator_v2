@@ -39,7 +39,8 @@ class ContinuousTransformBroadcaster
   {
     if (
       not current_transform.header.frame_id.empty() and
-      not current_transform.child_frame_id.empty()) {
+      not current_transform.child_frame_id.empty())  //
+    {
       current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       return transform_broadcaster.sendTransform(current_transform);
     }

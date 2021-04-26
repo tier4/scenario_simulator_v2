@@ -92,10 +92,6 @@ bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   return true;
 }
 
-bool EntityBase::setVisibility(const bool visibility) { return visibility_ = visibility; }
-
-bool EntityBase::getVisibility() { return visibility_; }
-
 void EntityBase::stopAtEndOfRoad()
 {
   if (!status_) {
