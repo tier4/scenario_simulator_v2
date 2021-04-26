@@ -29,7 +29,7 @@ class LidarSensor
 {
 public:
   LidarSensor(
-    const simulation_api_schema::LidarConfiguration & configuration,
+    const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
   void update(
     double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
