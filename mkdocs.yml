@@ -22,6 +22,7 @@ palette:
 copyright: 'Copyright &copy; 2020- Tier IV, Inc.'
 
 markdown_extensions:
+  - attr_list
   - codehilite: { guess_lang: false }
   - fontawesome_markdown
   - mdx_math
