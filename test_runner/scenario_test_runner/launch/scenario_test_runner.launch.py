@@ -15,10 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, Shutdown
 from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
 from launch_ros.actions import LifecycleNode, Node
 from pathlib import Path
 
@@ -34,6 +35,7 @@ def generate_launch_description():
     output_directory = LaunchConfiguration('output-directory', default=Path("/tmp"))
     scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))
     workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))
+    with_simulator_rviz = LaunchConfiguration('with_simulator_rviz', default=False)
 
     port = 8080
 
@@ -124,18 +126,23 @@ def generate_launch_description():
             name='openscenario_visualizer',
             output='screen',),
 
-        # Node(
-        #     package='rviz2',
-        #     executable='rviz2',
-        #     name='rviz2',
-        #     output={
-        #         'stderr': 'log',
-        #         'stdout': 'log',
-        #         },
-        #     arguments=[
-        #         '-d', str(
-        #             Path(get_package_share_directory('scenario_test_runner')) /
-        #             'planning_simulator_v2.rviz')
-        #         ],
-        #     ),
+        DeclareLaunchArgument(
+            'with_simulator_rviz', default_value=with_simulator_rviz,
+            description="if true, launch with rviz configuration in this framework"),
+
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output={
+                'stderr': 'log',
+                'stdout': 'log',
+                },
+            condition=IfCondition(with_simulator_rviz),
+            arguments=[
+                '-d', str(
+                    Path(get_package_share_directory('scenario_test_runner')) /
+                    'planning_simulator_v2.rviz')
+                ],
+            ),
         ])
