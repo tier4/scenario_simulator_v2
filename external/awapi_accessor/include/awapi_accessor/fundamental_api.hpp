@@ -40,7 +40,6 @@
 #include <limits>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
 #include <type_traits>
 #include <utility>
 

@@ -60,27 +60,6 @@ class MiscellaneousAPI
     return setCurrentControlMode(current_control_mode);
   }
 
-  /* ---- CurrentPose ----------------------------------------------------------
-   *
-   *  Topic: /current_pose
-   *
-   * ------------------------------------------------------------------------ */
-  using CurrentPose = geometry_msgs::msg::PoseStamped;
-
-  DEFINE_PUBLISHER(CurrentPose);
-
-  decltype(auto) setCurrentPose(const geometry_msgs::msg::Pose & pose)
-  {
-    geometry_msgs::msg::PoseStamped current_pose;
-    {
-      current_pose.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      current_pose.header.frame_id = "map";
-      current_pose.pose = pose;
-    }
-
-    return setCurrentPose(current_pose);
-  }
-
   /* ---- CurrentShift ---------------------------------------------------------
    *
    *  Topic: /vehicle/status/shift
@@ -245,43 +224,6 @@ class MiscellaneousAPI
     return setInitialPose(initial_pose);
   }
 
-  /* ---- InitialTwist ---------------------------------------------------------
-   *
-   *  Set initial velocity of Autoware.
-   *
-   *  Topic: /initialtwist
-   *
-   * ------------------------------------------------------------------------ */
-  using InitialTwist = geometry_msgs::msg::TwistStamped;
-
-  DEFINE_PUBLISHER(InitialTwist);
-
-  decltype(auto) setInitialTwist(
-    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
-  {
-    InitialTwist initial_twist;
-    {
-      initial_twist.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      initial_twist.header.frame_id = "map";
-      initial_twist.twist = twist;
-    }
-
-    // AWAPI_CURRENT_VALUE_OF(VehicleCommand).control.velocity = initial_twist.twist.linear.x;
-
-    return setInitialTwist(initial_twist);
-  }
-
-  decltype(auto) setInitialTwist(const double linear_x, const double angular_z = 0)
-  {
-    geometry_msgs::msg::Twist twist;
-    {
-      twist.linear.x = linear_x;
-      twist.angular.z = angular_z;
-    }
-
-    return setInitialTwist(twist);
-  }
-
   /* ---- LocalizationTwist ----------------------------------------------------
    *
    *  Topic: /localization/twist
@@ -294,7 +236,7 @@ class MiscellaneousAPI
   decltype(auto) setLocalizationTwist(
     const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
   {
-    InitialTwist localization_twist;
+    LocalizationTwist localization_twist;
     {
       localization_twist.header.stamp = static_cast<Node &>(*this).get_clock()->now();
       localization_twist.header.frame_id = "map";
@@ -322,11 +264,9 @@ class MiscellaneousAPI
 
   DEFINE_SUBSCRIPTION(TurnSignalCommand);
 
-  /* ---- InitialTwist ---------------------------------------------------------
+  /* ---- VehicleCommand -------------------------------------------------------
    *
-   *  Set initial velocity of Autoware.
-   *
-   *  Topic: /initialtwist
+   *  Topic: /control/vehicle_cmd
    *
    * ------------------------------------------------------------------------ */
   using VehicleCommand = autoware_vehicle_msgs::msg::VehicleCommand;
@@ -337,7 +277,6 @@ public:
   explicit MiscellaneousAPI()
   : INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
-    INIT_PUBLISHER(CurrentPose, "/current_pose"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),
@@ -345,7 +284,6 @@ public:
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
-    INIT_PUBLISHER(InitialTwist, "/initialtwist"),
     INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
