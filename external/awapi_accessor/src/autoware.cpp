@@ -59,6 +59,12 @@ void Autoware::update()
 #endif
 }
 
+bool Autoware::ready() const
+{
+  task_queue.rethrow();
+  return task_queue.exhausted();
+}
+
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  Send initial_pose to Autoware.

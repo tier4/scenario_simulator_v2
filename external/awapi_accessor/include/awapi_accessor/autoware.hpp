@@ -134,7 +134,7 @@ public:
 
   virtual ~Autoware();
 
-  auto ready() const { return task_queue.exhausted(); }
+  bool ready() const noexcept(false);
 
   const auto & set(const geometry_msgs::msg::Pose & pose) { return current_pose = pose; }
 
