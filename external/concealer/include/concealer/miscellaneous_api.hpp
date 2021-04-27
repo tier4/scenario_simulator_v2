@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <awapi_accessor/conversion.hpp>
-#include <awapi_accessor/define_macro.hpp>
+#ifndef CONCEALER__MISCELLANEOUS_API_HPP_
+#define CONCEALER__MISCELLANEOUS_API_HPP_
+
+#include <concealer/conversion.hpp>
+#include <concealer/define_macro.hpp>
 
 #if defined AUTOWARE_IV
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
@@ -25,7 +28,7 @@
 // TODO (someone else)
 #endif
 
-namespace awapi
+namespace concealer
 {
 template <typename Node>
 class MiscellaneousAPI
@@ -291,4 +294,6 @@ public:
   {
   }
 };
-}  // namespace awapi
+}  // namespace concealer
+
+#endif  // CONCEALER__MISCELLANEOUS_API_HPP_

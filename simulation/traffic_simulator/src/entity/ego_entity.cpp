@@ -50,7 +50,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, awapi::Autoware> EgoEntity::autowares{};
+std::unordered_map<std::string, concealer::Autoware> EgoEntity::autowares{};
 
 EgoEntity::EgoEntity(
   const std::string & name,  //

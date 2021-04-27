@@ -16,9 +16,9 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
-#include <awapi_accessor/autoware.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
+#include <concealer/autoware.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
@@ -34,7 +34,7 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
   // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
-  static std::unordered_map<std::string, awapi::Autoware> autowares;
+  static std::unordered_map<std::string, concealer::Autoware> autowares;
 
   bool autoware_initialized = false;  // TODO (yamacir-kit) REMOVE THIS!!!
 

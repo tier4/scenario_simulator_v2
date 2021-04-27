@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_
-#define AWAPI_ACCESSOR__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_
+#ifndef CONCEALER__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_
+#define CONCEALER__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_
 
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2_ros/transform_broadcaster.h>
@@ -22,7 +22,7 @@
 #include <chrono>
 #include <geometry_msgs/msg/pose.hpp>
 
-namespace awapi
+namespace concealer
 {
 template <typename Node>
 class ContinuousTransformBroadcaster
@@ -68,6 +68,6 @@ public:
   {
   }
 };
-}  // namespace awapi
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_
+#endif  // CONCEALER__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_

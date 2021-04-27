@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <awapi_accessor/autoware.hpp>
 #include <boost/range/adaptor/sliced.hpp>
+#include <concealer/autoware.hpp>
 
 #define DEBUG_VALUE(...) \
   std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
@@ -21,7 +21,7 @@
 #define DEBUG_LINE() \
   std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
 
-namespace awapi
+namespace concealer
 {
 Autoware::~Autoware()
 {
@@ -133,4 +133,4 @@ void Autoware::engage()
   static_assert(false, "");
 #endif
 }
-}  // namespace awapi
+}  // namespace concealer

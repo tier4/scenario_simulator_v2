@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <awapi_accessor/task_queue.hpp>
 #include <chrono>
+#include <concealer/task_queue.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <utility>
 
@@ -23,7 +23,7 @@
 #define DEBUG_LINE() \
   std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
 
-namespace awapi
+namespace concealer
 {
 TaskQueue::TaskQueue()
 : dispatcher(
@@ -59,4 +59,4 @@ void TaskQueue::rethrow() const
     std::rethrow_exception(thrown);
   }
 }
-}  // namespace awapi
+}  // namespace concealer

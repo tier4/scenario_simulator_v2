@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__CONVERSION_HPP_
-#define AWAPI_ACCESSOR__CONVERSION_HPP_
+#ifndef CONCEALER__CONVERSION_HPP_
+#define CONCEALER__CONVERSION_HPP_
 
 // NOTE: headers are lexicographically sorted.
 
@@ -29,7 +29,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace awapi
+namespace concealer
 {
 #define REQUIRES(...) typename = typename std::enable_if<__VA_ARGS__::value>::type
 
@@ -98,6 +98,6 @@ struct converter<From, autoware_vehicle_msgs::msg::Engage>
     return to;
   }
 };
-}  // namespace awapi
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__CONVERSION_HPP_
+#endif  // CONCEALER__CONVERSION_HPP_

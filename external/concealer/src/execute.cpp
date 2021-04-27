@@ -14,10 +14,10 @@
 
 #include <unistd.h>
 
-#include <awapi_accessor/execute.hpp>
+#include <concealer/execute.hpp>
 #include <type_traits>
 
-namespace awapi
+namespace concealer
 {
 /* ---- NOTE -------------------------------------------------------------------
  *
@@ -45,4 +45,4 @@ int execute(const std::vector<std::string> & f_xs)
 
   return ::execvp(argv[0], argv.data());
 }
-}  // namespace awapi
+}  // namespace concealer

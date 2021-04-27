@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__TASK_QUEUE_HPP_
-#define AWAPI_ACCESSOR__TASK_QUEUE_HPP_
+#ifndef CONCEALER__TASK_QUEUE_HPP_
+#define CONCEALER__TASK_QUEUE_HPP_
 
 #include <exception>
 #include <functional>
@@ -21,7 +21,7 @@
 #include <queue>
 #include <thread>
 
-namespace awapi
+namespace concealer
 {
 class TaskQueue
 {
@@ -56,6 +56,6 @@ public:
 
   void rethrow() const noexcept(false);
 };
-}  // namespace awapi
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__TASK_QUEUE_HPP_
+#endif  // CONCEALER__TASK_QUEUE_HPP_

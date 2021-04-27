@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
-#define AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
+#ifndef CONCEALER__FUNDAMENTAL_API_HPP_
+#define CONCEALER__FUNDAMENTAL_API_HPP_
 
 #if defined AUTOWARE_IV
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
@@ -30,10 +30,10 @@
 // TODO(yamacir-kit)
 #endif
 
-#include <awapi_accessor/autoware_error.hpp>
-#include <awapi_accessor/conversion.hpp>
-#include <awapi_accessor/define_macro.hpp>
 #include <cassert>
+#include <concealer/autoware_error.hpp>
+#include <concealer/conversion.hpp>
+#include <concealer/define_macro.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
@@ -43,7 +43,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace awapi
+namespace concealer
 {
 template <typename Node>
 class FundamentalAPI
@@ -178,13 +178,13 @@ public:
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                               \
-  auto is##NAME() const noexcept                                                          \
-  {                                                                                       \
-    using autoware_system_msgs::msg::AutowareState;                                       \
-    assert(AutowareState::VALUE == #NAME);                                                \
-    return AWAPI_CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
-  }                                                                                       \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                                   \
+  auto is##NAME() const noexcept                                                              \
+  {                                                                                           \
+    using autoware_system_msgs::msg::AutowareState;                                           \
+    assert(AutowareState::VALUE == #NAME);                                                    \
+    return CONCEALER_CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
+  }                                                                                           \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
@@ -225,6 +225,6 @@ public:
   {
   }
 };
-}  // namespace awapi
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
+#endif  // CONCEALER__FUNDAMENTAL_API_HPP_
