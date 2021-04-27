@@ -14,3 +14,5 @@ If you have some question about this package, please post issue or contact us!
 <a href="https://github.com/yamacir-kit">
   <img align="center" src="https://github-readme-stats.vercel.app/api?username=yamacir-kit&show_icons=true&title_color=22A3CD&icon_color=06579E" />
 </a>
+
+[Submit email to maintainers :fa-paper-plane:](mailto:masaya.kataoka@tier4.jp,tatsuya.yamasaki@tier4.jp){ .md-button .md-button--primary }
