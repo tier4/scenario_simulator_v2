@@ -23,4 +23,4 @@ jobs:
     - name: pull docker images
       run: docker pull tier4/scenario_simulator_v2
     - name: run scenario test
-      run: rocker --x11 scenario_simulator_v2 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' && ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
+      run: rocker scenario_simulator_v2 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml' && ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
