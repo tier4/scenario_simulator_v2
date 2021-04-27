@@ -20,8 +20,6 @@
 #include <future>
 #include <queue>
 #include <thread>
-#include <tuple>
-#include <utility>
 
 namespace awapi
 {
@@ -38,31 +36,9 @@ class TaskQueue
   std::exception_ptr thrown;
 
 public:
-  explicit TaskQueue()
-  : dispatcher(
-      [this](auto notification) {
-        using namespace std::literals::chrono_literals;
-        while (rclcpp::ok() and notification.wait_for(1ms) == std::future_status::timeout) {
-          if (not thunks.empty() and not thrown) {
-            // NOTE: To ensure that the task to be queued is completed as expected is the responsibility of the side to create a task.
-            std::thread(thunks.front()).join();
-            thunks.pop();
-          } else {
-            std::this_thread::sleep_for(100ms);
-          }
-        }
-      },
-      std::move(notifier.get_future()))
-  {
-  }
+  explicit TaskQueue();
 
-  ~TaskQueue()
-  {
-    if (dispatcher.joinable()) {
-      notifier.set_value();
-      dispatcher.join();
-    }
-  }
+  ~TaskQueue();
 
   template <typename F>
   decltype(auto) delay(F && f)
@@ -71,20 +47,14 @@ public:
       try {
         return f();
       } catch (...) {
-        std::cout << "\x1b[31m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl;
         thrown = std::current_exception();
       }
     });
   }
 
-  auto exhausted() const noexcept { return thunks.empty(); }
+  bool exhausted() const noexcept;
 
-  auto rethrow() const
-  {
-    if (thrown) {
-      std::rethrow_exception(thrown);
-    }
-  }
+  void rethrow() const noexcept(false);
 };
 }  // namespace awapi
 
