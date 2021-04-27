@@ -72,9 +72,9 @@ public:
    *  Topic: /awapi/autoware/put/route
    *
    * ------------------------------------------------------------------------ */
-  using AutowareRoute = autoware_planning_msgs::msg::Route;
-
-  DEFINE_PUBLISHER(AutowareRoute);
+  // using AutowareRoute = autoware_planning_msgs::msg::Route;
+  //
+  // DEFINE_PUBLISHER(AutowareRoute);
 
   /* ---- LaneChangeApproval ---------------------------------------------------
    *
@@ -134,21 +134,21 @@ public:
    *  Topic: /awapi/vehicle/put/velocity
    *
    * ------------------------------------------------------------------------ */
-  using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
-
-  DEFINE_PUBLISHER(VehicleVelocity);
-
-  template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
-  decltype(auto) setVehicleVelocity(const T value)
-  {
-    VehicleVelocity vehicle_velocity;
-    {
-      vehicle_velocity.stamp = static_cast<Node &>(*this).get_clock()->now();
-      vehicle_velocity.max_velocity = value;
-    }
-
-    return setVehicleVelocity(vehicle_velocity);
-  }
+  // using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
+  //
+  // DEFINE_PUBLISHER(VehicleVelocity);
+  //
+  // template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
+  // decltype(auto) setVehicleVelocity(const T value)
+  // {
+  //   VehicleVelocity vehicle_velocity;
+  //   {
+  //     vehicle_velocity.stamp = static_cast<Node &>(*this).get_clock()->now();
+  //     vehicle_velocity.max_velocity = value;
+  //   }
+  //
+  //   return setVehicleVelocity(vehicle_velocity);
+  // }
 
   /* ---- AutowareStatus -------------------------------------------------------
    *
@@ -164,9 +164,9 @@ public:
    *  Topic: /awapi/traffic_light/get/status
    *
    * ------------------------------------------------------------------------ */
-  using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
-
-  DEFINE_SUBSCRIPTION(TrafficLightStatus);
+  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
+  //
+  // DEFINE_SUBSCRIPTION(TrafficLightStatus);
 
   /* ---- VehicleStatus --------------------------------------------------------
    *
@@ -214,13 +214,13 @@ public:
 public:
   explicit FundamentalAPI()
   : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
-    INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
+    // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
-    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    // INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
-    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
+    // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
   {
   }
