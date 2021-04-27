@@ -23,20 +23,6 @@
 #include <tuple>
 #include <utility>
 
-template <typename F, typename Tuple, std::size_t... I>
-constexpr decltype(auto) apply_aux(F && f, Tuple && tuple, std::index_sequence<I...>)
-{
-  return std::forward<F>(f)(std::get<I>(std::forward<Tuple>(tuple))...);
-}
-
-template <typename F, typename Tuple>
-constexpr decltype(auto) apply(F && f, Tuple && tuple)
-{
-  return apply_aux(
-    std::forward<F>(f), std::forward<Tuple>(tuple),
-    std::make_index_sequence<std::tuple_size<std::remove_reference_t<Tuple>>::value>());
-}
-
 namespace awapi
 {
 class TaskQueue
@@ -49,7 +35,7 @@ class TaskQueue
 
   std::thread worker;
 
-  std::string what;
+  std::exception_ptr exception;
 
 public:
   explicit TaskQueue()
@@ -57,7 +43,7 @@ public:
       [this](auto future) {
         using namespace std::literals::chrono_literals;
         while (rclcpp::ok() and future.wait_for(1ms) == std::future_status::timeout) {
-          if (not thunks.empty()) {
+          if (not thunks.empty() and not exception) {
             std::thread(thunks.front()).join();
             thunks.pop();
           } else {
@@ -71,12 +57,10 @@ public:
 
   ~TaskQueue()
   {
-    std::cout << "DESTROYING TaskQueue BEGIN" << std::endl;
     if (worker.joinable()) {
       promise.set_value();
       worker.join();
     }
-    std::cout << "DESTROYING TaskQueue END" << std::endl;
   }
 
   template <typename F>
@@ -85,8 +69,9 @@ public:
     return thunks.emplace([this, f]() {
       try {
         return f();
-      } catch (const std::exception & error) {
-        what = error.what();
+      } catch (...) {
+        std::cout << "\x1b[31m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl;
+        exception = std::current_exception();
       }
     });
   }
