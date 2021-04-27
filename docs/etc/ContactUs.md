@@ -2,6 +2,9 @@
 
 If you have some question about this package, please post issue or contact us!
 
+[Post feature request :fa-github:](https://github.com/tier4/scenario_simulator_v2/issues/new?assignees=&labels=&template=feature_request.md&title=){ .md-button .md-button--primary }
+[Post bug report :fa-github:](https://github.com/tier4/scenario_simulator_v2/issues/new?assignees=&labels=&template=bug_report.md&title=){ .md-button .md-button--primary }
+
 ## Maintainers
 
 <a href="https://github.com/hakuturu583">
