@@ -23,4 +23,5 @@ jobs:
     - name: pull docker images
       run: docker pull tier4/scenario_simulator_v2
     - name: run scenario test
+      shell: script -e -c {0}
       run: rocker tier4/scenario_simulator_v2 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='/home/ubuntu/Desktop/scenario_simulator_ws/install/scenario_test_runner/share/scenario_test_runner/workflow_example.yaml'
