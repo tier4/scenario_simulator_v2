@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__UTILITY__VISIBILITY_HPP_
-#define AWAPI_ACCESSOR__UTILITY__VISIBILITY_HPP_
+#ifndef CONCEALER__UTILITY__VISIBILITY_HPP_
+#define CONCEALER__UTILITY__VISIBILITY_HPP_
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,38 +23,38 @@ extern "C" {
 //     https://gcc.gnu.org/wiki/Visibility
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef __GNUC__
-#define AWAPI_ACCESSOR_EXPORT __attribute__((dllexport))
-#define AWAPI_ACCESSOR_IMPORT __attribute__((dllimport))
+#define CONCEALER_EXPORT __attribute__((dllexport))
+#define CONCEALER_IMPORT __attribute__((dllimport))
 #else
-#define AWAPI_ACCESSOR_EXPORT __declspec(dllexport)
-#define AWAPI_ACCESSOR_IMPORT __declspec(dllimport)
+#define CONCEALER_EXPORT __declspec(dllexport)
+#define CONCEALER_IMPORT __declspec(dllimport)
 #endif
 
-#ifdef AWAPI_ACCESSOR_BUILDING_DLL
-#define AWAPI_ACCESSOR_PUBLIC AWAPI_ACCESSOR_EXPORT
+#ifdef CONCEALER_BUILDING_DLL
+#define CONCEALER_PUBLIC CONCEALER_EXPORT
 #else
-#define AWAPI_ACCESSOR_PUBLIC AWAPI_ACCESSOR_IMPORT
+#define CONCEALER_PUBLIC CONCEALER_IMPORT
 #endif
 
-#define AWAPI_ACCESSOR_PUBLIC_TYPE AWAPI_ACCESSOR_PUBLIC
-#define AWAPI_ACCESSOR_LOCAL
+#define CONCEALER_PUBLIC_TYPE CONCEALER_PUBLIC
+#define CONCEALER_LOCAL
 #else
-#define AWAPI_ACCESSOR_EXPORT __attribute__((visibility("default")))
-#define AWAPI_ACCESSOR_IMPORT
+#define CONCEALER_EXPORT __attribute__((visibility("default")))
+#define CONCEALER_IMPORT
 
 #if __GNUC__ >= 4
-#define AWAPI_ACCESSOR_PUBLIC __attribute__((visibility("default")))
-#define AWAPI_ACCESSOR_LOCAL __attribute__((visibility("hidden")))
+#define CONCEALER_PUBLIC __attribute__((visibility("default")))
+#define CONCEALER_LOCAL __attribute__((visibility("hidden")))
 #else
-#define AWAPI_ACCESSOR_PUBLIC
-#define AWAPI_ACCESSOR_LOCAL
+#define CONCEALER_PUBLIC
+#define CONCEALER_LOCAL
 #endif
 
-#define AWAPI_ACCESSOR_PUBLIC_TYPE
+#define CONCEALER_PUBLIC_TYPE
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // AWAPI_ACCESSOR__UTILITY__VISIBILITY_HPP_
+#endif  // CONCEALER__UTILITY__VISIBILITY_HPP_

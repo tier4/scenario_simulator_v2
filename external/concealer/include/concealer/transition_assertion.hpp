@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__TRANSITION_ASSERTION_HPP_
-#define AWAPI_ACCESSOR__TRANSITION_ASSERTION_HPP_
+#ifndef CONCEALER__TRANSITION_ASSERTION_HPP_
+#define CONCEALER__TRANSITION_ASSERTION_HPP_
 
-#include <awapi_accessor/autoware_error.hpp>
 #include <chrono>
+#include <concealer/autoware_error.hpp>
 
 #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                               \
   template <typename Thunk = void (*)(), typename Seconds = std::chrono::seconds>                 \
@@ -27,7 +27,7 @@
       },                                                                                          \
     Seconds interval = std::chrono::seconds(1))                                                   \
   {                                                                                               \
-    static const auto duration_max = std::chrono::seconds(30);                                    \
+    static const auto duration_max = std::chrono::seconds(10);                                    \
     Seconds duration{0};                                                                          \
     for (rclcpp::WallRate rate{interval}; not static_cast<Node &>(*this).is##STATE();             \
          rate.sleep()) {                                                                          \
@@ -50,7 +50,7 @@
   }                                                                                               \
   static_assert(true, "")
 
-namespace awapi
+namespace concealer
 {
 template <typename Node>
 struct TransitionAssertion
@@ -66,6 +66,6 @@ struct TransitionAssertion
 };
 
 #undef DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE
-}  // namespace awapi
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__TRANSITION_ASSERTION_HPP_
+#endif  // CONCEALER__TRANSITION_ASSERTION_HPP_

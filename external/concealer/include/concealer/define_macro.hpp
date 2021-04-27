@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
-#define AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
+#ifndef CONCEALER__DEFINE_MACRO_HPP_
+#define CONCEALER__DEFINE_MACRO_HPP_
 
 #include <mutex>
 #include <utility>
 
-#define AWAPI_CURRENT_VALUE_OF(TYPE) current_value_of_##TYPE
+#define CONCEALER_CURRENT_VALUE_OF(TYPE) current_value_of_##TYPE
 
 #define DEFINE_SUBSCRIPTION(TYPE)                               \
 private:                                                        \
-  TYPE AWAPI_CURRENT_VALUE_OF(TYPE);                            \
+  TYPE CONCEALER_CURRENT_VALUE_OF(TYPE);                        \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE; \
                                                                 \
 public:                                                         \
   const auto & get##TYPE()                                      \
   {                                                             \
     const auto lock = static_cast<Node &>(*this).lock();        \
-    return AWAPI_CURRENT_VALUE_OF(TYPE);                        \
+    return CONCEALER_CURRENT_VALUE_OF(TYPE);                    \
   }                                                             \
   static_assert(true, "")
 
@@ -48,7 +48,7 @@ public:                                                              \
   subscription_of_##TYPE(static_cast<Node &>(*this).template create_subscription<TYPE>( \
     TOPIC, 1, [this](const TYPE::SharedPtr message) {                                   \
       const auto lock = static_cast<Node &>(*this).lock();                              \
-      AWAPI_CURRENT_VALUE_OF(TYPE) = *message;                                          \
+      CONCEALER_CURRENT_VALUE_OF(TYPE) = *message;                                      \
       ERROR_CHECK();                                                                    \
     }))
 
@@ -56,4 +56,4 @@ public:                                                              \
   publisher_of_##TYPE(              \
     static_cast<Node &>(*this).template create_publisher<TYPE>(TOPIC, rclcpp::QoS(1).reliable()))
 
-#endif  // AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
+#endif  // CONCEALER__DEFINE_MACRO_HPP_

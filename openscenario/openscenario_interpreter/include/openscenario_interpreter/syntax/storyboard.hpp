@@ -112,7 +112,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
         }
         engaged = true;
       } else {
-        throw awapi::AutowareError("SOMETHING WENT WRONG.");
+        throw concealer::AutowareError("SOMETHING WENT WRONG.");
       }
     } else if (engaged) {
       for (auto && story : *this) {

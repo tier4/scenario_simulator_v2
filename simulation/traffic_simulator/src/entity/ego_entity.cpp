@@ -50,7 +50,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, awapi::Autoware> EgoEntity::autowares{};
+std::unordered_map<std::string, concealer::Autoware> EgoEntity::autowares{};
 
 EgoEntity::EgoEntity(
   const std::string & name,  //
@@ -255,7 +255,11 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   }
 }
 
-auto EgoEntity::ready() const -> bool { return autowares.at(name).ready(); }
+auto EgoEntity::ready() const -> bool
+{
+  // NOTE: Autoware::ready() will notify you with an exception if Autoware has detected any anomalies at the time of the call.
+  return autowares.at(name).ready();
+}
 
 void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {

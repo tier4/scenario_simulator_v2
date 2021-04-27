@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__LAUNCH_HPP_
-#define AWAPI_ACCESSOR__LAUNCH_HPP_
+#ifndef CONCEALER__LAUNCH_HPP_
+#define CONCEALER__LAUNCH_HPP_
 
-#ifdef AUTOWARE_CONCEALER_ISOLATE_STANDARD_OUTPUT
+#ifdef CONCEALER_ISOLATE_STANDARD_OUTPUT
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #endif
 
-#include <awapi_accessor/execute.hpp>
+#include <concealer/execute.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -30,12 +30,12 @@
 #include <type_traits>
 #include <vector>
 
-namespace awapi
+namespace concealer
 {
 template <typename... Ts>
 static auto ros2_launch(const std::string & package, const std::string & file, Ts &&... xs)
 {
-#ifdef AUTOWARE_CONCEALER_ISOLATE_STANDARD_OUTPUT
+#ifdef CONCEALER_ISOLATE_STANDARD_OUTPUT
   const std::string log_filename = "/tmp/scenario_test_runner/autoware-output.txt";
   const auto fd = ::open(log_filename.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
   ::dup2(fd, STDOUT_FILENO);
@@ -62,6 +62,6 @@ static auto ros2_launch(const std::string & package, const std::string & file, T
     return process_id;
   }
 }
-}  // namespace awapi
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__LAUNCH_HPP_
+#endif  // CONCEALER__LAUNCH_HPP_

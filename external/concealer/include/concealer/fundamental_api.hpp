@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
-#define AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
+#ifndef CONCEALER__FUNDAMENTAL_API_HPP_
+#define CONCEALER__FUNDAMENTAL_API_HPP_
 
-#if defined AUTOWARE_IV
+#if defined AUTOWARE_ARCHITECTURE_PROPOSAL
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
@@ -27,24 +27,23 @@
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/engage.hpp>
 #elif defined AUTOWARE_AUTO
-// TODO(yamacir-kit)
+// TODO (robotec.ai)
 #endif
 
-#include <awapi_accessor/autoware_error.hpp>
-#include <awapi_accessor/conversion.hpp>
-#include <awapi_accessor/define_macro.hpp>
 #include <cassert>
+#include <concealer/autoware_error.hpp>
+#include <concealer/conversion.hpp>
+#include <concealer/define_macro.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <limits>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/string.hpp>
 #include <type_traits>
 #include <utility>
 
-namespace awapi
+namespace concealer
 {
 template <typename Node>
 class FundamentalAPI
@@ -73,9 +72,9 @@ public:
    *  Topic: /awapi/autoware/put/route
    *
    * ------------------------------------------------------------------------ */
-  using AutowareRoute = autoware_planning_msgs::msg::Route;
-
-  DEFINE_PUBLISHER(AutowareRoute);
+  // using AutowareRoute = autoware_planning_msgs::msg::Route;
+  //
+  // DEFINE_PUBLISHER(AutowareRoute);
 
   /* ---- LaneChangeApproval ---------------------------------------------------
    *
@@ -135,21 +134,21 @@ public:
    *  Topic: /awapi/vehicle/put/velocity
    *
    * ------------------------------------------------------------------------ */
-  using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
-
-  DEFINE_PUBLISHER(VehicleVelocity);
-
-  template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
-  decltype(auto) setVehicleVelocity(const T value)
-  {
-    VehicleVelocity vehicle_velocity;
-    {
-      vehicle_velocity.stamp = static_cast<Node &>(*this).get_clock()->now();
-      vehicle_velocity.max_velocity = value;
-    }
-
-    return setVehicleVelocity(vehicle_velocity);
-  }
+  // using VehicleVelocity = autoware_api_msgs::msg::VelocityLimit;
+  //
+  // DEFINE_PUBLISHER(VehicleVelocity);
+  //
+  // template <typename T, REQUIRES(std::is_convertible<T, decltype(VehicleVelocity::max_velocity)>)>
+  // decltype(auto) setVehicleVelocity(const T value)
+  // {
+  //   VehicleVelocity vehicle_velocity;
+  //   {
+  //     vehicle_velocity.stamp = static_cast<Node &>(*this).get_clock()->now();
+  //     vehicle_velocity.max_velocity = value;
+  //   }
+  //
+  //   return setVehicleVelocity(vehicle_velocity);
+  // }
 
   /* ---- AutowareStatus -------------------------------------------------------
    *
@@ -165,9 +164,9 @@ public:
    *  Topic: /awapi/traffic_light/get/status
    *
    * ------------------------------------------------------------------------ */
-  using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
-
-  DEFINE_SUBSCRIPTION(TrafficLightStatus);
+  // using TrafficLightStatus = autoware_perception_msgs::msg::TrafficLightStateArray;
+  //
+  // DEFINE_SUBSCRIPTION(TrafficLightStatus);
 
   /* ---- VehicleStatus --------------------------------------------------------
    *
@@ -179,13 +178,13 @@ public:
   DEFINE_SUBSCRIPTION(VehicleStatus);
 
 public:
-#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                               \
-  auto is##NAME() const noexcept                                                          \
-  {                                                                                       \
-    using autoware_system_msgs::msg::AutowareState;                                       \
-    assert(AutowareState::VALUE == #NAME);                                                \
-    return AWAPI_CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
-  }                                                                                       \
+#define DEFINE_STATE_PREDICATE(NAME, VALUE)                                                   \
+  auto is##NAME() const noexcept                                                              \
+  {                                                                                           \
+    using autoware_system_msgs::msg::AutowareState;                                           \
+    assert(AutowareState::VALUE == #NAME);                                                    \
+    return CONCEALER_CURRENT_VALUE_OF(AutowareStatus).autoware_state == AutowareState::VALUE; \
+  }                                                                                           \
   static_assert(true, "")
 
   DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
@@ -215,17 +214,17 @@ public:
 public:
   explicit FundamentalAPI()
   : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
-    INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
+    // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
     INIT_PUBLISHER(TrafficLightStateArray, "/awapi/traffic_light/put/traffic_light_status"),
-    INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
+    // INIT_PUBLISHER(VehicleVelocity, "/awapi/vehicle/put/velocity"),
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
-    INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
+    // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
   {
   }
 };
-}  // namespace awapi
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__FUNDAMENTAL_API_HPP_
+#endif  // CONCEALER__FUNDAMENTAL_API_HPP_

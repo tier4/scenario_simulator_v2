@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__EXECUTE_HPP_
-#define AWAPI_ACCESSOR__EXECUTE_HPP_
+#ifndef CONCEALER__AUTOWARE_ERROR_HPP_
+#define CONCEALER__AUTOWARE_ERROR_HPP_
 
-#include <string>
-#include <vector>
+#include <stdexcept>
 
-namespace awapi
+namespace concealer
 {
-int execute(const std::vector<std::string> &);
-}  // namespace awapi
+struct AutowareError : public std::runtime_error
+{
+  using std::runtime_error::runtime_error;
 
-#endif  // AWAPI_ACCESSOR__EXECUTE_HPP_
+  virtual ~AutowareError() = default;
+
+  virtual void raise() const { throw *this; }
+};
+}  // namespace concealer
+
+#endif  // CONCEALER__AUTOWARE_ERROR_HPP_

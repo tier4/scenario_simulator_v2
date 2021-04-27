@@ -12,30 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__AUTOWARE_HPP_
-#define AWAPI_ACCESSOR__AUTOWARE_HPP_
+#ifndef CONCEALER__AUTOWARE_HPP_
+#define CONCEALER__AUTOWARE_HPP_
 
-#define AUTOWARE_AUTO false
-#define AUTOWARE_IV true
+// #define AUTOWARE_AUTO
+#include <exception>
+#define AUTOWARE_ARCHITECTURE_PROPOSAL
 
-// #define AUTOWARE_CONCEALER_ISOLATE_STANDARD_OUTPUT
+// #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
 #include <sys/wait.h>
 
-#include <awapi_accessor/continuous_transform_broadcaster.hpp>
-#include <awapi_accessor/fundamental_api.hpp>
-#include <awapi_accessor/launch.hpp>
-#include <awapi_accessor/miscellaneous_api.hpp>
-#include <awapi_accessor/task_queue.hpp>
-#include <awapi_accessor/transition_assertion.hpp>
-#include <awapi_accessor/utility/visibility.hpp>
 #include <chrono>
+#include <concealer/continuous_transform_broadcaster.hpp>
+#include <concealer/fundamental_api.hpp>
+#include <concealer/launch.hpp>
+#include <concealer/miscellaneous_api.hpp>
+#include <concealer/task_queue.hpp>
+#include <concealer/transition_assertion.hpp>
+#include <concealer/utility/visibility.hpp>
 #include <future>
 #include <mutex>
 #include <thread>
 #include <utility>
 
-namespace awapi
+namespace concealer
 {
 /* ---- NOTE -------------------------------------------------------------------
  *
@@ -51,29 +52,9 @@ namespace awapi
  *
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public ContinuousTransformBroadcaster<Autoware>,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public FundamentalAPI<Autoware>,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public MiscellaneousAPI<Autoware>,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public TransitionAssertion<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
@@ -115,26 +96,34 @@ class Autoware : public rclcpp::Node,
 
   TaskQueue task_queue;
 
+  std::exception_ptr thrown;
+
+  void rethrow() const noexcept(false);
+
 public:
-  template <std::size_t Rate = 5, typename... Ts>
-  AWAPI_ACCESSOR_PUBLIC explicit Autoware(Ts &&... xs)
-  : rclcpp::Node("awapi_accessor", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+  template <typename... Ts>
+  CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
+  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)),
     spinner(
       [this](auto future) {
         while (rclcpp::ok() and
                future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          rclcpp::spin_some(get_node_base_interface());
+          try {
+            rclcpp::spin_some(get_node_base_interface());
+          } catch (...) {
+            thrown = std::current_exception();
+          }
         }
       },
       std::move(promise.get_future())),
-    updater(create_wall_timer(std::chrono::milliseconds(Rate), [this]() { return update(); }))
+    updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
   {
   }
 
   virtual ~Autoware();
 
-  auto ready() const { return task_queue.exhausted(); }
+  bool ready() const noexcept(false);
 
   const auto & set(const geometry_msgs::msg::Pose & pose) { return current_pose = pose; }
 
@@ -146,8 +135,8 @@ public:
 
   void engage();
 };
-}  // namespace awapi
+}  // namespace concealer
 
-#include <awapi_accessor/undefine_macro.hpp>
+#include <concealer/undefine_macro.hpp>
 
-#endif  // AWAPI_ACCESSOR__AUTOWARE_HPP_
+#endif  // CONCEALER__AUTOWARE_HPP_
