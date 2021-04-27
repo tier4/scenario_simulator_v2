@@ -31,19 +31,20 @@ class TaskQueue
 
   std::queue<Thunk> thunks;
 
-  std::promise<void> promise;
+  std::promise<void> notifier;
 
-  std::thread worker;
+  std::thread dispatcher;
 
-  std::exception_ptr exception;
+  std::exception_ptr thrown;
 
 public:
   explicit TaskQueue()
-  : worker(
-      [this](auto future) {
+  : dispatcher(
+      [this](auto notification) {
         using namespace std::literals::chrono_literals;
-        while (rclcpp::ok() and future.wait_for(1ms) == std::future_status::timeout) {
-          if (not thunks.empty() and not exception) {
+        while (rclcpp::ok() and notification.wait_for(1ms) == std::future_status::timeout) {
+          if (not thunks.empty() and not thrown) {
+            // NOTE: To ensure that the task to be queued is completed as expected is the responsibility of the side to create a task.
             std::thread(thunks.front()).join();
             thunks.pop();
           } else {
@@ -51,15 +52,15 @@ public:
           }
         }
       },
-      std::move(promise.get_future()))
+      std::move(notifier.get_future()))
   {
   }
 
   ~TaskQueue()
   {
-    if (worker.joinable()) {
-      promise.set_value();
-      worker.join();
+    if (dispatcher.joinable()) {
+      notifier.set_value();
+      dispatcher.join();
     }
   }
 
@@ -71,12 +72,19 @@ public:
         return f();
       } catch (...) {
         std::cout << "\x1b[31m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl;
-        exception = std::current_exception();
+        thrown = std::current_exception();
       }
     });
   }
 
   auto exhausted() const noexcept { return thunks.empty(); }
+
+  auto rethrow() const
+  {
+    if (thrown) {
+      std::rethrow_exception(thrown);
+    }
+  }
 };
 }  // namespace awapi
 
