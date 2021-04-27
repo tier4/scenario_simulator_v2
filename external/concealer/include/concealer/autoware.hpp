@@ -16,6 +16,7 @@
 #define CONCEALER__AUTOWARE_HPP_
 
 // #define AUTOWARE_AUTO
+#include <exception>
 #define AUTOWARE_ARCHITECTURE_PROPOSAL
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
@@ -51,29 +52,9 @@ namespace concealer
  *
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public ContinuousTransformBroadcaster<Autoware>,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public FundamentalAPI<Autoware>,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public MiscellaneousAPI<Autoware>,
-
-                 /* ---- NOTE --------------------------------------------------
-                  *
-                  *
-                  * --------------------------------------------------------- */
                  public TransitionAssertion<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
@@ -115,8 +96,12 @@ class Autoware : public rclcpp::Node,
 
   TaskQueue task_queue;
 
+  std::exception_ptr thrown;
+
+  void rethrow() const noexcept(false);
+
 public:
-  template <std::size_t Rate = 5, typename... Ts>
+  template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)),
@@ -124,11 +109,15 @@ public:
       [this](auto future) {
         while (rclcpp::ok() and
                future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
-          rclcpp::spin_some(get_node_base_interface());
+          try {
+            rclcpp::spin_some(get_node_base_interface());
+          } catch (...) {
+            thrown = std::current_exception();
+          }
         }
       },
       std::move(promise.get_future())),
-    updater(create_wall_timer(std::chrono::milliseconds(Rate), [this]() { return update(); }))
+    updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
   {
   }
 

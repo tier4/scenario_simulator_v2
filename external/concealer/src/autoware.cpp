@@ -14,6 +14,7 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/autoware.hpp>
+#include <exception>
 
 #define DEBUG_VALUE(...) \
   std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
@@ -56,9 +57,17 @@ void Autoware::update()
 #endif
 }
 
+void Autoware::rethrow() const
+{
+  if (thrown) {
+    std::rethrow_exception(thrown);
+  }
+}
+
 bool Autoware::ready() const
 {
   task_queue.rethrow();
+  rethrow();
   return task_queue.exhausted();
 }
 
