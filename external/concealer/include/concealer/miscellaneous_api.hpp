@@ -18,13 +18,15 @@
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 
-#if defined AUTOWARE_IV
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
-#elif defined AUTOWARE_AUTO
+#endif
+
+#ifdef AUTOWARE_AUTO
 // TODO (someone else)
 #endif
 

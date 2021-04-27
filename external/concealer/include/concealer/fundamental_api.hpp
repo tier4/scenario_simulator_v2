@@ -15,7 +15,7 @@
 #ifndef CONCEALER__FUNDAMENTAL_API_HPP_
 #define CONCEALER__FUNDAMENTAL_API_HPP_
 
-#if defined AUTOWARE_IV
+#if defined AUTOWARE_ARCHITECTURE_PROPOSAL
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
@@ -27,7 +27,7 @@
 #include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <autoware_vehicle_msgs/msg/engage.hpp>
 #elif defined AUTOWARE_AUTO
-// TODO(yamacir-kit)
+// TODO (robotec.ai)
 #endif
 
 #include <cassert>

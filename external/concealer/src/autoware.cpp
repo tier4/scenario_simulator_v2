@@ -40,21 +40,19 @@ Autoware::~Autoware()
 
 void Autoware::update()
 {
-#if AUTOWARE_IV
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   setCurrentControlMode();
   setCurrentShift(current_twist);
   setCurrentSteering(current_twist);
-  // setCurrentTurnSignal();
   setCurrentTwist(current_twist);
   setCurrentVelocity(current_twist);
   setLaneChangeApproval();
   setLocalizationTwist(current_twist);
   setTransform(current_pose);
-  // setVehicleVelocity(parameters.performance.max_speed);
-#elif AUTOWARE_AUTO
+#endif
+
+#ifdef AUTOWARE_AUTO
   // TODO (Robotec.ai)
-#else
-  static_assert(false, "");
 #endif
 }
 
@@ -71,18 +69,18 @@ bool Autoware::ready() const
  * -------------------------------------------------------------------------- */
 void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 {
-#if AUTOWARE_IV
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   task_queue.delay([&]() {
     set(initial_pose);
     waitForAutowareStateToBeInitializingVehicle();
     waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
   });
-#elif AUTOWARE_AUTO
+#endif
+
+#ifdef AUTOWARE_AUTO
   task_queue.delay([&]() {
     // TODO (Robotec.ai)
   });
-#else
-  static_assert(false, "");
 #endif
 }
 
@@ -100,7 +98,7 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 {
   assert(0 < route.size());
 
-#if AUTOWARE_IV
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
     setGoalPose(route.back());
@@ -110,10 +108,10 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
     waitForAutowareStateToBePlanning();
     waitForAutowareStateToBeWaitingForEngage();  // NOTE: Autoware.IV 0.11.1 waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
   });
-#elif AUTOWARE_AUTO
+#endif
+
+#ifndef AUTOWARE_AUTO
   // TODO (Robotec.ai)
-#else
-  static_assert(false, "");
 #endif
 }
 
@@ -125,12 +123,12 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
  * -------------------------------------------------------------------------- */
 void Autoware::engage()
 {
-#if AUTOWARE_IV
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); });
-#elif AUTOWARE_AUTO
+#endif
+
+#ifdef AUTOWARE_AUTO
   // TODO (Robotec.ai)
-#else
-  static_assert(false, "");
 #endif
 }
 }  // namespace concealer
