@@ -9,7 +9,13 @@ jobs:
   ci:
     runs-on: ubuntu-20.04
     steps:
-    - uses: docker-practice/actions-setup-docker@master
-    - uses: actions/setup-python@v2
+    - name: setup docker
+      uses: docker-practice/actions-setup-docker@master
+    - name: setup python
+      uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: install rocker
+      run: pip3 install rocker
+    - name: pull docker images
+      run: docker pull tier4/scenario_simulator_v2
