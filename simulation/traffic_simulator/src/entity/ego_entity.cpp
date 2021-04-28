@@ -79,8 +79,8 @@ EgoEntity::EgoEntity(
       getParameter("autoware_launch_file", std::string("")),
       "map_path:=" + lanelet2_map_osm.parent_path().string(),
       "lanelet2_map_file:=" + lanelet2_map_osm.filename().string(),
-      "vehicle_model:=ymc_golfcart_proto2",  // XXX: HARD CODING!!!
-      "sensor_model:=aip_x1",                // XXX: HARD CODING!!!
+      "sensor_model:=" + getParameter("sensor_model", std::string("")),
+      "vehicle_model:=" + getParameter("vehicle_model", std::string("")),
       "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
         "/planning_simulator_v2.rviz",
       "scenario_simulation:=true"));

@@ -34,8 +34,10 @@ def generate_launch_description():
     global_timeout = LaunchConfiguration('global-timeout', default=180)
     output_directory = LaunchConfiguration('output-directory', default=Path("/tmp"))
     scenario = LaunchConfiguration('scenario', default=Path("/dev/null"))
+    sensor_model = LaunchConfiguration('sensor_model', default="aip_x1")
+    vehicle_model = LaunchConfiguration('vehicle_model', default="ymc_golfcart_proto2")
+    with_rviz = LaunchConfiguration('with_rviz', default=False)
     workflow = LaunchConfiguration('workflow', default=Path("/dev/null"))
-    with_simulator_rviz = LaunchConfiguration('with_simulator_rviz', default=False)
 
     port = 8080
 
@@ -66,12 +68,20 @@ def generate_launch_description():
             "generated file including the result file."),
 
         DeclareLaunchArgument(
+            'with_rviz', default_value=with_rviz,
+            description="if true, launch Autoware with given rviz configuration."),
+
+        DeclareLaunchArgument(
             'scenario', default_value=scenario,
             description="Specify a scenario file (.yaml or .xosc) you want to "
             "execute. If a workflow file is also specified by the '--workflow' "
             "option at the same time, this option takes precedence (that is, "
             "only one scenario passed to the --scenario option will be executed"
             ")."),
+
+        DeclareLaunchArgument('sensor_model', default_value=sensor_model),
+
+        DeclareLaunchArgument('vehicle_model', default_value=vehicle_model),
 
         DeclareLaunchArgument(
             'workflow', default_value=workflow,
@@ -117,6 +127,8 @@ def generate_launch_description():
                 {'autoware_launch_file': autoware_launch_file},
                 {'autoware_launch_package': autoware_launch_package},
                 {'port': port},
+                {'sensor_model': sensor_model},
+                {'vehicle_model': vehicle_model},
                 ],),
 
         Node(
@@ -126,10 +138,6 @@ def generate_launch_description():
             name='openscenario_visualizer',
             output='screen',),
 
-        DeclareLaunchArgument(
-            'with_simulator_rviz', default_value=with_simulator_rviz,
-            description="if true, launch with rviz configuration in this framework"),
-
         Node(
             package='rviz2',
             executable='rviz2',
@@ -138,7 +146,7 @@ def generate_launch_description():
                 'stderr': 'log',
                 'stdout': 'log',
                 },
-            condition=IfCondition(with_simulator_rviz),
+            condition=IfCondition(with_rviz),
             arguments=[
                 '-d', str(
                     Path(get_package_share_directory('scenario_test_runner')) /
