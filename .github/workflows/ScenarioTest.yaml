@@ -58,7 +58,7 @@ jobs:
           rm -rf autoware
       
       - name: Resolve rosdep
-        run:
+        run: |
           cd ~/ros2_ws
           rosdep install -iry --from-paths src --rosdistro foxy
 
