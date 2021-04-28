@@ -47,7 +47,7 @@ jobs:
 
       - name: Clone autoware packages
         run: |
-          cd ~/ros2_ws/src/autoware
+          cd ~/ros2_ws/src
           mv -v pilot.auto/awapi/autoware_api_msgs              ./
           mv -v pilot.auto/common/msgs/autoware_control_msgs    ./
           mv -v pilot.auto/common/msgs/autoware_debug_msgs      ./
