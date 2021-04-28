@@ -41,12 +41,10 @@ jobs:
         uses: ros-tooling/setup-ros@v0.1
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
-      - name: generate repos file
-        run: rosinstall_generator ${{ matrix.package }} --rosdistro ${{ matrix.rosdistro }} --deps-only --deps --upstream-development > /tmp/deps.repos
       - name: Run build test for ${{ matrix.package }} package
         uses: ros-tooling/action-ros-ci@v0.2
         with:
           package-name: ${{ matrix.package }}
           target-ros2-distro: ${{ matrix.rosdistro }}
-          vcs-repo-file-url: /tmp/deps.repos
+          vcs-repo-file-url: dependency.repos
 
