@@ -207,7 +207,7 @@ public:
   void checkAutowareState()
   {
     if (isReady() and isEmergency()) {
-      throw AutowareError("Autoware is in emergency state now");
+      // throw AutowareError("Autoware is in emergency state now");
     }
   }
 
