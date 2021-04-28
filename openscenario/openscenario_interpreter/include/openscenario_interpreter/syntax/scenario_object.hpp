@@ -93,10 +93,18 @@ struct ScenarioObject
         assignController(name, object_controller);
         if (object_controller.isEgo()) {
           attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-            traffic_simulator::helper::LidarType::VLP32, name,
-            "/sensing/lidar/no_ground/pointcloud"));
+            traffic_simulator::helper::LidarType::VLP32, name
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+            ,
+            "/sensing/lidar/no_ground/pointcloud"
+#endif
+            ));
           attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-            name, "/perception/object_recognition/objects", 0.1));
+            name,
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+            "/perception/object_recognition/objects",
+#endif
+            0.1));
         }
       }
       return unspecified;

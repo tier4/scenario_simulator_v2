@@ -52,9 +52,13 @@ namespace concealer
  *
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
-                 public ContinuousTransformBroadcaster<Autoware>,
+
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
                  public FundamentalAPI<Autoware>,
                  public MiscellaneousAPI<Autoware>,
+#endif
+
+                 public ContinuousTransformBroadcaster<Autoware>,
                  public TransitionAssertion<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
