@@ -23,17 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Storyboard ===========================================================
+/* ---- Storyboard -------------------------------------------------------------
  *
- * <xsd:complexType name="Storyboard">
- *   <xsd:sequence>
- *     <xsd:element name="Init" type="Init"/>
- *     <xsd:element name="Story" maxOccurs="unbounded" type="Story"/>
- *     <xsd:element name="StopTrigger" type="Trigger"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="Storyboard">
+ *    <xsd:sequence>
+ *      <xsd:element name="Init" type="Init"/>
+ *      <xsd:element name="Story" maxOccurs="unbounded" type="Story"/>
+ *      <xsd:element name="StopTrigger" type="Trigger"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 {
   Scope inner_scope;
@@ -42,8 +42,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 
   Trigger stop_trigger;
 
-  const String name{// XXX DIRTY HACK!!!
-                    "Storyboard"};
+  const String name{"Storyboard"};
 
   template <typename Node, typename Scope>
   explicit Storyboard(const Node & node, Scope & outer_scope)
@@ -84,10 +83,41 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     return std::all_of(std::begin(*this), std::end(*this), check);
   }
 
+#define DEBUG_VALUE(...) \
+  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
+
+  bool engaged = false;
+
   auto run()
   {
-    for (auto && story : *this) {
-      story.evaluate();
+    const auto all_ready = std::all_of(
+      std::begin(inner_scope.entities), std::end(inner_scope.entities), [&](const auto & each) {
+        // DEBUG_VALUE(each.first);
+        // DEBUG_VALUE(each.second.template as<ScenarioObject>().template is<Vehicle>());
+        // DEBUG_VALUE(each.second.template as<ScenarioObject>().object_controller.isEgo());
+        // DEBUG_VALUE(not openscenario_interpreter::ready(each.first));
+        // return each.second.template is<Vehicle>() and                                   //
+        //        each.second.template as<ScenarioObject>().object_controller.isEgo() and  //
+        //        not openscenario_interpreter::ready(each.first);
+        return openscenario_interpreter::ready(each.first);
+      });
+
+    // DEBUG_VALUE(getCurrentTime());
+    // DEBUG_VALUE(all_ready);
+
+    if (not engaged and 0 < getCurrentTime()) {
+      if (all_ready) {
+        for (const auto & each : inner_scope.entities) {
+          engage(each.first);
+        }
+        engaged = true;
+      } else {
+        throw concealer::AutowareError("SOMETHING WENT WRONG.");
+      }
+    } else if (engaged) {
+      for (auto && story : *this) {
+        story.evaluate();
+      }
     }
   }
 };

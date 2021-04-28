@@ -29,6 +29,7 @@ class DetectionSensor
 {
 public:
   DetectionSensor(
+    const double current_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
       publisher_ptr);

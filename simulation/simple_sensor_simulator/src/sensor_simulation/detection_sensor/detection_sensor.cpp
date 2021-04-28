@@ -25,12 +25,13 @@
 namespace simple_sensor_simulator
 {
 DetectionSensor::DetectionSensor(
+  const double current_time,
   const simulation_api_schema::DetectionSensorConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
     publisher_ptr)
 : configuration_(configuration), publisher_ptr_(publisher_ptr)
 {
-  last_update_stamp_ = 0;
+  last_update_stamp_ = current_time;
 }
 
 void DetectionSensor::update(

@@ -12,28 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__ENTITY__EXCEPTION_HPP_
-#define TRAFFIC_SIMULATOR__ENTITY__EXCEPTION_HPP_
+#ifndef CONCEALER__EXECUTE_HPP_
+#define CONCEALER__EXECUTE_HPP_
 
-#include <exception>
 #include <string>
+#include <vector>
 
-namespace traffic_simulator
+namespace concealer
 {
-struct SimulationRuntimeError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-};
+int execute(const std::vector<std::string> &);
+}  // namespace concealer
 
-struct UnsupportedActionError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-};
-
-struct SplineInterpolationError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-};
-}  // namespace traffic_simulator
-
-#endif  // TRAFFIC_SIMULATOR__ENTITY__EXCEPTION_HPP_
+#endif  // CONCEALER__EXECUTE_HPP_

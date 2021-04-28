@@ -12,14 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__CONVERSION_HPP_
-#define AWAPI_ACCESSOR__CONVERSION_HPP_
+#ifndef CONCEALER__CONVERSION_HPP_
+#define CONCEALER__CONVERSION_HPP_
 
 // NOTE: headers are lexicographically sorted.
 
-#ifdef AUTOWARE_IV
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
 #include <autoware_vehicle_msgs/msg/engage.hpp>
-#elif AUTOWARE_AUTO
+#endif
+
+#ifdef AUTOWARE_AUTO
 // TODO(yamacir-kit)
 #endif
 
@@ -29,7 +31,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace autoware_api
+namespace concealer
 {
 #define REQUIRES(...) typename = typename std::enable_if<__VA_ARGS__::value>::type
 
@@ -98,6 +100,6 @@ struct converter<From, autoware_vehicle_msgs::msg::Engage>
     return to;
   }
 };
-}  // namespace autoware_api
+}  // namespace concealer
 
-#endif  // AWAPI_ACCESSOR__CONVERSION_HPP_
+#endif  // CONCEALER__CONVERSION_HPP_

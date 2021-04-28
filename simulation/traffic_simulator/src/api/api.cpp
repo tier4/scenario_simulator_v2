@@ -52,8 +52,8 @@ bool API::spawn(
   if (is_ego) {
     if (
       !entity_manager_ptr_->entityExists(name) &&
-      !entity_manager_ptr_->spawnEntity(
-        traffic_simulator::entity::EgoEntity(name, lanelet2_map_osm, step_time_, params))) {
+      !entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
+        name, lanelet2_map_osm, step_time_, params)) {
       return false;
     }
     if (standalone_mode) {
@@ -66,8 +66,7 @@ bool API::spawn(
     spawn_vehicle_entity_client_.call(req, res);
     return res.result().success();
   } else {
-    traffic_simulator::entity::VehicleEntity npc(name, params);
-    if (!entity_manager_ptr_->spawnEntity(npc)) {
+    if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(name, params)) {
       return false;
     }
     if (standalone_mode) {
@@ -90,8 +89,8 @@ bool API::spawn(
   if (is_ego) {
     throw traffic_simulator::SimulationRuntimeError("pedestrian should not be ego");
   }
-  traffic_simulator::entity::PedestrianEntity pedestrian(name, params);
-  if (!entity_manager_ptr_->spawnEntity(pedestrian)) {
+  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::PedestrianEntity>(
+        name, params)) {
     return false;
   }
   if (standalone_mode) {
@@ -189,8 +188,6 @@ bool API::reachPosition(
   return entity_manager_ptr_->entityStatusSet(name) &&
          entity_manager_ptr_->reachPosition(
            name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
-
-  // NOTE: ^ ament_uncrustify says above indentation is so beautiful.
 }
 
 bool API::reachPosition(

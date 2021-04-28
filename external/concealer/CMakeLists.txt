@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(awapi_accessor)
+project(concealer)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
@@ -13,7 +13,10 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(${PROJECT_NAME} SHARED src/awapi_accessor.cpp)
+ament_auto_add_library(${PROJECT_NAME} SHARED
+  src/autoware.cpp
+  src/execute.cpp
+  src/task_queue.cpp)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

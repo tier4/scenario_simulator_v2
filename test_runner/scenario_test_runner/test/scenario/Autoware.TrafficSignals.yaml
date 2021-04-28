@@ -1,5 +1,7 @@
 ScenarioModifiers:
-  ScenarioModifier: []
+  ScenarioModifier:
+    - name: DUMMY-PARAMETER
+      list: [1, 2, 3]
 OpenSCENARIO:
   FileHeader:
     revMajor: 1

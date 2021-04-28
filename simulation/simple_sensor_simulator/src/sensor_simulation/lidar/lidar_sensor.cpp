@@ -26,11 +26,11 @@
 namespace simple_sensor_simulator
 {
 LidarSensor::LidarSensor(
-  const simulation_api_schema::LidarConfiguration & configuration,
+  const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
 : configuration_(configuration), publisher_ptr_(publisher_ptr)
 {
-  last_update_stamp_ = 0;
+  last_update_stamp_ = current_time;
 }
 
 const std::vector<std::string> & LidarSensor::getDetectedObjects() const
