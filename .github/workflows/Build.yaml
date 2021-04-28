@@ -1,0 +1,54 @@
+name: BuildTest
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: 0 0 * * *
+  pull_request:
+    paths-ignore:
+    - "docs/**"
+    - "mkdocs.yml"
+    - "README.md"
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        package: [
+          awapi_accessor, 
+          junit_exporter,
+          lanelet2_extension_psim,
+          kashiwanoha_map,
+          cpp_mock_scenarios,
+          joy_to_vehicle_cmd,
+          scenario_runner_mock,
+          openscenario_interpreter,
+          openscenario_msgs
+          openscenario_utility,
+          openscenario_visualization,
+          scenario_simulator_v2,
+          simple_sensor_simulator,
+          simulation_interface,
+          traffic_simulator,
+          scenario_test_runner]
+        rosdistro: [foxy]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+      - name: Setup ROS2 ${{ matrix.rosdistro }} environment
+        uses: ros-tooling/setup-ros@v0.1
+        with:
+          required-ros-distributions: ${{ matrix.rosdistro }}
+      - name: generate repos file
+        run: |
+        rosinstall_generator ${{ matrix.package }} --rosdistro ${{ matrix.rosdistro }} \
+          --deps-only --deps --upstream-development > /tmp/deps.repos
+      - name: Run build test for ${{ matrix.package }} package
+        uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: ${{ matrix.package }}
+          target-ros2-distro: ${{ matrix.rosdistro }}
+          vcs-repo-file-url: /tmp/deps.repos
+
