@@ -59,7 +59,7 @@ jobs:
       
       - name: Resolve rosdep
         run:
-          cd ~/ros2_ws/ 
+          cd ~/ros2_ws
           rosdep install -iry --from-paths src --rosdistro foxy
 
       - name: Build packages
