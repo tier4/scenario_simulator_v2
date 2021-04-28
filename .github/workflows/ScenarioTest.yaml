@@ -48,14 +48,14 @@ jobs:
       - name: Clone autoware packages
         run: |
           cd ~/ros2_ws/src
-          mv -v pilot.auto/awapi/autoware_api_msgs              ./
-          mv -v pilot.auto/common/msgs/autoware_control_msgs    ./
-          mv -v pilot.auto/common/msgs/autoware_debug_msgs      ./
-          mv -v pilot.auto/common/msgs/autoware_perception_msgs ./
-          mv -v pilot.auto/common/msgs/autoware_planning_msgs   ./
-          mv -v pilot.auto/common/msgs/autoware_system_msgs     ./
-          mv -v pilot.auto/common/msgs/autoware_vehicle_msgs    ./
-          rm -rf pilot.auto
+          mv -v autoware/awapi/autoware_api_msgs              ./
+          mv -v autoware/common/msgs/autoware_control_msgs    ./
+          mv -v autoware/common/msgs/autoware_debug_msgs      ./
+          mv -v autoware/common/msgs/autoware_perception_msgs ./
+          mv -v autoware/common/msgs/autoware_planning_msgs   ./
+          mv -v autoware/common/msgs/autoware_system_msgs     ./
+          mv -v autoware/common/msgs/autoware_vehicle_msgs    ./
+          rm -rf autoware
       
       - name: Resolve rosdep
         run: rosdep install -iry --from-paths src --rosdistro foxy
