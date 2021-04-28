@@ -26,7 +26,7 @@ jobs:
           joy_to_vehicle_cmd,
           scenario_runner_mock,
           openscenario_interpreter,
-          openscenario_msgs
+          openscenario_msgs,
           openscenario_utility,
           openscenario_visualization,
           scenario_simulator_v2,
