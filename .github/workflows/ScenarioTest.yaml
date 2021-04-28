@@ -66,14 +66,6 @@ jobs:
           cd ~/ros2_ws
           colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
-      - name: Test packages
-        run: |
-          source /opt/ros/foxy/setup.bash
-          source ~/ros2_ws/install/setup.bash
-          cd ~/ros2_ws
-          colcon test
-          colcon test-result --verbose
-
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash
