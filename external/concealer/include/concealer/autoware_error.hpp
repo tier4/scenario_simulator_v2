@@ -12,8 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <awapi_accessor/accessor.hpp>
+#ifndef CONCEALER__AUTOWARE_ERROR_HPP_
+#define CONCEALER__AUTOWARE_ERROR_HPP_
 
-namespace autoware_api
+#include <stdexcept>
+
+namespace concealer
 {
-}  // namespace autoware_api
+struct AutowareError : public std::runtime_error
+{
+  using std::runtime_error::runtime_error;
+
+  virtual ~AutowareError() = default;
+
+  virtual void raise() const { throw *this; }
+};
+}  // namespace concealer
+
+#endif  // CONCEALER__AUTOWARE_ERROR_HPP_

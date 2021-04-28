@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AWAPI_ACCESSOR__UNDEFINE_MACRO_HPP_
-#define AWAPI_ACCESSOR__UNDEFINE_MACRO_HPP_
+#ifndef CONCEALER__UNDEFINE_MACRO_HPP_
+#define CONCEALER__UNDEFINE_MACRO_HPP_
 
 #ifdef DEFINE_SUBSCRIPTION
 #undef DEFINE_SUBSCRIPTION
@@ -31,6 +31,6 @@
 #undef INIT_PUBLICATION
 #endif
 
-#undef AWAPI_ACCESSOR__DEFINE_MACRO_HPP_
+#undef CONCEALER__DEFINE_MACRO_HPP_
 
-#endif  // AWAPI_ACCESSOR__UNDEFINE_MACRO_HPP_
+#endif  // CONCEALER__UNDEFINE_MACRO_HPP_

@@ -26,8 +26,8 @@ namespace traffic_simulator
 namespace entity
 {
 PedestrianEntity::PedestrianEntity(
-  std::string name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  openscenario_msgs::msg::PedestrianParameters params)
+  const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
+  const openscenario_msgs::msg::PedestrianParameters & params)
 : EntityBase(params.name, name, initial_state), parameters(params)
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
@@ -36,7 +36,7 @@ PedestrianEntity::PedestrianEntity(
 }
 
 PedestrianEntity::PedestrianEntity(
-  std::string name, openscenario_msgs::msg::PedestrianParameters params)
+  const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params)
 : EntityBase(params.name, name), parameters(params)
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;

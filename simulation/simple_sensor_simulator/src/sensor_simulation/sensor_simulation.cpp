@@ -25,19 +25,20 @@ SensorSimulation::SensorSimulation(const std::shared_ptr<rclcpp::Clock> & clock_
 }
 
 void SensorSimulation::attachLidarSensor(
-  const simulation_api_schema::LidarConfiguration & configuration,
+  const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr)
 {
-  LidarSensor lidar_sensor(configuration, publisher_ptr);
+  LidarSensor lidar_sensor(current_time, configuration, publisher_ptr);
   lidar_sensors_.push_back(lidar_sensor);
 }
 
 void SensorSimulation::attachDetectionSensor(
+  const double current_time,
   const simulation_api_schema::DetectionSensorConfiguration & configuration,
   std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
     publisher_ptr)
 {
-  DetectionSensor detection_sensor(configuration, publisher_ptr);
+  DetectionSensor detection_sensor(current_time, configuration, publisher_ptr);
   detection_sensors_.push_back(detection_sensor);
 }
 

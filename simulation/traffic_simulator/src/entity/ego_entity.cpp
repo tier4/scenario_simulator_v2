@@ -14,103 +14,96 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <awapi_accessor/accessor.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>
+#include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <string>
+#include <system_error>
+#include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
+
+#define DEBUG_VALUE(...) \
+  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
+
+#define DEBUG_LINE() \
+  std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
+
+template <typename T>
+auto getParameter(const std::string & name, const T & alternate)
+{
+  rclcpp::Node node{"get_parameter", "simulation"};
+
+  auto value = alternate;
+
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
+
+  return value;
+}
 
 namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, std::shared_ptr<autoware_api::Accessor> > EgoEntity::autowares{};
+std::unordered_map<std::string, concealer::Autoware> EgoEntity::autowares{};
 
-void EgoEntity::requestAssignRoute(
-  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+EgoEntity::EgoEntity(
+  const std::string & name,  //
+  const boost::filesystem::path & lanelet2_map_osm,
+  const double step_time,  //
+  const openscenario_msgs::msg::VehicleParameters & parameters)
+: VehicleEntity(name, parameters),
+  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(  // XXX: HARD CODING!!!
+    parameters.performance.max_speed, parameters.axles.front_axle.max_steering,
+    parameters.performance.max_acceleration,
+    5.0,  // steer_rate_lim,
+    parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x, step_time,
+    0.25,  // vel_time_delay,
+    0.5,   // vel_time_constant,
+    0.3,   // steer_time_delay,
+    0.3,   // steer_time_constant,
+    0.0    // deadzone_delta_steer
+    ))
 {
-  assert(1 < waypoints.size());
+  entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
 
-  const auto destination = (*hdmap_utils_ptr_).toMapPose(waypoints.back());
-
-  std::vector<geometry_msgs::msg::PoseStamped> constraints{};
-
-  for (auto iter = std::cbegin(waypoints); std::next(iter) != std::cend(waypoints); ++iter) {
-    constraints.push_back((*hdmap_utils_ptr_).toMapPose(*iter));
-  }
-
-  return requestAcquirePosition(destination, constraints);
+  autowares.emplace(
+    std::piecewise_construct, std::forward_as_tuple(name),
+    std::forward_as_tuple(
+      getParameter("autoware_launch_package", std::string("")),
+      getParameter("autoware_launch_file", std::string("")),
+      "map_path:=" + lanelet2_map_osm.parent_path().string(),
+      "lanelet2_map_file:=" + lanelet2_map_osm.filename().string(),
+      "sensor_model:=" + getParameter("sensor_model", std::string("")),
+      "vehicle_model:=" + getParameter("vehicle_model", std::string("")),
+      "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
+        "/planning_simulator_v2.rviz",
+      "scenario_simulation:=true"));
 }
 
-const openscenario_msgs::msg::WaypointsArray EgoEntity::getWaypoints()
-{
-  openscenario_msgs::msg::WaypointsArray waypoints{};
+EgoEntity::~EgoEntity() { autowares.erase(name); }
 
-  for (const auto & point : std::atomic_load(&autowares.at(name))->getTrajectory().points) {
-    waypoints.waypoints.emplace_back(point.pose.position);
+void EgoEntity::engage()
+{
+  while (not ready()) {  // guard
+    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
-  return waypoints;
+  autowares.at(name).engage();
 }
 
-bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  // NOTE Currently, setStatus always succeeds.
-  const bool success = VehicleEntity::setStatus(status);
-
-  const auto current = getStatus();
-
-  if (autoware_initialized) {
-    updateAutoware(current.pose);
-  }
-
-  if (!initial_pose_) {
-    initial_pose_ = current.pose;
-  }
-
-  return success;
+  return autowares.at(name).getAutowareStatus().autoware_state;
 }
 
-void EgoEntity::requestLaneChange(const std::int64_t)
-{
-  std::stringstream what{};
-  what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. ";
-  what << "In general, such a request is an error, ";
-  what << "since Ego cars make autonomous decisions about everything but their destination.";
-  throw std::runtime_error(what.str());
-}
-
-void EgoEntity::onUpdate(double current_time, double step_time)
-{
-  if (current_time < 0) {
-    updateEntityStatusTimestamp(current_time);
-  } else {
-    Eigen::VectorXd input(2);
-    {
-      input << std::atomic_load(&autowares.at(name))->getVehicleCommand().control.velocity,
-        std::atomic_load(&autowares.at(name))->getVehicleCommand().control.steering_angle;
-    }
-
-    (*vehicle_model_ptr_).setInput(input);
-    (*vehicle_model_ptr_).update(step_time);
-
-    setStatus(getEntityStatus(current_time + step_time, step_time));
-
-    if (previous_linear_velocity_) {
-      linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
-    } else {
-      linear_jerk_ = 0;
-    }
-
-    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
-    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
-  }
-}
-
-const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
-  const double time, const double step_time) const
+auto EgoEntity::getEntityStatus(const double time, const double step_time) const
+  -> const openscenario_msgs::msg::EntityStatus
 {
   geometry_msgs::msg::Vector3 rpy;
   {
@@ -153,21 +146,22 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
   openscenario_msgs::msg::EntityStatus status;
   {
     status.time = time;
-    status.type.type = openscenario_msgs::msg::EntityType::EGO;
+    status.type.type = entity_type_.type;
     status.bounding_box = getBoundingBox();
     status.action_status.twist = twist;
     status.action_status.accel = accel;
     status.pose.position.x = v(0) + initial_pose_.get().position.x;
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
+
     const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLanletId(status.pose);
     if (!closest_lanelet_id) {
       throw SimulationRuntimeError("failed to closest lane.");
     }
+
     traffic_simulator::math::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(closest_lanelet_id.get()));
-    const auto s_value = spline.getSValue(status.pose.position);
-    if (s_value) {
+    if (const auto s_value = spline.getSValue(status.pose.position)) {
       status.pose.position.z = spline.getPoint(s_value.get()).z;
     }
 
@@ -176,13 +170,162 @@ const openscenario_msgs::msg::EntityStatus EgoEntity::getEntityStatus(
     const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose);
 
     status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-
-    if (lanelet_pose) {
+    if (status.lanelet_pose_valid) {
       status.lanelet_pose = lanelet_pose.get();
     }
   }
 
   return status;
+}
+
+auto EgoEntity::getEntityTypename() const -> const std::string &
+{
+  static const std::string result = "EgoEntity";
+  return result;
+}
+
+auto EgoEntity::getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacle>
+{
+  return boost::none;
+}
+
+auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
+{
+  openscenario_msgs::msg::WaypointsArray waypoints;
+
+  for (const auto & point : autowares.at(name).getTrajectory().points) {
+    waypoints.waypoints.emplace_back(point.pose.position);
+  }
+
+  return waypoints;
+}
+
+void EgoEntity::onUpdate(double current_time, double step_time)
+{
+  if (current_time < 0) {
+    updateEntityStatusTimestamp(current_time);
+
+    geometry_msgs::msg::Pose current_pose;
+    {
+      geometry_msgs::msg::Vector3 rpy;
+      {
+        rpy.x = 0;
+        rpy.y = 0;
+        rpy.z = vehicle_model_ptr_->getYaw();
+      }
+
+      current_pose.position.x = (*vehicle_model_ptr_).getX() + initial_pose_.get().position.x;
+      current_pose.position.y = (*vehicle_model_ptr_).getY() + initial_pose_.get().position.y;
+      current_pose.position.z = /*                          */ initial_pose_.get().position.z;
+
+      current_pose.orientation =
+        initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
+    }
+
+    autowares.at(name).set(current_pose);
+
+    geometry_msgs::msg::Twist current_twist;
+    {
+      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
+      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
+    }
+
+    autowares.at(name).set(current_twist);
+  } else {
+    Eigen::VectorXd input(2);
+    {
+      input <<  //
+        autowares.at(name).getVehicleCommand().control.velocity,
+        autowares.at(name).getVehicleCommand().control.steering_angle;
+    }
+
+    (*vehicle_model_ptr_).setInput(input);
+    (*vehicle_model_ptr_).update(step_time);
+
+    setStatus(getEntityStatus(current_time + step_time, step_time));
+
+    if (previous_linear_velocity_) {
+      linear_jerk_ = (vehicle_model_ptr_->getVx() - previous_linear_velocity_.get()) / step_time;
+    } else {
+      linear_jerk_ = 0;
+    }
+
+    previous_linear_velocity_ = vehicle_model_ptr_->getVx();
+    previous_angular_velocity_ = vehicle_model_ptr_->getWz();
+  }
+}
+
+auto EgoEntity::ready() const -> bool
+{
+  // NOTE: Autoware::ready() will notify you with an exception if Autoware has detected any anomalies at the time of the call.
+  return autowares.at(name).ready();
+}
+
+void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
+{
+  requestAssignRoute({lanelet_pose});
+}
+
+void EgoEntity::requestAssignRoute(
+  const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+{
+  std::vector<geometry_msgs::msg::PoseStamped> route;
+
+  for (const auto & waypoint : waypoints) {
+    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint));
+  }
+
+  assert(0 < route.size());
+
+  if (not std::exchange(autoware_initialized, true)) {
+    autowares.at(name).initialize(getStatus().pose);
+  }
+
+  autowares.at(name).plan(route);
+}
+
+void EgoEntity::requestLaneChange(const std::int64_t)
+{
+  std::stringstream what;
+  what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. "
+       << "In general, such a request is an error, "
+       << "since Ego cars make autonomous decisions about everything but their destination.";
+  throw std::runtime_error(what.str());
+}
+
+bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
+{
+  // NOTE Currently, setStatus always succeeds.
+  const bool success = VehicleEntity::setStatus(status);
+
+  const auto current_pose = getStatus().pose;
+
+  if (autoware_initialized) {
+    geometry_msgs::msg::Twist current_twist;
+    {
+      current_twist.linear.x = (*vehicle_model_ptr_).getVx();
+      current_twist.angular.z = (*vehicle_model_ptr_).getWz();
+    }
+
+    autowares.at(name).set(current_pose);
+    autowares.at(name).set(current_twist);
+  }
+
+  if (!initial_pose_) {
+    initial_pose_ = current_pose;
+  }
+
+  return success;
+}
+
+void EgoEntity::setTargetSpeed(double value, bool)
+{
+  Eigen::VectorXd v(5);
+  {
+    v << 0, 0, 0, value, 0;
+  }
+
+  (*vehicle_model_ptr_).setState(v);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

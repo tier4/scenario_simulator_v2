@@ -41,9 +41,9 @@ public:
   const std::string getCurrentAction() const { return current_action_; }
 
   template <typename T>
-  void setValueToBlackBoard(std::string key, T value)
+  void setValueToBlackBoard(const std::string & key, T && value)
   {
-    tree_.rootBlackboard()->set(key, value);
+    tree_.rootBlackboard()->set(key, std::forward<decltype(value)>(value));
   }
 
   openscenario_msgs::msg::EntityStatus getUpdatedStatus()
