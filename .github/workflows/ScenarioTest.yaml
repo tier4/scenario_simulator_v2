@@ -1,4 +1,4 @@
-name: ROS2-Foxy
+name: Scenario Test
 
 on:
   workflow_dispatch:
@@ -12,16 +12,25 @@ on:
     
 jobs:
   job1:
-    name: Build
+    name: Scenario Test
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2-beta
 
-      - name: Setup ROS environment
-        uses: ros-tooling/setup-ros@v0.1
-        with:
-          required-ros-distributions: foxy
+      - name: Install ROS2 via Debian Packages
+        run: | # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+          sudo apt update
+          sudo apt install locales
+          sudo locale-gen en_US en_US.UTF-8
+          sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+          export LANG=en_US.UTF-8
+          sudo apt update
+          sudo apt install curl gnupg2 lsb-release
+          curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+          sudo apt update
+          sudo apt install ros-foxy-desktop
 
       - name: Copy repository
         run: |
@@ -35,12 +44,10 @@ jobs:
           rosdep update
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator_v2/dependency.repos
-          rosdep install -iry --from-paths src --rosdistro foxy
 
       - name: Clone autoware packages
         run: |
-          cd ~/ros2_ws/src
-          git clone -b ros2 https://github.com/tier4/pilot.auto.git
+          cd ~/ros2_ws/src/autoware
           mv -v pilot.auto/awapi/autoware_api_msgs              ./
           mv -v pilot.auto/common/msgs/autoware_control_msgs    ./
           mv -v pilot.auto/common/msgs/autoware_debug_msgs      ./
@@ -49,6 +56,9 @@ jobs:
           mv -v pilot.auto/common/msgs/autoware_system_msgs     ./
           mv -v pilot.auto/common/msgs/autoware_vehicle_msgs    ./
           rm -rf pilot.auto
+      
+      - name: Resolve rosdep
+        run: rosdep install -iry --from-paths src --rosdistro foxy
 
       - name: Build packages
         run: |
