@@ -42,9 +42,7 @@ jobs:
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
       - name: generate repos file
-        run: |
-        rosinstall_generator ${{ matrix.package }} --rosdistro ${{ matrix.rosdistro }} \
-          --deps-only --deps --upstream-development > /tmp/deps.repos
+        run: rosinstall_generator ${{ matrix.package }} --rosdistro ${{ matrix.rosdistro }} --deps-only --deps --upstream-development > /tmp/deps.repos
       - name: Run build test for ${{ matrix.package }} package
         uses: ros-tooling/action-ros-ci@v0.2
         with:
