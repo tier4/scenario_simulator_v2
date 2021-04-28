@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         package: [
-          awapi_accessor, 
+          concealer, 
           junit_exporter,
           lanelet2_extension_psim,
           kashiwanoha_map,
