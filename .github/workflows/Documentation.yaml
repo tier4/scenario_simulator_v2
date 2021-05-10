@@ -110,6 +110,7 @@ jobs:
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             publish_dir: site
+            keep_files: true
         - name: Slack Notification
           uses: 8398a7/action-slack@v2
           if: failure()
