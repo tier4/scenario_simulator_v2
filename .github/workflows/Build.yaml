@@ -68,6 +68,9 @@ jobs:
           files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
           flags: unittests
           name: ${{ matrix.package }}
+      - name: create report directory
+        if: always()
+        run: mkdir ./gh-pages/last-history
       - name: generate allure report
         uses: simple-elf/allure-report-action@master
         if: always()
