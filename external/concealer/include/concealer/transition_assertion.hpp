@@ -27,7 +27,7 @@
       },                                                                                          \
     Seconds interval = std::chrono::seconds(1))                                                   \
   {                                                                                               \
-    static const auto duration_max = std::chrono::seconds(10);                                    \
+    static const auto duration_max = std::chrono::seconds(20);                                    \
     Seconds duration{0};                                                                          \
     for (rclcpp::WallRate rate{interval}; not static_cast<Node &>(*this).is##STATE();             \
          rate.sleep()) {                                                                          \
