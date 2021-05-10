@@ -70,7 +70,7 @@ jobs:
           name: ${{ matrix.package }}
       - name: create report directory
         if: always()
-        run: mkdir ./gh-pages/last-history
+        run: mkdir -p ./gh-pages/last-history
       - name: generate allure report
         uses: simple-elf/allure-report-action@master
         if: always()
