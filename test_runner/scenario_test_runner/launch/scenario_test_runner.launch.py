@@ -3,14 +3,14 @@
 
 # Copyright 2020 Tier IV, Inc. All rights reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the 'License');
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an 'AS IS' BASIS,
+# distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -36,23 +36,29 @@ def generate_launch_description():
     autoware_launch_package = LaunchConfiguration(
         'autoware-launch-package', default='autoware_launch')
     global_frame_rate = LaunchConfiguration('global-frame-rate', default=30.0)
-    global_real_time_factor = LaunchConfiguration('global-real-time-factor', default=1.0)
+    global_real_time_factor = LaunchConfiguration(
+        'global-real-time-factor', default=1.0)
     global_timeout = LaunchConfiguration('global-timeout', default=180)
-    output_directory = LaunchConfiguration('output-directory', default=Path('/tmp'))
+    output_directory = LaunchConfiguration(
+        'output-directory', default=Path('/tmp'))
     scenario = LaunchConfiguration('scenario', default=Path('/dev/null'))
     sensor_model = LaunchConfiguration('sensor_model', default='aip_x1')
-    vehicle_model = LaunchConfiguration('vehicle_model', default='ymc_golfcart_proto2')
+    vehicle_model = LaunchConfiguration(
+        'vehicle_model', default='ymc_golfcart_proto2')
     with_rviz = LaunchConfiguration('with_rviz', default=False)
     workflow = LaunchConfiguration('workflow', default=Path('/dev/null'))
 
     port = 8080
 
     return LaunchDescription([
-        DeclareLaunchArgument('autoware-launch-file', default_value=autoware_launch_file),
+        DeclareLaunchArgument('autoware-launch-file',
+                              default_value=autoware_launch_file),
 
-        DeclareLaunchArgument('autoware-launch-package', default_value=autoware_launch_package),
+        DeclareLaunchArgument('autoware-launch-package',
+                              default_value=autoware_launch_package),
 
-        DeclareLaunchArgument('global-frame-rate', default_value=global_frame_rate),
+        DeclareLaunchArgument('global-frame-rate',
+                              default_value=global_frame_rate),
 
         DeclareLaunchArgument(
             'global-real-time-factor', default_value=global_real_time_factor,
@@ -107,7 +113,7 @@ def generate_launch_description():
                 '--output-directory', output_directory,
                 '--scenario', scenario,
                 '--workflow', workflow,
-                ],),
+            ],),
 
         Node(
             package='simple_sensor_simulator',
@@ -117,7 +123,7 @@ def generate_launch_description():
             output='screen',
             parameters=[
                 {'port': port},
-                ],),
+            ],),
 
         LifecycleNode(
             package='openscenario_interpreter',
@@ -135,7 +141,7 @@ def generate_launch_description():
                 {'port': port},
                 {'sensor_model': sensor_model},
                 {'vehicle_model': vehicle_model},
-                ],),
+            ],),
 
         Node(
             package='openscenario_visualization',
@@ -151,12 +157,12 @@ def generate_launch_description():
             output={
                 'stderr': 'log',
                 'stdout': 'log',
-                },
+            },
             condition=IfCondition(with_rviz),
             arguments=[
                 '-d', str(
                     Path(get_package_share_directory('scenario_test_runner')) /
                     'planning_simulator_v2.rviz')
-                ],
-            ),
-        ])
+            ],
+        ),
+    ])
