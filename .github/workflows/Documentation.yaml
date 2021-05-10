@@ -105,7 +105,7 @@ jobs:
             path: site
             retention-days: 1
         - name: Publish Report
-          if: ${{ github.event_name == 'push' || github.event_name == 'schedule'}}
+          if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
           uses: peaceiris/actions-gh-pages@v3
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
