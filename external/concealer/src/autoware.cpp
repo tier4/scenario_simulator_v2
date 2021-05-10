@@ -47,7 +47,6 @@ void Autoware::update()
   setCurrentSteering(current_twist);
   setCurrentTwist(current_twist);
   setCurrentVelocity(current_twist);
-  setLaneChangeApproval();
   setLocalizationTwist(current_twist);
   setTransform(current_pose);
 #endif

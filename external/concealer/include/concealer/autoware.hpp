@@ -123,6 +123,7 @@ public:
       std::move(promise.get_future())),
     updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
   {
+    setLaneChangeApproval();
   }
 
   virtual ~Autoware();
