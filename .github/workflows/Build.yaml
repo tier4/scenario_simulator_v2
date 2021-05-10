@@ -60,10 +60,20 @@ jobs:
           # If possible, pin the repository in the workflow to a specific commit to avoid
           # changes in colcon-mixin-repository from breaking your tests.
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
-      - uses: codecov/codecov-action@v1.2.1
-        if: failure() || success()
+      - name: publish codevov result
+        uses: codecov/codecov-action@v1.2.1
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}  # only needed for private repos
           files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
           flags: unittests
           name: ${{ matrix.package }}
+      - name: generate allure report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
+        with:
+          allure_results: ros_ws/build/${{ matrix.package }}/test_results/${{ matrix.package }}
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
