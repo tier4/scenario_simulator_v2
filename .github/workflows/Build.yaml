@@ -1,4 +1,4 @@
-name: ROS2-Foxy
+name: BuildTest
 
 on:
   workflow_dispatch:
@@ -9,81 +9,62 @@ on:
     - "docs/**"
     - "mkdocs.yml"
     - "README.md"
-    
+
 jobs:
-  job1:
-    name: Build
+  build:
     runs-on: ubuntu-20.04
-    timeout-minutes: 60
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [
+          concealer, 
+          junit_exporter,
+          lanelet2_extension_psim,
+          kashiwanoha_map,
+          cpp_mock_scenarios,
+          joy_to_vehicle_cmd,
+          scenario_runner_mock,
+          openscenario_interpreter,
+          openscenario_msgs,
+          openscenario_utility,
+          openscenario_visualization,
+          scenario_simulator_v2,
+          simple_sensor_simulator,
+          simulation_interface,
+          traffic_simulator,
+          scenario_test_runner]
+        rosdistro: [foxy]
     steps:
-      - uses: actions/checkout@v2-beta
-
-      - name: Install ROS2 via Debian Packages
-        run: | # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
-          sudo apt update
-          sudo apt install locales
-          sudo locale-gen en_US en_US.UTF-8
-          sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
-          export LANG=en_US.UTF-8
-          sudo apt update
-          sudo apt install curl gnupg2 lsb-release
-          curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
-          sudo apt update
-          sudo apt install ros-foxy-desktop
-
-      - name: Copy repository
-        run: |
-          mkdir -p ~/ros2_ws/src/scenario_simulator_v2
-          cp -rf . ~/ros2_ws/src/scenario_simulator_v2
-
-      - name: Install dependencies
-        run: |
-          source /opt/ros/foxy/setup.bash
-          sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
-          rosdep update
-          cd ~/ros2_ws
-          vcs import src < src/scenario_simulator_v2/dependency.repos
-          rosdep install -iry --from-paths src --rosdistro foxy
-
-      - name: Dirty Hacks
-        run: |
-          cd ~/ros2_ws/src
-          git clone -b ros2 https://github.com/tier4/pilot.auto.git
-          mv -v pilot.auto/awapi/autoware_api_msgs              ./
-          mv -v pilot.auto/common/msgs/autoware_control_msgs    ./
-          mv -v pilot.auto/common/msgs/autoware_debug_msgs      ./
-          mv -v pilot.auto/common/msgs/autoware_perception_msgs ./
-          mv -v pilot.auto/common/msgs/autoware_planning_msgs   ./
-          mv -v pilot.auto/common/msgs/autoware_system_msgs     ./
-          mv -v pilot.auto/common/msgs/autoware_vehicle_msgs    ./
-          rm -rf pilot.auto
-
-      - name: Build packages
-        run: |
-          source /opt/ros/foxy/setup.bash
-          cd ~/ros2_ws
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
-
-      - name: Test packages
-        run: |
-          source /opt/ros/foxy/setup.bash
-          source ~/ros2_ws/install/setup.bash
-          cd ~/ros2_ws
-          colcon test
-          colcon test-result --verbose
-
-      - name: Scenario test
-        run: |
-          source ~/ros2_ws/install/setup.bash
-          ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml'
-          ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
-
-      - name: Notify Slack
-        uses: 8398a7/action-slack@v2
-        if: failure()
+      - name: Checkout
+        uses: actions/checkout@v2-beta
+      - name: Setup ROS2 ${{ matrix.rosdistro }} environment
+        uses: ros-tooling/setup-ros@v0.1
         with:
-          status: ${{ job.status }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          required-ros-distributions: ${{ matrix.rosdistro }}
+      - name: Run build test for ${{ matrix.package }} package
+        uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: ${{ matrix.package }}
+          target-ros2-distro: ${{ matrix.rosdistro }}
+          vcs-repo-file-url: dependency.repos
+          colcon-defaults: |
+            {
+              "build": {
+                "mixin": ["coverage-gcc", "coverage-pytest"]
+              },
+              "test": {
+                "mixin": ["coverage-pytest"]
+              }
+            }
+          # If possible, pin the repository in the workflow to a specific commit to avoid
+          # changes in colcon-mixin-repository from breaking your tests.
+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
+      - name: publish codevov result
+        uses: codecov/codecov-action@v1.2.1
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}  # only needed for private repos
+          files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
+          flags: unittests
+          name: ${{ matrix.package }}

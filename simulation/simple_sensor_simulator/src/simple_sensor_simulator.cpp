@@ -17,7 +17,6 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <limits>
 #include <memory>
-#include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <simple_sensor_simulator/exception.hpp>

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from glob import glob
 from pathlib import Path
 from setuptools import setup, find_packages
 
@@ -12,6 +11,7 @@ def read_file(path):
             return file.read()
     except IOError:
         return ""
+
 
 setup(
     name="openscenario_utility",

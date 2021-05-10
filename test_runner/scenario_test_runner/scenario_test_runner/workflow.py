@@ -58,7 +58,7 @@ class Scenario():
             path: Path,
             expect: Expect,
             frame_rate: float,
-            ):
+    ):
 
         self.path = substitute_ros_package(path).resolve()
 
@@ -84,7 +84,7 @@ class Workflow():
             self,
             path: Path,
             global_frame_rate: float,
-            ):
+    ):
 
         self.path = path
 
@@ -142,15 +142,17 @@ class Workflow():
                     scenarios.append(
                         Scenario(
                             each['path'],
-                            Expect[each['expect'] if 'expect' in each else 'success'],
+                            Expect[each['expect']
+                                   if 'expect' in each else 'success'],
                             each['frame-rate'] if 'frame-rate' in each else self.global_frame_rate,
-                            )
                         )
+                    )
 
                 return scenarios
 
         else:
-            print("No such file or directory: " + str(workflow_path), file=stderr)
+            print("No such file or directory: " +
+                  str(workflow_path), file=stderr)
             exit(1)
 
 

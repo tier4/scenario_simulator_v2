@@ -17,17 +17,17 @@
 
 
 import argparse
-import rclpy
 import time
-
-from openscenario_utility.conversion import convert
-from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
-from scenario_test_runner.lifecycle_controller import LifecycleController
-from scenario_test_runner.workflow import Expect, Scenario, Workflow, substitute_ros_package
 from shutil import rmtree
 from sys import exit
 from typing import List
+
+import rclpy
+from openscenario_utility.conversion import convert
+from openscenario_utility.validation import XOSCValidator
+from scenario_test_runner.lifecycle_controller import LifecycleController
+from scenario_test_runner.workflow import Expect, Scenario, Workflow, substitute_ros_package
 
 
 def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
@@ -66,7 +66,7 @@ class ScenarioTestRunner(LifecycleController):
             global_real_time_factor: float,
             global_timeout: int,  # [sec]
             output_directory: Path,
-            ):
+    ):
         """
         Initialize the class ScenarioTestRunner.
 
@@ -118,7 +118,7 @@ class ScenarioTestRunner(LifecycleController):
             path,
             self.global_frame_rate,
             # TODO self.global_real_time_factor,
-            )
+        )
 
         converted_scenarios = convert_scenarios(
             self.current_workflow.scenarios,
@@ -191,7 +191,7 @@ class ScenarioTestRunner(LifecycleController):
                 output_directory=self.output_directory,
                 real_time_factor=self.global_real_time_factor,
                 scenario=each.path,
-                )
+            )
 
             if self.get_lifecycle_state() == 'unconfigured':
                 self.get_logger().error("Failed to configure interpreter")
@@ -215,7 +215,8 @@ def main():
 
     parser.add_argument('--global-frame-rate', default=30, type=float)
 
-    parser.add_argument('-x', '--global-real-time-factor', default=1.0, type=float)
+    parser.add_argument('-x', '--global-real-time-factor',
+                        default=1.0, type=float)
 
     parser.add_argument('-t', '--global-timeout', default=180, type=float)
 
@@ -234,7 +235,7 @@ def main():
         global_real_time_factor=args.global_real_time_factor,
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / 'scenario_test_runner',
-        )
+    )
 
     if args.scenario != Path("/dev/null"):
         print(str(substitute_ros_package(args.scenario).resolve()))
