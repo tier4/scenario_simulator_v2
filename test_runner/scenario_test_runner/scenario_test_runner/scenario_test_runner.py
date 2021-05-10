@@ -17,16 +17,16 @@
 
 
 import argparse
-import rclpy
 import time
-
-from openscenario_utility.conversion import convert
-from openscenario_utility.validation import XOSCValidator
 from pathlib import Path
-from scenario_test_runner.lifecycle_controller import LifecycleController
-from scenario_test_runner.workflow import Expect, Scenario, Workflow, substitute_ros_package
 from shutil import rmtree
 from sys import exit
+
+import rclpy
+from openscenario_utility.conversion import convert
+from openscenario_utility.validation import XOSCValidator
+from scenario_test_runner.lifecycle_controller import LifecycleController
+from scenario_test_runner.workflow import Expect, Scenario, Workflow, substitute_ros_package
 from typing import List
 
 
