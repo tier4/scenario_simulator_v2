@@ -40,7 +40,8 @@ class ResultChecker:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='check scenario testing result is good or not')
+    parser = argparse.ArgumentParser(
+        description='check scenario testing result is good or not')
     parser.add_argument('xml', help='path to result xml file')
     args = parser.parse_args()
     checker = ResultChecker()

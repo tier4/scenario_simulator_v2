@@ -66,7 +66,7 @@ class LifecycleController(Node):
             output_directory: Path,
             real_time_factor: float,
             scenario: Path,
-            ):
+    ):
         """Send request to change scenario interperter's parameters."""
         request = rcl_interfaces.srv.SetParameters.Request()
 
@@ -100,7 +100,7 @@ class LifecycleController(Node):
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_DOUBLE,
                     double_value=frame_rate)),
-            ]
+        ]
 
         future = self.client_set_parameters.call_async(request)
         rclpy.spin_until_future_complete(self, future)
@@ -113,7 +113,7 @@ class LifecycleController(Node):
             output_directory: Path,
             real_time_factor: float,
             scenario: str,
-            ):
+    ):
         """Configure node to chagnge state from unconfigure to inactive."""
         self.current_scenario = scenario
 
@@ -123,7 +123,7 @@ class LifecycleController(Node):
                 output_directory=output_directory,
                 real_time_factor=real_time_factor,
                 scenario=self.current_scenario,
-                ).done():
+        ).done():
             self.get_logger().info('Failed to set parameters. Resending...')
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
