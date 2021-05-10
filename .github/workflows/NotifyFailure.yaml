@@ -1,3 +1,5 @@
+name: NotifyFailure
+
 on:
   workflow_run:
     workflows:
