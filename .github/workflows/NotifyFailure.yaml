@@ -7,7 +7,6 @@ on:
       - Docker
       - Documentation
       - ScenarioTest
-      - Release
     types: [ completed ]
 
 jobs:
