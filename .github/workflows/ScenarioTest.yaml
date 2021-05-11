@@ -32,6 +32,11 @@ jobs:
           sudo apt update
           sudo apt install ros-foxy-desktop
 
+      - name: Install lcov
+        run: |
+          sudo apt install wget
+          wget https://gitlab.com/autowarefoundation/autoware.auto/AutowareAuto/-/raw/master/.lcovrc
+
       - name: Copy repository
         run: |
           mkdir -p ~/ros2_ws/src/scenario_simulator_v2
@@ -66,13 +71,22 @@ jobs:
         run: |
           source /opt/ros/foxy/setup.bash
           cd ~/ros2_ws
-          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+          colcon build --symlink-install --ament-cmake-args -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1" --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.base --initial
 
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml'
           ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
+
+      - name: Collect coverage
+        run: |
+          cd ~/ros2_ws
+          lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.test
+          lcov --config-file .lcovrc -a lcov.base -a lcov.test -o lcov.total
+          lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/src/vendor/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" -o lcov.total.filtered
+          
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v2
