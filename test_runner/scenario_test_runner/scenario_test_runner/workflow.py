@@ -26,11 +26,12 @@ from yaml import safe_load
 
 
 def substitute_ros_package(pathname: Path):
-
     def find_pkg_share(match):
         return get_package_share_directory(match.group(1))
 
-    return Path(sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", find_pkg_share, str(pathname)))
+    return Path(
+        sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", find_pkg_share, str(pathname))
+    )
 
 
 class Expect(IntEnum):
@@ -40,7 +41,7 @@ class Expect(IntEnum):
     error = 2
 
 
-class Scenario():
+class Scenario:
     """
     Manages a scenario given as an element of workflow.yaml.
 
@@ -54,10 +55,10 @@ class Scenario():
     """
 
     def __init__(
-            self,
-            path: Path,
-            expect: Expect,
-            frame_rate: float,
+        self,
+        path: Path,
+        expect: Expect,
+        frame_rate: float,
     ):
 
         self.path = substitute_ros_package(path).resolve()
@@ -67,7 +68,7 @@ class Scenario():
         self.frame_rate = frame_rate
 
 
-class Workflow():
+class Workflow:
     """
     Manages a set of scenario test items given as workflow.yaml.
 
@@ -81,16 +82,18 @@ class Workflow():
     """
 
     def __init__(
-            self,
-            path: Path,
-            global_frame_rate: float,
+        self,
+        path: Path,
+        global_frame_rate: float,
     ):
 
         self.path = path
 
         self.schema = yamale.make_schema(
-            Path(get_package_share_directory('scenario_test_runner')).parent.joinpath(
-                'ament_index', 'resource_index', 'packages', 'workflow_schema.yaml'))
+            Path(get_package_share_directory("scenario_test_runner")).parent.joinpath(
+                "ament_index", "resource_index", "packages", "workflow_schema.yaml"
+            )
+        )
 
         self.global_frame_rate = global_frame_rate
 
@@ -133,29 +136,29 @@ class Workflow():
         self.validate(workflow_path)
 
         if workflow_path.exists():
-            with workflow_path.open('r') as file:
+            with workflow_path.open("r") as file:
 
                 scenarios = []
 
-                for each in safe_load(file)['Scenario']:
+                for each in safe_load(file)["Scenario"]:
 
                     scenarios.append(
                         Scenario(
-                            each['path'],
-                            Expect[each['expect']
-                                   if 'expect' in each else 'success'],
-                            each['frame-rate'] if 'frame-rate' in each else self.global_frame_rate,
+                            each["path"],
+                            Expect[each["expect"] if "expect" in each else "success"],
+                            each["frame-rate"]
+                            if "frame-rate" in each
+                            else self.global_frame_rate,
                         )
                     )
 
                 return scenarios
 
         else:
-            print("No such file or directory: " +
-                  str(workflow_path), file=stderr)
+            print("No such file or directory: " + str(workflow_path), file=stderr)
             exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """Entrypoint."""
     pass

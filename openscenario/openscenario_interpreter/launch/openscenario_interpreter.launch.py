@@ -23,15 +23,24 @@ import launch_ros.actions
 
 def generate_launch_description():
     """Generate launch description for scenario runner."""
-    return launch.LaunchDescription([
-        launch_ros.actions.Node(
-            package='openscenario_interpreter',
-            node_executable='openscenario_interpreter_node',
-            node_name='openscenario_interpreter',
-            output='screen',
-            parameters=[{
-                'verbose': 'true',
-                'scenario': os.path.join(
-                    ament_index_python.packages.get_package_share_directory(
-                        'openscenario_interpreter'),
-                    'example/lane_change.xosc')}])])
+    return launch.LaunchDescription(
+        [
+            launch_ros.actions.Node(
+                package="openscenario_interpreter",
+                node_executable="openscenario_interpreter_node",
+                node_name="openscenario_interpreter",
+                output="screen",
+                parameters=[
+                    {
+                        "verbose": "true",
+                        "scenario": os.path.join(
+                            ament_index_python.packages.get_package_share_directory(
+                                "openscenario_interpreter"
+                            ),
+                            "example/lane_change.xosc",
+                        ),
+                    }
+                ],
+            )
+        ]
+    )

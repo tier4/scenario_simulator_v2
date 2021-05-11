@@ -33,13 +33,14 @@ def iota(start, step, stop):
     if math.isclose(step, 0.0, abs_tol=tol):
         yield start
         return
-    while (start < stop if step > 0 else start > stop) or math.isclose(start, stop, abs_tol=tol):
+    while (start < stop if step > 0 else start > stop) or math.isclose(
+        start, stop, abs_tol=tol
+    ):
         yield start
         start = start + step
 
 
 class MacroExpander:
-
     def __init__(self, rules, schema):
 
         self.rules = rules
@@ -49,15 +50,19 @@ class MacroExpander:
         self.specs = []
 
         if rules is not None:
-            for each in rules['ScenarioModifier']:
-                name = each['name']
-                if 'list' in each:
-                    self.specs.append(list(map(
-                        lambda x: (name, x), each['list'])))
+            for each in rules["ScenarioModifier"]:
+                name = each["name"]
+                if "list" in each:
+                    self.specs.append(list(map(lambda x: (name, x), each["list"])))
                 else:
-                    self.specs.append(list(
-                        map(lambda x: (name, x),
-                            iota(each['start'], each['step'], each['stop']))))
+                    self.specs.append(
+                        list(
+                            map(
+                                lambda x: (name, x),
+                                iota(each["start"], each["step"], each["stop"]),
+                            )
+                        )
+                    )
 
     def __call__(self, xosc: str, output: Path, basename: str):
 
@@ -71,13 +76,12 @@ class MacroExpander:
                 target_name = deepcopy(basename)
 
                 for binding in bindings:
-                    target_name += '__' + str(binding[0]) + '_' + str(binding[1])
+                    target_name += "__" + str(binding[0]) + "_" + str(binding[1])
                     target = sub(str(binding[0]), str(binding[1]), target)
 
-                paths.append(
-                    output.joinpath(target_name + ".xosc"))
+                paths.append(output.joinpath(target_name + ".xosc"))
 
-                with paths[-1].open(mode='w') as file:
+                with paths[-1].open(mode="w") as file:
                     file.write(target)
 
                     try:
@@ -90,10 +94,9 @@ class MacroExpander:
                         exit()
 
         else:
-            paths.append(
-                output.joinpath(target_name + ".xosc"))
+            paths.append(output.joinpath(target_name + ".xosc"))
 
-            with paths[-1].open(mode='w') as f:
+            with paths[-1].open(mode="w") as f:
                 f.write(xosc)
 
         return paths
@@ -101,10 +104,12 @@ class MacroExpander:
 
 def load_yaml(path):
     if path.exists():
-        with path.open('r') as file:
+        with path.open("r") as file:
             return yaml.safe_load(file)
     else:
-        print("\x1b[31mNo such file or directory: " + str(path) + "\x1b[0m", file=stderr)
+        print(
+            "\x1b[31mNo such file or directory: " + str(path) + "\x1b[0m", file=stderr
+        )
         exit()
 
 
@@ -170,31 +175,36 @@ def convert(input: Path, output: Path, verbose: bool = True):
         output.mkdir(parents=True, exist_ok=True)
 
     schema = xmlschema.XMLSchema(
-        resource_string(__name__, 'resources/OpenSCENARIO.xsd').decode('utf-8'))
+        resource_string(__name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+    )
 
     yaml = load_yaml(input)
 
-    macroexpand = MacroExpander(
-        yaml.pop('ScenarioModifiers', None), schema)
+    macroexpand = MacroExpander(yaml.pop("ScenarioModifiers", None), schema)
 
     xosc, errors = schema.encode(
-        from_yaml('OpenSCENARIO', yaml),
+        from_yaml("OpenSCENARIO", yaml),
         indent=2,
         preserve_root=True,
         unordered=True,  # Reorder elements
-        validation='lax',  # The "strict" mode is too strict than we would like.
-        )
+        validation="lax",  # The "strict" mode is too strict than we would like.
+    )
 
     if not schema.is_valid(xosc) and len(errors) != 0:
-        print("Error: " + str(errors[0]), file=stderr)  # Other than the first is not important.
+        print(
+            "Error: " + str(errors[0]), file=stderr
+        )  # Other than the first is not important.
         exit()
 
     else:
         paths = macroexpand(
-            xmlschema.XMLResource(xosc).tostring(
-                ).replace("True", "true").replace("False", "false"),
+            xmlschema.XMLResource(xosc)
+            .tostring()
+            .replace("True", "true")
+            .replace("False", "false"),
             output,
-            input.stem)
+            input.stem,
+        )
 
         if verbose:
             for each in paths:
@@ -204,10 +214,10 @@ def convert(input: Path, output: Path, verbose: bool = True):
 
 
 def main():
-    parser = ArgumentParser(description='Convert OpenSCENARIO.yaml into .xosc')
+    parser = ArgumentParser(description="Convert OpenSCENARIO.yaml into .xosc")
 
-    parser.add_argument('--input', type=str, required=True)
-    parser.add_argument('--output', type=str, default=Path('/tmp').joinpath('xosc'))
+    parser.add_argument("--input", type=str, required=True)
+    parser.add_argument("--output", type=str, default=Path("/tmp").joinpath("xosc"))
 
     args = parser.parse_args()
 
