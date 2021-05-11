@@ -14,7 +14,7 @@ jobs:
   job1:
     name: ScenarioTest
     runs-on: ubuntu-20.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v2-beta
 
@@ -35,6 +35,7 @@ jobs:
       - name: Install lcov
         run: |
           sudo apt install wget
+          cd ~/ros2_ws
           wget https://gitlab.com/autowarefoundation/autoware.auto/AutowareAuto/-/raw/master/.lcovrc
 
       - name: Copy repository
@@ -86,7 +87,15 @@ jobs:
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.test
           lcov --config-file .lcovrc -a lcov.base -a lcov.test -o lcov.total
           lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/src/vendor/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" -o lcov.total.filtered
-          
+
+      - name: publish codevov result
+        uses: codecov/codecov-action@v1.2.1
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}  # only needed for private repos
+          files: ~/ros2_ws/cov.total.filtered
+          flags: scenario_test
+          name: scenario_simulator_v2
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v2
