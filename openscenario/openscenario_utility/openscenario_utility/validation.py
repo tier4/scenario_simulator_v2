@@ -23,20 +23,19 @@ import argparse
 import xmlschema
 
 
-class XOSCValidator():
-
+class XOSCValidator:
     def __init__(self, verbose: bool = False):
 
         self.verbose = verbose
 
         self.schema = xmlschema.XMLSchema(
-            resource_string(__name__, 'resources/OpenSCENARIO.xsd').decode('utf-8'))
+            resource_string(__name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+        )
 
     def __call__(self, xosc: Path) -> bool:
 
         try:
-            self.schema.validate(
-                xmlschema.XMLResource(str(xosc)))
+            self.schema.validate(xmlschema.XMLResource(str(xosc)))
 
             if self.verbose:
                 print("[OK] " + str(xosc))
@@ -54,10 +53,11 @@ class XOSCValidator():
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Validate if the XOSC file complies with the ASAM OpenSCENARIO 1.0.0 standard')
+        description="Validate if the XOSC file complies with the ASAM OpenSCENARIO 1.0.0 standard"
+    )
 
-    parser.add_argument('paths', metavar='*.xosc', type=Path, nargs='+')
-    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument("paths", metavar="*.xosc", type=Path, nargs="+")
+    parser.add_argument("-v", "--verbose", action="store_true")
 
     args = parser.parse_args()
 
@@ -73,6 +73,6 @@ def main():
     print("All xosc files given are standard compliant.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """Entrypoint."""
     main()

@@ -40,32 +40,39 @@ class LifecycleController(Node):
     NODE_NAME = "openscenario_interpreter"
 
     def __init__(self):
-        super().__init__(node_name='lifecycle_controller', namespace='simulation')
+        super().__init__(node_name="lifecycle_controller", namespace="simulation")
 
         self.client_get_state = self.create_client(
-            GetState, LifecycleController.NODE_NAME + "/get_state")
+            GetState, LifecycleController.NODE_NAME + "/get_state"
+        )
 
         while not self.client_get_state.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn(self.client_get_state.srv_name + ' service unavailable')
+            self.get_logger().warn(
+                self.client_get_state.srv_name + " service unavailable"
+            )
 
         self.client_change_state = self.create_client(
-            ChangeState, LifecycleController.NODE_NAME + "/change_state")
+            ChangeState, LifecycleController.NODE_NAME + "/change_state"
+        )
 
         while not self.client_change_state.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn(self.client_change_state.srv_name + ' service unavailable')
+            self.get_logger().warn(
+                self.client_change_state.srv_name + " service unavailable"
+            )
 
         self.current_scenario = ""
         self.client_set_parameters = self.create_client(
             rcl_interfaces.srv.SetParameters,
-            LifecycleController.NODE_NAME + '/set_parameters')
+            LifecycleController.NODE_NAME + "/set_parameters",
+        )
 
     def send_request_to_change_parameters(
-            self,  # Arguments are alphabetically sorted
-            expect,
-            frame_rate: float,
-            output_directory: Path,
-            real_time_factor: float,
-            scenario: Path,
+        self,  # Arguments are alphabetically sorted
+        expect,
+        frame_rate: float,
+        output_directory: Path,
+        real_time_factor: float,
+        scenario: Path,
     ):
         """Send request to change scenario interperter's parameters."""
         request = rcl_interfaces.srv.SetParameters.Request()
@@ -74,32 +81,34 @@ class LifecycleController(Node):
             Parameter(
                 name="intended_result",
                 value=ParameterValue(
-                    type=ParameterType.PARAMETER_STRING,
-                    string_value=str(expect.name))),
-
+                    type=ParameterType.PARAMETER_STRING, string_value=str(expect.name)
+                ),
+            ),
             Parameter(
                 name="osc_path",
                 value=ParameterValue(
-                    type=ParameterType.PARAMETER_STRING,
-                    string_value=str(scenario))),
-
+                    type=ParameterType.PARAMETER_STRING, string_value=str(scenario)
+                ),
+            ),
             Parameter(
-                name='output_directory',
+                name="output_directory",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING,
-                    string_value=str(output_directory))),
-
+                    string_value=str(output_directory),
+                ),
+            ),
             Parameter(
-                name='local_real_time_factor',
+                name="local_real_time_factor",
                 value=ParameterValue(
-                    type=ParameterType.PARAMETER_DOUBLE,
-                    double_value=real_time_factor)),
-
+                    type=ParameterType.PARAMETER_DOUBLE, double_value=real_time_factor
+                ),
+            ),
             Parameter(
-                name='local_frame_rate',
+                name="local_frame_rate",
                 value=ParameterValue(
-                    type=ParameterType.PARAMETER_DOUBLE,
-                    double_value=frame_rate)),
+                    type=ParameterType.PARAMETER_DOUBLE, double_value=frame_rate
+                ),
+            ),
         ]
 
         future = self.client_set_parameters.call_async(request)
@@ -107,24 +116,24 @@ class LifecycleController(Node):
         return future
 
     def configure_node(
-            self,  # Arguments are alphabetically sorted
-            expect,
-            frame_rate: float,
-            output_directory: Path,
-            real_time_factor: float,
-            scenario: str,
+        self,  # Arguments are alphabetically sorted
+        expect,
+        frame_rate: float,
+        output_directory: Path,
+        real_time_factor: float,
+        scenario: str,
     ):
         """Configure node to chagnge state from unconfigure to inactive."""
         self.current_scenario = scenario
 
         while not self.send_request_to_change_parameters(
-                expect=expect,
-                frame_rate=frame_rate,
-                output_directory=output_directory,
-                real_time_factor=real_time_factor,
-                scenario=self.current_scenario,
+            expect=expect,
+            frame_rate=frame_rate,
+            output_directory=output_directory,
+            real_time_factor=real_time_factor,
+            scenario=self.current_scenario,
         ).done():
-            self.get_logger().info('Failed to set parameters. Resending...')
+            self.get_logger().info("Failed to set parameters. Resending...")
 
         self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
 
@@ -204,6 +213,6 @@ def main(args=None):
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """Entrypoint."""
     main()

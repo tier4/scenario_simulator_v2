@@ -24,11 +24,14 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     """Launch description for spline visualization."""
-    return LaunchDescription([
-        Node(
-            package='simulation_interface',
-            executable='example',
-            name='example',
-            output='screen',
-            arguments=[('__log_level:=info')])
-    ])
+    return LaunchDescription(
+        [
+            Node(
+                package="simulation_interface",
+                executable="example",
+                name="example",
+                output="screen",
+                arguments=[("__log_level:=info")],
+            )
+        ]
+    )

@@ -32,22 +32,23 @@ class ResultChecker:
         for testsuite in testsuites:
             for testcase in testsuite:
                 for result in testcase:
-                    if result.tag == 'failure':
+                    if result.tag == "failure":
                         sys.exit(1)
-                    if result.tag == 'error':
+                    if result.tag == "error":
                         sys.exit(1)
         sys.exit(0)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='check scenario testing result is good or not')
-    parser.add_argument('xml', help='path to result xml file')
+        description="check scenario testing result is good or not"
+    )
+    parser.add_argument("xml", help="path to result xml file")
     args = parser.parse_args()
     checker = ResultChecker()
     checker.check(args.xml)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """Entrypoint."""
     pass

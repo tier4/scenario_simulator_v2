@@ -28,20 +28,23 @@ from launch_ros.actions import Node
 def generate_launch_description():
     """Launch description for spline visualization."""
     rviz_config_dir = os.path.join(
-            get_package_share_directory('traffic_simulator'),
-            'config',
-            'spline_viz.rviz')
-    return LaunchDescription([
-        Node(
-            package='traffic_simulator',
-            executable='catmull_rom_visualization',
-            name='scenario_runner_node',
-            output='screen',
-            arguments=[('__log_level:=info')]),
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2',
-            arguments=['-d', rviz_config_dir],
-            output='screen')
-    ])
+        get_package_share_directory("traffic_simulator"), "config", "spline_viz.rviz"
+    )
+    return LaunchDescription(
+        [
+            Node(
+                package="traffic_simulator",
+                executable="catmull_rom_visualization",
+                name="scenario_runner_node",
+                output="screen",
+                arguments=[("__log_level:=info")],
+            ),
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                arguments=["-d", rviz_config_dir],
+                output="screen",
+            ),
+        ]
+    )
