@@ -24,17 +24,17 @@ from launch_ros.actions import LifecycleNode
 
 def generate_launch_description():
     scenario_test_runner = Node(
-        package='scenario_test_runner',
-        node_executable='scenario_test_runner',
+        package="scenario_test_runner",
+        node_executable="scenario_test_runner",
         output={
-                'stdout': 'log',
-                'stderr': 'screen',
-        }
+            "stdout": "log",
+            "stderr": "screen",
+        },
     )
     scenario_runner_mock = LifecycleNode(
-        node_name='scenario_runner_mock',
-        package='scenario_runner_mock',
-        node_executable='scenario_runner_mock',
-        output='log'
+        node_name="scenario_runner_mock",
+        package="scenario_runner_mock",
+        node_executable="scenario_runner_mock",
+        output="log",
     )
     return LaunchDescription([scenario_test_runner, scenario_runner_mock])

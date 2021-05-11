@@ -28,21 +28,26 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     joy_param_file = LaunchConfiguration(
-        'joy_param_file',
+        "joy_param_file",
         default=os.path.join(
-            get_package_share_directory('joy_to_vehicle_cmd'),
-            'config', 'joy.yaml'))
-    description = LaunchDescription([
-        Node(
-            package='joy',
-            executable='joy_node',
-            name='joy_node',
-            parameters=[joy_param_file],
-            output='screen'),
-        Node(
-            package='joy_to_vehicle_cmd',
-            executable='joy_to_vehicle_cmd_node',
-            name='joy_to_vehicle_cmd_node',
-            output='screen'),
-    ])
+            get_package_share_directory("joy_to_vehicle_cmd"), "config", "joy.yaml"
+        ),
+    )
+    description = LaunchDescription(
+        [
+            Node(
+                package="joy",
+                executable="joy_node",
+                name="joy_node",
+                parameters=[joy_param_file],
+                output="screen",
+            ),
+            Node(
+                package="joy_to_vehicle_cmd",
+                executable="joy_to_vehicle_cmd_node",
+                name="joy_to_vehicle_cmd_node",
+                output="screen",
+            ),
+        ]
+    )
     return description

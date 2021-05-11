@@ -29,43 +29,48 @@ from launch_ros.actions import Node
 def generate_launch_description():
     """Launch description for scenario runner moc."""
     lanlet_path = os.path.join(
-            get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm')
+        get_package_share_directory("kashiwanoha_map"), "map", "lanelet2_map.osm"
+    )
     rviz_config_dir = os.path.join(
-            get_package_share_directory('traffic_simulator'),
-            'config',
-            'moc_test.rviz')
-    return LaunchDescription([
-        Node(
-            package='traffic_simulator',
-            executable='scenario_runner_moc_node',
-            name='scenario_runner_node',
-            output='screen',
-            parameters=[{
-                'map_path': lanlet_path,
-                'origin_latitude': 35.903555800615614,
-                'origin_longitude': 139.93339979022568,
-                'port': 8080}],
-            arguments=[('__log_level:=info')]),
-        Node(
-            package='simple_sensor_simulator',
-            executable='simple_sensor_simulator_node',
-            name='simple_sensor_simulator_node',
-            output='screen',
-            parameters=[{
-                'port': 8080
-            }],
-            arguments=[('__log_level:=warn')],
+        get_package_share_directory("traffic_simulator"), "config", "moc_test.rviz"
+    )
+    return LaunchDescription(
+        [
+            Node(
+                package="traffic_simulator",
+                executable="scenario_runner_moc_node",
+                name="scenario_runner_node",
+                output="screen",
+                parameters=[
+                    {
+                        "map_path": lanlet_path,
+                        "origin_latitude": 35.903555800615614,
+                        "origin_longitude": 139.93339979022568,
+                        "port": 8080,
+                    }
+                ],
+                arguments=[("__log_level:=info")],
             ),
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            name='rviz2',
-            arguments=['-d', rviz_config_dir],
-            output='log'),
-        Node(
-            package='openscenario_visualization',
-            executable='openscenario_visualization_node',
-            name='openscenario_visualization_node',
-            output='log'
-            )
-    ])
+            Node(
+                package="simple_sensor_simulator",
+                executable="simple_sensor_simulator_node",
+                name="simple_sensor_simulator_node",
+                output="screen",
+                parameters=[{"port": 8080}],
+                arguments=[("__log_level:=warn")],
+            ),
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                arguments=["-d", rviz_config_dir],
+                output="log",
+            ),
+            Node(
+                package="openscenario_visualization",
+                executable="openscenario_visualization_node",
+                name="openscenario_visualization_node",
+                output="log",
+            ),
+        ]
+    )

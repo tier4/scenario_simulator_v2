@@ -25,18 +25,16 @@ setup(
     description="Utility tools for ASAM OpenSCENARIO 1.0.0",
     long_description=read_file("README.md"),
     packages=find_packages(),
-    install_requires=open(
-        Path(__file__).resolve().parent.joinpath('requirements.txt')
-        ).read().splitlines(),
+    install_requires=open(Path(__file__).resolve().parent.joinpath("requirements.txt"))
+    .read()
+    .splitlines(),
     include_package_data=True,
-    package_data={
-        '': ["resources/*.xsd"]
-        },
+    package_data={"": ["resources/*.xsd"]},
     zip_safe=False,
     entry_points={
-        'console_scripts': [
+        "console_scripts": [
             "validate-xosc = openscenario_utility.validation:main",
             "yaml2xosc     = openscenario_utility.conversion:main",
-            ],
-        },
-    )
+        ],
+    },
+)
