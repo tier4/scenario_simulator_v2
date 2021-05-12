@@ -88,6 +88,8 @@ jobs:
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.test
           lcov --config-file .lcovrc -a lcov.base -a lcov.test -o lcov.total
           lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/src/vendor/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" -o lcov.total.filtered
+          ls ~/ros2_ws
+          cat ~/ros2_ws/lcov.total.filtered
 
       - name: publish codevov result
         uses: codecov/codecov-action@v1.2.1
