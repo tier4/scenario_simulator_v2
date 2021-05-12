@@ -51,29 +51,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
 
   void report(
-    const junit_exporter::TestResult & result, const std::string & type,
-    const std::string & what = "")
-  {
-    exporter.addTestCase(
-      script.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
-      "scenario_testing", 0, result, type, what);
-
-    std::cout << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
-    if (not what.empty()) {
-      std::cout << " (" << what.c_str() << ")";
-    }
-    std::cout << "\x1b[0m" << std::endl;
-
-    exporter.write(output_directory + "/result.junit.xml");
-
-    script.reset();
-
-    while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-
-    deactivate();
-  }
+    const junit_exporter::TestResult & result,  //
+    const std::string & type,                   //
+    const std::string & what = "");
 
 #define CATCH(TYPE)                         \
   catch (const TYPE & error)                \
