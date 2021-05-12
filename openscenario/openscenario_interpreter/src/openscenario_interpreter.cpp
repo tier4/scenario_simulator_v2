@@ -84,14 +84,21 @@ void Interpreter::report(
   const std::string & type,                   //
   const std::string & what)
 {
+  std::stringstream message;
+  {
+    message << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
+
+    if (not what.empty()) {
+      message << " (" << what.c_str() << ")";
+    }
+
+    message << "\x1b[0m";
+
+    RCLCPP_INFO_STREAM(get_logger(), message.str());
+  }
+
   exporter.addTestCase(  // XXX DIRTY HACK!!!
     script.as<OpenScenario>().scope.scenario.string(), "scenario_testing", 0, result, type, what);
-
-  std::cout << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
-  if (not what.empty()) {
-    std::cout << " (" << what.c_str() << ")";
-  }
-  std::cout << "\x1b[0m" << std::endl;
 
   exporter.write(output_directory + "/result.junit.xml");
 

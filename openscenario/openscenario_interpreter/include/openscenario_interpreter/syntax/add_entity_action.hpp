@@ -42,11 +42,7 @@ struct AddEntityAction
   {
   }
 
-  decltype(auto) operator()(const String & entity_ref) const
-  {
-    std::cout << "AddEntityAction: " << entity_ref << std::endl;
-    return unspecified;
-  }
+  auto operator()(const String & /* entity_ref */) const { return unspecified; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

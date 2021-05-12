@@ -73,36 +73,17 @@ struct ReachPositionCondition
       tolerance);
   }
 
-#ifndef NDEBUG
   auto distance(const TriggeringEntity & name)
   {
     const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
     return std::hypot(pose.position.x, pose.position.y);
   }
-#endif
 
   auto evaluate()
   {
-#ifndef NDEBUG
-    std::cout << (indent++) << "- BEC.RPC:\n";
-#endif
-
-    const auto result = asBoolean(for_each([&](const auto & triggering_entity) {
-      const bool result = apply<bool>(*this, position, triggering_entity);
-#ifndef NDEBUG
-      std::cout << indent << "  " << triggering_entity << ": ";
-      std::cout << std::boolalpha << result;
-      std::cout << " (distance = " << distance(triggering_entity);
-      std::cout << " < " << tolerance << ")" << std::endl;
-#endif
-      return result;
+    return asBoolean(for_each([&](const auto & triggering_entity) {
+      return apply<bool>(*this, position, triggering_entity);
     }));
-
-#ifndef NDEBUG
-    --indent;
-#endif
-
-    return result;
   }
 };
 }  // namespace syntax
