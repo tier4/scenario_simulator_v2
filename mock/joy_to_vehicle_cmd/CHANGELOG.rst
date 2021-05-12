@@ -2,8 +2,8 @@
 Changelog for package joy_to_vehicle_cmd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.1 (2021-05-12)
+------------------
 * Merge pull request `#295 <https://github.com/tier4/scenario_simulator_v2/issues/295>`_ from tier4/fix/python_format
   reformat by black
 * reformat by black
