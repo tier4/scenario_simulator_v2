@@ -84,9 +84,8 @@ void Interpreter::report(
   const std::string & type,                   //
   const std::string & what)
 {
-  exporter.addTestCase(
-    script.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
-    "scenario_testing", 0, result, type, what);
+  exporter.addTestCase(  // XXX DIRTY HACK!!!
+    script.as<OpenScenario>().scope.scenario.string(), "scenario_testing", 0, result, type, what);
 
   std::cout << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
   if (not what.empty()) {
@@ -123,13 +122,6 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
                   << (openscenario_interpreter::complete_state.use_count() - 1) << " complete]");
 #endif
           }
-          // else {
-          //   if (intended_result == "success") {
-          //     report(SUCCESS, "intended-success");
-          //   } else {
-          //     report(FAILURE, "unintended-success", "expected " + intended_result);
-          //   }
-          // }
         }
       });
     });

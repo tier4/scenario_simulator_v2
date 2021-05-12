@@ -50,10 +50,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   const junit_exporter::TestResult FAILURE = junit_exporter::TestResult::FAILURE;
   const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
 
-  void report(
-    const junit_exporter::TestResult & result,  //
-    const std::string & type,                   //
-    const std::string & what = "");
+  void report(const junit_exporter::TestResult &, const std::string &, const std::string & = "");
 
 #define CATCH(TYPE)                         \
   catch (const TYPE & error)                \
@@ -99,8 +96,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     CATCH(ImplementationFault)
     CATCH(SemanticError)
     CATCH(SyntaxError)
-
-    CATCH(InternalError)
+    CATCH(InternalError)  // NOTE: THIS MUST BE LAST OF CATCH STATEMENTS.
 
     catch (...) { report(ERROR, "UnknownException (unexpected)"); }
   }
