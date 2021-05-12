@@ -50,7 +50,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   const junit_exporter::TestResult FAILURE = junit_exporter::TestResult::FAILURE;
   const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
 
-  decltype(auto) report(
+  void report(
     const junit_exporter::TestResult & result, const std::string & type,
     const std::string & what = "")
   {
