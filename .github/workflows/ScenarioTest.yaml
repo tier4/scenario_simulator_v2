@@ -94,7 +94,7 @@ jobs:
         if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}  # only needed for private repos
-          files: ~/ros2_ws/cov.total.filtered
+          files: ~/ros2_ws/lcov.total.filtered
           flags: scenario_test
           name: scenario_simulator_v2
 
