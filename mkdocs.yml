@@ -75,5 +75,6 @@ nav:
     - design/Tier4ScenarioFormatVersion2.md
     - design/OpenSCENARIOSupport.md
   - Package Details: package/About.md
+  - Release Notes: release_notes/ReleaseNotes.md
   - Contact Infomation: etc/ContactUs.md
   - LICENSE: LICENSE.md
