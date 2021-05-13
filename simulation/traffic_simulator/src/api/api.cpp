@@ -236,6 +236,7 @@ bool API::initialize(double realtime_factor, double step_time)
 {
   step_time_ = step_time;
   current_time_ = -1 * initialize_duration;
+  clock_.initialize(-1 * initialize_duration, step_time);
   if (standalone_mode) {
     return true;
   }
