@@ -27,7 +27,6 @@ namespace openscenario_interpreter
  *  -- Error
  *      |-- SyntaxError
  *      |    `-- InvalidEnumeration
- *      |-- ConnectionError
  *      |-- SemanticError
  *      `-- ImplementationFault
  *

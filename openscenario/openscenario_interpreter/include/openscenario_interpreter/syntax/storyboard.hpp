@@ -102,7 +102,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     // DEBUG_VALUE(getCurrentTime());
     // DEBUG_VALUE(all_ready);
 
-    if (not engaged and 0 < getCurrentTime()) {
+    if (not engaged and 0 <= getCurrentTime()) {
       if (all_ready) {
         for (const auto & each : inner_scope.entities) {
           engage(each.first);
