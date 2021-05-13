@@ -1,0 +1,92 @@
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package simulation_interface
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+0.0.1 (2021-05-12)
+------------------
+* Merge pull request `#295 <https://github.com/tier4/scenario_simulator_v2/issues/295>`_ from tier4/fix/python_format
+  reformat by black
+* reformat by black
+* Merge pull request `#292 <https://github.com/tier4/scenario_simulator_v2/issues/292>`_ from tier4/feature/ros_tooling_workflow
+  use ros-setup action
+* remove flake8 check
+* add new line for the block
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/vehicle/base_link-offset
+* Merge pull request `#257 <https://github.com/tier4/scenario_simulator_v2/issues/257>`_ from tier4/feature/rename_packages
+  Feature/rename packages
+* use clang_format
+* Merge branch 'master' into feature/interpreter/vehicle/base_link-offset
+* apply reformat
+* Merge pull request `#252 <https://github.com/tier4/scenario_simulator_v2/issues/252>`_ from tier4/feature/publish_proto_doc
+  Feature/publish proto doc
+* enable pass textlint
+* udpate proto
+* modify case
+* enable generate link
+* add document about openscenario_msgs.proto
+* add document comment
+* update docs
+* fix case
+* remove unusd proto files
+* Merge branch 'master' into feature/test-runner/autoware.launch.xml
+* Merge pull request `#231 <https://github.com/tier4/scenario_simulator_v2/issues/231>`_ from tier4/feature/add_contributing_md
+  Feature/fix_licence_problems
+* fix e-mail
+* modify package.xml
+* Merge remote-tracking branch 'origin/master' into feature/support-autoware.iv-8
+* Merge pull request `#219 <https://github.com/tier4/scenario_simulator_v2/issues/219>`_ from tier4/feature/remove_xmlrpc
+  Feature/remove xmlrpc
+* Merge branch 'master' into feature/remove_xmlrpc
+* Merge pull request `#217 <https://github.com/tier4/scenario_simulator_v2/issues/217>`_ from tier4/feature/zeromq_integration
+  Feature/zeromq integration
+* add default
+* enable pass linter
+* remove stop watch
+* add all methods
+* add lidar callback
+* add despawn entity gunction
+* add spawn pedestrian func
+* add spawn vehicle entity
+* add soe callbacks
+* add multi server
+* remove debuf lines
+* add stop watch
+* add stopwatch class
+* update constants
+* remove unused files
+* check transport repeated field
+* remove xmlrclcpp
+* enable pass cpplint
+* apply reformat
+* add port configuration
+* add constructor to the server
+* add hostname enum
+* add constructor
+* Merge branch 'master' into feature/support-autoware.iv-6
+* Merge pull request `#216 <https://github.com/tier4/scenario_simulator_v2/issues/216>`_ from tier4/fix/test_in_simulation_interface
+  Fix/test in simulation interface
+* enable pass flake8
+* apply reformat
+* Merge branch 'master' into feature/support-autoware.iv-6
+* enable call client
+* add debug line
+* add debug line
+* add launch file
+* Merge branch 'master' into feature/support-autoware.iv-4
+* Merge pull request `#207 <https://github.com/tier4/scenario_simulator_v2/issues/207>`_ from tier4/fix/xmlrpc_connection_lost
+  Fix/xmlrpc connection lost
+* enable set status
+* remove unused fields
+* fix scenario
+* add debug lines
+* remove unused lines
+* remove multicall
+* remove warnings
+* remove multicall
+* Merge pull request `#202 <https://github.com/tier4/scenario_simulator_v2/issues/202>`_ from tier4/feature/get_waypoint_from_autoware
+  Feature/get waypoint from autoware
+* add proto
+* Merge branch 'feature/publish_obstacle' of https://github.com/tier4/scenario_simulator.auto into feature/get_waypoint_from_autoware
+* modify include gurad
+* rename packages
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, Yamasaki Tatsuya, yamacir-kit

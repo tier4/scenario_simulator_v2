@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>scenario_runner_mock</name>
-  <version>0.10.1</version>
+  <version>0.0.1</version>
   <description>scenario_runner_mock implementation</description>
   <maintainer email="taiki.tanaka@tier4.jp">Taiki Tanaka</maintainer>
   <license>Apache License 2.0</license>
