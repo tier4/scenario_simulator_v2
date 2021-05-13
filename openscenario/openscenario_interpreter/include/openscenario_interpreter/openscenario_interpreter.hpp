@@ -81,15 +81,15 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       if (intended_result == "success") {
         report(SUCCESS, "Success");
       } else {
-        report(FAILURE, "UnintendedSuccess", "expected " + intended_result);
+        report(FAILURE, "UnintendedSuccess", "Expected " + intended_result);
       }
     }
 
     catch (const SpecialAction<EXIT_FAILURE> &) {
       if (intended_result == "failure") {
-        report(SUCCESS, "UnintendedFailure");
+        report(SUCCESS, "IntendedFailure");
       } else {
-        report(FAILURE, "Failure", "expected " + intended_result);
+        report(FAILURE, "Failure", "Expected " + intended_result);
       }
     }
 

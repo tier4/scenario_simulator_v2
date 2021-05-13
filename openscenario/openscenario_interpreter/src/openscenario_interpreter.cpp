@@ -47,38 +47,6 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 #undef DECLARE_PARAMETER
 }
 
-Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
-try {
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-
-#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
-
-  GET_PARAMETER(intended_result);
-  GET_PARAMETER(local_frame_rate);
-  GET_PARAMETER(local_real_time_factor);
-  GET_PARAMETER(osc_path);
-  GET_PARAMETER(output_directory);
-
-#undef GET_PARAMETER
-
-  script.rebind<OpenScenario>(osc_path);
-
-  connect(
-    shared_from_this(),                                       //
-    boost::filesystem::path(osc_path).replace_extension(""),  // NOTE: /path/to/lanelet2_map.osm
-    script.as<OpenScenario>().scope.logic_file.string(),      //
-    30);
-
-  initialize(
-    local_real_time_factor,
-    1 / local_frame_rate * local_real_time_factor);  // interval_upper_bound
-
-  return Interpreter::Result::SUCCESS;
-} catch (const openscenario_interpreter::SyntaxError & error) {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << error.what() << "\x1b[0m");
-  return Interpreter::Result::FAILURE;
-}
-
 void Interpreter::report(
   const junit_exporter::TestResult & result,  //
   const std::string & type,                   //
@@ -109,6 +77,38 @@ void Interpreter::report(
   }
 
   deactivate();
+}
+
+Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
+try {
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+
+#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
+
+  GET_PARAMETER(intended_result);
+  GET_PARAMETER(local_frame_rate);
+  GET_PARAMETER(local_real_time_factor);
+  GET_PARAMETER(osc_path);
+  GET_PARAMETER(output_directory);
+
+#undef GET_PARAMETER
+
+  script.rebind<OpenScenario>(osc_path);
+
+  connect(
+    shared_from_this(),                                       //
+    boost::filesystem::path(osc_path).replace_extension(""),  // NOTE: /path/to/lanelet2_map.osm
+    script.as<OpenScenario>().scope.logic_file.string(),      //
+    30);
+
+  initialize(
+    local_real_time_factor,
+    1 / local_frame_rate * local_real_time_factor);  // interval_upper_bound
+
+  return Interpreter::Result::SUCCESS;
+} catch (const openscenario_interpreter::SyntaxError & error) {
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << error.what() << "\x1b[0m");
+  return Interpreter::Result::FAILURE;
 }
 
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
