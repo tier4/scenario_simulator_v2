@@ -18,18 +18,81 @@
 
 namespace concealer
 {
+#define RCLCPP_SYSTEM_ERROR(FROM)                         \
+  RCLCPP_ERROR_STREAM(                                    \
+    get_logger(), "\x1b[1;31mError on calling " FROM ": " \
+                    << std::system_error(errno, std::system_category()).what() << ".\x1b[0m")
+
 Autoware::~Autoware()
 {
-  if (spinner.joinable()) {
-    promise.set_value();
-    spinner.join();
+  RCLCPP_INFO_STREAM(
+    get_logger(), "\x1b[1;32mShutting down Autoware: (1/3) Stop publlishing/subscribing.\x1b[0m");
+  {
+    if (spinner.joinable()) {
+      promise.set_value();
+      spinner.join();
+    }
   }
 
-  int status = 0;
+  RCLCPP_INFO_STREAM(
+    get_logger(),
+    "\x1b[1;32mShutting down Autoware: (2/3) Send SIGINT to Autoware launch "
+    "process.\x1b[0m");
+  {
+    ::kill(process_id, SIGINT);
+  }
 
-  if (::kill(process_id, SIGINT) < 0 or ::waitpid(process_id, &status, WUNTRACED) < 0) {
-    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-    std::exit(EXIT_FAILURE);
+  RCLCPP_INFO_STREAM(
+    get_logger(),
+    "\x1b[1;32mShutting down Autoware: (2/3) Waiting for Autoware to be exited.\x1b[0m");
+  {
+    sigset_t mask{};
+    {
+      sigset_t orig_mask{};
+
+      sigemptyset(&mask);
+      sigaddset(&mask, SIGCHLD);
+
+      if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0) {
+        RCLCPP_SYSTEM_ERROR("sigprocmask");
+        std::exit(EXIT_FAILURE);
+      }
+    }
+
+    timespec timeout{};
+    {
+      timeout.tv_sec = 5;
+      timeout.tv_nsec = 0;
+    }
+
+    while (sigtimedwait(&mask, NULL, &timeout) < 0) {
+      switch (errno) {
+        case EINTR:  // Interrupted by a signal other than SIGCHLD.
+          break;
+
+        case EAGAIN:
+          RCLCPP_ERROR_STREAM(
+            get_logger(),
+            "\x1b[1;31mShutting down Autoware: (2/3) Autoware launch process does not respond. "
+            "Kill it.\x1b[0m");
+          kill(process_id, SIGKILL);
+          break;
+
+        default:
+          RCLCPP_SYSTEM_ERROR("sigtimedwait");
+          std::exit(EXIT_FAILURE);
+      }
+    }
+  }
+
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;32mShutting down Autoware: (3/3) Cleanup.\x1b[0m");
+  {
+    int status = 0;
+
+    if (waitpid(process_id, &status, 0) < 0) {
+      RCLCPP_SYSTEM_ERROR("waitpid");
+      std::exit(EXIT_FAILURE);
+    }
   }
 }
 
@@ -72,7 +135,7 @@ bool Autoware::ready() const
 void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  task_queue.delay([&]() {
+  task_queue.delay([this, initial_pose]() {
     set(initial_pose);
     waitForAutowareStateToBeInitializingVehicle();
     waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
