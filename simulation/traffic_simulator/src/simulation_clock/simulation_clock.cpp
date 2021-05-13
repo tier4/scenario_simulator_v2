@@ -25,6 +25,13 @@ void SimulationClock::update()
   current_simulation_time_ = current_simulation_time_ + step_time_;
 }
 
+rosgraph_msgs::msg::Clock SimulationClock::getCurrentRosTimeAsMsg() const
+{
+  rosgraph_msgs::msg::Clock clock;
+  clock.clock = getCurrentRosTime();
+  return clock;
+}
+
 rclcpp::Time SimulationClock::getCurrentRosTime() const
 {
   if (!initialized_) {

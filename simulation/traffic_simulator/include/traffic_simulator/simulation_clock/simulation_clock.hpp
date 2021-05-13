@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__SIMULATION_CLOCK__SIMULATION_CLOCK_HPP_
 
 #include <rclcpp/rclcpp.hpp>
+#include <rosgraph_msgs/msg/clock.hpp>
 
 namespace traffic_simulator
 {
@@ -42,6 +43,7 @@ public:
   double getCurrentSimulationTime() const { return current_simulation_time_; }
   double getStepTime() const { return step_time_; }
   rclcpp::Time getCurrentRosTime() const;
+  rosgraph_msgs::msg::Clock getCurrentRosTimeAsMsg() const;
 
 private:
   rclcpp::Duration step_time_duration_;

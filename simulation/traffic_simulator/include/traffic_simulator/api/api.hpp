@@ -24,6 +24,7 @@
 #include <memory>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/zmq_client.hpp>
 #include <stdexcept>
 #include <string>
@@ -70,6 +71,9 @@ public:
       [this](const auto & name) { return API::getEntityPose(name); },
       [this](const auto & name) { return API::despawn(name); }, auto_sink)),
     metrics_manager_(verbose, metrics_logfile_path),
+    clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
+      node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
+      rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     initialize_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::initialize),
@@ -225,6 +229,8 @@ private:
   const std::shared_ptr<traffic_simulator::traffic::TrafficController> traffic_controller_ptr_;
 
   metrics::MetricsManager metrics_manager_;
+
+  rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
   traffic_simulator::SimulationClock clock_;
 
   zeromq::Client<
