@@ -52,20 +52,21 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   void report(const junit_exporter::TestResult &, const std::string &, const std::string & = "");
 
-#define CATCH(TYPE)                         \
-  catch (const TYPE & error)                \
-  {                                         \
-    if (intended_result == "error") {       \
-      report(SUCCESS, #TYPE " (intended)"); \
-    } else {                                \
-      report(ERROR, #TYPE, error.what());   \
-    }                                       \
+#define CATCH(TYPE)                       \
+  catch (const TYPE & error)              \
+  {                                       \
+    if (intended_result == "error") {     \
+      report(SUCCESS, #TYPE);             \
+    } else {                              \
+      report(ERROR, #TYPE, error.what()); \
+    }                                     \
   }
 
   template <typename Thunk>
   void withExceptionHandler(Thunk && thunk)
   {
     using concealer::AutowareError;
+
     using openscenario_interpreter::ImplementationFault;
     using openscenario_interpreter::SemanticError;
     using openscenario_interpreter::SyntaxError;
@@ -78,17 +79,17 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     catch (const SpecialAction<EXIT_SUCCESS> &) {
       if (intended_result == "success") {
-        report(SUCCESS, "Success (intended)");
+        report(SUCCESS, "Success");
       } else {
-        report(FAILURE, "Success (unintended)", "expected " + intended_result);
+        report(FAILURE, "UnintendedSuccess", "expected " + intended_result);
       }
     }
 
     catch (const SpecialAction<EXIT_FAILURE> &) {
       if (intended_result == "failure") {
-        report(SUCCESS, "Failure (intended)");
+        report(SUCCESS, "UnintendedFailure");
       } else {
-        report(FAILURE, "Failure (unintended)", "expected " + intended_result);
+        report(FAILURE, "Failure", "expected " + intended_result);
       }
     }
 
@@ -98,7 +99,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     CATCH(SyntaxError)
     CATCH(InternalError)  // NOTE: THIS MUST BE LAST OF CATCH STATEMENTS.
 
-    catch (...) { report(ERROR, "UnknownException (unexpected)"); }
+    catch (...) { report(ERROR, "UnknownError", "An unknown exception has occurred"); }
   }
 
 #undef CATCH

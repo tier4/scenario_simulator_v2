@@ -69,13 +69,13 @@ try {
     script.as<OpenScenario>().scope.logic_file.string(),      //
     30);
 
-  const auto interval_upper_bound = 1 / local_frame_rate * local_real_time_factor;
-
-  initialize(local_real_time_factor, interval_upper_bound);
+  initialize(
+    local_real_time_factor,
+    1 / local_frame_rate * local_real_time_factor);  // interval_upper_bound
 
   return Interpreter::Result::SUCCESS;
 } catch (const openscenario_interpreter::SyntaxError & error) {
-  std::cerr << "\x1b[1;31m" << error.what() << "\x1b[0m" << std::endl;
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << error.what() << "\x1b[0m");
   return Interpreter::Result::FAILURE;
 }
 
