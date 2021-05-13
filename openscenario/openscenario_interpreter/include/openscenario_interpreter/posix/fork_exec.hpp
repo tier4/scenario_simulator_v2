@@ -40,9 +40,6 @@ auto execvp(const std::vector<std::string> & f_xs)
   argv.reserve(f_xs.size());
 
   for (const auto & each : f_xs) {
-#ifndef NDEBUG
-    std::cout << std::quoted(each) << std::endl;
-#endif
     buffer.emplace_back(std::begin(each), std::end(each));
     buffer.back().push_back('\0');
 

@@ -16,12 +16,6 @@
 #include <concealer/autoware.hpp>
 #include <exception>
 
-#define DEBUG_VALUE(...) \
-  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
-
-#define DEBUG_LINE() \
-  std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
-
 namespace concealer
 {
 Autoware::~Autoware()
