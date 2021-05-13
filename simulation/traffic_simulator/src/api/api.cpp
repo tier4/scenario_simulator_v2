@@ -338,6 +338,7 @@ bool API::updateFrame()
     }
     entity_manager_ptr_->broadcastEntityTransform();
     clock_.update();
+    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     metrics_manager_.calculate();
     if (!updateEntityStatusInSim()) {
       return false;
@@ -346,6 +347,7 @@ bool API::updateFrame()
   }
   entity_manager_ptr_->broadcastEntityTransform();
   clock_.update();
+  clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   metrics_manager_.calculate();
   return true;
 }
