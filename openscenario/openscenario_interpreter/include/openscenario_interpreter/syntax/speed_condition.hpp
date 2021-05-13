@@ -25,10 +25,10 @@ inline namespace syntax
 {
 /* ---- SpeedCondition ---------------------------------------------------------
  *
- * <xsd:complexType name="SpeedCondition">
- *   <xsd:attribute name="value" type="Double" use="required"/>
- *   <xsd:attribute name="rule" type="Rule" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="SpeedCondition">
+ *    <xsd:attribute name="value" type="Double" use="required"/>
+ *    <xsd:attribute name="rule" type="Rule" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct SpeedCondition
@@ -50,26 +50,9 @@ struct SpeedCondition
 
   auto evaluate()
   {
-#ifndef NDEBUG
-    std::cout << (indent++) << "- BEC.SC:\n";
-#endif
-
-    const auto result = asBoolean(for_each([&](auto && triggering_entity) {
-      const auto result =
-        compare(getEntityStatus(triggering_entity).action_status.twist.linear.x, value);
-#ifndef NDEBUG
-      std::cout << indent << "  " << triggering_entity << "'s speed = ";
-      std::cout << getEntityStatus(triggering_entity).action_status.twist.linear.x;
-      std::cout << " " << compare << " " << value << "? => " << result << std::endl;
-#endif
-      return result;
+    return asBoolean(for_each([&](auto && triggering_entity) {
+      return compare(getEntityStatus(triggering_entity).action_status.twist.linear.x, value);
     }));
-
-#ifndef NDEBUG
-    --indent;
-#endif
-
-    return result;
   }
 };
 }  // namespace syntax

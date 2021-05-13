@@ -45,14 +45,7 @@ struct SimulationTimeCondition
 
   Element result;
 
-  auto evaluate()
-  {
-    result = asBoolean(compare(getCurrentTime(), value));
-#ifndef NDEBUG
-    std::cout << *this << std::endl;
-#endif
-    return result;
-  }
+  auto evaluate() const { return asBoolean(compare(getCurrentTime(), value)); }
 
   friend std::ostream & operator<<(std::ostream & os, const SimulationTimeCondition & condition)
   {

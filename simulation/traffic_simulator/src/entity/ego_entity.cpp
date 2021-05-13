@@ -99,8 +99,19 @@ void EgoEntity::engage()
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const std::string state{autowares.at(name).getAutowareStatus().autoware_state};
-  return state.empty() ? "Unknown" : state;
+  std::stringstream message;
+  {
+    const auto state{autowares.at(name).getAutowareStatus().autoware_state};
+
+    message << (state.empty() ? "Starting" : state)  //
+            << "_("                                  //
+            << std::fixed                            //
+            << std::setprecision(2)                  //
+            << (status_ ? status_->time : 0)         //
+            << ")";
+  }
+
+  return message.str();
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
