@@ -170,7 +170,7 @@ public:
   bool updateFrame();
   bool updateSensorFrame();
 
-  double getCurrentTime() const noexcept { return current_time_; }
+  double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); }
 
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   template <typename... Ts>                                                \
@@ -223,9 +223,6 @@ private:
   const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
   const std::shared_ptr<traffic_simulator::traffic::TrafficController> traffic_controller_ptr_;
-
-  double step_time_;
-  double current_time_;
 
   metrics::MetricsManager metrics_manager_;
   traffic_simulator::SimulationClock clock_;

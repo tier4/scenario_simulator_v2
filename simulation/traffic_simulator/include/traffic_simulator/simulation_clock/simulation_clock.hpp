@@ -40,6 +40,7 @@ public:
   void initialize(double initial_simulation_time, double step_time);
   void update();
   double getCurrentSimulationTime() const { return current_simulation_time_; }
+  double getStepTime() const { return step_time_; }
   rclcpp::Time getCurrentRosTime() const;
 
 private:
