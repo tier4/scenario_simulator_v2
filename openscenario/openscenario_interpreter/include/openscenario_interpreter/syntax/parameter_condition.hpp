@@ -95,26 +95,15 @@ struct ParameterCondition
 
     if (target != std::end(inner_scope.parameters)) {
       const auto iter{overloads.find(std::get<1>(*target).type())};
-
       if (iter != std::end(overloads)) {
-#ifndef NDEBUG
-        std::cout << "ParameterCondition: " << std::get<1>(*target) << " " << compare << " "
-                  << value << " => ";
-#endif
-        const auto result =
-          std::get<1>(*iter)(compare, std::get<1>(*target), value) ? true_v : false_v;
-#ifndef NDEBUG
-        std::cout << result << std::endl;
-#endif
-        return result;
+        return std::get<1>(*iter)(compare, std::get<1>(*target), value) ? true_v : false_v;
       } else {
         throw SemanticError(
-          "No viable operation '" + boost::lexical_cast<std::string>(compare) +
-          "' with parameter '" + parameter_ref + "' and value '" +
-          boost::lexical_cast<std::string>(value) + "'");
+          "No viable operation '", compare, "' with parameter '", parameter_ref, "' and value '",
+          value, "'");
       }
     } else {
-      throw SemanticError("No such parameter '" + parameter_ref + "'");
+      throw SemanticError("No such parameter '", parameter_ref, "'");
     }
   }
 };

@@ -26,9 +26,6 @@
 #include <typeinfo>
 #include <utility>
 
-#define DEBUG() \
-  std::cout << green << __FILE__ << magenta << ":" << cyan << __LINE__ << reset << std::endl
-
 namespace openscenario_interpreter
 {
 template <typename T>

@@ -24,7 +24,6 @@
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
-#include <openscenario_interpreter/utility/verbose.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <string>
@@ -50,45 +49,23 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   const junit_exporter::TestResult FAILURE = junit_exporter::TestResult::FAILURE;
   const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
 
-  decltype(auto) report(
-    const junit_exporter::TestResult & result, const std::string & type,
-    const std::string & what = "")
-  {
-    exporter.addTestCase(
-      script.as<OpenScenario>().scope.scenario.string(),  // XXX DIRTY HACK!!!
-      "scenario_testing", 0, result, type, what);
+  void report(const junit_exporter::TestResult &, const std::string &, const std::string & = "");
 
-    std::cout << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
-    if (not what.empty()) {
-      std::cout << " (" << what.c_str() << ")";
-    }
-    std::cout << "\x1b[0m" << std::endl;
-
-    exporter.write(output_directory + "/result.junit.xml");
-
-    script.reset();
-
-    while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-
-    deactivate();
-  }
-
-#define CATCH(TYPE)                         \
-  catch (const TYPE & error)                \
-  {                                         \
-    if (intended_result == "error") {       \
-      report(SUCCESS, #TYPE " (intended)"); \
-    } else {                                \
-      report(ERROR, #TYPE, error.what());   \
-    }                                       \
+#define CATCH(TYPE)                       \
+  catch (const TYPE & error)              \
+  {                                       \
+    if (intended_result == "error") {     \
+      report(SUCCESS, #TYPE);             \
+    } else {                              \
+      report(ERROR, #TYPE, error.what()); \
+    }                                     \
   }
 
   template <typename Thunk>
   void withExceptionHandler(Thunk && thunk)
   {
     using concealer::AutowareError;
+
     using openscenario_interpreter::ImplementationFault;
     using openscenario_interpreter::SemanticError;
     using openscenario_interpreter::SyntaxError;
@@ -101,17 +78,17 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     catch (const SpecialAction<EXIT_SUCCESS> &) {
       if (intended_result == "success") {
-        report(SUCCESS, "Success (intended)");
+        report(SUCCESS, "Success");
       } else {
-        report(FAILURE, "Success (unintended)", "expected " + intended_result);
+        report(FAILURE, "UnintendedSuccess", "Expected " + intended_result);
       }
     }
 
     catch (const SpecialAction<EXIT_FAILURE> &) {
       if (intended_result == "failure") {
-        report(SUCCESS, "Failure (intended)");
+        report(SUCCESS, "IntendedFailure");
       } else {
-        report(FAILURE, "Failure (unintended)", "expected " + intended_result);
+        report(FAILURE, "Failure", "Expected " + intended_result);
       }
     }
 
@@ -119,10 +96,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     CATCH(ImplementationFault)
     CATCH(SemanticError)
     CATCH(SyntaxError)
+    CATCH(InternalError)  // NOTE: THIS MUST BE LAST OF CATCH STATEMENTS.
 
-    CATCH(InternalError)
-
-    catch (...) { report(ERROR, "UnknownException (unexpected)"); }
+    catch (...) { report(ERROR, "UnknownError", "An unknown exception has occurred"); }
   }
 
 #undef CATCH

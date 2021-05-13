@@ -30,7 +30,7 @@ inline namespace reader
 {
 /* ---- Dynamic Configuration --------------------------------------------------
  *
- * See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
+ *  See https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration
  *
  * -------------------------------------------------------------------------- */
 template <typename Scope>
@@ -41,12 +41,6 @@ auto substitute(std::string attribute, Scope & scope)
   std::smatch match{};
 
   while (std::regex_match(attribute, match, substitution_syntax)) {
-    // std::cout << "match 1: " << match.str(1) << std::endl;
-    // std::cout << "match 2: " << match.str(2) << std::endl;
-    // std::cout << "match 3: " << match.str(3) << std::endl;
-    // std::cout << "match 4: " << match.str(4) << std::endl;
-    // std::cout << "match 5: " << match.str(5) << std::endl;
-
     static const std::unordered_map<
       std::string, std::function<std::string(const std::string &, Scope &)> >
       substitutions{
@@ -58,7 +52,6 @@ auto substitute(std::string attribute, Scope & scope)
         {"var",
          [](auto && name, auto && scope) -> String {
            const auto iter{scope.parameters.find(name)};
-
            if (iter != std::end(scope.parameters)) {
              return boost::lexical_cast<String>(std::get<1>(*iter));
            } else {
@@ -67,8 +60,6 @@ auto substitute(std::string attribute, Scope & scope)
          }},
 
         {"dirname", [](auto &&, auto && scope) { return scope.scenario.parent_path().string(); }}};
-
-    // std::cout << "Substitute: " << cyan << attribute << reset << " => ";
 
     const auto iter{substitutions.find(match.str(3))};
 
@@ -79,8 +70,6 @@ auto substitute(std::string attribute, Scope & scope)
       ss << "Unknown substitution '" << match.str(3) << "' specified.";
       throw SyntaxError(ss.str());
     }
-
-    // std::cout << cyan << attribute << reset << std::endl;
   }
 
   return attribute;

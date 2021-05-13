@@ -103,26 +103,8 @@ struct RelativeDistanceCondition
 
   auto evaluate()
   {
-#ifndef NDEBUG
-    std::cout << (indent++) << "- BEC.RDC:\n";
-#endif
-
-    const auto result = asBoolean(for_each([&](auto && triggering_entity) {
-      const auto result = (*this)(triggering_entity);
-#ifndef NDEBUG
-      std::cout << indent << "  " << triggering_entity << ": ";
-      std::cout << "distance = " << distance(triggering_entity);
-      std::cout << " " << compare << " " << value << "? => " << std::boolalpha << result;
-      std::cout << std::endl;
-#endif
-      return result;
-    }));
-
-#ifndef NDEBUG
-    --indent;
-#endif
-
-    return result;
+    return asBoolean(
+      for_each([&](auto && triggering_entity) { return (*this)(triggering_entity); }));
   }
 };
 }  // namespace syntax

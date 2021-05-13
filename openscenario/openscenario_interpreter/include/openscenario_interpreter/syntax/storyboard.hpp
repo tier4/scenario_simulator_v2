@@ -83,9 +83,6 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     return std::all_of(std::begin(*this), std::end(*this), check);
   }
 
-#define DEBUG_VALUE(...) \
-  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
-
   bool engaged = false;
 
   auto run()
@@ -112,7 +109,8 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
         }
         engaged = true;
       } else {
-        throw concealer::AutowareError("SOMETHING WENT WRONG.");
+        throw concealer::AutowareError(
+          "Autoware does not respond. It is likely that some nodes were corrupted during launch");
       }
     } else if (engaged) {
       for (auto && story : *this) {

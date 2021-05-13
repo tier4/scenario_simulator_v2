@@ -47,6 +47,38 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 #undef DECLARE_PARAMETER
 }
 
+void Interpreter::report(
+  const junit_exporter::TestResult & result,  //
+  const std::string & type,                   //
+  const std::string & what)
+{
+  std::stringstream message;
+  {
+    message << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
+
+    if (not what.empty()) {
+      message << " (" << what.c_str() << ")";
+    }
+
+    message << "\x1b[0m";
+
+    RCLCPP_INFO_STREAM(get_logger(), message.str());
+  }
+
+  exporter.addTestCase(  // XXX DIRTY HACK!!!
+    script.as<OpenScenario>().scope.scenario.string(), "scenario_testing", 0, result, type, what);
+
+  exporter.write(output_directory + "/result.junit.xml");
+
+  script.reset();
+
+  while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+
+  deactivate();
+}
+
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 try {
   std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -69,13 +101,13 @@ try {
     script.as<OpenScenario>().scope.logic_file.string(),      //
     30);
 
-  const auto interval_upper_bound = 1 / local_frame_rate * local_real_time_factor;
-
-  initialize(local_real_time_factor, interval_upper_bound);
+  initialize(
+    local_real_time_factor,
+    1 / local_frame_rate * local_real_time_factor);  // interval_upper_bound
 
   return Interpreter::Result::SUCCESS;
 } catch (const openscenario_interpreter::SyntaxError & error) {
-  std::cerr << "\x1b[1;31m" << error.what() << "\x1b[0m" << std::endl;
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << error.what() << "\x1b[0m");
   return Interpreter::Result::FAILURE;
 }
 
@@ -88,22 +120,15 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
           if (!script.as<OpenScenario>().complete()) {
             script.as<OpenScenario>().evaluate();
 #ifndef NDEBUG
-            RCLCPP_INFO(
-              get_logger(), "[%d standby (=> %d) => %d running (=> %d) => %d complete]\n",
-              openscenario_interpreter::standby_state.use_count() - 1,
-              openscenario_interpreter::start_transition.use_count() - 1,
-              openscenario_interpreter::running_state.use_count() - 1,
-              openscenario_interpreter::stop_transition.use_count() - 1,
-              openscenario_interpreter::complete_state.use_count() - 1);
+            RCLCPP_INFO_STREAM(
+              get_logger(),
+              "[" << (openscenario_interpreter::standby_state.use_count() - 1) << " standby (=> "
+                  << (openscenario_interpreter::start_transition.use_count() - 1) << ") => "
+                  << (openscenario_interpreter::running_state.use_count() - 1) << " running (=> "
+                  << (openscenario_interpreter::stop_transition.use_count() - 1) << ") => "
+                  << (openscenario_interpreter::complete_state.use_count() - 1) << " complete]");
 #endif
           }
-          // else {
-          //   if (intended_result == "success") {
-          //     report(SUCCESS, "intended-success");
-          //   } else {
-          //     report(FAILURE, "unintended-success", "expected " + intended_result);
-          //   }
-          // }
         }
       });
     });

@@ -21,17 +21,16 @@
 #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                               \
   template <typename Thunk = void (*)(), typename Seconds = std::chrono::seconds>                 \
   void waitForAutowareStateToBe##STATE(                                                           \
-    Thunk thunk =                                                                                 \
-      []() {                                                                                      \
-        std::cout << "Simulator waiting for Autoware state to be " #STATE "." << std::endl;       \
-      },                                                                                          \
-    Seconds interval = std::chrono::seconds(1))                                                   \
+    Thunk thunk = []() {}, Seconds interval = std::chrono::seconds(1))                            \
   {                                                                                               \
     static const auto duration_max = std::chrono::seconds(20);                                    \
     Seconds duration{0};                                                                          \
     for (rclcpp::WallRate rate{interval}; not static_cast<Node &>(*this).is##STATE();             \
          rate.sleep()) {                                                                          \
       if ((duration += interval) < duration_max) {                                                \
+        RCLCPP_INFO_STREAM(                                                                       \
+          static_cast<Node &>(*this).get_logger(),                                                \
+          "Simulator waiting for Autoware state to be " #STATE ".");                              \
         thunk();                                                                                  \
       } else {                                                                                    \
         const auto current_state = static_cast<Node &>(*this).getAutowareStatus().autoware_state; \
