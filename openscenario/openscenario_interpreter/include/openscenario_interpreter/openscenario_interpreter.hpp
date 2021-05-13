@@ -24,7 +24,6 @@
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
-#include <openscenario_interpreter/utility/verbose.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <string>
