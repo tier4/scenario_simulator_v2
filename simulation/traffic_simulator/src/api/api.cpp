@@ -53,7 +53,7 @@ bool API::spawn(
     if (
       !entity_manager_ptr_->entityExists(name) &&
       !entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
-        name, lanelet2_map_osm, step_time_, params)) {
+        name, lanelet2_map_osm, clock_.getCurrentSimulationTime(), params)) {
       return false;
     }
     if (standalone_mode) {
@@ -144,7 +144,7 @@ bool API::setEntityStatus(
 {
   const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
   openscenario_msgs::msg::EntityStatus status;
-  status.time = current_time_;
+  status.time = clock_.getCurrentSimulationTime();
   status.pose = pose;
   const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(pose);
   status.action_status = action_status;
@@ -234,8 +234,7 @@ bool API::setEntityStatus(
 
 bool API::initialize(double realtime_factor, double step_time)
 {
-  step_time_ = step_time;
-  current_time_ = -1 * initialize_duration;
+  clock_.initialize(-1 * initialize_duration, step_time);
   if (standalone_mode) {
     return true;
   }
@@ -279,7 +278,7 @@ bool API::updateSensorFrame()
     return true;
   }
   simulation_api_schema::UpdateSensorFrameRequest req;
-  req.set_current_time(current_time_);
+  req.set_current_time(clock_.getCurrentSimulationTime());
   simulation_api_schema::UpdateSensorFrameResponse res;
   update_sensor_frame_client_.call(req, res);
   return res.result().success();
@@ -327,18 +326,19 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  entity_manager_ptr_->update(current_time_, step_time_);
+  entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
   if (!standalone_mode) {
     simulation_api_schema::UpdateFrameRequest req;
-    req.set_current_time(current_time_);
+    req.set_current_time(clock_.getCurrentSimulationTime());
     simulation_api_schema::UpdateFrameResponse res;
     update_frame_client_.call(req, res);
     if (!res.result().success()) {
       return false;
     }
     entity_manager_ptr_->broadcastEntityTransform();
-    current_time_ = current_time_ + step_time_;
+    clock_.update();
+    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     metrics_manager_.calculate();
     if (!updateEntityStatusInSim()) {
       return false;
@@ -346,7 +346,8 @@ bool API::updateFrame()
     return updateSensorFrame();
   }
   entity_manager_ptr_->broadcastEntityTransform();
-  current_time_ = current_time_ + step_time_;
+  clock_.update();
+  clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   metrics_manager_.calculate();
   return true;
 }
