@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package rosgraph_msgs;
+
+/**
+ * Protobuf defintion of the rosgraph_msgs/msg/Clock type in ROS2.
+**/
+message Clock {
+  
+}

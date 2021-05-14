@@ -23,6 +23,8 @@ include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
 set(PROTO_FILES
+  "proto/builtin_interfaces.proto"
+  "proto/rosgraph_msgs.proto"
   "proto/geometry_msgs.proto"
   "proto/openscenario_msgs.proto"
   "proto/simulation_api_schema.proto"
