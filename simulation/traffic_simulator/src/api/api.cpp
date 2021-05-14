@@ -331,6 +331,7 @@ bool API::updateFrame()
   if (!standalone_mode) {
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(clock_.getCurrentSimulationTime());
+    simulation_interface::toProto(clock_.getCurrentRosTime(), *req.mutable_current_ros_time());
     simulation_api_schema::UpdateFrameResponse res;
     update_frame_client_.call(req, res);
     if (!res.result().success()) {

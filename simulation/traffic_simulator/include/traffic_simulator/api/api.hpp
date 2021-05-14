@@ -172,7 +172,6 @@ public:
   bool initialize(double realtime_factor, double step_time);
 
   bool updateFrame();
-  bool updateSensorFrame();
 
   double getCurrentTime() const noexcept { return clock_.getCurrentSimulationTime(); }
 
@@ -214,6 +213,7 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
+  bool updateSensorFrame();
   bool updateEntityStatusInSim();
 
   template <typename Parameters>

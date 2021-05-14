@@ -120,6 +120,7 @@ private:
   double realtime_factor_;
   double step_time_;
   double current_time_;
+  rclcpp::Time current_ros_time_;
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
   zeromq::MultiServer server_;
