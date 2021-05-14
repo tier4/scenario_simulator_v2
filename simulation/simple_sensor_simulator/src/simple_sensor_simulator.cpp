@@ -30,7 +30,7 @@ namespace simple_sensor_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_sensor_simulator", options),
-  sensor_sim_(get_clock()),
+  sensor_sim_(),
   server_(
     simulation_interface::protocol, simulation_interface::HostName::ANY,
     std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
@@ -82,6 +82,9 @@ void ScenarioSimulator::updateFrame(
     return;
   }
   current_time_ = req.current_time();
+  builtin_interfaces::msg::Time t;
+  simulation_interface::toMsg(req.current_ros_time(), t);
+  current_ros_time_ = t;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
 }
@@ -188,7 +191,10 @@ void ScenarioSimulator::updateSensorFrame(
     res.mutable_result()->set_success(false);
     res.mutable_result()->set_description("timestamp does not match");
   }
-  sensor_sim_.updateSensorFrame(current_time_, entity_status_);
+  builtin_interfaces::msg::Time t;
+  simulation_interface::toMsg(req.current_ros_time(), t);
+  current_ros_time_ = t;
+  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
   res = simulation_api_schema::UpdateSensorFrameResponse();
   res.mutable_result()->set_success(true);
 }

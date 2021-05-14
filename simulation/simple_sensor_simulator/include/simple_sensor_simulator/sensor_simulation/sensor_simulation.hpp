@@ -28,7 +28,6 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  explicit SensorSimulation(const std::shared_ptr<rclcpp::Clock> & clock_ptr);
   void attachLidarSensor(
     const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> publisher_ptr);
@@ -38,12 +37,12 @@ public:
     std::shared_ptr<rclcpp::Publisher<autoware_perception_msgs::msg::DynamicObjectArray>>
       publisher_ptr);
   void updateSensorFrame(
-    double current_time, const std::vector<openscenario_msgs::EntityStatus> & status);
+    double current_time, const rclcpp::Time & current_ros_time,
+    const std::vector<openscenario_msgs::EntityStatus> & status);
 
 private:
   std::vector<LidarSensor> lidar_sensors_;
   std::vector<DetectionSensor> detection_sensors_;
-  std::shared_ptr<rclcpp::Clock> clock_ptr_;
 };
 }  // namespace simple_sensor_simulator
 
