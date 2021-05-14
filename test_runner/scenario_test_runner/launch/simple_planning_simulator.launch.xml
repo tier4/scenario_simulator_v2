@@ -1,9 +1,0 @@
-<launch>
-  <node pkg="topic_tools" exec="relay" name="twist_relay" output="log">
-    <param name="input_topic" value="/vehicle/status/twist" />
-    <param name="output_topic" value="/localization/twist" />
-    <param name="type" value="geometry_msgs/msg/TwistStamped" />
-  </node>
-
-  <executable cmd="ros2 bag record -a --compression-mode file --compression-format zstd --output $(var output_directory)" output="log"/>
-</launch>
