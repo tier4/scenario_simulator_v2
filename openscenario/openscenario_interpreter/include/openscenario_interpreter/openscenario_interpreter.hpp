@@ -66,10 +66,13 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   void withExceptionHandler(Thunk && thunk)
   {
     using common::AutowareError;
+    using common::SemanticError;
+    using common::SimulationError;
+    using common::SyntaxError;
 
-    using openscenario_interpreter::ImplementationFault;
-    using openscenario_interpreter::SemanticError;
-    using openscenario_interpreter::SyntaxError;
+    using DeprecatedImplementationFault = openscenario_interpreter::ImplementationFault;
+    using DeprecatedSemanticError = openscenario_interpreter::SemanticError;
+    using DeprecatedSyntaxError = openscenario_interpreter::SyntaxError;
 
     using InternalError = std::exception;
 
@@ -92,6 +95,10 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
         report(FAILURE, "Failure", "Expected " + intended_result);
       }
     }
+
+    CATCH(DeprecatedImplementationFault)  // TODO (yamacir-kit): REMOVE THIS!!!
+    CATCH(DeprecatedSemanticError)        // TODO (yamacir-kit): REMOVE THIS!!!
+    CATCH(DeprecatedSyntaxError)          // TODO (yamacir-kit): REMOVE THIS!!!
 
     CATCH(AutowareError)
     CATCH(ImplementationFault)
