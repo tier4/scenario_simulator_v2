@@ -26,8 +26,8 @@ inline namespace scenario_simulator_exception
 {
 auto concatenate = [](auto &&... xs) {
   auto write = [](auto && os, auto && x) {
-    os.get() << x;
-    return std::forward<decltype(x)>(x);
+    os.get() << std::forward<decltype(x)>(x);
+    return std::forward<decltype(os)>(os);
   };
   std::stringstream result;
   fold_left(write, std::ref(result), std::forward<decltype(xs)>(xs)...);
