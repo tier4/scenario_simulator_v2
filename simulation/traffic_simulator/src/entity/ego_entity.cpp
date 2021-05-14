@@ -90,9 +90,9 @@ EgoEntity::~EgoEntity() { autowares.erase(name); }
 
 void EgoEntity::engage()
 {
-  while (not ready()) {  // guard
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-  }
+  // while (not ready()) {  // guard
+  //   std::this_thread::sleep_for(std::chrono::seconds(1));
+  // }
 
   autowares.at(name).engage();
 }
@@ -104,7 +104,7 @@ auto EgoEntity::getCurrentAction() const -> const std::string
     const auto state{autowares.at(name).getAutowareStatus().autoware_state};
 
     message << (state.empty() ? "Starting" : state)  //
-            << "_("                                  //
+            << "_(t_=_"                              //
             << std::fixed                            //
             << std::setprecision(2)                  //
             << (status_ ? status_->time : 0)         //
