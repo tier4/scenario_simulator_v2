@@ -19,7 +19,7 @@
 
 namespace concealer
 {
-struct AutowareError : public std::runtime_error
+struct [[deprecated]] AutowareError : public std::runtime_error
 {
   using std::runtime_error::runtime_error;
 

@@ -109,7 +109,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
         }
         engaged = true;
       } else {
-        throw concealer::AutowareError(
+        throw common::AutowareError(
           "Autoware does not respond. It is likely that some nodes were corrupted during launch");
       }
     } else if (engaged) {

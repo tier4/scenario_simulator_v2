@@ -26,6 +26,7 @@
 #include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <utility>
 
@@ -64,7 +65,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   template <typename Thunk>
   void withExceptionHandler(Thunk && thunk)
   {
-    using concealer::AutowareError;
+    using common::AutowareError;
 
     using openscenario_interpreter::ImplementationFault;
     using openscenario_interpreter::SemanticError;

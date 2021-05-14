@@ -19,6 +19,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp_lifecycle</depend>
+  <depend>scenario_simulator_exception</depend>
   <depend>std_msgs</depend>
   <depend>traffic_simulator</depend>
 
