@@ -12,21 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__AUTOWARE_ERROR_HPP_
-#define CONCEALER__AUTOWARE_ERROR_HPP_
-
-#include <stdexcept>
-
-namespace concealer
-{
-struct AutowareError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-
-  virtual ~AutowareError() = default;
-
-  virtual void raise() const { throw *this; }
-};
-}  // namespace concealer
-
-#endif  // CONCEALER__AUTOWARE_ERROR_HPP_
+#include <scenario_simulator_exception/exception.hpp>

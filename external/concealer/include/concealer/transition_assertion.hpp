@@ -16,7 +16,7 @@
 #define CONCEALER__TRANSITION_ASSERTION_HPP_
 
 #include <chrono>
-#include <concealer/autoware_error.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 #define DEFINE_WAIT_FOR_AUTOWARE_STATE_TO_BE(STATE)                                               \
   template <typename Thunk = void (*)(), typename Seconds = std::chrono::seconds>                 \
@@ -34,15 +34,14 @@
         thunk();                                                                                  \
       } else {                                                                                    \
         const auto current_state = static_cast<Node &>(*this).getAutowareStatus().autoware_state; \
-        std::stringstream what;                                                                   \
-        what << "Simulator waited " << duration_max.count()                                       \
-             << " seconds, expecting the Autoware state to transitioning to " << #STATE           \
-             << ", but there was no change. The current Autoware state is "                       \
-             << (current_state.empty() ? "NOT PUBLISHED YET" : current_state)                     \
-             << ". This error is most likely due to the Autoware state transition "               \
-             << "conditions changing with the update. Please report this error to "               \
-             << "the developer. This error message was written by @yamacir-kit.";                 \
-        throw AutowareError(what.str());                                                          \
+        throw common::AutowareError(                                                              \
+          "Simulator waited ", duration_max.count(),                                              \
+          " seconds, expecting the Autoware state to transitioning to " #STATE                    \
+          ", but there was no change. The current Autoware state is ",                            \
+          (current_state.empty() ? "NOT PUBLISHED YET" : current_state),                          \
+          ". This error is most likely due to the Autoware state transition ",                    \
+          "conditions changing with the update. Please report this error to ",                    \
+          "the developer. This error message was written by @yamacir-kit.");                      \
       }                                                                                           \
     }                                                                                             \
     RCLCPP_INFO_STREAM(static_cast<Node &>(*this).get_logger(), "Autoware is " #STATE " now.");   \

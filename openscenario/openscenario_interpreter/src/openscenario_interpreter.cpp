@@ -129,6 +129,8 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
                   << (openscenario_interpreter::complete_state.use_count() - 1) << " complete]");
 #endif
           }
+        } else {
+          throw ImplementationFault("No script evaluable");
         }
       });
     });
@@ -138,13 +140,15 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 
 Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 {
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;32mDeactivating scenario.\x1b[0m");
+  connection.~API();
   timer.reset();
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;32mDeactivated scenario.\x1b[0m");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
-  connection.~API();
   return Interpreter::Result::SUCCESS;
 }
 

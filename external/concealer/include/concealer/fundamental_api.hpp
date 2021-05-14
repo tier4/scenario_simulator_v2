@@ -31,7 +31,6 @@
 #endif
 
 #include <cassert>
-#include <concealer/autoware_error.hpp>
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -40,6 +39,7 @@
 #include <limits>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <type_traits>
 #include <utility>
 
@@ -207,7 +207,7 @@ public:
   void checkAutowareState()
   {
     if (isReady() and isEmergency()) {
-      // throw AutowareError("Autoware is in emergency state now");
+      // throw common::AutowareError("Autoware is in emergency state now");
     }
   }
 
