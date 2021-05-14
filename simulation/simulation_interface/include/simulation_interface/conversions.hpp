@@ -15,10 +15,14 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
+#include <builtin_interfaces.pb.h>
 #include <geometry_msgs.pb.h>
 #include <openscenario_msgs.pb.h>
+#include <rosgraph_msgs.pb.h>
 #include <simulation_api_schema.pb.h>
 
+#include <builtin_interfaces/msg/duration.hpp>
+#include <builtin_interfaces/msg/time.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -38,6 +42,7 @@
 #include <openscenario_msgs/msg/performance.hpp>
 #include <openscenario_msgs/msg/property.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
+#include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/constants.hpp>
 #include <string>
 #include <vector>
@@ -129,6 +134,14 @@ void toProto(
   const openscenario_msgs::msg::EntityStatus & status, openscenario_msgs::EntityStatus & proto);
 void toMsg(
   const openscenario_msgs::EntityStatus & proto, openscenario_msgs::msg::EntityStatus & status);
+void toProto(
+  const builtin_interfaces::msg::Duration & duration, builtin_interfaces::Duration & proto);
+void toMsg(
+  const builtin_interfaces::Duration & proto, builtin_interfaces::msg::Duration & duration);
+void toProto(const builtin_interfaces::msg::Time & time, builtin_interfaces::Time & proto);
+void toMsg(const builtin_interfaces::Time & proto, builtin_interfaces::msg::Time & time);
+void toProto(const rosgraph_msgs::msg::Clock & time, rosgraph_msgs::Clock & proto);
+void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

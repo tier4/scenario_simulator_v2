@@ -12,6 +12,8 @@
   <depend>rclcpp</depend>
   <depend>geometry_msgs</depend>
   <depend>openscenario_msgs</depend>
+  <depend>builtin_interfaces</depend>
+  <depend>rosgraph_msgs</depend>
   <depend>protobuf</depend>
   <depend>protobuf-dev</depend>
   <depend>libzmqpp-dev</depend>

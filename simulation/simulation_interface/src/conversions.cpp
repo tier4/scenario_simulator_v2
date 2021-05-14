@@ -308,4 +308,39 @@ void toMsg(
   toMsg(proto.lanelet_pose(), status.lanelet_pose);
   status.lanelet_pose_valid = proto.lanelet_pose_valid();
 }
+
+void toProto(
+  const builtin_interfaces::msg::Duration & duration, builtin_interfaces::Duration & proto)
+{
+  proto.set_sec(duration.sec);
+  proto.set_nanosec(duration.nanosec);
+}
+
+void toMsg(const builtin_interfaces::Duration & proto, builtin_interfaces::msg::Duration & duration)
+{
+  duration.sec = proto.sec();
+  duration.nanosec = proto.nanosec();
+}
+
+void toProto(const builtin_interfaces::msg::Time & time, builtin_interfaces::Time & proto)
+{
+  proto.set_sec(time.sec);
+  proto.set_nanosec(time.nanosec);
+}
+
+void toMsg(const builtin_interfaces::Time & proto, builtin_interfaces::msg::Time & time)
+{
+  time.sec = proto.sec();
+  time.nanosec = proto.nanosec();
+}
+
+void toProto(const rosgraph_msgs::msg::Clock & clock, rosgraph_msgs::Clock & proto)
+{
+  toProto(clock.clock, *proto.mutable_clock());
+}
+
+void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & clock)
+{
+  toMsg(proto.clock(), clock.clock);
+}
 }  // namespace simulation_interface
