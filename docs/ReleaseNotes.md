@@ -1,6 +1,6 @@
 # Release Notes
 
-## Ver 0.1.0 (Next Release Version)
+## Difference between latest release and master
 - Synchronize ROS time between traffic_simulator and sensor_simulator.
 
 ## Ver 0.0.1
