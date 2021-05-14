@@ -44,7 +44,7 @@ def convert_scenarios(scenarios: List[Scenario], output_directory: Path):
         if each.path.suffix == ".xosc":
             result.append(each)
 
-        else:  # == '.yaml'
+        else:  # == '.yaml' or == '.yml'
             for path in convert(each.path, output_directory / each.path.stem, False):
                 result.append(Scenario(path, each.expect, each.frame_rate))
 

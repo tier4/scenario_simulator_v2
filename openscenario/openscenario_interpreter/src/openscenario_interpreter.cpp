@@ -54,7 +54,7 @@ void Interpreter::report(
 {
   std::stringstream message;
   {
-    message << (result == SUCCESS ? "\x1b[1;32m" : "\x1b[1;31m") << type.c_str();
+    message << (result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m") << type.c_str();
 
     if (not what.empty()) {
       message << " (" << what.c_str() << ")";
@@ -76,11 +76,16 @@ void Interpreter::report(
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivate myself.\x1b[0m");
   deactivate();
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivated myself.\x1b[0m");
 }
 
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 try {
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mConfiguring.\x1b[0m");
+
+  // NOTE: Wait for parameters to be set.
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
 #define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
@@ -113,6 +118,8 @@ try {
 
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mActivating.\x1b[0m");
+
   timer = create_wall_timer(
     std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000)), [this]() {
       withExceptionHandler([this]() {
@@ -140,26 +147,28 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 
 Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;32mDeactivating scenario.\x1b[0m");
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivating.\x1b[0m");
   connection.~API();
   timer.reset();
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;32mDeactivated scenario.\x1b[0m");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mCleaningUp.\x1b[0m");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
 {
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mShuttingDown.\x1b[0m");
   timer.reset();
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_error(const rclcpp_lifecycle::State &)
 {
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mErrorProcessing.\x1b[0m");
   timer.reset();
   return Interpreter::Result::SUCCESS;
 }

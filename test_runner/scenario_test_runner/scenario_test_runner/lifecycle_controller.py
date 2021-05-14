@@ -135,28 +135,81 @@ class LifecycleController(Node):
         ).done():
             self.get_logger().info("Failed to set parameters. Resending...")
 
-        self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
+        self.get_logger().info("\x1b[33mConfigure interpreter.\x1b[0m")
+        state_expects = "unconfigured"
+        if self.get_lifecycle_state() == state_expects:
+            self.set_lifecycle_state(Transition.TRANSITION_CONFIGURE)
+            self.get_logger().info(
+                "\x1b[33mInterpreter is " + self.get_lifecycle_state() + " now.\x1b[0m"
+            )
+        else:
+            self.get_logger().error(
+                "\x1b[1;31mInterpreter is "
+                + self.get_lifecycle_state()
+                + " now, but "
+                + state_expects
+                + ".\x1b[0m"
+            )
 
     def activate_node(self):
         """Activate node to chagnge state from inactive to activate."""
-        self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
-        # Logger.print_info(
-        #     "Activate -> scenario runner state is " + self.get_lifecycle_state())
-        # self.get_logger().info(self.get_lifecycle_state())
+        self.get_logger().info("\x1b[33mActivate interpreter.\x1b[0m")
+        state_expects = "inactive"
+        if self.get_lifecycle_state() == state_expects:
+            self.set_lifecycle_state(Transition.TRANSITION_ACTIVATE)
+        else:
+            self.get_logger().error(
+                "\x1b[1;31mInterpreter is "
+                + self.get_lifecycle_state()
+                + " now, but "
+                + state_expects
+                + ".\x1b[0m"
+            )
 
     def deactivate_node(self):
         """Dectivate node to chagnge state from active to inactive."""
-        self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
-        # Logger.print_info(
-        #     "Deactivate -> scenario runner state is " + self.get_lifecycle_state())
-        # self.get_logger().info(self.get_lifecycle_state())
+        self.get_logger().info("\x1b[33mDectivate interpreter.\x1b[0m")
+        state_expects = "active"
+        if self.get_lifecycle_state() == state_expects:
+            self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)
+        else:
+            self.get_logger().error(
+                "\x1b[1;31mInterpreter is "
+                + self.get_lifecycle_state()
+                + " now, but "
+                + state_expects
+                + ".\x1b[0m"
+            )
 
     def cleanup_node(self):
         """Cleanup node to change state from inactive to unconfigure."""
-        self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
-        # Logger.print_info(
-        #     "CleanUp -> scenario runner state is " + self.get_lifecycle_state())
-        # self.get_logger().info(self.get_lifecycle_state())
+        self.get_logger().info("\x1b[33mCleanup interpreter.\x1b[0m")
+        state_expects = "inactive"
+        if self.get_lifecycle_state() == state_expects:
+            self.set_lifecycle_state(Transition.TRANSITION_CLEANUP)
+        else:
+            self.get_logger().error(
+                "\x1b[1;31mInterpreter is "
+                + self.get_lifecycle_state()
+                + " now, but "
+                + state_expects
+                + ".\x1b[0m"
+            )
+
+    def shutdown(self):
+        """Shutdown lifecycle controller."""
+        self.get_logger().info("\x1b[33mShutdown interpreter.\x1b[0m")
+        state_expects = "unconfigured"
+        if self.get_lifecycle_state() == state_expects:
+            self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
+        else:
+            self.get_logger().error(
+                "\x1b[1;31mInterpreter is "
+                + self.get_lifecycle_state()
+                + " now, but "
+                + state_expects
+                + ".\x1b[0m"
+            )
 
     def set_lifecycle_state(self, transition_id):
         """
@@ -195,12 +248,6 @@ class LifecycleController(Node):
         executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
         rclpy.spin_until_future_complete(self, future, executor=executor)
         return future.result().current_state.label
-
-    def shutdown(self):
-        """Shutdown lifecycle controller."""
-        self.set_lifecycle_state(Transition.TRANSITION_UNCONFIGURED_SHUTDOWN)
-        # Logger.print_info(self.get_lifecycle_state())
-        # self.destroy_node()
 
 
 def main(args=None):
