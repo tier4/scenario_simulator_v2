@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "geometry_msgs.proto";
 import "openscenario_msgs.proto";
+import "builtin_interfaces.proto";
 package simulation_api_schema;
 
 /**
@@ -68,6 +69,7 @@ message InitializeResponse
 message UpdateFrameRequest
 {
     double current_time = 1; // Current simulation time
+    builtin_interfaces.Time current_ros_time = 2; // Current ROS time
 }
 
 /**
@@ -182,6 +184,7 @@ message AttachDetectionSensorResponse
 message UpdateSensorFrameRequest
 {
     double current_time = 1; // Current simulation timestamp.
+    builtin_interfaces.Time current_ros_time = 2; // Current ROS time
 }
 
 /**
