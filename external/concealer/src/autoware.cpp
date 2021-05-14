@@ -43,8 +43,7 @@ Autoware::~Autoware()
   }
 
   RCLCPP_INFO_STREAM(
-    get_logger(),
-    "\x1b[1;32mShutting down Autoware: (2/3) Waiting for Autoware to be exited.\x1b[0m");
+    get_logger(), "\x1b[1;32mShutting down Autoware: (2/3) Terminating Autoware.\x1b[0m");
   {
     sigset_t mask{};
     {
@@ -85,7 +84,9 @@ Autoware::~Autoware()
     }
   }
 
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;32mShutting down Autoware: (3/3) Cleanup.\x1b[0m");
+  RCLCPP_INFO_STREAM(
+    get_logger(),
+    "\x1b[1;32mShutting down Autoware: (3/3) Waiting for Autoware to be exited.\x1b[0m");
   {
     int status = 0;
 
