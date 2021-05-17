@@ -17,7 +17,6 @@
 
 #include <limits>
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <utility>
 #include <vector>

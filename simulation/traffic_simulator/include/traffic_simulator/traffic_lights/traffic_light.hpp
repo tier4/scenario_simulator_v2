@@ -20,7 +20,6 @@
 #include <limits>
 #include <stdexcept>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_phase.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <unordered_map>

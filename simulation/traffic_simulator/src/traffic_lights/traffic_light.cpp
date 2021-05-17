@@ -16,7 +16,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <unordered_map>
 #include <utility>

@@ -18,7 +18,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/exception.hpp>
 #include <unordered_map>
 #include <vector>
 

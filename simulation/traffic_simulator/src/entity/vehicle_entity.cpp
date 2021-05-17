@@ -18,7 +18,6 @@
 #include <memory>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <string>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <vector>
 

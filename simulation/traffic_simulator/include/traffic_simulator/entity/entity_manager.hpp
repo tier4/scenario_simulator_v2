@@ -35,7 +35,6 @@
 #include <string>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
