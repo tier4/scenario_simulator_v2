@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -38,10 +39,9 @@ std::istream & operator>>(std::istream & is, TrafficLightColor & datum)
   try {
     datum = conversions.at(value);
   } catch (const std::out_of_range &) {
-    std::stringstream what;
-    what << "An invalid value '" << value
-         << "' was specified for type 'traffic_simulator::TrafficLightColor'.";
-    throw std::runtime_error(what.str());
+    ;
+    THROW_SIMULATION_ERROR(
+      "an invalid value : ", value, "was specified for type 'traffic_simulator::TrafficLightColor'")
   }
 
   return is;
@@ -107,10 +107,9 @@ std::istream & operator>>(std::istream & is, TrafficLightArrow & datum)
   try {
     datum = conversions.at(value);
   } catch (const std::out_of_range &) {
-    std::stringstream what;
-    what << "An invalid value '" << value
-         << "' was specified for type 'traffic_simulator::TrafficLightArrow'.";
-    throw std::runtime_error(what.str());
+    THROW_SIMULATION_ERROR(
+      "An invalid value : ", value,
+      " was specified for type 'traffic_simulator::TrafficLightArrow'")
   }
 
   return is;

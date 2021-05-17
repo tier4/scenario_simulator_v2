@@ -298,11 +298,10 @@ void EgoEntity::requestAssignRoute(
 
 void EgoEntity::requestLaneChange(const std::int64_t)
 {
-  std::stringstream what;
-  what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. "
-       << "In general, such a request is an error, "
-       << "since Ego cars make autonomous decisions about everything but their destination.";
-  throw std::runtime_error(what.str());
+  THROW_SEMANTIC_ERROR(
+    "From scenario, a lane change was requested to Ego type entity ", name,
+    " In general, such a request is an error, since Ego cars make autonomous decisions about "
+    "everything but their destination.")
 }
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
