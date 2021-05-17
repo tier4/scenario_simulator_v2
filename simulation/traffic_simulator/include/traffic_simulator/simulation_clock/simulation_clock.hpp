@@ -20,20 +20,6 @@
 
 namespace traffic_simulator
 {
-class SimulationClockError : public std::runtime_error
-{
-public:
-  explicit SimulationClockError(const char * message) : runtime_error(message) {}
-  explicit SimulationClockError(std::string message) : runtime_error(message.c_str()) {}
-  explicit SimulationClockError(std::string message, const char * file, int line)
-  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line))
-  {
-  }
-};
-
-#define THROW_SIMULATION_CLOCK_ERROR(description) \
-  throw SimulationClockError(description, __FILE__, __LINE__);
-
 class SimulationClock : rclcpp::Clock
 {
 public:
