@@ -20,6 +20,7 @@
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 
 namespace metrics
@@ -35,22 +36,8 @@ public:
   }
 };
 
-class MetricsCalculationError : public std::runtime_error
-{
-public:
-  explicit MetricsCalculationError(const char * message) : runtime_error(message) {}
-  explicit MetricsCalculationError(std::string message) : runtime_error(message.c_str()) {}
-  explicit MetricsCalculationError(std::string message, const char * file, int line)
-  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line))
-  {
-  }
-};
-
 #define SPECIFICATION_VIOLATION_ERROR(description) \
   SpecificationViolationError(description, __FILE__, __LINE__)
-
-#define THROW_METRICS_CALCULATION_ERROR(description) \
-  throw MetricsCalculationError(description, __FILE__, __LINE__);
 
 enum class MetricLifecycle { INACTIVE, ACTIVE, FAILURE, SUCCESS };
 
