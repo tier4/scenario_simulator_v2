@@ -16,6 +16,7 @@
 #include <limits>
 #include <memory>
 #include <queue>
+#include <scenario_simulator_exception/exception.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -99,12 +100,11 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   }
   auto status0 = getEntityStatus(name0);
   if (!status0) {
-    throw traffic_simulator::SimulationRuntimeError("failed to calculate map pose : " + name0);
-    return false;
+    THROW_SEMANTIC_ERROR("eneity : ", name0, " status does not exist.");
   }
   auto status1 = getEntityStatus(name1);
   if (!status1) {
-    throw traffic_simulator::SimulationRuntimeError("failed to calculate map pose : " + name1);
+    THROW_SEMANTIC_ERROR("failed to calculate map pose : " + name1);
   }
   auto bbox0 = getBoundingBox(name0);
   auto bbox1 = getBoundingBox(name1);
@@ -141,7 +141,7 @@ auto EntityManager::getConflictingEntityOnRouteLanelets(
 {
   auto it = entities_.find(name);
   if (it == entities_.end()) {
-    throw SimulationRuntimeError("entity " + name + " does not exist");
+    THROW_SEMANTIC_ERROR("entity : ", name, " does not exist");
   }
   const auto route = getRouteLanelets(name, horizon);
   return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
@@ -194,7 +194,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const
   openscenario_msgs::msg::EntityStatus status_msg;
   auto it = entities_.find(name);
   if (it == entities_.end()) {
-    return boost::none;
+    THROW_SEMANTIC_ERROR("entity : ", name, " does not exist.");
   }
   status_msg = it->second->getStatus();
   status_msg.bounding_box = getBoundingBox(name);
@@ -275,8 +275,7 @@ geometry_msgs::msg::Pose EntityManager::getMapPose(const std::string & entity_na
 {
   const auto status = getEntityStatus(entity_name);
   if (!status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "failed to get status of " + entity_name + " entity in getMapPose");
+    THROW_SEMANTIC_ERROR("entity : ", entity_name, " status is empty");
   }
   return status->pose;
 }
@@ -286,8 +285,7 @@ geometry_msgs::msg::Pose EntityManager::getMapPose(
 {
   const auto ref_status = getEntityStatus(reference_entity_name);
   if (!ref_status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "failed to get status of " + reference_entity_name + " entity in getMapPose");
+    THROW_SEMANTIC_ERROR("entity : ", reference_entity_name, " status is empty");
   }
   tf2::Transform ref_transfrom, relative_transform;
   tf2::fromMsg(ref_status->pose, ref_transfrom);
@@ -358,8 +356,7 @@ auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const
 {
   const auto to_status = getEntityStatus(to);
   if (!to_status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "failed to get status of " + to + " entity in getRelativePose");
+    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
   }
   return getRelativePose(from, to_status->pose);
 }
@@ -369,8 +366,7 @@ auto EntityManager::getRelativePose(const std::string & from, const geometry_msg
 {
   const auto from_status = getEntityStatus(from);
   if (!from_status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "failed to get status of " + from + " entity in getRelativePose");
+    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
   }
   return getRelativePose(from_status->pose, to);
 }
@@ -381,12 +377,10 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
   const auto from_status = getEntityStatus(from);
   const auto to_status = getEntityStatus(to);
   if (!from_status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "failed to get status of " + from + " entity in getRelativePose");
+    THROW_SEMANTIC_ERROR("entity : " + from + " status is empty");
   }
   if (!to_status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "failed to get status of " + to + " entity in getRelativePose");
+    THROW_SEMANTIC_ERROR("entity : " + to + " status is empty");
   }
   return getRelativePose(from_status->pose, to_status->pose);
 }
@@ -468,7 +462,7 @@ bool EntityManager::isStopping(const std::string & name) const
 {
   const auto status = getEntityStatus(name);
   if (!status) {
-    throw traffic_simulator::SimulationRuntimeError("failed to get entity : " + name + " status");
+    THROW_SEMANTIC_ERROR("entity : " + name + " status is empty");
   }
   return std::fabs(status->action_status.twist.linear.x) < std::numeric_limits<double>::epsilon();
 }
@@ -486,8 +480,7 @@ bool EntityManager::reachPosition(
 {
   const auto status = getEntityStatus(name);
   if (!status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "error occurs while getting entity stauts, target entity : " + name);
+    THROW_SEMANTIC_ERROR("entity : " + name + " status is empty");
   }
 
   const auto pose = status->pose;
@@ -572,7 +565,7 @@ void EntityManager::update(const double current_time, const double step_time)
     std::cout << "current_time : " << current_time_ << std::endl;
   }
   if (getNumberOfEgo() >= 2) {
-    throw SimulationRuntimeError("multi ego simulation does not support yet.");
+    THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
   }
   setVerbose(verbose_);
   auto type_list = getEntityTypeList();

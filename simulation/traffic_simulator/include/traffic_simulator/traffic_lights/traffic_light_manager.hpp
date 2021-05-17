@@ -52,7 +52,7 @@ public:
     } catch (const std::out_of_range &) {                                                   \
       std::stringstream what;                                                               \
       what << "Given lanelet ID '" << lanelet_id << "' is not a valid traffic-light ID.";   \
-      throw SimulationRuntimeError(what.str());                                             \
+      THROW_SEMANTIC_ERROR(what.str());                                                     \
     }                                                                                       \
   }                                                                                         \
   static_assert(true, "")

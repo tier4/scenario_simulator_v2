@@ -168,7 +168,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
     const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLanletId(status.pose);
     if (!closest_lanelet_id) {
-      throw SimulationRuntimeError("failed to closest lane.");
+      THROW_SEMANTIC_ERROR("failed to find closest lane, lane is too far away.");
     }
 
     traffic_simulator::math::CatmullRomSpline spline(

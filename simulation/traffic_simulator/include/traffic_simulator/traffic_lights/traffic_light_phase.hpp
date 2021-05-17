@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PHASE_HPP_
 
 #include <limits>
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <utility>
@@ -34,7 +35,7 @@ public:
   double getPhaseDuration() const
   {
     if (phase_.empty()) {
-      throw SimulationRuntimeError("phase is empty");
+      THROW_SEMANTIC_ERROR("phase is empty");
     } else {
       return std::accumulate(
         std::begin(phase_), std::end(phase_), 0,
@@ -45,7 +46,7 @@ public:
   const T getState() const
   {
     if (phase_.empty()) {
-      throw SimulationRuntimeError("phase is empty");
+      THROW_SEMANTIC_ERROR("phase is empty");
     }
     double t = 0;
     for (const auto p : phase_) {
@@ -54,7 +55,7 @@ public:
         return p.second;
       }
     }
-    throw SimulationRuntimeError("failed to get state in phase");
+    THROW_SIMULATION_ERROR("failed to get state of the traffic light, time does not match");
   }
 
   void update(double step_time)

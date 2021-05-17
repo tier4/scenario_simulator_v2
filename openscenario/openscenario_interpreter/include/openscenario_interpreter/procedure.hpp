@@ -36,7 +36,7 @@ template <typename... Ts>
 decltype(auto) getEntityStatus(Ts &&... xs)
 try {
   return connection.getEntityStatus(std::forward<decltype(xs)>(xs)...);
-} catch (const traffic_simulator::SimulationRuntimeError & error) {
+} catch (const common::scenario_simulator_exception::SimulationError & error) {
   throw SemanticError(
     error.what(), ".\n", "Possible causes:\n",
     "  (1) The position of the corresponding entity is not specified by Teleport Action");
@@ -46,7 +46,7 @@ template <typename... Ts>
 decltype(auto) getRelativePose(Ts &&... xs)
 try {
   return connection.getRelativePose(std::forward<decltype(xs)>(xs)...);
-} catch (const traffic_simulator::SimulationRuntimeError &) {
+} catch (const common::scenario_simulator_exception::SimulationError &) {
   geometry_msgs::msg::Pose result{};
   result.position.x = std::numeric_limits<double>::quiet_NaN();
   result.position.y = std::numeric_limits<double>::quiet_NaN();

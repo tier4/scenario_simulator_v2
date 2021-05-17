@@ -20,11 +20,6 @@
 
 namespace traffic_simulator
 {
-struct SimulationRuntimeError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-};
-
 struct UnsupportedActionError : public std::runtime_error
 {
   using std::runtime_error::runtime_error;

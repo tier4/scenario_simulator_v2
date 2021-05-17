@@ -16,6 +16,7 @@
 
 #include <limits>
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <stdexcept>
 #include <string>
@@ -87,7 +88,7 @@ bool API::spawn(
   const openscenario_msgs::msg::PedestrianParameters & params)
 {
   if (is_ego) {
-    throw traffic_simulator::SimulationRuntimeError("pedestrian should not be ego");
+    THROW_SEMANTIC_ERROR("pedestrian should not be ego");
   }
   if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::PedestrianEntity>(
         name, params)) {
@@ -113,8 +114,7 @@ openscenario_msgs::msg::EntityStatus API::getEntityStatus(const std::string & na
 {
   auto status = entity_manager_ptr_->getEntityStatus(name);
   if (!status) {
-    throw traffic_simulator::SimulationRuntimeError(
-      "error occurs while getting entity stauts, target entity : " + name);
+    THROW_SEMANTIC_ERROR("entity : ", name, " status is empty");
   }
   return status.get();
 }

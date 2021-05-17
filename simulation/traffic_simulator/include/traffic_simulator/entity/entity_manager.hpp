@@ -30,6 +30,7 @@
 #include <openscenario_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/ego_entity.hpp>
@@ -191,7 +192,7 @@ public:
   try {                                                                        \
     return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);  \
   } catch (const std::out_of_range &) {                                        \
-    throw SimulationRuntimeError("Unknown entity " + name + " was specified"); \
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist")                  \
   }                                                                            \
   static_assert(true, "")
 
@@ -315,7 +316,7 @@ public:
       result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);
       return result.second;
     } else {
-      throw traffic_simulator::SimulationRuntimeError("Entity '" + name + "' is already exists.");
+      THROW_SEMANTIC_ERROR("entity : ", name, " is already exists.");
     }
   }
 

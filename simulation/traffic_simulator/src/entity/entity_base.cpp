@@ -80,8 +80,7 @@ void EntityBase::setOtherStatus(
 const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
 {
   if (!status_) {
-    THROW_SIMULATION_ERROR("status is not set");
-    throw SimulationRuntimeError("status is not set");
+    THROW_SEMANTIC_ERROR("status is not set");
   } else {
     return this->status_.get();
   }
@@ -97,7 +96,7 @@ bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 void EntityBase::stopAtEndOfRoad()
 {
   if (!status_) {
-    throw SimulationRuntimeError("status is not set");
+    THROW_SEMANTIC_ERROR("status is not set");
   } else {
     status_.get().action_status.twist = geometry_msgs::msg::Twist();
     status_.get().action_status.accel = geometry_msgs::msg::Accel();
