@@ -41,31 +41,34 @@ struct Error : public std::runtime_error
     }                                                                                         \
   }
 
-#define THROW_ERROR(TYPENAME, DESCRIPTION)                \
-  std::stringstream ss{};                                 \
-  ss << __FILE__ << ":" << __LINE__ << ":" << DESCRIPTION \
-  throw TYPENAME{ss.str()};                               \
+#define THROW_ERROR(TYPENAME, DESCRIPTION)                 \
+  std::stringstream ss{};                                  \
+  ss << __FILE__ << ":" << __LINE__ << ":" << DESCRIPTION; \
+  throw TYPENAME{ss.str()};
 
 // Autoware encountered some problem that led to a simulation failure.
 DEFINE_ERROR_CATEGORY(AutowareError);
-#define THROW_AUTOWARE_ERROR(DESCRIPTION) THROW_ERROR(AutowareError, DESCRIPTION);
+#define THROW_AUTOWARE_ERROR(DESCRIPTION) \
+  THROW_ERROR(common::scenario_simulator_exception::AutowareError, DESCRIPTION);
 
 // Although there were no syntactic errors in the description of the scenario,
 // differences in meaning and inconsistencies were found.
 DEFINE_ERROR_CATEGORY(SemanticError);
-#define THROW_SEMANTIC_ERROR(DESCRIPTION) THROW_ERROR(SemanticError, DESCRIPTION);
+#define THROW_SEMANTIC_ERROR(DESCRIPTION) \
+  THROW_ERROR(common::scenario_simulator_exception::SemanticError, DESCRIPTION);
 
 // A problem occurred that interfered with the continuation of the simulation.
 DEFINE_ERROR_CATEGORY(SimulationError);
-#define THROW_SIMULATION_ERROR(DESCRIPTION) THROW_ERROR(SimulationError, DESCRIPTION);
+#define THROW_SIMULATION_ERROR(DESCRIPTION) \
+  THROW_ERROR(common::scenario_simulator_exception::SimulationError, DESCRIPTION);
 
 // There is a syntactic error in the description of the scenario. Or you are
 // using a feature that is not yet supported by our implementation.
 DEFINE_ERROR_CATEGORY(SyntaxError);
-#define THROW_SYNTAX_ERROR(DESCRIPTION) THROW_ERROR(SyntaxError, DESCRIPTION);
+#define THROW_SYNTAX_ERROR(DESCRIPTION) \
+  THROW_ERROR(common::scenario_simulator_exception::SyntaxError, DESCRIPTION);
 
 #undef DEFINE_ERROR_CATEGORY
-#undef THROW_ERROR
 
 }  // namespace scenario_simulator_exception
 }  // namespace common

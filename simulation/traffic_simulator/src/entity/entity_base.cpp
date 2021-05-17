@@ -15,6 +15,7 @@
 #include <limits>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/exception.hpp>
@@ -79,6 +80,7 @@ void EntityBase::setOtherStatus(
 const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
 {
   if (!status_) {
+    THROW_SIMULATION_ERROR("status is not set");
     throw SimulationRuntimeError("status is not set");
   } else {
     return this->status_.get();
