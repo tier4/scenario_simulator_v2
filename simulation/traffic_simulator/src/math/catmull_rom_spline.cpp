@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <limits>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <utility>
@@ -137,7 +138,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
 {
   size_t n = control_points.size() - 1;
   if (control_points.size() <= 2) {
-    throw SplineInterpolationError("numbers of control points are not enough.");
+    THROW_SEMANTIC_ERROR("numbers of control points are not enough.");
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {
@@ -263,7 +264,7 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
       return std::make_pair(i, s - prev_s);
     }
   }
-  throw SplineInterpolationError("failed to calculate curve index");
+  THROW_SIMULATION_ERROR("failed to calculate curve index");
 }
 
 double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
@@ -277,7 +278,7 @@ double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
       ret = ret + curves_[i].getLength();
     }
   }
-  throw SplineInterpolationError("curve index does not match.");
+  THROW_SEMANTIC_ERROR("curve index does not match");
 }
 
 boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
@@ -332,7 +333,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int
 {
   std::vector<geometry_msgs::msg::Point> ret;
   if (num_points <= 1) {
-    throw SplineInterpolationError("trajectory points should be more than 2.");
+    THROW_SIMULATION_ERROR("trajectory points should be more than 2, num_points = ", num_points);
   }
   double seg_size = total_length_ / (num_points - 1);
   for (int i = 0; i < num_points; i++) {
@@ -361,10 +362,10 @@ boost::optional<double> CatmullRomSpline::getSValue(
     }
   }
   if (s_values.size() != error_values.size()) {
-    throw SplineInterpolationError("s values and error values size are does not match.");
+    THROW_SIMULATION_ERROR("s values and error values size are does not match");
   }
   if (s_values.size() != curve_index.size()) {
-    throw SplineInterpolationError("s values and error values size are does not match.");
+    THROW_SIMULATION_ERROR("s values and error values size are does not match");
   }
   if (s_values.empty()) {
     return boost::none;
@@ -398,7 +399,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 double CatmullRomSpline::getMaximum2DCurventure() const
 {
   if (maximum_2d_curvatures_.empty()) {
-    throw SplineInterpolationError("maximum 2D curventure vector size is 0.");
+    THROW_SIMULATION_ERROR("maximum 2D curventure vector size is 0.");
   }
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }
@@ -424,7 +425,7 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
 bool CatmullRomSpline::checkConnection() const
 {
   if (control_points.size() != (curves_.size() + 1)) {
-    throw SplineInterpolationError("number of control points and curves does not match.");
+    THROW_SIMULATION_ERROR("number of control points and curves does not match.");
   }
   for (size_t i = 0; i < curves_.size(); i++) {
     const auto control_point0 = control_points[i];
@@ -434,15 +435,13 @@ bool CatmullRomSpline::checkConnection() const
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
     } else if (!equals(control_point0, p0)) {
-      throw SplineInterpolationError(
-        "start point of the curve number " + std::to_string(i) + " does not match.");
+      THROW_SIMULATION_ERROR("start point of the curve number ", i, " does not match");
     } else if (!equals(control_point1, p1)) {
-      throw SplineInterpolationError(
-        "end point of the curve number " + std::to_string(i) + " does not match.");
+      THROW_SIMULATION_ERROR("end point of the curve number ", i, " does not match");
     }
   }
   if (curves_.empty()) {
-    throw SplineInterpolationError("curve size should not be zero.");
+    THROW_SIMULATION_ERROR("curve size should not be zero");
   }
   return true;
 }

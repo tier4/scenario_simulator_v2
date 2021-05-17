@@ -26,13 +26,6 @@ namespace traffic_simulator
 {
 namespace math
 {
-class SplineInterpolationError : public std::runtime_error
-{
-public:
-  explicit SplineInterpolationError(const char * message) : runtime_error(message) {}
-  explicit SplineInterpolationError(std::string message) : runtime_error(message.c_str()) {}
-};
-
 class CatmullRomSpline
 {
 public:

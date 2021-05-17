@@ -18,17 +18,4 @@
 #include <exception>
 #include <string>
 
-namespace traffic_simulator
-{
-struct UnsupportedActionError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-};
-
-struct SplineInterpolationError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-};
-}  // namespace traffic_simulator
-
 #endif  // TRAFFIC_SIMULATOR__ENTITY__EXCEPTION_HPP_
