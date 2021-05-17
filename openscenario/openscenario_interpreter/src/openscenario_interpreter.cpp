@@ -20,6 +20,7 @@
 // #undef NDEBUG
 
 #include <boost/filesystem.hpp>
+#include <concealer/execute.hpp>
 #include <memory>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
@@ -81,6 +82,40 @@ void Interpreter::report(
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivated myself.\x1b[0m");
 }
 
+pid_t record_process_id = 0;
+
+template <typename... Ts>
+auto record_start(Ts &&... xs)
+{
+  record_process_id = fork();
+
+  const std::vector<std::string> argv{
+    "python3", "/opt/ros/foxy/bin/ros2", "bag", "record", std::forward<decltype(xs)>(xs)...};
+
+  for (const auto & each : argv) {
+    std::cout << each << " ";
+  }
+  std::cout << std::endl;
+
+  if (record_process_id < 0) {
+    throw std::system_error(errno, std::system_category());
+  } else if (record_process_id == 0 and concealer::execute(argv) < 0) {
+    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+    std::exit(EXIT_FAILURE);
+  } else {
+    return record_process_id;
+  }
+}
+
+auto record_end()
+{
+  int status = 0;
+
+  if (::kill(record_process_id, SIGINT) or waitpid(record_process_id, &status, 0) < 0) {
+    std::exit(EXIT_FAILURE);
+  }
+}
+
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 try {
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mConfiguring.\x1b[0m");
@@ -99,6 +134,12 @@ try {
 #undef GET_PARAMETER
 
   script.rebind<OpenScenario>(osc_path);
+
+  record_start(
+    "-a",                            //
+    "--compression-mode", "file",    //
+    "--compression-format", "zstd",  //
+    "--output", boost::filesystem::path(osc_path).replace_extension("").string());
 
   connect(
     shared_from_this(),                                       //
@@ -150,6 +191,7 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivating.\x1b[0m");
   connection.~API();
   timer.reset();
+  record_end();
   return Interpreter::Result::SUCCESS;
 }
 
