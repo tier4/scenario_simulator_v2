@@ -17,6 +17,7 @@
   <depend>protobuf</depend>
   <depend>protobuf-dev</depend>
   <depend>libzmqpp-dev</depend>
+  <depend>scenario_simulator_exception</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>

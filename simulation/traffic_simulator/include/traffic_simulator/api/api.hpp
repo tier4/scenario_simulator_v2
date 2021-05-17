@@ -38,13 +38,6 @@
 
 namespace traffic_simulator
 {
-struct ExecutionFailedError : public std::runtime_error
-{
-  using std::runtime_error::runtime_error;
-
-  virtual ~ExecutionFailedError() = default;
-};
-
 class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
