@@ -31,11 +31,18 @@ class ResultChecker:
         tree = ET.parse(result)
         testsuites = tree.getroot()
         for testsuite in testsuites:
-            print("checking testsuite : " + testsuite.attrib['name'])
+            print("checking testsuite : " + testsuite.attrib["name"])
             index = 1
             for testcase in testsuite:
-                xosc_path = testcase.attrib['name']
-                print("[" + str(index) + "/" + str(testsuite.items()[1][1]) + "] checking result of " + xosc_path)
+                xosc_path = testcase.attrib["name"]
+                print(
+                    "["
+                    + str(index)
+                    + "/"
+                    + str(testsuite.items()[1][1])
+                    + "] checking result of "
+                    + xosc_path
+                )
                 for result in testcase:
                     if result.tag == "failure":
                         print("unexpected failure")
@@ -45,7 +52,7 @@ class ResultChecker:
                         sys.exit(1)
                 print("expected result")
                 rosbag_dir = os.path.splitext(xosc_path)[0]
-                print('checking log directory ' + rosbag_dir)
+                print("checking log directory " + rosbag_dir)
                 db3_found = False
                 metadata_found = False
                 for filename in os.listdir(rosbag_dir):
@@ -59,7 +66,7 @@ class ResultChecker:
                     print("rosnag not found")
                     sys.exit(1)
                 index = index + 1
-                print('')
+                print("")
         sys.exit(0)
 
 
