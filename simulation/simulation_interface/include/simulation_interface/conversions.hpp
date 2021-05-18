@@ -49,10 +49,6 @@
 
 namespace simulation_interface
 {
-#define THROW_XML_PARAMETER_NOT_DEFINED_ERROR(name) \
-  throw XmlParameterError(                          \
-    std::string("parameter : ") + name + std::string(" does not defined."), __FILE__, __LINE__);
-
 class ProtobufConversionError : public std::runtime_error
 {
 public:
