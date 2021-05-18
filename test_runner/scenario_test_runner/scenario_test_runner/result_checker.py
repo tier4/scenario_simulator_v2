@@ -63,7 +63,7 @@ class ResultChecker:
                 if db3_found and metadata_found:
                     print("rosbag file found")
                 else:
-                    print("rosnag not found")
+                    print("rosbag not found")
                     sys.exit(1)
                 index = index + 1
                 print("")
