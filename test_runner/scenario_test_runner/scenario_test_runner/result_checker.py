@@ -18,6 +18,7 @@
 import argparse
 import sys
 import xml.etree.ElementTree as ET
+import os
 
 
 class ResultChecker:
@@ -30,12 +31,35 @@ class ResultChecker:
         tree = ET.parse(result)
         testsuites = tree.getroot()
         for testsuite in testsuites:
+            print("checking testsuite : " + testsuite.attrib['name'])
+            index = 1
             for testcase in testsuite:
+                xosc_path = testcase.attrib['name']
+                print("[" + str(index) + "/" + str(testsuite.items()[1][1]) + "] checking result of " + xosc_path)
                 for result in testcase:
                     if result.tag == "failure":
+                        print("unexpected failure")
                         sys.exit(1)
                     if result.tag == "error":
+                        print("unexpected error")
                         sys.exit(1)
+                print("expected result")
+                rosbag_dir = os.path.splitext(xosc_path)[0]
+                print('checking log directory ' + rosbag_dir)
+                db3_found = False
+                metadata_found = False
+                for filename in os.listdir(rosbag_dir):
+                    if filename == "metadata.yaml":
+                        metadata_found = True
+                    elif os.path.splitext(filename)[1] == ".db3":
+                        db3_found = True
+                if db3_found and metadata_found:
+                    print("rosbag file found")
+                else:
+                    print("rosnag not found")
+                    sys.exit(1)
+                index = index + 1
+                print('')
         sys.exit(0)
 
 
