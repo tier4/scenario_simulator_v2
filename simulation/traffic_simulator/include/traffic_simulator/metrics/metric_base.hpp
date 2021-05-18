@@ -18,9 +18,9 @@
 #include <boost/optional.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
-#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 
 namespace metrics

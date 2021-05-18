@@ -31,12 +31,6 @@
 
 namespace entity_behavior
 {
-class BehaviorTreeRuntimeError : public std::runtime_error
-{
-public:
-  explicit BehaviorTreeRuntimeError(const char * message) : runtime_error(message) {}
-};
-
 class ActionNode : public BT::ActionNodeBase
 {
 public:
