@@ -41,8 +41,6 @@ struct Error : public std::runtime_error
     }                                                                                         \
   }
 
-#define THROW_ERROR(TYPENAME, ...) throw TYPENAME(__FILE__, ":", __LINE__, ": ", __VA_ARGS__);
-
 // Autoware encountered some problem that led to a simulation failure.
 DEFINE_ERROR_CATEGORY(AutowareError);
 
@@ -60,23 +58,18 @@ DEFINE_ERROR_CATEGORY(SpecificationViolation);
 // using a feature that is not yet supported by our implementation.
 DEFINE_ERROR_CATEGORY(SyntaxError);
 
-#define THROW_AUTOWARE_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::AutowareError, __VA_ARGS__);
-#define THROW_SEMANTIC_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SemanticError, __VA_ARGS__);
-#define THROW_SIMULATION_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SimulationError, __VA_ARGS__);
-#define THROW_SPECIFICATION_VIOLATION(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SpecificationViolation, __VA_ARGS__);
-#define THROW_SYNTAX_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SyntaxError, __VA_ARGS__);
-
-#define SPECIFICATION_VIOLATION(...)                            \
-  common::scenario_simulator_exception::SpecificationViolation( \
-    __FILE__, ":", __LINE__, ": ", __VA_ARGS__)
-
 #undef DEFINE_ERROR_CATEGORY
 
+#define THROW_ERROR(TYPENAME, ...) throw TYPENAME(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
+
+#define THROW_AUTOWARE_ERROR(...) /*    */ THROW_ERROR(common::AutowareError, __VA_ARGS__)
+#define THROW_SEMANTIC_ERROR(...) /*    */ THROW_ERROR(common::SemanticError, __VA_ARGS__)
+#define THROW_SIMULATION_ERROR(...) /*  */ THROW_ERROR(common::SimulationError, __VA_ARGS__)
+#define THROW_SPECIFICATION_VIOLATION(...) THROW_ERROR(common::SpecificationViolation, __VA_ARGS__)
+#define THROW_SYNTAX_ERROR(...) /*      */ THROW_ERROR(common::SyntaxError, __VA_ARGS__)
+
+#define SPECIFICATION_VIOLATION(...) \
+  common::SpecificationViolation(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
 }  // namespace scenario_simulator_exception
 }  // namespace common
 

@@ -40,7 +40,8 @@ std::istream & operator>>(std::istream & is, TrafficLightColor & datum)
     datum = conversions.at(value);
   } catch (const std::out_of_range &) {
     THROW_SIMULATION_ERROR(
-      "an invalid value : ", value, "was specified for type 'traffic_simulator::TrafficLightColor'");
+      "an invalid value : ", value,
+      "was specified for type 'traffic_simulator::TrafficLightColor'");
   }
 
   return is;
@@ -108,7 +109,7 @@ std::istream & operator>>(std::istream & is, TrafficLightArrow & datum)
   } catch (const std::out_of_range &) {
     THROW_SIMULATION_ERROR(
       "An invalid value : ", value,
-      " was specified for type 'traffic_simulator::TrafficLightArrow'")
+      " was specified for type 'traffic_simulator::TrafficLightArrow'");
   }
 
   return is;
