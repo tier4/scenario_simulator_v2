@@ -57,7 +57,7 @@ void MomentaryStopMetric::update()
     }
     return;
   } else {
-    failure(SPECIFICATION_VIOLATION_ERROR("acceleration is out of range."));
+    failure(SPECIFICATION_VIOLATION_ERROR("acceleration is out of range"));
   }
 }
 

@@ -65,6 +65,13 @@ DEFINE_ERROR_CATEGORY(SyntaxError);
 #define THROW_SYNTAX_ERROR(...) \
   THROW_ERROR(common::scenario_simulator_exception::SyntaxError, __VA_ARGS__);
 
+DEFINE_ERROR_CATEGORY(SpecificationViolationError);
+#define THROW_SPECIFICATION_VIOLATION_ERROR(...) \
+  THROW_ERROR(common::scenario_simulator_exception::SpecificationViolationError, __VA_ARGS__);
+
+#define SPECIFICATION_VIOLATION_ERROR(...) \
+  common::scenario_simulator_exception::SpecificationViolationError(__FILE__, ":", __LINE__, ": ", __VA_ARGS__);
+
 #undef DEFINE_ERROR_CATEGORY
 
 }  // namespace scenario_simulator_exception

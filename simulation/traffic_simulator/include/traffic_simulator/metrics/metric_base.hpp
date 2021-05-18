@@ -25,20 +25,6 @@
 
 namespace metrics
 {
-class SpecificationViolationError : public std::runtime_error
-{
-public:
-  explicit SpecificationViolationError(const char * message) : runtime_error(message) {}
-  explicit SpecificationViolationError(std::string message) : runtime_error(message.c_str()) {}
-  explicit SpecificationViolationError(std::string message, const char * file, int line)
-  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line))
-  {
-  }
-};
-
-#define SPECIFICATION_VIOLATION_ERROR(description) \
-  SpecificationViolationError(description, __FILE__, __LINE__)
-
 enum class MetricLifecycle { INACTIVE, ACTIVE, FAILURE, SUCCESS };
 
 class MetricBase
@@ -49,7 +35,7 @@ public:
   virtual bool activateTrigger() = 0;
   virtual void update() = 0;
   void success();
-  void failure(SpecificationViolationError error);
+  void failure(const common::scenario_simulator_exception::SpecificationViolationError & error);
   void activate();
   virtual nlohmann::json to_json() = 0;
   nlohmann::json to_base_json();
@@ -63,7 +49,7 @@ protected:
   std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
 private:
-  boost::optional<SpecificationViolationError> error_;
+  boost::optional<common::scenario_simulator_exception::SpecificationViolationError> error_;
   MetricLifecycle lifecycle_;
 };
 }  // namespace metrics
