@@ -17,6 +17,7 @@
 
 #include <functional>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/constants.hpp>
 #include <string>
 #include <thread>
@@ -81,7 +82,7 @@ private:
       func_(req_proto, res_proto);
       std::string res_serialized_str;
       if (!res_proto.SerializeToString(&res_serialized_str)) {
-        throw std::runtime_error("failed to serialize from proto");
+        THROW_SIMULATION_ERROR("failed to serialize from proto");
       }
       zmqpp::message response;
       response << res_serialized_str;

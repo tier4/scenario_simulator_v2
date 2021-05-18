@@ -168,7 +168,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
     const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLanletId(status.pose);
     if (!closest_lanelet_id) {
-      throw SimulationRuntimeError("failed to closest lane.");
+      THROW_SEMANTIC_ERROR("failed to find closest lane, lane is too far away.");
     }
 
     traffic_simulator::math::CatmullRomSpline spline(
@@ -298,11 +298,10 @@ void EgoEntity::requestAssignRoute(
 
 void EgoEntity::requestLaneChange(const std::int64_t)
 {
-  std::stringstream what;
-  what << "From scenario, a lane change was requested to Ego type entity '" << name << "'. "
-       << "In general, such a request is an error, "
-       << "since Ego cars make autonomous decisions about everything but their destination.";
-  throw std::runtime_error(what.str());
+  THROW_SEMANTIC_ERROR(
+    "From scenario, a lane change was requested to Ego type entity ", name,
+    " In general, such a request is an error, since Ego cars make autonomous decisions about "
+    "everything but their destination.");
 }
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)

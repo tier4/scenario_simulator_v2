@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 
 namespace traffic_simulator
@@ -34,7 +35,7 @@ void SimulationClock::initialize(double initial_simulation_time, double step_tim
 void SimulationClock::update()
 {
   if (!initialized_) {
-    THROW_SIMULATION_CLOCK_ERROR("SimulationClock does not initialized yet.");
+    THROW_SIMULATION_ERROR("SimulationClock does not initialized yet.");
   }
   current_simulation_time_ = current_simulation_time_ + step_time_;
 }
@@ -49,7 +50,7 @@ rosgraph_msgs::msg::Clock SimulationClock::getCurrentRosTimeAsMsg() const
 rclcpp::Time SimulationClock::getCurrentRosTime() const
 {
   if (!initialized_) {
-    THROW_SIMULATION_CLOCK_ERROR("SimulationClock does not initialized yet.");
+    THROW_SIMULATION_ERROR("SimulationClock does not initialized yet.");
   }
   return system_time_on_initialize_ +
          rclcpp::Duration::from_seconds(current_simulation_time_ - initial_simulation_time_);

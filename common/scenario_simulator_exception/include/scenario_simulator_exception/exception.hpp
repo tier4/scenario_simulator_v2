@@ -51,12 +51,25 @@ DEFINE_ERROR_CATEGORY(SemanticError);
 // A problem occurred that interfered with the continuation of the simulation.
 DEFINE_ERROR_CATEGORY(SimulationError);
 
+// Metric module detects specification violation in simulation.
+DEFINE_ERROR_CATEGORY(SpecificationViolation);
+
 // There is a syntactic error in the description of the scenario. Or you are
 // using a feature that is not yet supported by our implementation.
 DEFINE_ERROR_CATEGORY(SyntaxError);
 
 #undef DEFINE_ERROR_CATEGORY
 
+#define THROW_ERROR(TYPENAME, ...) throw TYPENAME(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
+
+#define THROW_AUTOWARE_ERROR(...) /*    */ THROW_ERROR(common::AutowareError, __VA_ARGS__)
+#define THROW_SEMANTIC_ERROR(...) /*    */ THROW_ERROR(common::SemanticError, __VA_ARGS__)
+#define THROW_SIMULATION_ERROR(...) /*  */ THROW_ERROR(common::SimulationError, __VA_ARGS__)
+#define THROW_SPECIFICATION_VIOLATION(...) THROW_ERROR(common::SpecificationViolation, __VA_ARGS__)
+#define THROW_SYNTAX_ERROR(...) /*      */ THROW_ERROR(common::SyntaxError, __VA_ARGS__)
+
+#define SPECIFICATION_VIOLATION(...) \
+  common::SpecificationViolation(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
 }  // namespace scenario_simulator_exception
 }  // namespace common
 

@@ -49,12 +49,6 @@
 
 namespace hdmap_utils
 {
-class HdMapError : public std::runtime_error
-{
-public:
-  explicit HdMapError(const char * message) : runtime_error(message) {}
-};
-
 class HdMapUtils
 {
 public:

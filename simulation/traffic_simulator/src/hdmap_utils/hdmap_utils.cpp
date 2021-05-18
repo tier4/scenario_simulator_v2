@@ -34,6 +34,7 @@
 #include <lanelet2_extension_psim/utility/utilities.hpp>
 #include <lanelet2_extension_psim/visualization/visualization.hpp>
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
@@ -60,10 +61,11 @@ HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint 
   lanelet::ErrorMessages errors;
   lanelet_map_ptr_ = lanelet::load(lanelet_path, projector, &errors);
   if (!errors.empty()) {
+    std::stringstream ss;
     for (const auto & error : errors) {
-      std::cerr << error << std::endl;
+      ss << "error : " << error;
     }
-    throw HdMapError("failed to load lanelet map");
+    THROW_SIMULATION_ERROR("failed to load lanelet map", ss.str());
   }
   overwriteLaneletsCenterline();
   traffic_rules_vehicle_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(
@@ -285,7 +287,7 @@ double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
 {
   std::vector<double> limits;
   if (lanelet_ids.empty()) {
-    throw HdMapError("size of the vector lanelet ids should be more than 1");
+    THROW_SEMANTIC_ERROR("size of the vector lanelet ids should be more than 1");
   }
   for (auto itr = lanelet_ids.begin(); itr != lanelet_ids.end(); itr++) {
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(*itr);
@@ -377,7 +379,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     }
   }
   if (!found) {
-    throw HdMapError("lanelet id did not match.");
+    THROW_SEMANTIC_ERROR("lanelet id does not match");
   }
   if (total_dist > distance) {
     return ret;
@@ -456,10 +458,10 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
 {
   std::vector<geometry_msgs::msg::Point> ret;
   if (!lanelet_map_ptr_) {
-    throw HdMapError("lanelet map is null pointer.");
+    THROW_SIMULATION_ERROR("lanelet map is null pointer");
   }
   if (lanelet_map_ptr_->laneletLayer.empty()) {
-    throw HdMapError("lanelet layer is empty.");
+    THROW_SIMULATION_ERROR("lanelet layer is empty");
   }
 
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -908,7 +910,7 @@ std::pair<size_t, size_t> HdMapUtils::findNearestIndexPair(
   }
 
   // Throw an exception because this never happens
-  throw HdMapError("findNearestIndexPair(): No nearest point found.");
+  THROW_SEMANTIC_ERROR("findNearestIndexPair(): No nearest point found.");
 }
 
 const std::unordered_map<std::int64_t, std::vector<std::int64_t>>
@@ -995,8 +997,7 @@ lanelet::AutowareTrafficLightConstPtr HdMapUtils::getTrafficLight(
       }
     }
   }
-  std::string message = "traffic_light_id does not match. ID : " + std::to_string(traffic_light_id);
-  throw HdMapError(message.c_str());
+  THROW_SEMANTIC_ERROR("traffic_light_id does not match. ID : ", traffic_light_id);
 }
 
 const boost::optional<std::int64_t> HdMapUtils::getTrafficLightStopLineId(

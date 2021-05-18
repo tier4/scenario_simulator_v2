@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
 #include <traffic_simulator/behavior/action_node.hpp>
@@ -33,23 +34,23 @@ BT::NodeStatus ActionNode::executeTick() { return BT::ActionNodeBase::executeTic
 void ActionNode::getBlackBoardValues()
 {
   if (!getInput("request", request)) {
-    throw BehaviorTreeRuntimeError("failed to get input request in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input request in ActionNode");
   }
   if (!getInput<double>("step_time", step_time)) {
-    throw BehaviorTreeRuntimeError("failed to get input step_time in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input step_time in ActionNode");
   }
   if (!getInput<double>("current_time", current_time)) {
-    throw BehaviorTreeRuntimeError("failed to get input current_time in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input current_time in ActionNode");
   }
   if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
-    throw BehaviorTreeRuntimeError("failed to get input hdmap_utils in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input hdmap_utils in ActionNode");
   }
   if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
         "traffic_light_manager", traffic_light_manager)) {
-    throw BehaviorTreeRuntimeError("failed to get input traffic_light_manager in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input traffic_light_manager in ActionNode");
   }
   if (!getInput<openscenario_msgs::msg::EntityStatus>("entity_status", entity_status)) {
-    throw BehaviorTreeRuntimeError("failed to get input entity_status in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input entity_status in ActionNode");
   }
 
   if (!getInput<boost::optional<double>>("target_speed", target_speed)) {
@@ -58,14 +59,14 @@ void ActionNode::getBlackBoardValues()
 
   if (!getInput<std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus>>(
         "other_entity_status", other_entity_status)) {
-    throw BehaviorTreeRuntimeError("failed to get input other_entity_status in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
   if (!getInput<std::unordered_map<std::string, openscenario_msgs::msg::EntityType>>(
         "entity_type_list", entity_type_list)) {
-    throw BehaviorTreeRuntimeError("failed to get input entity_type_list in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input entity_type_list in ActionNode");
   }
   if (!getInput<std::vector<std::int64_t>>("route_lanelets", route_lanelets)) {
-    throw BehaviorTreeRuntimeError("failed to get input route_lanelets in ActionNode");
+    THROW_SIMULATION_ERROR("failed to get input route_lanelets in ActionNode");
   }
 }
 

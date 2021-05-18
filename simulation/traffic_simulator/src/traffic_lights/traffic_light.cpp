@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <limits>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <unordered_map>
 #include <utility>
@@ -60,7 +60,7 @@ void TrafficLight::update(const double step_time)
 const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor & color)
 {
   if (color_positions_.count(color) == 0) {
-    throw traffic_simulator::SimulationRuntimeError("target color does not exists");
+    THROW_SEMANTIC_ERROR("target color does not exists");
   }
   return color_positions_.at(color);
 }
@@ -68,7 +68,7 @@ const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColo
 const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow & arrow)
 {
   if (arrow_positions_.count(arrow) == 0) {
-    throw traffic_simulator::SimulationRuntimeError("target arrow does not exists");
+    THROW_SEMANTIC_ERROR("target arrow does not exists");
   }
   return arrow_positions_.at(arrow);
 }

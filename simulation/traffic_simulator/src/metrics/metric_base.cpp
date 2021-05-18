@@ -35,7 +35,7 @@ void MetricBase::setEntityManager(
 void MetricBase::success()
 {
   if (lifecycle_ != MetricLifecycle::ACTIVE) {
-    THROW_METRICS_CALCULATION_ERROR("lifecycle of the metric should be active");
+    THROW_SIMULATION_ERROR("lifecycle of the metric should be active");
   }
   lifecycle_ = MetricLifecycle::SUCCESS;
 }
@@ -43,15 +43,15 @@ void MetricBase::success()
 void MetricBase::activate()
 {
   if (lifecycle_ != MetricLifecycle::INACTIVE) {
-    THROW_METRICS_CALCULATION_ERROR("lifecycle of the metric should be inactive");
+    THROW_SIMULATION_ERROR("lifecycle of the metric should be inactive");
   }
   lifecycle_ = MetricLifecycle::ACTIVE;
 }
 
-void MetricBase::failure(SpecificationViolationError error)
+void MetricBase::failure(const common::scenario_simulator_exception::SpecificationViolation & error)
 {
   if (lifecycle_ != MetricLifecycle::ACTIVE) {
-    THROW_METRICS_CALCULATION_ERROR("lifecycle of the metric should be active");
+    THROW_SIMULATION_ERROR("lifecycle of the metric should be active");
   }
   error_ = error;
   lifecycle_ = MetricLifecycle::FAILURE;
@@ -85,6 +85,6 @@ void MetricBase::throwException()
   if (error_) {
     throw error_.get();
   }
-  THROW_METRICS_CALCULATION_ERROR("error is empty");
+  THROW_SIMULATION_ERROR("error is empty");
 }
 }  // namespace metrics

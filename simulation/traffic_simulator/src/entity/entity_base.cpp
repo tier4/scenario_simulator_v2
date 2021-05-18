@@ -15,9 +15,9 @@
 #include <limits>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/exception.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -79,7 +79,7 @@ void EntityBase::setOtherStatus(
 const openscenario_msgs::msg::EntityStatus EntityBase::getStatus() const
 {
   if (!status_) {
-    throw SimulationRuntimeError("status is not set");
+    THROW_SEMANTIC_ERROR("status is not set");
   } else {
     return this->status_.get();
   }
@@ -95,7 +95,7 @@ bool EntityBase::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 void EntityBase::stopAtEndOfRoad()
 {
   if (!status_) {
-    throw SimulationRuntimeError("status is not set");
+    THROW_SEMANTIC_ERROR("status is not set");
   } else {
     status_.get().action_status.twist = geometry_msgs::msg::Twist();
     status_.get().action_status.accel = geometry_msgs::msg::Accel();

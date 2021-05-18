@@ -17,7 +17,6 @@
 #include <boost/algorithm/clamp.hpp>
 #include <memory>
 #include <string>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <vector>
 

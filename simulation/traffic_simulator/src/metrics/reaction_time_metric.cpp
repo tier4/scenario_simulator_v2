@@ -37,7 +37,7 @@ void ReactionTimeMetric::update()
 {
   const auto jerk = entity_manager_ptr_->getLinearJerk(target_entity);
   if (!jerk) {
-    THROW_METRICS_CALCULATION_ERROR("failed to calculate linear jerk.");
+    THROW_SIMULATION_ERROR("failed to calculate linear jerk.");
   }
   current_linear_jerk_ = jerk.get();
   if (check_lower_threashold && jerk_lower_threashold >= jerk.get()) {
@@ -49,7 +49,7 @@ void ReactionTimeMetric::update()
     return;
   }
   if (elapsed_duration_ > maximum_reaction_time) {
-    failure(SPECIFICATION_VIOLATION_ERROR("maximum reaction time is expired."));
+    failure(SPECIFICATION_VIOLATION("maximum reaction time is expired."));
     return;
   }
   elapsed_duration_ = elapsed_duration_ + entity_manager_ptr_->getStepTime();

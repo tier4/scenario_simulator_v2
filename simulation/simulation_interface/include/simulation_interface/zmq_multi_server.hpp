@@ -19,6 +19,7 @@
 
 #include <functional>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/constants.hpp>
 #include <string>
 #include <thread>

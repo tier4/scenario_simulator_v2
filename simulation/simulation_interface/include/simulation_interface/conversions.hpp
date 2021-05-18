@@ -23,7 +23,6 @@
 
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
-#include <exception>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -49,34 +48,6 @@
 
 namespace simulation_interface
 {
-class XmlParameterError : public std::runtime_error
-{
-public:
-  explicit XmlParameterError(std::string message, const char * file, int line)
-  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line))
-  {
-  }
-};
-
-#define THROW_XML_PARAMETER_ERROR(description) \
-  throw XmlParameterError(description, __FILE__, __LINE__);
-
-#define THROW_XML_PARAMETER_NOT_DEFINED_ERROR(name) \
-  throw XmlParameterError(                          \
-    std::string("parameter : ") + name + std::string(" does not defined."), __FILE__, __LINE__);
-
-class ProtobufConversionError : public std::runtime_error
-{
-public:
-  explicit ProtobufConversionError(std::string message, const char * file, int line)
-  : runtime_error(message + "\nFile:" + file + "\nLine:" + std::to_string(line))
-  {
-  }
-};
-
-#define THROW_PROTOBUF_PARAMETER_ERROR(description) \
-  throw ProtobufConversionError(description, __FILE__, __LINE__);
-
 void toProto(const geometry_msgs::msg::Point & p, geometry_msgs::Point & proto);
 void toMsg(const geometry_msgs::Point & proto, geometry_msgs::msg::Point & p);
 void toProto(const geometry_msgs::msg::Quaternion & q, geometry_msgs::Quaternion & proto);

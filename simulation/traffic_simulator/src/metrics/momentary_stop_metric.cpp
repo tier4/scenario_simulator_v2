@@ -21,7 +21,7 @@ void MomentaryStopMetric::update()
 {
   auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (!status) {
-    THROW_METRICS_CALCULATION_ERROR("failed to get target entity status.");
+    THROW_SIMULATION_ERROR("failed to get target entity status.");
     return;
   }
   boost::optional<double> distance;
@@ -33,18 +33,18 @@ void MomentaryStopMetric::update()
       distance = entity_manager_ptr_->getDistanceToCrosswalk(target_entity, stop_target_lanelet_id);
       break;
     default:
-      THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");
+      THROW_SIMULATION_ERROR("invalid lanlet type.");
       break;
   }
   if (!distance) {
-    THROW_METRICS_CALCULATION_ERROR("failed to calculate distance to stop line.");
+    THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
   }
   distance_to_stopline_ = distance.get();
   linear_acceleration_ = status->action_status.accel.linear.x;
   if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
     auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
     if (!standstill_duration) {
-      THROW_METRICS_CALCULATION_ERROR("failed to calculate standstill duration.");
+      THROW_SIMULATION_ERROR("failed to calculate standstill duration.");
     }
     standstill_duration_ = standstill_duration.get();
     if (
@@ -53,11 +53,11 @@ void MomentaryStopMetric::update()
       success();
     }
     if (distance.get() <= stop_sequence_end_distance) {
-      failure(SPECIFICATION_VIOLATION_ERROR("overrun detected"));
+      failure(SPECIFICATION_VIOLATION("overrun detected"));
     }
     return;
   } else {
-    failure(SPECIFICATION_VIOLATION_ERROR("acceleration is out of range."));
+    failure(SPECIFICATION_VIOLATION("acceleration is out of range"));
   }
 }
 
@@ -76,7 +76,7 @@ bool MomentaryStopMetric::activateTrigger()
       distance = entity_manager_ptr_->getDistanceToCrosswalk(target_entity, stop_target_lanelet_id);
       break;
     default:
-      THROW_METRICS_CALCULATION_ERROR("invalid lanlet type.");
+      THROW_SIMULATION_ERROR("invalid lanlet type.");
       break;
   }
   if (!distance) {

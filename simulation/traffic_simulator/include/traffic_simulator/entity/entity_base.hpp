@@ -127,9 +127,7 @@ public:
 
   virtual void requestWalkStraight()
   {
-    std::stringstream what;
-    what << getEntityTypename() << " type entities do not support WalkStraightAction";
-    throw UnsupportedActionError(what.str());
+    THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
   }
 
   /*   */ auto statusSet() const noexcept { return static_cast<bool>(status_); }

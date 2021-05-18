@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/behavior/pedestrian/pedestrian_action_node.hpp>
 
@@ -29,8 +30,7 @@ void PedestrianActionNode::getBlackBoardValues()
   ActionNode::getBlackBoardValues();
   if (!getInput<openscenario_msgs::msg::PedestrianParameters>(
         "pedestrian_parameters", pedestrian_parameters)) {
-    throw BehaviorTreeRuntimeError(
-      "failed to get input pedestrian_parameters in PedestrianActionNode");
+    THROW_SIMULATION_ERROR("failed to get input pedestrian_parameters in PedestrianActionNode");
   }
 }
 
@@ -97,7 +97,7 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
       }
     }
     if (!calculation_success) {
-      throw BehaviorTreeRuntimeError(
+      THROW_SIMULATION_ERROR(
         "failed to calculate next status calculateEntityStatusUpdated function");
     }
     openscenario_msgs::msg::EntityStatus entity_status_updated;
@@ -111,8 +111,7 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
     entity_status_updated.action_status.accel = accel_new;
     return entity_status_updated;
   }
-  throw BehaviorTreeRuntimeError(
-    "failed to calculate next status calculateEntityStatusUpdated function");
+  THROW_SIMULATION_ERROR("failed to calculate next status calculateEntityStatusUpdated function");
 }
 
 openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatusUpdatedInWorldFrame(

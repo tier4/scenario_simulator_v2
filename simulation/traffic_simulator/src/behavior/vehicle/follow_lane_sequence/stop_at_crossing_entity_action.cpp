@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
@@ -55,7 +56,7 @@ StopAtCrossingEntityAction::calculateObstacle(
 const openscenario_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
   if (!entity_status.lanelet_pose_valid) {
-    throw BehaviorTreeRuntimeError("failed to assign lane");
+    THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     openscenario_msgs::msg::WaypointsArray waypoints;

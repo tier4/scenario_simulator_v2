@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
@@ -39,10 +40,10 @@ const boost::optional<openscenario_msgs::msg::Obstacle> LaneChangeAction::calcul
 const openscenario_msgs::msg::WaypointsArray LaneChangeAction::calculateWaypoints()
 {
   if (!curve_) {
-    throw BehaviorTreeRuntimeError("curve is null");
+    THROW_SIMULATION_ERROR("curve is null");
   }
   if (!to_lanelet_id_) {
-    throw BehaviorTreeRuntimeError("to lanelet id is null");
+    THROW_SIMULATION_ERROR("to lanelet id is null");
   }
   if (entity_status.action_status.twist.linear.x >= 0) {
     openscenario_msgs::msg::WaypointsArray waypoints;

@@ -15,7 +15,6 @@
 #include <iterator>
 #include <memory>
 #include <string>
-#include <traffic_simulator/entity/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <type_traits>
 #include <utility>
