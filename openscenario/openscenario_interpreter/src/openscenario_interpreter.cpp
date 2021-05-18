@@ -137,10 +137,8 @@ try {
 #undef GET_PARAMETER
 
   record_start(
-    "-a",                            //
-    "--compression-mode", "file",    //
-    "--compression-format", "zstd",  //
-    "--output", boost::filesystem::path(osc_path).replace_extension("").string());
+    "-a",  //
+    "-o", boost::filesystem::path(osc_path).replace_extension("").string());
 
   script.rebind<OpenScenario>(osc_path);
 
