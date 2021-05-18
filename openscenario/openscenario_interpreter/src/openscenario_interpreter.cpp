@@ -92,11 +92,6 @@ auto record_start(Ts &&... xs)
   const std::vector<std::string> argv{
     "python3", "/opt/ros/foxy/bin/ros2", "bag", "record", std::forward<decltype(xs)>(xs)...};
 
-  for (const auto & each : argv) {
-    std::cout << each << " ";
-  }
-  std::cout << std::endl;
-
   if (record_process_id < 0) {
     throw std::system_error(errno, std::system_category());
   } else if (record_process_id == 0 and concealer::execute(argv) < 0) {
