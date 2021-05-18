@@ -33,7 +33,7 @@
 namespace concealer
 {
 template <typename... Ts>
-static auto ros2_launch(const std::string & package, const std::string & file, Ts &&... xs)
+auto ros2_launch(const std::string & package, const std::string & file, Ts &&... xs)
 {
 #ifdef CONCEALER_ISOLATE_STANDARD_OUTPUT
   const std::string log_filename = "/tmp/scenario_test_runner/autoware-output.txt";
