@@ -45,32 +45,34 @@ struct Error : public std::runtime_error
 
 // Autoware encountered some problem that led to a simulation failure.
 DEFINE_ERROR_CATEGORY(AutowareError);
-#define THROW_AUTOWARE_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::AutowareError, __VA_ARGS__);
 
 // Although there were no syntactic errors in the description of the scenario,
 // differences in meaning and inconsistencies were found.
 DEFINE_ERROR_CATEGORY(SemanticError);
-#define THROW_SEMANTIC_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SemanticError, __VA_ARGS__);
 
 // A problem occurred that interfered with the continuation of the simulation.
 DEFINE_ERROR_CATEGORY(SimulationError);
-#define THROW_SIMULATION_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SimulationError, __VA_ARGS__);
+
+// Metric module detects specification violation in simulation.
+DEFINE_ERROR_CATEGORY(SpecificationViolation);
 
 // There is a syntactic error in the description of the scenario. Or you are
 // using a feature that is not yet supported by our implementation.
 DEFINE_ERROR_CATEGORY(SyntaxError);
+
+#define THROW_AUTOWARE_ERROR(...) \
+  THROW_ERROR(common::scenario_simulator_exception::AutowareError, __VA_ARGS__);
+#define THROW_SEMANTIC_ERROR(...) \
+  THROW_ERROR(common::scenario_simulator_exception::SemanticError, __VA_ARGS__);
+#define THROW_SIMULATION_ERROR(...) \
+  THROW_ERROR(common::scenario_simulator_exception::SimulationError, __VA_ARGS__);
+#define THROW_SPECIFICATION_VIOLATION_ERROR(...) \
+  THROW_ERROR(common::scenario_simulator_exception::SpecificationViolationError, __VA_ARGS__);
 #define THROW_SYNTAX_ERROR(...) \
   THROW_ERROR(common::scenario_simulator_exception::SyntaxError, __VA_ARGS__);
 
-DEFINE_ERROR_CATEGORY(SpecificationViolationError);
-#define THROW_SPECIFICATION_VIOLATION_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SpecificationViolationError, __VA_ARGS__);
-
-#define SPECIFICATION_VIOLATION_ERROR(...) \
-  common::scenario_simulator_exception::SpecificationViolationError(__FILE__, ":", __LINE__, ": ", __VA_ARGS__);
+#define SPECIFICATION_VIOLATION(...) \
+  common::scenario_simulator_exception::SpecificationViolation(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
 
 #undef DEFINE_ERROR_CATEGORY
 
