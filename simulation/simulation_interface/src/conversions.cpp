@@ -15,6 +15,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace simulation_interface
 {
@@ -258,7 +259,7 @@ void toProto(const openscenario_msgs::msg::EntityType & type, openscenario_msgs:
     return;
   }
   std::string message = "type of the Entity Type is inavlid!\ntype is " + std::to_string(type.type);
-  THROW_PROTOBUF_PARAMETER_ERROR(message);
+  THROW_SIMULATION_ERROR(message);
 }
 
 void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::EntityType & type)
@@ -276,7 +277,7 @@ void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::
     return;
   }
   std::string message = "type of the Entity Type is inavlid!";
-  THROW_PROTOBUF_PARAMETER_ERROR(message);
+  THROW_SIMULATION_ERROR(message);
 }
 
 void toProto(
