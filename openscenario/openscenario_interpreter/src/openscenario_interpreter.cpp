@@ -20,6 +20,7 @@
 // #undef NDEBUG
 
 #include <boost/filesystem.hpp>
+#include <concealer/execute.hpp>
 #include <memory>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
@@ -27,6 +28,13 @@
 
 namespace openscenario_interpreter
 {
+#define INTERPRETER_INFO_STREAM(...) \
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
+
+// NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+#define INTERPRETER_ERROR_STREAM(...) \
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
+
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   intended_result("success"),
@@ -62,6 +70,7 @@ void Interpreter::report(
 
     message << "\x1b[0m";
 
+    // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
     RCLCPP_INFO_STREAM(get_logger(), message.str());
   }
 
@@ -76,14 +85,43 @@ void Interpreter::report(
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivate myself.\x1b[0m");
+  INTERPRETER_INFO_STREAM("Deactivate myself.");
   deactivate();
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivated myself.\x1b[0m");
+  INTERPRETER_INFO_STREAM("Deactivated myself.");
+}
+
+pid_t record_process_id = 0;
+
+template <typename... Ts>
+auto record_start(Ts &&... xs)
+{
+  record_process_id = fork();
+
+  const std::vector<std::string> argv{
+    "python3", "/opt/ros/foxy/bin/ros2", "bag", "record", std::forward<decltype(xs)>(xs)...};
+
+  if (record_process_id < 0) {
+    throw std::system_error(errno, std::system_category());
+  } else if (record_process_id == 0 and concealer::execute(argv) < 0) {
+    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+    std::exit(EXIT_FAILURE);
+  } else {
+    return record_process_id;
+  }
+}
+
+auto record_end()
+{
+  int status = 0;
+
+  if (::kill(record_process_id, SIGINT) or waitpid(record_process_id, &status, 0) < 0) {
+    std::exit(EXIT_FAILURE);
+  }
 }
 
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 try {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mConfiguring.\x1b[0m");
+  INTERPRETER_INFO_STREAM("Configuring.");
 
   // NOTE: Wait for parameters to be set.
   std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -97,6 +135,10 @@ try {
   GET_PARAMETER(output_directory);
 
 #undef GET_PARAMETER
+
+  record_start(
+    "-a",  //
+    "-o", boost::filesystem::path(osc_path).replace_extension("").string());
 
   script.rebind<OpenScenario>(osc_path);
 
@@ -112,13 +154,13 @@ try {
 
   return Interpreter::Result::SUCCESS;
 } catch (const openscenario_interpreter::SyntaxError & error) {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << error.what() << "\x1b[0m");
+  INTERPRETER_ERROR_STREAM(error.what());
   return Interpreter::Result::FAILURE;
 }
 
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mActivating.\x1b[0m");
+  INTERPRETER_INFO_STREAM("Activating.");
 
   timer = create_wall_timer(
     std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000)), [this]() {
@@ -147,28 +189,29 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 
 Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mDeactivating.\x1b[0m");
+  INTERPRETER_INFO_STREAM("Deactivating.");
   connection.~API();
   timer.reset();
+  record_end();
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mCleaningUp.\x1b[0m");
+  INTERPRETER_INFO_STREAM("CleaningUp.");
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
 {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mShuttingDown.\x1b[0m");
+  INTERPRETER_INFO_STREAM("ShuttingDown.");
   timer.reset();
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_error(const rclcpp_lifecycle::State &)
 {
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32mErrorProcessing.\x1b[0m");
+  INTERPRETER_INFO_STREAM("ErrorProcessing.");
   timer.reset();
   return Interpreter::Result::SUCCESS;
 }
