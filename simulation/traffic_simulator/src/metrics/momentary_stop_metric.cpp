@@ -53,11 +53,11 @@ void MomentaryStopMetric::update()
       success();
     }
     if (distance.get() <= stop_sequence_end_distance) {
-      failure(SPECIFICATION_VIOLATION_ERROR("overrun detected"));
+      failure(SPECIFICATION_VIOLATION("overrun detected"));
     }
     return;
   } else {
-    failure(SPECIFICATION_VIOLATION_ERROR("acceleration is out of range"));
+    failure(SPECIFICATION_VIOLATION("acceleration is out of range"));
   }
 }
 

@@ -35,7 +35,7 @@ public:
   virtual bool activateTrigger() = 0;
   virtual void update() = 0;
   void success();
-  void failure(const common::scenario_simulator_exception::SpecificationViolationError & error);
+  void failure(const common::scenario_simulator_exception::SpecificationViolation & error);
   void activate();
   virtual nlohmann::json to_json() = 0;
   nlohmann::json to_base_json();
@@ -49,7 +49,7 @@ protected:
   std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
 private:
-  boost::optional<common::scenario_simulator_exception::SpecificationViolationError> error_;
+  boost::optional<common::scenario_simulator_exception::SpecificationViolation> error_;
   MetricLifecycle lifecycle_;
 };
 }  // namespace metrics

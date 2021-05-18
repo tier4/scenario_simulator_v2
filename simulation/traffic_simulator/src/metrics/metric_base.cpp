@@ -48,8 +48,7 @@ void MetricBase::activate()
   lifecycle_ = MetricLifecycle::ACTIVE;
 }
 
-void MetricBase::failure(
-  const common::scenario_simulator_exception::SpecificationViolationError & error)
+void MetricBase::failure(const common::scenario_simulator_exception::SpecificationViolation & error)
 {
   if (lifecycle_ != MetricLifecycle::ACTIVE) {
     THROW_SIMULATION_ERROR("lifecycle of the metric should be active");

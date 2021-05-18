@@ -66,13 +66,14 @@ DEFINE_ERROR_CATEGORY(SyntaxError);
   THROW_ERROR(common::scenario_simulator_exception::SemanticError, __VA_ARGS__);
 #define THROW_SIMULATION_ERROR(...) \
   THROW_ERROR(common::scenario_simulator_exception::SimulationError, __VA_ARGS__);
-#define THROW_SPECIFICATION_VIOLATION_ERROR(...) \
-  THROW_ERROR(common::scenario_simulator_exception::SpecificationViolationError, __VA_ARGS__);
+#define THROW_SPECIFICATION_VIOLATION(...) \
+  THROW_ERROR(common::scenario_simulator_exception::SpecificationViolation, __VA_ARGS__);
 #define THROW_SYNTAX_ERROR(...) \
   THROW_ERROR(common::scenario_simulator_exception::SyntaxError, __VA_ARGS__);
 
-#define SPECIFICATION_VIOLATION(...) \
-  common::scenario_simulator_exception::SpecificationViolation(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
+#define SPECIFICATION_VIOLATION(...)                            \
+  common::scenario_simulator_exception::SpecificationViolation( \
+    __FILE__, ":", __LINE__, ": ", __VA_ARGS__)
 
 #undef DEFINE_ERROR_CATEGORY
 

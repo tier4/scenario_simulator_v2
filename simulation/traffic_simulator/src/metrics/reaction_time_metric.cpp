@@ -49,7 +49,7 @@ void ReactionTimeMetric::update()
     return;
   }
   if (elapsed_duration_ > maximum_reaction_time) {
-    failure(SPECIFICATION_VIOLATION_ERROR("maximum reaction time is expired."));
+    failure(SPECIFICATION_VIOLATION("maximum reaction time is expired."));
     return;
   }
   elapsed_duration_ = elapsed_duration_ + entity_manager_ptr_->getStepTime();
