@@ -39,9 +39,8 @@ std::istream & operator>>(std::istream & is, TrafficLightColor & datum)
   try {
     datum = conversions.at(value);
   } catch (const std::out_of_range &) {
-    ;
     THROW_SIMULATION_ERROR(
-      "an invalid value : ", value, "was specified for type 'traffic_simulator::TrafficLightColor'")
+      "an invalid value : ", value, "was specified for type 'traffic_simulator::TrafficLightColor'");
   }
 
   return is;
