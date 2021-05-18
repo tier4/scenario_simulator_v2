@@ -18,15 +18,19 @@
 
 namespace concealer
 {
-#define RCLCPP_SYSTEM_ERROR(FROM)                         \
-  RCLCPP_ERROR_STREAM(                                    \
-    get_logger(), "\x1b[1;31mError on calling " FROM ": " \
-                    << std::system_error(errno, std::system_category()).what() << ".\x1b[0m")
+#define AUTOWARE_INFO_STREAM(...) \
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
+
+#define AUTOWARE_ERROR_STREAM(...) \
+  RCLCPP_ERROR_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
+
+#define AUTOWARE_SYSTEM_ERROR(FROM) \
+  AUTOWARE_ERROR_STREAM(            \
+    "Error on calling " FROM ": " << std::system_error(errno, std::system_category()).what())
 
 Autoware::~Autoware()
 {
-  RCLCPP_INFO_STREAM(
-    get_logger(), "\x1b[1;32mShutting down Autoware: (1/3) Stop publlishing/subscribing.\x1b[0m");
+  AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publlishing/subscribing.");
   {
     if (spinner.joinable()) {
       promise.set_value();
@@ -34,16 +38,12 @@ Autoware::~Autoware()
     }
   }
 
-  RCLCPP_INFO_STREAM(
-    get_logger(),
-    "\x1b[1;32mShutting down Autoware: (2/3) Send SIGINT to Autoware launch "
-    "process.\x1b[0m");
+  AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
   {
     ::kill(process_id, SIGINT);
   }
 
-  RCLCPP_INFO_STREAM(
-    get_logger(), "\x1b[1;32mShutting down Autoware: (2/3) Terminating Autoware.\x1b[0m");
+  AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Terminating Autoware.");
   {
     sigset_t mask{};
     {
@@ -53,7 +53,7 @@ Autoware::~Autoware()
       sigaddset(&mask, SIGCHLD);
 
       if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0) {
-        RCLCPP_SYSTEM_ERROR("sigprocmask");
+        AUTOWARE_SYSTEM_ERROR("sigprocmask");
         std::exit(EXIT_FAILURE);
       }
     }
@@ -70,28 +70,24 @@ Autoware::~Autoware()
           break;
 
         case EAGAIN:
-          RCLCPP_ERROR_STREAM(
-            get_logger(),
-            "\x1b[1;31mShutting down Autoware: (2/3) Autoware launch process does not respond. "
-            "Kill it.\x1b[0m");
+          AUTOWARE_ERROR_STREAM(
+            "Shutting down Autoware: (2/3) Autoware launch process does not respond. Kill it.");
           kill(process_id, SIGKILL);
           break;
 
         default:
-          RCLCPP_SYSTEM_ERROR("sigtimedwait");
+          AUTOWARE_SYSTEM_ERROR("sigtimedwait");
           std::exit(EXIT_FAILURE);
       }
     }
   }
 
-  RCLCPP_INFO_STREAM(
-    get_logger(),
-    "\x1b[1;32mShutting down Autoware: (3/3) Waiting for Autoware to be exited.\x1b[0m");
+  AUTOWARE_INFO_STREAM("Shutting down Autoware: (3/3) Waiting for Autoware to be exited.");
   {
     int status = 0;
 
     if (waitpid(process_id, &status, 0) < 0) {
-      RCLCPP_SYSTEM_ERROR("waitpid");
+      AUTOWARE_SYSTEM_ERROR("waitpid");
       std::exit(EXIT_FAILURE);
     }
   }
