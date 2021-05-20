@@ -18,14 +18,11 @@
 #include <junit/test_case.hpp>
 #include <vector>
 
-namespace common
-{
-inline namespace junit
+namespace junit
 {
 using TestCases = std::vector<TestCase>;
 
 using TestSuite = TestCases;
 }  // namespace junit
-}  // namespace common
 
 #endif  // JUNIT_EXPORTER__TEST_SUITE_HPP_

@@ -43,26 +43,26 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  common::TestSuites test_suites;
+  junit::TestSuites test_suites;
 
-  const common::TestResult ERROR = common::TestResult::ERROR;
-  const common::TestResult FAILURE = common::TestResult::FAILURE;
-  const common::TestResult SUCCESS = common::TestResult::SUCCESS;
+  const junit::TestResult ERROR = junit::TestResult::ERROR;
+  const junit::TestResult FAILURE = junit::TestResult::FAILURE;
+  const junit::TestResult SUCCESS = junit::TestResult::SUCCESS;
 
-  common::TestResult current_result;
+  junit::TestResult current_result;
 
   std::string current_error_type;
   std::string current_error_what;
 
   void reset()
   {
-    current_result = common::TestResult::FAILURE;
+    current_result = junit::TestResult::FAILURE;
     current_error_type = "Failure";
     current_error_what =
       "The simulation time has exceeded the time specified by the scenario_test_runner";
   }
 
-  void report(const common::TestResult &, const std::string &, const std::string & = "");
+  void report(const junit::TestResult &, const std::string &, const std::string & = "");
 
 #define CATCH(TYPE)                       \
   catch (const TYPE & error)              \

@@ -58,8 +58,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 }
 
 void Interpreter::report(
-  const common::TestResult & result,  //
-  const std::string & type,           //
+  const junit::TestResult & result,  //
+  const std::string & type,          //
   const std::string & what)
 {
   current_result = result;

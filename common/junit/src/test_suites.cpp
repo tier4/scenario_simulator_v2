@@ -19,9 +19,7 @@
 #include <junit/test_suites.hpp>
 #include <string>
 
-namespace common
-{
-inline namespace junit
+namespace junit
 {
 TestSuites::TestSuites()
 : timestamp_(boost::posix_time::to_iso_string(boost::posix_time::microsec_clock::universal_time()))
@@ -85,4 +83,3 @@ void TestSuites::write(const boost::filesystem::path & destination)
   document.save_file(destination.c_str());
 }
 }  // namespace junit
-}  // namespace common

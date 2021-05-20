@@ -15,9 +15,7 @@
 #ifndef JUNIT_EXPORTER__TEST_RESULT_HPP_
 #define JUNIT_EXPORTER__TEST_RESULT_HPP_
 
-namespace common
-{
-inline namespace junit
+namespace junit
 {
 enum class TestResult {
   SUCCESS,
@@ -25,6 +23,5 @@ enum class TestResult {
   ERROR,
 };
 }  // namespace junit
-}  // namespace common
 
 #endif  // JUNIT_EXPORTER__TEST_RESULT_HPP_

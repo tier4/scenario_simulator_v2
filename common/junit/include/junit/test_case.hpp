@@ -19,9 +19,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace common
-{
-inline namespace junit
+namespace junit
 {
 struct TestCase
 {
@@ -50,6 +48,5 @@ struct TestCase
   const std::string description;
 };
 }  // namespace junit
-}  // namespace common
 
 #endif  // JUNIT_EXPORTER__TEST_CASE_HPP_

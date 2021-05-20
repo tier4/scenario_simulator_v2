@@ -21,9 +21,7 @@
 #include <pugixml.hpp>
 #include <string>
 
-namespace common
-{
-inline namespace junit
+namespace junit
 {
 class TestSuites
 {
@@ -75,6 +73,5 @@ public:
   }
 };
 }  // namespace junit
-}  // namespace common
 
 #endif  // JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_
