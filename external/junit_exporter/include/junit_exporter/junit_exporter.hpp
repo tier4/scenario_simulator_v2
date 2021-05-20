@@ -17,6 +17,7 @@
 
 #include <boost/filesystem/path.hpp>
 #include <junit_exporter/test_suites.hpp>
+#include <numeric>
 #include <pugixml.hpp>
 #include <string>
 #include <vector>
@@ -30,9 +31,42 @@ class JunitExporter
   TestSuites test_suites_;
 
 public:
-  JunitExporter();
+  explicit JunitExporter();
 
   void write(const boost::filesystem::path & path);
+
+  auto contains(const std::string & suite_name, const std::string & case_name) const
+  {
+    const auto iter = test_suites_.find(suite_name);
+
+    if (iter != std::end(test_suites_)) {
+      return std::any_of(
+        std::begin(iter->second), std::end(iter->second),
+        [&](const auto & each_case) { return each_case.name == case_name; });
+    } else {
+      return false;
+    }
+  }
+
+  auto getTotalTime() const
+  {
+    return std::accumulate(
+      std::cbegin(test_suites_), std::cend(test_suites_), 0,
+      [](const auto sum, const auto & each_suite) {
+        const auto & each_cases = std::get<1>(each_suite);
+
+        return sum + std::accumulate(
+                       std::cbegin(each_cases), std::cend(each_cases), 0,
+                       [](const auto sum, const auto & each_case) { return sum + each_case.time; });
+      });
+  }
+
+  // auto getTotalSize() const
+  // {
+  //   return std::accumulate(
+  //     std::cbegin(test_suites_), std::cend(test_suites_), 0,
+  //     [](const auto sum, const auto & each_suite) { return sum + std::get<1>(each_suite).size(); });
+  // }
 
   template <typename... Ts>
   void addTestCase(
@@ -40,8 +74,8 @@ public:
     const std::string & case_name,   //
     Ts &&... xs)
   {
-    if (not test_suites_.existTestCase(case_name, suite_name)) {
-      test_suites_.emplaceTestCase(
+    if (not contains(suite_name, case_name)) {
+      test_suites_[suite_name].emplace_back(
         case_name, suite_name, suite_name, std::forward<decltype(xs)>(xs)...);
     }
   }

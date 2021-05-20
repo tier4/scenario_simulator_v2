@@ -16,6 +16,7 @@
 #define JUNIT_EXPORTER__TEST_SUITES_HPP_
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace junit_exporter
@@ -55,33 +56,35 @@ struct TestCase
   const std::string description;
 };
 
-// using TestSuite = std::vector<TestCase>;
+using TestSuite = std::vector<TestCase>;
 
-class TestSuites
-{
-  std::vector<TestCase> test_cases_;
+using TestSuites = std::unordered_map<std::string, TestSuite>;
 
-  // using SuiteName = std::string;
-  //
-  // std::unordered_map<SuiteName, TestSuite> test_suites_;
-
-public:
-  TestSuites() = default;
-
-  template <typename... Ts>
-  void emplaceTestCase(Ts &&... xs)
-  {
-    test_cases_.emplace_back(std::forward<decltype(xs)>(xs)...);
-  }
-
-  double getTime() const;
-
-  std::vector<std::string> getTestSuites() const;
-
-  std::vector<TestCase> getTestSuite(const std::string & test_suite);
-
-  bool existTestCase(const std::string & name, const std::string & test_suite);
-};
+// class TestSuites
+// {
+//   std::vector<TestCase> test_cases_;
+//
+//   // using SuiteName = std::string;
+//   //
+//   // std::unordered_map<SuiteName, TestSuite> test_suites_;
+//
+// public:
+//   TestSuites() = default;
+//
+//   template <typename... Ts>
+//   void emplaceTestCase(Ts &&... xs)
+//   {
+//     test_cases_.emplace_back(std::forward<decltype(xs)>(xs)...);
+//   }
+//
+//   double getTime() const;
+//
+//   std::vector<std::string> getTestSuites() const;
+//
+//   std::vector<TestCase> getTestSuite(const std::string & test_suite);
+//
+//   bool existTestCase(const std::string & name, const std::string & test_suite);
+// };
 }  // namespace junit_exporter
 
 #endif  // JUNIT_EXPORTER__TEST_SUITES_HPP_

@@ -34,49 +34,52 @@ void JunitExporter::write(const boost::filesystem::path & destination)
     boost::filesystem::remove(destination);
   }
 
-  pugi::xml_document doc;
+  pugi::xml_document document;
 
-  pugi::xml_node node = doc.append_child("testsuites");
+  pugi::xml_node node = document.append_child("testsuites");
 
   node.append_attribute("timestamp") = timestamp_.c_str();
 
-  doc.child("testsuites").append_attribute("time") = test_suites_.getTime();
-  doc.child("testsuites").append_attribute("tests") = test_suites_.getTestSuites().size();
+  document.child("testsuites").append_attribute("time") = getTotalTime();
+  document.child("testsuites").append_attribute("tests") = test_suites_.size();
 
-  for (const auto & test_suite : test_suites_.getTestSuites()) {
-    pugi::xml_node testsuite_node = doc.child("testsuites").append_child("testsuite");
-    testsuite_node.append_attribute("name") = test_suite.c_str();
-    testsuite_node.append_attribute("tests") = test_suites_.getTestSuite(test_suite).size();
+  for (const auto & each : test_suites_) {
+    const auto & suite_name = std::get<0>(each);
+    const auto & test_cases = std::get<1>(each);
 
-    for (const auto & test_case : test_suites_.getTestSuite(test_suite)) {
+    auto testsuite_node = document.child("testsuites").append_child("testsuite");
+    testsuite_node.append_attribute("name") = suite_name.c_str();
+    testsuite_node.append_attribute("tests") = test_cases.size();
+
+    for (const auto & test_case : test_cases) {
       auto testcase_node = testsuite_node.append_child("testcase");
       testcase_node.append_attribute("classname") = test_case.classname.c_str();
       testcase_node.append_attribute("name") = test_case.name.c_str();
       testcase_node.append_attribute("time") = test_case.time;
 
       switch (test_case.result) {
-        case TestResult::SUCCESS: {
-          break;
-        }
-        case TestResult::FAILURE: {
+        case TestResult::FAILURE:
           testcase_node.append_child("failure");
-          testcase_node.child("failure").append_attribute("message") = "failure detected";
+          testcase_node.child("failure").append_attribute("message") = "test failed";
           testcase_node.child("failure")
             .append_child(pugi::node_pcdata)
             .set_value(test_case.description.c_str());
           break;
-        }
-        case TestResult::ERROR: {
+
+        case TestResult::ERROR:
           testcase_node.append_child("error");
-          testcase_node.child("error").append_attribute("message") = "error detected";
+          testcase_node.child("error").append_attribute("message") = "error on test";
           testcase_node.child("error")
             .append_child(pugi::node_pcdata)
             .set_value(test_case.description.c_str());
           break;
-        }
+
+        default:
+          break;
       }
     }
   }
-  doc.save_file(destination.c_str());
+
+  document.save_file(destination.c_str());
 }
 }  // namespace junit_exporter
