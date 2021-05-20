@@ -69,20 +69,23 @@ void Interpreter::report(
     }
 
     message << "\x1b[0m";
-
-    // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-    RCLCPP_INFO_STREAM(get_logger(), message.str());
   }
 
-  exporter.addTestCase(  // XXX DIRTY HACK!!!
-    script.as<OpenScenario>().scope.scenario.string(), "scenario_testing", 0, result, type, what);
+  // TODO MOVE INTO on_deactivate
+  {
+    // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+    RCLCPP_INFO_STREAM(get_logger(), message.str());
 
-  exporter.write(output_directory + "/result.junit.xml");
+    exporter.addTestCase(  // XXX DIRTY HACK!!!
+      script.as<OpenScenario>().scope.scenario.string(), "scenario_testing", 0, result, type, what);
 
-  script.reset();
+    exporter.write(output_directory + "/result.junit.xml");
 
-  while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    script.reset();
+
+    // while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
+    //   std::this_thread::sleep_for(std::chrono::seconds(1));
+    // }
   }
 
   INTERPRETER_INFO_STREAM("Deactivate myself.");

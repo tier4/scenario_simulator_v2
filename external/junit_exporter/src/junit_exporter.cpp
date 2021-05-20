@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/time_formatters.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <junit_exporter/junit_exporter.hpp>
@@ -21,19 +22,17 @@
 namespace junit_exporter
 {
 JunitExporter::JunitExporter()
+: timestamp_(boost::posix_time::to_iso_string(boost::posix_time::microsec_clock::universal_time()))
 {
-  boost::posix_time::ptime t = boost::posix_time::microsec_clock::universal_time();
-  timestamp_ = boost::posix_time::to_iso_extended_string(t);
 }
 
 void JunitExporter::write(const std::string & path)
 {
-  namespace fs = boost::filesystem;
-  const fs::path junit_path(path);
+  const boost::filesystem::path junit_path(path);
   boost::system::error_code error;
-  const bool result = fs::exists(junit_path, error);
+  const bool result = boost::filesystem::exists(junit_path, error);
   if (result) {
-    fs::remove(junit_path);
+    boost::filesystem::remove(junit_path);
   }
   pugi::xml_document doc;
   pugi::xml_node node = doc.append_child("testsuites");
@@ -77,24 +76,28 @@ void JunitExporter::write(const std::string & path)
 }
 
 void JunitExporter::addTestCase(
-  const std::string & name, const std::string & test_suite, const double & time,
+  const std::string & case_name,   //
+  const std::string & suite_name,  //
+  const double time,               //
   const TestResult & result)
 {
-  if (test_suites_.testCaseExists(name, test_suite)) {
-    return;
+  if (not test_suites_.testCaseExists(case_name, suite_name)) {
+    auto test_case = TestCase(case_name, suite_name, suite_name, time, result);
+    test_suites_.addTestCase(test_case);
   }
-  auto test_case = TestCase(name, test_suite, test_suite, time, result);
-  test_suites_.addTestCase(test_case);
 }
 
 void JunitExporter::addTestCase(
-  const std::string & name, const std::string & test_suite, const double & time,
-  const TestResult & result, const std::string & type, const std::string & description)
+  const std::string & name,        //
+  const std::string & test_suite,  //
+  const double & time,             //
+  const TestResult & result,       //
+  const std::string & type,        //
+  const std::string & description)
 {
-  if (test_suites_.testCaseExists(name, test_suite)) {
-    return;
+  if (not test_suites_.testCaseExists(name, test_suite)) {
+    auto test_case = TestCase(name, test_suite, test_suite, time, result, type, description);
+    test_suites_.addTestCase(test_case);
   }
-  auto test_case = TestCase(name, test_suite, test_suite, time, result, type, description);
-  test_suites_.addTestCase(test_case);
 }
 }  // namespace junit_exporter

@@ -40,6 +40,7 @@ struct TestCase
     description("")
   {
   }
+
   TestCase(
     const std::string & name, const std::string & test_suite, const std::string & classname,
     const double & time, const TestResult & result, const std::string & type,
@@ -53,6 +54,7 @@ struct TestCase
     description(description)
   {
   }
+
   const std::string name;
   const std::string test_suite;
   const std::string classname;
