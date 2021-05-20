@@ -15,8 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
-#include <openscenario_interpreter/utility/visibility.h>
-
 #include <exception>
 #include <junit_exporter/junit_exporter.hpp>
 #include <lifecycle_msgs/msg/state.hpp>
@@ -24,6 +22,7 @@
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/utility/visibility.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
