@@ -19,10 +19,6 @@
 
 namespace junit_exporter
 {
-TestSuites::TestSuites() {}
-
-void TestSuites::addTestCase(const TestCase & test_case) { test_cases_.emplace_back(test_case); }
-
 double TestSuites::getTime() const
 {
   double ret = 0;

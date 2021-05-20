@@ -28,23 +28,30 @@ enum class TestResult {
 
 struct TestCase
 {
-  TestCase(
-    const std::string & name, const std::string & test_suite, const std::string & classname,
-    const double & time, const TestResult & result)
-  : name(name),
-    test_suite(test_suite),
-    classname(classname),
-    time(time),
-    result(result),
-    type("type"),
-    description("")
-  {
-  }
+  // TestCase(
+  //   const std::string & name,
+  //   const std::string & test_suite,
+  //   const std::string & classname,
+  //   const double & time,
+  //   const TestResult & result)
+  // : name(name),
+  //   test_suite(test_suite),
+  //   classname(classname),
+  //   time(time),
+  //   result(result),
+  //   type("type"),
+  //   description("")
+  // {
+  // }
 
   TestCase(
-    const std::string & name, const std::string & test_suite, const std::string & classname,
-    const double & time, const TestResult & result, const std::string & type,
-    const std::string & description)
+    const std::string & name,           //
+    const std::string & test_suite,     //
+    const std::string & classname,      //
+    const double & time,                //
+    const TestResult & result,          //
+    const std::string & type = "type",  //
+    const std::string & description = "")
   : name(name),
     test_suite(test_suite),
     classname(classname),
@@ -66,16 +73,24 @@ struct TestCase
 
 class TestSuites
 {
-public:
-  TestSuites();
-  void addTestCase(const TestCase & test_case);
-  double getTime() const;
-  std::vector<std::string> getTestSuites() const;
-  std::vector<TestCase> getTestSuite(const std::string & test_suite);
-  bool testCaseExists(const std::string & name, const std::string & test_suite);
-
-private:
   std::vector<TestCase> test_cases_;
+
+public:
+  TestSuites() = default;
+
+  template <typename... Ts>
+  void emplaceTestCase(Ts &&... xs)
+  {
+    test_cases_.emplace_back(std::forward<decltype(xs)>(xs)...);
+  }
+
+  double getTime() const;
+
+  std::vector<std::string> getTestSuites() const;
+
+  std::vector<TestCase> getTestSuite(const std::string & test_suite);
+
+  bool testCaseExists(const std::string & name, const std::string & test_suite);
 };
 }  // namespace junit_exporter
 
