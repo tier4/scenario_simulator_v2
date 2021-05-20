@@ -1,0 +1,32 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 0
+    revMinor: 0
+    date: "1970-01-01T09:00:00+09:00"
+    author: yamacir-kit
+    description: ""
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+  RoadNetwork:
+    LogicFile:
+      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
+    TrafficSignals:
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+    Story:
+      - name: ""
+        Act:
+          - name: ""
+            ManeuverGroup:
+              - name: ""
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+            StartTrigger:
+              ConditionGroup: []
+    StopTrigger:
+      ConditionGroup: []
