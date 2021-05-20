@@ -16,19 +16,19 @@
 #include <boost/date_time/posix_time/time_formatters.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <junit_exporter/junit_exporter.hpp>
+#include <junit_exporter/test_suites.hpp>
 #include <string>
 
 namespace common
 {
 inline namespace junit
 {
-JunitExporter::JunitExporter()
+TestSuites::TestSuites()
 : timestamp_(boost::posix_time::to_iso_string(boost::posix_time::microsec_clock::universal_time()))
 {
 }
 
-void JunitExporter::write(const boost::filesystem::path & destination)
+void TestSuites::write(const boost::filesystem::path & destination)
 {
   boost::system::error_code error;
 

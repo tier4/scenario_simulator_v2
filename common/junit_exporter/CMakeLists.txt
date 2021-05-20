@@ -14,7 +14,7 @@ find_package(Boost COMPONENTS date_time filesystem)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(${PROJECT_NAME} SHARED src/junit_exporter.cpp)
+ament_auto_add_library(${PROJECT_NAME} SHARED src/test_suites.cpp)
 
 target_link_libraries(${PROJECT_NAME}
   Boost::date_time

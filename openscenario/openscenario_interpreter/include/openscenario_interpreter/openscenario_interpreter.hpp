@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
 #include <exception>
-#include <junit_exporter/junit_exporter.hpp>
+#include <junit_exporter/test_suites.hpp>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
@@ -43,7 +43,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  common::JunitExporter exporter;
+  common::TestSuites exporter;
 
   const common::TestResult ERROR = common::TestResult::ERROR;
   const common::TestResult FAILURE = common::TestResult::FAILURE;
