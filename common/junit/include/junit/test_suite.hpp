@@ -15,7 +15,7 @@
 #ifndef JUNIT_EXPORTER__TEST_SUITE_HPP_
 #define JUNIT_EXPORTER__TEST_SUITE_HPP_
 
-#include <junit_exporter/test_case.hpp>
+#include <junit/test_case.hpp>
 #include <vector>
 
 namespace common

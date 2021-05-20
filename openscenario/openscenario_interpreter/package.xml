@@ -11,7 +11,7 @@
 
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
-  <depend>junit_exporter</depend>
+  <depend>junit</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>lifecycle_msgs</depend>
   <depend>openscenario_msgs</depend>

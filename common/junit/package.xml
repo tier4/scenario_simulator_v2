@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>junit_exporter</name>
+  <name>junit</name>
   <version>0.0.1</version>
-  <description>junit export library for ROS2</description>
+  <description>Lightweight JUnit library for ROS2</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

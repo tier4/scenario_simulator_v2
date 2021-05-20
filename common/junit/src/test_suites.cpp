@@ -16,7 +16,7 @@
 #include <boost/date_time/posix_time/time_formatters.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <junit_exporter/test_suites.hpp>
+#include <junit/test_suites.hpp>
 #include <string>
 
 namespace common

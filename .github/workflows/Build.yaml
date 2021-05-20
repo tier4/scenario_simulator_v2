@@ -18,8 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         package: [
-          concealer, 
-          junit_exporter,
+          concealer,
+          junit,
           lanelet2_extension_psim,
           kashiwanoha_map,
           cpp_mock_scenarios,
