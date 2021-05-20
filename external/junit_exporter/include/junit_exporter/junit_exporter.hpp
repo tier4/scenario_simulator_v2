@@ -34,15 +34,17 @@ public:
 
   void write(const boost::filesystem::path & path);
 
+  template <typename... Ts>
   void addTestCase(
-    const std::string & name,        //
-    const std::string & test_suite,  //
-    const double time,               //
-    const TestResult & result);
-
-  void addTestCase(
-    const std::string & name, const std::string & test_suite, const double & time,
-    const TestResult & result, const std::string & type, const std::string & description);
+    const std::string & case_name,   //
+    const std::string & suite_name,  //
+    Ts &&... xs)
+  {
+    if (not test_suites_.existTestCase(case_name, suite_name)) {
+      test_suites_.emplaceTestCase(
+        case_name, suite_name, suite_name, std::forward<decltype(xs)>(xs)...);
+    }
+  }
 };
 }  // namespace junit_exporter
 
