@@ -15,7 +15,7 @@
 #ifndef JUNIT_EXPORTER__TEST_CASE_HPP_
 #define JUNIT_EXPORTER__TEST_CASE_HPP_
 
-#include <junit/test_result.hpp>
+#include <simple_junit/test_result.hpp>
 #include <string>
 #include <unordered_map>
 

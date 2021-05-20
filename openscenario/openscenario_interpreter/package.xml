@@ -11,7 +11,6 @@
 
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
-  <depend>junit</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>lifecycle_msgs</depend>
   <depend>openscenario_msgs</depend>
@@ -20,6 +19,7 @@
   <depend>rclcpp_components</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>scenario_simulator_exception</depend>
+  <depend>simple_junit</depend>
   <depend>std_msgs</depend>
   <depend>traffic_simulator</depend>
 

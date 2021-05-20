@@ -15,7 +15,7 @@
 #ifndef JUNIT_EXPORTER__TEST_SUITE_HPP_
 #define JUNIT_EXPORTER__TEST_SUITE_HPP_
 
-#include <junit/test_case.hpp>
+#include <simple_junit/test_case.hpp>
 #include <vector>
 
 namespace junit

@@ -16,9 +16,9 @@
 #define JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_
 
 #include <boost/filesystem/path.hpp>
-#include <junit/test_suite.hpp>
 #include <numeric>
 #include <pugixml.hpp>
+#include <simple_junit/test_suite.hpp>
 #include <string>
 
 namespace junit
