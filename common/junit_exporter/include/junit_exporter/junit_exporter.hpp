@@ -22,7 +22,9 @@
 #include <string>
 #include <vector>
 
-namespace junit_exporter
+namespace common
+{
+inline namespace junit
 {
 class JunitExporter
 {
@@ -73,6 +75,7 @@ public:
     }
   }
 };
-}  // namespace junit_exporter
+}  // namespace junit
+}  // namespace common
 
 #endif  // JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_

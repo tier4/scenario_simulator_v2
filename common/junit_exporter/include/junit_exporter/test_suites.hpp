@@ -19,7 +19,9 @@
 #include <unordered_map>
 #include <vector>
 
-namespace junit_exporter
+namespace common
+{
+inline namespace junit
 {
 enum class TestResult {
   SUCCESS,
@@ -57,6 +59,7 @@ struct TestCase
 using TestCases = std::vector<TestCase>;
 
 using TestSuites = std::unordered_map<std::string, TestCases>;
-}  // namespace junit_exporter
+}  // namespace junit
+}  // namespace common
 
 #endif  // JUNIT_EXPORTER__TEST_SUITES_HPP_

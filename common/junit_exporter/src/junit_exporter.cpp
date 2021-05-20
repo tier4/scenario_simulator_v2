@@ -19,7 +19,9 @@
 #include <junit_exporter/junit_exporter.hpp>
 #include <string>
 
-namespace junit_exporter
+namespace common
+{
+inline namespace junit
 {
 JunitExporter::JunitExporter()
 : timestamp_(boost::posix_time::to_iso_string(boost::posix_time::microsec_clock::universal_time()))
@@ -82,4 +84,5 @@ void JunitExporter::write(const boost::filesystem::path & destination)
 
   document.save_file(destination.c_str());
 }
-}  // namespace junit_exporter
+}  // namespace junit
+}  // namespace common

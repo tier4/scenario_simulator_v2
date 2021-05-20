@@ -56,8 +56,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 }
 
 void Interpreter::report(
-  const junit_exporter::TestResult & result,  //
-  const std::string & type,                   //
+  const common::TestResult & result,  //
+  const std::string & type,           //
   const std::string & what)
 {
   std::stringstream message;

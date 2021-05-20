@@ -43,13 +43,13 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  junit_exporter::JunitExporter exporter;
+  common::JunitExporter exporter;
 
-  const junit_exporter::TestResult ERROR = junit_exporter::TestResult::ERROR;
-  const junit_exporter::TestResult FAILURE = junit_exporter::TestResult::FAILURE;
-  const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
+  const common::TestResult ERROR = common::TestResult::ERROR;
+  const common::TestResult FAILURE = common::TestResult::FAILURE;
+  const common::TestResult SUCCESS = common::TestResult::SUCCESS;
 
-  void report(const junit_exporter::TestResult &, const std::string &, const std::string & = "");
+  void report(const common::TestResult &, const std::string &, const std::string & = "");
 
 #define CATCH(TYPE)                       \
   catch (const TYPE & error)              \
