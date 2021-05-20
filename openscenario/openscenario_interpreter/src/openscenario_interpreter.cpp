@@ -53,6 +53,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
 
 #undef DECLARE_PARAMETER
+
+  reset();
 }
 
 void Interpreter::report(
@@ -60,12 +62,17 @@ void Interpreter::report(
   const std::string & type,           //
   const std::string & what)
 {
+  current_result = result;
+  current_error_type = type;
+  current_error_what = what;
+
   std::stringstream message;
   {
-    message << (result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m") << type.c_str();
+    message << (current_result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m")
+            << current_error_type.c_str();
 
-    if (not what.empty()) {
-      message << " (" << what.c_str() << ")";
+    if (not current_error_what.empty()) {
+      message << " (" << current_error_what.c_str() << ")";
     }
 
     message << "\x1b[0m";
@@ -80,9 +87,9 @@ void Interpreter::report(
       script.as<OpenScenario>().scope.scenario.parent_path().stem().string(),
       script.as<OpenScenario>().scope.scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
       0,                                                  // time
-      result,                                             //
-      type,                                               //
-      what);
+      current_result,                                     //
+      current_error_type,                                 //
+      current_error_what);
 
     test_suites.write(output_directory + "/result.junit.xml");
 
@@ -207,6 +214,7 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
+  reset();
   return Interpreter::Result::SUCCESS;
 }
 

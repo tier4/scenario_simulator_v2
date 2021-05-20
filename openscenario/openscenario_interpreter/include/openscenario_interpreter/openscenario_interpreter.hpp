@@ -49,6 +49,19 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   const common::TestResult FAILURE = common::TestResult::FAILURE;
   const common::TestResult SUCCESS = common::TestResult::SUCCESS;
 
+  common::TestResult current_result;
+
+  std::string current_error_type;
+  std::string current_error_what;
+
+  void reset()
+  {
+    current_result = common::TestResult::FAILURE;
+    current_error_type = "Failure";
+    current_error_what =
+      "The simulation time has exceeded the time specified by the scenario_test_runner";
+  }
+
   void report(const common::TestResult &, const std::string &, const std::string & = "");
 
 #define CATCH(TYPE)                       \
