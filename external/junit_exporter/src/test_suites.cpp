@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <junit_exporter/test_suites.hpp>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -21,11 +22,9 @@ namespace junit_exporter
 {
 double TestSuites::getTime() const
 {
-  double ret = 0;
-  for (const auto & test_case : test_cases_) {
-    ret = ret + test_case.time;
-  }
-  return ret;
+  return std::accumulate(
+    std::cbegin(test_cases_), std::cend(test_cases_), 0,
+    [](const auto & lhs, const auto & each) { return lhs + each.time; });
 }
 
 std::vector<std::string> TestSuites::getTestSuites() const

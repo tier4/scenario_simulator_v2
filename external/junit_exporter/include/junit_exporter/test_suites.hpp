@@ -28,29 +28,13 @@ enum class TestResult {
 
 struct TestCase
 {
-  // TestCase(
-  //   const std::string & name,
-  //   const std::string & test_suite,
-  //   const std::string & classname,
-  //   const double & time,
-  //   const TestResult & result)
-  // : name(name),
-  //   test_suite(test_suite),
-  //   classname(classname),
-  //   time(time),
-  //   result(result),
-  //   type("type"),
-  //   description("")
-  // {
-  // }
-
-  TestCase(
-    const std::string & name,           //
-    const std::string & test_suite,     //
-    const std::string & classname,      //
-    const double & time,                //
-    const TestResult & result,          //
-    const std::string & type = "type",  //
+  explicit TestCase(
+    const std::string & name,              //
+    const std::string & test_suite,        //
+    const std::string & classname,         //
+    const double & time,                   //
+    const TestResult & result,             //
+    const std::string & type = "untyped",  //
     const std::string & description = "")
   : name(name),
     test_suite(test_suite),
