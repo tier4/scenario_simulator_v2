@@ -77,7 +77,7 @@ void Interpreter::report(
     RCLCPP_INFO_STREAM(get_logger(), message.str());
 
     exporter.addTestCase(
-      "scenario_test",                                    // suite-name
+      script.as<OpenScenario>().scope.scenario.parent_path().stem().string(),
       script.as<OpenScenario>().scope.scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
       0,                                                  // time
       result,                                             //

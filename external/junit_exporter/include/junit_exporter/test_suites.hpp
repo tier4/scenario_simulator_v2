@@ -31,14 +31,12 @@ struct TestCase
 {
   explicit TestCase(
     const std::string & name,              //
-    const std::string & test_suite,        //
     const std::string & classname,         //
     const double & time,                   //
     const TestResult & result,             //
     const std::string & type = "untyped",  //
     const std::string & description = "")
   : name(name),
-    test_suite(test_suite),
     classname(classname),
     time(time),
     result(result),
@@ -56,35 +54,9 @@ struct TestCase
   const std::string description;
 };
 
-using TestSuite = std::vector<TestCase>;
+using TestCases = std::vector<TestCase>;
 
-using TestSuites = std::unordered_map<std::string, TestSuite>;
-
-// class TestSuites
-// {
-//   std::vector<TestCase> test_cases_;
-//
-//   // using SuiteName = std::string;
-//   //
-//   // std::unordered_map<SuiteName, TestSuite> test_suites_;
-//
-// public:
-//   TestSuites() = default;
-//
-//   template <typename... Ts>
-//   void emplaceTestCase(Ts &&... xs)
-//   {
-//     test_cases_.emplace_back(std::forward<decltype(xs)>(xs)...);
-//   }
-//
-//   double getTime() const;
-//
-//   std::vector<std::string> getTestSuites() const;
-//
-//   std::vector<TestCase> getTestSuite(const std::string & test_suite);
-//
-//   bool existTestCase(const std::string & name, const std::string & test_suite);
-// };
+using TestSuites = std::unordered_map<std::string, TestCases>;
 }  // namespace junit_exporter
 
 #endif  // JUNIT_EXPORTER__TEST_SUITES_HPP_

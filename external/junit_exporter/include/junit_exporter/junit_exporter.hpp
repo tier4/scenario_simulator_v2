@@ -61,13 +61,6 @@ public:
       });
   }
 
-  // auto getTotalSize() const
-  // {
-  //   return std::accumulate(
-  //     std::cbegin(test_suites_), std::cend(test_suites_), 0,
-  //     [](const auto sum, const auto & each_suite) { return sum + std::get<1>(each_suite).size(); });
-  // }
-
   template <typename... Ts>
   void addTestCase(
     const std::string & suite_name,  //
@@ -76,7 +69,7 @@ public:
   {
     if (not contains(suite_name, case_name)) {
       test_suites_[suite_name].emplace_back(
-        case_name, suite_name, suite_name, std::forward<decltype(xs)>(xs)...);
+        case_name, suite_name, std::forward<decltype(xs)>(xs)...);
     }
   }
 };
