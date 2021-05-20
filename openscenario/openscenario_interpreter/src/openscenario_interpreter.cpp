@@ -66,40 +66,6 @@ void Interpreter::report(
   current_error_type = type;
   current_error_what = what;
 
-  std::stringstream message;
-  {
-    message << (current_result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m")
-            << current_error_type.c_str();
-
-    if (not current_error_what.empty()) {
-      message << " (" << current_error_what.c_str() << ")";
-    }
-
-    message << "\x1b[0m";
-  }
-
-  // TODO MOVE INTO on_deactivate
-  {
-    // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-    RCLCPP_INFO_STREAM(get_logger(), message.str());
-
-    test_suites.addTestCase(
-      script.as<OpenScenario>().scope.scenario.parent_path().stem().string(),
-      script.as<OpenScenario>().scope.scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
-      0,                                                  // time
-      current_result,                                     //
-      current_error_type,                                 //
-      current_error_what);
-
-    test_suites.write(output_directory + "/result.junit.xml");
-
-    script.reset();
-
-    // while (get_current_state().id() != lifecycle_msgs::msg::State::PRIMARY_STATE_ACTIVE) {
-    //   std::this_thread::sleep_for(std::chrono::seconds(1));
-    // }
-  }
-
   INTERPRETER_INFO_STREAM("Deactivate myself.");
   deactivate();
   INTERPRETER_INFO_STREAM("Deactivated myself.");
@@ -205,16 +171,49 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("Deactivating.");
-  connection.~API();
-  timer.reset();
+
+  timer.reset();  // Deactivate scenario evaluation
+
+  connection.~API();  // Deactivate simulator
+
+  std::stringstream message;
+  {
+    message << (current_result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m")
+            << current_error_type.c_str();
+
+    if (not current_error_what.empty()) {
+      message << " (" << current_error_what.c_str() << ")";
+    }
+
+    message << "\x1b[0m";
+  }
+
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+  RCLCPP_INFO_STREAM(get_logger(), message.str());
+
   record_end();
+
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
+
+  test_suites.addTestCase(
+    script.as<OpenScenario>().scope.scenario.parent_path().stem().string(),
+    script.as<OpenScenario>().scope.scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
+    0,                                                  // time
+    current_result,                                     //
+    current_error_type,                                 //
+    current_error_what);
+
+  test_suites.write(output_directory + "/result.junit.xml");
+
+  script.reset();
+
   reset();
+
   return Interpreter::Result::SUCCESS;
 }
 
