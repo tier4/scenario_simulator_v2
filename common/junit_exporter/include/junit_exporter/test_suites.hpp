@@ -15,6 +15,7 @@
 #ifndef JUNIT_EXPORTER__TEST_SUITES_HPP_
 #define JUNIT_EXPORTER__TEST_SUITES_HPP_
 
+#include <junit_exporter/test_result.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -23,12 +24,6 @@ namespace common
 {
 inline namespace junit
 {
-enum class TestResult {
-  SUCCESS,
-  FAILURE,
-  ERROR,
-};
-
 struct TestCase
 {
   explicit TestCase(
