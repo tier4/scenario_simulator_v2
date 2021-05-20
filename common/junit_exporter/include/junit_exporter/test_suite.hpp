@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef JUNIT_EXPORTER__TEST_SUITES_HPP_
-#define JUNIT_EXPORTER__TEST_SUITES_HPP_
+#ifndef JUNIT_EXPORTER__TEST_SUITE_HPP_
+#define JUNIT_EXPORTER__TEST_SUITE_HPP_
 
-#include <junit_exporter/test_suite.hpp>
-#include <unordered_map>
+#include <junit_exporter/test_case.hpp>
+#include <vector>
 
 namespace common
 {
 inline namespace junit
 {
-using TestSuites = std::unordered_map<std::string, TestSuite>;
+using TestCases = std::vector<TestCase>;
+
+using TestSuite = TestCases;
 }  // namespace junit
 }  // namespace common
 
-#endif  // JUNIT_EXPORTER__TEST_SUITES_HPP_
+#endif  // JUNIT_EXPORTER__TEST_SUITE_HPP_
