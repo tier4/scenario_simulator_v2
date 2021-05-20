@@ -55,9 +55,15 @@ struct TestCase
   const std::string description;
 };
 
+// using TestSuite = std::vector<TestCase>;
+
 class TestSuites
 {
   std::vector<TestCase> test_cases_;
+
+  // using SuiteName = std::string;
+  //
+  // std::unordered_map<SuiteName, TestSuite> test_suites_;
 
 public:
   TestSuites() = default;

@@ -76,8 +76,13 @@ void Interpreter::report(
     // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
     RCLCPP_INFO_STREAM(get_logger(), message.str());
 
-    exporter.addTestCase(  // XXX DIRTY HACK!!!
-      script.as<OpenScenario>().scope.scenario.string(), "scenario_testing", 0, result, type, what);
+    exporter.addTestCase(
+      "scenario_test",                                    // suite-name
+      script.as<OpenScenario>().scope.scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
+      0,                                                  // time
+      result,                                             //
+      type,                                               //
+      what);
 
     exporter.write(output_directory + "/result.junit.xml");
 

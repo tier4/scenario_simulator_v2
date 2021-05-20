@@ -36,8 +36,8 @@ public:
 
   template <typename... Ts>
   void addTestCase(
-    const std::string & case_name,   //
     const std::string & suite_name,  //
+    const std::string & case_name,   //
     Ts &&... xs)
   {
     if (not test_suites_.existTestCase(case_name, suite_name)) {
