@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(junit_exporter)
+project(simple_junit)
 
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
@@ -14,9 +14,7 @@ find_package(Boost COMPONENTS date_time filesystem)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(${PROJECT_NAME} SHARED
-  src/junit_exporter.cpp
-  src/test_suites.cpp)
+ament_auto_add_library(${PROJECT_NAME} SHARED src/test_suites.cpp)
 
 target_link_libraries(${PROJECT_NAME}
   Boost::date_time
