@@ -74,7 +74,7 @@ public:
 
   std::vector<TestCase> getTestSuite(const std::string & test_suite);
 
-  bool testCaseExists(const std::string & name, const std::string & test_suite);
+  bool existTestCase(const std::string & name, const std::string & test_suite);
 };
 }  // namespace junit_exporter
 

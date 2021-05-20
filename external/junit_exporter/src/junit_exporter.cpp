@@ -81,7 +81,7 @@ void JunitExporter::addTestCase(
   const double time,               //
   const TestResult & result)
 {
-  if (not test_suites_.testCaseExists(case_name, suite_name)) {
+  if (not test_suites_.existTestCase(case_name, suite_name)) {
     auto test_case = TestCase(case_name, suite_name, suite_name, time, result);
     test_suites_.emplaceTestCase(test_case);
   }
@@ -95,7 +95,7 @@ void JunitExporter::addTestCase(
   const std::string & type,        //
   const std::string & description)
 {
-  if (not test_suites_.testCaseExists(name, test_suite)) {
+  if (not test_suites_.existTestCase(name, test_suite)) {
     auto test_case = TestCase(name, test_suite, test_suite, time, result, type, description);
     test_suites_.emplaceTestCase(test_case);
   }

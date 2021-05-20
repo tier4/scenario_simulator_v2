@@ -49,13 +49,10 @@ std::vector<TestCase> TestSuites::getTestSuite(const std::string & test_suite)
   return ret;
 }
 
-bool TestSuites::testCaseExists(const std::string & name, const std::string & test_suite)
+bool TestSuites::existTestCase(const std::string & name, const std::string & test_suite)
 {
-  for (const auto & test_case : test_cases_) {
-    if (test_case.test_suite == test_suite && test_case.name == name) {
-      return true;
-    }
-  }
-  return false;
+  return std::any_of(std::cbegin(test_cases_), std::cend(test_cases_), [&](const auto & each) {
+    return each.test_suite == test_suite and each.name == name;
+  });
 }
 }  // namespace junit_exporter
