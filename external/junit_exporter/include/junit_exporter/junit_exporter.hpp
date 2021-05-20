@@ -15,6 +15,7 @@
 #ifndef JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_
 #define JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_
 
+#include <boost/filesystem/path.hpp>
 #include <junit_exporter/test_suites.hpp>
 #include <pugixml.hpp>
 #include <string>
@@ -31,7 +32,7 @@ class JunitExporter
 public:
   JunitExporter();
 
-  void write(const std::string & path);
+  void write(const boost::filesystem::path & path);
 
   void addTestCase(
     const std::string & name,        //

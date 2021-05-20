@@ -26,14 +26,14 @@ JunitExporter::JunitExporter()
 {
 }
 
-void JunitExporter::write(const std::string & path)
+void JunitExporter::write(const boost::filesystem::path & destination)
 {
-  const boost::filesystem::path junit_path(path);
   boost::system::error_code error;
-  const bool result = boost::filesystem::exists(junit_path, error);
-  if (result) {
-    boost::filesystem::remove(junit_path);
+
+  if (boost::filesystem::exists(destination, error)) {
+    boost::filesystem::remove(destination);
   }
+
   pugi::xml_document doc;
   pugi::xml_node node = doc.append_child("testsuites");
 
@@ -72,7 +72,7 @@ void JunitExporter::write(const std::string & path)
       }
     }
   }
-  doc.save_file(path.c_str());
+  doc.save_file(destination.c_str());
 }
 
 void JunitExporter::addTestCase(
