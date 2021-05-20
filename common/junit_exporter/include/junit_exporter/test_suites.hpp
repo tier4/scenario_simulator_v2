@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,42 +15,13 @@
 #ifndef JUNIT_EXPORTER__TEST_SUITES_HPP_
 #define JUNIT_EXPORTER__TEST_SUITES_HPP_
 
-#include <junit_exporter/test_result.hpp>
-#include <string>
-#include <unordered_map>
+#include <junit_exporter/test_case.hpp>
 #include <vector>
 
 namespace common
 {
 inline namespace junit
 {
-struct TestCase
-{
-  explicit TestCase(
-    const std::string & name,              //
-    const std::string & classname,         //
-    const double & time,                   //
-    const TestResult & result,             //
-    const std::string & type = "untyped",  //
-    const std::string & description = "")
-  : name(name),
-    classname(classname),
-    time(time),
-    result(result),
-    type(type),
-    description(description)
-  {
-  }
-
-  const std::string name;
-  const std::string test_suite;
-  const std::string classname;
-  const double time;
-  const TestResult result;
-  const std::string type;
-  const std::string description;
-};
-
 using TestCases = std::vector<TestCase>;
 
 using TestSuites = std::unordered_map<std::string, TestCases>;
