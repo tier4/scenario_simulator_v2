@@ -47,6 +47,8 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     std::bind(
       &ScenarioSimulator::updateEntityStatus, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
+      &ScenarioSimulator::updateEgoStatus, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
       &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
@@ -87,6 +89,12 @@ void ScenarioSimulator::updateFrame(
   current_ros_time_ = t;
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
+}
+
+void ScenarioSimulator ::updateEgoStatus(
+  const simulation_api_schema::UpdateEgoStatusRequest & req,
+  simulation_api_schema::UpdateEgoStatusResponse & res)
+{
 }
 
 void ScenarioSimulator::updateEntityStatus(

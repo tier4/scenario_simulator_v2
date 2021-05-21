@@ -62,6 +62,10 @@ public:
       simulation_api_schema::UpdateEntityStatusResponse &)>
       update_entity_status_func,
     std::function<void(
+      const simulation_api_schema::UpdateEgoStatusRequest &,
+      simulation_api_schema::UpdateEgoStatusResponse &)>
+      update_ego_status_func,
+    std::function<void(
       const simulation_api_schema::AttachLidarSensorRequest &,
       simulation_api_schema::AttachLidarSensorResponse &)>
       attach_lidar_sensor_func,
@@ -111,6 +115,11 @@ private:
     const simulation_api_schema::UpdateEntityStatusRequest &,
     simulation_api_schema::UpdateEntityStatusResponse &)>
     update_entity_status_func_;
+  zmqpp::socket update_ego_status_sock_;
+  std::function<void(
+    const simulation_api_schema::UpdateEgoStatusRequest &,
+    simulation_api_schema::UpdateEgoStatusResponse &)>
+    update_ego_status_func_;
   zmqpp::socket attach_lidar_sensor_sock_;
   std::function<void(
     const simulation_api_schema::AttachLidarSensorRequest &,
