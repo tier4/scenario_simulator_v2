@@ -102,8 +102,12 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     // DEBUG_VALUE(getCurrentTime());
     // DEBUG_VALUE(all_ready);
 
-    if (not engaged and 0 <= getCurrentTime()) {
-      if (all_ready) {
+    if (0 <= getCurrentTime()) {
+      if (engaged) {
+        for (auto && story : *this) {
+          story.evaluate();
+        }
+      } else if (all_ready) {
         for (const auto & each : inner_scope.entities) {
           engage(each.first);
         }
@@ -111,10 +115,6 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
       } else {
         throw common::AutowareError(
           "Autoware does not respond. It is likely that some nodes were corrupted during launch");
-      }
-    } else if (engaged) {
-      for (auto && story : *this) {
-        story.evaluate();
       }
     }
   }
