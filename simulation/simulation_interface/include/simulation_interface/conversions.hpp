@@ -25,6 +25,8 @@
 #include <std_msgs.pb.h>
 
 #include <autoware_control_msgs/msg/control_command.hpp>
+#include <autoware_vehicle_msgs/msg/shift.hpp>
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -126,6 +128,8 @@ void toProto(
 void toMsg(
   const autoware_control_msgs::ControlCommand & proto,
   autoware_control_msgs::msg::ControlCommand & control_command);
+void toProto(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift);
+void toMsg(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_
