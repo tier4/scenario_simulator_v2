@@ -130,6 +130,12 @@ void toMsg(
   autoware_control_msgs::msg::ControlCommand & control_command);
 void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto);
 void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift);
+void toProto(
+  const autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command,
+  autoware_vehicle_msgs::VehicleCommand & proto);
+void toMsg(
+  const autoware_vehicle_msgs::VehicleCommand & proto,
+  autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_
