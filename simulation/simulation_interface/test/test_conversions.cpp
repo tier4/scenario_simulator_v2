@@ -25,6 +25,17 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 
+#define EXPECT_CONTROL_COMMAND_EQ(msg, proto)                                     \
+  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());                               \
+  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
+  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
+  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
+
+#define EXPECT_HEADER_EQ(msg, proto)                            \
+  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str()); \
+  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());                \
+  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
+
 TEST(Conversion, ConvertPoint)
 {
   geometry_msgs::Point proto;
@@ -348,16 +359,12 @@ TEST(Conversion, Header)
   msg.stamp.nanosec = 4;
   msg.stamp.sec = 1;
   simulation_interface::toProto(msg, proto);
-  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str());
-  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());
-  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
+  EXPECT_HEADER_EQ(msg, proto);
   msg.frame_id = "";
   msg.stamp.nanosec = 0;
   msg.stamp.sec = 0;
   simulation_interface::toMsg(proto, msg);
-  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str());
-  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());
-  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
+  EXPECT_HEADER_EQ(msg, proto);
 }
 
 TEST(Conversion, ControlCommand)
@@ -369,10 +376,7 @@ TEST(Conversion, ControlCommand)
   msg.steering_angle_velocity = 13.4;
   msg.velocity = 11.3;
   simulation_interface::toProto(msg, proto);
-  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());
-  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity());
-  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());
-  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
+  EXPECT_CONTROL_COMMAND_EQ(msg, proto);
   msg.acceleration = 0;
   msg.steering_angle = 0;
   msg.steering_angle_velocity = 0;
@@ -395,6 +399,42 @@ TEST(Conversion, Shift)
   msg.data = 1023;
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+}
+
+TEST(Conversion, VehicleCommand)
+{
+  autoware_vehicle_msgs::VehicleCommand proto;
+  autoware_vehicle_msgs::msg::VehicleCommand msg;
+  msg.control.velocity = 1.2;
+  msg.control.steering_angle_velocity = 19.3;
+  msg.control.steering_angle = 12.0;
+  msg.control.steering_angle_velocity = 192.4;
+  msg.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+  msg.emergency = 1;
+  msg.header.frame_id = "base_link";
+  msg.header.stamp.nanosec = 99;
+  msg.header.stamp.sec = 3;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_TRUE(msg.shift.data == proto.shift().data());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  msg.shift.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+  EXPECT_HEADER_EQ(msg.header, proto.header());
+  EXPECT_EQ(msg.emergency, proto.emergency());
+  msg = autoware_vehicle_msgs::msg::VehicleCommand();
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_TRUE(msg.shift.data == proto.shift().data());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  msg.shift.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+  EXPECT_HEADER_EQ(msg.header, proto.header());
+  EXPECT_EQ(msg.emergency, proto.emergency());
 }
 
 int main(int argc, char ** argv)

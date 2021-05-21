@@ -434,4 +434,24 @@ void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::ms
       break;
   }
 }
+
+void toProto(
+  const autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command,
+  autoware_vehicle_msgs::VehicleCommand & proto)
+{
+  toProto(vehicle_command.control, *proto.mutable_control());
+  proto.set_emergency(vehicle_command.emergency);
+  toProto(vehicle_command.header, *proto.mutable_header());
+  toProto(vehicle_command.shift, *proto.mutable_shift());
+}
+
+void toMsg(
+  const autoware_vehicle_msgs::VehicleCommand & proto,
+  autoware_vehicle_msgs::msg::VehicleCommand & vehicle_command)
+{
+  toMsg(proto.control(), vehicle_command.control);
+  vehicle_command.emergency = proto.emergency();
+  toMsg(proto.header(), vehicle_command.header);
+  toMsg(proto.shift(), vehicle_command.shift);
+}
 }  // namespace simulation_interface

@@ -24,7 +24,7 @@ message Shift
 **/
 message VehicleCommand
 {
-  std_msgs.Header stamp = 1;
+  std_msgs.Header header = 1;
   autoware_control_msgs.ControlCommand control = 2;
   Shift shift = 3;
   int32 emergency = 4;
