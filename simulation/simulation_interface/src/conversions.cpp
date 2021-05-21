@@ -377,36 +377,7 @@ void toMsg(
   control_command.steering_angle_velocity = proto.steering_angle_velocity();
 }
 
-void toProto(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift)
-{
-  switch (proto.data()) {
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::NONE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::NONE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING:
-      shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL:
-      shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE:
-      shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-      break;
-    case autoware_vehicle_msgs::SHIFT_POSITIONS::LOW:
-      shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-      break;
-    default:
-      THROW_SEMANTIC_ERROR(
-        "shift position is invalid while converting proto to ROS2 message, shit position is ",
-        proto.data());
-      break;
-  }
-}
-
-void toMsg(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto)
+void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msgs::Shift & proto)
 {
   switch (shift.data) {
     case autoware_vehicle_msgs::msg::Shift::NONE:
@@ -430,6 +401,35 @@ void toMsg(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_msg
     default:
       THROW_SEMANTIC_ERROR(
         "shift position is invalid while converting ROS2 message to proto, shit position is ",
+        proto.data());
+      break;
+  }
+}
+
+void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::msg::Shift & shift)
+{
+  switch (proto.data()) {
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::NONE:
+      shift.data = autoware_vehicle_msgs::msg::Shift::NONE;
+      break;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING:
+      shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
+      break;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::REVERSE:
+      shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
+      break;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::NEUTRAL:
+      shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+      break;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::DRIVE:
+      shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
+      break;
+    case autoware_vehicle_msgs::SHIFT_POSITIONS::LOW:
+      shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
+      break;
+    default:
+      THROW_SEMANTIC_ERROR(
+        "shift position is invalid while converting proto to ROS2 message, shit position is ",
         proto.data());
       break;
   }

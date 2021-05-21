@@ -21,6 +21,7 @@
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
 
@@ -377,6 +378,23 @@ TEST(Conversion, ControlCommand)
   msg.steering_angle_velocity = 0;
   msg.velocity = 0;
   simulation_interface::toMsg(proto, msg);
+}
+
+TEST(Conversion, Shift)
+{
+  autoware_vehicle_msgs::Shift proto;
+  proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
+  autoware_vehicle_msgs::msg::Shift msg;
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
 }
 
 int main(int argc, char ** argv)
