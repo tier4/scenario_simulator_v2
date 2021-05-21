@@ -38,7 +38,7 @@ const unsigned int spawn_vehicle_entity = 5558;
 const unsigned int spawn_pedestrian_entity = 5559;
 const unsigned int despawn_entity = 5560;
 const unsigned int update_entity_status = 5561;
-const unsinged int updage_ego_status = 5562;
+const unsigned int updage_ego_status = 5562;
 const unsigned int attach_lidar_sensor = 5563;
 const unsigned int attach_detection_sensor = 5564;
 }  // namespace ports

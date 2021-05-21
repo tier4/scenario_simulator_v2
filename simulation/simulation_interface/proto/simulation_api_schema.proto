@@ -3,6 +3,7 @@ syntax = "proto3";
 import "geometry_msgs.proto";
 import "openscenario_msgs.proto";
 import "builtin_interfaces.proto";
+import "autoware_vehicle_msgs.proto";
 package simulation_api_schema;
 
 /**
@@ -144,6 +145,22 @@ message UpdateEntityStatusResponse
 {
     Result result = 1; // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
     repeated UpdatedEntityStatus status = 2; // List of updated entity status in sensor/dynamics simulator.
+}
+
+/**
+ * Requests updating ego entity status.
+**/
+message UpdateEgoStatusRequest
+{
+    autoware_vehicle_msgs.VehicleCommand vehicle_command = 1;
+}
+
+/**
+ * Response of updating ego entity status.
+**/
+message UpdateEgoStatusResponse
+{
+    Result result = 1; // Result of [UpdateEgoStatusRequest](#UpdateEgoStatusRequest)
 }
 
 /**
