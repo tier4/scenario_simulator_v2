@@ -344,4 +344,16 @@ void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & clock
 {
   toMsg(proto.clock(), clock.clock);
 }
+
+void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto)
+{
+  proto.set_frame_id(header.frame_id);
+  toProto(header.stamp, *proto.mutable_stamp());
+}
+
+void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header)
+{
+  header.frame_id = proto.frame_id();
+  toMsg(proto.stamp(), header.stamp);
+}
 }  // namespace simulation_interface

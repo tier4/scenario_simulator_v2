@@ -339,6 +339,25 @@ TEST(Conversion, Duration)
   EXPECT_EQ(msg.sec, proto.sec());
 }
 
+TEST(Conversion, Header)
+{
+  std_msgs::Header proto;
+  std_msgs::msg::Header msg;
+  msg.frame_id = "base_link";
+  msg.stamp.nanosec = 4;
+  msg.stamp.sec = 1;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str());
+  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());
+  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
+  msg.frame_id = "";
+  msg.stamp.nanosec = 0;
+  msg.stamp.sec = 0;
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str());
+  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());
+  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
+}
 
 int main(int argc, char ** argv)
 {

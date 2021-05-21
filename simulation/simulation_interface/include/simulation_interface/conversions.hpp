@@ -15,11 +15,14 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
+#include <autoware_control_msgs.pb.h>
+#include <autoware_vehicle_msgs.pb.h>
 #include <builtin_interfaces.pb.h>
 #include <geometry_msgs.pb.h>
 #include <openscenario_msgs.pb.h>
 #include <rosgraph_msgs.pb.h>
 #include <simulation_api_schema.pb.h>
+#include <std_msgs.pb.h>
 
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
@@ -43,6 +46,7 @@
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/constants.hpp>
+#include <std_msgs/msg/header.hpp>
 #include <string>
 #include <vector>
 
@@ -113,6 +117,8 @@ void toProto(const builtin_interfaces::msg::Time & time, builtin_interfaces::Tim
 void toMsg(const builtin_interfaces::Time & proto, builtin_interfaces::msg::Time & time);
 void toProto(const rosgraph_msgs::msg::Clock & time, rosgraph_msgs::Clock & proto);
 void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time);
+void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
+void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_
