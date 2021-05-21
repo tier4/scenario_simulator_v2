@@ -553,7 +553,7 @@ auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanele
 
 void EntityManager::updateEgo(const double current_time, const double step_time) {}
 
-boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> getEgoVehicleCommand()
+boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> EntityManager::getEgoVehicleCommand()
 {
   return boost::none;
 }
