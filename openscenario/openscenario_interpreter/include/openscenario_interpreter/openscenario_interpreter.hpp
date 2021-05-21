@@ -15,18 +15,17 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
-#include <openscenario_interpreter/utility/visibility.h>
-
 #include <exception>
-#include <junit_exporter/junit_exporter.hpp>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/utility/visibility.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <simple_junit/test_suites.hpp>
 #include <string>
 #include <utility>
 
@@ -44,13 +43,26 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  junit_exporter::JunitExporter exporter;
+  junit::TestSuites test_suites;
 
-  const junit_exporter::TestResult ERROR = junit_exporter::TestResult::ERROR;
-  const junit_exporter::TestResult FAILURE = junit_exporter::TestResult::FAILURE;
-  const junit_exporter::TestResult SUCCESS = junit_exporter::TestResult::SUCCESS;
+  const junit::TestResult ERROR = junit::TestResult::ERROR;
+  const junit::TestResult FAILURE = junit::TestResult::FAILURE;
+  const junit::TestResult SUCCESS = junit::TestResult::SUCCESS;
 
-  void report(const junit_exporter::TestResult &, const std::string &, const std::string & = "");
+  junit::TestResult current_result;
+
+  std::string current_error_type;
+  std::string current_error_what;
+
+  void reset()
+  {
+    current_result = junit::TestResult::FAILURE;
+    current_error_type = "Failure";
+    current_error_what =
+      "The simulation time has exceeded the time specified by the scenario_test_runner";
+  }
+
+  void report(const junit::TestResult &, const std::string &, const std::string & = "");
 
 #define CATCH(TYPE)                       \
   catch (const TYPE & error)              \
