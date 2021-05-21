@@ -24,6 +24,7 @@
 #include <simulation_api_schema.pb.h>
 #include <std_msgs.pb.h>
 
+#include <autoware_control_msgs/msg/control_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -119,6 +120,12 @@ void toProto(const rosgraph_msgs::msg::Clock & time, rosgraph_msgs::Clock & prot
 void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time);
 void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
 void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
+void toProto(
+  const autoware_control_msgs::msg::ControlCommand & control_command,
+  autoware_control_msgs::ControlCommand & proto);
+void toMsg(
+  const autoware_control_msgs::ControlCommand & proto,
+  autoware_control_msgs::msg::ControlCommand & control_command);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

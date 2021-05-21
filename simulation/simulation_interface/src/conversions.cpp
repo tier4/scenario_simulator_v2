@@ -356,4 +356,24 @@ void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header)
   header.frame_id = proto.frame_id();
   toMsg(proto.stamp(), header.stamp);
 }
+
+void toProto(
+  const autoware_control_msgs::msg::ControlCommand & control_command,
+  autoware_control_msgs::ControlCommand & proto)
+{
+  proto.set_velocity(control_command.velocity);
+  proto.set_acceleration(control_command.acceleration);
+  proto.set_steering_angle(control_command.steering_angle);
+  proto.set_steering_angle_velocity(control_command.steering_angle_velocity);
+}
+
+void toMsg(
+  const autoware_control_msgs::ControlCommand & proto,
+  autoware_control_msgs::msg::ControlCommand & control_command)
+{
+  control_command.velocity = proto.velocity();
+  control_command.acceleration = proto.acceleration();
+  control_command.steering_angle = proto.steering_angle();
+  control_command.steering_angle_velocity = proto.steering_angle_velocity();
+}
 }  // namespace simulation_interface

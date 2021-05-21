@@ -359,6 +359,26 @@ TEST(Conversion, Header)
   EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
 }
 
+TEST(Conversion, ControlCommand)
+{
+  autoware_control_msgs::ControlCommand proto;
+  autoware_control_msgs::msg::ControlCommand msg;
+  msg.acceleration = 3;
+  msg.steering_angle = 1.4;
+  msg.steering_angle_velocity = 13.4;
+  msg.velocity = 11.3;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());
+  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity());
+  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());
+  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
+  msg.acceleration = 0;
+  msg.steering_angle = 0;
+  msg.steering_angle_velocity = 0;
+  msg.velocity = 0;
+  simulation_interface::toMsg(proto, msg);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
