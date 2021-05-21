@@ -326,7 +326,7 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
+  entity_manager_ptr_->updateNpc(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
   if (!standalone_mode) {
     simulation_api_schema::UpdateFrameRequest req;

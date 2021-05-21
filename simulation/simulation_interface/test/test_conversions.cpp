@@ -307,6 +307,39 @@ TEST(Conversion, ConvertActionStatus)
   EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
 }
 
+TEST(Conversion, Time)
+{
+  builtin_interfaces::Time proto;
+  builtin_interfaces::msg::Time msg;
+  msg.nanosec = 1;
+  msg.sec = 2;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+  msg.nanosec = 0;
+  msg.sec = 0;
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+}
+
+TEST(Conversion, Duration)
+{
+  builtin_interfaces::Duration proto;
+  builtin_interfaces::msg::Duration msg;
+  msg.nanosec = 1;
+  msg.sec = 2;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+  msg.nanosec = 0;
+  msg.sec = 0;
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+}
+
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

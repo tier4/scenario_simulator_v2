@@ -322,7 +322,7 @@ public:
   auto toMapPose(const openscenario_msgs::msg::LaneletPose &) const
     -> const geometry_msgs::msg::Pose;
 
-  void update(const double current_time, const double step_time);
+  void updateNpc(const double current_time, const double step_time);
 
   void updateHdmapMarker();
 };

@@ -41,7 +41,7 @@ message DetectionSensorConfiguration
 **/
 message UpdatedEntityStatus
 {
-    string name = 1; // Name og the entity.
+    string name = 1; // Name of the entity.
     openscenario_msgs.ActionStatus action_status = 2; // Action status of the entity.
     geometry_msgs.Pose pose = 3; // Pose of the entity in the map coordinate.
 }
