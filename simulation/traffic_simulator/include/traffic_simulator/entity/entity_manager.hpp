@@ -322,6 +322,8 @@ public:
   auto toMapPose(const openscenario_msgs::msg::LaneletPose &) const
     -> const geometry_msgs::msg::Pose;
 
+  void updateEgo(const double current_time, const double step_time);
+  boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> getEgoVehicleCommand();
   void updateNpc(const double current_time, const double step_time);
 
   void updateHdmapMarker();

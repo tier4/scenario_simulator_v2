@@ -326,6 +326,17 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
+  entity_manager_ptr_->updateEgo(clock_.getCurrentSimulationTime(), clock_.getStepTime());
+  const auto vehicle_cmd = entity_manager_ptr_->getEgoVehicleCommand();
+  if (vehicle_cmd) {
+    simulation_api_schema::UpdateEgoStatusRequest req;
+    simulation_interface::toProto(vehicle_cmd.get(), *req.mutable_vehicle_command());
+    simulation_api_schema::UpdateEgoStatusResponse res;
+    update_ego_status_client_.call(req, res);
+    if (!res.result().success()) {
+      return false;
+    }
+  }
   entity_manager_ptr_->updateNpc(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
   if (!standalone_mode) {

@@ -95,6 +95,9 @@ void ScenarioSimulator ::updateEgoStatus(
   const simulation_api_schema::UpdateEgoStatusRequest & req,
   simulation_api_schema::UpdateEgoStatusResponse & res)
 {
+  res = simulation_api_schema::UpdateEgoStatusResponse();
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("");
 }
 
 void ScenarioSimulator::updateEntityStatus(

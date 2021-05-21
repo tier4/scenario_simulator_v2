@@ -551,6 +551,13 @@ auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanele
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
 
+void EntityManager::updateEgo(const double current_time, const double step_time) {}
+
+boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> getEgoVehicleCommand()
+{
+  return boost::none;
+}
+
 void EntityManager::updateNpc(const double current_time, const double step_time)
 {
   std::chrono::system_clock::time_point start, end;
