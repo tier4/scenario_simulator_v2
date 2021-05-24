@@ -17,6 +17,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <memory>
+#include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
@@ -47,35 +48,46 @@ void DetectionSensor::update(
       auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
       if (result != detected_objects.end()) {
         autoware_perception_msgs::msg::DynamicObject object;
-        if (s.type() == openscenario_msgs::EntityType::EGO) {
-          continue;
-        } else if (s.type() == openscenario_msgs::EntityType::VEHICLE) {
-          object.semantic.type = object.semantic.CAR;
-          object.semantic.confidence = 1;
-        } else if (s.type() == openscenario_msgs::EntityType::PEDESTRIAN) {
-          object.semantic.type = object.semantic.PEDESTRIAN;
-          object.semantic.confidence = 1;
+        bool is_ego = false;
+        switch (s.type()) {
+          case openscenario_msgs::EntityType::EGO:
+            is_ego = true;
+            break;
+          case openscenario_msgs::EntityType::VEHICLE:
+            object.semantic.type = object.semantic.CAR;
+            object.semantic.confidence = 1;
+            break;
+          case openscenario_msgs::EntityType::PEDESTRIAN:
+            object.semantic.type = object.semantic.PEDESTRIAN;
+            object.semantic.confidence = 1;
+            break;
+          default:
+            throw SimulationRuntimeError("unsupported entity type!");
+            break;
         }
-        boost::uuids::uuid base =
-          boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
-        boost::uuids::name_generator gen(base);
-        boost::uuids::uuid uuid = gen(s.name());
-        std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
-        simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
-        geometry_msgs::msg::Pose pose;
-        simulation_interface::toMsg(s.pose(), pose);
-        object.state.pose_covariance.pose = pose;
-        object.state.pose_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-                                                   0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-                                                   0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
-        object.shape.type = object.shape.BOUNDING_BOX;
-        object.state.orientation_reliable = true;
-        simulation_interface::toMsg(s.action_status().twist(), object.state.twist_covariance.twist);
-        object.state.twist_reliable = true;
-        simulation_interface::toMsg(
-          s.action_status().accel(), object.state.acceleration_covariance.accel);
-        object.state.acceleration_reliable = true;
-        msg.objects.emplace_back(object);
+        if (!is_ego) {
+          boost::uuids::uuid base =
+            boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
+          boost::uuids::name_generator gen(base);
+          boost::uuids::uuid uuid = gen(s.name());
+          std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
+          simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
+          geometry_msgs::msg::Pose pose;
+          simulation_interface::toMsg(s.pose(), pose);
+          object.state.pose_covariance.pose = pose;
+          object.state.pose_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                                                     0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+                                                     0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
+          object.shape.type = object.shape.BOUNDING_BOX;
+          object.state.orientation_reliable = true;
+          simulation_interface::toMsg(
+            s.action_status().twist(), object.state.twist_covariance.twist);
+          object.state.twist_reliable = true;
+          simulation_interface::toMsg(
+            s.action_status().accel(), object.state.acceleration_covariance.accel);
+          object.state.acceleration_reliable = true;
+          msg.objects.emplace_back(object);
+        }
       }
     }
     publisher_ptr_->publish(msg);
