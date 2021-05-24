@@ -123,7 +123,7 @@ struct SpeedAction
   auto update()
   {
     for (auto && each : accomplishments) {
-      each.second = each.second || check(each.first);
+      each.second = each.second or check(each.first);
     }
   }
 
