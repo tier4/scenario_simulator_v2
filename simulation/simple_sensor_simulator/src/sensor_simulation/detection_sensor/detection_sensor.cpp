@@ -41,15 +41,14 @@ void DetectionSensor::update(
   if ((current_time - last_update_stamp_) >= configuration_.update_duration()) {
     autoware_perception_msgs::msg::DynamicObjectArray msg;
     msg.header.stamp = stamp;
-    msg.header.frame_id = "base_link";
+    msg.header.frame_id = "map";
     last_update_stamp_ = current_time;
     for (const auto & s : status) {
       auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
       if (result != detected_objects.end()) {
         autoware_perception_msgs::msg::DynamicObject object;
         if (s.type() == openscenario_msgs::EntityType::EGO) {
-          object.semantic.type = object.semantic.CAR;
-          object.semantic.confidence = 1;
+          continue;
         } else if (s.type() == openscenario_msgs::EntityType::VEHICLE) {
           object.semantic.type = object.semantic.CAR;
           object.semantic.confidence = 1;
@@ -63,6 +62,18 @@ void DetectionSensor::update(
         boost::uuids::uuid uuid = gen(s.name());
         std::copy(uuid.begin(), uuid.end(), object.id.uuid.begin());
         simulation_interface::toMsg(s.bounding_box().dimensions(), object.shape.dimensions);
+        geometry_msgs::msg::Pose pose;
+        simulation_interface::toMsg(s.pose(), pose);
+        object.state.pose_covariance.pose = pose;
+        object.state.pose_covariance.covariance = 
+        {
+          1, 0, 0, 0, 0, 0,
+          0, 1, 0, 0, 0, 0,
+          0, 0, 1, 0, 0, 0,
+          0, 0, 0, 1, 0, 0,
+          0, 0, 0, 0, 1, 0,
+          0, 0, 0, 0, 0, 1,
+        };
         object.shape.type = object.shape.BOUNDING_BOX;
         object.state.orientation_reliable = true;
         simulation_interface::toMsg(s.action_status().twist(), object.state.twist_covariance.twist);
