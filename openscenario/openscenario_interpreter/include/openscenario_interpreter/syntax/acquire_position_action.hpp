@@ -48,38 +48,59 @@ struct AcquirePositionAction
   {
   }
 
+  auto operator()(const Scope::Actor & actor) const
+  {
+    if (position.is<LanePosition>()) {
+      requestAcquirePosition(
+        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
+    } else {
+      THROW_IMPLEMENTATION_FAULT();
+    }
+  }
+
   std::unordered_map<String, Boolean> accomplishments;
+
+  auto reset()
+  {
+    accomplishments.clear();
+    for (const auto & actor : inner_scope.actors) {
+      accomplishments.emplace(actor, false);
+    }
+  }
 
   auto start()
   {
-    accomplishments.clear();
+    reset();
 
+    for (const auto & actor : inner_scope.actors) {
+      (*this)(actor);
+    }
+
+    return unspecified;
+  }
+
+  auto check(const String & actor)
+  {
     if (position.is<LanePosition>()) {
-      for (const auto & actor : inner_scope.actors) {
-        accomplishments.emplace(actor, false);
-        requestAcquirePosition(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
-      }
+      return isReachedPosition(
+        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()), 1.0);
     } else {
       THROW_IMPLEMENTATION_FAULT();
+    }
+  }
+
+  auto update()
+  {
+    for (auto && each : accomplishments) {
+      each.second = each.second or check(each.first);
     }
   }
 
 #ifndef OPENSCENARIO_INTERPRETER_NO_EXTENSION
   auto accomplished()
   {
-    if (position.is<LanePosition>()) {
-      for (auto && each : accomplishments) {
-        if (!cdr(each)) {
-          cdr(each) = isReachedPosition(
-            car(each),
-            static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()), 5.0);
-        }
-      }
-      return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
-    } else {
-      THROW_IMPLEMENTATION_FAULT();
-    }
+    update();
+    return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
   }
 #else
   const std::true_type accomplished{};
