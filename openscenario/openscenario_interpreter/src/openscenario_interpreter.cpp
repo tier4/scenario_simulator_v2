@@ -135,7 +135,8 @@ try {
     boost::filesystem::path(osc_path).replace_extension(""),  // NOTE: /path/to/lanelet2_map.osm
     script.as<OpenScenario>().scope.logic_file.string(),      //
     with_autoware ? 30 : 0,
-    false  // auto-sink
+    false,  // auto-sink
+    true    // verbose
   );
 
   initialize(
