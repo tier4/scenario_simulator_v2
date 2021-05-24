@@ -65,14 +65,9 @@ void DetectionSensor::update(
         geometry_msgs::msg::Pose pose;
         simulation_interface::toMsg(s.pose(), pose);
         object.state.pose_covariance.pose = pose;
-        object.state.pose_covariance.covariance = 
-        {
-          1, 0, 0, 0, 0, 0,
-          0, 1, 0, 0, 0, 0,
-          0, 0, 1, 0, 0, 0,
-          0, 0, 0, 1, 0, 0,
-          0, 0, 0, 0, 1, 0,
-          0, 0, 0, 0, 0, 1,
+        object.state.pose_covariance.covariance = {
+          1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+          0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1,
         };
         object.shape.type = object.shape.BOUNDING_BOX;
         object.state.orientation_reliable = true;
