@@ -16,6 +16,7 @@
 
 #include <limits>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <stdexcept>
@@ -279,6 +280,8 @@ bool API::updateSensorFrame()
   }
   simulation_api_schema::UpdateSensorFrameRequest req;
   req.set_current_time(clock_.getCurrentSimulationTime());
+  simulation_interface::toProto(
+    clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
   simulation_api_schema::UpdateSensorFrameResponse res;
   update_sensor_frame_client_.call(req, res);
   return res.result().success();
@@ -331,7 +334,8 @@ bool API::updateFrame()
   if (!standalone_mode) {
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(clock_.getCurrentSimulationTime());
-    simulation_interface::toProto(clock_.getCurrentRosTime(), *req.mutable_current_ros_time());
+    simulation_interface::toProto(
+      clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
     simulation_api_schema::UpdateFrameResponse res;
     update_frame_client_.call(req, res);
     if (!res.result().success()) {
