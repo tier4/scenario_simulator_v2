@@ -23,17 +23,18 @@ namespace traffic_simulator
 class SimulationClock : rclcpp::Clock
 {
 public:
-  SimulationClock();
+  SimulationClock(rcl_clock_type_t clock_type = RCL_ROS_TIME, bool use_raw_clock = true);
   void initialize(double initial_simulation_time, double step_time);
   void update();
   double getCurrentSimulationTime() const { return current_simulation_time_; }
   double getStepTime() const { return step_time_; }
-  rclcpp::Time getCurrentRosTime() const;
-  rosgraph_msgs::msg::Clock getCurrentRosTimeAsMsg() const;
+  const rclcpp::Time getCurrentRosTime();
+  const rosgraph_msgs::msg::Clock getCurrentRosTimeAsMsg();
+  const bool use_raw_clock;
 
 private:
   rclcpp::Duration step_time_duration_;
-  rclcpp::Time system_time_on_initialize_;
+  rclcpp::Time time_on_initialize_;
   double current_simulation_time_;
   double initial_simulation_time_;
   double step_time_;
