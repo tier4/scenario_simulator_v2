@@ -93,7 +93,7 @@ struct ScenarioObject
         assignController(name, object_controller);
         if (object_controller.isEgo()) {
           attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-            traffic_simulator::helper::LidarType::VLP32, name
+            traffic_simulator::helper::LidarType::VLP16, name
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
             ,
             "/sensing/lidar/no_ground/pointcloud"
