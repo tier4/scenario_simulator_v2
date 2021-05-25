@@ -23,7 +23,10 @@ namespace metrics
 {
 MetricsManager::MetricsManager(
   bool verbose, const std::string & logfile_path, bool file_output_every_frame)
-: logfile_path(logfile_path), file_output_every_frame(file_output_every_frame), metrics_(), file_(logfile_path)
+: logfile_path(logfile_path),
+  file_output_every_frame(file_output_every_frame),
+  metrics_(),
+  file_(logfile_path)
 {
   verbose_ = verbose;
 }

@@ -31,10 +31,7 @@ class MetricsManager
 public:
   explicit MetricsManager(
     bool verbose, const std::string & logfile_path, bool file_out_every_frame = false);
-  ~MetricsManager()
-  {
-    file_ << log_;
-  }
+  ~MetricsManager() { file_ << log_; }
   void setVerbose(bool verbose);
   void setEntityManager(
     std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
