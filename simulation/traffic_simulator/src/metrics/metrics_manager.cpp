@@ -23,7 +23,7 @@ namespace metrics
 {
 MetricsManager::MetricsManager(
   bool verbose, const std::string & logfile_path, bool file_output_every_frame)
-: logfile_path(logfile_path), file_output_every_frame(file_output_every_frame), metrics_()
+: logfile_path(logfile_path), file_output_every_frame(file_output_every_frame), metrics_(), file_(logfile_path)
 {
   verbose_ = verbose;
 }
@@ -61,10 +61,7 @@ void MetricsManager::calculate()
   }
   double current_time = entity_manager_ptr_->getCurrentTime();
   log_[std::to_string(current_time)] = log;
-  if (file_output_every_frame) {
-    std::ofstream file(logfile_path);
-    file << log_;
-  }
+  file_ << log_;
 }
 
 void MetricsManager::setEntityManager(

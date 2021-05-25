@@ -30,11 +30,10 @@ class MetricsManager
 {
 public:
   explicit MetricsManager(
-    bool verbose, const std::string & logfile_path, bool file_output_every_frame = false);
+    bool verbose, const std::string & logfile_path, bool file_out_every_frame = false);
   ~MetricsManager()
   {
-    std::ofstream file(logfile_path);
-    file << log_;
+    file_ << log_;
   }
   void setVerbose(bool verbose);
   void setEntityManager(
@@ -55,6 +54,7 @@ private:
   nlohmann::json log_;
   std::unordered_map<std::string, std::shared_ptr<MetricBase>> metrics_;
   std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
+  std::ofstream file_;
 };
 }  // namespace metrics
 
