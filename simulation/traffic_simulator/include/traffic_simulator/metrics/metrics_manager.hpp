@@ -30,7 +30,7 @@ class MetricsManager
 {
 public:
   explicit MetricsManager(
-    bool verbose, const std::string & logfile_path, bool file_output_every_frame = true);
+    bool verbose, const std::string & logfile_path, bool file_output_every_frame = false);
   ~MetricsManager()
   {
     std::ofstream file(logfile_path);
