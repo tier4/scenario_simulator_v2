@@ -29,7 +29,8 @@ namespace metrics
 class MetricsManager
 {
 public:
-  explicit MetricsManager(bool verbose, const std::string & logfile_path);
+  explicit MetricsManager(
+    bool verbose, const std::string & logfile_path, bool file_output_every_frame = true);
   ~MetricsManager()
   {
     std::ofstream file(logfile_path);
@@ -47,6 +48,7 @@ public:
   }
   void calculate();
   const std::string logfile_path;
+  const bool file_output_every_frame;
 
 private:
   bool verbose_;
