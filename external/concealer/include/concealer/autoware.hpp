@@ -15,13 +15,15 @@
 #ifndef CONCEALER__AUTOWARE_HPP_
 #define CONCEALER__AUTOWARE_HPP_
 
-// #define AUTOWARE_AUTO
-#include <exception>
-#define AUTOWARE_ARCHITECTURE_PROPOSAL
+#include <concealer/autoware_def.hpp>
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
-#include <sys/wait.h>
+// #ifdef AUTOWARE_AUTO
+// // twist needs to be included manually when api's are not included
+// #include <geometry_msgs/msg/twist.hpp>
+// #include <concealer/conversion.hpp>
+// #endif
 
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
@@ -31,8 +33,10 @@
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/utility/visibility.hpp>
+#include <exception>
 #include <future>
 #include <mutex>
+#include <sys/wait.h>
 #include <thread>
 #include <utility>
 
@@ -52,12 +56,8 @@ namespace concealer
  *
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
-
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
                  public FundamentalAPI<Autoware>,
                  public MiscellaneousAPI<Autoware>,
-#endif
-
                  public ContinuousTransformBroadcaster<Autoware>,
                  public TransitionAssertion<Autoware>
 {
@@ -121,12 +121,15 @@ public:
         }
         RCLCPP_INFO_STREAM(
           get_logger(),
-          "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
+          "\x1b[32mShutting down Autoware: (1/2) Stoped publlishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
     updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
   {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    // Lane change is not implemented in Autoware.Auto
     setLaneChangeApproval();
+#endif
   }
 
   virtual ~Autoware();

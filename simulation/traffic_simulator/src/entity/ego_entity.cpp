@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <concealer/autoware_def.hpp>
+
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -199,6 +201,8 @@ auto EgoEntity::getCurrentAction() const -> const std::string
 {
   std::stringstream message;
   {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    // *** getAutowareStatus - FundamentalAPI dependency ***
     const auto state{ego_entities.at(name).getAutowareStatus().autoware_state};
 
     message << (state.empty() ? "Starting" : state)  //
@@ -207,6 +211,10 @@ auto EgoEntity::getCurrentAction() const -> const std::string
             << std::setprecision(2)                  //
             << (status_ ? status_->time : 0)         //
             << ")";
+#endif
+#ifdef AUTOWARE_AUTO
+    // TODO: implement Autoware.Auto equivalent when state monitoring is there
+#endif
   }
 
   return message.str();
@@ -303,9 +311,22 @@ auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 {
   openscenario_msgs::msg::WaypointsArray waypoints;
 
+
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+  // Trajectory returned by getTrajectory() is a different message between AAP and AA
   for (const auto & point : ego_entities.at(name).getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);
   }
+#endif
+#ifdef AUTOWARE_AUTO
+  for (const auto & point : autowares.at(name).getTrajectory().points) {
+    geometry_msgs::msg::Point waypoint;
+    waypoint.x = point.x;
+    waypoint.y = point.y;
+    waypoint.z = 0;
+    waypoints.waypoints.push_back(waypoint);
+  }
+#endif
 
   return waypoints;
 }
@@ -348,9 +369,16 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER: {
         Eigen::VectorXd input(2);
 
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
         input <<  //
           ego_entities.at(name).getVehicleCommand().control.velocity,
           ego_entities.at(name).getVehicleCommand().control.steering_angle;
+#endif
+#ifdef AUTOWARE_AUTO
+        input <<  //
+          ego_entities.at(name).getVehicleControlCommand().velocity_mps,
+          ego_entities.at(name).getVehicleControlCommand().front_wheel_angle_rad;
+#endif
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -358,12 +386,21 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER_ACC: {
         Eigen::VectorXd input(3);
 
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
         using autoware_vehicle_msgs::msg::Shift;
 
         input <<  //
           ego_entities.at(name).getVehicleCommand().control.acceleration,
           ego_entities.at(name).getVehicleCommand().control.steering_angle,
           ego_entities.at(name).getVehicleCommand().shift.data == Shift::REVERSE ? -1.0 : 1.0;
+#endif
+#ifdef AUTOWARE_AUTO
+        input <<  //
+          ego_entities.at(name).getVehicleControlCommand().velocity_mps,
+          ego_entities.at(name).getVehicleControlCommand().front_wheel_angle_rad,
+          ego_entities.at(name).getVehicleStateCommand().gear ==
+            autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE ? -1.0 : 1.0;
+#endif
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -466,11 +503,16 @@ void EgoEntity::setTargetSpeed(double value, bool)
     } break;
 
     case VehicleModelType::DELAY_STEER: {
-      Eigen::VectorXd v(5);
-      {
-        v << 0, 0, 0, value, 0;
-      }
-
+    Eigen::VectorXd v(5);
+    {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+      v << 0, 0, 0, value, 0;
+#endif
+#ifdef AUTOWARE_AUTO
+      // non-zero initial speed prevents behavioral planner from planning
+      v << 0, 0, 0, 0, 0;
+#endif
+    }
       (*vehicle_model_ptr_).setState(v);
     } break;
 

@@ -12,6 +12,13 @@
   <depend>python-yamale-pip</depend>
   <depend>rclpy</depend>
 
+  <exec_depend>simple_sensor_simulator</exec_depend>
+  <exec_depend>openscenario_interpreter</exec_depend>
+  <exec_depend>openscenario_utility</exec_depend>
+
+  <!-- AutowareAuto launch -->
+  <exec_depend>scenario_test_runner_launch</exec_depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
