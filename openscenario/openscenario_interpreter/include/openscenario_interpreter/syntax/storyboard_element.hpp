@@ -17,6 +17,7 @@
 
 #include <boost/mpl/and.hpp>
 #include <boost/scope_exit.hpp>
+#include <concealer/conversion.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <string>
 #include <type_traits>
