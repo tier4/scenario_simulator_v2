@@ -22,24 +22,24 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Priority =============================================================
+/* ---- PRIORITY ---------------------------------------------------------------
  *
- * <xsd:simpleType name="Priority">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="overwrite"/>
- *         <xsd:enumeration value="skip"/>
- *         <xsd:enumeration value="parallel"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="Priority">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="overwrite"/>
+ *          <xsd:enumeration value="skip"/>
+ *          <xsd:enumeration value="parallel"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Priority
 {
   enum value_type {
@@ -76,6 +76,7 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Priority 
   static_assert(true, "")
 
   BOILERPLATE(overwrite);
+  BOILERPLATE(parallel);
 
 #undef BOILERPLATE
 
@@ -89,7 +90,6 @@ std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Priority 
   static_assert(true, "")
 
   BOILERPLATE(skip);
-  BOILERPLATE(parallel);
 
 #undef BOILERPLATE
 
