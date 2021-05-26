@@ -84,6 +84,7 @@ struct converter<From, std_msgs::msg::Float32>
   }
 };
 
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
 template <typename From>
 struct converter<From, autoware_vehicle_msgs::msg::Engage>
 {
@@ -100,6 +101,8 @@ struct converter<From, autoware_vehicle_msgs::msg::Engage>
     return to;
   }
 };
+#endif
+
 }  // namespace concealer
 
 #endif  // CONCEALER__CONVERSION_HPP_

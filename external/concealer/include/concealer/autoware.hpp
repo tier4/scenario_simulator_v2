@@ -15,19 +15,26 @@
 #ifndef CONCEALER__AUTOWARE_HPP_
 #define CONCEALER__AUTOWARE_HPP_
 
-// #define AUTOWARE_AUTO
+#define AUTOWARE_AUTO
 #include <exception>
-#define AUTOWARE_ARCHITECTURE_PROPOSAL
+// #define AUTOWARE_ARCHITECTURE_PROPOSAL
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
+
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+#include <concealer/fundamental_api.hpp>
+#include <concealer/miscellaneous_api.hpp>
+#endif
+
+#ifdef AUTOWARE_AUTO
+#include <geometry_msgs/msg/twist.hpp>
+#endif
 
 #include <sys/wait.h>
 
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/fundamental_api.hpp>
 #include <concealer/launch.hpp>
-#include <concealer/miscellaneous_api.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/utility/visibility.hpp>
@@ -61,9 +68,11 @@ class Autoware : public rclcpp::Node,
                  public ContinuousTransformBroadcaster<Autoware>,
                  public TransitionAssertion<Autoware>
 {
-  friend class ContinuousTransformBroadcaster<Autoware>;
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   friend class FundamentalAPI<Autoware>;
   friend class MiscellaneousAPI<Autoware>;
+#endif
+  friend class ContinuousTransformBroadcaster<Autoware>;
   friend class TransitionAssertion<Autoware>;
 
   std::mutex mutex;
@@ -126,7 +135,9 @@ public:
       std::move(promise.get_future())),
     updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
   {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
     setLaneChangeApproval();
+#endif
   }
 
   virtual ~Autoware();
