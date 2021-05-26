@@ -101,7 +101,7 @@ public:
 
   auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool override;
 
-  void setTargetSpeed(double, bool) override;
+  void setTargetSpeed(const TargetSpeedType & target, const bool continuous) override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

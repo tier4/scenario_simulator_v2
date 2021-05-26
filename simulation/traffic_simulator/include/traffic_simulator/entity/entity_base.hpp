@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
 #include <boost/optional.hpp>
+#include <boost/variant.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/bounding_box.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
@@ -102,7 +103,9 @@ public:
 
   virtual auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool;
 
-  virtual void setTargetSpeed(const double target_speed, const bool continuous) = 0;
+  using RelativeTargetType = std::pair<std::function<double(double)>, std::string>;  // rel2abs, ref
+  using TargetSpeedType = boost::variant<double /* abs */, RelativeTargetType>;
+  virtual void setTargetSpeed(const TargetSpeedType & target, const bool continuous) = 0;
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)

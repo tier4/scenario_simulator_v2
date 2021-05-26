@@ -26,6 +26,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include "scenario_simulator_exception/exception.hpp"
 
 #define DEBUG_VALUE(...) \
   std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
@@ -329,11 +330,13 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
   return success;
 }
 
-void EgoEntity::setTargetSpeed(double value, bool)
+void EgoEntity::setTargetSpeed(const TargetSpeedType & target, const bool /*continuous*/)
 {
   Eigen::VectorXd v(5);
-  {
-    v << 0, 0, 0, value, 0;
+  if (auto * value = boost::get<double>(&target)) {
+    v << 0, 0, 0, *value, 0;
+  } else if (auto * ref_target = boost::get<RelativeTargetType>(&target)) {
+    THROW_SIMULATION_ERROR("relative target is not supported yet");
   }
 
   (*vehicle_model_ptr_).setState(v);

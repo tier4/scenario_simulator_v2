@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
+#include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
 #include <string>
 #include <unordered_map>
@@ -64,18 +65,38 @@ struct SpeedAction
   }
 
   template <typename T>
-  decltype(auto) setLinearTransition(const Scope::Actor & actor, const T value) const
+  decltype(auto) setLinearTransitionAbs(
+    const Scope::Actor & actor, const T value, bool continuous = true) const
   {
-    return setTargetSpeed(actor, value, true);
+    return setTargetSpeed(actor, value, continuous);
   }
 
   template <typename T>
-  decltype(auto) setStepTransition(const Scope::Actor & actor, const T value) const
+  decltype(auto) setStepTransitionAbs(
+    const Scope::Actor & actor, const T value, bool continuous = true) const
   {
     auto status = getEntityStatus(actor);
     status.action_status.twist.linear.x = value;
     setEntityStatus(actor, status);
-    return setTargetSpeed(actor, status.action_status.twist.linear.x, true);
+    return setTargetSpeed(actor, status.action_status.twist.linear.x, continuous);
+  }
+
+  template <typename F>
+  decltype(auto) setLinearTransitionRel(
+    const Scope::Actor & actor, std::pair<F, std::string> && target, bool continuous = true) const
+  {
+    return setTargetSpeed(actor, std::move(target), continuous);
+  }
+
+  template <typename F>
+  decltype(auto) setStepTransitionRel(
+    const Scope::Actor & actor, std::pair<F, std::string> && target, bool continuous = true) const
+  {
+    auto status = getEntityStatus(actor);
+    auto ref_status = getEntityStatus(target.second);
+    status.action_status.twist.linear.x = target.first(ref_status.action_status.twist.linear.x);
+    setEntityStatus(actor, status);
+    return setTargetSpeed(actor, std::move(target), continuous);
   }
 
   decltype(auto) operator()(const Scope::Actor & actor) const
@@ -83,12 +104,37 @@ struct SpeedAction
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       switch (speed_action_dynamics.dynamics_shape) {
         case DynamicsShape::linear:
-          return setLinearTransition(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
+          return setLinearTransitionAbs(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
         case DynamicsShape::step:
-          return setStepTransition(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
+          return setStepTransitionAbs(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
         default:
           THROW(ImplementationFault);
       }
+    } else if (speed_action_target.is<RelativeTargetSpeed>()) {
+      auto & rts = speed_action_target.as<RelativeTargetSpeed>();
+
+      std::function<double(double)> rel2abs;
+      switch (rts.speed_target_value_type) {
+        case SpeedTargetValueType::delta:
+          rel2abs = [delta = rts.value](auto rel) { return rel + delta; };
+          break;
+        case SpeedTargetValueType::factor:
+          rel2abs = [factor = rts.value](auto rel) { return factor * rel; };
+          break;
+        default:
+          THROW(ImplementationFault);
+      }
+      switch (speed_action_dynamics.dynamics_shape) {
+        case DynamicsShape::linear:
+          return setLinearTransitionRel(
+            actor, std::make_pair(rel2abs, rts.entity_ref), rts.continuous);
+        case DynamicsShape::step:
+          return setStepTransitionRel(
+            actor, std::make_pair(rel2abs, rts.entity_ref), rts.continuous);
+        default:
+          THROW(ImplementationFault);
+      }
+      THROW(ImplementationFault);
     } else {
       THROW(ImplementationFault);
     }
@@ -113,6 +159,10 @@ struct SpeedAction
       return compare(
         getEntityStatus(actor).action_status.twist.linear.x,
         speed_action_target.as<AbsoluteTargetSpeed>().value);
+    } else if (speed_action_target.is<RelativeTargetSpeed>()) {
+      auto & rts = speed_action_target.as<RelativeTargetSpeed>();
+      // TODO: Implementation
+      THROW(ImplementationFault);
     } else {
       THROW(ImplementationFault);
     }
