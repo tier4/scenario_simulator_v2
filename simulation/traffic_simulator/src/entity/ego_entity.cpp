@@ -101,17 +101,20 @@ auto EgoEntity::getCurrentAction() const -> const std::string
 {
   std::stringstream message;
   {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
     // *** getAutowareStatus - FundamentalAPI dependency ***
-    // TODO: take care of if traffic simulator is needed
+    const auto state{autowares.at(name).getAutowareStatus().autoware_state};
 
-    // const auto state{autowares.at(name).getAutowareStatus().autoware_state};
-
-    // message << (state.empty() ? "Starting" : state)  //
-    //         << "_(t_=_"                              //
-    //         << std::fixed                            //
-    //         << std::setprecision(2)                  //
-    //         << (status_ ? status_->time : 0)         //
-    //         << ")";
+    message << (state.empty() ? "Starting" : state)  //
+            << "_(t_=_"                              //
+            << std::fixed                            //
+            << std::setprecision(2)                  //
+            << (status_ ? status_->time : 0)         //
+            << ")";
+#endif
+#ifdef AUTOWARE_AUTO
+    // TODO: implement
+#endif
   }
 
   return message.str();
@@ -208,12 +211,15 @@ auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 {
   openscenario_msgs::msg::WaypointsArray waypoints;
 
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   // *** getTrajectory - MiscellaneousAPI dependency ***
-  // TODO: take care of if traffic simulator is needed
-
-  // for (const auto & point : autowares.at(name).getTrajectory().points) {
-  //   waypoints.waypoints.emplace_back(point.pose.position);
-  // }
+  for (const auto & point : autowares.at(name).getTrajectory().points) {
+    waypoints.waypoints.emplace_back(point.pose.position);
+  }
+#endif
+#ifdef AUTOWARE_AUTO
+    // TODO: implement
+#endif
 
   return waypoints;
 }
@@ -252,12 +258,15 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   } else {
     Eigen::VectorXd input(2);
     {
-      // *** getVehicleCommand - MiscellaneousAPI dependency ***
-      // TODO: take care of if traffic simulator is needed
-
-      // input <<  //
-      //   autowares.at(name).getVehicleCommand().control.velocity,
-      //   autowares.at(name).getVehicleCommand().control.steering_angle;
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+      *** getVehicleCommand - MiscellaneousAPI dependency ***
+      input <<  //
+        autowares.at(name).getVehicleCommand().control.velocity,
+        autowares.at(name).getVehicleCommand().control.steering_angle;
+#endif
+#ifdef AUTOWARE_AUTO
+      // TODO: implement
+#endif
     }
 
     (*vehicle_model_ptr_).setInput(input);

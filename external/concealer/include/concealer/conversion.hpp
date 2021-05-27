@@ -85,6 +85,7 @@ struct converter<From, std_msgs::msg::Float32>
 };
 
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+// Engage is not used in Autoware.Auto
 template <typename From>
 struct converter<From, autoware_vehicle_msgs::msg::Engage>
 {

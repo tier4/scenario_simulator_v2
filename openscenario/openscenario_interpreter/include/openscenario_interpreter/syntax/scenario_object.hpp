@@ -99,9 +99,8 @@ struct ScenarioObject
             "/sensing/lidar/no_ground/pointcloud"
 #endif
 #ifdef AUTOWARE_AUTO
-            // TODO: figure out Autoware.Auto equivalent
             ,
-            "/sensing/lidar/no_ground/pointcloud"
+            "/perception/points_nonground"
 #endif
             ));
           attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
@@ -111,6 +110,7 @@ struct ScenarioObject
 #endif
 #ifdef AUTOWARE_AUTO
             // TODO: figure out Autoware.Auto equivalent
+            // publishing autoware_perception_msgs::msg::DynamicObjectArray
             "/perception/object_recognition/objects",
 #endif
             0.1));
