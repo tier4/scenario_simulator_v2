@@ -12,68 +12,60 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
-#include <sstream>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, SpeedTargetValueType & type)
+std::istream & operator>>(std::istream & is, SpeedTargetValueType & datum)
 {
-  std::string buffer{};
+  std::string buffer;
 
   is >> buffer;
 
-#define BOILERPLATE(IDENTIFIER)                    \
-  if (buffer == #IDENTIFIER) {                     \
-    type.value = SpeedTargetValueType::IDENTIFIER; \
-    return is;                                     \
-  }                                                \
+#define BOILERPLATE(IDENTIFIER)                     \
+  if (buffer == #IDENTIFIER) {                      \
+    datum.value = SpeedTargetValueType::IDENTIFIER; \
+    return is;                                      \
+  }                                                 \
   static_assert(true, "")
 
   BOILERPLATE(delta);
 
 #undef BOILERPLATE
 
-#define BOILERPLATE(IDENTIFIER)                                                                   \
-  if (buffer == #IDENTIFIER) {                                                                    \
-    std::stringstream ss{};                                                                       \
-    ss << "given value \'" << buffer                                                              \
-       << "\' is valid OpenSCENARIO value of type SpeedTargetValueType, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                          \
-  }                                                                                               \
+#define BOILERPLATE(IDENTIFIER)                                                  \
+  if (buffer == #IDENTIFIER) {                                                   \
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(SpeedTargetValueType, buffer); \
+  }                                                                              \
   static_assert(true, "")
 
   BOILERPLATE(factor);
 
 #undef BOILERPLATE
 
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type SpeedTargetValueType";
-  throw SyntaxError{ss.str()};
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(SpeedTargetValueType, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const SpeedTargetValueType & type)
+std::ostream & operator<<(std::ostream & os, const SpeedTargetValueType & datum)
 {
-  switch (type) {
 #define BOILERPLATE(NAME)          \
   case SpeedTargetValueType::NAME: \
     return os << #NAME;
 
+  switch (datum) {
     BOILERPLATE(delta);
     BOILERPLATE(factor);
 
-#undef BOILERPLATE
-
     default:
-      std::stringstream ss{};
-      ss << "enum class SpeedTargetValueType holds unexpected value "
-         << static_cast<SpeedTargetValueType::value_type>(type);
-      throw ImplementationFault{ss.str()};
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(SpeedTargetValueType, datum);
   }
+
+#undef BOILERPLATE
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
