@@ -73,7 +73,7 @@ struct Position : public Element
       return static_cast<geometry_msgs::msg::Pose>(as<LanePosition>());
     } else {
       // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-      UNSUPPORTED_ELEMENT_SPECIFIED(Position, type().name());
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(Position, type().name());
     }
   }
 };

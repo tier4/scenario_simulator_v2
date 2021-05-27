@@ -46,8 +46,7 @@ namespace openscenario_interpreter
  *  -- Error
  *      |-- SyntaxError
  *      |    `-- InvalidEnumeration
- *      |-- SemanticError
- *      `-- ImplementationFault
+ *      `-- SemanticError
  *
  * -------------------------------------------------------------------------- */
 struct Error : public std::runtime_error
