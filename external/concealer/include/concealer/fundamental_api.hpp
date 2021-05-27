@@ -49,6 +49,7 @@ template <typename Node>
 class FundamentalAPI
 {
 public:
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   /* ---- AutowareEngage -------------------------------------------------------
    *
    *  Topic: /awapi/autoware/put/engage
@@ -210,10 +211,14 @@ public:
       // throw common::AutowareError("Autoware is in emergency state now");
     }
   }
+#endif
 
+#ifdef AUTOWARE_AUTO
+#endif
 public:
   explicit FundamentalAPI()
-  : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),
@@ -222,6 +227,10 @@ public:
     INIT_SUBSCRIPTION(AutowareStatus, "/awapi/autoware/get/status", checkAutowareState),
     // INIT_SUBSCRIPTION(TrafficLightStatus, "/awapi/traffic_light/get/status", []() {}),
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
+#endif
+
+#ifdef AUTOWARE_AUTO
+#endif
   {
   }
 };

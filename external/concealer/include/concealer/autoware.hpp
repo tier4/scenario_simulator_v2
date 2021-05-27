@@ -21,10 +21,8 @@
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
 #include <concealer/fundamental_api.hpp>
 #include <concealer/miscellaneous_api.hpp>
-#endif
 
 #ifdef AUTOWARE_AUTO
 // twist needs to be included manually when api's are not included
@@ -62,18 +60,14 @@ namespace concealer
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
                  public FundamentalAPI<Autoware>,
                  public MiscellaneousAPI<Autoware>,
-#endif
 
                  public ContinuousTransformBroadcaster<Autoware>,
                  public TransitionAssertion<Autoware>
 {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   friend class FundamentalAPI<Autoware>;
   friend class MiscellaneousAPI<Autoware>;
-#endif
   friend class ContinuousTransformBroadcaster<Autoware>;
   friend class TransitionAssertion<Autoware>;
 

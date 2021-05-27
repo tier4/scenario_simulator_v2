@@ -27,7 +27,7 @@
 #endif
 
 #ifdef AUTOWARE_AUTO
-// TODO (someone else)
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #endif
 
 namespace concealer
@@ -35,6 +35,7 @@ namespace concealer
 template <typename Node>
 class MiscellaneousAPI
 {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   /* ---- Checkpoint -----------------------------------------------------------
    *
    *  Set goal pose of Autoware.
@@ -278,9 +279,34 @@ class MiscellaneousAPI
 
   DEFINE_SUBSCRIPTION(VehicleCommand);
 
+#endif
+
+#ifdef AUTOWARE_AUTO
+  using GoalPose = geometry_msgs::msg::PoseWithCovarianceStamped;
+
+  DEFINE_PUBLISHER(GoalPose);
+
+  decltype(auto) setGoalPose(const geometry_msgs::msg::Pose & pose)
+  {
+    GoalPose goal_pose;
+    {
+      goal_pose.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+      goal_pose.header.frame_id = "map";
+      goal_pose.pose.pose = pose;
+    }
+
+    return setGoalPose(goal_pose);
+  }
+
+  using VehicleControlCommand = autoware_auto_msgs::msg::VehicleControlCommand;
+
+  DEFINE_SUBSCRIPTION(VehicleControlCommand);
+#endif
+
 public:
   explicit MiscellaneousAPI()
-  : INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    : INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
@@ -293,6 +319,12 @@ public:
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {})
+#endif
+
+#ifdef AUTOWARE_AUTO
+    : INIT_PUBLISHER(GoalPose, "/planning/goal_pose"),
+    INIT_SUBSCRIPTION(VehicleControlCommand, "/vehicle/vehicle_command", []() {})
+#endif
   {
   }
 };

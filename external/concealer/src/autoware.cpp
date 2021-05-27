@@ -106,7 +106,7 @@ void Autoware::update()
 #endif
 
 #ifdef AUTOWARE_AUTO
-  // TODO (Robotec.ai)
+  setTransform(current_pose);
 #endif
 }
 
@@ -140,9 +140,11 @@ void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 #endif
 
 #ifdef AUTOWARE_AUTO
-  task_queue.delay([&]() {
-    // TODO (Robotec.ai)
-  });
+  task_queue.delay(
+    [this, initial_pose]() {
+      set(initial_pose);
+    }
+  );
 #endif
 }
 
@@ -172,8 +174,12 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
   });
 #endif
 
-#ifndef AUTOWARE_AUTO
-  // TODO (Robotec.ai)
+#ifdef AUTOWARE_AUTO
+  task_queue.delay(
+    [this, route]() {
+
+    }
+  );
 #endif
 }
 
@@ -191,6 +197,9 @@ void Autoware::engage()
 #endif
 
 #ifdef AUTOWARE_AUTO
+  task_queue.delay(
+    [this]() {}
+  );
   // TODO (Robotec.ai)
 #endif
 }

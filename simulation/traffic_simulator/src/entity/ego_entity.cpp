@@ -259,13 +259,14 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     Eigen::VectorXd input(2);
     {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-      *** getVehicleCommand - MiscellaneousAPI dependency ***
       input <<  //
         autowares.at(name).getVehicleCommand().control.velocity,
         autowares.at(name).getVehicleCommand().control.steering_angle;
 #endif
 #ifdef AUTOWARE_AUTO
-      // TODO: implement
+      input <<  //
+        autowares.at(name).getVehicleControlCommand().long_accel_mps2,
+        autowares.at(name).getVehicleControlCommand().front_wheel_angle_rad;
 #endif
     }
 
