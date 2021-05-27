@@ -68,13 +68,10 @@ struct [[deprecated]] ConnectionError : public Error{
     Error("connection-error: ", std::forward<decltype(xs)>(xs)...){}
 };
 
-struct ImplementationFault : public Error
-{
+struct [[deprecated]] ImplementationFault : public Error{
   template <typename... Ts>
-  explicit ImplementationFault(Ts &&... xs)
-  : Error("ImplementationFault: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
+  explicit ImplementationFault(Ts && ... xs) :
+    Error("ImplementationFault: ", std::forward<decltype(xs)>(xs)...){}
 };
 
 #define THROW(TYPENAME)                \
