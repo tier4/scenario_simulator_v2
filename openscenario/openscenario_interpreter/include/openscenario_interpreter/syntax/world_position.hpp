@@ -54,24 +54,34 @@ struct WorldPosition
 
   explicit operator geometry_msgs::msg::Pose() const
   {
-    geometry_msgs::msg::Vector3 vector{};
-    vector.x = r;
-    vector.y = p;
-    vector.z = h;
+    geometry_msgs::msg::Vector3 vector;
+    {
+      vector.x = r;
+      vector.y = p;
+      vector.z = h;
+    }
 
-    geometry_msgs::msg::Point point{};
-    point.x = x;
-    point.y = y;
-    point.z = z;
+    geometry_msgs::msg::Point point;
+    {
+      point.x = x;
+      point.y = y;
+      point.z = z;
+    }
 
-    geometry_msgs::msg::Pose pose{};
-    pose.position = point;
-    pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
+    geometry_msgs::msg::Pose pose;
+    {
+      pose.position = point;
+      pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(vector);
+    }
 
     return pose;
   }
 
-  explicit operator openscenario_msgs::msg::LaneletPose() const { THROW(ImplementationFault); }
+  explicit operator openscenario_msgs::msg::LaneletPose() const
+  {
+    throw SemanticError(
+      "To convert the WorldPosition to LanePosition is currently not yet supported");
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
