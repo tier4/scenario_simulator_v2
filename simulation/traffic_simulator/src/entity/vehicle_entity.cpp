@@ -69,16 +69,12 @@ void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 
 void VehicleEntity::cancelRequest() { tree_ptr_->setRequest("none"); }
 
-void VehicleEntity::setTargetSpeed(const TargetSpeedType & target, const bool continuous)
+void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
 {
-  if (auto * target_speed = boost::get<double>(&target)) {
-    target_speed_ = *target_speed;
-    tree_ptr_->setValueToBlackBoard("target_speed", target_speed_);
-    if (continuous) {
-      target_speed_ = boost::none;
-    }
-  } else if (auto * ref_target = boost::get<RelativeTargetType>(&target)) {
-    THROW_SIMULATION_ERROR("relative target is not supported yet");
+  target_speed_ = target_speed;
+  tree_ptr_->setValueToBlackBoard("target_speed", target_speed_);
+  if (continuous) {
+    target_speed_ = boost::none;
   }
 }
 

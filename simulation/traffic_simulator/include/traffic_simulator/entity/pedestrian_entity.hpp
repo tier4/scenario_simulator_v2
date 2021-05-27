@@ -70,7 +70,7 @@ public:
     tree_ptr_->setValueToBlackBoard("traffic_light_manager", traffic_light_manager_);
   }
 
-  void setTargetSpeed(const TargetSpeedType & target, const bool continuous) override;
+  void setTargetSpeed(double target_speed, bool continuous) override;
 
   const openscenario_msgs::msg::BoundingBox getBoundingBox() const override
   {
