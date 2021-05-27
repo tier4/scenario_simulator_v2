@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIORITY_HPP_
 
 #include <openscenario_interpreter/object.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
@@ -56,69 +55,13 @@ struct Priority
     parallel,
   } value;
 
-  explicit constexpr Priority(value_type value = {}) : value{value} {}
+  explicit constexpr Priority(value_type value = parallel) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Priority & priority)
-{
-  std::string buffer{};
-
-  is >> buffer;
-
-#define BOILERPLATE(IDENTIFIER)            \
-  if (buffer == #IDENTIFIER) {             \
-    priority.value = Priority::IDENTIFIER; \
-    return is;                             \
-  }                                        \
-  static_assert(true, "")
-
-  BOILERPLATE(overwrite);
-  BOILERPLATE(parallel);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                                       \
-  if (buffer == #IDENTIFIER) {                                                        \
-    std::stringstream ss{};                                                           \
-    ss << "given value \'" << buffer                                                  \
-       << "\' is valid OpenSCENARIO value of type Priority, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                              \
-  }                                                                                   \
-  static_assert(true, "")
-
-  BOILERPLATE(skip);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type Priority";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Priority & priority)
-{
-  switch (priority) {
-#define BOILERPLATE(NAME) \
-  case Priority::NAME:    \
-    return os << #NAME;
-
-    BOILERPLATE(overwrite);
-    BOILERPLATE(skip);
-    BOILERPLATE(parallel);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class Priority holds unexpected value "
-         << static_cast<Priority::value_type>(priority);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::istream & operator>>(std::istream &, Priority &);
+std::ostream & operator<<(std::ostream &, const Priority &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
