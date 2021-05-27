@@ -15,13 +15,27 @@
 #ifndef OPENSCENARIO_INTERPRETER__ERROR_HPP_
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
+#include <iomanip>
 #include <openscenario_interpreter/string/cat.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace openscenario_interpreter
 {
+#define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
+  SyntaxError(                                               \
+    "Given value ", std::quoted(VALUE),                      \
+    " is valid OpenSCENARIO value of type " #TYPE ", but it is not supported yet")
+
+#define UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
+  SyntaxError("Unexpected value ", std::quoted(VALUE), " of type " #TYPE " was specified")
+
+#define UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(TYPE, VALUE) \
+  SyntaxError(                                             \
+    "Unexpected value ", static_cast<TYPE::value_type>(VALUE), " was assigned to type " #TYPE)
+
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  -- Error

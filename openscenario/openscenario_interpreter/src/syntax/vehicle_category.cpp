@@ -41,14 +41,10 @@ std::istream & operator>>(std::istream & is, VehicleCategory & category)
 
 #undef BOILERPLATE
 
-#define BOILERPLATE(IDENTIFIER)                                                              \
-  if (buffer == #IDENTIFIER) {                                                               \
-    std::stringstream ss;                                                                    \
-    ss << "given value \'";                                                                  \
-    ss << buffer;                                                                            \
-    ss << "\' is valid OpenSCENARIO value of type VehicleCategory, but it is not supported"; \
-    throw ImplementationFault(ss.str());                                                     \
-  }                                                                                          \
+#define BOILERPLATE(IDENTIFIER)                                             \
+  if (buffer == #IDENTIFIER) {                                              \
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(VehicleCategory, buffer); \
+  }                                                                         \
   static_assert(true, "")
 
   BOILERPLATE(semitrailer);
@@ -59,18 +55,16 @@ std::istream & operator>>(std::istream & is, VehicleCategory & category)
 
 #undef BOILERPLATE
 
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type VehicleCategory";
-  throw SyntaxError{ss.str()};
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(VehicleCategory, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const VehicleCategory & category)
+std::ostream & operator<<(std::ostream & os, const VehicleCategory & datum)
 {
 #define BOILERPLATE(NAME)     \
   case VehicleCategory::NAME: \
     return os << #NAME;
 
-  switch (category) {
+  switch (datum) {
     BOILERPLATE(bicycle);
     BOILERPLATE(bus);
     BOILERPLATE(car);
@@ -83,10 +77,7 @@ std::ostream & operator<<(std::ostream & os, const VehicleCategory & category)
     BOILERPLATE(van);
 
     default:
-      std::stringstream ss;
-      ss << "enum class VehicleCategory holds unexpected value "
-         << static_cast<VehicleCategory::value_type>(category);
-      throw ImplementationFault(ss.str());
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(VehicleCategory, datum);
   }
 
 #undef BOILERPLATE
