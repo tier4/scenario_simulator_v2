@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
-#include <sstream>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, RelativeDistanceType & type)
+std::istream & operator>>(std::istream & is, RelativeDistanceType & datum)
 {
   std::string buffer;
 
   is >> buffer;
 
-#define BOILERPLATE(IDENTIFIER)                    \
-  if (buffer == #IDENTIFIER) {                     \
-    type.value = RelativeDistanceType::IDENTIFIER; \
-    return is;                                     \
-  }                                                \
+#define BOILERPLATE(IDENTIFIER)                     \
+  if (buffer == #IDENTIFIER) {                      \
+    datum.value = RelativeDistanceType::IDENTIFIER; \
+    return is;                                      \
+  }                                                 \
   static_assert(true, "")
 
   BOILERPLATE(longitudinal);
@@ -40,14 +40,12 @@ std::istream & operator>>(std::istream & is, RelativeDistanceType & type)
 
 #undef BOILERPLATE
 
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type RelativeDistanceType";
-  throw SyntaxError{ss.str()};
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(RelativeDistanceType, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const RelativeDistanceType & type)
+std::ostream & operator<<(std::ostream & os, const RelativeDistanceType & datum)
 {
-  switch (type) {
+  switch (datum) {
 #define BOILERPLATE(ID)          \
   case RelativeDistanceType::ID: \
     return os << #ID;
@@ -59,10 +57,7 @@ std::ostream & operator<<(std::ostream & os, const RelativeDistanceType & type)
 #undef BOILERPLATE
 
     default:
-      std::stringstream ss{};
-      ss << "enum class RelativeDistanceType holds unexpected value "
-         << static_cast<RelativeDistanceType::value_type>(type.value);
-      throw ImplementationFault{ss.str()};
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(RelativeDistanceType, datum);
   }
 }
 }  // namespace syntax

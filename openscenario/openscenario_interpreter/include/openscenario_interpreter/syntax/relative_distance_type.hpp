@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_TYPE_HPP_
 
 #include <iostream>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
@@ -47,10 +48,14 @@ struct RelativeDistanceType
     cartesianDistance,
   } value;
 
-  explicit constexpr RelativeDistanceType(value_type value = cartesianDistance) : value(value) {}
+  explicit RelativeDistanceType() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
+
+static_assert(std::is_standard_layout<RelativeDistanceType>::value, "");
+
+static_assert(std::is_trivial<RelativeDistanceType>::value, "");
 
 std::istream & operator>>(std::istream &, RelativeDistanceType &);
 
