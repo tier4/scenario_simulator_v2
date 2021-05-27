@@ -22,23 +22,23 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== ReferenceContext =====================================================
+/* ---- ReferenceContext -------------------------------------------------------
  *
- * <xsd:simpleType name="ReferenceContext">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="relative"/>
- *         <xsd:enumeration value="absolute"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="ReferenceContext">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="relative"/>
+ *          <xsd:enumeration value="absolute"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct ReferenceContext
 {
   enum value_type {
@@ -46,68 +46,14 @@ struct ReferenceContext
     absolute,
   } value;
 
-  constexpr ReferenceContext(value_type value = {}) : value{value} {}
+  constexpr ReferenceContext(value_type value = relative) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, ReferenceContext & context)
-{
-  std::string buffer{};
+std::istream & operator>>(std::istream &, ReferenceContext &);
 
-  is >> buffer;
-
-#define BOILERPLATE(IDENTIFIER)                   \
-  if (buffer == #IDENTIFIER) {                    \
-    context.value = ReferenceContext::IDENTIFIER; \
-    return is;                                    \
-  }                                               \
-  static_assert(true, "")
-
-  BOILERPLATE(relative);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                                               \
-  if (buffer == #IDENTIFIER) {                                                                \
-    std::stringstream ss{};                                                                   \
-    ss << "given value \'" << buffer                                                          \
-       << "\' is valid OpenSCENARIO value of type ReferenceContext, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                      \
-  }                                                                                           \
-  static_assert(true, "")
-
-  BOILERPLATE(absolute);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type ReferenceContext";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os, const ReferenceContext & context)
-{
-  switch (context) {
-#define BOILERPLATE(ID)      \
-  case ReferenceContext::ID: \
-    return os << #ID;
-
-    BOILERPLATE(absolute);
-    BOILERPLATE(relative);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class ReferenceContext holds unexpected value "
-         << static_cast<ReferenceContext::value_type>(context.value);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const ReferenceContext &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
