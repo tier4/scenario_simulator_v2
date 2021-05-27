@@ -51,6 +51,38 @@ struct RelativeTargetSpeed
     continuous{readAttribute<Boolean>("continuous", node, scope, Boolean())}
   {
   }
+
+  auto operator()() const
+  {
+    std::function<double()> calc_absolute_target_speed;
+    switch (speed_target_value_type) {
+      case SpeedTargetValueType::factor:
+        calc_absolute_target_speed = [factor = value, entity_ref = entity_ref]() {
+          return factor * getEntityStatus(entity_ref).action_status.twist.linear.x;
+        };
+        break;
+      case SpeedTargetValueType::delta:
+        calc_absolute_target_speed = [delta = value, entity_ref = entity_ref]() {
+          return delta + getEntityStatus(entity_ref).action_status.twist.linear.x;
+        };
+        break;
+      default:
+        THROW(ImplementationFault);
+    }
+
+    std::function<bool(const Scope::Actor & actor)> is_end;
+    if (continuous) {
+      is_end = [](const auto &) { return false; };  // ends never
+    } else {
+      is_end = [calc_absolute_target_speed](const Scope::Actor & actor) {
+        const auto compare = Rule(Rule::equalTo);
+        return compare(
+          getEntityStatus(actor).action_status.twist.linear.x, calc_absolute_target_speed());
+      };
+    }
+
+    return std::make_pair(std::move(calc_absolute_target_speed), std::move(is_end));
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

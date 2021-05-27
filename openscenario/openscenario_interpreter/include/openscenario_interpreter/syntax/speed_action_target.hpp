@@ -44,6 +44,17 @@ struct SpeedActionTarget : public Element
   : Element(choice(node, ELEMENT(RelativeTargetSpeed), ELEMENT(AbsoluteTargetSpeed)))
   {
   }
+
+  std::pair<std::function<double()>, std::function<bool(const Scope::Actor &)>> operator()() const
+  {
+    if (is<AbsoluteTargetSpeed>()) {
+      return as<AbsoluteTargetSpeed>()();
+    } else if (is<RelativeTargetSpeed>()) {
+      return as<RelativeTargetSpeed>()();
+    } else {
+      THROW(ImplementationFault);
+    }
+  }
 };
 
 #undef ELEMENT

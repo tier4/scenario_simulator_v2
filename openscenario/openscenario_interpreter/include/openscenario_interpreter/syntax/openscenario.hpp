@@ -82,7 +82,7 @@ struct ScenarioDefinition
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
+inline std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
 {
   return os << unspecified;
 }

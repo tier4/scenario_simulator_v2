@@ -63,34 +63,37 @@ struct SpeedAction
     }
   }
 
-  template <typename T>
-  decltype(auto) setLinearTransition(const Scope::Actor & actor, const T value) const
+  decltype(auto) operator()(const Scope::Actor & actor)
   {
-    return setTargetSpeed(actor, value, true);
-  }
+    std::function<double()> calc_absolute_target_speed;
+    std::function<bool(const Scope::Actor &)> is_end;
+    std::tie(calc_absolute_target_speed, is_end) = speed_action_target();
 
-  template <typename T>
-  decltype(auto) setStepTransition(const Scope::Actor & actor, const T value) const
-  {
-    auto status = getEntityStatus(actor);
-    status.action_status.twist.linear.x = value;
-    setEntityStatus(actor, status);
-    return setTargetSpeed(actor, status.action_status.twist.linear.x, true);
-  }
-
-  decltype(auto) operator()(const Scope::Actor & actor) const
-  {
-    if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      switch (speed_action_dynamics.dynamics_shape) {
-        case DynamicsShape::linear:
-          return setLinearTransition(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
-        case DynamicsShape::step:
-          return setStepTransition(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
-        default:
-          THROW(ImplementationFault);
+    double current_absolute_target_speed = calc_absolute_target_speed();
+    switch (speed_action_dynamics.dynamics_shape) {
+      case DynamicsShape::step: {
+        auto status = getEntityStatus(actor);
+        status.action_status.twist.linear.x = current_absolute_target_speed;
+        setEntityStatus(actor, status);
+        setTargetSpeed(actor, current_absolute_target_speed, true);
+        break;
       }
+      case DynamicsShape::linear: {
+        setTargetSpeed(actor, current_absolute_target_speed, true);
+        break;
+      }
+      default:
+        THROW(ImplementationFault);
+    }
+
+    if (speed_action_target.is<RelativeTargetSpeed>()) {
+      // dynamics_shape is not taken in account
+      check = [calc_absolute_target_speed, is_end = std::move(is_end)](const Scope::Actor & actor) {
+        setTargetSpeed(actor, calc_absolute_target_speed(), true);
+        return is_end(actor);
+      };
     } else {
-      THROW(ImplementationFault);
+      check = std::move(is_end);
     }
   }
 
@@ -105,25 +108,10 @@ struct SpeedAction
     return unspecified;
   }
 
-  auto check(const String & actor)
-  try {
-    const auto compare = Rule(Rule::equalTo);
-
-    if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      return compare(
-        getEntityStatus(actor).action_status.twist.linear.x,
-        speed_action_target.as<AbsoluteTargetSpeed>().value);
-    } else {
-      THROW(ImplementationFault);
-    }
-  } catch (const SemanticError &) {
-    return false;  // NOTE: The actor is maybe lane-changing now.
-  }
-
   auto update()
   {
     for (auto && each : accomplishments) {
-      each.second = each.second or check(each.first);
+      each.second = each.second or (check ? check(Scope::Actor(each.first)) : true);
     }
   }
 
@@ -132,6 +120,9 @@ struct SpeedAction
     update();
     return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
   }
+
+private:
+  std::function<bool(const Scope::Actor &)> check;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
