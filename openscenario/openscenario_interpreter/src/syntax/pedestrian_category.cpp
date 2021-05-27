@@ -12,39 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/pedestrian_category.hpp>
-#include <sstream>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::istream & operator>>(std::istream & is, PedestrianCategory & category)
+std::istream & operator>>(std::istream & is, PedestrianCategory & datum)
 {
-  std::string buffer{};
+  std::string buffer;
 
   is >> buffer;
 
-#define BOILERPLATE(IDENTIFIER)                      \
-  if (buffer == #IDENTIFIER) {                       \
-    category.value = PedestrianCategory::IDENTIFIER; \
-    return is;                                       \
-  }                                                  \
+#define BOILERPLATE(IDENTIFIER)                   \
+  if (buffer == #IDENTIFIER) {                    \
+    datum.value = PedestrianCategory::IDENTIFIER; \
+    return is;                                    \
+  }                                               \
   static_assert(true, "")
 
   BOILERPLATE(pedestrian);
 
 #undef BOILERPLATE
 
-#define BOILERPLATE(IDENTIFIER)                                                                 \
-  if (buffer == #IDENTIFIER) {                                                                  \
-    std::stringstream ss{};                                                                     \
-    ss << "given value \'" << buffer                                                            \
-       << "\' is valid OpenSCENARIO value of type PedestrianCategory, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                        \
-  }                                                                                             \
+#define BOILERPLATE(IDENTIFIER)                                                \
+  if (buffer == #IDENTIFIER) {                                                 \
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(PedestrianCategory, buffer); \
+  }                                                                            \
   static_assert(true, "")
 
   BOILERPLATE(wheelchair);
@@ -52,14 +49,12 @@ std::istream & operator>>(std::istream & is, PedestrianCategory & category)
 
 #undef BOILERPLATE
 
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type PedestrianCategory";
-  throw SyntaxError{ss.str()};
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(PedestrianCategory, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const PedestrianCategory & category)
+std::ostream & operator<<(std::ostream & os, const PedestrianCategory & datum)
 {
-  switch (category) {
+  switch (datum) {
 #define BOILERPLATE(NAME)        \
   case PedestrianCategory::NAME: \
     return os << #NAME;
@@ -71,10 +66,7 @@ std::ostream & operator<<(std::ostream & os, const PedestrianCategory & category
 #undef BOILERPLATE
 
     default:
-      std::stringstream ss{};
-      ss << "enum class PedestrianCategory holds unexpected value "
-         << static_cast<PedestrianCategory::value_type>(category);
-      throw ImplementationFault{ss.str()};
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(PedestrianCategory, datum);
   }
 }
 }  // namespace syntax
