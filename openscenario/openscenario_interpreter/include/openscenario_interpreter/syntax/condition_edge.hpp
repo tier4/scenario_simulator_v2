@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_EDGE_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
@@ -105,54 +104,9 @@ struct ConditionEdge
   operator value_type() const noexcept { return value; }
 };
 
-std::istream & operator>>(std::istream & is, ConditionEdge & edge)
-{
-  std::string buffer{};
+std::istream & operator>>(std::istream & is, ConditionEdge &);
 
-  is >> buffer;
-
-#define BOILERPLATE(IDENTIFIER)             \
-  if (buffer == #IDENTIFIER) {              \
-    edge.value = ConditionEdge::IDENTIFIER; \
-    return is;                              \
-  }                                         \
-  static_assert(true, "")
-
-  BOILERPLATE(rising);
-  BOILERPLATE(falling);
-  BOILERPLATE(risingOrFalling);
-  BOILERPLATE(none);
-  BOILERPLATE(sticky);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type ConditionEdge";
-  throw SyntaxError(ss.str());
-}
-
-std::ostream & operator<<(std::ostream & os, const ConditionEdge & edge)
-{
-  switch (edge) {
-#define BOILERPLATE(ID)   \
-  case ConditionEdge::ID: \
-    return os << #ID;
-
-    BOILERPLATE(rising);
-    BOILERPLATE(falling);
-    BOILERPLATE(risingOrFalling);
-    BOILERPLATE(none);
-    BOILERPLATE(sticky);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class ConditionEdge holds unexpected value "
-         << static_cast<ConditionEdge::value_type>(edge.value);
-      throw ImplementationFault(ss.str());
-  }
-}
+std::ostream & operator<<(std::ostream & os, const ConditionEdge &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
