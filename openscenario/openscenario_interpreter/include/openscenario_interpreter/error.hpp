@@ -36,6 +36,11 @@ namespace openscenario_interpreter
   SyntaxError(                                             \
     "Unexpected value ", static_cast<TYPE::value_type>(VALUE), " was assigned to type " #TYPE)
 
+#define UNSUPPORTED_ELEMENT_SPECIFIED(PARENT, CHILD) \
+  SyntaxError(                                       \
+    "Given class ",                                  \
+    #CHILD " is valid OpenSCENARIO element of class " #PARENT ", but is is not supported yet")
+
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  -- Error

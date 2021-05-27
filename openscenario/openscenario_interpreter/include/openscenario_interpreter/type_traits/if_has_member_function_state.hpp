@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
 
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/type_traits/has_member_function_state.hpp>
 #include <sstream>
 
@@ -28,9 +29,7 @@ struct IfHasMemberFunctionState
   template <typename Result>
   static const Result & callIt(const T &)
   {
-    std::stringstream ss{};
-    ss << "class " << typeid(T).name() << " is not has member function 'state'";
-    throw ImplementationFault{ss.str()};
+    throw SemanticError("Class ", typeid(T).name(), " is not an StoryboardElement");
   }
 };
 
