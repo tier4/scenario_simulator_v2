@@ -37,42 +37,34 @@ std::istream & operator>>(std::istream & is, ReferenceContext & context)
 
 #undef BOILERPLATE
 
-#define BOILERPLATE(IDENTIFIER)                                                               \
-  if (buffer == #IDENTIFIER) {                                                                \
-    std::stringstream ss{};                                                                   \
-    ss << "given value \'" << buffer                                                          \
-       << "\' is valid OpenSCENARIO value of type ReferenceContext, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                      \
-  }                                                                                           \
+#define BOILERPLATE(IDENTIFIER)                                              \
+  if (buffer == #IDENTIFIER) {                                               \
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(ReferenceContext, buffer); \
+  }                                                                          \
   static_assert(true, "")
 
   BOILERPLATE(absolute);
 
 #undef BOILERPLATE
 
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type ReferenceContext";
-  throw SyntaxError{ss.str()};
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(ReferenceContext, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const ReferenceContext & context)
+std::ostream & operator<<(std::ostream & os, const ReferenceContext & datum)
 {
-  switch (context) {
 #define BOILERPLATE(ID)      \
   case ReferenceContext::ID: \
     return os << #ID;
 
+  switch (datum) {
     BOILERPLATE(absolute);
     BOILERPLATE(relative);
 
-#undef BOILERPLATE
-
     default:
-      std::stringstream ss{};
-      ss << "enum class ReferenceContext holds unexpected value "
-         << static_cast<ReferenceContext::value_type>(context.value);
-      throw ImplementationFault{ss.str()};
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ReferenceContext, datum);
   }
+
+#undef BOILERPLATE
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
