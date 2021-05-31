@@ -22,7 +22,7 @@ inline namespace syntax
 {
 std::istream & operator>>(std::istream & is, ConditionEdge & edge)
 {
-  std::string buffer{};
+  std::string buffer;
 
   is >> buffer;
 
@@ -33,40 +33,44 @@ std::istream & operator>>(std::istream & is, ConditionEdge & edge)
   }                                         \
   static_assert(true, "")
 
-  BOILERPLATE(rising);
-  BOILERPLATE(falling);
-  BOILERPLATE(risingOrFalling);
   BOILERPLATE(none);
   BOILERPLATE(sticky);
 
 #undef BOILERPLATE
 
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type ConditionEdge";
-  throw SyntaxError(ss.str());
+#define BOILERPLATE(IDENTIFIER)                                           \
+  if (buffer == #IDENTIFIER) {                                            \
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(ConditionEdge, buffer); \
+  }                                                                       \
+  static_assert(true, "")
+
+  BOILERPLATE(rising);
+  BOILERPLATE(falling);
+  BOILERPLATE(risingOrFalling);
+
+#undef BOILERPLATE
+
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(ConditionEdge, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const ConditionEdge & edge)
+std::ostream & operator<<(std::ostream & os, const ConditionEdge & datum)
 {
-  switch (edge) {
-#define BOILERPLATE(ID)   \
-  case ConditionEdge::ID: \
-    return os << #ID;
+#define BOILERPLATE(IDENTIFIER)   \
+  case ConditionEdge::IDENTIFIER: \
+    return os << #IDENTIFIER;
 
+  switch (datum) {
     BOILERPLATE(rising);
     BOILERPLATE(falling);
     BOILERPLATE(risingOrFalling);
     BOILERPLATE(none);
     BOILERPLATE(sticky);
 
-#undef BOILERPLATE
-
     default:
-      std::stringstream ss{};
-      ss << "enum class ConditionEdge holds unexpected value "
-         << static_cast<ConditionEdge::value_type>(edge.value);
-      throw ImplementationFault(ss.str());
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(ConditionEdge, datum);
   }
+
+#undef BOILERPLATE
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
