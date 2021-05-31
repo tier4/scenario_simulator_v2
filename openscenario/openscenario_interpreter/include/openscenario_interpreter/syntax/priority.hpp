@@ -42,25 +42,43 @@ inline namespace syntax
 struct Priority
 {
   enum value_type {
-    // If a starting event has priority Overwrite, all events in running state,
-    // within the same scope (maneuver) as the starting event, should be issued
-    // a stop command (stop transition).
+
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  If a starting event has priority Overwrite, all events in running state,
+     *  within the same scope (maneuver) as the starting event, should be issued
+     *  a stop command (stop transition).
+     *
+     * ---------------------------------------------------------------------- */
     overwrite,
 
-    // If a starting event has priority Skip, then it will not be ran if there
-    // is any other event in the same scope (maneuver) in the running state.
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  If a starting event has priority Skip, then it will not be ran if there
+     *  is any other event in the same scope (maneuver) in the running state.
+     *
+     * ---------------------------------------------------------------------- */
     skip,
 
-    // Execute in parallel to other events.
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *   Execute in parallel to other events.
+     *
+     * ---------------------------------------------------------------------- */
     parallel,
   } value;
 
-  explicit constexpr Priority(value_type value = parallel) : value(value) {}
+  explicit Priority() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
+static_assert(std::is_standard_layout<Priority>::value, "");
+
+static_assert(std::is_trivial<Priority>::value, "");
+
 std::istream & operator>>(std::istream &, Priority &);
+
 std::ostream & operator<<(std::ostream &, const Priority &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter

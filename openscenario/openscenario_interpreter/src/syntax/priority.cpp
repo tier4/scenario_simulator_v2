@@ -38,43 +38,35 @@ std::istream & operator>>(std::istream & is, Priority & priority)
 
 #undef BOILERPLATE
 
-#define BOILERPLATE(IDENTIFIER)                                                       \
-  if (buffer == #IDENTIFIER) {                                                        \
-    std::stringstream ss{};                                                           \
-    ss << "given value \'" << buffer                                                  \
-       << "\' is valid OpenSCENARIO value of type Priority, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                              \
-  }                                                                                   \
+#define BOILERPLATE(IDENTIFIER)                                      \
+  if (buffer == #IDENTIFIER) {                                       \
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(Priority, buffer); \
+  }                                                                  \
   static_assert(true, "")
 
   BOILERPLATE(skip);
 
 #undef BOILERPLATE
 
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type Priority";
-  throw SyntaxError{ss.str()};
+  throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Priority, buffer);
 }
 
-std::ostream & operator<<(std::ostream & os, const Priority & priority)
+std::ostream & operator<<(std::ostream & os, const Priority & datum)
 {
-  switch (priority) {
 #define BOILERPLATE(NAME) \
   case Priority::NAME:    \
     return os << #NAME;
 
+  switch (datum) {
     BOILERPLATE(overwrite);
     BOILERPLATE(skip);
     BOILERPLATE(parallel);
 
-#undef BOILERPLATE
-
     default:
-      std::stringstream ss{};
-      ss << "enum class Priority holds unexpected value "
-         << static_cast<Priority::value_type>(priority);
-      throw ImplementationFault{ss.str()};
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(Priority, datum);
   }
+
+#undef BOILERPLATE
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

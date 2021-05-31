@@ -42,14 +42,18 @@ inline namespace syntax
 struct ReferenceContext
 {
   enum value_type {
-    relative,
+    relative,  // NOTE: DEFAULT (DON'T REORDER THIS ENUMERATION)
     absolute,
   } value;
 
-  constexpr ReferenceContext(value_type value = relative) : value(value) {}
+  explicit ReferenceContext() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
+
+static_assert(std::is_standard_layout<ReferenceContext>::value, "");
+
+static_assert(std::is_trivial<ReferenceContext>::value, "");
 
 std::istream & operator>>(std::istream &, ReferenceContext &);
 
