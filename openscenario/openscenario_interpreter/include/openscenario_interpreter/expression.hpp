@@ -30,25 +30,19 @@ struct Expression
 
   virtual Pointer<Expression> evaluate(const Pointer<Expression> &)
   {
-    std::stringstream ss{};
-    ss << "no viable evaluation for class Expression";
-    throw ImplementationFault{ss.str()};
+    throw SemanticError("No viable evaluation for class ", type().name());
   }
 
   virtual bool accomplished() { return false; }
 
   virtual const Pointer<Expression> & state() const
   {
-    std::stringstream ss{};
-    ss << "class Expression is not stateful";
-    throw ImplementationFault{ss.str()};
+    throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
   }
 
   virtual void start()
   {
-    std::stringstream ss{};
-    ss << "class Expression is not startable";
-    throw ImplementationFault{ss.str()};
+    throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
   }
 };
 }  // namespace openscenario_interpreter
