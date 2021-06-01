@@ -39,7 +39,11 @@ namespace openscenario_interpreter
 #define UNSUPPORTED_ELEMENT_SPECIFIED(PARENT, CHILD) \
   SyntaxError(                                       \
     "Given class ",                                  \
-    #CHILD " is valid OpenSCENARIO element of class " #PARENT ", but is is not supported yet")
+    #CHILD " is valid OpenSCENARIO element of class " #PARENT ", but is not supported yet")
+
+#define UNSUPPORTED_CONVERSION_DETECTED(FROM, TO) \
+  SyntaxError("Converting " #FROM " to " #TO      \
+              ". This is valid in OpenSCENARIO standard, but is not yet supported")
 
 /* ---- NOTE -------------------------------------------------------------------
  *
