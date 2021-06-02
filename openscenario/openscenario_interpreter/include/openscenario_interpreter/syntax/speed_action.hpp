@@ -114,7 +114,6 @@ struct SpeedAction
         getEntityStatus(actor).action_status.twist.linear.x,
         speed_action_target.as<AbsoluteTargetSpeed>().value);
     } else {
-      THROW(ImplementationFault);
       throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_target.type().name());
     }
   } catch (const SemanticError &) {
