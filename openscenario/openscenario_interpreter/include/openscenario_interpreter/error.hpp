@@ -45,6 +45,9 @@ namespace openscenario_interpreter
   SyntaxError("Converting " #FROM " to " #TO      \
               ". This is valid in OpenSCENARIO standard, but is not yet supported")
 
+#define UNSUPPORTED_SETTING_DETECTED(ACTION_OR_CONDITION, ELEMENT) \
+  SyntaxError(#ACTION_OR_CONDITION " does not yet supports ", ELEMENT)
+
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  -- Error
