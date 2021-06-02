@@ -93,29 +93,6 @@ struct [[deprecated]] ConnectionError : public Error{
     Error("connection-error: ", std::forward<decltype(xs)>(xs)...){}
 };
 
-struct [[deprecated]] ImplementationFault : public Error{
-  template <typename... Ts>
-  explicit ImplementationFault(Ts && ... xs) :
-    Error("ImplementationFault: ", std::forward<decltype(xs)>(xs)...){}
-};
-
-#define THROW(TYPENAME)                \
-  do {                                 \
-    std::stringstream ss{};            \
-    ss << __FILE__ << ":" << __LINE__; \
-    throw TYPENAME{ss.str()};          \
-  } while (false)
-
-#define THROW_IMPLEMENTATION_FAULT() THROW(ImplementationFault)
-
-#define UNIMPLEMENTED(NAME)                                               \
-  do {                                                                    \
-    std::stringstream ss{};                                               \
-    ss << "given class \'" << NAME                                        \
-       << "\' is valid OpenSCENARIO element, but is not yet implemented"; \
-    throw ImplementationFault{ss.str()};                                  \
-  } while (false)
-
 #define THROW_UNSUPPORTED_ERROR(PARENT)                                                  \
   [&](auto && child) {                                                                   \
     std::stringstream ss{};                                                              \

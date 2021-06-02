@@ -82,7 +82,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     using common::SimulationError;
     using common::SyntaxError;
 
-    using DeprecatedImplementationFault = openscenario_interpreter::ImplementationFault;
     using DeprecatedSemanticError = openscenario_interpreter::SemanticError;
     using DeprecatedSyntaxError = openscenario_interpreter::SyntaxError;
 
@@ -108,13 +107,12 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       }
     }
 
-    CATCH(DeprecatedImplementationFault)  // TODO (yamacir-kit): REMOVE THIS!!!
-    CATCH(DeprecatedSemanticError)        // TODO (yamacir-kit): REMOVE THIS!!!
-    CATCH(DeprecatedSyntaxError)          // TODO (yamacir-kit): REMOVE THIS!!!
+    CATCH(DeprecatedSemanticError)  // TODO (yamacir-kit): REMOVE THIS!!!
+    CATCH(DeprecatedSyntaxError)    // TODO (yamacir-kit): REMOVE THIS!!!
 
     CATCH(AutowareError)
-    CATCH(ImplementationFault)
     CATCH(SemanticError)
+    CATCH(SimulationError)
     CATCH(SyntaxError)
     CATCH(InternalError)  // NOTE: THIS MUST BE LAST OF CATCH STATEMENTS.
 

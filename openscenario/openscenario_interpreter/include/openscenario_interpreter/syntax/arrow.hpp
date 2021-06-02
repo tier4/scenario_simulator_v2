@@ -51,7 +51,7 @@ struct Arrow
         return traffic_simulator::TrafficLightArrow::STRAIGHT;
 
       default:
-        THROW_IMPLEMENTATION_FAULT();
+        throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(Arrow, *this);
     }
   }
 };

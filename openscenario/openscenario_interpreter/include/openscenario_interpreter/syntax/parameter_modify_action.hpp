@@ -54,14 +54,12 @@ struct ParameterModifyAction
     const auto target{inner_scope.parameters.at(parameter_ref)};
     if (rule.is<ParameterAddValueRule>()) {
       return rule.as<ParameterAddValueRule>()(target);
-    } else if (rule.is<ParameterMultiplyByValueRule>()) {
-      return rule.as<ParameterMultiplyByValueRule>()(target);
     } else {
-      THROW_IMPLEMENTATION_FAULT();
+      return rule.as<ParameterMultiplyByValueRule>()(target);
     }
     return unspecified;
   } catch (const std::out_of_range &) {
-    throw SemanticError("No such parameter '" + parameter_ref + "'");
+    throw SemanticError("No such parameter '", parameter_ref, "'");
   }
 };
 }  // namespace syntax
