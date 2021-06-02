@@ -2,13 +2,13 @@ name: BuildTest
 
 on:
   workflow_dispatch:
-  schedule:
-  - cron: 0 0 * * *
-  pull_request:
-    paths-ignore:
-    - "docs/**"
-    - "mkdocs.yml"
-    - "README.md"
+  #schedule:
+  #- cron: 0 0 * * *
+  #pull_request:
+  #  paths-ignore:
+  #  - "docs/**"
+  #  - "mkdocs.yml"
+  #  - "README.md"
 
 jobs:
   build:
@@ -17,24 +17,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [
-          concealer,
-          cpp_mock_scenarios,
-          joy_to_vehicle_cmd,
-          kashiwanoha_map,
-          lanelet2_extension_psim,
-          openscenario_interpreter,
-          openscenario_msgs,
-          openscenario_utility,
-          openscenario_visualization,
-          scenario_runner_mock,
-          scenario_simulator_exception,
-          scenario_simulator_v2,
-          scenario_test_runner,
-          simple_junit,
-          simple_sensor_simulator,
-          simulation_interface,
-          traffic_simulator]
+        package:
+          [
+            concealer,
+            cpp_mock_scenarios,
+            joy_to_vehicle_cmd,
+            kashiwanoha_map,
+            lanelet2_extension_psim,
+            openscenario_interpreter,
+            openscenario_msgs,
+            openscenario_utility,
+            openscenario_visualization,
+            scenario_runner_mock,
+            scenario_simulator_exception,
+            scenario_simulator_v2,
+            scenario_test_runner,
+            simple_junit,
+            simple_sensor_simulator,
+            simulation_interface,
+            traffic_simulator,
+          ]
         rosdistro: [foxy]
     steps:
       - name: Checkout
@@ -65,7 +67,7 @@ jobs:
         uses: codecov/codecov-action@v1.2.1
         if: always()
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}  # only needed for private repos
+          token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
           flags: unittests
           name: ${{ matrix.package }}
