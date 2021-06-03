@@ -54,7 +54,7 @@ struct AcquirePositionAction
       requestAcquirePosition(
         actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
     } else {
-      THROW_IMPLEMENTATION_FAULT();
+      throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
     }
   }
 
@@ -85,7 +85,7 @@ struct AcquirePositionAction
       return isReachedPosition(
         actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()), 1.0);
     } else {
-      THROW_IMPLEMENTATION_FAULT();
+      throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
     }
   }
 

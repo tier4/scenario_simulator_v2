@@ -169,7 +169,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 #endif
           }
         } else {
-          throw ImplementationFault("No script evaluable");
+          throw Error("No script evaluable");
         }
       });
     });

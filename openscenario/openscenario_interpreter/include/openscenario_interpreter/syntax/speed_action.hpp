@@ -18,8 +18,8 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
-#include <string>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -28,12 +28,12 @@ inline namespace syntax
 {
 /* ---- SpeedAction ------------------------------------------------------------
  *
- * <xsd:complexType name="SpeedAction">
- *   <xsd:all>
- *     <xsd:element name="SpeedActionDynamics" type="TransitionDynamics"/>
- *     <xsd:element name="SpeedActionTarget" type="SpeedActionTarget"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="SpeedAction">
+ *    <xsd:all>
+ *      <xsd:element name="SpeedActionDynamics" type="TransitionDynamics"/>
+ *      <xsd:element name="SpeedActionTarget" type="SpeedActionTarget"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct SpeedAction
@@ -65,6 +65,7 @@ struct SpeedAction
 
   decltype(auto) operator()(const Scope::Actor & actor)
   {
+    //<<<<<<< HEAD
     std::function<double()> calc_absolute_target_speed;
     std::function<bool(const Scope::Actor &)> is_end;
     std::tie(calc_absolute_target_speed, is_end) = speed_action_target();
@@ -83,7 +84,7 @@ struct SpeedAction
         break;
       }
       default:
-        THROW(ImplementationFault);
+        throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_dynamics.dynamics_shape);
     }
 
     if (speed_action_target.is<RelativeTargetSpeed>()) {

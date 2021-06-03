@@ -51,7 +51,9 @@ struct Rule
     equalTo,
   } value;
 
-  explicit constexpr Rule(value_type value = {}) : value{value} {}
+  explicit Rule() = default;
+
+  explicit Rule(value_type value) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -76,51 +78,13 @@ struct Rule
   }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Rule & rule)
-{
-  std::string buffer{};
+static_assert(std::is_standard_layout<Rule>::value, "");
 
-  is >> buffer;
+static_assert(std::is_trivial<Rule>::value, "");
 
-#define BOILERPLATE(IDENTIFIER)    \
-  if (buffer == #IDENTIFIER) {     \
-    rule.value = Rule::IDENTIFIER; \
-    return is;                     \
-  }                                \
-  static_assert(true, "")
+std::istream & operator>>(std::istream &, Rule &);
 
-  BOILERPLATE(greaterThan);
-  BOILERPLATE(lessThan);
-  BOILERPLATE(equalTo);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type Rule";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Rule & rule)
-{
-  switch (rule) {
-#define BOILERPLATE(ID) \
-  case Rule::ID:        \
-    return os << #ID;
-
-    BOILERPLATE(greaterThan);
-    BOILERPLATE(lessThan);
-    BOILERPLATE(equalTo);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class Rule holds unexpected value " << static_cast<Rule::value_type>(rule.value);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const Rule &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

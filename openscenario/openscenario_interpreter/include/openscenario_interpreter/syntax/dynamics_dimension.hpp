@@ -15,8 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_DIMENSION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_DIMENSION_HPP_
 
-#include <openscenario_interpreter/object.hpp>
-#include <string>
+#include <iostream>
 
 namespace openscenario_interpreter
 {
@@ -24,99 +23,42 @@ inline namespace syntax
 {
 /* ---- DynamicsDimension ------------------------------------------------------
  *
- * <xsd:simpleType name="DynamicsDimension">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="rate"/>
- *         <xsd:enumeration value="time"/>
- *         <xsd:enumeration value="distance"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="DynamicsDimension">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="rate"/>
+ *          <xsd:enumeration value="time"/>
+ *          <xsd:enumeration value="distance"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
  * -------------------------------------------------------------------------- */
 struct DynamicsDimension
 {
   enum value_type {
-    // A predefined constant rate is used to acquire the target value.
-    rate,
-
-    // A predefined time (duration) is used to acquire the target value.
-    time,
-
-    // A predefined distance used to acquire the target value.
-    distance,
+    rate,      // A predefined constant rate is used to acquire the target value.
+    time,      // A predefined time (duration) is used to acquire the target value.
+    distance,  // A predefined distance used to acquire the target value.
   } value;
 
-  constexpr DynamicsDimension(value_type value = {}) : value{value} {}
+  explicit DynamicsDimension() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(
-  std::basic_istream<Ts...> & is, DynamicsDimension & dimension)
-{
-  std::string buffer{};
+static_assert(std::is_standard_layout<DynamicsDimension>::value, "");
 
-  is >> buffer;
+static_assert(std::is_trivial<DynamicsDimension>::value, "");
 
-#define BOILERPLATE(IDENTIFIER)                \
-  if (buffer == #IDENTIFIER) {                 \
-    dimension = DynamicsDimension::IDENTIFIER; \
-    return is;                                 \
-  }                                            \
-  static_assert(true, "")
+std::istream & operator>>(std::istream &, DynamicsDimension &);
 
-  BOILERPLATE(rate);
-  BOILERPLATE(time);
-  BOILERPLATE(distance);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                                                \
-  if (buffer == #IDENTIFIER) {                                                                 \
-    std::stringstream ss{};                                                                    \
-    ss << "given value \'" << buffer                                                           \
-       << "\' is valid OpenSCENARIO value of type DynamicsDimension, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                       \
-  }                                                                                            \
-  static_assert(true, "")
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type DynamicsDimension";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os, const DynamicsDimension & dimension)
-{
-  switch (dimension) {
-#define BOILERPLATE(NAME)       \
-  case DynamicsDimension::NAME: \
-    return os << #NAME;
-
-    BOILERPLATE(rate);
-    BOILERPLATE(time);
-    BOILERPLATE(distance);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class DynamicsDimension holds unexpected value "
-         << static_cast<DynamicsDimension::value_type>(dimension);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const DynamicsDimension &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

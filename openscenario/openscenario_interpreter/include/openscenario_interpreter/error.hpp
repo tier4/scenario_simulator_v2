@@ -15,20 +15,45 @@
 #ifndef OPENSCENARIO_INTERPRETER__ERROR_HPP_
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
+#include <iomanip>
 #include <openscenario_interpreter/string/cat.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace openscenario_interpreter
 {
+#define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
+  SyntaxError(                                               \
+    "Given value ", std::quoted(VALUE),                      \
+    " is valid OpenSCENARIO value of type " #TYPE ", but it is not supported yet")
+
+#define UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
+  SyntaxError("Unexpected value ", std::quoted(VALUE), " of type " #TYPE " was specified")
+
+#define UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(TYPE, VALUE) \
+  SyntaxError(                                             \
+    "Unexpected value ", static_cast<TYPE::value_type>(VALUE), " was assigned to type " #TYPE)
+
+#define UNSUPPORTED_ELEMENT_SPECIFIED(PARENT, CHILD) \
+  SyntaxError(                                       \
+    "Given class ",                                  \
+    #CHILD " is valid OpenSCENARIO element of class " #PARENT ", but is not supported yet")
+
+#define UNSUPPORTED_CONVERSION_DETECTED(FROM, TO) \
+  SyntaxError("Converting " #FROM " to " #TO      \
+              ". This is valid in OpenSCENARIO standard, but is not yet supported")
+
+#define UNSUPPORTED_SETTING_DETECTED(ACTION_OR_CONDITION, ELEMENT) \
+  SyntaxError(#ACTION_OR_CONDITION " does not yet supports ", ELEMENT)
+
 /* ---- NOTE -------------------------------------------------------------------
  *
  *  -- Error
  *      |-- SyntaxError
  *      |    `-- InvalidEnumeration
- *      |-- SemanticError
- *      `-- ImplementationFault
+ *      `-- SemanticError
  *
  * -------------------------------------------------------------------------- */
 struct Error : public std::runtime_error
@@ -67,32 +92,6 @@ struct [[deprecated]] ConnectionError : public Error{
   explicit ConnectionError(Ts && ... xs) :
     Error("connection-error: ", std::forward<decltype(xs)>(xs)...){}
 };
-
-struct ImplementationFault : public Error
-{
-  template <typename... Ts>
-  explicit ImplementationFault(Ts &&... xs)
-  : Error("ImplementationFault: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
-};
-
-#define THROW(TYPENAME)                \
-  do {                                 \
-    std::stringstream ss{};            \
-    ss << __FILE__ << ":" << __LINE__; \
-    throw TYPENAME{ss.str()};          \
-  } while (false)
-
-#define THROW_IMPLEMENTATION_FAULT() THROW(ImplementationFault)
-
-#define UNIMPLEMENTED(NAME)                                               \
-  do {                                                                    \
-    std::stringstream ss{};                                               \
-    ss << "given class \'" << NAME                                        \
-       << "\' is valid OpenSCENARIO element, but is not yet implemented"; \
-    throw ImplementationFault{ss.str()};                                  \
-  } while (false)
 
 #define THROW_UNSUPPORTED_ERROR(PARENT)                                                  \
   [&](auto && child) {                                                                   \

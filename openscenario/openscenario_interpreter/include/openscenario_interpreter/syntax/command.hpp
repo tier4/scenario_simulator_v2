@@ -22,11 +22,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Command ==============================================================
- *
- * TODO
- *
- * ======================================================================== */
 struct Command
 {
   enum value_type {
@@ -36,64 +31,24 @@ struct Command
     print,
   } value;
 
-  explicit constexpr Command(value_type value = {}) : value{value} {}
+  explicit Command() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 
-  decltype(auto) operator=(const value_type & rhs)
+  auto & operator=(const value_type & rhs)
   {
     value = rhs;
     return *this;
   }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, Command & command)
-{
-  std::string buffer{};
+static_assert(std::is_standard_layout<Command>::value, "");
 
-  is >> buffer;
+static_assert(std::is_trivial<Command>::value, "");
 
-#define BOILERPLATE(IDENTIFIER)    \
-  if (buffer == #IDENTIFIER) {     \
-    command = Command::IDENTIFIER; \
-    return is;                     \
-  }
+std::istream & operator>>(std::istream &, Command &);
 
-  BOILERPLATE(exitFailure);
-  BOILERPLATE(exitSuccess);
-  BOILERPLATE(nop);
-  BOILERPLATE(print);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type Command";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Command & command)
-{
-  switch (command) {
-#define BOILERPLATE(NAME) \
-  case Command::NAME:     \
-    return os << #NAME;
-
-    BOILERPLATE(exitFailure);
-    BOILERPLATE(exitSuccess);
-    BOILERPLATE(nop);
-    BOILERPLATE(print);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class Command holds unexpected value "
-         << static_cast<Command::value_type>(command);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const Command &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
