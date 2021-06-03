@@ -18,8 +18,8 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
-#include <string>
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -28,12 +28,12 @@ inline namespace syntax
 {
 /* ---- SpeedAction ------------------------------------------------------------
  *
- * <xsd:complexType name="SpeedAction">
- *   <xsd:all>
- *     <xsd:element name="SpeedActionDynamics" type="TransitionDynamics"/>
- *     <xsd:element name="SpeedActionTarget" type="SpeedActionTarget"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="SpeedAction">
+ *    <xsd:all>
+ *      <xsd:element name="SpeedActionDynamics" type="TransitionDynamics"/>
+ *      <xsd:element name="SpeedActionTarget" type="SpeedActionTarget"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct SpeedAction
@@ -87,10 +87,10 @@ struct SpeedAction
         case DynamicsShape::step:
           return setStepTransition(actor, speed_action_target.as<AbsoluteTargetSpeed>().value);
         default:
-          THROW(ImplementationFault);
+          throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_dynamics.dynamics_shape);
       }
     } else {
-      THROW(ImplementationFault);
+      throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_target.type().name());
     }
   }
 
@@ -114,7 +114,7 @@ struct SpeedAction
         getEntityStatus(actor).action_status.twist.linear.x,
         speed_action_target.as<AbsoluteTargetSpeed>().value);
     } else {
-      THROW(ImplementationFault);
+      throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_target.type().name());
     }
   } catch (const SemanticError &) {
     return false;  // NOTE: The actor is maybe lane-changing now.

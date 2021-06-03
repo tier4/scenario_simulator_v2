@@ -15,114 +15,52 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_STRATEGY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ROUTE_STRATEGY_HPP_
 
-#include <openscenario_interpreter/object.hpp>
-#include <string>
+#include <iostream>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== RouteStrategy ========================================================
+/* ---- RouteStrategy ----------------------------------------------------------
  *
- * <xsd:simpleType name="RouteStrategy">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="fastest"/>
- *         <xsd:enumeration value="shortest"/>
- *         <xsd:enumeration value="leastIntersections"/>
- *         <xsd:enumeration value="random"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="RouteStrategy">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="fastest"/>
+ *          <xsd:enumeration value="shortest"/>
+ *          <xsd:enumeration value="leastIntersections"/>
+ *          <xsd:enumeration value="random"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct RouteStrategy
 {
   enum value_type {
-    // Fastest route.
-    fastest,
-
-    // Shortest route.
-    shortest,
-
-    // Route with least number of intersections.
-    leastIntersections,
-
-    // Random route.
-    random,
+    shortest,            // Shortest route.
+    fastest,             // Fastest route.
+    leastIntersections,  // Route with least number of intersections.
+    random,              // Random route.
   } value;
 
-  explicit constexpr RouteStrategy(value_type value = {}) : value{value} {}
+  explicit RouteStrategy() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, RouteStrategy & strategy)
-{
-  std::string buffer{};
+static_assert(std::is_standard_layout<RouteStrategy>::value, "");
 
-  is >> buffer;
+static_assert(std::is_trivial<RouteStrategy>::value, "");
 
-#define BOILERPLATE(IDENTIFIER)                 \
-  if (buffer == #IDENTIFIER) {                  \
-    strategy.value = RouteStrategy::IDENTIFIER; \
-    return is;                                  \
-  }                                             \
-  static_assert(true, "")
+std::istream & operator>>(std::istream &, RouteStrategy &);
 
-  BOILERPLATE(shortest);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                                            \
-  if (buffer == #IDENTIFIER) {                                                             \
-    std::stringstream ss{};                                                                \
-    ss << "given value \'" << buffer                                                       \
-       << "\' is valid OpenSCENARIO value of type RouteStrategy, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                   \
-  }                                                                                        \
-  static_assert(true, "")
-
-  BOILERPLATE(fastest);
-  BOILERPLATE(leastIntersections);
-  BOILERPLATE(random);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type RouteStrategy";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os, const RouteStrategy & strategy)
-{
-  switch (strategy) {
-#define BOILERPLATE(NAME)   \
-  case RouteStrategy::NAME: \
-    return os << #NAME;
-
-    BOILERPLATE(fastest);
-    BOILERPLATE(shortest);
-    BOILERPLATE(leastIntersections);
-    BOILERPLATE(random);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class RouteStrategy holds unexpected value "
-         << static_cast<RouteStrategy::value_type>(strategy);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const RouteStrategy &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

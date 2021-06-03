@@ -15,33 +15,33 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_TYPE_HPP_
 
-#include <string>
+#include <iostream>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== StoryboardElementType ==================================================
+/* ---- StoryboardElementType --------------------------------------------------
  *
- * <xsd:simpleType name="StoryboardElementType">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="story"/>
- *         <xsd:enumeration value="act"/>
- *         <xsd:enumeration value="maneuver"/>
- *         <xsd:enumeration value="event"/>
- *         <xsd:enumeration value="action"/>
- *         <xsd:enumeration value="maneuverGroup"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="StoryboardElementType">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="story"/>
+ *          <xsd:enumeration value="act"/>
+ *          <xsd:enumeration value="maneuver"/>
+ *          <xsd:enumeration value="event"/>
+ *          <xsd:enumeration value="action"/>
+ *          <xsd:enumeration value="maneuverGroup"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ========================================================================== */
+ * -------------------------------------------------------------------------- */
 struct StoryboardElementType
 {
   enum value_type {
@@ -53,64 +53,14 @@ struct StoryboardElementType
     story,
   } value;
 
-  explicit constexpr StoryboardElementType(value_type value = {}) : value{value} {}
+  explicit StoryboardElementType() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, StoryboardElementType & type)
-{
-  std::string buffer{};
+std::istream & operator>>(std::istream &, StoryboardElementType &);
 
-  is >> buffer;
-
-#define BOILERPLATE(IDENTIFIER)                     \
-  if (buffer == #IDENTIFIER) {                      \
-    type.value = StoryboardElementType::IDENTIFIER; \
-    return is;                                      \
-  }                                                 \
-  static_assert(true, "")
-
-  BOILERPLATE(act);
-  BOILERPLATE(action);
-  BOILERPLATE(event);
-  BOILERPLATE(maneuver);
-  BOILERPLATE(maneuverGroup);
-  BOILERPLATE(story);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type StoryboardElementType";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os, const StoryboardElementType & type)
-{
-  switch (type) {
-#define BOILERPLATE(ID)           \
-  case StoryboardElementType::ID: \
-    return os << #ID;
-
-    BOILERPLATE(act);
-    BOILERPLATE(action);
-    BOILERPLATE(event);
-    BOILERPLATE(maneuver);
-    BOILERPLATE(maneuverGroup);
-    BOILERPLATE(story);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class StoryboardElementType holds unexpected value "
-         << static_cast<StoryboardElementType::value_type>(type.value);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const StoryboardElementType &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

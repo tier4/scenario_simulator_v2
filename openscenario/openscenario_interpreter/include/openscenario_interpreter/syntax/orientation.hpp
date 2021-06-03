@@ -43,7 +43,7 @@ struct Orientation
 
   template <typename Node, typename Scope>
   explicit Orientation(const Node & node, Scope & scope)
-  : type(readAttribute<ReferenceContext>("type", node, scope, ReferenceContext::relative)),
+  : type(readAttribute<ReferenceContext>("type", node, scope, ReferenceContext())),
     h(readAttribute<Double>("h", node, scope, Double())),
     p(readAttribute<Double>("p", node, scope, Double())),
     r(readAttribute<Double>("r", node, scope, Double()))

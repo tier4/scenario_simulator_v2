@@ -15,30 +15,30 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_TARGET_VALUE_TYPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_TARGET_VALUE_TYPE_HPP_
 
-#include <openscenario_interpreter/object.hpp>
-#include <string>
+#include <iostream>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== SpeedTargetValueType =================================================
+/* ---- SpeedTargetValueType ---------------------------------------------------
  *
- * <xsd:simpleType name="SpeedTargetValueType">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="delta"/>
- *         <xsd:enumeration value="factor"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="SpeedTargetValueType">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="delta"/>
+ *          <xsd:enumeration value="factor"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct SpeedTargetValueType
 {
   enum value_type {
@@ -53,68 +53,18 @@ struct SpeedTargetValueType
     factor,
   } value;
 
-  explicit constexpr SpeedTargetValueType(value_type value = delta) : value{value} {}
+  explicit SpeedTargetValueType() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, SpeedTargetValueType & type)
-{
-  std::string buffer{};
+static_assert(std::is_standard_layout<SpeedTargetValueType>::value, "");
 
-  is >> buffer;
+static_assert(std::is_trivial<SpeedTargetValueType>::value, "");
 
-#define BOILERPLATE(IDENTIFIER)                    \
-  if (buffer == #IDENTIFIER) {                     \
-    type.value = SpeedTargetValueType::IDENTIFIER; \
-    return is;                                     \
-  }                                                \
-  static_assert(true, "")
+std::istream & operator>>(std::istream &, SpeedTargetValueType &);
 
-  BOILERPLATE(delta);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                                                   \
-  if (buffer == #IDENTIFIER) {                                                                    \
-    std::stringstream ss{};                                                                       \
-    ss << "given value \'" << buffer                                                              \
-       << "\' is valid OpenSCENARIO value of type SpeedTargetValueType, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                          \
-  }                                                                                               \
-  static_assert(true, "")
-
-  BOILERPLATE(factor);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type SpeedTargetValueType";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(
-  std::basic_ostream<Ts...> & os, const SpeedTargetValueType & type)
-{
-  switch (type) {
-#define BOILERPLATE(NAME)          \
-  case SpeedTargetValueType::NAME: \
-    return os << #NAME;
-
-    BOILERPLATE(delta);
-    BOILERPLATE(factor);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class SpeedTargetValueType holds unexpected value "
-         << static_cast<SpeedTargetValueType::value_type>(type);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const SpeedTargetValueType &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

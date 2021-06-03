@@ -91,15 +91,9 @@ struct ParameterSetAction
          }},
       };
 
-    const auto target{inner_scope.parameters.at(parameter_ref)};
+    const auto target = inner_scope.parameters.at(parameter_ref);
 
-    const auto iter{overloads.find(target.type())};
-
-    if (iter != std::end(overloads)) {
-      return std::get<1>(*iter)(target, value);
-    } else {
-      THROW_IMPLEMENTATION_FAULT();
-    }
+    return overloads.at(target.type())(target, value);
   }
 };
 }  // namespace syntax
