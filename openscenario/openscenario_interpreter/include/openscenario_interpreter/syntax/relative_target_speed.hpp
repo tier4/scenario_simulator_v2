@@ -75,9 +75,13 @@ struct RelativeTargetSpeed
       is_end = [](const auto &) { return false; };  // ends never
     } else {
       is_end = [calc_absolute_target_speed](const Scope::Actor & actor) {
-        const auto compare = Rule(Rule::equalTo);
-        return compare(
-          getEntityStatus(actor).action_status.twist.linear.x, calc_absolute_target_speed());
+        try {
+          const auto compare = Rule(Rule::equalTo);
+          return compare(
+            getEntityStatus(actor).action_status.twist.linear.x, calc_absolute_target_speed());
+        } catch (const SemanticError &) {
+          return false;  // NOTE: The actor is maybe lane-changing now
+        }
       };
     }
 

@@ -43,8 +43,12 @@ struct AbsoluteTargetSpeed
     return std::make_pair(
       [target_speed = value] { return target_speed; },      // calculate absolute target speed
       [target_speed = value](const Scope::Actor & actor) {  // is_end
-        const auto compare = Rule(Rule::equalTo);
-        return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);
+        try {
+          const auto compare = Rule(Rule::equalTo);
+          return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);
+        } catch (const SemanticError &) {
+          return false; // NOTE: The actor is maybe lane-changing now
+        }
       });
   }
 };
