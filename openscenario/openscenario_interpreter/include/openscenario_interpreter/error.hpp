@@ -87,12 +87,6 @@ struct SemanticError : public Error
   }
 };
 
-struct [[deprecated]] ConnectionError : public Error{
-  template <typename... Ts>
-  explicit ConnectionError(Ts && ... xs) :
-    Error("connection-error: ", std::forward<decltype(xs)>(xs)...){}
-};
-
 #define THROW_UNSUPPORTED_ERROR(PARENT)                                                  \
   [&](auto && child) {                                                                   \
     std::stringstream ss{};                                                              \
