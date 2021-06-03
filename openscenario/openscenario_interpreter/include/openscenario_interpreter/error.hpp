@@ -16,14 +16,15 @@
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
 #include <iomanip>
-#include <openscenario_interpreter/string/cat.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
-#include <string>
-#include <utility>
 
 namespace openscenario_interpreter
 {
+using common::Error;
+using common::SemanticError;
+using common::SyntaxError;
+
 #define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
   SyntaxError(                                               \
     "Given value ", std::quoted(VALUE),                      \
@@ -47,45 +48,6 @@ namespace openscenario_interpreter
 
 #define UNSUPPORTED_SETTING_DETECTED(ACTION_OR_CONDITION, ELEMENT) \
   SyntaxError(#ACTION_OR_CONDITION " does not yet supports ", ELEMENT)
-
-/* ---- NOTE -------------------------------------------------------------------
- *
- *  -- Error
- *      |-- SyntaxError
- *      |    `-- InvalidEnumeration
- *      `-- SemanticError
- *
- * -------------------------------------------------------------------------- */
-struct Error : public std::runtime_error
-{
-  template <typename... Ts>
-  explicit constexpr Error(Ts &&... xs)
-  : std::runtime_error(cat(std::forward<decltype(xs)>(xs)..., "."))
-  {
-  }
-};
-
-struct SyntaxError : public Error
-{
-  template <typename... Ts>
-  explicit constexpr SyntaxError(Ts &&... xs)
-  : Error("SyntaxError: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
-
-  static decltype(auto) invalidValue(const std::string & type, const std::string & value)
-  {
-    return SyntaxError("An invalid value '", value, "' was specified for type '", type);
-  };
-};
-
-struct SemanticError : public Error
-{
-  template <typename... Ts>
-  explicit SemanticError(Ts &&... xs) : Error("SemanticError: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
-};
 
 #define THROW_UNSUPPORTED_ERROR(PARENT)                                                  \
   [&](auto && child) {                                                                   \

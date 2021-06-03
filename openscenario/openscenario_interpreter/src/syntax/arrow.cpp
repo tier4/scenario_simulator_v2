@@ -36,7 +36,7 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
   try {
     datum.value = conversions.at(value);
   } catch (const std::out_of_range &) {
-    throw SyntaxError::invalidValue("Arrow", value);
+    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Arrow, value);
   }
 
   return is;
