@@ -28,15 +28,15 @@ struct Integer : public std_msgs::msg::Int64
 {
   using value_type = decltype(std_msgs::msg::Int64::data);
 
-  explicit Integer(value_type value = {}) { data = value; }
+  explicit Integer() = default;
+
+  explicit Integer(value_type value) { data = value; }
 
   explicit Integer(const std::string & s)
   try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss;
-    ss << "Can't treat value \"" << s << "\" as type Integer";
-    throw SyntaxError(ss.str());
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(Integer, s);
   }
 
   constexpr operator value_type() const noexcept { return data; }
@@ -54,8 +54,13 @@ struct Integer : public std_msgs::msg::Int64
   }
 };
 
-std::ostream & operator<<(std::ostream &, const Integer &);
+static_assert(std::is_standard_layout<Integer>::value, "");
+
+static_assert(not std::is_trivial<Integer>::value, "");
+
 std::istream & operator>>(std::istream &, Integer &);
+
+std::ostream & operator<<(std::ostream &, const Integer &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

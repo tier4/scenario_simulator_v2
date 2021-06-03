@@ -29,6 +29,10 @@ using common::SemanticError;
 using common::SimulationError;
 using common::SyntaxError;
 
+#define INVALID_NUMERIC_LITERAL_SPECIFIED(TYPE, VALUE) \
+  SyntaxError(                                         \
+    "Given value ", std::quoted(VALUE), " is not an external representation of type " #TYPE)
+
 #define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
   SyntaxError(                                               \
     "Given value ", std::quoted(VALUE),                      \
