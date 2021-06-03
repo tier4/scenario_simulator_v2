@@ -149,19 +149,19 @@ decltype(auto) choice(const XML & node, Ts &&... xs)
   };
 
   if (specs.empty()) {
-    std::stringstream ss;
-    ss << "Class " << node.name() << " requires one of following elements: ";
-    print_keys_to(ss, callees);
-    ss << ". But no element specified";
-    throw SyntaxError(ss.str());
+    std::stringstream what;
+    what << "Class " << node.name() << " requires one of following elements: ";
+    print_keys_to(what, callees);
+    what << ". But no element specified";
+    throw SyntaxError(what.str());
   } else if (1 < specs.size()) {
-    std::stringstream ss;
-    ss << "Class " << node.name() << " requires just one of following elements: ";
-    print_keys_to(ss, callees);
-    ss << ". But " << specs.size() << " element" << (1 < specs.size() ? "s" : "") << " (";
-    print_keys_to(ss, specs);
-    ss << ") specified";
-    throw SyntaxError(ss.str());
+    std::stringstream what;
+    what << "Class " << node.name() << " requires just one of following elements: ";
+    print_keys_to(what, callees);
+    what << ". But " << specs.size() << " element" << (1 < specs.size() ? "s" : "") << " (";
+    print_keys_to(what, specs);
+    what << ") specified";
+    throw SyntaxError(what.str());
   } else {
     const auto iter = std::cbegin(specs);
     return callees.at(std::get<0>(*iter))(std::get<1>(*iter));
