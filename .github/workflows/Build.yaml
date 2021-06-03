@@ -46,7 +46,7 @@ jobs:
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
       - name: Run build test for ${{ matrix.package }} package
-        uses: ros-tooling/action-ros-ci@v0.2.1
+        uses: ros-tooling/action-ros-ci@v0.2
         with:
           package-name: ${{ matrix.package }}
           target-ros2-distro: ${{ matrix.rosdistro }}
