@@ -42,7 +42,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
       - name: Setup ROS2 ${{ matrix.rosdistro }} environment
-        uses: ros-tooling/setup-ros@v0.1
+        uses: ros-tooling/setup-ros@v0.2.1
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
       - name: Run build test for ${{ matrix.package }} package
