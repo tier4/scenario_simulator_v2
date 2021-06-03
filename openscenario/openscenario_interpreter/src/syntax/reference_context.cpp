@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/reference_context.hpp>
-#include <sstream>
 #include <string>
 
 namespace openscenario_interpreter

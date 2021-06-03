@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/type_traits/has_member_function_state.hpp>
-#include <sstream>
 
 namespace openscenario_interpreter
 {
