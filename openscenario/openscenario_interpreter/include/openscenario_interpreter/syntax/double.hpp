@@ -30,7 +30,9 @@ struct Double : public std_msgs::msg::Float64
 {
   using value_type = decltype(std_msgs::msg::Float64::data);
 
-  explicit Double(value_type value = {}) { data = value; }
+  explicit Double() = default;
+
+  explicit Double(value_type value) { data = value; }
 
   explicit Double(const std::string & s)
   try {
@@ -61,8 +63,13 @@ struct Double : public std_msgs::msg::Float64
   }
 };
 
-std::ostream & operator<<(std::ostream &, const Double &);
+static_assert(std::is_standard_layout<Double>::value, "");
+
+static_assert(not std::is_trivial<Double>::value, "");
+
 std::istream & operator>>(std::istream &, Double &);
+
+std::ostream & operator<<(std::ostream &, const Double &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
