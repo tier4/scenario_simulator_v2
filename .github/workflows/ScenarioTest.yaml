@@ -77,13 +77,6 @@ jobs:
           colcon build --symlink-install --ament-cmake-args -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1" --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.base --initial
 
-      - name: Test packages
-        run: |
-          source /opt/ros/foxy/setup.bash
-          cd ~/ros2_ws
-          colcon test
-          colcon test-result --verbose
-
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash

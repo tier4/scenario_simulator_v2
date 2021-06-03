@@ -2,13 +2,13 @@ name: BuildTest
 
 on:
   workflow_dispatch:
-  #schedule:
-  #- cron: 0 0 * * *
-  #pull_request:
-  #  paths-ignore:
-  #  - "docs/**"
-  #  - "mkdocs.yml"
-  #  - "README.md"
+  schedule:
+    - cron: 0 0 * * *
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2-beta
       - name: Setup ROS2 ${{ matrix.rosdistro }} environment
-        uses: ros-tooling/setup-ros@v0.1
+        uses: ros-tooling/setup-ros@v0.2
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
       - name: Run build test for ${{ matrix.package }} package
