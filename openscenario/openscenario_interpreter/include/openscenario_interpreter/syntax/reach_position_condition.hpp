@@ -62,7 +62,7 @@ struct ReachPositionCondition
 
   bool operator()(const RelativeWorldPosition &, const TriggeringEntity &) const
   {
-    THROW(ImplementationFault);
+    throw UNSUPPORTED_SETTING_DETECTED(ReachPositionCondition, position.type().name());
   }
 
   decltype(auto) operator()(

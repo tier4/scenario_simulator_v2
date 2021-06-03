@@ -15,8 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <geometry_msgs/msg/point.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
@@ -58,16 +56,21 @@ struct RelativeWorldPosition
 
   operator geometry_msgs::msg::Point() const
   {
-    geometry_msgs::msg::Point result{};
-
-    result.x = dx;
-    result.y = dy;
-    result.z = dz;
+    geometry_msgs::msg::Point result;
+    {
+      result.x = dx;
+      result.y = dy;
+      result.z = dz;
+    }
 
     return result;
   }
 
-  explicit operator openscenario_msgs::msg::LaneletPose() const { THROW(ImplementationFault); }
+  explicit operator openscenario_msgs::msg::LaneletPose() const
+  {
+    throw UNSUPPORTED_CONVERSION_DETECTED(
+      RelativeWorldPosition, openscenario_msgs::msg::LaneletPose);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

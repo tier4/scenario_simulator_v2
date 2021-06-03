@@ -173,7 +173,7 @@ public:
 
     BOOST_SCOPE_EXIT_ALL() { --indent; };
 
-    switch (state().template as<StoryboardElementState>(__FILE__, __LINE__)) {
+    switch (state().template as<StoryboardElementState>()) {
       /* ---- StandBy ----------------------------------------------------------
        *
        *  This is the default initialization state of a StoryboardElement. When

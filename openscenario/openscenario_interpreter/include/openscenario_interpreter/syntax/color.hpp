@@ -31,7 +31,9 @@ struct Color
     yellow,
   } value;
 
-  explicit constexpr Color(value_type value = noColor) : value(value) {}
+  explicit Color() = default;
+
+  explicit constexpr Color(value_type value) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -51,10 +53,14 @@ struct Color
         return traffic_simulator::TrafficLightColor::YELLOW;
 
       default:
-        THROW_IMPLEMENTATION_FAULT();
+        throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(Color, *this);
     }
   }
 };
+
+static_assert(std::is_standard_layout<Color>::value, "");
+
+static_assert(std::is_trivial<Color>::value, "");
 
 std::istream & operator>>(std::istream &, Color &);
 

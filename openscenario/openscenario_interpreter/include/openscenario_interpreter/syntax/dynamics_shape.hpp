@@ -15,8 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_SHAPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DYNAMICS_SHAPE_HPP_
 
-#include <openscenario_interpreter/object.hpp>
-#include <string>
+#include <iostream>
 
 namespace openscenario_interpreter
 {
@@ -24,106 +23,78 @@ inline namespace syntax
 {
 /* ---- DynamicsShape ----------------------------------------------------------
  *
- * <xsd:simpleType name="DynamicsShape">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="linear"/>
- *         <xsd:enumeration value="cubic"/>
- *         <xsd:enumeration value="sinusoidal"/>
- *         <xsd:enumeration value="step"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
+ *  <xsd:simpleType name="DynamicsShape">
+ *    <xsd:union>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="xsd:string">
+ *          <xsd:enumeration value="linear"/>
+ *          <xsd:enumeration value="cubic"/>
+ *          <xsd:enumeration value="sinusoidal"/>
+ *          <xsd:enumeration value="step"/>
+ *        </xsd:restriction>
+ *      </xsd:simpleType>
+ *      <xsd:simpleType>
+ *        <xsd:restriction base="parameter"/>
+ *      </xsd:simpleType>
+ *    </xsd:union>
+ *  </xsd:simpleType>
  *
  * -------------------------------------------------------------------------- */
 struct DynamicsShape
 {
   enum value_type {
-    // Value changes in a linear function: f(x) = f_0 + rate * x.
+
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  Value changes in a linear function:
+     *
+     *    f(x) = f_0 + rate * x.
+     *
+     * ---------------------------------------------------------------------- */
     linear,
 
-    // Cubical transition f(x)=A*x^3+B*x^2+C*x+D with the constraint that the
-    // gradient must be zero at start and end.
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  Cubical transition
+     *
+     *    f(x) = A * x^3 + B * x^2 + C * x + D
+     *
+     *  with the constraint that the gradient must be zero at start and end.
+     *
+     * ---------------------------------------------------------------------- */
     cubic,
 
-    // Sinusoidal transition f(x)=A*sin(x)+B with the constraint that the
-    // gradient must be zero at start and end.
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  Sinusoidal transition
+     *
+     *    f(x) = A * sin(x) + B
+     *
+     *  with the constraint that the gradient must be zero at start and end.
+     *
+     * ---------------------------------------------------------------------- */
     sinusoidal,
 
-    // Step transition.
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  Step transition.
+     *
+     * ---------------------------------------------------------------------- */
     step,
   } value;
 
-  constexpr DynamicsShape(value_type value = {}) : value{value} {}
+  explicit DynamicsShape() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
 
-template <typename... Ts>
-std::basic_istream<Ts...> & operator>>(std::basic_istream<Ts...> & is, DynamicsShape & shape)
-{
-  std::string buffer{};
+static_assert(std::is_standard_layout<DynamicsShape>::value, "");
 
-  is >> buffer;
+static_assert(std::is_trivial<DynamicsShape>::value, "");
 
-#define BOILERPLATE(IDENTIFIER)        \
-  if (buffer == #IDENTIFIER) {         \
-    shape = DynamicsShape::IDENTIFIER; \
-    return is;                         \
-  }                                    \
-  static_assert(true, "")
+std::istream & operator>>(std::istream &, DynamicsShape &);
 
-  BOILERPLATE(linear);
-  BOILERPLATE(step);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                                            \
-  if (buffer == #IDENTIFIER) {                                                             \
-    std::stringstream ss{};                                                                \
-    ss << "given value \'" << buffer                                                       \
-       << "\' is valid OpenSCENARIO value of type DynamicsShape, but it is not supported"; \
-    throw ImplementationFault{ss.str()};                                                   \
-  }                                                                                        \
-  static_assert(true, "")
-
-  BOILERPLATE(cubic);
-  BOILERPLATE(sinusoidal);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type DynamicsShape";
-  throw SyntaxError{ss.str()};
-}
-
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const DynamicsShape & shape)
-{
-  switch (shape) {
-#define BOILERPLATE(NAME)   \
-  case DynamicsShape::NAME: \
-    return os << #NAME;
-
-    BOILERPLATE(linear);
-    BOILERPLATE(cubic);
-    BOILERPLATE(sinusoidal);
-    BOILERPLATE(step);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class DynamicsShape holds unexpected value "
-         << static_cast<DynamicsShape::value_type>(shape);
-      throw ImplementationFault{ss.str()};
-  }
-}
+std::ostream & operator<<(std::ostream &, const DynamicsShape &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
