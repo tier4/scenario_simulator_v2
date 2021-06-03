@@ -32,16 +32,6 @@ target_link_libraries(view_kashiwanoha
   zmq
 )
 
-ament_auto_add_executable(manual_drive_kashiwanoha
-  src/manual_drive_kashiwanoha.cpp
-)
-target_link_libraries(manual_drive_kashiwanoha
-  ${PROTOBUF_LIBRARY}
-  pthread
-  sodium
-  zmqpp
-  zmq
-)
 ament_auto_add_executable(idiot_npc
   src/idiot_npc.cpp
 )
