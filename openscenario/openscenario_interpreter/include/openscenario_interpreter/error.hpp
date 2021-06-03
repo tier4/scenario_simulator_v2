@@ -21,8 +21,12 @@
 
 namespace openscenario_interpreter
 {
+using InternalError = std::exception;
+
+using common::AutowareError;
 using common::Error;
 using common::SemanticError;
+using common::SimulationError;
 using common::SyntaxError;
 
 #define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
