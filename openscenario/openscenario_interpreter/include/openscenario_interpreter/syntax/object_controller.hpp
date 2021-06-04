@@ -47,7 +47,7 @@ struct ObjectController : public ComplexType
   // clang-format off
   : ComplexType(
       choice(node,
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(ObjectController, node.name()); return unspecified; }),
+        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {

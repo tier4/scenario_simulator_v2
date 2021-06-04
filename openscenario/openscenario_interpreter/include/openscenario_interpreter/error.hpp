@@ -47,10 +47,10 @@ using common::SyntaxError;
   SyntaxError(                                             \
     "Unexpected value ", static_cast<TYPE::value_type>(VALUE), " was assigned to type " #TYPE)
 
-#define UNSUPPORTED_ELEMENT_SPECIFIED(PARENT, CHILD) \
-  SyntaxError(                                       \
-    "Given class ", CHILD,                           \
-    " is valid OpenSCENARIO element of class " #PARENT ", but is not supported yet")
+#define UNSUPPORTED_ELEMENT_SPECIFIED(ELEMENT)                                                    \
+  SyntaxError(                                                                                    \
+    "Given class ", ELEMENT, " is valid OpenSCENARIO element of class ", demangle(typeid(*this)), \
+    ", but is not supported yet")
 
 #define UNSUPPORTED_CONVERSION_DETECTED(FROM, TO) \
   SyntaxError("Converting " #FROM " to " #TO      \

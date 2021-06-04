@@ -42,7 +42,7 @@ struct RoutingAction : public ComplexType
   : ComplexType(
       choice(node,
         std::make_pair(     "AssignRouteAction", [&](auto && node) { return make<     AssignRouteAction>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("FollowTrajectoryAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(RoutingAction, node.name()); return unspecified; }),
+        std::make_pair("FollowTrajectoryAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair( "AcquirePositionAction", [&](auto && node) { return make< AcquirePositionAction>(node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {

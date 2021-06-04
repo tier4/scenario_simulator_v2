@@ -50,7 +50,7 @@ struct CollisionCondition
   : given(
       choice(node,
         std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
-        std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(CollisionCondition, node.name()); return unspecified; }))),
+        std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
     for_each(triggering_entities)
   // clang-format on
   {

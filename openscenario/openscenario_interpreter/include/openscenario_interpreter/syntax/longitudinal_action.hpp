@@ -40,7 +40,7 @@ struct LongitudinalAction : public Element
   : Element(
       choice(node,
         std::make_pair(               "SpeedAction", [&](auto && node) { return make<SpeedAction>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("LongitudinalDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(LongitudinalAction, node.name()); return unspecified; })))
+        std::make_pair("LongitudinalDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }

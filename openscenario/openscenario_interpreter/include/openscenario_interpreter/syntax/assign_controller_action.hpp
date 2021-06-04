@@ -51,7 +51,7 @@ struct AssignControllerAction : public ComplexType
   : ComplexType(
       choice(node,
         std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, outer_scope); }),
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(AssignControllerAction, node.name()); return unspecified; }))),
+        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
     inner_scope(outer_scope)
   // clang-format on
   {

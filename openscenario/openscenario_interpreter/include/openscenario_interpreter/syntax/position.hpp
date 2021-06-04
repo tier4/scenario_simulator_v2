@@ -51,12 +51,12 @@ struct Position : public Element
       choice(node,
         std::make_pair(         "WorldPosition", [&](auto && node) { return make<        WorldPosition>(node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair( "RelativeWorldPosition", [&](auto && node) { return make<RelativeWorldPosition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("RelativeObjectPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(Position, node.name()); return unspecified; }),
-        std::make_pair(          "RoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(Position, node.name()); return unspecified; }),
-        std::make_pair(  "RelativeRoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(Position, node.name()); return unspecified; }),
+        std::make_pair("RelativeObjectPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+        std::make_pair(          "RoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+        std::make_pair(  "RelativeRoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair(          "LanePosition", [&](auto && node) { return make<         LanePosition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(  "RelativeLanePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(Position, node.name()); return unspecified; }),
-        std::make_pair(         "RoutePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(Position, node.name()); return unspecified; })))
+        std::make_pair(  "RelativeLanePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+        std::make_pair(         "RoutePosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }
@@ -69,7 +69,7 @@ struct Position : public Element
       return static_cast<geometry_msgs::msg::Pose>(as<LanePosition>());
     } else {
       // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(Position, type().name());
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
     }
   }
 };

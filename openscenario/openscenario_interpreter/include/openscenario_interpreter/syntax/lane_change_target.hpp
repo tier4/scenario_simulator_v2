@@ -39,7 +39,7 @@ struct LaneChangeTarget : public ComplexType
   // clang-format off
   : ComplexType(
       choice(node,
-        std::make_pair("RelativeTargetLane", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(LaneChangeTarget, node.name()); return unspecified; }),
+        std::make_pair("RelativeTargetLane", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair("AbsoluteTargetLane", [&](auto && node) { return make<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {

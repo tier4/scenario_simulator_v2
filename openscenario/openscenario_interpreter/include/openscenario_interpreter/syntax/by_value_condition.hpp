@@ -48,12 +48,12 @@ struct ByValueCondition : public ComplexType
   : ComplexType(
       choice(node,
         std::make_pair(              "ParameterCondition", [&](auto && node) { return make<              ParameterCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(              "TimeOfDayCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(ByValueCondition, node.name()); return unspecified; }),
+        std::make_pair(              "TimeOfDayCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair(         "SimulationTimeCondition", [&](auto && node) { return make<         SimulationTimeCondition>(node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair( "StoryboardElementStateCondition", [&](auto && node) { return make< StoryboardElementStateCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(       "UserDefinedValueCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(ByValueCondition, node.name()); return unspecified; }),
+        std::make_pair(       "UserDefinedValueCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair(          "TrafficSignalCondition", [&](auto && node) { return make<          TrafficSignalCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("TrafficSignalControllerCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(ByValueCondition, node.name()); return unspecified; })))
+        std::make_pair("TrafficSignalControllerCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }

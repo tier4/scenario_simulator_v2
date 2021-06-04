@@ -44,11 +44,11 @@ struct GlobalAction : public Element
   // clang-format off
   : Element(
       choice(node,
-        std::make_pair(   "EnvironmentAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(GlobalAction, node.name()); return unspecified; }),
+        std::make_pair(   "EnvironmentAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair(        "EntityAction", [&](auto && node) { return make<        EntityAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
         std::make_pair(     "ParameterAction", [&](auto && node) { return make<     ParameterAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("InfrastructureAction", [&](auto && node) { return make<InfrastructureAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(GlobalAction, node.name()); return unspecified; })))
+        std::make_pair(       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }

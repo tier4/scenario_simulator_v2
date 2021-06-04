@@ -44,7 +44,7 @@ struct Entities
     });
 
     callWithElements(node, "EntitySelection", 0, unbounded, [&](auto && node) {
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(Entities, node.name());
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
       return unspecified;
     });
   }

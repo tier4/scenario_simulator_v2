@@ -48,7 +48,7 @@ struct AssignRouteAction
     route_or_catalog_reference(
       choice(node,
         std::make_pair("Route",            [&](auto && node) { return make<Route>(node, inner_scope); }),
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(AssignRouteAction, node.name()); return unspecified; })))
+        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }

@@ -53,7 +53,7 @@ struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
     actors(readElement<Actors>("Actors", node, inner_scope))
   {
     callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
-      throw UNSUPPORTED_ELEMENT_SPECIFIED(ManeuverGroup, node.name());
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
       return unspecified;
     });
 
