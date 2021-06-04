@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
 #include <iomanip>
+#include <openscenario_interpreter/utility/demangle.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 
@@ -29,9 +30,10 @@ using common::SemanticError;
 using common::SimulationError;
 using common::SyntaxError;
 
-#define INVALID_NUMERIC_LITERAL_SPECIFIED(TYPE, VALUE) \
-  SyntaxError(                                         \
-    "Given value ", std::quoted(VALUE), " is not an external representation of type " #TYPE)
+#define INVALID_NUMERIC_LITERAL_SPECIFIED(VALUE)                                       \
+  SyntaxError(                                                                         \
+    "Given value ", std::quoted(VALUE), " is not an external representation of type ", \
+    demangle(typeid(*this)))
 
 #define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
   SyntaxError(                                               \

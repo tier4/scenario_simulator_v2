@@ -37,7 +37,7 @@ struct Double : public std_msgs::msg::Float64
   try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    throw INVALID_NUMERIC_LITERAL_SPECIFIED(Double, s);
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
   }
 
   constexpr operator value_type() const noexcept { return data; }

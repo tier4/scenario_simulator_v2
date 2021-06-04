@@ -40,7 +40,7 @@ struct Boolean
     std::stringstream interpreter;
 
     if (!(interpreter << target && interpreter >> std::boolalpha >> data)) {
-      throw INVALID_NUMERIC_LITERAL_SPECIFIED(Boolean, target);
+      throw INVALID_NUMERIC_LITERAL_SPECIFIED(target);
     }
   }
 
