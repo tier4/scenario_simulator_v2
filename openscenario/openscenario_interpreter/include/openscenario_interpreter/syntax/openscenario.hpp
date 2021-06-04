@@ -118,12 +118,11 @@ struct OpenScenario : public pugi::xml_document
 
   const auto & load(const std::string & scenario)
   {
-    const auto result{load_file(scenario.c_str())};
+    const auto result = load_file(scenario.c_str());
 
     if (!result) {
-      std::stringstream ss{};
-      ss << "while loading scenario \"" << scenario << "\" => " << result.description();
-      throw SyntaxError(ss.str());
+      throw SyntaxError(
+        "while loading scenario ", std::quoted(scenario), " => ", result.description());
     } else {
       return *this;
     }

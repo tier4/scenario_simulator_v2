@@ -66,9 +66,7 @@ auto substitute(std::string attribute, Scope & scope)
     if (iter != std::end(substitutions)) {
       attribute = match.str(1) + std::get<1>(*iter)(match.str(4), scope) + match.str(5);
     } else {
-      std::stringstream ss{};
-      ss << "Unknown substitution '" << match.str(3) << "' specified.";
-      throw SyntaxError(ss.str());
+      throw SyntaxError("Unknown substitution ", std::quoted(match.str(3)), " specified");
     }
   }
 
@@ -83,37 +81,34 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
 
     if (value.empty()) {
 #ifndef OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
-      std::stringstream ss{};
-      ss << "Blank is not allowed for the value of attribute \'" << name << "\' of class \'"
-         << node.name() << "\'";
-      throw SyntaxError{ss.str()};
+      throw SyntaxError(
+        "Blank is not allowed for the value of attribute ", std::quoted(name), " of class ",
+        std::quoted(node.name()));
 #else
-      return T{};
+      return T();
 #endif
     } else if (value.front() == '$') {
       const auto iter{scope.parameters.find(value.substr(1))};
       if (iter != std::end(scope.parameters)) {
         return boost::lexical_cast<T>(boost::lexical_cast<String>(cdr(*iter)));
       } else {
-        std::stringstream ss{};
-        ss << "There is no parameter named '" << value.substr(1) << "' (Attribute \'" << name;
-        ss << "\' of class \'" << node.name() << "\' references this parameter)";
-        throw SyntaxError(ss.str());
+        throw SyntaxError(
+          "There is no parameter named ", std::quoted(value.substr(1)), " (Attribute ",
+          std::quoted(name), " of class ", std::quoted(node.name()), " references this parameter)");
       }
     } else {
       try {
         return boost::lexical_cast<T>(value);
       } catch (const boost::bad_lexical_cast &) {
-        std::stringstream ss{};
-        ss << "Value \"" << value << "\" specified for attribute \'" << name;
-        ss << "\' is invalid (Is not value of type " << typeid(T).name() << ")";
-        throw SyntaxError(ss.str());
+        throw SyntaxError(
+          "Value ", std::quoted(value), " specified for attribute ", std::quoted(name),
+          " is invalid (Is not value of type ", typeid(T).name(), ")");
       }
     }
   } else {
-    std::stringstream ss{};
-    ss << "Required attribute \'" << name << "\' not specified for class \'" << node.name() << "\'";
-    throw SyntaxError{ss.str()};
+    throw SyntaxError(
+      "Required attribute ", std::quoted(name), " not specified for class ",
+      std::quoted(node.name()));
   }
 }
 

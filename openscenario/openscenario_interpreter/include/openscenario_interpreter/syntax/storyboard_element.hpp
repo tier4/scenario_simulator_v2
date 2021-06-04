@@ -143,10 +143,9 @@ protected:
       return inner_scope.storyboard_elements[name] =
                make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
     } else {
-      std::stringstream ss{};
-      ss << "detected redefinition of StoryboardElement named \'" << name << "\' ";
-      ss << "(class " << typeid(U).name() << ")";
-      throw SyntaxError(ss.str());
+      throw SyntaxError(
+        "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",
+        typeid(U).name(), ")");
     }
   }
 

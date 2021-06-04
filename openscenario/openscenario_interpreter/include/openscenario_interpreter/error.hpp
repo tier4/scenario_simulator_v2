@@ -16,14 +16,25 @@
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
 #include <iomanip>
-#include <openscenario_interpreter/string/cat.hpp>
+#include <openscenario_interpreter/utility/demangle.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
-#include <string>
-#include <utility>
 
 namespace openscenario_interpreter
 {
+using InternalError = std::exception;
+
+using common::AutowareError;
+using common::Error;
+using common::SemanticError;
+using common::SimulationError;
+using common::SyntaxError;
+
+#define INVALID_NUMERIC_LITERAL_SPECIFIED(VALUE)                                       \
+  SyntaxError(                                                                         \
+    "Given value ", std::quoted(VALUE), " is not an external representation of type ", \
+    demangle(typeid(*this)))
+
 #define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
   SyntaxError(                                               \
     "Given value ", std::quoted(VALUE),                      \
@@ -36,10 +47,10 @@ namespace openscenario_interpreter
   SyntaxError(                                             \
     "Unexpected value ", static_cast<TYPE::value_type>(VALUE), " was assigned to type " #TYPE)
 
-#define UNSUPPORTED_ELEMENT_SPECIFIED(PARENT, CHILD) \
-  SyntaxError(                                       \
-    "Given class ",                                  \
-    #CHILD " is valid OpenSCENARIO element of class " #PARENT ", but is not supported yet")
+#define UNSUPPORTED_ELEMENT_SPECIFIED(ELEMENT)                                                    \
+  SyntaxError(                                                                                    \
+    "Given class ", ELEMENT, " is valid OpenSCENARIO element of class ", demangle(typeid(*this)), \
+    ", but is not supported yet")
 
 #define UNSUPPORTED_CONVERSION_DETECTED(FROM, TO) \
   SyntaxError("Converting " #FROM " to " #TO      \
@@ -47,69 +58,6 @@ namespace openscenario_interpreter
 
 #define UNSUPPORTED_SETTING_DETECTED(ACTION_OR_CONDITION, ELEMENT) \
   SyntaxError(#ACTION_OR_CONDITION " does not yet supports ", ELEMENT)
-
-/* ---- NOTE -------------------------------------------------------------------
- *
- *  -- Error
- *      |-- SyntaxError
- *      |    `-- InvalidEnumeration
- *      `-- SemanticError
- *
- * -------------------------------------------------------------------------- */
-struct Error : public std::runtime_error
-{
-  template <typename... Ts>
-  explicit constexpr Error(Ts &&... xs)
-  : std::runtime_error(cat(std::forward<decltype(xs)>(xs)..., "."))
-  {
-  }
-};
-
-struct SyntaxError : public Error
-{
-  template <typename... Ts>
-  explicit constexpr SyntaxError(Ts &&... xs)
-  : Error("SyntaxError: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
-
-  static decltype(auto) invalidValue(const std::string & type, const std::string & value)
-  {
-    return SyntaxError("An invalid value '", value, "' was specified for type '", type);
-  };
-};
-
-struct SemanticError : public Error
-{
-  template <typename... Ts>
-  explicit SemanticError(Ts &&... xs) : Error("SemanticError: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
-};
-
-struct [[deprecated]] ConnectionError : public Error{
-  template <typename... Ts>
-  explicit ConnectionError(Ts && ... xs) :
-    Error("connection-error: ", std::forward<decltype(xs)>(xs)...){}
-};
-
-#define THROW_UNSUPPORTED_ERROR(PARENT)                                                  \
-  [&](auto && child) {                                                                   \
-    std::stringstream ss{};                                                              \
-    ss << "given class \'" << child.name() << "\' (element of class \'" << PARENT.name() \
-       << "\') is valid OpenSCENARIO element, but is not supported";                     \
-    throw SyntaxError(ss.str());                                                         \
-    return unspecified;                                                                  \
-  }
-
-#define UNSUPPORTED()                                             \
-  [&](auto && node) {                                             \
-    std::stringstream ss{};                                       \
-    ss << "given class \'" << node.name()                         \
-       << " is valid OpenSCENARIO element, but is not supported"; \
-    throw SyntaxError(ss.str());                                  \
-    return unspecified;                                           \
-  }
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__ERROR_HPP_

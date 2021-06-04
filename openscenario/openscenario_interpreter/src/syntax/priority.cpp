@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/priority.hpp>
-#include <sstream>
 #include <string>
 
 namespace openscenario_interpreter

@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__UNSIGNED_SHORT_HPP_
 
 #include <boost/lexical_cast.hpp>
+#include <iostream>
+#include <openscenario_interpreter/error.hpp>
 #include <std_msgs/msg/u_int16.hpp>
 #include <string>
 
@@ -27,15 +29,15 @@ struct UnsignedShort : public std_msgs::msg::UInt16
 {
   using value_type = decltype(std_msgs::msg::UInt16::data);
 
-  explicit UnsignedShort(value_type value = {}) { data = value; }
+  explicit UnsignedShort() = default;
+
+  explicit UnsignedShort(value_type value) { data = value; }
 
   explicit UnsignedShort(const std::string & s)
   try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss{};
-    ss << "can't treat value \"" << s << "\" as type UnsignedShort";
-    throw SyntaxError{ss.str()};
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
   }
 
   constexpr operator value_type() const noexcept { return data; }
@@ -59,17 +61,13 @@ struct UnsignedShort : public std_msgs::msg::UInt16
   }
 };
 
-template <typename... Ts>
-decltype(auto) operator<<(std::basic_ostream<Ts...> & os, const UnsignedShort & rhs)
-{
-  return os << rhs.data;
-}
+static_assert(std::is_standard_layout<UnsignedShort>::value, "");
 
-template <typename... Ts>
-decltype(auto) operator>>(std::basic_istream<Ts...> & is, UnsignedShort & rhs)
-{
-  return is >> rhs.data;
-}
+static_assert(not std::is_trivial<UnsignedShort>::value, "");
+
+std::istream & operator>>(std::istream &, UnsignedShort &);
+
+std::ostream & operator<<(std::ostream &, const UnsignedShort &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

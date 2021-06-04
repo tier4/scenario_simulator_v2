@@ -33,11 +33,11 @@ namespace openscenario_interpreter
 {
 class Interpreter : public rclcpp_lifecycle::LifecycleNode
 {
-  std::string intended_result;
+  String intended_result;
   double local_frame_rate;
   double local_real_time_factor;
-  std::string osc_path;
-  std::string output_directory;
+  String osc_path;
+  String output_directory;
 
   Element script;
 
@@ -77,21 +77,12 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   template <typename Thunk>
   void withExceptionHandler(Thunk && thunk)
   {
-    using common::AutowareError;
-    using common::SemanticError;
-    using common::SimulationError;
-    using common::SyntaxError;
-
-    using DeprecatedSemanticError = openscenario_interpreter::SemanticError;
-    using DeprecatedSyntaxError = openscenario_interpreter::SyntaxError;
-
-    using InternalError = std::exception;
-
     try {
       return thunk();
     }
 
-    catch (const SpecialAction<EXIT_SUCCESS> &) {
+    catch (const SpecialAction<EXIT_SUCCESS> &)  // from CustomCommandAction::exitSuccess
+    {
       if (intended_result == "success") {
         report(SUCCESS, "Success");
       } else {
@@ -99,7 +90,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       }
     }
 
-    catch (const SpecialAction<EXIT_FAILURE> &) {
+    catch (const SpecialAction<EXIT_FAILURE> &)  // from CustomCommandAction::exitFailure
+    {
       if (intended_result == "failure") {
         report(SUCCESS, "IntendedFailure");
       } else {
@@ -107,16 +99,16 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       }
     }
 
-    CATCH(DeprecatedSemanticError)  // TODO (yamacir-kit): REMOVE THIS!!!
-    CATCH(DeprecatedSyntaxError)    // TODO (yamacir-kit): REMOVE THIS!!!
-
     CATCH(AutowareError)
     CATCH(SemanticError)
     CATCH(SimulationError)
     CATCH(SyntaxError)
     CATCH(InternalError)  // NOTE: THIS MUST BE LAST OF CATCH STATEMENTS.
 
-    catch (...) { report(ERROR, "UnknownError", "An unknown exception has occurred"); }
+    catch (...)  // FINAL BARRIER
+    {
+      report(ERROR, "UnknownError", "An unknown exception has occurred");
+    }
   }
 
 #undef CATCH

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
-#include <sstream>
 #include <string>
 
 namespace openscenario_interpreter

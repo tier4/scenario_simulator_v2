@@ -12,28 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/io/ios_state.hpp>
-#include <openscenario_interpreter/syntax/boolean.hpp>
+#ifndef OPENSCENARIO_INTERPRETER__UTILITY__DEMANGLE_HPP_
+#define OPENSCENARIO_INTERPRETER__UTILITY__DEMANGLE_HPP_
+
+#include <string>
+#include <typeinfo>
 
 namespace openscenario_interpreter
 {
-inline namespace syntax
+inline namespace utility
 {
-std::ostream & operator<<(std::ostream & os, const Boolean & datum)
-{
-  boost::io::ios_flags_saver saver{os};
-  return os << std::boolalpha << datum.data;
-}
+auto demangle(const char * name) -> std::string;
 
-std::istream & operator>>(std::istream & is, Boolean & datum)
-{
-  boost::io::ios_flags_saver saver{is};
-  return is >> std::boolalpha >> datum.data;
-}
-
-const Element true_v = make<Boolean>(true);
-const Element false_v = make<Boolean>(false);
-
-const Element & asBoolean(bool value) { return value ? true_v : false_v; }
-}  // namespace syntax
+auto demangle(const std::type_info &) -> std::string;
+}  // namespace utility
 }  // namespace openscenario_interpreter
+
+#endif  // OPENSCENARIO_INTERPRETER__UTILITY__DEMANGLE_HPP_
