@@ -56,15 +56,6 @@ using common::SyntaxError;
 
 #define UNSUPPORTED_SETTING_DETECTED(ACTION_OR_CONDITION, ELEMENT) \
   SyntaxError(#ACTION_OR_CONDITION " does not yet supports ", ELEMENT)
-
-#define THROW_UNSUPPORTED_ERROR(PARENT)                                                  \
-  [&](auto && child) {                                                                   \
-    std::stringstream ss{};                                                              \
-    ss << "given class \'" << child.name() << "\' (element of class \'" << PARENT.name() \
-       << "\') is valid OpenSCENARIO element, but is not supported";                     \
-    throw SyntaxError(ss.str());                                                         \
-    return unspecified;                                                                  \
-  }
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__ERROR_HPP_

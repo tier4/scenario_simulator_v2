@@ -52,7 +52,10 @@ struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
     inner_scope(outer_scope),
     actors(readElement<Actors>("Actors", node, inner_scope))
   {
-    callWithElements(node, "CatalogReference", 0, unbounded, THROW_UNSUPPORTED_ERROR(node));
+    callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(ManeuverGroup, node.name());
+      return unspecified;
+    });
 
     callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Maneuver>(node, inner_scope));
