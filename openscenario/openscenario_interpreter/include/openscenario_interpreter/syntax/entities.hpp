@@ -43,7 +43,10 @@ struct Entities
         make<ScenarioObject>(node, outer_scope));
     });
 
-    callWithElements(node, "EntitySelection", 0, unbounded, UNSUPPORTED());
+    callWithElements(node, "EntitySelection", 0, unbounded, [&](auto && node) {
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(Entities, node.name());
+      return unspecified;
+    });
   }
 };
 }  // namespace syntax

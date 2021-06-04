@@ -47,8 +47,8 @@ using common::SyntaxError;
 
 #define UNSUPPORTED_ELEMENT_SPECIFIED(PARENT, CHILD) \
   SyntaxError(                                       \
-    "Given class ",                                  \
-    #CHILD " is valid OpenSCENARIO element of class " #PARENT ", but is not supported yet")
+    "Given class ", CHILD,                           \
+    " is valid OpenSCENARIO element of class " #PARENT ", but is not supported yet")
 
 #define UNSUPPORTED_CONVERSION_DETECTED(FROM, TO) \
   SyntaxError("Converting " #FROM " to " #TO      \
@@ -64,15 +64,6 @@ using common::SyntaxError;
        << "\') is valid OpenSCENARIO element, but is not supported";                     \
     throw SyntaxError(ss.str());                                                         \
     return unspecified;                                                                  \
-  }
-
-#define UNSUPPORTED()                                             \
-  [&](auto && node) {                                             \
-    std::stringstream ss{};                                       \
-    ss << "given class \'" << node.name()                         \
-       << " is valid OpenSCENARIO element, but is not supported"; \
-    throw SyntaxError(ss.str());                                  \
-    return unspecified;                                           \
   }
 }  // namespace openscenario_interpreter
 

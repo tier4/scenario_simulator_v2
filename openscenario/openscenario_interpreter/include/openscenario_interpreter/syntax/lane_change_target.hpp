@@ -24,23 +24,24 @@ inline namespace syntax
 {
 /* ---- LaneChangeTarget -------------------------------------------------------
  *
- * <xsd:complexType name="LaneChangeTarget">
- *   <xsd:choice>
- *     <xsd:element name="RelativeTargetLane" type="RelativeTargetLane"/>
- *     <xsd:element name="AbsoluteTargetLane" type="AbsoluteTargetLane"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="LaneChangeTarget">
+ *    <xsd:choice>
+ *      <xsd:element name="RelativeTargetLane" type="RelativeTargetLane"/>
+ *      <xsd:element name="AbsoluteTargetLane" type="AbsoluteTargetLane"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LaneChangeTarget : public Element
+struct LaneChangeTarget : public ComplexType
 {
   template <typename Node, typename... Ts>
   explicit LaneChangeTarget(const Node & node, Ts &&... xs)
-  : Element(choice(
-      node, std::make_pair("RelativeTargetLane", UNSUPPORTED()),
-      std::make_pair("AbsoluteTargetLane", [&](auto && node) {
-        return make<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...);
-      })))
+  // clang-format off
+  : ComplexType(
+      choice(node,
+        std::make_pair("RelativeTargetLane", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(LaneChangeTarget, node.name()); return unspecified; }),
+        std::make_pair("AbsoluteTargetLane", [&](auto && node) { return make<AbsoluteTargetLane>(node, std::forward<decltype(xs)>(xs)...); })))
+  // clang-format on
   {
   }
 };

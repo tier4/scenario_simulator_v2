@@ -34,22 +34,20 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair(     \
-    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
-
-struct RoutingAction : public Element
+struct RoutingAction : public ComplexType
 {
   template <typename Node, typename... Ts>
   explicit RoutingAction(const Node & node, Ts &&... xs)
-  : Element(choice(
-      node, ELEMENT(AssignRouteAction), std::make_pair("FollowTrajectoryAction", UNSUPPORTED()),
-      ELEMENT(AcquirePositionAction)))
+  // clang-format off
+  : ComplexType(
+      choice(node,
+        std::make_pair(     "AssignRouteAction", [&](auto && node) { return make<     AssignRouteAction>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("FollowTrajectoryAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(RoutingAction, node.name()); return unspecified; }),
+        std::make_pair( "AcquirePositionAction", [&](auto && node) { return make< AcquirePositionAction>(node, std::forward<decltype(xs)>(xs)...); })))
+  // clang-format on
   {
   }
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

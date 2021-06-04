@@ -43,10 +43,13 @@ struct AssignRouteAction
 
   template <typename Node>
   explicit AssignRouteAction(const Node & node, Scope & outer_scope)
+  // clang-format off
   : inner_scope(outer_scope),
-    route_or_catalog_reference(choice(
-      node, std::make_pair("Route", [&](auto && node) { return make<Route>(node, inner_scope); }),
-      std::make_pair("CatalogReference", UNSUPPORTED())))
+    route_or_catalog_reference(
+      choice(node,
+        std::make_pair("Route",            [&](auto && node) { return make<Route>(node, inner_scope); }),
+        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(AssignRouteAction, node.name()); return unspecified; })))
+  // clang-format on
   {
   }
 

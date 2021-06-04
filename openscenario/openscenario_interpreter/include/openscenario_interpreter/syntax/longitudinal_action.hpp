@@ -22,26 +22,26 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== LongitudinalAction ===================================================
+/* ---- LongitudinalAction -----------------------------------------------------
  *
- * <xsd:complexType name="LongitudinalAction">
- *   <xsd:choice>
- *     <xsd:element name="SpeedAction" type="SpeedAction"/>
- *     <xsd:element name="LongitudinalDistanceAction" type="LongitudinalDistanceAction"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="LongitudinalAction">
+ *    <xsd:choice>
+ *      <xsd:element name="SpeedAction" type="SpeedAction"/>
+ *      <xsd:element name="LongitudinalDistanceAction" type="LongitudinalDistanceAction"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct LongitudinalAction : public Element
 {
   template <typename Node, typename... Ts>
   explicit LongitudinalAction(const Node & node, Ts &&... xs)
-  : Element(choice(
-      node,
-      std::make_pair(
-        "SpeedAction",
-        [&](auto && node) { return make<SpeedAction>(node, std::forward<decltype(xs)>(xs)...); }),
-      std::make_pair("LongitudinalDistanceAction", UNSUPPORTED())))
+  // clang-format off
+  : Element(
+      choice(node,
+        std::make_pair(               "SpeedAction", [&](auto && node) { return make<SpeedAction>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("LongitudinalDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(LongitudinalAction, node.name()); return unspecified; })))
+  // clang-format on
   {
   }
 };

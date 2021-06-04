@@ -27,37 +27,37 @@ inline namespace syntax
 {
 /* ---- ByValueCondition -------------------------------------------------------
  *
- * <xsd:complexType name="ByValueCondition">
- *   <xsd:choice>
- *     <xsd:element name="ParameterCondition" type="ParameterCondition"/>
- *     <xsd:element name="TimeOfDayCondition" type="TimeOfDayCondition"/>
- *     <xsd:element name="SimulationTimeCondition" type="SimulationTimeCondition"/>
- *     <xsd:element name="StoryboardElementStateCondition" type="StoryboardElementStateCondition"/>
- *     <xsd:element name="UserDefinedValueCondition" type="UserDefinedValueCondition"/>
- *     <xsd:element name="TrafficSignalCondition" type="TrafficSignalCondition"/>
- *     <xsd:element name="TrafficSignalControllerCondition" type="TrafficSignalControllerCondition"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="ByValueCondition">
+ *    <xsd:choice>
+ *      <xsd:element name="ParameterCondition" type="ParameterCondition"/>
+ *      <xsd:element name="TimeOfDayCondition" type="TimeOfDayCondition"/>
+ *      <xsd:element name="SimulationTimeCondition" type="SimulationTimeCondition"/>
+ *      <xsd:element name="StoryboardElementStateCondition" type="StoryboardElementStateCondition"/>
+ *      <xsd:element name="UserDefinedValueCondition" type="UserDefinedValueCondition"/>
+ *      <xsd:element name="TrafficSignalCondition" type="TrafficSignalCondition"/>
+ *      <xsd:element name="TrafficSignalControllerCondition" type="TrafficSignalControllerCondition"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair(     \
-    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
-
-struct ByValueCondition : public Element
+struct ByValueCondition : public ComplexType
 {
   template <typename Node, typename... Ts>
   explicit ByValueCondition(const Node & node, Ts &&... xs)
-  : Element(choice(
-      node, ELEMENT(ParameterCondition), std::make_pair("TimeOfDayCondition", UNSUPPORTED()),
-      ELEMENT(SimulationTimeCondition), ELEMENT(StoryboardElementStateCondition),
-      std::make_pair("UserDefinedValueCondition", UNSUPPORTED()), ELEMENT(TrafficSignalCondition),
-      std::make_pair("TrafficSignalControllerCondition", UNSUPPORTED())))
+  // clang-format off
+  : ComplexType(
+      choice(node,
+        std::make_pair(              "ParameterCondition", [&](auto && node) { return make<              ParameterCondition>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair(              "TimeOfDayCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(ByValueCondition, node.name()); return unspecified; }),
+        std::make_pair(         "SimulationTimeCondition", [&](auto && node) { return make<         SimulationTimeCondition>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair( "StoryboardElementStateCondition", [&](auto && node) { return make< StoryboardElementStateCondition>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair(       "UserDefinedValueCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(ByValueCondition, node.name()); return unspecified; }),
+        std::make_pair(          "TrafficSignalCondition", [&](auto && node) { return make<          TrafficSignalCondition>(node, std::forward<decltype(xs)>(xs)...); }),
+        std::make_pair("TrafficSignalControllerCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(ByValueCondition, node.name()); return unspecified; })))
+  // clang-format on
   {
   }
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

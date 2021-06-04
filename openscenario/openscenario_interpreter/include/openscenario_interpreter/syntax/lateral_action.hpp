@@ -37,12 +37,13 @@ struct LateralAction : public ComplexType
 {
   template <typename Node, typename Scope>
   explicit LateralAction(const Node & node, Scope & scope)
-  : ComplexType(choice(
-      node,
-      std::make_pair(
-        "LaneChangeAction", [&](auto && node) { return make<LaneChangeAction>(node, scope); }),
-      std::make_pair("LaneOffsetAction", UNSUPPORTED()),
-      std::make_pair("LateralDistanceAction", UNSUPPORTED())))
+  // clang-format off
+  : ComplexType(
+      choice(node,
+        std::make_pair(     "LaneChangeAction", [&](auto && node) { return make<LaneChangeAction>(node, scope); }),
+        std::make_pair(     "LaneOffsetAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(LateralAction, node.name()); return unspecified; }),
+        std::make_pair("LateralDistanceAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(LateralAction, node.name()); return unspecified; })))
+  // clang-format on
   {
   }
 };

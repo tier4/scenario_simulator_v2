@@ -44,10 +44,10 @@ struct EntityObject : public Group
   : Group(
       choice(
         node,
-        std::make_pair("CatalogReference", UNSUPPORTED()),
+        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(EntityObject, node.name()); return unspecified; }),
         std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>   (node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("MiscObject",       UNSUPPORTED())))
+        std::make_pair("MiscObject",       [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(EntityObject, node.name()); return unspecified; })))
   // clang-format on
   {
   }

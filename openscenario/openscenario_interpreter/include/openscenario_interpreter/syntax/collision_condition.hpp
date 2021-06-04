@@ -46,10 +46,13 @@ struct CollisionCondition
   template <typename Node, typename Scope>
   explicit CollisionCondition(
     const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  : given(choice(
-      node, std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
-      std::make_pair("ByType", UNSUPPORTED()))),
+  // clang-format off
+  : given(
+      choice(node,
+        std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
+        std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(CollisionCondition, node.name()); return unspecified; }))),
     for_each(triggering_entities)
+  // clang-format on
   {
   }
 
