@@ -2,18 +2,18 @@ name: Docker
 
 on:
   workflow_dispatch:
-  #schedule:
-  #  - cron: 0 0 * * *
-  #pull_request:
-  #  paths-ignore:
-  #    - "docs/**"
-  #    - "mkdocs.yml"
-  #    - "README.md"
-  #push:
-  #  branches:
-  #    - master
-  #release:
-  #  types: [published]
+  schedule:
+    - cron: 0 0 * * *
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+  push:
+    branches:
+      - master
+  release:
+    types: [published]
 jobs:
   job1:
     name: Build Docker Image
