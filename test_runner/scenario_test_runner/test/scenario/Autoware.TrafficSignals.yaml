@@ -14,8 +14,10 @@ OpenSCENARIO:
   CatalogLocations:
     CatalogLocation: []
   RoadNetwork:
-    LogicFile: { filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm }
-    SceneGraphFile: { filepath: lanelet2_map.pcd }
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
+    SceneGraphFile:
+      filepath: pointcloud_map.pcd
     TrafficSignals:
       TrafficSignalController:
         - name: controller-1
@@ -48,12 +50,31 @@ OpenSCENARIO:
           name: ''
           vehicleCategory: car
           BoundingBox:
-            Center: { x: 0, y: 0, z: 0 }
-            Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
-          Performance: { maxSpeed: 30, maxAcceleration: INF, maxDeceleration: INF }
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              width: 2.25
+              length: 4.77
+              height: 2.5
+          Performance:
+            maxSpeed: 30
+            maxAcceleration: INF
+            maxDeceleration: INF
           Axles:
-            FrontAxle: { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX:  1, positionZ: 0.3 }
-            RearAxle:  { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX: -1, positionZ: 0.3 }
+            FrontAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX:  1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: -1
+              positionZ: 0.3
           Properties:
             Property: []
         ObjectController:
@@ -75,16 +96,24 @@ OpenSCENARIO:
                       laneId: '34513'
                       s: 0
                       offset: 0
-                      Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position:
+                    Position: &ego-destination
                       LanePosition:
                         roadId: ''
                         laneId: '34630'
                         s: 20
                         offset: 0
-                        Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
     Story:
       - name: ''
         Act:
@@ -161,13 +190,7 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: '34507'
-                                            s: 50
-                                            offset: 0
-                                            Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                                        Position: *ego-destination
                                         tolerance: 1
                         Action:
                           - name: ''

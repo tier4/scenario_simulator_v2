@@ -56,6 +56,9 @@ std::ostream & operator<<(std::ostream & os, const Color & datum)
 
     case Color::yellow:
       return os << "yellow";
+
+    default:
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(Color, datum);
   }
 }
 }  // namespace syntax
