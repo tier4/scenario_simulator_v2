@@ -39,7 +39,7 @@ void DetectionSensor::update(
   double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp, const std::vector<std::string> & detected_objects)
 {
-  if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
+  if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
     autoware_perception_msgs::msg::DynamicObjectArray msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";
