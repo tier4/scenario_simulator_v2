@@ -40,6 +40,8 @@ struct OpenScenario : public Scope
 {
   pugi::xml_document script;
 
+  const FileHeader file_header;
+
   const OpenScenarioCategory category;
 
   const auto & load(const std::string & scenario)
@@ -58,8 +60,8 @@ struct OpenScenario : public Scope
   template <typename... Ts>
   explicit OpenScenario(Ts &&... xs)
   : Scope(std::forward<decltype(xs)>(xs)...),
-    category(readElement<OpenScenarioCategory>(
-      "OpenSCENARIO", load(scenario), static_cast<Scope &>(*this)))
+    file_header(readElement<FileHeader>("FileHeader", load(scenario).child("OpenSCENARIO"), *this)),
+    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, *this))
   {
   }
 
