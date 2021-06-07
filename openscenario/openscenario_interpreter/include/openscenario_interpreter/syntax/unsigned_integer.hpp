@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__UNSIGNED_INTEGER_HPP_
 
 #include <boost/lexical_cast.hpp>
+#include <openscenario_interpreter/error.hpp>
 #include <std_msgs/msg/u_int64.hpp>
 #include <string>
 
@@ -33,9 +34,7 @@ struct UnsignedInteger : public std_msgs::msg::UInt64
   try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss{};
-    ss << "can't treat value \"" << s << "\" as type UnsignedInteger";
-    throw SyntaxError{ss.str()};
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
   }
 
   constexpr operator value_type() const noexcept { return data; }
@@ -59,17 +58,13 @@ struct UnsignedInteger : public std_msgs::msg::UInt64
   }
 };
 
-template <typename... Ts>
-decltype(auto) operator<<(std::basic_ostream<Ts...> & os, const UnsignedInteger & rhs)
-{
-  return os << rhs.data;
-}
+static_assert(std::is_standard_layout<UnsignedInteger>::value, "");
 
-template <typename... Ts>
-decltype(auto) operator>>(std::basic_istream<Ts...> & is, UnsignedInteger & rhs)
-{
-  return is >> rhs.data;
-}
+static_assert(not std::is_trivial<UnsignedInteger>::value, "");
+
+std::istream & operator>>(std::istream &, UnsignedInteger &);
+
+std::ostream & operator<<(std::ostream &, const UnsignedInteger &);
 
 using UnsignedInt = UnsignedInteger;
 }  // namespace syntax

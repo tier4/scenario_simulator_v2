@@ -15,18 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STRING_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STRING_HPP_
 
-#include <openscenario_interpreter/object.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== String ===============================================================
- *
- * TODO
- *
- * ======================================================================== */
 using String = std::string;
 }  // namespace syntax
 }  // namespace openscenario_interpreter

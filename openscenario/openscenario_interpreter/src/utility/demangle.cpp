@@ -12,31 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__STRING__CAT_HPP_
-#define OPENSCENARIO_INTERPRETER__STRING__CAT_HPP_
+#include <memory>
+#include <openscenario_interpreter/utility/demangle.hpp>
 
-#include <openscenario_interpreter/functional/fold.hpp>
-#include <sstream>
-#include <string>
-#include <utility>
+#ifdef __GNUC__
+#include <cxxabi.h>
+#endif
 
 namespace openscenario_interpreter
 {
-inline namespace string
+inline namespace utility
 {
-auto cat = [](auto &&... xs) {
-  std::stringstream ss;
+auto demangle(const char * name) -> std::string
+{
+#ifdef __GNUC__
+  int failed = 0;
 
-  auto write = [](auto && os, auto && x) {
-    os.get() << x;
-    return std::forward<decltype(os)>(os);
-  };
+  std::unique_ptr<char, decltype(&std::free)> demangled{
+    abi::__cxa_demangle(name, nullptr, nullptr, &failed),
+    [](void * x) noexcept -> void { std::free(x); }};
 
-  fold_left(write, std::ref(ss), std::forward<decltype(xs)>(xs)...);
+  return std::string(failed ? name : demangled.get());
+#else
+  return std::string(name);
+#endif
+}
 
-  return ss.str();
-};
-}  // namespace string
+auto demangle(const std::type_info & info) -> std::string { return demangle(info.name()); }
+}  // namespace utility
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__STRING__CAT_HPP_

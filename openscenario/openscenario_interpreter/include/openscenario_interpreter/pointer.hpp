@@ -46,7 +46,6 @@ class Pointer : public std::shared_ptr<T>
     const std::type_info & type() const noexcept override { return typeid(Bound); }
 
   private:
-    // ^ Note: This broken indent was forced by ament_uncrustify.
     std::ostream & write(std::ostream & os) const override
     {
       return IfHasStreamOutputOperator<Bound>::applyIt(os, *this);
@@ -94,9 +93,8 @@ public:
     if (*this) {
       return std::shared_ptr<T>::operator*();
     } else {
-      std::stringstream ss{};
-      ss << "dereferencing nullptr";
-      throw ImplementationFault{ss.str()};
+      throw SemanticError(
+        "Dereferencing null-pointer. This is likely due to improper implementation");
     }
   }
 
@@ -114,21 +112,8 @@ public:
     if (const auto bound = std::dynamic_pointer_cast<U>(*this)) {
       return *bound;
     } else {
-      std::stringstream what;
-      what << "type-error: can't treat " << binding().type().name() << " as type "
-           << typeid(U).name();
-      throw std::runtime_error(what.str());
+      throw SemanticError("Can't treat ", binding().type().name(), " as ", typeid(U).name());
     }
-  }
-
-  template <typename U>
-  decltype(auto) as(const char * const file, int line) const
-  try {
-    return as<U>();
-  } catch (const std::runtime_error & error) {
-    std::stringstream ss{};
-    ss << error.what() << " (call from " << file << ":" << line << ")";
-    throw std::runtime_error{ss.str()};
   }
 
 public:
@@ -157,8 +142,8 @@ public:
   }
 };
 
-template <typename T, typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const Pointer<T> & pointer)
+template <typename T>
+std::ostream & operator<<(std::ostream & os, const Pointer<T> & pointer)
 {
   return (pointer ? pointer.binding().write(os) : (os << faint << "<Null/>")) << reset;
 }

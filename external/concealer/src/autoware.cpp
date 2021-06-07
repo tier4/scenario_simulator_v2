@@ -186,7 +186,8 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 void Autoware::engage()
 {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); });
+  task_queue.delay(
+    [this]() { waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); }); });
 #endif
 
 #ifdef AUTOWARE_AUTO

@@ -46,32 +46,25 @@ struct EntityAction : public Element
 
   template <typename Node, typename Scope>
   explicit EntityAction(const Node & node, Scope & outer_scope)
-  : Element(choice(
-      node,
-
-      std::make_pair(
-        "AddEntityAction", [&](auto && node) { return make<AddEntityAction>(node, outer_scope); }),
-
-      std::make_pair(
-        "DeleteEntityAction",
-        [&](auto && node) { return make<DeleteEntityAction>(node, outer_scope); }))),
-
+  // clang-format off
+  : Element(
+      choice(node,
+        std::make_pair(   "AddEntityAction", [&](auto && node) { return make<   AddEntityAction>(node, outer_scope); }),
+        std::make_pair("DeleteEntityAction", [&](auto && node) { return make<DeleteEntityAction>(node, outer_scope); }))),
     entity_ref(readAttribute<String>("entityRef", node, outer_scope))
+  // clang-format on
   {
   }
 
   decltype(auto) evaluate() const
   {
-    static const std::unordered_map<std::type_index, std::function<Element(const String &)>>
-      overloads{
-        {typeid(AddEntityAction),
-         [this](auto &&... xs) {
-           return as<AddEntityAction>()(std::forward<decltype(xs)>(xs)...);
-         }},
-
-        {typeid(DeleteEntityAction), [this](auto &&... xs) {
-           return as<DeleteEntityAction>()(std::forward<decltype(xs)>(xs)...);
-         }}};
+    // clang-format off
+    static const std::unordered_map<std::type_index, std::function<Element(const String &)>> overloads
+    {
+      { typeid(AddEntityAction),    [this](auto &&... xs) { return as<AddEntityAction   >()(std::forward<decltype(xs)>(xs)...); }},
+      { typeid(DeleteEntityAction), [this](auto &&... xs) { return as<DeleteEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
+    };
+    // clang-format on
 
     return overloads.at(type())(entity_ref);
   }

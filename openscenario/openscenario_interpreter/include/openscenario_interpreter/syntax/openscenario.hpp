@@ -118,12 +118,11 @@ struct OpenScenario : public pugi::xml_document
 
   const auto & load(const std::string & scenario)
   {
-    const auto result{load_file(scenario.c_str())};
+    const auto result = load_file(scenario.c_str());
 
     if (!result) {
-      std::stringstream ss{};
-      ss << "while loading scenario \"" << scenario << "\" => " << result.description();
-      throw SyntaxError(ss.str());
+      throw SyntaxError(
+        "while loading scenario ", std::quoted(scenario), " => ", result.description());
     } else {
       return *this;
     }
@@ -135,7 +134,7 @@ struct OpenScenario : public pugi::xml_document
   explicit OpenScenario(Ts &&... xs) : scope(std::forward<decltype(xs)>(xs)...)
   {
     if (load(scope.scenario).child("OpenSCENARIO").child("Catalog")) {
-      THROW_IMPLEMENTATION_FAULT();
+      throw SyntaxError("The Catalog feature is not yet supported");
     } else {
       category = make<ScenarioDefinition>(child("OpenSCENARIO"), scope);
     }
@@ -144,11 +143,7 @@ struct OpenScenario : public pugi::xml_document
   template <typename... Ts>
   decltype(auto) complete(Ts &&... xs)
   {
-    if (category.is<ScenarioDefinition>()) {
-      return category.as<ScenarioDefinition>().complete(std::forward<decltype(xs)>(xs)...);
-    } else {
-      THROW_IMPLEMENTATION_FAULT();
-    }
+    return category.as<ScenarioDefinition>().complete(std::forward<decltype(xs)>(xs)...);
   }
 
   template <typename... Ts>

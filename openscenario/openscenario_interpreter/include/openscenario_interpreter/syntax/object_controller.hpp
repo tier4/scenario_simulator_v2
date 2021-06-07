@@ -22,10 +22,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-#define ELEMENT(TYPE) \
-  std::make_pair(     \
-    #TYPE, [&](auto && node) { return make<TYPE>(node, std::forward<decltype(xs)>(xs)...); })
-
 /* ---- ObjectController -------------------------------------------------------
  *
  *  Definition of a controller for a scenario object. Either an inline
@@ -48,8 +44,12 @@ struct ObjectController : public ComplexType
 
   template <typename Node, typename... Ts>
   explicit ObjectController(const Node & node, Ts &&... xs)
+  // clang-format off
   : ComplexType(
-      choice(node, std::make_pair("CatalogReference", UNSUPPORTED()), ELEMENT(Controller)))
+      choice(node,
+        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+        std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, std::forward<decltype(xs)>(xs)...); })))
+  // clang-format on
   {
   }
 
@@ -76,8 +76,6 @@ struct ObjectController : public ComplexType
     }
   }
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

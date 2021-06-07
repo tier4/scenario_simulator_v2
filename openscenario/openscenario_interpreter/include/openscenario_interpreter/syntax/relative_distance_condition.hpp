@@ -77,7 +77,7 @@ struct RelativeDistanceCondition
         case RelativeDistanceType::cartesianDistance:
           return getBoundingBoxDistance(entity_ref, triggering_entity);
         default:
-          THROW(ImplementationFault);
+          throw UNSUPPORTED_SETTING_DETECTED(RelativeDistanceCondition, relative_distance_type);
       }
     } else {
       switch (relative_distance_type) {
@@ -90,7 +90,7 @@ struct RelativeDistanceCondition
             getRelativePose(triggering_entity, entity_ref).position.x,
             getRelativePose(triggering_entity, entity_ref).position.y);
         default:
-          THROW(ImplementationFault);
+          throw UNSUPPORTED_SETTING_DETECTED(RelativeDistanceCondition, relative_distance_type);
       }
     }
   }

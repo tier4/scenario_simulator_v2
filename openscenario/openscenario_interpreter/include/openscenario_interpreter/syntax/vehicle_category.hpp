@@ -63,7 +63,7 @@ struct VehicleCategory
     van,
   } value;
 
-  explicit constexpr VehicleCategory(value_type value = {}) : value(value) {}
+  explicit constexpr VehicleCategory(value_type value = car) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 };

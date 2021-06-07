@@ -28,13 +28,13 @@ inline namespace syntax
 {
 /* ---- LaneChangeAction -------------------------------------------------------
  *
- * <xsd:complexType name="LaneChangeAction">
- *   <xsd:all>
- *     <xsd:element name="LaneChangeActionDynamics" type="TransitionDynamics"/>
- *     <xsd:element name="LaneChangeTarget" type="LaneChangeTarget"/>
- *   </xsd:all>
- *   <xsd:attribute name="targetLaneOffset" type="Double" use="optional"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="LaneChangeAction">
+ *    <xsd:all>
+ *      <xsd:element name="LaneChangeActionDynamics" type="TransitionDynamics"/>
+ *      <xsd:element name="LaneChangeTarget" type="LaneChangeTarget"/>
+ *    </xsd:all>
+ *    <xsd:attribute name="targetLaneOffset" type="Double" use="optional"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct LaneChangeAction
@@ -57,7 +57,7 @@ struct LaneChangeAction
   {
   }
 
-  std::unordered_map<std::string, Boolean> accomplishments;
+  std::unordered_map<String, Boolean> accomplishments;
 
   void start()
   {
@@ -69,7 +69,8 @@ struct LaneChangeAction
         requestLaneChange(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
       }
     } else {
-      THROW(ImplementationFault);
+      // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
     }
   }
 
@@ -84,7 +85,8 @@ struct LaneChangeAction
       }
       return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
     } else {
-      THROW(ImplementationFault);
+      // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.
+      throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
     }
   }
 };

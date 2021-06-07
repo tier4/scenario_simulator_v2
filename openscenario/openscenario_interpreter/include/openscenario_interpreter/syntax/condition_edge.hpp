@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_EDGE_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {
@@ -47,7 +46,18 @@ inline namespace syntax
 struct ConditionEdge
 {
   enum value_type {
-    /* ---- Rising -------------------------------------------------------------
+
+    /* ---- NOTE ---------------------------------------------------------------
+     *
+     *  A condition defined with a 'none' edge shall return true at discrete
+     *  time t if its logical expression is true at discrete time t.
+     *
+     *  Default constructor select this.
+     *
+     * ---------------------------------------------------------------------- */
+    none,
+
+    /* ---- NOTE ---------------------------------------------------------------
      *
      *  A condition defined with a rising edge shall return true at discrete
      *  time t if its logical expression is true at discrete time t and its
@@ -57,7 +67,7 @@ struct ConditionEdge
      * ---------------------------------------------------------------------- */
     rising,
 
-    /* ---- Falling ------------------------------------------------------------
+    /* ---- NOTE ---------------------------------------------------------------
      *
      *  A condition defined with a falling edge shall return true at discrete
      *  time t if its logical expression is false at discrete time t and its
@@ -67,7 +77,7 @@ struct ConditionEdge
      * ---------------------------------------------------------------------- */
     falling,
 
-    /* ---- Rising or Falling --------------------------------------------------
+    /* ---- NOTE ---------------------------------------------------------------
      *
      *  A condition defined with a 'risingOrFalling' edge shall return true at
      *  discrete time t if its logical expression is true at discrete time t
@@ -79,80 +89,31 @@ struct ConditionEdge
      * ---------------------------------------------------------------------- */
     risingOrFalling,
 
-    /* ---- None ---------------------------------------------------------------
-     *
-     *  A condition defined with a 'none' edge shall return true at discrete
-     *  time t if its logical expression is true at discrete time t.
-     *
-     * ---------------------------------------------------------------------- */
-    none,
-
-    /* ---- Sticky (Tier IV Extension) -----------------------------------------
+    /* ---- NOTE ---------------------------------------------------------------
      *
      *  A condition defined by a 'sticky' edge returns true at discrete time
      *  t + k (0 < k) if its logical expression evaluates to true at discrete
      *  time t. This edge is provided for simply defining assertions such as
      *  "Did the Ego car pass over checkpoint X?
      *
-     *  This edge is a non-OpenSCEANRIO 1.0.0 standard feature.
+     *  This is NOT an OpenSCEANRIO 1.0.0 standard feature (Tier IV extension).
      *
      * ---------------------------------------------------------------------- */
     sticky,
   } value;
 
-  explicit constexpr ConditionEdge(const value_type value = {}) : value(value) {}
+  explicit ConditionEdge() = default;
 
   operator value_type() const noexcept { return value; }
 };
 
-std::istream & operator>>(std::istream & is, ConditionEdge & edge)
-{
-  std::string buffer{};
+static_assert(std::is_standard_layout<ConditionEdge>::value, "");
 
-  is >> buffer;
+static_assert(std::is_trivial<ConditionEdge>::value, "");
 
-#define BOILERPLATE(IDENTIFIER)             \
-  if (buffer == #IDENTIFIER) {              \
-    edge.value = ConditionEdge::IDENTIFIER; \
-    return is;                              \
-  }                                         \
-  static_assert(true, "")
+std::istream & operator>>(std::istream & is, ConditionEdge &);
 
-  BOILERPLATE(rising);
-  BOILERPLATE(falling);
-  BOILERPLATE(risingOrFalling);
-  BOILERPLATE(none);
-  BOILERPLATE(sticky);
-
-#undef BOILERPLATE
-
-  std::stringstream ss{};
-  ss << "unexpected value \'" << buffer << "\' specified as type ConditionEdge";
-  throw SyntaxError(ss.str());
-}
-
-std::ostream & operator<<(std::ostream & os, const ConditionEdge & edge)
-{
-  switch (edge) {
-#define BOILERPLATE(ID)   \
-  case ConditionEdge::ID: \
-    return os << #ID;
-
-    BOILERPLATE(rising);
-    BOILERPLATE(falling);
-    BOILERPLATE(risingOrFalling);
-    BOILERPLATE(none);
-    BOILERPLATE(sticky);
-
-#undef BOILERPLATE
-
-    default:
-      std::stringstream ss{};
-      ss << "enum class ConditionEdge holds unexpected value "
-         << static_cast<ConditionEdge::value_type>(edge.value);
-      throw ImplementationFault(ss.str());
-  }
-}
+std::ostream & operator<<(std::ostream & os, const ConditionEdge &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

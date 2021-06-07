@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_NOT_NOTHROW_DEFAULT_CONSTRUCTIBLE_HPP_
 
+#include <openscenario_interpreter/error.hpp>
 #include <string>
 #include <type_traits>
 
@@ -27,10 +28,8 @@ struct IfNotNothrowDefaultConstructible
 {
   static T error(const std::string & parent_name, const std::string & child_name)
   {
-    std::stringstream ss{};
-    ss << parent_name << " requires class " << child_name
-       << " as element, but there is no specification";
-    throw SyntaxError{ss.str()};
+    throw SyntaxError(
+      parent_name, " requires class ", child_name, " as element, but there is no specification");
   }
 };
 
@@ -41,7 +40,7 @@ struct IfNotNothrowDefaultConstructible<
   template <typename... Ts>
   static T error(Ts &&...)
   {
-    return T{};
+    return T();
   }
 };
 }  // namespace type_traits

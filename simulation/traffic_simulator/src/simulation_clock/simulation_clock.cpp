@@ -17,8 +17,11 @@
 
 namespace traffic_simulator
 {
-SimulationClock::SimulationClock()
-: rclcpp::Clock(RCL_SYSTEM_TIME), step_time_duration_(0), initialized_(false)
+SimulationClock::SimulationClock(rcl_clock_type_t clock_type, bool use_raw_clock)
+: rclcpp::Clock(clock_type),
+  use_raw_clock(use_raw_clock),
+  step_time_duration_(0),
+  initialized_(false)
 {
 }
 
@@ -29,7 +32,7 @@ void SimulationClock::initialize(double initial_simulation_time, double step_tim
   current_simulation_time_ = initial_simulation_time_;
   step_time_ = step_time;
   step_time_duration_ = rclcpp::Duration::from_seconds(step_time_);
-  system_time_on_initialize_ = now();
+  time_on_initialize_ = now();
 }
 
 void SimulationClock::update()
@@ -40,19 +43,23 @@ void SimulationClock::update()
   current_simulation_time_ = current_simulation_time_ + step_time_;
 }
 
-rosgraph_msgs::msg::Clock SimulationClock::getCurrentRosTimeAsMsg() const
+const rosgraph_msgs::msg::Clock SimulationClock::getCurrentRosTimeAsMsg()
 {
   rosgraph_msgs::msg::Clock clock;
   clock.clock = getCurrentRosTime();
   return clock;
 }
 
-rclcpp::Time SimulationClock::getCurrentRosTime() const
+const rclcpp::Time SimulationClock::getCurrentRosTime()
 {
   if (!initialized_) {
     THROW_SIMULATION_ERROR("SimulationClock does not initialized yet.");
   }
-  return system_time_on_initialize_ +
-         rclcpp::Duration::from_seconds(current_simulation_time_ - initial_simulation_time_);
+  if (use_raw_clock) {
+    return now();
+  } else {
+    return time_on_initialize_ +
+           rclcpp::Duration::from_seconds(current_simulation_time_ - initial_simulation_time_);
+  }
 }
 }  // namespace traffic_simulator

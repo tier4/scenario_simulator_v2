@@ -15,102 +15,49 @@
 #ifndef OPENSCENARIO_INTERPRETER__ERROR_HPP_
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
-#include <openscenario_interpreter/string/cat.hpp>
+#include <iomanip>
+#include <openscenario_interpreter/utility/demangle.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
-#include <string>
-#include <utility>
 
 namespace openscenario_interpreter
 {
-/* ---- NOTE -------------------------------------------------------------------
- *
- *  -- Error
- *      |-- SyntaxError
- *      |    `-- InvalidEnumeration
- *      |-- SemanticError
- *      `-- ImplementationFault
- *
- * -------------------------------------------------------------------------- */
-struct Error : public std::runtime_error
-{
-  template <typename... Ts>
-  explicit constexpr Error(Ts &&... xs)
-  : std::runtime_error(cat(std::forward<decltype(xs)>(xs)..., "."))
-  {
-  }
-};
+using InternalError = std::exception;
 
-struct SyntaxError : public Error
-{
-  template <typename... Ts>
-  explicit constexpr SyntaxError(Ts &&... xs)
-  : Error("SyntaxError: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
+using common::AutowareError;
+using common::Error;
+using common::SemanticError;
+using common::SimulationError;
+using common::SyntaxError;
 
-  static decltype(auto) invalidValue(const std::string & type, const std::string & value)
-  {
-    return SyntaxError("An invalid value '", value, "' was specified for type '", type);
-  };
-};
+#define INVALID_NUMERIC_LITERAL_SPECIFIED(VALUE)                                       \
+  SyntaxError(                                                                         \
+    "Given value ", std::quoted(VALUE), " is not an external representation of type ", \
+    demangle(typeid(*this)))
 
-struct SemanticError : public Error
-{
-  template <typename... Ts>
-  explicit SemanticError(Ts &&... xs) : Error("SemanticError: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
-};
+#define UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
+  SyntaxError(                                               \
+    "Given value ", std::quoted(VALUE),                      \
+    " is valid OpenSCENARIO value of type " #TYPE ", but it is not supported yet")
 
-struct [[deprecated]] ConnectionError : public Error{
-  template <typename... Ts>
-  explicit ConnectionError(Ts && ... xs) :
-    Error("connection-error: ", std::forward<decltype(xs)>(xs)...){}
-};
+#define UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(TYPE, VALUE) \
+  SyntaxError("Unexpected value ", std::quoted(VALUE), " of type " #TYPE " was specified")
 
-struct ImplementationFault : public Error
-{
-  template <typename... Ts>
-  explicit ImplementationFault(Ts &&... xs)
-  : Error("ImplementationFault: ", std::forward<decltype(xs)>(xs)...)
-  {
-  }
-};
+#define UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(TYPE, VALUE) \
+  SyntaxError(                                             \
+    "Unexpected value ", static_cast<TYPE::value_type>(VALUE), " was assigned to type " #TYPE)
 
-#define THROW(TYPENAME)                \
-  do {                                 \
-    std::stringstream ss{};            \
-    ss << __FILE__ << ":" << __LINE__; \
-    throw TYPENAME{ss.str()};          \
-  } while (false)
+#define UNSUPPORTED_ELEMENT_SPECIFIED(ELEMENT)                                                    \
+  SyntaxError(                                                                                    \
+    "Given class ", ELEMENT, " is valid OpenSCENARIO element of class ", demangle(typeid(*this)), \
+    ", but is not supported yet")
 
-#define THROW_IMPLEMENTATION_FAULT() THROW(ImplementationFault)
+#define UNSUPPORTED_CONVERSION_DETECTED(FROM, TO) \
+  SyntaxError("Converting " #FROM " to " #TO      \
+              ". This is valid in OpenSCENARIO standard, but is not yet supported")
 
-#define UNIMPLEMENTED(NAME)                                               \
-  do {                                                                    \
-    std::stringstream ss{};                                               \
-    ss << "given class \'" << NAME                                        \
-       << "\' is valid OpenSCENARIO element, but is not yet implemented"; \
-    throw ImplementationFault{ss.str()};                                  \
-  } while (false)
-
-#define THROW_UNSUPPORTED_ERROR(PARENT)                                                  \
-  [&](auto && child) {                                                                   \
-    std::stringstream ss{};                                                              \
-    ss << "given class \'" << child.name() << "\' (element of class \'" << PARENT.name() \
-       << "\') is valid OpenSCENARIO element, but is not supported";                     \
-    throw SyntaxError(ss.str());                                                         \
-    return unspecified;                                                                  \
-  }
-
-#define UNSUPPORTED()                                             \
-  [&](auto && node) {                                             \
-    std::stringstream ss{};                                       \
-    ss << "given class \'" << node.name()                         \
-       << " is valid OpenSCENARIO element, but is not supported"; \
-    throw SyntaxError(ss.str());                                  \
-    return unspecified;                                           \
-  }
+#define UNSUPPORTED_SETTING_DETECTED(ACTION_OR_CONDITION, ELEMENT) \
+  SyntaxError(#ACTION_OR_CONDITION " does not yet supports ", ELEMENT)
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__ERROR_HPP_

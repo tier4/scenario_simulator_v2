@@ -36,7 +36,7 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
   try {
     datum.value = conversions.at(value);
   } catch (const std::out_of_range &) {
-    throw SyntaxError::invalidValue("Arrow", value);
+    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Arrow, value);
   }
 
   return is;
@@ -44,22 +44,21 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
 
 std::ostream & operator<<(std::ostream & os, const Arrow & datum)
 {
+#define BOILERPLATE(IDENTIFIER) \
+  case Arrow::IDENTIFIER:       \
+    return os << #IDENTIFIER
+
   switch (datum.value) {
-    case Arrow::noArrow:
-      return os << "noArrow";
-
-    case Arrow::left:
-      return os << "left";
-
-    case Arrow::right:
-      return os << "right";
-
-    case Arrow::straight:
-      return os << "straight";
+    BOILERPLATE(noArrow);
+    BOILERPLATE(left);
+    BOILERPLATE(right);
+    BOILERPLATE(straight);
 
     default:
-      THROW_IMPLEMENTATION_FAULT();
+      throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(Arrow, datum);
   }
+
+#undef BOILERPLATE
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

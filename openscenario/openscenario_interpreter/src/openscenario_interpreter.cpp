@@ -130,13 +130,13 @@ try {
       return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
     });
 
-  std::cout << std::boolalpha << "With Autoware? = " << with_autoware << std::endl;
-
   connect(
     shared_from_this(),                                       //
     boost::filesystem::path(osc_path).replace_extension(""),  // NOTE: /path/to/lanelet2_map.osm
     script.as<OpenScenario>().scope.logic_file.string(),      //
-    with_autoware ? 30 : 0);
+    with_autoware ? 30 : 0,
+    false  // auto-sink
+  );
 
   initialize(
     local_real_time_factor,
@@ -169,7 +169,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 #endif
           }
         } else {
-          throw ImplementationFault("No script evaluable");
+          throw Error("No script evaluable");
         }
       });
     });

@@ -3,13 +3,13 @@ name: ScenarioTest
 on:
   workflow_dispatch:
   schedule:
-  - cron: 0 0 * * *
+    - cron: 0 0 * * *
   pull_request:
     paths-ignore:
-    - "docs/**"
-    - "mkdocs.yml"
-    - "README.md"
-    
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+
 jobs:
   job1:
     name: ScenarioTest
@@ -19,7 +19,8 @@ jobs:
       - uses: actions/checkout@v2-beta
 
       - name: Install ROS2 via Debian Packages
-        run: | # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+        run:
+          | # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
           sudo apt update
           sudo apt install locales
           sudo locale-gen en_US en_US.UTF-8
@@ -63,7 +64,7 @@ jobs:
           mv -v autoware/common/msgs/autoware_system_msgs     ./
           mv -v autoware/common/msgs/autoware_vehicle_msgs    ./
           rm -rf autoware
-      
+
       - name: Resolve rosdep
         run: |
           cd ~/ros2_ws
@@ -93,7 +94,7 @@ jobs:
         uses: codecov/codecov-action@v1.2.1
         if: always()
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}  # only needed for private repos
+          token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: /home/runner/ros2_ws/lcov.total.filtered
           flags: scenario_test
           name: scenario_simulator_v2

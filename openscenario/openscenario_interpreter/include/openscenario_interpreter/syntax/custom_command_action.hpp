@@ -16,10 +16,10 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
 #include <iterator>  // std::distance
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
-#include <openscenario_interpreter/string/cat.hpp>
 #include <stdexcept>  // std::runtime_error
 #include <string>
 #include <type_traits>  // std::true_type
@@ -91,7 +91,7 @@ struct CustomCommandAction
 
   static int error(const std::vector<std::string> &, const Scope &)
   {
-    throw std::runtime_error(cat(__FILE__, ":", __LINE__));
+    throw Error(__FILE__, ":", __LINE__);
   }
 
   static int segv(const std::vector<std::string> &, const Scope &)
