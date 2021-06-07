@@ -97,6 +97,8 @@ void ScenarioSimulator ::updateEgoStatus(
 {
   autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
   simulation_interface::toMsg(req.vehicle_command(), vehicle_command);
+  openscenario_msgs::msg::EntityStatus ego_status;
+  simulation_interface::toMsg(req.status(), ego_status);
   res = simulation_api_schema::UpdateEgoStatusResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
