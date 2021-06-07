@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
-#include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#include <openscenario_interpreter/syntax/open_scenario_category.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,25 +35,12 @@ inline namespace syntax
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * <xsd:group name="OpenScenarioCategory">
- *   <xsd:choice>
- *     <xsd:group ref="ScenarioDefinition"/>
- *     <xsd:group ref="CatalogDefinition"/>
- *   </xsd:choice>
- * </xsd:group>
- *
- * <xsd:group name="CatalogDefinition">
- *   <xsd:sequence>
- *     <xsd:element name="Catalog" type="Catalog"/>
- *   </xsd:sequence>
- * </xsd:group>
- *
  * -------------------------------------------------------------------------- */
 struct OpenScenario : public pugi::xml_document
 {
-  Element category;
-
   Scope scope;
+
+  Element category;
 
   const auto & load(const std::string & scenario)
   {
@@ -70,13 +57,10 @@ struct OpenScenario : public pugi::xml_document
   decltype(auto) load(const boost::filesystem::path & scenario) { return load(scenario.string()); }
 
   template <typename... Ts>
-  explicit OpenScenario(Ts &&... xs) : scope(std::forward<decltype(xs)>(xs)...)
+  explicit OpenScenario(Ts &&... xs)
+  : scope(std::forward<decltype(xs)>(xs)...),
+    category(readElement<OpenScenarioCategory>("OpenSCENARIO", load(scope.scenario), scope))
   {
-    if (load(scope.scenario).child("OpenSCENARIO").child("Catalog")) {
-      throw SyntaxError("The Catalog feature is not yet supported");
-    } else {
-      category = make<ScenarioDefinition>(child("OpenSCENARIO"), scope);
-    }
   }
 
   template <typename... Ts>

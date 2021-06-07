@@ -42,8 +42,7 @@ struct EntityObject : public Group
   explicit EntityObject(const XML & node, Ts &&... xs)
   // clang-format off
   : Group(
-      choice(
-        node,
+      choice(node,
         std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>   (node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...); }),
