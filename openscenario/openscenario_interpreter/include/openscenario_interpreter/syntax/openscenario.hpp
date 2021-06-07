@@ -36,21 +36,20 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct OpenScenario : public pugi::xml_document
+struct OpenScenario : public Scope
 {
-  Scope scope;
+  pugi::xml_document script;
 
-  Element category;
+  const OpenScenarioCategory category;
 
   const auto & load(const std::string & scenario)
   {
-    const auto result = load_file(scenario.c_str());
+    const auto result = script.load_file(scenario.c_str());
 
     if (!result) {
-      throw SyntaxError(
-        "While loading scenario ", std::quoted(scenario), " => ", result.description());
+      throw SyntaxError(result.description(), ": ", scenario);
     } else {
-      return *this;
+      return script;
     }
   }
 
@@ -58,28 +57,15 @@ struct OpenScenario : public pugi::xml_document
 
   template <typename... Ts>
   explicit OpenScenario(Ts &&... xs)
-  : scope(std::forward<decltype(xs)>(xs)...),
-    category(readElement<OpenScenarioCategory>("OpenSCENARIO", load(scope.scenario), scope))
+  : Scope(std::forward<decltype(xs)>(xs)...),
+    category(readElement<OpenScenarioCategory>(
+      "OpenSCENARIO", load(scenario), static_cast<Scope &>(*this)))
   {
   }
 
-  template <typename... Ts>
-  decltype(auto) complete(Ts &&... xs)
-  {
-    return category.as<ScenarioDefinition>().complete(std::forward<decltype(xs)>(xs)...);
-  }
+  auto complete() const { return category.as<ScenarioDefinition>().complete(); }
 
-  template <typename... Ts>
-  decltype(auto) evaluate(Ts &&... xs)
-  {
-    return category.evaluate(std::forward<decltype(xs)>(xs)...);
-  }
-
-  template <typename... Ts>
-  decltype(auto) operator()(Ts &&... xs)
-  {
-    return evaluate(std::forward<decltype(xs)>(xs)...);
-  }
+  auto evaluate() { return category.evaluate(); }
 };
 
 std::ostream & operator<<(std::ostream & os, const OpenScenario &);

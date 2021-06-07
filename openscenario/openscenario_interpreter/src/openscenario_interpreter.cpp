@@ -125,15 +125,15 @@ try {
   script.rebind<OpenScenario>(osc_path);
 
   const auto with_autoware = std::any_of(
-    std::begin(script.as<OpenScenario>().scope.entities),
-    std::end(script.as<OpenScenario>().scope.entities), [](auto & each) {
+    std::begin(script.as<OpenScenario>().entities), std::end(script.as<OpenScenario>().entities),
+    [](auto & each) {
       return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
     });
 
   connect(
     shared_from_this(),                                       //
     boost::filesystem::path(osc_path).replace_extension(""),  // NOTE: /path/to/lanelet2_map.osm
-    script.as<OpenScenario>().scope.logic_file.string(),      //
+    script.as<OpenScenario>().logic_file.string(),            //
     with_autoware ? 30 : 0,
     false  // auto-sink
   );
@@ -210,11 +210,11 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   INTERPRETER_INFO_STREAM("CleaningUp.");
 
   test_suites.addTestCase(
-    script.as<OpenScenario>().scope.scenario.parent_path().stem().string(),
-    script.as<OpenScenario>().scope.scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
-    0,                                                  // time
-    current_result,                                     //
-    current_error_type,                                 //
+    script.as<OpenScenario>().scenario.parent_path().stem().string(),
+    script.as<OpenScenario>().scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
+    0,                                            // time
+    current_result,                               //
+    current_error_type,                           //
     current_error_what);
 
   test_suites.write(output_directory + "/result.junit.xml");
