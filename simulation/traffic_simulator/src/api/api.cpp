@@ -334,6 +334,7 @@ bool API::updateFrame()
   if (vehicle_cmd) {
     simulation_api_schema::UpdateEgoStatusRequest req;
     simulation_interface::toProto(vehicle_cmd.get(), *req.mutable_vehicle_command());
+    // entity_manager_ptr_->getEntityStatus();
     simulation_api_schema::UpdateEgoStatusResponse res;
     update_ego_status_client_.call(req, res);
     if (!res.result().success()) {

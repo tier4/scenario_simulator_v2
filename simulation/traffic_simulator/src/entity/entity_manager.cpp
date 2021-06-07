@@ -126,6 +126,16 @@ bool EntityManager::entityStatusSet(const std::string & name) const
   return entities_.at(name)->statusSet();
 }
 
+auto EntityManager::getEgoEntityName() -> const std::string
+{
+  for (const auto & entitiy : entities_) {
+    if (entitiy.second->getEntityTypename() == "EgoEntity";) {
+      return entitiy.first;
+    }
+  }
+  throw common::SemanticError("Ego entity does not exsit in entity manager");
+}
+
 auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::string & to)
   -> boost::optional<double>
 {

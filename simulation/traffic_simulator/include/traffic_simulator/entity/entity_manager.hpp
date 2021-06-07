@@ -229,6 +229,8 @@ public:
   // TODO (yamacir-kit) Rename to 'hasEntityStatus'
   bool entityStatusSet(const std::string & name) const;
 
+  auto getEgoEntityName() -> const std::string;
+
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;
 

@@ -153,6 +153,7 @@ message UpdateEntityStatusResponse
 message UpdateEgoStatusRequest
 {
     autoware_vehicle_msgs.VehicleCommand vehicle_command = 1;
+    UpdatedEntityStatus status = 2;
 }
 
 /**

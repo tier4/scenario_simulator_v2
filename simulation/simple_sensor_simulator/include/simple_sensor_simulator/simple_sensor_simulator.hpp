@@ -129,6 +129,7 @@ private:
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
   zeromq::MultiServer server_;
   std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
+  boost::optional<openscenario_msgs::EntityStatus> initial_ego_status_;
 };
 }  // namespace simple_sensor_simulator
 
