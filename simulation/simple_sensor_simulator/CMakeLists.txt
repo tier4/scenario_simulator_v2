@@ -38,6 +38,10 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/lidar/lidar_sensor.cpp
   src/sensor_simulation/sensor_simulation.cpp
   src/sensor_simulation/detection_sensor/detection_sensor.cpp
+  src/vehicle_model/sim_model_ideal.cpp
+  src/vehicle_model/sim_model_interface.cpp
+  src/vehicle_model/sim_model_time_delay.cpp
+  src/vehicle_model/sim_model_util.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
   embree3
