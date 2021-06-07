@@ -26,33 +26,55 @@
 
 namespace openscenario_interpreter
 {
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  This structure provides resource access during the scenario at each level of
+ *  Storyboard.
+ *
+ *  Typically, in programming language implementations, scopes are implemented
+ *  as linked lists that hold pointers to outer scopes. However, OpenSCENARIO
+ *  does not have features that require dynamic frame construction like function
+ *  calls, and the structure is fixed at the time of parsing, so it is okay to
+ *  build the child scope as a copy of the parent scope.
+ *
+ *  In other words, this structure is not elegant, but I believe it is a simple
+ *  structure that even beginners of programming language implementations can
+ *  understand.
+ *
+ * -------------------------------------------------------------------------- */
 struct Scope
 {
-  std::unordered_map<String, Element> parameters;
-  std::unordered_map<String, Element> entities;
-  std::unordered_map<String, Element> storyboard_elements;
-
   using Actor = EntityRef;
 
   using Actors = std::list<Actor>;
 
-  Actors actors;
+  /* ---- GLOBAL ------------------------------------------------------------ */
+
+  const boost::filesystem::path scenario;  // for substituation syntax '$(dirname)'
 
   boost::filesystem::path logic_file;
+
   boost::filesystem::path scene_graph_file;
 
-  // for substituation syntax '$(dirname)'
-  const boost::filesystem::path scenario;
+  std::unordered_map<String, Element> entities;
+
+  /* ---- LEXICAL ----------------------------------------------------------- */
+
+  std::unordered_map<String, Element> parameters;
+
+  std::unordered_map<String, Element> storyboard_elements;
+
+  Actors actors;
+
+  /* ---- CONSTRUCTORS ------------------------------------------------------ */
 
   Scope() = delete;
 
   explicit Scope(Scope &) = default;
+
   explicit Scope(const Scope &) = default;
 
-  template <typename... Ts>
-  explicit Scope(const std::string & scenario, Ts &&... xs) : scenario(scenario)
-  {
-  }
+  explicit Scope(const std::string & scenario) : scenario(scenario) {}
 };
 }  // namespace openscenario_interpreter
 

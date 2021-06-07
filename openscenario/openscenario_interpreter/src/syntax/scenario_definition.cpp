@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__POSIX__FORK_EXEC_HPP_
-#define OPENSCENARIO_INTERPRETER__POSIX__FORK_EXEC_HPP_
-
-#include <unistd.h>  // pid_t
-
-#include <string>
-#include <vector>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
 {
-inline namespace posix
+inline namespace syntax
 {
-int execvp(const std::vector<std::string> &);
-
-pid_t fork_exec(const std::vector<std::string> &);
-
-pid_t fork_exec(const std::string &);
-
-pid_t fork_exec(const std::string &, const std::string &);
-}  // namespace posix
+std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
+{
+  return os << unspecified;
+}
+}  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__POSIX__FORK_EXEC_HPP_

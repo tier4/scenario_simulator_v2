@@ -16,11 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/syntax/catalog_locations.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
-#include <openscenario_interpreter/syntax/road_network.hpp>
-#include <openscenario_interpreter/syntax/storyboard.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,64 +26,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ScenarioDefinition -----------------------------------------------------
- *
- * <xsd:group name="ScenarioDefinition">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="CatalogLocations" type="CatalogLocations"/>
- *     <xsd:element name="RoadNetwork" type="RoadNetwork"/>
- *     <xsd:element name="Entities" type="Entities"/>
- *     <xsd:element name="Storyboard" type="Storyboard"/>
- *   </xsd:sequence>
- * </xsd:group>
- *
- * -------------------------------------------------------------------------- */
-struct ScenarioDefinition
-{
-  ASSERT_IS_OPTIONAL_ELEMENT(ParameterDeclarations);
-  const ParameterDeclarations parameter_declarations;
-
-  const CatalogLocations catalog_locations;
-
-  RoadNetwork road_network;
-
-  const Entities entities;
-
-  Storyboard storyboard;
-
-  template <typename Node, typename Scope>
-  explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
-  : parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, outer_scope)),
-    catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, outer_scope)),
-    road_network(readElement<RoadNetwork>("RoadNetwork", node, outer_scope)),
-    entities(readElement<Entities>("Entities", node, outer_scope)),
-    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope))
-  {
-  }
-
-  template <typename... Ts>
-  decltype(auto) complete(Ts &&... xs)
-  {
-    return storyboard.complete(std::forward<decltype(xs)>(xs)...);
-  }
-
-  template <typename... Ts>
-  auto evaluate(Ts &&... xs)
-  {
-    road_network.evaluate();
-    const auto result = storyboard.evaluate();
-    updateFrame();
-    return result;
-  }
-};
-
-std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
-{
-  return os << unspecified;
-}
-
 /* ---- OpenScenario -----------------------------------------------------------
  *
  * <xsd:complexType name="OpenScenario">
