@@ -129,7 +129,7 @@ bool EntityManager::entityStatusSet(const std::string & name) const
 auto EntityManager::getEgoEntityName() -> const std::string
 {
   for (const auto & entitiy : entities_) {
-    if (entitiy.second->getEntityTypename() == "EgoEntity";) {
+    if (entitiy.second->getEntityTypename() == "EgoEntity") {
       return entitiy.first;
     }
   }
