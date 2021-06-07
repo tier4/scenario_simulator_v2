@@ -61,14 +61,9 @@ struct ScenarioDefinition
   {
   }
 
-  template <typename... Ts>
-  decltype(auto) complete(Ts &&... xs)
-  {
-    return storyboard.complete(std::forward<decltype(xs)>(xs)...);
-  }
+  auto complete() { return storyboard.complete(); }
 
-  template <typename... Ts>
-  auto evaluate(Ts &&... xs)
+  auto evaluate()
   {
     road_network.evaluate();
     const auto result = storyboard.evaluate();

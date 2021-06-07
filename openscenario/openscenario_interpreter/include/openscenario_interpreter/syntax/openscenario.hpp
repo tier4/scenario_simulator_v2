@@ -61,7 +61,7 @@ struct OpenScenario : public pugi::xml_document
 
     if (!result) {
       throw SyntaxError(
-        "while loading scenario ", std::quoted(scenario), " => ", result.description());
+        "While loading scenario ", std::quoted(scenario), " => ", result.description());
     } else {
       return *this;
     }
@@ -98,11 +98,7 @@ struct OpenScenario : public pugi::xml_document
   }
 };
 
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const OpenScenario &)
-{
-  return os << unspecified;
-}
+std::ostream & operator<<(std::ostream & os, const OpenScenario &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
