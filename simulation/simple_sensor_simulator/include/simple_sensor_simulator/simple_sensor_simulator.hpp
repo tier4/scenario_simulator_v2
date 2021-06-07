@@ -26,6 +26,7 @@
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
+#include <simple_sensor_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <simulation_interface/zmq_server.hpp>
 #include <string>
@@ -127,6 +128,7 @@ private:
   bool initialized_;
   std::vector<openscenario_msgs::EntityStatus> entity_status_;
   zeromq::MultiServer server_;
+  std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 };
 }  // namespace simple_sensor_simulator
 

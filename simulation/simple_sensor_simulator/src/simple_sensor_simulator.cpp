@@ -122,6 +122,20 @@ void ScenarioSimulator::spawnVehicleEntity(
   }
   if (req.is_ego()) {
     ego_vehicles_.emplace_back(req.parameters());
+    vehicle_model_ptr_ = std::make_shared<SimModelTimeDelaySteer>(
+      req.parameters().performance().max_speed(),
+      req.parameters().axles().front_axle().max_steering(),
+      req.parameters().performance().max_acceleration(),
+      5.0,  // steer_rate_lim,
+      req.parameters().axles().front_axle().position_x() -
+        req.parameters().axles().rear_axle().position_x(),
+      step_time_,
+      0.25,  // vel_time_delay,
+      0.5,   // vel_time_constant,
+      0.3,   // steer_time_delay,
+      0.3,   // steer_time_constant,
+      0.0    // deadzone_delta_steer
+    );
   } else {
     vehicles_.emplace_back(req.parameters());
   }
