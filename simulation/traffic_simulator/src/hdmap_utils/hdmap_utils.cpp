@@ -422,7 +422,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
 std::vector<std::int64_t> HdMapUtils::getRoute(
   std::int64_t from_lanelet_id, std::int64_t to_lanelet_id)
 {
-  if(route_chache_.exists(from_lanelet_id, to_lanelet_id)) {
+  if (route_chache_.exists(from_lanelet_id, to_lanelet_id)) {
     return getRoute(from_lanelet_id, to_lanelet_id);
   }
   std::vector<std::int64_t> ret;
@@ -776,12 +776,12 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
     }
   }
   const auto route = getRoute(from_lanelet_id, to_lanelet_id);
-  if(route.empty()) {
+  if (route.empty()) {
     return boost::none;
   }
   double dist = 0.0;
   for (const auto lanelet_id : route) {
-    if(lanelet_id == from_lanelet_id) {
+    if (lanelet_id == from_lanelet_id) {
       dist = dist + getLaneletLength(from_lanelet_id) - from_s;
     } else if (lanelet_id == to_lanelet_id) {
       dist = dist + to_s;

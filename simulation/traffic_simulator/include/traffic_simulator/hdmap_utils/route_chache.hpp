@@ -15,11 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__HDMAP_UTILS__ROUTE_CHCACHE_HPP_
 #define TRAFFIC_SIMULATOR__HDMAP_UTILS__ROUTE_CHCACHE_HPP_
 
+#include <boost/optional.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-
 #include <unordered_map>
 #include <vector>
-#include <boost/optional.hpp>
 
 namespace hdmap_utils
 {
@@ -31,15 +30,16 @@ public:
     std::pair<std::int64_t, std::int64_t> key;
     key.first = from;
     key.second = to;
-    if(data_.find(key) == data_.end()) {
+    if (data_.find(key) == data_.end()) {
       return false;
     }
     return true;
   }
   std::vector<std::int64_t> getRoute(std::int64_t from, std::int64_t to) const
   {
-    if(!exists(from, to)) {
-      THROW_SIMULATION_ERROR("route from : ", from, " to : ", to ," does not exists on route chache.");
+    if (!exists(from, to)) {
+      THROW_SIMULATION_ERROR(
+        "route from : ", from, " to : ", to, " does not exists on route chache.");
     }
     return data_.at({from, to});
   }
