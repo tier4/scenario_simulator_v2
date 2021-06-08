@@ -553,6 +553,7 @@ auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanele
 
 void EntityManager::update(const double current_time, const double step_time)
 {
+  verbose_ = true;
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
