@@ -551,12 +551,8 @@ auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanele
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
 
-#include <traffic_simulator/helper/stop_watch.hpp>
-
 void EntityManager::update(const double current_time, const double step_time)
 {
-  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch("entityManager");
-  stop_watch.start();
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
