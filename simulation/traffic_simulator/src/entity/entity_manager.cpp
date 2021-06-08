@@ -551,8 +551,12 @@ auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanele
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
 
+#include <traffic_simulator/helper/stop_watch.hpp>
+
 void EntityManager::update(const double current_time, const double step_time)
 {
+  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch("entityManager");
+  stop_watch.start();
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
@@ -567,9 +571,12 @@ void EntityManager::update(const double current_time, const double step_time)
   if (getNumberOfEgo() >= 2) {
     THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
   }
+  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   setVerbose(verbose_);
   auto type_list = getEntityTypeList();
-  std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
+  for (auto it = entities_.begin(); it != entities_.end(); it++) {
+    it->second->setOtherStatus(all_status);
+  }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     if (verbose_) {
       std::cout << "update " << it->first << " behavior" << std::endl;
@@ -581,10 +588,6 @@ void EntityManager::update(const double current_time, const double step_time)
       all_status.emplace(it->first, status);
     }
   }
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    it->second->setOtherStatus(all_status);
-  }
-  auto entity_type_list = getEntityTypeList();
   openscenario_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & status : all_status) {
     // std::cout << "calculating " << status.first << " status" << std::endl;

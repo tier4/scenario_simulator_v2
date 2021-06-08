@@ -45,7 +45,7 @@ public:
   HermiteCurve(
     double ax, double bx, double cx, double dx, double ay, double by, double cy, double dy,
     double az, double bz, double cz, double dz);
-  std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 30) const;
+  std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 20) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution, bool autoscale = false) const;
   const geometry_msgs::msg::Pose getPose(double s, bool autoscale = false) const;
@@ -57,7 +57,7 @@ public:
   double getLength(size_t num_points = 100) const;
   boost::optional<double> getSValue(
     geometry_msgs::msg::Point position, double threadhold_distance = 1.0,
-    unsigned int initial_resolution = 30, unsigned int max_iteration = 30, double tolerance = 0.001,
+    unsigned int initial_resolution = 20, unsigned int max_iteration = 30, double tolerance = 0.001,
     bool autoscale = false) const;
   double getSquaredDistanceIn2D(
     geometry_msgs::msg::Point point, double s, bool autoscale = false) const;

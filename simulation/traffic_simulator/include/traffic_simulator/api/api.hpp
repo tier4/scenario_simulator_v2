@@ -30,6 +30,7 @@
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/metrics/metrics_manager.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>

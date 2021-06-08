@@ -45,7 +45,7 @@ public:
     double start_s, double end_s, double resolution) const;
   boost::optional<double> getSValue(
     geometry_msgs::msg::Point position, double threadhold_distance = 3.0,
-    unsigned int initial_resolution = 30, unsigned int max_iteration = 30,
+    unsigned int initial_resolution = 20, unsigned int max_iteration = 30,
     double tolerance = 0.001);
   double getSquaredDistanceIn2D(geometry_msgs::msg::Point point, double s) const;
   boost::optional<double> getCollisionPointIn2D(
@@ -59,7 +59,7 @@ public:
   const geometry_msgs::msg::Point getLeftBoundsPoint(
     double width, double s, double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
-    double width, size_t num_points = 30, double z_offset = 0);
+    double width, size_t num_points = 20, double z_offset = 0);
 
 private:
   const std::vector<geometry_msgs::msg::Point> getRightBounds(

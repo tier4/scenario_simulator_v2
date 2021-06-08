@@ -18,6 +18,7 @@
 #include <set>
 #include <string>
 #include <traffic_simulator/behavior/action_node.hpp>
+#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -200,14 +201,19 @@ boost::optional<double> ActionNode::getDistanceToFrontEntity()
 
 boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
 {
+  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch(
+    "getFrontEntityStatus");
   boost::optional<double> front_entity_distance, front_entity_speed;
   std::string front_entity_name = "";
   for (const auto & each : other_entity_status) {
     if (!entity_status.lanelet_pose_valid || !each.second.lanelet_pose_valid) {
       continue;
     }
+    stop_watch.start();
     boost::optional<double> distance =
       hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, each.second.lanelet_pose);
+    stop_watch.stop();
+    stop_watch.print();
     if (distance) {
       if (distance.get() < 40) {
         if (!front_entity_distance && !front_entity_speed) {
