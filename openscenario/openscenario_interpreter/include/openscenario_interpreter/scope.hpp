@@ -16,10 +16,11 @@
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
 #include <boost/filesystem.hpp>
+#include <functional>  // std::reference_wrapper
 #include <limits>
 #include <memory>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <string>
+#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -52,9 +53,21 @@ struct Scope
 
   const boost::filesystem::path pathname;  // for substituation syntax '$(dirname)'
 
-  boost::filesystem::path logic_file;
+  boost::filesystem::path logic_file;  // NOTE: Assigned by RoadNetwork's constructor.
 
-  boost::filesystem::path scene_graph_file;
+  boost::filesystem::path scene_graph_file;  // NOTE: Assigned by RoadNetwork's constructor.
+
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  for TrafficSignalControllerAction.trafficSignalControllerRef
+   *
+   *  Be careful not to use the TrafficSignalController as a dangling reference.
+   *  Normally, the destruction of all scopes occurs at the same time as the
+   *  destruction of the scenario itself.
+   *
+   * ------------------------------------------------------------------------ */
+  std::unordered_map<String, std::reference_wrapper<TrafficSignalController>>
+    traffic_signal_controller_refs;
 
   std::unordered_map<String, Element> entities;
 
