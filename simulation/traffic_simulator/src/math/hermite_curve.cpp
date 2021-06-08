@@ -39,6 +39,7 @@ HermiteCurve::HermiteCurve(
   cz_(cz),
   dz_(dz)
 {
+  length_ = getLength(100);
 }
 
 HermiteCurve::HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve)
@@ -55,6 +56,7 @@ HermiteCurve::HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve)
   cz_(curve.cz),
   dz_(curve.dz)
 {
+  length_ = getLength(100);
 }
 
 HermiteCurve::HermiteCurve(
@@ -75,6 +77,7 @@ HermiteCurve::HermiteCurve(
   bz_ = -3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z;
   cz_ = start_vec.z;
   dz_ = start_pose.position.z;
+  length_ = getLength(100);
 }
 
 const openscenario_msgs::msg::HermiteCurve HermiteCurve::toRosMsg() const
