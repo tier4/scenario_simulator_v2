@@ -53,4 +53,4 @@ private:
 };
 }  // namespace hdmap_utils
 
-#endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__ROUTE_CHCACHE_HPP_ 
+#endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__ROUTE_CHCACHE_HPP_

@@ -422,7 +422,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
 std::vector<std::int64_t> HdMapUtils::getRoute(
   std::int64_t from_lanelet_id, std::int64_t to_lanelet_id)
 {
-  if(route_chache_.exists(from_lanelet_id, to_lanelet_id)) {
+  if (route_chache_.exists(from_lanelet_id, to_lanelet_id)) {
     return route_chache_.getRoute(from_lanelet_id, to_lanelet_id);
   }
   std::vector<std::int64_t> ret;
