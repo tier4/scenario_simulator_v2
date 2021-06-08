@@ -636,7 +636,7 @@ HdMapUtils::getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, std::int
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
     auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
     if (traj) {
-      if (traj->getMaximu2DCurvature() < 1.0) {
+      if (traj->getMaximum2DCurvature() < 1.0) {
         double eval = std::fabs(20 - traj->getLength());
         evaluation.push_back(eval);
         curves.push_back(traj.get());

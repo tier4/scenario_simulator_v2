@@ -341,7 +341,7 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale) const
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
-double HermiteCurve::getMaximu2DCurvature() const
+double HermiteCurve::getMaximum2DCurvature() const
 {
   std::vector<double> curvatures;
   for (double s = 0; s <= 1; s = s + 0.01) {

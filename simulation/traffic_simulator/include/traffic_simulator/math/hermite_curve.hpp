@@ -53,7 +53,7 @@ public:
   const geometry_msgs::msg::Vector3 getTangentVector(double s, bool autoscale = false) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s, bool autoscale = false) const;
   double get2DCurvature(double s, bool autoscale = false) const;
-  double getMaximu2DCurvature() const;
+  double getMaximum2DCurvature() const;
   double getLength(size_t num_points) const;
   double getLength() const { return length_; }
   boost::optional<double> getSValue(
