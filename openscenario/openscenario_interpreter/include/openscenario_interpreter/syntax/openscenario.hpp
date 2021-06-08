@@ -44,23 +44,21 @@ struct OpenScenario : public Scope
 
   const OpenScenarioCategory category;
 
-  const auto & load(const std::string & scenario)
+  const auto & load(const boost::filesystem::path & pathname)
   {
-    const auto result = script.load_file(scenario.c_str());
+    const auto result = script.load_file(pathname.string().c_str());
 
     if (!result) {
-      throw SyntaxError(result.description(), ": ", scenario);
+      throw SyntaxError(result.description(), ": ", pathname);
     } else {
       return script;
     }
   }
 
-  decltype(auto) load(const boost::filesystem::path & scenario) { return load(scenario.string()); }
-
   template <typename... Ts>
   explicit OpenScenario(Ts &&... xs)
   : Scope(std::forward<decltype(xs)>(xs)...),
-    file_header(readElement<FileHeader>("FileHeader", load(scenario).child("OpenSCENARIO"), *this)),
+    file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), *this)),
     category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, *this))
   {
   }

@@ -210,8 +210,8 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   INTERPRETER_INFO_STREAM("CleaningUp.");
 
   test_suites.addTestCase(
-    script.as<OpenScenario>().scenario.parent_path().stem().string(),
-    script.as<OpenScenario>().scenario.string(),  // case-name (XXX: DIRTY HACK!!!)
+    script.as<OpenScenario>().pathname.parent_path().stem().string(),
+    script.as<OpenScenario>().pathname.string(),  // case-name (XXX: DIRTY HACK!!!)
     0,                                            // time
     current_result,                               //
     current_error_type,                           //

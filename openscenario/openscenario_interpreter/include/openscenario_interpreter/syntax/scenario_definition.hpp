@@ -66,9 +66,9 @@ struct ScenarioDefinition
   auto evaluate()
   {
     road_network.evaluate();
-    const auto result = storyboard.evaluate();
+    storyboard.evaluate();
     updateFrame();
-    return result;
+    return storyboard.current_state;
   }
 };
 

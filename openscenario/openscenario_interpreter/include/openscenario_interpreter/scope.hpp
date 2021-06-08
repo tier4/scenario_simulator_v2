@@ -50,7 +50,7 @@ struct Scope
 
   /* ---- GLOBAL ------------------------------------------------------------ */
 
-  const boost::filesystem::path scenario;  // for substituation syntax '$(dirname)'
+  const boost::filesystem::path pathname;  // for substituation syntax '$(dirname)'
 
   boost::filesystem::path logic_file;
 
@@ -74,7 +74,7 @@ struct Scope
 
   explicit Scope(const Scope &) = default;
 
-  explicit Scope(const std::string & scenario) : scenario(scenario) {}
+  explicit Scope(const boost::filesystem::path & pathname) : pathname(pathname) {}
 };
 }  // namespace openscenario_interpreter
 
