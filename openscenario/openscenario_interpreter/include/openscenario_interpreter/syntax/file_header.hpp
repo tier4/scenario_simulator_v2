@@ -21,20 +21,21 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== FileHeader ===========================================================
+/* ---- FileHeader -------------------------------------------------------------
  *
- * <xsd:complexType name="FileHeader">
- *   <xsd:attribute name="revMajor" type="UnsignedShort" use="required"/>
- *   <xsd:attribute name="revMinor" type="UnsignedShort" use="required"/>
- *   <xsd:attribute name="date" type="DateTime" use="required"/>
- *   <xsd:attribute name="description" type="String" use="required"/>
- *   <xsd:attribute name="author" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="FileHeader">
+ *    <xsd:attribute name="revMajor" type="UnsignedShort" use="required"/>
+ *    <xsd:attribute name="revMinor" type="UnsignedShort" use="required"/>
+ *    <xsd:attribute name="date" type="DateTime" use="required"/>
+ *    <xsd:attribute name="description" type="String" use="required"/>
+ *    <xsd:attribute name="author" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct FileHeader
 {
   const UnsignedShort revMajor;
+
   const UnsignedShort revMinor;
 
   const String date;
@@ -43,13 +44,13 @@ struct FileHeader
 
   const String author;
 
-  template <typename Node, typename Scope>
-  explicit FileHeader(const Node & node, Scope & outer_scope)
-  : revMajor{readAttribute<UnsignedShort>("revMajor", node, outer_scope)},
-    revMinor{readAttribute<UnsignedShort>("revMinor", node, outer_scope)},
-    date{readAttribute<String>("date", node, outer_scope)},
-    description{readAttribute<String>("description", node, outer_scope)},
-    author{readAttribute<String>("author", node, outer_scope)}
+  template <typename Tree, typename Scope>
+  explicit FileHeader(const Tree & tree, Scope & outer_scope)
+  : revMajor(readAttribute<UnsignedShort>("revMajor", tree, outer_scope)),
+    revMinor(readAttribute<UnsignedShort>("revMinor", tree, outer_scope)),
+    date(readAttribute<String>("date", tree, outer_scope)),
+    description(readAttribute<String>("description", tree, outer_scope)),
+    author(readAttribute<String>("author", tree, outer_scope))
   {
   }
 };

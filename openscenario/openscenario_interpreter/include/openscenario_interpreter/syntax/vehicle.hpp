@@ -131,20 +131,7 @@ struct Vehicle
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const Vehicle & datum)
-{
-  // clang-format off
-
-  return os << (indent++) << blue << "<Vehicle" << " " << highlight("name", datum.name)
-                                                << " " << highlight("vehicleCategory", datum.vehicle_category) << blue << ">\n" << reset
-            << datum.parameter_declarations << "\n"
-            << datum.bounding_box           << "\n"
-            << datum.performance            << "\n"
-            << datum.axles                  << "\n"
-            << (--indent) << blue << "</Vehicle>" << reset;
-
-  // clang-format on
-}
+std::ostream & operator<<(std::ostream &, const Vehicle &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
