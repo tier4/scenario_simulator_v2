@@ -33,6 +33,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
+#include <traffic_simulator/util/parallel.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>

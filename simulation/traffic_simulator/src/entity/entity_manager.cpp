@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <cstdint>
+#include <future>
 #include <limits>
 #include <memory>
 #include <queue>
@@ -563,6 +564,7 @@ openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   if (entities_[name]->statusSet()) {
     return entities_[name]->getStatus();
   }
+  THROW_SIMULATION_ERROR("status of entity ", name, "is empty");
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -586,11 +588,9 @@ void EntityManager::update(const double current_time, const double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
-#pragma omp parallel
-  {
-#pragma omp for
-    for (size_t i = 0; i < entity_names.size(); i++) {
-        all_status.emplace(entity_names[i], updateNpcLogic(entity_names[i], type_list));
+  for (size_t i = 0; i < entity_names.size(); i++) {
+    if(entities_[entity_names[i]]->statusSet()) {
+      all_status.emplace(entity_names[i], updateNpcLogic(entity_names[i], type_list));
     }
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
