@@ -41,6 +41,10 @@ void VehicleActionNode::getBlackBoardValues()
 openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpdated(
   double target_speed)
 {
+  /*
+  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> watch("calculateEntityStatusUpdated");
+  watch.start();
+  */
   geometry_msgs::msg::Accel accel_new;
   accel_new = entity_status.action_status.accel;
   double target_accel = (target_speed - entity_status.action_status.twist.linear.x) / step_time;
@@ -114,6 +118,10 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
     entity_status_updated.pose = hdmap_utils->toMapPose(entity_status_updated.lanelet_pose).pose;
     entity_status_updated.action_status.twist = twist_new;
     entity_status_updated.action_status.accel = accel_new;
+    /*
+    watch.stop();
+    watch.print();
+    */
     return entity_status_updated;
   }
   THROW_SIMULATION_ERROR("failed to calculate next status calculateEntityStatusUpdated function");

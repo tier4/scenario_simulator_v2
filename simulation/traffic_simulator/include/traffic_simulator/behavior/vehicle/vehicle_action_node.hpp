@@ -27,6 +27,7 @@
 #include <traffic_simulator/behavior/action_node.hpp>
 #include <traffic_simulator/entity/vehicle_parameter.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
+#include <traffic_simulator/helper/stop_watch.hpp>
 #include <vector>
 
 namespace entity_behavior
