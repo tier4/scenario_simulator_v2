@@ -344,7 +344,7 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale) const
 double HermiteCurve::getMaximum2DCurvature() const
 {
   std::vector<double> curvatures;
-  for (double s = 0; s <= 1; s = s + 0.01) {
+  for (double s = 0; s <= 1; s = s + 0.1) {
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }
