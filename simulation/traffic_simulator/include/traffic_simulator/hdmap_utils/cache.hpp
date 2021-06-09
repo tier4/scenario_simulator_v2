@@ -17,10 +17,10 @@
 
 #include <boost/optional.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <mutex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <unordered_map>
 #include <vector>
-#include <mutex>
 
 namespace hdmap_utils
 {

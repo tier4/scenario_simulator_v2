@@ -24,8 +24,8 @@
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <unordered_map>
 #include <vector>
