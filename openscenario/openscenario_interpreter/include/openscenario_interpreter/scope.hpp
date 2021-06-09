@@ -41,7 +41,7 @@ struct Scope
   boost::filesystem::path logic_file;
   boost::filesystem::path scene_graph_file;
 
-  // for substituation syntax '$(dirname)'
+  // for substitution syntax '$(dirname)'
   const boost::filesystem::path scenario;
 
   Scope() = delete;

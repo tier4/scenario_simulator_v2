@@ -1,7 +1,7 @@
 /**
  * @file walk_straight_action.cpp
  * @author Masaya Kataoka (masaya.kataoka@tier4.jp)
- * @brief class implimentation of the walk straight action
+ * @brief class implementation of the walk straight action
  * @version 0.1
  * @date 2021-04-02
  *
