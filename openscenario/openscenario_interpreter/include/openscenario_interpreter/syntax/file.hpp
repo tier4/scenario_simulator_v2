@@ -26,9 +26,9 @@ inline namespace syntax
 {
 /* ---- File -------------------------------------------------------------------
  *
- * <xsd:complexType name="File">
- *   <xsd:attribute name="filepath" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="File">
+ *    <xsd:attribute name="filepath" type="String" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct File

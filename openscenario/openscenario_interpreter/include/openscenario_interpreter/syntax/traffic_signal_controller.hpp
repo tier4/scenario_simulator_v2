@@ -80,9 +80,11 @@ struct TrafficSignalController
 
   decltype(getCurrentTime()) current_phase_started_at;
 
-  TrafficSignalController() = delete;
-  TrafficSignalController(TrafficSignalController &&) = delete;
-  TrafficSignalController(const TrafficSignalController &) = delete;
+  explicit TrafficSignalController() = delete;
+
+  explicit TrafficSignalController(TrafficSignalController &&) = delete;
+
+  explicit TrafficSignalController(const TrafficSignalController &) = delete;
 
   template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
