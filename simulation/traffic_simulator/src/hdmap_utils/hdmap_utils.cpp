@@ -500,7 +500,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
 
 double HdMapUtils::getLaneletLength(std::int64_t lanelet_id)
 {
-  if(lanelet_length_cache_.exists(lanelet_id)) {
+  if (lanelet_length_cache_.exists(lanelet_id)) {
     return lanelet_length_cache_.getLength(lanelet_id);
   }
   double ret = lanelet::utils::getLaneletLength2d(lanelet_map_ptr_->laneletLayer.get(lanelet_id));

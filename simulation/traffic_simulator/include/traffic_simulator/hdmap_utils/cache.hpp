@@ -73,8 +73,7 @@ public:
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR(
-        "center point of : ", lanelet_id, " does not exists on route chache.");
+      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route chache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
     const auto ret = data_.at(lanelet_id);
@@ -105,8 +104,7 @@ public:
   double getLength(std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR(
-        "length of : ", lanelet_id, " does not exists on route chache.");
+      THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route chache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return data_[lanelet_id];
@@ -116,6 +114,7 @@ public:
     std::lock_guard<std::mutex> lock(mutex_);
     data_[lanelet_id] = length;
   }
+
 private:
   std::unordered_map<std::int64_t, double> data_;
   std::mutex mutex_;
