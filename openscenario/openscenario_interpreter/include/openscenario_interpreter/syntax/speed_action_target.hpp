@@ -52,7 +52,7 @@ struct SpeedActionTarget : public Element
     } else if (is<RelativeTargetSpeed>()) {
       return as<RelativeTargetSpeed>()();
     } else {
-      THROW(ImplementationFault);
+      throw UNSUPPORTED_SETTING_DETECTED(SpeedActionTarget, this->type().name());
     }
   }
 };

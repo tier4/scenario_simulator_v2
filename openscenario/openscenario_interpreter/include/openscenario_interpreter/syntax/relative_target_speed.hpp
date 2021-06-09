@@ -67,7 +67,7 @@ struct RelativeTargetSpeed
         };
         break;
       default:
-        THROW(ImplementationFault);
+        throw UNSUPPORTED_SETTING_DETECTED(RelativeTargetSpeed, speed_target_value_type);
     }
 
     std::function<bool(const Scope::Actor & actor)> is_end;
