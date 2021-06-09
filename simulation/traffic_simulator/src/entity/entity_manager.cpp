@@ -592,18 +592,26 @@ void EntityManager::update(const double current_time, const double step_time)
     std::string, std::shared_ptr<std::future<openscenario_msgs::msg::EntityStatus>>>
     futures;
   for (const auto & entity_name : entity_names) {
+    /*
     if (entities_[entity_name]->statusSet()) {
       futures[entity_name] =
         std::make_shared<std::future<openscenario_msgs::msg::EntityStatus>>(std::async(
           std::launch::async, &EntityManager::updateNpcLogic, this, entity_name, type_list));
     }
+    */
+    if (entities_[entity_name]->statusSet()) {
+      const auto status = updateNpcLogic(entity_name, type_list);
+      all_status.emplace(entity_name, status);
+    }
   }
+  /*
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
       const auto status = futures[entity_name]->get();
       all_status.emplace(entity_name, status);
     }
   }
+  */
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
     it->second->setOtherStatus(all_status);
   }
