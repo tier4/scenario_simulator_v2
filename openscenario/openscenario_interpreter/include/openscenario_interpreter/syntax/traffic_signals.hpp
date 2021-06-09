@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
-#include <functional>  // for std::ref
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <vector>
