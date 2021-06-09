@@ -9,6 +9,8 @@
 - Fix problems in publishing detection result. Before this change, the value of the pose was always (x,y,z,roll,pitch,yaw) = (0,0,0,0,0,0)
 - Remove unused packages (joy_to_vehicle_cmd, scenario_runner_mock)
 - Fix problems when simulator running in 30 FPS and with 10 FPS sensors
+- Enable caching routing reslut in hdmap_utils class
+- Enable run paralell thread in each logics
 
 ## Ver 0.0.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.0.1) on Github :fa-github:
