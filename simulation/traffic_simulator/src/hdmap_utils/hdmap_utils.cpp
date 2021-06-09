@@ -469,8 +469,8 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
   if (lanelet_map_ptr_->laneletLayer.empty()) {
     THROW_SIMULATION_ERROR("lanelet layer is empty");
   }
-  if (center_points_chache_.exists(lanelet_id)) {
-    return center_points_chache_.getCenterPoints(lanelet_id);
+  if (center_points_cache_.exists(lanelet_id)) {
+    return center_points_cache_.getCenterPoints(lanelet_id);
   }
 
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -494,13 +494,18 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
     ret.push_back(p1);
     ret.push_back(p2);
   }
-  center_points_chache_.appendData(lanelet_id, ret);
+  center_points_cache_.appendData(lanelet_id, ret);
   return ret;
 }
 
-double HdMapUtils::getLaneletLength(std::int64_t lanelet_id) const
+double HdMapUtils::getLaneletLength(std::int64_t lanelet_id)
 {
-  return lanelet::utils::getLaneletLength2d(lanelet_map_ptr_->laneletLayer.get(lanelet_id));
+  if(lanelet_length_cache_.exists(lanelet_id)) {
+    return lanelet_length_cache_.getLength(lanelet_id);
+  }
+  double ret = lanelet::utils::getLaneletLength2d(lanelet_map_ptr_->laneletLayer.get(lanelet_id));
+  lanelet_length_cache_.appendData(lanelet_id, ret);
+  return ret;
 }
 
 std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet_id) const

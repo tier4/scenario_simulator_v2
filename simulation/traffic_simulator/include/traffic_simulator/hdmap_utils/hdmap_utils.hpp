@@ -79,7 +79,7 @@ public:
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
-  double getLaneletLength(std::int64_t lanelet_id) const;
+  double getLaneletLength(std::int64_t lanelet_id);
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
     openscenario_msgs::msg::LaneletPose from, openscenario_msgs::msg::LaneletPose to);
@@ -135,7 +135,8 @@ public:
 
 private:
   RouteCache route_cache_;
-  CenterPointsCache center_points_chache_;
+  CenterPointsCache center_points_cache_;
+  LaneletLengthCache lanelet_length_cache_;
   lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
     const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);

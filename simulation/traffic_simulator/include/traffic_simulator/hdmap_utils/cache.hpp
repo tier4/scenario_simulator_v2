@@ -74,7 +74,7 @@ public:
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR(
-        "center point from : ", lanelet_id, " does not exists on route chache.");
+        "center point of : ", lanelet_id, " does not exists on route chache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
     const auto ret = data_.at(lanelet_id);
@@ -88,6 +88,36 @@ public:
 
 private:
   std::unordered_map<std::int64_t, std::vector<geometry_msgs::msg::Point> > data_;
+  std::mutex mutex_;
+};
+
+class LaneletLengthCache
+{
+public:
+  bool exists(std::int64_t lanelet_id)
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (data_.find(lanelet_id) == data_.end()) {
+      return false;
+    }
+    return true;
+  }
+  double getLength(std::int64_t lanelet_id)
+  {
+    if (!exists(lanelet_id)) {
+      THROW_SIMULATION_ERROR(
+        "length of : ", lanelet_id, " does not exists on route chache.");
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    return data_[lanelet_id];
+  }
+  void appendData(std::int64_t lanelet_id, double length)
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    data_[lanelet_id] = length;
+  }
+private:
+  std::unordered_map<std::int64_t, double> data_;
   std::mutex mutex_;
 };
 }  // namespace hdmap_utils
