@@ -32,7 +32,7 @@ TEST(syntax, dummy) { ASSERT_TRUE(true); }
 //     std::make_shared<rclcpp::Node>("", rclcpp::NodeOptions())
 //   };
 //
-//   openscenario_interpreter::OpenScenario interperter {
+//   openscenario_interpreter::OpenScenario interpreter {
 //     get_package_share_directory("openscenario_interpreter") + "/test/lexical-scope.xosc",
 //     node
 //   };

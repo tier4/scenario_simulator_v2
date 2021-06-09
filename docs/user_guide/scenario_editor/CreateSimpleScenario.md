@@ -25,7 +25,7 @@ You can place Ego car and set the destination on the map by following steps.
 Objects which show Ego car and the destination are displayed on the map like a following figure.
 ![](screenshot01.png)
 
-You can see that a condition to judge if Ego car arrived at the destination as a success criteria is added in "Success" window on the bottom of the screen.
+You can see that a condition to judge if Ego car arrived at the destination as a success criteria is added in "Success" window at the bottom of the screen.
 
 ## Velocity designation of Ego car
 
@@ -57,4 +57,4 @@ You can export a scenario file by following steps.
 
 The scenario is exported as a file. You can execute a simulator using the file.
 
-<font color="Red">Do not forget!! : Please export scenario in Tier4 format V2.</font>
+<font color="Red">Do not forget!! Please export scenario in TierIV Scenario format V2.</font>

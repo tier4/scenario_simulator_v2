@@ -4,7 +4,7 @@
 
 Scenario Runner is an OpenSCENARIO (.xosc) interpreter to run an autonomous driving simulation.
 
-OpenSCENARIO is an **open file format** for the description of dynamic contents in driving simulation applications privided by ASAM e.V.
+OpenSCENARIO is an **open file format** for the description of dynamic contents in driving simulation applications provided by ASAM e.V.
 
 Tier IV plans to use OpenSCENARIO for Autoware's Continuous Integration (CI), and is extending it for CI as far as the standard allows (see [Extensions](#Extensions) for details).
 
@@ -104,7 +104,7 @@ example:
 </UserDefinedAction>
 ```
 
-## Supprted/Implemented Elements
+## Supported/Implemented Elements
 
 Scenario Runner does not fully implement OpenSCENARIO at this time.
 Checked features in the following list are already implemented.

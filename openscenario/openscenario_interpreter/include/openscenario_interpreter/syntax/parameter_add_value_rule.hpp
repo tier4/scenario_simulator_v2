@@ -77,7 +77,7 @@ struct ParameterAddValueRule
       return std::get<1>(*iter)(target, value);
     } else {
       throw SyntaxError(
-        "The parameter specified by attrribute 'parameterRef' of type 'ParameterAction' must be "
+        "The parameter specified by attribute 'parameterRef' of type 'ParameterAction' must be "
         "numeric type (double, integer, unsignedInteger or unsignedShort), but ",
         target, " (type ", target.type().name(), ") specified");
     }

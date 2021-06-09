@@ -2,8 +2,8 @@
 
 Scenario Test Runner is being developed to assist in the definitive planning
 simulation using concept of OpenSCENARIO.
-Simulations are described in a "YAML" based format called a "tier4 scenario format".
-Then convert scenario into a "XML" based format called a "OpenSCENARIO" The format has been found at [OpenSCENARIO](http://www.openscenario.org/)
+Simulations are described in a "YAML" based format called a "TierIV Scenario Format".
+Then convert the scenario into an "XML" based format called an "OpenSCENARIO". The details of the format can be found at [OpenSCENARIO](http://www.openscenario.org/).
 
 
 # How to use
@@ -19,10 +19,10 @@ docker import
 ```
 
 
-# Tier4 Format V2 -> OpenSCENARIO Format
+# TierIV Scenario Format version 2.0 -> OpenSCENARIO Format
 
 ### Scenario Modifiers
-ScenarioModifiers and OpenSCENARIO is defined structure below
+ScenarioModifiers and OpenSCENARIO are defined as below.
 ```
 ScenarioModifiers:
   ScenarioModifier:
@@ -43,14 +43,14 @@ OpenSCENARIO:
   .
   .
 ```
-name express a variable It is not case sensitive, but attributes must be a lower snake case and it is converted to a variable in it's list during parameter distribution.
-See more details in test folder
+`name` expresses a variable: It is not case-sensitive, but its attributes must be the lower snake case, and it is converted to a variable in its list during parameter distribution.
+You can find more details in the test folder.
 
-start,step stop express it's variable range.
-initial parameter distribution is from start to end while increasing a value.
+`start`, `step`, `stop` express theirs variable ranges:
+Initial parameter distribution is from start to end while increasing a value.
 
 ### Scenario Tags
-CatalogLocations and other Tags inside OpenSCENARIO is defined structure below
+CatalogLocations and other Tags inside OpenSCENARIO are defined as below.
 ```
 CatalogLocations:
 or
@@ -58,14 +58,14 @@ CatalogLocations: {}
 ```
 
 ## Parameter Distribution Example
-ex)
-start: 10
-stop: 20
-if step is 1 then distributed parameter is 10
-if step is 2 distributed parameter is 10 , 20
+ex)  
+start: 10  
+stop: 20  
+if step is 1 then distributed parameter is 10  
+if step is 2 distributed parameter is 10 , 20  
 if step is 3 distributed parameter is 10 , 15, 20
 
-attension or int
+attention or int
 - if step is one, only parameter of start is used
 - if step is zero, it returns error
 - the number of simulation is factorial to number of  steps
@@ -73,15 +73,16 @@ attension or int
 ## For None Value Expression
 
 ### OK
-Without modifier element case
+You can write the scenario as below if ScenarioModifiers is empty.
 ```
 ScenarioModifiers:
 or
 ScenarioModifiers: {}
 ```
 
-### NG
-Neither Lack of neccesary keys nor [] is invaild
+### Bad
+You cannot write the scenario as below, because there is no necessary key
+and `ScenarioModifier: []` is invalid syntax.
 ```
 ScenarioModifiers:
   ScenarioModifier:
@@ -92,7 +93,6 @@ ScenarioModifiers:
   ScenarioModifier: []
 ```
 
-
 ## Workflow Example
 Required
 - path
@@ -100,7 +100,6 @@ Required
 Optional
 - expect
 - frame-rate
-
 
 ```
 Scenario:
@@ -118,8 +117,6 @@ Scenario:
     }
 ```
 
-### Tier4 Format V2 -> OpenSCENARIO Format Separatory
+### TierIV Scenario Format version 2.0 -> OpenSCENARIO Format Separator
 
-To convert OpenSCENARIO, see scenario test utility packcage[Scenario Converter](../scenario_test_utility)
-
-
+To convert OpenSCENARIO, see the scenario test utility package [Scenario Converter](../scenario_test_utility).
