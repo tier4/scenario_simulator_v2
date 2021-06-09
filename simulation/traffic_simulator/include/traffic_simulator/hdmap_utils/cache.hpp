@@ -20,14 +20,16 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <unordered_map>
 #include <vector>
+#include <mutex>
 
 namespace hdmap_utils
 {
 class RouteCache
 {
 public:
-  bool exists(std::int64_t from, std::int64_t to) const
+  bool exists(std::int64_t from, std::int64_t to)
   {
+    std::lock_guard<std::mutex> lock(mutex_);
     std::pair<std::int64_t, std::int64_t> key;
     key.first = from;
     key.second = to;
@@ -36,48 +38,57 @@ public:
     }
     return true;
   }
-  std::vector<std::int64_t> getRoute(std::int64_t from, std::int64_t to) const
+  std::vector<std::int64_t> getRoute(std::int64_t from, std::int64_t to)
   {
     if (!exists(from, to)) {
       THROW_SIMULATION_ERROR(
         "route from : ", from, " to : ", to, " does not exists on route chache.");
     }
-    return data_.at({from, to});
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto ret = data_.at({from, to});
+    return ret;
   }
   void appendData(std::int64_t from, std::int64_t to, const std::vector<std::int64_t> & route)
   {
+    std::lock_guard<std::mutex> lock(mutex_);
     data_[{from, to}] = route;
   }
 
 private:
   std::unordered_map<std::pair<std::int64_t, std::int64_t>, std::vector<std::int64_t> > data_;
+  std::mutex mutex_;
 };
 
 class CenterPointsCache
 {
 public:
-  bool exists(std::int64_t lanelet_id) const
+  bool exists(std::int64_t lanelet_id)
   {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (data_.find(lanelet_id) == data_.end()) {
       return false;
     }
     return true;
   }
-  std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id) const
+  std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR(
         "center point from : ", lanelet_id, " does not exists on route chache.");
     }
-    return data_.at(lanelet_id);
+    std::lock_guard<std::mutex> lock(mutex_);
+    const auto ret = data_.at(lanelet_id);
+    return ret;
   }
   void appendData(std::int64_t lanelet_id, const std::vector<geometry_msgs::msg::Point> & route)
   {
+    std::lock_guard<std::mutex> lock(mutex_);
     data_[lanelet_id] = route;
   }
 
 private:
   std::unordered_map<std::int64_t, std::vector<geometry_msgs::msg::Point> > data_;
+  std::mutex mutex_;
 };
 }  // namespace hdmap_utils
 
