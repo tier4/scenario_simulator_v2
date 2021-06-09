@@ -1,13 +1,13 @@
 # Run with docker
 
 You can use this scenario_simulator_v2 with docker.
-We automatically build docker images by using github actions and push them into dockerhub.
+We automatically build docker images by using GitHub Actions and push them into Docker Hub.
 
-If you want to run scenario_simulator_v2 with docker, please follow instructions below.
+If you want to run scenario_simulator_v2 with docker, please follow the instructions below.
 
 ## Install docker
 
-Please follow instructions below.
+Please follow the instructions below.
 
 <iframe
     src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.docker.com%2Fengine%2Finstall%2F" 
@@ -18,12 +18,12 @@ Please follow instructions below.
     style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;">
 </iframe>
 
-If you finished to install docker, please type commands below in order to check docker is working.
+If you finished installing docker, please type the commands below in order to check docker is working correctly.
 ```bash
 docker run hello-world
 ```
 
-You can see output like below if you have succeed to install docker.  
+You can see the output like below if you have succeeded to install docker.  
 ```bash
 Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
@@ -55,11 +55,11 @@ For more examples and ideas, visit:
 
 ## Install nvidia-docker2 (optional)
 
-If you have nvidia GPU, in your machine, you have to install nvidia-driver and install nvidia-docker2
+If you have NVIDIA GPU(s) in your machine, you have to install nvidia-driver and install nvidia-docker2.
 
 ### Ubuntu
 
-In order to install vidia-docker2 in ubuntu, please type commands below.
+In order to install nvidia-docker2 on Ubuntu, please type the commands below.
 
 ```bash
 curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | \
@@ -70,13 +70,13 @@ curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidi
 sudo apt-get update
 ```
 
-If you finished to install docker and nvidia-docker2, please type this commands below.
+If you finished installing docker and nvidia-docker2, please type the commands below.
 
 ```bash
 docker run --gpus all --rm nvidia/cuda:9.0-base nvidia-smi
 ```
 
-You can see outputs like below.
+You can see the outputs like below.
 
 ```bash
 +-----------------------------------------------------------------------------+
@@ -109,71 +109,71 @@ You can see outputs like below.
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 
-rocker is a docker support tools for ROS.  
-It enables us to run rviz inside docker very easilly.  
+rocker is a docker support tool for ROS.  
+It enables us to run rviz inside docker very easily.  
 You can install rocker via pip3.
 ```bash
 sudo pip3 install rocker
 ```
 
-After install rocker, please check rocker works.  
-If your machine has GPU, please type this commands below.  
+After install rocker, please check rocker works correctly.  
+If your machine has GPU(s), please type the commands below.  
 ```bash
 rocker --nvidia --x11 osrf/ros:crystal-desktop rviz2
 ```
 You can see rviz working on docker.  
-![Runnig rviz inside rocker](../image/rviz_with_rocker.png "runnig rviz inside rocker.")
+![Running rviz inside rocker](../image/rviz_with_rocker.png "running rviz inside rocker.")
 
-If your machine has no GPU, please type this commands below.  
+If your machine has no GPU, please type the commands below.  
 ```bash
 rocker --x11 osrf/ros:crystal-desktop rviz2
 ```
-You can see same result with nvidia GPU.
+You can see the same result with NVIDIA GPU.
 
 ## Build docker image locally (optional)
 
-If you want to build docker image in your local machine, please type commands below in your terminal.
+If you want to build a docker image in your local machine, please type the commands below in your terminal.
 
 ```bash
 cd (path_to_scenario_simulator_v2)
 docker build -t scenario_simulator_v2 .
 ```
 
-## Runing Simulation with docker.
+## Running Simulation with docker.
 
-### Runing with docker image in your machine.
+### Running with docker image in your machine.
 Please type this commands and run [simple demo](SimpleDemo.md) in your local terminal.
 
-If your local machine has nvidia GPUs,
+If your local machine has NVIDIA GPUs,
 
 ```bash
 rocker --nvidia --x11 scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
 ```
 
-If your local machine does not have nvidia GPUs,
+If your local machine does not have NVIDIA GPUs,
 
 ```bash
 rocker --x11 scenario_simulator_v2 ros2 launch traffic_simulator mock_test.launch.py
 ```
 
-### Runing with docker image from dockerhub.
+### Running with docker image from Docker Hub.
 
-We automatically build docker images of scenario_simulator_v2 by using github actions and put them into our dockerhub.
+We automatically build docker images of scenario_simulator_v2 by using GitHub Actions and put them into our Docker Hub repository.
 
 [![Push Docker Image](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)
 
 [![dockeri.co](https://dockeri.co/image/tier4/scenario_simulator_v2)](https://hub.docker.com/r/tier4/scenario_simulator_v2)
 
-We can pull docker image from dockerhub and run simulation with scenario_simulator_v2 just typing commands below.
+We can pull the docker image from Docker Hub and run simulation with scenario_simulator_v2 just typing the commands below.
 
-If your local machine has nvidia GPUs,
+If your local machine has NVIDIA GPUs,
 
 ```bash
 docker pull tier4/scenario_simulator_v2:latest
 rocker --nvidia --x11 tier4/scenario_simulator_v2:latest ros2 launch traffic_simulator mock_test.launch.py
 ```
 
-If your local machine does not have nvidia GPUs,
+If your local machine does not have NVIDIA GPUs,
 
 ```bash
 docker pull tier4/scenario_simulator_v2:latest

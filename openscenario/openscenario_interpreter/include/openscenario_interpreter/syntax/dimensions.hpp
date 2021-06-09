@@ -26,7 +26,7 @@ inline namespace syntax
 {
 /* ---- Dimensions -------------------------------------------------------------
  *
- *  <xsd:complexType name="Dimensionss">
+ *  <xsd:complexType name="Dimensions">
  *    <xsd:attribute name="width"  type="Double" use="required"/>
  *    <xsd:attribute name="length" type="Double" use="required"/>
  *    <xsd:attribute name="height" type="Double" use="required"/>

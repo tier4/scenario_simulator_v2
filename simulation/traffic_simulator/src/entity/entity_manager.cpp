@@ -100,7 +100,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   }
   auto status0 = getEntityStatus(name0);
   if (!status0) {
-    THROW_SEMANTIC_ERROR("eneity : ", name0, " status does not exist.");
+    THROW_SEMANTIC_ERROR("entity : ", name0, " status does not exist.");
   }
   auto status1 = getEntityStatus(name1);
   if (!status1) {

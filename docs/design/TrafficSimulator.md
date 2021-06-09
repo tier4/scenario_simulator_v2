@@ -1,4 +1,4 @@
-# Traffic simulatior
+# Traffic simulator
 
 ![Simple Demo](../image/simple_demo.png "traffic simulator")
 
@@ -105,7 +105,7 @@ private:
   bool bob_spawned_;
   double current_time_;
   int port_;
-  traffic_simulatorr::API api_;
+  traffic_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 
   std::string catalog_xml =

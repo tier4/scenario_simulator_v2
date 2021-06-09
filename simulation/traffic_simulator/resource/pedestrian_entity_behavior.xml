@@ -16,7 +16,7 @@
             route_lanelets="{route_lanelets}"
             obstacle="{obstacle}"
             traffic_light_manager="{traffic_light_manager}"/>
-        <WalkStraightAction name="walk_staight"
+        <WalkStraightAction name="walk_straight"
             waypoints="{waypoints}"
             request="{request}"
             hdmap_utils="{hdmap_utils}"

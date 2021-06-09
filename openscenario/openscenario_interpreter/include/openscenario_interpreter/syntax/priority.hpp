@@ -54,7 +54,7 @@ struct Priority
 
     /* ---- NOTE ---------------------------------------------------------------
      *
-     *  If a starting event has priority Skip, then it will not be ran if there
+     *  If a starting event has priority Skip, then it will not be run if there
      *  is any other event in the same scope (maneuver) in the running state.
      *
      * ---------------------------------------------------------------------- */
