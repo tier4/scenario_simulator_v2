@@ -599,7 +599,7 @@ void EntityManager::update(const double current_time, const double step_time)
     }
   }
   for (const auto & entity_name : entity_names) {
-    if(entities_[entity_name]->statusSet()) {
+    if (entities_[entity_name]->statusSet()) {
       const auto status = futures[entity_name]->get();
       all_status.emplace(entity_name, status);
     }
