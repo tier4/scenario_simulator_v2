@@ -53,7 +53,7 @@ inline Function forEach(Container && c, Function f)
 {
   return forEach(std::begin(c), std::end(c), f);
 }
-}
+}  // namespace parallel
 }  // namespace util
 
 #endif  // TRAFFIC_SIMULATOR__UTIL__PARALLEL_FOR_EACH_HPP_

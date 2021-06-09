@@ -588,9 +588,20 @@ void EntityManager::update(const double current_time, const double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
-  for (size_t i = 0; i < entity_names.size(); i++) {
-    if(entities_[entity_names[i]]->statusSet()) {
-      all_status.emplace(entity_names[i], updateNpcLogic(entity_names[i], type_list));
+  std::unordered_map<
+    std::string, std::shared_ptr<std::future<openscenario_msgs::msg::EntityStatus>>>
+    futures;
+  for (const auto & entity_name : entity_names) {
+    if (entities_[entity_name]->statusSet()) {
+      futures[entity_name] =
+        std::make_shared<std::future<openscenario_msgs::msg::EntityStatus>>(std::async(
+          std::launch::async, &EntityManager::updateNpcLogic, this, entity_name, type_list));
+    }
+  }
+  for (const auto & entity_name : entity_names) {
+    if(entities_[entity_name]->statusSet()) {
+      const auto status = futures[entity_name]->get();
+      all_status.emplace(entity_name, status);
     }
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
