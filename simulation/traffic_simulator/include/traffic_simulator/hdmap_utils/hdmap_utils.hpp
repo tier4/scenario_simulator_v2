@@ -40,7 +40,7 @@
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
-#include <traffic_simulator/hdmap_utils/route_chache.hpp>
+#include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <unordered_map>
@@ -134,7 +134,8 @@ public:
     const std::vector<std::int64_t> & route_lanelets) const;
 
 private:
-  RouteChache route_chache_;
+  RouteCache route_cache_;
+  CenterPointsCache center_points_chache_;
   lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
     const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);

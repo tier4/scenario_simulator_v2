@@ -422,8 +422,8 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
 std::vector<std::int64_t> HdMapUtils::getRoute(
   std::int64_t from_lanelet_id, std::int64_t to_lanelet_id)
 {
-  if (route_chache_.exists(from_lanelet_id, to_lanelet_id)) {
-    return route_chache_.getRoute(from_lanelet_id, to_lanelet_id);
+  if (route_cache_.exists(from_lanelet_id, to_lanelet_id)) {
+    return route_cache_.getRoute(from_lanelet_id, to_lanelet_id);
   }
   std::vector<std::int64_t> ret;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
@@ -431,18 +431,18 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
   lanelet::Optional<lanelet::routing::Route> route =
     vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, true);
   if (!route) {
-    route_chache_.appendData(from_lanelet_id, to_lanelet_id, ret);
+    route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
     return ret;
   }
   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
   if (shortest_path.empty()) {
-    route_chache_.appendData(from_lanelet_id, to_lanelet_id, ret);
+    route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
     return ret;
   }
   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
     ret.push_back(lane_itr->id());
   }
-  route_chache_.appendData(from_lanelet_id, to_lanelet_id, ret);
+  route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
   return ret;
 }
 
@@ -469,6 +469,9 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
   if (lanelet_map_ptr_->laneletLayer.empty()) {
     THROW_SIMULATION_ERROR("lanelet layer is empty");
   }
+  if (center_points_chache_.exists(lanelet_id)) {
+    return center_points_chache_.getCenterPoints(lanelet_id);
+  }
 
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
   const auto centerline = lanelet.centerline();
@@ -491,6 +494,7 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
     ret.push_back(p1);
     ret.push_back(p2);
   }
+  center_points_chache_.appendData(lanelet_id, ret);
   return ret;
 }
 

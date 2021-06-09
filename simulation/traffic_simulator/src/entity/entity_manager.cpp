@@ -574,15 +574,15 @@ void EntityManager::update(const double current_time, const double step_time)
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
   current_time_ = current_time;
-  if (current_time_ >= 0) {
-    traffic_light_manager_ptr_->update(step_time_);
-  }
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
     std::cout << "current_time : " << current_time_ << std::endl;
   }
   if (getNumberOfEgo() >= 2) {
     THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
+  }
+  if (current_time_ >= 0) {
+    traffic_light_manager_ptr_->update(step_time_);
   }
   setVerbose(verbose_);
   auto type_list = getEntityTypeList();
