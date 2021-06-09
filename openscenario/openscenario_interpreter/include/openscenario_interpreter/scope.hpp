@@ -16,43 +16,78 @@
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
 #include <boost/filesystem.hpp>
+#include <functional>  // std::reference_wrapper
 #include <limits>
 #include <memory>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <string>
+#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 namespace openscenario_interpreter
 {
+/* ---- NOTE -------------------------------------------------------------------
+ *
+ *  This structure provides resource access during the scenario at each level of
+ *  Storyboard.
+ *
+ *  Typically, in programming language implementations, scopes are implemented
+ *  as linked lists that hold pointers to outer scopes. However, OpenSCENARIO
+ *  does not have features that require dynamic frame construction like function
+ *  calls, and the structure is fixed at the time of parsing, so it is okay to
+ *  build the child scope as a copy of the parent scope.
+ *
+ *  In other words, this structure is not elegant, but I believe it is a simple
+ *  structure that even beginners of programming language implementations can
+ *  understand.
+ *
+ * -------------------------------------------------------------------------- */
 struct Scope
 {
-  std::unordered_map<String, Element> parameters;
-  std::unordered_map<String, Element> entities;
-  std::unordered_map<String, Element> storyboard_elements;
-
   using Actor = EntityRef;
 
   using Actors = std::list<Actor>;
 
+  /* ---- GLOBAL ------------------------------------------------------------ */
+
+  const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
+
+  boost::filesystem::path logic_file;  // NOTE: Assigned by RoadNetwork's constructor.
+
+  boost::filesystem::path scene_graph_file;  // NOTE: Assigned by RoadNetwork's constructor.
+
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  for TrafficSignalControllerAction.trafficSignalControllerRef
+   *
+   *  Be careful not to use the TrafficSignalController as a dangling reference.
+   *  Normally, the destruction of all scopes occurs at the same time as the
+   *  destruction of the scenario itself.
+   *
+   * ------------------------------------------------------------------------ */
+  std::unordered_map<String, std::reference_wrapper<TrafficSignalController>>
+    traffic_signal_controller_refs;
+
+  std::unordered_map<String, Element> entities;
+
+  /* ---- LEXICAL ----------------------------------------------------------- */
+
+  std::unordered_map<String, Element> parameters;
+
+  std::unordered_map<String, Element> storyboard_elements;
+
   Actors actors;
 
-  boost::filesystem::path logic_file;
-  boost::filesystem::path scene_graph_file;
-
-  // for substitution syntax '$(dirname)'
-  const boost::filesystem::path scenario;
+  /* ---- CONSTRUCTORS ------------------------------------------------------ */
 
   Scope() = delete;
 
   explicit Scope(Scope &) = default;
+
   explicit Scope(const Scope &) = default;
 
-  template <typename... Ts>
-  explicit Scope(const std::string & scenario, Ts &&... xs) : scenario(scenario)
-  {
-  }
+  explicit Scope(const boost::filesystem::path & pathname) : pathname(pathname) {}
 };
 }  // namespace openscenario_interpreter
 

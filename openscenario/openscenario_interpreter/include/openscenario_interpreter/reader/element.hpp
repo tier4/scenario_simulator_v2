@@ -95,7 +95,7 @@ auto readElement(const std::string & name, const XML & parent, Ts &&... xs)
      *
      * ---------------------------------------------------------------------- */
     return MustBeDefaultConstructible<T>::makeItOrThrow(SyntaxError(
-      parent.name(), " requires class ", name, " as element, but there is no specification"));
+      parent.name(), " requires class ", name, " as element, but there is no declaration"));
   }
 }
 

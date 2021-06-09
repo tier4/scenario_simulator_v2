@@ -16,11 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
-#include <openscenario_interpreter/syntax/catalog_locations.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
-#include <openscenario_interpreter/syntax/road_network.hpp>
-#include <openscenario_interpreter/syntax/storyboard.hpp>
+#include <openscenario_interpreter/syntax/open_scenario_category.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,64 +26,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ScenarioDefinition -----------------------------------------------------
- *
- * <xsd:group name="ScenarioDefinition">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="CatalogLocations" type="CatalogLocations"/>
- *     <xsd:element name="RoadNetwork" type="RoadNetwork"/>
- *     <xsd:element name="Entities" type="Entities"/>
- *     <xsd:element name="Storyboard" type="Storyboard"/>
- *   </xsd:sequence>
- * </xsd:group>
- *
- * -------------------------------------------------------------------------- */
-struct ScenarioDefinition
-{
-  ASSERT_IS_OPTIONAL_ELEMENT(ParameterDeclarations);
-  const ParameterDeclarations parameter_declarations;
-
-  const CatalogLocations catalog_locations;
-
-  RoadNetwork road_network;
-
-  const Entities entities;
-
-  Storyboard storyboard;
-
-  template <typename Node, typename Scope>
-  explicit ScenarioDefinition(const Node & node, Scope & outer_scope)
-  : parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, outer_scope)),
-    catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, outer_scope)),
-    road_network(readElement<RoadNetwork>("RoadNetwork", node, outer_scope)),
-    entities(readElement<Entities>("Entities", node, outer_scope)),
-    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope))
-  {
-  }
-
-  template <typename... Ts>
-  decltype(auto) complete(Ts &&... xs)
-  {
-    return storyboard.complete(std::forward<decltype(xs)>(xs)...);
-  }
-
-  template <typename... Ts>
-  auto evaluate(Ts &&... xs)
-  {
-    road_network.evaluate();
-    const auto result = storyboard.evaluate();
-    updateFrame();
-    return result;
-  }
-};
-
-std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
-{
-  return os << unspecified;
-}
-
 /* ---- OpenScenario -----------------------------------------------------------
  *
  * <xsd:complexType name="OpenScenario">
@@ -96,74 +35,40 @@ std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
  *   </xsd:sequence>
  * </xsd:complexType>
  *
- * <xsd:group name="OpenScenarioCategory">
- *   <xsd:choice>
- *     <xsd:group ref="ScenarioDefinition"/>
- *     <xsd:group ref="CatalogDefinition"/>
- *   </xsd:choice>
- * </xsd:group>
- *
- * <xsd:group name="CatalogDefinition">
- *   <xsd:sequence>
- *     <xsd:element name="Catalog" type="Catalog"/>
- *   </xsd:sequence>
- * </xsd:group>
- *
  * -------------------------------------------------------------------------- */
-struct OpenScenario : public pugi::xml_document
+struct OpenScenario : public Scope
 {
-  Element category;
+  pugi::xml_document script;
 
-  Scope scope;
+  const FileHeader file_header;
 
-  const auto & load(const std::string & scenario)
+  const OpenScenarioCategory category;
+
+  const auto & load(const boost::filesystem::path & pathname)
   {
-    const auto result = load_file(scenario.c_str());
+    const auto result = script.load_file(pathname.string().c_str());
 
     if (!result) {
-      throw SyntaxError(
-        "while loading scenario ", std::quoted(scenario), " => ", result.description());
+      throw SyntaxError(result.description(), ": ", pathname);
     } else {
-      return *this;
-    }
-  }
-
-  decltype(auto) load(const boost::filesystem::path & scenario) { return load(scenario.string()); }
-
-  template <typename... Ts>
-  explicit OpenScenario(Ts &&... xs) : scope(std::forward<decltype(xs)>(xs)...)
-  {
-    if (load(scope.scenario).child("OpenSCENARIO").child("Catalog")) {
-      throw SyntaxError("The Catalog feature is not yet supported");
-    } else {
-      category = make<ScenarioDefinition>(child("OpenSCENARIO"), scope);
+      return script;
     }
   }
 
   template <typename... Ts>
-  decltype(auto) complete(Ts &&... xs)
+  explicit OpenScenario(Ts &&... xs)
+  : Scope(std::forward<decltype(xs)>(xs)...),
+    file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), *this)),
+    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, *this))
   {
-    return category.as<ScenarioDefinition>().complete(std::forward<decltype(xs)>(xs)...);
   }
 
-  template <typename... Ts>
-  decltype(auto) evaluate(Ts &&... xs)
-  {
-    return category.evaluate(std::forward<decltype(xs)>(xs)...);
-  }
+  auto complete() const { return category.as<ScenarioDefinition>().complete(); }
 
-  template <typename... Ts>
-  decltype(auto) operator()(Ts &&... xs)
-  {
-    return evaluate(std::forward<decltype(xs)>(xs)...);
-  }
+  auto evaluate() { return category.evaluate(); }
 };
 
-template <typename... Ts>
-std::basic_ostream<Ts...> & operator<<(std::basic_ostream<Ts...> & os, const OpenScenario &)
-{
-  return os << unspecified;
-}
+std::ostream & operator<<(std::ostream & os, const OpenScenario &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
