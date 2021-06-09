@@ -19,6 +19,7 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <mutex>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -55,7 +56,7 @@ public:
   }
 
 private:
-  std::unordered_map<std::pair<std::int64_t, std::int64_t>, std::vector<std::int64_t> > data_;
+  std::unordered_map<std::pair<std::int64_t, std::int64_t>, std::vector<std::int64_t>> data_;
   std::mutex mutex_;
 };
 
@@ -76,17 +77,28 @@ public:
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route chache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    const auto ret = data_.at(lanelet_id);
-    return ret;
+    return data_.at(lanelet_id);
+  }
+  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> getCenterPointsSpline(
+    std::int64_t lanelet_id)
+  {
+    if (!exists(lanelet_id)) {
+      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route chache.");
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    return splines_[lanelet_id];
   }
   void appendData(std::int64_t lanelet_id, const std::vector<geometry_msgs::msg::Point> & route)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     data_[lanelet_id] = route;
+    splines_[lanelet_id] = std::make_shared<traffic_simulator::math::CatmullRomSpline>(route);
   }
 
 private:
-  std::unordered_map<std::int64_t, std::vector<geometry_msgs::msg::Point> > data_;
+  std::unordered_map<std::int64_t, std::vector<geometry_msgs::msg::Point>> data_;
+  std::unordered_map<std::int64_t, std::shared_ptr<traffic_simulator::math::CatmullRomSpline>>
+    splines_;
   std::mutex mutex_;
 };
 
