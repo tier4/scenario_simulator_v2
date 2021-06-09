@@ -551,6 +551,20 @@ auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanele
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
 
+openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
+  const std::string & name,
+  const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list)
+{
+  if (verbose_) {
+    std::cout << "update " << name << " behavior" << std::endl;
+  }
+  entities_[name]->setEntityTypeList(type_list);
+  entities_[name]->onUpdate(current_time_, step_time_);
+  if (entities_[name]->statusSet()) {
+    return entities_[name]->getStatus();
+  }
+}
+
 void EntityManager::update(const double current_time, const double step_time)
 {
   verbose_ = true;
@@ -571,15 +585,12 @@ void EntityManager::update(const double current_time, const double step_time)
   setVerbose(verbose_);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (verbose_) {
-      std::cout << "update " << it->first << " behavior" << std::endl;
-    }
-    it->second->setEntityTypeList(type_list);
-    it->second->onUpdate(current_time, step_time);
-    if (it->second->statusSet()) {
-      auto status = it->second->getStatus();
-      all_status.emplace(it->first, status);
+  const std::vector<std::string> entity_names = getEntityNames();
+#pragma omp parallel
+  {
+#pragma omp for
+    for (size_t i = 0; i < entity_names.size(); i++) {
+        all_status.emplace(entity_names[i], updateNpcLogic(entity_names[i], type_list));
     }
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
