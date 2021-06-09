@@ -59,7 +59,7 @@ struct TrafficSignalStateAction : private Scope
   {
   }
 
-  const std::true_type accomplished{};
+  static auto accomplished() noexcept { return true; }
 
   auto start() const { return unspecified; }
 };

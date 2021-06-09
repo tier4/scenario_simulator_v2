@@ -76,11 +76,10 @@ struct ParameterAddValueRule
     if (iter != std::end(overloads)) {
       return std::get<1>(*iter)(target, value);
     } else {
-      std::stringstream ss{};
-      ss << "The parameter specified by attrribute 'parameterRef' of type 'ParameterAction' ";
-      ss << "must be numeric type (double, integer, unsignedInteger or unsignedShort), but ";
-      ss << target << " (type " << target.type().name() << ") specified";
-      throw SyntaxError(ss.str());
+      throw SyntaxError(
+        "The parameter specified by attrribute 'parameterRef' of type 'ParameterAction' must be "
+        "numeric type (double, integer, unsignedInteger or unsignedShort), but ",
+        target, " (type ", target.type().name(), ") specified");
     }
   }
 };

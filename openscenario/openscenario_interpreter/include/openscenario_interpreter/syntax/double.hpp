@@ -18,7 +18,6 @@
 #include <boost/lexical_cast.hpp>
 #include <limits>
 #include <openscenario_interpreter/error.hpp>
-#include <regex>
 #include <std_msgs/msg/float64.hpp>
 #include <string>
 
@@ -30,15 +29,15 @@ struct Double : public std_msgs::msg::Float64
 {
   using value_type = decltype(std_msgs::msg::Float64::data);
 
-  explicit Double(value_type value = {}) { data = value; }
+  explicit Double() = default;
+
+  explicit Double(value_type value) { data = value; }
 
   explicit Double(const std::string & s)
   try {
     data = boost::lexical_cast<value_type>(s);
   } catch (const boost::bad_lexical_cast &) {
-    std::stringstream ss;
-    ss << "can't treat value \"" << s << "\" as type Double";
-    throw SyntaxError(ss.str());
+    throw INVALID_NUMERIC_LITERAL_SPECIFIED(s);
   }
 
   constexpr operator value_type() const noexcept { return data; }
@@ -61,8 +60,13 @@ struct Double : public std_msgs::msg::Float64
   }
 };
 
-std::ostream & operator<<(std::ostream &, const Double &);
+static_assert(std::is_standard_layout<Double>::value, "");
+
+static_assert(not std::is_trivial<Double>::value, "");
+
 std::istream & operator>>(std::istream &, Double &);
+
+std::ostream & operator<<(std::ostream &, const Double &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

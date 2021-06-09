@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <joy_to_vehicle_cmd/joy_to_vehicle_cmd_component.hpp>
-#include <memory>
-#include <rclcpp/rclcpp.hpp>
+#ifndef OPENSCENARIO_INTERPRETER__UTILITY__DEMANGLE_HPP_
+#define OPENSCENARIO_INTERPRETER__UTILITY__DEMANGLE_HPP_
 
-int main(int argc, char * argv[])
+#include <string>
+#include <typeinfo>
+
+namespace openscenario_interpreter
 {
-  rclcpp::init(argc, argv);
-  rclcpp::NodeOptions options;
-  auto component = std::make_shared<joy_to_vehicle_cmd::JoyToVehicleCommandComponent>(options);
-  rclcpp::spin(component);
-  rclcpp::shutdown();
-  return 0;
-}
+inline namespace utility
+{
+auto demangle(const char * name) -> std::string;
+
+auto demangle(const std::type_info &) -> std::string;
+}  // namespace utility
+}  // namespace openscenario_interpreter
+
+#endif  // OPENSCENARIO_INTERPRETER__UTILITY__DEMANGLE_HPP_

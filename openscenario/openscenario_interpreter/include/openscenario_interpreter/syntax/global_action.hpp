@@ -26,15 +26,15 @@ inline namespace syntax
 {
 /* ---- GlobalAction -----------------------------------------------------------
  *
- * <xsd:complexType name="GlobalAction">
- *   <xsd:choice>
- *     <xsd:element name="EnvironmentAction" type="EnvironmentAction"/>
- *     <xsd:element name="EntityAction" type="EntityAction"/>
- *     <xsd:element name="ParameterAction" type="ParameterAction"/>
- *     <xsd:element name="InfrastructureAction" type="InfrastructureAction"/>
- *     <xsd:element name="TrafficAction" type="TrafficAction"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="GlobalAction">
+ *    <xsd:choice>
+ *      <xsd:element name="EnvironmentAction" type="EnvironmentAction"/>
+ *      <xsd:element name="EntityAction" type="EntityAction"/>
+ *      <xsd:element name="ParameterAction" type="ParameterAction"/>
+ *      <xsd:element name="InfrastructureAction" type="InfrastructureAction"/>
+ *      <xsd:element name="TrafficAction" type="TrafficAction"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct GlobalAction : public Element
@@ -44,11 +44,11 @@ struct GlobalAction : public Element
   // clang-format off
   : Element(
       choice(node,
-        std::make_pair(   "EnvironmentAction", UNSUPPORTED()),
+        std::make_pair(   "EnvironmentAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair(        "EntityAction", [&](auto && node) { return make<        EntityAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
         std::make_pair(     "ParameterAction", [&](auto && node) { return make<     ParameterAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("InfrastructureAction", [&](auto && node) { return make<InfrastructureAction>(std::forward<decltype(node)>(node), std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair(       "TrafficAction", UNSUPPORTED())))
+        std::make_pair(       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }

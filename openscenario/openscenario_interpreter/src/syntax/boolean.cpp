@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/io/ios_state.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
-#include <string>
 
 namespace openscenario_interpreter
 {

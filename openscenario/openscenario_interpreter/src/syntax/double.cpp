@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iomanip>
-#include <limits>
+#include <iomanip>  // std::fixed
+#include <limits>   // std::numeric_limits
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <regex>
 #include <string>
@@ -22,20 +22,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Double & datum)
-{
-  return os << std::fixed << datum.data;
-}
-
 std::istream & operator>>(std::istream & is, Double & datum)
 {
-  std::string token{};
+  std::string token;
 
   is >> token;
 
   static const std::regex infinity{R"([+-]?INF)"};
 
-  std::smatch result{};
+  std::smatch result;
 
 #ifndef OPENSCENARIO_INTERPRETER_ALLOW_INFINITY
   constexpr auto upper_bound_value = std::numeric_limits<Double::value_type>::max();
@@ -50,6 +45,11 @@ std::istream & operator>>(std::istream & is, Double & datum)
   }
 
   return is;
+}
+
+std::ostream & operator<<(std::ostream & os, const Double & datum)
+{
+  return os << std::fixed << datum.data;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -42,7 +42,7 @@ void LidarSensor::update(
   double current_time, const std::vector<openscenario_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp)
 {
-  if ((current_time - last_update_stamp_) >= configuration_.scan_duration()) {
+  if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
     last_update_stamp_ = current_time;
     publisher_ptr_->publish(raycast(status, stamp));
   } else {
