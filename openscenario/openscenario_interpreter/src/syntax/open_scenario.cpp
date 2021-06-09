@@ -12,12 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iomanip>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/utility/indent.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const OpenScenario &) { return os << unspecified; }
+std::ostream & operator<<(std::ostream & os, const OpenScenario & datum)
+{
+  os << "{\n";
+  os << (++indent) << std::quoted("version") << ": " << std::quoted("1.0") << ",\n";
+
+  if (datum.category.is<ScenarioDefinition>()) {
+    os << indent << datum.category.as<ScenarioDefinition>() << "\n";
+  } else {
+    os;
+  }
+
+  return os << (--indent) << "}";
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

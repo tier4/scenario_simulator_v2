@@ -18,8 +18,9 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const ScenarioDefinition &)
+std::ostream & operator<<(std::ostream & os, const ScenarioDefinition & datum)
 {
+  // return os << datum.storyboard;
   return os << unspecified;
 }
 }  // namespace syntax
