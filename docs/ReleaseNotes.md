@@ -12,6 +12,7 @@
 - Enable caching routing reslut, and center points and it' spline, lanelet length in hdmap_utils class
 - Update interpreter to access TrafficSignals from Action / Condition
 - Update EgoEntity to use precise simulation model parameters
+- Adding vehicle_command and ego_entity_status_before_update data field to the UpdateEntityStatusRequest
 
 ## Ver 0.0.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.0.1) on Github :fa-github:
