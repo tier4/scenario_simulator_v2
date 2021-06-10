@@ -23,6 +23,8 @@ from launch.actions import DeclareLaunchArgument, Shutdown
 
 from launch.conditions import IfCondition
 
+from launch.launch_context import LaunchContext
+
 from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node, LifecycleNode
@@ -151,6 +153,10 @@ def generate_launch_description():
                     {"port": port},
                     {"sensor_model": sensor_model},
                     {"vehicle_model": vehicle_model},
+                    get_package_share_directory(
+                        vehicle_model.perform(LaunchContext()) + "_description"
+                    )
+                    + "/config/simulator_model.param.yaml",
                 ],
             ),
             Node(
