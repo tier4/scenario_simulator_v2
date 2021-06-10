@@ -103,7 +103,7 @@ public:
 
   void setTargetSpeed(double, bool) override;
 
-  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
+  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

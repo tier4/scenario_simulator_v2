@@ -304,14 +304,14 @@ bool API::updateEntityStatusInSim()
     const auto ego_vehicle_command = entity_manager_ptr_->getEgoVehicleCommand();
     const auto ego_entity_status_before_update =
       entity_manager_ptr_->getEgoEntityStatusBeforeUpdate();
-    if(ego_entity_status_before_update) {
-      simulation_interface::toProto(ego_entity_status_before_update.get(), *req.mutable_ego_entity_status_before_update());
+    if (ego_entity_status_before_update) {
+      simulation_interface::toProto(
+        ego_entity_status_before_update.get(), *req.mutable_ego_entity_status_before_update());
       req.set_ego_entity_status_before_update_is_empty(false);
-    }
-    else {
+    } else {
       req.set_ego_entity_status_before_update_is_empty(true);
     }
-    simulation_interface::toProto(ego_vehicle_command.get(), *req.mutable_vehicle_command());
+    simulation_interface::toProto(ego_vehicle_command, *req.mutable_vehicle_command());
     req.set_vehicle_command_is_empty(false);
   } else {
     req.set_ego_entity_status_before_update_is_empty(true);

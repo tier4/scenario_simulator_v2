@@ -84,7 +84,7 @@ void EntityBase::setOtherStatus(
   }
 }
 
-autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand() const
+autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
 {
   THROW_SIMULATION_ERROR("getVehicleCommand only supported in EgoVehicleType");
 }

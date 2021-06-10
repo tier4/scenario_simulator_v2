@@ -342,7 +342,7 @@ void EgoEntity::setTargetSpeed(double value, bool)
   (*vehicle_model_ptr_).setState(v);
 }
 
-autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const
+autoware_vehicle_msgs::msg::VehicleCommand EgoEntity::getVehicleCommand()
 {
   return autowares.at(name).getVehicleCommand();
 }

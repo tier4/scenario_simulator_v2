@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/bounding_box.hpp>
@@ -26,7 +27,6 @@
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <queue>
 #include <string>
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <unordered_map>
@@ -139,7 +139,7 @@ public:
 
   /*   */ void updateStandStillDuration(const double step_time);
 
-  virtual autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const;
+  virtual autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand();
 
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
