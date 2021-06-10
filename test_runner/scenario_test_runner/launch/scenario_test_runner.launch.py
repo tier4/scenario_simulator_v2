@@ -23,6 +23,8 @@ from launch.actions import DeclareLaunchArgument, Shutdown
 
 from launch.conditions import IfCondition
 
+from launch.launch_context import LaunchContext
+
 from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node, LifecycleNode
@@ -44,12 +46,38 @@ def generate_launch_description():
     global_timeout = LaunchConfiguration("global-timeout", default=180)
     output_directory = LaunchConfiguration("output-directory", default=Path("/tmp"))
     scenario = LaunchConfiguration("scenario", default=Path("/dev/null"))
-    sensor_model = LaunchConfiguration("sensor_model", default="aip_x1")
-    vehicle_model = LaunchConfiguration("vehicle_model", default="ymc_golfcart_proto2")
+    sensor_model = LaunchConfiguration("sensor_model", default="")
+    vehicle_model = LaunchConfiguration("vehicle_model", default="")
     with_rviz = LaunchConfiguration("with_rviz", default=False)
     workflow = LaunchConfiguration("workflow", default=Path("/dev/null"))
 
     port = 8080
+
+    def make_parameters():
+
+        parameters = [
+            {"autoware_launch_file": autoware_launch_file},
+            {"autoware_launch_package": autoware_launch_package},
+            {"port": port},
+            {"sensor_model": sensor_model},
+            {"vehicle_model": vehicle_model},
+        ]
+
+        if vehicle_model.perform(LaunchContext()) != "":
+            parameters.append(
+                get_package_share_directory(
+                    vehicle_model.perform(LaunchContext()) + "_description"
+                )
+                + "/config/vehicle_info.param.yaml"
+            )
+            parameters.append(
+                get_package_share_directory(
+                    vehicle_model.perform(LaunchContext()) + "_description"
+                )
+                + "/config/simulator_model.param.yaml"
+            )
+
+        return parameters
 
     return LaunchDescription(
         [
@@ -141,17 +169,7 @@ def generate_launch_description():
                 namespace="simulation",
                 name="openscenario_interpreter",
                 output="screen",
-                parameters=[
-                    # 'map_path': os.path.join(
-                    #     get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
-                    # 'origin_latitude':   34.903555800615614,
-                    # 'origin_longitude': 139.93339979022568,
-                    {"autoware_launch_file": autoware_launch_file},
-                    {"autoware_launch_package": autoware_launch_package},
-                    {"port": port},
-                    {"sensor_model": sensor_model},
-                    {"vehicle_model": vehicle_model},
-                ],
+                parameters=make_parameters(),
             ),
             Node(
                 package="openscenario_visualization",
