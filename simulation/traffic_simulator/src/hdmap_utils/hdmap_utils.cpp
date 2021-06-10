@@ -246,16 +246,15 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   if (!lanelet_id) {
     return boost::none;
   }
-  const auto center_points = getCenterPoints(lanelet_id.get());
-  traffic_simulator::math::CatmullRomSpline spline(center_points);
-  const auto s = spline.getSValue(pose.position);
+  const auto spline = getCenterPointsSpline(lanelet_id.get());
+  const auto s = spline->getSValue(pose.position);
   if (!s) {
     return boost::none;
   }
-  auto pose_on_centerline = spline.getPose(s.get());
+  auto pose_on_centerline = spline->getPose(s.get());
   auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
     quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
-  double offset = spline.getSquaredDistanceIn2D(pose.position, s.get());
+  double offset = spline->getSquaredDistanceIn2D(pose.position, s.get());
   openscenario_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id.get();
   lanelet_pose.s = s.get();
@@ -422,22 +421,35 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
 std::vector<std::int64_t> HdMapUtils::getRoute(
   std::int64_t from_lanelet_id, std::int64_t to_lanelet_id)
 {
+  if (route_cache_.exists(from_lanelet_id, to_lanelet_id)) {
+    return route_cache_.getRoute(from_lanelet_id, to_lanelet_id);
+  }
   std::vector<std::int64_t> ret;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
   lanelet::Optional<lanelet::routing::Route> route =
     vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, true);
   if (!route) {
+    route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
     return ret;
   }
   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
   if (shortest_path.empty()) {
+    route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
     return ret;
   }
   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
     ret.push_back(lane_itr->id());
   }
+  route_cache_.appendData(from_lanelet_id, to_lanelet_id, ret);
   return ret;
+}
+
+std::shared_ptr<traffic_simulator::math::CatmullRomSpline> HdMapUtils::getCenterPointsSpline(
+  std::int64_t lanelet_id)
+{
+  getCenterPoints(lanelet_id);
+  return center_points_cache_.getCenterPointsSpline(lanelet_id);
 }
 
 std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(
@@ -463,6 +475,9 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
   if (lanelet_map_ptr_->laneletLayer.empty()) {
     THROW_SIMULATION_ERROR("lanelet layer is empty");
   }
+  if (center_points_cache_.exists(lanelet_id)) {
+    return center_points_cache_.getCenterPoints(lanelet_id);
+  }
 
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
   const auto centerline = lanelet.centerline();
@@ -485,12 +500,18 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::getCenterPoints(std::int64_t 
     ret.push_back(p1);
     ret.push_back(p2);
   }
+  center_points_cache_.appendData(lanelet_id, ret);
   return ret;
 }
 
-double HdMapUtils::getLaneletLength(std::int64_t lanelet_id) const
+double HdMapUtils::getLaneletLength(std::int64_t lanelet_id)
 {
-  return lanelet::utils::getLaneletLength2d(lanelet_map_ptr_->laneletLayer.get(lanelet_id));
+  if (lanelet_length_cache_.exists(lanelet_id)) {
+    return lanelet_length_cache_.getLength(lanelet_id);
+  }
+  double ret = lanelet::utils::getLaneletLength2d(lanelet_map_ptr_->laneletLayer.get(lanelet_id));
+  lanelet_length_cache_.appendData(lanelet_id, ret);
+  return ret;
 }
 
 std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds(std::int64_t lanelet_id) const
@@ -630,7 +651,7 @@ HdMapUtils::getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, std::int
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
     auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
     if (traj) {
-      if (traj->getMaximu2DCurvature() < 1.0) {
+      if (traj->getMaximum2DCurvature() < 1.0) {
         double eval = std::fabs(20 - traj->getLength());
         evaluation.push_back(eval);
         curves.push_back(traj.get());
@@ -676,9 +697,8 @@ geometry_msgs::msg::Vector3 HdMapUtils::getVectorFromPose(
 
 bool HdMapUtils::isInLanelet(std::int64_t lanelet_id, double s)
 {
-  const auto center_points = getCenterPoints(lanelet_id);
-  traffic_simulator::math::CatmullRomSpline spline(center_points);
-  double l = spline.getLength();
+  const auto spline = getCenterPointsSpline(lanelet_id);
+  double l = spline->getLength();
   if (s > l) {
     return false;
   } else if (s < 0) {
@@ -691,10 +711,9 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::toMapPoints(
   std::int64_t lanelet_id, std::vector<double> s)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  const auto center_points = getCenterPoints(lanelet_id);
-  traffic_simulator::math::CatmullRomSpline spline(center_points);
+  const auto spline = getCenterPointsSpline(lanelet_id);
   for (const auto & s_value : s) {
-    ret.push_back(spline.getPoint(s_value));
+    ret.push_back(spline->getPoint(s_value));
   }
   return ret;
 }
@@ -704,10 +723,9 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 {
   geometry_msgs::msg::PoseStamped ret;
   ret.header.frame_id = "map";
-  const auto center_points = getCenterPoints(lanelet_id);
-  traffic_simulator::math::CatmullRomSpline spline(center_points);
-  ret.pose = spline.getPose(s);
-  const auto tangent_vec = spline.getTangentVector(s);
+  const auto spline = getCenterPointsSpline(lanelet_id);
+  ret.pose = spline->getPose(s);
+  const auto tangent_vec = spline->getTangentVector(s);
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0.0;
   rpy.y = 0.0;
@@ -741,9 +759,7 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 boost::optional<geometry_msgs::msg::Vector3> HdMapUtils::getTangentVector(
   std::int64_t lanelet_id, double s)
 {
-  const auto center_points = getCenterPoints(lanelet_id);
-  traffic_simulator::math::CatmullRomSpline spline(center_points);
-  return spline.getTangentVector(s);
+  return getCenterPointsSpline(lanelet_id)->getTangentVector(s);
 }
 
 bool HdMapUtils::canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id)
@@ -769,25 +785,18 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
       return to_s - from_s;
     }
   }
-  const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  lanelet::Optional<lanelet::routing::Route> route =
-    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, true);
-  if (!route) {
+  const auto route = getRoute(from_lanelet_id, to_lanelet_id);
+  if (route.empty()) {
     return boost::none;
   }
-  lanelet::routing::LaneletPath shortest_path = route->shortestPath();
-  double dist = 0.0;
-  if (shortest_path.empty()) {
-    return boost::none;
-  }
-  for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
-    if (lane_itr->id() == from_lanelet_id) {
+  double dist = 0;
+  for (const auto lanelet_id : route) {
+    if (lanelet_id == from_lanelet_id) {
       dist = dist + getLaneletLength(from_lanelet_id) - from_s;
-    } else if (lane_itr->id() == to_lanelet_id) {
+    } else if (lanelet_id == to_lanelet_id) {
       dist = dist + to_s;
     } else {
-      dist = dist + getLaneletLength(lane_itr->id());
+      dist = dist + getLaneletLength(lanelet_id);
     }
   }
   return dist;

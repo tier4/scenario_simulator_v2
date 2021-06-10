@@ -53,8 +53,9 @@ public:
   const geometry_msgs::msg::Vector3 getTangentVector(double s, bool autoscale = false) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s, bool autoscale = false) const;
   double get2DCurvature(double s, bool autoscale = false) const;
-  double getMaximu2DCurvature() const;
-  double getLength(size_t num_points = 100) const;
+  double getMaximum2DCurvature() const;
+  double getLength(size_t num_points) const;
+  double getLength() const { return length_; }
   boost::optional<double> getSValue(
     geometry_msgs::msg::Point position, double threadhold_distance = 1.0,
     unsigned int initial_resolution = 30, unsigned int max_iteration = 30, double tolerance = 0.001,
@@ -69,6 +70,7 @@ public:
   const openscenario_msgs::msg::HermiteCurve toRosMsg() const;
 
 private:
+  double length_;
   double getNewtonMethodStepSize(
     geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
 };

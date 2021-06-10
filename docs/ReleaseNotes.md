@@ -9,6 +9,7 @@
 - Fix problems in publishing detection result. Before this change, the value of the pose was always (x,y,z,roll,pitch,yaw) = (0,0,0,0,0,0)
 - Remove unused packages (joy_to_vehicle_cmd, scenario_runner_mock)
 - Fix problems when simulator running in 30 FPS and with 10 FPS sensors
+- Enable caching routing reslut, and center points and it' spline, lanelet length in hdmap_utils class
 - Updated interpreter to access TrafficSignals from Action / Condition
 
 ## Ver 0.0.1
