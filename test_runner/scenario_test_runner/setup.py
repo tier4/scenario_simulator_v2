@@ -31,6 +31,6 @@ setup(
         "console_scripts": [
             "scenario_test_runner = scenario_test_runner.scenario_test_runner:main",
             "result_checker       = scenario_test_runner.result_checker:main",
-        ],
+        ]
     },
 )

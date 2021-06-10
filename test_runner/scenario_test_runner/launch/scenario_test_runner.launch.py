@@ -21,7 +21,7 @@ from launch import LaunchDescription
 
 from launch.actions import DeclareLaunchArgument, Shutdown
 
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 
 from launch.launch_context import LaunchContext
 
@@ -44,11 +44,15 @@ def generate_launch_description():
         "global-real-time-factor", default=1.0
     )
     global_timeout = LaunchConfiguration("global-timeout", default=180)
-    output_directory = LaunchConfiguration("output-directory", default=Path("/tmp"))
+    output_directory = LaunchConfiguration(
+        "output-directory", default=Path("/tmp"))
     scenario = LaunchConfiguration("scenario", default=Path("/dev/null"))
     sensor_model = LaunchConfiguration("sensor_model", default="aip_x1")
-    vehicle_model = LaunchConfiguration("vehicle_model", default="ymc_golfcart_proto2")
+    vehicle_model = LaunchConfiguration(
+        "vehicle_model", default="ymc_golfcart_proto2")
     with_rviz = LaunchConfiguration("with_rviz", default=False)
+    load_ego_vehicle_description = LaunchConfiguration(
+        "load_ego_vehicle_description", default=True)
     workflow = LaunchConfiguration("workflow", default=Path("/dev/null"))
 
     port = 8080
@@ -61,7 +65,8 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "autoware-launch-package", default_value=autoware_launch_package
             ),
-            DeclareLaunchArgument("global-frame-rate", default_value=global_frame_rate),
+            DeclareLaunchArgument("global-frame-rate",
+                                  default_value=global_frame_rate),
             DeclareLaunchArgument(
                 "global-real-time-factor",
                 default_value=global_real_time_factor,
@@ -98,8 +103,14 @@ def generate_launch_description():
                 "only one scenario passed to the --scenario option will be executed"
                 ").",
             ),
+            DeclareLaunchArgument(
+                "load_ego_vehicle_description",
+                default_value=load_ego_vehicle_description,
+                description="If true, this launch file try to find urdf description for the Autoware vehicle.",
+            ),
             DeclareLaunchArgument("sensor_model", default_value=sensor_model),
-            DeclareLaunchArgument("vehicle_model", default_value=vehicle_model),
+            DeclareLaunchArgument(
+                "vehicle_model", default_value=vehicle_model),
             DeclareLaunchArgument(
                 "workflow",
                 default_value=workflow,
@@ -133,9 +144,7 @@ def generate_launch_description():
                 namespace="simulation",
                 name="simple_sensor_simulator",
                 output="screen",
-                parameters=[
-                    {"port": port},
-                ],
+                parameters=[{"port": port}],
             ),
             LifecycleNode(
                 package="openscenario_interpreter",
@@ -143,6 +152,7 @@ def generate_launch_description():
                 namespace="simulation",
                 name="openscenario_interpreter",
                 output="screen",
+                condition=IfCondition(load_ego_vehicle_description),
                 parameters=[
                     # 'map_path': os.path.join(
                     #     get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
@@ -163,6 +173,25 @@ def generate_launch_description():
                     + "/config/simulator_model.param.yaml",
                 ],
             ),
+            LifecycleNode(
+                package="openscenario_interpreter",
+                executable="openscenario_interpreter_node",
+                namespace="simulation",
+                name="openscenario_interpreter",
+                output="screen",
+                condition=UnlessCondition(load_ego_vehicle_description),
+                parameters=[
+                    # 'map_path': os.path.join(
+                    #     get_package_share_directory('kashiwanoha_map'), 'map', 'lanelet2_map.osm'),
+                    # 'origin_latitude':   34.903555800615614,
+                    # 'origin_longitude': 139.93339979022568,
+                    {"autoware_launch_file": autoware_launch_file},
+                    {"autoware_launch_package": autoware_launch_package},
+                    {"port": port},
+                    {"sensor_model": sensor_model},
+                    {"vehicle_model": vehicle_model}
+                ],
+            ),
             Node(
                 package="openscenario_visualization",
                 executable="openscenario_visualization_node",
@@ -174,15 +203,13 @@ def generate_launch_description():
                 package="rviz2",
                 executable="rviz2",
                 name="rviz2",
-                output={
-                    "stderr": "log",
-                    "stdout": "log",
-                },
+                output={"stderr": "log", "stdout": "log"},
                 condition=IfCondition(with_rviz),
                 arguments=[
                     "-d",
                     str(
-                        Path(get_package_share_directory("scenario_test_runner"))
+                        Path(get_package_share_directory(
+                            "scenario_test_runner"))
                         / "planning_simulator_v2.rviz"
                     ),
                 ],
