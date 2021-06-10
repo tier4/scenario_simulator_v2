@@ -58,17 +58,20 @@ EgoEntity::EgoEntity(
   const double step_time,  //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
-  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(  // XXX: HARD CODING!!!
-    parameters.performance.max_speed, parameters.axles.front_axle.max_steering,
-    parameters.performance.max_acceleration,
-    5.0,  // steer_rate_lim,
-    parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x, step_time,
-    0.25,  // vel_time_delay,
-    0.5,   // vel_time_constant,
-    0.3,   // steer_time_delay,
-    0.3,   // steer_time_constant,
-    0.0    // deadzone_delta_steer
-    ))
+  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(
+    getParameter<double>("vel_lim", 50.0),     // parameters.performance.max_speed,
+    getParameter<double>("steer_lim", 1.0),    // parameters.axles.front_axle.max_steering,
+    getParameter<double>("accel_rate", 10.0),  // parameters.performance.max_acceleration,
+    getParameter<double>("steer_rate_lim", 5.0),
+    getParameter<double>(
+      "wheel_base",
+      parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x),  //
+    step_time,                                                                          //
+    getParameter<double>("vel_time_delay", 0.25),                                       //
+    getParameter<double>("vel_time_constant", 0.5),                                     //
+    getParameter<double>("steer_time_delay", 0.3),                                      //
+    getParameter<double>("steer_time_constant", 0.3),                                   //
+    getParameter<double>("deadzone_delta_steer", 0.0)))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
 
@@ -84,18 +87,6 @@ EgoEntity::EgoEntity(
       "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
         "/planning_simulator_v2.rviz",
       "scenario_simulation:=true"));
-
-  DEBUG_VALUE(getParameter<double>("vel_lim", 50.0));
-  DEBUG_VALUE(getParameter<double>("steer_lim", 1.0));
-  DEBUG_VALUE(getParameter<double>("accel_rate", 10.0));
-  DEBUG_VALUE(getParameter<double>("steer_rate_lim", 5.0));
-  DEBUG_VALUE(getParameter<double>("vel_time_delay", 0.25));
-  DEBUG_VALUE(getParameter<double>("vel_time_constant", 0.5));
-  DEBUG_VALUE(getParameter<double>("steer_time_delay", 0.3));
-  DEBUG_VALUE(getParameter<double>("steer_time_constant", 0.3));
-  DEBUG_VALUE(getParameter<double>("acc_time_delay", 0.1));
-  DEBUG_VALUE(getParameter<double>("acc_time_constant", 0.1));
-  DEBUG_VALUE(getParameter<double>("deadzone_delta_steer", 0.0));
 }
 
 EgoEntity::~EgoEntity() { autowares.erase(name); }

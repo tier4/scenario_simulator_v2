@@ -156,6 +156,10 @@ def generate_launch_description():
                     get_package_share_directory(
                         vehicle_model.perform(LaunchContext()) + "_description"
                     )
+                    + "/config/vehicle_info.param.yaml",
+                    get_package_share_directory(
+                        vehicle_model.perform(LaunchContext()) + "_description"
+                    )
                     + "/config/simulator_model.param.yaml",
                 ],
             ),
