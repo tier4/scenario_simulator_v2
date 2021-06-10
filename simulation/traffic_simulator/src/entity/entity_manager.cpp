@@ -428,6 +428,18 @@ auto EntityManager::getWaypoints(const std::string & name) -> openscenario_msgs:
   return entities_.at(name)->getWaypoints();
 }
 
+bool EntityManager::isEgoExists() const
+{
+  const auto entity_names = getEntityNames();
+  for(const auto entity_name : entity_names)
+  {
+    if(isEgo(entity_name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool EntityManager::isEgo(const std::string & name) const
 {
   return getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO;
@@ -593,6 +605,12 @@ void EntityManager::update(const double current_time, const double step_time)
     traffic_light_manager_ptr_->update(step_time_);
   }
   setVerbose(verbose_);
+  if(isEgoExists()) {
+    ego_entity_status_before_update_ = getEntityStatus(getEgoEntityName());
+  }
+  else {
+    ego_entity_status_before_update_ = boost::none;
+  }
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();

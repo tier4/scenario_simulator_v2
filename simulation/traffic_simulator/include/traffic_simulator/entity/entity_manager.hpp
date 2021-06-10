@@ -291,6 +291,8 @@ public:
 
   auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
 
+  bool isEgoExists() const;
+
   bool isEgo(const std::string & name) const;
 
   bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);
@@ -330,6 +332,11 @@ public:
   auto toMapPose(const openscenario_msgs::msg::LaneletPose &) const
     -> const geometry_msgs::msg::Pose;
 
+  boost::optional<openscenario_msgs::msg::EntityStatus> getEgoEntityStatusBeforeUpdate() const
+  {
+    return ego_entity_status_before_update_;
+  }
+  boost::optional<openscenario_msgs::msg::EntityStatus> ego_entity_status_before_update_;
   boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> getEgoVehicleCommand();
 
   void updateHdmapMarker();
