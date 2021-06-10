@@ -47,8 +47,6 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     std::bind(
       &ScenarioSimulator::updateEntityStatus, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
-      &ScenarioSimulator::updateEgoStatus, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
       &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,

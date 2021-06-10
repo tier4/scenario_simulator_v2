@@ -213,6 +213,8 @@ public:
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
 
+  void update(const double current_time, const double step_time);
+
   openscenario_msgs::msg::EntityStatus updateNpcLogic(
     const std::string & name,
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list);
@@ -328,9 +330,7 @@ public:
   auto toMapPose(const openscenario_msgs::msg::LaneletPose &) const
     -> const geometry_msgs::msg::Pose;
 
-  void updateEgo(const double current_time, const double step_time);
   boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> getEgoVehicleCommand();
-  void updateNpc(const double current_time, const double step_time);
 
   void updateHdmapMarker();
 };
