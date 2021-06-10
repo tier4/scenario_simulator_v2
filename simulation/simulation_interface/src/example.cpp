@@ -81,12 +81,6 @@ void update_entity_status_callback(
   res.PrintDebugString();
 }
 
-void update_ego_status_callback(
-  const simulation_api_schema::UpdateEgoStatusRequest &,
-  simulation_api_schema::UpdateEgoStatusResponse &)
-{
-}
-
 class ExampleNode : public rclcpp::Node
 {
 public:
@@ -96,7 +90,7 @@ public:
       simulation_interface::TransportProtocol::TCP, simulation_interface::HostName::ANY,
       initialize_callback, update_frame_callback, update_sensor_frame_callback,
       spawn_vehicle_entity_callback, spawn_pedestrian_entity_callback, despawn_entity_callback,
-      update_entity_status_callback, update_ego_status_callback, attach_lidar_sensor_callback,
+      update_entity_status_callback, attach_lidar_sensor_callback,
       attach_detection_sensor_callback),
     client_(
       simulation_interface::TransportProtocol::TCP, simulation_interface::HostName::LOCLHOST,

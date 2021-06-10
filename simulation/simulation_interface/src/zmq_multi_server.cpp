@@ -67,10 +67,6 @@ MultiServer::MultiServer(
     simulation_api_schema::UpdateEntityStatusResponse &)>
     update_entity_status_func,
   std::function<void(
-    const simulation_api_schema::UpdateEgoStatusRequest &,
-    simulation_api_schema::UpdateEgoStatusResponse &)>
-    update_ego_status_func,
-  std::function<void(
     const simulation_api_schema::AttachLidarSensorRequest &,
     simulation_api_schema::AttachLidarSensorResponse &)>
     attach_lidar_sensor_func,
@@ -94,8 +90,6 @@ MultiServer::MultiServer(
   despawn_entity_func_(despawn_entity_func),
   update_entity_status_sock_(context_, type_),
   update_entity_status_func_(update_entity_status_func),
-  update_ego_status_sock_(context_, type_),
-  update_ego_status_func_(update_ego_status_func),
   attach_lidar_sensor_sock_(context_, type_),
   attach_lidar_sensor_func_(attach_lidar_sensor_func),
   attach_detection_sensor_sock_(context_, type_),
@@ -103,8 +97,6 @@ MultiServer::MultiServer(
 {
   initialize_sock_.bind(
     simulation_interface::getEndPoint(protocol, hostname, simulation_interface::ports::initialize));
-  update_ego_status_sock_.bind(simulation_interface::getEndPoint(
-    protocol, hostname, simulation_interface::ports::update_ego_status));
   update_entity_status_sock_.bind(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::update_entity_status));
   update_frame_sock_.bind(simulation_interface::getEndPoint(

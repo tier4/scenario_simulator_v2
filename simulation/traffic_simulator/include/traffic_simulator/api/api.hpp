@@ -88,9 +88,6 @@ public:
     update_entity_status_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::update_entity_status),
-    update_ego_status_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
-      simulation_interface::ports::update_ego_status),
     attach_lidar_sensor_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::attach_lidar_sensor),
@@ -254,9 +251,6 @@ private:
     simulation_api_schema::UpdateEntityStatusRequest,
     simulation_api_schema::UpdateEntityStatusResponse>
     update_entity_status_client_;
-  zeromq::Client<
-    simulation_api_schema::UpdateEgoStatusRequest, simulation_api_schema::UpdateEgoStatusResponse>
-    update_ego_status_client_;
   zeromq::Client<
     simulation_api_schema::AttachLidarSensorRequest,
     simulation_api_schema::AttachLidarSensorResponse>

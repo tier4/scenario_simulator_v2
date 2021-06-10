@@ -94,9 +94,6 @@ private:
   void updateFrame(
     const simulation_api_schema::UpdateFrameRequest & req,
     simulation_api_schema::UpdateFrameResponse & res);
-  void updateEgoStatus(
-    const simulation_api_schema::UpdateEgoStatusRequest & req,
-    simulation_api_schema::UpdateEgoStatusResponse & res);
   void updateEntityStatus(
     const simulation_api_schema::UpdateEntityStatusRequest & req,
     simulation_api_schema::UpdateEntityStatusResponse & res);

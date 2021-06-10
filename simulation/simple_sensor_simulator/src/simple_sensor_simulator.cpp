@@ -91,19 +91,6 @@ void ScenarioSimulator::updateFrame(
   res.mutable_result()->set_description("succeed to update frame");
 }
 
-void ScenarioSimulator ::updateEgoStatus(
-  const simulation_api_schema::UpdateEgoStatusRequest & req,
-  simulation_api_schema::UpdateEgoStatusResponse & res)
-{
-  autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
-  simulation_interface::toMsg(req.vehicle_command(), vehicle_command);
-  openscenario_msgs::msg::EntityStatus ego_status;
-  simulation_interface::toMsg(req.status(), ego_status);
-  res = simulation_api_schema::UpdateEgoStatusResponse();
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("");
-}
-
 void ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
