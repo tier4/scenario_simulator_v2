@@ -90,7 +90,7 @@ struct LaneChangeAction
     }
   }
 
-  static constexpr std::false_type is_complete_immediately{};
+  const std::false_type is_complete_immediately{};
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

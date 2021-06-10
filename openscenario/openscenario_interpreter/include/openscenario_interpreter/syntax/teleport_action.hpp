@@ -73,7 +73,7 @@ struct TeleportAction
     }
   }
 
-  static constexpr std::true_type is_complete_immediately{};
+  const std::true_type is_complete_immediately{};
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
