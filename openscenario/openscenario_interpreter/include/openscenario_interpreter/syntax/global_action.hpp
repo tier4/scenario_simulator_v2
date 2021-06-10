@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_action.hpp>
 #include <utility>
-#include "openscenario_interpreter/syntax/storyboard_element.hpp"
 
 namespace openscenario_interpreter
 {

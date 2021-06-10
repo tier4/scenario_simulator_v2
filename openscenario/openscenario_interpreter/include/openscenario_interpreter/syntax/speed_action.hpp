@@ -21,7 +21,6 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
 #include <unordered_map>
-#include "openscenario_interpreter/syntax/dynamics_shape.hpp"
 
 namespace openscenario_interpreter
 {

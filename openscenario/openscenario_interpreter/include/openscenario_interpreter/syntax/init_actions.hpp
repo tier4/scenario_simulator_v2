@@ -21,8 +21,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "openscenario_interpreter/syntax/global_action.hpp"
-#include "openscenario_interpreter/syntax/user_defined_action.hpp"
 
 namespace openscenario_interpreter
 {
@@ -71,13 +69,15 @@ struct InitActions : public Elements
 
   bool is_complete_immediately() const
   {
-    return std::all_of(begin(), end(), [](const Element & elm) {
+    return std::all_of(begin(), end(), [=](const Element & elm) {
       if (elm.is<GlobalAction>()) {
         return elm.as<GlobalAction>().is_complete_immediately();
       } else if (elm.is<UserDefinedAction>()) {
         return elm.as<UserDefinedAction>().is_complete_immediately();
       } else if (elm.is<Private>()) {
         return elm.as<Private>().is_complete_immediately();
+      } else {
+        throw UNSUPPORTED_ELEMENT_SPECIFIED(elm.type().name());
       }
     });
   }

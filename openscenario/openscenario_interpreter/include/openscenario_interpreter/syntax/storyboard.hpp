@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
-#include "openscenario_interpreter/error.hpp"
 
 namespace openscenario_interpreter
 {
