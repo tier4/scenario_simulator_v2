@@ -49,6 +49,8 @@ struct ParameterAction : public Element
   : Element(choice(parent, ELEMENT(SetAction), ELEMENT(ModifyAction)))
   {
   }
+
+  static constexpr std::true_type is_complete_immediately{};
 };
 
 #undef ELEMENT

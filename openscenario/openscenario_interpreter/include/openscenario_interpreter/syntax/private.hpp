@@ -56,6 +56,14 @@ struct Private
 
     return unspecified;
   }
+
+  bool is_complete_immediately() const
+  {
+    return std::all_of(
+      private_actions.begin(), private_actions.end(), [](const PrivateAction & private_action) {
+        return private_action.is_complete_immediately();
+      });
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

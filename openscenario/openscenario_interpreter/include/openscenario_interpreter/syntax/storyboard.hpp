@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
+#include "openscenario_interpreter/error.hpp"
 
 namespace openscenario_interpreter
 {
@@ -53,6 +54,10 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Story>(node, inner_scope));
     });
+
+    if (not init.is_complete_immediately()) {
+      throw SemanticError("Actions in Init should be completed immediately.");
+    }
   }
 
   const std::true_type ready{};

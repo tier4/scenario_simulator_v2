@@ -72,6 +72,8 @@ struct TeleportAction
       apply(*this, position, actor);
     }
   }
+
+  static constexpr std::true_type is_complete_immediately{};
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

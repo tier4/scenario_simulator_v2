@@ -44,6 +44,14 @@ struct LongitudinalAction : public Element
   // clang-format on
   {
   }
+
+  bool is_complete_immediately() const
+  {
+    if (is<SpeedAction>()) {
+      return as<SpeedAction>().is_complete_immediately();
+    }
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

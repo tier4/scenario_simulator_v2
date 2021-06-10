@@ -46,6 +46,14 @@ struct LateralAction : public ComplexType
   // clang-format on
   {
   }
+
+  bool is_complete_immediately() const
+  {
+    if (is<LaneChangeAction>()) {
+      return as<LaneChangeAction>().is_complete_immediately();
+    }
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

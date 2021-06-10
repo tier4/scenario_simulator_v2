@@ -60,6 +60,20 @@ struct PrivateAction : public ComplexType
   // clang-format on
   {
   }
+  bool is_complete_immediately() const
+  {
+#define BOILERPLATE(TYPE)                        \
+  if (is<TYPE>()) {                              \
+    return as<TYPE>().is_complete_immediately(); \
+  }
+    BOILERPLATE(LongitudinalAction)
+    BOILERPLATE(LateralAction)
+    BOILERPLATE(ControllerAction)
+    BOILERPLATE(TeleportAction)
+    BOILERPLATE(RoutingAction)
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
+#undef BOILERPLATE
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

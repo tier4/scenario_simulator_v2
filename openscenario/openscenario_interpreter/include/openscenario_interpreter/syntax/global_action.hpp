@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/infrastructure_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_action.hpp>
 #include <utility>
+#include "openscenario_interpreter/syntax/storyboard_element.hpp"
 
 namespace openscenario_interpreter
 {
@@ -51,6 +52,19 @@ struct GlobalAction : public Element
         std::make_pair(       "TrafficAction", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
+  }
+
+  bool is_complete_immediately() const
+  {
+#define BOILERPLATE(TYPE)                        \
+  if (is<TYPE>()) {                              \
+    return as<TYPE>().is_complete_immediately(); \
+  }
+    BOILERPLATE(EntityAction)
+    BOILERPLATE(ParameterAction)
+    BOILERPLATE(InfrastructureAction)
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
+#undef BOILERPLATE
   }
 };
 }  // namespace syntax

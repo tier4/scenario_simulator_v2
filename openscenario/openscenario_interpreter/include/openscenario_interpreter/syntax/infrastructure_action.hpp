@@ -39,6 +39,8 @@ struct InfrastructureAction : public ComplexType
       readElement<TrafficSignalAction>("TrafficSignalAction", std::forward<decltype(xs)>(xs)...))
   {
   }
+
+  static constexpr std::true_type is_complete_immediately{};
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

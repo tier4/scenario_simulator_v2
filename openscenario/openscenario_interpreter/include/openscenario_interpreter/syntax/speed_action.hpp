@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/transition_dynamics.hpp>
 #include <unordered_map>
+#include "openscenario_interpreter/syntax/dynamics_shape.hpp"
 
 namespace openscenario_interpreter
 {
@@ -51,6 +52,8 @@ struct SpeedAction
       readElement<TransitionDynamics>("SpeedActionDynamics", node, inner_scope)),
     speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
   {
+    is_complete_immediately_ = speed_action_target.is<AbsoluteTargetSpeed>() and
+                               speed_action_dynamics.dynamics_shape == DynamicsShape::step;
   }
 
   std::unordered_map<String, Boolean> accomplishments;
@@ -65,7 +68,6 @@ struct SpeedAction
 
   decltype(auto) operator()(const Scope::Actor & actor)
   {
-    //<<<<<<< HEAD
     std::function<double()> calc_absolute_target_speed;
     std::function<bool(const Scope::Actor &)> is_end;
     std::tie(calc_absolute_target_speed, is_end) = speed_action_target();
@@ -122,8 +124,11 @@ struct SpeedAction
     return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
   }
 
+  bool is_complete_immediately() const { return is_complete_immediately_; }
+
 private:
   std::function<bool(const Scope::Actor &)> check;
+  bool is_complete_immediately_;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

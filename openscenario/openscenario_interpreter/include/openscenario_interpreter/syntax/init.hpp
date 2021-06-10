@@ -37,6 +37,8 @@ struct Init : public InitActions
   : InitActions(readElement<InitActions>("Actions", node, scope))
   {
   }
+
+  using InitActions::is_complete_immediately;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

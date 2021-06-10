@@ -125,15 +125,52 @@ OpenSCENARIO:
                     SpeedActionDynamics:
                       dynamicsDimension: time
                       value: 0
-                      dynamicsShape: linear
+                      dynamicsShape: step
                     SpeedActionTarget:
-                      RelativeTargetSpeed: {entityRef: ego, value: 0.0, speedTargetValueType: delta, continuous: true }
+                      AbsoluteTargetSpeed:
+                        value: 0
 
     Story:
       - name: ''
         Act:
           - name: _EndCondition
             ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: npc
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              LongitudinalAction:
+                                SpeedAction:
+                                  SpeedActionDynamics:
+                                    dynamicsDimension: time
+                                    value: 0
+                                    dynamicsShape: step
+                                  SpeedActionTarget:
+                                    RelativeTargetSpeed:
+                                      entityRef: ego
+                                      value: 0
+                                      speedTargetValueType: delta
+                                      continuous: true
               - maximumExecutionCount: 1
                 name: ''
                 Actors:

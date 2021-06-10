@@ -68,6 +68,8 @@ struct AssignRouteAction
       (*this)(actor);
     }
   }
+
+  static constexpr std::true_type is_complete_immediately{};
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -89,6 +89,8 @@ struct LaneChangeAction
       throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
     }
   }
+
+  static constexpr std::false_type is_complete_immediately{};
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
