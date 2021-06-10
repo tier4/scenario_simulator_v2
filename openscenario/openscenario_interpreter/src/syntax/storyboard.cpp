@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#include <iomanip>
+#include <openscenario_interpreter/syntax/storyboard.hpp>
+#include <openscenario_interpreter/utility/indent.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const ScenarioDefinition & datum)
+std::ostream & operator<<(std::ostream & os, const Storyboard & datum)
 {
-  return os << datum.storyboard;
+  os << indent << std::quoted("Storyboard") << ": {\n";
+
+  return os << (--indent) << "}";
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

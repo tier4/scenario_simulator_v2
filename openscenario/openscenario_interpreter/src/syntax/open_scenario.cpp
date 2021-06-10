@@ -23,15 +23,22 @@ inline namespace syntax
 std::ostream & operator<<(std::ostream & os, const OpenScenario & datum)
 {
   os << "{\n";
-  os << (++indent) << std::quoted("version") << ": " << std::quoted("1.0") << ",\n";
+
+  ++indent;
+
+  os << indent << std::quoted("version") << ": " << std::quoted("1.0") << ",\n";
+  os << indent << std::quoted("OpenSCENARIO") << ": {\n";
+
+  ++indent;
 
   if (datum.category.is<ScenarioDefinition>()) {
-    os << indent << datum.category.as<ScenarioDefinition>() << "\n";
+    os << datum.category.as<ScenarioDefinition>() << "\n";
   } else {
     os;
   }
 
-  return os << (--indent) << "}";
+  return os << (--indent) << "}\n"  //
+            << (--indent) << "}";
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -55,7 +55,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     });
   }
 
-  const std::true_type ready{};
+  static constexpr auto ready() noexcept { return true; }
 
   void start()
   {
@@ -119,6 +119,8 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     }
   }
 };
+
+std::ostream & operator<<(std::ostream &, const Storyboard &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
