@@ -10,7 +10,8 @@
 - Remove unused packages (joy_to_vehicle_cmd, scenario_runner_mock)
 - Fix problems when simulator running in 30 FPS and with 10 FPS sensors
 - Enable caching routing reslut, and center points and it' spline, lanelet length in hdmap_utils class
-- Updated interpreter to access TrafficSignals from Action / Condition
+- Update interpreter to access TrafficSignals from Action / Condition
+- Update EgoEntity to use precise simulation model parameters
 
 ## Ver 0.0.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.0.1) on Github :fa-github:
