@@ -40,6 +40,7 @@
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 #include <unordered_map>
@@ -78,7 +79,7 @@ public:
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
-  double getLaneletLength(std::int64_t lanelet_id) const;
+  double getLaneletLength(std::int64_t lanelet_id);
   bool isInLanelet(std::int64_t lanelet_id, double s);
   boost::optional<double> getLongitudinalDistance(
     openscenario_msgs::msg::LaneletPose from, openscenario_msgs::msg::LaneletPose to);
@@ -94,6 +95,8 @@ public:
   std::vector<std::int64_t> getPreviousLanelets(std::int64_t lanelet_id, double distance = 100);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::vector<std::int64_t> lanelet_ids);
+  std::shared_ptr<traffic_simulator::math::CatmullRomSpline> getCenterPointsSpline(
+    std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
     std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids,
     double foward_distance = 20);
@@ -133,6 +136,9 @@ public:
     const std::vector<std::int64_t> & route_lanelets) const;
 
 private:
+  RouteCache route_cache_;
+  CenterPointsCache center_points_cache_;
+  LaneletLengthCache lanelet_length_cache_;
   lanelet::AutowareTrafficLightConstPtr getTrafficLight(const std::int64_t traffic_light_id) const;
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLaneletsWithDistance(
     const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[]);

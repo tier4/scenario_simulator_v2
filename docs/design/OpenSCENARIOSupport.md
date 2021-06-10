@@ -12,7 +12,7 @@ If you want to know about OpenSCENARIO, refer to the link below.
 
 ### ROS 2 Launch-like substitution syntax
 
-Our interpreter supports some of the substitution syntax of [the ROS 2 Launch system](https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration) (a.k.a string-interpolation).
+Our interpreter supports some substitution syntax of [the ROS 2 Launch system](https://design.ros2.org/articles/roslaunch_xml.html#dynamic-configuration) (a.k.a. string-interpolation).
 The substitution syntax works with any attribute string in OpenSCENARIO XML.
 
 This substitution is done only once when reading the attribute.
@@ -78,7 +78,7 @@ This Action is specified in the standard as follows.
 > Used to either issue a command to the simulation environment or start an external script. Allows the user to activate custom actions in their simulation tool.
 
 For OpenSCENARIO interpreters implemented in scripting languages such as Python, this Action is often implemented as a call to an external script file written in the same language as the host language.
-However, our interpreter is implemented in C ++ and we cannot simply implement such a feature.
+However, our interpreter is implemented in C++ and we cannot simply implement such a feature.
 Therefore, our interpreter treats the string given in CustomCommandAction.type as a command and executes it on a subprocess, as `sh` does.
 
 For example, the `echo` command can be written as follows:
@@ -221,7 +221,7 @@ OpenSCENARIO standards.
 ### SpeedAction
 
 - The implementation of type [TransitionDynamics](#transitiondynamics) for element `SpeedActionDynamics` is incomplete and
-  **SpeedActionDynamics.dynamicsDimention is ignored**.
+  **SpeedActionDynamics.dynamicsDimension is ignored**.
 
 ### LaneChangeAction
 
@@ -274,7 +274,7 @@ See also section [Scoping](#scoping).
 |:------------------|:--------------------------------|:------:
 | dynamicsShape     | [DynamicsShape](#dynamicsshape) | Incomplete
 | value             | Double                          | ✔
-| dynamicsDimention | DynamicsDimension               | ✔
+| dynamicsDimension | DynamicsDimension               | ✔
 
 ### DynamicsShape
 

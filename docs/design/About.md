@@ -20,7 +20,7 @@ If you want to know how to connect your simulator with this testing framework, p
 ## Autoware API
 If you want to know how we can send command to the Autoware via simulator, please read [this documentation](AutowareAPI.md).
 
-## Systen Architecture
+## System Architecture
 If you want to know whole system architecture of this framework, please read [this documentation](SystemArchitecture.md).
 
 ## TierIV Scenario Format Version 2.0

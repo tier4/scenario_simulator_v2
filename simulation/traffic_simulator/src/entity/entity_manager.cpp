@@ -100,7 +100,7 @@ bool EntityManager::checkCollision(const std::string & name0, const std::string 
   }
   auto status0 = getEntityStatus(name0);
   if (!status0) {
-    THROW_SEMANTIC_ERROR("eneity : ", name0, " status does not exist.");
+    THROW_SEMANTIC_ERROR("entity : ", name0, " status does not exist.");
   }
   auto status1 = getEntityStatus(name1);
   if (!status1) {
@@ -561,22 +561,27 @@ auto EntityManager::toMapPose(const openscenario_msgs::msg::LaneletPose & lanele
   return hdmap_utils_ptr_->toMapPose(lanelet_pose).pose;
 }
 
-void EntityManager::updateEgo(const double current_time, const double step_time) {}
-
-boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> EntityManager::getEgoVehicleCommand()
+openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
+  const std::string & name,
+  const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list)
 {
-  return boost::none;
+  if (verbose_) {
+    std::cout << "update " << name << " behavior" << std::endl;
+  }
+  entities_[name]->setEntityTypeList(type_list);
+  entities_[name]->onUpdate(current_time_, step_time_);
+  if (entities_[name]->statusSet()) {
+    return entities_[name]->getStatus();
+  }
+  THROW_SIMULATION_ERROR("status of entity ", name, "is empty");
 }
 
-void EntityManager::updateNpc(const double current_time, const double step_time)
+void EntityManager::update(const double current_time, const double step_time)
 {
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
   current_time_ = current_time;
-  if (current_time_ >= 0) {
-    traffic_light_manager_ptr_->update(step_time_);
-  }
   if (verbose_) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
     std::cout << "current_time : " << current_time_ << std::endl;
@@ -584,18 +589,17 @@ void EntityManager::updateNpc(const double current_time, const double step_time)
   if (getNumberOfEgo() >= 2) {
     THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
   }
+  if (current_time_ >= 0) {
+    traffic_light_manager_ptr_->update(step_time_);
+  }
   setVerbose(verbose_);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    if (verbose_) {
-      std::cout << "update " << it->first << " behavior" << std::endl;
-    }
-    it->second->setEntityTypeList(type_list);
-    it->second->onUpdate(current_time, step_time);
-    if (it->second->statusSet()) {
-      auto status = it->second->getStatus();
-      all_status.emplace(it->first, status);
+  const std::vector<std::string> entity_names = getEntityNames();
+  for (const auto & entity_name : entity_names) {
+    if (entities_[entity_name]->statusSet()) {
+      const auto status = updateNpcLogic(entity_name, type_list);
+      all_status.emplace(entity_name, status);
     }
   }
   for (auto it = entities_.begin(); it != entities_.end(); it++) {

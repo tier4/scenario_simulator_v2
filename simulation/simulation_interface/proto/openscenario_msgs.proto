@@ -5,7 +5,7 @@ import "geometry_msgs.proto";
 package openscenario_msgs;
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/ActionStatus type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/ActionStatus type in ROS2.
 **/
 message ActionStatus
 {
@@ -16,7 +16,7 @@ message ActionStatus
 
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/BoundingBox type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/BoundingBox type in ROS2.
 **/
 message BoundingBox
 {
@@ -25,7 +25,7 @@ message BoundingBox
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/LaneletPose type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/LaneletPose type in ROS2.
 **/
 message LaneletPose
 {
@@ -36,7 +36,7 @@ message LaneletPose
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/EntityType type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/EntityType type in ROS2.
 **/
 enum EntityType
 {
@@ -46,7 +46,7 @@ enum EntityType
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/EntityStatus type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/EntityStatus type in ROS2.
 **/
 message EntityStatus
 {
@@ -61,7 +61,7 @@ message EntityStatus
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/Performance type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/Performance type in ROS2.
 **/
 message Performance
 {
@@ -71,7 +71,7 @@ message Performance
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/Axle type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/Axle type in ROS2.
 **/
 message Axle
 {
@@ -83,7 +83,7 @@ message Axle
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/Axles type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/Axles type in ROS2.
 **/
 message Axles
 {
@@ -92,14 +92,14 @@ message Axles
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/Property type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/Property type in ROS2.
 **/
 message Property
 {
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/VehicleParameters type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/VehicleParameters type in ROS2.
 **/
 message VehicleParameters
 {
@@ -112,7 +112,7 @@ message VehicleParameters
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/PedestrianParameters type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/PedestrianParameters type in ROS2.
 **/
 message PedestrianParameters
 {
@@ -122,7 +122,7 @@ message PedestrianParameters
 }
 
 /**
- * Protobuf definiciton of openscenario_msgs/msg/Waypoints type in ROS2.
+ * Protobuf definition of openscenario_msgs/msg/Waypoints type in ROS2.
 **/
 message Waypoints
 {

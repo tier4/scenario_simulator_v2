@@ -44,7 +44,7 @@ You can add an Act which describes a motion of the pedestrian by following steps
    - Input "Sample act" in "Act name"
    - Select "Pedestrian0" in "Actors"
    - Select "SimulationTime" in "Condition"
-   - Select "gt" in "Rule" and input "0" in ”Value"
+   - Select "gt" in "Rule" and input "0" in "Value"
 3. Click "OK" button.
 
 A new act is added and "Act0" tab is displayed in the bottom left window.
@@ -58,9 +58,9 @@ You can add an Event which describes a condition of the pedestrian's motion star
 1. Click "Act0" tab in the bottom left window.
 2. Click "+" icon on the left of the "New event".
 3. Input data in the displayed dialog. (Refer the figure below.)
-   - Input ”Sample event" in "Event name"
+   - Input "Sample event" in "Event name"
    - Select "ReachPosition" in "Condition"
-   - Select "/Point/Point0/position" in ”Position", "Ego" in "Trigger" and input 1 in "Tolerance".
+   - Select "/Point/Point0/position" in "Position", "Ego" in "Trigger" and input 1 in "Tolerance".
 4. Click "OK" button.
 
 ![](screenshot07.png)
@@ -70,7 +70,7 @@ You can add an Event which describes a condition of the pedestrian's motion star
 You can add an Action which changes the velocity of the pedestrian by following steps.
 
 1. Click "Act0" tab in the bottom left window.
-2. Click "+" icon on the left of the ”New action".
+2. Click "+" icon on the left of the "New action".
 3. Input data in the displayed dialog. (Refer the figure below.)
    - Select "Speed" in "Action"
    - Input 1 in "Value"
@@ -88,4 +88,4 @@ You can export a scenario file by following steps.
 
 The edited scenario is exported as a file. You can execute a simulator using the file.
 
-<font color="Red">Do not forget!! : Please export scenario in Tier4 format V2.</font>
+<font color="Red">Do not forget!! Please export scenario in TierIV Scenario format V2.</font>

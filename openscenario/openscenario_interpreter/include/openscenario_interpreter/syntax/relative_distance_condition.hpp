@@ -45,7 +45,7 @@ struct RelativeDistanceCondition
 
   /* ---- freespace ------------------------------------------------------------
    *
-   *  True: distance is measured between closest bounding box points.
+   *  True: distance is measured between the closest bounding box points.
    *  False: reference point distance is used.
    *
    * ------------------------------------------------------------------------ */

@@ -26,15 +26,15 @@ inline namespace syntax
 {
 /* ---- GlobalAction -----------------------------------------------------------
  *
- * <xsd:complexType name="GlobalAction">
- *   <xsd:choice>
- *     <xsd:element name="EnvironmentAction" type="EnvironmentAction"/>
- *     <xsd:element name="EntityAction" type="EntityAction"/>
- *     <xsd:element name="ParameterAction" type="ParameterAction"/>
- *     <xsd:element name="InfrastructureAction" type="InfrastructureAction"/>
- *     <xsd:element name="TrafficAction" type="TrafficAction"/>
- *   </xsd:choice>
- * </xsd:complexType>
+ *  <xsd:complexType name="GlobalAction">
+ *    <xsd:choice>
+ *      <xsd:element name="EnvironmentAction" type="EnvironmentAction"/>
+ *      <xsd:element name="EntityAction" type="EntityAction"/>
+ *      <xsd:element name="ParameterAction" type="ParameterAction"/>
+ *      <xsd:element name="InfrastructureAction" type="InfrastructureAction"/>
+ *      <xsd:element name="TrafficAction" type="TrafficAction"/>
+ *    </xsd:choice>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct GlobalAction : public Element

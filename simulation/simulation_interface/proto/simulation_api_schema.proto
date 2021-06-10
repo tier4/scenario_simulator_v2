@@ -135,7 +135,7 @@ message DespawnEntityResponse
 **/
 message UpdateEntityStatusRequest
 {
-    repeated openscenario_msgs.EntityStatus status = 1; // List of updateed entity status in traffic simulator.
+    repeated openscenario_msgs.EntityStatus status = 1; // List of updated entity status in traffic simulator.
 }
 
 /**

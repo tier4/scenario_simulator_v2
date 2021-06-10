@@ -114,16 +114,7 @@ struct ScenarioObject
   }
 };
 
-std::ostream & operator<<(std::ostream & os, const ScenarioObject & datum)
-{
-  // clang-format off
-
-  return os << (indent++) << blue << "<ScenarioObject " << highlight("name", datum.name) << blue << ">\n" << reset
-            << static_cast<const EntityObject &>(datum) << "\n"
-            << (--indent) << blue << "</ScenarioObject>" << reset;
-
-  // clang-format on
-}
+std::ostream & operator<<(std::ostream &, const ScenarioObject &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

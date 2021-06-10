@@ -59,7 +59,7 @@ auto substitute(std::string attribute, Scope & scope)
            }
          }},
 
-        {"dirname", [](auto &&, auto && scope) { return scope.scenario.parent_path().string(); }}};
+        {"dirname", [](auto &&, auto && scope) { return scope.pathname.parent_path().string(); }}};
 
     const auto iter{substitutions.find(match.str(3))};
 

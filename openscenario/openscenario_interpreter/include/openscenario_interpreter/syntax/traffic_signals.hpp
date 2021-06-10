@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <vector>
 
@@ -42,6 +43,13 @@ struct TrafficSignals
   : traffic_signal_controllers(
       readElements<TrafficSignalController, 0>("TrafficSignalController", node, outer_scope))
   {
+    for (auto & each : traffic_signal_controllers) {
+      const auto result = outer_scope.traffic_signal_controller_refs.emplace(each.name, each);
+      if (not result.second) {
+        throw SyntaxError(
+          "Multiple TrafficSignalControllers have been declared with the same name: ", each.name);
+      }
+    }
   }
 
   auto evaluate()
