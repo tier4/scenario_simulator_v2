@@ -134,6 +134,8 @@ message UpdateEntityStatusRequest {
   bool vehicle_command_is_empty = 3; // If True, vehicle command is empty
   openscenario_msgs.EntityStatus ego_entity_status_before_update =
       4; // Entity status of ego entity before runnig vehicle model
+  bool ego_entity_status_before_update_is_empty =
+      5; // If True,ego entity status before update is empty.
 }
 
 /**

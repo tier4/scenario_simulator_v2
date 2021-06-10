@@ -336,8 +336,23 @@ public:
   {
     return ego_entity_status_before_update_;
   }
-  boost::optional<openscenario_msgs::msg::EntityStatus> ego_entity_status_before_update_;
-  boost::optional<autoware_vehicle_msgs::msg::VehicleCommand> getEgoVehicleCommand();
+  boost::optional<openscenario_msgs::msg::EntityStatus ego_entity_status_before_update_;
+  autoware_vehicle_msgs::msg::VehicleCommand getEgoVehicleCommand()
+  {
+    if(isEgoExists()) {
+      try
+      {
+        return entities_.at(getEgoEntityName())->getVehicleCommand();
+      }
+      catch(const std::out_of_range& e)
+      {
+        THROW_SIMULATION_ERROR("Ego entity : ", getEgoEntityName(), " does not exist.");
+      }
+    }
+    else {
+      THROW_SIMULATION_ERROR("Ego vehicle does not exist.");
+    }
+  }
 
   void updateHdmapMarker();
 };
