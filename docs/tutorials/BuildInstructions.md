@@ -38,7 +38,7 @@ sh install_depends.sh
 
 ```bash
 source /opt/ros/foxy/setup.bash
-vcs import src < src/scenario_simulator_v2/dependency.repos
+vcs import src < src/scenario_simulator_v2/dependency_foxy.repos
 rosdep install -iry --from-paths src --rosdistro foxy
 ```
 

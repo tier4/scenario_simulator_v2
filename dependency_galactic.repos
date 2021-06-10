@@ -1,0 +1,16 @@
+repositories:
+  quaternion_operation:
+    type: git
+    url: https://github.com/OUXT-Polaris/quaternion_operation.git
+    version: ros2
+  operational-design-domains:
+    type: git
+    url: https://gitlab.com/autowarefoundation/operational-design-domains
+  autoware:
+    type: git
+    url: https://github.com/tier4/pilot.auto.git
+    version: ros2
+  lanelet2:
+    type: git
+    url: https://github.com/fzi-forschungszentrum-informatik/Lanelet2.git
+    version: master

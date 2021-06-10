@@ -6,7 +6,7 @@ cd "$repository_root"
 
 mkdir -p "$repository_root/external"
 
-vcs import external < dependency.repos
+vcs import external < dependency_foxy.repos
 
 cp -r "$repository_root/external/autoware/awapi/autoware_api_msgs"              "$repository_root/external"
 cp -r "$repository_root/external/autoware/common/msgs/autoware_control_msgs"    "$repository_root/external"

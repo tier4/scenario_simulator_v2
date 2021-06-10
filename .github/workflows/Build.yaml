@@ -35,7 +35,7 @@ jobs:
             simulation_interface,
             traffic_simulator,
           ]
-        rosdistro: [foxy]
+        rosdistro: [foxy, galactic]
     steps:
       - name: Checkout
         uses: actions/checkout@v2-beta
@@ -48,7 +48,7 @@ jobs:
         with:
           package-name: ${{ matrix.package }}
           target-ros2-distro: ${{ matrix.rosdistro }}
-          vcs-repo-file-url: dependency.repos
+          vcs-repo-file-url: dependency_${{ matrix.rosdistro }}.repos
           colcon-defaults: |
             {
               "build": {
