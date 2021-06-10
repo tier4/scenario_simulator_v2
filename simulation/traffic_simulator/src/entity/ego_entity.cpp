@@ -87,6 +87,8 @@ EgoEntity::EgoEntity(
       "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
         "/planning_simulator_v2.rviz",
       "scenario_simulation:=true"));
+
+  DEBUG_VALUE(getParameter<double>("vel_lim", 50.0));
 }
 
 EgoEntity::~EgoEntity() { autowares.erase(name); }
