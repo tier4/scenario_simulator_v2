@@ -448,7 +448,7 @@ std::vector<std::int64_t> HdMapUtils::getRoute(
 std::shared_ptr<traffic_simulator::math::CatmullRomSpline> HdMapUtils::getCenterPointsSpline(
   std::int64_t lanelet_id)
 {
-  const auto center_points = getCenterPoints(lanelet_id);
+  getCenterPoints(lanelet_id);
   return center_points_cache_.getCenterPointsSpline(lanelet_id);
 }
 

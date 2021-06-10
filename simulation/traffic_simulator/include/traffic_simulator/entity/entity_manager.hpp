@@ -40,7 +40,6 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <traffic_simulator/util/parallel.hpp>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>

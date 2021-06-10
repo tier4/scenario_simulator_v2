@@ -586,9 +586,6 @@ void EntityManager::update(const double current_time, const double step_time)
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
-  std::unordered_map<
-    std::string, std::shared_ptr<std::future<openscenario_msgs::msg::EntityStatus>>>
-    futures;
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
       const auto status = updateNpcLogic(entity_name, type_list);

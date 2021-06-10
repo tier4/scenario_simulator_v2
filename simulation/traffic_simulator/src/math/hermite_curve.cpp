@@ -37,9 +37,9 @@ HermiteCurve::HermiteCurve(
   az_(az),
   bz_(bz),
   cz_(cz),
-  dz_(dz)
+  dz_(dz),
+  length_(getLength(100))
 {
-  length_ = getLength(100);
 }
 
 HermiteCurve::HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve)
@@ -54,9 +54,9 @@ HermiteCurve::HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve)
   az_(curve.ax),
   bz_(curve.bz),
   cz_(curve.cz),
-  dz_(curve.dz)
+  dz_(curve.dz),
+  length_(getLength(100))
 {
-  length_ = getLength(100);
 }
 
 HermiteCurve::HermiteCurve(
