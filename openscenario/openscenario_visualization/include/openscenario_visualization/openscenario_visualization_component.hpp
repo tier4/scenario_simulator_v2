@@ -86,7 +86,7 @@ public:
 private:
   /**
    * @brief callback function when subscribe entity status array.
-   * @param msg entity status array message from openscenario interpretor.
+   * @param msg entity status array message from openscenario interpreter.
    */
   void entityStatusCallback(
     const openscenario_msgs::msg::EntityStatusWithTrajectoryArray::SharedPtr msg);

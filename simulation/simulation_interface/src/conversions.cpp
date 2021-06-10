@@ -258,7 +258,7 @@ void toProto(const openscenario_msgs::msg::EntityType & type, openscenario_msgs:
     proto = openscenario_msgs::EntityType::PEDESTRIAN;
     return;
   }
-  std::string message = "type of the Entity Type is inavlid!\ntype is " + std::to_string(type.type);
+  std::string message = "type of the Entity Type is invalid!\ntype is " + std::to_string(type.type);
   THROW_SIMULATION_ERROR(message);
 }
 
@@ -276,7 +276,7 @@ void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::
     type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
     return;
   }
-  std::string message = "type of the Entity Type is inavlid!";
+  std::string message = "type of the Entity Type is invalid!";
   THROW_SIMULATION_ERROR(message);
 }
 

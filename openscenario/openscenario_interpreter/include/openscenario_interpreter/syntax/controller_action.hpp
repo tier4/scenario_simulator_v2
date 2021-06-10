@@ -59,7 +59,7 @@ struct ControllerAction
   : assignController(
       readElement<AssignControllerAction>("AssignControllerAction", node, outer_scope)),
     override_controller_value_action(readElement<OverrideControllerValueAction>(
-      "OverrideControllerValueAction", node, outer_scope))  // NOTE: DUMMY IMPLEMENTAION
+      "OverrideControllerValueAction", node, outer_scope))  // NOTE: DUMMY IMPLEMENTATION
   {
   }
 
