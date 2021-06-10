@@ -47,7 +47,7 @@ struct AbsoluteTargetSpeed
           const auto compare = Rule(Rule::equalTo);
           return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);
         } catch (const SemanticError &) {
-          return false; // NOTE: The actor is maybe lane-changing now
+          return false;  // NOTE: The actor is maybe lane-changing now
         }
       });
   }
