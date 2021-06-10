@@ -431,9 +431,8 @@ auto EntityManager::getWaypoints(const std::string & name) -> openscenario_msgs:
 bool EntityManager::isEgoExists() const
 {
   const auto entity_names = getEntityNames();
-  for(const auto entity_name : entity_names)
-  {
-    if(isEgo(entity_name)) {
+  for (const auto entity_name : entity_names) {
+    if (isEgo(entity_name)) {
       return true;
     }
   }
@@ -605,10 +604,9 @@ void EntityManager::update(const double current_time, const double step_time)
     traffic_light_manager_ptr_->update(step_time_);
   }
   setVerbose(verbose_);
-  if(isEgoExists()) {
+  if (isEgoExists()) {
     ego_entity_status_before_update_ = getEntityStatus(getEgoEntityName());
-  }
-  else {
+  } else {
     ego_entity_status_before_update_ = boost::none;
   }
   auto type_list = getEntityTypeList();

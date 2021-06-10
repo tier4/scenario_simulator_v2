@@ -355,6 +355,5 @@ bool API::updateFrame()
   clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
   metrics_manager_.calculate();
   return true;
-
 }
 }  // namespace traffic_simulator
