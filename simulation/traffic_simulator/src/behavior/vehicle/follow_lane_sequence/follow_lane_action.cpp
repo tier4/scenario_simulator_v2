@@ -16,6 +16,7 @@
 #include <string>
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <vector>
 
@@ -73,6 +74,7 @@ BT::NodeStatus FollowLaneAction::tick()
     setOutput("updated_status", stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }
+  const auto waypoints = calculateWaypoints();
   if (driver_model.see_around) {
     if (getRightOfWayEntities(route_lanelets).size() != 0) {
       return BT::NodeStatus::FAILURE;
@@ -85,7 +87,6 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    const auto waypoints = calculateWaypoints();
     const auto distance_to_traffic_stop_line =
       getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);
     if (distance_to_traffic_stop_line) {
@@ -111,13 +112,11 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
   }
-
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   auto updated_status = calculateEntityStatusUpdated(target_speed.get());
   setOutput("updated_status", updated_status);
-  const auto waypoints = calculateWaypoints();
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

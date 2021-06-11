@@ -51,7 +51,7 @@ struct Scope
 
   /* ---- GLOBAL ------------------------------------------------------------ */
 
-  const boost::filesystem::path pathname;  // for substituation syntax '$(dirname)'
+  const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
   boost::filesystem::path logic_file;  // NOTE: Assigned by RoadNetwork's constructor.
 

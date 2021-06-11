@@ -38,7 +38,7 @@ void SimulationClock::initialize(double initial_simulation_time, double step_tim
 void SimulationClock::update()
 {
   if (!initialized_) {
-    THROW_SIMULATION_ERROR("SimulationClock does not initialized yet.");
+    THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
   }
   current_simulation_time_ = current_simulation_time_ + step_time_;
 }
@@ -53,7 +53,7 @@ const rosgraph_msgs::msg::Clock SimulationClock::getCurrentRosTimeAsMsg()
 const rclcpp::Time SimulationClock::getCurrentRosTime()
 {
   if (!initialized_) {
-    THROW_SIMULATION_ERROR("SimulationClock does not initialized yet.");
+    THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
   }
   if (use_raw_clock) {
     return now();

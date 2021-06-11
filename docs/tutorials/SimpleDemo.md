@@ -13,7 +13,7 @@ Only you have to do is type this command in your terminal.
 ros2 launch traffic_simulator mock_test.launch.py
 ```
 
-You can see ego vehicle runnig in kashiwanoha.
+You can see ego vehicle running in kashiwanoha.
 
 ![Simple Demo](../image/simple_demo.png "simple demo")
 

@@ -33,7 +33,7 @@ void MomentaryStopMetric::update()
       distance = entity_manager_ptr_->getDistanceToCrosswalk(target_entity, stop_target_lanelet_id);
       break;
     default:
-      THROW_SIMULATION_ERROR("invalid lanlet type.");
+      THROW_SIMULATION_ERROR("invalid lanelet type.");
       break;
   }
   if (!distance) {
@@ -76,7 +76,7 @@ bool MomentaryStopMetric::activateTrigger()
       distance = entity_manager_ptr_->getDistanceToCrosswalk(target_entity, stop_target_lanelet_id);
       break;
     default:
-      THROW_SIMULATION_ERROR("invalid lanlet type.");
+      THROW_SIMULATION_ERROR("invalid lanelet type.");
       break;
   }
   if (!distance) {

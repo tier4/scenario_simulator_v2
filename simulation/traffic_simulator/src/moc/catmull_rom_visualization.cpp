@@ -72,7 +72,7 @@ private:
     marker.points = spline.getTrajectory(100);
     marker.type = marker.LINE_STRIP;
     marker.color = color_utils::makeColorMsg("red", 0.99);
-    marker.ns = "spiline";
+    marker.ns = "spline";
     marker.id = 0;
     marker.scale.x = 0.01;
     marker.scale.y = 0.01;

@@ -36,8 +36,8 @@ BOILERPLATE("[1m", bold);
 BOILERPLATE("[2m", faint);
 BOILERPLATE("[3m", italic);  // Not widely supported. Sometimes treated as inverse.
 BOILERPLATE("[4m", underline);
-BOILERPLATE("[5m", slow_blink);   // Less than 150 per minite.
-BOILERPLATE("[6m", rapid_blink);  // More than 150 per minite. Not widely supported.
+BOILERPLATE("[5m", slow_blink);   // Less than 150 per minute.
+BOILERPLATE("[6m", rapid_blink);  // More than 150 per minute. Not widely supported.
 BOILERPLATE("[7m", reverse);
 BOILERPLATE("[8m", conceal);  // Not widely supported.
 

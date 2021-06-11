@@ -37,7 +37,8 @@ HermiteCurve::HermiteCurve(
   az_(az),
   bz_(bz),
   cz_(cz),
-  dz_(dz)
+  dz_(dz),
+  length_(getLength(100))
 {
 }
 
@@ -53,7 +54,8 @@ HermiteCurve::HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve)
   az_(curve.ax),
   bz_(curve.bz),
   cz_(curve.cz),
-  dz_(curve.dz)
+  dz_(curve.dz),
+  length_(getLength(100))
 {
 }
 
@@ -75,6 +77,7 @@ HermiteCurve::HermiteCurve(
   bz_ = -3 * start_pose.position.z + 3 * goal_pose.position.z - 2 * start_vec.z - goal_vec.z;
   cz_ = start_vec.z;
   dz_ = start_pose.position.z;
+  length_ = getLength(100);
 }
 
 const openscenario_msgs::msg::HermiteCurve HermiteCurve::toRosMsg() const
@@ -338,10 +341,13 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale) const
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
-double HermiteCurve::getMaximu2DCurvature() const
+double HermiteCurve::getMaximum2DCurvature() const
 {
   std::vector<double> curvatures;
-  for (double s = 0; s <= 1; s = s + 0.01) {
+  /**
+   * @brief 0.1 is a sampling resolution of the curvature
+   */
+  for (double s = 0; s <= 1; s = s + 0.1) {
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }

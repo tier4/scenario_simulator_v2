@@ -164,7 +164,7 @@
               </StartTrigger>
             </Event>
 
-            <Event name="seqeunce-2-of-3" priority="overwrite">
+            <Event name="sequence-2-of-3" priority="overwrite">
               <Action name="accelerate">
                 <PrivateAction>
                   <LongitudinalAction>

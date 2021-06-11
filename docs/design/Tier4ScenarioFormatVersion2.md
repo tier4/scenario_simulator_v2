@@ -3,7 +3,7 @@
 ### What is TierIV Scenario Format version 2.0
 The "TierIV Scenario format version 2.0" is a yaml-based scenario description format.
 
-"TierIV Scenario format version 2.0" consisting of two blocks below.  
+"TierIV Scenario format version 2.0" consists of two blocks below.  
 
 ```yaml
 ScenarioModifiers:
@@ -29,12 +29,12 @@ OpenSCENARIO:
 #### ScenarioModifiers Block  
 This block provides features to provide parameter distribution.
 
-The parameter, "name" express a variable It is not case sensitive, but attributes must be a lower snake case and it converts to a variable in its list during parameter distribution.
-See more details in test folder in scenario_test_runner package.
-Three parameters, "start", "stop" and "step" express its varied range.
+The parameter "name" expresses a variable. It is not case-sensitive, but its attributes must be the lower snake case and it is converted to a variable in its list during parameter distribution.
+You can find more details in the test folder of the scenario_test_runner package.
+Three parameters, "start", "stop" and "step" express theirs varied ranges.
 Initial parameter distribution is from start to finish while increasing a value.
 
-We can define parameter distributions like below
+We can define parameter distributions like below.
 ```yaml
 ScenarioModifiers:
   ScenarioModifier:
@@ -58,5 +58,5 @@ attention
 #### OpenSCENARIO Block  
 This block is a pure yaml conversion of the OpenSCENARIO xml file.
 
-The OpenSCENARIO user guide is [here.](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_foreword)
+The OpenSCENARIO user guide is [here](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_foreword).
 

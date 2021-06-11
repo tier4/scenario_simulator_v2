@@ -229,7 +229,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   }
   for (const auto & curve : curves_) {
     length_list_.emplace_back(curve.getLength());
-    maximum_2d_curvatures_.emplace_back(curve.getMaximu2DCurvature());
+    maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
   }
   total_length_ = 0;
   for (const auto & length : length_list_) {

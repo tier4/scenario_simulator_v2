@@ -74,7 +74,7 @@ class LifecycleController(Node):
         real_time_factor: float,
         scenario: Path,
     ):
-        """Send request to change scenario interperter's parameters."""
+        """Send request to change scenario interpreter's parameters."""
         request = rcl_interfaces.srv.SetParameters.Request()
 
         request.parameters = [
@@ -123,7 +123,7 @@ class LifecycleController(Node):
         real_time_factor: float,
         scenario: str,
     ):
-        """Configure node to chagnge state from unconfigure to inactive."""
+        """Configure node to change state from unconfigure to inactive."""
         self.current_scenario = scenario
 
         while not self.send_request_to_change_parameters(
@@ -152,7 +152,7 @@ class LifecycleController(Node):
             )
 
     def activate_node(self):
-        """Activate node to chagnge state from inactive to activate."""
+        """Activate node to change state from inactive to activate."""
         self.get_logger().info("\x1b[33mActivate interpreter.\x1b[0m")
         state_expects = "inactive"
         if self.get_lifecycle_state() == state_expects:
@@ -167,8 +167,8 @@ class LifecycleController(Node):
             )
 
     def deactivate_node(self):
-        """Dectivate node to chagnge state from active to inactive."""
-        self.get_logger().info("\x1b[33mDectivate interpreter.\x1b[0m")
+        """Deactivate node to change state from active to inactive."""
+        self.get_logger().info("\x1b[33mDeactivate interpreter.\x1b[0m")
         state_expects = "active"
         if self.get_lifecycle_state() == state_expects:
             self.set_lifecycle_state(Transition.TRANSITION_DEACTIVATE)

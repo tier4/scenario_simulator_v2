@@ -40,7 +40,7 @@ inline namespace syntax
  *  </xsd:simpleType>
  *
  *  Tier IV Extension:
- *    - Add enumuration <xsd.enumeration value="sticky"/>
+ *    - Add enumeration <xsd.enumeration value="sticky"/>
  *
  * -------------------------------------------------------------------------- */
 struct ConditionEdge

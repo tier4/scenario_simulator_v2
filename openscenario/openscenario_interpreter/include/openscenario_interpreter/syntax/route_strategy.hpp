@@ -45,7 +45,7 @@ struct RouteStrategy
   enum value_type {
     shortest,            // Shortest route.
     fastest,             // Fastest route.
-    leastIntersections,  // Route with least number of intersections.
+    leastIntersections,  // Route with the least number of intersections.
     random,              // Random route.
   } value;
 

@@ -69,9 +69,17 @@ void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> & status)
 {
   other_status_.clear();
-  for (const auto & each : status) {
-    if (each.first != name) {
-      other_status_.insert(each);
+  if (status_) {
+    for (const auto & each : status) {
+      if (each.first != name) {
+        const auto p0 = each.second.pose.position;
+        const auto p1 = status_.get().pose.position;
+        double distance =
+          std::sqrt(std::pow(p0.x - p1.x, 2) + std::pow(p0.y - p1.y, 2) + std::pow(p0.z - p1.z, 2));
+        if (distance < 30) {
+          other_status_.insert(each);
+        }
+      }
     }
   }
 }
