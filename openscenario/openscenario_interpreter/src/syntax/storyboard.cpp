@@ -30,6 +30,13 @@ nlohmann::json & operator<<(nlohmann::json & json, const Storyboard & datum)
 {
   json["state"] = boost::lexical_cast<std::string>(datum.state());
 
+  json["Story"] = nlohmann::json::array();
+
+  for (const auto & each : datum) {
+    nlohmann::json story;
+    json["Story"].push_back(story);
+  }
+
   return json;
 }
 }  // namespace syntax
