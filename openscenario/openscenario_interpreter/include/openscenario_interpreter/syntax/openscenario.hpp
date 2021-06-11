@@ -15,6 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPENSCENARIO_HPP_
 
+#include <cstddef>
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
@@ -44,6 +46,8 @@ struct OpenScenario : public Scope
 
   const OpenScenarioCategory category;
 
+  std::size_t frame;
+
   const auto & load(const boost::filesystem::path & pathname)
   {
     const auto result = script.load_file(pathname.string().c_str());
@@ -59,16 +63,23 @@ struct OpenScenario : public Scope
   explicit OpenScenario(Ts &&... xs)
   : Scope(std::forward<decltype(xs)>(xs)...),
     file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), *this)),
-    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, *this))
+    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, *this)),
+    frame(0)
   {
   }
 
   auto complete() const { return category.as<ScenarioDefinition>().complete(); }
 
-  auto evaluate() { return category.evaluate(); }
+  auto evaluate()
+  {
+    ++frame;
+    return category.evaluate();
+  }
 };
 
-std::ostream & operator<<(std::ostream & os, const OpenScenario &);
+std::ostream & operator<<(std::ostream &, const OpenScenario &);
+
+nlohmann::json & operator<<(nlohmann::json &, const OpenScenario &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

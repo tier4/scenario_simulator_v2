@@ -40,5 +40,13 @@ std::ostream & operator<<(std::ostream & os, const OpenScenario & datum)
   return os << (--indent) << "}\n"  //
             << (--indent) << "}";
 }
+
+nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
+{
+  json["version"] = "1.0";
+  json["frame"] = datum.frame;
+
+  return json;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
