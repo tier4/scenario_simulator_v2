@@ -97,7 +97,7 @@ struct TrafficSignalController
   {
   }
 
-  auto theDurationExeeded() const
+  auto theDurationExceeded() const
   {
     if (not phases.empty()) {
       return (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
@@ -108,7 +108,7 @@ struct TrafficSignalController
 
   auto evaluate()
   {
-    if (theDurationExeeded()) {
+    if (theDurationExceeded()) {
       current_phase_started_at = getCurrentTime();
       return (*++current_phase).evaluate();
     } else {

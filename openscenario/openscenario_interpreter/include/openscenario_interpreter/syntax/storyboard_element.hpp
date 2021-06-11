@@ -127,7 +127,7 @@ protected:
   auto rename(const std::string & name) const
   {
     static std::size_t id = 0;
-    return name.empty() ? std::string("annonymous-") + std::to_string(++id) : name;
+    return name.empty() ? std::string("anonymous-") + std::to_string(++id) : name;
   }
 
   std::unordered_set<std::string> names;
