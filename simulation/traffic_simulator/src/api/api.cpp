@@ -55,7 +55,7 @@ bool API::spawn(
     if (
       !entity_manager_ptr_->entityExists(name) &&
       !entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
-        name, lanelet2_map_osm, clock_.getCurrentSimulationTime(), params)) {
+        name, lanelet2_map_osm, clock_.getStepTime(), params)) {
       return false;
     }
     if (standalone_mode) {

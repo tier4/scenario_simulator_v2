@@ -87,6 +87,19 @@ EgoEntity::EgoEntity(
       "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
         "/planning_simulator_v2.rviz",
       "scenario_simulation:=true"));
+
+  DEBUG_VALUE(getParameter<double>("vel_lim", 50.0));
+  DEBUG_VALUE(getParameter<double>("steer_lim", 1.0));
+  DEBUG_VALUE(getParameter<double>("accel_rate", 10.0));
+  DEBUG_VALUE(getParameter<double>("steer_rate_lim", 5.0));
+  DEBUG_VALUE(getParameter<double>(
+    "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
+  DEBUG_VALUE(step_time);
+  DEBUG_VALUE(getParameter<double>("vel_time_delay", 0.25));
+  DEBUG_VALUE(getParameter<double>("vel_time_constant", 0.5));
+  DEBUG_VALUE(getParameter<double>("steer_time_delay", 0.3));
+  DEBUG_VALUE(getParameter<double>("steer_time_constant", 0.3));
+  DEBUG_VALUE(getParameter<double>("deadzone_delta_steer", 0.0));
 }
 
 EgoEntity::~EgoEntity() { autowares.erase(name); }
