@@ -14,7 +14,6 @@
 
 #include <iomanip>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
-#include <openscenario_interpreter/utility/indent.hpp>
 
 namespace openscenario_interpreter
 {
@@ -22,29 +21,20 @@ inline namespace syntax
 {
 std::ostream & operator<<(std::ostream & os, const OpenScenario & datum)
 {
-  os << "{\n";
+  nlohmann::json json;
 
-  ++indent;
-
-  os << indent << std::quoted("version") << ": " << std::quoted("1.0") << ",\n";
-  os << indent << std::quoted("OpenSCENARIO") << ": {\n";
-
-  ++indent;
-
-  if (datum.category.is<ScenarioDefinition>()) {
-    os << datum.category.as<ScenarioDefinition>() << "\n";
-  } else {
-    os;
-  }
-
-  return os << (--indent) << "}\n"  //
-            << (--indent) << "}";
+  return os << (json << datum).dump(2);
 }
 
 nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
 {
   json["version"] = "1.0";
+
   json["frame"] = datum.frame;
+
+  if (datum.category.is<ScenarioDefinition>()) {
+    json["OpenSCENARIO"] << datum.category.as<ScenarioDefinition>();
+  }
 
   return json;
 }

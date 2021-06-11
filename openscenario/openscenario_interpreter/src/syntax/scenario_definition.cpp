@@ -22,5 +22,12 @@ std::ostream & operator<<(std::ostream & os, const ScenarioDefinition & datum)
 {
   return os << datum.storyboard;
 }
+
+nlohmann::json & operator<<(nlohmann::json & json, const ScenarioDefinition & datum)
+{
+  json["Storyboard"];
+
+  return json;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
