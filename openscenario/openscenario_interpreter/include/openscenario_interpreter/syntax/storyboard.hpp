@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
@@ -121,6 +122,8 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 };
 
 std::ostream & operator<<(std::ostream &, const Storyboard &);
+
+nlohmann::json & operator<<(nlohmann::json &, const Storyboard &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

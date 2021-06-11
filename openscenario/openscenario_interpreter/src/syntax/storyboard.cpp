@@ -14,7 +14,6 @@
 
 #include <iomanip>
 #include <openscenario_interpreter/syntax/storyboard.hpp>
-#include <openscenario_interpreter/utility/indent.hpp>
 
 namespace openscenario_interpreter
 {
@@ -22,9 +21,16 @@ inline namespace syntax
 {
 std::ostream & operator<<(std::ostream & os, const Storyboard & datum)
 {
-  os << indent << std::quoted("Storyboard") << ": {\n";
+  nlohmann::json json;
 
-  return os << (--indent) << "}";
+  return os << (json << datum).dump(2);
+}
+
+nlohmann::json & operator<<(nlohmann::json & json, const Storyboard & datum)
+{
+  json["state"] = boost::lexical_cast<std::string>(datum.state());
+
+  return json;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
