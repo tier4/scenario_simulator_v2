@@ -23,6 +23,7 @@
 #include <boost/filesystem.hpp>
 #include <concealer/execute.hpp>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
