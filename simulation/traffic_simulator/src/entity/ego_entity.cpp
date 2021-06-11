@@ -265,7 +265,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     Eigen::VectorXd input(2);
     {
       input <<  //
-        autowares.at(name).getVehicleCommand().control.velocity,
+        autowares.at(name).getVehicleCommand().control.acceleration,
         autowares.at(name).getVehicleCommand().control.steering_angle;
     }
 
@@ -349,9 +349,9 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::setTargetSpeed(double value, bool)
 {
-  Eigen::VectorXd v(5);
+  Eigen::VectorXd v(6);
   {
-    v << 0, 0, 0, value, 0;
+    v << 0, 0, 0, value, 0, 0;
   }
 
   (*vehicle_model_ptr_).setState(v);
