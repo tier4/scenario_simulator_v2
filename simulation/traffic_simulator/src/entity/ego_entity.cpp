@@ -58,7 +58,7 @@ EgoEntity::EgoEntity(
   const double step_time,  //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
-  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteer>(
+  vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteerAccel>(
     getParameter<double>("vel_lim", 50.0),     // parameters.performance.max_speed,
     getParameter<double>("steer_lim", 1.0),    // parameters.axles.front_axle.max_steering,
     getParameter<double>("accel_rate", 10.0),  // parameters.performance.max_acceleration,
@@ -67,8 +67,8 @@ EgoEntity::EgoEntity(
       "wheel_base",
       parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x),  //
     step_time,                                                                          //
-    getParameter<double>("vel_time_delay", 0.25),                                       //
-    getParameter<double>("vel_time_constant", 0.5),                                     //
+    getParameter<double>("acc_time_delay", 0.1),                                        //
+    getParameter<double>("acc_time_constant", 0.1),                                     //
     getParameter<double>("steer_time_delay", 0.3),                                      //
     getParameter<double>("steer_time_constant", 0.3),                                   //
     getParameter<double>("deadzone_delta_steer", 0.0)))
