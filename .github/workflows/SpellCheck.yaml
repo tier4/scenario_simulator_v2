@@ -23,3 +23,4 @@ jobs:
         with:
           config: ".github/workflows/.cspell.json"
           incremental_files_only: false
+          strict: false
