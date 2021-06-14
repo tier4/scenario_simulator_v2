@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORY_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 #include <string>
@@ -24,33 +25,31 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Story ================================================================
+/* ---- Story ------------------------------------------------------------------
  *
- * <xsd:complexType name="Story">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="Act" maxOccurs="unbounded" type="Act"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Story">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
+ *      <xsd:element name="Act" maxOccurs="unbounded" type="Act"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
-struct Story : public StoryboardElement<Story>, public Elements
+ * -------------------------------------------------------------------------- */
+struct Story : public StoryboardElement<Story>, public Elements, public Scope
 {
   const String name;
 
-  Scope inner_scope;
-
   template <typename Node>
   explicit Story(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)}, inner_scope{outer_scope}
+  : Scope(outer_scope), name(readAttribute<String>("name", node, *this))
   {
     callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
-      return make<ParameterDeclarations>(node, inner_scope);
+      return make<ParameterDeclarations>(node, *this);
     });
 
     callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Act>(node, inner_scope));
+      return push_back(readStoryboardElement<Act>(node, *this));
     });
   }
 
@@ -89,6 +88,8 @@ struct Story : public StoryboardElement<Story>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Story &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -43,13 +43,14 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 
   Trigger stop_trigger;
 
-  const String name{"Storyboard"};
+  const String name;
 
   template <typename Node, typename Scope>
   explicit Storyboard(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
     init(readElement<Init>("Init", node, inner_scope)),
-    stop_trigger(readElement<Trigger>("StopTrigger", node, inner_scope))
+    stop_trigger(readElement<Trigger>("StopTrigger", node, inner_scope)),
+    name("Storyboard")
   {
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Story>(node, inner_scope));

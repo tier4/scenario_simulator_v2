@@ -12,30 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/storyboard.hpp>
+#include <openscenario_interpreter/syntax/story.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const Storyboard & datum)
+nlohmann::json & operator<<(nlohmann::json & json, const Story & datum)
 {
-  nlohmann::json json;
-
-  return os << (json << datum).dump(2);
-}
-
-nlohmann::json & operator<<(nlohmann::json & json, const Storyboard & datum)
-{
+  json["name"] = datum.name;
   json["state"] = boost::lexical_cast<std::string>(datum.state());
-
-  json["Story"] = nlohmann::json::array();
-
-  for (const auto & each : datum) {
-    nlohmann::json story;
-    story << each.as<Story>();
-    json["Story"].push_back(story);
-  }
 
   return json;
 }
