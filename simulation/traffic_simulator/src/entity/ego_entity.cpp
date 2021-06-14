@@ -423,12 +423,37 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
 void EgoEntity::setTargetSpeed(double value, bool)
 {
-  Eigen::VectorXd v(6);
-  {
-    v << 0, 0, 0, value, 0, 0;
-  }
+  switch (vehicle_model_type_) {
+    case VehicleModelType::IDEAL_STEER: {
+      Eigen::VectorXd v(3);
+      {
+        v << 0, 0, 0;
+      }
 
-  (*vehicle_model_ptr_).setState(v);
+      (*vehicle_model_ptr_).setState(v);
+    } break;
+
+    case VehicleModelType::DELAY_STEER: {
+      Eigen::VectorXd v(5);
+      {
+        v << 0, 0, 0, value, 0;
+      }
+
+      (*vehicle_model_ptr_).setState(v);
+    } break;
+
+    case VehicleModelType::DELAY_STEER_ACC: {
+      Eigen::VectorXd v(6);
+      {
+        v << 0, 0, 0, value, 0, 0;
+      }
+
+      (*vehicle_model_ptr_).setState(v);
+    } break;
+
+    default:
+      throw std::runtime_error("TODO");
+  }
 }
 }  // namespace entity
 }  // namespace traffic_simulator
