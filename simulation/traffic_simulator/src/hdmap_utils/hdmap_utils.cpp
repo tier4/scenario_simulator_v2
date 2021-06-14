@@ -242,7 +242,7 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
 boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   geometry_msgs::msg::Pose pose)
 {
-  const auto lanelet_id = getClosetLanletId(pose);
+  const auto lanelet_id = getClosetLaneletId(pose);
   if (!lanelet_id) {
     return boost::none;
   }
@@ -263,7 +263,7 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   return lanelet_pose;
 }
 
-boost::optional<std::int64_t> HdMapUtils::getClosetLanletId(
+boost::optional<std::int64_t> HdMapUtils::getClosetLaneletId(
   geometry_msgs::msg::Pose pose, double distance_thresh)
 {
   lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);

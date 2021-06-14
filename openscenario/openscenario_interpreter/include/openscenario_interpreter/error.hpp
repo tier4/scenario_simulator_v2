@@ -57,7 +57,7 @@ using common::SyntaxError;
               ". This is valid in OpenSCENARIO standard, but is not yet supported")
 
 #define UNSUPPORTED_SETTING_DETECTED(ACTION_OR_CONDITION, ELEMENT) \
-  SyntaxError(#ACTION_OR_CONDITION " does not yet supports ", ELEMENT)
+  SyntaxError(#ACTION_OR_CONDITION " does not yet support ", ELEMENT)
 }  // namespace openscenario_interpreter
 
 #endif  // OPENSCENARIO_INTERPRETER__ERROR_HPP_
