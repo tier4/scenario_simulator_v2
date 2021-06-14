@@ -31,6 +31,18 @@ namespace traffic_simulator
 {
 namespace entity
 {
+enum class VehicleModelType {
+  IDEAL_TWIST = 0,
+  IDEAL_STEER = 1,
+  DELAY_TWIST = 2,
+  DELAY_STEER = 3,
+  CONST_ACCEL_TWIST = 4,
+  IDEAL_FORKLIFT_RLS = 5,
+  DELAY_FORKLIFT_RLS = 6,
+  IDEAL_ACCEL = 7,
+  DELAY_STEER_ACC = 8,
+};
+
 class EgoEntity : public VehicleEntity
 {
   // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
@@ -43,6 +55,8 @@ class EgoEntity : public VehicleEntity
   boost::optional<geometry_msgs::msg::Pose> initial_pose_;
 
   boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
+
+  const VehicleModelType vehicle_model_type_;
 
 public:
   EgoEntity() = delete;

@@ -18,6 +18,7 @@
 #include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
+#include <stdexcept>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -52,12 +53,30 @@ namespace entity
 {
 std::unordered_map<std::string, concealer::Autoware> EgoEntity::autowares{};
 
+auto getVehicleModelType()
+{
+  const auto vehicle_model_type = getParameter<std::string>("vehicle_model_type", "UNSPECIDIED");
+
+  DEBUG_VALUE(vehicle_model_type);
+
+  if (vehicle_model_type == "IDEAL_STEER") {
+    return VehicleModelType::IDEAL_STEER;
+  } else if (vehicle_model_type == "DELAY_STEER") {
+    return VehicleModelType::DELAY_STEER;
+  } else if (vehicle_model_type == "DELAY_STEER_ACC") {
+    return VehicleModelType::DELAY_STEER_ACC;
+  } else {
+    throw std::runtime_error("");
+  }
+}
+
 EgoEntity::EgoEntity(
   const std::string & name,  //
   const boost::filesystem::path & lanelet2_map_osm,
   const double step_time,  //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
+  vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(std::make_shared<SimModelTimeDelaySteerAccel>(
     getParameter<double>("vel_lim", 50.0),     // parameters.performance.max_speed,
     getParameter<double>("steer_lim", 1.0),    // parameters.axles.front_axle.max_steering,
