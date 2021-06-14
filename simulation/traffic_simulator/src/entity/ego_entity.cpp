@@ -18,7 +18,6 @@
 #include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
-#include <stdexcept>
 #include <string>
 #include <system_error>
 #include <thread>
@@ -51,9 +50,30 @@ namespace entity
 {
 std::unordered_map<std::string, concealer::Autoware> EgoEntity::autowares{};
 
+auto toString(const VehicleModelType datum) -> std::string
+{
+#define BOILERPLATE(IDENTIFIER)      \
+  case VehicleModelType::IDENTIFIER: \
+    return #IDENTIFIER
+
+  switch (datum) {
+    BOILERPLATE(CONST_ACCEL_TWIST);
+    BOILERPLATE(DELAY_FORKLIFT_RLS);
+    BOILERPLATE(DELAY_STEER);
+    BOILERPLATE(DELAY_STEER_ACC);
+    BOILERPLATE(DELAY_TWIST);
+    BOILERPLATE(IDEAL_ACCEL);
+    BOILERPLATE(IDEAL_FORKLIFT_RLS);
+    BOILERPLATE(IDEAL_STEER);
+    BOILERPLATE(IDEAL_TWIST);
+  }
+
+#undef BOILERPLATE
+}
+
 auto getVehicleModelType()
 {
-  const auto vehicle_model_type = getParameter<std::string>("vehicle_model_type", "UNSPECIDIED");
+  const auto vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
 
   DEBUG_VALUE(vehicle_model_type);
 
@@ -64,7 +84,7 @@ auto getVehicleModelType()
   } else if (vehicle_model_type == "DELAY_STEER_ACC") {
     return VehicleModelType::DELAY_STEER_ACC;
   } else {
-    throw std::runtime_error("");
+    THROW_SEMANTIC_ERROR("Unsupported vehicle_model_type ", vehicle_model_type, "specified");
   }
 }
 
@@ -128,7 +148,8 @@ auto makeSimulationModel(
         getParameter<double>("deadzone_delta_steer", 0.0));
 
     default:
-      throw std::runtime_error("");
+      THROW_SEMANTIC_ERROR(
+        "Unsupported vehicle_model_type ", toString(vehicle_model_type), "specified");
   }
 }
 
@@ -341,7 +362,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       } break;
 
       default:
-        throw std::runtime_error("TODO");
+        THROW_SEMANTIC_ERROR(
+          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
     (*vehicle_model_ptr_).update(step_time);
@@ -452,7 +474,9 @@ void EgoEntity::setTargetSpeed(double value, bool)
     } break;
 
     default:
-      throw std::runtime_error("TODO");
+      THROW_SEMANTIC_ERROR(
+        "Unsupported simulation model ",
+        getParameter<std::string>("vehicle_model_type", "IDEAL_STEER"), "specified");
   }
 }
 }  // namespace entity
