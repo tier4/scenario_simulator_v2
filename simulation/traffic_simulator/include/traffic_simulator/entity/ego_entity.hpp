@@ -46,8 +46,8 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
-  static std::unordered_map<std::string, concealer::Autoware> autowares;
+  // NOTE: One day we will have to do simultaneous simulations of multiple Ego entities.
+  static std::unordered_map<std::string, concealer::Autoware> ego_entities;
 
   bool autoware_initialized = false;  // TODO (yamacir-kit) REMOVE THIS!!!
 

@@ -48,7 +48,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, concealer::Autoware> EgoEntity::autowares{};
+std::unordered_map<std::string, concealer::Autoware> EgoEntity::ego_entities{};
 
 auto toString(const VehicleModelType datum) -> std::string
 {
@@ -164,7 +164,7 @@ EgoEntity::EgoEntity(
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
 
-  autowares.emplace(
+  ego_entities.emplace(
     std::piecewise_construct, std::forward_as_tuple(name),
     std::forward_as_tuple(
       getParameter("autoware_launch_package", std::string("")),
@@ -178,7 +178,7 @@ EgoEntity::EgoEntity(
       "scenario_simulation:=true"));
 }
 
-EgoEntity::~EgoEntity() { autowares.erase(name); }
+EgoEntity::~EgoEntity() { ego_entities.erase(name); }
 
 void EgoEntity::engage()
 {
@@ -186,14 +186,14 @@ void EgoEntity::engage()
   //   std::this_thread::sleep_for(std::chrono::seconds(1));
   // }
 
-  autowares.at(name).engage();
+  ego_entities.at(name).engage();
 }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   std::stringstream message;
   {
-    const auto state{autowares.at(name).getAutowareStatus().autoware_state};
+    const auto state{ego_entities.at(name).getAutowareStatus().autoware_state};
 
     message << (state.empty() ? "Starting" : state)  //
             << "_(t_=_"                              //
@@ -258,7 +258,7 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
     status.pose.position.y = v(1) + initial_pose_.get().position.y;
     status.pose.position.z = v(2) + initial_pose_.get().position.z;
 
-    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLanletId(status.pose);
+    const auto closest_lanelet_id = hdmap_utils_ptr_->getClosetLaneletId(status.pose);
     if (!closest_lanelet_id) {
       THROW_SEMANTIC_ERROR("failed to find closest lane, lane is too far away.");
     }
@@ -297,7 +297,7 @@ auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 {
   openscenario_msgs::msg::WaypointsArray waypoints;
 
-  for (const auto & point : autowares.at(name).getTrajectory().points) {
+  for (const auto & point : ego_entities.at(name).getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);
   }
 
@@ -326,7 +326,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
     }
 
-    autowares.at(name).set(current_pose);
+    ego_entities.at(name).set(current_pose);
 
     geometry_msgs::msg::Twist current_twist;
     {
@@ -334,7 +334,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    autowares.at(name).set(current_twist);
+    ego_entities.at(name).set(current_twist);
   } else {
     switch (vehicle_model_type_) {
       case VehicleModelType::IDEAL_STEER:
@@ -342,8 +342,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         Eigen::VectorXd input(2);
 
         input <<  //
-          autowares.at(name).getVehicleCommand().control.velocity,
-          autowares.at(name).getVehicleCommand().control.steering_angle;
+          ego_entities.at(name).getVehicleCommand().control.velocity,
+          ego_entities.at(name).getVehicleCommand().control.steering_angle;
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -354,9 +354,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         using autoware_vehicle_msgs::msg::Shift;
 
         input <<  //
-          autowares.at(name).getVehicleCommand().control.acceleration,
-          autowares.at(name).getVehicleCommand().control.steering_angle,
-          autowares.at(name).getVehicleCommand().shift.data == Shift::REVERSE ? -1.0 : 1.0;
+          ego_entities.at(name).getVehicleCommand().control.acceleration,
+          ego_entities.at(name).getVehicleCommand().control.steering_angle,
+          ego_entities.at(name).getVehicleCommand().shift.data == Shift::REVERSE ? -1.0 : 1.0;
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -384,7 +384,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 auto EgoEntity::ready() const -> bool
 {
   // NOTE: Autoware::ready() will notify you with an exception if Autoware has detected any anomalies at the time of the call.
-  return autowares.at(name).ready();
+  return ego_entities.at(name).ready();
 }
 
 void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
@@ -404,10 +404,10 @@ void EgoEntity::requestAssignRoute(
   assert(0 < route.size());
 
   if (not std::exchange(autoware_initialized, true)) {
-    autowares.at(name).initialize(getStatus().pose);
+    ego_entities.at(name).initialize(getStatus().pose);
   }
 
-  autowares.at(name).plan(route);
+  ego_entities.at(name).plan(route);
 }
 
 void EgoEntity::requestLaneChange(const std::int64_t)
@@ -432,8 +432,8 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    autowares.at(name).set(current_pose);
-    autowares.at(name).set(current_twist);
+    ego_entities.at(name).set(current_pose);
+    ego_entities.at(name).set(current_twist);
   }
 
   if (!initial_pose_) {
