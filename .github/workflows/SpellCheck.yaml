@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   spellcheck:
@@ -21,3 +22,5 @@ jobs:
       - uses: streetsidesoftware/cspell-action@v1.2.3
         with:
           config: ".github/workflows/.cspell.json"
+          incremental_files_only: false
+          strict: false
