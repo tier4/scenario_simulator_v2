@@ -90,6 +90,11 @@ auto makeSimulationModel(
   DEBUG_VALUE(getParameter<double>("deadzone_delta_steer", 0.0));
 
   switch (vehicle_model_type) {
+    case VehicleModelType::IDEAL_STEER:
+      return std::make_shared<SimModelIdealSteer>(getParameter<double>(
+        "wheel_base",
+        parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
+
     case VehicleModelType::DELAY_STEER:
       return std::make_shared<SimModelTimeDelaySteer>(
         getParameter<double>("vel_lim", 50.0),     // parameters.performance.max_speed,

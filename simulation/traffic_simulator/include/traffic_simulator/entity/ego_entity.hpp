@@ -23,6 +23,7 @@
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <unordered_map>
 #include <vector>
