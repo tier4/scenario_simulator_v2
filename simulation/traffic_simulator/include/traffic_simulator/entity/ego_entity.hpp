@@ -23,6 +23,7 @@
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <unordered_map>
 #include <vector>
@@ -31,12 +32,26 @@ namespace traffic_simulator
 {
 namespace entity
 {
+enum class VehicleModelType {
+  IDEAL_TWIST = 0,
+  IDEAL_STEER = 1,
+  DELAY_TWIST = 2,
+  DELAY_STEER = 3,
+  CONST_ACCEL_TWIST = 4,
+  IDEAL_FORKLIFT_RLS = 5,
+  DELAY_FORKLIFT_RLS = 6,
+  IDEAL_ACCEL = 7,
+  DELAY_STEER_ACC = 8,
+};
+
 class EgoEntity : public VehicleEntity
 {
-  // NOTE: One day we will have to do simultaneous simulations of multiple Autowares.
-  static std::unordered_map<std::string, concealer::Autoware> autowares;
+  // NOTE: One day we will have to do simultaneous simulations of multiple Ego entities.
+  static std::unordered_map<std::string, concealer::Autoware> ego_entities;
 
   bool autoware_initialized = false;  // TODO (yamacir-kit) REMOVE THIS!!!
+
+  const VehicleModelType vehicle_model_type_;
 
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
