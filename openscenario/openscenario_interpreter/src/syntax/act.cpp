@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/story.hpp>
+#include <openscenario_interpreter/syntax/act.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Story & datum)
+nlohmann::json & operator<<(nlohmann::json & json, const Act & datum)
 {
   json["name"] = datum.name;
 
   json["state"] = boost::lexical_cast<std::string>(datum.state());
 
-  json["Act"] = nlohmann::json::array();
-
-  for (const auto & each : datum) {
-    nlohmann::json act;
-    act << each.as<Act>();
-    json["Act"].push_back(act);
-  }
+  // json["Act"] = nlohmann::json::array();
+  //
+  // for (const auto & each : datum) {
+  //   nlohmann::json act;
+  //   act << each.as<Act>();
+  //   json["Act"].push_back(act);
+  // }
 
   return json;
 }

@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 
@@ -93,6 +94,8 @@ struct Act : public StoryboardElement<Act>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Act &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
