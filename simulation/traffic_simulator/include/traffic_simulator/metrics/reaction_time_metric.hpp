@@ -24,19 +24,19 @@ class ReactionTimeMetric : public MetricBase
 {
 public:
   explicit ReactionTimeMetric(
-    std::string target_entity, double maximum_reaction_time, double jerk_upper_threashold,
-    double jerk_lower_threashold, bool check_upper_threashold = true,
-    bool check_lower_threashold = true);
+    std::string target_entity, double maximum_reaction_time, double jerk_upper_threshold,
+    double jerk_lower_threshold, bool check_upper_threshold = true,
+    bool check_lower_threshold = true);
   ~ReactionTimeMetric() override = default;
   void update() override;
   nlohmann::json to_json();
   bool activateTrigger() override;
   const std::string target_entity;
   const double maximum_reaction_time;
-  const double jerk_upper_threashold;
-  const double jerk_lower_threashold;
-  const bool check_upper_threashold;
-  const bool check_lower_threashold;
+  const double jerk_upper_threshold;
+  const double jerk_lower_threshold;
+  const bool check_upper_threshold;
+  const bool check_lower_threshold;
 
 private:
   double elapsed_duration_;

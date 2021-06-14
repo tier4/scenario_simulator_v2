@@ -180,11 +180,11 @@ std::vector<std::int64_t> HdMapUtils::getConflictingCrosswalkIds(
 }
 
 std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
-  std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids, double foward_distance)
+  std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids, double forward_distance)
 {
   std::vector<geometry_msgs::msg::Point> ret;
   bool on_traj = false;
-  double rest_distance = foward_distance;
+  double rest_distance = forward_distance;
   for (auto id_itr = lanelet_ids.begin(); id_itr != lanelet_ids.end(); id_itr++) {
     double l = getLaneletLength(*id_itr);
     if (on_traj) {
@@ -205,8 +205,8 @@ std::vector<geometry_msgs::msg::Point> HdMapUtils::clipTrajectoryFromLaneletIds(
     }
     if (lanelet_id == *id_itr) {
       on_traj = true;
-      if ((s + foward_distance) < l) {
-        for (double s_val = s; s_val < s + foward_distance; s_val = s_val + 1.0) {
+      if ((s + forward_distance) < l) {
+        for (double s_val = s; s_val < s + forward_distance; s_val = s_val + 1.0) {
           auto map_pose = toMapPose(lanelet_id, s_val, 0);
           ret.emplace_back(map_pose.pose.position);
         }
@@ -296,20 +296,20 @@ double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)
   return *std::min_element(limits.begin(), limits.end());
 }
 
-boost::optional<int> HdMapUtils::getLaneChangeableLenletId(
+boost::optional<int> HdMapUtils::getLaneChangeableLaneletId(
   std::int64_t lanelet_id, std::string direction)
 {
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
   if (direction == "left") {
-    auto left_lanlet = vehicle_routing_graph_ptr_->left(lanelet);
-    if (left_lanlet) {
-      return left_lanlet->id();
+    auto left_lanelet = vehicle_routing_graph_ptr_->left(lanelet);
+    if (left_lanelet) {
+      return left_lanelet->id();
     }
   }
   if (direction == "right") {
-    auto right_lanlet = vehicle_routing_graph_ptr_->right(lanelet);
-    if (right_lanlet) {
-      return right_lanlet->id();
+    auto right_lanelet = vehicle_routing_graph_ptr_->right(lanelet);
+    if (right_lanelet) {
+      return right_lanelet->id();
     }
   }
   return boost::none;
@@ -739,11 +739,11 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
-  openscenario_msgs::msg::LaneletPose lanlet_pose)
+  openscenario_msgs::msg::LaneletPose lanelet_pose)
 {
   return toMapPose(
-    lanlet_pose.lanelet_id, lanlet_pose.s, lanlet_pose.offset,
-    quaternion_operation::convertEulerAngleToQuaternion(lanlet_pose.rpy));
+    lanelet_pose.lanelet_id, lanelet_pose.s, lanelet_pose.offset,
+    quaternion_operation::convertEulerAngleToQuaternion(lanelet_pose.rpy));
 }
 
 geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(

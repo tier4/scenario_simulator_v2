@@ -18,15 +18,15 @@
 namespace metrics
 {
 ReactionTimeMetric::ReactionTimeMetric(
-  std::string target_entity, double maximum_reaction_time, double jerk_upper_threashold,
-  double jerk_lower_threashold, bool check_upper_threashold, bool check_lower_threashold)
+  std::string target_entity, double maximum_reaction_time, double jerk_upper_threshold,
+  double jerk_lower_threshold, bool check_upper_threshold, bool check_lower_threshold)
 : MetricBase("ReactionTime"),
   target_entity(target_entity),
   maximum_reaction_time(maximum_reaction_time),
-  jerk_upper_threashold(jerk_upper_threashold),
-  jerk_lower_threashold(jerk_lower_threashold),
-  check_upper_threashold(check_upper_threashold),
-  check_lower_threashold(check_lower_threashold)
+  jerk_upper_threshold(jerk_upper_threshold),
+  jerk_lower_threshold(jerk_lower_threshold),
+  check_upper_threshold(check_upper_threshold),
+  check_lower_threshold(check_lower_threshold)
 {
   elapsed_duration_ = 0;
 }
@@ -40,11 +40,11 @@ void ReactionTimeMetric::update()
     THROW_SIMULATION_ERROR("failed to calculate linear jerk.");
   }
   current_linear_jerk_ = jerk.get();
-  if (check_lower_threashold && jerk_lower_threashold >= jerk.get()) {
+  if (check_lower_threshold && jerk_lower_threshold >= jerk.get()) {
     success();
     return;
   }
-  if (check_upper_threashold && jerk_upper_threashold <= jerk.get()) {
+  if (check_upper_threshold && jerk_upper_threshold <= jerk.get()) {
     success();
     return;
   }

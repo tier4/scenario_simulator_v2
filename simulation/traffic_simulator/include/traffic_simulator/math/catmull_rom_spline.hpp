@@ -35,7 +35,7 @@ public:
     const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves);
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   double getLength() const { return total_length_; }
-  double getMaximum2DCurventure() const;
+  double getMaximum2DCurvature() const;
   const geometry_msgs::msg::Point getPoint(double s) const;
   const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s) const;
@@ -44,7 +44,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution) const;
   boost::optional<double> getSValue(
-    geometry_msgs::msg::Point position, double threadhold_distance = 3.0,
+    geometry_msgs::msg::Point position, double threshold_distance = 3.0,
     unsigned int initial_resolution = 30, unsigned int max_iteration = 30,
     double tolerance = 0.001);
   double getSquaredDistanceIn2D(geometry_msgs::msg::Point point, double s) const;
