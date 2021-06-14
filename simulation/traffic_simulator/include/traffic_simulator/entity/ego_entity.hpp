@@ -50,13 +50,13 @@ class EgoEntity : public VehicleEntity
 
   bool autoware_initialized = false;  // TODO (yamacir-kit) REMOVE THIS!!!
 
+  const VehicleModelType vehicle_model_type_;
+
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
   boost::optional<geometry_msgs::msg::Pose> initial_pose_;
 
   boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
-
-  const VehicleModelType vehicle_model_type_;
 
 public:
   EgoEntity() = delete;
