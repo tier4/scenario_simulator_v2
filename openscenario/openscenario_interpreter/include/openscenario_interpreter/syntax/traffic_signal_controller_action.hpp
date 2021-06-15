@@ -34,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalControllerAction : public Scope
+struct TrafficSignalControllerAction : private Scope
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -54,8 +54,9 @@ struct TrafficSignalControllerAction : public Scope
   template <typename Node>
   explicit TrafficSignalControllerAction(const Node & node, const Scope & current_scope)
   : Scope(current_scope),
-    traffic_signal_controller_ref(readAttribute<String>("trafficSignalControllerRef", node, *this)),
-    phase(readAttribute<String>("phase", node, *this))
+    traffic_signal_controller_ref(
+      readAttribute<String>("trafficSignalControllerRef", node, scope())),
+    phase(readAttribute<String>("phase", node, scope()))
   {
   }
 

@@ -30,12 +30,12 @@ inline namespace syntax
 {
 /* ---- OpenScenario -----------------------------------------------------------
  *
- * <xsd:complexType name="OpenScenario">
- *   <xsd:sequence>
- *     <xsd:element name="FileHeader" type="FileHeader"/>
- *     <xsd:group ref="OpenScenarioCategory"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="OpenScenario">
+ *    <xsd:sequence>
+ *      <xsd:element name="FileHeader" type="FileHeader"/>
+ *      <xsd:group ref="OpenScenarioCategory"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct OpenScenario : public Scope
@@ -62,8 +62,9 @@ struct OpenScenario : public Scope
   template <typename... Ts>
   explicit OpenScenario(Ts &&... xs)
   : Scope(std::forward<decltype(xs)>(xs)...),
-    file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), *this)),
-    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, *this)),
+    file_header(
+      readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), scope())),
+    category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, scope())),
     frame(0)
   {
   }

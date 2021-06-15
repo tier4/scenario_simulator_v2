@@ -35,30 +35,30 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act : public StoryboardElement<Act>, public Elements, public Scope
+struct Act : private Scope, public StoryboardElement<Act>, public Elements
 {
   const String name;
 
-  Element start_trigger, stop_trigger;
+  Trigger start_trigger;
+
+  Element stop_trigger;
 
   template <typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), name(readAttribute<String>("name", node, outer_scope))
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, outer_scope)),
+    start_trigger(readElement<Trigger>("StartTrigger", node, scope()))
   {
     callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<ManeuverGroup>(node, *this));
-    });
-
-    callWithElements(node, "StartTrigger", 1, 1, [&](auto && node) {
-      return start_trigger.rebind<Trigger>(node, *this);
+      return push_back(readStoryboardElement<ManeuverGroup>(node, scope()));
     });
 
     callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
-      return stop_trigger.rebind<Trigger>(node, *this);
+      return stop_trigger.rebind<Trigger>(node, scope());
     });
   }
 
-  auto ready() const { return start_trigger.evaluate().as<Boolean>(); }
+  auto ready() { return start_trigger.evaluate().as<Boolean>(); }
 
   auto stopTriggered() const { return stop_trigger && stop_trigger.evaluate().as<Boolean>(); }
 

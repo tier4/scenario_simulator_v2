@@ -36,20 +36,20 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Story : public StoryboardElement<Story>, public Elements, public Scope
+struct Story : private Scope, public StoryboardElement<Story>, public Elements
 {
   const String name;
 
   template <typename Node>
   explicit Story(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), name(readAttribute<String>("name", node, *this))
+  : Scope(outer_scope), name(readAttribute<String>("name", node, scope()))
   {
     callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
-      return make<ParameterDeclarations>(node, *this);
+      return make<ParameterDeclarations>(node, scope());
     });
 
     callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Act>(node, *this));
+      return push_back(readStoryboardElement<Act>(node, scope()));
     });
   }
 

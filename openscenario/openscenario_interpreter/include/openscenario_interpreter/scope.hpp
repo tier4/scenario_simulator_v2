@@ -88,6 +88,8 @@ struct Scope
   explicit Scope(const Scope &) = default;
 
   explicit Scope(const boost::filesystem::path & pathname) : pathname(pathname) {}
+
+  auto & scope() { return *this; }
 };
 }  // namespace openscenario_interpreter
 
