@@ -57,9 +57,7 @@ struct Story : private Scope, public StoryboardElement<Story>, public Elements
 
   /* -------------------------------------------------------------------------
    *
-   * Story
-   *   A Story's goal is accomplished when all its Acts are in the
-   *   completeState.
+   *  A Story's goal is accomplished when all its Acts are in the completeState.
    *
    * ---------------------------------------------------------------------- */
   auto accomplished() const
