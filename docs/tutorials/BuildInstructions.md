@@ -2,7 +2,7 @@
 
 ## Setup ROS 2 environment
 
-This framework only supports ROS 2 Foxy Fitzroy. (https://docs.ros.org/en/foxy/Installation.html)  
+This framework only supports ROS 2 Foxy Fitzroy. (<https://docs.ros.org/en/foxy/Installation.html>)  
 You can install Foxy by typing the command below in your terminal.
 
 ```bash
@@ -25,8 +25,8 @@ rosdep update
 ## Setup workspace
 
 ```bash
-mkdir -p scenario_simulator_ws/src
-cd scenario_simulator_ws/src
+mkdir -p ~/scenario_simulator_ws/src
+cd ~/scenario_simulator_ws/src
 git clone https://github.com/tier4/scenario_simulator_v2.git
 # These lines are necessary right now, but it will be removed in the near future
 cd scenario_simulator_v2
@@ -37,12 +37,13 @@ sh install_depends.sh
 ## Install dependencies via rosdep
 
 ```bash
+cd ~/scenario_simulator_ws
 source /opt/ros/foxy/setup.bash
-vcs import src < src/scenario_simulator_v2/dependency_foxy.repos
 rosdep install -iry --from-paths src --rosdistro foxy
 ```
 
 ## Build scenario_simulator_vs
-```
+
+```bash
 colcon build --symlink-install
 ```
