@@ -69,6 +69,7 @@ auto toString(const VehicleModelType datum) -> std::string
   }
 
 #undef BOILERPLATE
+  THROW_SIMULATION_ERROR("Unsupported vehicle model type, failed to convert to string");
 }
 
 auto getVehicleModelType()
