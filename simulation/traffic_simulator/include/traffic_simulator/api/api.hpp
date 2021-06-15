@@ -209,7 +209,8 @@ public:
 
 private:
   bool updateSensorFrame();
-  bool updateEntityStatusInSim();
+  bool updateEntityStatusInSim(
+    const boost::optional<openscenario_msgs::msg::EntityStatus> & ego_entity_stauts_before_update);
 
   template <typename Parameters>
   bool spawn(
