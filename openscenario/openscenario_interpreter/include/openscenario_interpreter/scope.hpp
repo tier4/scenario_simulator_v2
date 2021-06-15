@@ -89,7 +89,10 @@ struct Scope
 
   explicit Scope(const boost::filesystem::path & pathname) : pathname(pathname) {}
 
-  auto & scope() { return *this; }
+  // clang-format off
+  auto scope()       noexcept ->       auto & { return *this; }
+  auto scope() const noexcept -> const auto & { return *this; }
+  // clang-format on
 };
 }  // namespace openscenario_interpreter
 

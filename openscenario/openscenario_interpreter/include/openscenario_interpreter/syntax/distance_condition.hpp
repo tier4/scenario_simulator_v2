@@ -85,7 +85,7 @@ struct DistanceCondition
    * ------------------------------------------------------------------------ */
   const Position position;
 
-  template <typename Node>
+  template <typename Node, typename Scope>
   explicit DistanceCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),

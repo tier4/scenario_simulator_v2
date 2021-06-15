@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- StandStillCondition ---------------------------------------------------------
+/* ---- StandStillCondition ----------------------------------------------------
  *
  *  <xsd:complexType name="StandStillCondition">
  *    <xsd:attribute name="duration" type="Double" use="required"/>
@@ -38,7 +38,7 @@ struct StandStillCondition
 
   const TriggeringEntities for_each;
 
-  template <typename Node>
+  template <typename Node, typename Scope>
   explicit StandStillCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & for_each)
   : duration(readAttribute<Double>("duration", node, outer_scope)),

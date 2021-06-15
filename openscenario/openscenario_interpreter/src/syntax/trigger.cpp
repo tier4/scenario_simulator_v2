@@ -12,30 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/event.hpp>
+#include <openscenario_interpreter/syntax/trigger.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Event & datum)
+nlohmann::json & operator<<(nlohmann::json & json, const Trigger & datum)
 {
-  json["name"] = datum.name;
-
-  json["state"] = boost::lexical_cast<std::string>(datum.state());
-
-  json["currentExecutionCount"] = datum.current_execution_count;
-  json["maximumExecutionCount"] = datum.maximum_execution_count;
-
-  json["Action"] = nlohmann::json::array();
-
-  for (const auto & each : datum) {
-    nlohmann::json action;
-    action << each.as<Action>();
-    json["Action"].push_back(action);
-  }
-
-  json["StartTrigger"] << datum.start_trigger;
+  json["value"] = boost::lexical_cast<std::string>(datum.current_evaluation);
 
   return json;
 }

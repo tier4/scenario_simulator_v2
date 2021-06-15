@@ -48,15 +48,17 @@ struct TimeHeadwayCondition
 
   const TriggeringEntities trigger;
 
-  template <typename Node>
+  template <typename Node, typename Scope>
   explicit TimeHeadwayCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
-  : entity_ref(/* */ readAttribute<String> /* */ ("entityRef", /* */ node, outer_scope)),
-    value(/*      */ readAttribute<Double> /* */ ("value", /*     */ node, outer_scope)),
-    freespace(/*  */ readAttribute<Boolean> /**/ ("freespace", /* */ node, outer_scope)),
-    along_route(/**/ readAttribute<Boolean> /**/ ("alongRoute", /**/ node, outer_scope)),
-    compare(/*    */ readAttribute<Rule> /*   */ ("rule", /*      */ node, outer_scope)),
+  // clang-format off
+  : entity_ref (readAttribute<String> ("entityRef",  node, outer_scope)),
+    value      (readAttribute<Double> ("value",      node, outer_scope)),
+    freespace  (readAttribute<Boolean>("freespace",  node, outer_scope)),
+    along_route(readAttribute<Boolean>("alongRoute", node, outer_scope)),
+    compare    (readAttribute<Rule>   ("rule",       node, outer_scope)),
     trigger(trigger)
+  // clang-format on
   {
   }
 

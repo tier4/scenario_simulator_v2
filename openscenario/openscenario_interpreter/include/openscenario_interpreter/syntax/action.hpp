@@ -28,14 +28,14 @@ inline namespace syntax
 {
 /* ---- Action -----------------------------------------------------------------
  *
- * <xsd:complexType name="Action">
- *   <xsd:choice>
- *     <xsd:element name="GlobalAction" type="GlobalAction"/>
- *     <xsd:element name="UserDefinedAction" type="UserDefinedAction"/>
- *     <xsd:element name="PrivateAction" type="PrivateAction"/>
- *   </xsd:choice>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Action">
+ *    <xsd:choice>
+ *      <xsd:element name="GlobalAction" type="GlobalAction"/>
+ *      <xsd:element name="UserDefinedAction" type="UserDefinedAction"/>
+ *      <xsd:element name="PrivateAction" type="PrivateAction"/>
+ *    </xsd:choice>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct Action : public StoryboardElement<Action>, public Element
