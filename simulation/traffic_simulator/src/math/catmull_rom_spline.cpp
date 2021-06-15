@@ -344,7 +344,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int
 }
 
 boost::optional<double> CatmullRomSpline::getSValue(
-  geometry_msgs::msg::Point position, double threadhold_distance, unsigned int initial_num_points,
+  geometry_msgs::msg::Point position, double threshold_distance, unsigned int initial_num_points,
   unsigned int max_iteration, double tolerance)
 {
   std::vector<double> s_values;
@@ -352,7 +352,7 @@ boost::optional<double> CatmullRomSpline::getSValue(
   std::vector<size_t> curve_index;
   for (size_t i = 0; i < curves_.size(); i++) {
     auto s_value = curves_[i].getSValue(
-      position, threadhold_distance, initial_num_points, max_iteration, tolerance, true);
+      position, threshold_distance, initial_num_points, max_iteration, tolerance, true);
     if (s_value) {
       if (s_value.get() > 0 && s_value.get() < curves_[i].getLength()) {
         s_values.emplace_back(s_value.get());
@@ -396,10 +396,10 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
   return curves_[index_and_s.first].getPoint(index_and_s.second, true);
 }
 
-double CatmullRomSpline::getMaximum2DCurventure() const
+double CatmullRomSpline::getMaximum2DCurvature() const
 {
   if (maximum_2d_curvatures_.empty()) {
-    THROW_SIMULATION_ERROR("maximum 2D curventure vector size is 0.");
+    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");
   }
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }

@@ -33,7 +33,7 @@ namespace helper
  * @brief helper function for constructing action status
  *
  * @param linear_vel linear velocity
- * @param angular_vel angluar velocity
+ * @param angular_vel angular velocity
  * @param linear_accel linear acceleration
  * @param angular_accel angular acceleration
  * @return openscenario_msgs::msg::ActionStatus
@@ -72,7 +72,7 @@ geometry_msgs::msg::Vector3 constructRPY(double roll = 0, double pitch = 0, doub
  * @param quaternion quaternion class
  * @return geometry_msgs::msg::Vector3 RPY value
  */
-geometry_msgs::msg::Vector3 constructRPYfronQuaternion(geometry_msgs::msg::Quaternion quaternion);
+geometry_msgs::msg::Vector3 constructRPYfromQuaternion(geometry_msgs::msg::Quaternion quaternion);
 
 /**
  * @brief helper function for constructing pose

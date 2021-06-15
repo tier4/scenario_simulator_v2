@@ -26,7 +26,7 @@ class CatmullRomSplineVisualization : public rclcpp::Node
 {
 public:
   explicit CatmullRomSplineVisualization(const rclcpp::NodeOptions & option)
-  : Node("catumull_rom_spline_viz", option)
+  : Node("catmull_rom_spline_viz", option)
   {
     marker_pub_ptr_ = create_publisher<visualization_msgs::msg::MarkerArray>("/spline/marker", 1);
     clicked_points_sub_ptr_ = create_subscription<geometry_msgs::msg::PoseStamped>(
