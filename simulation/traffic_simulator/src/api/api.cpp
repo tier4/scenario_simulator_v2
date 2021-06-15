@@ -290,6 +290,12 @@ bool API::updateSensorFrame()
 bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
+  if (entity_manager_ptr_->getNumberOfEgo() != 0) {
+    simulation_interface::toProto(
+      entity_manager_ptr_->getVehicleCommand(entity_manager_ptr_->getEgoName()),
+      *req.mutable_vehicle_command());
+  }
+  // simulation_interface::toProto(entity_behavior->);
   const auto names = entity_manager_ptr_->getEntityNames();
   for (const auto name : names) {
     auto status = entity_manager_ptr_->getEntityStatus(name);
