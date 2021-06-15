@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/event.hpp>
+#include <openscenario_interpreter/utility/demangle.hpp>
 
 namespace openscenario_interpreter
 {
@@ -21,6 +22,18 @@ inline namespace syntax
 nlohmann::json & operator<<(nlohmann::json & json, const Action & datum)
 {
   json["name"] = datum.name;
+
+  // clang-format off
+  static const std::unordered_map<
+    std::type_index, std::function<std::string(const Action &)>> table
+  {
+    { typeid(     GlobalAction), [](const Action & action) { return makeTypename(action.as<     GlobalAction>().type()); } },
+    { typeid(UserDefinedAction), [](const Action & action) { return makeTypename(action.as<UserDefinedAction>().type()); } },
+    { typeid(    PrivateAction), [](const Action & action) { return makeTypename(action.as<    PrivateAction>().type()); } },
+  };
+  // clang-format on
+
+  json["type"] = table.at(datum.type())(datum);
 
   json["state"] = boost::lexical_cast<std::string>(datum.state());
 
