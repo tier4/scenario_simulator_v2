@@ -189,6 +189,11 @@ void EgoEntity::engage()
   ego_entities.at(name).engage();
 }
 
+const autoware_vehicle_msgs::msg::VehicleCommand EgoEntity::getVehicleCommand()
+{
+  return ego_entities.at(name).getVehicleCommand();
+}
+
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   std::stringstream message;

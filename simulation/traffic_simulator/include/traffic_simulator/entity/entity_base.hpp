@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_BASE_HPP_
 
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/bounding_box.hpp>
@@ -137,6 +138,7 @@ public:
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
   /*   */ void updateStandStillDuration(const double step_time);
+  virtual const autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand();
 
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
