@@ -287,18 +287,19 @@ bool API::updateSensorFrame()
   return res.result().success();
 }
 
-bool API::updateEntityStatusInSim(
-  const boost::optional<openscenario_msgs::msg::EntityStatus> & ego_entity_stauts_before_update)
+bool API::updateEntityStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   if (entity_manager_ptr_->getNumberOfEgo() != 0) {
     simulation_interface::toProto(
       entity_manager_ptr_->getVehicleCommand(entity_manager_ptr_->getEgoName()),
       *req.mutable_vehicle_command());
-    if (ego_entity_stauts_before_update) {
+    const auto ego_status_before_update =
+      entity_manager_ptr_->getEntityStatusBeforeUpdate(entity_manager_ptr_->getEgoName());
+    if (ego_status_before_update) {
       req.set_ego_entity_status_before_update_is_empty(false);
       simulation_interface::toProto(
-        ego_entity_stauts_before_update.get(), *req.mutable_ego_entity_status_before_update());
+        ego_status_before_update.get(), *req.mutable_ego_entity_status_before_update());
     } else {
       req.set_ego_entity_status_before_update_is_empty(true);
     }
@@ -343,10 +344,6 @@ bool API::updateEntityStatusInSim(
 bool API::updateFrame()
 {
   boost::optional<openscenario_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
-  if (entity_manager_ptr_->getNumberOfEgo() != 0) {
-    ego_status_before_update =
-      entity_manager_ptr_->getEntityStatus(entity_manager_ptr_->getEgoName());
-  }
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
   if (!standalone_mode) {
@@ -363,7 +360,7 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     metrics_manager_.calculate();
-    if (!updateEntityStatusInSim(ego_status_before_update)) {
+    if (!updateEntityStatusInSim()) {
       return false;
     }
     return updateSensorFrame();
