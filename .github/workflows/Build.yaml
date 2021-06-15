@@ -9,6 +9,11 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - "README.md"
+      - "workflows/Docker.yaml"
+      - "workflows/Documentation.yaml"
+      - "workflows/NotifyFailure.yaml"
+      - "workflows/Release.yaml"
+      - "workflows/SpellCheck.yaml"
 
 jobs:
   build:

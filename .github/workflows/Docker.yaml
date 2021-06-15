@@ -9,6 +9,12 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - "README.md"
+      - "workflows/Build.yaml"
+      - "workflows/Documentation.yaml"
+      - "workflows/NotifyFailure.yaml"
+      - "workflows/Release.yaml"
+      - "workflows/ScenarioTest.yaml"
+      - "workflows/SpellCheck.yaml"
   push:
     branches:
       - master
