@@ -41,6 +41,11 @@ EntityBase::EntityBase(
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
 
+const autoware_vehicle_msgs::msg::VehicleCommand EntityBase::getVehicleCommand()
+{
+  THROW_SIMULATION_ERROR("get vehicle command does not support in ", type, " entity type");
+}
+
 void EntityBase::updateStandStillDuration(const double step_time)
 {
   if (!status_) {
