@@ -5,7 +5,7 @@ package rosgraph_msgs;
 
 /**
  * Protobuf definition of the rosgraph_msgs/msg/Clock type in ROS2.
-**/
+ **/
 message Clock {
   builtin_interfaces.Time clock = 1; // Describe current ros time.
 }

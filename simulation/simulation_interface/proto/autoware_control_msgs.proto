@@ -1,8 +1,7 @@
 syntax = "proto3";
 package autoware_control_msgs;
 
-message ControlCommand
-{
+message ControlCommand {
   double steering_angle = 1;
   double steering_angle_velocity = 2;
   double velocity = 3;

@@ -4,16 +4,18 @@ package builtin_interfaces;
 
 /**
  * Protobuf definition of builtin_interface/msg/Duration type in ROS2.
-**/
+ **/
 message Duration {
   int32 sec = 1; // The seconds component, valid over all int32 values.
-  uint32 nanosec = 2; // The nanoseconds component, valid in the range [0, 10e9).
+  uint32 nanosec =
+      2; // The nanoseconds component, valid in the range [0, 10e9).
 }
 
 /**
  * Protobuf definition of builtin_interface/msg/Time type in ROS2.
-**/
+ **/
 message Time {
   int32 sec = 1; // The seconds component, valid over all int32 values.
-  uint32 nanosec = 2; // The nanoseconds component, valid in the range [0, 10e9).
+  uint32 nanosec =
+      2; // The nanoseconds component, valid in the range [0, 10e9).
 }

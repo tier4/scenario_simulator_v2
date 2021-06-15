@@ -130,12 +130,11 @@ message UpdateEntityStatusRequest {
   repeated openscenario_msgs.EntityStatus status =
       1; // List of updated entity status in traffic simulator.
   autoware_vehicle_msgs.VehicleCommand vehicle_command =
-      2;                             // Ego Vehicle Command of from Autoware
-  bool vehicle_command_is_empty = 3; // If True, vehicle command is empty
+      2; // Ego Vehicle Command of from Autoware
   openscenario_msgs.EntityStatus ego_entity_status_before_update =
-      4; // Entity status of ego entity before runnig vehicle model
+      3; // Entity status of ego entity before runnig vehicle model
   bool ego_entity_status_before_update_is_empty =
-      5; // If True,ego entity status before update is empty.
+      4; // If True,ego entity status before update is empty.
 }
 
 /**
