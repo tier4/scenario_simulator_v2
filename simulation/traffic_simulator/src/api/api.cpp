@@ -343,8 +343,9 @@ bool API::updateEntityStatusInSim(
 bool API::updateFrame()
 {
   boost::optional<openscenario_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
-  if(entity_manager_ptr_->getNumberOfEgo() != 0) {
-    ego_status_before_update = entity_manager_ptr_->getEntityStatus(entity_manager_ptr_->getEgoName());
+  if (entity_manager_ptr_->getNumberOfEgo() != 0) {
+    ego_status_before_update =
+      entity_manager_ptr_->getEntityStatus(entity_manager_ptr_->getEgoName());
   }
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();

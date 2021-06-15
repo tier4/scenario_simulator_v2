@@ -312,6 +312,7 @@ auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  EntityBase::onUpdate(current_time, step_time);
   if (current_time < 0) {
     updateEntityStatusTimestamp(current_time);
 
