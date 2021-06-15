@@ -21,8 +21,20 @@
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+
+#define EXPECT_CONTROL_COMMAND_EQ(msg, proto)                                     \
+  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());                               \
+  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
+  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
+  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
+
+#define EXPECT_HEADER_EQ(msg, proto)                            \
+  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str()); \
+  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());                \
+  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
 
 TEST(Conversion, ConvertPoint)
 {
@@ -305,6 +317,124 @@ TEST(Conversion, ConvertActionStatus)
   EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
   EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
   EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
+}
+
+TEST(Conversion, Time)
+{
+  builtin_interfaces::Time proto;
+  builtin_interfaces::msg::Time msg;
+  msg.nanosec = 1;
+  msg.sec = 2;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+  msg.nanosec = 0;
+  msg.sec = 0;
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+}
+
+TEST(Conversion, Duration)
+{
+  builtin_interfaces::Duration proto;
+  builtin_interfaces::msg::Duration msg;
+  msg.nanosec = 1;
+  msg.sec = 2;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+  msg.nanosec = 0;
+  msg.sec = 0;
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.nanosec, proto.nanosec());
+  EXPECT_EQ(msg.sec, proto.sec());
+}
+
+TEST(Conversion, Header)
+{
+  std_msgs::Header proto;
+  std_msgs::msg::Header msg;
+  msg.frame_id = "base_link";
+  msg.stamp.nanosec = 4;
+  msg.stamp.sec = 1;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_HEADER_EQ(msg, proto);
+  msg.frame_id = "";
+  msg.stamp.nanosec = 0;
+  msg.stamp.sec = 0;
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_HEADER_EQ(msg, proto);
+}
+
+TEST(Conversion, ControlCommand)
+{
+  autoware_control_msgs::ControlCommand proto;
+  autoware_control_msgs::msg::ControlCommand msg;
+  msg.acceleration = 3;
+  msg.steering_angle = 1.4;
+  msg.steering_angle_velocity = 13.4;
+  msg.velocity = 11.3;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_CONTROL_COMMAND_EQ(msg, proto);
+  msg.acceleration = 0;
+  msg.steering_angle = 0;
+  msg.steering_angle_velocity = 0;
+  msg.velocity = 0;
+  simulation_interface::toMsg(proto, msg);
+}
+
+TEST(Conversion, Shift)
+{
+  autoware_vehicle_msgs::Shift proto;
+  proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
+  autoware_vehicle_msgs::msg::Shift msg;
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+}
+
+TEST(Conversion, VehicleCommand)
+{
+  autoware_vehicle_msgs::VehicleCommand proto;
+  autoware_vehicle_msgs::msg::VehicleCommand msg;
+  msg.control.velocity = 1.2;
+  msg.control.steering_angle_velocity = 19.3;
+  msg.control.steering_angle = 12.0;
+  msg.control.steering_angle_velocity = 192.4;
+  msg.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+  msg.emergency = 1;
+  msg.header.frame_id = "base_link";
+  msg.header.stamp.nanosec = 99;
+  msg.header.stamp.sec = 3;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_TRUE(msg.shift.data == proto.shift().data());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  msg.shift.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+  EXPECT_HEADER_EQ(msg.header, proto.header());
+  EXPECT_EQ(msg.emergency, proto.emergency());
+  msg = autoware_vehicle_msgs::msg::VehicleCommand();
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_TRUE(msg.shift.data == proto.shift().data());
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  msg.shift.data = 1023;
+  EXPECT_THROW(
+    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+  EXPECT_HEADER_EQ(msg.header, proto.header());
+  EXPECT_EQ(msg.emergency, proto.emergency());
 }
 
 int main(int argc, char ** argv)

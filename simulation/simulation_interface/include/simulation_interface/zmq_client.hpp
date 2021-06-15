@@ -71,8 +71,8 @@ public:
     socket_.send(message);
     zmqpp::message buffer;
     socket_.receive(buffer);
-    std::string received_string = buffer.get(0);
-    res.ParseFromString(received_string);
+    std::string recieved_string = buffer.get(0);
+    res.ParseFromString(recieved_string);
     /*
     end = std::chrono::system_clock::now();
     double elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
