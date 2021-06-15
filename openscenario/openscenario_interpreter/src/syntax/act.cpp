@@ -24,12 +24,12 @@ nlohmann::json & operator<<(nlohmann::json & json, const Act & datum)
 
   json["state"] = boost::lexical_cast<std::string>(datum.state());
 
-  // json["Act"] = nlohmann::json::array();
+  // json["ManeuverGroup"] = nlohmann::json::array();
   //
   // for (const auto & each : datum) {
   //   nlohmann::json act;
-  //   act << each.as<Act>();
-  //   json["Act"].push_back(act);
+  //   act << each.as<ManeuverGroup>();
+  //   json["ManeuverGroup"].push_back(act);
   // }
 
   return json;

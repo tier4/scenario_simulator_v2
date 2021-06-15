@@ -35,28 +35,26 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act : public StoryboardElement<Act>, public Elements
+struct Act : public StoryboardElement<Act>, public Elements, public Scope
 {
   const String name;
-
-  Scope inner_scope;
 
   Element start_trigger, stop_trigger;
 
   template <typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)), inner_scope(outer_scope)
+  : Scope(outer_scope), name(readAttribute<String>("name", node, outer_scope))
   {
     callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<ManeuverGroup>(node, inner_scope));
+      return push_back(readStoryboardElement<ManeuverGroup>(node, *this));
     });
 
     callWithElements(node, "StartTrigger", 1, 1, [&](auto && node) {
-      return start_trigger.rebind<Trigger>(node, inner_scope);
+      return start_trigger.rebind<Trigger>(node, *this);
     });
 
     callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
-      return stop_trigger.rebind<Trigger>(node, inner_scope);
+      return stop_trigger.rebind<Trigger>(node, *this);
     });
   }
 
@@ -66,8 +64,8 @@ struct Act : public StoryboardElement<Act>, public Elements
 
   /* -------------------------------------------------------------------------
    *
-   * A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
-   * completeState.
+   *  A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
+   *  completeState.
    *
    * ---------------------------------------------------------------------- */
   auto accomplished() const
