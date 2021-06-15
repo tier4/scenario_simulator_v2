@@ -56,7 +56,7 @@ public:
 private:
   void autoSink();
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
-  std::vector<std::shared_ptr<traffic_simulator::traffic::TraffiModuleBase>> modules_;
+  std::vector<std::shared_ptr<traffic_simulator::traffic::TrafficModuleBase>> modules_;
   const std::function<std::vector<std::string>(void)> get_entity_names_function;
   const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
   const std::function<void(const std::string &)> despawn_function;

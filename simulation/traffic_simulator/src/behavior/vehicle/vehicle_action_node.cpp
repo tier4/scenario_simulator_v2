@@ -64,9 +64,9 @@ openscenario_msgs::msg::EntityStatus VehicleActionNode::calculateEntityStatusUpd
     entity_status.lanelet_pose.s +
     (twist_new.linear.x + entity_status.action_status.twist.linear.x) / 2.0 * step_time;
   if (new_s < 0) {
-    auto previous_lanlet_ids =
+    auto previous_lanelet_ids =
       hdmap_utils->getPreviousLaneletIds(entity_status.lanelet_pose.lanelet_id);
-    new_lanelet_id = previous_lanlet_ids[0];
+    new_lanelet_id = previous_lanelet_ids[0];
     new_s = new_s + hdmap_utils->getLaneletLength(new_lanelet_id) - 0.01;
     openscenario_msgs::msg::EntityStatus entity_status_updated;
     entity_status_updated.time = current_time + step_time;

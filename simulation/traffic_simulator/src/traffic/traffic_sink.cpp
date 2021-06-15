@@ -40,7 +40,7 @@ TrafficSink::TrafficSink(
   const std::function<std::vector<std::string>(void)> & get_entity_names_function,
   const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
   const std::function<void(std::string)> & despawn_function)
-: TraffiModuleBase(),
+: TrafficModuleBase(),
   radius(radius),
   position(position),
   get_entity_names_function(get_entity_names_function),

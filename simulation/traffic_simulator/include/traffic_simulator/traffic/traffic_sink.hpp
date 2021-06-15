@@ -36,7 +36,7 @@ namespace traffic_simulator
 {
 namespace traffic
 {
-class TrafficSink : public TraffiModuleBase
+class TrafficSink : public TrafficModuleBase
 {
 public:
   explicit TrafficSink(

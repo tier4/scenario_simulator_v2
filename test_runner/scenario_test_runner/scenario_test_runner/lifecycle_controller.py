@@ -224,9 +224,9 @@ class LifecycleController(Node):
         success : bool
 
         """
-        reqest = ChangeState.Request()
-        reqest.transition.id = transition_id
-        future = self.client_change_state.call_async(reqest)
+        request = ChangeState.Request()
+        request.transition.id = transition_id
+        future = self.client_change_state.call_async(request)
         executor = rclpy.executors.SingleThreadedExecutor(context=self.context)
         rclpy.spin_until_future_complete(self, future, executor=executor)
         return future.result().success

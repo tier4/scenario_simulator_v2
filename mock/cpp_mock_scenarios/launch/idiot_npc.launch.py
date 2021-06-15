@@ -28,7 +28,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     """Launch description for scenario runner moc."""
-    lanlet_path = os.path.join(
+    lanelet_path = os.path.join(
         get_package_share_directory("kashiwanoha_map"), "map", "lanelet2_map.osm"
     )
     rviz_config_dir = os.path.join(
@@ -45,7 +45,7 @@ def generate_launch_description():
                 output="screen",
                 parameters=[
                     {
-                        "map_path": lanlet_path,
+                        "map_path": lanelet_path,
                         "origin_latitude": 35.903555800615614,
                         "origin_longitude": 139.93339979022568,
                         "port": 8080,
