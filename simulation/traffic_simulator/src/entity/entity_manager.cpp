@@ -516,13 +516,13 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
   if (status) {
     if (direction == Direction::LEFT) {
       const auto target =
-          hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "left");
+        hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "left");
       if (target) {
         requestLaneChange(name, target.get());
       }
     } else if (direction == Direction::RIGHT) {
       const auto target =
-          hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "right");
+        hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "right");
       if (target) {
         requestLaneChange(name, target.get());
       }
