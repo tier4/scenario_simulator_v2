@@ -18,19 +18,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Event & datum)
+nlohmann::json & operator<<(nlohmann::json & json, const Action & datum)
 {
   json["name"] = datum.name;
 
   json["state"] = boost::lexical_cast<std::string>(datum.state());
-
-  json["Action"] = nlohmann::json::array();
-
-  for (const auto & each : datum) {
-    nlohmann::json action;
-    action << each.as<Action>();
-    json["Action"].push_back(action);
-  }
 
   return json;
 }
