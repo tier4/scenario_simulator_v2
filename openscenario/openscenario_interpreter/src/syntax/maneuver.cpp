@@ -12,28 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/maneuver_group.hpp>
+#include <openscenario_interpreter/syntax/maneuver.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const ManeuverGroup & datum)
+nlohmann::json & operator<<(nlohmann::json & json, const Maneuver & datum)
 {
   json["name"] = datum.name;
 
   json["state"] = boost::lexical_cast<std::string>(datum.state());
 
-  json["currentExecutionCount"] = datum.current_execution_count;
-  json["maximumExecutionCount"] = datum.maximum_execution_count;
+  json["Event"] = nlohmann::json::array();
 
-  json["Maneuver"] = nlohmann::json::array();
-
-  for (const auto & each : datum) {
-    nlohmann::json maneuver;
-    maneuver << each.as<Maneuver>();
-    json["Maneuver"].push_back(maneuver);
-  }
+  // for (const auto & each : datum) {
+  //   nlohmann::json event;
+  //   event << each.as<Event>();
+  //   json["Event"].push_back(event);
+  // }
 
   return json;
 }
