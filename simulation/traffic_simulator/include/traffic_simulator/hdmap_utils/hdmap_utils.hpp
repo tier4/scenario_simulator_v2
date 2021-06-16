@@ -64,7 +64,7 @@ public:
 
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
-  geometry_msgs::msg::PoseStamped toMapPose(openscenario_msgs::msg::LaneletPose lanlet_pose);
+  geometry_msgs::msg::PoseStamped toMapPose(openscenario_msgs::msg::LaneletPose lanelet_pose);
   geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset);
 
   double getHeight(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
@@ -75,7 +75,7 @@ public:
   std::vector<std::int64_t> getPreviousLaneletIds(
     std::int64_t lanelet_id, std::string turn_direction);
   std::vector<std::int64_t> getPreviousLaneletIds(std::int64_t lanelet_id) const;
-  boost::optional<int> getLaneChangeableLenletId(std::int64_t lanelet_id, std::string direction);
+  boost::optional<int> getLaneChangeableLaneletId(std::int64_t lanelet_id, std::string direction);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
@@ -99,7 +99,7 @@ public:
     std::int64_t lanelet_id);
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
     std::int64_t lanelet_id, double s, std::vector<std::int64_t> lanelet_ids,
-    double foward_distance = 20);
+    double forward_distance = 20);
   bool canChangeLane(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
   boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>> getLaneChangeTrajectory(
     geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id);
@@ -115,7 +115,7 @@ public:
   const std::vector<std::int64_t> getRightOfWayLaneletIds(std::int64_t lanelet_id) const;
   const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     std::vector<std::int64_t> lanelet_ids) const;
-  boost::optional<std::int64_t> getClosetLanletId(
+  boost::optional<std::int64_t> getClosetLaneletId(
     geometry_msgs::msg::Pose pose, double distance_thresh = 30.0);
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);

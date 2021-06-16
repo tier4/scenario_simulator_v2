@@ -287,11 +287,11 @@ geometry_msgs::msg::Pose EntityManager::getMapPose(
   if (!ref_status) {
     THROW_SEMANTIC_ERROR("entity : ", reference_entity_name, " status is empty");
   }
-  tf2::Transform ref_transfrom, relative_transform;
-  tf2::fromMsg(ref_status->pose, ref_transfrom);
+  tf2::Transform ref_transform, relative_transform;
+  tf2::fromMsg(ref_status->pose, ref_transform);
   tf2::fromMsg(relative_pose, relative_transform);
   geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transfrom * relative_transform, ret);
+  tf2::toMsg(ref_transform * relative_transform, ret);
   return ret;
 }
 
@@ -516,13 +516,13 @@ void EntityManager::requestLaneChange(const std::string & name, const Direction 
   if (status) {
     if (direction == Direction::LEFT) {
       const auto target =
-        hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_pose.lanelet_id, "left");
+        hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "left");
       if (target) {
         requestLaneChange(name, target.get());
       }
     } else if (direction == Direction::RIGHT) {
       const auto target =
-        hdmap_utils_ptr_->getLaneChangeableLenletId(status->lanelet_pose.lanelet_id, "right");
+        hdmap_utils_ptr_->getLaneChangeableLaneletId(status->lanelet_pose.lanelet_id, "right");
       if (target) {
         requestLaneChange(name, target.get());
       }
@@ -632,7 +632,7 @@ void EntityManager::update(const double current_time, const double step_time)
   end = std::chrono::system_clock::now();
   double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
   if (verbose_) {
-    std::cout << "elapsed " << elapsed / 1000 << " secands in update function." << std::endl;
+    std::cout << "elapsed " << elapsed / 1000 << " seconds in update function." << std::endl;
   }
 }
 

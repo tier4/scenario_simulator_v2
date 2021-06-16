@@ -9,7 +9,11 @@ on:
       - "docs/**"
       - "mkdocs.yml"
       - "README.md"
-
+      - "workflows/Docker.yaml"
+      - "workflows/Documentation.yaml"
+      - "workflows/NotifyFailure.yaml"
+      - "workflows/Release.yaml"
+      - "workflows/SpellCheck.yaml"
 jobs:
   job1:
     name: ScenarioTest
@@ -51,7 +55,7 @@ jobs:
           sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
           cd ~/ros2_ws
-          vcs import src < src/scenario_simulator_v2/dependency.repos
+          vcs import src < src/scenario_simulator_v2/dependency_foxy.repos
 
       - name: Clone autoware packages
         run: |

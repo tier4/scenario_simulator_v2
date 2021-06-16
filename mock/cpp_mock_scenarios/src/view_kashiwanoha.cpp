@@ -60,8 +60,8 @@ private:
     api_.updateFrame();
     current_time_ = current_time_ + 0.05;
   }
-  bool lanechange_excuted_;
-  bool target_speed_setted_;
+  bool lanechange_executed_;
+  bool target_speed_set_;
   bool bob_spawned_;
   double current_time_;
   int port_;

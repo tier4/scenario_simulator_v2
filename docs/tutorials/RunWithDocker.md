@@ -5,6 +5,8 @@ We automatically build docker images by using GitHub Actions and push them into 
 
 If you want to run scenario_simulator_v2 with docker, please follow the instructions below.
 
+Currently, macOS and Windows are not supported yet.
+
 ## Install docker
 
 Please follow the instructions below.

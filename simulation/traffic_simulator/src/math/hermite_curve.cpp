@@ -201,7 +201,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
 }
 
 boost::optional<double> HermiteCurve::getSValue(
-  geometry_msgs::msg::Point point, double threadhold_distance, unsigned int initial_resolution,
+  geometry_msgs::msg::Point point, double threshold_distance, unsigned int initial_resolution,
   unsigned int max_iteration, double tolerance, bool autoscale) const
 {
   double step_size = static_cast<double>(1.0) / static_cast<double>(initial_resolution);
@@ -229,14 +229,14 @@ boost::optional<double> HermiteCurve::getSValue(
   }
   std::vector<double>::iterator min_iter = std::min_element(errors.begin(), errors.end());
   double min_error = *std::min_element(errors.begin(), errors.end());
-  if (min_error > (threadhold_distance * threadhold_distance)) {
+  if (min_error > (threshold_distance * threshold_distance)) {
     return boost::none;
   }
   size_t value_index = std::distance(errors.begin(), min_iter);
   ret = s_values[value_index];
   if (ret < 0) {
     double error = getSquaredDistanceIn2D(point, 0, false);
-    if (error < (threadhold_distance * threadhold_distance)) {
+    if (error < (threshold_distance * threshold_distance)) {
       ret = 0;
     } else {
       return boost::none;
@@ -244,7 +244,7 @@ boost::optional<double> HermiteCurve::getSValue(
   }
   if (ret > 1) {
     double error = getSquaredDistanceIn2D(point, 0, false);
-    if (error < (threadhold_distance * threadhold_distance)) {
+    if (error < (threshold_distance * threshold_distance)) {
       ret = 1;
     } else {
       return boost::none;
