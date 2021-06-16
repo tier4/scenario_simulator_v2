@@ -18,10 +18,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const CollisionCondition & datum)
-{
-  //
-  return os;
-}
+std::ostream & operator<<(std::ostream & os, const CollisionCondition & datum) { return os; }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

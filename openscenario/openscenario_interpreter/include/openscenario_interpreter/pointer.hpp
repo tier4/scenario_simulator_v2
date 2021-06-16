@@ -18,6 +18,7 @@
 #include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_accomplished.hpp>
+#include <openscenario_interpreter/type_traits/if_has_member_function_description.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_start.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_state.hpp>
@@ -46,26 +47,34 @@ class Pointer : public std::shared_ptr<T>
     const std::type_info & type() const noexcept override { return typeid(Bound); }
 
   private:
-    std::ostream & write(std::ostream & os) const override
+    bool accomplished() override  //
     {
-      return IfHasStreamOutputOperator<Bound>::applyIt(os, *this);
+      return IfHasMemberFunctionAccomplished<Bound>::callIt(*this);
     }
 
-    Pointer evaluate(const Pointer & else_) override
+    auto description() const -> std::string override
+    {
+      return IfHasMemberFunctionDescription<Bound>::invoke(*this);
+    }
+
+    auto evaluate(const Pointer & else_) -> Pointer override
     {
       return IfHasMemberFunctionEvaluate<Bound>::callIt(static_cast<Bound &>(*this), else_);
-    }
-
-    bool accomplished() override { return IfHasMemberFunctionAccomplished<Bound>::callIt(*this); }
-
-    const Pointer & state() const override
-    {
-      return IfHasMemberFunctionState<Bound>::template callIt<Pointer>(*this);
     }
 
     void start() override  // corresponds to startTransition
     {
       IfHasMemberFunctionStart<Bound>::callIt(*this);
+    }
+
+    auto state() const -> const Pointer & override
+    {
+      return IfHasMemberFunctionState<Bound>::template callIt<Pointer>(*this);
+    }
+
+    auto write(std::ostream & os) const -> std::ostream & override
+    {
+      return IfHasStreamOutputOperator<Bound>::applyIt(os, *this);
     }
   };
 
@@ -140,12 +149,18 @@ public:
   {
     return binding().start(std::forward<decltype(xs)>(xs)...);
   }
+
+  template <typename... Ts>
+  decltype(auto) description(Ts &&... xs) const
+  {
+    return binding().description(std::forward<decltype(xs)>(xs)...);
+  }
 };
 
 template <typename T>
 std::ostream & operator<<(std::ostream & os, const Pointer<T> & pointer)
 {
-  return (pointer ? pointer.binding().write(os) : (os << faint << "<Null/>")) << reset;
+  return (pointer ? pointer.binding().write(os) : (os << faint << "<TODO/>")) << reset;
 }
 }  // namespace openscenario_interpreter
 
