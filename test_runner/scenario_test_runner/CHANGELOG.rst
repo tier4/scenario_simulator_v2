@@ -2,6 +2,43 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/get_vehicle_cmd
+* Merge pull request `#354 <https://github.com/tier4/scenario_simulator_v2/issues/354>`_ from tier4/fix/typos-misc
+* Fix typos in docs / mock / simulation/ test_runner
+* Merge pull request `#346 <https://github.com/tier4/scenario_simulator_v2/issues/346>`_ from tier4/feature/replay.launch
+* add launch file
+* Merge pull request `#341 <https://github.com/tier4/scenario_simulator_v2/issues/341>`_ from tier4/fix/traffic-simulator/vehicle-description
+* Cleanup
+* Update launch file to receive LaunchContext
+* Merge pull request `#338 <https://github.com/tier4/scenario_simulator_v2/issues/338>`_ from tier4/feature/interpreter/vehicle-description
+* Fixed not to load description when no argument vehicle is given
+* Update EgoEntity to use precise simulation model parameters
+* Update scenario_test_runner.launch.py to load Autoware parameter
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#334 <https://github.com/tier4/scenario_simulator_v2/issues/334>`_ from tier4/fix/typos-in-docs-and-comments
+* Merge branch 'master' into fix/typos-in-docs-and-comments
+* Fix typos and grammars in docs and comments
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#331 <https://github.com/tier4/scenario_simulator_v2/issues/331>`_ from tier4/feature/interpreter/traffic-signals
+* Cleanup struct 'OpenScenario'
+* Move struct ScenarioDefinition into new header
+* Rename scenario 'Autoware.TrafficSignals' to 'TrafficSignals'
+* Update test scenario
+* Merge pull request `#309 <https://github.com/tier4/scenario_simulator_v2/issues/309>`_ from tier4/fix/interpreter/deactivation
+* Add new test scenario 'empty'
+* Merge pull request `#308 <https://github.com/tier4/scenario_simulator_v2/issues/308>`_ from tier4/feature/check_rosbag_output
+* fix typo
+* apply reformat
+* enable check log output
+* Merge pull request `#305 <https://github.com/tier4/scenario_simulator_v2/issues/305>`_ from tier4/refactor/scenario-test-runner
+* Add interactive messages
+* Remove deprecated launch files
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Merge remote-tracking branch 'origin/master' into feature/error-handling
+* Contributors: Kazuki Miyahara, Masaya Kataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#295 <https://github.com/tier4/scenario_simulator_v2/issues/295>`_ from tier4/fix/python_format

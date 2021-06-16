@@ -2,6 +2,12 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Merge remote-tracking branch 'origin/master' into feature/error-handling
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#295 <https://github.com/tier4/scenario_simulator_v2/issues/295>`_ from tier4/fix/python_format

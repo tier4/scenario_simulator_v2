@@ -2,6 +2,11 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Contributors: Masaya Kataoka
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#292 <https://github.com/tier4/scenario_simulator_v2/issues/292>`_ from tier4/feature/ros_tooling_workflow

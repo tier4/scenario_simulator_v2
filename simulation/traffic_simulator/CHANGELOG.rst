@@ -2,6 +2,112 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#355 <https://github.com/tier4/scenario_simulator_v2/issues/355>`_ from tier4/feature/get_vehicle_cmd
+* add getVehicleCommand class to the API class
+* add const autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand(); function to the EntityManager class
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/get_vehicle_cmd
+* add getVehicleCommand function to the ego entity class
+* Merge pull request `#354 <https://github.com/tier4/scenario_simulator_v2/issues/354>`_ from tier4/fix/typos-misc
+* Apply clang-format
+* Fix typos in docs / mock / simulation/ test_runner
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into doc/update_image
+* Merge pull request `#351 <https://github.com/tier4/scenario_simulator_v2/issues/351>`_ from tier4/fix/traffic-simulator/simulation-model-2
+* Replace some identifiers spellcheck reported as issue
+* Replace temporary excptions
+* Update EgoEntity::setTargetSpeed to consider parameter 'vehicle_model_type'
+* Support simulation model 'SimModelIdealSteer'
+* Update EgoEntity to use model specified by parameter 'vehicle_model_type'
+* Update EgoEntity to read parameter 'vehicle_model_type'
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/replay.launch
+* Merge pull request `#345 <https://github.com/tier4/scenario_simulator_v2/issues/345>`_ from tier4/fix/traffic-simulator/simulation-model
+* Fix control inputs
+* Add some debug prints
+* Update EgoEntity's simulation model to use SimModelTimeDelaySteerAccel
+* Merge pull request `#343 <https://github.com/tier4/scenario_simulator_v2/issues/343>`_ from tier4/fix/traffic-simulator/vehicle-parameter
+* Fix API to pass step-time to EgoEntity's constructor
+* Add debug prints
+* Remove debug print
+* Update launch file to receive LaunchContext
+* Merge pull request `#338 <https://github.com/tier4/scenario_simulator_v2/issues/338>`_ from tier4/feature/interpreter/vehicle-description
+* Update EgoEntity to use precise simulation model parameters
+* Update scenario_test_runner.launch.py to load Autoware parameter
+* Merge pull request `#336 <https://github.com/tier4/scenario_simulator_v2/issues/336>`_ from tier4/feature/speed_up_npc_logic
+* add meanings  of sampling resolution
+* fixd problems described in review
+* remove verbose true
+* remove unused lines
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#334 <https://github.com/tier4/scenario_simulator_v2/issues/334>`_ from tier4/fix/typos-in-docs-and-comments
+* apply reformat
+* Fix typos and grammars in docs and comments
+* apply reformat
+* add LaneletLengthChache
+* filter other entity status by cartesian distance
+* comment out multithread section
+* commend out stop watch
+* calculate waypoints only one time in follow lane action
+* add center points cache
+* fix typo
+* apply reformat
+* use future and async launch
+* remove warning
+* add parallel util
+* use openmp
+* add omp to the depends
+* fix typo
+* update branch
+* apply reformat
+* enable chache length
+* apply reformat
+* add route chache
+* Merge pull request `#316 <https://github.com/tier4/scenario_simulator_v2/issues/316>`_ from tier4/fix/hold_stream
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into fix/hold_stream
+* apply reformat
+* hold ostrem in manager class
+* change default value
+* apply reformat
+* add file_output_every_frame option (default = false)
+* Merge pull request `#315 <https://github.com/tier4/scenario_simulator_v2/issues/315>`_ from tier4/feature/use_ros_clock
+* enable use raw ros timestamp
+* Merge pull request `#314 <https://github.com/tier4/scenario_simulator_v2/issues/314>`_ from tier4/fix/sensor_timestamp
+* apply reformat
+* Merge pull request `#306 <https://github.com/tier4/scenario_simulator_v2/issues/306>`_ from tier4/feature/use_common_exception
+* Remove trailing semicolon from macro definition
+* fix problems in https://github.com/tier4/scenario_simulator_v2/pull/306#discussion_r634055658
+* fix typo
+* add spec violation error
+* remove BehaviorTree exception
+* remove CALCURATION_ERROR
+* remove SimulationClockError
+* remove Execution Error
+* remove some exception
+* remove exception.hpp
+* remove hdmap error
+* use common exception
+* remove traffic_simulator::SimulationRuntimeError
+* modify macro
+* Merge pull request `#304 <https://github.com/tier4/scenario_simulator_v2/issues/304>`_ from tier4/feature/synchronize_clock
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/synchronize_clock
+* enable send clock
+* Merge pull request `#302 <https://github.com/tier4/scenario_simulator_v2/issues/302>`_ from tier4/feature/error-handling-2
+* Merge pull request `#301 <https://github.com/tier4/scenario_simulator_v2/issues/301>`_ from tier4/feature/publish_clock
+* add licence
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Merge pull request `#297 <https://github.com/tier4/scenario_simulator_v2/issues/297>`_ from tier4/feature/error-handling
+* use from_seconds function
+* enable publish clock
+* add publisher
+* Update Interpreter to destruct simulator on deactivation phase
+* remove unused params
+* add clock class to the api
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* add SimulationClock class
+* Merge remote-tracking branch 'origin/master' into feature/error-handling
+* Update EgoEntity to show current-time
+* Contributors: Kazuki Miyahara, Masaya Kataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#295 <https://github.com/tier4/scenario_simulator_v2/issues/295>`_ from tier4/fix/python_format
