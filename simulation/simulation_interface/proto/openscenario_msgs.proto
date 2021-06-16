@@ -9,7 +9,7 @@ package openscenario_msgs;
 **/
 message ActionStatus
 {
-    string current_action = 1; // Current acttion of the entity.
+    string current_action = 1; // Current action of the entity.
     geometry_msgs.Twist twist = 2; // Velocity of the entity.
     geometry_msgs.Accel accel = 3; // Acceleration of the entity.
 }
@@ -29,7 +29,7 @@ message BoundingBox
 **/
 message LaneletPose
 {
-    int64 lanlet_id = 1; // Lanelet id of the entity exists.
+    int64 lanelet_id = 1; // Lanelet id of the entity exists.
     double s = 2; // S value in the lane coordinate.
     double offset = 3; // Offset value in the lane coordinate.
     geometry_msgs.Vector3 rpy = 4; // RPY(roll/pitch/yaw) value in the lane coordinate.

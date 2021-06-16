@@ -67,7 +67,7 @@ public:
       traffic_simulator::helper::constructLaneletPose(34579, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
-    lanechange_excuted_ = false;
+    lanechange_executed_ = false;
     api_.spawn(false, "npc2", params,
       traffic_simulator::helper::constructLaneletPose(34606, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
@@ -100,8 +100,8 @@ private:
     api_.updateFrame();
     current_time_ = current_time_ + 0.02;
   }
-  bool lanechange_excuted_;
-  bool target_speed_setted_;
+  bool lanechange_executed_;
+  bool target_speed_set_;
   bool bob_spawned_;
   double current_time_;
   int port_;

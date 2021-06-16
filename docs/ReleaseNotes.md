@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+## Ver 0.1.0
 - Synchronize ROS time between traffic_simulator and sensor_simulator.
 - openscenario_interpreter now stores recorded rosbags for each simulation in output_directory (argument of scenario_test_runner).
 - Add AutowareError, SemanticError, SimulationError, SpecificationViolation, SyntaxError and use these errors in traffic_simulator and openscenario_interpreter package.
@@ -12,6 +14,7 @@
 - Enable caching routing reslut, and center points and it' spline, lanelet length in hdmap_utils class
 - Update interpreter to access TrafficSignals from Action / Condition
 - Update EgoEntity to use precise simulation model parameters
+- add getVehicleCommand function to the API class
 
 ## Ver 0.0.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.0.1) on Github :fa-github:

@@ -171,30 +171,30 @@ struct VehicleParameters
     bounding_box(xml.child("Vehicle")),
     axles(xml.child("Vehicle")),
     name(xml.attribute("name").as_string()),
-    vehicle_categoly(xml.attribute("vehicleCategory").as_string())
+    vehicle_category(xml.attribute("vehicleCategory").as_string())
   {
   }
   VehicleParameters(
-    std::string name, std::string vehicle_categoly, Performance performance,
+    std::string name, std::string vehicle_category, Performance performance,
     BoundingBox bounding_box, Axles axles)
   : performance(performance),
     bounding_box(bounding_box),
     axles(axles),
     name(name),
-    vehicle_categoly(vehicle_categoly)
+    vehicle_category(vehicle_category)
   {
   }
   const Performance performance;
   const BoundingBox bounding_box;
   const Axles axles;
   const std::string name;
-  const std::string vehicle_categoly;
+  const std::string vehicle_category;
 
   const openscenario_msgs::msg::VehicleParameters toRosMsg()
   {
     openscenario_msgs::msg::VehicleParameters ret;
     ret.name = name;
-    ret.vehicle_category = vehicle_categoly;
+    ret.vehicle_category = vehicle_category;
     ret.bounding_box = bounding_box.toRosMsg();
     ret.axles = axles.toRosMsg();
     ret.performance = performance.toRosMsg();
@@ -207,7 +207,7 @@ struct VehicleParameters
     ptree pt;
     ptree & vehicle_tree = pt.add("Vehicle", "");
     vehicle_tree.put("<xmlattr>.name", name);
-    vehicle_tree.put("<xmlattr>.vehicleCategory", vehicle_categoly);
+    vehicle_tree.put("<xmlattr>.vehicleCategory", vehicle_category);
     ptree & performance_tree = vehicle_tree.add("Performance", "");
     performance_tree.put("<xmlattr>.maxSpeed", performance.max_speed);
     performance_tree.put("<xmlattr>.maxAcceleration", performance.max_acceleration);

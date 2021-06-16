@@ -30,10 +30,10 @@ namespace traffic_simulator
 {
 namespace traffic
 {
-class TraffiModuleBase
+class TrafficModuleBase
 {
 public:
-  TraffiModuleBase() {}
+  TrafficModuleBase() {}
   virtual void execute() = 0;
 };
 }  // namespace traffic
