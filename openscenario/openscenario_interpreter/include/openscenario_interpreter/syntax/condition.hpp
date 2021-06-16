@@ -54,7 +54,7 @@ struct Condition : public Element
   : Element(
       choice(node,
         std::make_pair("ByEntityCondition", [&](auto && node) { return make<ByEntityCondition>(node, scope); }),
-        std::make_pair("ByValueCondition",  [&](auto && node) { return make<ByValueCondition >(node, scope); }))),
+        std::make_pair( "ByValueCondition", [&](auto && node) { return make< ByValueCondition>(node, scope); }))),
     name(readAttribute<String>("name", node, scope)),
     delay(readAttribute<Double>("delay", node, scope, Double())),
     condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope)),

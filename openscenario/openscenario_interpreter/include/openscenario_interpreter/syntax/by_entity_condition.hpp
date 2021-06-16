@@ -33,23 +33,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ByEntityCondition : private Scope
+struct ByEntityCondition : private Scope, public EntityCondition
 {
-  const EntityCondition entity_condition;
-
   template <typename Node, typename Scope>
   explicit ByEntityCondition(const Node & node, Scope & outer_scope)
   : Scope(outer_scope),
-    entity_condition(readElement<EntityCondition>(
+    EntityCondition(readElement<EntityCondition>(
       "EntityCondition", node, scope(),
       readElement<TriggeringEntities>("TriggeringEntities", node, scope())))
   {
-  }
-
-  template <typename... Ts>
-  auto evaluate(Ts &&... xs) const
-  {
-    return entity_condition.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace syntax

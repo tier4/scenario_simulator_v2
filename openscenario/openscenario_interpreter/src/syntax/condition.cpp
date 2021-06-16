@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/condition.hpp>
+#include <openscenario_interpreter/utility/demangle.hpp>
 
 namespace openscenario_interpreter
 {
@@ -21,6 +22,20 @@ inline namespace syntax
 nlohmann::json & operator<<(nlohmann::json & json, const Condition & datum)
 {
   json["currentEvaluation"] = boost::lexical_cast<std::string>(datum.current_evaluation);
+
+  json["name"] = datum.name;
+
+  // clang-format off
+  static const std::unordered_map<
+    std::type_index,
+    std::function<std::string(const Condition &)>> table
+  {
+    { typeid(ByEntityCondition), [&](const Condition & condition) { return makeTypename(condition.as<ByEntityCondition>().type()); } },
+    { typeid( ByValueCondition), [&](const Condition & condition) { return makeTypename(condition.as< ByValueCondition>().type()); } },
+  };
+  // clang-format on
+
+  json["type"] = table.at(datum.type())(datum);
 
   return json;
 }
