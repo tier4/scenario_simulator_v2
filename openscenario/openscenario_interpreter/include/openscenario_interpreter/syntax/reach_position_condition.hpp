@@ -51,29 +51,27 @@ struct ReachPositionCondition
 
   const TriggeringEntities for_each;
 
-  using TriggeringEntity = TriggeringEntities::value_type;
-
   decltype(auto) operator()(
-    const WorldPosition & world_position, const TriggeringEntity & triggering_entity) const
+    const WorldPosition & world_position, const EntityRef & triggering_entity) const
   {
     return isReachedPosition(
       triggering_entity, static_cast<geometry_msgs::msg::Pose>(world_position), tolerance);
   }
 
-  bool operator()(const RelativeWorldPosition &, const TriggeringEntity &) const
+  bool operator()(const RelativeWorldPosition &, const EntityRef &) const
   {
     throw UNSUPPORTED_SETTING_DETECTED(ReachPositionCondition, position.type().name());
   }
 
   decltype(auto) operator()(
-    const LanePosition & lane_position, const TriggeringEntity & triggering_entity) const
+    const LanePosition & lane_position, const EntityRef & triggering_entity) const
   {
     return isReachedPosition(
       triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position),
       tolerance);
   }
 
-  auto distance(const TriggeringEntity & name)
+  auto distance(const EntityRef & name)
   {
     const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
     return std::hypot(pose.position.x, pose.position.y);

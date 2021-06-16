@@ -53,7 +53,7 @@ struct TriggeringEntitiesRule
   constexpr operator value_type() const noexcept { return value; }
 
   template <typename... Ts>
-  constexpr decltype(auto) operator()(Ts &&... xs) const
+  constexpr decltype(auto) apply(Ts &&... xs) const
   {
     switch (value) {
       case all:

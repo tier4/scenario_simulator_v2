@@ -37,6 +37,8 @@ nlohmann::json & operator<<(nlohmann::json & json, const Condition & datum)
 
   json["type"] = table.at(datum.type())(datum);
 
+  json["description"] = boost::lexical_cast<std::string>(datum);
+
   return json;
 }
 }  // namespace syntax
