@@ -2,6 +2,30 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.0 (2021-06-16)
+------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/get_vehicle_cmd
+* Merge pull request `#354 <https://github.com/tier4/scenario_simulator_v2/issues/354>`_ from tier4/fix/typos-misc
+* Fix typos in docs / mock / simulation/ test_runner
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#334 <https://github.com/tier4/scenario_simulator_v2/issues/334>`_ from tier4/fix/typos-in-docs-and-comments
+* Fix typos and grammars in docs and comments
+* Merge pull request `#306 <https://github.com/tier4/scenario_simulator_v2/issues/306>`_ from tier4/feature/use_common_exception
+* Remove trailing semicolon from macro definition
+* remove protobuf conversion error
+* remove unused macro
+* remove XML parameter error
+* remove SimulationClockError
+* remove Execution Error
+* Merge pull request `#304 <https://github.com/tier4/scenario_simulator_v2/issues/304>`_ from tier4/feature/synchronize_clock
+* modify API schema
+* enable convert clock topic
+* add Clock message definition
+* add messages
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Merge remote-tracking branch 'origin/master' into feature/error-handling
+* Contributors: Kazuki Miyahara, Masaya Kataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#295 <https://github.com/tier4/scenario_simulator_v2/issues/295>`_ from tier4/fix/python_format
