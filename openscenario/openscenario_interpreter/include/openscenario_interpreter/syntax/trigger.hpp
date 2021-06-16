@@ -58,7 +58,7 @@ struct Trigger : public std::list<ConditionGroup>
       std::begin(*this), std::end(*this), false,
       [&](auto && lhs, ConditionGroup & condition_group) {
         const auto rhs = condition_group.evaluate();
-        return lhs || rhs.as<Boolean>();
+        return lhs or rhs.as<Boolean>();
       });
 
     return asBoolean(current_evaluation);

@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/trigger.hpp>
+#include <openscenario_interpreter/syntax/condition_group.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-nlohmann::json & operator<<(nlohmann::json & json, const Trigger & datum)
+nlohmann::json & operator<<(nlohmann::json & json, const ConditionGroup & datum)
 {
   json["currentEvaluation"] = boost::lexical_cast<std::string>(datum.current_evaluation);
 
-  json["ConditionGroup"] = nlohmann::json::array();
+  json["Condition"] = nlohmann::json::array();
 
   for (const auto & each : datum) {
-    nlohmann::json condition_group;
-    condition_group << each;
-    json["ConditionGroup"].push_back(condition_group);
+    nlohmann::json condition;
+    // condition << each;
+    json["Condition"].push_back(condition);
   }
 
   return json;
