@@ -47,13 +47,19 @@ struct Double : public std_msgs::msg::Float64
     return static_cast<Double>(std::numeric_limits<value_type>::infinity());
   }
 
-  auto & operator+=(const double & rhs)
+  auto operator=(const value_type & rhs) noexcept -> decltype(auto)
+  {
+    data = rhs;
+    return *this;
+  }
+
+  auto operator+=(const double & rhs) noexcept -> decltype(auto)
   {
     data += rhs;
     return *this;
   }
 
-  auto & operator*=(const double & rhs)
+  auto operator*=(const double & rhs) noexcept -> decltype(auto)
   {
     data *= rhs;
     return *this;
