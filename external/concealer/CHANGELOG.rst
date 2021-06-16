@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2021-06-16)
+------------------
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
 * Merge pull request `#335 <https://github.com/tier4/scenario_simulator_v2/issues/335>`_ from tier4/fix-for-galactic
 * Fix galactic build errors

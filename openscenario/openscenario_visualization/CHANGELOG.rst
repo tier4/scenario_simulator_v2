@@ -2,8 +2,8 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2021-06-16)
+------------------
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
 * Merge pull request `#334 <https://github.com/tier4/scenario_simulator_v2/issues/334>`_ from tier4/fix/typos-in-docs-and-comments
 * Fix typos and grammars in docs and comments
