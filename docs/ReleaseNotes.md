@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+## Ver 0.1.0
 - Synchronize ROS time between traffic_simulator and sensor_simulator.
 - openscenario_interpreter now stores recorded rosbags for each simulation in output_directory (argument of scenario_test_runner).
 - Add AutowareError, SemanticError, SimulationError, SpecificationViolation, SyntaxError and use these errors in traffic_simulator and openscenario_interpreter package.
