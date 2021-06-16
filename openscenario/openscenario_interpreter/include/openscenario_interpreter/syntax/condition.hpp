@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/by_entity_condition.hpp>
 #include <openscenario_interpreter/syntax/by_value_condition.hpp>
 #include <openscenario_interpreter/syntax/condition_edge.hpp>
@@ -45,31 +46,34 @@ struct Condition : public Element
 
   const ConditionEdge condition_edge;
 
+  Boolean current_evaluation;
+
   template <typename Node, typename Scope>
   explicit Condition(const Node & node, Scope & scope)
-  : Element(choice(
-      node,
-      std::make_pair(
-        "ByEntityCondition", [&](auto && node) { return make<ByEntityCondition>(node, scope); }),
-      std::make_pair(
-        "ByValueCondition", [&](auto && node) { return make<ByValueCondition>(node, scope); }))),
+  // clang-format off
+  : Element(
+      choice(node,
+        std::make_pair("ByEntityCondition", [&](auto && node) { return make<ByEntityCondition>(node, scope); }),
+        std::make_pair("ByValueCondition",  [&](auto && node) { return make<ByValueCondition >(node, scope); }))),
     name(readAttribute<String>("name", node, scope)),
     delay(readAttribute<Double>("delay", node, scope, Double())),
-    condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope))
+    condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope)),
+    current_evaluation(false)
+  // clang-format on
   {
   }
-
-  Element result = false_v;
 
   const auto & evaluate()
   {
-    if (condition_edge == ConditionEdge::sticky && result.as<Boolean>()) {
-      return result;
+    if (condition_edge == ConditionEdge::sticky and current_evaluation) {
+      return true_v;
     } else {
-      return result = Element::evaluate();
+      return asBoolean(current_evaluation = Element::evaluate().as<Boolean>());
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Condition &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -42,7 +42,7 @@ struct ConditionGroup : public std::list<Condition>
   Boolean current_evaluation;
 
   template <typename Node, typename Scope>
-  explicit ConditionGroup(const Node & node, Scope & scope) : current_evaluation()
+  explicit ConditionGroup(const Node & node, Scope & scope) : current_evaluation(false)
   {
     callWithElements(
       node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
