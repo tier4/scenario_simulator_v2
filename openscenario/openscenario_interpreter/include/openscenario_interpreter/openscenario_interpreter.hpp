@@ -21,6 +21,7 @@
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
+#include <openscenario_interpreter/utility/execution_timer.hpp>
 #include <openscenario_interpreter/utility/visibility.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
@@ -53,6 +54,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::string current_error_type;
   std::string current_error_what;
+
+  ExecutionTimer<> execution_timer;
 
   void reset()
   {
