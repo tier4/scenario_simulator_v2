@@ -45,12 +45,23 @@ struct SpeedActionTarget : public Element
   {
   }
 
-  std::pair<std::function<double()>, std::function<bool(const Scope::Actor &)>> operator()() const
+  std::function<double()> getCalculateAbsoluteTargetSpeed() const
   {
     if (is<AbsoluteTargetSpeed>()) {
-      return as<AbsoluteTargetSpeed>()();
+      return as<AbsoluteTargetSpeed>().getCalculateAbsoluteTargetSpeed();
     } else if (is<RelativeTargetSpeed>()) {
-      return as<RelativeTargetSpeed>()();
+      return as<RelativeTargetSpeed>().getCalculateAbsoluteTargetSpeed();
+    } else {
+      throw UNSUPPORTED_SETTING_DETECTED(SpeedActionTarget, this->type().name());
+    }
+  }
+
+  std::function<bool(const Scope::Actor & actor)> getIsEnd() const
+  {
+    if (is<AbsoluteTargetSpeed>()) {
+      return as<AbsoluteTargetSpeed>().getIsEnd();
+    } else if (is<RelativeTargetSpeed>()) {
+      return as<RelativeTargetSpeed>().getIsEnd();
     } else {
       throw UNSUPPORTED_SETTING_DETECTED(SpeedActionTarget, this->type().name());
     }

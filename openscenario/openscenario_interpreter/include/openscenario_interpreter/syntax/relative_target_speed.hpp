@@ -52,29 +52,28 @@ struct RelativeTargetSpeed
   {
   }
 
-  auto operator()() const
+  std::function<double()> getCalculateAbsoluteTargetSpeed() const
   {
-    std::function<double()> calc_absolute_target_speed;
-    switch (speed_target_value_type) {
-      case SpeedTargetValueType::factor:
-        calc_absolute_target_speed = [factor = value, entity_ref = entity_ref]() {
-          return factor * getEntityStatus(entity_ref).action_status.twist.linear.x;
-        };
-        break;
-      case SpeedTargetValueType::delta:
-        calc_absolute_target_speed = [delta = value, entity_ref = entity_ref]() {
-          return delta + getEntityStatus(entity_ref).action_status.twist.linear.x;
-        };
-        break;
-      default:
-        throw UNSUPPORTED_SETTING_DETECTED(RelativeTargetSpeed, speed_target_value_type);
-    }
-
-    std::function<bool(const Scope::Actor & actor)> is_end;
-    if (continuous) {
-      is_end = [](const auto &) { return false; };  // ends never
+    if (speed_target_value_type == SpeedTargetValueType::factor) {
+      return [factor = value, entity_ref = entity_ref]() -> double {
+        return factor * getEntityStatus(entity_ref).action_status.twist.linear.x;
+      };
+    } else if (speed_target_value_type == SpeedTargetValueType::delta) {
+      return [delta = value, entity_ref = entity_ref]() -> double {
+        return delta + getEntityStatus(entity_ref).action_status.twist.linear.x;
+      };
     } else {
-      is_end = [calc_absolute_target_speed](const Scope::Actor & actor) {
+      throw UNSUPPORTED_SETTING_DETECTED(RelativeTargetSpeed, speed_target_value_type);
+    }
+  }
+
+  std::function<bool(const Scope::Actor & actor)> getIsEnd() const
+  {
+    if (continuous) {
+      return [](const auto &) { return false; };  // ends never
+    } else {
+      return [calc_absolute_target_speed =
+                getCalculateAbsoluteTargetSpeed()](const Scope::Actor & actor) {
         try {
           const auto compare = Rule(Rule::equalTo);
           return compare(
@@ -84,8 +83,6 @@ struct RelativeTargetSpeed
         }
       };
     }
-
-    return std::make_pair(std::move(calc_absolute_target_speed), std::move(is_end));
   }
 };
 }  // namespace syntax

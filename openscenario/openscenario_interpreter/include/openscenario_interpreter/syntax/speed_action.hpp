@@ -63,12 +63,10 @@ struct SpeedAction
     }
   }
 
-  decltype(auto) operator()(const Scope::Actor & actor)
+private:
+  void startImpl(const Scope::Actor & actor)
   {
-    std::function<double()> calc_absolute_target_speed;
-    std::function<bool(const Scope::Actor &)> is_end;
-    std::tie(calc_absolute_target_speed, is_end) = speed_action_target();
-
+    auto calc_absolute_target_speed = speed_action_target.getCalculateAbsoluteTargetSpeed();
     double current_absolute_target_speed = calc_absolute_target_speed();
     switch (speed_action_dynamics.dynamics_shape) {
       case DynamicsShape::step: {
@@ -86,23 +84,26 @@ struct SpeedAction
         throw UNSUPPORTED_SETTING_DETECTED(SpeedAction, speed_action_dynamics.dynamics_shape);
     }
 
+    auto is_end = speed_action_target.getIsEnd();
     if (speed_action_target.is<RelativeTargetSpeed>()) {
       // dynamics_shape is not taken in account
-      check = [calc_absolute_target_speed, is_end = std::move(is_end)](const Scope::Actor & actor) {
+      update_and_check = [calc_absolute_target_speed,
+                          is_end = std::move(is_end)](const Scope::Actor & actor) -> bool {
         setTargetSpeed(actor, calc_absolute_target_speed(), true);
         return is_end(actor);
       };
     } else {
-      check = std::move(is_end);
+      update_and_check = std::move(is_end);
     }
   }
 
+public:
   auto start()
   {
     reset();
 
     for (const auto & actor : inner_scope.actors) {
-      (*this)(actor);
+      startImpl(actor);
     }
 
     return unspecified;
@@ -111,7 +112,8 @@ struct SpeedAction
   auto update()
   {
     for (auto && each : accomplishments) {
-      each.second = each.second or (check ? check(Scope::Actor(each.first)) : true);
+      each.second =
+        each.second or (update_and_check ? update_and_check(Scope::Actor(each.first)) : true);
     }
   }
 
@@ -128,7 +130,7 @@ struct SpeedAction
   }
 
 private:
-  std::function<bool(const Scope::Actor &)> check;
+  std::function<bool(const Scope::Actor &)> update_and_check;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
