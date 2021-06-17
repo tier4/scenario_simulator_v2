@@ -20,8 +20,6 @@
 #include <functional>
 #include <unordered_map>
 
-#include "raii.hpp"
-
 namespace openscenario_interpreter
 {
 inline namespace utility
