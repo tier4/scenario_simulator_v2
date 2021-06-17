@@ -20,13 +20,7 @@ inline namespace syntax
 {
 nlohmann::json & operator<<(nlohmann::json & json, const Init & datum)
 {
-  json["Actions"] = nlohmann::json::array();
-
-  for (const auto & each : datum.actions) {
-    nlohmann::json action;
-    // action << each.as<Story>();
-    json["Actions"].push_back(action);
-  }
+  json["Actions"] << datum.actions;
 
   return json;
 }

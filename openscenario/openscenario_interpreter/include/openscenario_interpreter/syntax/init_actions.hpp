@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__INIT_ACTIONS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INIT_ACTIONS_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <string>
@@ -51,7 +52,7 @@ struct InitActions : public Elements
     };
 
     for (const auto & each : node.children()) {
-      const auto iter{dispatcher.find(each.name())};
+      const auto iter = dispatcher.find(each.name());
       if (iter != std::end(dispatcher)) {
         std::get<1> (*iter)(each);
       }
@@ -66,6 +67,8 @@ struct InitActions : public Elements
     return unspecified;
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const InitActions &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
