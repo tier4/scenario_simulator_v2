@@ -37,18 +37,17 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(TYPE) \
-  std::make_pair(#TYPE, [&](auto && node) { push_back(make<TYPE>(node, scope)); })
-
 struct InitActions : public Elements
 {
   template <typename Node, typename Scope>
   explicit InitActions(const Node & node, Scope & scope)
   {
     std::unordered_map<std::string, std::function<void(const Node & node)>> dispatcher{
-      ELEMENT(GlobalAction),
-      ELEMENT(UserDefinedAction),
-      ELEMENT(Private),
+      // clang-format off
+      std::make_pair("GlobalAction",      [&](auto && node) { return push_back(make<GlobalAction>     (node, scope)); }),
+      std::make_pair("UserDefinedAction", [&](auto && node) { return push_back(make<UserDefinedAction>(node, scope)); }),
+      std::make_pair("Private",           [&](auto && node) { return push_back(make<Private>          (node, scope)); })
+      // clang-format on
     };
 
     for (const auto & each : node.children()) {
@@ -67,8 +66,6 @@ struct InitActions : public Elements
     return unspecified;
   }
 };
-
-#undef ELEMENT
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

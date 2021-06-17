@@ -33,7 +33,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Init
 {
-  InitActions actions;
+  const InitActions actions;
 
   template <typename Node, typename Scope>
   explicit Init(const Node & node, Scope & scope)
@@ -47,6 +47,8 @@ struct Init
     return actions.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Init &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
