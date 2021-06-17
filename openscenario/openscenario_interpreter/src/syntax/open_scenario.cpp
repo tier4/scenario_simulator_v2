@@ -27,6 +27,12 @@ nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
 
   json["frame"] = datum.frame;
 
+  json["Overview"]["standbyState"] = openscenario_interpreter::standby_state.use_count() - 1;
+  json["Overview"]["startTransition"] = openscenario_interpreter::start_transition.use_count() - 1;
+  json["Overview"]["runningState"] = openscenario_interpreter::running_state.use_count() - 1;
+  json["Overview"]["stopTransition"] = openscenario_interpreter::stop_transition.use_count() - 1;
+  json["Overview"]["completeState"] = openscenario_interpreter::complete_state.use_count() - 1;
+
   if (datum.category.is<ScenarioDefinition>()) {
     json["OpenSCENARIO"] << datum.category.as<ScenarioDefinition>();
   }

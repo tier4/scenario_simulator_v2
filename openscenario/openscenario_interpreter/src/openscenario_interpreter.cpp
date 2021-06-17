@@ -161,15 +161,6 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
             script.as<OpenScenario>().evaluate();
             nlohmann::json json;
             std::cout << (json << script.as<OpenScenario>()).dump(2) << std::endl;
-#ifndef NDEBUG
-            RCLCPP_INFO_STREAM(
-              get_logger(),
-              "[" << (openscenario_interpreter::standby_state.use_count() - 1) << " standby (=> "
-                  << (openscenario_interpreter::start_transition.use_count() - 1) << ") => "
-                  << (openscenario_interpreter::running_state.use_count() - 1) << " running (=> "
-                  << (openscenario_interpreter::stop_transition.use_count() - 1) << ") => "
-                  << (openscenario_interpreter::complete_state.use_count() - 1) << " complete]");
-#endif
           }
         } else {
           throw Error("No script evaluable");
