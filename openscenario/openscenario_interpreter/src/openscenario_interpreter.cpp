@@ -157,7 +157,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
     withExceptionHandler([this, period]() {
       if (script) {
         if (!script.as<OpenScenario>().complete()) {
-          auto evaluate_time = execution_timer.invoke("evaluate", [&] {
+          const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
             script.as<OpenScenario>().evaluate();
             return getCurrentTime() >= 0;  // statistics only if getCurrentTime() >= 0
           });
@@ -171,21 +171,21 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
                 << (openscenario_interpreter::complete_state.use_count() - 1) << " complete]");
 #endif
           if (getCurrentTime() >= 0 && evaluate_time > period) {
-            auto time_ms =
-              std::chrono::duration_cast<std::chrono::milliseconds>(evaluate_time).count();
-            std::stringstream msg;
+            using namespace std::chrono;
+            const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
+            const auto & time_statistics = execution_timer.getStatistics("evaluate");
             // clang-format off
-            msg << "\nThe execution time of evaluate() (" << time_ms << " ms) is not in time.\n"
-                << "The current local frame rate (" << local_frame_rate << " Hz) (period = "<< period.count() <<" ms) is too high. \n"
-                << "If the frame rate is less than " << static_cast<unsigned int>(1.0 / time_ms * 1e3) << " Hz, you will make it.\n";
-            auto & time_statistics = execution_timer.get_statistics("evaluate");
-            msg << "time statatistics: "
-                << "count = " << time_statistics.count() << ", "
-                << "mean = " << std::chrono::duration_cast<std::chrono::milliseconds>(time_statistics.mean()).count() << " ms, "
-                << "max = " << std::chrono::duration_cast<std::chrono::milliseconds>(time_statistics.max()).count() << " ms, "
-                << "stddev = " << std::chrono::duration_cast<std::chrono::microseconds>(time_statistics.stddev()).count() / 1000.0 << " ms";
+            THROW_SIMULATION_ERROR(
+              "\nThe execution time of evaluate() (",  time_ms, " ms) is not in time.\n",
+              "The current local frame rate (", local_frame_rate, " Hz) (period = ", period.count(), " ms) is too high. \n",
+              "If the frame rate is less than ", static_cast<unsigned int>(1.0 / time_ms * 1e3), " Hz, you will make it.\n",
+              "time statatistics: ",
+              "count = ", time_statistics.count(), ", ",
+              "mean = ", duration_cast<milliseconds>(time_statistics.mean()).count(), " ms, ",
+              "max = ", duration_cast<milliseconds>(time_statistics.max()).count(), " ms, ",
+              "standard deviation = ", duration_cast<microseconds>(time_statistics.standardDeviation()).count() / 1000.0 , " ms"
+            );
             // clang-format on
-            THROW_SIMULATION_ERROR(msg.str());
           }
         }
       } else {

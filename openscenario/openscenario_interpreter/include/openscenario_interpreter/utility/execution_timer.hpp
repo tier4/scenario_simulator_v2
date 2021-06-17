@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__UTILITY__TIME_STAT_HPP_
-#define OPENSCENARIO_INTERPRETER__UTILITY__TIME_STAT_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__UTILITY__EXECUTION_TIMER_HPP_
+#define OPENSCENARIO_INTERPRETER__UTILITY__EXECUTION_TIMER_HPP_
 
 #include <chrono>
 #include <cmath>
@@ -44,13 +44,13 @@ struct ExecutionTimer
     std::chrono::nanoseconds max() const { return std::chrono::nanoseconds(ns_max); }
     std::chrono::nanoseconds min() const { return std::chrono::nanoseconds(ns_min); }
     std::chrono::nanoseconds mean() const { return std::chrono::nanoseconds(ns_sum / count_); }
-    std::chrono::nanoseconds stddev() const
+    std::chrono::nanoseconds standardDeviation() const
     {
       std::int64_t mean_of_sq = ns_sq_sum / count_;
       std::int64_t sq_of_mean = std::pow(ns_sum / count_, 2);
       std::int64_t var = mean_of_sq - sq_of_mean;
-      double stddev_ = std::sqrt(var);
-      return std::chrono::nanoseconds(static_cast<std::int64_t>(stddev_));
+      double standard_deviation = std::sqrt(var);
+      return std::chrono::nanoseconds(static_cast<std::int64_t>(standard_deviation));
     }
 
   private:
@@ -89,7 +89,7 @@ struct ExecutionTimer
 
   void clear() { statistics_map.clear(); }
 
-  const Statistics & get_statistics(const std::string & tag) { return statistics_map[tag]; }
+  const Statistics & getStatistics(const std::string & tag) { return statistics_map[tag]; }
   auto begin() const { return statistics_map.begin(); }
   auto end() const { return statistics_map.end(); }
 
@@ -99,4 +99,4 @@ private:
 }  // namespace utility
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__UTILITY__TIME_STAT_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__UTILITY__EXECUTION_TIMER_HPP_
