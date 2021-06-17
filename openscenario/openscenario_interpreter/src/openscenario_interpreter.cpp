@@ -39,6 +39,7 @@ namespace openscenario_interpreter
 
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
+  publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
   intended_result("success"),
   local_frame_rate(30),
   local_real_time_factor(1.0),
@@ -126,7 +127,7 @@ try {
   script.rebind<OpenScenario>(osc_path);
 
   const auto with_autoware = std::any_of(
-    std::begin(script.as<OpenScenario>().entities), std::end(script.as<OpenScenario>().entities),
+    std::cbegin(script.as<OpenScenario>().entities), std::cend(script.as<OpenScenario>().entities),
     [](auto & each) {
       return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
     });
@@ -152,32 +153,57 @@ try {
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("Activating.");
-  auto period = std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
+
+  const auto period =
+    std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
+
   execution_timer.clear();
+
+  (*publisher_of_context).on_activate();
+
   timer = create_wall_timer(period, [this, period]() {
     withExceptionHandler([this, period]() {
       if (script) {
         if (not script.as<OpenScenario>().complete()) {
           const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
             script.as<OpenScenario>().evaluate();
-            nlohmann::json json;
-            std::cout << (json << script.as<OpenScenario>()).dump(2) << std::endl;
+
+            Context context;
+            {
+              nlohmann::json json;
+              {
+                json << script.as<OpenScenario>();
+              }
+
+              context.stamp = now();
+              context.data = json.dump();
+            }
+
+            std::cout << context.data << std::endl;
+
+            if ((*publisher_of_context).is_activated()) {
+              (*publisher_of_context).publish(context);
+            } else {
+              throw Error("Interpreter's publisher has not been activated yet");
+            }
+
             return getCurrentTime() >= 0;  // statistics only if getCurrentTime() >= 0
           });
+
           if (getCurrentTime() >= 0 && evaluate_time > period) {
             using namespace std::chrono;
             const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
             const auto & time_statistics = execution_timer.getStatistics("evaluate");
             // clang-format off
             THROW_SIMULATION_ERROR(
-              "\nThe execution time of evaluate() (",  time_ms, " ms) is not in time.\n",
-              "The current local frame rate (", local_frame_rate, " Hz) (period = ", period.count(), " ms) is too high. \n",
-              "If the frame rate is less than ", static_cast<unsigned int>(1.0 / time_ms * 1e3), " Hz, you will make it.\n",
-              "time statatistics: ",
+              "The execution time of evaluate() (",  time_ms, " ms) is not in time. ",
+              "The current local frame rate (", local_frame_rate, " Hz) (period = ", period.count(), " ms) is too high. ",
+              "If the frame rate is less than ", static_cast<unsigned int>(1.0 / time_ms * 1e3), " Hz, you will make it. ",
+              "(Statatistics: ",
               "count = ", time_statistics.count(), ", ",
               "mean = ", duration_cast<milliseconds>(time_statistics.mean()).count(), " ms, ",
               "max = ", duration_cast<milliseconds>(time_statistics.max()).count(), " ms, ",
-              "standard deviation = ", duration_cast<microseconds>(time_statistics.standardDeviation()).count() / 1000.0 , " ms"
+              "standard deviation = ", duration_cast<microseconds>(time_statistics.standardDeviation()).count() / 1000.0 , " ms)"
             );
             // clang-format on
           }
@@ -196,6 +222,8 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
   INTERPRETER_INFO_STREAM("Deactivating.");
 
   timer.reset();  // Deactivate scenario evaluation
+
+  (*publisher_of_context).on_deactivate();
 
   connection.~API();  // Deactivate simulator
 
@@ -243,14 +271,18 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("ShuttingDown.");
+
   timer.reset();
+
   return Interpreter::Result::SUCCESS;
 }
 
 Interpreter::Result Interpreter::on_error(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("ErrorProcessing.");
+
   timer.reset();
+
   return Interpreter::Result::SUCCESS;
 }
 }  // namespace openscenario_interpreter

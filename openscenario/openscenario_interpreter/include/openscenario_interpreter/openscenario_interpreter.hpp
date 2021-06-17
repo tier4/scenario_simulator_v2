@@ -35,6 +35,10 @@ namespace openscenario_interpreter
 {
 class Interpreter : public rclcpp_lifecycle::LifecycleNode
 {
+  using Context = openscenario_interpreter_msgs::msg::Context;
+
+  const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
+
   String intended_result;
   double local_frame_rate;
   double local_real_time_factor;
