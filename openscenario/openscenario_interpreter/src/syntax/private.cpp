@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/private.hpp>
+#include <openscenario_interpreter/utility/demangle.hpp>
 
 namespace openscenario_interpreter
 {
@@ -21,6 +22,14 @@ inline namespace syntax
 nlohmann::json & operator<<(nlohmann::json & json, const Private & datum)
 {
   json["entityRef"] = datum.entity_ref;
+
+  json["PrivateAction"] = nlohmann::json::array();
+
+  for (const auto & private_action : datum.private_actions) {
+    nlohmann::json action;
+    action["type"] = makeTypename(private_action.type());
+    json["PrivateAction"].push_back(action);
+  }
 
   return json;
 }
