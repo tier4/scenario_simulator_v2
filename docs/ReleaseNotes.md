@@ -13,6 +13,7 @@
 - Update interpreter to access TrafficSignals from Action / Condition
 - Update EgoEntity to use precise simulation model parameters
 - add getVehicleCommand function to the API class
+- Add support for RelativeTargetSpeed, the syntax of OpenSCENARIO
 
 ## Ver 0.0.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.0.1) on Github :fa-github:
