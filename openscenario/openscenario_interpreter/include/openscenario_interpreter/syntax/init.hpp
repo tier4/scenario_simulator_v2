@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__INIT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__INIT_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/init_actions.hpp>
 
 namespace openscenario_interpreter
@@ -30,12 +31,20 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Init : public InitActions
+struct Init
 {
+  InitActions actions;
+
   template <typename Node, typename Scope>
   explicit Init(const Node & node, Scope & scope)
-  : InitActions(readElement<InitActions>("Actions", node, scope))
+  : actions(readElement<InitActions>("Actions", node, scope))
   {
+  }
+
+  template <typename... Ts>
+  decltype(auto) evaluate(Ts &&... xs)
+  {
+    return actions.evaluate(std::forward<decltype(xs)>(xs)...);
   }
 };
 }  // namespace syntax
