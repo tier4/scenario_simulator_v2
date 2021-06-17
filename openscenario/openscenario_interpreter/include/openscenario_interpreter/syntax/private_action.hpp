@@ -62,8 +62,8 @@ struct PrivateAction : public ComplexType
   }
   bool endsImmediately() const
   {
-#define BOILERPLATE(TYPE)                        \
-  if (is<TYPE>()) {                              \
+#define BOILERPLATE(TYPE)                \
+  if (is<TYPE>()) {                      \
     return as<TYPE>().endsImmediately(); \
   }
     BOILERPLATE(LongitudinalAction)

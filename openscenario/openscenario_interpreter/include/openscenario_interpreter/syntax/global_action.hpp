@@ -55,8 +55,8 @@ struct GlobalAction : public Element
 
   bool endsImmediately() const
   {
-#define BOILERPLATE(TYPE)                        \
-  if (is<TYPE>()) {                              \
+#define BOILERPLATE(TYPE)                \
+  if (is<TYPE>()) {                      \
     return as<TYPE>().endsImmediately(); \
   }
     BOILERPLATE(EntityAction)
