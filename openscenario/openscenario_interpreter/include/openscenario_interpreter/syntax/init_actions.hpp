@@ -67,17 +67,17 @@ struct InitActions : public Elements
     return unspecified;
   }
 
-  bool is_complete_immediately() const
+  bool endsImmediately() const
   {
-    return std::all_of(begin(), end(), [=](const Element & elm) {
-      if (elm.is<GlobalAction>()) {
-        return elm.as<GlobalAction>().is_complete_immediately();
-      } else if (elm.is<UserDefinedAction>()) {
-        return elm.as<UserDefinedAction>().is_complete_immediately();
-      } else if (elm.is<Private>()) {
-        return elm.as<Private>().is_complete_immediately();
+    return std::all_of(begin(), end(), [=](const Element & e) {
+      if (e.is<GlobalAction>()) {
+        return e.as<GlobalAction>().endsImmediately();
+      } else if (e.is<UserDefinedAction>()) {
+        return e.as<UserDefinedAction>().endsImmediately();
+      } else if (e.is<Private>()) {
+        return e.as<Private>().endsImmediately();
       } else {
-        throw UNSUPPORTED_ELEMENT_SPECIFIED(elm.type().name());
+        throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
       }
     });
   }

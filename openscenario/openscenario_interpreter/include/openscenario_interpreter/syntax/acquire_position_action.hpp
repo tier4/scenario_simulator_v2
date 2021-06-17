@@ -96,17 +96,8 @@ struct AcquirePositionAction
     }
   }
 
-#ifndef OPENSCENARIO_INTERPRETER_NO_EXTENSION
-  auto accomplished()
-  {
-    update();
-    return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
-  }
-  const std::false_type is_complete_immediately{};
-#else
   const std::true_type accomplished{};
-  const std::true_type is_complete_immediately{};
-#endif
+  static bool endsImmediately() { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

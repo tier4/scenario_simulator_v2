@@ -54,8 +54,8 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
       return push_back(readStoryboardElement<Story>(node, inner_scope));
     });
 
-    if (not init.is_complete_immediately()) {
-      throw SemanticError("Actions in Init should be completed immediately.");
+    if (not init.endsImmediately()) {
+      throw SemanticError("Actions in Init should end immediately.");
     }
   }
 

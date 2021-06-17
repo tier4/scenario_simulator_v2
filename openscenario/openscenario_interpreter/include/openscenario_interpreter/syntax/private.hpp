@@ -57,11 +57,11 @@ struct Private
     return unspecified;
   }
 
-  bool is_complete_immediately() const
+  bool endsImmediately() const
   {
     return std::all_of(
       private_actions.begin(), private_actions.end(), [](const PrivateAction & private_action) {
-        return private_action.is_complete_immediately();
+        return private_action.endsImmediately();
       });
   }
 };

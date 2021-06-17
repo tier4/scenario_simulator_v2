@@ -48,11 +48,11 @@ struct RoutingAction : public ComplexType
   {
   }
 
-  bool is_complete_immediately() const
+  bool endsImmediately() const
   {
-#define BOILERPLATE(TYPE)                        \
-  if (is<TYPE>()) {                              \
-    return as<TYPE>().is_complete_immediately(); \
+#define BOILERPLATE(TYPE)                \
+  if (is<TYPE>()) {                      \
+    return as<TYPE>().endsImmediately(); \
   }
     BOILERPLATE(AssignRouteAction)
     BOILERPLATE(AcquirePositionAction)

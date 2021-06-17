@@ -60,11 +60,11 @@ struct PrivateAction : public ComplexType
   // clang-format on
   {
   }
-  bool is_complete_immediately() const
+  bool endsImmediately() const
   {
 #define BOILERPLATE(TYPE)                        \
   if (is<TYPE>()) {                              \
-    return as<TYPE>().is_complete_immediately(); \
+    return as<TYPE>().endsImmediately(); \
   }
     BOILERPLATE(LongitudinalAction)
     BOILERPLATE(LateralAction)

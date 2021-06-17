@@ -53,11 +53,11 @@ struct GlobalAction : public Element
   {
   }
 
-  bool is_complete_immediately() const
+  bool endsImmediately() const
   {
 #define BOILERPLATE(TYPE)                        \
   if (is<TYPE>()) {                              \
-    return as<TYPE>().is_complete_immediately(); \
+    return as<TYPE>().endsImmediately(); \
   }
     BOILERPLATE(EntityAction)
     BOILERPLATE(ParameterAction)

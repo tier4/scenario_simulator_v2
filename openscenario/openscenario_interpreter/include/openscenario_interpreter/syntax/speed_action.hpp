@@ -51,8 +51,6 @@ struct SpeedAction
       readElement<TransitionDynamics>("SpeedActionDynamics", node, inner_scope)),
     speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
   {
-    is_complete_immediately_ = speed_action_target.is<AbsoluteTargetSpeed>() and
-                               speed_action_dynamics.dynamics_shape == DynamicsShape::step;
   }
 
   std::unordered_map<String, Boolean> accomplishments;
@@ -123,11 +121,14 @@ struct SpeedAction
     return std::all_of(std::begin(accomplishments), std::end(accomplishments), cdr);
   }
 
-  bool is_complete_immediately() const { return is_complete_immediately_; }
+  bool endsImmediately() const
+  {
+    return speed_action_target.is<AbsoluteTargetSpeed>() and
+           speed_action_dynamics.dynamics_shape == DynamicsShape::step;
+  }
 
 private:
   std::function<bool(const Scope::Actor &)> check;
-  bool is_complete_immediately_;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -38,7 +38,7 @@ struct Init : public InitActions
   {
   }
 
-  using InitActions::is_complete_immediately;
+  using InitActions::endsImmediately;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

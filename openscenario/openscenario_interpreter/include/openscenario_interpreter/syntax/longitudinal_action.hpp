@@ -45,10 +45,10 @@ struct LongitudinalAction : public Element
   {
   }
 
-  bool is_complete_immediately() const
+  bool endsImmediately() const
   {
     if (is<SpeedAction>()) {
-      return as<SpeedAction>().is_complete_immediately();
+      return as<SpeedAction>().endsImmediately();
     }
     throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
   }

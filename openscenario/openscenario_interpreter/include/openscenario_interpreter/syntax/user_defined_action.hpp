@@ -40,7 +40,7 @@ struct UserDefinedAction : public Element
     });
   }
 
-  const std::true_type is_complete_immediately{};
+  static bool endsImmediately() { return true; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -47,10 +47,10 @@ struct LateralAction : public ComplexType
   {
   }
 
-  bool is_complete_immediately() const
+  bool endsImmediately() const
   {
     if (is<LaneChangeAction>()) {
-      return as<LaneChangeAction>().is_complete_immediately();
+      return as<LaneChangeAction>().endsImmediately();
     }
     throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
   }

@@ -50,7 +50,7 @@ struct ParameterAction : public Element
   {
   }
 
-  const std::true_type is_complete_immediately{};
+  static bool endsImmediately() { return true; }
 };
 
 #undef ELEMENT

@@ -69,7 +69,7 @@ struct EntityAction : public Element
     return overloads.at(type())(entity_ref);
   }
 
-  const std::true_type is_complete_immediately{};
+  static bool endsImmediately() { return true; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
