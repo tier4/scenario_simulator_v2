@@ -159,7 +159,8 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
         if (script) {
           if (!script.as<OpenScenario>().complete()) {
             script.as<OpenScenario>().evaluate();
-            std::cout << script.as<OpenScenario>() << std::endl;
+            nlohmann::json json;
+            std::cout << (json << script.as<OpenScenario>()).dump(2) << std::endl;
 #ifndef NDEBUG
             RCLCPP_INFO_STREAM(
               get_logger(),

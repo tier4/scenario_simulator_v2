@@ -19,12 +19,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const OpenScenario & datum)
-{
-  nlohmann::json json;
-
-  return os << (json << datum).dump(2);
-}
+std::ostream & operator<<(std::ostream & os, const OpenScenario & datum) { return os; }
 
 nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
 {
