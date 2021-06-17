@@ -25,9 +25,9 @@ nlohmann::json & operator<<(nlohmann::json & json, const InitActions & init_acti
 
   for (const auto & init_action : init_actions) {
     if (init_action.is<GlobalAction>()) {
-      nlohmann::json global_action;
-      global_action = makeTypename(init_action.as<GlobalAction>().type());
-      json["GlobalAction"].push_back(global_action);
+      nlohmann::json action;
+      action["type"] = makeTypename(init_action.as<GlobalAction>().type());
+      json["GlobalAction"].push_back(action);
     }
   }
 
@@ -35,21 +35,21 @@ nlohmann::json & operator<<(nlohmann::json & json, const InitActions & init_acti
 
   for (const auto & init_action : init_actions) {
     if (init_action.is<UserDefinedAction>()) {
-      nlohmann::json user_defined_action;
-      user_defined_action = makeTypename(init_action.as<UserDefinedAction>().type());
-      json["UserDefinedAction"].push_back(user_defined_action);
+      nlohmann::json action;
+      action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
+      json["UserDefinedAction"].push_back(action);
     }
   }
 
   json["Private"] = nlohmann::json::array();
 
-  // for (const auto & init_action : init_actions) {
-  //   if (init_action.is<Private>()) {
-  //     nlohmann::json global_action;
-  //     global_action = makeTypename(init_action.as<Private>().type());
-  //     json["Private"].push_back(global_action);
-  //   }
-  // }
+  for (const auto & init_action : init_actions) {
+    if (init_action.is<Private>()) {
+      nlohmann::json action;
+      action << init_action.as<Private>();
+      json["Private"].push_back(action);
+    }
+  }
 
   return json;
 }
