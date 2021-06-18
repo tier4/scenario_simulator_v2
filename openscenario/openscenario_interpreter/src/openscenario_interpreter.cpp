@@ -173,13 +173,13 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
               nlohmann::json json;
               {
                 json << script.as<OpenScenario>();
+
+                // std::cout << json.dump(2) << std::endl; // DEBUG
               }
 
               context.stamp = now();
               context.data = json.dump();
             }
-
-            std::cout << context.data << std::endl;
 
             if ((*publisher_of_context).is_activated()) {
               (*publisher_of_context).publish(context);

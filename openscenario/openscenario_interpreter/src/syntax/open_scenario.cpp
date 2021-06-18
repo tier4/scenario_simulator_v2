@@ -19,7 +19,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const OpenScenario & datum) { return os; }
+std::ostream & operator<<(std::ostream & os, const OpenScenario &) { return os; }
 
 nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
 {
@@ -27,11 +27,13 @@ nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
 
   json["frame"] = datum.frame;
 
-  json["Overview"]["standbyState"] = openscenario_interpreter::standby_state.use_count() - 1;
-  json["Overview"]["startTransition"] = openscenario_interpreter::start_transition.use_count() - 1;
-  json["Overview"]["runningState"] = openscenario_interpreter::running_state.use_count() - 1;
-  json["Overview"]["stopTransition"] = openscenario_interpreter::stop_transition.use_count() - 1;
-  json["Overview"]["completeState"] = openscenario_interpreter::complete_state.use_count() - 1;
+  // clang-format off
+  json["CurrentStates"]["completeState"]   = openscenario_interpreter::complete_state  .use_count() - 1;
+  json["CurrentStates"]["runningState"]    = openscenario_interpreter::running_state   .use_count() - 1;
+  json["CurrentStates"]["standbyState"]    = openscenario_interpreter::standby_state   .use_count() - 1;
+  json["CurrentStates"]["startTransition"] = openscenario_interpreter::start_transition.use_count() - 1;
+  json["CurrentStates"]["stopTransition"]  = openscenario_interpreter::stop_transition .use_count() - 1;
+  // clang-format on
 
   if (datum.category.is<ScenarioDefinition>()) {
     json["OpenSCENARIO"] << datum.category.as<ScenarioDefinition>();
