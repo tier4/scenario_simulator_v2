@@ -44,7 +44,7 @@ struct Expression  // NOTE: Member functions are lexicographically sorted.
 
   virtual auto write(std::ostream & os) const -> std::ostream &
   {
-    return IfHasStreamOutputOperator<Expression>::applyIt(os, *this);
+    return IfHasStreamOutputOperator<Expression>::invoke(os, *this);
   }
 };
 }  // namespace openscenario_interpreter

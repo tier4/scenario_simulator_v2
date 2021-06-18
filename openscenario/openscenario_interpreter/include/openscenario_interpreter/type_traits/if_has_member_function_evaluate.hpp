@@ -26,7 +26,7 @@ template <typename T, typename = void>
 struct IfHasMemberFunctionEvaluate
 {
   template <typename Result>
-  static constexpr Result callIt(T &, const Result & as_self_evaluating)
+  static constexpr auto invoke(T &, const Result & as_self_evaluating) -> Result
   {
     return as_self_evaluating;
   }
@@ -37,7 +37,7 @@ struct IfHasMemberFunctionEvaluate<
   T, typename std::enable_if<HasMemberFunctionEvaluate<T>::value>::type>
 {
   template <typename Result>
-  static constexpr Result callIt(T & then, const Result &)
+  static constexpr auto invoke(T & then, const Result &) -> Result
   {
     return then.evaluate();
   }

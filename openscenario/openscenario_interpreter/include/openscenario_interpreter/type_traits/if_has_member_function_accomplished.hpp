@@ -24,14 +24,14 @@ inline namespace type_traits
 template <typename T, typename = void>
 struct IfHasMemberFunctionAccomplished
 {
-  static constexpr auto callIt(const T &) noexcept { return false; }
+  static constexpr auto invoke(const T &) noexcept { return false; }
 };
 
 template <typename T>
 struct IfHasMemberFunctionAccomplished<
   T, typename std::enable_if<HasMemberFunctionAccomplished<T>::value>::type>
 {
-  static decltype(auto) callIt(T & is) { return is.accomplished(); }
+  static decltype(auto) invoke(T & is) { return is.accomplished(); }
 };
 }  // namespace type_traits
 }  // namespace openscenario_interpreter
