@@ -41,12 +41,12 @@ struct Private : private Scope
 
   template <typename Node>
   explicit Private(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), entity_ref(readAttribute<String>("entityRef", node, scope()))
+  : Scope(outer_scope), entity_ref(readAttribute<String>("entityRef", node, localScope()))
   {
     actors.emplace_back(entity_ref);
 
     callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
-      return private_actions.emplace_back(node, scope());
+      return private_actions.emplace_back(node, localScope());
     });
   }
 

@@ -47,14 +47,14 @@ struct Act : private Scope, public StoryboardElement<Act>, public Elements
   explicit Act(const Node & node, Scope & outer_scope)
   : Scope(outer_scope),
     name(readAttribute<String>("name", node, outer_scope)),
-    start_trigger(readElement<Trigger>("StartTrigger", node, scope()))
+    start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {
     callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<ManeuverGroup>(node, scope()));
+      return push_back(readStoryboardElement<ManeuverGroup>(node, localScope()));
     });
 
     callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
-      return stop_trigger.rebind<Trigger>(node, scope());
+      return stop_trigger.rebind<Trigger>(node, localScope());
     });
   }
 

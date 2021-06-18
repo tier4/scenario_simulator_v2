@@ -46,9 +46,9 @@ struct ParameterCondition : private Scope
   template <typename Node>
   explicit ParameterCondition(const Node & node, Scope & current_scope)
   : Scope(current_scope),
-    parameter_ref(readAttribute<String>("parameterRef", node, scope())),
-    value(readAttribute<String>("value", node, scope())),
-    compare(readAttribute<Rule>("rule", node, scope()))
+    parameter_ref(readAttribute<String>("parameterRef", node, localScope())),
+    value(readAttribute<String>("value", node, localScope())),
+    compare(readAttribute<Rule>("rule", node, localScope()))
   {
   }
 
@@ -90,9 +90,9 @@ struct ParameterCondition : private Scope
          }},
       };
 
-    const auto target = scope().parameters.find(parameter_ref);
+    const auto target = localScope().parameters.find(parameter_ref);
 
-    if (target != std::end(scope().parameters)) {
+    if (target != std::end(localScope().parameters)) {
       const auto iter{overloads.find(std::get<1>(*target).type())};
       if (iter != std::end(overloads)) {
         return std::get<1>(*iter)(compare, std::get<1>(*target), value) ? true_v : false_v;

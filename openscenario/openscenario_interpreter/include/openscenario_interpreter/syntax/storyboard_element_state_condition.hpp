@@ -43,9 +43,9 @@ struct StoryboardElementStateCondition : private Scope
   template <typename Node>
   explicit StoryboardElementStateCondition(const Node & node, const Scope & outer_scope)
   : Scope(outer_scope),
-    name(readAttribute<String>("storyboardElementRef", node, scope())),
-    type(readAttribute<StoryboardElementType>("storyboardElementType", node, scope())),
-    state(readAttribute<StoryboardElementState>("state", node, scope()))
+    name(readAttribute<String>("storyboardElementRef", node, localScope())),
+    type(readAttribute<StoryboardElementType>("storyboardElementType", node, localScope())),
+    state(readAttribute<StoryboardElementState>("state", node, localScope()))
   {
   }
 
@@ -56,7 +56,7 @@ struct StoryboardElementStateCondition : private Scope
 
   auto evaluate() const
   {
-    const auto result = compare(scope().storyboard_elements.at(name).currentState(), state);
+    const auto result = compare(localScope().storyboard_elements.at(name).currentState(), state);
 
 #ifndef NDEBUG
     std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" << reset

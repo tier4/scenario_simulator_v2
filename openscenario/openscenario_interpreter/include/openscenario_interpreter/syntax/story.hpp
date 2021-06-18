@@ -42,14 +42,14 @@ struct Story : private Scope, public StoryboardElement<Story>, public Elements
 
   template <typename Node>
   explicit Story(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), name(readAttribute<String>("name", node, scope()))
+  : Scope(outer_scope), name(readAttribute<String>("name", node, localScope()))
   {
     callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
-      return make<ParameterDeclarations>(node, scope());
+      return make<ParameterDeclarations>(node, localScope());
     });
 
     callWithElements(node, "Act", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Act>(node, scope()));
+      return push_back(readStoryboardElement<Act>(node, localScope()));
     });
   }
 

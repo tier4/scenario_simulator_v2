@@ -39,8 +39,8 @@ struct ByEntityCondition : private Scope, public EntityCondition
   explicit ByEntityCondition(const Node & node, Scope & outer_scope)
   : Scope(outer_scope),
     EntityCondition(readElement<EntityCondition>(
-      "EntityCondition", node, scope(),
-      readElement<TriggeringEntities>("TriggeringEntities", node, scope())))
+      "EntityCondition", node, localScope(),
+      readElement<TriggeringEntities>("TriggeringEntities", node, localScope())))
   {
   }
 };

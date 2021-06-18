@@ -55,8 +55,8 @@ struct TrafficSignalControllerAction : private Scope
   explicit TrafficSignalControllerAction(const Node & node, const Scope & current_scope)
   : Scope(current_scope),
     traffic_signal_controller_ref(
-      readAttribute<String>("trafficSignalControllerRef", node, scope())),
-    phase(readAttribute<String>("phase", node, scope()))
+      readAttribute<String>("trafficSignalControllerRef", node, localScope())),
+    phase(readAttribute<String>("phase", node, localScope()))
   {
   }
 
