@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_GROUP_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONDITION_GROUP_HPP_
 
+#include <nlohmann/json.hpp>
 #include <numeric>
 #include <openscenario_interpreter/syntax/condition.hpp>
 #include <vector>
@@ -25,21 +26,23 @@ inline namespace syntax
 {
 /* ---- ConditionGroup ---------------------------------------------------------
  *
- * A condition group is an association of conditions that is assessed during
- * simulation time and signals true when all associated conditions are
- * evaluated to true.
+ *  A condition group is an association of conditions that is assessed during
+ *  simulation time and signals true when all associated conditions are
+ *  evaluated to true.
  *
- * <xsd:complexType name="ConditionGroup">
- *   <xsd:sequence>
- *     <xsd:element name="Condition" type="Condition" maxOccurs="unbounded"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="ConditionGroup">
+ *    <xsd:sequence>
+ *      <xsd:element name="Condition" type="Condition" maxOccurs="unbounded"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct ConditionGroup : public std::list<Condition>
 {
+  bool current_value;
+
   template <typename Node, typename Scope>
-  explicit ConditionGroup(const Node & node, Scope & scope)
+  explicit ConditionGroup(const Node & node, Scope & scope) : current_value(false)
   {
     callWithElements(
       node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
@@ -47,15 +50,17 @@ struct ConditionGroup : public std::list<Condition>
 
   auto evaluate()
   {
+    // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
     return asBoolean(
-      // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
-      std::accumulate(
+      current_value = std::accumulate(
         std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
           const auto rhs = condition.evaluate();
-          return lhs && rhs.as<Boolean>();
+          return lhs and rhs.as<Boolean>();
         }));
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const ConditionGroup &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

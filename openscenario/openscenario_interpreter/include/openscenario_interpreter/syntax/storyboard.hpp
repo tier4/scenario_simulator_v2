@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
@@ -42,13 +43,14 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 
   Trigger stop_trigger;
 
-  const String name{"Storyboard"};
+  const String name;
 
   template <typename Node, typename Scope>
   explicit Storyboard(const Node & node, Scope & outer_scope)
   : inner_scope(outer_scope),
     init(readElement<Init>("Init", node, inner_scope)),
-    stop_trigger(readElement<Trigger>("StopTrigger", node, inner_scope))
+    stop_trigger(readElement<Trigger>("StopTrigger", node, inner_scope)),
+    name("Storyboard")
   {
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Story>(node, inner_scope));
@@ -59,7 +61,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     }
   }
 
-  const std::true_type ready{};
+  static constexpr auto ready() noexcept { return true; }
 
   void start()
   {
@@ -123,6 +125,10 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     }
   }
 };
+
+std::ostream & operator<<(std::ostream &, const Storyboard &);
+
+nlohmann::json & operator<<(nlohmann::json &, const Storyboard &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

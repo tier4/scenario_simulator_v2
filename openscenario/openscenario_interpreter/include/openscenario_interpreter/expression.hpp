@@ -19,30 +19,32 @@
 
 namespace openscenario_interpreter
 {
-struct Expression
+struct Expression  // NOTE: Member functions are lexicographically sorted.
 {
-  virtual const std::type_info & type() const noexcept { return typeid(Expression); }
-
-  virtual std::ostream & write(std::ostream & os) const
-  {
-    return IfHasStreamOutputOperator<Expression>::applyIt(os, *this);
-  }
-
-  virtual Pointer<Expression> evaluate(const Pointer<Expression> &)
-  {
-    throw SemanticError("No viable evaluation for class ", type().name());
-  }
-
   virtual bool accomplished() { return false; }
 
-  virtual const Pointer<Expression> & state() const
+  virtual auto description() const -> std::string { return ""; }
+
+  virtual auto evaluate(const Pointer<Expression> &) -> Pointer<Expression>
   {
-    throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
+    throw SemanticError("No viable evaluation for class ", type().name());
   }
 
   virtual void start()
   {
     throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
+  }
+
+  virtual auto currentState() const -> const Pointer<Expression> &
+  {
+    throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
+  }
+
+  virtual auto type() const noexcept -> const std::type_info & { return typeid(Expression); }
+
+  virtual auto write(std::ostream & os) const -> std::ostream &
+  {
+    return IfHasStreamOutputOperator<Expression>::applyIt(os, *this);
   }
 };
 }  // namespace openscenario_interpreter

@@ -15,22 +15,23 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACTORS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACTORS_HPP_
 
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Actors ===============================================================
+/* ---- Actors -----------------------------------------------------------------
  *
- * <xsd:complexType name="Actors">
- *   <xsd:sequence>
- *     <xsd:element name="EntityRef" minOccurs="0" maxOccurs="unbounded" type="EntityRef"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="selectTriggeringEntities" type="Boolean" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Actors">
+ *    <xsd:sequence>
+ *      <xsd:element name="EntityRef" minOccurs="0" maxOccurs="unbounded" type="EntityRef"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="selectTriggeringEntities" type="Boolean" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Actors
 {
   // Indicates whether the triggering entities are considered actors.
@@ -38,8 +39,8 @@ struct Actors
 
   template <typename Node, typename Scope>
   explicit Actors(const Node & node, Scope & scope)
-  : select_triggering_entities{
-      readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean())}
+  : select_triggering_entities(
+      readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean()))
   {
     callWithElements(node, "EntityRef", 0, unbounded, [&](auto && node) {
       scope.actors.emplace_back(node, scope);

@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACT_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
 
@@ -34,39 +35,37 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act : public StoryboardElement<Act>, public Elements
+struct Act : private Scope, public StoryboardElement<Act>, public Elements
 {
   const String name;
 
-  Scope inner_scope;
+  Trigger start_trigger;
 
-  Element start_trigger, stop_trigger;
+  Element stop_trigger;
 
   template <typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)), inner_scope(outer_scope)
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, outer_scope)),
+    start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {
     callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<ManeuverGroup>(node, inner_scope));
-    });
-
-    callWithElements(node, "StartTrigger", 1, 1, [&](auto && node) {
-      return start_trigger.rebind<Trigger>(node, inner_scope);
+      return push_back(readStoryboardElement<ManeuverGroup>(node, localScope()));
     });
 
     callWithElements(node, "StopTrigger", 0, 1, [&](auto && node) {
-      return stop_trigger.rebind<Trigger>(node, inner_scope);
+      return stop_trigger.rebind<Trigger>(node, localScope());
     });
   }
 
-  auto ready() const { return start_trigger.evaluate().as<Boolean>(); }
+  auto ready() { return start_trigger.evaluate().as<Boolean>(); }
 
   auto stopTriggered() const { return stop_trigger && stop_trigger.evaluate().as<Boolean>(); }
 
   /* -------------------------------------------------------------------------
    *
-   * A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
-   * completeState.
+   *  A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
+   *  completeState.
    *
    * ---------------------------------------------------------------------- */
   auto accomplished() const
@@ -93,6 +92,8 @@ struct Act : public StoryboardElement<Act>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Act &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

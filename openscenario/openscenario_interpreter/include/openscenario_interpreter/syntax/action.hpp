@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ACTION_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/global_action.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -27,28 +28,31 @@ inline namespace syntax
 {
 /* ---- Action -----------------------------------------------------------------
  *
- * <xsd:complexType name="Action">
- *   <xsd:choice>
- *     <xsd:element name="GlobalAction" type="GlobalAction"/>
- *     <xsd:element name="UserDefinedAction" type="UserDefinedAction"/>
- *     <xsd:element name="PrivateAction" type="PrivateAction"/>
- *   </xsd:choice>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Action">
+ *    <xsd:choice>
+ *      <xsd:element name="GlobalAction" type="GlobalAction"/>
+ *      <xsd:element name="UserDefinedAction" type="UserDefinedAction"/>
+ *      <xsd:element name="PrivateAction" type="PrivateAction"/>
+ *    </xsd:choice>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(NAME) std::make_pair(#NAME, [&](auto && node) { return make<NAME>(node, scope); })
-
 struct Action : public StoryboardElement<Action>, public Element
 {
   const String name;
 
   template <typename Node, typename Scope>
   explicit Action(const Node & node, Scope & scope, std::size_t maximum_execution_count)
+  // clang-format off
   : StoryboardElement(maximum_execution_count),
     Element(
-      choice(node, ELEMENT(GlobalAction), ELEMENT(UserDefinedAction), ELEMENT(PrivateAction))),
+      choice(node,
+        std::make_pair(     "GlobalAction", [&](auto && node) { return make<     GlobalAction>(node, scope); }),
+        std::make_pair("UserDefinedAction", [&](auto && node) { return make<UserDefinedAction>(node, scope); }),
+        std::make_pair(    "PrivateAction", [&](auto && node) { return make<    PrivateAction>(node, scope); }))),
     name(readAttribute<String>("name", node, scope))
+  // clang-format on
   {
   }
 
@@ -56,25 +60,26 @@ struct Action : public StoryboardElement<Action>, public Element
 
   static constexpr auto stopTriggered() noexcept { return false; }
 
+  using StoryboardElement<Action>::currentState;
+
   using Element::start;
 
   /* -------------------------------------------------------------------------
    *
-   * Action
-   *   An Action's goal is a function of the Action type and cannot be
-   *   generalized. Accomplishing an Action's goal will involve meeting some
-   *   arbitrary prerequisites related with the Action type (for example, a
-   *   SpeedAction accomplishes its goal when the considered Entity is
-   *   travelling at the prescribed speed). If an Action is acting on an
-   *   EntitySelection, all instances of Entity within the selection have to
-   *   complete in order to reach the completeState of the Action.
+   *  An Action's goal is a function of the Action type and cannot be
+   *  generalized. Accomplishing an Action's goal will involve meeting some
+   *  arbitrary prerequisites related with the Action type (for example, a
+   *  SpeedAction accomplishes its goal when the considered Entity is
+   *  travelling at the prescribed speed). If an Action is acting on an
+   *  EntitySelection, all instances of Entity within the selection have to
+   *  complete in order to reach the completeState of the Action.
    *
    * ---------------------------------------------------------------------- */
   using Element::accomplished;
 
   using StoryboardElement::evaluate;
 
-  Boolean overridden{false};
+  bool overridden = false;
 
   void stop()
   {
@@ -92,7 +97,7 @@ struct Action : public StoryboardElement<Action>, public Element
   }
 };
 
-#undef ELEMENT
+nlohmann::json & operator<<(nlohmann::json &, const Action &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

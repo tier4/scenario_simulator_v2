@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/openscenario.hpp>
 #include <openscenario_interpreter/utility/execution_timer.hpp>
 #include <openscenario_interpreter/utility/visibility.hpp>
+#include <openscenario_interpreter_msgs/msg/context.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -34,6 +35,10 @@ namespace openscenario_interpreter
 {
 class Interpreter : public rclcpp_lifecycle::LifecycleNode
 {
+  using Context = openscenario_interpreter_msgs::msg::Context;
+
+  const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
+
   String intended_result;
   double local_frame_rate;
   double local_real_time_factor;
@@ -106,7 +111,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     CATCH(SemanticError)
     CATCH(SimulationError)
     CATCH(SyntaxError)
-    CATCH(InternalError)  // NOTE: THIS MUST BE LAST OF CATCH STATEMENTS.
+    CATCH(InternalError)  // NOTE: InternalError MUST BE LAST OF CATCH STATEMENTS.
 
     catch (...)  // FINAL BARRIER
     {

@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/priority.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -97,6 +98,8 @@ struct Event : public StoryboardElement<Event>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Event &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

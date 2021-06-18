@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PRIVATE_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
 #include <vector>
 
@@ -32,19 +33,20 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Private
+struct Private : private Scope
 {
-  Scope inner_scope;
+  const String entity_ref;
 
   std::list<PrivateAction> private_actions;
 
   template <typename Node>
-  explicit Private(const Node & node, Scope & outer_scope) : inner_scope(outer_scope)
+  explicit Private(const Node & node, Scope & outer_scope)
+  : Scope(outer_scope), entity_ref(readAttribute<String>("entityRef", node, localScope()))
   {
-    inner_scope.actors.emplace_back(readAttribute<String>("entityRef", node, inner_scope));
+    actors.emplace_back(entity_ref);
 
     callWithElements(node, "PrivateAction", 1, unbounded, [&](auto && node) {
-      return private_actions.emplace_back(node, inner_scope);
+      return private_actions.emplace_back(node, localScope());
     });
   }
 
@@ -64,6 +66,8 @@ struct Private
       [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Private &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

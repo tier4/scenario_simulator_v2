@@ -2,6 +2,7 @@
 
 ## Difference between the latest release and master
 - Add support for RelativeTargetSpeed, the syntax of OpenSCENARIO
+- Add feature to publish context information during scenario execution to topic `/simulation/context` as a JSON string
 
 ## Ver 0.1.0
 - Synchronize ROS time between traffic_simulator and sensor_simulator.
@@ -15,7 +16,7 @@
 - Enable caching routing reslut, and center points and it' spline, lanelet length in hdmap_utils class
 - Update interpreter to access TrafficSignals from Action / Condition
 - Update EgoEntity to use precise simulation model parameters
-- add getVehicleCommand function to the API class
+- Add getVehicleCommand function to the API class
 
 ## Ver 0.0.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.0.1) on Github :fa-github:

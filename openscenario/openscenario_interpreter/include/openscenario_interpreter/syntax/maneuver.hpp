@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -23,17 +24,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Maneuver =============================================================
+/* ---- Maneuver ---------------------------------------------------------------
  *
- * <xsd:complexType name="Maneuver">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="Event" maxOccurs="unbounded" type="Event"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Maneuver">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
+ *      <xsd:element name="Event" maxOccurs="unbounded" type="Event"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct Maneuver : public StoryboardElement<Maneuver>, public Elements
 {
   const String name;
@@ -88,6 +89,8 @@ struct Maneuver : public StoryboardElement<Maneuver>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Maneuver &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
