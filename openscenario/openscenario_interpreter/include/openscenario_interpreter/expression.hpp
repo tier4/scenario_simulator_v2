@@ -35,7 +35,7 @@ struct Expression  // NOTE: Member functions are lexicographically sorted.
     throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
   }
 
-  virtual auto state() const -> const Pointer<Expression> &
+  virtual auto currentState() const -> const Pointer<Expression> &
   {
     throw SemanticError("Class ", type().name(), " is not a StoryboardElementType");
   }

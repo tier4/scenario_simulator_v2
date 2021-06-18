@@ -56,7 +56,7 @@ struct StoryboardElementStateCondition : private Scope
 
   auto evaluate() const
   {
-    const auto result = compare(scope().storyboard_elements.at(name).state(), state);
+    const auto result = compare(scope().storyboard_elements.at(name).currentState(), state);
 
 #ifndef NDEBUG
     std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" << reset

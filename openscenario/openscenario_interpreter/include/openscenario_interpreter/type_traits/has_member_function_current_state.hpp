@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_STATE_HPP_
-#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_STATE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_CURRENT_STATE_HPP_
+#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_CURRENT_STATE_HPP_
 
 #include <openscenario_interpreter/type_traits/void_t.hpp>
 
@@ -22,16 +22,16 @@ namespace openscenario_interpreter
 inline namespace type_traits
 {
 template <typename T, typename = void>
-struct HasMemberFunctionState : public std::false_type
+struct HasMemberFunctionCurrentState : public std::false_type
 {
 };
 
 template <typename T>
-struct HasMemberFunctionState<T, void_t<decltype(std::declval<T>().state())>>
+struct HasMemberFunctionCurrentState<T, void_t<decltype(std::declval<T>().currentState())>>
 : public std::true_type
 {
 };
 }  // namespace type_traits
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_STATE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_CURRENT_STATE_HPP_

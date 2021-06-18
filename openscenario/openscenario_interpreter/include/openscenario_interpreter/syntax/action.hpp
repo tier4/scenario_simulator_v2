@@ -60,7 +60,7 @@ struct Action : public StoryboardElement<Action>, public Element
 
   static constexpr auto stopTriggered() noexcept { return false; }
 
-  using StoryboardElement<Action>::state;
+  using StoryboardElement<Action>::currentState;
 
   using Element::start;
 
@@ -79,7 +79,7 @@ struct Action : public StoryboardElement<Action>, public Element
 
   using StoryboardElement::evaluate;
 
-  Boolean overridden{false};
+  bool overridden = false;
 
   void stop()
   {

@@ -22,7 +22,7 @@ std::ostream & operator<<(std::ostream & os, const Storyboard &) { return os; }
 
 nlohmann::json & operator<<(nlohmann::json & json, const Storyboard & datum)
 {
-  json["state"] = boost::lexical_cast<std::string>(datum.state());
+  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
 
   json["Init"] << datum.init;
 

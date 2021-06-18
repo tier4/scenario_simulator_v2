@@ -18,10 +18,10 @@
 #include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_accomplished.hpp>
+#include <openscenario_interpreter/type_traits/if_has_member_function_current_state.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_description.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_evaluate.hpp>
 #include <openscenario_interpreter/type_traits/if_has_member_function_start.hpp>
-#include <openscenario_interpreter/type_traits/if_has_member_function_state.hpp>
 #include <openscenario_interpreter/type_traits/if_has_stream_output_operator.hpp>
 #include <openscenario_interpreter/utility/pair.hpp>
 #include <typeinfo>
@@ -65,9 +65,9 @@ class Pointer : public std::shared_ptr<T>
       IfHasMemberFunctionStart<Bound>::callIt(*this);
     }
 
-    auto state() const -> const Pointer & override
+    auto currentState() const -> const Pointer & override
     {
-      return IfHasMemberFunctionState<Bound>::template callIt<Pointer>(*this);
+      return IfHasMemberFunctionCurrentState<Bound>::template callIt<Pointer>(*this);
     }
 
     auto write(std::ostream & os) const -> std::ostream & override
@@ -137,9 +137,9 @@ public:
   }
 
   template <typename... Ts>
-  decltype(auto) state(Ts &&... xs) const
+  decltype(auto) currentState(Ts &&... xs) const
   {
-    return binding().state(std::forward<decltype(xs)>(xs)...);
+    return binding().currentState(std::forward<decltype(xs)>(xs)...);
   }
 
   template <typename... Ts>

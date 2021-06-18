@@ -23,6 +23,8 @@ nlohmann::json & operator<<(nlohmann::json & json, const Action & datum)
 {
   json["name"] = datum.name;
 
+  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
+
   // clang-format off
   static const std::unordered_map<
     std::type_index, std::function<std::string(const Action &)>> table
@@ -34,8 +36,6 @@ nlohmann::json & operator<<(nlohmann::json & json, const Action & datum)
   // clang-format on
 
   json["type"] = table.at(datum.type())(datum);
-
-  json["state"] = boost::lexical_cast<std::string>(datum.state());
 
   return json;
 }

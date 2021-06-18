@@ -22,7 +22,7 @@ nlohmann::json & operator<<(nlohmann::json & json, const Maneuver & datum)
 {
   json["name"] = datum.name;
 
-  json["state"] = boost::lexical_cast<std::string>(datum.state());
+  json["currentState"] = boost::lexical_cast<std::string>(datum.currentState());
 
   json["Event"] = nlohmann::json::array();
 
