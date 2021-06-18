@@ -52,6 +52,19 @@ struct GlobalAction : public Element
   // clang-format on
   {
   }
+
+  bool endsImmediately() const
+  {
+#define BOILERPLATE(TYPE)                \
+  if (is<TYPE>()) {                      \
+    return as<TYPE>().endsImmediately(); \
+  }
+    BOILERPLATE(EntityAction)
+    BOILERPLATE(ParameterAction)
+    BOILERPLATE(InfrastructureAction)
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
+#undef BOILERPLATE
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

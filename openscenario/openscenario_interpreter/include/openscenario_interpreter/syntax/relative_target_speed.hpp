@@ -51,6 +51,39 @@ struct RelativeTargetSpeed
     continuous{readAttribute<Boolean>("continuous", node, scope, Boolean())}
   {
   }
+
+  std::function<double()> getCalculateAbsoluteTargetSpeed() const
+  {
+    if (speed_target_value_type == SpeedTargetValueType::factor) {
+      return [factor = value, entity_ref = entity_ref]() -> double {
+        return factor * getEntityStatus(entity_ref).action_status.twist.linear.x;
+      };
+    } else if (speed_target_value_type == SpeedTargetValueType::delta) {
+      return [delta = value, entity_ref = entity_ref]() -> double {
+        return delta + getEntityStatus(entity_ref).action_status.twist.linear.x;
+      };
+    } else {
+      throw UNSUPPORTED_SETTING_DETECTED(RelativeTargetSpeed, speed_target_value_type);
+    }
+  }
+
+  std::function<bool(const Scope::Actor & actor)> getIsEnd() const
+  {
+    if (continuous) {
+      return [](const auto &) { return false; };  // ends never
+    } else {
+      return [calc_absolute_target_speed =
+                getCalculateAbsoluteTargetSpeed()](const Scope::Actor & actor) {
+        try {
+          const auto compare = Rule(Rule::equalTo);
+          return compare(
+            getEntityStatus(actor).action_status.twist.linear.x, calc_absolute_target_speed());
+        } catch (const SemanticError &) {
+          return false;  // NOTE: The actor is maybe lane-changing now
+        }
+      };
+    }
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -89,6 +89,8 @@ struct LaneChangeAction
       throw UNSUPPORTED_ELEMENT_SPECIFIED(lane_change_target.type().name());
     }
   }
+
+  static bool endsImmediately() { return false; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

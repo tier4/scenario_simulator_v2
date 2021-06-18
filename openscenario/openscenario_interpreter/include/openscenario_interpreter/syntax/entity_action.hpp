@@ -68,6 +68,8 @@ struct EntityAction : public Element
 
     return overloads.at(type())(entity_ref);
   }
+
+  static bool endsImmediately() { return true; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

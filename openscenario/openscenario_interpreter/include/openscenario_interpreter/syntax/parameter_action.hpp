@@ -49,6 +49,8 @@ struct ParameterAction : public Element
   : Element(choice(parent, ELEMENT(SetAction), ELEMENT(ModifyAction)))
   {
   }
+
+  static bool endsImmediately() { return true; }
 };
 
 #undef ELEMENT

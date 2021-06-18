@@ -53,6 +53,10 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Story>(node, inner_scope));
     });
+
+    if (not init.endsImmediately()) {
+      throw SemanticError("Actions in Init should end immediately.");
+    }
   }
 
   const std::true_type ready{};

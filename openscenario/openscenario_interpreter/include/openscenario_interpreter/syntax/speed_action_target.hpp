@@ -44,6 +44,28 @@ struct SpeedActionTarget : public Element
   : Element(choice(node, ELEMENT(RelativeTargetSpeed), ELEMENT(AbsoluteTargetSpeed)))
   {
   }
+
+  std::function<double()> getCalculateAbsoluteTargetSpeed() const
+  {
+    if (is<AbsoluteTargetSpeed>()) {
+      return as<AbsoluteTargetSpeed>().getCalculateAbsoluteTargetSpeed();
+    } else if (is<RelativeTargetSpeed>()) {
+      return as<RelativeTargetSpeed>().getCalculateAbsoluteTargetSpeed();
+    } else {
+      throw UNSUPPORTED_SETTING_DETECTED(SpeedActionTarget, this->type().name());
+    }
+  }
+
+  std::function<bool(const Scope::Actor & actor)> getIsEnd() const
+  {
+    if (is<AbsoluteTargetSpeed>()) {
+      return as<AbsoluteTargetSpeed>().getIsEnd();
+    } else if (is<RelativeTargetSpeed>()) {
+      return as<RelativeTargetSpeed>().getIsEnd();
+    } else {
+      throw UNSUPPORTED_SETTING_DETECTED(SpeedActionTarget, this->type().name());
+    }
+  }
 };
 
 #undef ELEMENT
