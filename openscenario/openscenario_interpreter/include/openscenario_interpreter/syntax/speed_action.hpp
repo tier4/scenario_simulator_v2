@@ -36,20 +36,18 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SpeedAction
+struct SpeedAction : private Scope
 {
-  Scope inner_scope;
-
   const TransitionDynamics speed_action_dynamics;
 
   const SpeedActionTarget speed_action_target;
 
   template <typename Node>
   explicit SpeedAction(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope),
+  : Scope(outer_scope),
     speed_action_dynamics(
-      readElement<TransitionDynamics>("SpeedActionDynamics", node, inner_scope)),
-    speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, inner_scope))
+      readElement<TransitionDynamics>("SpeedActionDynamics", node, localScope())),
+    speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, localScope()))
   {
   }
 
@@ -58,7 +56,7 @@ struct SpeedAction
   auto reset()
   {
     accomplishments.clear();
-    for (const auto & actor : inner_scope.actors) {
+    for (const auto & actor : actors) {
       accomplishments.emplace(actor, false);
     }
   }
@@ -102,7 +100,7 @@ public:
   {
     reset();
 
-    for (const auto & actor : inner_scope.actors) {
+    for (const auto & actor : actors) {
       startImpl(actor);
     }
 

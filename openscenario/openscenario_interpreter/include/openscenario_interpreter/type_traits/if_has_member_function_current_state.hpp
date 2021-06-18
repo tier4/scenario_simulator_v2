@@ -26,7 +26,7 @@ template <typename T, typename = void>
 struct IfHasMemberFunctionCurrentState
 {
   template <typename Result>
-  static const Result & callIt(const T &)
+  static auto invoke(const T &) noexcept(false) -> const Result &
   {
     throw SemanticError("Class ", typeid(T).name(), " is not an StoryboardElement");
   }
@@ -37,7 +37,7 @@ struct IfHasMemberFunctionCurrentState<
   T, typename std::enable_if<HasMemberFunctionCurrentState<T>::value>::type>
 {
   template <typename Result>
-  static const Result & callIt(const T & callee)
+  static auto invoke(const T & callee) -> const Result &
   {
     return callee.currentState();
   }

@@ -37,11 +37,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct LaneChangeAction
+struct LaneChangeAction : private Scope
 {
   const Double target_lane_offset;
-
-  Scope inner_scope;
 
   const TransitionDynamics lane_change_action_dynamics;
 
@@ -49,11 +47,11 @@ struct LaneChangeAction
 
   template <typename Node>
   explicit LaneChangeAction(const Node & node, Scope & outer_scope)
-  : target_lane_offset(readAttribute<Double>("targetLaneOffset", node, outer_scope, Double())),
-    inner_scope(outer_scope),
+  : Scope(outer_scope),
+    target_lane_offset(readAttribute<Double>("targetLaneOffset", node, localScope(), Double())),
     lane_change_action_dynamics(
-      readElement<TransitionDynamics>("LaneChangeActionDynamics", node, inner_scope)),
-    lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, inner_scope))
+      readElement<TransitionDynamics>("LaneChangeActionDynamics", node, localScope())),
+    lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, localScope()))
   {
   }
 
@@ -64,7 +62,7 @@ struct LaneChangeAction
     accomplishments.clear();
 
     if (lane_change_target.is<AbsoluteTargetLane>()) {
-      for (const auto & actor : inner_scope.actors) {
+      for (const auto & actor : actors) {
         accomplishments.emplace(actor, false);
         requestLaneChange(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
       }

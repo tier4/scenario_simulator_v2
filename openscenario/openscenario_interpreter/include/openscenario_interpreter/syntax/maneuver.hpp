@@ -35,22 +35,21 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Maneuver : public StoryboardElement<Maneuver>, public Elements
+struct Maneuver : private Scope, public StoryboardElement<Maneuver>, public Elements
 {
   const String name;
 
-  Scope inner_scope;
+  const ParameterDeclarations parameter_declarations;
 
   template <typename Node, typename Scope>
   explicit Maneuver(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)}, inner_scope{outer_scope}
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, localScope())),
+    parameter_declarations(
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
   {
-    callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
-      return make<ParameterDeclarations>(node, inner_scope);
-    });
-
     callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Event>(node, inner_scope));
+      return push_back(readStoryboardElement<Event>(node, localScope()));
     });
   }
 

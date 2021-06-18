@@ -24,13 +24,13 @@ inline namespace type_traits
 template <typename T, typename = void>
 struct IfHasMemberFunctionStart
 {
-  static constexpr void callIt(const T &) noexcept {}
+  static constexpr void invoke(const T &) noexcept {}
 };
 
 template <typename T>
 struct IfHasMemberFunctionStart<T, typename std::enable_if<HasMemberFunctionStart<T>::value>::type>
 {
-  static constexpr decltype(auto) callIt(T & then) { return then.start(); }
+  static constexpr decltype(auto) invoke(T & then) { return then.start(); }
 };
 }  // namespace type_traits
 }  // namespace openscenario_interpreter

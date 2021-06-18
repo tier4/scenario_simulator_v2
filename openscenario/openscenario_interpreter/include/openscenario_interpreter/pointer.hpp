@@ -47,7 +47,7 @@ class Pointer : public std::shared_ptr<T>
   private:
     bool accomplished() override  //
     {
-      return IfHasMemberFunctionAccomplished<Bound>::callIt(*this);
+      return IfHasMemberFunctionAccomplished<Bound>::invoke(*this);
     }
 
     auto description() const -> std::string override
@@ -57,22 +57,22 @@ class Pointer : public std::shared_ptr<T>
 
     auto evaluate(const Pointer & else_) -> Pointer override
     {
-      return IfHasMemberFunctionEvaluate<Bound>::callIt(static_cast<Bound &>(*this), else_);
+      return IfHasMemberFunctionEvaluate<Bound>::invoke(static_cast<Bound &>(*this), else_);
     }
 
     void start() override  // corresponds to startTransition
     {
-      IfHasMemberFunctionStart<Bound>::callIt(*this);
+      IfHasMemberFunctionStart<Bound>::invoke(*this);
     }
 
     auto currentState() const -> const Pointer & override
     {
-      return IfHasMemberFunctionCurrentState<Bound>::template callIt<Pointer>(*this);
+      return IfHasMemberFunctionCurrentState<Bound>::template invoke<Pointer>(*this);
     }
 
     auto write(std::ostream & os) const -> std::ostream & override
     {
-      return IfHasStreamOutputOperator<Bound>::applyIt(os, *this);
+      return IfHasStreamOutputOperator<Bound>::invoke(os, *this);
     }
   };
 

@@ -47,19 +47,17 @@ struct SpecialAction : public std::integral_constant<int, Value>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct CustomCommandAction
+struct CustomCommandAction : private Scope
 {
-  Scope inner_scope;
-
   const String type;
 
   const String content;
 
   template <typename Node>
   explicit CustomCommandAction(const Node & node, const Scope & outer_scope)
-  : inner_scope(outer_scope),
-    type(readAttribute<String>("type", node, inner_scope)),
-    content(readContent<String>(node, inner_scope))
+  : Scope(outer_scope),
+    type(readAttribute<String>("type", node, localScope())),
+    content(readContent<String>(node, localScope()))
   {
   }
 
@@ -151,7 +149,7 @@ struct CustomCommandAction
     std::smatch result{};
 
     if (std::regex_match(type, result, pattern) && builtins.find(result[1]) != std::end(builtins)) {
-      builtins.at(result[1])(split(result[3]), inner_scope);
+      builtins.at(result[1])(split(result[3]), localScope());
     } else {
       fork_exec(type, content);
     }
