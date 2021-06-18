@@ -3,6 +3,7 @@
 ## Difference between the latest release and master
 - Add support for RelativeTargetSpeed, the syntax of OpenSCENARIO
 - Add feature to publish context information during scenario execution to topic `/simulation/context` as a JSON string
+- Enable throw semantic error when you call setEntityStatus or setTargetSpeed function which targets to the ego vehicle after starting scenario.
 
 ## Ver 0.1.0
 - Synchronize ROS time between traffic_simulator and sensor_simulator.
