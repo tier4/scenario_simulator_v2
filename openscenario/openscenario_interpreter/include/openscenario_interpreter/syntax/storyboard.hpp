@@ -35,10 +35,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Storyboard : public StoryboardElement<Storyboard>, public Elements
+struct Storyboard : private Scope, public StoryboardElement<Storyboard>, public Elements
 {
-  Scope inner_scope;
-
   Init init;
 
   Trigger stop_trigger;
@@ -47,13 +45,13 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 
   template <typename Node, typename Scope>
   explicit Storyboard(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope),
-    init(readElement<Init>("Init", node, inner_scope)),
-    stop_trigger(readElement<Trigger>("StopTrigger", node, inner_scope)),
+  : Scope(outer_scope),
+    init(readElement<Init>("Init", node, localScope())),
+    stop_trigger(readElement<Trigger>("StopTrigger", node, localScope())),
     name("Storyboard")
   {
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Story>(node, inner_scope));
+      return push_back(readStoryboardElement<Story>(node, localScope()));
     });
 
     if (not init.endsImmediately()) {
@@ -65,7 +63,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 
   void start()
   {
-    for (const auto & each : inner_scope.entities) {
+    for (const auto & each : entities) {
       std::get<1>(each).evaluate();
     }
 
@@ -93,8 +91,8 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
 
   auto run()
   {
-    const auto all_ready = std::all_of(
-      std::begin(inner_scope.entities), std::end(inner_scope.entities), [&](const auto & each) {
+    const auto all_ready =
+      std::all_of(std::cbegin(entities), std::cend(entities), [&](const auto & each) {
         // DEBUG_VALUE(each.first);
         // DEBUG_VALUE(each.second.template as<ScenarioObject>().template is<Vehicle>());
         // DEBUG_VALUE(each.second.template as<ScenarioObject>().object_controller.isEgo());
@@ -114,7 +112,7 @@ struct Storyboard : public StoryboardElement<Storyboard>, public Elements
           story.evaluate();
         }
       } else if (all_ready) {
-        for (const auto & each : inner_scope.entities) {
+        for (const auto & each : entities) {
           engage(each.first);
         }
         engaged = true;

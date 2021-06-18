@@ -36,15 +36,13 @@ inline namespace syntax
  *  TODO REMOVE EXTENSION
  *
  * -------------------------------------------------------------------------- */
-struct AcquirePositionAction
+struct AcquirePositionAction : private Scope
 {
-  Scope inner_scope;
-
   const Position position;
 
   template <typename Node>
   explicit AcquirePositionAction(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope), position(readElement<Position>("Position", node, inner_scope))
+  : Scope(outer_scope), position(readElement<Position>("Position", node, localScope()))
   {
   }
 
@@ -63,7 +61,7 @@ struct AcquirePositionAction
   auto reset()
   {
     accomplishments.clear();
-    for (const auto & actor : inner_scope.actors) {
+    for (const auto & actor : actors) {
       accomplishments.emplace(actor, false);
     }
   }
@@ -72,7 +70,7 @@ struct AcquirePositionAction
   {
     reset();
 
-    for (const auto & actor : inner_scope.actors) {
+    for (const auto & actor : actors) {
       (*this)(actor);
     }
 
@@ -96,8 +94,9 @@ struct AcquirePositionAction
     }
   }
 
-  const std::true_type accomplished{};
-  static bool endsImmediately() { return true; };
+  static constexpr auto accomplished() { return true; }
+
+  static constexpr bool endsImmediately() { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

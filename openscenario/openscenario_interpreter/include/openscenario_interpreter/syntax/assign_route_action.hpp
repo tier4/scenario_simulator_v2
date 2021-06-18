@@ -35,25 +35,23 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AssignRouteAction
+struct AssignRouteAction : private Scope
 {
-  Scope inner_scope;
-
   Element route_or_catalog_reference;
 
   template <typename Node>
   explicit AssignRouteAction(const Node & node, Scope & outer_scope)
   // clang-format off
-  : inner_scope(outer_scope),
+  : Scope(outer_scope),
     route_or_catalog_reference(
       choice(node,
-        std::make_pair("Route",            [&](auto && node) { return make<Route>(node, inner_scope); }),
+        std::make_pair("Route",            [&](auto && node) { return make<Route>(node, localScope()); }),
         std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }
 
-  const std::true_type accomplished{};
+  static constexpr auto accomplished() noexcept { return true; }
 
   decltype(auto) operator()(const Scope::Actor & actor)
   {
@@ -64,7 +62,7 @@ struct AssignRouteAction
 
   auto start()
   {
-    for (const auto & actor : inner_scope.actors) {
+    for (const auto & actor : actors) {
       (*this)(actor);
     }
   }
