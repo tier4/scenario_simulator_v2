@@ -103,7 +103,7 @@ public:
 
   virtual auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool;
 
-  virtual void setTargetSpeed(const double target_speed, const bool continuous) = 0;
+  virtual void setTargetSpeed(double target_speed, bool continuous) = 0;
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)

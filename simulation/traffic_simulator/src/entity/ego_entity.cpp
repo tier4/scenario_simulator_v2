@@ -69,6 +69,7 @@ auto toString(const VehicleModelType datum) -> std::string
   }
 
 #undef BOILERPLATE
+  THROW_SEMANTIC_ERROR("Invalid vehicle model type.");
 }
 
 auto getVehicleModelType()
