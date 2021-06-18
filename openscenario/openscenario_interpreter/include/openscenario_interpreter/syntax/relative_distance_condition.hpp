@@ -68,9 +68,7 @@ struct RelativeDistanceCondition
 
   const TriggeringEntities for_each;
 
-  using TriggeringEntity = TriggeringEntities::value_type;
-
-  auto distance(const TriggeringEntity & triggering_entity)
+  auto distance(const EntityRef & triggering_entity)
   {
     if (freespace) {
       switch (relative_distance_type) {

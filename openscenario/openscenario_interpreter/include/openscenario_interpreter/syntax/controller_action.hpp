@@ -66,6 +66,8 @@ struct ControllerAction
   void start() const { assignController(); }
 
   const std::true_type accomplished{};
+
+  static bool endsImmediately() { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

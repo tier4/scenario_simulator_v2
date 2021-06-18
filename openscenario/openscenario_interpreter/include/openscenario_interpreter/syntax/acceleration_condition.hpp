@@ -39,7 +39,7 @@ struct AccelerationCondition
 
   const TriggeringEntities trigger;
 
-  template <typename Node>
+  template <typename Node, typename Scope>
   explicit AccelerationCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
   : value(readAttribute<Double>("value", node, outer_scope)),

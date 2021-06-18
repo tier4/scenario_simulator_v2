@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_STATE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_STATE_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_type.hpp>
 
@@ -22,16 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== StoryboardElementStateCondition ========================================
+/* ---- StoryboardElementStateCondition ----------------------------------------
  *
- * <xsd:complexType name="StoryboardElementStateCondition">
- *   <xsd:attribute name="storyboardElementType" type="StoryboardElementType" use="required"/>
- *   <xsd:attribute name="storyboardElementRef" type="String" use="required"/>
- *   <xsd:attribute name="state" type="StoryboardElementState" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="StoryboardElementStateCondition">
+ *    <xsd:attribute name="storyboardElementType" type="StoryboardElementType" use="required"/>
+ *    <xsd:attribute name="storyboardElementRef" type="String" use="required"/>
+ *    <xsd:attribute name="state" type="StoryboardElementState" use="required"/>
+ *  </xsd:complexType>
  *
- * ========================================================================== */
-struct StoryboardElementStateCondition
+ * -------------------------------------------------------------------------- */
+struct StoryboardElementStateCondition : private Scope
 {
   const String name;
 
@@ -39,14 +40,12 @@ struct StoryboardElementStateCondition
 
   const StoryboardElementState state;
 
-  Scope inner_scope;
-
-  template <typename Node, typename Scope>
-  explicit StoryboardElementStateCondition(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("storyboardElementRef", node, outer_scope)),
-    type(readAttribute<StoryboardElementType>("storyboardElementType", node, outer_scope)),
-    state(readAttribute<StoryboardElementState>("state", node, outer_scope)),
-    inner_scope(outer_scope)
+  template <typename Node>
+  explicit StoryboardElementStateCondition(const Node & node, const Scope & outer_scope)
+  : Scope(outer_scope),
+    name(readAttribute<String>("storyboardElementRef", node, localScope())),
+    type(readAttribute<StoryboardElementType>("storyboardElementType", node, localScope())),
+    state(readAttribute<StoryboardElementState>("state", node, localScope()))
   {
   }
 
@@ -57,7 +56,7 @@ struct StoryboardElementStateCondition
 
   auto evaluate() const
   {
-    const auto result{compare(inner_scope.storyboard_elements.at(name).state(), state)};
+    const auto result = compare(localScope().storyboard_elements.at(name).currentState(), state);
 
 #ifndef NDEBUG
     std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" << reset

@@ -25,22 +25,20 @@ inline namespace syntax
 {
 /* ---- TeleportAction ---------------------------------------------------------
  *
- * <xsd:complexType name="TeleportAction">
- *   <xsd:sequence>
- *     <xsd:element name="Position" type="Position"/>
- *   </xsd:sequence>
- * </xsd:complexType>
+ *  <xsd:complexType name="TeleportAction">
+ *    <xsd:sequence>
+ *      <xsd:element name="Position" type="Position"/>
+ *    </xsd:sequence>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TeleportAction
+struct TeleportAction : private Scope
 {
-  Scope inner_scope;
-
   const Position position;
 
   template <typename Node>
   explicit TeleportAction(const Node & node, Scope & outer_scope)
-  : inner_scope(outer_scope), position(readElement<Position>("Position", node, inner_scope))
+  : Scope(outer_scope), position(readElement<Position>("Position", node, localScope()))
   {
   }
 
@@ -68,10 +66,12 @@ struct TeleportAction
 
   void start() const
   {
-    for (const auto & actor : inner_scope.actors) {
+    for (const auto & actor : actors) {
       apply(*this, position, actor);
     }
   }
+
+  static constexpr auto endsImmediately() noexcept { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

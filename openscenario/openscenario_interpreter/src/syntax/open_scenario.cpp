@@ -12,12 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iomanip>
 #include <openscenario_interpreter/syntax/openscenario.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const OpenScenario &) { return os << unspecified; }
+std::ostream & operator<<(std::ostream & os, const OpenScenario &) { return os; }
+
+nlohmann::json & operator<<(nlohmann::json & json, const OpenScenario & datum)
+{
+  json["version"] = "1.0";
+
+  json["frame"] = datum.frame;
+
+  // clang-format off
+  json["CurrentStates"]["completeState"]   = openscenario_interpreter::complete_state  .use_count() - 1;
+  json["CurrentStates"]["runningState"]    = openscenario_interpreter::running_state   .use_count() - 1;
+  json["CurrentStates"]["standbyState"]    = openscenario_interpreter::standby_state   .use_count() - 1;
+  json["CurrentStates"]["startTransition"] = openscenario_interpreter::start_transition.use_count() - 1;
+  json["CurrentStates"]["stopTransition"]  = openscenario_interpreter::stop_transition .use_count() - 1;
+  // clang-format on
+
+  if (datum.category.is<ScenarioDefinition>()) {
+    json["OpenSCENARIO"] << datum.category.as<ScenarioDefinition>();
+  }
+
+  return json;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

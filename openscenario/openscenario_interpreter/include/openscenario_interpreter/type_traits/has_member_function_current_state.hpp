@@ -12,36 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
-#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_CURRENT_STATE_HPP_
+#define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_CURRENT_STATE_HPP_
 
-#include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/type_traits/has_member_function_state.hpp>
+#include <openscenario_interpreter/type_traits/void_t.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace type_traits
 {
 template <typename T, typename = void>
-struct IfHasMemberFunctionState
+struct HasMemberFunctionCurrentState : public std::false_type
 {
-  template <typename Result>
-  static const Result & callIt(const T &)
-  {
-    throw SemanticError("Class ", typeid(T).name(), " is not an StoryboardElement");
-  }
 };
 
 template <typename T>
-struct IfHasMemberFunctionState<T, typename std::enable_if<HasMemberFunctionState<T>::value>::type>
+struct HasMemberFunctionCurrentState<T, void_t<decltype(std::declval<T>().currentState())>>
+: public std::true_type
 {
-  template <typename Result>
-  static const Result & callIt(const T & callee)
-  {
-    return callee.state();
-  }
 };
 }  // namespace type_traits
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__IF_HAS_MEMBER_FUNCTION_STATE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_CURRENT_STATE_HPP_

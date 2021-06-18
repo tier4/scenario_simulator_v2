@@ -67,6 +67,8 @@ struct CollisionCondition
     }
   }
 };
+
+std::ostream & operator<<(std::ostream &, const CollisionCondition &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

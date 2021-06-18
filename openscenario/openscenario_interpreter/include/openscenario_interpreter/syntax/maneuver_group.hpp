@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_GROUP_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_GROUP_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/actors.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -44,7 +45,7 @@ struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
 
   const Actors actors;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit ManeuverGroup(const Node & node, Scope & outer_scope)
   : StoryboardElement(readAttribute<UnsignedInteger>(
       "maximumExecutionCount", node, outer_scope, UnsignedInteger())),
@@ -66,13 +67,12 @@ struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
 
   static constexpr auto stopTriggered() noexcept { return false; }
 
-  /* -------------------------------------------------------------------------
+  /* ---------------------------------------------------------------------------
    *
-   * ManeuverGroup
-   *   A ManeuverGroup's goal is accomplished when all its Maneuvers are in
-   *   the completeState.
+   *  A ManeuverGroup's goal is accomplished when all its Maneuvers are in the
+   *  completeState.
    *
-   * ---------------------------------------------------------------------- */
+   * ------------------------------------------------------------------------ */
   auto accomplished() const
   {
     return std::all_of(std::begin(*this), std::end(*this), [&](auto && each) {
@@ -97,6 +97,8 @@ struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const ManeuverGroup &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

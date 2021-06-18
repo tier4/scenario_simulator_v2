@@ -29,7 +29,8 @@ struct IfNotNothrowDefaultConstructible
   static T error(const std::string & parent_name, const std::string & child_name)
   {
     throw SyntaxError(
-      parent_name, " requires class ", child_name, " as element, but there is no specification");
+      "Class ", parent_name, " requires class ", child_name,
+      " as element, but there is no declaration");
   }
 };
 

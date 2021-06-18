@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
 #include <boost/mpl/and.hpp>
-#include <boost/scope_exit.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <string>
 #include <type_traits>
@@ -44,13 +43,13 @@ public:
   {
   }
 
-  const auto & state() const { return current_state; }
+  const auto & currentState() const { return current_state; }
 
-#define BOILERPLATE(NAME, STATE)                                                           \
-  constexpr auto NAME() const noexcept                                                     \
-  {                                                                                        \
-    return state().template as<StoryboardElementState>() == StoryboardElementState::STATE; \
-  }                                                                                        \
+#define BOILERPLATE(NAME, STATE)                                                                  \
+  constexpr auto NAME() const noexcept                                                            \
+  {                                                                                               \
+    return currentState().template as<StoryboardElementState>() == StoryboardElementState::STATE; \
+  }                                                                                               \
   static_assert(true, "")
 
   BOILERPLATE(standby, standbyState);
@@ -68,12 +67,6 @@ public:
     Boolean && test, const Element & consequent_state, const Element & alternate_state)
   {
     if (test) {
-#ifndef NDEBUG
-      std::cout << indent;
-      std::cout << typeid(T).name();
-      std::cout << "::evaluate [" << current_state << " => " << consequent_state << "]";
-      std::cout << std::endl;
-#endif
       return current_state = consequent_state;
     } else {
       return current_state = alternate_state;
@@ -94,9 +87,6 @@ public:
 
   Element override()
   {
-#ifndef NDEBUG
-    std::cout << state() << std::endl;
-#endif
     if (!complete() && !stopping()) {
       return current_state = stop_transition;
     } else {
@@ -161,18 +151,7 @@ public:
       override();
     }
 
-#ifndef NDEBUG
-    std::cout << (indent++);
-    std::cout << "- evaluate: \x1b[36m";
-    std::cout << std::quoted(static_cast<const T &>(*this).name);
-    std::cout << "\x1b[0m";
-    std::cout << " [" << current_state << "] ";
-    std::cout << std::endl;
-#endif
-
-    BOOST_SCOPE_EXIT_ALL() { --indent; };
-
-    switch (state().template as<StoryboardElementState>()) {
+    switch (currentState().template as<StoryboardElementState>()) {
       /* ---- StandBy ----------------------------------------------------------
        *
        *  This is the default initialization state of a StoryboardElement. When
@@ -310,12 +289,6 @@ public:
           stop();
           return current_state;
         } else {
-#ifndef NDEBUG
-          std::cout << indent;
-          std::cout << typeid(T).name();
-          std::cout << "::stop [" << current_state << " => " << complete_state << "]";
-          std::cout << std::endl;
-#endif
           return current_state = complete_state;
         }
     }

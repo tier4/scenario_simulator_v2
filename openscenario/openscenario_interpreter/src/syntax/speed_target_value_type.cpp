@@ -35,15 +35,6 @@ std::istream & operator>>(std::istream & is, SpeedTargetValueType & datum)
   static_assert(true, "")
 
   BOILERPLATE(delta);
-
-#undef BOILERPLATE
-
-#define BOILERPLATE(IDENTIFIER)                                                  \
-  if (buffer == #IDENTIFIER) {                                                   \
-    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(SpeedTargetValueType, buffer); \
-  }                                                                              \
-  static_assert(true, "")
-
   BOILERPLATE(factor);
 
 #undef BOILERPLATE

@@ -23,43 +23,40 @@ inline namespace syntax
 {
 /* ---- ModifyAction -----------------------------------------------------------
  *
- * <xsd:complexType name="ParameterModifyAction">
- *   <xsd:all>
- *     <xsd:element name="Rule" type="ModifyRule"/>
- *   </xsd:all>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterModifyAction">
+ *    <xsd:all>
+ *      <xsd:element name="Rule" type="ModifyRule"/>
+ *    </xsd:all>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterModifyAction
+struct ParameterModifyAction : Scope
 {
-  Scope inner_scope;
-
   const String parameter_ref;
 
   const ModifyRule rule;
 
-  const std::true_type accomplished{};
-
   template <typename Node>
   explicit ParameterModifyAction(
     const Node & node, Scope & outer_scope, const String & parameter_ref)
-  : inner_scope(outer_scope),
+  : Scope(outer_scope),
     parameter_ref(parameter_ref),
-    rule(readElement<ModifyRule>("Rule", node, inner_scope))
+    rule(readElement<ModifyRule>("Rule", node, localScope()))
   {
   }
 
+  static constexpr auto accomplished() noexcept { return true; }
+
   auto evaluate()
   try {
-    const auto target{inner_scope.parameters.at(parameter_ref)};
+    const auto target = parameters.at(parameter_ref);
     if (rule.is<ParameterAddValueRule>()) {
       return rule.as<ParameterAddValueRule>()(target);
     } else {
       return rule.as<ParameterMultiplyByValueRule>()(target);
     }
-    return unspecified;
   } catch (const std::out_of_range &) {
-    throw SemanticError("No such parameter '", parameter_ref, "'");
+    throw SemanticError("No such parameter ", std::quoted(parameter_ref));
   }
 };
 }  // namespace syntax

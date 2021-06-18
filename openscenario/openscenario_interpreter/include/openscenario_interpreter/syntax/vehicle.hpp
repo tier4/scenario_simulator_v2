@@ -43,7 +43,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Vehicle
+struct Vehicle : private Scope  // for ParameterDeclarations
 {
   /* ---- name -----------------------------------------------------------------
    *
@@ -58,8 +58,6 @@ struct Vehicle
    *
    * ------------------------------------------------------------------------ */
   const VehicleCategory vehicle_category;
-
-  Scope inner_scope;
 
   /* ---- ParameterDeclarations ------------------------------------------------
    *
@@ -98,15 +96,15 @@ struct Vehicle
 
   template <typename Node, typename Scope>
   explicit Vehicle(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
-    vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, outer_scope)),
-    inner_scope(outer_scope),
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, localScope())),
+    vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, localScope())),
     parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)),
-    bounding_box(readElement<BoundingBox>("BoundingBox", node, inner_scope)),
-    performance(readElement<Performance>("Performance", node, inner_scope)),
-    axles(readElement<Axles>("Axles", node, inner_scope)),
-    properties(readElement<Properties>("Properties", node, inner_scope))
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+    bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
+    performance(readElement<Performance>("Performance", node, localScope())),
+    axles(readElement<Axles>("Axles", node, localScope())),
+    properties(readElement<Properties>("Properties", node, localScope()))
   {
   }
 

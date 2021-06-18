@@ -44,20 +44,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-using DefaultController = Properties;
-
-struct Controller
+struct Controller : private Scope
 {
   /* ---- name -----------------------------------------------------------------
    *
    *  Name of the controller type.
    *
    * ------------------------------------------------------------------------ */
-  using Name = String;
-
-  const Name name;
-
-  Scope inner_scope;
+  const String name;
 
   /* ---- ParameterDeclarations ------------------------------------------------
    *
@@ -75,11 +69,11 @@ struct Controller
 
   template <typename Node, typename Scope>
   explicit Controller(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
-    inner_scope(outer_scope),
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, localScope())),
     parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)),
-    properties(readElement<Properties>("Properties", node, inner_scope))
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+    properties(readElement<Properties>("Properties", node, localScope()))
   {
   }
 
@@ -93,12 +87,14 @@ struct Controller
   {
     openscenario_msgs::msg::DriverModel controller;
     {
-      controller.see_around = !(*this)["isBlind"];
+      controller.see_around = not(*this)["isBlind"];
     }
 
     return controller;
   }
 };
+
+using DefaultController = Properties;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
