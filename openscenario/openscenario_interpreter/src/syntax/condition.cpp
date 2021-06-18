@@ -21,6 +21,8 @@ inline namespace syntax
 {
 nlohmann::json & operator<<(nlohmann::json & json, const Condition & datum)
 {
+  json["currentEvaluation"] = datum.description();
+
   json["currentValue"] = boost::lexical_cast<std::string>(datum.current_value);
 
   json["name"] = datum.name;
@@ -36,8 +38,6 @@ nlohmann::json & operator<<(nlohmann::json & json, const Condition & datum)
   // clang-format on
 
   json["type"] = table.at(datum.type())(datum);
-
-  json["description"] = datum.description();
 
   return json;
 }
