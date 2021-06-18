@@ -34,10 +34,10 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Trigger : public std::list<ConditionGroup>
 {
-  Boolean current_evaluation;
+  bool current_value;
 
   template <typename Node, typename Scope>
-  explicit Trigger(const Node & node, Scope & scope) : current_evaluation()
+  explicit Trigger(const Node & node, Scope & scope) : current_value()
   {
     callWithElements(
       node, "ConditionGroup", 0, unbounded, [&](auto && node) { emplace_back(node, scope); });
@@ -54,14 +54,13 @@ struct Trigger : public std::list<ConditionGroup>
      *
      * ---------------------------------------------------------------------- */
     // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
-    current_evaluation = std::accumulate(
-      std::begin(*this), std::end(*this), false,
-      [&](auto && lhs, ConditionGroup & condition_group) {
-        const auto rhs = condition_group.evaluate();
-        return lhs or rhs.as<Boolean>();
-      });
-
-    return asBoolean(current_evaluation);
+    return asBoolean(
+      current_value = std::accumulate(
+        std::begin(*this), std::end(*this), false,
+        [&](auto && lhs, ConditionGroup & condition_group) {
+          const auto rhs = condition_group.evaluate();
+          return lhs or rhs.as<Boolean>();
+        }));
   }
 };
 

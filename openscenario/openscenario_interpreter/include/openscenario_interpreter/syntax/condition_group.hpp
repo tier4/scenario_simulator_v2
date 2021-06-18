@@ -39,10 +39,10 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ConditionGroup : public std::list<Condition>
 {
-  Boolean current_evaluation;
+  bool current_value;
 
   template <typename Node, typename Scope>
-  explicit ConditionGroup(const Node & node, Scope & scope) : current_evaluation(false)
+  explicit ConditionGroup(const Node & node, Scope & scope) : current_value(false)
   {
     callWithElements(
       node, "Condition", 1, unbounded, [&](auto && node) { emplace_back(node, scope); });
@@ -51,13 +51,12 @@ struct ConditionGroup : public std::list<Condition>
   auto evaluate()
   {
     // NOTE: Don't use std::all_of; Intentionally does not short-circuit evaluation.
-    current_evaluation = std::accumulate(
-      std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
-        const auto rhs = condition.evaluate();
-        return lhs and rhs.as<Boolean>();
-      });
-
-    return asBoolean(current_evaluation);
+    return asBoolean(
+      current_value = std::accumulate(
+        std::begin(*this), std::end(*this), true, [&](auto && lhs, Condition & condition) {
+          const auto rhs = condition.evaluate();
+          return lhs and rhs.as<Boolean>();
+        }));
   }
 };
 

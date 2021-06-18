@@ -46,7 +46,7 @@ struct Condition : public Element
 
   const ConditionEdge condition_edge;
 
-  Boolean current_evaluation;
+  bool current_value;
 
   template <typename Node, typename Scope>
   explicit Condition(const Node & node, Scope & scope)
@@ -58,17 +58,17 @@ struct Condition : public Element
     name(readAttribute<String>("name", node, scope)),
     delay(readAttribute<Double>("delay", node, scope, Double())),
     condition_edge(readAttribute<ConditionEdge>("conditionEdge", node, scope)),
-    current_evaluation(false)
+    current_value(false)
   // clang-format on
   {
   }
 
   const auto & evaluate()
   {
-    if (condition_edge == ConditionEdge::sticky and current_evaluation) {
+    if (condition_edge == ConditionEdge::sticky and current_value) {
       return true_v;
     } else {
-      return asBoolean(current_evaluation = Element::evaluate().as<Boolean>());
+      return asBoolean(current_value = Element::evaluate().as<Boolean>());
     }
   }
 };

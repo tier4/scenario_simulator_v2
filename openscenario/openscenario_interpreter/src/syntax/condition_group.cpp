@@ -20,7 +20,7 @@ inline namespace syntax
 {
 nlohmann::json & operator<<(nlohmann::json & json, const ConditionGroup & datum)
 {
-  json["currentEvaluation"] = boost::lexical_cast<std::string>(datum.current_evaluation);
+  json["currentValue"] = boost::lexical_cast<std::string>(datum.current_value);
 
   json["Condition"] = nlohmann::json::array();
 
