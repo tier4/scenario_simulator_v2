@@ -68,6 +68,8 @@ struct AssignRouteAction
       (*this)(actor);
     }
   }
+
+  static bool endsImmediately() { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

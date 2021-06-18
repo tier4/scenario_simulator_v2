@@ -66,6 +66,21 @@ struct InitActions : public Elements
     }
     return unspecified;
   }
+
+  bool endsImmediately() const
+  {
+    return std::all_of(begin(), end(), [=](const Element & e) {
+      if (e.is<GlobalAction>()) {
+        return e.as<GlobalAction>().endsImmediately();
+      } else if (e.is<UserDefinedAction>()) {
+        return e.as<UserDefinedAction>().endsImmediately();
+      } else if (e.is<Private>()) {
+        return e.as<Private>().endsImmediately();
+      } else {
+        throw UNSUPPORTED_ELEMENT_SPECIFIED(e.type().name());
+      }
+    });
+  }
 };
 
 nlohmann::json & operator<<(nlohmann::json &, const InitActions &);

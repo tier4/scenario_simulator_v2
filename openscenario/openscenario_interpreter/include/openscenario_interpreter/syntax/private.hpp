@@ -58,6 +58,13 @@ struct Private : private Scope
 
     return unspecified;
   }
+
+  bool endsImmediately() const
+  {
+    return std::all_of(
+      private_actions.begin(), private_actions.end(),
+      [](const PrivateAction & private_action) { return private_action.endsImmediately(); });
+  }
 };
 
 nlohmann::json & operator<<(nlohmann::json &, const Private &);

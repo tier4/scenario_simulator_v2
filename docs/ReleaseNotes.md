@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Add support for RelativeTargetSpeed, the syntax of OpenSCENARIO
 
 ## Ver 0.1.0
 - Synchronize ROS time between traffic_simulator and sensor_simulator.

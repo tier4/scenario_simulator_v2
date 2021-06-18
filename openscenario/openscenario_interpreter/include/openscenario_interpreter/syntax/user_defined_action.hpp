@@ -39,6 +39,8 @@ struct UserDefinedAction : public Element
       return rebind<CustomCommandAction>(node, scope);
     });
   }
+
+  static bool endsImmediately() { return true; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

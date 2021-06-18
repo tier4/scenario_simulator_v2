@@ -46,6 +46,12 @@ struct Init
   {
     return actions.evaluate(std::forward<decltype(xs)>(xs)...);
   }
+
+  template <typename... Ts>
+  decltype(auto) endsImmediately(Ts &&... xs)
+  {
+    return actions.endsImmediately(std::forward<decltype(xs)>(xs)...);
+  }
 };
 
 nlohmann::json & operator<<(nlohmann::json &, const Init &);
