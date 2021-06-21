@@ -302,6 +302,19 @@ auto EntityManager::getNumberOfEgo() const -> std::size_t
   });
 }
 
+const std::string EntityManager::getEgoName() const
+{
+  const auto names = getEntityNames();
+  for (const auto name : names) {
+    if (isEgo(name)) {
+      return name;
+    }
+  }
+  THROW_SEMANTIC_ERROR(
+    "const std::string EntityManager::getEgoName(const std::string & name) function was called, "
+    "but ego vehicle does not exist");
+}
+
 auto EntityManager::getObstacle(const std::string & name)
   -> boost::optional<openscenario_msgs::msg::Obstacle>
 {

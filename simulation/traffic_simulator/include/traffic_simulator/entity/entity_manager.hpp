@@ -199,6 +199,7 @@ public:
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
   FORWARD_TO_ENTITY(getStandStillDuration, const);
@@ -290,6 +291,8 @@ public:
   auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
 
   bool isEgo(const std::string & name) const;
+
+  const std::string getEgoName() const;
 
   bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);
 

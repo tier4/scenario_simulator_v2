@@ -80,6 +80,7 @@ void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
 
 void VehicleEntity::onUpdate(double current_time, double step_time)
 {
+  EntityBase::onUpdate(current_time, step_time);
   if (!status_) {
     return;
   }

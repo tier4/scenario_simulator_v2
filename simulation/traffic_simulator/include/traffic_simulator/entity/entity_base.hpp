@@ -115,7 +115,7 @@ public:
 
   /*   */ auto setVisibility(const bool visibility) { return visibility_ = visibility; }
 
-  virtual void onUpdate(double current_time, double step_time) = 0;
+  virtual void onUpdate(double current_time, double step_time);
 
   virtual auto ready() const -> bool { return static_cast<bool>(status_); }
 
@@ -140,9 +140,15 @@ public:
   /*   */ void updateStandStillDuration(const double step_time);
   virtual const autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand();
 
+  const boost::optional<openscenario_msgs::msg::EntityStatus> getEntityStatusBeforeUpdate() const
+  {
+    return status_before_update_;
+  }
+
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;
+  boost::optional<openscenario_msgs::msg::EntityStatus> status_before_update_;
 
   std::queue<openscenario_msgs::msg::LaneletPose> waypoints_;
 
