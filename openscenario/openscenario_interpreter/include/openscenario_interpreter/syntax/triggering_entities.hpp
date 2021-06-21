@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities_rule.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 #include <utility>
 #include <vector>
 
@@ -66,18 +67,9 @@ struct TriggeringEntities
   {
     std::stringstream description;
 
-    description << triggering_entities_rule.description() << " [";
+    description << triggering_entities_rule.description() << " ";
 
-    const auto comma = ", ";
-
-    const auto * separator = "";
-
-    for (const auto & entity_ref : entity_refs) {
-      description << separator << entity_ref;
-      separator = comma;
-    }
-
-    description << "]";
+    print_to(description, entity_refs);
 
     return description.str();
   }

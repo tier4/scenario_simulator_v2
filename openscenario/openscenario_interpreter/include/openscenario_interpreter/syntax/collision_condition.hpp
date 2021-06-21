@@ -56,6 +56,19 @@ struct CollisionCondition
   {
   }
 
+  auto description() const
+  {
+    std::stringstream description;
+
+    description << triggering_entities.description() << " colliding with another given entity "
+                << another_given_entity << "?";
+
+    // TODO (yamacir-kit): If another_given_entity.is<ByType>(), description
+    // will be "Is any of [A, B, C] colliding with another T typed entities?"
+
+    return description.str();
+  }
+
   auto evaluate() const noexcept
   {
     if (another_given_entity.is<EntityRef>()) {
@@ -65,16 +78,6 @@ struct CollisionCondition
     } else {
       return false_v;
     }
-  }
-
-  auto description() const
-  {
-    std::stringstream description;
-
-    description << triggering_entities.description() << " colliding with another given entity "
-                << another_given_entity << "?";
-
-    return description.str();
   }
 };
 
