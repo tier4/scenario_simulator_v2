@@ -69,6 +69,23 @@ struct TriggeringEntitiesRule
         return false;
     }
   }
+
+  auto description() const -> std::string
+  {
+    switch (value) {
+      case all:
+        return "Are all of";
+
+      case any:
+        return "Is any of";
+
+      case none:
+        return "Is none of";
+
+      default:
+        throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(TriggeringEntitiesRule, *this);
+    }
+  }
 };
 
 static_assert(std::is_standard_layout<TriggeringEntitiesRule>::value, "");
