@@ -168,7 +168,7 @@ visualization_msgs::msg::MarkerArray parkingSpacesAsMarkerArray(
   const lanelet::ConstLineStrings3d & parking_spaces, const std_msgs::msg::ColorRGBA & c);
 
 /**
- * [detectionAreasAsMarkerArray creates marker array to visualize lanlet_id]
+ * [detectionAreasAsMarkerArray creates marker array to visualize lanelet_id]
  * @param road_lanelets [road lanelets]
  * @param c [color of the marker]
  * @param duration [lifetime of the marker]

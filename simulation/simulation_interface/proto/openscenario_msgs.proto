@@ -25,7 +25,7 @@ message BoundingBox {
  * Protobuf definition of openscenario_msgs/msg/LaneletPose type in ROS2.
  **/
 message LaneletPose {
-  int64 lanlet_id = 1;           // Lanelet id of the entity exists.
+  int64 lanelet_id = 1;           // Lanelet id of the entity exists.
   double s = 2;                  // S value in the lane coordinate.
   double offset = 3;             // Offset value in the lane coordinate.
   geometry_msgs.Vector3 rpy = 4; // RPY(roll/pitch/yaw) value in the lane coordinate.

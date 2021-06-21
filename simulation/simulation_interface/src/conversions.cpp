@@ -232,7 +232,7 @@ void toMsg(const openscenario_msgs::ActionStatus & proto, openscenario_msgs::msg
 void toProto(
   const openscenario_msgs::msg::LaneletPose & pose, openscenario_msgs::LaneletPose & proto)
 {
-  proto.set_lanlet_id(pose.lanelet_id);
+  proto.set_lanelet_id(pose.lanelet_id);
   proto.set_s(pose.s);
   proto.set_offset(pose.offset);
   toProto(pose.rpy, *proto.mutable_rpy());
@@ -240,7 +240,7 @@ void toProto(
 
 void toMsg(const openscenario_msgs::LaneletPose & proto, openscenario_msgs::msg::LaneletPose & pose)
 {
-  pose.lanelet_id = proto.lanlet_id();
+  pose.lanelet_id = proto.lanelet_id();
   pose.s = proto.s();
   pose.offset = proto.offset();
   toMsg(proto.rpy(), pose.rpy);
