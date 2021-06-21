@@ -7,8 +7,7 @@ package builtin_interfaces;
  **/
 message Duration {
   int32 sec = 1; // The seconds component, valid over all int32 values.
-  uint32 nanosec =
-      2; // The nanoseconds component, valid in the range [0, 10e9).
+  uint32 nanosec = 2; // The nanoseconds component, valid in the range [0, 10e9).
 }
 
 /**
@@ -16,6 +15,5 @@ message Duration {
  **/
 message Time {
   int32 sec = 1; // The seconds component, valid over all int32 values.
-  uint32 nanosec =
-      2; // The nanoseconds component, valid in the range [0, 10e9).
+  uint32 nanosec = 2; // The nanoseconds component, valid in the range [0, 10e9).
 }

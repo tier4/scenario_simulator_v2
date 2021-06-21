@@ -18,7 +18,7 @@ message Result {
  * Parameter configuration of the lidar sensor
  **/
 message LidarConfiguration {
-  string entity = 1; // Name of the entity which you want to attach lidar.
+  string entity = 1;                   // Name of the entity which you want to attach lidar.
   double horizontal_resolution = 2;    // Horizontal resolutions of the lidar.
   repeated double vertical_angles = 3; // Vertical resolutions of the lidar.
   double scan_duration = 4;            // Scan duration of the lidar.
@@ -29,8 +29,7 @@ message LidarConfiguration {
  * Parameter configuration of the detection sensor
  **/
 message DetectionSensorConfiguration {
-  string entity =
-      1; // Name of the entity which you want to attach detection sensor.
+  string entity = 1;          // Name of the entity which you want to attach detection sensor.
   double update_duration = 2; // Update duration of the detection sensor.
   string topic_name = 3;      // Topic name of the detection result.
 }
@@ -39,10 +38,9 @@ message DetectionSensorConfiguration {
  * Updated entity status by the simulator.
  **/
 message UpdatedEntityStatus {
-  string name = 1; // Name of the entity.
-  openscenario_msgs.ActionStatus action_status =
-      2;                       // Action status of the entity.
-  geometry_msgs.Pose pose = 3; // Pose of the entity in the map coordinate.
+  string name = 1;                                  // Name of the entity.
+  openscenario_msgs.ActionStatus action_status = 2; // Action status of the entity.
+  geometry_msgs.Pose pose = 3;                      // Pose of the entity in the map coordinate.
 }
 
 /**
@@ -79,34 +77,29 @@ message UpdateFrameResponse {
  * Requests spawning vehicle entity.
  **/
 message SpawnVehicleEntityRequest {
-  openscenario_msgs.VehicleParameters parameters =
-      1;           // Parameters of vehicle entity.
-  bool is_ego = 2; // If true, the entity is Ego vehicle. (Autoware vehicle.)
+  openscenario_msgs.VehicleParameters parameters = 1; // Parameters of vehicle entity.
+  bool is_ego = 2;                                    // If true, the entity is Ego vehicle. (Autoware vehicle.)
 }
 
 /**
  * Response of spawning vehicle entity.
  **/
 message SpawnVehicleEntityResponse {
-  Result result =
-      1; // Result of [SpawnVehicleEntityResponse](#SpawnVehicleEntityResponse)
+  Result result = 1; // Result of [SpawnVehicleEntityResponse](#SpawnVehicleEntityResponse)
 }
 
 /**
  * Requests spawning pedestrian entity.
  **/
 message SpawnPedestrianEntityRequest {
-  openscenario_msgs.PedestrianParameters parameters =
-      1; // Parameters of pedestrian entity.
+  openscenario_msgs.PedestrianParameters parameters = 1; // Parameters of pedestrian entity.
 }
 
 /**
  * Response of spawning vehicle entity.
  **/
 message SpawnPedestrianEntityResponse {
-  Result result =
-      1; // Result of
-         // [SpawnPedestrianEntityResponse](#SpawnPedestrianEntityResponse)
+  Result result = 1; // Result of [SpawnPedestrianEntityResponse](#SpawnPedestrianEntityResponse)
 }
 
 /**
@@ -127,24 +120,18 @@ message DespawnEntityResponse {
  * Requests updating entity status.
  **/
 message UpdateEntityStatusRequest {
-  repeated openscenario_msgs.EntityStatus status =
-      1; // List of updated entity status in traffic simulator.
-  autoware_vehicle_msgs.VehicleCommand vehicle_command =
-      2; // Ego Vehicle Command of from Autoware
-  openscenario_msgs.EntityStatus ego_entity_status_before_update =
-      3; // Entity status of ego entity before runnig vehicle model
-  bool ego_entity_status_before_update_is_empty =
-      4; // If True,ego entity status before update is empty.
+  repeated openscenario_msgs.EntityStatus status = 1;                 // List of updated entity status in traffic simulator.
+  autoware_vehicle_msgs.VehicleCommand vehicle_command = 2;           // Ego Vehicle Command of from Autoware
+  openscenario_msgs.EntityStatus ego_entity_status_before_update = 3; // Entity status of ego entity before runnig vehicle model
+  bool ego_entity_status_before_update_is_empty = 4;                  // If True,ego entity status before update is empty.
 }
 
 /**
  * Response of updating entity status.
  **/
 message UpdateEntityStatusResponse {
-  Result result =
-      1; // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
-  repeated UpdatedEntityStatus status =
-      2; // List of updated entity status in sensor/dynamics simulator.
+  Result result = 1;                       // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
+  repeated UpdatedEntityStatus status = 2; // List of updated entity status in sensor/dynamics simulator.
 }
 
 /**
@@ -158,25 +145,21 @@ message AttachLidarSensorRequest {
  * Response of attaching a lidar sensor to the target entity.
  **/
 message AttachLidarSensorResponse {
-  Result result =
-      1; // Result of [AttachLidarSensorRequest](#AttachLidarSensorRequest)
+  Result result = 1; // Result of [AttachLidarSensorRequest](#AttachLidarSensorRequest)
 }
 
 /**
  * Requests attaching detection sensor to the target entity.
  **/
 message AttachDetectionSensorRequest {
-  DetectionSensorConfiguration configuration =
-      1; // Configuration of the detection sensor.
+  DetectionSensorConfiguration configuration = 1; // Configuration of the detection sensor.
 }
 
 /**
  * Response of attaching detection sensor to the target entity.
  **/
 message AttachDetectionSensorResponse {
-  Result result =
-      1; // Result of
-         // [AttachDetectionSensorRequest](#AttachDetectionSensorRequest)
+  Result result = 1; // Result of [AttachDetectionSensorRequest](#AttachDetectionSensorRequest)
 }
 
 /**
@@ -191,6 +174,5 @@ message UpdateSensorFrameRequest {
  * Response of updating a frame of sensor simulation.
  **/
 message UpdateSensorFrameResponse {
-  Result result =
-      1; // Result of [UpdateSensorFrameRequest](#UpdateSensorFrameRequest)
+  Result result = 1; // Result of [UpdateSensorFrameRequest](#UpdateSensorFrameRequest)
 }
