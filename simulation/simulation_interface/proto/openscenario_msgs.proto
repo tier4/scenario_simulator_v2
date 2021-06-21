@@ -25,11 +25,10 @@ message BoundingBox {
  * Protobuf definition of openscenario_msgs/msg/LaneletPose type in ROS2.
  **/
 message LaneletPose {
-  int64 lanlet_id = 1; // Lanelet id of the entity exists.
-  double s = 2;        // S value in the lane coordinate.
-  double offset = 3;   // Offset value in the lane coordinate.
-  geometry_msgs.Vector3 rpy =
-      4; // RPY(roll/pitch/yaw) value in the lane coordinate.
+  int64 lanlet_id = 1;           // Lanelet id of the entity exists.
+  double s = 2;                  // S value in the lane coordinate.
+  double offset = 3;             // Offset value in the lane coordinate.
+  geometry_msgs.Vector3 rpy = 4; // RPY(roll/pitch/yaw) value in the lane coordinate.
 }
 
 /**
@@ -52,8 +51,7 @@ message EntityStatus {
   ActionStatus action_status = 5; // Action status of the entity.
   geometry_msgs.Pose pose = 6;    // Pose in map coordinate of the entity.
   LaneletPose lanelet_pose = 7;   // Pose in lane coordinate of the entity.
-  bool lanelet_pose_valid =
-      8; // If true, the lane matching of the entity is succeeded.
+  bool lanelet_pose_valid = 8; // If true, the lane matching of the entity is succeeded.
 }
 
 /**
@@ -102,8 +100,7 @@ message VehicleParameters {
 }
 
 /**
- * Protobuf definition of openscenario_msgs/msg/PedestrianParameters type in
- *ROS2.
+ * Protobuf definition of openscenario_msgs/msg/PedestrianParameters type in ROS2.
  **/
 message PedestrianParameters {
   string name = 1;                // Name of the pedestrian entity.
