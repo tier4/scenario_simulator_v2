@@ -195,15 +195,15 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
             const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
             const auto & time_statistics = execution_timer.getStatistics("evaluate");
             // clang-format off
-            THROW_SIMULATION_ERROR(
-              "The execution time of evaluate() (",  time_ms, " ms) is not in time. ",
-              "The current local frame rate (", local_frame_rate, " Hz) (period = ", period.count(), " ms) is too high. ",
-              "If the frame rate is less than ", static_cast<unsigned int>(1.0 / time_ms * 1e3), " Hz, you will make it. ",
-              "(Statatistics: ",
-              "count = ", time_statistics.count(), ", ",
-              "mean = ", duration_cast<milliseconds>(time_statistics.mean()).count(), " ms, ",
-              "max = ", duration_cast<milliseconds>(time_statistics.max()).count(), " ms, ",
-              "standard deviation = ", duration_cast<microseconds>(time_statistics.standardDeviation()).count() / 1000.0 , " ms)"
+            RCLCPP_WARN_STREAM(get_logger(),
+              "The execution time of evaluate() (" <<  time_ms << " ms) is not in time. " <<
+              "The current local frame rate (" << local_frame_rate << " Hz) (period = " << period.count() << " ms) is too high. " <<
+              "If the frame rate is less than " << static_cast<unsigned int>(1.0 / time_ms * 1e3) << " Hz, you will make it. " <<
+              "(Statatistics: " <<
+              "count = " << time_statistics.count() << ", " <<
+              "mean = " << duration_cast<milliseconds>(time_statistics.mean()).count() << " ms, " <<
+              "max = " << duration_cast<milliseconds>(time_statistics.max()).count() << " ms, " <<
+              "standard deviation = " << duration_cast<microseconds>(time_statistics.standardDeviation()).count() / 1000.0 << " ms)"
             );
             // clang-format on
           }
