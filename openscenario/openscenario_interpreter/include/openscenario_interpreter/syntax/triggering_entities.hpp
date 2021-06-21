@@ -49,11 +49,37 @@ struct TriggeringEntities
   {
   }
 
-  template <typename... Ts>
-  constexpr decltype(auto) operator()(Ts &&... xs) const
+  template <typename Predicate>
+  constexpr decltype(auto) apply(Predicate && predicate) const
   {
     return triggering_entities_rule.apply(
-      std::begin(entity_refs), std::end(entity_refs), std::forward<decltype(xs)>(xs)...);
+      std::begin(entity_refs), std::end(entity_refs), std::forward<decltype(predicate)>(predicate));
+  }
+
+  template <typename... Ts>
+  [[deprecated]] constexpr decltype(auto) operator()(Ts &&... xs) const
+  {
+    return apply(std::forward<decltype(xs)>(xs)...);
+  }
+
+  auto description() const
+  {
+    std::stringstream description;
+
+    description << triggering_entities_rule.description() << " [";
+
+    const auto comma = ", ";
+
+    const auto * separator = "";
+
+    for (const auto & entity_ref : entity_refs) {
+      description << separator << entity_ref;
+      separator = comma;
+    }
+
+    description << "]";
+
+    return description.str();
   }
 };
 }  // namespace syntax
