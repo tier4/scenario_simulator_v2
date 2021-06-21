@@ -39,32 +39,42 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct CollisionCondition
 {
-  const Element given;
+  const Element another_given_entity;
 
-  const TriggeringEntities for_each;
+  const TriggeringEntities triggering_entities;
 
   template <typename Node, typename Scope>
   explicit CollisionCondition(
     const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : given(
+  : another_given_entity(
       choice(node,
         std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
         std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
-    for_each(triggering_entities)
+    triggering_entities(triggering_entities)
   // clang-format on
   {
   }
 
   auto evaluate() const noexcept
   {
-    if (given.is<EntityRef>()) {
-      return asBoolean(for_each([&](auto && triggering_entity) {
-        return checkCollision(triggering_entity, given.as<EntityRef>());
+    if (another_given_entity.is<EntityRef>()) {
+      return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+        return checkCollision(triggering_entity, another_given_entity.as<EntityRef>());
       }));
     } else {
       return false_v;
     }
+  }
+
+  auto description() const
+  {
+    std::stringstream description;
+
+    description << triggering_entities.description() << " colliding with another given entity "
+                << another_given_entity << "?";
+
+    return description.str();
   }
 };
 
