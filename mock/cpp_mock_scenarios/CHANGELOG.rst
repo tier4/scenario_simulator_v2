@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2021-06-21)
+------------------
 * Merge branch 'master' into relative_target_speed
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/context
 * Merge branch 'master' into relative_target_speed

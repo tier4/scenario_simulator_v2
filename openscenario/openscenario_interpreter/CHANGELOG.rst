@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2021-06-21)
+------------------
 * Merge pull request `#364 <https://github.com/tier4/scenario_simulator_v2/issues/364>`_ from tier4/feature/change_timeout_to_warning
 * change warnings
 * Merge pull request `#362 <https://github.com/tier4/scenario_simulator_v2/issues/362>`_ from tier4/feature/interpreter/scope

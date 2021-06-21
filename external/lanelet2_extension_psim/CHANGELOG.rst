@@ -2,8 +2,8 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2021-06-21)
+------------------
 * Merge branch 'master' into relative_target_speed
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/context
 * Contributors: kyabe2718, yamacir-kit

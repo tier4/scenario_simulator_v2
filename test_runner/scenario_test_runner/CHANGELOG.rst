@@ -2,8 +2,8 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2021-06-21)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/context
 * Merge pull request `#320 <https://github.com/tier4/scenario_simulator_v2/issues/320>`_ from tier4/relative_target_speed
 * Merge branch 'master' into relative_target_speed
