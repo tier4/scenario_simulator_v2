@@ -2,6 +2,16 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#344 <https://github.com/tier4/scenario_simulator_v2/issues/344>`_ from tier4/feature/interpreter/context
+* Add new package 'openscenario_interpreter_msgs'
+* Merge branch 'master' into relative_target_speed
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'master' into relative_target_speed
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Contributors: Masaya Kataoka, kyabe2718, yamacir-kit
+
 0.1.0 (2021-06-16)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/traffic-simulator/simulation-model-2
