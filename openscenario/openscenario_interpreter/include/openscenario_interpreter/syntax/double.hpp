@@ -31,7 +31,7 @@ struct Double : public std_msgs::msg::Float64
 
   explicit Double() = default;
 
-  explicit Double(value_type value) { data = value; }
+  Double(value_type value) { data = value; }
 
   explicit Double(const std::string & s)
   try {

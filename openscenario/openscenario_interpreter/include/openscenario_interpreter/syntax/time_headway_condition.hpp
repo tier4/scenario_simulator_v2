@@ -53,7 +53,7 @@ struct TimeHeadwayCondition
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<double> last_checked_values;  // for description
+  std::vector<Double> last_checked_values;  // for description
 
   template <typename Node, typename Scope>
   explicit TimeHeadwayCondition(

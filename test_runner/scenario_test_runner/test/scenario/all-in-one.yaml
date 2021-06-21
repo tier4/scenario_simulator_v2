@@ -218,6 +218,19 @@ OpenSCENARIO:
                                       AccelerationCondition:
                                         rule: greaterThan
                                         value: 10
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                        - entityRef: vehicle-1
+                                    EntityCondition:
+                                      StandStillCondition:
+                                        duration: 10
                         Action:
                           - name: ''
                             UserDefinedAction:
