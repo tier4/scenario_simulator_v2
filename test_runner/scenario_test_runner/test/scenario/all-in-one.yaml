@@ -205,6 +205,19 @@ OpenSCENARIO:
                             #             freespace: true
                             #             alongRoute: true
                             #             rule: lessThan
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      AccelerationCondition:
+                                        rule: greaterThan
+                                        value: 10
                         Action:
                           - name: ''
                             UserDefinedAction:

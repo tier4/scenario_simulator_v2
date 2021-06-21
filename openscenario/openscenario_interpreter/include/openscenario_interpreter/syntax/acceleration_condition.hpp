@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
 {
@@ -25,10 +26,10 @@ inline namespace syntax
 {
 /* ---- AccelerationCondition --------------------------------------------------
  *
- * <xsd:complexType name="AccelerationCondition">
- *   <xsd:attribute name="value" type="Double" use="required"/>
- *   <xsd:attribute name="rule" type="Rule" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="AccelerationCondition">
+ *    <xsd:attribute name="value" type="Double" use="required"/>
+ *    <xsd:attribute name="rule" type="Rule" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct AccelerationCondition
@@ -37,21 +38,41 @@ struct AccelerationCondition
 
   const Rule compare;
 
-  const TriggeringEntities trigger;
+  const TriggeringEntities triggering_entities;
+
+  std::vector<double> last_checked_values;  // for description
 
   template <typename Node, typename Scope>
   explicit AccelerationCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
-    trigger(trigger)
+    triggering_entities(triggering_entities),
+    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
   {
   }
 
-  auto evaluate() const
+  auto description() const
   {
-    return asBoolean(trigger([&](auto && entity) {
-      return compare(getEntityStatus(entity).action_status.accel.linear.x, value);
+    std::stringstream description;
+
+    description << triggering_entities.description() << "'s acceleration = ";
+
+    print_to(description, last_checked_values);
+
+    description << " " << compare << " " << value << "?";
+
+    return description.str();
+  }
+
+  auto evaluate()
+  {
+    last_checked_values.clear();
+
+    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+      last_checked_values.push_back(
+        getEntityStatus(triggering_entity).action_status.accel.linear.x);
+      return compare(last_checked_values.back(), value);
     }));
   }
 };

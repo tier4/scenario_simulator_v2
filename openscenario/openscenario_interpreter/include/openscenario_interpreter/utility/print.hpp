@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__UTILITY__PRINT_HPP_
 #define OPENSCENARIO_INTERPRETER__UTILITY__PRINT_HPP_
 
+#include <iomanip>
 #include <iostream>
 
 namespace openscenario_interpreter
@@ -24,8 +25,6 @@ inline namespace utility
 template <typename SequenceContainer>
 auto & print_to(std::ostream & os, const SequenceContainer & sequence_container)
 {
-  // const auto comma = ", ";
-
   const auto * separator = "[";
 
   for (const auto & each : sequence_container) {
