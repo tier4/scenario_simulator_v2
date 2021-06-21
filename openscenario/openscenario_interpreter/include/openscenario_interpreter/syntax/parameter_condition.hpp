@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <string>
 #include <typeindex>
@@ -27,14 +28,14 @@ inline namespace syntax
 {
 /* ---- ParameterCondition -----------------------------------------------------
  *
- * <xsd:complexType name="ParameterCondition">
- *   <xsd:attribute name="parameterRef" type="String" use="required"/>
- *   <xsd:attribute name="value" type="String" use="required"/>
- *   <xsd:attribute name="rule" type="Rule" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterCondition">
+ *    <xsd:attribute name="parameterRef" type="String" use="required"/>
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *    <xsd:attribute name="rule" type="Rule" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterCondition
+struct ParameterCondition : private Scope
 {
   const String parameter_ref;
 
@@ -42,14 +43,12 @@ struct ParameterCondition
 
   const Rule compare;
 
-  Scope inner_scope;
-
   template <typename Node>
-  explicit ParameterCondition(const Node & node, Scope & outer_scope)
-  : parameter_ref(readAttribute<String>("parameterRef", node, outer_scope)),
-    value(readAttribute<String>("value", node, outer_scope)),
-    compare(readAttribute<Rule>("rule", node, outer_scope)),
-    inner_scope(outer_scope)
+  explicit ParameterCondition(const Node & node, Scope & current_scope)
+  : Scope(current_scope),
+    parameter_ref(readAttribute<String>("parameterRef", node, localScope())),
+    value(readAttribute<String>("value", node, localScope())),
+    compare(readAttribute<Rule>("rule", node, localScope()))
   {
   }
 
@@ -91,9 +90,9 @@ struct ParameterCondition
          }},
       };
 
-    const auto target{inner_scope.parameters.find(parameter_ref)};
+    const auto target = localScope().parameters.find(parameter_ref);
 
-    if (target != std::end(inner_scope.parameters)) {
+    if (target != std::end(localScope().parameters)) {
       const auto iter{overloads.find(std::get<1>(*target).type())};
       if (iter != std::end(overloads)) {
         return std::get<1>(*iter)(compare, std::get<1>(*target), value) ? true_v : false_v;

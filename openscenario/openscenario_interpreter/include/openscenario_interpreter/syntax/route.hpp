@@ -37,28 +37,26 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Route
+struct Route : private Scope
 {
   const String name;
 
   const Boolean closed;
 
-  Scope inner_scope;
+  const ParameterDeclarations parameter_declarations;
 
   std::list<Waypoint> waypoints;
 
   template <typename Node>
   explicit Route(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, outer_scope)),
     closed(readAttribute<Boolean>("closed", node, outer_scope, Boolean())),
-    inner_scope(outer_scope)
+    parameter_declarations(
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
   {
-    callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
-      return ParameterDeclarations(node, inner_scope);
-    });
-
     callWithElements(node, "Waypoint", 2, unbounded, [&](auto && node) {
-      return waypoints.emplace_back(node, inner_scope);
+      return waypoints.emplace_back(node, localScope());
     });
   }
 

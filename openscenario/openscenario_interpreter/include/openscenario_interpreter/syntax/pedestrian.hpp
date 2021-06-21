@@ -40,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Pedestrian
+struct Pedestrian : private Scope
 {
   const String name;
 
@@ -50,8 +50,6 @@ struct Pedestrian
 
   const PedestrianCategory pedestrian_category;
 
-  Scope inner_scope;
-
   const ParameterDeclarations parameter_declarations;
 
   const BoundingBox bounding_box;
@@ -60,15 +58,16 @@ struct Pedestrian
 
   template <typename Node, typename Scope>
   explicit Pedestrian(const Node & node, Scope & outer_scope)
-  : name(readAttribute<String>("name", node, outer_scope)),
-    mass(readAttribute<Double>("mass", node, outer_scope)),
-    model(readAttribute<String>("model", node, outer_scope)),
-    pedestrian_category(readAttribute<PedestrianCategory>("pedestrianCategory", node, outer_scope)),
-    inner_scope(outer_scope),
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, localScope())),
+    mass(readAttribute<Double>("mass", node, localScope())),
+    model(readAttribute<String>("model", node, localScope())),
+    pedestrian_category(
+      readAttribute<PedestrianCategory>("pedestrianCategory", node, localScope())),
     parameter_declarations(
-      readElement<ParameterDeclarations>("ParameterDeclarations", node, inner_scope)),
-    bounding_box(readElement<BoundingBox>("BoundingBox", node, inner_scope)),
-    properties(readElement<Properties>("Properties", node, inner_scope))
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),
+    bounding_box(readElement<BoundingBox>("BoundingBox", node, localScope())),
+    properties(readElement<Properties>("Properties", node, localScope()))
   {
   }
 

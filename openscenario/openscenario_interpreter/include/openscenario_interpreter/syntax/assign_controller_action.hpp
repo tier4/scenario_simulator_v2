@@ -41,25 +41,23 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AssignControllerAction : public ComplexType
+struct AssignControllerAction : private Scope, public ComplexType
 {
-  Scope inner_scope;
-
   template <typename Node>
   explicit AssignControllerAction(const Node & node, Scope & outer_scope)
   // clang-format off
-  : ComplexType(
+  : Scope(outer_scope),
+    ComplexType(
       choice(node,
-        std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, outer_scope); }),
-        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
-    inner_scope(outer_scope)
+        std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, localScope()); }),
+        std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
   // clang-format on
   {
   }
 
   void operator()() const
   {
-    for (const auto & actor : inner_scope.actors) {
+    for (const auto & actor : actors) {
       assignController(actor, (*this).as<Controller>());
     }
   }

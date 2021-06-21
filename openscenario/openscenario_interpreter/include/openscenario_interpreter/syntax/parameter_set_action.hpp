@@ -26,74 +26,47 @@ inline namespace syntax
 {
 /* ---- SetAction --------------------------------------------------------------
  *
- * <xsd:complexType name="ParameterSetAction">
- *   <xsd:attribute name="value" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="ParameterSetAction">
+ *    <xsd:attribute name="value" type="String" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterSetAction
+struct ParameterSetAction : private Scope
 {
-  Scope inner_scope;
-
   const String parameter_ref;
 
   const String value;
 
-  const std::true_type accomplished{};
-
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit ParameterSetAction(const Node & node, Scope & outer_scope, const String & parameter_ref)
-  : inner_scope(outer_scope),
+  : Scope(outer_scope),
     parameter_ref(parameter_ref),
-    value(readAttribute<String>("value", node, inner_scope))
+    value(readAttribute<String>("value", node, localScope()))
   {
   }
 
+  static constexpr auto accomplished() noexcept { return true; }
+
   auto evaluate() const noexcept(false)
   {
+    // clang-format off
     static const std::unordered_map<
-      std::type_index, std::function<Element(const Element &, const String &)> >
-      overloads{
-        {typeid(Integer),
-         [](auto && target, auto && value) {
-           target.template as<Integer>() = boost::lexical_cast<Integer>(value);
-           return target;
-         }},
+      std::type_index, std::function<void(const Element &, const String &)>> overloads
+    {
+      { typeid(Boolean),         [](const Element & parameter, auto && value) { parameter.as<Boolean        >() = boost::lexical_cast<Boolean        >(value); } },
+      { typeid(Double),          [](const Element & parameter, auto && value) { parameter.as<Double         >() = boost::lexical_cast<Double         >(value); } },
+      { typeid(Integer),         [](const Element & parameter, auto && value) { parameter.as<Integer        >() = boost::lexical_cast<Integer        >(value); } },
+      { typeid(String),          [](const Element & parameter, auto && value) { parameter.as<String         >() =                                      value ; } },
+      { typeid(UnsignedInteger), [](const Element & parameter, auto && value) { parameter.as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value); } },
+      { typeid(UnsignedShort),   [](const Element & parameter, auto && value) { parameter.as<UnsignedShort  >() = boost::lexical_cast<UnsignedShort  >(value); } },
+    };
+    // clang-format on
 
-        {typeid(Double),
-         [](auto && target, auto && value) {
-           target.template as<Double>() = boost::lexical_cast<Double>(value);
-           return target;
-         }},
+    const auto parameter = parameters.at(parameter_ref);
 
-        {typeid(String),
-         [](auto && target, auto && value) {
-           target.template as<String>() = value;
-           return target;
-         }},
+    overloads.at(parameter.type())(parameter, value);
 
-        {typeid(UnsignedInteger),
-         [](auto && target, auto && value) {
-           target.template as<UnsignedInteger>() = boost::lexical_cast<UnsignedInteger>(value);
-           return target;
-         }},
-
-        {typeid(UnsignedShort),
-         [](auto && target, auto && value) {
-           target.template as<UnsignedShort>() = boost::lexical_cast<UnsignedShort>(value);
-           return target;
-         }},
-
-        {typeid(Boolean),
-         [](auto && target, auto && value) {
-           target.template as<Boolean>() = boost::lexical_cast<Boolean>(value);
-           return target;
-         }},
-      };
-
-    const auto target = inner_scope.parameters.at(parameter_ref);
-
-    return overloads.at(target.type())(target, value);
+    return parameter;
   }
 };
 }  // namespace syntax

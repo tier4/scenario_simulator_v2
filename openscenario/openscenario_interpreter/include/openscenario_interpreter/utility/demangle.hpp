@@ -25,6 +25,14 @@ inline namespace utility
 auto demangle(const char * name) -> std::string;
 
 auto demangle(const std::type_info &) -> std::string;
+
+template <typename... Ts>
+auto makeTypename(Ts &&... xs)
+{
+  const auto name = demangle(std::forward<decltype(xs)>(xs)...);
+
+  return name.substr(name.find_last_of(':') + 1);
+}
 }  // namespace utility
 }  // namespace openscenario_interpreter
 

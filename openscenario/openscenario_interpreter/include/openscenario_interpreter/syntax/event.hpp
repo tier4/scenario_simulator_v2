@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/priority.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -37,7 +38,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Event : public StoryboardElement<Event>, public Elements
+struct Event : private Scope, public StoryboardElement<Event>, public Elements
 {
   // Name of the event.
   const String name;
@@ -45,21 +46,19 @@ struct Event : public StoryboardElement<Event>, public Elements
   // Priority of each event.
   const Priority priority;
 
-  Scope inner_scope;
-
   Trigger start_trigger;
 
   template <typename XML>
   explicit Event(const XML & node, Scope & outer_scope)
-  : StoryboardElement(
-      readAttribute<UnsignedInt>("maximumExecutionCount", node, outer_scope, UnsignedInt(1))),
-    name(readAttribute<String>("name", node, outer_scope)),
-    priority(readAttribute<Priority>("priority", node, outer_scope)),
-    inner_scope(outer_scope),
-    start_trigger(readElement<Trigger>("StartTrigger", node, inner_scope))
+  : Scope(outer_scope),
+    StoryboardElement(
+      readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
+    name(readAttribute<String>("name", node, localScope())),
+    priority(readAttribute<Priority>("priority", node, localScope())),
+    start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {
     callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Action>(node, inner_scope, maximum_execution_count));
+      return push_back(readStoryboardElement<Action>(node, localScope(), maximum_execution_count));
     });
   }
 
@@ -97,6 +96,8 @@ struct Event : public StoryboardElement<Event>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Event &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

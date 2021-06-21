@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__MANEUVER_HPP_
 
+#include <nlohmann/json.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -23,33 +24,32 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== Maneuver =============================================================
+/* ---- Maneuver ---------------------------------------------------------------
  *
- * <xsd:complexType name="Maneuver">
- *   <xsd:sequence>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="Event" maxOccurs="unbounded" type="Event"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="Maneuver">
+ *    <xsd:sequence>
+ *      <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
+ *      <xsd:element name="Event" maxOccurs="unbounded" type="Event"/>
+ *    </xsd:sequence>
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
-struct Maneuver : public StoryboardElement<Maneuver>, public Elements
+ * -------------------------------------------------------------------------- */
+struct Maneuver : private Scope, public StoryboardElement<Maneuver>, public Elements
 {
   const String name;
 
-  Scope inner_scope;
+  const ParameterDeclarations parameter_declarations;
 
   template <typename Node, typename Scope>
   explicit Maneuver(const Node & node, Scope & outer_scope)
-  : name{readAttribute<String>("name", node, outer_scope)}, inner_scope{outer_scope}
+  : Scope(outer_scope),
+    name(readAttribute<String>("name", node, localScope())),
+    parameter_declarations(
+      readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
   {
-    callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
-      return make<ParameterDeclarations>(node, inner_scope);
-    });
-
     callWithElements(node, "Event", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Event>(node, inner_scope));
+      return push_back(readStoryboardElement<Event>(node, localScope()));
     });
   }
 
@@ -88,6 +88,8 @@ struct Maneuver : public StoryboardElement<Maneuver>, public Elements
     }
   }
 };
+
+nlohmann::json & operator<<(nlohmann::json &, const Maneuver &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

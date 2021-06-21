@@ -2,6 +2,18 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.1 (2021-06-21)
+------------------
+* Merge branch 'master' into relative_target_speed
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Contributors: kyabe2718, yamacir-kit
+
+0.1.0 (2021-06-16)
+------------------
+* Merge pull request `#309 <https://github.com/tier4/scenario_simulator_v2/issues/309>`_ from tier4/fix/interpreter/deactivation
+* Rename package 'junit' to 'simple_junit'
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#292 <https://github.com/tier4/scenario_simulator_v2/issues/292>`_ from tier4/feature/ros_tooling_workflow

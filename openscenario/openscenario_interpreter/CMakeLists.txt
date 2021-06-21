@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16.3) # Ubuntu 20.04 default CMake version
 
 project(openscenario_interpreter)
 
@@ -13,6 +13,16 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
+
+# ------------------------------------------------------------------------------
+
+include(FetchContent)
+
+FetchContent_Declare(json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG v3.9.1)
+
+FetchContent_MakeAvailable(json)
 
 # ------------------------------------------------------------------------------
 #  libopenscenario_interpreter
@@ -33,6 +43,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   Boost::filesystem
   glog
+  nlohmann_json::nlohmann_json
   pugixml)
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "openscenario_interpreter::Interpreter")
@@ -52,7 +63,6 @@ target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-
   ament_add_gtest(test_syntax test/test_syntax.cpp)
   target_link_libraries(test_syntax ${PROJECT_NAME})
 endif()

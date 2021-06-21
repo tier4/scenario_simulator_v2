@@ -2,6 +2,211 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.1 (2021-06-21)
+------------------
+* Merge pull request `#364 <https://github.com/tier4/scenario_simulator_v2/issues/364>`_ from tier4/feature/change_timeout_to_warning
+* change warnings
+* Merge pull request `#362 <https://github.com/tier4/scenario_simulator_v2/issues/362>`_ from tier4/feature/interpreter/scope
+* Convert almost all of class Scope to be base-class from data member
+* Rename identifier 'callIt' and 'applyIt' to 'invoke'
+* Merge pull request `#344 <https://github.com/tier4/scenario_simulator_v2/issues/344>`_ from tier4/feature/interpreter/context
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Rename context member 'Overview' to 'CurrentStates'
+* Merge pull request `#320 <https://github.com/tier4/scenario_simulator_v2/issues/320>`_ from tier4/relative_target_speed
+* Rename context element to 'currentEvaluation' from 'description'
+* Rename context element 'currentEvaluation' to 'currentValue'
+* Rename Scope::scope to Scope::localScope
+* Rename member function 'state' to 'currentState'
+* Update Interpreter to publish JSON formatted execution context
+* Add new package 'openscenario_interpreter_msgs'
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'master' into relative_target_speed
+* Merge pull request `#361 <https://github.com/tier4/scenario_simulator_v2/issues/361>`_ from tier4/execution_timer
+* Update syntax Private to print each PrivateAction's typename
+* Update syntax Private to be printable as JSON
+* not use operator()
+* Update syntax InitActions to be printable as JSON
+* clang-format
+* fix trivial
+* add support for SpeedTargetValueType.factor and add these changes to the ReleaseNotes
+* replace is_complete_immediately to endsImmediately
+* Update syntax Init to be printable as JSON
+* Update syntax Init to hold InitActions as data member
+* Move states overview into operator<< of syntax OpenScenario
+* remove unused include
+* Move JSON-to-string conversion into on_activate from operator<<
+* if evaluation() is not in time, the interpreter will throw an error
+* Update member function SimulationTimeCondition::description
+* Add new implicit member function 'description' to class Pointer<T>
+* Update syntax TriggeringEntities
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Update syntax Condition to print it's typename
+* Update syntax Condition to be printable as JSON
+* Update syntax ConditionGroup to be printable as JSON
+* Merge branch 'master' into relative_target_speed
+* Update syntax Trigger to be printable as JSON
+* Update syntax Action to print it's element typename
+* Update syntax Action to be printable as JSON
+* Update syntax Event to be printable as JSON
+* Update syntax Maneuver to be printable as JSON
+* Update syntax ManeuverGroup to be printable as JSON
+* Update struct Scope
+* Update syntax Act to hold scope as base-class
+* Update syntax Act to be printable as JSON
+* Update syntax Story to be printable as JSON
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Update syntax Storyboard to print each Story
+* Update syntax Storyboard to be printable as JSON
+* Update OpenScenario::operator<<
+* Merge branch 'feature/interpreter/context' of github.com:tier4/scenario_simulator_v2 into feature/interpreter/context
+* Add operator<< for json vs syntax OpenScenario
+* Update interpreter's CMakeLists to link nlohmann/json
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* clang-format
+* fix link error
+* fix control reacheas end of non-void function and remove useless include
+* Actions in Init must be completed immediately
+* Merge branch 'master' into relative_target_speed
+* Update syntax Storyboard to be printable
+* Update syntax OpenScenario to be printable
+* replace ImplementationFault with UNSUPPORTED_SETTING_DETECTED
+* Merge branch 'master' into relative_target_speed
+* ignore SemanticError while lane-changing
+* Merge branch 'master' into relative_target_speed
+* add support for RelativeActionTarget
+* Merge branch 'master' into relative_target_speed
+* Revert "add RelativeTargetSpeed support to interpreter"
+* add RelativeTargetSpeed support to interpreter
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
+0.1.0 (2021-06-16)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/traffic-simulator/simulation-model-2
+* Merge pull request `#349 <https://github.com/tier4/scenario_simulator_v2/issues/349>`_ from tier4/fix/typos-in-openscenario-dir
+* Fix typos in the openscenario directory
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#334 <https://github.com/tier4/scenario_simulator_v2/issues/334>`_ from tier4/fix/typos-in-docs-and-comments
+* Merge branch 'master' into fix/typos-in-docs-and-comments
+* Fix typos and grammars in docs and comments
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#333 <https://github.com/tier4/scenario_simulator_v2/issues/333>`_ from tier4/feature/interpreter/release-notes
+* Lipsticks
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#331 <https://github.com/tier4/scenario_simulator_v2/issues/331>`_ from tier4/feature/interpreter/traffic-signals
+* Update Scope to store references to TrafficSignalController
+* Rename variable 'scenario' to 'pathname'
+* Add struct FileHeader into struct OpenScenario
+* Cleanup struct 'OpenScenario'
+* Add new struct OpenScenarioCategory
+* Move struct OpenScenario's stream ouput operator into .cpp
+* Move struct ScenarioDefinition into new header
+* Rename scenario 'Autoware.TrafficSignals' to 'TrafficSignals'
+* Update test scenario
+* Merge pull request `#325 <https://github.com/tier4/scenario_simulator_v2/issues/325>`_ from tier4/feature/interpreter/error-type-2
+* Simplify macro 'UNSUPPORTED_ELEMENT_SPECIFIED'
+* Add utility function 'demangle'
+* Remove macro 'THROW_UNSUPPORTED_ERROR'
+* Remove macro 'UNSUPPORTED'
+* Remove sstream inclusion
+* Remove cat.hpp
+* Remove almost all of std::stringstream use
+* Remove some of std::stringstream use
+* Lipsticks
+* Cleanup Interpreter::withExceptionHandler
+* Replace error types in error.hpp with common::(.*)Error
+* Remove struct ConnectionError
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into fix/image_font_size
+* Merge pull request `#319 <https://github.com/tier4/scenario_simulator_v2/issues/319>`_ from tier4/feature/interpreter/error-type
+* Remove struct ImplementationFault
+* Remove ImplementationFault from Action/Conditions
+* Remove ImplementationFault from struct SpeedAction
+* Remove ImplementationFault from struct RelativeWorldPosition
+* Remove ImplementationFault from class Pointer
+* Remove ImplementationFault from struct Expression
+* Remove ImplementationFault from struct StoryboardElementState
+* Remove ImplementationFault from struct Command
+* Remove ImplementationFault from struct ParameterType
+* Remove ImplementationFault from TriggeringEntitiesRule
+* Remove ImplementationFault from struct StoryboardElementType
+* Remove ImplementationFault from struct DynamicsDimension
+* Remove ImplementationFault from struct DynamicsShape
+* Remove ImplementationFault from struct RouteStrategy
+* Remove ImplementationFault from struct Rule
+* Remove ImplementationFault from struct ConditionEdge
+* Remove ImplementationFault from struct Priority
+* Remove ImplementationFault from struct ReferenceContext
+* Remove ImplementationFault from struct SpeedTargetValueType
+* Remove ImplementationFault from struct RelativeDistanceType
+* Remove ImplementationFault from struct PedestrianCategory
+* Move stream output operator's implementation into .cpp
+* Move stream output operator's implementation into .cpp
+* Remove ImplementationFault from struct LaneChangeAction
+* Move stream output operator's implementation into .cpp
+* Move stream output operator's implementation into .cpp
+* Remove ImplementationFault from struct WorldPosition
+* Move stream output operator's implementation into .cpp
+* Move stream output operator's implementation into .cpp
+* Remove ImplementationFault from struct Position
+* Remove ImplementationFault from struct VehicleCategory
+* Deprecate struct 'ImplementationFault'
+* Merge pull request `#317 <https://github.com/tier4/scenario_simulator_v2/issues/317>`_ from tier4/fix/interpreter/priority
+* Lipsticks
+* Update type 'Priority' to accept value 'parallel'
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into fix/hold_stream
+* Merge pull request `#315 <https://github.com/tier4/scenario_simulator_v2/issues/315>`_ from tier4/feature/use_ros_clock
+* enable use raw ros timestamp
+* Lipsticks
+* remove verbose option
+* apply reformat
+* Merge pull request `#313 <https://github.com/tier4/scenario_simulator_v2/issues/313>`_ from tier4/fix/publish_npc_detection_result_in_map_frame
+* Merge branch 'fix/publish_npc_detection_result_in_map_frame' of github.com:tier4/scenario_simulator.auto into fix/publish_npc_detection_result_in_map_frame
+* Disable auto-sink feature
+* Merge pull request `#312 <https://github.com/tier4/scenario_simulator_v2/issues/312>`_ from tier4/fix/interpreter/acquire-position-action
+* Cleanup AcquirePositionAction
+* Merge pull request `#309 <https://github.com/tier4/scenario_simulator_v2/issues/309>`_ from tier4/fix/interpreter/deactivation
+* Update interpreter to start simulation time from 0 if there is no Ego vehicle
+* Rename package 'junit' to 'simple_junit'
+* Remove namespace 'common'
+* Update interpreter to write JUnit file on deactivation phase
+* Update interpreter to store current error status
+* Rename package 'junit_exporter' to 'junit'
+* Rename class 'JunitExporter' to 'TestSuites'
+* Move package 'junit_exporter' into directory 'common'
+* Cleanup
+* Reverse arguments order of JunitExporter::addTestCase
+* Lipsticks
+* Rename 'visibility.h' to 'visibility.hpp'
+* Merge pull request `#306 <https://github.com/tier4/scenario_simulator_v2/issues/306>`_ from tier4/feature/use_common_exception
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/use_common_exception
+* Merge pull request `#307 <https://github.com/tier4/scenario_simulator_v2/issues/307>`_ from tier4/feature/rosbag-record
+* Remove some options from command 'ros2 bag record'
+* Lipsticks
+* Remove debug print
+* Update interpreter to start 'ros2 bag record' on configure phase
+* remove traffic_simulator::SimulationRuntimeError
+* Merge pull request `#305 <https://github.com/tier4/scenario_simulator_v2/issues/305>`_ from tier4/refactor/scenario-test-runner
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/synchronize_clock
+* Add interactive messages
+* Merge pull request `#303 <https://github.com/tier4/scenario_simulator_v2/issues/303>`_ from tier4/feature/common-exception-package
+* Update Interpreter to receive new common exception types
+* Update concealer to use common::AutowareError
+* Merge pull request `#302 <https://github.com/tier4/scenario_simulator_v2/issues/302>`_ from tier4/feature/error-handling-2
+* Remove an misimplemented error throwing
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Merge pull request `#297 <https://github.com/tier4/scenario_simulator_v2/issues/297>`_ from tier4/feature/error-handling
+* Update Interpreter to destruct simulator on deactivation phase
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Replace some of std::cout with RCLCPP_INFO_STREAM
+* Remove deprecated header 'utility/verbose.hpp'
+* Lipsticks
+* Update error display names
+* Remove debug codes
+* Remove debug codes
+* Move Interpreter::report into .cpp
+* Update interpreter to use RCLCPP_INFO_STREAM
+* Merge remote-tracking branch 'origin/master' into feature/error-handling
+* Contributors: Kazuki Miyahara, Masaya Kataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#295 <https://github.com/tier4/scenario_simulator_v2/issues/295>`_ from tier4/fix/python_format

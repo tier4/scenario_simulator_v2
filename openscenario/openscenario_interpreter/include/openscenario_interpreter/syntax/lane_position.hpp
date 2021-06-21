@@ -15,8 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__LANE_POSITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__LANE_POSITION_HPP_
 
+#include <geometry_msgs/msg/pose.hpp>
+#include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 
 namespace openscenario_interpreter
 {

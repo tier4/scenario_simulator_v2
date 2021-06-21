@@ -37,7 +37,7 @@ struct SpeedCondition
 
   const Rule compare;
 
-  template <typename AST>
+  template <typename AST, typename Scope>
   explicit SpeedCondition(
     const AST & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),

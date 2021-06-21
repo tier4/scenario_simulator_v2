@@ -2,6 +2,22 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.1 (2021-06-21)
+------------------
+* Merge branch 'master' into relative_target_speed
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'master' into relative_target_speed
+* Contributors: kyabe2718, yamacir-kit
+
+0.1.0 (2021-06-16)
+------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic
+* Merge pull request `#334 <https://github.com/tier4/scenario_simulator_v2/issues/334>`_ from tier4/fix/typos-in-docs-and-comments
+* Fix typos and grammars in docs and comments
+* Merge https://github.com/tier4/scenario_simulator.auto into feature/publish_clock
+* Contributors: Kazuki Miyahara, Masaya Kataoka
+
 0.0.1 (2021-05-12)
 ------------------
 * Merge pull request `#292 <https://github.com/tier4/scenario_simulator_v2/issues/292>`_ from tier4/feature/ros_tooling_workflow

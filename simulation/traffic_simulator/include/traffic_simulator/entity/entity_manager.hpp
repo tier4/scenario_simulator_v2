@@ -211,9 +211,10 @@ public:
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(setDriverModel, );
-  FORWARD_TO_ENTITY(setTargetSpeed, );
 
 #undef FORWARD_TO_SPECIFIED_ENTITY
+
+  void setTargetSpeed(const std::string & name, double target_speed, bool continuous);
 
   openscenario_msgs::msg::EntityStatus updateNpcLogic(
     const std::string & name,
