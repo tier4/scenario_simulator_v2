@@ -2,6 +2,14 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.1 (2021-06-21)
+------------------
+* Merge branch 'master' into relative_target_speed
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'master' into relative_target_speed
+* Contributors: kyabe2718, yamacir-kit
+
 0.1.0 (2021-06-16)
 ------------------
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/speed_up_npc_logic

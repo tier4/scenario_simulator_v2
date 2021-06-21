@@ -2,6 +2,83 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.1 (2021-06-21)
+------------------
+* Merge pull request `#364 <https://github.com/tier4/scenario_simulator_v2/issues/364>`_ from tier4/feature/change_timeout_to_warning
+* change warnings
+* Merge pull request `#362 <https://github.com/tier4/scenario_simulator_v2/issues/362>`_ from tier4/feature/interpreter/scope
+* Convert almost all of class Scope to be base-class from data member
+* Rename identifier 'callIt' and 'applyIt' to 'invoke'
+* Merge pull request `#344 <https://github.com/tier4/scenario_simulator_v2/issues/344>`_ from tier4/feature/interpreter/context
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Rename context member 'Overview' to 'CurrentStates'
+* Merge pull request `#320 <https://github.com/tier4/scenario_simulator_v2/issues/320>`_ from tier4/relative_target_speed
+* Rename context element to 'currentEvaluation' from 'description'
+* Rename context element 'currentEvaluation' to 'currentValue'
+* Rename Scope::scope to Scope::localScope
+* Rename member function 'state' to 'currentState'
+* Update Interpreter to publish JSON formatted execution context
+* Add new package 'openscenario_interpreter_msgs'
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'master' into relative_target_speed
+* Merge pull request `#361 <https://github.com/tier4/scenario_simulator_v2/issues/361>`_ from tier4/execution_timer
+* Update syntax Private to print each PrivateAction's typename
+* Update syntax Private to be printable as JSON
+* not use operator()
+* Update syntax InitActions to be printable as JSON
+* clang-format
+* fix trivial
+* add support for SpeedTargetValueType.factor and add these changes to the ReleaseNotes
+* replace is_complete_immediately to endsImmediately
+* Update syntax Init to be printable as JSON
+* Update syntax Init to hold InitActions as data member
+* Move states overview into operator<< of syntax OpenScenario
+* remove unused include
+* Move JSON-to-string conversion into on_activate from operator<<
+* if evaluation() is not in time, the interpreter will throw an error
+* Update member function SimulationTimeCondition::description
+* Add new implicit member function 'description' to class Pointer<T>
+* Update syntax TriggeringEntities
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Update syntax Condition to print it's typename
+* Update syntax Condition to be printable as JSON
+* Update syntax ConditionGroup to be printable as JSON
+* Merge branch 'master' into relative_target_speed
+* Update syntax Trigger to be printable as JSON
+* Update syntax Action to print it's element typename
+* Update syntax Action to be printable as JSON
+* Update syntax Event to be printable as JSON
+* Update syntax Maneuver to be printable as JSON
+* Update syntax ManeuverGroup to be printable as JSON
+* Update struct Scope
+* Update syntax Act to hold scope as base-class
+* Update syntax Act to be printable as JSON
+* Update syntax Story to be printable as JSON
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Update syntax Storyboard to print each Story
+* Update syntax Storyboard to be printable as JSON
+* Update OpenScenario::operator<<
+* Merge branch 'feature/interpreter/context' of github.com:tier4/scenario_simulator_v2 into feature/interpreter/context
+* Add operator<< for json vs syntax OpenScenario
+* Update interpreter's CMakeLists to link nlohmann/json
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* clang-format
+* fix link error
+* fix control reacheas end of non-void function and remove useless include
+* Actions in Init must be completed immediately
+* Merge branch 'master' into relative_target_speed
+* Update syntax Storyboard to be printable
+* Update syntax OpenScenario to be printable
+* replace ImplementationFault with UNSUPPORTED_SETTING_DETECTED
+* Merge branch 'master' into relative_target_speed
+* ignore SemanticError while lane-changing
+* Merge branch 'master' into relative_target_speed
+* add support for RelativeActionTarget
+* Merge branch 'master' into relative_target_speed
+* Revert "add RelativeTargetSpeed support to interpreter"
+* add RelativeTargetSpeed support to interpreter
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.1.0 (2021-06-16)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/traffic-simulator/simulation-model-2

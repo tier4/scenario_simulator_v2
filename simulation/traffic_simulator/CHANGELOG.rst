@@ -2,6 +2,24 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.1 (2021-06-21)
+------------------
+* Merge pull request `#363 <https://github.com/tier4/scenario_simulator_v2/issues/363>`_ from tier4/fix/throw_errors_when_set_target_speed_after_ego_starts
+* apply clanf-format
+* enable throw semantic error for setTargetSpeed and setEntityStatus after starting simulation
+* Merge branch 'master' into relative_target_speed
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'master' into relative_target_speed
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'feature/interpreter/context' of github.com:tier4/scenario_simulator_v2 into feature/interpreter/context
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/context
+* Merge branch 'master' into relative_target_speed
+* Merge branch 'master' into relative_target_speed
+* Revert "add RelativeTargetSpeed support to interpreter"
+* add RelativeTargetSpeed support to interpreter
+* Contributors: Masaya Kataoka, kyabe2718, yamacir-kit
+
 0.1.0 (2021-06-16)
 ------------------
 * Merge pull request `#355 <https://github.com/tier4/scenario_simulator_v2/issues/355>`_ from tier4/feature/get_vehicle_cmd
