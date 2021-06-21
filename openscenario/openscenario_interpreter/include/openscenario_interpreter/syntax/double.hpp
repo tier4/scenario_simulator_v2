@@ -47,6 +47,11 @@ struct Double : public std_msgs::msg::Float64
     return static_cast<Double>(std::numeric_limits<value_type>::infinity());
   }
 
+  static auto nan() noexcept
+  {
+    return static_cast<Double>(std::numeric_limits<value_type>::quiet_NaN());
+  }
+
   auto operator=(const value_type & rhs) noexcept -> decltype(auto)
   {
     data = rhs;
