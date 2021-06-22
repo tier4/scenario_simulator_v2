@@ -274,6 +274,22 @@ OpenSCENARIO:
                                         freespace: false
                                         rule: lessThan
                                         value: 1
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle-1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        entityRef: ego
+                                        freespace: false
+                                        relativeDistanceType: cartesianDistance
+                                        rule: greaterThan
+                                        value: 100
                         Action:
                           - name: ''
                             UserDefinedAction:
