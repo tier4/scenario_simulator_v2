@@ -354,7 +354,7 @@ OpenSCENARIO:
                                     StoryboardElementStateCondition:
                                       storyboardElementRef: "countup!"
                                       storyboardElementType: act
-                                      state: completeState
+                                      state: skipTransition
                         Action:
                           - name: ''
                             UserDefinedAction:
