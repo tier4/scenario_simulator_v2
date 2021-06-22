@@ -346,6 +346,15 @@ OpenSCENARIO:
                                       parameterRef: count
                                       rule: greaterThan
                                       value: *count-max
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: "countup!"
+                                      storyboardElementType: act
+                                      state: completeState
                         Action:
                           - name: ''
                             UserDefinedAction:

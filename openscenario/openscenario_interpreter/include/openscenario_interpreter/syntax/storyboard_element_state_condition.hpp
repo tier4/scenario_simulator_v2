@@ -34,36 +34,47 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct StoryboardElementStateCondition : private Scope
 {
-  const String name;
+  const String storyboard_element_ref;
 
-  const StoryboardElementType type;
+  const StoryboardElementType storyboard_element_type;
 
   const StoryboardElementState state;
 
+  StoryboardElementState last_checked_value;
+
   template <typename Node>
   explicit StoryboardElementStateCondition(const Node & node, const Scope & outer_scope)
+  // clang-format off
   : Scope(outer_scope),
-    name(readAttribute<String>("storyboardElementRef", node, localScope())),
-    type(readAttribute<StoryboardElementType>("storyboardElementType", node, localScope())),
-    state(readAttribute<StoryboardElementState>("state", node, localScope()))
+    storyboard_element_ref (readAttribute<String                >("storyboardElementRef",  node, localScope())),
+    storyboard_element_type(readAttribute<StoryboardElementType >("storyboardElementType", node, localScope())),
+    state                  (readAttribute<StoryboardElementState>("state",                 node, localScope())),
+    last_checked_value(StoryboardElementState::standbyState)
+  // clang-format on
   {
   }
 
-  auto compare(const Element & lhs, StoryboardElementState rhs) const
+  auto description() const
   {
-    return asBoolean(lhs.as<StoryboardElementState>() == rhs);
+    std::stringstream description;
+
+    description << "The state of StoryboardElement " << std::quoted(storyboard_element_ref)
+                << " (= " << last_checked_value << ") is given state " << state << "?";
+
+    return description.str();
   }
 
-  auto evaluate() const
+  auto evaluate()
   {
-    const auto result = compare(localScope().storyboard_elements.at(name).currentState(), state);
-
-#ifndef NDEBUG
-    std::cout << indent << "StoryboardElementState [Is " << cyan << "\"" << name << "\"" << reset
-              << " in " << state << "? => " << result << "]" << std::endl;
-#endif
-
-    return result;
+    try {
+      last_checked_value = localScope()
+                             .storyboard_elements.at(storyboard_element_ref)
+                             .currentState()
+                             .as<StoryboardElementState>();
+      return asBoolean(last_checked_value == state);
+    } catch (const std::out_of_range &) {
+      return false_v;
+    }
   }
 };
 }  // namespace syntax
