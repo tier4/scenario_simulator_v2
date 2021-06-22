@@ -8,7 +8,10 @@ OpenSCENARIO:
     description: ''
     author: ''
   ParameterDeclarations:
-    ParameterDeclaration: []
+    ParameterDeclaration:
+      - name: count
+        parameterType: unsignedInt
+        value: &count-default 0
   CatalogLocations:
     CatalogLocation: []
   RoadNetwork:
@@ -153,6 +156,50 @@ OpenSCENARIO:
     Story:
       - name: ''
         Act:
+          - name: "countup!"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        maximumExecutionCount: &count-max 100
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  ParameterCondition:
+                                    parameterRef: count
+                                    rule: lessThan
+                                    value: *count-max
+                        Action:
+                          - name: "increment"
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: count
+                                ModifyAction:
+                                  Rule:
+                                    AddValue:
+                                      value: 1
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                  - name: ""
+                    delay: 0
+                    conditionEdge: none
+                    ByValueCondition:
+                      ParameterCondition:
+                        parameterRef: count
+                        rule: equalTo
+                        value: *count-default
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
@@ -290,6 +337,15 @@ OpenSCENARIO:
                                         relativeDistanceType: cartesianDistance
                                         rule: greaterThan
                                         value: 100
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: count
+                                      rule: greaterThan
+                                      value: *count-max
                         Action:
                           - name: ''
                             UserDefinedAction:

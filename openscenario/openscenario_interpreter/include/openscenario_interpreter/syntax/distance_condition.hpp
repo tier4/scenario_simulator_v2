@@ -93,10 +93,10 @@ struct DistanceCondition
   explicit DistanceCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : value      (readAttribute<Double>  ("value",      node, outer_scope)),
-    freespace  (readAttribute<Boolean> ("freespace",  node, outer_scope)),
-    along_route(readAttribute<Boolean> ("alongRoute", node, outer_scope)),
-    compare    (readAttribute<Rule>    ("rule",       node, outer_scope)),
+  : value      (readAttribute<Double  >("value",      node, outer_scope)),
+    freespace  (readAttribute<Boolean >("freespace",  node, outer_scope)),
+    along_route(readAttribute<Boolean >("alongRoute", node, outer_scope)),
+    compare    (readAttribute<Rule    >("rule",       node, outer_scope)),
     position   (readElement  <Position>("Position",   node, outer_scope)),
     triggering_entities(triggering_entities),
     last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
