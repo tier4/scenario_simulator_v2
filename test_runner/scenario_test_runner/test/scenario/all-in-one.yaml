@@ -255,9 +255,25 @@ OpenSCENARIO:
                                       EntityRef:
                                         - entityRef: ego
                                     EntityCondition:
-                                      ReachPositionCondition:
+                                      ReachPositionCondition: # NOTE: ReachPositionCondition is specialized DistanceCondition.
                                         Position: *ego-goal-position
                                         tolerance: 1
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        Position: *ego-goal-position
+                                        alongRoute: false
+                                        freespace: false
+                                        rule: lessThan
+                                        value: 1
                         Action:
                           - name: ''
                             UserDefinedAction:
