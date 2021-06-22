@@ -40,19 +40,24 @@ struct ReachPositionCondition
 
   const Position position;
 
+  const Rule compare;
+
+  const TriggeringEntities triggering_entities;
+
+  std::vector<Double> last_checked_values;  // for description
+
   template <typename Node, typename Scope>
   explicit ReachPositionCondition(
     const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : tolerance(readAttribute<Double>("tolerance", node, outer_scope)),
     position(readElement<Position>("Position", node, outer_scope)),
-    for_each(triggering_entities)
+    compare(Rule::lessThan),
+    triggering_entities(triggering_entities),
+    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
   {
   }
 
-  const TriggeringEntities for_each;
-
-  decltype(auto) operator()(
-    const WorldPosition & world_position, const EntityRef & triggering_entity) const
+  bool operator()(const WorldPosition & world_position, const EntityRef & triggering_entity) const
   {
     return isReachedPosition(
       triggering_entity, static_cast<geometry_msgs::msg::Pose>(world_position), tolerance);
@@ -63,23 +68,37 @@ struct ReachPositionCondition
     throw UNSUPPORTED_SETTING_DETECTED(ReachPositionCondition, position.type().name());
   }
 
-  decltype(auto) operator()(
-    const LanePosition & lane_position, const EntityRef & triggering_entity) const
+  bool operator()(const LanePosition & lane_position, const EntityRef & triggering_entity) const
   {
     return isReachedPosition(
       triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position),
       tolerance);
   }
 
-  auto distance(const EntityRef & name)
+  auto description() const
   {
-    const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
-    return std::hypot(pose.position.x, pose.position.y);
+    std::stringstream description;
+
+    description << triggering_entities.description() << "'s distance to given position = ";
+
+    print_to(description, last_checked_values);
+
+    description << " " << compare << " " << tolerance << "?";
+
+    return description.str();
   }
 
   auto evaluate()
   {
-    return asBoolean(for_each([&](const auto & triggering_entity) {
+    auto distance = [&](const EntityRef & name) {
+      const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
+      return std::hypot(pose.position.x, pose.position.y);
+    };
+
+    last_checked_values.clear();
+
+    return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
+      last_checked_values.push_back(distance(triggering_entity));
       return apply<bool>(*this, position, triggering_entity);
     }));
   }

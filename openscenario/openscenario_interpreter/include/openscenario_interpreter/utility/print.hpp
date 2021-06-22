@@ -12,16 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/syntax/collision_condition.hpp>
+#ifndef OPENSCENARIO_INTERPRETER__UTILITY__PRINT_HPP_
+#define OPENSCENARIO_INTERPRETER__UTILITY__PRINT_HPP_
+
+#include <iomanip>
+#include <iostream>
 
 namespace openscenario_interpreter
 {
-inline namespace syntax
+inline namespace utility
 {
-std::ostream & operator<<(std::ostream & os, const CollisionCondition & datum)
+template <typename SequenceContainer>
+auto & print_to(std::ostream & os, const SequenceContainer & sequence_container)
 {
-  // TODO (yamacir-kit): Print datum as XML.
-  return os;
+  const auto * separator = "[";
+
+  for (const auto & each : sequence_container) {
+    os << separator << each;
+    separator = ", ";
+  }
+
+  return os << "]";
 }
-}  // namespace syntax
+}  // namespace utility
 }  // namespace openscenario_interpreter
+
+#endif  // OPENSCENARIO_INTERPRETER__UTILITY__PRINT_HPP_

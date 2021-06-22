@@ -25,6 +25,9 @@ inline namespace syntax
 {
 /* ---- SpeedCondition ---------------------------------------------------------
  *
+ *  Compares a triggering entity's/entities' speed to a target speed. The
+ *  logical operator for the comparison is given by the rule attribute.
+ *
  *  <xsd:complexType name="SpeedCondition">
  *    <xsd:attribute name="value" type="Double" use="required"/>
  *    <xsd:attribute name="rule" type="Rule" use="required"/>
@@ -37,21 +40,41 @@ struct SpeedCondition
 
   const Rule compare;
 
+  const TriggeringEntities triggering_entities;
+
+  std::vector<Double> last_checked_values;  // for description
+
   template <typename AST, typename Scope>
   explicit SpeedCondition(
     const AST & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : value(readAttribute<Double>("value", node, outer_scope)),
     compare(readAttribute<Rule>("rule", node, outer_scope)),
-    for_each(triggering_entities)
+    triggering_entities(triggering_entities),
+    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
   {
   }
 
-  const TriggeringEntities for_each;
+  auto description() const
+  {
+    std::stringstream description;
+
+    description << triggering_entities.description() << "'s speed = ";
+
+    print_to(description, last_checked_values);
+
+    description << " " << compare << " " << value << "?";
+
+    return description.str();
+  }
 
   auto evaluate()
   {
-    return asBoolean(for_each([&](auto && triggering_entity) {
-      return compare(getEntityStatus(triggering_entity).action_status.twist.linear.x, value);
+    last_checked_values.clear();
+
+    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+      last_checked_values.push_back(
+        getEntityStatus(triggering_entity).action_status.twist.linear.x);
+      return compare(last_checked_values.back(), value);
     }));
   }
 };

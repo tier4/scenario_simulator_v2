@@ -27,7 +27,7 @@ inline namespace syntax
  *
  *  <xsd:complexType name="StandStillCondition">
  *    <xsd:attribute name="duration" type="Double" use="required"/>
- *  </xsd:complexType>*
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct StandStillCondition
@@ -36,21 +36,40 @@ struct StandStillCondition
 
   const Rule compare;
 
-  const TriggeringEntities for_each;
+  const TriggeringEntities triggering_entities;
+
+  std::vector<Double> last_checked_values;  // for description
 
   template <typename Node, typename Scope>
   explicit StandStillCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & for_each)
+    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   : duration(readAttribute<Double>("duration", node, outer_scope)),
     compare(Rule::greaterThan),
-    for_each(for_each)
+    triggering_entities(triggering_entities),
+    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
   {
   }
 
-  auto evaluate() const
+  auto description() const
   {
-    return asBoolean(for_each([&](auto && triggering_entity) {
-      return compare(getStandStillDuration(triggering_entity), duration);
+    std::stringstream description;
+
+    description << triggering_entities.description() << "'s standstill time = ";
+
+    print_to(description, last_checked_values);
+
+    description << " " << compare << " " << duration << "?";
+
+    return description.str();
+  }
+
+  auto evaluate()
+  {
+    last_checked_values.clear();
+
+    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+      last_checked_values.push_back(getStandStillDuration(triggering_entity));
+      return compare(last_checked_values.back(), duration);
     }));
   }
 };

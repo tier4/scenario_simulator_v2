@@ -31,7 +31,7 @@ struct Double : public std_msgs::msg::Float64
 
   explicit Double() = default;
 
-  explicit Double(value_type value) { data = value; }
+  Double(value_type value) { data = value; }
 
   explicit Double(const std::string & s)
   try {
@@ -45,6 +45,11 @@ struct Double : public std_msgs::msg::Float64
   static auto infinity() noexcept
   {
     return static_cast<Double>(std::numeric_limits<value_type>::infinity());
+  }
+
+  static auto nan() noexcept
+  {
+    return static_cast<Double>(std::numeric_limits<value_type>::quiet_NaN());
   }
 
   auto operator=(const value_type & rhs) noexcept -> decltype(auto)

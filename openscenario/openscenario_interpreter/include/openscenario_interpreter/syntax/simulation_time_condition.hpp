@@ -50,10 +50,12 @@ struct SimulationTimeCondition
 
   auto description() const
   {
-    std::stringstream ss;
-    ss << std::fixed << std::setprecision(6) << last_checked_time << " is " << compare << " "
-       << value << "?";
-    return ss.str();
+    std::stringstream description;
+
+    description << std::fixed << std::setprecision(6) << last_checked_time << " is " << compare
+                << " " << value << "?";
+
+    return description.str();
   }
 };
 }  // namespace syntax

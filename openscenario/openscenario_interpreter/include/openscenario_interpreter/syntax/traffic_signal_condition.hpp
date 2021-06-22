@@ -21,14 +21,14 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== TrafficSignalCondition ===============================================
+/* ---- TrafficSignalCondition -------------------------------------------------
  *
- * <xsd:complexType name="TrafficSignalCondition">
- *   <xsd:attribute name="name" type="String" use="required"/>
- *   <xsd:attribute name="state" type="String" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="TrafficSignalCondition">
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *    <xsd:attribute name="state" type="String" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct TrafficSignalCondition
 {
   const String name;
@@ -37,8 +37,8 @@ struct TrafficSignalCondition
 
   template <typename Node, typename Scope>
   explicit TrafficSignalCondition(const Node & node, Scope & scope)
-  : name{readAttribute<String>("name", node, scope)},
-    state{readAttribute<String>("state", node, scope)}
+  : name(readAttribute<String>("name", node, scope)),
+    state(readAttribute<String>("state", node, scope))
   {
   }
 };

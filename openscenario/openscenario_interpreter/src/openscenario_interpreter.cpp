@@ -174,7 +174,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
               {
                 json << script.as<OpenScenario>();
 
-                // std::cout << json.dump(2) << std::endl; // DEBUG
+                // std::cout << json.dump(2) << std::endl;  // DEBUG
               }
 
               context.stamp = now();

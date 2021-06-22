@@ -18,12 +18,17 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
 /* ---- TimeHeadwayCondition ---------------------------------------------------
+ *
+ *  Condition based on the headway time between a triggering entity/entities
+ *  and a reference entity. The logical operator used for comparison is defined
+ *  by the rule attribute.
  *
  *  <xsd:complexType name="TimeHeadwayCondition">
  *    <xsd:attribute name="entityRef" type="String" use="required"/>
@@ -46,26 +51,47 @@ struct TimeHeadwayCondition
 
   const Rule compare;
 
-  const TriggeringEntities trigger;
+  const TriggeringEntities triggering_entities;
+
+  std::vector<Double> last_checked_values;  // for description
 
   template <typename Node, typename Scope>
   explicit TimeHeadwayCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & trigger)
+    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   // clang-format off
   : entity_ref (readAttribute<String> ("entityRef",  node, outer_scope)),
     value      (readAttribute<Double> ("value",      node, outer_scope)),
     freespace  (readAttribute<Boolean>("freespace",  node, outer_scope)),
     along_route(readAttribute<Boolean>("alongRoute", node, outer_scope)),
     compare    (readAttribute<Rule>   ("rule",       node, outer_scope)),
-    trigger(trigger)
+    triggering_entities(triggering_entities),
+    last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
   // clang-format on
   {
   }
 
+  auto description() const
+  {
+    std::stringstream description;
+
+    description << triggering_entities.description()
+                << "'s headway time between each and the referenced entity " << entity_ref << " = ";
+
+    print_to(description, last_checked_values);
+
+    description << " " << compare << " " << value << "?";
+
+    return description.str();
+  }
+
   auto evaluate()
   {
-    return asBoolean(
-      trigger([&](auto && entity) { return compare(getTimeHeadway(entity, entity_ref), value); }));
+    last_checked_values.clear();
+
+    return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
+      last_checked_values.push_back(getTimeHeadway(triggering_entity, entity_ref));
+      return compare(last_checked_values.back(), value);
+    }));
   }
 };
 }  // namespace syntax
