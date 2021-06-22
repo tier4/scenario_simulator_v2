@@ -103,7 +103,7 @@ OpenSCENARIO:
           - entityRef: ego
             PrivateAction:
               - TeleportAction:
-                  Position:
+                  Position: &ego-initial-position
                     LanePosition:
                       roadId: ''
                       laneId: '34513'
@@ -116,7 +116,7 @@ OpenSCENARIO:
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position:
+                    Position: &ego-goal-position
                       LanePosition:
                         roadId: ''
                         laneId: '34630'
@@ -245,6 +245,19 @@ OpenSCENARIO:
                                       SpeedCondition:
                                         rule: greaterThan
                                         value: 10
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *ego-goal-position
+                                        tolerance: 1
                         Action:
                           - name: ''
                             UserDefinedAction:
