@@ -15,10 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/iterator/circular_iterator.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include "openscenario_interpreter/procedure.hpp"
+#include "scenario_simulator_exception/exception.hpp"
 
 namespace openscenario_interpreter
 {
@@ -38,6 +41,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalController
 {
+private:
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  ID of the traffic signal controller in the road network.
@@ -80,6 +84,7 @@ struct TrafficSignalController
 
   decltype(getCurrentTime()) current_phase_started_at;
 
+public:
   explicit TrafficSignalController() = delete;
 
   explicit TrafficSignalController(TrafficSignalController &&) = delete;
@@ -97,15 +102,6 @@ struct TrafficSignalController
   {
   }
 
-  auto theDurationExceeded() const
-  {
-    if (not phases.empty()) {
-      return (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
-    } else {
-      return false;
-    }
-  }
-
   auto evaluate()
   {
     if (theDurationExceeded()) {
@@ -115,6 +111,32 @@ struct TrafficSignalController
       return unspecified;
     }
   }
+
+private:
+  auto theDurationExceeded() const -> bool
+  {
+    if (not phases.empty()) {
+      return (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
+    } else {
+      return false;
+    }
+  }
+
+  void changePhaseByName(const std::string & phase_name)
+  {
+    auto it = std::find(phases.begin(), phases.end(), [&phase_name](const Phase & phase) {
+      return phase.name == phase_name;
+    });
+
+    if (it == phases.end()) {
+      THROW_SYNTAX_ERROR(phase_name, "is not declared in this scope.");
+    }
+
+    current_phase_started_at = getCurrentTime();
+    current_phase = it;
+  }
+
+  friend struct TrafficSignalControllerAction;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

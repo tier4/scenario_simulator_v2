@@ -62,6 +62,8 @@ struct TrafficSignalStateAction : private Scope
   static auto accomplished() noexcept { return true; }
 
   auto start() const { return unspecified; }
+
+  static bool endsImmediately() { return true; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

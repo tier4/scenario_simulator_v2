@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
 #include <openscenario_interpreter/error.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <vector>
 
@@ -34,28 +35,33 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignals
 {
-  std::list<TrafficSignalController> traffic_signal_controllers;
+  std::list<std::reference_wrapper<TrafficSignalController>> traffic_signal_controllers;
 
   TrafficSignals() = default;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit TrafficSignals(const Node & node, Scope & outer_scope)
-  : traffic_signal_controllers(
-      readElements<TrafficSignalController, 0>("TrafficSignalController", node, outer_scope))
   {
-    for (auto & each : traffic_signal_controllers) {
-      const auto result = outer_scope.traffic_signal_controller_refs.emplace(each.name, each);
+    for (auto && each :
+         readElements<TrafficSignalController, 0>("TrafficSignalController", node, outer_scope)) {
+      auto result =
+        outer_scope.traffic_signal_controllers.emplace(std::forward<decltype(each)>(each));
+
       if (not result.second) {
         throw SyntaxError(
           "Multiple TrafficSignalControllers have been declared with the same name: ", each.name);
       }
+    }
+
+    for (auto & each : outer_scope.traffic_signal_controllers) {
+      traffic_signal_controllers.emplace_back(std::ref(each.second));
     }
   }
 
   auto evaluate()
   {
     for (auto && controller : traffic_signal_controllers) {
-      controller.evaluate();
+      controller.get().evaluate();
     }
 
     return unspecified;

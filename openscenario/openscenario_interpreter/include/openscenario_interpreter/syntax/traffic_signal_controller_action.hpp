@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 
 namespace openscenario_interpreter
 {
@@ -62,7 +63,19 @@ struct TrafficSignalControllerAction : private Scope
 
   static auto accomplished() noexcept { return true; }
 
-  auto start() const { return unspecified; }
+  auto start()
+  {
+    auto target = localScope().traffic_signal_controllers.find(traffic_signal_controller_ref);
+    if (target == localScope().traffic_signal_controllers.end()) {
+      THROW_SYNTAX_ERROR(traffic_signal_controller_ref, "is not declared in this scope.");
+    }
+
+    target->second.changePhaseByName(phase);
+
+    return unspecified;
+  }
+
+  static bool endsImmediately() { return true; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -61,13 +61,12 @@ struct Scope
    *
    *  for TrafficSignalControllerAction.trafficSignalControllerRef
    *
-   *  Be careful not to use the TrafficSignalController as a dangling reference.
+   *  <del>Be careful not to use the TrafficSignalController as a dangling reference.
    *  Normally, the destruction of all scopes occurs at the same time as the
-   *  destruction of the scenario itself.
+   *  destruction of the scenario itself. </del>
    *
    * ------------------------------------------------------------------------ */
-  std::unordered_map<String, std::reference_wrapper<TrafficSignalController>>
-    traffic_signal_controller_refs;
+  std::unordered_map<String, TrafficSignalController> traffic_signal_controllers;
 
   std::unordered_map<String, Element> entities;
 

@@ -45,6 +45,12 @@ public:
   {
   }
 
+  CircularIterator & operator=(const ForwardIterator & iterator)
+  {
+    current = iterator;
+    return *this;
+  }
+
   reference operator*() const { return *current; }
 
   auto & operator++()
