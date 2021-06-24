@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
+
 #include "openscenario_interpreter/utility/circular_check.hpp"
 #include "scenario_simulator_exception/exception.hpp"
 
