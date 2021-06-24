@@ -50,6 +50,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/math/distance.cpp
   src/math/hermite_curve.cpp
   src/math/polynomial_solver.cpp
+  src/math/transform.cpp
   src/math/uuid.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp

@@ -41,6 +41,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
+#include <traffic_simulator/math/transfrom.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -637,7 +638,10 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
 }
 
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
-HdMapUtils::getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id)
+HdMapUtils::getLaneChangeTrajectory(
+  geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id,
+  double maximum_curvature_threshold, double target_trajectory_length,
+  double forward_distance_threashold)
 {
   double to_length = getLaneletLength(to_lanelet_id);
   std::vector<double> evaluation, target_s;
@@ -645,18 +649,21 @@ HdMapUtils::getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, std::int
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
+    if (
+      traffic_simulator::math::getRelativePose(from_pose, goal_pose.pose).position.x <=
+      forward_distance_threashold) {
+      continue;
+    }
     double start_to_goal_dist = std::sqrt(
       std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
       std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
     auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
-    if (traj) {
-      if (traj->getMaximum2DCurvature() < 1.0) {
-        double eval = std::fabs(20 - traj->getLength());
-        evaluation.push_back(eval);
-        curves.push_back(traj.get());
-        target_s.push_back(to_s);
-      }
+    if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
+      double eval = std::fabs(target_trajectory_length - traj.getLength());
+      evaluation.push_back(eval);
+      curves.push_back(traj);
+      target_s.push_back(to_s);
     }
   }
   if (evaluation.empty()) {
@@ -667,7 +674,7 @@ HdMapUtils::getLaneChangeTrajectory(geometry_msgs::msg::Pose from_pose, std::int
   return std::make_pair(curves[min_index], target_s[min_index]);
 }
 
-boost::optional<traffic_simulator::math::HermiteCurve> HdMapUtils::getLaneChangeTrajectory(
+traffic_simulator::math::HermiteCurve HdMapUtils::getLaneChangeTrajectory(
   geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id, double to_s,
   double tangent_vector_size)
 {
