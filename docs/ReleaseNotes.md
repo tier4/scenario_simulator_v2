@@ -1,6 +1,9 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+## Ver 0.2.0
+- Enhance `/simulation/context` topic infomation. (adding TriggeringEntitiesRule, TriggeringEntities, CollisionCondition, TimeHeadwayCondition, AccelerationCondition, StandStillCondition, SpeedCondition, ReachPositionCondition, DistanceCondition, RelativeDistanceCondition, ParameterCondition, StoryboardElementStateCondition)
 - NPC becomes ubable to change lanes behind of them.
 
 ## Ver 0.1.1
