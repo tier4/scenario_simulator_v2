@@ -2,6 +2,19 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.0 (2021-06-24)
+------------------
+* Merge pull request `#357 <https://github.com/tier4/scenario_simulator_v2/issues/357>`_ from tier4/feature/send_ego_command
+* fix typo
+* fix indent
+* fix indent
+* fix indend
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/send_ego_command
+* apply clang-format
+* add proto files
+* Contributors: Masaya Kataoka
+
 0.1.1 (2021-06-21)
 ------------------
 * Merge branch 'master' into relative_target_speed
