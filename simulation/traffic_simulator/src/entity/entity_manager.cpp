@@ -24,6 +24,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/collision.hpp>
+#include <traffic_simulator/math/transfrom.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -328,40 +329,7 @@ auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
 {
-  geometry_msgs::msg::Transform from_translation;
-  {
-    from_translation.translation.x = from.position.x;
-    from_translation.translation.y = from.position.y;
-    from_translation.translation.z = from.position.z;
-    from_translation.rotation = from.orientation;
-  }
-
-  tf2::Transform from_tf;
-  {
-    tf2::fromMsg(from_translation, from_tf);
-  }
-
-  geometry_msgs::msg::Transform to_translation;
-  {
-    to_translation.translation.x = to.position.x;
-    to_translation.translation.y = to.position.y;
-    to_translation.translation.z = to.position.z;
-    to_translation.rotation = to.orientation;
-  }
-
-  tf2::Transform to_tf;
-  {
-    tf2::fromMsg(to_translation, to_tf);
-  }
-
-  tf2::Transform tf_delta = from_tf.inverse() * to_tf;
-
-  geometry_msgs::msg::Pose ret;
-  {
-    tf2::toMsg(tf_delta, ret);
-  }
-
-  return ret;
+  return traffic_simulator::math::getRelativePose(from, to);
 }
 
 auto EntityManager::getRelativePose(const geometry_msgs::msg::Pose & from, const std::string & to)
