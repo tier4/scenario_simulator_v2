@@ -2,8 +2,8 @@
 Changelog for package kashiwanoha_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2021-06-24)
+------------------
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/send_ego_command
 * Contributors: Masaya Kataoka

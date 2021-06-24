@@ -2,8 +2,8 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2021-06-24)
+------------------
 * Merge pull request `#357 <https://github.com/tier4/scenario_simulator_v2/issues/357>`_ from tier4/feature/send_ego_command
 * fix typo
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command
