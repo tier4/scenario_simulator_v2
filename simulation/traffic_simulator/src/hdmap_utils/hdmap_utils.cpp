@@ -41,6 +41,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
+#include <traffic_simulator/math/transfrom.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -647,6 +648,9 @@ HdMapUtils::getLaneChangeTrajectory(
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
+    if (traffic_simulator::math::getRelativePose(from_pose, goal_pose.pose).position.x <= 1.0) {
+      continue;
+    }
     double start_to_goal_dist = std::sqrt(
       std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
       std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
