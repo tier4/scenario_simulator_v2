@@ -23,20 +23,38 @@ inline namespace syntax
 std::istream & operator>>(std::istream & is, Color & datum)
 {
   std::string value;
-
   is >> value;
 
-  static const std::unordered_map<std::string, Color::value_type> conversions{
-    std::make_pair("noColor", Color::noColor),
-    std::make_pair("green", Color::green),
-    std::make_pair("red", Color::red),
-    std::make_pair("yellow", Color::yellow),
-  };
-
-  try {
-    datum.value = conversions.at(value);
-  } catch (const std::out_of_range &) {
+  if (value == "noColor") {
+    datum = Color::noColor;
+  } else if (value == "green") {
+    datum = Color::green;
+  } else if (value == "red") {
+    datum = Color::red;
+  } else if (value == "yellow") {
+    datum = Color::yellow;
+  } else {
     throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color, value);
+  }
+
+  return is;
+}
+
+std::istream & operator>>(std::istream & is, boost::optional<Color> & datum)
+{
+  std::string value;
+  is >> value;
+
+  if (value == "noColor") {
+    datum.emplace(Color::noColor);
+  } else if (value == "green") {
+    datum.emplace(Color::green);
+  } else if (value == "red") {
+    datum.emplace(Color::red);
+  } else if (value == "yellow") {
+    datum.emplace(Color::yellow);
+  } else {
+    datum = boost::none;
   }
 
   return is;

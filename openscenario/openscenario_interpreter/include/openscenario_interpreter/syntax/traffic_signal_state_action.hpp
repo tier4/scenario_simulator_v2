@@ -40,6 +40,9 @@ struct TrafficSignalStateAction : private Scope
    *  ID of a signal in a road network. The signal ID must be listed in the
    *  TrafficSignal list of the RoadNetwork.
    *
+   *  In the TierIV OpenSCENARIO implementation, it is the Lanelet ID (positive
+   *  integer) of the traffic light.
+   *
    * ------------------------------------------------------------------------ */
   const String name;
 
@@ -61,9 +64,26 @@ struct TrafficSignalStateAction : private Scope
 
   static auto accomplished() noexcept { return true; }
 
-  auto start() const { return unspecified; }
+  auto start() const
+  {
+    const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
+    if (color_opt.has_value()) {
+      setTrafficLightColor(id(), color_opt.value());
+      return unspecified;
+    }
+
+    const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
+    if (arrow_opt.has_value()) {
+      setTrafficLightArrow(id(), arrow_opt.value());
+      return unspecified;
+    }
+
+    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
+  }
 
   static bool endsImmediately() { return true; }
+
+  auto id() const -> std::int64_t { return boost::lexical_cast<std::int64_t>(name); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

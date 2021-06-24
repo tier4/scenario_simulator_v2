@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__COLOR_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__COLOR_HPP_
 
+#include <boost/optional.hpp>
 #include <iostream>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 
@@ -33,7 +34,15 @@ struct Color
 
   explicit Color() = default;
 
+  Color & operator=(const Color &) = default;
+
   explicit constexpr Color(value_type value) : value(value) {}
+
+  constexpr Color & operator=(value_type value)
+  {
+    this->value = value;
+    return *this;
+  }
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -63,6 +72,7 @@ static_assert(std::is_standard_layout<Color>::value, "");
 static_assert(std::is_trivial<Color>::value, "");
 
 std::istream & operator>>(std::istream &, Color &);
+std::istream & operator>>(std::istream &, boost::optional<Color> &);
 
 std::ostream & operator<<(std::ostream &, const Color &);
 }  // namespace syntax

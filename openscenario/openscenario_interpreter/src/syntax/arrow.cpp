@@ -42,6 +42,26 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
   return is;
 }
 
+std::istream & operator>>(std::istream & is, boost::optional<Arrow> & datum)
+{
+  std::string value;
+  is >> value;
+
+  if (value == "noArrow") {
+    datum.emplace(Arrow::noArrow);
+  } else if (value == "left") {
+    datum.emplace(Arrow::left);
+  } else if (value == "right") {
+    datum.emplace(Arrow::right);
+  } else if (value == "straight") {
+    datum.emplace(Arrow::straight);
+  } else {
+    datum = boost::none;
+  }
+
+  return is;
+}
+
 std::ostream & operator<<(std::ostream & os, const Arrow & datum)
 {
 #define BOILERPLATE(IDENTIFIER) \

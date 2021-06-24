@@ -51,11 +51,15 @@ public:
     return *this;
   }
 
+  operator ForwardIterator() const { return current; }
+
   reference operator*() const { return *current; }
 
   auto & operator++()
   {
-    if (++current == end) {
+    if (current == end) {
+      current = begin;
+    } else if (++current == end) {
       current = begin;
     }
 

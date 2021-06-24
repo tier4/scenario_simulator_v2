@@ -15,13 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 
+#include <numeric>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/iterator/circular_iterator.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include "openscenario_interpreter/procedure.hpp"
-#include "scenario_simulator_exception/exception.hpp"
 
 namespace openscenario_interpreter
 {
@@ -41,7 +41,6 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalController
 {
-private:
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  ID of the traffic signal controller in the road network.
@@ -73,6 +72,7 @@ private:
    * ------------------------------------------------------------------------ */
   const String reference;
 
+private:
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  Phases of a TrafficSignalController.
@@ -80,9 +80,28 @@ private:
    * ------------------------------------------------------------------------ */
   std::list<Phase> phases;
 
-  CircularIterator<decltype(phases)::iterator> current_phase;
+  CircularIterator<typename std::list<Phase>::iterator> current_phase;
 
+  decltype(getCurrentTime()) begin_phase_started_at;
   decltype(getCurrentTime()) current_phase_started_at;
+
+  std::shared_ptr<TrafficSignalController> reference_controller;
+
+  auto changePhase(const std::list<Phase>::iterator & next)
+  {
+    auto current_time = getCurrentTime();
+
+    if (next == phases.begin()) {
+      begin_phase_started_at = current_time;
+    }
+
+    current_phase_started_at = current_time;
+    current_phase = next;
+    return (*current_phase).evaluate();
+  }
+
+  friend struct TrafficSignalControllerAction;
+  friend struct TrafficSignals;
 
 public:
   explicit TrafficSignalController() = delete;
@@ -98,18 +117,31 @@ public:
     reference(readAttribute<String>("reference", node, outer_scope, String())),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
     current_phase(std::begin(phases), std::end(phases), std::end(phases)),
+    begin_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min()),
     current_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min())
   {
   }
 
   auto evaluate()
   {
-    if (theDurationExceeded()) {
-      current_phase_started_at = getCurrentTime();
-      return (*++current_phase).evaluate();
+    if (changeToBeginCondition()) {
+      return changePhase(phases.begin());
+    } else if (theDurationExceeded()) {
+      return changePhase(std::next(current_phase));
     } else {
       return unspecified;
     }
+  }
+
+  const std::list<Phase> & getPhases() const { return phases; }
+
+  auto cicleTime() const
+  {
+    Double sum = 0;
+    for (auto & each : phases) {
+      sum += each.duration;
+    }
+    return sum;
   }
 
 private:
@@ -122,9 +154,19 @@ private:
     }
   }
 
+  auto changeToBeginCondition() -> bool
+  {
+    if (reference_controller) {
+      return current_phase != phases.begin() &&
+             reference_controller->begin_phase_started_at + delay <= getCurrentTime();
+    } else {
+      return current_phase == phases.end();  // if current_phase haven't been initialized
+    }
+  }
+
   void changePhaseByName(const std::string & phase_name)
   {
-    auto it = std::find(phases.begin(), phases.end(), [&phase_name](const Phase & phase) {
+    auto it = std::find_if(phases.begin(), phases.end(), [&phase_name](const Phase & phase) {
       return phase.name == phase_name;
     });
 
@@ -132,11 +174,8 @@ private:
       THROW_SYNTAX_ERROR(phase_name, "is not declared in this scope.");
     }
 
-    current_phase_started_at = getCurrentTime();
-    current_phase = it;
+    changePhase(it);
   }
-
-  friend struct TrafficSignalControllerAction;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -61,21 +61,22 @@ struct TrafficSignalControllerAction : private Scope
   {
   }
 
-  static auto accomplished() noexcept { return true; }
+  static auto accomplished() noexcept -> bool { return true; }
 
   auto start()
   {
     auto target = localScope().traffic_signal_controllers.find(traffic_signal_controller_ref);
+
     if (target == localScope().traffic_signal_controllers.end()) {
       THROW_SYNTAX_ERROR(traffic_signal_controller_ref, "is not declared in this scope.");
     }
 
-    target->second.changePhaseByName(phase);
+    target->second->changePhaseByName(phase);
 
     return unspecified;
   }
 
-  static bool endsImmediately() { return true; }
+  static auto endsImmediately() -> bool { return true; }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

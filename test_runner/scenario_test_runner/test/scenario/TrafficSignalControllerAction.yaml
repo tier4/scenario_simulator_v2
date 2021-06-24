@@ -1,10 +1,13 @@
 ScenarioModifiers:
-  ScenarioModifier: []
+  ScenarioModifier:
+    - name: DUMMY-PARAMETER
+      # list: [1, 2, 3]
+      list: [1]
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: '2021-06-07T06:19:29.876Z'
+    date: '2021-02-01T08:31:04.600Z'
     description: ''
     author: ''
   ParameterDeclarations:
@@ -13,11 +16,34 @@ OpenSCENARIO:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: lanelet2_map.osm
+      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
     SceneGraphFile:
-      filepath: lanelet2_map.pcd
+      filepath: pointcloud_map.pcd
     TrafficSignals:
-      TrafficSignalController: []
+      TrafficSignalController:
+        - name: controller-1
+          delay: 0
+          reference: ''
+          Phase:
+            - name: phase-1
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34802', state: 'green' }
+                - { trafficSignalId: '34802', state: 'noArrow' }
+            - name: phase-2
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34802', state: 'yellow' }
+            - name: dummy-phase (for debugging corner case)
+              duration: 0
+              TrafficSignalState: []
+            - name: phase-3
+              duration: 30
+              TrafficSignalState:
+                - { trafficSignalId: '34802', state: 'red' }
+                - { trafficSignalId: '34802', state: 'left' }
+        - name: empty-controller (for debugging corner case)
+          Phase: []
   Entities:
     ScenarioObject:
       - name: ego
@@ -26,30 +52,30 @@ OpenSCENARIO:
           vehicleCategory: car
           BoundingBox:
             Center:
-              x: 1.355
+              x: 0
               y: 0
-              z: 1.25
+              z: 0
             Dimensions:
               width: 2.25
               length: 4.77
               height: 2.5
           Performance:
-            maxSpeed: 50
+            maxSpeed: 30
             maxAcceleration: INF
             maxDeceleration: INF
           Axles:
             FrontAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.78
-              trackWidth: 1.63
-              positionX: 1.385
-              positionZ: 0.39
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX:  1
+              positionZ: 0.3
             RearAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.78
-              trackWidth: 1.63
-              positionX: -1.355
-              positionZ: 0.39
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: -1
+              positionZ: 0.3
           Properties:
             Property: []
         ObjectController:
@@ -57,8 +83,7 @@ OpenSCENARIO:
             name: ''
             Properties:
               Property:
-                - name: isEgo
-                  value: 'true'
+                - { name: isEgo, value: 'true' }
   Storyboard:
     Init:
       Actions:
@@ -75,24 +100,84 @@ OpenSCENARIO:
                       Orientation:
                         type: relative
                         h: 0
-                        p: -0.0
+                        p: 0
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position:
+                    Position: &ego-destination
                       LanePosition:
                         roadId: ''
                         laneId: '34630'
-                        s: 10
+                        s: 20
                         offset: 0
                         Orientation:
                           type: relative
                           h: 0
-                          p: -0.0
+                          p: 0
                           r: 0
     Story:
       - name: ''
         Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 5
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalControllerAction:
+                                    trafficSignalControllerRef: controller-1
+                                    phase: phase-3
+                      - name: ''
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 20
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalStateAction:
+                                    name: '34802'
+                                    state: 'green'
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
@@ -105,7 +190,7 @@ OpenSCENARIO:
                   - name: ''
                     Event:
                       - name: ''
-                        priority: parallel
+                        priority: overwrite
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -119,17 +204,7 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: '34630'
-                                            s: 10
-                                            offset: 0
-                                            Orientation:
-                                              type: relative
-                                              h: 0
-                                              p: -0.0
-                                              r: 0
+                                        Position: *ego-destination
                                         tolerance: 1
                         Action:
                           - name: ''
@@ -137,7 +212,7 @@ OpenSCENARIO:
                               CustomCommandAction:
                                 type: exitSuccess
                       - name: ''
-                        priority: parallel
+                        priority: overwrite
                         StartTrigger:
                           ConditionGroup:
                             - Condition:

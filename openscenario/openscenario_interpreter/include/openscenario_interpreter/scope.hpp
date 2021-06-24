@@ -66,7 +66,7 @@ struct Scope
    *  destruction of the scenario itself. </del>
    *
    * ------------------------------------------------------------------------ */
-  std::unordered_map<String, TrafficSignalController> traffic_signal_controllers;
+  std::unordered_map<String, std::shared_ptr<TrafficSignalController>> traffic_signal_controllers;
 
   std::unordered_map<String, Element> entities;
 

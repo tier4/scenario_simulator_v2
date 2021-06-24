@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ARROW_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ARROW_HPP_
 
+#include <boost/optional.hpp>
 #include <iostream>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 
@@ -32,6 +33,7 @@ struct Arrow
   } value;
 
   explicit constexpr Arrow(value_type value = noArrow) : value(value) {}
+  Arrow & operator=(const Arrow &) = default;
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -57,6 +59,7 @@ struct Arrow
 };
 
 std::istream & operator>>(std::istream &, Arrow &);
+std::istream & operator>>(std::istream &, boost::optional<Arrow> &);
 
 std::ostream & operator<<(std::ostream &, const Arrow &);
 }  // namespace syntax

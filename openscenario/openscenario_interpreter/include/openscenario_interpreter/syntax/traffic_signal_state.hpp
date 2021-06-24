@@ -61,18 +61,23 @@ struct TrafficSignalState
   {
   }
 
-  decltype(auto) id() const { return boost::lexical_cast<std::int64_t>(traffic_signal_id); }
+  auto id() const { return boost::lexical_cast<std::int64_t>(traffic_signal_id); }
 
-  auto evaluate() const  // XXX DIRTY HACK
+  auto evaluate() const
   {
-    try {
-      setTrafficLightColor(id(), boost::lexical_cast<Color>(state));
-    } catch (...) {
-      // setTrafficLightArrow(boost::lexical_cast<Arrow>(state));
-      boost::lexical_cast<Arrow>(state);  // NOTE: Currently ignored.
+    const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
+    if (color_opt.has_value()) {
+      setTrafficLightColor(id(), color_opt.value());
+      return unspecified;
     }
 
-    return unspecified;
+    const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
+    if (arrow_opt.has_value()) {
+      setTrafficLightArrow(id(), arrow_opt.value());
+      return unspecified;
+    }
+
+    throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Color or Arrow, state);
   }
 };
 }  // namespace syntax
