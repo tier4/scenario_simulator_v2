@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- NPC becomes ubable to change lanes behind of them.
 
 ## Ver 0.1.1
 - Add support for RelativeTargetSpeed, the syntax of OpenSCENARIO
