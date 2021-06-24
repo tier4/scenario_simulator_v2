@@ -85,7 +85,7 @@ private:
   decltype(getCurrentTime()) begin_phase_started_at;
   decltype(getCurrentTime()) current_phase_started_at;
 
-  std::shared_ptr<TrafficSignalController> reference_controller;
+  std::shared_ptr<TrafficSignalController> reference_controller = nullptr;
 
   auto changePhase(const std::list<Phase>::iterator & next)
   {
@@ -97,7 +97,12 @@ private:
 
     current_phase_started_at = current_time;
     current_phase = next;
-    return (*current_phase).evaluate();
+
+    if (current_phase != phases.end()) {
+      return (*current_phase).evaluate();
+    } else {
+      return unspecified;
+    }
   }
 
   friend struct TrafficSignalControllerAction;
@@ -147,7 +152,7 @@ public:
 private:
   auto theDurationExceeded() const -> bool
   {
-    if (not phases.empty()) {
+    if (std::list<Phase>::iterator(current_phase) != phases.end()) {
       return (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
     } else {
       return false;
@@ -171,7 +176,7 @@ private:
     });
 
     if (it == phases.end()) {
-      THROW_SYNTAX_ERROR(phase_name, "is not declared in this scope.");
+      THROW_SYNTAX_ERROR(phase_name, "is not declared in this TrafficSignalContoller, ", name);
     }
 
     changePhase(it);

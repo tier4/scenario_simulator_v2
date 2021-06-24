@@ -51,22 +51,26 @@ private:
   {
     std::unordered_map<std::string, std::vector<std::string>> reference_map;
     for (auto & each : traffic_signal_controllers) {
-      try {
-        auto reference = controllers.at(each->reference);
-        each->reference_controller = reference;
-      } catch (std::out_of_range &) {
-        THROW_SYNTAX_ERROR(each->reference, "is not declared in the TrafficSignals.");
+      if (!each->reference.empty()) {
+        try {
+          auto reference = controllers.at(each->reference);
+          each->reference_controller = reference;
+        } catch (std::out_of_range &) {
+          THROW_SYNTAX_ERROR(each->reference, "is not declared in the TrafficSignals.");
+        }
       }
     }
 
     for (auto & controller : traffic_signal_controllers) {
-      bool is_circular = utility::circular_check(
-        controller->name, [&reference_map](const std::string & node) -> decltype(auto) {
-          return reference_map[node];
-        });
+      if (controller) {
+        bool is_circular = utility::circular_check(
+          controller->name, [&reference_map](const std::string & node) -> decltype(auto) {
+            return reference_map[node];
+          });
 
-      if (is_circular) {
-        THROW_SEMANTIC_ERROR("detect circular reference among TrafficSignalControlers");
+        if (is_circular) {
+          THROW_SEMANTIC_ERROR("detect circular reference among TrafficSignalControlers");
+        }
       }
     }
   }
@@ -80,10 +84,13 @@ public:
       readSharedElements<TrafficSignalController, 0>("TrafficSignalController", node, outer_scope))
   {
     for (auto && each : traffic_signal_controllers) {
-      auto result = outer_scope.traffic_signal_controllers.emplace(each->name, each);
-      if (not result.second) {
-        throw SyntaxError(
-          "Multiple TrafficSignalControllers have been declared with the same name: ", each->name);
+      if (each) {
+        auto result = outer_scope.traffic_signal_controllers.emplace(each->name, each);
+        if (not result.second) {
+          throw SyntaxError(
+            "Multiple TrafficSignalControllers have been declared with the same name: ",
+            each->name);
+        }
       }
     }
 
