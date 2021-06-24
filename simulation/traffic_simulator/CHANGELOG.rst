@@ -2,6 +2,25 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#372 <https://github.com/tier4/scenario_simulator_v2/issues/372>`_ from tier4/fix/lane_change_parameter
+* add New lines at the end of the file
+* apply reformat
+* input optional arguments
+* update lane change logic
+* move getRelativePose function to the math directory
+* enable set maximum_curvature_threshold parameter
+* Merge pull request `#357 <https://github.com/tier4/scenario_simulator_v2/issues/357>`_ from tier4/feature/send_ego_command
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/send_ego_command
+* enable use getEntityStatusBeforeUpdate function in EntityManager class
+* add getEntityStatusBeforeUpdate() function
+* fix problems while getting ego status
+* remove warnings and add getEgoName function to the API class
+* add getEgoName function to the entity manager class
+* Contributors: Masaya Kataoka
+
 0.1.1 (2021-06-21)
 ------------------
 * Merge pull request `#363 <https://github.com/tier4/scenario_simulator_v2/issues/363>`_ from tier4/fix/throw_errors_when_set_target_speed_after_ego_starts
