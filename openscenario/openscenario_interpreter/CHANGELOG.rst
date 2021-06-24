@@ -2,6 +2,29 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.0 (2021-06-24)
+------------------
+* Merge pull request `#370 <https://github.com/tier4/scenario_simulator_v2/issues/370>`_ from tier4/feature/interpreter/context-2
+* Disable debug print
+* Lipsticks
+* Add member function 'description' to syntax StoryboardElementStateCondition
+* Add member function 'description' to syntax ParameterCondition
+* Add member function 'distance' to syntax RelativeDistanceCondition
+* Add member function 'description' to syntax DistanceCondition
+* Add member function 'description' to syntax ReachPositionCondition
+* Add member function 'description' to syntax SpeedCondition
+* Add member function 'description' to syntax StandStillCondition
+* Add member function 'description' to syntax AccelerationCondition
+* Add member function 'description' to syntax TimeHeadwayCondition
+* Add new function 'print_to'
+* Lipsticks
+* Add member function 'description' to syntax CollisionCondition
+* Add member function 'description' to syntax TriggeringEntities
+* Add member function 'description' to syntax TriggeringEntitiesRule
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/send_ego_command
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.1.1 (2021-06-21)
 ------------------
 * Merge pull request `#364 <https://github.com/tier4/scenario_simulator_v2/issues/364>`_ from tier4/feature/change_timeout_to_warning

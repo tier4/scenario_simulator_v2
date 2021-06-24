@@ -2,6 +2,12 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.0 (2021-06-24)
+------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/send_ego_command
+* Contributors: Masaya Kataoka
+
 0.1.1 (2021-06-21)
 ------------------
 * Merge branch 'master' into relative_target_speed
