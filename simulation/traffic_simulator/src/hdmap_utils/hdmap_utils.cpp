@@ -640,7 +640,7 @@ const boost::optional<geometry_msgs::msg::Point> HdMapUtils::getTrafficLightBulb
 boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id,
-  double maximum_curvature_threshold)
+  double maximum_curvature_threshold, double target_trajectory_length)
 {
   double to_length = getLaneletLength(to_lanelet_id);
   std::vector<double> evaluation, target_s;
@@ -657,7 +657,7 @@ HdMapUtils::getLaneChangeTrajectory(
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
     auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
     if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
-      double eval = std::fabs(20 - traj.getLength());
+      double eval = std::fabs(target_trajectory_length - traj.getLength());
       evaluation.push_back(eval);
       curves.push_back(traj);
       target_s.push_back(to_s);
