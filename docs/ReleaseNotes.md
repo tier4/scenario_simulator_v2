@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Add /simulator/context topic (openscenario_interpreter_msgs/msg/Context type) and enable visualize scenario execution status.
 - NPC becomes ubable to change lanes behind of them.
 
 ## Ver 0.1.1
