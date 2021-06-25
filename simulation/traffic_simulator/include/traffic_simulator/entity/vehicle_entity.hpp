@@ -104,13 +104,14 @@ public:
   {
     try {
       return tree_ptr_->getWaypoints();
-    }
-    catch(const std::runtime_error & e) {
-      if(!status_) {
+    } catch (const std::runtime_error & e) {
+      if (!status_) {
         THROW_SIMULATION_ERROR("Entity : ", name, " status is empty.");
       }
-      if(status_ && status_->lanelet_pose_valid == false) {
-        THROW_SIMULATION_ERROR("Failed to caluclate waypoints in NPC logics, please check Entity : ", name, " is in a lane coordinate.");
+      if (status_ && status_->lanelet_pose_valid == false) {
+        THROW_SIMULATION_ERROR(
+          "Failed to caluclate waypoints in NPC logics, please check Entity : ", name,
+          " is in a lane coordinate.");
       }
       THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
     }
