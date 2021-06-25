@@ -412,9 +412,12 @@ void EgoEntity::requestAssignRoute(
 
   if (not std::exchange(autoware_initialized, true)) {
     ego_entities.at(name).initialize(getStatus().pose);
+    ego_entities.at(name).plan(route);
+    // NOTE: engage() will be executed at simulation-time 0.
+  } else {
+    ego_entities.at(name).plan(route);
+    ego_entities.at(name).engage();
   }
-
-  ego_entities.at(name).plan(route);
 }
 
 void EgoEntity::requestLaneChange(const std::int64_t)

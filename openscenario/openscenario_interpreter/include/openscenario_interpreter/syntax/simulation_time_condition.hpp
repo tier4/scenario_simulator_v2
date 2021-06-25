@@ -52,8 +52,8 @@ struct SimulationTimeCondition
   {
     std::stringstream description;
 
-    description << std::fixed << std::setprecision(6) << last_checked_time << " is " << compare
-                << " " << value << "?";
+    description << "Is the simulation time (= " << std::fixed << std::setprecision(6)
+                << last_checked_time << ") is " << compare << " " << value << "?";
 
     return description.str();
   }
