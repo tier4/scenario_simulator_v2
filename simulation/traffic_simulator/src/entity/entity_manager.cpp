@@ -561,7 +561,6 @@ openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
 
 void EntityManager::update(const double current_time, const double step_time)
 {
-  verbose_ = true;
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
