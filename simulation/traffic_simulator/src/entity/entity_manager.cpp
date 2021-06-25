@@ -561,6 +561,7 @@ openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
 
 void EntityManager::update(const double current_time, const double step_time)
 {
+  verbose_ = true;
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
@@ -591,7 +592,6 @@ void EntityManager::update(const double current_time, const double step_time)
   auto entity_type_list = getEntityTypeList();
   openscenario_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (const auto & status : all_status) {
-    // std::cout << "calculating " << status.first << " status" << std::endl;
     openscenario_msgs::msg::EntityStatusWithTrajectory status_with_traj;
     auto status_msg = status.second;
     status_msg.name = status.first;

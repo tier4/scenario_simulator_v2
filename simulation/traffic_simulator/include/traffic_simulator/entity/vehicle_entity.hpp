@@ -102,7 +102,18 @@ public:
 
   const openscenario_msgs::msg::WaypointsArray getWaypoints() override
   {
-    return tree_ptr_->getWaypoints();
+    try {
+      return tree_ptr_->getWaypoints();
+    }
+    catch(const std::runtime_error & e) {
+      if(!status_) {
+        THROW_SIMULATION_ERROR("Entity : ", name, " status is empty.");
+      }
+      if(status_ && status_->lanelet_pose_valid == false) {
+        THROW_SIMULATION_ERROR("Failed to caluclate waypoints in NPC logics, please check Entity : ", name, " is in a lane coordinate.");
+      }
+      THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
+    }
   }
 
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
