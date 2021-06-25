@@ -1,5 +1,3 @@
-ScenarioModifiers:
-  ScenarioModifier: []
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
@@ -83,41 +81,13 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: '34507'
-                        s: 30
+                        s: 10
                         offset: 0
                         Orientation:
                           type: relative
                           h: 0
                           p: 0
                           r: 0
-          # - entityRef: Npc1
-          #   PrivateAction:
-          #     - TeleportAction:
-          #         Position:
-          #           LanePosition:
-          #             roadId: ''
-          #             laneId: '34606'
-          #             s: 15
-          #             offset: 0
-          #             Orientation:
-          #               type: relative
-          #               h: 0
-          #               p: -0.0
-          #               r: 0
-          # - entityRef: Npc2
-          #   PrivateAction:
-          #     - TeleportAction:
-          #         Position:
-          #           LanePosition:
-          #             roadId: ''
-          #             laneId: '34600'
-          #             s: 30
-          #             offset: 0
-          #             Orientation:
-          #               type: relative
-          #               h: 0
-          #               p: -0.0
-          #               r: 0
     Story:
       - name: ""
         Act:
@@ -151,26 +121,53 @@ OpenSCENARIO:
                                         tolerance: 1
                         Action:
                           - name: ''
-                            UserDefinedAction:
-                              CustomCommandAction:
-                                type: exitSuccess
-                      - name: ''
+                            PrivateAction:
+                              RoutingAction:
+                                AcquirePositionAction:
+                                  Position: &destination-2
+                                    LanePosition:
+                                      roadId: ''
+                                      laneId: '34507'
+                                      s: 30
+                                      offset: 0
+                                      Orientation:
+                                        type: relative
+                                        h: 0
+                                        p: 0
+                                        r: 0
+                      - name: ""
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ''
+                                - name: 'if ego reachs destination-1'
                                   delay: 0
                                   conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 180
-                                      rule: greaterThan
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *destination-2
+                                        tolerance: 1
                         Action:
                           - name: ''
-                            UserDefinedAction:
-                              CustomCommandAction:
-                                type: exitFailure
+                            PrivateAction:
+                              RoutingAction:
+                                AcquirePositionAction:
+                                  Position: &destination-3
+                                    LanePosition:
+                                      roadId: ''
+                                      laneId: '34606'
+                                      s: 15
+                                      offset: 0
+                                      Orientation:
+                                        type: relative
+                                        h: 0
+                                        p: 0
+                                        r: 0
             StartTrigger:
               ConditionGroup:
                 - Condition:
@@ -181,7 +178,6 @@ OpenSCENARIO:
                         SimulationTimeCondition:
                           value: 0
                           rule: greaterThan
-
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
@@ -198,35 +194,18 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                # - name: ''
-                                #   delay: 0
-                                #   conditionEdge: none
-                                #   ByEntityCondition:
-                                #     TriggeringEntities:
-                                #       triggeringEntitiesRule: any
-                                #       EntityRef:
-                                #         - entityRef: ego
-                                #     EntityCondition:
-                                #       ReachPositionCondition:
-                                #         Position:
-                                #           LanePosition:
-                                #             roadId: ''
-                                #             laneId: '34507'
-                                #             s: 30
-                                #             offset: 0
-                                #             Orientation:
-                                #               type: relative
-                                #               h: 0
-                                #               p: 0
-                                #               r: 0
-                                #         tolerance: 1
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 90
-                                      rule: greaterThan
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *destination-3
+                                        tolerance: 1
                         Action:
                           - name: ''
                             UserDefinedAction:
