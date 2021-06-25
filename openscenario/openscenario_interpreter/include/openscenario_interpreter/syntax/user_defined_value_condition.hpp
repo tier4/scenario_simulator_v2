@@ -35,7 +35,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct UserDefinedValueCondition : public ComplexType
+struct UserDefinedValueCondition
 {
   const String name;
 
@@ -49,6 +49,20 @@ struct UserDefinedValueCondition : public ComplexType
     value(readAttribute<String>("value", node, scope)),
     compare(readAttribute<Rule>("rule", node, scope))
   {
+  }
+
+  String last_checked_value;
+
+  auto evaluate() { return asBoolean(compare(last_checked_value, value)); }
+
+  auto description() const
+  {
+    std::stringstream description;
+
+    description << "Is the " << name << " (= " << last_checked_value << ") is " << compare << " "
+                << value << "?";
+
+    return description.str();
   }
 };
 }  // namespace syntax
