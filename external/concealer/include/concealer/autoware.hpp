@@ -19,12 +19,6 @@
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
-// #ifdef AUTOWARE_AUTO
-// // twist needs to be included manually when api's are not included
-// #include <geometry_msgs/msg/twist.hpp>
-// #include <concealer/conversion.hpp>
-// #endif
-
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/fundamental_api.hpp>

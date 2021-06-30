@@ -99,7 +99,7 @@ void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 #ifdef AUTOWARE_AUTO
   task_queue.delay(
     [this, initial_pose]() {
-      // TODO - handle autoware states: wait for a correct state if necessary
+      // TODO: wait for a correct state if necessary once state monitoring is there
       set(initial_pose);
       setInitialPose(initial_pose);
     }
@@ -142,7 +142,7 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 
   task_queue.delay(
     [this, route]() {
-      // TODO replace this sleep with proper state wait logic once state support is there (waitForAutowareStateToBeWaitingForRoute)
+      // TODO: replace this sleep with proper state wait logic once state monitoring is there (waitForAutowareStateToBeWaitingForRoute)
       std::this_thread::sleep_for(std::chrono::milliseconds(2000));
       geometry_msgs::msg::PoseStamped gp;
       gp.pose = route.back().pose;
