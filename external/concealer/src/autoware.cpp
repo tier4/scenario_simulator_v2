@@ -164,7 +164,7 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
     setGoalPose(route.back());
-    for (const auto & each : route | boost::adaptors::sliced(0, route.size())) {
+    for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
       setCheckpoint(each);
     }
     waitForAutowareStateToBePlanning();
