@@ -40,6 +40,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp
+  src/entity/misc_object_entity.cpp
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
   src/hdmap_utils/hdmap_utils.cpp
