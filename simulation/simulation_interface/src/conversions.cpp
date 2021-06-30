@@ -215,6 +215,24 @@ void toMsg(
 }
 
 void toProto(
+  const openscenario_msgs::msg::MiscObjectParameters & p,
+  openscenario_msgs::MiscObjectParameters & proto)
+{
+  toProto(p.bounding_box, *proto.mutable_bounding_box());
+  proto.set_name(p.name);
+  proto.set_misc_object_category(p.misc_object_category);
+}
+
+void toMsg(
+  const openscenario_msgs::MiscObjectParameters & proto,
+  openscenario_msgs::msg::MiscObjectParameters & p)
+{
+  p.name = proto.name();
+  p.misc_object_category = proto.misc_object_category();
+  toMsg(proto.bounding_box(), p.bounding_box);
+}
+
+void toProto(
   const openscenario_msgs::msg::ActionStatus & s, openscenario_msgs::ActionStatus & proto)
 {
   proto.set_current_action(s.current_action);
