@@ -102,6 +102,9 @@ private:
   void spawnPedestrianEntity(
     const simulation_api_schema::SpawnPedestrianEntityRequest & req,
     simulation_api_schema::SpawnPedestrianEntityResponse & res);
+  void spawnMiscObjectEntity(
+    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
+    simulation_api_schema::SpawnMiscObjectEntityResponse &);
   void despawnEntity(
     const simulation_api_schema::DespawnEntityRequest & req,
     simulation_api_schema::DespawnEntityResponse & res);

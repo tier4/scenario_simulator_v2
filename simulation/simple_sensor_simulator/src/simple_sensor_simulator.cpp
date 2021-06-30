@@ -43,6 +43,9 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       &ScenarioSimulator::spawnPedestrianEntity, this, std::placeholders::_1,
       std::placeholders::_2),
     std::bind(
+      &ScenarioSimulator::spawnMiscObjectEntity, this, std::placeholders::_1,
+      std::placeholders::_2),
+    std::bind(
       &ScenarioSimulator::despawnEntity, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::updateEntityStatus, this, std::placeholders::_1, std::placeholders::_2),
@@ -125,6 +128,15 @@ void ScenarioSimulator::spawnPedestrianEntity(
 {
   pedestrians_.emplace_back(req.parameters());
   res = simulation_api_schema::SpawnPedestrianEntityResponse();
+  res.mutable_result()->set_success(true);
+  res.mutable_result()->set_description("");
+}
+
+void ScenarioSimulator::spawnMiscObjectEntity(
+  const simulation_api_schema::SpawnMiscObjectEntityRequest & req,
+  simulation_api_schema::SpawnMiscObjectEntityResponse & res)
+{
+  res = simulation_api_schema::SpawnMiscObjectEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
 }
