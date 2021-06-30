@@ -216,7 +216,7 @@ public:
 public:
   explicit FundamentalAPI()
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-    : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
+  : INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
     INIT_PUBLISHER(LaneChangeApproval, "/awapi/lane_change/put/approval"),
     INIT_PUBLISHER(LaneChangeForce, "/awapi/lane_change/put/force"),

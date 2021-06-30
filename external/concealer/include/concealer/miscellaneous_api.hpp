@@ -16,7 +16,6 @@
 #define CONCEALER__MISCELLANEOUS_API_HPP_
 
 #include <concealer/autoware_def.hpp>
-
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 
@@ -29,11 +28,11 @@
 #endif
 
 #ifdef AUTOWARE_AUTO
+#include <autoware_auto_msgs/msg/trajectory.hpp>
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_report.hpp>
-#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-#include <autoware_auto_msgs/msg/trajectory.hpp>
 #endif
 
 namespace concealer
@@ -319,7 +318,8 @@ class MiscellaneousAPI
 
   using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
   DEFINE_PUBLISHER(VehicleKinematicState);
-  decltype(auto) setVehicleKinematicState(const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
+  decltype(auto) setVehicleKinematicState(
+    const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
   {
     VehicleKinematicState kinematic_state;
     {
@@ -362,7 +362,7 @@ class MiscellaneousAPI
 public:
   explicit MiscellaneousAPI()
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-    : INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
+  : INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
@@ -377,7 +377,7 @@ public:
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {})
 #endif  // AUTOWARE_ARCHITECTURE_PROPOSAL
 #ifdef AUTOWARE_AUTO
-    : INIT_PUBLISHER(GoalPose, "/planning/goal_pose"),
+  : INIT_PUBLISHER(GoalPose, "/planning/goal_pose"),
     INIT_PUBLISHER(InitialPose, "/localization/initialpose"),
     INIT_PUBLISHER(VehicleKinematicState, "/vehicle/vehicle_kinematic_state"),
     INIT_PUBLISHER(VehicleStateReport, "/vehicle/state_report"),

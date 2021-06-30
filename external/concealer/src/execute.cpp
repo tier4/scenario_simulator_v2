@@ -16,11 +16,11 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/wait.h>
-#include <iostream>
+#include <unistd.h>
 
 #include <concealer/execute.hpp>
+#include <iostream>
 #include <type_traits>
 
 namespace concealer
@@ -54,7 +54,7 @@ int execute(const std::vector<std::string> & f_xs)
 
 void sudokill(pid_t process_id)
 {
-  char *process_str;
+  char * process_str;
   int status;
   pid_t pid;
 
@@ -62,13 +62,13 @@ void sudokill(pid_t process_id)
     std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
 
   pid = fork();
-  
+
   switch (pid) {
-  case -1:
-    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-  case 0:
-    execlp("sudo", "sudo", "kill", "-2", process_str, (char *) NULL);
-    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+    case -1:
+      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+    case 0:
+      execlp("sudo", "sudo", "kill", "-2", process_str, (char *) NULL);
+      std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
   }
 
   free(process_str);

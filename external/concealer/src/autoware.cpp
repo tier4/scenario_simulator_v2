@@ -45,7 +45,6 @@ Autoware::~Autoware()
   {
     sudokill(process_id);
   }
-
 }
 
 void Autoware::update()
@@ -97,13 +96,11 @@ void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 #endif
 
 #ifdef AUTOWARE_AUTO
-  task_queue.delay(
-    [this, initial_pose]() {
-      // TODO: wait for a correct state if necessary once state monitoring is there
-      set(initial_pose);
-      setInitialPose(initial_pose);
-    }
-  );
+  task_queue.delay([this, initial_pose]() {
+    // TODO: wait for a correct state if necessary once state monitoring is there
+    set(initial_pose);
+    setInitialPose(initial_pose);
+  });
 #endif
 }
 
@@ -134,24 +131,23 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 #endif  // AUTOWARE_ARCHITECTURE_PROPOSAL
 
 #ifdef AUTOWARE_AUTO
-  if (route.size() > 1)
-  {
-    AUTOWARE_WARN_STREAM("AutowareAuto received route consisting of " << route.size() <<
-      " poses but it does not support checkpoints. Ignoring first " << route.size() - 1 << " poses and treating last pose as the goal.");
+  if (route.size() > 1) {
+    AUTOWARE_WARN_STREAM(
+      "AutowareAuto received route consisting of " << route.size() <<
+      " poses but it does not support checkpoints. Ignoring first "
+      << route.size() - 1 << " poses and treating last pose as the goal.");
   }
 
-  task_queue.delay(
-    [this, route]() {
-      // TODO: replace this sleep with proper state wait logic once state monitoring is there (waitForAutowareStateToBeWaitingForRoute)
-      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-      geometry_msgs::msg::PoseStamped gp;
-      gp.pose = route.back().pose;
-      gp.pose.position.z = 0.0;
-      gp.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      gp.header.frame_id = "map";
-      setGoalPose(gp);
-    }
-  );
+  task_queue.delay([this, route]() {
+    // TODO: replace this sleep with proper state wait logic once state monitoring is there (waitForAutowareStateToBeWaitingForRoute)
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    geometry_msgs::msg::PoseStamped gp;
+    gp.pose = route.back().pose;
+    gp.pose.position.z = 0.0;
+    gp.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+    gp.header.frame_id = "map";
+    setGoalPose(gp);
+  });
 #endif  // AUTOWARE_AUTO
 }
 

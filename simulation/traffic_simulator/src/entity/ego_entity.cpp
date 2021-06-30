@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// this def needs to be on top
 #include <concealer/autoware_def.hpp>
 
 #include <quaternion_operation/quaternion_operation.h>
@@ -220,32 +221,22 @@ const autoware_vehicle_msgs::msg::VehicleCommand EgoEntity::getVehicleCommand()
   auto vehicle_state_command = ego_entities.at(name).getVehicleStateCommand();
 
   // handle gear enum remapping
-  switch(vehicle_state_command.gear){
+  switch (vehicle_state_command.gear) {
     case autoware_auto_msgs::msg::VehicleStateReport::GEAR_DRIVE:
-    {
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
       break;
-    }
     case autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE:
-    {
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
       break;
-    }
     case autoware_auto_msgs::msg::VehicleStateReport::GEAR_PARK:
-    {
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
       break;
-    }
     case autoware_auto_msgs::msg::VehicleStateReport::GEAR_LOW:
-    {
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
       break;
-    }
     case autoware_auto_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
-    {
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
       break;
-    }
   }
 
   // these fields are hard-coded because they are not present in AutowareAuto
@@ -459,7 +450,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           ego_entities.at(name).getVehicleControlCommand().velocity_mps,
           ego_entities.at(name).getVehicleControlCommand().front_wheel_angle_rad,
           ego_entities.at(name).getVehicleStateCommand().gear ==
-            autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE ? -1.0 : 1.0;
+              autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE
+              ? -1.0 : 1.0;
 #endif
 
         (*vehicle_model_ptr_).setInput(input);
@@ -564,15 +556,16 @@ void EgoEntity::setTargetSpeed(double value, bool)
 
     case VehicleModelType::DELAY_STEER: {
     Eigen::VectorXd v(5);
-    {
+      {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-      v << 0, 0, 0, value, 0;
+        v << 0, 0, 0, value, 0;
 #endif
 #ifdef AUTOWARE_AUTO
-      // non-zero initial speed prevents behavioral planner from planning
-      v << 0, 0, 0, 0, 0;
+        // non-zero initial speed prevents behavioral planner from planning
+        v << 0, 0, 0, 0, 0;
 #endif
-    }
+      }
+
       (*vehicle_model_ptr_).setState(v);
     } break;
 
@@ -583,8 +576,8 @@ void EgoEntity::setTargetSpeed(double value, bool)
         v << 0, 0, 0, value, 0, 0;
 #endif
 #ifdef AUTOWARE_AUTO
-      // non-zero initial speed prevents behavioral planner from planning
-      v << 0, 0, 0, 0, 0, 0;
+        // non-zero initial speed prevents behavioral planner from planning
+        v << 0, 0, 0, 0, 0, 0;
 #endif
       }
 

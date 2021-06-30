@@ -19,6 +19,8 @@
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
+#include <sys/wait.h>
+
 #include <chrono>
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/fundamental_api.hpp>
@@ -30,7 +32,6 @@
 #include <exception>
 #include <future>
 #include <mutex>
-#include <sys/wait.h>
 #include <thread>
 #include <utility>
 

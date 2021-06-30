@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 
 #include <concealer/autoware_def.hpp>
-
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
@@ -107,8 +106,7 @@ struct ScenarioObject
           attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
             name,
             // publishing autoware_perception_msgs::msg::DynamicObjectArray
-            "/perception/object_recognition/objects",
-            0.1));
+            "/perception/object_recognition/objects", 0.1));
 #endif
           // Autoware.Auto does not currently support object prediction
           // however it is work-in-progress for Cargo ODD
