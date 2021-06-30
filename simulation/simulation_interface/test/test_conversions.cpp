@@ -286,6 +286,18 @@ TEST(Conversion, ConvertVehicleParametrs)
   // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
 }
 
+TEST(Conversion, ConvertMiscObjectParametrs)
+{
+  openscenario_msgs::MiscObjectParameters proto;
+  openscenario_msgs::msg::MiscObjectParameters p;
+  p.misc_object_category = "obstacle";
+  EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
+  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+  p.misc_object_category = "";
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
+  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+}
+
 TEST(Conversion, ConvertActionStatus)
 {
   openscenario_msgs::ActionStatus proto;
