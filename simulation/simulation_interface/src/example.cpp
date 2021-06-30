@@ -39,6 +39,12 @@ void update_sensor_frame_callback(
 {
 }
 
+void spawn_misc_object_entity_callback(
+  const simulation_api_schema::SpawnMiscObjectEntityRequest &,
+  simulation_api_schema::SpawnMiscObjectEntityResponse &)
+{
+}
+
 void spawn_vehicle_entity_callback(
   const simulation_api_schema::SpawnVehicleEntityRequest &,
   simulation_api_schema::SpawnVehicleEntityResponse &)
@@ -89,9 +95,9 @@ public:
     server_(
       simulation_interface::TransportProtocol::TCP, simulation_interface::HostName::ANY,
       initialize_callback, update_frame_callback, update_sensor_frame_callback,
-      spawn_vehicle_entity_callback, spawn_pedestrian_entity_callback, despawn_entity_callback,
-      update_entity_status_callback, attach_lidar_sensor_callback,
-      attach_detection_sensor_callback),
+      spawn_vehicle_entity_callback, spawn_pedestrian_entity_callback,
+      spawn_misc_object_entity_callback, despawn_entity_callback, update_entity_status_callback,
+      attach_lidar_sensor_callback, attach_detection_sensor_callback),
     client_(
       simulation_interface::TransportProtocol::TCP, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::update_entity_status),

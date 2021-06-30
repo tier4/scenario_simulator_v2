@@ -103,6 +103,20 @@ message SpawnPedestrianEntityResponse {
 }
 
 /**
+ * Requests spawning misc object entity
+ **/
+message SpawnMiscObjectEntityRequest {
+  openscenario_msgs.MiscObjectParameters parameters = 1; // Parameters of misc object entity.
+}
+
+/**
+ * Response of spawning misc object entity
+ **/
+message SpawnMiscObjectEntityResponse {
+  Result result = 1; // Result of [SpawnPedestrianEntityResponse](#SpawnPedestrianEntityResponse)
+}
+
+/**
  * Requests despawning entity.
  **/
 message DespawnEntityRequest {
