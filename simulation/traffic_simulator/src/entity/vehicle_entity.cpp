@@ -28,7 +28,7 @@ namespace entity
 VehicleEntity::VehicleEntity(
   const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
   const openscenario_msgs::msg::VehicleParameters & params)
-: EntityBase(params.name, name, initial_state),
+: EntityBase(params.vehicle_category, name, initial_state),
   parameters(params),
   tree_ptr_(std::make_shared<entity_behavior::vehicle::BehaviorTree>())
 {
@@ -38,7 +38,7 @@ VehicleEntity::VehicleEntity(
 
 VehicleEntity::VehicleEntity(
   const std::string & name, const openscenario_msgs::msg::VehicleParameters & params)
-: EntityBase(params.name, name),
+: EntityBase(params.vehicle_category, name),
   parameters(params),
   tree_ptr_(std::make_shared<entity_behavior::vehicle::BehaviorTree>())
 {

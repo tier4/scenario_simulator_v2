@@ -15,18 +15,22 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__MISC_OBJECT_ENTITY_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__MISC_OBJECT_ENTITY_HPP_
 
+#include <openscenario_msgs/msg/misc_object_parameters.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 
 namespace traffic_simulator
 {
 namespace entity
 {
-/*
 class MiscObjectEntity : public EntityBase
 {
 public:
-}
-*/
+  MiscObjectEntity(
+    const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
+    const openscenario_msgs::msg::MiscObjectParameters & params);
+  MiscObjectEntity(
+    const std::string & name, const openscenario_msgs::msg::MiscObjectParameters & params);
+};
 }  // namespace entity
 }  // namespace traffic_simulator
 
