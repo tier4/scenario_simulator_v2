@@ -257,6 +257,9 @@ void toProto(const openscenario_msgs::msg::EntityType & type, openscenario_msgs:
   } else if (type.type == openscenario_msgs::msg::EntityType::PEDESTRIAN) {
     proto = openscenario_msgs::EntityType::PEDESTRIAN;
     return;
+  } else if (type.type == openscenario_msgs::msg::EntityType::MISC_OBJECT) {
+    proto = openscenario_msgs::EntityType::MISC_OBJECT;
+    return;
   }
   std::string message = "type of the Entity Type is invalid!\ntype is " + std::to_string(type.type);
   THROW_SIMULATION_ERROR(message);
@@ -274,6 +277,10 @@ void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::
   }
   if (proto == openscenario_msgs::EntityType::PEDESTRIAN) {
     type.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
+    return;
+  }
+  if (proto == openscenario_msgs::EntityType::MISC_OBJECT) {
+    type.type = openscenario_msgs::msg::EntityType::MISC_OBJECT;
     return;
   }
   std::string message = "type of the Entity Type is invalid!";

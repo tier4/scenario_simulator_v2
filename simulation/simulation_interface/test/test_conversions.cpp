@@ -437,6 +437,18 @@ TEST(Conversion, VehicleCommand)
   EXPECT_EQ(msg.emergency, proto.emergency());
 }
 
+TEST(Conversion, EntityType)
+{
+  openscenario_msgs::EntityType proto;
+  openscenario_msgs::msg::EntityType msg;
+  msg.type = msg.VEHICLE;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(proto, openscenario_msgs::EntityType::VEHICLE);
+  msg.type = msg.EGO;
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::EGO);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

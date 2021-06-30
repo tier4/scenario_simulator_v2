@@ -35,9 +35,10 @@ message LaneletPose {
  * Protobuf definition of openscenario_msgs/msg/EntityType type in ROS2.
  **/
 enum EntityType {
-  EGO = 0;        // Ego Vehicle (Autoware Vehicle)
-  VEHICLE = 1;    // Vehicle Entity (NPC Vehicle)
-  PEDESTRIAN = 2; // Pedestrian Entity (NPC Pedestrian)
+  EGO = 0;         // Ego Vehicle (Autoware Vehicle)
+  VEHICLE = 1;     // Vehicle Entity (NPC Vehicle)
+  PEDESTRIAN = 2;  // Pedestrian Entity (NPC Pedestrian)
+  MISC_OBJECT = 3; // Misc Object Entity (Static Objects in environment like cones)
 }
 
 /**
