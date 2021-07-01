@@ -27,7 +27,7 @@ namespace entity
 PedestrianEntity::PedestrianEntity(
   const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
   const openscenario_msgs::msg::PedestrianParameters & params)
-: EntityBase(params.name, name, initial_state), parameters(params)
+: EntityBase(params.pedestrian_category, name, initial_state), parameters(params)
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
   tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
@@ -36,7 +36,7 @@ PedestrianEntity::PedestrianEntity(
 
 PedestrianEntity::PedestrianEntity(
   const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params)
-: EntityBase(params.name, name), parameters(params)
+: EntityBase(params.pedestrian_category, name), parameters(params)
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
   tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();

@@ -6,27 +6,28 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
+  msg/ActionStatus.msg
+  msg/Axle.msg
+  msg/Axles.msg
   msg/BoundingBox.msg
-  msg/EntityType.msg
+  msg/CatmullRomSpline.msg
+  msg/DriverModel.msg
   msg/EntityStatus.msg
+  msg/EntityStatusWithTrajectory.msg
+  msg/EntityStatusWithTrajectoryArray.msg
+  msg/EntityTrajectory.msg
+  msg/EntityType.msg
+  msg/HermiteCurve.msg
   msg/LaneletPose.msg
   msg/LaneletPoseAndStatus.msg
   msg/MapPoseAndStatus.msg
-  msg/ActionStatus.msg
-  msg/HermiteCurve.msg
-  msg/CatmullRomSpline.msg
-  msg/EntityTrajectory.msg
-  msg/WaypointsArray.msg
-  msg/EntityStatusWithTrajectory.msg
-  msg/EntityStatusWithTrajectoryArray.msg
+  msg/MiscObjectParameters.msg
   msg/Obstacle.msg
-  msg/DriverModel.msg
+  msg/PedestrianParameters.msg
   msg/Performance.msg
-  msg/Axle.msg
-  msg/Axles.msg
   msg/Property.msg
   msg/VehicleParameters.msg
-  msg/PedestrianParameters.msg
+  msg/WaypointsArray.msg
   DEPENDENCIES std_msgs geometry_msgs
 )
 

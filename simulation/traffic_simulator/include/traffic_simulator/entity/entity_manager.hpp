@@ -35,6 +35,7 @@
 #include <string>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -318,7 +319,6 @@ public:
   {
     const auto result =
       entities_.emplace(name, std::make_unique<Entity>(name, std::forward<decltype(xs)>(xs)...));
-
     if (result.second) {
       result.first->second->setHdMapUtils(hdmap_utils_ptr_);
       result.first->second->setTrafficLightManager(traffic_light_manager_ptr_);

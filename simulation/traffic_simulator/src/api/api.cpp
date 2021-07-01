@@ -105,6 +105,28 @@ bool API::spawn(
   return res.result().success();
 }
 
+bool API::spawn(
+  const bool is_ego, const std::string & name,
+  const openscenario_msgs::msg::MiscObjectParameters & params)
+{
+  if (is_ego) {
+    THROW_SEMANTIC_ERROR("misc object should not be ego");
+  }
+  if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::MiscObjectEntity>(
+        name, params)) {
+    return false;
+  }
+  if (standalone_mode) {
+    return true;
+  }
+  simulation_api_schema::SpawnMiscObjectEntityRequest req;
+  simulation_api_schema::SpawnMiscObjectEntityResponse res;
+  simulation_interface::toProto(params, *req.mutable_parameters());
+  spawn_misc_object_entity_client_.call(req, res);
+  return res.result().success();
+  return true;
+}
+
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
 {
   auto status = getEntityStatus(name);
