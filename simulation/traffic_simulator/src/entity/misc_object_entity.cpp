@@ -23,12 +23,14 @@ MiscObjectEntity::MiscObjectEntity(
   const openscenario_msgs::msg::MiscObjectParameters & params)
 : EntityBase(params.misc_object_category, name, initial_state), params_(params)
 {
+  entity_type_.type = openscenario_msgs::msg::EntityType::MISC_OBJECT;
 }
 
 MiscObjectEntity::MiscObjectEntity(
   const std::string & name, const openscenario_msgs::msg::MiscObjectParameters & params)
 : EntityBase(params.misc_object_category, name), params_(params)
 {
+  entity_type_.type = openscenario_msgs::msg::EntityType::MISC_OBJECT;
 }
 
 void MiscObjectEntity::onUpdate(double, double)
