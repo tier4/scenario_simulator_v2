@@ -67,7 +67,7 @@ void sudokill(pid_t process_id)
     case -1:
       std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
     case 0:
-      execlp("sudo", "sudo", "kill", "-2", process_str, (char *) NULL);
+      execlp("sudo", "sudo", "kill", "-2", process_str, (char *)NULL);
       std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
   }
 

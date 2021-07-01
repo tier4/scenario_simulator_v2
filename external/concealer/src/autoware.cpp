@@ -133,8 +133,8 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
 #ifdef AUTOWARE_AUTO
   if (route.size() > 1) {
     AUTOWARE_WARN_STREAM(
-      "AutowareAuto received route consisting of " << route.size() <<
-      " poses but it does not support checkpoints. Ignoring first "
+      "AutowareAuto received route consisting of "
+      << route.size() << " poses but it does not support checkpoints. Ignoring first "
       << route.size() - 1 << " poses and treating last pose as the goal.");
   }
 
@@ -167,8 +167,7 @@ void Autoware::engage()
 #ifdef AUTOWARE_AUTO
   task_queue.delay(
     // Engage is not implemented in Autoware.Auto
-    [this]() { }
-  );
+    [this]() {});
 
 #endif
 }

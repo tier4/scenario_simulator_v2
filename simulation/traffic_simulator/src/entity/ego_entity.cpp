@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// this def needs to be on top
-#include <concealer/autoware_def.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <concealer/autoware_def.hpp>
 #include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
@@ -362,7 +360,6 @@ auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 {
   openscenario_msgs::msg::WaypointsArray waypoints;
 
-
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   // Trajectory returned by getTrajectory() is a different message between AAP and AA
   for (const auto & point : ego_entities.at(name).getTrajectory().points) {
@@ -451,7 +448,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           ego_entities.at(name).getVehicleControlCommand().front_wheel_angle_rad,
           ego_entities.at(name).getVehicleStateCommand().gear ==
               autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE
-              ? -1.0 : 1.0;
+            ? -1.0
+            : 1.0;
 #endif
 
         (*vehicle_model_ptr_).setInput(input);
@@ -555,7 +553,7 @@ void EgoEntity::setTargetSpeed(double value, bool)
     } break;
 
     case VehicleModelType::DELAY_STEER: {
-    Eigen::VectorXd v(5);
+      Eigen::VectorXd v(5);
       {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
         v << 0, 0, 0, value, 0;
