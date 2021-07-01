@@ -15,12 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 
-#include <limits>
 #include <openscenario_interpreter/iterator/circular_iterator.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include "openscenario_interpreter/procedure.hpp"
 
 namespace openscenario_interpreter
 {

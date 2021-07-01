@@ -28,8 +28,7 @@ class CircularIterator
   using ForwardIterator = typename Container::iterator;
   using ForwardConstIterator = typename Container::const_iterator;
 
-  ForwardConstIterator begin, end;
-  ForwardIterator current;
+  ForwardIterator begin, end, current;
 
 public:
   using iterator_category = std::forward_iterator_tag;
