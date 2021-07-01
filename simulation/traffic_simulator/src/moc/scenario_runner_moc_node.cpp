@@ -110,6 +110,7 @@ public:
   }
 
 private:
+
   void spaenObstacle()
   {
     openscenario_msgs::msg::MiscObjectParameters misc_object_param;
@@ -127,6 +128,9 @@ private:
   {
     if (api_.getCurrentTime() >= 4 && api_.entityExists("tom")) {
       api_.despawn("tom");
+    }
+    if (api_.getCurrentTime() >= 4 && api_.entityExists("obstacle")) {
+      api_.despawn("obstacle");
     }
     /*
     if (api_.getLinearJerk("ego")) {
