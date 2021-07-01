@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Enable spawn MiscObjectEntity by using API class.
 
 ## Ver 0.2.0
 - Enhance `/simulation/context` topic infomation. (adding TriggeringEntitiesRule, TriggeringEntities, CollisionCondition, TimeHeadwayCondition, AccelerationCondition, StandStillCondition, SpeedCondition, ReachPositionCondition, DistanceCondition, RelativeDistanceCondition, ParameterCondition, StoryboardElementStateCondition)
