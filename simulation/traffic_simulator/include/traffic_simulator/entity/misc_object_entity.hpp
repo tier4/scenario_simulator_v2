@@ -30,6 +30,44 @@ public:
     const openscenario_msgs::msg::MiscObjectParameters & params);
   MiscObjectEntity(
     const std::string & name, const openscenario_msgs::msg::MiscObjectParameters & params);
+  void onUpdate(double, double) override;
+  auto getBoundingBox() const -> const openscenario_msgs::msg::BoundingBox override;
+  auto getCurrentAction() const -> const std::string override;
+  auto getEntityTypename() const -> const std::string & override
+  {
+    static const std::string result = "VehicleEntity";
+    return result;
+  }
+
+  boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
+
+  auto getRouteLanelets(const double) -> std::vector<std::int64_t> override
+  {
+    THROW_SEMANTIC_ERROR("getRouteLanelets function cannot not use in MiscObjectEntity");
+  }
+
+  auto getWaypoints() -> const openscenario_msgs::msg::WaypointsArray override
+  {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
+
+  void setTargetSpeed(double, bool) override
+  {
+    THROW_SEMANTIC_ERROR("setTargetSpeed function cannot not use in MiscObjectEntity");
+  }
+
+  void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> &) override
+  {
+    THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
+  }
+
+  void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose &) override
+  {
+    THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
+  }
+
+private:
+  const openscenario_msgs::msg::MiscObjectParameters params_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

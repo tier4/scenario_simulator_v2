@@ -115,6 +115,10 @@ public:
     const bool is_ego, const std::string & name,
     const openscenario_msgs::msg::PedestrianParameters & params);
 
+  bool spawn(
+    const bool is_ego, const std::string & name,
+    const openscenario_msgs::msg::MiscObjectParameters & params);
+
   template <typename Parameters, typename... Ts>
   decltype(auto) spawn(
     const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)

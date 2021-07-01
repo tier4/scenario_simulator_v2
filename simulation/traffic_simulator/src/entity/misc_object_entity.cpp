@@ -21,13 +21,39 @@ namespace entity
 MiscObjectEntity::MiscObjectEntity(
   const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
   const openscenario_msgs::msg::MiscObjectParameters & params)
-: EntityBase(params.misc_object_category, name, initial_state)
+: EntityBase(params.misc_object_category, name, initial_state), params_(params)
 {
 }
+
 MiscObjectEntity::MiscObjectEntity(
   const std::string & name, const openscenario_msgs::msg::MiscObjectParameters & params)
-: EntityBase(params.misc_object_category, name)
+: EntityBase(params.misc_object_category, name), params_(params)
 {
+}
+
+void MiscObjectEntity::onUpdate(double, double)
+{
+  if (status_) {
+    status_->action_status.accel = geometry_msgs::msg::Accel();
+    status_->action_status.twist = geometry_msgs::msg::Twist();
+    status_->action_status.current_action = "static";
+    status_before_update_ = status_;
+  } else {
+    status_before_update_ = status_;
+  }
+}
+
+auto MiscObjectEntity::getBoundingBox() const -> const openscenario_msgs::msg::BoundingBox
+{
+  return params_.bounding_box;
+}
+
+auto MiscObjectEntity::getCurrentAction() const -> const std::string
+{
+  if (status_) {
+    return status_->action_status.current_action;
+  }
+  return "";
 }
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -42,6 +42,13 @@ public:
     pugi::xml_document catalog_xml_doc;
     catalog_xml_doc.load_string(catalog_xml.c_str());
     auto vehicle_params = traffic_simulator::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
+    openscenario_msgs::msg::MiscObjectParameters misc_object_param;
+    misc_object_param.bounding_box.dimensions.x = 1.0;
+    misc_object_param.bounding_box.dimensions.y = 1.0;
+    misc_object_param.bounding_box.dimensions.z = 1.0;
+    misc_object_param.misc_object_category = "obstacle";
+    misc_object_param.name = "obstacle";
+    api_.spawn(false, "obstacle", misc_object_param);
     vehicle_params.name = "ego";
     api_.spawn(false, "ego", vehicle_params);
     api_.setEntityStatus(
