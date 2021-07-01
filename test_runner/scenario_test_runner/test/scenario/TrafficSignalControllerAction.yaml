@@ -22,8 +22,6 @@ OpenSCENARIO:
     TrafficSignals:
       TrafficSignalController:
         - name: controller-1
-          delay: 0
-          reference: ''
           Phase:
             - name: phase-1
               duration: 10

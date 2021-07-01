@@ -128,15 +128,18 @@ public:
     current_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min())
   {
     if (delay < 0) {
-      THROW_SYNTAX_ERROR("delay must not be a negative number");
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController (", name, "): delay must not be a negative number");
     }
 
-    if (delay != 0 && reference.empty()) {
-      THROW_SYNTAX_ERROR("If delay is set, reference is required");
+    if (!std::isnan(delay) && reference.empty()) {
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController (", name, "): If delay is set, reference is required");
     }
 
     if (!reference.empty() && std::isnan(delay)) {
-      THROW_SYNTAX_ERROR("If reference is set, delay is required");
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController (", name, "): If reference is set, delay is required");
     }
   }
 
