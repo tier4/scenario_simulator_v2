@@ -83,7 +83,7 @@ public:
     api_.setEntityStatus(
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
       traffic_simulator::helper::constructActionStatus(10));
-    spaenObstacle();
+    spawnObstacle();
     /*
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
     api_.addMetric<metrics::MomentaryStopMetric>(
@@ -110,8 +110,7 @@ public:
   }
 
 private:
-
-  void spaenObstacle()
+  void spawnObstacle()
   {
     openscenario_msgs::msg::MiscObjectParameters misc_object_param;
     misc_object_param.bounding_box.dimensions.x = 1.0;
@@ -130,6 +129,11 @@ private:
       api_.despawn("tom");
     }
     if (api_.getCurrentTime() >= 4 && api_.entityExists("obstacle")) {
+      api_.setEntityStatus(
+        "obstacle", traffic_simulator::helper::constructLaneletPose(120545, 0),
+        traffic_simulator::helper::constructActionStatus(10));
+    }
+    if (api_.getCurrentTime() >= 6 && api_.entityExists("obstacle")) {
       api_.despawn("obstacle");
     }
     /*
