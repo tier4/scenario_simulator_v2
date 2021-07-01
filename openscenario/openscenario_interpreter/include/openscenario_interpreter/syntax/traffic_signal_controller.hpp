@@ -69,6 +69,7 @@ struct TrafficSignalController
    * ------------------------------------------------------------------------ */
   const String reference;
 
+private:
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  Phases of a TrafficSignalController.
@@ -76,10 +77,39 @@ struct TrafficSignalController
    * ------------------------------------------------------------------------ */
   std::list<Phase> phases;
 
-  CircularIterator<decltype(phases)::iterator> current_phase;
+  CircularIterator<std::list<Phase>> current_phase;
 
+  boost::optional<decltype(getCurrentTime())> change_to_begin_time;
   decltype(getCurrentTime()) current_phase_started_at;
 
+  std::vector<std::shared_ptr<TrafficSignalController>> observers;
+
+  auto changePhaseTo(const std::list<Phase>::iterator & next)
+  {
+    auto current_time = getCurrentTime();
+
+    if (next == phases.begin()) {
+      for (auto & observer : observers) {
+        observer->notify_begin();
+      }
+    }
+
+    current_phase_started_at = current_time;
+    current_phase = next;
+
+    if (current_phase != phases.end()) {
+      return (*current_phase).evaluate();
+    } else {
+      return unspecified;
+    }
+  }
+
+  void notify_begin() { change_to_begin_time = getCurrentTime() + delay; }
+
+  friend struct TrafficSignalControllerAction;
+  friend struct TrafficSignals;
+
+public:
   explicit TrafficSignalController() = delete;
 
   explicit TrafficSignalController(TrafficSignalController &&) = delete;
@@ -89,31 +119,85 @@ struct TrafficSignalController
   template <typename Node, typename Scope>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
-    delay(readAttribute<Double>("delay", node, outer_scope, Double())),
+    delay(
+      readAttribute<Double>("delay", node, outer_scope, std::numeric_limits<double>::quiet_NaN())),
     reference(readAttribute<String>("reference", node, outer_scope, String())),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
     current_phase(std::begin(phases), std::end(phases), std::end(phases)),
+    change_to_begin_time(boost::none),
     current_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min())
   {
+    if (delay < 0) {
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController (", name, "): delay must not be a negative number");
+    }
+
+    if (!std::isnan(delay) && reference.empty()) {
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController (", name, "): If delay is set, reference is required");
+    }
+
+    if (!reference.empty() && std::isnan(delay)) {
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController (", name, "): If reference is set, delay is required");
+    }
   }
 
-  auto theDurationExceeded() const
+  auto evaluate()
   {
-    if (not phases.empty()) {
+    if (shouldChangePhaseToBegin()) {
+      return changePhaseTo(phases.begin());
+    } else if (theDurationExceeded()) {
+      return changePhaseTo(std::next(current_phase));
+    } else {
+      return unspecified;
+    }
+  }
+
+  auto cycleTime() const
+  {
+    Double sum = 0;
+    for (auto & each : phases) {
+      sum += each.duration;
+    }
+    return sum;
+  }
+
+private:
+  auto theDurationExceeded() const -> bool
+  {
+    if (current_phase != phases.end()) {
       return (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
     } else {
       return false;
     }
   }
 
-  auto evaluate()
+  auto shouldChangePhaseToBegin() -> bool
   {
-    if (theDurationExceeded()) {
-      current_phase_started_at = getCurrentTime();
-      return (*++current_phase).evaluate();
+    if (reference.empty()) {
+      return current_phase == phases.end();  // if current_phase haven't been initialized
     } else {
-      return unspecified;
+      if (change_to_begin_time.has_value() && (change_to_begin_time.value() < getCurrentTime())) {
+        change_to_begin_time = boost::none;
+        return true;
+      } else {
+        return false;
+      }
     }
+  }
+
+  void changePhaseByName(const std::string & phase_name)
+  {
+    auto it = std::find_if(phases.begin(), phases.end(), [&phase_name](const Phase & phase) {
+      return phase.name == phase_name;
+    });
+
+    if (it == phases.end()) {
+      THROW_SYNTAX_ERROR(phase_name, "is not declared in this TrafficSignalContoller, ", name);
+    }
+
+    changePhaseTo(it);
   }
 };
 }  // namespace syntax

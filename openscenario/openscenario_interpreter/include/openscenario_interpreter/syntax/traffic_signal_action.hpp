@@ -45,6 +45,16 @@ struct TrafficSignalAction : public ComplexType
   // clang-format on
   {
   }
+
+  bool endsImmediately() const
+  {
+    if (is<TrafficSignalControllerAction>()) {
+      return as<TrafficSignalControllerAction>().endsImmediately();
+    } else if (is<TrafficSignalStateAction>()) {
+      return as<TrafficSignalStateAction>().endsImmediately();
+    }
+    throw UNSUPPORTED_ELEMENT_SPECIFIED(type().name());
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

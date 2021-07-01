@@ -40,7 +40,7 @@ struct InfrastructureAction : public ComplexType
   {
   }
 
-  static bool endsImmediately() { return true; }
+  bool endsImmediately() const { return as<TrafficSignalAction>().endsImmediately(); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

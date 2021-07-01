@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ARROW_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ARROW_HPP_
 
+#include <boost/optional.hpp>
 #include <iostream>
 #include <traffic_simulator/traffic_lights/traffic_light_state.hpp>
 
@@ -31,7 +32,7 @@ struct Arrow
     straight,
   } value;
 
-  explicit constexpr Arrow(value_type value = noArrow) : value(value) {}
+  constexpr Arrow(value_type value = noArrow) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -56,7 +57,12 @@ struct Arrow
   }
 };
 
+static_assert(std::is_trivially_copy_constructible<Arrow>::value, "");
+static_assert(std::is_trivially_copy_assignable<Arrow>::value, "");
+static_assert(std::is_standard_layout<Arrow>::value, "");
+
 std::istream & operator>>(std::istream &, Arrow &);
+std::istream & operator>>(std::istream &, boost::optional<Arrow> &);
 
 std::ostream & operator<<(std::ostream &, const Arrow &);
 }  // namespace syntax

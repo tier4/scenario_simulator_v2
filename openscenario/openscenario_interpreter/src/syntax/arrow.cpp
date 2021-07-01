@@ -26,17 +26,36 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
 
   is >> value;
 
-  static const std::unordered_map<std::string, Arrow::value_type> conversions{
-    std::make_pair("noArrow", Arrow::noArrow),
-    std::make_pair("left", Arrow::left),
-    std::make_pair("right", Arrow::right),
-    std::make_pair("straight", Arrow::straight),
-  };
-
-  try {
-    datum.value = conversions.at(value);
-  } catch (const std::out_of_range &) {
+  if (value == "noArrow") {
+    datum = Arrow::noArrow;
+  } else if (value == "left") {
+    datum = Arrow::left;
+  } else if (value == "right") {
+    datum = Arrow::right;
+  } else if (value == "straight") {
+    datum = Arrow::straight;
+  } else {
     throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Arrow, value);
+  }
+
+  return is;
+}
+
+std::istream & operator>>(std::istream & is, boost::optional<Arrow> & datum)
+{
+  std::string value;
+  is >> value;
+
+  if (value == "noArrow") {
+    datum = Arrow::noArrow;
+  } else if (value == "left") {
+    datum = Arrow::left;
+  } else if (value == "right") {
+    datum = Arrow::right;
+  } else if (value == "straight") {
+    datum = Arrow::straight;
+  } else {
+    datum = boost::none;
   }
 
   return is;
