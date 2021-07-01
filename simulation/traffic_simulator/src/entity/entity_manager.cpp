@@ -525,7 +525,7 @@ bool EntityManager::setEntityStatus(
   status.name = name;  // XXX UGLY CODE
   if (isEgo(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR(
-      "You cannot set entity status to the ego vehicle after starting scenario.");
+      "You cannot set entity status to the ego vehicle name:", name, " after starting scenario.");
   }
   return entities_.at(name)->setStatus(status);
 }
