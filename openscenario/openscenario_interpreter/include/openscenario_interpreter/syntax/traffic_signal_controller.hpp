@@ -84,7 +84,7 @@ private:
 
   std::vector<std::shared_ptr<TrafficSignalController>> observers;
 
-  auto changePhase(const std::list<Phase>::iterator & next)
+  auto changePhaseTo(const std::list<Phase>::iterator & next)
   {
     auto current_time = getCurrentTime();
 
@@ -142,16 +142,14 @@ public:
 
   auto evaluate()
   {
-    if (changeToBeginCondition()) {
-      return changePhase(phases.begin());
+    if (shouldChangePhaseToBegin()) {
+      return changePhaseTo(phases.begin());
     } else if (theDurationExceeded()) {
-      return changePhase(std::next(current_phase));
+      return changePhaseTo(std::next(current_phase));
     } else {
       return unspecified;
     }
   }
-
-  const std::list<Phase> & getPhases() const { return phases; }
 
   auto cycleTime() const
   {
@@ -172,7 +170,7 @@ private:
     }
   }
 
-  auto changeToBeginCondition() -> bool
+  auto shouldChangePhaseToBegin() -> bool
   {
     if (reference.empty()) {
       return current_phase == phases.end();  // if current_phase haven't been initialized
@@ -196,7 +194,7 @@ private:
       THROW_SYNTAX_ERROR(phase_name, "is not declared in this TrafficSignalContoller, ", name);
     }
 
-    changePhase(it);
+    changePhaseTo(it);
   }
 };
 }  // namespace syntax

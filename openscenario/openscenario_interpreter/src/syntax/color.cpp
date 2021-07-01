@@ -46,13 +46,13 @@ std::istream & operator>>(std::istream & is, boost::optional<Color> & datum)
   is >> value;
 
   if (value == "noColor") {
-    datum.emplace(Color::noColor);
+    datum = Color::noColor;
   } else if (value == "green") {
-    datum.emplace(Color::green);
+    datum = Color::green;
   } else if (value == "red") {
-    datum.emplace(Color::red);
+    datum = Color::red;
   } else if (value == "yellow") {
-    datum.emplace(Color::yellow);
+    datum = Color::yellow;
   } else {
     datum = boost::none;
   }

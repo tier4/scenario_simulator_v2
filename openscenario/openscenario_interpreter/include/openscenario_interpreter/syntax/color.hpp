@@ -32,15 +32,7 @@ struct Color
     yellow,
   } value;
 
-  explicit Color() = default;
-
-  explicit constexpr Color(value_type value) : value(value) {}
-
-  constexpr Color & operator=(value_type value)
-  {
-    this->value = value;
-    return *this;
-  }
+  constexpr Color(value_type value = noColor) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 
@@ -65,9 +57,9 @@ struct Color
   }
 };
 
+static_assert(std::is_trivially_copy_constructible<Color>::value, "");
+static_assert(std::is_trivially_copy_assignable<Color>::value, "");
 static_assert(std::is_standard_layout<Color>::value, "");
-
-static_assert(std::is_trivial<Color>::value, "");
 
 std::istream & operator>>(std::istream &, Color &);
 std::istream & operator>>(std::istream &, boost::optional<Color> &);
