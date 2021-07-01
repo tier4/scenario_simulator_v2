@@ -33,7 +33,6 @@ struct Arrow
   } value;
 
   explicit constexpr Arrow(value_type value = noArrow) : value(value) {}
-  Arrow & operator=(const Arrow &) = default;
 
   constexpr operator value_type() const noexcept { return value; }
 

@@ -34,8 +34,6 @@ struct Color
 
   explicit Color() = default;
 
-  Color & operator=(const Color &) = default;
-
   explicit constexpr Color(value_type value) : value(value) {}
 
   constexpr Color & operator=(value_type value)
