@@ -59,6 +59,10 @@ MultiServer::MultiServer(
     simulation_api_schema::SpawnPedestrianEntityResponse &)>
     spawn_pedestrian_entity_func,
   std::function<void(
+    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
+    simulation_api_schema::SpawnMiscObjectEntityResponse &)>
+    spawn_misc_object_entity_func,
+  std::function<void(
     const simulation_api_schema::DespawnEntityRequest &,
     simulation_api_schema::DespawnEntityResponse &)>
     despawn_entity_func,
@@ -86,6 +90,8 @@ MultiServer::MultiServer(
   spawn_vehicle_entity_func_(spawn_vehicle_entity_func),
   spawn_pedestrian_entity_sock_(context_, type_),
   spawn_pedestrian_entity_func_(spawn_pedestrian_entity_func),
+  spawn_misc_object_entity_sock_(context_, type_),
+  spawn_misc_object_entity_func_(spawn_misc_object_entity_func),
   despawn_entity_sock_(context_, type_),
   despawn_entity_func_(despawn_entity_func),
   update_entity_status_sock_(context_, type_),
@@ -105,6 +111,8 @@ MultiServer::MultiServer(
     protocol, hostname, simulation_interface::ports::spawn_vehicle_entity));
   spawn_pedestrian_entity_sock_.bind(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::spawn_pedestrian_entity));
+  spawn_misc_object_entity_sock_.bind(simulation_interface::getEndPoint(
+    protocol, hostname, simulation_interface::ports::spawn_misc_object_entity));
   despawn_entity_sock_.bind(simulation_interface::getEndPoint(
     protocol, hostname, simulation_interface::ports::despawn_entity));
   update_sensor_frame_sock_.bind(simulation_interface::getEndPoint(
@@ -118,6 +126,7 @@ MultiServer::MultiServer(
   poller_.add(update_sensor_frame_sock_);
   poller_.add(spawn_vehicle_entity_sock_);
   poller_.add(spawn_pedestrian_entity_sock_);
+  poller_.add(spawn_misc_object_entity_sock_);
   poller_.add(despawn_entity_sock_);
   poller_.add(update_entity_status_sock_);
   poller_.add(attach_lidar_sensor_sock_);
@@ -170,6 +179,15 @@ void MultiServer::poll()
       toProto<simulation_api_schema::SpawnPedestrianEntityRequest>(request), response);
     auto msg = toZMQ(response);
     spawn_pedestrian_entity_sock_.send(msg);
+  }
+  if (poller_.has_input(spawn_misc_object_entity_sock_)) {
+    zmqpp::message request;
+    spawn_misc_object_entity_sock_.receive(request);
+    simulation_api_schema::SpawnMiscObjectEntityResponse response;
+    spawn_misc_object_entity_func_(
+      toProto<simulation_api_schema::SpawnMiscObjectEntityRequest>(request), response);
+    auto msg = toZMQ(response);
+    spawn_misc_object_entity_sock_.send(msg);
   }
   if (poller_.has_input(despawn_entity_sock_)) {
     zmqpp::message request;

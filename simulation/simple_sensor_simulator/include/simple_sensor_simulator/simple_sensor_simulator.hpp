@@ -102,6 +102,9 @@ private:
   void spawnPedestrianEntity(
     const simulation_api_schema::SpawnPedestrianEntityRequest & req,
     simulation_api_schema::SpawnPedestrianEntityResponse & res);
+  void spawnMiscObjectEntity(
+    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
+    simulation_api_schema::SpawnMiscObjectEntityResponse &);
   void despawnEntity(
     const simulation_api_schema::DespawnEntityRequest & req,
     simulation_api_schema::DespawnEntityResponse & res);
@@ -117,6 +120,7 @@ private:
   std::vector<openscenario_msgs::VehicleParameters> ego_vehicles_;
   std::vector<openscenario_msgs::VehicleParameters> vehicles_;
   std::vector<openscenario_msgs::PedestrianParameters> pedestrians_;
+  std::vector<openscenario_msgs::MiscObjectParameters> misc_objects_;
   double realtime_factor_;
   double step_time_;
   double current_time_;

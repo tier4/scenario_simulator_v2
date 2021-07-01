@@ -83,6 +83,7 @@ public:
     api_.setEntityStatus(
       "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0),
       traffic_simulator::helper::constructActionStatus(10));
+    spawnObstacle();
     /*
     api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
     api_.addMetric<metrics::MomentaryStopMetric>(
@@ -109,10 +110,31 @@ public:
   }
 
 private:
+  void spawnObstacle()
+  {
+    openscenario_msgs::msg::MiscObjectParameters misc_object_param;
+    misc_object_param.bounding_box.dimensions.x = 1.0;
+    misc_object_param.bounding_box.dimensions.y = 1.0;
+    misc_object_param.bounding_box.dimensions.z = 1.0;
+    misc_object_param.misc_object_category = "obstacle";
+    misc_object_param.name = "obstacle";
+    api_.spawn(false, "obstacle", misc_object_param);
+    api_.setEntityStatus(
+      "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
+      traffic_simulator::helper::constructActionStatus());
+  }
   void update()
   {
     if (api_.getCurrentTime() >= 4 && api_.entityExists("tom")) {
       api_.despawn("tom");
+    }
+    if (api_.getCurrentTime() >= 4 && api_.entityExists("obstacle")) {
+      api_.setEntityStatus(
+        "obstacle", traffic_simulator::helper::constructLaneletPose(120545, 0),
+        traffic_simulator::helper::constructActionStatus(10));
+    }
+    if (api_.getCurrentTime() >= 6 && api_.entityExists("obstacle")) {
+      api_.despawn("obstacle");
     }
     /*
     if (api_.getLinearJerk("ego")) {
@@ -171,9 +193,7 @@ private:
            <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
            <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>
          </Axles>
-         <Properties>
-           <Property name='type' value='ego_vehicle'/>
-         </Properties>
+         <Properties/>
        </Vehicle>)";
 
   std::string pedestrian_xml =
