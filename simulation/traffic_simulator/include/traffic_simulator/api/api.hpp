@@ -82,6 +82,9 @@ public:
     spawn_pedestrian_entity_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::spawn_pedestrian_entity),
+    spawn_misc_object_entity_client_(
+      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::ports::spawn_misc_object_entity),
     despawn_entity_client_(
       simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
       simulation_interface::ports::despawn_entity),
@@ -250,6 +253,10 @@ private:
     simulation_api_schema::SpawnPedestrianEntityRequest,
     simulation_api_schema::SpawnPedestrianEntityResponse>
     spawn_pedestrian_entity_client_;
+  zeromq::Client<
+    simulation_api_schema::SpawnMiscObjectEntityRequest,
+    simulation_api_schema::SpawnMiscObjectEntityResponse>
+    spawn_misc_object_entity_client_;
   zeromq::Client<
     simulation_api_schema::DespawnEntityRequest, simulation_api_schema::DespawnEntityResponse>
     despawn_entity_client_;

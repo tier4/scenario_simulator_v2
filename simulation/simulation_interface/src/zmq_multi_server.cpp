@@ -180,6 +180,15 @@ void MultiServer::poll()
     auto msg = toZMQ(response);
     spawn_pedestrian_entity_sock_.send(msg);
   }
+  if (poller_.has_input(spawn_misc_object_entity_sock_)) {
+    zmqpp::message request;
+    spawn_misc_object_entity_sock_.receive(request);
+    simulation_api_schema::SpawnMiscObjectEntityResponse response;
+    spawn_misc_object_entity_func_(
+      toProto<simulation_api_schema::SpawnMiscObjectEntityRequest>(request), response);
+    auto msg = toZMQ(response);
+    spawn_misc_object_entity_sock_.send(msg);
+  }
   if (poller_.has_input(despawn_entity_sock_)) {
     zmqpp::message request;
     despawn_entity_sock_.receive(request);

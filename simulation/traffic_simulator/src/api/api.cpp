@@ -119,13 +119,11 @@ bool API::spawn(
   if (standalone_mode) {
     return true;
   }
-  /*
-  simulation_api_schema::SpawnPedestrianEntityRequest req;
-  simulation_api_schema::SpawnPedestrianEntityResponse res;
+  simulation_api_schema::SpawnMiscObjectEntityRequest req;
+  simulation_api_schema::SpawnMiscObjectEntityResponse res;
   simulation_interface::toProto(params, *req.mutable_parameters());
-  spawn_pedestrian_entity_client_.call(req, res);
+  spawn_misc_object_entity_client_.call(req, res);
   return res.result().success();
-  */
   return true;
 }
 
