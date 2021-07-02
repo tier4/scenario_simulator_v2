@@ -21,6 +21,7 @@
 
 #include <concealer/execute.hpp>
 #include <iostream>
+#include <memory>
 #include <type_traits>
 
 namespace concealer
@@ -54,24 +55,18 @@ int execute(const std::vector<std::string> & f_xs)
 
 void sudokill(pid_t process_id)
 {
-  char * process_str;
-  int status;
-  pid_t pid;
-
-  if (asprintf(&process_str, "%d", process_id) < 0)
-    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-
-  pid = fork();
+  auto process_str = std::to_string(process_id);
+  pid_t pid = fork();
 
   switch (pid) {
     case -1:
       std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+      break;
     case 0:
-      execlp("sudo", "sudo", "kill", "-2", process_str, (char *)NULL);
+      execlp("sudo", "sudo", "kill", "-2", process_str.c_str(), (char *)NULL);
       std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
+      break;
   }
-
-  free(process_str);
 }
 
 }  // namespace concealer
