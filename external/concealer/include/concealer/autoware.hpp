@@ -116,7 +116,7 @@ public:
         }
         RCLCPP_INFO_STREAM(
           get_logger(),
-          "\x1b[32mShutting down Autoware: (1/2) Stoped publlishing/subscribing.\x1b[0m");
+          "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
     updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
