@@ -23,3 +23,7 @@ jobs:
           config: ".github/workflows/.cspell.json"
           incremental_files_only: true
           strict: false
+          files: |
+            **
+            .*/**
+            !*/CHANGELOG.rst

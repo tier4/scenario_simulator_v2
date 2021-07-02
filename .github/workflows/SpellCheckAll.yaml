@@ -24,3 +24,4 @@ jobs:
           files: |
             **
             .*/**
+            !*/CHANGELOG.rst
