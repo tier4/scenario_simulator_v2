@@ -27,3 +27,4 @@ jobs:
             **
             .*/**
             !*/CHANGELOG.rst
+            !scenario_simulator_v2/CHANGELOG.rst
