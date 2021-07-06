@@ -93,7 +93,6 @@ Autoware::~Autoware()
       std::exit(EXIT_FAILURE);
     }
   }
-
 }
 
 void Autoware::update()
