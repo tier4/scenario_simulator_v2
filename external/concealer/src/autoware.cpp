@@ -43,7 +43,13 @@ Autoware::~Autoware()
 
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
   {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    ::kill(process_id, SIGINT);
+#endif
+
+#ifdef AUTOWARE_AUTO
     sudokill(process_id);
+#endif
   }
 
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Terminating Autoware.");
@@ -66,6 +72,7 @@ Autoware::~Autoware()
       timeout.tv_sec = 5;
       timeout.tv_nsec = 0;
     }
+
     while (sigtimedwait(&mask, NULL, &timeout) < 0) {
       switch (errno) {
         case EINTR:  // Interrupted by a signal other than SIGCHLD.
@@ -88,7 +95,15 @@ Autoware::~Autoware()
   {
     int status = 0;
 
-    if (waitpid(process_id, &status, WNOHANG) < 0) {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    int options = 0;
+#endif
+
+#ifdef AUTOWARE_AUTO
+    int options = WNOHANG;
+#endif
+
+    if (waitpid(process_id, &status, options) < 0) {
       AUTOWARE_SYSTEM_ERROR("waitpid");
       std::exit(EXIT_FAILURE);
     }
