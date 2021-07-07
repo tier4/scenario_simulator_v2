@@ -54,6 +54,10 @@ public:
       simulation_api_schema::SpawnPedestrianEntityResponse &)>
       spawn_pedestrian_entity_func,
     std::function<void(
+      const simulation_api_schema::SpawnMiscObjectEntityRequest &,
+      simulation_api_schema::SpawnMiscObjectEntityResponse &)>
+      spawn_misc_object_entity_func,
+    std::function<void(
       const simulation_api_schema::DespawnEntityRequest &,
       simulation_api_schema::DespawnEntityResponse &)>
       despawn_entity_func,
@@ -101,6 +105,11 @@ private:
     const simulation_api_schema::SpawnPedestrianEntityRequest &,
     simulation_api_schema::SpawnPedestrianEntityResponse &)>
     spawn_pedestrian_entity_func_;
+  zmqpp::socket spawn_misc_object_entity_sock_;
+  std::function<void(
+    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
+    simulation_api_schema::SpawnMiscObjectEntityResponse &)>
+    spawn_misc_object_entity_func_;
   zmqpp::socket despawn_entity_sock_;
   std::function<void(
     const simulation_api_schema::DespawnEntityRequest &,

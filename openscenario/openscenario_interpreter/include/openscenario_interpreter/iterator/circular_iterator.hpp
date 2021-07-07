@@ -22,10 +22,13 @@ namespace openscenario_interpreter
 {
 inline namespace iterator
 {
-template <typename ForwardIterator>
+template <typename Container>
 class CircularIterator
 {
-  ForwardIterator begin, current, end;
+  using ForwardIterator = typename Container::iterator;
+  using ForwardConstIterator = typename Container::const_iterator;
+
+  ForwardIterator begin, end, current;
 
 public:
   using iterator_category = std::forward_iterator_tag;
@@ -41,15 +44,26 @@ public:
   using difference_type = typename std::iterator_traits<ForwardIterator>::difference_type;
 
   explicit CircularIterator(ForwardIterator begin, ForwardIterator end, ForwardIterator current)
-  : begin(begin), current(current), end(end)
+  : begin(begin), end(end), current(current)
   {
   }
+
+  CircularIterator & operator=(const ForwardIterator & iterator)
+  {
+    current = iterator;
+    return *this;
+  }
+
+  operator ForwardConstIterator() const { return current; }
+  operator ForwardIterator() { return current; }
 
   reference operator*() const { return *current; }
 
   auto & operator++()
   {
-    if (++current == end) {
+    if (current == end) {
+      current = begin;
+    } else if (++current == end) {
       current = begin;
     }
 

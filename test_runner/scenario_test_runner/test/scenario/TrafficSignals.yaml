@@ -38,12 +38,26 @@ OpenSCENARIO:
               duration: 0
               TrafficSignalState: []
             - name: phase-3
-              duration: 60
+              duration: 10
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'red' }
                 - { trafficSignalId: '34802', state: 'left' }
-        - name: empty-controller (for debugging corner case)
-          Phase: []
+        - name: controller-2
+          delay: 1
+          reference: 'controller-1'
+          Phase:
+            - name: phase-1
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34836', state: 'green' }
+            - name: phase-2
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34836', state: 'yellow' }
+            - name: phase-3
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34836', state: 'red' }
   Entities:
     ScenarioObject:
       - name: ego

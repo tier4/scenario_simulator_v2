@@ -61,6 +61,8 @@ void DetectionSensor::update(
             object.semantic.type = object.semantic.PEDESTRIAN;
             object.semantic.confidence = 1;
             break;
+          case openscenario_msgs::EntityType::MISC_OBJECT:
+            break;
           default:
             throw SimulationRuntimeError("unsupported entity type!");
             break;

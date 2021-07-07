@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Enable spawn MiscObjectEntity by using API class.
 - Integrate with AutowareAuto (Autoware type is chosen at build time using `AUTOWARE_ARCHITECTURE_PROPOSAL` or `AUTOWARE_AUTO` flag)
 
 ## Ver 0.2.0

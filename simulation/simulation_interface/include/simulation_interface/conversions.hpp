@@ -43,6 +43,7 @@
 #include <openscenario_msgs/msg/entity_status.hpp>
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
+#include <openscenario_msgs/msg/misc_object_parameters.hpp>
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
 #include <openscenario_msgs/msg/performance.hpp>
 #include <openscenario_msgs/msg/property.hpp>
@@ -98,6 +99,12 @@ void toProto(
 void toMsg(
   const openscenario_msgs::PedestrianParameters & proto,
   openscenario_msgs::msg::PedestrianParameters & p);
+void toProto(
+  const openscenario_msgs::msg::MiscObjectParameters & p,
+  openscenario_msgs::MiscObjectParameters & proto);
+void toMsg(
+  const openscenario_msgs::MiscObjectParameters & proto,
+  openscenario_msgs::msg::MiscObjectParameters & p);
 void toProto(
   const openscenario_msgs::msg::ActionStatus & s, openscenario_msgs::ActionStatus & proto);
 void toMsg(openscenario_msgs::ActionStatus & proto, const openscenario_msgs::msg::ActionStatus & s);

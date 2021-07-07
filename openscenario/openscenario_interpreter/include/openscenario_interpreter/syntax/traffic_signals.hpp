@@ -15,9 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNALS_HPP_
 
+#include <cassert>
 #include <openscenario_interpreter/error.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
-#include <vector>
+#include <openscenario_interpreter/utility/circular_check.hpp>
 
 namespace openscenario_interpreter
 {
@@ -34,28 +36,58 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignals
 {
-  std::list<TrafficSignalController> traffic_signal_controllers;
+private:
+  std::list<std::shared_ptr<TrafficSignalController>> traffic_signal_controllers;
 
-  TrafficSignals() = default;
+  using NameToController =
+    std::unordered_map<std::string, std::shared_ptr<TrafficSignalController>>;
 
-  template <typename Node, typename Scope>
-  explicit TrafficSignals(const Node & node, Scope & outer_scope)
-  : traffic_signal_controllers(
-      readElements<TrafficSignalController, 0>("TrafficSignalController", node, outer_scope))
+  void resolve_reference(const NameToController & controllers)
   {
     for (auto & each : traffic_signal_controllers) {
-      const auto result = outer_scope.traffic_signal_controller_refs.emplace(each.name, each);
-      if (not result.second) {
-        throw SyntaxError(
-          "Multiple TrafficSignalControllers have been declared with the same name: ", each.name);
+      if (!each->reference.empty()) {
+        try {
+          auto reference = controllers.at(each->reference);
+
+          if (each->cycleTime() != reference->cycleTime()) {
+            THROW_SEMANTIC_ERROR(
+              "The cycle time of ", each->name, "(", each->cycleTime(), " sec) and ",
+              each->reference, "(", reference->cycleTime(), " sec) is different");
+          }
+
+          reference->observers.push_back(each);
+
+        } catch (std::out_of_range &) {
+          THROW_SYNTAX_ERROR(each->reference, "is not declared in the TrafficSignals.");
+        }
       }
     }
+  }
+
+public:
+  TrafficSignals() = default;
+
+  template <typename Node>
+  explicit TrafficSignals(const Node & node, Scope & outer_scope)
+  : traffic_signal_controllers(
+      readSharedElements<TrafficSignalController, 0>("TrafficSignalController", node, outer_scope))
+  {
+    for (auto && each : traffic_signal_controllers) {
+      assert(each);
+      auto result = outer_scope.traffic_signal_controllers.emplace(each->name, each);
+      if (not result.second) {
+        throw SyntaxError(
+          "Multiple TrafficSignalControllers have been declared with the same name: ", each->name);
+      }
+    }
+
+    resolve_reference(outer_scope.traffic_signal_controllers);
   }
 
   auto evaluate()
   {
     for (auto && controller : traffic_signal_controllers) {
-      controller.evaluate();
+      controller->evaluate();
     }
 
     return unspecified;

@@ -286,6 +286,18 @@ TEST(Conversion, ConvertVehicleParametrs)
   // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
 }
 
+TEST(Conversion, ConvertMiscObjectParametrs)
+{
+  openscenario_msgs::MiscObjectParameters proto;
+  openscenario_msgs::msg::MiscObjectParameters p;
+  p.misc_object_category = "obstacle";
+  EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
+  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+  p.misc_object_category = "";
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
+  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+}
+
 TEST(Conversion, ConvertActionStatus)
 {
   openscenario_msgs::ActionStatus proto;
@@ -435,6 +447,18 @@ TEST(Conversion, VehicleCommand)
     simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
   EXPECT_HEADER_EQ(msg.header, proto.header());
   EXPECT_EQ(msg.emergency, proto.emergency());
+}
+
+TEST(Conversion, EntityType)
+{
+  openscenario_msgs::EntityType proto;
+  openscenario_msgs::msg::EntityType msg;
+  msg.type = msg.VEHICLE;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(proto, openscenario_msgs::EntityType::VEHICLE);
+  msg.type = msg.EGO;
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::VEHICLE);
 }
 
 int main(int argc, char ** argv)
