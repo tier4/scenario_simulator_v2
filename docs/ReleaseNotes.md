@@ -2,6 +2,7 @@
 
 ## Difference between the latest release and master
 - Enable spawn MiscObjectEntity by using API class.
+- Update WorldPosition to be convertible with 'openscenario_msgs::msg::LaneletPose'.
 
 ## Ver 0.2.0
 - Enhance `/simulation/context` topic infomation. (adding TriggeringEntitiesRule, TriggeringEntities, CollisionCondition, TimeHeadwayCondition, AccelerationCondition, StandStillCondition, SpeedCondition, ReachPositionCondition, DistanceCondition, RelativeDistanceCondition, ParameterCondition, StoryboardElementStateCondition)

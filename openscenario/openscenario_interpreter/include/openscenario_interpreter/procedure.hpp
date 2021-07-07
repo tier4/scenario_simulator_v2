@@ -73,6 +73,9 @@ try {
 //   }
 // }
 
+auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
+  decltype(connection.toLaneletPose(std::declval<decltype(pose)>()).get())>::type;
+
 #define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                     \
   template <typename... Ts>                                                       \
   auto IDENTIFIER(Ts &&... xs)                                                    \
