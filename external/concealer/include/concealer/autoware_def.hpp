@@ -1,4 +1,4 @@
-// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__EXECUTE_HPP_
-#define CONCEALER__EXECUTE_HPP_
+#ifndef CONCEALER__AUTOWARE_DEF_HPP_
+#define CONCEALER__AUTOWARE_DEF_HPP_
 
-#include <string>
-#include <vector>
+// uncomment this line to enable AutowareAuto instead of ArchitectureProposal
+// #define AUTOWARE_AUTO
 
-namespace concealer
-{
-int execute(const std::vector<std::string> &);
-void sudokill(pid_t process_id);
-}  // namespace concealer
+#ifndef AUTOWARE_AUTO
+#define AUTOWARE_ARCHITECTURE_PROPOSAL
+#endif  // AUTOWARE_AUTO
 
-#endif  // CONCEALER__EXECUTE_HPP_
+#endif  // CONCEALER__AUTOWARE_DEF_HPP_
