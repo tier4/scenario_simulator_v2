@@ -15,6 +15,7 @@
 #ifndef CONCEALER__MISCELLANEOUS_API_HPP_
 #define CONCEALER__MISCELLANEOUS_API_HPP_
 
+#include <concealer/autoware_def.hpp>
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 
@@ -27,7 +28,11 @@
 #endif
 
 #ifdef AUTOWARE_AUTO
-// TODO (someone else)
+#include <autoware_auto_msgs/msg/trajectory.hpp>
+#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_msgs/msg/vehicle_state_report.hpp>
 #endif
 
 namespace concealer
@@ -35,6 +40,7 @@ namespace concealer
 template <typename Node>
 class MiscellaneousAPI
 {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   /* ---- Checkpoint -----------------------------------------------------------
    *
    *  Set goal pose of Autoware.
@@ -278,8 +284,84 @@ class MiscellaneousAPI
 
   DEFINE_SUBSCRIPTION(VehicleCommand);
 
+#endif  // AUTOWARE_ARCHITECTURE_PROPOSAL
+
+#ifdef AUTOWARE_AUTO
+  using GoalPose = geometry_msgs::msg::PoseStamped;
+  DEFINE_PUBLISHER(GoalPose);
+
+  using VehicleControlCommand = autoware_auto_msgs::msg::VehicleControlCommand;
+  DEFINE_SUBSCRIPTION(VehicleControlCommand);
+
+  using VehicleStateCommand = autoware_auto_msgs::msg::VehicleStateCommand;
+  DEFINE_SUBSCRIPTION(VehicleStateCommand);
+
+  using VehicleStateReport = autoware_auto_msgs::msg::VehicleStateReport;
+  DEFINE_PUBLISHER(VehicleStateReport);
+  decltype(auto) setVehicleStateReport()
+  {
+    VehicleStateReport report;
+    {
+      auto current_state_command = getVehicleStateCommand();
+      report.stamp = static_cast<Node &>(*this).get_clock()->now();
+      report.blinker = current_state_command.blinker;
+      report.headlight = current_state_command.headlight;
+      report.wiper = current_state_command.wiper;
+      report.gear = current_state_command.gear;
+      report.mode = current_state_command.mode;
+      report.hand_brake = current_state_command.hand_brake;
+      report.horn = current_state_command.horn;
+    }
+
+    return setVehicleStateReport(report);
+  }
+
+  using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
+  DEFINE_PUBLISHER(VehicleKinematicState);
+  decltype(auto) setVehicleKinematicState(
+    const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
+  {
+    VehicleKinematicState kinematic_state;
+    {
+      kinematic_state.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+      kinematic_state.header.frame_id = "map";
+      autoware_auto_msgs::msg::TrajectoryPoint state;
+      state.x = pose.position.x;
+      state.y = pose.position.y;
+      state.heading.real = pose.orientation.w;  // from motion_common package of autoware.auto
+      state.heading.imag = pose.orientation.z;  // from motion_common package of autoware.auto
+      state.longitudinal_velocity_mps = twist.linear.x;
+      state.lateral_velocity_mps = twist.linear.y;
+      state.acceleration_mps2 = getVehicleControlCommand().long_accel_mps2;
+      state.heading_rate_rps = 0.0;  // TODO - what should be the value here?
+      state.front_wheel_angle_rad = getVehicleControlCommand().front_wheel_angle_rad;
+      kinematic_state.state = state;
+    }
+
+    return setVehicleKinematicState(kinematic_state);
+  }
+
+  using InitialPose = geometry_msgs::msg::PoseWithCovarianceStamped;
+  DEFINE_PUBLISHER(InitialPose);
+  decltype(auto) setInitialPose(const geometry_msgs::msg::Pose & pose)
+  {
+    InitialPose initial_pose;
+    {
+      initial_pose.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+      initial_pose.header.frame_id = "map";
+      initial_pose.pose.pose = pose;
+    }
+
+    return setInitialPose(initial_pose);
+  }
+
+  using Trajectory = autoware_auto_msgs::msg::Trajectory;
+  DEFINE_SUBSCRIPTION(Trajectory);
+#endif  // AUTOWARE_AUTO
+
 public:
   explicit MiscellaneousAPI()
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   : INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
     INIT_PUBLISHER(CurrentControlMode, "/vehicle/status/control_mode"),
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
@@ -293,6 +375,16 @@ public:
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {})
+#endif  // AUTOWARE_ARCHITECTURE_PROPOSAL
+#ifdef AUTOWARE_AUTO
+  : INIT_PUBLISHER(GoalPose, "/planning/goal_pose"),
+    INIT_PUBLISHER(InitialPose, "/localization/initialpose"),
+    INIT_PUBLISHER(VehicleKinematicState, "/vehicle/vehicle_kinematic_state"),
+    INIT_PUBLISHER(VehicleStateReport, "/vehicle/state_report"),
+    INIT_SUBSCRIPTION(VehicleControlCommand, "/vehicle/vehicle_command", []() {}),
+    INIT_SUBSCRIPTION(VehicleStateCommand, "/vehicle/state_command", []() {}),
+    INIT_SUBSCRIPTION(Trajectory, "/planning/trajectory", []() {})
+#endif  // AUTOWARE_AUTO
   {
   }
 };

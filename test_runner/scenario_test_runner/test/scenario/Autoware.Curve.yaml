@@ -109,8 +109,8 @@ OpenSCENARIO:
                                         Position:
                                           LanePosition:
                                             roadId: ''
-                                            laneId: '34507'
-                                            s: 50
+                                            laneId: '34630'
+                                            s: 20
                                             offset: 0
                                             Orientation: { type: relative, h: 0, p: 0, r: 0 }
                                         tolerance: 1

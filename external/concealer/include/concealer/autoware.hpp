@@ -15,9 +15,7 @@
 #ifndef CONCEALER__AUTOWARE_HPP_
 #define CONCEALER__AUTOWARE_HPP_
 
-// #define AUTOWARE_AUTO
-#include <exception>
-#define AUTOWARE_ARCHITECTURE_PROPOSAL
+#include <concealer/autoware_def.hpp>
 
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
@@ -31,6 +29,7 @@
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/utility/visibility.hpp>
+#include <exception>
 #include <future>
 #include <mutex>
 #include <thread>
@@ -52,12 +51,8 @@ namespace concealer
  *
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
-
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
                  public FundamentalAPI<Autoware>,
                  public MiscellaneousAPI<Autoware>,
-#endif
-
                  public ContinuousTransformBroadcaster<Autoware>,
                  public TransitionAssertion<Autoware>
 {
@@ -126,7 +121,10 @@ public:
       std::move(promise.get_future())),
     updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
   {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    // Lane change is not implemented in Autoware.Auto
     setLaneChangeApproval();
+#endif
   }
 
   virtual ~Autoware();
