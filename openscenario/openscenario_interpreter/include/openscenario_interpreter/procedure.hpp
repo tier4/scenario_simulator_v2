@@ -123,7 +123,6 @@ FORWARD_TO_SIMULATION_API(setTrafficLightArrowPhase);
 FORWARD_TO_SIMULATION_API(setTrafficLightColor);
 FORWARD_TO_SIMULATION_API(setTrafficLightColorPhase);
 FORWARD_TO_SIMULATION_API(spawn);
-FORWARD_TO_SIMULATION_API(toMapPose);
 FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
@@ -138,6 +137,7 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 
 RENAME(reachPosition, isReachedPosition);
 RENAME(setDriverModel, assignController);
+RENAME(toMapPose, toWorldPosition);
 
 #undef RENAME
 }  // namespace openscenario_interpreter
