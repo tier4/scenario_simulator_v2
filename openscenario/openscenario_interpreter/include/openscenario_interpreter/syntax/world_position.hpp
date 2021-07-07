@@ -79,8 +79,7 @@ struct WorldPosition
 
   explicit operator openscenario_msgs::msg::LaneletPose() const
   {
-    throw SemanticError(
-      "To convert the WorldPosition to LanePosition is currently not yet supported");
+    return toLanePosition(static_cast<geometry_msgs::msg::Pose>(*this));
   }
 };
 }  // namespace syntax

@@ -65,7 +65,7 @@ struct LanePosition
 
   explicit operator geometry_msgs::msg::Pose() const
   {
-    return toMapPose(static_cast<openscenario_msgs::msg::LaneletPose>(*this));
+    return toWorldPosition(static_cast<openscenario_msgs::msg::LaneletPose>(*this));
   }
 };
 }  // namespace syntax
