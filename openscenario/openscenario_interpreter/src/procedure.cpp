@@ -39,7 +39,7 @@ auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::deca
       "location where multiple lanes overlap, and there are at least two or "
       "more candidates for a LanePosition that can be approximated to that "
       "WorldPosition. This issue can be resolved by strictly specifying the "
-      "location using LanePosition instead of WorldPosition.");
+      "location using LanePosition instead of WorldPosition");
     // clang-format on
   }
 }
