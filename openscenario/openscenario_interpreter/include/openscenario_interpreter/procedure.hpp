@@ -73,6 +73,9 @@ try {
 //   }
 // }
 
+auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
+  decltype(connection.toLaneletPose(std::declval<decltype(pose)>()).get())>::type;
+
 #define STRIP_OPTIONAL(IDENTIFIER, ALTERNATE)                                     \
   template <typename... Ts>                                                       \
   auto IDENTIFIER(Ts &&... xs)                                                    \
@@ -123,7 +126,6 @@ FORWARD_TO_SIMULATION_API(setTrafficLightArrowPhase);
 FORWARD_TO_SIMULATION_API(setTrafficLightColor);
 FORWARD_TO_SIMULATION_API(setTrafficLightColorPhase);
 FORWARD_TO_SIMULATION_API(spawn);
-FORWARD_TO_SIMULATION_API(toMapPose);
 FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
@@ -138,6 +140,7 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 
 RENAME(reachPosition, isReachedPosition);
 RENAME(setDriverModel, assignController);
+RENAME(toMapPose, toWorldPosition);
 
 #undef RENAME
 }  // namespace openscenario_interpreter

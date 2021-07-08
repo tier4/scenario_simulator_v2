@@ -21,6 +21,9 @@ namespace concealer
 #define AUTOWARE_INFO_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
 
+#define AUTOWARE_WARN_STREAM(...) \
+  RCLCPP_WARN_STREAM(get_logger(), "\x1b[33m" << __VA_ARGS__ << "\x1b[0m")
+
 #define AUTOWARE_ERROR_STREAM(...) \
   RCLCPP_ERROR_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
 
@@ -40,7 +43,13 @@ Autoware::~Autoware()
 
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
   {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
     ::kill(process_id, SIGINT);
+#endif
+
+#ifdef AUTOWARE_AUTO
+    sudokill(process_id);
+#endif
   }
 
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Terminating Autoware.");
@@ -86,7 +95,15 @@ Autoware::~Autoware()
   {
     int status = 0;
 
-    if (waitpid(process_id, &status, 0) < 0) {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    int options = 0;
+#endif
+
+#ifdef AUTOWARE_AUTO
+    int options = WNOHANG;
+#endif
+
+    if (waitpid(process_id, &status, options) < 0) {
       AUTOWARE_SYSTEM_ERROR("waitpid");
       std::exit(EXIT_FAILURE);
     }
@@ -106,7 +123,9 @@ void Autoware::update()
 #endif
 
 #ifdef AUTOWARE_AUTO
-  // TODO (Robotec.ai)
+  setTransform(current_pose);
+  setVehicleKinematicState(current_pose, current_twist);
+  setVehicleStateReport();
 #endif
 }
 
@@ -140,8 +159,10 @@ void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 #endif
 
 #ifdef AUTOWARE_AUTO
-  task_queue.delay([&]() {
-    // TODO (Robotec.ai)
+  task_queue.delay([this, initial_pose]() {
+    // TODO: wait for a correct state if necessary once state monitoring is there
+    set(initial_pose);
+    setInitialPose(initial_pose);
   });
 #endif
 }
@@ -170,11 +191,27 @@ void Autoware::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
     waitForAutowareStateToBePlanning();
     waitForAutowareStateToBeWaitingForEngage();  // NOTE: Autoware.IV 0.11.1 waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
   });
-#endif
+#endif  // AUTOWARE_ARCHITECTURE_PROPOSAL
 
-#ifndef AUTOWARE_AUTO
-  // TODO (Robotec.ai)
-#endif
+#ifdef AUTOWARE_AUTO
+  if (route.size() > 1) {
+    AUTOWARE_WARN_STREAM(
+      "AutowareAuto received route consisting of "
+      << route.size() << " poses but it does not support checkpoints. Ignoring first "
+      << route.size() - 1 << " poses and treating last pose as the goal.");
+  }
+
+  task_queue.delay([this, route]() {
+    // TODO: replace this sleep with proper state wait logic once state monitoring is there (waitForAutowareStateToBeWaitingForRoute)
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    geometry_msgs::msg::PoseStamped gp;
+    gp.pose = route.back().pose;
+    gp.pose.position.z = 0.0;
+    gp.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+    gp.header.frame_id = "map";
+    setGoalPose(gp);
+  });
+#endif  // AUTOWARE_AUTO
 }
 
 /* ---- NOTE -------------------------------------------------------------------
@@ -191,7 +228,10 @@ void Autoware::engage()
 #endif
 
 #ifdef AUTOWARE_AUTO
-  // TODO (Robotec.ai)
+  task_queue.delay(
+    // Engage is not implemented in Autoware.Auto
+    [this]() {});
+
 #endif
 }
 }  // namespace concealer

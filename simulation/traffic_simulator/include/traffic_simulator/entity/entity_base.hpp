@@ -61,6 +61,12 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
+  /*   */ auto getEntityStatusBeforeUpdate() const
+    -> const boost::optional<openscenario_msgs::msg::EntityStatus>
+  {
+    return status_before_update_;
+  }
+
   /*   */ auto getEntityType() const -> const auto & { return entity_type_; }
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
@@ -76,6 +82,8 @@ public:
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
 
   /*   */ auto getVisibility() { return visibility_; }
+
+  virtual auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand;
 
   /*   */ auto getVehicleParameters() const
     -> const boost::optional<openscenario_msgs::msg::VehicleParameters>
@@ -138,12 +146,6 @@ public:
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
   /*   */ void updateStandStillDuration(const double step_time);
-  virtual const autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand();
-
-  const boost::optional<openscenario_msgs::msg::EntityStatus> getEntityStatusBeforeUpdate() const
-  {
-    return status_before_update_;
-  }
 
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;

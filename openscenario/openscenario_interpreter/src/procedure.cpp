@@ -21,4 +21,26 @@ static typename std::aligned_storage<
   sizeof(traffic_simulator::API), alignof(traffic_simulator::API)>::type memory;
 
 traffic_simulator::API & connection = reinterpret_cast<traffic_simulator::API &>(memory);
+
+auto toLanePosition(const geometry_msgs::msg::Pose & pose) -> typename std::decay<
+  decltype(connection.toLaneletPose(std::declval<decltype(pose)>()).get())>::type
+{
+  const auto result = connection.toLaneletPose(pose);
+
+  if (result) {
+    return result.get();
+  } else {
+    // clang-format off
+    throw SimulationError(
+      "The specified WorldPosition = [", pose.position.x, ", ",
+                                         pose.position.y, ", ",
+                                         pose.position.z, "] could not be "
+      "approximated to the proper Lane. Perhaps the WorldPosition points to a "
+      "location where multiple lanes overlap, and there are at least two or "
+      "more candidates for a LanePosition that can be approximated to that "
+      "WorldPosition. This issue can be resolved by strictly specifying the "
+      "location using LanePosition instead of WorldPosition");
+    // clang-format on
+  }
+}
 }  // namespace openscenario_interpreter
