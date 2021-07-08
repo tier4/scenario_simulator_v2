@@ -231,6 +231,47 @@ OpenSCENARIO:
                         parameterRef: count
                         rule: equalTo
                         value: *count-default
+          # - name: ""
+          #   ManeuverGroup:
+          #     - maximumExecutionCount: 1
+          #       name: ""
+          #       Actors:
+          #         selectTriggeringEntities: false
+          #         EntityRef: []
+          #       Maneuver:
+          #         - name: ""
+          #           Event:
+          #             - name: ""
+          #               priority: parallel
+          #               maximumExecutionCount: 1
+          #               StartTrigger:
+          #                 ConditionGroup:
+          #                   - Condition:
+          #                     - name: ""
+          #                       delay: 0
+          #                       conditionEdge: none
+          #                       ByValueCondition:
+          #                         TrafficSignalCondition:
+          #                           name: too-long-duration-controller
+          #                           state: blank
+          #               Action:
+          #                 - name: ""
+          #                   GlobalAction:
+          #                     InfrastructureAction:
+          #                       TrafficSignalAction:
+          #                         TrafficSignalControllerAction:
+          #                           trafficSignalControllerRef: too-long-duration-controller
+          #                           phase: green
+          #   StartTrigger:
+          #     ConditionGroup:
+          #       - Condition:
+          #           - name:
+          #             delay: 0
+          #             conditionEdge: none
+          #             ByValueCondition:
+          #               SimulationTimeCondition:
+          #                 value: 10
+          #                 rule: greaterThan
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
