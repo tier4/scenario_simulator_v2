@@ -143,6 +143,15 @@ public:
     }
   }
 
+  auto currentPhaseName() const { return (*current_phase).name; }
+
+  auto cycleTime() const
+  {
+    return std::accumulate(
+      std::cbegin(phases), std::cend(phases), 0,
+      [](const auto & sum, const auto & phase) { return sum + phase.duration; });
+  }
+
   auto evaluate()
   {
     if (shouldChangePhaseToBegin()) {
@@ -152,15 +161,6 @@ public:
     } else {
       return unspecified;
     }
-  }
-
-  auto cycleTime() const
-  {
-    Double sum = 0;
-    for (auto & each : phases) {
-      sum += each.duration;
-    }
-    return sum;
   }
 
 private:
@@ -194,7 +194,7 @@ private:
     });
 
     if (it == phases.end()) {
-      THROW_SYNTAX_ERROR(phase_name, "is not declared in this TrafficSignalContoller, ", name);
+      THROW_SYNTAX_ERROR(phase_name, " is not declared in this TrafficSignalContoller, ", name);
     }
 
     changePhaseTo(it);

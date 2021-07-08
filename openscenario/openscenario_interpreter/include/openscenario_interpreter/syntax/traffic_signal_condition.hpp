@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONDITION_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {
@@ -23,13 +25,18 @@ inline namespace syntax
 {
 /* ---- TrafficSignalCondition -------------------------------------------------
  *
+ *  Considered true if a referenced traffic signal (e.g. from an OpenDRIVE
+ *  file) reaches a specific states. Signal IDs are listed in the TrafficSignal
+ *  list of the RoadNetwork together with their states and their controllers to
+ *  enable dynamic signal modelling.
+ *
  *  <xsd:complexType name="TrafficSignalCondition">
  *    <xsd:attribute name="name" type="String" use="required"/>
  *    <xsd:attribute name="state" type="String" use="required"/>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalCondition
+struct TrafficSignalCondition : private Scope
 {
   const String name;
 
@@ -37,9 +44,34 @@ struct TrafficSignalCondition
 
   template <typename Node, typename Scope>
   explicit TrafficSignalCondition(const Node & node, Scope & scope)
-  : name(readAttribute<String>("name", node, scope)),
-    state(readAttribute<String>("state", node, scope))
+  : Scope(scope),
+    name(readAttribute<String>("name", node, localScope())),
+    state(readAttribute<String>("state", node, localScope()))
   {
+  }
+
+  String last_checked_value;
+
+  auto evaluate()
+  {
+    auto iter = localScope().traffic_signal_controllers.find(name);
+
+    if (iter != localScope().traffic_signal_controllers.end()) {
+      return asBoolean((last_checked_value = std::get<1>(*iter)->currentPhaseName()) == state);
+    } else {
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController ", std::quoted(name), " is not declared in this scope");
+    }
+  }
+
+  auto description() const
+  {
+    std::stringstream description;
+
+    description << "Is controller " << std::quoted(name) << " (" << last_checked_value
+                << ") in state " << state << "?";
+
+    return description.str();
   }
 };
 }  // namespace syntax
