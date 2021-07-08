@@ -1,5 +1,3 @@
-ScenarioModifiers:
-  ScenarioModifier: []
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
@@ -20,7 +18,40 @@ OpenSCENARIO:
     SceneGraphFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map/pointcloud_map.pcd
     TrafficSignals:
-      TrafficSignalController: []
+      TrafficSignalController:
+        - name: empty-contoller
+          Phase: []
+        - name: simple-controller
+          Phase:
+            - name: green
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "green" }
+            - name: yellow
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "yellow" }
+            - name: red
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "red" }
+        - name: too-long-duration-controller
+          Phase:
+            - name: blank
+              duration: 180
+              TrafficSignalState: []
+            - name: green
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34836', state: 'green' }
+            - name: yellow
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34836', state: 'yellow' }
+            - name: red
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34836', state: 'red' }
   Entities:
     ScenarioObject:
       - name: ego

@@ -9,7 +9,7 @@ Panels:
         - /Planning1/MissionPlanning1
         - /Planning1/ScenarioPlanning1
         - /Planning1/ScenarioPlanning1/LaneDriving1
-        - /Simulation1/Lanelet Marker1
+        - /Simulation1
         - /Simulation1/Lanelet Marker1/Topic1
       Splitter Ratio: 0.4971751272678375
     Tree Height: 651
@@ -133,52 +133,6 @@ Visualization Manager:
                 Expand Link Details: false
                 Expand Tree: false
                 Link Tree Style: Links in Alphabetic Order
-                base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_center:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_center_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_left:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_left_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_right:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_right_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                sensor_kit_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                velodyne_top:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_top_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
               Name: VehicleModel
               TF Prefix: ""
               Update Interval: 0
@@ -1135,10 +1089,10 @@ Visualization Manager:
           Enabled: true
           Name: Traffic Light Marker
           Namespaces:
-            {}
+            bulb: true
           Topic:
             Depth: 5
-            Durability Policy: Volatile
+            Durability Policy: Transient Local
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /simulation/traffic_light/marker
