@@ -13,6 +13,7 @@
   <depend>geometry_msgs</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>lifecycle_msgs</depend>
+  <depend>nlohmann-json-dev</depend>
   <depend>openscenario_interpreter_msgs</depend>
   <depend>openscenario_msgs</depend>
   <depend>pugixml-dev</depend>
