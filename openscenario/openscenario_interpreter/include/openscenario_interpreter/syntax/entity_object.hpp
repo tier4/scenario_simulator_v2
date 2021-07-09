@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 
+// #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 #include <unordered_map>

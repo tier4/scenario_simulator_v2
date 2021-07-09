@@ -69,6 +69,7 @@ struct VehicleCategory
 };
 
 std::istream & operator>>(std::istream &, VehicleCategory &);
+
 std::ostream & operator<<(std::ostream &, const VehicleCategory &);
 }  // namespace syntax
 }  // namespace openscenario_interpreter

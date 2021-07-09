@@ -116,7 +116,7 @@ struct ScenarioObject
       }
       return unspecified;
     } else {
-      throw SemanticError("Failed to spawn entity '", name, "'.");
+      throw SemanticError("Failed to spawn entity ", std::quoted(name));
     }
   }
 };
