@@ -69,7 +69,7 @@ std::vector<std::int64_t> RoutePlanner::getRouteLanelets(
   if (!whole_route_) {
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   }
-  if(whole_route_->size() == 0) {
+  if (whole_route_->size() == 0) {
     whole_route_ = boost::none;
     return hdmap_utils_ptr_->getFollowingLanelets(entity_lanelet_pose.lanelet_id, horizon, true);
   }
