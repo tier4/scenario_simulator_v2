@@ -1,4 +1,5 @@
 Scenario:
+  - { path: $(find-pkg-share scenario_test_runner)/test/scenario/all-in-one.yaml }
   # - { path: $(find-pkg-share scenario_test_runner)/test/scenario/simple.xosc }
   - { path: $(find-pkg-share scenario_test_runner)/test/scenario/ControllerAction.AssignControllerAction.yaml }
   - { path: $(find-pkg-share scenario_test_runner)/test/scenario/Property.isBlind.yaml }
@@ -7,4 +8,4 @@ Scenario:
   # - { path: $(find-pkg-share scenario_test_runner)/test/scenario/minimal.yaml }
   - { path: $(find-pkg-share scenario_test_runner)/test/scenario/stand-still.yaml }
   # - { path: $(find-pkg-share scenario_test_runner)/test/scenario/success.yaml, expect: success }
-#  - { path: $(find-pkg-share scenario_test_runner)/test/scenario/distance-condition.yaml }
+  # - { path: $(find-pkg-share scenario_test_runner)/test/scenario/distance-condition.yaml }

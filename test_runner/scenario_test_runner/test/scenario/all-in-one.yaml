@@ -1,12 +1,10 @@
-ScenarioModifiers:
-  ScenarioModifier: []
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: '2021-06-21T07:36:35.584Z'
-    description: ''
-    author: ''
+    date: "2021-06-21T07:36:35.584Z"
+    description: ""
+    author: ""
   ParameterDeclarations:
     ParameterDeclaration:
       - name: count
@@ -20,12 +18,28 @@ OpenSCENARIO:
     SceneGraphFile:
       filepath: $(find-pkg-share kashiwanoha_map)/map/pointcloud_map.pcd
     TrafficSignals:
-      TrafficSignalController: []
+      TrafficSignalController:
+        - name: empty-contoller
+          Phase: []
+        - name: simple-controller
+          Phase:
+            - name: green
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "green" }
+            - name: yellow
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "yellow" }
+            - name: red
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "red" }
   Entities:
     ScenarioObject:
       - name: ego
         Vehicle:
-          name: ''
+          name: ""
           vehicleCategory: car
           BoundingBox:
             Center:
@@ -57,18 +71,18 @@ OpenSCENARIO:
             Property: []
         ObjectController:
           Controller:
-            name: ''
+            name: ""
             Properties:
               Property:
                 - name: isEgo
-                  value: 'true'
+                  value: "false"
       - name: vehicle-1
         Vehicle:
-          name: ''
+          name: ""
           vehicleCategory: car
           BoundingBox:
             Center:
-              x: -0.0
+              x: 0
               y: 0
               z: 1.25
             Dimensions:
@@ -96,7 +110,7 @@ OpenSCENARIO:
             Property: []
         ObjectController:
           Controller:
-            name: ''
+            name: ""
             Properties:
               Property: []
   Storyboard:
@@ -108,8 +122,8 @@ OpenSCENARIO:
               - TeleportAction:
                   Position: &ego-initial-position
                     LanePosition:
-                      roadId: ''
-                      laneId: '34513'
+                      roadId: ""
+                      laneId: "34513"
                       s: 20
                       offset: 0
                       Orientation:
@@ -121,8 +135,8 @@ OpenSCENARIO:
                   AcquirePositionAction:
                     Position: &ego-goal-position
                       LanePosition:
-                        roadId: ''
-                        laneId: '34630'
+                        roadId: ""
+                        laneId: "34630"
                         s: 10
                         offset: 0
                         Orientation:
@@ -135,8 +149,8 @@ OpenSCENARIO:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ''
-                      laneId: '34681'
+                      roadId: ""
+                      laneId: "34681"
                       s: 0
                       offset: 0
                       Orientation:
@@ -154,25 +168,25 @@ OpenSCENARIO:
                       AbsoluteTargetSpeed:
                         value: 10
     Story:
-      - name: ''
+      - name: ""
         Act:
           - name: "countup!"
             ManeuverGroup:
               - maximumExecutionCount: 1
-                name: ''
+                name: ""
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef: []
                 Maneuver:
-                  - name: ''
+                  - name: ""
                     Event:
-                      - name: ''
+                      - name: ""
                         priority: parallel
                         maximumExecutionCount: &count-max 100
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                              - name: ''
+                              - name: "if (count < *count-max)"
                                 delay: 0
                                 conditionEdge: none
                                 ByValueCondition:
@@ -181,7 +195,7 @@ OpenSCENARIO:
                                     rule: lessThan
                                     value: *count-max
                         Action:
-                          - name: "increment"
+                          - name: "count += 1"
                             GlobalAction:
                               ParameterAction:
                                 parameterRef: count
@@ -200,23 +214,101 @@ OpenSCENARIO:
                         parameterRef: count
                         rule: equalTo
                         value: *count-default
+          # - name: ""
+          #   ManeuverGroup:
+          #     - maximumExecutionCount: 1
+          #       name: ""
+          #       Actors:
+          #         selectTriggeringEntities: false
+          #         EntityRef: []
+          #       Maneuver:
+          #         - name: ""
+          #           Event:
+          #             - name: ""
+          #               priority: parallel
+          #               maximumExecutionCount: 1
+          #               StartTrigger:
+          #                 ConditionGroup:
+          #                   - Condition:
+          #                     - name: ""
+          #                       delay: 0
+          #                       conditionEdge: none
+          #                       ByValueCondition:
+          #                         TrafficSignalCondition:
+          #                           name: too-long-duration-controller
+          #                           state: blank
+          #               Action:
+          #                 - name: ""
+          #                   GlobalAction:
+          #                     InfrastructureAction:
+          #                       TrafficSignalAction:
+          #                         TrafficSignalControllerAction:
+          #                           trafficSignalControllerRef: too-long-duration-controller
+          #                           phase: green
+          #   StartTrigger:
+          #     ConditionGroup:
+          #       - Condition:
+          #           - name:
+          #             delay: 0
+          #             conditionEdge: none
+          #             ByValueCondition:
+          #               SimulationTimeCondition:
+          #                 value: 10
+          #                 rule: greaterThan
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
-                name: ''
+                name: ""
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
                     - entityRef: ego
                 Maneuver:
-                  - name: ''
+                  - name: ""
                     Event:
-                      - name: ''
+                      - name: "success if"
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ''
+                                - name: "if (ego.reach_position(*ego-goal-position, 1))"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition: # NOTE: ReachPositionCondition is specialized DistanceCondition.
+                                        Position: *ego-goal-position
+                                        tolerance: 1
+                                - name: "if (distance(ego, *ego-goal-position) < 1)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        Position: *ego-goal-position
+                                        alongRoute: false
+                                        freespace: false
+                                        rule: lessThan
+                                        value: 1
+                        Action:
+                          - name: "return EXIT_SUCCESS"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: "failure if"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
@@ -224,7 +316,7 @@ OpenSCENARIO:
                                       value: 180
                                       rule: greaterThan
                             - Condition:
-                                - name: ''
+                                - name: ""
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -237,7 +329,7 @@ OpenSCENARIO:
                                         EntityRef:
                                           entityRef: ego
                             # - Condition:
-                            #     - name: ''
+                            #     - name: ""
                             #       delay: 0
                             #       conditionEdge: none
                             #       ByEntityCondition:
@@ -253,7 +345,7 @@ OpenSCENARIO:
                             #             alongRoute: true
                             #             rule: lessThan
                             - Condition:
-                                - name: ''
+                                - name: ""
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -266,7 +358,7 @@ OpenSCENARIO:
                                         rule: greaterThan
                                         value: 10
                             - Condition:
-                                - name: ''
+                                - name: ""
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -279,7 +371,7 @@ OpenSCENARIO:
                                       StandStillCondition:
                                         duration: 10
                             - Condition:
-                                - name: ''
+                                - name: ""
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -293,36 +385,7 @@ OpenSCENARIO:
                                         rule: greaterThan
                                         value: 10
                             - Condition:
-                                - name: ''
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: any
-                                      EntityRef:
-                                        - entityRef: ego
-                                    EntityCondition:
-                                      ReachPositionCondition: # NOTE: ReachPositionCondition is specialized DistanceCondition.
-                                        Position: *ego-goal-position
-                                        tolerance: 1
-                            - Condition:
-                                - name: ''
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: any
-                                      EntityRef:
-                                        - entityRef: ego
-                                    EntityCondition:
-                                      DistanceCondition:
-                                        Position: *ego-goal-position
-                                        alongRoute: false
-                                        freespace: false
-                                        rule: lessThan
-                                        value: 1
-                            - Condition:
-                                - name: ''
+                                - name: ""
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -356,14 +419,14 @@ OpenSCENARIO:
                                       storyboardElementType: act
                                       state: skipTransition
                         Action:
-                          - name: ''
+                          - name: "return EXIT_FAILURE"
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitFailure
             StartTrigger:
               ConditionGroup:
                 - Condition:
-                    - name: ''
+                    - name: "if (0 < t)"
                       delay: 0
                       conditionEdge: none
                       ByValueCondition:
@@ -373,11 +436,10 @@ OpenSCENARIO:
     StopTrigger:
       ConditionGroup:
         - Condition:
-            - name: ''
+            - name: "if (300 < t)"
               delay: 0
               conditionEdge: none
               ByValueCondition:
                 SimulationTimeCondition:
                   value: 300
                   rule: greaterThan
-

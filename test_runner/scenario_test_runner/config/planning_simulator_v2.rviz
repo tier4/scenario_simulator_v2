@@ -9,10 +9,10 @@ Panels:
         - /Planning1/MissionPlanning1
         - /Planning1/ScenarioPlanning1
         - /Planning1/ScenarioPlanning1/LaneDriving1
-        - /Simulation1/Lanelet Marker1
+        - /Simulation1
         - /Simulation1/Lanelet Marker1/Topic1
       Splitter Ratio: 0.4971751272678375
-    Tree Height: 644
+    Tree Height: 651
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -133,52 +133,6 @@ Visualization Manager:
                 Expand Link Details: false
                 Expand Tree: false
                 Link Tree Style: Links in Alphabetic Order
-                base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_center:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_center_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_left:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_left_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_right:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_right_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                sensor_kit_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                velodyne_top:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_top_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
               Name: VehicleModel
               TF Prefix: ""
               Update Interval: 0
@@ -713,6 +667,9 @@ Visualization Manager:
                 Constant Color: false
                 Value: true
                 Width: 2
+              View Text Velocity:
+                Scale: 0.30000001192092896
+                Value: false
               View Velocity:
                 Alpha: 0.9990000128746033
                 Color: 0; 0; 0
@@ -886,6 +843,9 @@ Visualization Manager:
                         Constant Color: false
                         Value: true
                         Width: 2
+                      View Text Velocity:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Velocity:
                         Alpha: 0.9990000128746033
                         Color: 0; 0; 0
@@ -1019,6 +979,9 @@ Visualization Manager:
             Constant Color: true
             Value: true
             Width: 0.05000000074505806
+          View Text Velocity:
+            Scale: 0.30000001192092896
+            Value: false
           View Velocity:
             Alpha: 1
             Color: 0; 0; 0
@@ -1068,9 +1031,9 @@ Visualization Manager:
           Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
-          Max Intensity: -999999
+          Max Intensity: 0
           Min Color: 0; 0; 0
-          Min Intensity: 999999
+          Min Intensity: 0
           Name: PointCloud2
           Position Transformer: XYZ
           Selectable: true
@@ -1090,7 +1053,8 @@ Visualization Manager:
           Enabled: true
           Name: Entity Marker
           Namespaces:
-            Ego: true
+            ego: true
+            vehicle-1: true
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -1104,13 +1068,16 @@ Visualization Manager:
           Namespaces:
             center_lane_line: true
             crosswalk_lanelets: true
-            detection_area: true
             lanelet direction: true
             lanelet_id: true
             left_lane_bound: true
+            parking_lots: true
+            parking_space: true
             right_lane_bound: true
             road_lanelets: true
             stop_lines: true
+            traffic_light: true
+            traffic_light_triangle: true
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -1122,10 +1089,10 @@ Visualization Manager:
           Enabled: true
           Name: Traffic Light Marker
           Namespaces:
-            {}
+            bulb: true
           Topic:
             Depth: 5
-            Durability Policy: Volatile
+            Durability Policy: Transient Local
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /simulation/traffic_light/marker
@@ -1201,7 +1168,7 @@ Visualization Manager:
       Name: Current View
       Near Clip Distance: 0.009999999776482582
       Scale: 20
-      Target Frame: base_link
+      Target Frame: ego
       Value: TopDownOrtho (rviz_default_plugins)
       X: 0
       Y: 0
@@ -1244,12 +1211,12 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1376
+  Height: 1389
   Hide Left Dock: false
   Hide Right Dock: false
   InitialPoseButtonPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002c600000506fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002c1000000c900fffffffc000003040000023f000000c10100001cfa000000000100000002fb0000000a0056006900650077007301000000000000033c0000010000fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009d00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000007700fffffffb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d0061006700650000000462000000ee0000002800ffffff000000010000015f000006fffc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d00650100000000000004500000000000000000000006ec0000050600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002c600000513fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002c8000000c900fffffffc0000030b00000245000000c10100001cfa000000000100000002fb0000000a0056006900650077007301000000000000033c0000010000fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009d00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000007700fffffffb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d0061006700650000000462000000ee0000002800ffffff000000010000015f000006fffc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d00650100000000000004500000000000000000000007100000051300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RecognitionResultOnImage:
     collapsed: false
   Selection:
@@ -1258,6 +1225,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2488
-  X: 72
+  Width: 2524
+  X: 2596
   Y: 27

@@ -68,12 +68,13 @@ struct TrafficSignalControllerAction : private Scope
     auto target = localScope().traffic_signal_controllers.find(traffic_signal_controller_ref);
 
     if (target == localScope().traffic_signal_controllers.end()) {
-      THROW_SYNTAX_ERROR(traffic_signal_controller_ref, "is not declared in this scope.");
+      THROW_SYNTAX_ERROR(
+        "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
+        " is not declared in this scope");
+    } else {
+      target->second->changePhaseByName(phase);
+      return unspecified;
     }
-
-    target->second->changePhaseByName(phase);
-
-    return unspecified;
   }
 
   static auto endsImmediately() -> bool { return true; }
