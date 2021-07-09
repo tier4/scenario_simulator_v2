@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 
 namespace openscenario_interpreter
 {
@@ -74,28 +75,24 @@ struct ScenarioObject
   {
   }
 
-  auto operator()(const Vehicle & vehicle)
-  {
-    return spawn(
-      object_controller.isEgo(), name,
-      static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
-  }
-
-  auto operator()(const Pedestrian & pedestrian) const
-  {
-    return spawn(
-      false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
-  }
-
-  auto operator()(const MiscObject & misc_object) const
-  {
-    return spawn(
-      false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
-  }
-
   auto evaluate()
   {
-    if (apply<bool>(*this, static_cast<const EntityObject &>(*this))) {
+    auto spawn_entity = overload(
+      [this](const Vehicle & vehicle) {
+        return spawn(
+          object_controller.isEgo(), name,
+          static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
+      },
+      [this](const Pedestrian & pedestrian) {
+        return spawn(
+          false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+      },
+      [this](const MiscObject & misc_object) {
+        return spawn(
+          false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
+      });
+
+    if (apply<bool>(spawn_entity, static_cast<const EntityObject &>(*this))) {
       if (is<Vehicle>()) {
         assignController(name, object_controller);
         if (object_controller.isEgo()) {

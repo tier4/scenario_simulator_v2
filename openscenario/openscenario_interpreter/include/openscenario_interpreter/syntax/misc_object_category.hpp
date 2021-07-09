@@ -21,7 +21,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- MiscObjectCategory -----------------------------------------------------
+/* ---- MiscObjectCategory 1.1 -------------------------------------------------
  *
  * <xsd:simpleType name="MiscObjectCategory">
  *   <xsd:union>

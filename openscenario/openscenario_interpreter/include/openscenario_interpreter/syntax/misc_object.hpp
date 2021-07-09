@@ -27,7 +27,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- MiscObject -------------------------------------------------------------
+/* ---- MiscObject 1.1 ---------------------------------------------------------
  *
  *  <xsd:complexType name="MiscObject">
  *    <xsd:all>
@@ -50,8 +50,8 @@ struct MiscObject : private Scope
 
   const String name;  // Name of the miscellaneous object type.
 
-  const String
-    model3d;  // Definition of the model of the miscellaneous object as a model type or a relative or absolute file path.
+  // const String
+  //   model3d;  // Definition of the model of the miscellaneous object as a model type or a relative or absolute file path.
 
   const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
 
@@ -66,7 +66,7 @@ struct MiscObject : private Scope
     mass                  (readAttribute<Double               >("mass",                  tree, localScope())),
     misc_object_category  (readAttribute<MiscObjectCategory   >("miscObjectCategory",    tree, localScope())),
     name                  (readAttribute<String               >("name",                  tree, localScope())),
-    model3d               (readAttribute<String               >("model3d",               tree, localScope())),
+    // model3d               (readAttribute<String               >("model3d",               tree, localScope())),
     parameter_declarations(readElement  <ParameterDeclarations>("ParameterDeclarations", tree, localScope())),
     bounding_box          (readElement  <BoundingBox          >("BoundingBox",           tree, localScope())),
     properties            (readElement  <Properties           >("Properties",            tree, localScope()))

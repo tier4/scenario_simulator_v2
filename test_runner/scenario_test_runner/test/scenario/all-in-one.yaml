@@ -113,6 +113,23 @@ OpenSCENARIO:
             name: ""
             Properties:
               Property: []
+      - name: obstacle-1
+        MiscObject:
+          mass: 1.0
+          miscObjectCategory: obstacle
+          # model3d: "" # since OSC 1.1
+          name: simple-box
+          BoundingBox:
+            Center:
+              x: 0.5
+              y: 0.5
+              z: 0.5
+            Dimensions:
+              width: 1
+              length: 1
+              height: 1
+          Properties:
+            Property: []
   Storyboard:
     Init:
       Actions:
@@ -167,6 +184,20 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 10
+          # - entityRef: obstacle-1
+          #   PrivateAction:
+          #     - TeleportAction:
+          #         Position: &simple-box-position
+          #           LanePosition:
+          #             roadId: ""
+          #             laneId: "34513"
+          #             s: 30
+          #             offset: 0
+          #             Orientation:
+          #               type: relative
+          #               h: 0
+          #               p: 0
+          #               r: 0
     Story:
       - name: ""
         Act:
