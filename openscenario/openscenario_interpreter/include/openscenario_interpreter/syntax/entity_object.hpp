@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 
-// #include <openscenario_interpreter/syntax/misc_object.hpp>
+#include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 #include <unordered_map>
@@ -53,18 +53,19 @@ struct EntityObject : public Group
   }
 };
 
-template <typename R = void, typename F, typename... Ts>
-decltype(auto) apply(F && f, const EntityObject & entity_object, Ts &&... xs)
+template <typename Result = void, typename Function, typename... Ts>
+auto apply(Function && function, const EntityObject & entity_object, Ts &&... xs) -> Result
 {
-#define BOILERPLATE(TYPE)                                                       \
-  {                                                                             \
-    typeid(TYPE), [](F && f, const EntityObject & entity_object, Ts &&... xs) { \
-      return f(entity_object.as<TYPE>(), std::forward<decltype(xs)>(xs)...);    \
-    }                                                                           \
+#define BOILERPLATE(TYPE)                                                                     \
+  {                                                                                           \
+    typeid(TYPE), [](Function && function, const EntityObject & entity_object, Ts &&... xs) { \
+      return function(entity_object.as<TYPE>(), std::forward<decltype(xs)>(xs)...);           \
+    }                                                                                         \
   }
 
   static const std::unordered_map<
-    std::type_index, std::function<R(F && f, const EntityObject & entity_object, Ts &&... xs)>>
+    std::type_index,
+    std::function<Result(Function && function, const EntityObject & entity_object, Ts &&... xs)>>
     overloads{
       BOILERPLATE(Vehicle),
       BOILERPLATE(Pedestrian),
@@ -73,7 +74,7 @@ decltype(auto) apply(F && f, const EntityObject & entity_object, Ts &&... xs)
 #undef BOILERPLATE
 
   return overloads.at(entity_object.type())(
-    std::forward<decltype(f)>(f), entity_object, std::forward<decltype(xs)>(xs)...);
+    std::forward<decltype(function)>(function), entity_object, std::forward<decltype(xs)>(xs)...);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
