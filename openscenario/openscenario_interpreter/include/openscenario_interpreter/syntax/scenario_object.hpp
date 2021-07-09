@@ -74,17 +74,23 @@ struct ScenarioObject
   {
   }
 
-  decltype(auto) operator()(const Vehicle & vehicle)
+  auto operator()(const Vehicle & vehicle)
   {
     return spawn(
       object_controller.isEgo(), name,
       static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
   }
 
-  decltype(auto) operator()(const Pedestrian & pedestrian) const
+  auto operator()(const Pedestrian & pedestrian) const
   {
     return spawn(
       false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+  }
+
+  auto operator()(const MiscObject & misc_object) const
+  {
+    return spawn(
+      false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
   }
 
   auto evaluate()

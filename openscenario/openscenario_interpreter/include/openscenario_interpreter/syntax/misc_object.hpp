@@ -74,9 +74,21 @@ struct MiscObject : private Scope
   {
   }
 
-  // explicit operator openscenario_msgs::msg::MiscObjectParameters() const
-  // {
-  // }
+  explicit operator openscenario_msgs::msg::MiscObjectParameters() const
+  {
+    openscenario_msgs::msg::MiscObjectParameters misc_object_parameters;
+    {
+      misc_object_parameters.misc_object_category =
+        boost::lexical_cast<String>(misc_object_category);
+
+      misc_object_parameters.name = name;
+
+      misc_object_parameters.bounding_box =
+        static_cast<const openscenario_msgs::msg::BoundingBox>(bounding_box);
+    }
+
+    return misc_object_parameters;
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

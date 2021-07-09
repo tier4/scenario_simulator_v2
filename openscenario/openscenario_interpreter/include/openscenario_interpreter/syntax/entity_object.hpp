@@ -47,7 +47,7 @@ struct EntityObject : public Group
         std::make_pair("CatalogReference", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
         std::make_pair("Vehicle",          [&](auto && node) { return make<Vehicle>   (node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair("Pedestrian",       [&](auto && node) { return make<Pedestrian>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("MiscObject",       [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+        std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>(node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {
   }
@@ -69,6 +69,7 @@ auto apply(Function && function, const EntityObject & entity_object, Ts &&... xs
     overloads{
       BOILERPLATE(Vehicle),
       BOILERPLATE(Pedestrian),
+      BOILERPLATE(MiscObject),
     };
 
 #undef BOILERPLATE
