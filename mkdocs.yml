@@ -69,7 +69,6 @@ nav:
     - About: design/About.md
     - design/AutowareAPI.md
     - design/ErrorCategories.md
-    - design/OpenSCENARIOInterpreter.md
     - design/OpenSCENARIOSupport.md
     - design/SimpleSensorSimulator.md
     - design/SystemArchitecture.md
