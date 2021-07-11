@@ -72,7 +72,6 @@ nav:
     - design/OpenSCENARIOSupport.md
     - design/SimpleSensorSimulator.md
     - design/SystemArchitecture.md
-    - design/Tier4ScenarioFormatVersion2.md
     - design/TrafficSimulator.md
     - design/ZeroMQ.md
   - Package Details: package/About.md
