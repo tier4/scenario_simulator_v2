@@ -217,7 +217,9 @@ public:
        *
        * -------------------------------------------------------------------- */
       case StoryboardElementState::runningState:
-        run();
+        if (0 <= getCurrentTime()) {
+          run();
+        }
         return changeStateIf(accomplished(), end_transition);
 
       /* ---- End --------------------------------------------------------------

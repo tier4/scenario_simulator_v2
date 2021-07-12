@@ -91,22 +91,20 @@ struct Storyboard : private Scope, public StoryboardElement<Storyboard>, public 
 
   auto run()
   {
-    if (0 <= getCurrentTime()) {
-      if (engaged) {
-        for (auto && story : *this) {
-          story.evaluate();
-        }
-      } else if (std::all_of(std::cbegin(entities), std::cend(entities), [&](const auto & each) {
-                   return openscenario_interpreter::ready(std::get<0>(each));
-                 })) {
-        for (const auto & each : entities) {
-          engage(each.first);
-        }
-        engaged = true;
-      } else {
-        throw common::AutowareError(
-          "Autoware does not respond. It is likely that some nodes were corrupted during launch");
+    if (engaged) {
+      for (auto && story : *this) {
+        story.evaluate();
       }
+    } else if (std::all_of(std::cbegin(entities), std::cend(entities), [&](const auto & each) {
+                 return openscenario_interpreter::ready(std::get<0>(each));
+               })) {
+      for (const auto & each : entities) {
+        engage(each.first);
+      }
+      engaged = true;
+    } else {
+      throw common::AutowareError(
+        "Autoware does not respond. It is likely that some nodes were corrupted during launch");
     }
   }
 };
