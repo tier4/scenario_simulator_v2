@@ -32,7 +32,7 @@ from pathlib import Path
 def generate_launch_description():
     rviz_config_dir = os.path.join(
         get_package_share_directory(
-            "scenario_test_runner"), "planning_simulator_v2.rviz"
+            "scenario_test_runner"), "config/scenario_simulator_v2.rviz"
     )
     print(rviz_config_dir)
     rosbag_dir = LaunchConfiguration("rosbag_directory", default=Path("/tmp"))
