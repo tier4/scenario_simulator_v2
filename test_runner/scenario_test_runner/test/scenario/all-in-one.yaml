@@ -199,7 +199,7 @@ OpenSCENARIO:
                         p: 0
                         r: 0
     Story:
-      - name: ""
+      - name: "main"
         Act:
           - name: "countup!"
             ManeuverGroup:
@@ -358,10 +358,10 @@ OpenSCENARIO:
                                     state: completeState
                         Action:
                           - name: ""
-                            # GlobalAction: (NOTE: SOMETHING WENT WRONG)
-                            #   EntityAction:
-                            #     entityRef: barricade
-                            #     DeleteEntityAction:
+                            GlobalAction:
+                              EntityAction:
+                                entityRef: barricade
+                                DeleteEntityAction:
                             # PrivateAction: (NOTE: SOMETHING WENT WRONG)
                             #   - TeleportAction:
                             #       Position:
@@ -375,12 +375,6 @@ OpenSCENARIO:
                             #             h: 0
                             #             p: 0
                             #             r: 0
-                            PrivateAction:
-                              - TeleportAction:
-                                  Position:
-                                    LanePosition:
-                                      <<: *barricade-initial-position
-                                      s: 10
             StartTrigger:
               ConditionGroup:
                 - Condition:

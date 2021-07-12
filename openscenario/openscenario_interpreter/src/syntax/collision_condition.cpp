@@ -18,7 +18,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-std::ostream & operator<<(std::ostream & os, const CollisionCondition & datum)
+std::ostream & operator<<(std::ostream & os, const CollisionCondition &)
 {
   // TODO (yamacir-kit): Print datum as XML.
   return os;
