@@ -275,15 +275,8 @@ OpenSCENARIO:
                               - TeleportAction:
                                   Position:
                                     LanePosition:
-                                      roadId: ""
-                                      laneId: "34513"
+                                      <<: *barricade-initial-position
                                       s: 25
-                                      offset: 0
-                                      Orientation:
-                                        type: relative
-                                        h: 0
-                                        p: 0
-                                        r: 0
                       - name: "warp-2"
                         priority: parallel
                         maximumExecutionCount: 1
@@ -311,15 +304,8 @@ OpenSCENARIO:
                               - TeleportAction:
                                   Position:
                                     LanePosition:
-                                      roadId: ""
-                                      laneId: "34513"
+                                      <<: *barricade-initial-position
                                       s: 30
-                                      offset: 0
-                                      Orientation:
-                                        type: relative
-                                        h: 0
-                                        p: 0
-                                        r: 0
                       - name: "warp-3"
                         priority: parallel
                         maximumExecutionCount: 1
@@ -347,15 +333,8 @@ OpenSCENARIO:
                               - TeleportAction:
                                   Position:
                                     LanePosition:
-                                      roadId: ""
-                                      laneId: "34513"
+                                      <<: *barricade-initial-position
                                       s: 35
-                                      offset: 0
-                                      Orientation:
-                                        type: relative
-                                        h: 0
-                                        p: 0
-                                        r: 0
                       - name: "delete barricade"
                         priority: parallel
                         maximumExecutionCount: 1
@@ -400,15 +379,8 @@ OpenSCENARIO:
                               - TeleportAction:
                                   Position:
                                     LanePosition:
-                                      roadId: ""
-                                      laneId: "34513"
+                                      <<: *barricade-initial-position
                                       s: 10
-                                      offset: 0
-                                      Orientation:
-                                        type: relative
-                                        h: 0
-                                        p: 0
-                                        r: 0
             StartTrigger:
               ConditionGroup:
                 - Condition:
