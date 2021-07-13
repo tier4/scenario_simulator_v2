@@ -2,8 +2,8 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.0 (2021-07-13)
+------------------
 * Merge branch 'master' into traffic_signal_actions
 * Contributors: kyabe2718
 
