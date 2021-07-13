@@ -113,6 +113,23 @@ OpenSCENARIO:
             name: ""
             Properties:
               Property: []
+      - name: barricade
+        MiscObject:
+          mass: 1.0
+          miscObjectCategory: obstacle
+          # model3d: "" # since OSC 1.1
+          name: ""
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0.5
+            Dimensions:
+              width: 3
+              length: 1
+              height: 1
+          Properties:
+            Property: []
   Storyboard:
     Init:
       Actions:
@@ -124,7 +141,7 @@ OpenSCENARIO:
                     LanePosition:
                       roadId: ""
                       laneId: "34513"
-                      s: 20
+                      s: 10
                       offset: 0
                       Orientation:
                         type: relative
@@ -167,8 +184,22 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 10
+          - entityRef: barricade
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition: &barricade-initial-position
+                      roadId: ""
+                      laneId: "34513"
+                      s: 20
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
     Story:
-      - name: ""
+      - name: "main"
         Act:
           - name: "countup!"
             ManeuverGroup:
@@ -214,6 +245,146 @@ OpenSCENARIO:
                         parameterRef: count
                         rule: equalTo
                         value: *count-default
+          - name: "obstacle"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: barricade
+                Maneuver:
+                  - name: "warp-every-3sec"
+                    Event:
+                      - name: "warp-1"
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    value: 3
+                                    rule: greaterThan
+                        Action:
+                          - name: ""
+                            PrivateAction:
+                              - TeleportAction:
+                                  Position:
+                                    LanePosition:
+                                      <<: *barricade-initial-position
+                                      s: 25
+                      - name: "warp-2"
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    value: 6
+                                    rule: greaterThan
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  StoryboardElementStateCondition:
+                                    storyboardElementRef: "warp-1"
+                                    storyboardElementType: event
+                                    state: completeState
+                        Action:
+                          - name: ""
+                            PrivateAction:
+                              - TeleportAction:
+                                  Position:
+                                    LanePosition:
+                                      <<: *barricade-initial-position
+                                      s: 30
+                      - name: "warp-3"
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    value: 9
+                                    rule: greaterThan
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  StoryboardElementStateCondition:
+                                    storyboardElementRef: "warp-2"
+                                    storyboardElementType: event
+                                    state: completeState
+                        Action:
+                          - name: ""
+                            PrivateAction:
+                              - TeleportAction:
+                                  Position:
+                                    LanePosition:
+                                      <<: *barricade-initial-position
+                                      s: 35
+                      - name: "delete barricade"
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    value: 12
+                                    rule: greaterThan
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  StoryboardElementStateCondition:
+                                    storyboardElementRef: "warp-3"
+                                    storyboardElementType: event
+                                    state: completeState
+                        Action:
+                          - name: ""
+                            GlobalAction:
+                              EntityAction:
+                                entityRef: barricade
+                                DeleteEntityAction:
+                            # PrivateAction: (NOTE: SOMETHING WENT WRONG)
+                            #   - TeleportAction:
+                            #       Position:
+                            #         LanePosition:
+                            #           roadId: ""
+                            #           laneId: "34513"
+                            #           s: 35
+                            #           offset: 10
+                            #           Orientation:
+                            #             type: relative
+                            #             h: 0
+                            #             p: 0
+                            #             r: 0
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name:
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
           # - name: ""
           #   ManeuverGroup:
           #     - maximumExecutionCount: 1

@@ -238,7 +238,7 @@ def main():
         "-w",
         "--workflow",
         type=Path,
-        default="$(find-pkg-share scenario_test_runner)/workflow_example.yaml",
+        default="$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml",
     )
 
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK

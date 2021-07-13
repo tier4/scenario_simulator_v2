@@ -45,54 +45,19 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Vehicle : private Scope  // for ParameterDeclarations
 {
-  /* ---- name -----------------------------------------------------------------
-   *
-   *  Name of the vehicle type.
-   *
-   * ------------------------------------------------------------------------ */
-  const String name;
+  const String name;  // Name of the vehicle type.
 
-  /* ---- vehicleCategory ------------------------------------------------------
-   *
-   *  Category of the vehicle (bicycle, train,...).
-   *
-   * ------------------------------------------------------------------------ */
-  const VehicleCategory vehicle_category;
+  const VehicleCategory vehicle_category;  // Category of the vehicle (bicycle, train,...).
 
-  /* ---- ParameterDeclarations ------------------------------------------------
-   *
-   *  Definition of additional parameters.
-   *
-   * ------------------------------------------------------------------------ */
-  const ParameterDeclarations parameter_declarations;
+  const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
 
-  /* ---- BoundingBox ----------------------------------------------------------
-   *
-   *  The three dimensional bounding box that encloses the vehicle.
-   *
-   * ------------------------------------------------------------------------ */
-  const BoundingBox bounding_box;
+  const BoundingBox bounding_box;  // The three dimensional bounding box that encloses the vehicle.
 
-  /* ---- Performance ----------------------------------------------------------
-   *
-   *  Performance properties of the vehicle.
-   *
-   * ------------------------------------------------------------------------ */
-  const Performance performance;
+  const Performance performance;  // Performance properties of the vehicle.
 
-  /* ---- Axles ----------------------------------------------------------------
-   *
-   *  A set of axles (front, rear, additional) and their geometric locations.
-   *
-   * ------------------------------------------------------------------------ */
-  const Axles axles;
+  const Axles axles;  // A set of axles (front, rear, additional) and their geometric locations.
 
-  /* ---- Properties -----------------------------------------------------------
-   *
-   *  Additional properties as name value pairs.
-   *
-   * ------------------------------------------------------------------------ */
-  Properties properties;
+  Properties properties;  // Additional properties as name value pairs.
 
   template <typename Node, typename Scope>
   explicit Vehicle(const Node & node, Scope & outer_scope)

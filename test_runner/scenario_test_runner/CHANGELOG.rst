@@ -2,6 +2,43 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.0 (2021-07-13)
+------------------
+* Merge pull request `#386 <https://github.com/tier4/scenario_simulator_v2/issues/386>`_ from tier4/feature/interpreter/misc-object
+* Fix rviz config paths
+* Fix Storyboard to check entities are ready if only before start simulation
+* Rename rviz configuration file
+* Simplify scenario 'all-in-one'
+* Update test scenario 'all-in-one' to use MiscObject
+* Add utility function 'overload'
+* Merge pull request `#383 <https://github.com/tier4/scenario_simulator_v2/issues/383>`_ from tier4/feature/interpreter/test-scenario
+* Support TrafficSignalCondition
+* Lipsticks
+* Add TrafficSignalControllers to scenario 'all-in-one'
+* Merge pull request `#385 <https://github.com/tier4/scenario_simulator_v2/issues/385>`_ from tier4/fix/remove-unresolvable-dependency
+* Remove dependency for only Autoware.Auto (to fix rosdep error)
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/test-scenario
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/assign-route-action-with-world-position
+* Merge pull request `#328 <https://github.com/tier4/scenario_simulator_v2/issues/328>`_ from RobotecAI/pjaroszek/map_and_planning
+* Merge branch 'master' into pjaroszek/map_and_planning
+* Add scenario 'all-in-one' to example workflow
+* Update scenario 'all-in-one' to be successfull
+* ArchitectureProposal as default Autoware instead of Auto
+* Merge pull request `#377 <https://github.com/tier4/scenario_simulator_v2/issues/377>`_ from tier4/traffic_signal_actions
+* fix bug
+* trivial fix
+* add support for TrafficSignalController.referece
+* rebase adjustments
+* Merge branch 'master' into traffic_signal_actions
+* build with AUTOWARE_AUTO flag defined instead of AUTOWARE_ARCHITECTURE_PROPOSAL
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into fix/get_waypoints_error_message
+* Merge pull request `#378 <https://github.com/tier4/scenario_simulator_v2/issues/378>`_ from tier4/feature/ego-entity/acuquire-position-action
+* Update EgoEntity to be able to request AcquirePositionAction multiple times
+* Add struct 'UserDefinedValueCondition'
+* Merge branch 'master' into traffic_signal_actions
+* add support for TrafficSingnalAction
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, danielm1405, kyabe2718, yamacir-kit
+
 0.2.0 (2021-06-24)
 ------------------
 * Merge pull request `#370 <https://github.com/tier4/scenario_simulator_v2/issues/370>`_ from tier4/feature/interpreter/context-2

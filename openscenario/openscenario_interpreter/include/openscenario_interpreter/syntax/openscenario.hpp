@@ -48,7 +48,7 @@ struct OpenScenario : public Scope
 
   std::size_t frame;
 
-  const auto & load(const boost::filesystem::path & pathname)
+  auto load(const boost::filesystem::path & pathname) -> const auto &
   {
     const auto result = script.load_file(pathname.string().c_str());
 

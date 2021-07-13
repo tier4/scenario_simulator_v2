@@ -2,6 +2,27 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.0 (2021-07-13)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/test-scenario
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/assign-route-action-with-world-position
+* Merge pull request `#328 <https://github.com/tier4/scenario_simulator_v2/issues/328>`_ from RobotecAI/pjaroszek/map_and_planning
+* killing Autoware: branching for AAP (no changes) and AA (sudokill etc)
+* fix formatting
+* ArchitectureProposal as default Autoware instead of Auto
+* Code review fixes in autoware destructor
+* refactor sudokill function
+* clang formatting
+* adapt formatting
+* cleanup comments
+* Merge branch 'master' into traffic_signal_actions
+* build with AUTOWARE_AUTO flag defined instead of AUTOWARE_ARCHITECTURE_PROPOSAL
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into fix/get_waypoints_error_message
+* Merge pull request `#378 <https://github.com/tier4/scenario_simulator_v2/issues/378>`_ from tier4/feature/ego-entity/acuquire-position-action
+* Add member function 'description' to syntax UserDefinedValueCondition
+* Merge branch 'master' into traffic_signal_actions
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, danielm1405, kyabe2718, wjaworski, yamacir-kit
+
 0.2.0 (2021-06-24)
 ------------------
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command

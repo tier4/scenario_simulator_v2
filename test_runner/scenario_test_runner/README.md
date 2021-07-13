@@ -8,7 +8,7 @@ Then convert the scenario into an "XML" based format called an "OpenSCENARIO". T
 
 # How to use
 ```
-ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/workflow_example.yaml'
+ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml'
 ```
 
 # Build with docker image
@@ -58,11 +58,11 @@ CatalogLocations: {}
 ```
 
 ## Parameter Distribution Example
-ex)  
-start: 10  
-stop: 20  
-if step is 1 then distributed parameter is 10  
-if step is 2 distributed parameter is 10 , 20  
+ex)
+start: 10
+stop: 20
+if step is 1 then distributed parameter is 10
+if step is 2 distributed parameter is 10 , 20
 if step is 3 distributed parameter is 10 , 15, 20
 
 attention or int

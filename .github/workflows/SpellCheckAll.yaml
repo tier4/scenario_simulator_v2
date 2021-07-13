@@ -16,11 +16,17 @@ jobs:
             --output .github/workflows/.cspell.json \
             https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/cspell/.cspell.json
 
-      - uses: streetsidesoftware/cspell-action@v1.2.5
-        with:
-          config: ".github/workflows/.cspell.json"
-          incremental_files_only: false
-          strict: false
-          files: |
-            **
-            .*/**
+      - name: Prepare node
+        uses: actions/setup-node@v2
+
+      - name: Check spelling
+        run: |
+          # The cspell-action might not be able to exclude specific files.
+          # So use cspell package directly instead.
+          # How to exclude specific files:
+          #   Ex. "**/!(*.osm|*.svg|CHANGELOG.rst)"
+          npm install cspell
+          ./node_modules/.bin/cspell \
+            --config .github/workflows/.cspell.json \
+            "**/!(CHANGELOG.rst)" \
+            2> /dev/null || true
