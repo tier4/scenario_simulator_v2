@@ -36,6 +36,8 @@ struct Arrow
 
   constexpr Arrow(value_type value = none) : value(value) {}
 
+  explicit constexpr Arrow(const traffic_simulator::TrafficLightArrow &);
+
   constexpr operator value_type() const noexcept { return value; }
 
   operator traffic_simulator::TrafficLightArrow() const

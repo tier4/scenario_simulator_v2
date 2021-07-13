@@ -20,6 +20,32 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+// NOTE: This function is not included in the header and can only be referenced from this .cpp file.
+constexpr auto toValueType(const traffic_simulator::TrafficLightArrow & arrow)
+{
+  switch (arrow) {
+    case traffic_simulator::TrafficLightArrow::LEFT:
+      return Arrow::left;
+
+    case traffic_simulator::TrafficLightArrow::RIGHT:
+      return Arrow::right;
+
+    case traffic_simulator::TrafficLightArrow::STRAIGHT:
+      return Arrow::straight;
+
+    case traffic_simulator::TrafficLightArrow::NONE:
+      // [[fallthrough]];
+
+    default:
+      return Arrow::none;
+  }
+}
+
+constexpr Arrow::Arrow(const traffic_simulator::TrafficLightArrow & arrow)
+: value(toValueType(arrow))
+{
+}
+
 std::istream & operator>>(std::istream & is, Arrow & datum)
 {
   std::string value;
