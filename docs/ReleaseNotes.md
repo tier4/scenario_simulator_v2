@@ -5,6 +5,7 @@
 - Integrate with AutowareAuto (Autoware type is chosen at build time using `AUTOWARE_ARCHITECTURE_PROPOSAL` or `AUTOWARE_AUTO` flag)
 - Update WorldPosition to be convertible with 'openscenario_msgs::msg::LaneletPose'.
 - Fix problems when the whole route is empty in route planner class.
+- Start supporting MiscObject
 
 ## Ver 0.2.0
 - Enhance `/simulation/context` topic infomation. (adding TriggeringEntitiesRule, TriggeringEntities, CollisionCondition, TimeHeadwayCondition, AccelerationCondition, StandStillCondition, SpeedCondition, ReachPositionCondition, DistanceCondition, RelativeDistanceCondition, ParameterCondition, StoryboardElementStateCondition)
