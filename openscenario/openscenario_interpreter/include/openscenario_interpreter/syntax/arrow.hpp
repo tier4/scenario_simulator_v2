@@ -26,20 +26,22 @@ inline namespace syntax
 struct Arrow
 {
   enum value_type {
-    noArrow,
+    none,
+
+    // NOTE: Sorted lexicographically.
     left,
     right,
     straight,
   } value;
 
-  constexpr Arrow(value_type value = noArrow) : value(value) {}
+  constexpr Arrow(value_type value = none) : value(value) {}
 
   constexpr operator value_type() const noexcept { return value; }
 
   operator traffic_simulator::TrafficLightArrow() const
   {
     switch (value) {
-      case noArrow:
+      case none:
         return traffic_simulator::TrafficLightArrow::NONE;
 
       case left:
@@ -57,11 +59,14 @@ struct Arrow
   }
 };
 
-static_assert(std::is_trivially_copy_constructible<Arrow>::value, "");
-static_assert(std::is_trivially_copy_assignable<Arrow>::value, "");
 static_assert(std::is_standard_layout<Arrow>::value, "");
 
+static_assert(std::is_trivially_copy_assignable<Arrow>::value, "");
+
+static_assert(std::is_trivially_copy_constructible<Arrow>::value, "");
+
 std::istream & operator>>(std::istream &, Arrow &);
+
 std::istream & operator>>(std::istream &, boost::optional<Arrow> &);
 
 std::ostream & operator<<(std::ostream &, const Arrow &);

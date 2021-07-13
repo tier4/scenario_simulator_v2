@@ -65,15 +65,15 @@ struct TrafficSignalState
 
   auto evaluate() const
   {
-    const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
-    if (color_opt.has_value()) {
-      setTrafficLightColor(id(), color_opt.value());
+    const auto color = boost::lexical_cast<boost::optional<Color>>(state);
+    if (color.has_value()) {
+      setTrafficLightColor(id(), color.value());
       return unspecified;
     }
 
-    const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
-    if (arrow_opt.has_value()) {
-      setTrafficLightArrow(id(), arrow_opt.value());
+    const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
+    if (arrow.has_value()) {
+      setTrafficLightArrow(id(), arrow.value());
       return unspecified;
     }
 

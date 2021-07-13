@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
+#include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <stdexcept>  // std::out_of_range
@@ -51,7 +52,8 @@ public:
       return traffic_lights_.at(lanelet_id)->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
     } catch (const std::out_of_range &) {                                                   \
       std::stringstream what;                                                               \
-      what << "Given lanelet ID '" << lanelet_id << "' is not a valid traffic-light ID.";   \
+      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))                \
+           << " is not a valid traffic-light ID.";                                          \
       THROW_SEMANTIC_ERROR(what.str());                                                     \
     }                                                                                       \
   }                                                                                         \
