@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+## Ver 0.3.0
 - Enable spawn MiscObjectEntity by using API class.
 - Integrate with AutowareAuto (Autoware type is chosen at build time using `AUTOWARE_ARCHITECTURE_PROPOSAL` or `AUTOWARE_AUTO` flag)
 - Update WorldPosition to be convertible with 'openscenario_msgs::msg::LaneletPose'.
