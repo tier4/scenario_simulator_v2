@@ -184,7 +184,7 @@ EgoEntity::EgoEntity(
       "sensor_model:=" + getParameter("sensor_model", std::string("")),
       "vehicle_model:=" + getParameter("vehicle_model", std::string("")),
       "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
-        "/planning_simulator_v2.rviz",
+        "/config/scenario_simulator_v2.rviz",
       "scenario_simulation:=true"));
 }
 

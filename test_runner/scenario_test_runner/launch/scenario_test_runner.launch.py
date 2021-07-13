@@ -206,7 +206,7 @@ def launch_setup(context, *args, **kwargs):
                 "-d",
                 str(
                     Path(get_package_share_directory("scenario_test_runner"))
-                    / "planning_simulator_v2.rviz"
+                    / "config/scenario_simulator_v2.rviz"
                 ),
             ],
         ),

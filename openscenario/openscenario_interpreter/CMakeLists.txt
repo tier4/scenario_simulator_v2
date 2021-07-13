@@ -15,16 +15,6 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 # ------------------------------------------------------------------------------
-
-include(FetchContent)
-
-FetchContent_Declare(json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.9.1)
-
-FetchContent_MakeAvailable(json)
-
-# ------------------------------------------------------------------------------
 #  libopenscenario_interpreter
 # ------------------------------------------------------------------------------
 
@@ -43,7 +33,6 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   Boost::filesystem
   glog
-  nlohmann_json::nlohmann_json
   pugixml)
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "openscenario_interpreter::Interpreter")

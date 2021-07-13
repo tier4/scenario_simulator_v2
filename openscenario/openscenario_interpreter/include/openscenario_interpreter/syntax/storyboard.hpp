@@ -55,7 +55,7 @@ struct Storyboard : private Scope, public StoryboardElement<Storyboard>, public 
     });
 
     if (not init.endsImmediately()) {
-      throw SemanticError("Actions in Init should end immediately.");
+      throw SemanticError("Init.Actions should end immediately");
     }
   }
 
@@ -91,35 +91,20 @@ struct Storyboard : private Scope, public StoryboardElement<Storyboard>, public 
 
   auto run()
   {
-    const auto all_ready =
-      std::all_of(std::cbegin(entities), std::cend(entities), [&](const auto & each) {
-        // DEBUG_VALUE(each.first);
-        // DEBUG_VALUE(each.second.template as<ScenarioObject>().template is<Vehicle>());
-        // DEBUG_VALUE(each.second.template as<ScenarioObject>().object_controller.isEgo());
-        // DEBUG_VALUE(not openscenario_interpreter::ready(each.first));
-        // return each.second.template is<Vehicle>() and                                   //
-        //        each.second.template as<ScenarioObject>().object_controller.isEgo() and  //
-        //        not openscenario_interpreter::ready(each.first);
-        return openscenario_interpreter::ready(each.first);
-      });
-
-    // DEBUG_VALUE(getCurrentTime());
-    // DEBUG_VALUE(all_ready);
-
-    if (0 <= getCurrentTime()) {
-      if (engaged) {
-        for (auto && story : *this) {
-          story.evaluate();
-        }
-      } else if (all_ready) {
-        for (const auto & each : entities) {
-          engage(each.first);
-        }
-        engaged = true;
-      } else {
-        throw common::AutowareError(
-          "Autoware does not respond. It is likely that some nodes were corrupted during launch");
+    if (engaged) {
+      for (auto && story : *this) {
+        story.evaluate();
       }
+    } else if (std::all_of(std::cbegin(entities), std::cend(entities), [&](const auto & each) {
+                 return openscenario_interpreter::ready(std::get<0>(each));
+               })) {
+      for (const auto & each : entities) {
+        engage(each.first);
+      }
+      engaged = true;
+    } else {
+      throw common::AutowareError(
+        "Autoware does not respond. It is likely that some nodes were corrupted during launch");
     }
   }
 };
