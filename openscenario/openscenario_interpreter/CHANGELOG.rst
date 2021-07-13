@@ -2,6 +2,47 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.0 (2021-07-13)
+------------------
+* Merge pull request `#386 <https://github.com/tier4/scenario_simulator_v2/issues/386>`_ from tier4/feature/interpreter/misc-object
+* Move Storyboard's simulation time check into StoryboardElement
+* Fix Storyboard to check entities are ready if only before start simulation
+* Add utility function 'overload'
+* Update dependency 'nlohmann/json' to install via rosdep
+* Support syntax MiscObject
+* Update struct MiscObject
+* Lipsticks
+* Support syntax 'MiscObjectCategory'
+* Merge pull request `#383 <https://github.com/tier4/scenario_simulator_v2/issues/383>`_ from tier4/feature/interpreter/test-scenario
+* Support TrafficSignalCondition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/test-scenario
+* Merge pull request `#384 <https://github.com/tier4/scenario_simulator_v2/issues/384>`_ from tier4/feature/interpreter/assign-route-action-with-world-position
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/assign-route-action-with-world-position
+* Merge pull request `#328 <https://github.com/tier4/scenario_simulator_v2/issues/328>`_ from RobotecAI/pjaroszek/map_and_planning
+* Remove duplicated period
+* Update WorldPosition to be convertible with 'openscenario_msgs::msg::LaneletPose'
+* Rename function 'toMapPose' to 'toWorldPosition'
+* Merge branch 'master' into pjaroszek/map_and_planning
+* Merge pull request `#377 <https://github.com/tier4/scenario_simulator_v2/issues/377>`_ from tier4/traffic_signal_actions
+* fix bug
+* fix some function name and fix Arrow and Color trivially
+* trivial fix
+* add support for TrafficSignalController.referece
+* adapt formatting
+* remove like_action.hpp
+* Merge branch 'master' into traffic_signal_actions
+* build with AUTOWARE_AUTO flag defined instead of AUTOWARE_ARCHITECTURE_PROPOSAL
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into fix/get_waypoints_error_message
+* Merge pull request `#378 <https://github.com/tier4/scenario_simulator_v2/issues/378>`_ from tier4/feature/ego-entity/acuquire-position-action
+* Add member function 'description' to syntax UserDefinedValueCondition
+* Add struct 'UserDefinedValueCondition'
+* ament_clang_format
+* Merge branch 'master' into traffic_signal_actions
+* fix segv
+* add support for TrafficSingnalAction
+* TrafficSignalControllerAction can directly modify the phase of TrafficSignalController
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, danielm1405, kyabe2718, yamacir-kit
+
 0.2.0 (2021-06-24)
 ------------------
 * Merge pull request `#370 <https://github.com/tier4/scenario_simulator_v2/issues/370>`_ from tier4/feature/interpreter/context-2

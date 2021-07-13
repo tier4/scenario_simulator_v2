@@ -2,6 +2,11 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.0 (2021-07-13)
+------------------
+* Merge branch 'master' into traffic_signal_actions
+* Contributors: kyabe2718
+
 0.2.0 (2021-06-24)
 ------------------
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/send_ego_command
