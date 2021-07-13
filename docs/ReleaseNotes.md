@@ -5,7 +5,7 @@
 ## Ver 0.3.0
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.3.0) on Github :fa-github:
 - Enable spawn MiscObjectEntity by using API class.
-- Integrate with AutowareAuto (Autoware type is chosen at build time using `AUTOWARE_ARCHITECTURE_PROPOSAL` or `AUTOWARE_AUTO` flag).
+- Integrate with AutowareAuto (Autoware type is chosen at build time using `AUTOWARE_ARCHITECTURE_PROPOSAL` or `AUTOWARE_AUTO` flag). (Contribution by [Robotec.ai](https://robotec.ai/)).
 - Update WorldPosition to be convertible with `openscenario_msgs::msg::LaneletPose`.
 - Fix problems when the whole route is empty in route planner class.
 - Support OpenSCENARIO 1.0 MiscObject.
