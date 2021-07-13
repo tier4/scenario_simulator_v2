@@ -26,7 +26,7 @@ inline namespace syntax
 struct Arrow
 {
   enum value_type {
-    none,
+    none = 0,
 
     // NOTE: Sorted lexicographically.
     left,

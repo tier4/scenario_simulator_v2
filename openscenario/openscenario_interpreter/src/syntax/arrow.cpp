@@ -73,8 +73,8 @@ std::ostream & operator<<(std::ostream & os, const Arrow & datum)
     return os << #IDENTIFIER
 
   switch (datum.value) {
-    BOILERPLATE(none);
     BOILERPLATE(left);
+    BOILERPLATE(none);
     BOILERPLATE(right);
     BOILERPLATE(straight);
 
