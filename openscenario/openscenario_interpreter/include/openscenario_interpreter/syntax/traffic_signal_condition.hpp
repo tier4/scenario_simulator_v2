@@ -42,6 +42,8 @@ struct TrafficSignalCondition : private Scope
 
   const String state;
 
+  using LaneletId = std::int64_t;
+
   template <typename Node, typename Scope>
   explicit TrafficSignalCondition(const Node & node, Scope & scope)
   : Scope(scope),
@@ -50,26 +52,25 @@ struct TrafficSignalCondition : private Scope
   {
   }
 
-  String last_checked_value;
+  String current_arrow, current_color;
 
   auto evaluate()
   {
-    auto iter = localScope().traffic_signal_controllers.find(name);
+    current_arrow = boost::lexical_cast<String>(
+      static_cast<Arrow>(getTrafficSignalArrow(boost::lexical_cast<LaneletId>(name))));
 
-    if (iter != localScope().traffic_signal_controllers.end()) {
-      return asBoolean((last_checked_value = std::get<1>(*iter)->currentPhaseName()) == state);
-    } else {
-      THROW_SYNTAX_ERROR(
-        "TrafficSignalController ", std::quoted(name), " is not declared in this scope");
-    }
+    current_color = boost::lexical_cast<String>(
+      static_cast<Color>(getTrafficSignalColor(boost::lexical_cast<LaneletId>(name))));
+
+    return asBoolean(current_arrow == state or current_color == state);
   }
 
   auto description() const
   {
     std::stringstream description;
 
-    description << "Is controller " << std::quoted(name) << " (" << last_checked_value
-                << ") in state " << state << "?";
+    description << "Is TrafficSignal " << std::quoted(name) << " (Arrow = " << current_arrow
+                << ", Color = " << current_color << ") in state " << std::quoted(state) << "?";
 
     return description.str();
   }

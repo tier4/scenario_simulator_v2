@@ -36,7 +36,27 @@ struct Color
 
   constexpr Color(value_type value = none) : value(value) {}
 
-  explicit constexpr Color(const traffic_simulator::TrafficLightColor &);
+  explicit Color(const traffic_simulator::TrafficLightColor & color)
+  : value([](auto && color) {
+      switch (color) {
+        case traffic_simulator::TrafficLightColor::GREEN:
+          return Color::green;
+
+        case traffic_simulator::TrafficLightColor::RED:
+          return Color::red;
+
+        case traffic_simulator::TrafficLightColor::YELLOW:
+          return Color::yellow;
+
+        case traffic_simulator::TrafficLightColor::NONE:
+          // [[fallthrough]];
+
+        default:
+          return Color::none;
+      }
+    }(color))
+  {
+  }
 
   constexpr operator value_type() const noexcept { return value; }
 

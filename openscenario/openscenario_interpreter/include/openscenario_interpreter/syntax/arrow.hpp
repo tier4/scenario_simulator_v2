@@ -36,7 +36,27 @@ struct Arrow
 
   constexpr Arrow(value_type value = none) : value(value) {}
 
-  explicit constexpr Arrow(const traffic_simulator::TrafficLightArrow &);
+  explicit Arrow(const traffic_simulator::TrafficLightArrow & arrow)
+  : value([](auto && arrow) {
+      switch (arrow) {
+        case traffic_simulator::TrafficLightArrow::LEFT:
+          return Arrow::left;
+
+        case traffic_simulator::TrafficLightArrow::RIGHT:
+          return Arrow::right;
+
+        case traffic_simulator::TrafficLightArrow::STRAIGHT:
+          return Arrow::straight;
+
+        case traffic_simulator::TrafficLightArrow::NONE:
+          // [[fallthrough]];
+
+        default:
+          return Arrow::none;
+      }
+    }(arrow))
+  {
+  }
 
   constexpr operator value_type() const noexcept { return value; }
 
