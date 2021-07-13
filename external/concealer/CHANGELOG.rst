@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.0 (2021-07-13)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/test-scenario
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/assign-route-action-with-world-position
 * Merge pull request `#328 <https://github.com/tier4/scenario_simulator_v2/issues/328>`_ from RobotecAI/pjaroszek/map_and_planning
