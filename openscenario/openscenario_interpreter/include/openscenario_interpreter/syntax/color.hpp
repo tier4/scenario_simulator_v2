@@ -36,9 +36,11 @@ struct Color
 
   constexpr Color(value_type value = none) : value(value) {}
 
+  explicit constexpr Color(const traffic_simulator::TrafficLightColor &);
+
   constexpr operator value_type() const noexcept { return value; }
 
-  operator traffic_simulator::TrafficLightColor() const
+  constexpr operator traffic_simulator::TrafficLightColor() const
   {
     switch (value) {
       case none:

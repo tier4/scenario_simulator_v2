@@ -40,7 +40,7 @@ struct Arrow
 
   constexpr operator value_type() const noexcept { return value; }
 
-  operator traffic_simulator::TrafficLightArrow() const
+  constexpr operator traffic_simulator::TrafficLightArrow() const
   {
     switch (value) {
       case none:

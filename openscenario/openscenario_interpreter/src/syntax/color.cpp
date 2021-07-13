@@ -21,6 +21,32 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+// NOTE: This function is not included in the header and can only be referenced from this .cpp file.
+constexpr auto toValueType(const traffic_simulator::TrafficLightColor & color)
+{
+  switch (color) {
+    case traffic_simulator::TrafficLightColor::GREEN:
+      return Color::green;
+
+    case traffic_simulator::TrafficLightColor::RED:
+      return Color::red;
+
+    case traffic_simulator::TrafficLightColor::YELLOW:
+      return Color::yellow;
+
+    case traffic_simulator::TrafficLightColor::NONE:
+      // [[fallthrough]];
+
+    default:
+      return Color::none;
+  }
+}
+
+constexpr Color::Color(const traffic_simulator::TrafficLightColor & color)
+: value(toValueType(color))
+{
+}
+
 std::istream & operator>>(std::istream & is, Color & datum)
 {
   std::string value;
