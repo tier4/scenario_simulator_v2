@@ -38,13 +38,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Event : private Scope, public StoryboardElement<Event>, public Elements
+struct Event : private Scope, public StoryboardElement<Event>
 {
   // Name of the event.
   const String name;
 
   // Priority of each event.
   const Priority priority;
+
+  std::list<Action> actions;
 
   Trigger start_trigger;
 
@@ -55,11 +57,9 @@ struct Event : private Scope, public StoryboardElement<Event>, public Elements
       readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
     name(readAttribute<String>("name", node, localScope())),
     priority(readAttribute<Priority>("priority", node, localScope())),
+    actions(readElements<Action, 1>("Action", node, localScope())),
     start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {
-    callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Action>(node, localScope(), maximum_execution_count));
-    });
   }
 
   auto ready() { return start_trigger.evaluate().as<Boolean>(); }
@@ -74,25 +74,22 @@ struct Event : private Scope, public StoryboardElement<Event>, public Elements
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
-      return each.template as<Action>().complete();
-    });
+    return std::all_of(
+      std::begin(actions), std::end(actions), [](auto && each) { return each.complete(); });
   }
-
-  using StoryboardElement::evaluate;
 
   void stop()
   {
-    for (auto && each : *this) {
-      each.as<Action>().override();
-      each.evaluate();
+    for (auto && action : actions) {
+      action.override();
+      action.evaluate();
     }
   }
 
   void run()
   {
-    for (auto && each : *this) {
-      each.evaluate();
+    for (auto && action : actions) {
+      action.evaluate();
     }
   }
 };

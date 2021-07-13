@@ -43,10 +43,9 @@ struct Action : public StoryboardElement<Action>, public Element
   const String name;
 
   template <typename Node, typename Scope>
-  explicit Action(const Node & node, Scope & scope, std::size_t maximum_execution_count)
+  explicit Action(const Node & node, Scope & scope)
   // clang-format off
-  : StoryboardElement(maximum_execution_count),
-    Element(
+  : Element(
       choice(node,
         std::make_pair(     "GlobalAction", [&](auto && node) { return make<     GlobalAction>(node, scope); }),
         std::make_pair("UserDefinedAction", [&](auto && node) { return make<UserDefinedAction>(node, scope); }),

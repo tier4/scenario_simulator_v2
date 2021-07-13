@@ -52,17 +52,21 @@ struct TrafficSignalCondition : private Scope
   {
   }
 
-  String current_arrow, current_color;
+  Arrow current_arrow;
+  Color current_color;
 
   auto evaluate()
   {
-    current_arrow = boost::lexical_cast<String>(
-      static_cast<Arrow>(getTrafficSignalArrow(boost::lexical_cast<LaneletId>(name))));
+    current_arrow = static_cast<Arrow>(getTrafficSignalArrow(boost::lexical_cast<LaneletId>(name)));
+    current_color = static_cast<Color>(getTrafficSignalColor(boost::lexical_cast<LaneletId>(name)));
 
-    current_color = boost::lexical_cast<String>(
-      static_cast<Color>(getTrafficSignalColor(boost::lexical_cast<LaneletId>(name))));
-
-    return asBoolean(current_arrow == state or current_color == state);
+    if (state == "none") {
+      return asBoolean(current_arrow == Arrow::none and current_color == Color::none);
+    } else {
+      return asBoolean(
+        boost::lexical_cast<String>(current_arrow) == state or
+        boost::lexical_cast<String>(current_color) == state);
+    }
   }
 
   auto description() const

@@ -36,7 +36,7 @@ public:
 
   Element current_state;
 
-  explicit constexpr StoryboardElement(std::size_t maximum_execution_count = 1)
+  explicit constexpr StoryboardElement(std::size_t maximum_execution_count = 0)
   : maximum_execution_count(maximum_execution_count),
     current_execution_count(0),
     current_state(standby_state)

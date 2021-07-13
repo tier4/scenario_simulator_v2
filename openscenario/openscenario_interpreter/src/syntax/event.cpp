@@ -29,9 +29,9 @@ nlohmann::json & operator<<(nlohmann::json & json, const Event & datum)
 
   json["Action"] = nlohmann::json::array();
 
-  for (const auto & each : datum) {
+  for (const auto & each : datum.actions) {
     nlohmann::json action;
-    action << each.as<Action>();
+    action << each;
     json["Action"].push_back(action);
   }
 
