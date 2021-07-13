@@ -12,8 +12,8 @@
 
 ## Ver 0.2.0
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.2.0) on Github :fa-github:
-- Enhance `/simulation/context` topic infomation. (adding TriggeringEntitiesRule, TriggeringEntities, CollisionCondition, TimeHeadwayCondition, AccelerationCondition, StandStillCondition, SpeedCondition, ReachPositionCondition, DistanceCondition, RelativeDistanceCondition, ParameterCondition, StoryboardElementStateCondition)
-- NPC becomes ubable to change lanes behind of them.
+- Enhance `/simulation/context` topic information. (adding TriggeringEntitiesRule, TriggeringEntities, CollisionCondition, TimeHeadwayCondition, AccelerationCondition, StandStillCondition, SpeedCondition, ReachPositionCondition, DistanceCondition, RelativeDistanceCondition, ParameterCondition, StoryboardElementStateCondition)
+- NPC becomes unable to change lanes behind of them.
 
 ## Ver 0.1.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.1.1) on Github :fa-github:
@@ -31,7 +31,7 @@
 - Fix problems in publishing detection result. Before this change, the value of the pose was always (x,y,z,roll,pitch,yaw) = (0,0,0,0,0,0)
 - Remove unused packages (joy_to_vehicle_cmd, scenario_runner_mock)
 - Fix problems when simulator running in 30 FPS and with 10 FPS sensors
-- Enable caching routing reslut, and center points and it' spline, lanelet length in hdmap_utils class
+- Enable caching routing result, and center points and it' spline, lanelet length in hdmap_utils class
 - Update interpreter to access TrafficSignals from Action / Condition
 - Update EgoEntity to use precise simulation model parameters
 - Add getVehicleCommand function to the API class
