@@ -81,8 +81,6 @@ struct TrafficSignalControllerCondition : private Scope
                 << ", since " << current_phase_since                               //
                 << " sec) in phase " << std::quoted(phase) << "?";
 
-    PRINT(description.str());
-
     return description.str();
   }
 };

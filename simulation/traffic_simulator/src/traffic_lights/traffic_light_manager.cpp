@@ -35,22 +35,28 @@ TrafficLightManager::TrafficLightManager(
   map_frame_(map_frame)
 {
   for (const auto id : (*hdmap_utils_ptr).getTrafficLightIds()) {
-    std::shared_ptr<TrafficLight> light_ptr = std::make_shared<TrafficLight>(id);
-    auto red_position = hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::RED);
+    std::unordered_map<TrafficLightColor, geometry_msgs::msg::Point> color_positions;
+
+    const auto red_position =
+      hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::RED);
     if (red_position) {
-      light_ptr->setPosition(TrafficLightColor::RED, red_position.get());
+      color_positions.emplace(TrafficLightColor::RED, red_position.get());
     }
-    auto yellow_position =
+
+    const auto yellow_position =
       hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::YELLOW);
     if (yellow_position) {
-      light_ptr->setPosition(TrafficLightColor::YELLOW, yellow_position.get());
+      color_positions.emplace(TrafficLightColor::YELLOW, yellow_position.get());
     }
-    auto green_position =
+
+    const auto green_position =
       hdmap_utils_ptr->getTrafficLightBulbPosition(id, TrafficLightColor::GREEN);
     if (green_position) {
-      light_ptr->setPosition(TrafficLightColor::GREEN, green_position.get());
+      color_positions.emplace(TrafficLightColor::GREEN, green_position.get());
     }
-    traffic_lights_.insert({id, light_ptr});
+
+    traffic_lights_.emplace(
+      std::piecewise_construct, std::make_tuple(id), std::make_tuple(id, color_positions));
   }
 }
 
@@ -80,9 +86,12 @@ void TrafficLightManager::deleteAllMarkers() const
 void TrafficLightManager::drawMarkers() const
 {
   visualization_msgs::msg::MarkerArray msg;
+
   const auto now = (*clock_ptr_).now();
+
   for (const auto & light : traffic_lights_) {
-    const auto color = light.second->getColor();
+    const auto color = std::get<1>(light).getColor();
+
     if (color != TrafficLightColor::NONE) {
       visualization_msgs::msg::Marker marker;
       marker.header.stamp = now;
@@ -91,7 +100,7 @@ void TrafficLightManager::drawMarkers() const
       marker.ns = "bulb";
       marker.id = light.first;
       marker.type = marker.SPHERE;
-      marker.pose.position = light.second->getPosition(color);
+      marker.pose.position = std::get<1>(light).getPosition(color);
       marker.pose.orientation = geometry_msgs::msg::Quaternion();
       marker.scale.x = 0.3;
       marker.scale.y = 0.3;
@@ -100,6 +109,7 @@ void TrafficLightManager::drawMarkers() const
       msg.markers.push_back(marker);
     }
   }
+
   marker_pub_->publish(msg);
 }
 
@@ -109,7 +119,9 @@ void TrafficLightManager::update(const double)
 
   if (std::any_of(
         std::begin(traffic_lights_), std::end(traffic_lights_),
-        [](const auto & traffic_light) { return (*traffic_light.second).colorChanged(); })) {
+        [](const auto & id_and_traffic_light) {
+          return std::get<1>(id_and_traffic_light).colorChanged();
+        })) {
     deleteAllMarkers();
   }
 

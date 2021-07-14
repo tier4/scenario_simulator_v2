@@ -78,8 +78,6 @@ struct TrafficSignalCondition : private Scope
     description << "Is TrafficSignal " << std::quoted(name) << " (Arrow = " << current_arrow
                 << ", Color = " << current_color << ") in state " << std::quoted(state) << "?";
 
-    PRINT(description.str());
-
     return description.str();
   }
 };
