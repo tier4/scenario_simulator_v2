@@ -37,8 +37,8 @@ TrafficLight::TrafficLight(
   arrow_phase_.setState(TrafficLightArrow::NONE);
 }
 
-void TrafficLight::setColor(TrafficLightColor color) { color_phase_.setState(color); }
-void TrafficLight::setArrow(TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
+void TrafficLight::setColor(const TrafficLightColor color) { color_phase_.setState(color); }
+void TrafficLight::setArrow(const TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
 
 double TrafficLight::getColorPhaseDuration() const { return color_phase_.getPhaseDuration(); }
 double TrafficLight::getArrowPhaseDuration() const { return arrow_phase_.getPhaseDuration(); }

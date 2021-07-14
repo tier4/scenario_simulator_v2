@@ -59,7 +59,7 @@ struct Action : public StoryboardElement<Action>, public Element
 
   static constexpr auto stopTriggered() noexcept { return false; }
 
-  using StoryboardElement<Action>::currentState;
+  using StoryboardElement::currentState;
 
   using Element::start;
 
@@ -90,7 +90,7 @@ struct Action : public StoryboardElement<Action>, public Element
   }
 
   template <typename... Ts>
-  decltype(auto) run(Ts &&... xs)
+  auto run(Ts &&... xs) -> decltype(auto)
   {
     return Element::evaluate(std::forward<decltype(xs)>(xs)...);
   }

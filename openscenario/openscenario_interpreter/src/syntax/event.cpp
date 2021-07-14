@@ -31,7 +31,7 @@ nlohmann::json & operator<<(nlohmann::json & json, const Event & datum)
 
   for (const auto & each : datum.actions) {
     nlohmann::json action;
-    action << each;
+    action << each.as<Action>();
     json["Action"].push_back(action);
   }
 

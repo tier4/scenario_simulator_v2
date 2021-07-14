@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
 #include <boost/mpl/and.hpp>
+#include <cstddef>
+#include <limits>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <string>
 #include <type_traits>
@@ -36,7 +38,7 @@ public:
 
   Element current_state;
 
-  explicit constexpr StoryboardElement(std::size_t maximum_execution_count = 0)
+  explicit constexpr StoryboardElement(const std::size_t maximum_execution_count = 0)
   : maximum_execution_count(maximum_execution_count),
     current_execution_count(0),
     current_state(standby_state)

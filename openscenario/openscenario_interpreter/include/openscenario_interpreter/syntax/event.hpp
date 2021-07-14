@@ -40,13 +40,11 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Event : private Scope, public StoryboardElement<Event>
 {
-  // Name of the event.
-  const String name;
+  const String name;  // Name of the event.
 
-  // Priority of each event.
-  const Priority priority;
+  const Priority priority;  // Priority of each event.
 
-  std::list<Action> actions;
+  Elements actions;
 
   Trigger start_trigger;
 
@@ -57,9 +55,11 @@ struct Event : private Scope, public StoryboardElement<Event>
       readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
     name(readAttribute<String>("name", node, localScope())),
     priority(readAttribute<Priority>("priority", node, localScope())),
-    actions(readElements<Action, 1>("Action", node, localScope())),
     start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {
+    callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
+      return actions.push_back(readStoryboardElement<Action>(node, localScope()));
+    });
   }
 
   auto ready() { return start_trigger.evaluate().as<Boolean>(); }
@@ -74,15 +74,23 @@ struct Event : private Scope, public StoryboardElement<Event>
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(
-      std::begin(actions), std::end(actions), [](auto && each) { return each.complete(); });
+    return std::all_of(std::begin(actions), std::end(actions), [](auto && each) {
+      return each.template as<Action>().complete();
+    });
+  }
+
+  void start()
+  {
+    for (auto && each : actions) {
+      each.as<Action>().changeStateIf(true, standby_state);
+    }
   }
 
   void stop()
   {
-    for (auto && action : actions) {
-      action.override();
-      action.evaluate();
+    for (auto && each : actions) {
+      each.as<Action>().override();
+      each.evaluate();
     }
   }
 

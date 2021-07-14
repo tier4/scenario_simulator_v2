@@ -52,8 +52,8 @@ public:
     return arrow_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
   }
 
-  void setColor(TrafficLightColor color);
-  void setArrow(TrafficLightArrow arrow);
+  void setColor(const TrafficLightColor color);
+  void setArrow(const TrafficLightArrow arrow);
 
   double getColorPhaseDuration() const;
   double getArrowPhaseDuration() const;
