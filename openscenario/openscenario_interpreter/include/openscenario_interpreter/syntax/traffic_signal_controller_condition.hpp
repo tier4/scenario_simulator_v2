@@ -53,12 +53,16 @@ struct TrafficSignalControllerCondition : private Scope
 
   String current_phase;
 
+  Double since;
+
   auto evaluate()
   {
     auto iter = localScope().traffic_signal_controllers.find(traffic_signal_controller_ref);
 
     if (iter != localScope().traffic_signal_controllers.end()) {
-      return asBoolean((current_phase = std::get<1>(*iter)->currentPhaseName()) == phase);
+      current_phase = std::get<1>(*iter)->currentPhaseName();
+      since = std::get<1>(*iter)->currentPhaseSince();
+      return asBoolean(current_phase == phase);
     } else {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
@@ -70,8 +74,13 @@ struct TrafficSignalControllerCondition : private Scope
   {
     std::stringstream description;
 
-    description << "Is controller " << std::quoted(traffic_signal_controller_ref) << " ("
-                << current_phase << ") in phase " << std::quoted(phase) << "?";
+    description << "Is controller " << std::quoted(traffic_signal_controller_ref)  //
+                << " (Phase = "                                                    //
+                << current_phase                                                   //
+                << ", since " << since                                             //
+                << " sec) in phase " << std::quoted(phase) << "?";
+
+    PRINT(description.str());
 
     return description.str();
   }
