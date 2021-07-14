@@ -51,19 +51,20 @@ struct TrafficSignalControllerCondition : private Scope
   {
   }
 
-  String current_phase;
+  String current_phase_name;
 
-  Double since;
+  Double current_phase_since;
 
   auto evaluate()
   {
-    auto iter = localScope().traffic_signal_controllers.find(traffic_signal_controller_ref);
-
-    if (iter != localScope().traffic_signal_controllers.end()) {
-      current_phase = std::get<1>(*iter)->currentPhaseName();
-      since = std::get<1>(*iter)->currentPhaseSince();
-      return asBoolean(current_phase == phase);
-    } else {
+    try {
+      const auto & controller =
+        localScope().traffic_signal_controllers.at(traffic_signal_controller_ref);
+      assert(controller);
+      current_phase_name = (*controller).currentPhaseName();
+      current_phase_since = (*controller).currentPhaseSince();
+      return asBoolean(current_phase_name == phase);
+    } catch (const std::out_of_range &) {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
         " is not declared in this scope");
@@ -76,8 +77,8 @@ struct TrafficSignalControllerCondition : private Scope
 
     description << "Is controller " << std::quoted(traffic_signal_controller_ref)  //
                 << " (Phase = "                                                    //
-                << current_phase                                                   //
-                << ", since " << since                                             //
+                << current_phase_name                                              //
+                << ", since " << current_phase_since                               //
                 << " sec) in phase " << std::quoted(phase) << "?";
 
     PRINT(description.str());

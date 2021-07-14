@@ -123,24 +123,34 @@ public:
     }
   }
 
-  auto changePhaseTo(const std::list<Phase>::iterator & next)
+  auto changePhaseByName(const std::string & phase_name)
+  {
+    auto it = std::find_if(phases.begin(), phases.end(), [&phase_name](const Phase & phase) {
+      return phase.name == phase_name;
+    });
+
+    if (it == phases.end()) {
+      THROW_SYNTAX_ERROR(
+        std::quoted(phase_name), " is not declared in TrafficSignalContoller ", std::quoted(name));
+    }
+
+    return changePhaseTo(it);
+  }
+
+  auto changePhaseTo(const std::list<Phase>::iterator & next) -> Element
   {
     const auto current_time = getCurrentTime();
 
     if (next == phases.begin()) {
       for (auto & observer : observers) {
-        observer->notify_begin();
+        observer->notifyBegin();
       }
     }
 
     current_phase_started_at = current_time;
     current_phase = next;
 
-    if (current_phase != phases.end()) {
-      return (*current_phase).evaluate();
-    } else {
-      return unspecified;
-    }
+    return current_phase != phases.end() ? (*current_phase).evaluate() : unspecified;
   }
 
   auto currentPhaseExceeded() const -> bool
@@ -171,7 +181,7 @@ public:
     }
   }
 
-  void notify_begin() { change_to_begin_time = getCurrentTime() + delay; }
+  void notifyBegin() { change_to_begin_time = getCurrentTime() + delay; }
 
   auto shouldChangePhaseToBegin() -> bool
   {
@@ -185,20 +195,6 @@ public:
         return false;
       }
     }
-  }
-
-  auto changePhaseByName(const std::string & phase_name)
-  {
-    auto it = std::find_if(phases.begin(), phases.end(), [&phase_name](const Phase & phase) {
-      return phase.name == phase_name;
-    });
-
-    if (it == phases.end()) {
-      THROW_SYNTAX_ERROR(
-        std::quoted(phase_name), " is not declared in TrafficSignalContoller ", std::quoted(name));
-    }
-
-    return changePhaseTo(it);
   }
 };
 }  // namespace syntax
