@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
 namespace openscenario_interpreter
 {
@@ -42,7 +43,7 @@ struct TrafficSignalCondition : private Scope
 
   const String state;
 
-  using LaneletId = std::int64_t;
+  using LaneletId = TrafficSignalState::LaneletId;
 
   template <typename Node, typename Scope>
   explicit TrafficSignalCondition(const Node & node, Scope & scope)
@@ -53,6 +54,7 @@ struct TrafficSignalCondition : private Scope
   }
 
   Arrow current_arrow;
+
   Color current_color;
 
   auto evaluate()
