@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <utility>
 

@@ -35,20 +35,20 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Storyboard : private Scope, public StoryboardElement<Storyboard>, public Elements
+struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public Elements
 {
   Init init;
 
   Trigger stop_trigger;
 
-  const String name;
+  const Entities & entities;
 
-  template <typename Node, typename Scope>
-  explicit Storyboard(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope),
+  template <typename Node>
+  explicit Storyboard(const Node & node, Scope & outer_scope, const Entities & entities)
+  : Scope(outer_scope.makeChildScope("Storyboard")),
     init(readElement<Init>("Init", node, localScope())),
     stop_trigger(readElement<Trigger>("StopTrigger", node, localScope())),
-    name("Storyboard")
+    entities(entities)
   {
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Story>(node, localScope()));

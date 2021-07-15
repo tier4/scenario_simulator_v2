@@ -32,13 +32,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Entities
+struct Entities : std::unordered_map<std::string, Element>
 {
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit Entities(const Node & node, Scope & outer_scope)
   {
-    callWithElements(node, "ScenarioObject", 0, unbounded, [&](auto && node) {
-      outer_scope.entities.emplace(
+    callWithElements(node, "ScenarioObject", 0, unbounded, [&](auto && node) mutable {
+      this->emplace(
         readAttribute<ScenarioObject::Name>("name", node, outer_scope),
         make<ScenarioObject>(node, outer_scope));
     });

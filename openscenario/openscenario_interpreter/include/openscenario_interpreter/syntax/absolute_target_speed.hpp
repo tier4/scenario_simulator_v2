@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ABSOLUTE_TARGET_SPEED_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 
 namespace openscenario_interpreter
 {
@@ -32,7 +34,7 @@ struct AbsoluteTargetSpeed
 {
   const Double value;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit AbsoluteTargetSpeed(const Node & node, Scope & scope)
   : value{readAttribute<Double>("value", node, scope)}
   {

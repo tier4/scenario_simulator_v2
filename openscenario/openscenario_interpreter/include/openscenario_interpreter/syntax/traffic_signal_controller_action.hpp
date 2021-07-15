@@ -35,7 +35,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalControllerAction : private Scope
+struct TrafficSignalControllerAction : public Scope
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -65,15 +65,14 @@ struct TrafficSignalControllerAction : private Scope
 
   auto start()
   {
-    try {
-      auto & controller = localScope().traffic_signal_controllers.at(traffic_signal_controller_ref);
-      (*controller).changePhaseByName(phase);
-      return unspecified;
-    } catch (const std::out_of_range &) {
+    auto found = localScope().findElement(traffic_signal_controller_ref);
+    if (!found || found.is<TrafficSignalController>()) {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
         " is not declared in this scope");
     }
+    found.as<TrafficSignalController>().changePhaseByName(phase);
+    return unspecified;
   }
 
   static auto endsImmediately() -> bool { return true; }

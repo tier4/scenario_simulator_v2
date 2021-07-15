@@ -126,11 +126,7 @@ try {
 
   script.rebind<OpenScenario>(osc_path);
 
-  const auto with_autoware = std::any_of(
-    std::cbegin(script.as<OpenScenario>().entities), std::cend(script.as<OpenScenario>().entities),
-    [](auto & each) {
-      return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
-    });
+  const auto with_autoware = ObjectController::isAnyEgo;
 
   connect(
     shared_from_this(),                                       //

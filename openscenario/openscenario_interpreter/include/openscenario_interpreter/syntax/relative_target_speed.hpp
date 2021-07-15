@@ -16,6 +16,8 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_SPEED_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
 
 namespace openscenario_interpreter

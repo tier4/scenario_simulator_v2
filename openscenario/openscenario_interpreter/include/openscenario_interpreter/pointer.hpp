@@ -77,10 +77,13 @@ class Pointer : public std::shared_ptr<T>
   };
 
 public:
-  template <typename... Ts>
-  explicit constexpr Pointer(Ts &&... xs) : std::shared_ptr<T>{std::forward<decltype(xs)>(xs)...}
-  {
-  }
+  using std::shared_ptr<T>::shared_ptr;
+  using std::shared_ptr<T>::operator=;
+
+  //template <typename... Ts>
+  //explicit constexpr Pointer(Ts &&... xs) : std::shared_ptr<T>{std::forward<decltype(xs)>(xs)...}
+  //{
+  //}
 
   template <typename U, typename... Ts>
   static Pointer bind(Ts &&... xs)
