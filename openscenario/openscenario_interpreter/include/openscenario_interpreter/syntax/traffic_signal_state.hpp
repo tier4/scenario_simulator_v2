@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 
-#include <openscenario_interpreter/procedure.hpp>  // for setTrafficLight(Color|Arrow)
+#include <openscenario_interpreter/procedure.hpp>  // for setTrafficSignal(Color|Arrow)
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/arrow.hpp>
 #include <openscenario_interpreter/syntax/color.hpp>
@@ -75,13 +75,13 @@ struct TrafficSignalState
   {
     const auto color = boost::lexical_cast<boost::optional<Color>>(state);
     if (color.has_value()) {
-      setTrafficLightColor(id(), color.value());
+      setTrafficSignalColor(id(), color.value());
       return unspecified;
     }
 
     const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
     if (arrow.has_value()) {
-      setTrafficLightArrow(id(), arrow.value());
+      setTrafficSignalArrow(id(), arrow.value());
       return unspecified;
     }
 

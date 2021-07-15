@@ -64,7 +64,7 @@ struct LaneChangeAction : private Scope
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       for (const auto & actor : actors) {
         accomplishments.emplace(actor, false);
-        requestLaneChange(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
+        applyLaneChangeAction(actor, Integer(lane_change_target.as<AbsoluteTargetLane>().value));
       }
     } else {
       // NOTE: Specifying an unsupported element is an error in the constructor, so this line cannot be reached.

@@ -53,21 +53,16 @@ struct AssignRouteAction : private Scope
 
   static constexpr auto accomplished() noexcept { return true; }
 
-  decltype(auto) operator()(const Scope::Actor & actor)
-  {
-    return requestAssignRoute(
-      actor, static_cast<std::vector<openscenario_msgs::msg::LaneletPose> >(
-               route_or_catalog_reference.as<const Route>()));
-  }
+  static constexpr auto endsImmediately() noexcept { return true; };
 
   auto start()
   {
     for (const auto & actor : actors) {
-      (*this)(actor);
+      applyAssignRouteAction(
+        actor, static_cast<std::vector<openscenario_msgs::msg::LaneletPose>>(
+                 route_or_catalog_reference.as<const Route>()));
     }
   }
-
-  static bool endsImmediately() { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

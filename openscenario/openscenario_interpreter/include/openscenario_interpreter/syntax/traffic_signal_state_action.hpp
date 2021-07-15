@@ -68,13 +68,13 @@ struct TrafficSignalStateAction : private Scope
   {
     const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
     if (color_opt.has_value()) {
-      setTrafficLightColor(id(), color_opt.value());
+      setTrafficSignalColor(id(), color_opt.value());
       return unspecified;
     }
 
     const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
     if (arrow_opt.has_value()) {
-      setTrafficLightArrow(id(), arrow_opt.value());
+      setTrafficSignalArrow(id(), arrow_opt.value());
       return unspecified;
     }
 
