@@ -78,27 +78,26 @@ struct Position : public Element
 template <typename Result = void, typename Function, typename... Ts>
 auto apply(Function && function, const Position & position, Ts &&... xs) -> Result
 {
+  using application = std::function<Result(Function &&, const Position &, Ts &&...)>;
+
 #define BOILERPLATE(TYPE)                                                            \
-  {                                                                                  \
+  std::make_pair<std::type_index, application>(                                      \
     typeid(TYPE), [](Function && function, const Position & position, Ts &&... xs) { \
       return function(position.as<TYPE>(), std::forward<decltype(xs)>(xs)...);       \
-    }                                                                                \
-  }
+    })
 
-  static const std::unordered_map<
-    std::type_index, std::function<Result(Function &&, const Position &, Ts &&...)>>
-    overloads{
-      // clang-format off
-      BOILERPLATE(         WorldPosition),
-      BOILERPLATE( RelativeWorldPosition),
-      // BOILERPLATE(RelativeObjectPosition),
-      // BOILERPLATE(          RoadPosition),
-      // BOILERPLATE(  RelativeRoadPosition),
-      BOILERPLATE(          LanePosition),
-      // BOILERPLATE(  RelativeLanePosition),
-      // BOILERPLATE(         RoutePosition),
-      // clang-format on
-    };
+  static const std::unordered_map<std::type_index, application> overloads{
+    // clang-format off
+    BOILERPLATE(         WorldPosition),
+    BOILERPLATE( RelativeWorldPosition),
+    // BOILERPLATE(RelativeObjectPosition),
+    // BOILERPLATE(          RoadPosition),
+    // BOILERPLATE(  RelativeRoadPosition),
+    BOILERPLATE(          LanePosition),
+    // BOILERPLATE(  RelativeLanePosition),
+    // BOILERPLATE(         RoutePosition),
+    // clang-format on
+  };
 
 #undef BOILERPLATE
 
