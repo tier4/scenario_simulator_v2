@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <unordered_map>
 
@@ -61,6 +62,7 @@ struct AcquirePositionAction : private Scope
   auto reset()
   {
     accomplishments.clear();
+
     for (const auto & actor : actors) {
       accomplishments.emplace(actor, false);
     }
@@ -70,8 +72,23 @@ struct AcquirePositionAction : private Scope
   {
     reset();
 
+    const auto acquire_position = overload(
+      [](const WorldPosition & position, auto && actor) {
+        return requestAcquirePosition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      },
+      [](const RelativeWorldPosition & position, auto && actor) {
+        return requestAcquirePosition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      },
+      [](const LanePosition & position, auto && actor) {
+        return requestAcquirePosition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      });
+
     for (const auto & actor : actors) {
-      (*this)(actor);
+      // (*this)(actor);
+      apply(acquire_position, position, actor);
     }
 
     return unspecified;
