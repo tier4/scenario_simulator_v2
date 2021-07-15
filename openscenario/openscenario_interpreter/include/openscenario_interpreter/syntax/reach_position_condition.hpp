@@ -87,15 +87,32 @@ struct ReachPositionCondition
           triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
       });
 
-    const auto distance = [&](const EntityRef & name) {
-      const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
-      return std::hypot(pose.position.x, pose.position.y);
-    };
+    // const auto distance = [&](const EntityRef & name) {
+    //   const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
+    //   return std::hypot(pose.position.x, pose.position.y);
+    // };
+
+    const auto distance = overload(
+      [&](const WorldPosition & position, auto && triggering_entity) {
+        const auto pose =
+          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+        return std::hypot(pose.position.x, pose.position.y);
+      },
+      [&](const RelativeWorldPosition & position, auto && triggering_entity) {
+        const auto pose =
+          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+        return std::hypot(pose.position.x, pose.position.y);
+      },
+      [&](const LanePosition & position, auto && triggering_entity) {
+        const auto pose =
+          getRelativePose(triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+        return std::hypot(pose.position.x, pose.position.y);
+      });
 
     last_checked_values.clear();
 
     return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-      last_checked_values.push_back(distance(triggering_entity));
+      last_checked_values.push_back(apply<Double>(distance, position, triggering_entity));
       return apply<bool>(reach_position, position, triggering_entity, tolerance);
     }));
   }
