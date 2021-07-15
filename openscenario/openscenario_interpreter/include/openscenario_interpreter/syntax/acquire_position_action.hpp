@@ -47,15 +47,15 @@ struct AcquirePositionAction : private Scope
   {
   }
 
-  auto operator()(const Scope::Actor & actor) const
-  {
-    if (position.is<LanePosition>()) {
-      requestAcquirePosition(
-        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
-    } else {
-      throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
-    }
-  }
+  // auto operator()(const Scope::Actor & actor) const
+  // {
+  //   if (position.is<LanePosition>()) {
+  //     requestAcquirePosition(
+  //       actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
+  //   } else {
+  //     throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
+  //   }
+  // }
 
   std::unordered_map<String, Boolean> accomplishments;
 
@@ -87,27 +87,31 @@ struct AcquirePositionAction : private Scope
       });
 
     for (const auto & actor : actors) {
-      // (*this)(actor);
       apply(acquire_position, position, actor);
     }
 
     return unspecified;
   }
 
-  auto check(const String & actor)
-  {
-    if (position.is<LanePosition>()) {
-      return isReachedPosition(
-        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()), 1.0);
-    } else {
-      throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
-    }
-  }
-
   auto update()
   {
+    const auto reach_position = overload(
+      [](const WorldPosition & position, auto && actor) {
+        return isReachedPosition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
+      },
+      [](const RelativeWorldPosition & position, auto && actor) {
+        return isReachedPosition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
+      },
+      [](const LanePosition & position, auto && actor) {
+        return isReachedPosition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
+      });
+
     for (auto && each : accomplishments) {
-      each.second = each.second or check(each.first);
+      std::get<1>(each) =
+        std::get<1>(each) or apply<bool>(reach_position, position, std::get<0>(each));
     }
   }
 
