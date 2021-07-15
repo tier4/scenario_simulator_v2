@@ -97,15 +97,15 @@ struct AcquirePositionAction : private Scope
   {
     const auto reach_position = overload(
       [](const WorldPosition & position, auto && actor) {
-        return isReachedPosition(
+        return evaluateReachPositionCondition(
           actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
       },
       [](const RelativeWorldPosition & position, auto && actor) {
-        return isReachedPosition(
+        return evaluateReachPositionCondition(
           actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
       },
       [](const LanePosition & position, auto && actor) {
-        return isReachedPosition(
+        return evaluateReachPositionCondition(
           actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
       });
 

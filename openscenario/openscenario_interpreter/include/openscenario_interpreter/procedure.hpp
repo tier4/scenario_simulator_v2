@@ -136,10 +136,12 @@ FORWARD_TO_SIMULATION_API(updateFrame);
   }                                                            \
   static_assert(true, "")
 
+// NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
+
 RENAME(assignController, setDriverModel);
+RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(getTrafficSignalArrow, getTrafficLightArrow);
 RENAME(getTrafficSignalColor, getTrafficLightColor);
-RENAME(isReachedPosition, reachPosition);
 RENAME(toWorldPosition, toMapPose);
 
 #undef RENAME
