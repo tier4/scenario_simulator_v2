@@ -87,11 +87,6 @@ struct ReachPositionCondition
           triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
       });
 
-    // const auto distance = [&](const EntityRef & name) {
-    //   const auto pose = getRelativePose(name, static_cast<geometry_msgs::msg::Pose>(position));
-    //   return std::hypot(pose.position.x, pose.position.y);
-    // };
-
     const auto distance = overload(
       [&](const WorldPosition & position, auto && triggering_entity) {
         const auto pose =

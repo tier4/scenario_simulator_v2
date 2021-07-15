@@ -113,7 +113,6 @@ FORWARD_TO_SIMULATION_API(getCurrentTime);
 FORWARD_TO_SIMULATION_API(initialize);
 FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
-FORWARD_TO_SIMULATION_API(requestAcquirePosition);
 FORWARD_TO_SIMULATION_API(requestAssignRoute);
 FORWARD_TO_SIMULATION_API(requestLaneChange);
 FORWARD_TO_SIMULATION_API(requestWalkStraight);
@@ -138,6 +137,7 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
+RENAME(applyAcquirePositionAction, requestAcquirePosition);
 RENAME(assignController, setDriverModel);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(getTrafficSignalArrow, getTrafficLightArrow);

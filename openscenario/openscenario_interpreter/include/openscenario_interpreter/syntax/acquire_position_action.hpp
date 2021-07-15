@@ -47,16 +47,6 @@ struct AcquirePositionAction : private Scope
   {
   }
 
-  // auto operator()(const Scope::Actor & actor) const
-  // {
-  //   if (position.is<LanePosition>()) {
-  //     requestAcquirePosition(
-  //       actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
-  //   } else {
-  //     throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
-  //   }
-  // }
-
   std::unordered_map<String, Boolean> accomplishments;
 
   auto reset()
@@ -74,15 +64,15 @@ struct AcquirePositionAction : private Scope
 
     const auto acquire_position = overload(
       [](const WorldPosition & position, auto && actor) {
-        return requestAcquirePosition(
+        return applyAcquirePositionAction(
           actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
       },
       [](const RelativeWorldPosition & position, auto && actor) {
-        return requestAcquirePosition(
+        return applyAcquirePositionAction(
           actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
       },
       [](const LanePosition & position, auto && actor) {
-        return requestAcquirePosition(
+        return applyAcquirePositionAction(
           actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
       });
 
