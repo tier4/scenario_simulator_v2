@@ -35,6 +35,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalState
 {
+  using LaneletId = std::int64_t;
+
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  ID of the referenced signal in a road network. The signal ID must be
@@ -61,19 +63,25 @@ struct TrafficSignalState
   {
   }
 
-  auto id() const { return boost::lexical_cast<std::int64_t>(traffic_signal_id); }
+  auto id() const { return boost::lexical_cast<LaneletId>(traffic_signal_id); }
 
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  `state: none` is valid for both Arrow / Color. That is, `state: none`
+   *  changes both the arrow signal and the color signal to unlit at once.
+   *
+   * ------------------------------------------------------------------------ */
   auto evaluate() const
   {
-    const auto color_opt = boost::lexical_cast<boost::optional<Color>>(state);
-    if (color_opt.has_value()) {
-      setTrafficLightColor(id(), color_opt.value());
+    const auto color = boost::lexical_cast<boost::optional<Color>>(state);
+    if (color.has_value()) {
+      setTrafficLightColor(id(), color.value());
       return unspecified;
     }
 
-    const auto arrow_opt = boost::lexical_cast<boost::optional<Arrow>>(state);
-    if (arrow_opt.has_value()) {
-      setTrafficLightArrow(id(), arrow_opt.value());
+    const auto arrow = boost::lexical_cast<boost::optional<Arrow>>(state);
+    if (arrow.has_value()) {
+      setTrafficLightArrow(id(), arrow.value());
       return unspecified;
     }
 

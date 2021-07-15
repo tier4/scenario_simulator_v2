@@ -38,13 +38,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Event : private Scope, public StoryboardElement<Event>, public Elements
+struct Event : private Scope, public StoryboardElement<Event>
 {
-  // Name of the event.
-  const String name;
+  const String name;  // Name of the event.
 
-  // Priority of each event.
-  const Priority priority;
+  const Priority priority;  // Priority of each event.
+
+  Elements actions;
 
   Trigger start_trigger;
 
@@ -58,7 +58,7 @@ struct Event : private Scope, public StoryboardElement<Event>, public Elements
     start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {
     callWithElements(node, "Action", 1, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Action>(node, localScope(), maximum_execution_count));
+      return actions.push_back(readStoryboardElement<Action>(node, localScope()));
     });
   }
 
@@ -74,16 +74,21 @@ struct Event : private Scope, public StoryboardElement<Event>, public Elements
    * ---------------------------------------------------------------------- */
   auto accomplished() const
   {
-    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+    return std::all_of(std::begin(actions), std::end(actions), [](auto && each) {
       return each.template as<Action>().complete();
     });
   }
 
-  using StoryboardElement::evaluate;
+  void start()
+  {
+    for (auto && each : actions) {
+      each.as<Action>().changeStateIf(true, standby_state);
+    }
+  }
 
   void stop()
   {
-    for (auto && each : *this) {
+    for (auto && each : actions) {
       each.as<Action>().override();
       each.evaluate();
     }
@@ -91,8 +96,8 @@ struct Event : private Scope, public StoryboardElement<Event>, public Elements
 
   void run()
   {
-    for (auto && each : *this) {
-      each.evaluate();
+    for (auto && action : actions) {
+      action.evaluate();
     }
   }
 };

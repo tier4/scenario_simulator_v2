@@ -43,10 +43,9 @@ struct Action : public StoryboardElement<Action>, public Element
   const String name;
 
   template <typename Node, typename Scope>
-  explicit Action(const Node & node, Scope & scope, std::size_t maximum_execution_count)
+  explicit Action(const Node & node, Scope & scope)
   // clang-format off
-  : StoryboardElement(maximum_execution_count),
-    Element(
+  : Element(
       choice(node,
         std::make_pair(     "GlobalAction", [&](auto && node) { return make<     GlobalAction>(node, scope); }),
         std::make_pair("UserDefinedAction", [&](auto && node) { return make<UserDefinedAction>(node, scope); }),
@@ -60,7 +59,7 @@ struct Action : public StoryboardElement<Action>, public Element
 
   static constexpr auto stopTriggered() noexcept { return false; }
 
-  using StoryboardElement<Action>::currentState;
+  using StoryboardElement::currentState;
 
   using Element::start;
 
@@ -91,7 +90,7 @@ struct Action : public StoryboardElement<Action>, public Element
   }
 
   template <typename... Ts>
-  decltype(auto) run(Ts &&... xs)
+  auto run(Ts &&... xs) -> decltype(auto)
   {
     return Element::evaluate(std::forward<decltype(xs)>(xs)...);
   }

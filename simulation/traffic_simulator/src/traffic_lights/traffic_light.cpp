@@ -37,8 +37,8 @@ TrafficLight::TrafficLight(
   arrow_phase_.setState(TrafficLightArrow::NONE);
 }
 
-void TrafficLight::setColor(TrafficLightColor color) { color_phase_.setState(color); }
-void TrafficLight::setArrow(TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
+void TrafficLight::setColor(const TrafficLightColor color) { color_phase_.setState(color); }
+void TrafficLight::setArrow(const TrafficLightArrow arrow) { arrow_phase_.setState(arrow); }
 
 double TrafficLight::getColorPhaseDuration() const { return color_phase_.getPhaseDuration(); }
 double TrafficLight::getArrowPhaseDuration() const { return arrow_phase_.getPhaseDuration(); }
@@ -57,7 +57,7 @@ void TrafficLight::update(const double step_time)
   color_changed_ = (previous_color != getColor());
 }
 
-const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColor & color)
+const geometry_msgs::msg::Point & TrafficLight::getPosition(const TrafficLightColor & color) const
 {
   if (color_positions_.count(color) == 0) {
     THROW_SEMANTIC_ERROR("target color does not exist");
@@ -65,7 +65,7 @@ const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightColo
   return color_positions_.at(color);
 }
 
-const geometry_msgs::msg::Point TrafficLight::getPosition(const TrafficLightArrow & arrow)
+const geometry_msgs::msg::Point & TrafficLight::getPosition(const TrafficLightArrow & arrow) const
 {
   if (arrow_positions_.count(arrow) == 0) {
     THROW_SEMANTIC_ERROR("target arrow does not exist");

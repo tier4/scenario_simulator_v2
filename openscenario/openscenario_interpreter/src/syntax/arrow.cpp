@@ -26,15 +26,17 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
 
   is >> value;
 
-  if (value == "noArrow") {
-    datum = Arrow::noArrow;
-  } else if (value == "left") {
-    datum = Arrow::left;
-  } else if (value == "right") {
-    datum = Arrow::right;
-  } else if (value == "straight") {
-    datum = Arrow::straight;
-  } else {
+  static const std::unordered_map<std::string, Arrow::value_type> choice{
+    // NOTE: Sorted lexicographically.
+    std::make_pair("left", Arrow::left),
+    std::make_pair("none", Arrow::none),
+    std::make_pair("right", Arrow::right),
+    std::make_pair("straight", Arrow::straight),
+  };
+
+  try {
+    datum = choice.at(value);
+  } catch (const std::out_of_range &) {
     throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Arrow, value);
   }
 
@@ -44,17 +46,20 @@ std::istream & operator>>(std::istream & is, Arrow & datum)
 std::istream & operator>>(std::istream & is, boost::optional<Arrow> & datum)
 {
   std::string value;
+
   is >> value;
 
-  if (value == "noArrow") {
-    datum = Arrow::noArrow;
-  } else if (value == "left") {
-    datum = Arrow::left;
-  } else if (value == "right") {
-    datum = Arrow::right;
-  } else if (value == "straight") {
-    datum = Arrow::straight;
-  } else {
+  static const std::unordered_map<std::string, Arrow::value_type> choice{
+    // NOTE: Sorted lexicographically.
+    std::make_pair("left", Arrow::left),
+    std::make_pair("none", Arrow::none),
+    std::make_pair("right", Arrow::right),
+    std::make_pair("straight", Arrow::straight),
+  };
+
+  try {
+    datum = choice.at(value);
+  } catch (const std::out_of_range &) {
     datum = boost::none;
   }
 
@@ -68,8 +73,8 @@ std::ostream & operator<<(std::ostream & os, const Arrow & datum)
     return os << #IDENTIFIER
 
   switch (datum.value) {
-    BOILERPLATE(noArrow);
     BOILERPLATE(left);
+    BOILERPLATE(none);
     BOILERPLATE(right);
     BOILERPLATE(straight);
 

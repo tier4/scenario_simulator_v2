@@ -23,6 +23,10 @@ OpenSCENARIO:
           Phase: []
         - name: simple-controller
           Phase:
+            - name: blank
+              duration: 65535
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "none" }
             - name: green
               duration: 3
               TrafficSignalState:
@@ -385,47 +389,54 @@ OpenSCENARIO:
                         SimulationTimeCondition:
                           value: 0
                           rule: greaterThan
-          # - name: ""
-          #   ManeuverGroup:
-          #     - maximumExecutionCount: 1
-          #       name: ""
-          #       Actors:
-          #         selectTriggeringEntities: false
-          #         EntityRef: []
-          #       Maneuver:
-          #         - name: ""
-          #           Event:
-          #             - name: ""
-          #               priority: parallel
-          #               maximumExecutionCount: 1
-          #               StartTrigger:
-          #                 ConditionGroup:
-          #                   - Condition:
-          #                     - name: ""
-          #                       delay: 0
-          #                       conditionEdge: none
-          #                       ByValueCondition:
-          #                         TrafficSignalCondition:
-          #                           name: too-long-duration-controller
-          #                           state: blank
-          #               Action:
-          #                 - name: ""
-          #                   GlobalAction:
-          #                     InfrastructureAction:
-          #                       TrafficSignalAction:
-          #                         TrafficSignalControllerAction:
-          #                           trafficSignalControllerRef: too-long-duration-controller
-          #                           phase: green
-          #   StartTrigger:
-          #     ConditionGroup:
-          #       - Condition:
-          #           - name:
-          #             delay: 0
-          #             conditionEdge: none
-          #             ByValueCondition:
-          #               SimulationTimeCondition:
-          #                 value: 10
-          #                 rule: greaterThan
+          - name: "traffic-signal"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        maximumExecutionCount: 100
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: "if signal(34802).state() == none"
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  TrafficSignalCondition:
+                                    name: "34802"
+                                    state: none
+                              - name: "if simple_controller.phase() == blank"
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  TrafficSignalControllerCondition:
+                                    trafficSignalControllerRef: simple-controller
+                                    phase: blank
+                        Action:
+                          - name: "change_phase(simple_controller, green)"
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalControllerAction:
+                                    trafficSignalControllerRef: simple-controller
+                                    phase: green
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name:
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1

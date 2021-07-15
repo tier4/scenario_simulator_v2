@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/simulation_time_condition.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state_condition.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_condition.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_controller_condition.hpp>
 #include <openscenario_interpreter/syntax/user_defined_value_condition.hpp>
 #include <utility>
 
@@ -54,7 +55,7 @@ struct ByValueCondition : public ComplexType
         std::make_pair( "StoryboardElementStateCondition", [&](auto && node) { return make< StoryboardElementStateCondition>(node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair(       "UserDefinedValueCondition", [&](auto && node) { return make<       UserDefinedValueCondition>(node, std::forward<decltype(xs)>(xs)...); }),
         std::make_pair(          "TrafficSignalCondition", [&](auto && node) { return make<          TrafficSignalCondition>(node, std::forward<decltype(xs)>(xs)...); }),
-        std::make_pair("TrafficSignalControllerCondition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; })))
+        std::make_pair("TrafficSignalControllerCondition", [&](auto && node) { return make<TrafficSignalControllerCondition>(node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {
   }
