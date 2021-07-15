@@ -65,15 +65,14 @@ struct TrafficSignalControllerAction : private Scope
 
   auto start()
   {
-    auto target = localScope().traffic_signal_controllers.find(traffic_signal_controller_ref);
-
-    if (target == localScope().traffic_signal_controllers.end()) {
+    try {
+      auto & controller = localScope().traffic_signal_controllers.at(traffic_signal_controller_ref);
+      (*controller).changePhaseByName(phase);
+      return unspecified;
+    } catch (const std::out_of_range &) {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
         " is not declared in this scope");
-    } else {
-      target->second->changePhaseByName(phase);
-      return unspecified;
     }
   }
 

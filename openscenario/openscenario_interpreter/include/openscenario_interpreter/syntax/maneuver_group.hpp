@@ -82,6 +82,13 @@ struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
 
   using StoryboardElement::evaluate;
 
+  void start()
+  {
+    for (auto && each : *this) {
+      each.as<Maneuver>().changeStateIf(true, standby_state);
+    }
+  }
+
   void stop()
   {
     for (auto && each : *this) {

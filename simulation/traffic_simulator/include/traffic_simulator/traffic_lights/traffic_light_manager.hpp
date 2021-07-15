@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
 
 #include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
+#include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <stdexcept>  // std::out_of_range
@@ -43,18 +44,19 @@ public:
 
   void update(const double current_time);
 
-#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                          \
-  template <typename... Ts>                                                                 \
-  decltype(auto) IDENTIFIER(const std::int64_t lanelet_id, Ts &&... xs)                     \
-  {                                                                                         \
-    try {                                                                                   \
-      return traffic_lights_.at(lanelet_id)->IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
-    } catch (const std::out_of_range &) {                                                   \
-      std::stringstream what;                                                               \
-      what << "Given lanelet ID '" << lanelet_id << "' is not a valid traffic-light ID.";   \
-      THROW_SEMANTIC_ERROR(what.str());                                                     \
-    }                                                                                       \
-  }                                                                                         \
+#define FORWARD_TO_GIVEN_TRAFFIC_LIGHT(IDENTIFIER)                                         \
+  template <typename... Ts>                                                                \
+  decltype(auto) IDENTIFIER(const std::int64_t lanelet_id, Ts &&... xs)                    \
+  {                                                                                        \
+    try {                                                                                  \
+      return traffic_lights_.at(lanelet_id).IDENTIFIER(std::forward<decltype(xs)>(xs)...); \
+    } catch (const std::out_of_range &) {                                                  \
+      std::stringstream what;                                                              \
+      what << "Given lanelet ID " << std::quoted(std::to_string(lanelet_id))               \
+           << " is not a valid traffic-light ID.";                                         \
+      THROW_SEMANTIC_ERROR(what.str());                                                    \
+    }                                                                                      \
+  }                                                                                        \
   static_assert(true, "")
 
   FORWARD_TO_GIVEN_TRAFFIC_LIGHT(getArrow);
@@ -82,14 +84,14 @@ private:
 
       for (const auto & each : traffic_lights_) {
         traffic_light_state_array.states.push_back(
-          static_cast<autoware_perception_msgs::msg::TrafficLightState>(*std::get<1>(each)));
+          static_cast<autoware_perception_msgs::msg::TrafficLightState>(std::get<1>(each)));
       }
     }
 
     return (*traffic_light_state_array_publisher_).publish(traffic_light_state_array);
   }
 
-  std::unordered_map<std::int64_t, std::shared_ptr<TrafficLight>> traffic_lights_;
+  std::unordered_map<std::int64_t, TrafficLight> traffic_lights_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 

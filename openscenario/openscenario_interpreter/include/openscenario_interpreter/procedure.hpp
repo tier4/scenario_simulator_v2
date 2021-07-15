@@ -110,8 +110,6 @@ FORWARD_TO_SIMULATION_API(checkCollision);
 FORWARD_TO_SIMULATION_API(despawn);
 FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
-FORWARD_TO_SIMULATION_API(getTrafficLightArrow);
-FORWARD_TO_SIMULATION_API(getTrafficLightColor);
 FORWARD_TO_SIMULATION_API(initialize);
 FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
@@ -130,7 +128,7 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
 
-#define RENAME(FROM, TO)                                       \
+#define RENAME(TO, FROM)                                       \
   template <typename... Ts>                                    \
   decltype(auto) TO(Ts &&... xs)                               \
   {                                                            \
@@ -138,9 +136,11 @@ FORWARD_TO_SIMULATION_API(updateFrame);
   }                                                            \
   static_assert(true, "")
 
-RENAME(reachPosition, isReachedPosition);
-RENAME(setDriverModel, assignController);
-RENAME(toMapPose, toWorldPosition);
+RENAME(assignController, setDriverModel);
+RENAME(getTrafficSignalArrow, getTrafficLightArrow);
+RENAME(getTrafficSignalColor, getTrafficLightColor);
+RENAME(isReachedPosition, reachPosition);
+RENAME(toWorldPosition, toMapPose);
 
 #undef RENAME
 }  // namespace openscenario_interpreter

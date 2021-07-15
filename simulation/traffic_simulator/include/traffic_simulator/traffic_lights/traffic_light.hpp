@@ -52,8 +52,8 @@ public:
     return arrow_phase_.setPhase(std::forward<decltype(xs)>(xs)...);
   }
 
-  void setColor(TrafficLightColor color);
-  void setArrow(TrafficLightArrow arrow);
+  void setColor(const TrafficLightColor color);
+  void setArrow(const TrafficLightArrow arrow);
 
   double getColorPhaseDuration() const;
   double getArrowPhaseDuration() const;
@@ -63,8 +63,8 @@ public:
   TrafficLightArrow getArrow() const;
   TrafficLightColor getColor() const;
 
-  const geometry_msgs::msg::Point getPosition(const TrafficLightColor & color);
-  const geometry_msgs::msg::Point getPosition(const TrafficLightArrow & arrow);
+  const geometry_msgs::msg::Point & getPosition(const TrafficLightColor & color) const;
+  const geometry_msgs::msg::Point & getPosition(const TrafficLightArrow & arrow) const;
 
   template <typename... Ts>
   decltype(auto) setPosition(Ts &&... xs)
