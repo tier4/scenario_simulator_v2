@@ -1,4 +1,4 @@
-### Set a position of an entity in relative position
+### Topic : Placing an entity in relative position
 
 #### Launch a scenario editor and open a map
 
