@@ -32,10 +32,7 @@ class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
-  : Node("scenario_runner", option),
-    api_(
-      this, __FILE__,
-      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm", 5)
+  : Node("scenario_runner", option), api_(this, configure())
   {
     api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
@@ -123,6 +120,7 @@ private:
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
   }
+
   void update()
   {
     if (api_.getCurrentTime() >= 4 && api_.entityExists("tom")) {
@@ -175,6 +173,20 @@ private:
     }
     api_.updateFrame();
   }
+
+  static auto configure() -> traffic_simulator::Configuration
+  {
+    traffic_simulator::Configuration configuration;
+    {
+      configuration.initialize_duration = 5;
+      configuration.map_path =
+        ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map";
+      configuration.scenario_path = __FILE__;
+    }
+
+    return configuration;
+  }
+
   bool lanechange_executed_;
   bool target_speed_set_;
   int port_;

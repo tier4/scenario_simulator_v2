@@ -38,6 +38,51 @@
 
 namespace traffic_simulator
 {
+struct Configuration
+{
+  using Filename = std::string;
+
+  using Pathname = boost::filesystem::path;
+
+  bool auto_sink = true;
+
+  bool verbose = false;
+
+  bool standalone_mode = false;
+
+  double initialize_duration = 0;
+
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  This setting comes from the argument of the same name (= `map_path`) in
+   *  the launch file of ArchitectureProposal. In general, Autoware expects
+   *  this argument to be given the path to the directory containing the two HD
+   *  maps, lanelet_map.osm and pointcloud_map.pcd.
+   *
+   *  Depending on your map file, you may need to include additional files in
+   *  this directory. For example, Autoware.Auto (at the time this comment was
+   *  written) should be given the map origin coordinates in a separate yaml
+   *  file.
+   *
+   * ------------------------------------------------------------------------ */
+  boost::filesystem::path map_path = "";
+
+  // TODO (yamacir-kit): Use `static inline` (if C++17)
+  std::string lanelet2_map_file = "lanelet2_map.osm";
+
+  // TODO (yamacir-kit): Use `static inline` (if C++17)
+  std::string pointcloud_map_file = "pointcloud_map.pcd";
+
+  boost::filesystem::path scenario_path = "";
+
+  // TODO (yamacir-kit): Use boost::filesystem::path
+  std::string metrics_logfile_path = "/tmp/metrics.json";
+
+  auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
+
+  auto pointcloud_map_path() const { return map_path / pointcloud_map_file; }
+};
+
 class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
@@ -51,19 +96,23 @@ public:
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(
-    NodeT && node, const boost::filesystem::path, const std::string & lanelet2_map_osm,
-    const double initialize_duration = 0, const bool auto_sink = true, const bool verbose = false,
-    const bool standalone_mode = false,
-    const std::string & metrics_logfile_path = "/tmp/metrics.json")
-  : lanelet2_map_osm(lanelet2_map_osm),
-    initialize_duration(initialize_duration),
-    standalone_mode(standalone_mode),
+    NodeT && node, const Configuration & configuration = Configuration()
+    // const std::string & lanelet2_map_osm,  //
+    // const double initialize_duration = 0,  //
+    // const bool auto_sink = true,           //
+    // const bool verbose = false,            //
+    // const bool standalone_mode = false,    //
+    // const std::string & metrics_logfile_path = "/tmp/metrics.json"
+    )
+  : lanelet2_map_osm(configuration.lanelet2_map_path().string()),
+    initialize_duration(configuration.initialize_duration),
+    standalone_mode(configuration.standalone_mode),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getEntityPose(name); },
-      [this](const auto & name) { return API::despawn(name); }, auto_sink)),
-    metrics_manager_(verbose, metrics_logfile_path),
+      [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
+    metrics_manager_(configuration.verbose, configuration.metrics_logfile_path),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
@@ -99,7 +148,7 @@ public:
       simulation_interface::ports::attach_detection_sensor)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);
-    setVerbose(verbose);
+    setVerbose(configuration.verbose);
   }
 
   template <typename T, typename... Ts>

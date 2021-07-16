@@ -126,19 +126,26 @@ try {
 
   script.rebind<OpenScenario>(osc_path);
 
-  const auto with_autoware = std::any_of(
-    std::cbegin(script.as<OpenScenario>().entities), std::cend(script.as<OpenScenario>().entities),
-    [](auto & each) {
-      return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
-    });
+  traffic_simulator::Configuration configuration;
+  {
+    const auto with_autoware = std::any_of(
+      std::cbegin(script.as<OpenScenario>().entities),
+      std::cend(script.as<OpenScenario>().entities), [](auto & each) {
+        return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
+      });
 
-  connect(
-    shared_from_this(),                                       //
-    boost::filesystem::path(osc_path).replace_extension(""),  // NOTE: /path/to/lanelet2_map.osm
-    script.as<OpenScenario>().logic_file.string(),            //
-    with_autoware ? 30 : 0,
-    false  // auto-sink
-  );
+    configuration.auto_sink = false;
+    configuration.initialize_duration = with_autoware ? 30 : 0;
+    configuration.scenario_path = osc_path;
+
+    if (script.as<OpenScenario>().logic_file.has_extension()) {
+      configuration.map_path = script.as<OpenScenario>().logic_file.parent_path();
+    } else {
+      configuration.map_path = script.as<OpenScenario>().logic_file;
+    }
+  }
+
+  connect(shared_from_this(), configuration);
 
   initialize(
     local_real_time_factor,

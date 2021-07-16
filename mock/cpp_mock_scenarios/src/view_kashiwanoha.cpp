@@ -31,13 +31,8 @@ class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
-  : Node("scenario_runner", option),
-    api_(
-      this, __FILE__,
-      ament_index_cpp::get_package_share_directory("cargo_delivery") +
-        "/maps/kashiwa/lanelet2_map_with_private_road_and_walkway_ele_fix.osm")
+  : Node("scenario_runner", option), api_(this, configure())
   {
-    api_.setVerbose(true);
     api_.initialize(1.0, 0.05);
     pugi::xml_document vehicle_catalog_xml_doc;
     Catalog catalog;
@@ -60,6 +55,21 @@ private:
     api_.updateFrame();
     current_time_ = current_time_ + 0.05;
   }
+
+  static auto configure() -> traffic_simulator::Configuration
+  {
+    traffic_simulator::Configuration configuration;
+    {
+      configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
+      configuration.map_path =
+        ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa";
+      configuration.scenario_path = __FILE__;
+      configuration.verbose = true;
+    }
+
+    return configuration;
+  }
+
   bool lanechange_executed_;
   bool target_speed_set_;
   bool bob_spawned_;
