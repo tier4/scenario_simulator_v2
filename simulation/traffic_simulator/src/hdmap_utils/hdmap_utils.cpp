@@ -51,18 +51,18 @@ namespace hdmap_utils
 HdMapUtils::HdMapUtils(
   const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint & origin)
 {
-  const lanelet::GPSPoint origin_gps_point{origin.latitude, origin.longitude, origin.altitude};
-  const lanelet::Origin origin_lanelet{origin_gps_point};
-  lanelet::projection::UtmProjector projector(origin_lanelet);
+  lanelet::projection::MGRSProjector projector;
 
   lanelet::ErrorMessages errors;
+
   lanelet_map_ptr_ = lanelet::load(lanelet2_map_path.string(), projector, &errors);
+
   if (not errors.empty()) {
     std::stringstream ss;
     const auto * separator = "";
     for (const auto & error : errors) {
       ss << separator << error;
-      separator = ", ";
+      separator = "\n";
     }
     THROW_SIMULATION_ERROR("Failed to load lanelet map (", ss.str(), ")");
   }
