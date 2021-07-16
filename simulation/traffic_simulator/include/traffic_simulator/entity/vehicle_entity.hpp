@@ -135,7 +135,6 @@ public:
 
 private:
   std::shared_ptr<entity_behavior::vehicle::BehaviorTree> tree_ptr_;
-  std::int64_t to_lanelet_id_;
   boost::optional<double> target_speed_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };
