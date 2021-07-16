@@ -131,7 +131,7 @@ public:
 
     if (it == phases.end()) {
       THROW_SYNTAX_ERROR(
-        std::quoted(phase_name), " is not declared in TrafficSignalContoller ", std::quoted(name));
+        std::quoted(phase_name), " is not declared in TrafficSignalController ", std::quoted(name));
     }
 
     return changePhaseTo(it);
