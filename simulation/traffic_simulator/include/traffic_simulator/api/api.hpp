@@ -87,15 +87,10 @@ class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
 
-  const Configuration configuration;
-
 public:
-  // const std::string lanelet2_map_osm;
-
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(NodeT && node, const Configuration & configuration = Configuration())
   : configuration(configuration),
-    // lanelet2_map_osm(configuration.lanelet2_map_path().string()),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, configuration.lanelet2_map_path())),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
@@ -264,6 +259,8 @@ private:
   {
     return spawn(is_ego, parameters.toXml(), status);
   }
+
+  const Configuration configuration;
 
   const std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
 
