@@ -46,7 +46,7 @@ public:
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(NodeT && node, const Configuration & configuration = Configuration())
   : configuration(configuration),
-    entity_manager_ptr_(std::make_shared<EntityManager>(node, configuration.lanelet2_map_path())),
+    entity_manager_ptr_(std::make_shared<EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getEntityPose(name); },

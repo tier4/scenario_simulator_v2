@@ -33,6 +33,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -65,7 +66,7 @@ public:
 
 class EntityManager
 {
-  bool verbose_;
+  Configuration configuration;
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
@@ -116,8 +117,8 @@ public:
   }
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
-  explicit EntityManager(NodeT && node, const boost::filesystem::path & map_path)
-  : verbose_(false),
+  explicit EntityManager(NodeT && node, const Configuration & configuration)
+  : configuration(configuration),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -130,7 +131,8 @@ public:
     kinematic_state_pub_ptr_(rclcpp::create_publisher<VehicleKinematicState>(
       node, "output/kinematic_state", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(map_path, getOrigin(*node))),
+    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
+      configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
     traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(
       hdmap_utils_ptr_,
@@ -312,7 +314,7 @@ public:
 
   bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
 
-  void setVerbose(bool verbose);
+  void setVerbose(const bool verbose);
 
   template <typename Entity, typename... Ts>
   auto spawnEntity(const std::string & name, Ts &&... xs)
