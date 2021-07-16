@@ -71,7 +71,7 @@ BT::NodeStatus BehaviorTree::tickOnce(double current_time, double step_time)
 
 void BehaviorTree::tick(double current_time, double step_time)
 {
-  getCurrentAction();
+  tickOnce(current_time, step_time);
   while (getCurrentAction() == "root") {
     tickOnce(current_time, step_time);
   }
