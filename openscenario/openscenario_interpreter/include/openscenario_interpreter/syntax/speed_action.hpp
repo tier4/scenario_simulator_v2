@@ -56,6 +56,7 @@ struct SpeedAction : private Scope
   auto reset()
   {
     accomplishments.clear();
+
     for (const auto & actor : actors) {
       accomplishments.emplace(actor, false);
     }

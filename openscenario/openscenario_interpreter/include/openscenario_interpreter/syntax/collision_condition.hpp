@@ -73,9 +73,10 @@ struct CollisionCondition
   {
     if (another_given_entity.is<EntityRef>()) {
       return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-        return checkCollision(triggering_entity, another_given_entity.as<EntityRef>());
+        return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
       }));
     } else {
+      // TODO ByType
       return false_v;
     }
   }

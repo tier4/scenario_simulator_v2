@@ -10,112 +10,112 @@ on:
   pull_request:
     branches:
       - master
-    
+
 jobs:
-    job1:
-        name: Generate Documentation
-        runs-on: ubuntu-18.04
-        steps:
-        - uses: actions/checkout@v2-beta
-        - uses: docker-practice/actions-setup-docker@master
-        - name: run protoc-gen-doc
-          run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
-        - name: Set up Python
-          uses: actions/setup-python@v1
-          with:
-            python-version: '3.6.13'
-        - name: Install
-          run: pip3 install mkdocs mkdocs-material pymdown-extensions mdx_unimoji fontawesome_markdown markdown python-markdown-math plantuml-markdown
-        - name: Install doxygen/depends of doxybook
-          run: sudo apt install -y doxygen wget
-        - name: Wget package
-          run: |
-            wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
-            mkdir -p ~/doxybook2
-            cp -rf . ~/doxybook2
-            cd ~/doxybook2
-            unzip doxybook2-linux-amd64-v1.2.3.zip
+  job1:
+    name: Generate Documentation
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2-beta
+      - uses: docker-practice/actions-setup-docker@master
+      - name: run protoc-gen-doc
+        run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.6.14"
+      - name: Install
+        run: pip3 install mkdocs mkdocs-material pymdown-extensions mdx_unimoji fontawesome_markdown markdown python-markdown-math plantuml-markdown
+      - name: Install doxygen/depends of doxybook
+        run: sudo apt install -y doxygen wget
+      - name: Wget package
+        run: |
+          wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
+          mkdir -p ~/doxybook2
+          cp -rf . ~/doxybook2
+          cd ~/doxybook2
+          unzip doxybook2-linux-amd64-v1.2.3.zip
 
-        # generating traffic_simulator package documentation
-        - name: Generate doxygen for traffic_simulator package
-          run: |
-            cd docs/package/traffic_simulator
-            doxygen Doxyfile
-        - name: Generate markdown for traffic_simulator package
-          run: |
-            export PATH="$PATH:~/doxybook2/bin"
-            cd docs/package/traffic_simulator
-            mkdir -p ./markdown/Classes
-            doxybook2 --input ./build/ --output ./markdown -c config.json
+      # generating traffic_simulator package documentation
+      - name: Generate doxygen for traffic_simulator package
+        run: |
+          cd docs/package/traffic_simulator
+          doxygen Doxyfile
+      - name: Generate markdown for traffic_simulator package
+        run: |
+          export PATH="$PATH:~/doxybook2/bin"
+          cd docs/package/traffic_simulator
+          mkdir -p ./markdown/Classes
+          doxybook2 --input ./build/ --output ./markdown -c config.json
 
-        # generating simple_sensor_simulator package documentation
-        - name: Generate doxygen for simple_sensor_simulator package
-          run: |
-            cd docs/package/simple_sensor_simulator
-            doxygen Doxyfile
-        - name: Generate markdown for simple_sensor_simulator package
-          run: |
-            export PATH="$PATH:~/doxybook2/bin"
-            cd docs/package/simple_sensor_simulator
-            mkdir -p ./markdown/Classes
-            doxybook2 --input ./build/ --output ./markdown -c config.json
+      # generating simple_sensor_simulator package documentation
+      - name: Generate doxygen for simple_sensor_simulator package
+        run: |
+          cd docs/package/simple_sensor_simulator
+          doxygen Doxyfile
+      - name: Generate markdown for simple_sensor_simulator package
+        run: |
+          export PATH="$PATH:~/doxybook2/bin"
+          cd docs/package/simple_sensor_simulator
+          mkdir -p ./markdown/Classes
+          doxybook2 --input ./build/ --output ./markdown -c config.json
 
-        # generating simulation_interface package documentation
-        - name: Generate doxygen for simulation_interface package
-          run: |
-            cd docs/package/simulation_interface
-            doxygen Doxyfile
-        - name: Generate markdown for simulation_interface package
-          run: |
-            export PATH="$PATH:~/doxybook2/bin"
-            cd docs/package/simulation_interface
-            mkdir -p ./markdown/Classes
-            doxybook2 --input ./build/ --output ./markdown -c config.json
+      # generating simulation_interface package documentation
+      - name: Generate doxygen for simulation_interface package
+        run: |
+          cd docs/package/simulation_interface
+          doxygen Doxyfile
+      - name: Generate markdown for simulation_interface package
+        run: |
+          export PATH="$PATH:~/doxybook2/bin"
+          cd docs/package/simulation_interface
+          mkdir -p ./markdown/Classes
+          doxybook2 --input ./build/ --output ./markdown -c config.json
 
-        # generating openscenario_interpreter package documentation
-        - name: Generate doxygen for openscenario_interpreter package
-          run: |
-            cd docs/package/openscenario_interpreter
-            doxygen Doxyfile
-        - name: Generate markdown for openscenario_interpreter package
-          run: |
-            export PATH="$PATH:~/doxybook2/bin"
-            cd docs/package/openscenario_interpreter
-            mkdir -p ./markdown/Classes
-            doxybook2 --input ./build/ --output ./markdown -c config.json
+      # generating openscenario_interpreter package documentation
+      - name: Generate doxygen for openscenario_interpreter package
+        run: |
+          cd docs/package/openscenario_interpreter
+          doxygen Doxyfile
+      - name: Generate markdown for openscenario_interpreter package
+        run: |
+          export PATH="$PATH:~/doxybook2/bin"
+          cd docs/package/openscenario_interpreter
+          mkdir -p ./markdown/Classes
+          doxybook2 --input ./build/ --output ./markdown -c config.json
 
-        # generating openscenario_visualization package documentation
-        - name: Generate doxygen for openscenario_visualization package
-          run: |
-            cd docs/package/openscenario_visualization
-            doxygen Doxyfile
-        - name: Generate markdown for openscenario_visualization package
-          run: |
-            export PATH="$PATH:~/doxybook2/bin"
-            cd docs/package/openscenario_visualization
-            mkdir -p ./markdown/Classes
-            doxybook2 --input ./build/ --output ./markdown -c config.json
+      # generating openscenario_visualization package documentation
+      - name: Generate doxygen for openscenario_visualization package
+        run: |
+          cd docs/package/openscenario_visualization
+          doxygen Doxyfile
+      - name: Generate markdown for openscenario_visualization package
+        run: |
+          export PATH="$PATH:~/doxybook2/bin"
+          cd docs/package/openscenario_visualization
+          mkdir -p ./markdown/Classes
+          doxybook2 --input ./build/ --output ./markdown -c config.json
 
-        - name: Generate documentation
-          run: mkdocs build
-        - name: 'Upload Artifact'
-          uses: actions/upload-artifact@v2
-          with:
-            name: site
-            path: site
-            retention-days: 1
-        - name: Publish Report
-          if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
-          uses: peaceiris/actions-gh-pages@v3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: site
-            keep_files: false
-        - name: Slack Notification
-          uses: 8398a7/action-slack@v2
-          if: failure()
-          with:
-            status: ${{ job.status }}
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      - name: Generate documentation
+        run: mkdocs build
+      - name: "Upload Artifact"
+        uses: actions/upload-artifact@v2
+        with:
+          name: site
+          path: site
+          retention-days: 1
+      - name: Publish Report
+        if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: site
+          keep_files: false
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v2
+        if: failure()
+        with:
+          status: ${{ job.status }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

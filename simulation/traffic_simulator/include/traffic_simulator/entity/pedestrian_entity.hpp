@@ -100,7 +100,6 @@ public:
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;
-  BT::NodeStatus action_status_;
   boost::optional<double> target_speed_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };

@@ -58,7 +58,7 @@ struct AssignControllerAction : private Scope, public ComplexType
   void operator()() const
   {
     for (const auto & actor : actors) {
-      assignController(actor, (*this).as<Controller>());
+      applyAssignControllerAction(actor, (*this).as<Controller>());
     }
   }
 };
