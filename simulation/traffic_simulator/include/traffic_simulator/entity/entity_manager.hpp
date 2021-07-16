@@ -20,9 +20,6 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/bounding_box.hpp>
@@ -71,24 +68,19 @@ class EntityManager
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
 
-  rclcpp::Clock::SharedPtr clock_ptr_;
+  const rclcpp::Clock::SharedPtr clock_ptr_;
 
   std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
-
   double step_time_;
+
   double current_time_;
 
   using EntityStatusWithTrajectoryArray = openscenario_msgs::msg::EntityStatusWithTrajectoryArray;
-  rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
+  const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
 
   using MarkerArray = visualization_msgs::msg::MarkerArray;
-  rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-
-  using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
-  rclcpp::Publisher<VehicleKinematicState>::SharedPtr kinematic_state_pub_ptr_;
+  const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
@@ -127,9 +119,6 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
-      rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    kinematic_state_pub_ptr_(rclcpp::create_publisher<VehicleKinematicState>(
-      node, "output/kinematic_state", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
