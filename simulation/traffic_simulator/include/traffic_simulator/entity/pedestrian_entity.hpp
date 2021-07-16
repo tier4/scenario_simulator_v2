@@ -22,6 +22,7 @@
 #include <string>
 #include <traffic_simulator/behavior/pedestrian/behavior_tree.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
+#include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/pedestrian_parameter.hpp>
 #include <vector>
@@ -100,7 +101,7 @@ public:
 
 private:
   std::shared_ptr<entity_behavior::pedestrian::BehaviorTree> tree_ptr_;
-  boost::optional<double> target_speed_;
+  traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
 };
 }  // namespace entity
