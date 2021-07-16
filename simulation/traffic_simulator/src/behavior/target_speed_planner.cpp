@@ -34,6 +34,6 @@ void TargetSpeedPlanner::update(double current_speed)
   }
 }
 
-boost::optional<double> TargetSpeedPlanner::getTargetSpeed() { return target_speed_; }
+boost::optional<double> TargetSpeedPlanner::getTargetSpeed() const { return target_speed_; }
 }  // namespace behavior
 }  // namespace traffic_simulator

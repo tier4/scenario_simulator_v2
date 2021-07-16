@@ -26,7 +26,7 @@ class TargetSpeedPlanner
 public:
   void setTargetSpeed(double target_speed, bool continuous);
   void update(double current_speed);
-  boost::optional<double> getTargetSpeed();
+  boost::optional<double> getTargetSpeed() const;
 
 private:
   boost::optional<double> target_speed_;
