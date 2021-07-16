@@ -27,6 +27,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/behavior/pedestrian/pedestrian_action_node.cpp
   src/behavior/pedestrian/walk_straight_action.cpp
   src/behavior/route_planner.cpp
+  src/behavior/target_speed_planner.cpp
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
