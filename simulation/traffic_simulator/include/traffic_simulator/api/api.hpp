@@ -19,7 +19,6 @@
 
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
-#include <boost/filesystem.hpp>
 #include <cassert>
 #include <memory>
 #include <openscenario_msgs/msg/driver_model.hpp>
@@ -28,6 +27,7 @@
 #include <simulation_interface/zmq_client.hpp>
 #include <stdexcept>
 #include <string>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/metrics/metrics_manager.hpp>
@@ -38,51 +38,6 @@
 
 namespace traffic_simulator
 {
-struct Configuration
-{
-  using Filename = std::string;
-
-  using Pathname = boost::filesystem::path;
-
-  bool auto_sink = true;
-
-  bool verbose = false;
-
-  bool standalone_mode = false;
-
-  double initialize_duration = 0;
-
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  This setting comes from the argument of the same name (= `map_path`) in
-   *  the launch file of ArchitectureProposal. In general, Autoware expects
-   *  this argument to be given the path to the directory containing the two HD
-   *  maps, lanelet_map.osm and pointcloud_map.pcd.
-   *
-   *  Depending on your map file, you may need to include additional files in
-   *  this directory. For example, Autoware.Auto (at the time this comment was
-   *  written) should be given the map origin coordinates in a separate yaml
-   *  file.
-   *
-   * ------------------------------------------------------------------------ */
-  Pathname map_path = "";
-
-  Filename lanelet2_map_file =
-    "lanelet2_map.osm";  // TODO (yamacir-kit): Use `static inline` (if C++17)
-
-  Filename pointcloud_map_file =
-    "pointcloud_map.pcd";  // TODO (yamacir-kit): Use `static inline` (if C++17)
-
-  Pathname scenario_path = "";
-
-  // TODO (yamacir-kit): Use boost::filesystem::path
-  Filename metrics_logfile_path = "/tmp/metrics.json";
-
-  auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
-
-  auto pointcloud_map_path() const { return map_path / pointcloud_map_file; }
-};
-
 class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
@@ -96,7 +51,7 @@ public:
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getEntityPose(name); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
-    metrics_manager_(configuration.metrics_logfile_path, configuration.verbose),
+    metrics_manager_(configuration.metrics_log_path, configuration.verbose),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
