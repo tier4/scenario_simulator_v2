@@ -76,7 +76,7 @@ struct Configuration
   Pathname scenario_path = "";
 
   // TODO (yamacir-kit): Use boost::filesystem::path
-  std::string metrics_logfile_path = "/tmp/metrics.json";
+  Filename metrics_logfile_path = "/tmp/metrics.json";
 
   auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
 
@@ -96,7 +96,7 @@ public:
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getEntityPose(name); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
-    metrics_manager_(configuration.verbose, configuration.metrics_logfile_path),
+    metrics_manager_(configuration.metrics_logfile_path, configuration.verbose),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
