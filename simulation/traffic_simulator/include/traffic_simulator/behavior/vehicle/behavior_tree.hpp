@@ -69,6 +69,7 @@ public:
   void setRequest(std::string request);
 
 private:
+  BT::NodeStatus tickOnce(double current_time, double step_time);
   std::string request_;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;
