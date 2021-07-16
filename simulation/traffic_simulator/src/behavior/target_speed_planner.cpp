@@ -13,3 +13,27 @@
 // limitations under the License.
 
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
+#include <iostream>
+
+namespace traffic_simulator
+{
+namespace behavior
+{
+void TargetSpeedPlanner::setTargetSpeed(double target_speed, bool continuous)
+{
+  continuous_ = continuous;
+  target_speed_ = target_speed;
+}
+
+void TargetSpeedPlanner::update(double current_speed)
+{
+  if (!continuous_) {
+    if (current_speed >= target_speed_.get()) {
+      target_speed_ = boost::none;
+    }
+  }
+}
+
+boost::optional<double> TargetSpeedPlanner::getTargetSpeed() { return target_speed_; }
+}  // namespace behavior
+}  // namespace traffic_simulator

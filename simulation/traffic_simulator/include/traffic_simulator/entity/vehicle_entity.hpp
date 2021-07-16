@@ -20,6 +20,7 @@
 #include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/behavior/route_planner.hpp>
+#include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
@@ -135,8 +136,8 @@ public:
 
 private:
   std::shared_ptr<entity_behavior::vehicle::BehaviorTree> tree_ptr_;
-  boost::optional<double> target_speed_;
   std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
+  traffic_simulator::behavior::TargetSpeedPlanner target_speed_planner_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

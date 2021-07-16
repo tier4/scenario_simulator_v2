@@ -11,3 +11,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#include <boost/optional.hpp>
+
+namespace traffic_simulator
+{
+namespace behavior
+{
+class TargetSpeedPlanner
+{
+public:
+  void setTargetSpeed(double target_speed, bool continuous);
+  void update(double current_speed);
+  boost::optional<double> getTargetSpeed();
+
+private:
+  boost::optional<double> target_speed_;
+  bool continuous_;
+};
+}  // namespace behavior
+}  // namespace traffic_simulator
