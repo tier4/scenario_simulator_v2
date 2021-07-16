@@ -90,13 +90,13 @@ class API
   const Configuration configuration;
 
 public:
-  const std::string lanelet2_map_osm;
+  // const std::string lanelet2_map_osm;
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(NodeT && node, const Configuration & configuration = Configuration())
   : configuration(configuration),
-    lanelet2_map_osm(configuration.lanelet2_map_path().string()),
-    entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
+    // lanelet2_map_osm(configuration.lanelet2_map_path().string()),
+    entity_manager_ptr_(std::make_shared<EntityManager>(node, configuration.lanelet2_map_path())),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getEntityPose(name); },

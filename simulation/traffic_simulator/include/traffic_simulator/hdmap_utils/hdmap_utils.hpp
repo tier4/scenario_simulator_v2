@@ -29,6 +29,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <autoware_auto_msgs/msg/had_map_bin.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -53,7 +54,8 @@ namespace hdmap_utils
 class HdMapUtils
 {
 public:
-  explicit HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin);
+  explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
+
   const autoware_auto_msgs::msg::HADMapBin toMapBin();
   void insertMarkerArray(
     visualization_msgs::msg::MarkerArray & a1,
