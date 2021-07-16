@@ -97,10 +97,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       std::vector<std::int64_t> empty = {};
       tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
     }
-    action_status_ = tree_ptr_->tick(current_time, step_time);
-    while (getCurrentAction() == "root") {
-      action_status_ = tree_ptr_->tick(current_time, step_time);
-    }
+    tree_ptr_->tick(current_time, step_time);
     auto status_updated = tree_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
       auto following_lanelets =

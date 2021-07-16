@@ -62,12 +62,19 @@ void BehaviorTree::setupLogger()
   BT::applyRecursiveVisitor(tree_.rootNode(), visitor);
 }
 
-BT::NodeStatus BehaviorTree::tick(double current_time, double step_time)
+BT::NodeStatus BehaviorTree::tickOnce(double current_time, double step_time)
 {
   setValueToBlackBoard("current_time", current_time);
   setValueToBlackBoard("step_time", step_time);
-  auto ret = tree_.rootNode()->executeTick();
-  return ret;
+  return tree_.rootNode()->executeTick();
+}
+
+void BehaviorTree::tick(double current_time, double step_time)
+{
+  tickOnce(current_time, step_time);
+  while (getCurrentAction() == "root") {
+    tickOnce(current_time, step_time);
+  }
 }
 
 void BehaviorTree::callback(
