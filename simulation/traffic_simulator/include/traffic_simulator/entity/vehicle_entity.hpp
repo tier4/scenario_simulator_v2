@@ -110,7 +110,7 @@ public:
       }
       if (status_ && status_->lanelet_pose_valid == false) {
         THROW_SIMULATION_ERROR(
-          "Failed to caluclate waypoints in NPC logics, please check Entity : ", name,
+          "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
           " is in a lane coordinate.");
       }
       THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
