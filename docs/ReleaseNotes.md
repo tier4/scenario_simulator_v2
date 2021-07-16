@@ -2,6 +2,7 @@
 
 ## Difference between the latest release and master
 - Support OpenSCENARIO 1.0 TrafficSignal features (RoadNetwork.TrafficSignalController, Action and Condition).
+- Update AcquirePositionAction to support WorldPosition as destination.
 
 ## Ver 0.3.0
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.3.0) on Github :fa-github:

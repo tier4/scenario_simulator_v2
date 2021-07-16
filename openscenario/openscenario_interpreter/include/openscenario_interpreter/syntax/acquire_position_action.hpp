@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/utility/overload.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <unordered_map>
 
@@ -46,21 +47,12 @@ struct AcquirePositionAction : private Scope
   {
   }
 
-  auto operator()(const Scope::Actor & actor) const
-  {
-    if (position.is<LanePosition>()) {
-      requestAcquirePosition(
-        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()));
-    } else {
-      throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
-    }
-  }
-
   std::unordered_map<String, Boolean> accomplishments;
 
   auto reset()
   {
     accomplishments.clear();
+
     for (const auto & actor : actors) {
       accomplishments.emplace(actor, false);
     }
@@ -70,27 +62,46 @@ struct AcquirePositionAction : private Scope
   {
     reset();
 
+    const auto acquire_position = overload(
+      [](const WorldPosition & position, auto && actor) {
+        return applyAcquirePositionAction(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      },
+      [](const RelativeWorldPosition & position, auto && actor) {
+        return applyAcquirePositionAction(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      },
+      [](const LanePosition & position, auto && actor) {
+        return applyAcquirePositionAction(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      });
+
     for (const auto & actor : actors) {
-      (*this)(actor);
+      apply(acquire_position, position, actor);
     }
 
     return unspecified;
   }
 
-  auto check(const String & actor)
-  {
-    if (position.is<LanePosition>()) {
-      return isReachedPosition(
-        actor, static_cast<openscenario_msgs::msg::LaneletPose>(position.as<LanePosition>()), 1.0);
-    } else {
-      throw UNSUPPORTED_SETTING_DETECTED(AcquirePositionAction, position.type().name());
-    }
-  }
-
   auto update()
   {
+    const auto reach_position = overload(
+      [](const WorldPosition & position, auto && actor) {
+        return evaluateReachPositionCondition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
+      },
+      [](const RelativeWorldPosition & position, auto && actor) {
+        return evaluateReachPositionCondition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
+      },
+      [](const LanePosition & position, auto && actor) {
+        return evaluateReachPositionCondition(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
+      });
+
     for (auto && each : accomplishments) {
-      each.second = each.second or check(each.first);
+      std::get<1>(each) =
+        std::get<1>(each) or apply<bool>(reach_position, position, std::get<0>(each));
     }
   }
 

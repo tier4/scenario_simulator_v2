@@ -67,11 +67,11 @@ struct CustomCommandAction : private Scope
     const std::vector<std::string> & actors, const Scope & current_scope)
   {
     for (const auto & actor : actors) {
-      requestWalkStraight(actor);
+      applyWalkStraightAction(actor);
     }
 
     for (const auto actor : current_scope.actors) {
-      requestWalkStraight(actor);
+      applyWalkStraightAction(actor);
     }
 
     return current_scope.actors.size();
