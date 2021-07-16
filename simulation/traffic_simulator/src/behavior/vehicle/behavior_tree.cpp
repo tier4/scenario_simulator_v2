@@ -82,7 +82,7 @@ BT::NodeStatus BehaviorTree::tickOnce(double current_time, double step_time)
   return tree_.rootNode()->executeTick();
 }
 
-BT::NodeStatus BehaviorTree::tick(double current_time, double step_time)
+void BehaviorTree::tick(double current_time, double step_time)
 {
   getCurrentAction();
   while (getCurrentAction() == "root") {

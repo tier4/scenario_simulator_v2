@@ -37,7 +37,7 @@ class BehaviorTree
 {
 public:
   BehaviorTree();
-  BT::NodeStatus tick(double current_time, double step_time);
+  void tick(double current_time, double step_time);
   const std::string getCurrentAction() const { return current_action_; }
   template <typename T>
   void setValueToBlackBoard(std::string key, T value)
