@@ -128,21 +128,23 @@ try {
 
   traffic_simulator::Configuration configuration;
   {
-    const auto with_autoware = std::any_of(
-      std::cbegin(script.as<OpenScenario>().entities),
-      std::cend(script.as<OpenScenario>().entities), [](auto & each) {
-        return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
-      });
-
     configuration.auto_sink = false;
-    configuration.initialize_duration = with_autoware ? 30 : 0;
-    configuration.scenario_path = osc_path;
 
-    if (script.as<OpenScenario>().logic_file.has_extension()) {
-      configuration.map_path = script.as<OpenScenario>().logic_file.parent_path();
-    } else {
-      configuration.map_path = script.as<OpenScenario>().logic_file;
-    }
+    configuration.initialize_duration =
+      std::any_of(
+        std::cbegin(script.as<OpenScenario>().entities),
+        std::cend(script.as<OpenScenario>().entities),
+        [](auto & each) {
+          return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
+        })
+        ? 30
+        : 0;
+
+    configuration.map_path = script.as<OpenScenario>().logic_file.has_extension()
+                               ? script.as<OpenScenario>().logic_file.parent_path()
+                               : script.as<OpenScenario>().logic_file;
+
+    configuration.scenario_path = osc_path;
   }
 
   connect(shared_from_this(), configuration);

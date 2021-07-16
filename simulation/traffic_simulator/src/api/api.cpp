@@ -25,7 +25,7 @@
 
 namespace traffic_simulator
 {
-void API::setVerbose(bool verbose)
+void API::setVerbose(const bool verbose)
 {
   metrics_manager_.setVerbose(verbose);
   entity_manager_ptr_->setVerbose(verbose);
@@ -37,7 +37,7 @@ bool API::despawn(const std::string & name)
   if (!result) {
     return false;
   }
-  if (!standalone_mode) {
+  if (not configuration.standalone_mode) {
     simulation_api_schema::DespawnEntityRequest req;
     simulation_api_schema::DespawnEntityResponse res;
     req.set_name(name);
@@ -58,7 +58,7 @@ bool API::spawn(
         name, lanelet2_map_osm, clock_.getStepTime(), params)) {
       return false;
     }
-    if (standalone_mode) {
+    if (configuration.standalone_mode) {
       return true;
     }
     simulation_api_schema::SpawnVehicleEntityRequest req;
@@ -71,7 +71,7 @@ bool API::spawn(
     if (!entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(name, params)) {
       return false;
     }
-    if (standalone_mode) {
+    if (configuration.standalone_mode) {
       return true;
     }
     simulation_api_schema::SpawnVehicleEntityRequest req;
@@ -95,7 +95,7 @@ bool API::spawn(
         name, params)) {
     return false;
   }
-  if (standalone_mode) {
+  if (configuration.standalone_mode) {
     return true;
   }
   simulation_api_schema::SpawnPedestrianEntityRequest req;
@@ -116,7 +116,7 @@ bool API::spawn(
         name, params)) {
     return false;
   }
-  if (standalone_mode) {
+  if (configuration.standalone_mode) {
     return true;
   }
   simulation_api_schema::SpawnMiscObjectEntityRequest req;
@@ -257,39 +257,42 @@ bool API::setEntityStatus(
 
 bool API::initialize(double realtime_factor, double step_time)
 {
-  clock_.initialize(-1 * initialize_duration, step_time);
-  if (standalone_mode) {
+  clock_.initialize(-1 * configuration.initialize_duration, step_time);
+
+  if (configuration.standalone_mode) {
     return true;
+  } else {
+    simulation_api_schema::InitializeRequest req;
+    req.set_step_time(step_time);
+    req.set_realtime_factor(realtime_factor);
+    simulation_api_schema::InitializeResponse res;
+    initialize_client_.call(req, res);
+    return res.result().success();
   }
-  simulation_api_schema::InitializeRequest req;
-  req.set_step_time(step_time);
-  req.set_realtime_factor(realtime_factor);
-  simulation_api_schema::InitializeResponse res;
-  initialize_client_.call(req, res);
-  return res.result().success();
 }
 
-bool API::attachDetectionSensor(simulation_api_schema::DetectionSensorConfiguration configuration)
+bool API::attachDetectionSensor(
+  simulation_api_schema::DetectionSensorConfiguration sensor_configuration)
 {
-  if (standalone_mode) {
+  if (configuration.standalone_mode) {
     return true;
   } else {
     simulation_api_schema::AttachDetectionSensorRequest req;
     simulation_api_schema::AttachDetectionSensorResponse res;
-    *req.mutable_configuration() = configuration;
+    *req.mutable_configuration() = sensor_configuration;
     attach_detection_sensor_client_.call(req, res);
     return res.result().success();
   }
 }
 
-bool API::attachLidarSensor(simulation_api_schema::LidarConfiguration configuration)
+bool API::attachLidarSensor(simulation_api_schema::LidarConfiguration lidar_configuration)
 {
-  if (standalone_mode) {
+  if (configuration.standalone_mode) {
     return true;
   } else {
     simulation_api_schema::AttachLidarSensorRequest req;
     simulation_api_schema::AttachLidarSensorResponse res;
-    *req.mutable_configuration() = configuration;
+    *req.mutable_configuration() = lidar_configuration;
     attach_lidar_sensor_client_.call(req, res);
     return res.result().success();
   }
@@ -297,16 +300,17 @@ bool API::attachLidarSensor(simulation_api_schema::LidarConfiguration configurat
 
 bool API::updateSensorFrame()
 {
-  if (standalone_mode) {
+  if (configuration.standalone_mode) {
     return true;
+  } else {
+    simulation_api_schema::UpdateSensorFrameRequest req;
+    req.set_current_time(clock_.getCurrentSimulationTime());
+    simulation_interface::toProto(
+      clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
+    simulation_api_schema::UpdateSensorFrameResponse res;
+    update_sensor_frame_client_.call(req, res);
+    return res.result().success();
   }
-  simulation_api_schema::UpdateSensorFrameRequest req;
-  req.set_current_time(clock_.getCurrentSimulationTime());
-  simulation_interface::toProto(
-    clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
-  simulation_api_schema::UpdateSensorFrameResponse res;
-  update_sensor_frame_client_.call(req, res);
-  return res.result().success();
 }
 
 bool API::updateEntityStatusInSim()
@@ -368,7 +372,8 @@ bool API::updateFrame()
   boost::optional<openscenario_msgs::msg::EntityStatus> ego_status_before_update = boost::none;
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
-  if (!standalone_mode) {
+
+  if (not configuration.standalone_mode) {
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(clock_.getCurrentSimulationTime());
     simulation_interface::toProto(
@@ -386,11 +391,12 @@ bool API::updateFrame()
       return false;
     }
     return updateSensorFrame();
+  } else {
+    entity_manager_ptr_->broadcastEntityTransform();
+    clock_.update();
+    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
+    metrics_manager_.calculate();
+    return true;
   }
-  entity_manager_ptr_->broadcastEntityTransform();
-  clock_.update();
-  clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-  metrics_manager_.calculate();
-  return true;
 }
 }  // namespace traffic_simulator

@@ -65,15 +65,15 @@ struct Configuration
    *  file.
    *
    * ------------------------------------------------------------------------ */
-  boost::filesystem::path map_path = "";
+  Pathname map_path = "";
 
-  // TODO (yamacir-kit): Use `static inline` (if C++17)
-  std::string lanelet2_map_file = "lanelet2_map.osm";
+  Filename lanelet2_map_file =
+    "lanelet2_map.osm";  // TODO (yamacir-kit): Use `static inline` (if C++17)
 
-  // TODO (yamacir-kit): Use `static inline` (if C++17)
-  std::string pointcloud_map_file = "pointcloud_map.pcd";
+  Filename pointcloud_map_file =
+    "pointcloud_map.pcd";  // TODO (yamacir-kit): Use `static inline` (if C++17)
 
-  boost::filesystem::path scenario_path = "";
+  Pathname scenario_path = "";
 
   // TODO (yamacir-kit): Use boost::filesystem::path
   std::string metrics_logfile_path = "/tmp/metrics.json";
@@ -87,26 +87,15 @@ class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
 
+  const Configuration configuration;
+
 public:
   const std::string lanelet2_map_osm;
 
-  const double initialize_duration;
-
-  const bool standalone_mode;
-
   template <class NodeT, class AllocatorT = std::allocator<void>>
-  explicit API(
-    NodeT && node, const Configuration & configuration = Configuration()
-    // const std::string & lanelet2_map_osm,  //
-    // const double initialize_duration = 0,  //
-    // const bool auto_sink = true,           //
-    // const bool verbose = false,            //
-    // const bool standalone_mode = false,    //
-    // const std::string & metrics_logfile_path = "/tmp/metrics.json"
-    )
-  : lanelet2_map_osm(configuration.lanelet2_map_path().string()),
-    initialize_duration(configuration.initialize_duration),
-    standalone_mode(configuration.standalone_mode),
+  explicit API(NodeT && node, const Configuration & configuration = Configuration())
+  : configuration(configuration),
+    lanelet2_map_osm(configuration.lanelet2_map_path().string()),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, lanelet2_map_osm)),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
@@ -172,8 +161,7 @@ public:
     const openscenario_msgs::msg::MiscObjectParameters & params);
 
   template <typename Parameters, typename... Ts>
-  decltype(auto) spawn(
-    const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
+  auto spawn(const bool is_ego, const std::string & name, const Parameters & params, Ts &&... xs)
   {
     return spawn(is_ego, name, params) && setEntityStatus(name, std::forward<decltype(xs)>(xs)...);
   }
@@ -181,6 +169,7 @@ public:
   bool despawn(const std::string & name);
 
   openscenario_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
+
   geometry_msgs::msg::Pose getEntityPose(const std::string & name);
 
   bool setEntityStatus(
@@ -216,6 +205,7 @@ public:
     const std::string & name, const std::string & target_name, const double tolerance) const;
 
   bool attachLidarSensor(simulation_api_schema::LidarConfiguration configuration);
+
   bool attachDetectionSensor(simulation_api_schema::DetectionSensorConfiguration configuration);
 
   bool initialize(double realtime_factor, double step_time);
@@ -281,7 +271,8 @@ private:
 
   metrics::MetricsManager metrics_manager_;
 
-  rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
+  const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
+
   traffic_simulator::SimulationClock clock_;
 
   zeromq::Client<
