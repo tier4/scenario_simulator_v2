@@ -14,7 +14,6 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <concealer/autoware_def.hpp>
 #include <functional>
 #include <memory>
@@ -184,8 +183,7 @@ EgoEntity::EgoEntity(
       "pointcloud_map_file:=" + configuration.pointcloud_map_file,
       "sensor_model:=" + getParameter("sensor_model", std::string("")),
       "vehicle_model:=" + getParameter("vehicle_model", std::string("")),
-      "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
-        "/config/scenario_simulator_v2.rviz",
+      "rviz_config:=" + configuration.rviz_config_path.string(),  //
       "scenario_simulation:=true"));
 }
 

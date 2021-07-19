@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__API__CONFIGURATION_HPP_
 #define TRAFFIC_SIMULATOR__API__CONFIGURATION_HPP_
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
 
@@ -58,6 +59,10 @@ struct Configuration
   Pathname scenario_path = "";
 
   Pathname metrics_log_path = "/tmp/metrics.json";
+
+  Pathname rviz_config_path =  //
+    ament_index_cpp::get_package_share_directory("scenario_test_runner") +
+    "/config/scenario_simulator_v2.rviz";
 
   auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
 
