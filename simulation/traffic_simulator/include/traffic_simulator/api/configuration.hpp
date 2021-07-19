@@ -135,8 +135,6 @@ struct Configuration
     }
   }
 
-  auto getMapPath() const -> const Pathname & { return assertMapPath(map_path); }
-
   auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
 
   auto pointcloud_map_path() const { return map_path / pointcloud_map_file; }

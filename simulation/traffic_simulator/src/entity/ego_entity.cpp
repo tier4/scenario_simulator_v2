@@ -178,7 +178,7 @@ EgoEntity::EgoEntity(
     std::forward_as_tuple(
       getParameter("autoware_launch_package", std::string("")),
       getParameter("autoware_launch_file", std::string("")),
-      "map_path:=" + configuration.getMapPath().string(),
+      "map_path:=" + configuration.map_path.string(),
       "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
       "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
       "sensor_model:=" + getParameter("sensor_model", std::string("")),
