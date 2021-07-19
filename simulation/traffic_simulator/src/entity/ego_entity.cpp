@@ -178,7 +178,7 @@ EgoEntity::EgoEntity(
     std::forward_as_tuple(
       getParameter("autoware_launch_package", std::string("")),
       getParameter("autoware_launch_file", std::string("")),
-      "map_path:=" + configuration.map_path.string(),
+      "map_path:=" + configuration.getMapPath().string(),
       "lanelet2_map_file:=" + configuration.lanelet2_map_file,
       "pointcloud_map_file:=" + configuration.pointcloud_map_file,
       "sensor_model:=" + getParameter("sensor_model", std::string("")),
@@ -191,7 +191,7 @@ EgoEntity::~EgoEntity() { ego_entities.erase(name); }
 
 void EgoEntity::engage() { ego_entities.at(name).engage(); }
 
-const autoware_vehicle_msgs::msg::VehicleCommand EgoEntity::getVehicleCommand()
+auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
 {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   return ego_entities.at(name).getVehicleCommand();

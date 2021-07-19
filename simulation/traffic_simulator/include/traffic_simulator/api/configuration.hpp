@@ -17,12 +17,16 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <iomanip>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 
 namespace traffic_simulator
 {
-struct Configuration
+class Configuration
 {
+public:
   using Filename = std::string;
 
   using Pathname = boost::filesystem::path;
@@ -35,6 +39,7 @@ struct Configuration
 
   double initialize_duration = 0;
 
+private:
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  This setting comes from the argument of the same name (= `map_path`) in
@@ -50,6 +55,7 @@ struct Configuration
    * ------------------------------------------------------------------------ */
   Pathname map_path = "";
 
+public:
   Filename lanelet2_map_file =
     "lanelet2_map.osm";  // TODO (yamacir-kit): Use `static inline` (if C++17)
 
@@ -63,6 +69,26 @@ struct Configuration
   Pathname rviz_config_path =  //
     ament_index_cpp::get_package_share_directory("scenario_test_runner") +
     "/config/scenario_simulator_v2.rviz";
+
+public:
+  explicit Configuration(const Pathname & map_path)  //
+  : map_path(assertMapPath(map_path))                //
+  {
+  }
+
+  auto assertMapPath(const Pathname & map_path) const -> const Pathname &
+  {
+    if (map_path.empty()) {
+      throw common::SimulationError("No map path is given");
+    } else if (not boost::filesystem::is_directory(map_path)) {
+      throw common::SimulationError(
+        "The map_path must be a directory (given an ", std::quoted(map_path.string()), ")");
+    } else {
+      return map_path;
+    }
+  }
+
+  auto getMapPath() const -> const auto & { return assertMapPath(map_path); }
 
   auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
 

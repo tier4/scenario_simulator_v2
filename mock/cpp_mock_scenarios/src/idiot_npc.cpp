@@ -70,11 +70,10 @@ private:
 
   static auto configure() -> traffic_simulator::Configuration
   {
-    traffic_simulator::Configuration configuration;
+    auto configuration = traffic_simulator::Configuration(
+      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa");
     {
       configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
-      configuration.map_path =
-        ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa";
       configuration.scenario_path = __FILE__;
       configuration.verbose = true;
     }

@@ -176,11 +176,10 @@ private:
 
   static auto configure() -> traffic_simulator::Configuration
   {
-    traffic_simulator::Configuration configuration;
+    auto configuration = traffic_simulator::Configuration(
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map");
     {
       configuration.initialize_duration = 5;
-      configuration.map_path =
-        ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map";
       configuration.scenario_path = __FILE__;
     }
 

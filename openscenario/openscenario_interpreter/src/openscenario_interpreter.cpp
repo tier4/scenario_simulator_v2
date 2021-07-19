@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/filesystem/operations.hpp>
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
@@ -126,7 +127,10 @@ try {
 
   script.rebind<OpenScenario>(osc_path);
 
-  traffic_simulator::Configuration configuration;
+  auto configuration = traffic_simulator::Configuration(
+    boost::filesystem::is_directory(script.as<OpenScenario>().logic_file)
+      ? script.as<OpenScenario>().logic_file
+      : script.as<OpenScenario>().logic_file.parent_path());
   {
     configuration.auto_sink = false;
 
@@ -139,10 +143,6 @@ try {
         })
         ? 30
         : 0;
-
-    configuration.map_path = script.as<OpenScenario>().logic_file.has_extension()
-                               ? script.as<OpenScenario>().logic_file.parent_path()
-                               : script.as<OpenScenario>().logic_file;
 
     configuration.scenario_path = osc_path;
   }
