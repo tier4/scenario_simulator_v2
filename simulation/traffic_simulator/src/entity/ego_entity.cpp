@@ -179,8 +179,8 @@ EgoEntity::EgoEntity(
       getParameter("autoware_launch_package", std::string("")),
       getParameter("autoware_launch_file", std::string("")),
       "map_path:=" + configuration.getMapPath().string(),
-      "lanelet2_map_file:=" + configuration.lanelet2_map_file,
-      "pointcloud_map_file:=" + configuration.pointcloud_map_file,
+      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
       "sensor_model:=" + getParameter("sensor_model", std::string("")),
       "vehicle_model:=" + getParameter("vehicle_model", std::string("")),
       "rviz_config:=" + configuration.rviz_config_path.string(),  //

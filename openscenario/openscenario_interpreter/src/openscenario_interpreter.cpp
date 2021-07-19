@@ -145,6 +145,13 @@ try {
         : 0;
 
     configuration.scenario_path = osc_path;
+
+    // XXX DIRTY HACK!!!
+    if (
+      not boost::filesystem::is_directory(script.as<OpenScenario>().logic_file) and
+      script.as<OpenScenario>().logic_file.extension() == ".osm") {
+      configuration.lanelet2_map_file = script.as<OpenScenario>().logic_file.filename().string();
+    }
   }
 
   connect(shared_from_this(), configuration);

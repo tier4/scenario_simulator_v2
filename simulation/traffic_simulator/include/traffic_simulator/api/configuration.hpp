@@ -26,9 +26,8 @@
 
 namespace traffic_simulator
 {
-class Configuration
+struct Configuration
 {
-public:
   using Filename = std::string;
 
   using Pathname = boost::filesystem::path;
@@ -41,7 +40,6 @@ public:
 
   double initialize_duration = 0;
 
-private:
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  This setting comes from the argument of the same name (= `map_path`) in
@@ -55,12 +53,11 @@ private:
    *  file.
    *
    * ------------------------------------------------------------------------ */
-  Pathname map_path = "";
+  const Pathname map_path;
 
-public:
-  Filename lanelet2_map_file = "lanelet2_map.osm";
+  Filename lanelet2_map_file;
 
-  Filename pointcloud_map_file = "pointcloud_map.pcd";
+  Filename pointcloud_map_file;
 
   Pathname scenario_path = "";
 
@@ -70,9 +67,10 @@ public:
     ament_index_cpp::get_package_share_directory("scenario_test_runner") +
     "/config/scenario_simulator_v2.rviz";
 
-public:
   explicit Configuration(const Pathname & map_path)  //
-  : map_path(assertMapPath(map_path))                //
+  : map_path(assertMapPath(map_path)),
+    lanelet2_map_file(findLexicographicallyFirstFilenameOf(map_path, ".osm")),
+    pointcloud_map_file(findLexicographicallyFirstFilenameOf(map_path, ".pcd"))
   {
   }
 
@@ -119,7 +117,25 @@ public:
     return result;
   }
 
-  auto getMapPath() const -> const auto & { return assertMapPath(map_path); }
+  auto getLanelet2MapFile() const -> const auto &
+  {
+    if (not lanelet2_map_file.empty()) {
+      return lanelet2_map_file;
+    } else {
+      throw common::SimulationError("The map_path must contain at least one *.osm file");
+    }
+  }
+
+  auto getPointCloudMapFile() const -> const auto &
+  {
+    if (not pointcloud_map_file.empty()) {
+      return pointcloud_map_file;
+    } else {
+      throw common::SimulationError("The map_path must contain at least one *.pcd file");
+    }
+  }
+
+  auto getMapPath() const -> const Pathname & { return assertMapPath(map_path); }
 
   auto lanelet2_map_path() const { return map_path / lanelet2_map_file; }
 
