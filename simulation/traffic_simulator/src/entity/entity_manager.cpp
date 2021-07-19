@@ -90,13 +90,7 @@ void EntityManager::broadcastTransform(
 
 bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
 {
-  if (name0 == name1) {
-    return false;
-  }
-  if (!entityStatusSet(name0)) {
-    return false;
-  }
-  if (!entityStatusSet(name1)) {
+  if (name0 == name1 or not entityStatusSet(name0) or not entityStatusSet(name1)) {
     return false;
   }
   auto status0 = getEntityStatus(name0);

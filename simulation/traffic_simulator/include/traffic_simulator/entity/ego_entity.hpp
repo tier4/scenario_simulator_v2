@@ -22,6 +22,7 @@
 #include <memory>
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
@@ -79,9 +80,9 @@ public:
    *
    * ------------------------------------------------------------------------ */
   explicit EgoEntity(
-    const std::string & name,                          //
-    const boost::filesystem::path & lanelet2_map_osm,  //
-    const double step_time,                            //
+    const std::string & name,             //
+    const Configuration & configuration,  //
+    const double step_time,               //
     const openscenario_msgs::msg::VehicleParameters & parameters);
 
   ~EgoEntity() override;

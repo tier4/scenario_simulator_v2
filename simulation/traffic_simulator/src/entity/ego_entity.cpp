@@ -163,9 +163,9 @@ auto makeSimulationModel(
 }
 
 EgoEntity::EgoEntity(
-  const std::string & name,  //
-  const boost::filesystem::path & lanelet2_map_osm,
-  const double step_time,  //
+  const std::string & name,             //
+  const Configuration & configuration,  //
+  const double step_time,               //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
   vehicle_model_type_(getVehicleModelType()),
@@ -174,12 +174,14 @@ EgoEntity::EgoEntity(
   entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
 
   ego_entities.emplace(
-    std::piecewise_construct, std::forward_as_tuple(name),
+    std::piecewise_construct,  //
+    std::forward_as_tuple(name),
     std::forward_as_tuple(
       getParameter("autoware_launch_package", std::string("")),
       getParameter("autoware_launch_file", std::string("")),
-      "map_path:=" + lanelet2_map_osm.parent_path().string(),
-      "lanelet2_map_file:=" + lanelet2_map_osm.filename().string(),
+      "map_path:=" + configuration.map_path.string(),
+      "lanelet2_map_file:=" + configuration.lanelet2_map_file,
+      "pointcloud_map_file:=" + configuration.pointcloud_map_file,
       "sensor_model:=" + getParameter("sensor_model", std::string("")),
       "vehicle_model:=" + getParameter("vehicle_model", std::string("")),
       "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +

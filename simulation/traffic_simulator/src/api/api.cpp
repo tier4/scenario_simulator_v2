@@ -53,9 +53,9 @@ bool API::spawn(
 {
   if (is_ego) {
     if (
-      !entity_manager_ptr_->entityExists(name) &&
-      !entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
-        name, configuration.lanelet2_map_path(), clock_.getStepTime(), params)) {
+      not entity_manager_ptr_->entityExists(name) and
+      not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
+        name, configuration, clock_.getStepTime(), params)) {
       return false;
     }
     if (configuration.standalone_mode) {
@@ -81,7 +81,6 @@ bool API::spawn(
     spawn_vehicle_entity_client_.call(req, res);
     return res.result().success();
   }
-  return false;
 }
 
 bool API::spawn(

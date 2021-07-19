@@ -79,7 +79,7 @@ OpenSCENARIO:
             Properties:
               Property:
                 - name: isEgo
-                  value: "false"
+                  value: "true"
       - name: vehicle-1
         Vehicle:
           name: ""
@@ -117,21 +117,6 @@ OpenSCENARIO:
             name: ""
             Properties:
               Property: []
-        MiscObject:                      #
-          mass: 1.0                      #
-          miscObjectCategory: obstacle   #
-          name: ""                       #
-          BoundingBox:                   #
-            Center:                      #
-              x: 0                       # 変更箇所！
-              y: 0                       #
-              z: 0.5                     #
-            Dimensions:                  #
-              width: 1                   #
-              length: 1                  #
-              height: 1                  #
-          Properties:                    #
-            Property: []                 #
       - name: barricade
         MiscObject:
           mass: 1.0
