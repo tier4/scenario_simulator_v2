@@ -67,7 +67,11 @@ OpenSCENARIO:
                       laneId: '34513'
                       s: 0
                       offset: 0
-                      Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
               - RoutingAction:
                   AcquirePositionAction:
                     Position:
@@ -76,7 +80,11 @@ OpenSCENARIO:
                         laneId: '34507'
                         s: 50
                         offset: 0
-                        Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
               - LongitudinalAction:
                   SpeedAction:
                     SpeedActionDynamics:

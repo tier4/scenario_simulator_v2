@@ -70,6 +70,7 @@ auto toString(const VehicleModelType datum) -> std::string
   }
 
 #undef BOILERPLATE
+
   THROW_SIMULATION_ERROR("Unsupported vehicle model type, failed to convert to string");
 }
 
@@ -84,8 +85,6 @@ auto getVehicleModelType()
   // please, let us know if we should do that
   const auto vehicle_model_type = "IDEAL_STEER";
 #endif
-
-  DEBUG_VALUE(vehicle_model_type);
 
   if (vehicle_model_type == "IDEAL_STEER") {
     return VehicleModelType::IDEAL_STEER;
@@ -102,7 +101,7 @@ auto makeSimulationModel(
   const VehicleModelType vehicle_model_type,
   const double step_time,  //
   const openscenario_msgs::msg::VehicleParameters & parameters)
-  -> std::shared_ptr<SimModelInterface>
+  -> const std::shared_ptr<SimModelInterface>
 {
   DEBUG_VALUE(getParameter<double>("vel_lim", 50.0));
   DEBUG_VALUE(getParameter<double>("steer_lim", 1.0));
@@ -190,14 +189,7 @@ EgoEntity::EgoEntity(
 
 EgoEntity::~EgoEntity() { ego_entities.erase(name); }
 
-void EgoEntity::engage()
-{
-  // while (not ready()) {  // guard
-  //   std::this_thread::sleep_for(std::chrono::seconds(1));
-  // }
-
-  ego_entities.at(name).engage();
-}
+void EgoEntity::engage() { ego_entities.at(name).engage(); }
 
 const autoware_vehicle_msgs::msg::VehicleCommand EgoEntity::getVehicleCommand()
 {
@@ -252,7 +244,7 @@ auto EgoEntity::getCurrentAction() const -> const std::string
   {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
     // *** getAutowareStatus - FundamentalAPI dependency ***
-    const auto state{ego_entities.at(name).getAutowareStatus().autoware_state};
+    const auto & state = ego_entities.at(name).getAutowareStatus().autoware_state;
 
     message << (state.empty() ? "Starting" : state)  //
             << "_(t_=_"                              //
@@ -449,7 +441,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           ego_entities.at(name).getVehicleStateCommand().gear ==
               autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE
             ? -1.0
-            : 1.0;
+            : +1.0;
 #endif
 
         (*vehicle_model_ptr_).setInput(input);
@@ -510,15 +502,14 @@ void EgoEntity::requestAssignRoute(
 void EgoEntity::requestLaneChange(const std::int64_t)
 {
   THROW_SEMANTIC_ERROR(
-    "From scenario, a lane change was requested to Ego type entity ", name,
+    "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),
     " In general, such a request is an error, since Ego cars make autonomous decisions about "
-    "everything but their destination.");
+    "everything but their destination");
 }
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  // NOTE Currently, setStatus always succeeds.
-  const bool success = VehicleEntity::setStatus(status);
+  const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
 
   const auto current_pose = getStatus().pose;
 
