@@ -1,9 +1,9 @@
 # Scenario Test Runner User Guide
 
-Scenario Test Runner is being developed to support the scenario simulation using the OpenSCENARIO format.
-Scenarios are described in the YAML based format called "tier4 scenario format".
-Then the scenario is converted into XML based OpenSCENARIO format.
-The specification of this scenario format is found at [OpenSCENARIO](http://www.openscenario.org/) site.
+You can test run (preview) the scenarios you created usng the GUI scenario editor before running it with Autoware.
+
+The file you exported from th GUI scenrio editor is in YAML based format called "tier4 scenario format". Then it is converted into XML based OpenSCENARIO format.
+The specification of this OpenSCENARIO format is found at [OpenSCENARIO](http://www.openscenario.org/) site.
 
 ## Before Testing Scenarios
 
