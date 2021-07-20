@@ -67,15 +67,18 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  const auto vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
-#endif
-#ifdef AUTOWARE_AUTO
-  // hard-coded for now
-  // it would require changes in https://github.com/tier4/lexus_description.iv.universe
-  // please, let us know if we should do that
-  const auto vehicle_model_type = "IDEAL_STEER";
-#endif
+  auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
+  std::string vehicle_model_type;
+
+  if (autoware_type == "proposal") {
+    vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
+  } else if (autoware_type == "auto") {
+    // hard-coded for now
+    // it would require changes in https://github.com/tier4/lexus_description.iv.universe
+    vehicle_model_type = "IDEAL_STEER";
+  } else {
+    THROW_SEMANTIC_ERROR("Unsupported autoware_type ", autoware_type);
+  }
 
   if (vehicle_model_type == "IDEAL_STEER") {
     return VehicleModelType::IDEAL_STEER;
@@ -164,72 +167,12 @@ void EgoEntity::engage() { autoware.engage(); }
 
 auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
 {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   return autoware.getVehicleCommand();
-#endif
-#ifdef AUTOWARE_AUTO
-  // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
-  autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
-
-  auto vehicle_control_command = autoware.getVehicleControlCommand();
-
-  vehicle_command.header.stamp = vehicle_control_command.stamp;
-
-  vehicle_command.control.steering_angle = vehicle_control_command.front_wheel_angle_rad;
-  vehicle_command.control.velocity = vehicle_control_command.velocity_mps;
-  vehicle_command.control.acceleration = vehicle_control_command.long_accel_mps2;
-
-  auto vehicle_state_command = autoware.getVehicleStateCommand();
-
-  // handle gear enum remapping
-  switch (vehicle_state_command.gear) {
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_DRIVE:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_PARK:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_LOW:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-      break;
-  }
-
-  // these fields are hard-coded because they are not present in AutowareAuto
-  vehicle_command.header.frame_id = "";
-  vehicle_command.control.steering_angle_velocity = 0.0;
-  vehicle_command.emergency = 0;
-
-  return vehicle_command;
-#endif
 }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  std::stringstream message;
-  {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-    // *** getAutowareStatus - FundamentalAPI dependency ***
-    const auto & state = autoware.getAutowareStatus().autoware_state;
-
-    message << (state.empty() ? "Starting" : state)  //
-            << "_(t_=_"                              //
-            << std::fixed                            //
-            << std::setprecision(2)                  //
-            << (status_ ? status_->time : 0)         //
-            << ")";
-#endif
-#ifdef AUTOWARE_AUTO
-    // TODO: implement Autoware.Auto equivalent when state monitoring is there
-#endif
-  }
-
-  return message.str();
+  return autoware.getAutowareStateMessage();
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
@@ -321,25 +264,7 @@ auto EgoEntity::getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacl
 
 auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 {
-  openscenario_msgs::msg::WaypointsArray waypoints;
-
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  // Trajectory returned by getTrajectory() is a different message between AAP and AA
-  for (const auto & point : autoware.getTrajectory().points) {
-    waypoints.waypoints.emplace_back(point.pose.position);
-  }
-#endif
-#ifdef AUTOWARE_AUTO
-  for (const auto & point : autoware.getTrajectory().points) {
-    geometry_msgs::msg::Point waypoint;
-    waypoint.x = point.x;
-    waypoint.y = point.y;
-    waypoint.z = 0;
-    waypoints.waypoints.push_back(waypoint);
-  }
-#endif
-
-  return waypoints;
+  return autoware.getWaypoints();
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)

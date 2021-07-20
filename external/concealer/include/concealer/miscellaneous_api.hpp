@@ -19,12 +19,16 @@
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+
+#include <openscenario_msgs/msg/waypoints_array.hpp>
+
+
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #endif
 
 #ifdef AUTOWARE_AUTO
@@ -381,7 +385,90 @@ class MiscellaneousAPI
 
   using Trajectory = autoware_auto_msgs::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
+
+  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() {
+    // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
+    autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
+
+    auto vehicle_control_command = getVehicleControlCommand();
+
+    vehicle_command.header.stamp = vehicle_control_command.stamp;
+
+    vehicle_command.control.steering_angle = vehicle_control_command.front_wheel_angle_rad;
+    vehicle_command.control.velocity = vehicle_control_command.velocity_mps;
+    vehicle_command.control.acceleration = vehicle_control_command.long_accel_mps2;
+
+    auto vehicle_state_command = getVehicleStateCommand();
+
+    // handle gear enum remapping
+    switch (vehicle_state_command.gear) {
+      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_DRIVE:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
+        break;
+      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
+        break;
+      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_PARK:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
+        break;
+      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_LOW:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
+        break;
+      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
+        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
+        break;
+    }
+
+    // these fields are hard-coded because they are not present in AutowareAuto
+    vehicle_command.header.frame_id = "";
+    vehicle_command.control.steering_angle_velocity = 0.0;
+    vehicle_command.emergency = 0;
+
+    return vehicle_command;
+  }
 #endif  // AUTOWARE_AUTO
+
+std::string getAutowareStateMessage() {
+  std::stringstream message;
+  {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    const auto state{getAutowareStatus().autoware_state};
+
+    message << (state.empty() ? "Starting" : state)  //
+            << "_(t_=_"                              //
+            << std::fixed                            //
+            << std::setprecision(2)                  //
+            << (status_ ? status_->time : 0)         //
+            << ")";
+#endif
+#ifdef AUTOWARE_AUTO
+    // TODO: implement Autoware.Auto equivalent when state monitoring is there
+#endif
+  }
+
+  return message.str();
+}
+
+openscenario_msgs::msg::WaypointsArray getWaypoints() {
+  openscenario_msgs::msg::WaypointsArray waypoints;
+
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+  for (const auto & point : getTrajectory().points) {
+    waypoints.waypoints.emplace_back(point.pose.position);
+  }
+#endif
+#ifdef AUTOWARE_AUTO
+  for (const auto & point : getTrajectory().points) {
+    geometry_msgs::msg::Point waypoint;
+    waypoint.x = point.x;
+    waypoint.y = point.y;
+    waypoint.z = 0;
+    waypoints.waypoints.push_back(waypoint);
+  }
+#endif
+
+  return waypoints;
+}
 
 public:
   explicit MiscellaneousAPI()
