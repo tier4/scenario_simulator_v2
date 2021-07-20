@@ -43,6 +43,8 @@ def launch_setup(context, *args, **kwargs):
         "autoware-launch-package", default="scenario_test_runner_launch"
     )
 
+    autoware_type = LaunchConfiguration("autoware_type", default="proposal")
+
     global_frame_rate = LaunchConfiguration("global-frame-rate", default=30.0)
 
     global_real_time_factor = LaunchConfiguration(
@@ -70,6 +72,7 @@ def launch_setup(context, *args, **kwargs):
         parameters = [
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
+            {"autoware_type": autoware_type},
             {"port": port},
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
@@ -99,6 +102,9 @@ def launch_setup(context, *args, **kwargs):
         ),
         DeclareLaunchArgument(
             "autoware-launch-package", default_value=autoware_launch_package
+        ),
+        DeclareLaunchArgument(
+            "autoware_type", default_value=autoware_type
         ),
         DeclareLaunchArgument("global-frame-rate", default_value=global_frame_rate),
         DeclareLaunchArgument(
