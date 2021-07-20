@@ -27,12 +27,6 @@
 #include <utility>
 #include <vector>
 
-#define DEBUG_VALUE(...) \
-  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
-
-#define DEBUG_LINE() \
-  std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
-
 template <typename T>
 auto getParameter(const std::string & name, T value)
 {
@@ -102,21 +96,6 @@ auto makeSimulationModel(
   const openscenario_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
-  DEBUG_VALUE(getParameter<double>("vel_lim", 50.0));
-  DEBUG_VALUE(getParameter<double>("steer_lim", 1.0));
-  DEBUG_VALUE(getParameter<double>("accel_rate", 10.0));
-  DEBUG_VALUE(getParameter<double>("steer_rate_lim", 5.0));
-  DEBUG_VALUE(getParameter<double>(
-    "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
-  DEBUG_VALUE(step_time);
-  DEBUG_VALUE(getParameter<double>("vel_time_delay", 0.25));
-  DEBUG_VALUE(getParameter<double>("vel_time_constant", 0.5));
-  DEBUG_VALUE(getParameter<double>("acc_time_delay", 0.1));
-  DEBUG_VALUE(getParameter<double>("acc_time_constant", 0.1));
-  DEBUG_VALUE(getParameter<double>("steer_time_delay", 0.3));
-  DEBUG_VALUE(getParameter<double>("steer_time_constant", 0.3));
-  DEBUG_VALUE(getParameter<double>("deadzone_delta_steer", 0.0));
-
   switch (vehicle_model_type) {
     case VehicleModelType::IDEAL_STEER:
       return std::make_shared<SimModelIdealSteer>(getParameter<double>(
@@ -157,7 +136,7 @@ auto makeSimulationModel(
 
     default:
       THROW_SEMANTIC_ERROR(
-        "Unsupported vehicle_model_type ", toString(vehicle_model_type), "specified");
+        "Unsupported vehicle_model_type ", toString(vehicle_model_type), " specified");
   }
 }
 

@@ -79,7 +79,7 @@ OpenSCENARIO:
             Properties:
               Property:
                 - name: isEgo
-                  value: "false"
+                  value: "true"
       - name: vehicle-1
         Vehicle:
           name: ""
