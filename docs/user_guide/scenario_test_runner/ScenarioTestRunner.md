@@ -1,15 +1,15 @@
 # Scenario Test Runner User Guide
 
-You can test run (preview) the scenarios you created usng the GUI scenario editor before running it with Autoware.
+You can test run (preview) the scenarios you created using the GUI scenario editor before running it with Autoware.
 
-The file you exported from th GUI scenrio editor is in YAML based format called "tier4 scenario format". Then it is converted into XML based OpenSCENARIO format.
+The file you exported from the GUI scenario editor is in YAML based format called "[TierIV Scenario Format Version 2.0](../../design/TierIVScenarioFormatVersion2.md)". Then it is converted into XML based OpenSCENARIO format.
 The specification of this OpenSCENARIO format is found at [OpenSCENARIO](http://www.openscenario.org/) site.
 
 ## Before Testing Scenarios
 
 You need to open your YAML file with text editor and edit the following two parts of your scenario file before testing it.
 
-#### 1. Add Full Path to your Map File 
+#### 1. Add Full Path to your Map File
 
 Find the following part in your YAML file;
 
@@ -42,7 +42,7 @@ and change to;
                 - name: isEgo
                   value: "false"
 ```
-This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario. <font color="Red"> Please note that this "isEgo" setting is only for scenario testing and you will need to revert it to "true" when you conduct the actual sceario simulation with Autoware. </font>
+This is the setting to let Ego vehicle run without connecting to Autoware for testing the scenario. <font color="Red"> Please note that this "isEgo" setting is only for scenario testing and you will need to revert it to "true" when you conduct the actual scenario simulation with Autoware. </font>
 
 ## How to Test Single Scenario
 ```bash
@@ -51,7 +51,7 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:='/home
 The workflow file defines how to execute scenarios.
 If you want to know how to write the workflow file, read [here.](./HowToWriteWorkflowFile.md)
 
-## How to Test Mutiple Scenarios
+## How to Test Multiple Scenarios
 ```bash
 ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' log_directory:='/tmp'
 ```
