@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/filesystem/operations.hpp>
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
+// clang-format off (NOTE: ament-clang-format does not respect the include order)
 #include <concealer/autoware_def.hpp>
-
-// #undef NDEBUG
+// clang-format on
 
 #include <algorithm>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <concealer/execute.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
