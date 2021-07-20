@@ -32,17 +32,15 @@ from pathlib import Path
 
 def launch_setup(context, *args, **kwargs):
     autoware_launch_file = LaunchConfiguration(
-        "autoware-launch-file",
-        default="planning_simulator.launch.xml"
+        # "autoware-launch-file", default="planning_simulator.launch.xml"
         # use the below launch file to enable AutowareAuto instead of ArchitectureProposal
-        # "autoware-launch-file", default="autoware_auto.launch.py"
+        "autoware-launch-file", default="autoware_auto.launch.py"
     )
 
     autoware_launch_package = LaunchConfiguration(
-        "autoware-launch-package",
-        default="autoware_launch"
+        # "autoware-launch-package", default="autoware_launch"
         # use the below package to enable AutowareAuto instead of ArchitectureProposal
-        # "autoware-launch-package", default="scenario_test_runner_launch"
+        "autoware-launch-package", default="scenario_test_runner_launch"
     )
 
     global_frame_rate = LaunchConfiguration("global-frame-rate", default=30.0)

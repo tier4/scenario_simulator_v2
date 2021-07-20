@@ -16,7 +16,7 @@
 #define CONCEALER__AUTOWARE_DEF_HPP_
 
 // uncomment this line to enable AutowareAuto instead of ArchitectureProposal
-// #define AUTOWARE_AUTO
+#define AUTOWARE_AUTO
 
 #ifndef AUTOWARE_AUTO
 #define AUTOWARE_ARCHITECTURE_PROPOSAL
