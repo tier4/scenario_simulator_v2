@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_OBJECT_HPP_
 
-#include <concealer/autoware_def.hpp>
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
@@ -23,6 +22,21 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <traffic_simulator/metrics/out_of_range_metric.hpp>
+
+
+// borrowed from "simulation/traffic_simulator/src/entity/ego_entity.cpp"
+// TODO: find some shared space for this function
+template <typename T>
+auto getParameter(const std::string & name, T value)
+{
+  rclcpp::Node node{"get_parameter", "simulation"};
+
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
+
+  return value;
+}
+
 
 namespace openscenario_interpreter
 {
@@ -105,25 +119,29 @@ struct ScenarioObject
       if (is<Vehicle>()) {
         applyAssignControllerAction(name, object_controller);
         if (object_controller.isEgo()) {
-          attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-            traffic_simulator::helper::LidarType::VLP16, name,
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-            "/sensing/lidar/no_ground/pointcloud"
-#endif
-#ifdef AUTOWARE_AUTO
-            "/perception/points_nonground"
-#endif
-            ));
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-          attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-            name,
-            // publishing autoware_perception_msgs::msg::DynamicObjectArray
-            "/perception/object_recognition/objects", 0.1));
-#endif
-          // Autoware.Auto does not currently support object prediction
-          // however it is work-in-progress for Cargo ODD
-          // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
-          // topic name is yet unknown
+          auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
+
+          std::cout << "autoware_type = " << autoware_type << std::endl;
+
+          if (autoware_type == "proposal") {
+            attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+              traffic_simulator::helper::LidarType::VLP16, name,
+              "/sensing/lidar/no_ground/pointcloud"));
+
+            attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+              name, "/perception/object_recognition/objects", 0.1));
+          } else if (autoware_type == "auto") {
+            attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+              traffic_simulator::helper::LidarType::VLP16, name,
+              "/perception/points_nonground"));
+
+            // Autoware.Auto does not currently support object prediction
+            // however it is work-in-progress for Cargo ODD
+            // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
+            // topic name is yet unknown
+          } else {
+            throw std::invalid_argument("Invalid autoware_type = " + autoware_type);
+          }
         }
       }
       return unspecified;
