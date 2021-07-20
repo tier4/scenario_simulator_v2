@@ -63,8 +63,6 @@ class Autoware : public rclcpp::Node,
 
   mutable std::mutex mutex;
 
-  auto lock() const { return std::unique_lock<std::mutex>(mutex); }
-
   const pid_t process_id;
 
   std::promise<void> promise;
@@ -83,21 +81,14 @@ class Autoware : public rclcpp::Node,
    *
    * ------------------------------------------------------------------------ */
   geometry_msgs::msg::Pose current_pose;
+
   geometry_msgs::msg::Twist current_twist;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  This update function is responsible for mass updates of topics that must
-   *  be continuously updated.
-   *
-   * ------------------------------------------------------------------------ */
-  void update();
+  bool initialize_was_called = false;
 
   TaskQueue task_queue;
 
   std::exception_ptr thrown;
-
-  void rethrow() const noexcept(false);
 
 public:
   template <typename... Ts>
@@ -129,17 +120,28 @@ public:
 
   virtual ~Autoware();
 
-  bool ready() const noexcept(false);
-
-  const auto & set(const geometry_msgs::msg::Pose & pose) { return current_pose = pose; }
-
-  const auto & set(const geometry_msgs::msg::Twist & twist) { return current_twist = twist; }
+  void engage();
 
   void initialize(const geometry_msgs::msg::Pose &);
 
+  auto initialized() const noexcept { return initialize_was_called; }
+
+  auto lock() const { return std::unique_lock<std::mutex>(mutex); }
+
   void plan(const std::vector<geometry_msgs::msg::PoseStamped> &);
 
-  void engage();
+  void rethrow() const noexcept(false);
+
+  bool ready() const noexcept(false);
+
+  auto set(const geometry_msgs::msg::Pose & pose) -> const auto & { return current_pose = pose; }
+
+  auto set(const geometry_msgs::msg::Twist & twist) -> const auto &
+  {
+    return current_twist = twist;
+  }
+
+  void update();
 };
 }  // namespace concealer
 

@@ -460,7 +460,7 @@ void EgoEntity::requestAssignRoute(
 
   assert(0 < route.size());
 
-  if (not std::exchange(autoware_initialized, true)) {
+  if (not autoware.initialized()) {
     autoware.initialize(getStatus().pose);
     autoware.plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
@@ -484,7 +484,7 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   const auto current_pose = getStatus().pose;
 
-  if (autoware_initialized) {
+  if (autoware.initialized()) {
     geometry_msgs::msg::Twist current_twist;
     {
       current_twist.linear.x = (*vehicle_model_ptr_).getVx();

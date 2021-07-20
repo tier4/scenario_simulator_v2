@@ -150,21 +150,23 @@ bool Autoware::ready() const
  * -------------------------------------------------------------------------- */
 void Autoware::initialize(const geometry_msgs::msg::Pose & initial_pose)
 {
+  if (not std::exchange(initialize_was_called, true)) {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  task_queue.delay([this, initial_pose]() {
-    set(initial_pose);
-    waitForAutowareStateToBeInitializingVehicle();
-    waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
-  });
+    task_queue.delay([this, initial_pose]() {
+      set(initial_pose);
+      waitForAutowareStateToBeInitializingVehicle();
+      waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
+    });
 #endif
 
 #ifdef AUTOWARE_AUTO
-  task_queue.delay([this, initial_pose]() {
-    // TODO: wait for a correct state if necessary once state monitoring is there
-    set(initial_pose);
-    setInitialPose(initial_pose);
-  });
+    task_queue.delay([this, initial_pose]() {
+      // TODO: wait for a correct state if necessary once state monitoring is there
+      set(initial_pose);
+      setInitialPose(initial_pose);
+    });
 #endif
+  }
 }
 
 /* ---- NOTE -------------------------------------------------------------------
