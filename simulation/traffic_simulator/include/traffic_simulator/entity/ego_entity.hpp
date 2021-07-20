@@ -47,8 +47,7 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  // NOTE: One day we will have to do simultaneous simulations of multiple Ego entities.
-  static std::unordered_map<std::string, concealer::Autoware> ego_entities;
+  concealer::Autoware autoware;
 
   bool autoware_initialized = false;  // TODO (yamacir-kit) REMOVE THIS!!!
 
@@ -85,7 +84,7 @@ public:
     const double step_time,               //
     const openscenario_msgs::msg::VehicleParameters & parameters);
 
-  ~EgoEntity() override;
+  ~EgoEntity() override = default;
 
   EgoEntity(const EgoEntity &) = delete;
 

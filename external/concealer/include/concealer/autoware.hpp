@@ -61,9 +61,9 @@ class Autoware : public rclcpp::Node,
   friend class MiscellaneousAPI<Autoware>;
   friend class TransitionAssertion<Autoware>;
 
-  std::mutex mutex;
+  mutable std::mutex mutex;
 
-  decltype(auto) lock() { return std::unique_lock<std::mutex>(mutex); }
+  auto lock() const { return std::unique_lock<std::mutex>(mutex); }
 
   const pid_t process_id;
 
