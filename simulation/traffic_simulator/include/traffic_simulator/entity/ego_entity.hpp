@@ -22,6 +22,7 @@
 #include <memory>
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_ideal.hpp>
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
@@ -46,10 +47,7 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  // NOTE: One day we will have to do simultaneous simulations of multiple Ego entities.
-  static std::unordered_map<std::string, concealer::Autoware> ego_entities;
-
-  bool autoware_initialized = false;  // TODO (yamacir-kit) REMOVE THIS!!!
+  concealer::Autoware autoware;
 
   const VehicleModelType vehicle_model_type_;
 
@@ -60,37 +58,24 @@ class EgoEntity : public VehicleEntity
   boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
 public:
-  EgoEntity() = delete;
+  explicit EgoEntity() = delete;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  This constructor builds an Ego-type entity with an ambiguous initial
-   *  state. In this case, the values for status_ and current_kinematic_state_
-   *  are boost::none, respectively.
-   *
-   *  This constructor is used for the purpose of delaying the transmission of
-   *  the initial position from the entity's spawn. If you build an ego-type
-   *  entity with this constructor, you must explicitly call setStatus at least
-   *  once before the first onUpdate call to establish location and kinematic
-   *  state.
-   *
-   *  For OpenSCENARIO, setStatus before the onUpdate call is called by
-   *  TeleportAction in the Storyboard.Init section.
-   *
-   * ------------------------------------------------------------------------ */
   explicit EgoEntity(
-    const std::string & name,                          //
-    const boost::filesystem::path & lanelet2_map_osm,  //
-    const double step_time,                            //
+    const std::string & name,             //
+    const Configuration & configuration,  //
+    const double step_time,               //
     const openscenario_msgs::msg::VehicleParameters & parameters);
 
-  ~EgoEntity() override;
+  explicit EgoEntity(EgoEntity &&) = delete;
 
-  EgoEntity(const EgoEntity &) = delete;
+  explicit EgoEntity(const EgoEntity &) = delete;
 
-  EgoEntity & operator=(const EgoEntity &) = delete;
+  ~EgoEntity() override = default;
 
-public:
+  auto operator=(EgoEntity &&) -> EgoEntity & = delete;
+
+  auto operator=(const EgoEntity &) -> EgoEntity & = delete;
+
   void engage() override;
 
   auto getCurrentAction() const -> const std::string override;
@@ -101,6 +86,8 @@ public:
   auto getEntityTypename() const -> const std::string & override;
 
   auto getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacle> override;
+
+  auto getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand override;
 
   auto getWaypoints() -> const openscenario_msgs::msg::WaypointsArray override;
 
@@ -117,8 +104,6 @@ public:
   auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool override;
 
   void setTargetSpeed(double, bool) override;
-
-  const autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
