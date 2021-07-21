@@ -1,5 +1,8 @@
 # Build Instructions
 
+This setup instraction is based on ROS2-foxy.
+If you want to setup in galactic environment, please replace foxy to galactic.
+
 ## Setup ROS 2 environment
 
 This framework only supports ROS 2 Foxy Fitzroy. (<https://docs.ros.org/en/foxy/Installation.html>)  
@@ -31,7 +34,7 @@ git clone https://github.com/tier4/scenario_simulator_v2.git
 # These lines are necessary right now, but it will be removed in the near future
 cd scenario_simulator_v2
 # This script clones the part of the source codes in Autoware and add it to the workspace
-sh install_depends.sh
+sh install_depends.sh foxy
 ```
 
 ## Install dependencies via rosdep
