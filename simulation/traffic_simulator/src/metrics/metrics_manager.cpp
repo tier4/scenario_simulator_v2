@@ -22,22 +22,22 @@
 namespace metrics
 {
 MetricsManager::MetricsManager(
-  bool verbose, const std::string & logfile_path, bool file_output_every_frame)
-: logfile_path(logfile_path),
-  file_output_every_frame(file_output_every_frame),
+  const boost::filesystem::path & log_path, const bool verbose, const bool write_file_every_frame)
+: log_path(log_path),
+  write_file_every_frame(write_file_every_frame),
+  verbose_(verbose),
   metrics_(),
-  file_(logfile_path)
+  file_(log_path.string())
 {
-  verbose_ = verbose;
 }
 
-void MetricsManager::setVerbose(bool verbose) { verbose_ = verbose; }
+void MetricsManager::setVerbose(const bool verbose) { verbose_ = verbose; }
 
 void MetricsManager::calculate()
 {
   nlohmann::json log;
   std::vector<std::string> disable_metrics_list = {};
-  for (auto & metric : metrics_) {
+  for (const auto & metric : metrics_) {
     if (metric.second->getLifecycle() == MetricLifecycle::INACTIVE) {
       if (metric.second->activateTrigger()) {
         metric.second->activate();
@@ -56,19 +56,18 @@ void MetricsManager::calculate()
       disable_metrics_list.emplace_back(metric.first);
     }
   }
-  for (const auto name : disable_metrics_list) {
+  for (const auto & name : disable_metrics_list) {
     if (metrics_[name]->getLifecycle() == MetricLifecycle::FAILURE) {
       metrics_[name]->throwException();
     }
     metrics_.erase(name);
   }
-  double current_time = entity_manager_ptr_->getCurrentTime();
-  log_[std::to_string(current_time)] = log;
+  log_[std::to_string(entity_manager_ptr_->getCurrentTime())] = log;
   file_ << log_;
 }
 
 void MetricsManager::setEntityManager(
-  std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr)
+  const std::shared_ptr<traffic_simulator::entity::EntityManager> & entity_manager_ptr)
 {
   entity_manager_ptr_ = entity_manager_ptr;
 }

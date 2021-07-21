@@ -46,27 +46,25 @@
 #include <utility>
 #include <vector>
 
-#define EXPERIMENTAL_AUTOWARE_IV_SUPPORT
-
 namespace hdmap_utils
 {
-HdMapUtils::HdMapUtils(std::string lanelet_path, geographic_msgs::msg::GeoPoint origin)
+HdMapUtils::HdMapUtils(
+  const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint & origin)
 {
-#ifndef EXPERIMENTAL_AUTOWARE_IV_SUPPORT
-  lanelet::GPSPoint origin_gps_point{origin.latitude, origin.longitude, origin.altitude};
-  lanelet::Origin origin_lanelet{origin_gps_point};
-  lanelet::projection::UtmProjector projector(origin_lanelet);
-#else
-  lanelet::projection::MGRSProjector projector{};  // TODO(yamacir-kit)
-#endif
+  lanelet::projection::MGRSProjector projector;
+
   lanelet::ErrorMessages errors;
-  lanelet_map_ptr_ = lanelet::load(lanelet_path, projector, &errors);
-  if (!errors.empty()) {
+
+  lanelet_map_ptr_ = lanelet::load(lanelet2_map_path.string(), projector, &errors);
+
+  if (not errors.empty()) {
     std::stringstream ss;
+    const auto * separator = "";
     for (const auto & error : errors) {
-      ss << "error : " << error;
+      ss << separator << error;
+      separator = "\n";
     }
-    THROW_SIMULATION_ERROR("failed to load lanelet map", ss.str());
+    THROW_SIMULATION_ERROR("Failed to load lanelet map (", ss.str(), ")");
   }
   overwriteLaneletsCenterline();
   traffic_rules_vehicle_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(

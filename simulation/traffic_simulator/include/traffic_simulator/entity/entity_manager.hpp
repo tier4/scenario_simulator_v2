@@ -20,9 +20,6 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/bounding_box.hpp>
@@ -33,6 +30,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -65,29 +63,24 @@ public:
 
 class EntityManager
 {
-  bool verbose_;
+  Configuration configuration;
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
 
-  rclcpp::Clock::SharedPtr clock_ptr_;
+  const rclcpp::Clock::SharedPtr clock_ptr_;
 
   std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
-  boost::optional<autoware_auto_msgs::msg::VehicleControlCommand> control_cmd_;
-  boost::optional<autoware_auto_msgs::msg::VehicleStateCommand> state_cmd_;
-
   double step_time_;
+
   double current_time_;
 
   using EntityStatusWithTrajectoryArray = openscenario_msgs::msg::EntityStatusWithTrajectoryArray;
-  rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
+  const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
 
   using MarkerArray = visualization_msgs::msg::MarkerArray;
-  rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-
-  using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
-  rclcpp::Publisher<VehicleKinematicState>::SharedPtr kinematic_state_pub_ptr_;
+  const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
@@ -116,8 +109,8 @@ public:
   }
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
-  explicit EntityManager(NodeT && node, const std::string & map_path)
-  : verbose_(false),
+  explicit EntityManager(NodeT && node, const Configuration & configuration)
+  : configuration(configuration),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -127,10 +120,8 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    kinematic_state_pub_ptr_(rclcpp::create_publisher<VehicleKinematicState>(
-      node, "output/kinematic_state", LaneletMarkerQoS(),
-      rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(map_path, getOrigin(*node))),
+    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
+      configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
     traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(
       hdmap_utils_ptr_,
@@ -312,7 +303,7 @@ public:
 
   bool setEntityStatus(const std::string & name, openscenario_msgs::msg::EntityStatus status);
 
-  void setVerbose(bool verbose);
+  void setVerbose(const bool verbose);
 
   template <typename Entity, typename... Ts>
   auto spawnEntity(const std::string & name, Ts &&... xs)

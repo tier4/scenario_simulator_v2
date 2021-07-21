@@ -15,12 +15,13 @@
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
+// clang-format off (NOTE: ament-clang-format does not respect the include order)
 #include <concealer/autoware_def.hpp>
-
-// #undef NDEBUG
+// clang-format on
 
 #include <algorithm>
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <concealer/execute.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
@@ -126,19 +127,34 @@ try {
 
   script.rebind<OpenScenario>(osc_path);
 
-  const auto with_autoware = std::any_of(
-    std::cbegin(script.as<OpenScenario>().entities), std::cend(script.as<OpenScenario>().entities),
-    [](auto & each) {
-      return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
-    });
+  auto configuration = traffic_simulator::Configuration(
+    boost::filesystem::is_directory(script.as<OpenScenario>().logic_file)
+      ? script.as<OpenScenario>().logic_file
+      : script.as<OpenScenario>().logic_file.parent_path());
+  {
+    configuration.auto_sink = false;
 
-  connect(
-    shared_from_this(),                                       //
-    boost::filesystem::path(osc_path).replace_extension(""),  // NOTE: /path/to/lanelet2_map.osm
-    script.as<OpenScenario>().logic_file.string(),            //
-    with_autoware ? 30 : 0,
-    false  // auto-sink
-  );
+    configuration.initialize_duration =
+      std::any_of(
+        std::cbegin(script.as<OpenScenario>().entities),
+        std::cend(script.as<OpenScenario>().entities),
+        [](auto & each) {
+          return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
+        })
+        ? 30
+        : 0;
+
+    configuration.scenario_path = osc_path;
+
+    // XXX DIRTY HACK!!!
+    if (
+      not boost::filesystem::is_directory(script.as<OpenScenario>().logic_file) and
+      script.as<OpenScenario>().logic_file.extension() == ".osm") {
+      configuration.lanelet2_map_file = script.as<OpenScenario>().logic_file.filename().string();
+    }
+  }
+
+  connect(shared_from_this(), configuration);
 
   initialize(
     local_real_time_factor,

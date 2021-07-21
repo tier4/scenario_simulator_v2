@@ -14,7 +14,6 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <concealer/autoware_def.hpp>
 #include <functional>
 #include <memory>
@@ -28,14 +27,8 @@
 #include <utility>
 #include <vector>
 
-#define DEBUG_VALUE(...) \
-  std::cout << "\x1b[32m" #__VA_ARGS__ " = " << (__VA_ARGS__) << "\x1b[0m" << std::endl
-
-#define DEBUG_LINE() \
-  std::cout << "\x1b[32m" << __FILE__ << ":" << __LINE__ << "\x1b[0m" << std::endl
-
 template <typename T>
-auto getParameter(const std::string & name, T value)
+auto getParameter(const std::string & name, T value = {})
 {
   rclcpp::Node node{"get_parameter", "simulation"};
 
@@ -49,8 +42,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-std::unordered_map<std::string, concealer::Autoware> EgoEntity::ego_entities{};
-
 auto toString(const VehicleModelType datum) -> std::string
 {
 #define BOILERPLATE(IDENTIFIER)      \
@@ -70,6 +61,7 @@ auto toString(const VehicleModelType datum) -> std::string
   }
 
 #undef BOILERPLATE
+
   THROW_SIMULATION_ERROR("Unsupported vehicle model type, failed to convert to string");
 }
 
@@ -84,8 +76,6 @@ auto getVehicleModelType()
   // please, let us know if we should do that
   const auto vehicle_model_type = "IDEAL_STEER";
 #endif
-
-  DEBUG_VALUE(vehicle_model_type);
 
   if (vehicle_model_type == "IDEAL_STEER") {
     return VehicleModelType::IDEAL_STEER;
@@ -102,23 +92,8 @@ auto makeSimulationModel(
   const VehicleModelType vehicle_model_type,
   const double step_time,  //
   const openscenario_msgs::msg::VehicleParameters & parameters)
-  -> std::shared_ptr<SimModelInterface>
+  -> const std::shared_ptr<SimModelInterface>
 {
-  DEBUG_VALUE(getParameter<double>("vel_lim", 50.0));
-  DEBUG_VALUE(getParameter<double>("steer_lim", 1.0));
-  DEBUG_VALUE(getParameter<double>("accel_rate", 10.0));
-  DEBUG_VALUE(getParameter<double>("steer_rate_lim", 5.0));
-  DEBUG_VALUE(getParameter<double>(
-    "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x));
-  DEBUG_VALUE(step_time);
-  DEBUG_VALUE(getParameter<double>("vel_time_delay", 0.25));
-  DEBUG_VALUE(getParameter<double>("vel_time_constant", 0.5));
-  DEBUG_VALUE(getParameter<double>("acc_time_delay", 0.1));
-  DEBUG_VALUE(getParameter<double>("acc_time_constant", 0.1));
-  DEBUG_VALUE(getParameter<double>("steer_time_delay", 0.3));
-  DEBUG_VALUE(getParameter<double>("steer_time_constant", 0.3));
-  DEBUG_VALUE(getParameter<double>("deadzone_delta_steer", 0.0));
-
   switch (vehicle_model_type) {
     case VehicleModelType::IDEAL_STEER:
       return std::make_shared<SimModelIdealSteer>(getParameter<double>(
@@ -159,56 +134,44 @@ auto makeSimulationModel(
 
     default:
       THROW_SEMANTIC_ERROR(
-        "Unsupported vehicle_model_type ", toString(vehicle_model_type), "specified");
+        "Unsupported vehicle_model_type ", toString(vehicle_model_type), " specified");
   }
 }
 
 EgoEntity::EgoEntity(
-  const std::string & name,  //
-  const boost::filesystem::path & lanelet2_map_osm,
-  const double step_time,  //
+  const std::string & name,             //
+  const Configuration & configuration,  //
+  const double step_time,               //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
+  autoware(
+    getParameter<std::string>("autoware_launch_package"),
+    getParameter<std::string>("autoware_launch_file"),
+    "map_path:=" + configuration.map_path.string(),
+    "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+    "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+    "sensor_model:=" + getParameter<std::string>("sensor_model"),
+    "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+    "rviz_config:=" + configuration.rviz_config_path.string(),  //
+    "scenario_simulation:=true"),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
-
-  ego_entities.emplace(
-    std::piecewise_construct, std::forward_as_tuple(name),
-    std::forward_as_tuple(
-      getParameter("autoware_launch_package", std::string("")),
-      getParameter("autoware_launch_file", std::string("")),
-      "map_path:=" + lanelet2_map_osm.parent_path().string(),
-      "lanelet2_map_file:=" + lanelet2_map_osm.filename().string(),
-      "sensor_model:=" + getParameter("sensor_model", std::string("")),
-      "vehicle_model:=" + getParameter("vehicle_model", std::string("")),
-      "rviz_config:=" + ament_index_cpp::get_package_share_directory("scenario_test_runner") +
-        "/config/scenario_simulator_v2.rviz",
-      "scenario_simulation:=true"));
 }
 
-EgoEntity::~EgoEntity() { ego_entities.erase(name); }
+void EgoEntity::engage() { autoware.engage(); }
 
-void EgoEntity::engage()
-{
-  // while (not ready()) {  // guard
-  //   std::this_thread::sleep_for(std::chrono::seconds(1));
-  // }
-
-  ego_entities.at(name).engage();
-}
-
-const autoware_vehicle_msgs::msg::VehicleCommand EgoEntity::getVehicleCommand()
+auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
 {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  return ego_entities.at(name).getVehicleCommand();
+  return autoware.getVehicleCommand();
 #endif
 #ifdef AUTOWARE_AUTO
   // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
   autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
 
-  auto vehicle_control_command = ego_entities.at(name).getVehicleControlCommand();
+  auto vehicle_control_command = autoware.getVehicleControlCommand();
 
   vehicle_command.header.stamp = vehicle_control_command.stamp;
 
@@ -216,7 +179,7 @@ const autoware_vehicle_msgs::msg::VehicleCommand EgoEntity::getVehicleCommand()
   vehicle_command.control.velocity = vehicle_control_command.velocity_mps;
   vehicle_command.control.acceleration = vehicle_control_command.long_accel_mps2;
 
-  auto vehicle_state_command = ego_entities.at(name).getVehicleStateCommand();
+  auto vehicle_state_command = autoware.getVehicleStateCommand();
 
   // handle gear enum remapping
   switch (vehicle_state_command.gear) {
@@ -252,7 +215,7 @@ auto EgoEntity::getCurrentAction() const -> const std::string
   {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
     // *** getAutowareStatus - FundamentalAPI dependency ***
-    const auto state{ego_entities.at(name).getAutowareStatus().autoware_state};
+    const auto & state = autoware.getAutowareStatus().autoware_state;
 
     message << (state.empty() ? "Starting" : state)  //
             << "_(t_=_"                              //
@@ -362,12 +325,12 @@ auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
   // Trajectory returned by getTrajectory() is a different message between AAP and AA
-  for (const auto & point : ego_entities.at(name).getTrajectory().points) {
+  for (const auto & point : autoware.getTrajectory().points) {
     waypoints.waypoints.emplace_back(point.pose.position);
   }
 #endif
 #ifdef AUTOWARE_AUTO
-  for (const auto & point : ego_entities.at(name).getTrajectory().points) {
+  for (const auto & point : autoware.getTrajectory().points) {
     geometry_msgs::msg::Point waypoint;
     waypoint.x = point.x;
     waypoint.y = point.y;
@@ -402,7 +365,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
     }
 
-    ego_entities.at(name).set(current_pose);
+    autoware.set(current_pose);
 
     geometry_msgs::msg::Twist current_twist;
     {
@@ -410,7 +373,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    ego_entities.at(name).set(current_twist);
+    autoware.set(current_twist);
   } else {
     switch (vehicle_model_type_) {
       case VehicleModelType::IDEAL_STEER:
@@ -419,13 +382,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
         input <<  //
-          ego_entities.at(name).getVehicleCommand().control.velocity,
-          ego_entities.at(name).getVehicleCommand().control.steering_angle;
+          autoware.getVehicleCommand().control.velocity,
+          autoware.getVehicleCommand().control.steering_angle;
 #endif
 #ifdef AUTOWARE_AUTO
         input <<  //
-          ego_entities.at(name).getVehicleControlCommand().velocity_mps,
-          ego_entities.at(name).getVehicleControlCommand().front_wheel_angle_rad;
+          autoware.getVehicleControlCommand().velocity_mps,
+          autoware.getVehicleControlCommand().front_wheel_angle_rad;
 #endif
 
         (*vehicle_model_ptr_).setInput(input);
@@ -438,18 +401,18 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         using autoware_vehicle_msgs::msg::Shift;
 
         input <<  //
-          ego_entities.at(name).getVehicleCommand().control.acceleration,
-          ego_entities.at(name).getVehicleCommand().control.steering_angle,
-          ego_entities.at(name).getVehicleCommand().shift.data == Shift::REVERSE ? -1.0 : 1.0;
+          autoware.getVehicleCommand().control.acceleration,
+          autoware.getVehicleCommand().control.steering_angle,
+          autoware.getVehicleCommand().shift.data == Shift::REVERSE ? -1.0 : 1.0;
 #endif
 #ifdef AUTOWARE_AUTO
         input <<  //
-          ego_entities.at(name).getVehicleControlCommand().velocity_mps,
-          ego_entities.at(name).getVehicleControlCommand().front_wheel_angle_rad,
-          ego_entities.at(name).getVehicleStateCommand().gear ==
+          autoware.getVehicleControlCommand().velocity_mps,
+          autoware.getVehicleControlCommand().front_wheel_angle_rad,
+          autoware.getVehicleStateCommand().gear ==
               autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE
             ? -1.0
-            : 1.0;
+            : +1.0;
 #endif
 
         (*vehicle_model_ptr_).setInput(input);
@@ -478,7 +441,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 auto EgoEntity::ready() const -> bool
 {
   // NOTE: Autoware::ready() will notify you with an exception if Autoware has detected any anomalies at the time of the call.
-  return ego_entities.at(name).ready();
+  return autoware.ready();
 }
 
 void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
@@ -497,40 +460,39 @@ void EgoEntity::requestAssignRoute(
 
   assert(0 < route.size());
 
-  if (not std::exchange(autoware_initialized, true)) {
-    ego_entities.at(name).initialize(getStatus().pose);
-    ego_entities.at(name).plan(route);
+  if (not autoware.initialized()) {
+    autoware.initialize(getStatus().pose);
+    autoware.plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    ego_entities.at(name).plan(route);
-    ego_entities.at(name).engage();
+    autoware.plan(route);
+    autoware.engage();
   }
 }
 
 void EgoEntity::requestLaneChange(const std::int64_t)
 {
   THROW_SEMANTIC_ERROR(
-    "From scenario, a lane change was requested to Ego type entity ", name,
+    "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),
     " In general, such a request is an error, since Ego cars make autonomous decisions about "
-    "everything but their destination.");
+    "everything but their destination");
 }
 
 bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 {
-  // NOTE Currently, setStatus always succeeds.
-  const bool success = VehicleEntity::setStatus(status);
+  const bool success = VehicleEntity::setStatus(status);  // NOTE: setStatus always succeeds.
 
   const auto current_pose = getStatus().pose;
 
-  if (autoware_initialized) {
+  if (autoware.initialized()) {
     geometry_msgs::msg::Twist current_twist;
     {
       current_twist.linear.x = (*vehicle_model_ptr_).getVx();
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    ego_entities.at(name).set(current_pose);
-    ego_entities.at(name).set(current_twist);
+    autoware.set(current_pose);
+    autoware.set(current_twist);
   }
 
   if (!initial_pose_) {
