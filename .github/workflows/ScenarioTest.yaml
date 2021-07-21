@@ -97,7 +97,7 @@ jobs:
           lcov --config-file .lcovrc -a lcov.base -a lcov.test -o lcov.total
           lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/src/vendor/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" -o lcov.total.filtered
 
-      - name: publish codevov result
+      - name: publish codecov result
         uses: codecov/codecov-action@v1.2.1
         if: always()
         with:
