@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/lane_position.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
 
@@ -74,21 +75,19 @@ struct Position : public Element
   }
 };
 
-template <typename R = void, typename F, typename... Ts>
-decltype(auto) apply(F && f, const Position & position, Ts &&... xs)
+template <typename Result = void, typename Function, typename... Ts>
+auto apply(Function && function, const Position & position, Ts &&... xs) -> Result
 {
-#define BOILERPLATE(TYPE)                                               \
-  {                                                                     \
-    typeid(TYPE), [](F && f, const Position & position, Ts &&... xs) {  \
-      return f(position.as<TYPE>(), std::forward<decltype(xs)>(xs)...); \
-    }                                                                   \
-  }
+  using application = std::function<Result(Function &&, const Position &, Ts &&...)>;
 
-  // clang-format off
-  static const std::unordered_map<
-    std::type_index, std::function<R(F && f, const Position & position, Ts &&... xs)>>
-  overloads
-  {
+#define BOILERPLATE(TYPE)                                                            \
+  std::make_pair<std::type_index, application>(                                      \
+    typeid(TYPE), [](Function && function, const Position & position, Ts &&... xs) { \
+      return function(position.as<TYPE>(), std::forward<decltype(xs)>(xs)...);       \
+    })
+
+  static const std::unordered_map<std::type_index, application> overloads{
+    // clang-format off
     BOILERPLATE(         WorldPosition),
     BOILERPLATE( RelativeWorldPosition),
     // BOILERPLATE(RelativeObjectPosition),
@@ -97,13 +96,17 @@ decltype(auto) apply(F && f, const Position & position, Ts &&... xs)
     BOILERPLATE(          LanePosition),
     // BOILERPLATE(  RelativeLanePosition),
     // BOILERPLATE(         RoutePosition),
+    // clang-format on
   };
-  // clang-format on
 
 #undef BOILERPLATE
 
-  return overloads.at(position.type())(
-    std::forward<decltype(f)>(f), position, std::forward<decltype(xs)>(xs)...);
+  try {
+    return overloads.at(position.type())(
+      std::forward<decltype(function)>(function), position, std::forward<decltype(xs)>(xs)...);
+  } catch (const std::out_of_range &) {
+    throw UNSUPPORTED_SETTING_DETECTED(Position, makeTypename(position.type().name()));
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

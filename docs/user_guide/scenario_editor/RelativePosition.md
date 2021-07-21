@@ -1,6 +1,6 @@
-### Set a position of an entity in relative position
+### Topic : Placing Entity at Relative Position
 
-#### Launch a scenario editor and open a map
+#### Launch scenario editor and open map
 
 You can launch a scenario editor and open a map by following steps.
 

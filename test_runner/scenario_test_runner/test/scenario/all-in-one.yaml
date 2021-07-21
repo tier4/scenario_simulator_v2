@@ -14,12 +14,10 @@ OpenSCENARIO:
     CatalogLocation: []
   RoadNetwork:
     LogicFile:
-      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
-    SceneGraphFile:
-      filepath: $(find-pkg-share kashiwanoha_map)/map/pointcloud_map.pcd
+      filepath: $(find-pkg-share kashiwanoha_map)/map
     TrafficSignals:
       TrafficSignalController:
-        - name: empty-contoller
+        - name: empty-controller
           Phase: []
         - name: simple-controller
           Phase:
@@ -221,14 +219,14 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                              - name: "if (count < *count-max)"
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  ParameterCondition:
-                                    parameterRef: count
-                                    rule: lessThan
-                                    value: *count-max
+                                - name: "if (count < *count-max)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: count
+                                      rule: lessThan
+                                      value: *count-max
                         Action:
                           - name: "count += 1"
                             GlobalAction:
@@ -241,14 +239,14 @@ OpenSCENARIO:
             StartTrigger:
               ConditionGroup:
                 - Condition:
-                  - name: ""
-                    delay: 0
-                    conditionEdge: none
-                    ByValueCondition:
-                      ParameterCondition:
-                        parameterRef: count
-                        rule: equalTo
-                        value: *count-default
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        ParameterCondition:
+                          parameterRef: count
+                          rule: equalTo
+                          value: *count-default
           - name: "obstacle"
             ManeuverGroup:
               - maximumExecutionCount: 1
@@ -266,13 +264,13 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                              - name: ""
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  SimulationTimeCondition:
-                                    value: 3
-                                    rule: greaterThan
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 3
+                                      rule: greaterThan
                         Action:
                           - name: ""
                             PrivateAction:
@@ -287,21 +285,21 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                              - name: ""
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  SimulationTimeCondition:
-                                    value: 6
-                                    rule: greaterThan
-                              - name: ""
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  StoryboardElementStateCondition:
-                                    storyboardElementRef: "warp-1"
-                                    storyboardElementType: event
-                                    state: completeState
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 6
+                                      rule: greaterThan
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: "warp-1"
+                                      storyboardElementType: event
+                                      state: completeState
                         Action:
                           - name: ""
                             PrivateAction:
@@ -316,21 +314,21 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                              - name: ""
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  SimulationTimeCondition:
-                                    value: 9
-                                    rule: greaterThan
-                              - name: ""
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  StoryboardElementStateCondition:
-                                    storyboardElementRef: "warp-2"
-                                    storyboardElementType: event
-                                    state: completeState
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 9
+                                      rule: greaterThan
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: "warp-2"
+                                      storyboardElementType: event
+                                      state: completeState
                         Action:
                           - name: ""
                             PrivateAction:
@@ -345,21 +343,21 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                              - name: ""
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  SimulationTimeCondition:
-                                    value: 12
-                                    rule: greaterThan
-                              - name: ""
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  StoryboardElementStateCondition:
-                                    storyboardElementRef: "warp-3"
-                                    storyboardElementType: event
-                                    state: completeState
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 12
+                                      rule: greaterThan
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: "warp-3"
+                                      storyboardElementType: event
+                                      state: completeState
                         Action:
                           - name: ""
                             GlobalAction:
@@ -405,20 +403,20 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                              - name: "if signal(34802).state() == none"
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  TrafficSignalCondition:
-                                    name: "34802"
-                                    state: none
-                              - name: "if simple_controller.phase() == blank"
-                                delay: 0
-                                conditionEdge: none
-                                ByValueCondition:
-                                  TrafficSignalControllerCondition:
-                                    trafficSignalControllerRef: simple-controller
-                                    phase: blank
+                                - name: "if signal(34802).state() == none"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    TrafficSignalCondition:
+                                      name: "34802"
+                                      state: none
+                                - name: "if simple_controller.phase() == blank"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    TrafficSignalControllerCondition:
+                                      trafficSignalControllerRef: simple-controller
+                                      phase: blank
                         Action:
                           - name: "change_phase(simple_controller, green)"
                             GlobalAction:

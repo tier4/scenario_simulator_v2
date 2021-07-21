@@ -30,27 +30,39 @@ class MetricsManager
 {
 public:
   explicit MetricsManager(
-    bool verbose, const std::string & logfile_path, bool file_out_every_frame = false);
+    const boost::filesystem::path & log_path, const bool verbose = false,
+    const bool write_file_every_frame = false);
+
   ~MetricsManager() { file_ << log_; }
-  void setVerbose(bool verbose);
+
+  void setVerbose(const bool verbose);
+
   void setEntityManager(
-    std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
+    const std::shared_ptr<traffic_simulator::entity::EntityManager> & entity_manager_ptr);
+
   template <typename T, typename... Ts>
-  void addMetric(std::string name, Ts &&... xs)
+  void addMetric(const std::string & name, Ts &&... xs)
   {
-    auto metric_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
-    metric_ptr->setEntityManager(this->entity_manager_ptr_);
+    const auto metric_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
+    metric_ptr->setEntityManager(entity_manager_ptr_);
     metrics_.insert({name, metric_ptr});
   }
+
   void calculate();
-  const std::string logfile_path;
-  const bool file_output_every_frame;
+
+  const boost::filesystem::path log_path;
+
+  const bool write_file_every_frame;
 
 private:
   bool verbose_;
+
   nlohmann::json log_;
+
   std::unordered_map<std::string, std::shared_ptr<MetricBase>> metrics_;
+
   std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr_;
+
   std::ofstream file_;
 };
 }  // namespace metrics

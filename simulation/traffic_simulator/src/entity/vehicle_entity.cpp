@@ -71,11 +71,7 @@ void VehicleEntity::cancelRequest() { tree_ptr_->setRequest("none"); }
 
 void VehicleEntity::setTargetSpeed(double target_speed, bool continuous)
 {
-  target_speed_ = target_speed;
-  tree_ptr_->setValueToBlackBoard("target_speed", target_speed_);
-  if (continuous) {
-    target_speed_ = boost::none;
-  }
+  target_speed_planner_.setTargetSpeed(target_speed, continuous);
 }
 
 void VehicleEntity::onUpdate(double current_time, double step_time)
@@ -90,6 +86,8 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     tree_ptr_->setValueToBlackBoard("other_entity_status", other_status_);
     tree_ptr_->setValueToBlackBoard("entity_type_list", entity_type_list_);
     tree_ptr_->setValueToBlackBoard("entity_status", status_.get());
+    target_speed_planner_.update(status_->action_status.twist.linear.x);
+    tree_ptr_->setValueToBlackBoard("target_speed", target_speed_planner_.getTargetSpeed());
     if (status_->lanelet_pose_valid) {
       tree_ptr_->setValueToBlackBoard(
         "route_lanelets", route_planner_ptr_->getRouteLanelets(status_->lanelet_pose));
@@ -97,10 +95,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       std::vector<std::int64_t> empty = {};
       tree_ptr_->setValueToBlackBoard("route_lanelets", empty);
     }
-    action_status_ = tree_ptr_->tick(current_time, step_time);
-    while (getCurrentAction() == "root") {
-      action_status_ = tree_ptr_->tick(current_time, step_time);
-    }
+    tree_ptr_->tick(current_time, step_time);
     auto status_updated = tree_ptr_->getUpdatedStatus();
     if (status_updated.lanelet_pose_valid) {
       auto following_lanelets =
@@ -109,12 +104,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       if (following_lanelets.size() == 1 && l <= status_updated.lanelet_pose.s) {
         stopAtEndOfRoad();
         return;
-      }
-    }
-    if (target_speed_) {
-      if (status_updated.action_status.twist.linear.x >= target_speed_.get()) {
-        target_speed_ = boost::none;
-        tree_ptr_->setValueToBlackBoard("target_speed", target_speed_);
       }
     }
     if (!status_) {

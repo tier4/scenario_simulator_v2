@@ -90,13 +90,7 @@ void EntityManager::broadcastTransform(
 
 bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
 {
-  if (name0 == name1) {
-    return false;
-  }
-  if (!entityStatusSet(name0)) {
-    return false;
-  }
-  if (!entityStatusSet(name1)) {
+  if (name0 == name1 or not entityStatusSet(name0) or not entityStatusSet(name1)) {
     return false;
   }
   auto status0 = getEntityStatus(name0);
@@ -530,9 +524,9 @@ bool EntityManager::setEntityStatus(
   return entities_.at(name)->setStatus(status);
 }
 
-void EntityManager::setVerbose(bool verbose)
+void EntityManager::setVerbose(const bool verbose)
 {
-  verbose_ = verbose;
+  configuration.verbose = verbose;
   for (auto & entity : entities_) {
     entity.second->setVerbose(verbose);
   }
@@ -548,7 +542,7 @@ openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   const std::string & name,
   const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list)
 {
-  if (verbose_) {
+  if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
   entities_[name]->setEntityTypeList(type_list);
@@ -565,7 +559,7 @@ void EntityManager::update(const double current_time, const double step_time)
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
   current_time_ = current_time;
-  if (verbose_) {
+  if (configuration.verbose) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
     std::cout << "current_time : " << current_time_ << std::endl;
   }
@@ -575,7 +569,7 @@ void EntityManager::update(const double current_time, const double step_time)
   if (current_time_ >= 0) {
     traffic_light_manager_ptr_->update(step_time_);
   }
-  setVerbose(verbose_);
+  setVerbose(configuration.verbose);
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> all_status;
   const std::vector<std::string> entity_names = getEntityNames();
@@ -623,7 +617,7 @@ void EntityManager::update(const double current_time, const double step_time)
   entity_status_array_pub_ptr_->publish(status_array_msg);
   end = std::chrono::system_clock::now();
   double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-  if (verbose_) {
+  if (configuration.verbose) {
     std::cout << "elapsed " << elapsed / 1000 << " seconds in update function." << std::endl;
   }
 }

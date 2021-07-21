@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_msgs/msg/lanelet_pose.hpp>
 
@@ -64,6 +65,11 @@ struct RelativeWorldPosition
     }
 
     return result;
+  }
+
+  explicit operator geometry_msgs::msg::Pose() const
+  {
+    throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, geometry_msgs::msg::Pose);
   }
 
   explicit operator openscenario_msgs::msg::LaneletPose() const

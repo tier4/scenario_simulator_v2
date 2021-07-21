@@ -43,7 +43,7 @@ struct ControllerAction
    *  Assign a controller to an entity.
    *
    * ------------------------------------------------------------------------ */
-  const AssignControllerAction assignController;
+  const AssignControllerAction assign_controller_action;
 
   /* ---- OverrideControllerValueAction ----------------------------------------
    *
@@ -56,14 +56,14 @@ struct ControllerAction
 
   template <typename Node, typename Scope>
   explicit ControllerAction(const Node & node, Scope & outer_scope)
-  : assignController(
+  : assign_controller_action(
       readElement<AssignControllerAction>("AssignControllerAction", node, outer_scope)),
     override_controller_value_action(readElement<OverrideControllerValueAction>(
       "OverrideControllerValueAction", node, outer_scope))  // NOTE: DUMMY IMPLEMENTATION
   {
   }
 
-  void start() const { assignController(); }
+  void start() const { assign_controller_action(); }
 
   const std::true_type accomplished{};
 
