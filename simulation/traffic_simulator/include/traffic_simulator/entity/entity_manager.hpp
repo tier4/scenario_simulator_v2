@@ -96,13 +96,8 @@ public:
     {
       node.declare_parameter("origin_latitude", 0.0);
       node.declare_parameter("origin_longitude", 0.0);
-      // node.declare_parameter("origin_altitude", 0.0);
       node.get_parameter("origin_latitude", origin.latitude);
       node.get_parameter("origin_longitude", origin.longitude);
-      // node.get_parameter("origin_altitude", origin.altitude);
-      node.undeclare_parameter("origin_latitude");
-      node.undeclare_parameter("origin_longitude");
-      // node.undeclare_parameter("origin_altitude");
     }
 
     return origin;
