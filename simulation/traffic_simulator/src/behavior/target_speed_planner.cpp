@@ -27,7 +27,7 @@ void TargetSpeedPlanner::setTargetSpeed(double target_speed, bool continuous)
 
 void TargetSpeedPlanner::update(double current_speed)
 {
-  if (!continuous_) {
+  if (!continuous_ && target_speed_) {
     if (current_speed >= target_speed_.get()) {
       target_speed_ = boost::none;
     }
