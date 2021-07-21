@@ -1,6 +1,6 @@
 # Build Instructions
 
-This setup instraction is based on ROS2-foxy.
+This setup instruction is based on ROS2-foxy.
 If you want to setup in galactic environment, please replace foxy to galactic.
 
 ## Setup ROS 2 environment
