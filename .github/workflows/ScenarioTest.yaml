@@ -19,12 +19,15 @@ jobs:
     name: ScenarioTest
     runs-on: ubuntu-20.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        rosdistro: [${{ matrix.rosdistro }}, galactic]
     steps:
       - uses: actions/checkout@v2-beta
 
       - name: Install ROS2 via Debian Packages
-        run:
-          | # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+        run: | 
           sudo apt update
           sudo apt install locales
           sudo locale-gen en_US en_US.UTF-8
@@ -35,7 +38,7 @@ jobs:
           curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
           sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
           sudo apt update
-          sudo apt install ros-foxy-desktop
+          sudo apt install ros-${{ matrix.rosdistro }}-desktop
 
       - name: Install lcov
         run: |
@@ -51,11 +54,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          source /opt/ros/foxy/setup.bash
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
           cd ~/ros2_ws
-          vcs import src < src/scenario_simulator_v2/dependency_foxy.repos
+          vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
 
       - name: Clone autoware packages
         run: |
@@ -72,11 +75,11 @@ jobs:
       - name: Resolve rosdep
         run: |
           cd ~/ros2_ws
-          rosdep install -iry --from-paths src --rosdistro foxy
+          rosdep install -iry --from-paths src --rosdistro ${{ matrix.rosdistro }}
 
       - name: Build packages
         run: |
-          source /opt/ros/foxy/setup.bash
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
           colcon build --symlink-install --ament-cmake-args -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1" --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.base --initial
