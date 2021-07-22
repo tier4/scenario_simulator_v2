@@ -428,7 +428,7 @@ class MiscellaneousAPI
   }
 #endif  // AUTOWARE_AUTO
 
-std::string getAutowareStateMessage() {
+std::string getAutowareStateMessage() const {
   std::stringstream message;
   {
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
@@ -449,7 +449,7 @@ std::string getAutowareStateMessage() {
   return message.str();
 }
 
-openscenario_msgs::msg::WaypointsArray getWaypoints() {
+openscenario_msgs::msg::WaypointsArray getWaypoints() const {
   openscenario_msgs::msg::WaypointsArray waypoints;
 
 #ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
@@ -469,6 +469,44 @@ openscenario_msgs::msg::WaypointsArray getWaypoints() {
 
   return waypoints;
 }
+
+  double getVelocity() const {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    return getVehicleCommand().control.velocity;
+#endif
+#ifdef AUTOWARE_AUTO
+    return getVehicleControlCommand().velocity_mps;
+#endif
+  }
+
+  double getSteeringAngle() const {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    return getVehicleCommand().control.steering_angle;
+#endif
+#ifdef AUTOWARE_AUTO
+    return getVehicleControlCommand().front_wheel_angle_rad;
+#endif
+  }
+
+  // returns -1.0 when gear is reverse and 1.0 otherwise
+  double getGearSign() const {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    return getVehicleCommand().shift.data == autoware_vehicle_msgs::msg::Shift::REVERSE ? -1.0 : 1.0;
+#endif
+#ifdef AUTOWARE_AUTO
+    return getVehicleStateCommand().gear == autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE ? -1.0 : +1.0;
+#endif
+  }
+
+  double restrictTargetSpeed(double value) const {
+#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
+    return value;
+#endif
+#ifdef AUTOWARE_AUTO
+    // non-zero initial speed prevents behavioral planner from planning
+    return 0;
+#endif
+  }
 
 public:
   explicit MiscellaneousAPI()

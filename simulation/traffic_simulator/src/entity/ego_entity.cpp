@@ -14,7 +14,6 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <concealer/autoware_def.hpp>
 #include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
@@ -305,16 +304,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER: {
         Eigen::VectorXd input(2);
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        input <<  //
-          autoware.getVehicleCommand().control.velocity,
-          autoware.getVehicleCommand().control.steering_angle;
-#endif
-#ifdef AUTOWARE_AUTO
-        input <<  //
-          autoware.getVehicleControlCommand().velocity_mps,
-          autoware.getVehicleControlCommand().front_wheel_angle_rad;
-#endif
+        input << autoware.getVelocity(), autoware.getSteeringAngle();
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -322,25 +312,9 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER_ACC: {
         Eigen::VectorXd input(3);
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        using autoware_vehicle_msgs::msg::Shift;
+        input << autoware.getVelocity(), autoware.getSteeringAngle(), autoware.getGearSign();
 
-        input <<  //
-          autoware.getVehicleCommand().control.acceleration,
-          autoware.getVehicleCommand().control.steering_angle,
-          autoware.getVehicleCommand().shift.data == Shift::REVERSE ? -1.0 : 1.0;
-#endif
-#ifdef AUTOWARE_AUTO
-        input <<  //
-          autoware.getVehicleControlCommand().velocity_mps,
-          autoware.getVehicleControlCommand().front_wheel_angle_rad,
-          autoware.getVehicleStateCommand().gear ==
-              autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE
-            ? -1.0
-            : +1.0;
-#endif
-
-        (*vehicle_model_ptr_).setInput(input);
+              (*vehicle_model_ptr_).setInput(input);
       } break;
 
       default:
@@ -432,39 +406,21 @@ void EgoEntity::setTargetSpeed(double value, bool)
   switch (vehicle_model_type_) {
     case VehicleModelType::IDEAL_STEER: {
       Eigen::VectorXd v(3);
-      {
-        v << 0, 0, 0;
-      }
+      v << 0, 0, 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;
 
     case VehicleModelType::DELAY_STEER: {
       Eigen::VectorXd v(5);
-      {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        v << 0, 0, 0, value, 0;
-#endif
-#ifdef AUTOWARE_AUTO
-        // non-zero initial speed prevents behavioral planner from planning
-        v << 0, 0, 0, 0, 0;
-#endif
-      }
+      v << 0, 0, 0, autoware.restrictTargetSpeed(value), 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;
 
     case VehicleModelType::DELAY_STEER_ACC: {
       Eigen::VectorXd v(6);
-      {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        v << 0, 0, 0, value, 0, 0;
-#endif
-#ifdef AUTOWARE_AUTO
-        // non-zero initial speed prevents behavioral planner from planning
-        v << 0, 0, 0, 0, 0, 0;
-#endif
-      }
+      v << 0, 0, 0, autoware.restrictTargetSpeed(value), 0, 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;

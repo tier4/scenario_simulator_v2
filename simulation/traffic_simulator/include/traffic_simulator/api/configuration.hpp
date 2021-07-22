@@ -82,7 +82,8 @@ struct Configuration
       throw common::SimulationError(
         "The map_path must be a directory (given an ", std::quoted(map_path.string()), ")");
     } else if (not contains(map_path, ".osm")) {
-      throw common::SimulationError("The map_path must contain at least one *.osm file");
+      throw common::SimulationError("The map_path ", std::quoted(map_path.string()),
+                                    "must contain at least one *.osm file");
     }
     // else if (not contains(map_path, ".pcd")) {
     //   throw common::SimulationError("The map_path must contain at least one *.pcd file");
@@ -122,7 +123,7 @@ struct Configuration
     if (not lanelet2_map_file.empty()) {
       return lanelet2_map_file;
     } else {
-      throw common::SimulationError("The map_path must contain at least one *.osm file");
+      throw common::SimulationError("The map_path ", std::quoted(map_path.string()), " must contain at least one *.osm file");
     }
   }
 
@@ -131,7 +132,7 @@ struct Configuration
     if (not pointcloud_map_file.empty()) {
       return pointcloud_map_file;
     } else {
-      throw common::SimulationError("The map_path must contain at least one *.pcd file");
+      throw common::SimulationError("The map_path ", std::quoted(map_path.string()), " must contain at least one *.pcd file");
     }
   }
 
