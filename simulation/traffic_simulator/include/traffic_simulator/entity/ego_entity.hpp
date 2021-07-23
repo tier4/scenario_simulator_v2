@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_auto.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
@@ -47,7 +47,9 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  concealer::Autoware autoware;
+  // tmp for tests
+  // TODO: make it switchable
+  concealer::AutowareAuto autoware;
 
   const VehicleModelType vehicle_model_type_;
 

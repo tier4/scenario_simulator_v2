@@ -15,13 +15,9 @@
 #ifndef CONCEALER__CONVERSION_HPP_
 #define CONCEALER__CONVERSION_HPP_
 
-#include <concealer/autoware_def.hpp>
-
 // NOTE: headers are lexicographically sorted.
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
 #include <autoware_vehicle_msgs/msg/engage.hpp>
-#endif
 
 #include <boost/mpl/and.hpp>
 #include <std_msgs/msg/bool.hpp>
@@ -82,8 +78,6 @@ struct converter<From, std_msgs::msg::Float32>
   }
 };
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-// Engage is not implemented in Autoware.Auto
 template <typename From>
 struct converter<From, autoware_vehicle_msgs::msg::Engage>
 {
@@ -100,7 +94,6 @@ struct converter<From, autoware_vehicle_msgs::msg::Engage>
     return to;
   }
 };
-#endif  // AUTOWARE_ARCHITECTURE_PROPOSAL
 
 }  // namespace concealer
 

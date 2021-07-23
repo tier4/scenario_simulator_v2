@@ -15,25 +15,29 @@
 #ifndef CONCEALER__AUTOWARE_HPP_
 #define CONCEALER__AUTOWARE_HPP_
 
-#include <concealer/autoware_def.hpp>
-
 // #define CONCEALER_ISOLATE_STANDARD_OUTPUT
 
 #include <sys/wait.h>
 
-#include <chrono>
+#include <concealer/conversion.hpp>
+#include <concealer/define_macro.hpp>
+
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/fundamental_api.hpp>
 #include <concealer/launch.hpp>
-#include <concealer/miscellaneous_api.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
+#include <concealer/utility/autoware_stream.hpp>
 #include <concealer/utility/visibility.hpp>
+#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
+
+#include <chrono>
 #include <exception>
 #include <future>
 #include <mutex>
 #include <thread>
 #include <utility>
+
 
 namespace concealer
 {
@@ -51,19 +55,13 @@ namespace concealer
  *
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
-                 public FundamentalAPI<Autoware>,
-                 public MiscellaneousAPI<Autoware>,
                  public ContinuousTransformBroadcaster<Autoware>,
                  public TransitionAssertion<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
-  friend class FundamentalAPI<Autoware>;
-  friend class MiscellaneousAPI<Autoware>;
   friend class TransitionAssertion<Autoware>;
 
   mutable std::mutex mutex;
-
-  const pid_t process_id;
 
   std::promise<void> promise;
 
@@ -71,24 +69,30 @@ class Autoware : public rclcpp::Node,
 
   const rclcpp::TimerBase::SharedPtr updater;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  For a simple simulator, I believe that most of the information that needs
-   *  to be published could be easily calculated from Twist and Pose. However,
-   *  if the information that the update function wants to use cannot be
-   *  created only from Twist and Pose, you can add it after separating it with
-   *  '#if AUTOWARE_AUTO ... #endif'.
-   *
-   * ------------------------------------------------------------------------ */
+  std::exception_ptr thrown;
+
+protected:
+  const pid_t process_id;
+
+  int waitpid_options = 0;
+
+  TaskQueue task_queue;
+
+  bool initialize_was_called = false;
+
   geometry_msgs::msg::Pose current_pose;
 
   geometry_msgs::msg::Twist current_twist;
 
-  bool initialize_was_called = false;
+  virtual void sendSIGINT() {
+    std::cout << "Autoware::sendSIGINT" << std::endl;
 
-  TaskQueue task_queue;
+    // TODO: not ok?
+  };
 
-  std::exception_ptr thrown;
+  // method called in destructor of a derived class
+  // because it is difficult to differentiate shutting down behavior in destructor of a base class
+  void shutdownAutoware();
 
 public:
   template <typename... Ts>
@@ -110,38 +114,64 @@ public:
           "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
-    updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); }))
-  {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-    // Lane change is not implemented in Autoware.Auto
-    setLaneChangeApproval();
-#endif
-  }
+    updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); })) {}
 
-  virtual ~Autoware();
+  virtual ~Autoware() = default;
 
-  void engage();
+  /* ---- NOTE -------------------------------------------------------------------
+   *
+   *  Send an engagement request to Autoware. If Autoware does not have an
+   *  engagement equivalent, this operation can be nop (No operation).
+   *
+   * -------------------------------------------------------------------------- */
+  virtual void engage() = 0;
 
-  void initialize(const geometry_msgs::msg::Pose &);
+  /* ---- NOTE -------------------------------------------------------------------
+   *
+   *  Send initial_pose to Autoware.
+   *
+   * -------------------------------------------------------------------------- */
+  virtual void initialize(const geometry_msgs::msg::Pose &) = 0;
 
-  auto initialized() const noexcept { return initialize_was_called; }
+  /* ---- NOTE -------------------------------------------------------------------
+   *
+   *  Send the destination and route constraint points to Autoware. The argument
+   *  route is guaranteed to be size 1 or greater, and its last element is the
+   *  destination. When the size of a route is 2 or greater, the non-last element
+   *  is the route constraint. That is, Autoware must go through the element
+   *  points on the given'route' starting at index 0 and stop at index
+   *  route.size() - 1.
+   *
+   * -------------------------------------------------------------------------- */
+  virtual void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) = 0;
 
-  auto lock() const { return std::unique_lock<std::mutex>(mutex); }
+  virtual void update() = 0;
 
-  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &);
+  virtual double getVelocity() const = 0;
+
+  virtual double getSteeringAngle() const = 0;
+
+  // returns -1.0 when gear is reverse and 1.0 otherwise
+  virtual double getGearSign() const = 0;
+
+  virtual openscenario_msgs::msg::WaypointsArray getWaypoints() const = 0;
+
+  // different autowares accept different initial target speed
+  virtual double restrictTargetSpeed(double value) const = 0;
+
+  virtual std::string getAutowareStateMessage() const = 0;
 
   void rethrow() const noexcept(false);
 
   bool ready() const noexcept(false);
 
+  auto initialized() const noexcept { return initialize_was_called; }
+
+  auto lock() const { return std::unique_lock<std::mutex>(mutex); }
+
   auto set(const geometry_msgs::msg::Pose & pose) -> const auto & { return current_pose = pose; }
 
-  auto set(const geometry_msgs::msg::Twist & twist) -> const auto &
-  {
-    return current_twist = twist;
-  }
-
-  void update();
+  auto set(const geometry_msgs::msg::Twist & twist) -> const auto & { return current_twist = twist; }
 };
 }  // namespace concealer
 

@@ -20,17 +20,17 @@
 
 #define CONCEALER_CURRENT_VALUE_OF(TYPE) current_value_of_##TYPE
 
-#define DEFINE_SUBSCRIPTION(TYPE)                               \
-private:                                                        \
-  TYPE CONCEALER_CURRENT_VALUE_OF(TYPE);                        \
-  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE; \
-                                                                \
-public:                                                         \
-  auto get##TYPE() const->const auto &                          \
-  {                                                             \
-    const auto lock = static_cast<const Node &>(*this).lock();  \
-    return CONCEALER_CURRENT_VALUE_OF(TYPE);                    \
-  }                                                             \
+#define DEFINE_SUBSCRIPTION(TYPE)                                   \
+private:                                                            \
+  TYPE CONCEALER_CURRENT_VALUE_OF(TYPE);                            \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;     \
+                                                                    \
+public:                                                             \
+  const auto & get##TYPE() const->const auto &                      \
+  {                                                                 \
+    const auto lock = static_cast<const Autoware &>(*this).lock();  \
+    return CONCEALER_CURRENT_VALUE_OF(TYPE);                        \
+  }                                                                 \
   static_assert(true, "")
 
 #define DEFINE_PUBLISHER(TYPE)                                       \
@@ -44,12 +44,12 @@ public:                                                              \
   }                                                                  \
   static_assert(true, "")
 
-#define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK)                                     \
-  subscription_of_##TYPE(static_cast<Node &>(*this).template create_subscription<TYPE>( \
-    TOPIC, 1, [this](const TYPE::SharedPtr message) {                                   \
-      const auto lock = static_cast<Node &>(*this).lock();                              \
-      CONCEALER_CURRENT_VALUE_OF(TYPE) = *message;                                      \
-      ERROR_CHECK();                                                                    \
+#define INIT_SUBSCRIPTION(TYPE, TOPIC, ERROR_CHECK)                                         \
+  subscription_of_##TYPE(static_cast<Autoware &>(*this).template create_subscription<TYPE>( \
+    TOPIC, 1, [this](const TYPE::SharedPtr message) {                                       \
+      const auto lock = static_cast<Autoware &>(*this).lock();                              \
+      CONCEALER_CURRENT_VALUE_OF(TYPE) = *message;                                          \
+      ERROR_CHECK();                                                                        \
     }))
 
 #define INIT_PUBLISHER(TYPE, TOPIC) \
