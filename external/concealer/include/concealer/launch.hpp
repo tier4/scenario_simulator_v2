@@ -47,7 +47,12 @@ auto ros2_launch(const std::string & package, const std::string & file, Ts &&...
 
   const std::vector<std::string> argv{
     "python3",
+#if FOXY
     "/opt/ros/foxy/bin/ros2",
+#endif
+#if GALACTIC
+    "/opt/ros/galactic/bin/ros2",
+#endif
     "launch",  // NOTE: The command 'ros2' is a Python script.
     package,
     file,
