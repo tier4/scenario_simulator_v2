@@ -118,6 +118,7 @@ void Autoware::update()
   setCurrentSteering(current_twist);
   setCurrentTwist(current_twist);
   setCurrentVelocity(current_twist);
+  setLocalizationPose(current_pose);
   setLocalizationTwist(current_twist);
   setTransform(current_pose);
 #endif
