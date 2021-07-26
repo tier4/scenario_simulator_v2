@@ -257,6 +257,30 @@ class MiscellaneousAPI
     return setLocalizationTwist(localization_twist);
   }
 
+  /* ---- PoseWithCovariance ---------------------------------------------------
+   *
+   *  Topic: /localization/pose_twist_fusion_filter/pose_with_covariance
+   *
+   * ------------------------------------------------------------------------ */
+  using PoseWithCovariance = geometry_msgs::msg::PoseWithCovarianceStamped;
+
+  DEFINE_PUBLISHER(PoseWithCovariance);
+
+  auto setPoseWithCovarianceStamped(
+    const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
+    const std::array<double, 36> & covariance = {}) -> decltype(auto)
+  {
+    geometry_msgs::msg::PoseWithCovarianceStamped pose_with_covariance_stamped;
+    {
+      pose_with_covariance_stamped.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+      pose_with_covariance_stamped.header.frame_id = "map";
+      pose_with_covariance_stamped.pose.pose = pose;
+      pose_with_covariance_stamped.pose.covariance = covariance;
+    }
+
+    return setPoseWithCovarianceStamped(pose_with_covariance_stamped);
+  }
+
   /* ---- Trajectory -----------------------------------------------------------
    *
    *  Topic: /planning/scenario_planning/trajectory
