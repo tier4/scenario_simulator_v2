@@ -94,10 +94,10 @@ public:
   {
     geographic_msgs::msg::GeoPoint origin;
     {
-      if(!node.has_parameter("origin_latitude")) {
+      if (!node.has_parameter("origin_latitude")) {
         node.declare_parameter("origin_latitude", 0.0);
       }
-      if(!node.has_parameter("origin_longitude")) {
+      if (!node.has_parameter("origin_longitude")) {
         node.declare_parameter("origin_longitude", 0.0);
       }
       node.get_parameter("origin_latitude", origin.latitude);
