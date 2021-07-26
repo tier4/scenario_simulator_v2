@@ -45,18 +45,18 @@ auto ros2_launch(const std::string & package, const std::string & file, Ts &&...
 
   const auto process_id = fork();
 
-  const std::vector<std::string> argv{
+  const std::vector<std::string> argv
+  {
     "python3",
 #if FOXY
-    "/opt/ros/foxy/bin/ros2",
+      "/opt/ros/foxy/bin/ros2",
 #endif
 #if GALACTIC
-    "/opt/ros/galactic/bin/ros2",
+      "/opt/ros/galactic/bin/ros2",
 #endif
-    "launch",  // NOTE: The command 'ros2' is a Python script.
-    package,
-    file,
-    std::forward<decltype(xs)>(xs)...};
+      "launch",  // NOTE: The command 'ros2' is a Python script.
+      package, file, std::forward<decltype(xs)>(xs)...
+  };
 
   if (process_id < 0) {
     throw std::system_error(errno, std::system_category());
