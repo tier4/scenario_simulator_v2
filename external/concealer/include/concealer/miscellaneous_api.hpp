@@ -257,16 +257,16 @@ class MiscellaneousAPI
     return setLocalizationTwist(localization_twist);
   }
 
-  /* ---- PoseWithCovariance ---------------------------------------------------
+  /* ---- LocalizationPose -----------------------------------------------------
    *
-   *  Topic: /localization/pose_twist_fusion_filter/pose_with_covariance
+   *  Topic: /localization/pose_with_covariance
    *
    * ------------------------------------------------------------------------ */
-  using PoseWithCovariance = geometry_msgs::msg::PoseWithCovarianceStamped;
+  using LocalizationPose = geometry_msgs::msg::PoseWithCovarianceStamped;
 
-  DEFINE_PUBLISHER(PoseWithCovariance);
+  DEFINE_PUBLISHER(LocalizationPose);
 
-  auto setPoseWithCovarianceStamped(
+  auto setLocalizationPose(
     const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
     const std::array<double, 36> & covariance = {}) -> decltype(auto)
   {
@@ -278,7 +278,7 @@ class MiscellaneousAPI
       pose_with_covariance_stamped.pose.covariance = covariance;
     }
 
-    return setPoseWithCovarianceStamped(pose_with_covariance_stamped);
+    return setLocalizationPose(pose_with_covariance_stamped);
   }
 
   /* ---- Trajectory -----------------------------------------------------------
@@ -395,6 +395,7 @@ public:
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
+    INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
     INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
