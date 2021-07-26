@@ -23,8 +23,6 @@ from shutil import rmtree
 from sys import exit
 from typing import List
 
-from xmlschema import validators
-
 import rclpy
 from openscenario_utility.conversion import convert
 from openscenario_utility.validation import XOSCValidator, ReachPositionConditionValidator
