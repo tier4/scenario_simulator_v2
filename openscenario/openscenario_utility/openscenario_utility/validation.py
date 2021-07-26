@@ -23,7 +23,12 @@ from openscenario_utility.conversion import from_yaml, load_yaml
 import argparse
 import xmlschema
 
+
 def find_in_dict(key, dictionary):
+
+    if not isinstance(dictionary, dict):
+        return []
+
     values = list()
     if key in dictionary:
         values.append(dictionary[key])
@@ -34,14 +39,19 @@ def find_in_dict(key, dictionary):
             for i in v:
                 for j in find_in_dict(key, i):
                     values.append(j)
-        elif isinstance(v,dict):
+        elif isinstance(v, dict):
             for result in find_in_dict(key, v):
                 values.append(result)
     return values
 
+
 class ScenarioValidator:
     def __init__(self):
         self.warning_message = ''
+        self.schema = xmlschema.XMLSchema(
+            resource_string(
+                __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+        )
 
     def __call__(self, path: Path):
         return None
@@ -52,20 +62,21 @@ class ScenarioValidator:
 
 class ReachPositionConditionValidator(ScenarioValidator):
     def __init__(self):
+        super().__init__()
         self.warning_message = "ReachPositionCondition position does not match the last position of the path"
-        self.schema = xmlschema.XMLSchema(
-            resource_string(__name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
-        )
 
     def __call__(self, path: Path):
         scenario = self.schema.to_dict(str(path))
-        #Search for the last Routing Action destionation:
-        last_destination = find_in_dict('Position',find_in_dict('RoutingAction', scenario)[-1])
+        # Search for the last Routing Action destionation:
+        last_destination = find_in_dict(
+            'Position', find_in_dict('RoutingAction', scenario)[-1])
 
-        #Search for ReachPositionCondition:
-        reach_position_conditon = find_in_dict('Position',find_in_dict('ReachPositionCondition', scenario)[-1])
+        # Search for ReachPositionCondition:
+        reach_position_conditon = find_in_dict(
+            'Position', find_in_dict('ReachPositionCondition', scenario)[-1])
 
         return reach_position_conditon == last_destination
+
 
 class XOSCValidator:
     def __init__(self, verbose: bool = False):
@@ -73,7 +84,8 @@ class XOSCValidator:
         self.verbose = verbose
 
         self.schema = xmlschema.XMLSchema(
-            resource_string(__name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+            resource_string(
+                __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
         )
 
     def __call__(self, xosc: Path) -> bool:
