@@ -82,17 +82,17 @@ auto record_start(Ts &&... xs)
 {
   record_process_id = fork();
 
-  const std::vector<std::string> argv{
+  const std::vector<std::string> argv
+  {
     "python3",
 #if FOXY
-    "/opt/ros/foxy/bin/ros2",
+      "/opt/ros/foxy/bin/ros2",
 #endif
 #if GALACTIC
-    "/opt/ros/galactic/bin/ros2",
+      "/opt/ros/galactic/bin/ros2",
 #endif
-    "bag",
-    "record",
-    std::forward<decltype(xs)>(xs)...};
+      "bag", "record", std::forward<decltype(xs)>(xs)...
+  };
 
   if (record_process_id < 0) {
     throw std::system_error(errno, std::system_category());
