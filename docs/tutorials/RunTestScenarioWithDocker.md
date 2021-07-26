@@ -4,7 +4,7 @@ Before you try this documentation, please check [this document](RunWithDocker.md
 
 ## Run test scenarios in docker
 
-Please check isEgo value is set false before runnig this script.
+Please check isEgo value is set false before running this script.
 For example.
 
 ```
