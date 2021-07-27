@@ -24,6 +24,9 @@ find_package(visualization_msgs REQUIRED)
 find_package(traffic_simulator REQUIRED)
 find_package(openscenario_msgs REQUIRED)
 find_package(quaternion_operation REQUIRED)
+find_package(rviz2 REQUIRED)
+find_package(rviz_common REQUIRED)
+find_package(rviz_default_plugins REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
