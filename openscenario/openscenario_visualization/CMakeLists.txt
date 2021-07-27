@@ -70,7 +70,6 @@ add_definitions(-DQT_NO_KEYWORDS)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 
 pluginlib_export_plugin_description_file(rviz_common plugins.xml)
 
@@ -78,10 +77,15 @@ include_directories(
   include
 )
 
+qt5_wrap_ui(UIC_FILES
+  src/ui/context_panel_plugin.ui
+)
+message(${UIC_FILES})
+
 add_library(openscenario_visualization_rviz_plugin SHARED
   include/openscenario_visualization/context_panel_plugin.hpp
   src/context_panel_plugin.cpp
-  src/ui/context_panel_plugin.ui)
+  ${UIC_FILES})
 ament_target_dependencies(openscenario_visualization_rviz_plugin
   rviz2
   Qt5
@@ -97,6 +101,7 @@ install(TARGETS
 )
 install(TARGETS
   openscenario_visualization_component
+  openscenario_visualization_rviz_plugin
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)

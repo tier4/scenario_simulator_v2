@@ -15,11 +15,11 @@
 #include <openscenario_visualization/context_panel_plugin.hpp>
 #include <class_loader/class_loader.hpp>
 
-#include "ui_context_panel.h"
+#include "ui_context_panel_plugin.h"
 
 namespace openscenario_visualization
 {
-ContextPanel::ContextPanel(QWidget* parent) : Panel(parent)
+ContextPanel::ContextPanel(QWidget* parent) : Panel(parent), ui_(new Ui::ContextPanel())
 {
   node_ = std::make_shared<rclcpp::Node>("context_panel", "openscenario_visualization");
   ui_->setupUi(this);
