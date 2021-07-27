@@ -11,7 +11,7 @@ COPY . $WORKDIR
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/
 RUN mkdir -p /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/external
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
-RUN sh install_depends.sh
+RUN sh install_depends.sh foxy
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
 RUN source /opt/ros/foxy/setup.bash && rosdep install -iry --from-paths . --rosdistro foxy
 

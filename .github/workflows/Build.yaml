@@ -66,7 +66,7 @@ jobs:
           # If possible, pin the repository in the workflow to a specific commit to avoid
           # changes in colcon-mixin-repository from breaking your tests.
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
-      - name: publish codevov result
+      - name: publish codecov result
         uses: codecov/codecov-action@v1.2.1
         if: always()
         with:

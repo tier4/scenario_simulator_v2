@@ -9,6 +9,8 @@ external/autoware_system_msgs
 external/autoware_vehicle_msgs
 external/autoware_control_msgs
 external/autoware_debug_msgs
+external/lanelet2
+external/mrt_cmake_modules
 html
 latex
 scenario_simulator.tar
