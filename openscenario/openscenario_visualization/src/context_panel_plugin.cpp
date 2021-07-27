@@ -55,8 +55,8 @@ void ContextPanel::updateTopicCandidates()
       // std::cout << "topic : " << data.first << std::endl;
       const auto types = data.second;
       for (const auto & type : types) {
-        if(type == "openscenario_interpreter_msgs/msg/Context") {
-            topics_.emplace_back(data.first);
+        if (type == "openscenario_interpreter_msgs/msg/Context") {
+          topics_.emplace_back(data.first);
         }
       }
     }
@@ -71,7 +71,7 @@ void ContextPanel::selectTopic(int)
   topic_candidates_mutex_.lock();
   ui_->TopicSelect->clear();
   ui_->TopicSelect->addItem("--- Select Topics ---");
-  for(const auto & topic : topics_) {
+  for (const auto & topic : topics_) {
     ui_->TopicSelect->addItem(topic.c_str());
   }
   topic_candidates_mutex_.unlock();
