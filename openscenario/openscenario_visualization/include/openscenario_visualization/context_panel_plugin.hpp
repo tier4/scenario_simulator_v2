@@ -19,23 +19,25 @@
 #include <rclcpp/rclcpp.hpp>
 #endif
 
-#include <rviz_common/panel.hpp>
+#include <mutex>
 #include <openscenario_visualization/context_panel_plugin.hpp>
-
-#include <vector>
+#include <rviz_common/panel.hpp>
 #include <string>
+#include <thread>
+#include <vector>
 
-namespace Ui {
-  class ContextPanel;
+namespace Ui
+{
+class ContextPanel;
 }
 
 namespace openscenario_visualization
 {
-class ContextPanel: public rviz_common::Panel
+class ContextPanel : public rviz_common::Panel
 {
   Q_OBJECT
 public:
-  ContextPanel(QWidget* parent = nullptr);
+  ContextPanel(QWidget * parent = nullptr);
   ~ContextPanel() override;
 
   void onInitialize() override;
@@ -45,10 +47,15 @@ private Q_SLOTS:
   void selectTopic(int);
 
 protected:
-  Ui::ContextPanel* ui_;
+  Ui::ContextPanel * ui_;
   rclcpp::Node::SharedPtr node_;
   std::vector<std::string> topics_;
+
+private:
+  std::thread topic_query_thread_;
+  void updateTopicCandidates();
+  std::mutex topic_candidates_mutex_;
 };
-}   // namespace openscenario_visualization
+}  // namespace openscenario_visualization
 
 #endif  // OPENSCENARIO_VISUALIZATION__CONTEXT_PANEL_PLUGIN_HPP_
