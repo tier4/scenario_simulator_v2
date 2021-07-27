@@ -20,6 +20,7 @@
 #endif
 
 #include <mutex>
+#include <openscenario_interpreter_msgs/msg/context.hpp>
 #include <openscenario_visualization/context_panel_plugin.hpp>
 #include <rviz_common/panel.hpp>
 #include <string>
@@ -53,9 +54,15 @@ protected:
 
 private:
   std::thread topic_query_thread_;
+  std::thread spin_thread_;
   void updateTopicCandidates();
   std::mutex topic_candidates_mutex_;
   bool selected_ = false;
+  rclcpp::Subscription<openscenario_interpreter_msgs::msg::Context>::SharedPtr context_sub_;
+  void startSubscription();
+  void contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg);
+  void spin();
+  std::string context_;
 };
 }  // namespace openscenario_visualization
 
