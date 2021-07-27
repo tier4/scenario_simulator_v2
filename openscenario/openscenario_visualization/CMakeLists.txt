@@ -27,6 +27,7 @@ find_package(quaternion_operation REQUIRED)
 find_package(rviz2 REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(rviz_default_plugins REQUIRED)
+find_package(openscenario_interpreter_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -80,7 +81,6 @@ include_directories(
 qt5_wrap_ui(UIC_FILES
   src/ui/context_panel_plugin.ui
 )
-message(${UIC_FILES})
 
 add_library(openscenario_visualization_rviz_plugin SHARED
   include/openscenario_visualization/context_panel_plugin.hpp
@@ -91,6 +91,7 @@ ament_target_dependencies(openscenario_visualization_rviz_plugin
   Qt5
   pluginlib
   rclcpp
+  openscenario_interpreter_msgs
 )
 target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
 

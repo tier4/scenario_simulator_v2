@@ -23,6 +23,8 @@ ContextPanel::ContextPanel(QWidget* parent) : Panel(parent), ui_(new Ui::Context
 {
   node_ = std::make_shared<rclcpp::Node>("context_panel", "openscenario_visualization");
   ui_->setupUi(this);
+  connect(ui_->TopicSelect, SIGNAL(highlighted(int)), this, SLOT(selectTopic(int)));
+  ui_->TopicSelect->addItem("--- Select Topics ---");
 }
 
 ContextPanel::~ContextPanel() = default;
@@ -42,6 +44,23 @@ void ContextPanel::onDisable()
 {
   hide();
   parentWidget()->hide();
+}
+
+void ContextPanel::selectTopic(int)
+{
+  const auto topic_dict = node_->get_topic_names_and_types();
+  for(const auto & data : topic_dict)
+  {
+    // std::cout << "topic : " << data.first << std::endl;
+    const auto types = data.second;
+    for(const auto & type : types)
+    {
+      // std::cout << "type : " << type << std::endl;
+      if(type == "openscenario_interpreter_msgs/msg/Context") {
+        topics_.emplace_back(data.first);
+      }
+    }
+  }
 }
 }  // namespace openscenario_visualization
 

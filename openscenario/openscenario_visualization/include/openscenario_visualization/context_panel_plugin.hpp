@@ -22,6 +22,9 @@
 #include <rviz_common/panel.hpp>
 #include <openscenario_visualization/context_panel_plugin.hpp>
 
+#include <vector>
+#include <string>
+
 namespace Ui {
   class ContextPanel;
 }
@@ -31,17 +34,20 @@ namespace openscenario_visualization
 class ContextPanel: public rviz_common::Panel
 {
   Q_OBJECT
- public:
+public:
   ContextPanel(QWidget* parent = nullptr);
   ~ContextPanel() override;
 
   void onInitialize() override;
   void onEnable();
   void onDisable();
+private Q_SLOTS:
+  void selectTopic(int);
 
 protected:
   Ui::ContextPanel* ui_;
   rclcpp::Node::SharedPtr node_;
+  std::vector<std::string> topics_;
 };
 }   // namespace openscenario_visualization
 
