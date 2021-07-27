@@ -4,6 +4,8 @@
 - Support OpenSCENARIO 1.0 TrafficSignal features (RoadNetwork.TrafficSignalController, Action and Condition).
 - Update AcquirePositionAction to support WorldPosition as destination.
 - Update syntax 'RoadNetwork.LogicFile' to allow user to specify the directory that contains `lanelet2_map.osm`.
+- Check boost::none in TargetSpeedPlanner class.
+- Add ROS2 galactic support.
 
 ## Ver 0.3.0
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.3.0) on Github :fa-github:

@@ -20,8 +20,12 @@
 
 namespace concealer
 {
-int execute(const std::vector<std::string> &);
-void sudokill(pid_t process_id);
+auto execute(const std::vector<std::string> &) -> int;
+
+// Emulates shell's $(...) expression.
+auto dollar(const std::string & command) -> std::string;
+
+void sudokill(const pid_t process_id);
 }  // namespace concealer
 
 #endif  // CONCEALER__EXECUTE_HPP_

@@ -219,8 +219,8 @@ class ScenarioTestRunner(LifecycleController):
     #     pass
 
 
-def main():
-    rclpy.init(args="scenario_test_runner")
+def main(args=None):
+    rclpy.init(args=args)
 
     parser = argparse.ArgumentParser()
 
