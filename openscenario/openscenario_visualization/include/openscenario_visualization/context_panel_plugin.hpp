@@ -63,6 +63,7 @@ private:
   void contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg);
   void spin();
   std::string context_;
+  bool runnning_ = true;
 };
 }  // namespace openscenario_visualization
 

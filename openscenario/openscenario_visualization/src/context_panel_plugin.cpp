@@ -31,7 +31,10 @@ ContextPanel::ContextPanel(QWidget * parent) : Panel(parent), ui_(new Ui::Contex
   spin_thread_ = std::thread(&ContextPanel::spin, this);
 }
 
-ContextPanel::~ContextPanel() = default;
+ContextPanel::~ContextPanel()
+{
+  runnning_ = false;
+}
 
 void ContextPanel::onInitialize() { parentWidget()->setVisible(true); }
 
@@ -50,12 +53,11 @@ void ContextPanel::onDisable()
 void ContextPanel::contextCallback(const openscenario_interpreter_msgs::msg::Context::SharedPtr msg)
 {
   context_ = msg->data;
-  std::cout << "context : " << context_ << std::endl;
 }
 
 void ContextPanel::updateTopicCandidates()
 {
-  while (rclcpp::ok()) {
+  while (runnning_) {
     if (selected_) {
       break;
     }
@@ -85,7 +87,7 @@ void ContextPanel::updateTopicCandidates()
 
 void ContextPanel::spin()
 {
-  while (rclcpp::ok()) {
+  while (runnning_) {
     rclcpp::spin_some(node_);
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
