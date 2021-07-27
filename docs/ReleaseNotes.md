@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+## Ver 0.4.0
 - Support OpenSCENARIO 1.0 TrafficSignal features (RoadNetwork.TrafficSignalController, Action and Condition).
 - Update AcquirePositionAction to support WorldPosition as destination.
 - Update syntax 'RoadNetwork.LogicFile' to allow user to specify the directory that contains `lanelet2_map.osm`.
