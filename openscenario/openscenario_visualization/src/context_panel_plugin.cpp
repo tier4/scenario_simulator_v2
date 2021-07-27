@@ -48,6 +48,9 @@ void ContextPanel::onDisable()
 void ContextPanel::updateTopicCandidates()
 {
   while (rclcpp::ok()) {
+    if(selected_) {
+      break;
+    }
     const auto topic_dict = node_->get_topic_names_and_types();
     topics_.clear();
     topic_candidates_mutex_.lock();
@@ -61,6 +64,11 @@ void ContextPanel::updateTopicCandidates()
       }
     }
     std::unique(topics_.begin(), topics_.end());
+    ui_->TopicSelect->clear();
+    ui_->TopicSelect->addItem("--- Select Topics ---");
+    for (const auto & topic : topics_) {
+        ui_->TopicSelect->addItem(topic.c_str());
+    }
     topic_candidates_mutex_.unlock();
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
@@ -69,11 +77,7 @@ void ContextPanel::updateTopicCandidates()
 void ContextPanel::selectTopic(int)
 {
   topic_candidates_mutex_.lock();
-  ui_->TopicSelect->clear();
-  ui_->TopicSelect->addItem("--- Select Topics ---");
-  for (const auto & topic : topics_) {
-    ui_->TopicSelect->addItem(topic.c_str());
-  }
+  selected_ = true;
   topic_candidates_mutex_.unlock();
 }
 }  // namespace openscenario_visualization

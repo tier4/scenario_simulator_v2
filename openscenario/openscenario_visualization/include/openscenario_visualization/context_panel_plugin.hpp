@@ -55,6 +55,7 @@ private:
   std::thread topic_query_thread_;
   void updateTopicCandidates();
   std::mutex topic_candidates_mutex_;
+  bool selected_ = false;
 };
 }  // namespace openscenario_visualization
 
