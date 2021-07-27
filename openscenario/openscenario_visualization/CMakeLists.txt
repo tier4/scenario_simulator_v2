@@ -60,6 +60,45 @@ ament_target_dependencies(openscenario_visualization_node
   quaternion_operation
 )
 
+###############
+# Qt settings #
+###############
+find_package(Qt5 ${rviz_QT_VERSION} REQUIRED Core Widgets)
+macro(qt_wrap_ui)
+  qt5_wrap_ui(${ARGN})
+endmacro()
+include_directories(${Qt5Core_INCLUDE_DIRS})
+include_directories(${Qt5Widgets_INCLUDE_DIRS})
+add_definitions(-DQT_NO_KEYWORDS)
+# cmake settings #
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+pluginlib_export_plugin_description_file(rviz_common plugins.xml)
+
+include_directories(
+  include
+)
+set(HEADERS
+  include/openscenario_visualization/context_panel_plugin.hpp
+)
+qt5_wrap_ui(UIC_FILES
+  src/ui/context_panel_plugin.ui
+)
+set(SOURCE_FILES
+  src/context_panel_plugin.cpp
+)
+
+add_library(openscenario_visualization_rviz_plugin SHARED ${SOURCE_FILES} ${HEADERS} ${UIC_FILES})
+ament_target_dependencies(openscenario_visualization_rviz_plugin
+  std_msgs
+  rviz2
+  Qt5
+  pluginlib
+)
+target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
+
 install(TARGETS
   openscenario_visualization_node
   DESTINATION lib/openscenario_visualization
