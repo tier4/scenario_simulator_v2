@@ -12,7 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_VISUALIZATION__CONTEXT_PABEL_PLUGIN_HPP_
-#define OPENSCENARIO_VISUALIZATION__CONTEXT_PABEL_PLUGIN_HPP_
+#ifndef OPENSCENARIO_VISUALIZATION__CONTEXT_PANEL_PLUGIN_HPP_
+#define OPENSCENARIO_VISUALIZATION__CONTEXT_PANEL_PLUGIN_HPP_
 
-#endif  // OPENSCENARIO_VISUALIZATION__CONTEXT_PABEL_PLUGIN_HPP_
+#ifndef Q_MOC_RUN
+#include <rclcpp/rclcpp.hpp>
+#endif
+
+#include <rviz_common/panel.hpp>
+#include <openscenario_visualization/context_panel_plugin.hpp>
+
+namespace Ui {
+  class ContextPanel;
+}
+
+namespace openscenario_visualization
+{
+class ContextPanel: public rviz_common::Panel
+{
+  Q_OBJECT
+ public:
+  ContextPanel(QWidget* parent = nullptr);
+  ~ContextPanel() override;
+
+  void onInitialize() override;
+  void onEnable();
+  void onDisable();
+
+protected:
+  Ui::ContextPanel* ui_;
+  rclcpp::Node::SharedPtr node_;
+};
+}   // namespace openscenario_visualization
+
+#endif  // OPENSCENARIO_VISUALIZATION__CONTEXT_PANEL_PLUGIN_HPP_

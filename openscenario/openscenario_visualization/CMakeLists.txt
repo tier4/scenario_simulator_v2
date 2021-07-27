@@ -60,9 +60,6 @@ ament_target_dependencies(openscenario_visualization_node
   quaternion_operation
 )
 
-###############
-# Qt settings #
-###############
 find_package(Qt5 ${rviz_QT_VERSION} REQUIRED Core Widgets)
 macro(qt_wrap_ui)
   qt5_wrap_ui(${ARGN})
@@ -70,35 +67,30 @@ endmacro()
 include_directories(${Qt5Core_INCLUDE_DIRS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 add_definitions(-DQT_NO_KEYWORDS)
-# cmake settings #
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 pluginlib_export_plugin_description_file(rviz_common plugins.xml)
 
 include_directories(
   include
 )
-set(HEADERS
-  include/openscenario_visualization/context_panel_plugin.hpp
-)
-qt5_wrap_ui(UIC_FILES
-  src/ui/context_panel_plugin.ui
-)
-set(SOURCE_FILES
-  src/context_panel_plugin.cpp
-)
 
-add_library(openscenario_visualization_rviz_plugin SHARED ${SOURCE_FILES} ${HEADERS} ${UIC_FILES})
+add_library(openscenario_visualization_rviz_plugin SHARED
+  include/openscenario_visualization/context_panel_plugin.hpp
+  src/context_panel_plugin.cpp
+  src/ui/context_panel_plugin.ui)
 ament_target_dependencies(openscenario_visualization_rviz_plugin
-  std_msgs
   rviz2
   Qt5
   pluginlib
+  rclcpp
 )
 target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
 
+install(DIRECTORY icons DESTINATION share/openscenario_visualization_rviz_plugin)
 install(TARGETS
   openscenario_visualization_node
   DESTINATION lib/openscenario_visualization
@@ -114,12 +106,6 @@ rclcpp_components_register_nodes(openscenario_visualization_component
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
 
