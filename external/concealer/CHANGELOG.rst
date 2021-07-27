@@ -2,6 +2,19 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support
+* Cleanup
+* Add free function 'doller' emulates shell's '$(...)' expression
+* apply reformat
+* add ifdef flags for rosdistro
+* Merge pull request `#402 <https://github.com/tier4/scenario_simulator_v2/issues/402>`_ from tier4/feature/interpreter/logic-file
+* Move flag 'autoware_initialized' into class 'Autoware'
+* Update EgoEntity to occupy one Autoware each
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.3.0 (2021-07-13)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/test-scenario

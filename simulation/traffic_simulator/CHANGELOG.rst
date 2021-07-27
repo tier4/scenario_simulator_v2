@@ -2,6 +2,58 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support
+* apply reformat
+* fix usage of declare_parameter function
+* check boost::none in update function
+* remove undeclare line
+* Merge pull request `#402 <https://github.com/tier4/scenario_simulator_v2/issues/402>`_ from tier4/feature/interpreter/logic-file
+* Move flag 'autoware_initialized' into class 'Autoware'
+* Update EgoEntity to occupy one Autoware each
+* Remove debug codes from EgoEntity
+* Remove member function 'getMapPath'
+* Add member function 'get*MapFile' to struct Configuration
+* Update class Configuration to assert .osm file existence
+* Update class Configuration to assert given map_path
+* Add data member 'rviz_config_path' to struct Configuration
+* Update EgoEntity's constructor to receive Configuration
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/logic-file
+* Lipsticks
+* Remove some unused data members
+* Merge pull request `#403 <https://github.com/tier4/scenario_simulator_v2/issues/403>`_ from tier4/feature/target_speed_planner
+* Update EntityManager's constructor to receive Configuration
+* add const
+* enable use target speed planner in pedestrian entity
+* Fix lanelet projector
+* enable use target_speed_planner in vehicle entity
+* Move class 'Configuration' into new header 'configuration.hpp'
+* Update MetricsManager to receive boost::filesystem::path
+* Cleanup
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/logic-file
+* add new file
+* Update HDMapUtils's constructor to receive boost::filesystem::path
+* remove value
+* Merge pull request `#400 <https://github.com/tier4/scenario_simulator_v2/issues/400>`_ from tier4/feature/remove_unused_member_value_in_entity
+* Merge pull request `#401 <https://github.com/tier4/scenario_simulator_v2/issues/401>`_ from tier4/fix/typo
+* Remove some duplicated API's data members
+* remove getCurrentAction and replace to tickOnce(current_time, step_time);
+* fix typo of calculate
+* change return type to void
+* remove action status from pedestrian entity
+* Add new struct 'Configuration' for class 'API'
+* fix compile error
+* remove from member
+* remove action_status from vehicle entity
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/acquire-position-action
+* Merge pull request `#390 <https://github.com/tier4/scenario_simulator_v2/issues/390>`_ from tier4/feature/interpreter/traffic-signal-controller-condition
+* Fix syntax Event and ManeuverGroup to be able to restart elements
+* Update TrafficLightManager to store TrafficLight objects directly
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
+* Update enumeration 'Arrow'
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.3.0 (2021-07-13)
 ------------------
 * Merge pull request `#386 <https://github.com/tier4/scenario_simulator_v2/issues/386>`_ from tier4/feature/interpreter/misc-object

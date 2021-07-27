@@ -2,6 +2,48 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support
+* Lipsticks
+* Add free function 'doller' emulates shell's '$(...)' expression
+* add build flags for galactic/foxy to the openscenario_interpreter package
+* apply reformat
+* add ifdef flags for rosdistro
+* Merge pull request `#402 <https://github.com/tier4/scenario_simulator_v2/issues/402>`_ from tier4/feature/interpreter/logic-file
+* Lipsticks
+* Add member function 'get*MapFile' to struct Configuration
+* Update class Configuration to assert given map_path
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/logic-file
+* Merge pull request `#401 <https://github.com/tier4/scenario_simulator_v2/issues/401>`_ from tier4/fix/typo
+* Remove some duplicated API's data members
+* fix typo described in https://github.com/tier4/scenario_simulator_v2/issues/398
+* Add new struct 'Configuration' for class 'API'
+* Merge pull request `#397 <https://github.com/tier4/scenario_simulator_v2/issues/397>`_ from tier4/fix/interpreter/acquire-position-action
+* Rename some functions
+* Rename function 'requestAcquirePosition' to 'applyAcquirePositionAction'
+* Cleanup syntax ReachPositionCondition
+* Rename procedure 'isReachedPosition' to 'evaluateReachPositionCondition'
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/acquire-position-action
+* Update syntax AcquirePositionAction's accomplishments check
+* Lipsticks
+* Update syntax AcquirePositionAction to receive WorldPosition as destination
+* Merge pull request `#390 <https://github.com/tier4/scenario_simulator_v2/issues/390>`_ from tier4/feature/interpreter/traffic-signal-controller-condition
+* Fix syntax Event and ManeuverGroup to be able to restart elements
+* Update TrafficLightManager to store TrafficLight objects directly
+* Add type alias 'LaneletId' to syntax TrafficSignalCondition
+* Lipsticks
+* Add some member functions (for debug) to TrafficSignalController
+* Fix StoryboardElement Action to ignore maximum_execution_count
+* Update syntax 'TrafficSignalCondition'
+* Update enumeration 'Color' to support conversion from traffic_simulator's Color
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
+* Update enumeration 'Arrow' to support conversion from traffic_simulator's Arrow
+* Update enumeration 'Color'
+* Update enumeration 'Arrow'
+* Support syntax TrafficSignalControllerCondition
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.3.0 (2021-07-13)
 ------------------
 * Merge pull request `#386 <https://github.com/tier4/scenario_simulator_v2/issues/386>`_ from tier4/feature/interpreter/misc-object
