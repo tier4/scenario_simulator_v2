@@ -55,11 +55,9 @@ namespace concealer
  *
  * -------------------------------------------------------------------------- */
 class Autoware : public rclcpp::Node,
-                 public ContinuousTransformBroadcaster<Autoware>,
-                 public TransitionAssertion<Autoware>
+                 public ContinuousTransformBroadcaster<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
-  friend class TransitionAssertion<Autoware>;
 
   mutable std::mutex mutex;
 

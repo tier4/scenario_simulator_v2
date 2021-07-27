@@ -171,7 +171,18 @@ auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::Vehicle
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  return autoware.getAutowareStateMessage();
+  std::stringstream message;
+
+  const auto state{autoware.getAutowareStateMessage()};
+
+  message << (state.empty() ? "Starting" : state)  //
+          << "_(t_=_"                              //
+          << std::fixed                            //
+          << std::setprecision(2)                  //
+          << (status_ ? status_->time : 0)         //
+          << ")";
+
+  return message.str();
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const

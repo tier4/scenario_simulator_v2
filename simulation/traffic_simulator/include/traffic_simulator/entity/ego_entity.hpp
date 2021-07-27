@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware_auto.hpp>
+#include <concealer/autoware_architecture_proposal.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
@@ -49,7 +49,7 @@ class EgoEntity : public VehicleEntity
 {
   // tmp for tests
   // TODO: make it switchable
-  concealer::AutowareAuto autoware;
+  concealer::AutowareArchitectureProposal autoware;
 
   const VehicleModelType vehicle_model_type_;
 

@@ -15,20 +15,36 @@
 #ifndef CONCEALER__AUTOWARE_ARCHITECTURE_PROPOSAL_HPP_
 #define CONCEALER__AUTOWARE_ARCHITECTURE_PROPOSAL_HPP_
 
+#include <boost/range/adaptor/sliced.hpp>
+
 #include <concealer/autoware.hpp>
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
 
+#include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
+#include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
+#include <autoware_api_msgs/msg/velocity_limit.hpp>
+#include <autoware_debug_msgs/msg/float32_stamped.hpp>
+#include <autoware_perception_msgs/msg/traffic_light_state_array.hpp>
+#include <autoware_planning_msgs/msg/lane_change_command.hpp>
+#include <autoware_planning_msgs/msg/route.hpp>
+#include <autoware_planning_msgs/msg/trajectory.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
+#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 
 
 namespace concealer
 {
-class AutowareArchitectureProposal : public Autoware
+class AutowareArchitectureProposal : public Autoware,
+                                     public TransitionAssertion<AutowareArchitectureProposal>
 {
+  friend class TransitionAssertion<AutowareArchitectureProposal>;
+
   void sendSIGINT() override {
     std::cout << "AutowareArchitectureProposal::sendSIGINT" << std::endl;
 
@@ -458,9 +474,9 @@ public:
 
 #undef DEFINE_STATE_PREDICATE
 
-    bool ready = false;
+    bool is_ready = false;
 
-    auto isReady() noexcept { return ready or (ready = isWaitingForRoute()); }
+    auto isReady() noexcept { return is_ready or (is_ready = isWaitingForRoute()); }
 
     auto isNotReady() noexcept { return not isReady(); }
 
@@ -491,7 +507,7 @@ public:
     INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
-    INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}).
+    INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
     /// FundamentalAPI
     INIT_PUBLISHER(AutowareEngage, "/awapi/autoware/put/engage"),
     // INIT_PUBLISHER(AutowareRoute, "/awapi/autoware/put/route"),
@@ -512,7 +528,7 @@ public:
     shutdownAutoware();
   }
 
-  void initialize(const geometry_msgs::msg::Pose &) override {
+  void initialize(const geometry_msgs::msg::Pose & initial_pose) override {
     if (not std::exchange(initialize_was_called, true)) {
       task_queue.delay([this, initial_pose]() {
         set(initial_pose);
@@ -522,7 +538,7 @@ public:
     }
   }
 
-  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) override {
+  void plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) override {
     assert(!route.empty());
 
     task_queue.delay([this, route] {
@@ -580,18 +596,7 @@ public:
   }
 
   std::string getAutowareStateMessage() const override {
-    std::stringstream message;
-
-    const auto state{getAutowareStatus().autoware_state};
-
-    message << (state.empty() ? "Starting" : state)  //
-            << "_(t_=_"                              //
-            << std::fixed                            //
-            << std::setprecision(2)                  //
-            << (status_ ? status_->time : 0)         //
-            << ")";
-
-    return message.str();
+    return getAutowareStatus().autoware_state;
   }
 };
 }  // namespace concealer
