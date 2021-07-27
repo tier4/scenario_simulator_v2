@@ -94,7 +94,7 @@ ament_target_dependencies(openscenario_visualization_rviz_plugin
 )
 target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGRE_PREFIX_DIR}/include")
 
-install(DIRECTORY icons DESTINATION share/openscenario_visualization_rviz_plugin)
+install(DIRECTORY icons DESTINATION share/openscenario_visualization)
 install(TARGETS
   openscenario_visualization_node
   DESTINATION lib/openscenario_visualization
