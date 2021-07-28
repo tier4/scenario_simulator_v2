@@ -24,9 +24,9 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.events import Shutdown
-from launch.event_handlers import OnProcessExit, OnExecutionComplete
+from launch.event_handlers import OnProcessExit
 
-from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, OpaqueFunction
+from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, OpaqueFunction, TimerAction
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
@@ -50,6 +50,12 @@ def generate_launch_description():
             OpaqueFunction(function=lambda print: sys.exit(-1))
         ]
     )
+    timer_action = TimerAction(
+        period=10.0,
+        actions=[
+            LogInfo(msg="Timeout, start shutdown simulation."),
+            EmitEvent(event=Shutdown())
+        ])
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -70,5 +76,6 @@ def generate_launch_description():
                 name="openscenario_visualization_node",
                 output="screen",
             ),
+            timer_action
         ]
     )
