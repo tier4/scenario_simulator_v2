@@ -34,25 +34,12 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Launch description for scenario runner moc."""
-    lanelet_path = os.path.join(
-        get_package_share_directory(
-            "kashiwanoha_map"), "map", "lanelet2_map.osm"
-    )
     scenario = LaunchConfiguration("scenario", default="")
     scenario_node = Node(
         package="cpp_mock_scenarios",
         executable=scenario,
         name=scenario,
         output="screen",
-        parameters=[
-            {
-                "map_path": lanelet_path,
-                "origin_latitude": 35.903555800615614,
-                "origin_longitude": 139.93339979022568,
-                "port": 8080,
-            }
-        ],
         arguments=[("__log_level:=info")],
     )
     shutdown_handler = OnProcessExit(
@@ -75,7 +62,6 @@ def generate_launch_description():
                 executable="simple_sensor_simulator_node",
                 name="simple_sensor_simulator_node",
                 output="log",
-                parameters=[{"port": 8080}],
                 arguments=[("__log_level:=warn")],
             ),
             Node(
