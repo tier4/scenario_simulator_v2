@@ -40,15 +40,21 @@ from launch.substitutions.launch_configuration import LaunchConfiguration
 from launch_ros.actions import Node
 
 from typing import cast
+from termcolor import colored
 
 
-def on_output(event: launch.Event) -> None:
-    for line in event.text.decode().splitlines():
-        print(
-            "[{}] {}".format(
-                cast(launch.events.process.ProcessIO, event).process_name, line
-            )
-        )
+def on_stderr_output(event: launch.Event) -> None:
+    lines = event.text.decode().splitlines()
+    if len(lines) == 1:
+        if lines[0] == "cpp_scenario:failure":
+            print(colored("Scenario Failed", "red"))
+
+
+def on_stdout_output(event: launch.Event) -> None:
+    lines = event.text.decode().splitlines()
+    if len(lines) == 1:
+        if lines[0] == "cpp_scenario:success":
+            print(colored("Scenario Succeed", "green"))
 
 
 def generate_launch_description():
@@ -61,17 +67,11 @@ def generate_launch_description():
         output="screen",
         arguments=[("__log_level:=info")],
     )
-    shutdown_handler = OnProcessExit(
-        target_action=scenario_node,
-        on_exit=[
-            LogInfo(msg="Shutting down by failure"),
-            EmitEvent(event=Shutdown())
-            # OpaqueFunction(function=lambda print: sys.exit(-1))
-        ],
-    )
     io_handler = OnProcessIO(
         target_action=scenario_node,
-        on_stderr=on_output)
+        on_stderr=on_stderr_output,
+        on_stdout=on_stdout_output,
+    )
     timer_action = TimerAction(
         period=timeout,
         actions=[
