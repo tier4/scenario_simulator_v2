@@ -44,12 +44,13 @@ target_link_libraries(idiot_npc
 )
 
 install(
-  DIRECTORY launch rviz
+  DIRECTORY launch rviz test
   DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  add_launch_test(test/launch/idiot_npc.launch.py)
 endif()
 
 ament_auto_package()
