@@ -19,7 +19,7 @@ jobs:
     needs: CheckFileChanged
     steps:
       - name: Check Release Note
-        if: contains(fromJson(needs.precheck.outputs.files_changed), 'docs/ReleaseNotes.md') == false
+        if: contains(fromJson(needs.CheckFileChanged.outputs.files_changed), 'docs/ReleaseNotes.md') == false
         uses: mshick/add-pr-comment@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,7 +34,7 @@ jobs:
     needs: CheckFileChanged
     steps:
       - name: Check Release Note
-        if: contains(fromJson(needs.precheck.outputs.files_changed), 'docs/ReleaseNotes.md') == false
+        if: contains(fromJson(needs.CheckFileChanged.outputs.files_changed), 'docs/ReleaseNotes.md') == false
         uses: mshick/add-pr-comment@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
