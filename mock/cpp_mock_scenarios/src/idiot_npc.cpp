@@ -66,11 +66,10 @@ private:
       api_.updateFrame();
       current_time_ = current_time_ + 0.05;
     } else {
-      rclcpp::shutdown();
       if (current_time_ <= 3.0) {
+        rclcpp::shutdown();
         std::exit(-1);
       }
-      std::exit(0);
     }
   }
 

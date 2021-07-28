@@ -45,7 +45,7 @@ def generate_launch_description():
     shutdown_handler = OnProcessExit(
         target_action=scenario_node,
         on_exit=[
-            LogInfo(msg="Shutting down..."),
+            LogInfo(msg="Shutting down by failure"),
             EmitEvent(event=Shutdown()),
             OpaqueFunction(function=lambda print: sys.exit(-1))
         ]
@@ -53,8 +53,9 @@ def generate_launch_description():
     timer_action = TimerAction(
         period=10.0,
         actions=[
-            LogInfo(msg="Timeout, start shutdown simulation."),
-            EmitEvent(event=Shutdown())
+            LogInfo(msg="Shutting down by success"),
+            EmitEvent(event=Shutdown()),
+            OpaqueFunction(function=lambda print: sys.exit(0))
         ])
     return LaunchDescription(
         [
