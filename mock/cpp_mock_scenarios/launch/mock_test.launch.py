@@ -22,6 +22,12 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
+from launch.events import Shutdown
+from launch.event_handlers import OnProcessExit
+
+from launch.actions import EmitEvent, RegisterEventHandler
+from launch.actions.declare_launch_argument import DeclareLaunchArgument
+from launch.substitutions.launch_configuration import LaunchConfiguration
 
 from launch_ros.actions import Node
 
@@ -29,30 +35,41 @@ from launch_ros.actions import Node
 def generate_launch_description():
     """Launch description for scenario runner moc."""
     lanelet_path = os.path.join(
-        get_package_share_directory("kashiwanoha_map"), "map", "lanelet2_map.osm"
+        get_package_share_directory(
+            "kashiwanoha_map"), "map", "lanelet2_map.osm"
     )
     rviz_config_dir = os.path.join(
         get_package_share_directory("cpp_mock_scenarios"),
         "rviz",
         "view_kashiwanoha.rviz",
     )
+    scenario = LaunchConfiguration("scenario", default="")
+    scenario_node = Node(
+        package="cpp_mock_scenarios",
+        executable=scenario,
+        name=scenario,
+        output="screen",
+        parameters=[
+            {
+                "map_path": lanelet_path,
+                "origin_latitude": 35.903555800615614,
+                "origin_longitude": 139.93339979022568,
+                "port": 8080,
+            }
+        ],
+        arguments=[("__log_level:=info")],
+    )
     return LaunchDescription(
         [
-            Node(
-                package="cpp_mock_scenarios",
-                executable="idiot_npc",
-                name="idiot_npc",
-                output="screen",
-                parameters=[
-                    {
-                        "map_path": lanelet_path,
-                        "origin_latitude": 35.903555800615614,
-                        "origin_longitude": 139.93339979022568,
-                        "port": 8080,
-                    }
-                ],
-                arguments=[("__log_level:=info")],
-            ),
+            DeclareLaunchArgument(
+                "scenario",
+                default_value=scenario,
+                description="name of the scenario."),
+            scenario_node,
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=scenario_node,
+                    on_exit=[EmitEvent(event=Shutdown())])),
             Node(
                 package="simple_sensor_simulator",
                 executable="simple_sensor_simulator_node",
