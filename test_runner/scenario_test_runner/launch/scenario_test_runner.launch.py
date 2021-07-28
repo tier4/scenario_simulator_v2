@@ -61,7 +61,7 @@ def launch_setup(context, *args, **kwargs):
 
     vehicle_model = LaunchConfiguration("vehicle_model", default="")
 
-    with_rviz = LaunchConfiguration("with_rviz", default=False)
+    with_rviz = LaunchConfiguration("with-rviz", default=False)
 
     workflow = LaunchConfiguration("workflow", default=Path("/dev/null"))
 

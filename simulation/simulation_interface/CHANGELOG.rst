@@ -2,6 +2,13 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.0 (2021-07-27)
+------------------
+* Merge pull request `#411 <https://github.com/tier4/scenario_simulator_v2/issues/411>`_ from tier4/doc/run_scenario_test_with_docker
+* fix typo
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.3.0 (2021-07-13)
 ------------------
 * Merge branch 'master' into pjaroszek/map_and_planning

@@ -22,6 +22,7 @@
 #include <unistd.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <concealer/execute.hpp>
 #include <cstdlib>
 #include <iostream>
@@ -47,7 +48,7 @@ auto ros2_launch(const std::string & package, const std::string & file, Ts &&...
 
   const std::vector<std::string> argv{
     "python3",
-    "/opt/ros/foxy/bin/ros2",
+    boost::algorithm::replace_all_copy(dollar("which ros2"), "\n", ""),
     "launch",  // NOTE: The command 'ros2' is a Python script.
     package,
     file,

@@ -2,6 +2,11 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.0 (2021-07-27)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
+* Contributors: yamacir-kit
+
 0.3.0 (2021-07-13)
 ------------------
 * Merge branch 'master' into traffic_signal_actions
