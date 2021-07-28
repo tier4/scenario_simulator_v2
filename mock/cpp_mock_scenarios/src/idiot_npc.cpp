@@ -70,7 +70,7 @@ private:
       if (current_time_ <= 3.0) {
         std::exit(-1);
       }
-      std::exit(-1);
+      std::exit(0);
     }
   }
 

@@ -18,6 +18,7 @@
 # limitations under the License.
 
 import os
+import sys
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -25,7 +26,7 @@ from launch import LaunchDescription
 from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit, OnExecutionComplete
 
-from launch.actions import EmitEvent, RegisterEventHandler, LogInfo
+from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, OpaqueFunction
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
@@ -58,14 +59,15 @@ def generate_launch_description():
         target_action=scenario_node,
         on_exit=[
             LogInfo(msg="Shutting down..."),
-            EmitEvent(event=Shutdown())
-        ])
+            EmitEvent(event=Shutdown()),
+            OpaqueFunction(function=lambda print: sys.exit(-1))
+        ]
+    )
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                "scenario",
-                default_value=scenario,
-                description="name of the scenario."),
+                "scenario", default_value=scenario, description="name of the scenario."
+            ),
             scenario_node,
             RegisterEventHandler(event_handler=shutdown_handler),
             Node(

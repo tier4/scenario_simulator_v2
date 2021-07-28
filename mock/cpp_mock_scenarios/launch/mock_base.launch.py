@@ -21,11 +21,11 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 
-from launch import LaunchDescription
+from launch import LaunchDescription, event
 from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit, OnExecutionComplete
 
-from launch.actions import EmitEvent, RegisterEventHandler, LogInfo
+from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, TimerAction
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
@@ -33,11 +33,12 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    """Launch description for scenario runner moc."""
-    lanelet_path = os.path.join(
-        get_package_share_directory(
-            "kashiwanoha_map"), "map", "lanelet2_map.osm"
-    )
+    timer_action = TimerAction(
+        period=10.0,
+        actions=[
+            LogInfo(msg="Timeout, start shutdown simulation."),
+            EmitEvent(event=Shutdown())
+        ])
     return LaunchDescription(
         [
             Node(
@@ -54,5 +55,6 @@ def generate_launch_description():
                 name="openscenario_visualization_node",
                 output="screen",
             ),
+            timer_action
         ]
     )
