@@ -25,13 +25,30 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 import launch
 from launch.events import Shutdown
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnProcessIO
 
-from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, OpaqueFunction, TimerAction
+from launch.actions import (
+    EmitEvent,
+    RegisterEventHandler,
+    LogInfo,
+    OpaqueFunction,
+    TimerAction,
+)
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
 from launch_ros.actions import Node
+
+from typing import cast
+
+
+def on_output(event: launch.Event) -> None:
+    for line in event.text.decode().splitlines():
+        print(
+            "[{}] {}".format(
+                cast(launch.events.process.ProcessIO, event).process_name, line
+            )
+        )
 
 
 def generate_launch_description():
@@ -49,17 +66,21 @@ def generate_launch_description():
         on_exit=[
             LogInfo(msg="Shutting down by failure"),
             EmitEvent(event=Shutdown())
-            #OpaqueFunction(function=lambda print: sys.exit(-1))
-        ]
+            # OpaqueFunction(function=lambda print: sys.exit(-1))
+        ],
     )
+    io_handler = OnProcessIO(
+        target_action=scenario_node,
+        on_stderr=on_output)
     timer_action = TimerAction(
-        period=10.0,
+        period=timeout,
         actions=[
-            LogInfo(msg="Shutting down by success"),
+            LogInfo(msg="Shutting down by timeout"),
             EmitEvent(event=Shutdown())
-            #OpaqueFunction(function=lambda print: sys.exit(0))
-        ])
-    return LaunchDescription(
+            # OpaqueFunction(function=lambda print: sys.exit(0))
+        ],
+    )
+    description = LaunchDescription(
         [
             DeclareLaunchArgument(
                 "scenario", default_value=scenario, description="Name of the scenario."
@@ -68,7 +89,7 @@ def generate_launch_description():
                 "timeout", default_value=timeout, description="Timeout in seconds."
             ),
             scenario_node,
-            RegisterEventHandler(event_handler=shutdown_handler),
+            RegisterEventHandler(event_handler=io_handler),
             Node(
                 package="simple_sensor_simulator",
                 executable="simple_sensor_simulator_node",
@@ -82,6 +103,7 @@ def generate_launch_description():
                 name="openscenario_visualization_node",
                 output="screen",
             ),
-            timer_action
+            timer_action,
         ]
     )
+    return description
