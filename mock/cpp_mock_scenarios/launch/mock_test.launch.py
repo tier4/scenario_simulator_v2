@@ -23,9 +23,9 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.events import Shutdown
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnExecutionComplete
 
-from launch.actions import EmitEvent, RegisterEventHandler
+from launch.actions import EmitEvent, RegisterEventHandler, LogInfo
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
@@ -37,11 +37,6 @@ def generate_launch_description():
     lanelet_path = os.path.join(
         get_package_share_directory(
             "kashiwanoha_map"), "map", "lanelet2_map.osm"
-    )
-    rviz_config_dir = os.path.join(
-        get_package_share_directory("cpp_mock_scenarios"),
-        "rviz",
-        "view_kashiwanoha.rviz",
     )
     scenario = LaunchConfiguration("scenario", default="")
     scenario_node = Node(
@@ -59,6 +54,12 @@ def generate_launch_description():
         ],
         arguments=[("__log_level:=info")],
     )
+    shutdown_handler = OnProcessExit(
+        target_action=scenario_node,
+        on_exit=[
+            LogInfo(msg="Shutting down..."),
+            EmitEvent(event=Shutdown())
+        ])
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -66,10 +67,7 @@ def generate_launch_description():
                 default_value=scenario,
                 description="name of the scenario."),
             scenario_node,
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=scenario_node,
-                    on_exit=[EmitEvent(event=Shutdown())])),
+            RegisterEventHandler(event_handler=shutdown_handler),
             Node(
                 package="simple_sensor_simulator",
                 executable="simple_sensor_simulator_node",
@@ -77,13 +75,6 @@ def generate_launch_description():
                 output="log",
                 parameters=[{"port": 8080}],
                 arguments=[("__log_level:=warn")],
-            ),
-            Node(
-                package="rviz2",
-                executable="rviz2",
-                name="rviz2",
-                arguments=["-d", rviz_config_dir],
-                output="screen",
             ),
             Node(
                 package="openscenario_visualization",
