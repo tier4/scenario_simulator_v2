@@ -20,6 +20,7 @@
 // clang-format on
 
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <concealer/execute.hpp>
@@ -83,7 +84,8 @@ auto record_start(Ts &&... xs)
   record_process_id = fork();
 
   const std::vector<std::string> argv{
-    "python3", "/opt/ros/foxy/bin/ros2", "bag", "record", std::forward<decltype(xs)>(xs)...};
+    "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
+    "record", std::forward<decltype(xs)>(xs)...};
 
   if (record_process_id < 0) {
     throw std::system_error(errno, std::system_category());
@@ -207,7 +209,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
               "The execution time of evaluate() (" <<  time_ms << " ms) is not in time. " <<
               "The current local frame rate (" << local_frame_rate << " Hz) (period = " << period.count() << " ms) is too high. " <<
               "If the frame rate is less than " << static_cast<unsigned int>(1.0 / time_ms * 1e3) << " Hz, you will make it. " <<
-              "(Statatistics: " <<
+              "(Statistics: " <<
               "count = " << time_statistics.count() << ", " <<
               "mean = " << duration_cast<milliseconds>(time_statistics.mean()).count() << " ms, " <<
               "max = " << duration_cast<milliseconds>(time_statistics.max()).count() << " ms, " <<
