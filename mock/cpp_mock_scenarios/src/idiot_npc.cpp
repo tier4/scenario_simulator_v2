@@ -67,11 +67,11 @@ private:
       current_time_ = current_time_ + 0.05;
     } else {
       if (current_time_ <= 3.0) {
+        std::cerr << "cpp_scenario:failure" << std::endl;
         rclcpp::shutdown();
         std::exit(-1);
       }
-      std::cerr << "ERROR" << std::endl;
-      trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVE_SHUTDOWN);
+      std::cout << "cpp_scenario:success" << std::endl;
       update_timer_->cancel();
     }
   }
