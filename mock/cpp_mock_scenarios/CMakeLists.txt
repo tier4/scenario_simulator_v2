@@ -44,7 +44,7 @@ target_link_libraries(idiot_npc
 )
 
 install(
-  DIRECTORY launch rviz test
+  DIRECTORY launch rviz
   DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
