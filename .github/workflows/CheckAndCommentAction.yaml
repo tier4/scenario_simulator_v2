@@ -13,7 +13,7 @@ jobs:
       - id: file_changes
         uses: trilom/file-changes-action@v1.2.3
   CheckBugPullRequest:
-    if: ${{ github.event.label.name == 'bug' }} && !${{ github.event.label.name == 'small problem' }}
+    if: ${{ github.event.label.name == 'bug' }}
     name: Check Bug Pull Request
     runs-on: ubuntu-20.04
     needs: CheckFileChanged
@@ -28,7 +28,7 @@ jobs:
             You labeld this PR as "bug", but Release Note does not updated, please check your PR.
           allow-repeats: true
   CheckFeaturePullRequest:
-    if: ${{ github.event.label.name == 'feature' }} && !${{ github.event.label.name == 'small feature' }}
+    if: ${{ github.event.label.name == 'feature' }}
     name: Check Feature Pull Request
     runs-on: ubuntu-20.04
     needs: CheckFileChanged
