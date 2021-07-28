@@ -23,6 +23,7 @@ import sys
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
+import launch
 from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit
 
@@ -34,6 +35,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
     scenario_node = Node(
         package="cpp_mock_scenarios",
@@ -46,21 +48,24 @@ def generate_launch_description():
         target_action=scenario_node,
         on_exit=[
             LogInfo(msg="Shutting down by failure"),
-            EmitEvent(event=Shutdown()),
-            OpaqueFunction(function=lambda print: sys.exit(-1))
+            EmitEvent(event=Shutdown())
+            #OpaqueFunction(function=lambda print: sys.exit(-1))
         ]
     )
     timer_action = TimerAction(
         period=10.0,
         actions=[
             LogInfo(msg="Shutting down by success"),
-            EmitEvent(event=Shutdown()),
-            OpaqueFunction(function=lambda print: sys.exit(0))
+            EmitEvent(event=Shutdown())
+            #OpaqueFunction(function=lambda print: sys.exit(0))
         ])
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                "scenario", default_value=scenario, description="name of the scenario."
+                "scenario", default_value=scenario, description="Name of the scenario."
+            ),
+            DeclareLaunchArgument(
+                "timeout", default_value=timeout, description="Timeout in seconds."
             ),
             scenario_node,
             RegisterEventHandler(event_handler=shutdown_handler),
