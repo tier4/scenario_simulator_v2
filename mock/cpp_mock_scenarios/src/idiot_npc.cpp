@@ -18,7 +18,6 @@
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <traffic_simulator/api/api.hpp>
 
 // headers in STL
@@ -29,14 +28,35 @@
 // headers in pugixml
 #include "pugixml.hpp"
 
-class ScenarioRunnerMoc : public rclcpp_lifecycle::LifecycleNode
+class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
   explicit ScenarioRunnerMoc(const rclcpp::NodeOptions & option)
-  : rclcpp_lifecycle::LifecycleNode("scenario_runner", option), api_(this, configure())
+  : Node("scenario_runner", option), api_(this, configure())
   {
-    trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
-    trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
+    api_.initialize(1.0, 0.05);
+    pugi::xml_document vehicle_catalog_xml_doc;
+    Catalog catalog;
+    vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
+    api_.spawn(
+      false, "idiot",
+      traffic_simulator::entity::VehicleParameters(vehicle_catalog_xml_doc).toRosMsg());
+    api_.setEntityStatus(
+      "idiot", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+      traffic_simulator::helper::constructActionStatus(0));
+    api_.setTargetSpeed("idiot", 15, true);
+    openscenario_msgs::msg::DriverModel driver_model;
+    driver_model.see_around = false;
+    api_.setDriverModel("idiot", driver_model);
+    api_.spawn(
+      false, "npc",
+      traffic_simulator::entity::VehicleParameters(vehicle_catalog_xml_doc).toRosMsg());
+    api_.setEntityStatus(
+      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
+      traffic_simulator::helper::constructActionStatus(0));
+    api_.setTargetSpeed("npc", 5, true);
+    using namespace std::chrono_literals;
+    update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
   }
 
 private:
@@ -69,47 +89,6 @@ private:
     return configuration;
   }
 
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_configure(const rclcpp_lifecycle::State &) 
-  {
-    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  };
-
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_shutdown(const rclcpp_lifecycle::State &)
-  {
-    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  }
-  
-  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-  on_activate(const rclcpp_lifecycle::State &)
-  {
-    api_.initialize(1.0, 0.05);
-    pugi::xml_document vehicle_catalog_xml_doc;
-    Catalog catalog;
-    vehicle_catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
-    api_.spawn(
-      false, "idiot",
-      traffic_simulator::entity::VehicleParameters(vehicle_catalog_xml_doc).toRosMsg());
-    api_.setEntityStatus(
-      "idiot", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("idiot", 15, true);
-    openscenario_msgs::msg::DriverModel driver_model;
-    driver_model.see_around = false;
-    api_.setDriverModel("idiot", driver_model);
-    api_.spawn(
-      false, "npc",
-      traffic_simulator::entity::VehicleParameters(vehicle_catalog_xml_doc).toRosMsg());
-    api_.setEntityStatus(
-      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
-      traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("npc", 5, true);
-    using namespace std::chrono_literals;
-    update_timer_ = this->create_wall_timer(50ms, std::bind(&ScenarioRunnerMoc::update, this));
-    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-  }
-
   bool lanechange_executed_;
   bool target_speed_set_;
   bool bob_spawned_;
@@ -124,7 +103,7 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   auto component = std::make_shared<ScenarioRunnerMoc>(options);
-  rclcpp::spin(component->get_node_base_interface());
+  rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
 }
