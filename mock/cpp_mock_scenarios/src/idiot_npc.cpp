@@ -66,6 +66,9 @@ private:
       api_.updateFrame();
       current_time_ = current_time_ + 0.05;
     }
+    else {
+      rclcpp::shutdown();
+    }
   }
 
   static auto configure() -> traffic_simulator::Configuration
