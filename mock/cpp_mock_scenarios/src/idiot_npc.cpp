@@ -25,9 +25,6 @@
 #include <string>
 #include <vector>
 
-// headers in pugixml
-#include "pugixml.hpp"
-
 class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
@@ -93,7 +90,6 @@ private:
   bool target_speed_set_;
   bool bob_spawned_;
   double current_time_;
-  int port_;
   traffic_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 };
