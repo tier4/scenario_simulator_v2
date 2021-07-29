@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from logging import shutdown
 import os
 import sys
 
@@ -24,6 +25,7 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 import launch
+from launch import event_handlers
 from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit, OnProcessIO
 
@@ -92,8 +94,11 @@ def generate_launch_description():
         actions=[
             LogInfo(msg="Shutting down by timeout"),
             EmitEvent(event=Shutdown())
-            # OpaqueFunction(function=lambda print: sys.exit(0))
         ],
+    )
+    shutdown_handler = OnProcessExit(
+        target_action=scenario_node,
+        on_exit=[EmitEvent(event=Shutdown())]
     )
     description = LaunchDescription(
         [
@@ -105,6 +110,7 @@ def generate_launch_description():
             ),
             scenario_node,
             RegisterEventHandler(event_handler=io_handler),
+            RegisterEventHandler(event_handler=shutdown_handler),
             Node(
                 package="simple_sensor_simulator",
                 executable="simple_sensor_simulator_node",
