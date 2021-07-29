@@ -43,7 +43,7 @@ struct ManeuverGroup : public Scope, public StoryboardElement<ManeuverGroup>, pu
 
   template <typename Node>
   explicit ManeuverGroup(const Node & node, Scope & outer_scope)
-  : Scope(readAttribute<String>("name", node, outer_scope)),
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
     StoryboardElement(readAttribute<UnsignedInteger>(
       "maximumExecutionCount", node, localScope(), UnsignedInteger())),
     actors(readElement<Actors>("Actors", node, localScope()))

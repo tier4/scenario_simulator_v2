@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 
 namespace openscenario_interpreter
 {

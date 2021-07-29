@@ -16,9 +16,11 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONTROLLER_HPP_
 
 #include <openscenario_interpreter/iterator/circular_iterator.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include "scenario_simulator_exception/exception.hpp"
 
 namespace openscenario_interpreter
 {
@@ -67,7 +69,7 @@ struct TrafficSignalController
    *  CURRENTLY, IGNORED!!!
    *
    * ------------------------------------------------------------------------ */
-  const String reference;
+  const std::string reference;
 
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -96,14 +98,14 @@ public:
 
   explicit TrafficSignalController(const TrafficSignalController &) = delete;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit TrafficSignalController(const Node & node, Scope & outer_scope)
   : name(readAttribute<String>("name", node, outer_scope)),
     delay(
       readAttribute<Double>("delay", node, outer_scope, std::numeric_limits<double>::quiet_NaN())),
-    reference(readAttribute<String>("reference", node, outer_scope, String())),
+    reference(readAttribute<std::string>("reference", node, outer_scope, std::string{})),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
-    current_phase(std::begin(phases), std::end(phases), std::end(phases)),
+    current_phase(phases.begin(), phases.end(), phases.end()),
     change_to_begin_time(boost::none),
     current_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min())
   {
@@ -137,7 +139,7 @@ public:
     return changePhaseTo(it);
   }
 
-  auto changePhaseTo(const std::list<Phase>::iterator & next) -> Element
+  auto changePhaseTo(std::list<Phase>::iterator next) -> Element
   {
     const auto current_time = getCurrentTime();
 
@@ -159,7 +161,7 @@ public:
            (*current_phase).duration <= (getCurrentTime() - current_phase_started_at);
   }
 
-  auto currentPhaseName() const { return (*current_phase).name; }
+  auto currentPhaseName() const -> const auto & { return (*current_phase).name; }
 
   auto currentPhaseSince() const { return current_phase_started_at; }
 
@@ -196,7 +198,7 @@ public:
       }
     }
   }
-};
+};  // namespace syntax
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

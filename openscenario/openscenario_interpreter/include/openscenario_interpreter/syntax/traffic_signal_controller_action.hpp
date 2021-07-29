@@ -66,7 +66,7 @@ struct TrafficSignalControllerAction : public Scope
   auto start()
   {
     auto found = localScope().findElement(traffic_signal_controller_ref);
-    if (!found || found.is<TrafficSignalController>()) {
+    if (!(found && found.is<TrafficSignalController>())) {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
         " is not declared in this scope");

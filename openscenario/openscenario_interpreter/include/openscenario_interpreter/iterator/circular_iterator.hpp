@@ -43,10 +43,14 @@ public:
 
   using difference_type = typename std::iterator_traits<ForwardIterator>::difference_type;
 
+  CircularIterator() = default;
+
   explicit CircularIterator(ForwardIterator begin, ForwardIterator end, ForwardIterator current)
   : begin(begin), end(end), current(current)
   {
   }
+
+  CircularIterator & operator=(const CircularIterator &) = default;
 
   CircularIterator & operator=(const ForwardIterator & iterator)
   {
@@ -66,7 +70,6 @@ public:
     } else if (++current == end) {
       current = begin;
     }
-
     return *this;
   }
 

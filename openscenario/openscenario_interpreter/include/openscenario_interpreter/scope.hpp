@@ -22,20 +22,21 @@
 #include <limits>
 #include <memory>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <queue>
 #include <scenario_simulator_exception/exception.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include "scenario_simulator_exception/exception.hpp"
 
 namespace openscenario_interpreter
 {
 struct ScopeImpl
 {
+private:
   friend struct Scope;
+
+  const std::string scope_name;
 
   std::unordered_map<std::string, Element> enviroments;
 
@@ -47,9 +48,9 @@ struct ScopeImpl
 
   ScopeImpl() = default;
 
-  ScopeImpl(ScopeImpl & parent, const std::string & name) : parent(&parent)
+  ScopeImpl(ScopeImpl & parent, const std::string & name) : scope_name(name), parent(&parent)
   {
-    if (name.empty()) {
+    if (name.empty() || name.find("anonymous") == 0) {
       parent.anonymous_children.push_back(this);
     } else {
       auto ret = parent.named_children.insert({name, this});
@@ -74,7 +75,6 @@ public:
 
   auto findElement(const std::string & name) const -> Element
   {
-    std::cout << "\n\n" << name << "\n\n" << std::endl;
     std::vector<std::string> splitted;
     {
       const char * delim = "::";
@@ -99,7 +99,7 @@ public:
 private:
   auto lookupUnqualifiedElement(const std::string & name) const -> Element
   {
-    for (auto * p = parent; p != nullptr; p = p->parent) {
+    for (auto * p = this; p != nullptr; p = p->parent) {
       auto found = p->enviroments.find(name);
       if (found != p->enviroments.end()) {
         return found->second;
@@ -166,7 +166,7 @@ struct Scope
 {
   using Actor = EntityRef;
 
-private:
+  // private:
   const std::shared_ptr<ScopeImpl> impl;
 
 public:
@@ -182,13 +182,10 @@ public:
 
   boost::filesystem::path scene_graph_file;  // NOTE: Assigned by RoadNetwork's constructor.
 
-  //std::unordered_map<std::string, std::shared_ptr<TrafficSignalController>>
-  //  traffic_signal_controllers;  // TODO: あとで消す
-
   Scope() = delete;
 
   explicit Scope(const boost::filesystem::path & pathname)
-  : impl(std::make_shared<ScopeImpl>()), pathname(pathname)
+  : impl(new ScopeImpl()), pathname(pathname)
   {
   }
 
@@ -203,7 +200,6 @@ private:
   {
   }
 
-  //protected:
 public:
   // note: shallow copy
   Scope(const Scope &) = default;
@@ -216,7 +212,7 @@ public:
 
   auto makeChildScope(const std::string & name) const
   {
-    return Scope{*this, name, std::make_shared<ScopeImpl>(*impl, name)};
+    return Scope{*this, name, std::shared_ptr<ScopeImpl>(new ScopeImpl(*impl, name))};
   }
 
   auto addElement(const std::string & name_, const Element & element)
