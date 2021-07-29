@@ -14,6 +14,8 @@
 
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 
+#include <iostream>
+
 namespace cpp_mock_scenarios
 {
 CppScenarioNode::CppScenarioNode(
@@ -29,6 +31,19 @@ void CppScenarioNode::start()
   api_.initialize(1.0, 0.05);
   using namespace std::chrono_literals;
   update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::onUpdate, this));
+}
+
+void CppScenarioNode::stop(bool success)
+{
+  if(success)
+  {
+    std::cout << "cpp_scenario:success" << std::endl;
+  }
+  else
+  {
+    std::cerr << "cpp_scenario:failure" << std::endl;
+  }
+  update_timer_->cancel();
 }
 
 static auto configure(
