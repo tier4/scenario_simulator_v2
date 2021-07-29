@@ -79,10 +79,6 @@ target_link_libraries(traffic_simulator
   zmq
   ${PROTOBUF_LIBRARY})
 
-ament_auto_add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_node.cpp)
-
-target_link_libraries(scenario_runner_moc_node traffic_simulator)
-
 install(
   DIRECTORY launch resource test/catalog test/map
   DESTINATION share/${PROJECT_NAME})
