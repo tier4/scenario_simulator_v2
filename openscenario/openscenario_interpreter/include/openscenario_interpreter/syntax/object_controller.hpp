@@ -37,7 +37,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectController : public ComplexType
 {
-  inline static bool EgoExists = false;
+  // inline static bool EgoExists = false;
+  static bool EgoExists;
 
   explicit ObjectController()  // ObjectController is optional element.
   : ComplexType(unspecified)

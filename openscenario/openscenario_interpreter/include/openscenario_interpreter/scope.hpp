@@ -16,16 +16,12 @@
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
 #include <boost/algorithm/string.hpp>
-#include <boost/any.hpp>
 #include <boost/filesystem.hpp>
-#include <iostream>
 #include <limits>
 #include <memory>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
-#include <queue>
 #include <scenario_simulator_exception/exception.hpp>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -128,8 +124,8 @@ private:
 
   auto lookupUnqualifiedScope(const std::string & name) const -> const ScopeImpl *
   {
-    if (name.empty() && parent == nullptr) {  // global scope
-      return this;
+    if (parent == nullptr) {  // this is global scope
+      return name.empty() ? this : nullptr;
     } else {
       auto sibling_scope = parent->lookupChildScope(name);
       if (sibling_scope.size() == 1) {

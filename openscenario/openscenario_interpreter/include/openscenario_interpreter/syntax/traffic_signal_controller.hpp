@@ -20,7 +20,6 @@
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/phase.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
-#include "scenario_simulator_exception/exception.hpp"
 
 namespace openscenario_interpreter
 {

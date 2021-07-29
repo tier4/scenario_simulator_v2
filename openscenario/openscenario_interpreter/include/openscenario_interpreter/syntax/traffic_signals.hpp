@@ -21,7 +21,6 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 #include <openscenario_interpreter/utility/circular_check.hpp>
-#include "scenario_simulator_exception/exception.hpp"
 
 namespace openscenario_interpreter
 {

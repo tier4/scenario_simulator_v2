@@ -25,7 +25,6 @@ inline namespace iterator
 template <typename Container>
 class CircularIterator
 {
-public:
   using ForwardIterator = typename Container::iterator;
   using ForwardConstIterator = typename Container::const_iterator;
 
@@ -44,8 +43,6 @@ public:
   using pointer = typename std::iterator_traits<ForwardIterator>::pointer;
 
   using difference_type = typename std::iterator_traits<ForwardIterator>::difference_type;
-
-  CircularIterator() = default;
 
   explicit CircularIterator(ForwardIterator begin, ForwardIterator end, ForwardIterator current)
   : begin(begin), end(end), current(current)
@@ -70,6 +67,7 @@ public:
     } else if (++current == end) {
       current = begin;
     }
+
     return *this;
   }
 
