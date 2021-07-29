@@ -31,6 +31,7 @@ public:
   explicit CppScenarioNode(
     const std::string & node_name, const std::string & map_path,
     const std::string & scenario_filename, const bool verbose, const rclcpp::NodeOptions & option);
+  void start();
 
 private:
   traffic_simulator::API api_;
