@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from logging import shutdown
 import os
 import sys
 
@@ -24,22 +25,20 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 import launch
+
+from launch.conditions import IfCondition
 from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit, OnProcessIO
 
-from launch.actions import (
-    EmitEvent,
-    RegisterEventHandler,
-    LogInfo,
-    OpaqueFunction,
-    TimerAction,
-)
+from launch.actions import EmitEvent, RegisterEventHandler, LogInfo, TimerAction
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions.launch_configuration import LaunchConfiguration
 
 from launch_ros.actions import Node
 
 from typing import cast
+
+from pathlib import Path
 
 
 class Color:
@@ -75,6 +74,7 @@ def on_stdout_output(event: launch.Event) -> None:
 def generate_launch_description():
     timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
+    with_rviz = LaunchConfiguration("with_rviz", default=False)
     scenario_node = Node(
         package="cpp_mock_scenarios",
         executable=scenario,
@@ -89,11 +89,10 @@ def generate_launch_description():
     )
     timer_action = TimerAction(
         period=timeout,
-        actions=[
-            LogInfo(msg="Shutting down by timeout"),
-            EmitEvent(event=Shutdown())
-            # OpaqueFunction(function=lambda print: sys.exit(0))
-        ],
+        actions=[LogInfo(msg="Shutting down by timeout"), EmitEvent(event=Shutdown())],
+    )
+    shutdown_handler = OnProcessExit(
+        target_action=scenario_node, on_exit=[EmitEvent(event=Shutdown())]
     )
     description = LaunchDescription(
         [
@@ -103,8 +102,14 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "timeout", default_value=timeout, description="Timeout in seconds."
             ),
+            DeclareLaunchArgument(
+                "with_rviz",
+                default_value=with_rviz,
+                description="If true, launch with rviz.",
+            ),
             scenario_node,
             RegisterEventHandler(event_handler=io_handler),
+            RegisterEventHandler(event_handler=shutdown_handler),
             Node(
                 package="simple_sensor_simulator",
                 executable="simple_sensor_simulator_node",
@@ -119,6 +124,20 @@ def generate_launch_description():
                 output="screen",
             ),
             timer_action,
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                output={"stderr": "log", "stdout": "log"},
+                condition=IfCondition(with_rviz),
+                arguments=[
+                    "-d",
+                    str(
+                        Path(get_package_share_directory("cpp_mock_scenarios"))
+                        / "rviz/mock_test.rviz"
+                    ),
+                ],
+            ),
         ]
     )
     return description

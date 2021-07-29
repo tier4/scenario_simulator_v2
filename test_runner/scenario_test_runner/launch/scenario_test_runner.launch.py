@@ -23,8 +23,6 @@ from launch.actions import DeclareLaunchArgument, OpaqueFunction, Shutdown
 
 from launch.conditions import IfCondition
 
-from launch.launch_context import LaunchContext
-
 from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node, LifecycleNode

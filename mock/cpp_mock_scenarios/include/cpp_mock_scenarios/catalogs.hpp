@@ -16,6 +16,8 @@
 #define CPP_MOCK_SCENARIOS__CATALOGS_HPP_
 
 #include <string>
+#include <traffic_simulator/entity/pedestrian_parameter.hpp>
+#include <traffic_simulator/entity/vehicle_parameter.hpp>
 
 struct Catalog
 {
@@ -46,5 +48,21 @@ struct Catalog
             <Properties/>
         </Pedestrian>)";
 };
+
+auto getVehicleParameters() -> openscenario_msgs::msg::VehicleParameters
+{
+  pugi::xml_document catalog_xml_doc;
+  Catalog catalog;
+  catalog_xml_doc.load_string(catalog.vehicle_catalog_xml.c_str());
+  return traffic_simulator::entity::VehicleParameters(catalog_xml_doc).toRosMsg();
+}
+
+auto getPedestrianParameters() -> openscenario_msgs::msg::PedestrianParameters
+{
+  pugi::xml_document catalog_xml_doc;
+  Catalog catalog;
+  catalog_xml_doc.load_string(catalog.pedestrian_catalog_xml.c_str());
+  return traffic_simulator::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
+}
 
 #endif  // CPP_MOCK_SCENARIOS__CATALOGS_HPP_
