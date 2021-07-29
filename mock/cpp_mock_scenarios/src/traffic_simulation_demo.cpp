@@ -91,16 +91,19 @@ private:
     api_.requestWalkStraight("tom");
     api_.setTargetSpeed("tom", 3, true);
     api_.spawn(
-      false, "bob", getPedestrianParameters(), traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      false, "bob", getPedestrianParameters(),
+      traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
     api_.setTargetSpeed("bob", 1, true);
     api_.spawn(
-      false, "npc1", getVehicleParameters(), traffic_simulator::helper::constructLaneletPose(34579, 20.0),
+      false, "npc1", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34579, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc1", 5, true);
     lanechange_executed_ = false;
     api_.spawn(
-      false, "npc2", getVehicleParameters(), traffic_simulator::helper::constructLaneletPose(34606, 20.0),
+      false, "npc2", getVehicleParameters(),
+      traffic_simulator::helper::constructLaneletPose(34606, 20.0),
       traffic_simulator::helper::constructActionStatus(5));
     api_.setTargetSpeed("npc2", 0, true);
     api_.requestAssignRoute(
@@ -124,6 +127,7 @@ private:
       {10, traffic_simulator::TrafficLightColor::RED}};
     api_.setTrafficLightColorPhase(34802, phase);
   }
+
 private:
   bool lanechange_executed_;
 };
