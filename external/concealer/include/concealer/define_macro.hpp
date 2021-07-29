@@ -33,6 +33,19 @@ public:                                                             \
   }                                                                 \
   static_assert(true, "")
 
+#define DEFINE_SUBSCRIPTION_WITH_OVERRIDE(TYPE)                     \
+private:                                                            \
+  TYPE CONCEALER_CURRENT_VALUE_OF(TYPE);                            \
+  rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;     \
+                                                                    \
+public:                                                             \
+  TYPE get##TYPE() const override                                   \
+  {                                                                 \
+    const auto lock = static_cast<const Autoware &>(*this).lock();  \
+    return CONCEALER_CURRENT_VALUE_OF(TYPE);                        \
+  }                                                                 \
+  static_assert(true, "")
+
 #define DEFINE_PUBLISHER(TYPE)                                       \
 private:                                                             \
   rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE;            \

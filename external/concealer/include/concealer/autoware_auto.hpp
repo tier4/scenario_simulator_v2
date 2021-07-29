@@ -24,7 +24,6 @@
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_report.hpp>
 
-#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 
 
 namespace concealer
@@ -110,7 +109,7 @@ class AutowareAuto : public Autoware
   using Trajectory = autoware_auto_msgs::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
 
-  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() {
+  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override {
     // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
     autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
 

@@ -14,6 +14,8 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <concealer/autoware_auto.hpp>
+#include <concealer/autoware_architecture_proposal.hpp>
 #include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
@@ -26,16 +28,6 @@
 #include <utility>
 #include <vector>
 
-template <typename T>
-auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
 
 namespace traffic_simulator
 {
@@ -146,34 +138,53 @@ EgoEntity::EgoEntity(
   const double step_time,               //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
-  autoware(
-    getParameter<std::string>("autoware_launch_package"),
-    getParameter<std::string>("autoware_launch_file"),
-    "map_path:=" + configuration.map_path.string(),
-    "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-    "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-    "sensor_model:=" + getParameter<std::string>("sensor_model"),
-    "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-    "rviz_config:=" + configuration.rviz_config_path.string(),  //
-    "scenario_simulation:=true"),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
+  auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
+
+  std::cout << "EgoEntity::autoware_type = " << autoware_type << std::endl;
+
+  if (autoware_type == "proposal") {
+    autoware = std::make_unique<concealer::AutowareArchitectureProposal>(getParameter<std::string>("autoware_launch_package"),
+                                                                         getParameter<std::string>("autoware_launch_file"),
+                                                                         "map_path:=" + configuration.map_path.string(),
+                                                                         "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+                                                                         "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+                                                                         "sensor_model:=" + getParameter<std::string>("sensor_model"),
+                                                                         "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                                                                         "rviz_config:=" + configuration.rviz_config_path.string(),
+                                                                         "scenario_simulation:=true");
+  } else if (autoware_type == "auto") {
+    autoware = std::make_unique<concealer::AutowareAuto>(getParameter<std::string>("autoware_launch_package"),
+                                                         getParameter<std::string>("autoware_launch_file"),
+                                                         "map_path:=" + configuration.map_path.string(),
+                                                         "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+                                                         "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+                                                         "sensor_model:=" + getParameter<std::string>("sensor_model"),
+                                                         "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                                                         "rviz_config:=" + configuration.rviz_config_path.string(),
+                                                         "scenario_simulation:=true");
+
+  } else {
+    throw std::invalid_argument("Invalid autoware_type = " + autoware_type);
+  }
+
   entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
 }
 
-void EgoEntity::engage() { autoware.engage(); }
+void EgoEntity::engage() { autoware->engage(); }
 
 auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
 {
-  return autoware.getVehicleCommand();
+  return autoware->getVehicleCommand();
 }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   std::stringstream message;
 
-  const auto state{autoware.getAutowareStateMessage()};
+  const auto state{autoware->getAutowareStateMessage()};
 
   message << (state.empty() ? "Starting" : state)  //
           << "_(t_=_"                              //
@@ -274,7 +285,7 @@ auto EgoEntity::getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacl
 
 auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 {
-  return autoware.getWaypoints();
+  return autoware->getWaypoints();
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)
@@ -300,7 +311,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
     }
 
-    autoware.set(current_pose);
+    autoware->set(current_pose);
 
     geometry_msgs::msg::Twist current_twist;
     {
@@ -308,14 +319,14 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    autoware.set(current_twist);
+    autoware->set(current_twist);
   } else {
     switch (vehicle_model_type_) {
       case VehicleModelType::IDEAL_STEER:
       case VehicleModelType::DELAY_STEER: {
         Eigen::VectorXd input(2);
 
-        input << autoware.getVelocity(), autoware.getSteeringAngle();
+        input << autoware->getVelocity(), autoware->getSteeringAngle();
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -323,7 +334,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER_ACC: {
         Eigen::VectorXd input(3);
 
-        input << autoware.getVelocity(), autoware.getSteeringAngle(), autoware.getGearSign();
+        input << autoware->getVelocity(), autoware->getSteeringAngle(), autoware->getGearSign();
 
               (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -351,7 +362,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 auto EgoEntity::ready() const -> bool
 {
   // NOTE: Autoware::ready() will notify you with an exception if Autoware has detected any anomalies at the time of the call.
-  return autoware.ready();
+  return autoware->ready();
 }
 
 void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
@@ -370,13 +381,13 @@ void EgoEntity::requestAssignRoute(
 
   assert(0 < route.size());
 
-  if (not autoware.initialized()) {
-    autoware.initialize(getStatus().pose);
-    autoware.plan(route);
+  if (not autoware->initialized()) {
+    autoware->initialize(getStatus().pose);
+    autoware->plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    autoware.plan(route);
-    autoware.engage();
+    autoware->plan(route);
+    autoware->engage();
   }
 }
 
@@ -394,15 +405,15 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   const auto current_pose = getStatus().pose;
 
-  if (autoware.initialized()) {
+  if (autoware->initialized()) {
     geometry_msgs::msg::Twist current_twist;
     {
       current_twist.linear.x = (*vehicle_model_ptr_).getVx();
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    autoware.set(current_pose);
-    autoware.set(current_twist);
+    autoware->set(current_pose);
+    autoware->set(current_twist);
   }
 
   if (!initial_pose_) {
@@ -424,14 +435,14 @@ void EgoEntity::setTargetSpeed(double value, bool)
 
     case VehicleModelType::DELAY_STEER: {
       Eigen::VectorXd v(5);
-      v << 0, 0, 0, autoware.restrictTargetSpeed(value), 0;
+      v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;
 
     case VehicleModelType::DELAY_STEER_ACC: {
       Eigen::VectorXd v(6);
-      v << 0, 0, 0, autoware.restrictTargetSpeed(value), 0, 0;
+      v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0, 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;

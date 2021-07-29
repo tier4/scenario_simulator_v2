@@ -19,9 +19,9 @@
 
 #include <sys/wait.h>
 
+#include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
-
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
@@ -82,11 +82,7 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
-  virtual void sendSIGINT() {
-    std::cout << "Autoware::sendSIGINT" << std::endl;
-
-    // TODO: not ok?
-  };
+  virtual void sendSIGINT() = 0;
 
   // method called in destructor of a derived class
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
@@ -158,6 +154,8 @@ public:
   virtual double restrictTargetSpeed(double value) const = 0;
 
   virtual std::string getAutowareStateMessage() const = 0;
+
+  virtual autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const = 0;
 
   void rethrow() const noexcept(false);
 
