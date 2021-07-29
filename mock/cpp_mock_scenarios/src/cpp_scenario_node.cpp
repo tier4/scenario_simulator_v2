@@ -21,6 +21,9 @@ CppScenarioNode::CppScenarioNode(
   const std::string & scenario_filename, const bool verbose, const rclcpp::NodeOptions & option)
 : Node(node_name, option), api_(this, configure(map_path, scenario_filename, verbose))
 {
+  onInitialize();
+  using namespace std::chrono_literals;
+  update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::onUpdate, this));
 }
 
 static auto configure(

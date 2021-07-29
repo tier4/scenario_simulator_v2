@@ -34,6 +34,9 @@ public:
 
 private:
   traffic_simulator::API api_;
+  virtual void onUpdate() = 0;
+  virtual void onInitialize() = 0;
+  rclcpp::TimerBase::SharedPtr update_timer_;
 };
 
 static auto configure(
