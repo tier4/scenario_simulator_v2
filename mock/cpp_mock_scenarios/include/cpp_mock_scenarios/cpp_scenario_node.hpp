@@ -39,6 +39,7 @@ protected:
   traffic_simulator::API api_;
 
 private:
+  void update();
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;
   rclcpp::TimerBase::SharedPtr update_timer_;
