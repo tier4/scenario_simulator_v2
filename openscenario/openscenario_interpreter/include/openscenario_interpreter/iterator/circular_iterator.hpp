@@ -25,10 +25,12 @@ inline namespace iterator
 template <typename Container>
 class CircularIterator
 {
+public:
   using ForwardIterator = typename Container::iterator;
   using ForwardConstIterator = typename Container::const_iterator;
 
-  ForwardIterator begin, end, current;
+  const ForwardIterator begin, end;
+  ForwardIterator current;
 
 public:
   using iterator_category = std::forward_iterator_tag;
@@ -49,8 +51,6 @@ public:
   : begin(begin), end(end), current(current)
   {
   }
-
-  CircularIterator & operator=(const CircularIterator &) = default;
 
   CircularIterator & operator=(const ForwardIterator & iterator)
   {
