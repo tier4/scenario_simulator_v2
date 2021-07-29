@@ -18,6 +18,7 @@
 #include <string>
 #include <traffic_simulator/entity/pedestrian_parameter.hpp>
 #include <traffic_simulator/entity/vehicle_parameter.hpp>
+#include <openscenario_msgs/msg/misc_object_parameters.hpp>
 
 struct Catalog
 {
@@ -63,6 +64,17 @@ auto getPedestrianParameters() -> openscenario_msgs::msg::PedestrianParameters
   Catalog catalog;
   catalog_xml_doc.load_string(catalog.pedestrian_catalog_xml.c_str());
   return traffic_simulator::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
+}
+
+auto getMiscObjectParameters() -> openscenario_msgs::msg::MiscObjectParameters
+{
+  openscenario_msgs::msg::MiscObjectParameters misc_object_param;
+  misc_object_param.bounding_box.dimensions.x = 1.0;
+  misc_object_param.bounding_box.dimensions.y = 1.0;
+  misc_object_param.bounding_box.dimensions.z = 1.0;
+  misc_object_param.misc_object_category = "obstacle";
+  misc_object_param.name = "obstacle";
+  return misc_object_param;
 }
 
 #endif  // CPP_MOCK_SCENARIOS__CATALOGS_HPP_

@@ -37,6 +37,11 @@ ament_auto_add_executable(idiot_npc
 )
 target_link_libraries(idiot_npc cpp_scenario_node)
 
+ament_auto_add_executable(traffic_simulation_demo
+  src/traffic_simulation_demo.cpp
+)
+target_link_libraries(traffic_simulation_demo cpp_scenario_node)
+
 install(
   DIRECTORY launch rviz
   DESTINATION share/${PROJECT_NAME})

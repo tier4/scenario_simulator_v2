@@ -83,12 +83,8 @@ ament_auto_add_executable(scenario_runner_moc_node src/moc/scenario_runner_moc_n
 
 target_link_libraries(scenario_runner_moc_node traffic_simulator)
 
-ament_auto_add_executable(catmull_rom_visualization src/moc/catmull_rom_visualization.cpp)
-
-target_link_libraries(catmull_rom_visualization traffic_simulator)
-
 install(
-  DIRECTORY config launch resource test/catalog test/map
+  DIRECTORY launch resource test/catalog test/map
   DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)

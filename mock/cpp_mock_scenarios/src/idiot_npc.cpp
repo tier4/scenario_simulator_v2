@@ -41,9 +41,7 @@ private:
   void onUpdate() override
   {
     double current_time = api_.getCurrentTime();
-    if (!api_.checkCollision("ego", "npc")) {
-      api_.updateFrame();
-    } else {
+    if (api_.checkCollision("ego", "npc")) {
       if (current_time <= 3.0) {
         stop(false);
       } else {
