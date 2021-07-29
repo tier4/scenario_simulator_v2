@@ -13,15 +13,16 @@
 // limitations under the License.
 
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
-
 #include <iostream>
 
 namespace cpp_mock_scenarios
 {
 CppScenarioNode::CppScenarioNode(
   const std::string & node_name, const std::string & map_path,
-  const std::string & scenario_filename, const bool verbose, const rclcpp::NodeOptions & option)
-: Node(node_name, option), api_(this, configure(map_path, scenario_filename, verbose))
+  const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
+  const rclcpp::NodeOptions & option)
+: Node(node_name, option),
+  api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose))
 {
 }
 
@@ -35,28 +36,11 @@ void CppScenarioNode::start()
 
 void CppScenarioNode::stop(bool success)
 {
-  if(success)
-  {
+  if (success) {
     std::cout << "cpp_scenario:success" << std::endl;
-  }
-  else
-  {
+  } else {
     std::cerr << "cpp_scenario:failure" << std::endl;
   }
   update_timer_->cancel();
-}
-
-static auto configure(
-  const std::string & map_path, const std::string & scenario_filename, const bool verbose)
-  -> traffic_simulator::Configuration
-{
-  auto configuration = traffic_simulator::Configuration(map_path);
-  {
-    configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
-    configuration.scenario_path = scenario_filename;
-    configuration.verbose = verbose;
-    configuration.initialize_duration = 0;
-  }
-  return configuration;
 }
 }  // namespace cpp_mock_scenarios

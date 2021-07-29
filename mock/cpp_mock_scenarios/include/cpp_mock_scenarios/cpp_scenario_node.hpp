@@ -30,20 +30,34 @@ class CppScenarioNode : public rclcpp::Node
 public:
   explicit CppScenarioNode(
     const std::string & node_name, const std::string & map_path,
-    const std::string & scenario_filename, const bool verbose, const rclcpp::NodeOptions & option);
+    const std::string & lanelet2_map_file, const std::string & scenario_filename,
+    const bool verbose, const rclcpp::NodeOptions & option);
   void start();
-  void stop(bool success=true);
+  void stop(bool success = true);
+
 protected:
   traffic_simulator::API api_;
+
 private:
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;
   rclcpp::TimerBase::SharedPtr update_timer_;
+  auto configure(
+    const std::string & map_path, const std::string & lanelet2_map_file,
+    const std::string & scenario_filename, const bool verbose) -> traffic_simulator::Configuration
+  {
+    auto configuration = traffic_simulator::Configuration(map_path);
+    {
+      configuration.lanelet2_map_file = lanelet2_map_file;
+      // configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
+      configuration.scenario_path = scenario_filename;
+      configuration.verbose = verbose;
+      configuration.initialize_duration = 0;
+    }
+    return configuration;
+  }
 };
 
-static auto configure(
-  const std::string & map_path, const std::string & scenario_filename, const bool verbose)
-  -> traffic_simulator::Configuration;
 }  // namespace cpp_mock_scenarios
 
 #endif  // CPP_MOCK_SCENARIOS__CPP_SCENARIO_NODE_HPP_

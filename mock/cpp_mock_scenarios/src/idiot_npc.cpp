@@ -16,6 +16,7 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
+#include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
@@ -25,6 +26,18 @@
 #include <string>
 #include <vector>
 
+class IdiotNpcScenario : public cpp_mock_scenarios::CppScenarioNode
+{
+public:
+  explicit IdiotNpcScenario(const rclcpp::NodeOptions & option)
+  : cpp_mock_scenarios::CppScenarioNode(
+      "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
+      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
+  {
+  }
+};
+
+/*
 class ScenarioRunnerMoc : public rclcpp::Node
 {
 public:
@@ -86,20 +99,20 @@ private:
     return configuration;
   }
 
-  bool lanechange_executed_;
   bool target_speed_set_;
   bool bob_spawned_;
   double current_time_;
   traffic_simulator::API api_;
   rclcpp::TimerBase::SharedPtr update_timer_;
 };
+*/
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<ScenarioRunnerMoc>(options);
-  rclcpp::spin(component);
+  // auto component = std::make_shared<ScenarioRunnerMoc>(options);
+  // rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
 }
