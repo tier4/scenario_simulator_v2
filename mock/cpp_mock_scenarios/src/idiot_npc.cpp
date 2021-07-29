@@ -41,7 +41,7 @@ private:
   void onUpdate() override
   {
     double current_time = api_.getCurrentTime();
-    if (!api_.checkCollision("idiot", "npc")) {
+    if (!api_.checkCollision("ego", "npc")) {
       api_.updateFrame();
     } else {
       if (current_time <= 3.0) {
@@ -53,14 +53,14 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(false, "idiot", getVehicleParameters());
+    api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
-      "idiot", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("idiot", 15, true);
+    api_.setTargetSpeed("ego", 15, true);
     openscenario_msgs::msg::DriverModel driver_model;
     driver_model.see_around = false;
-    api_.setDriverModel("idiot", driver_model);
+    api_.setDriverModel("ego", driver_model);
     api_.spawn(false, "npc", getVehicleParameters());
     api_.setEntityStatus(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
