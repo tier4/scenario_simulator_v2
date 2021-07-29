@@ -36,6 +36,7 @@ public:
   {
     start();
   }
+
 private:
   void onUpdate() override
   {
@@ -45,8 +46,7 @@ private:
     } else {
       if (current_time <= 3.0) {
         stop(false);
-      }
-      else{
+      } else {
         stop(true);
       }
     }
