@@ -42,5 +42,7 @@ void CppScenarioNode::stop(bool success)
     std::cerr << "cpp_scenario:failure" << std::endl;
   }
   update_timer_->cancel();
+  rclcpp::shutdown();
+  std::exit(0);
 }
 }  // namespace cpp_mock_scenarios
