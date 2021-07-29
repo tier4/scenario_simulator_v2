@@ -32,27 +32,10 @@ target_link_libraries(cpp_scenario_node
   zmq
 )
 
-ament_auto_add_executable(view_kashiwanoha
-  src/view_kashiwanoha.cpp
-)
-target_link_libraries(view_kashiwanoha
-  ${PROTOBUF_LIBRARY}
-  pthread
-  sodium
-  zmqpp
-  zmq
-)
-
 ament_auto_add_executable(idiot_npc
   src/idiot_npc.cpp
 )
-target_link_libraries(idiot_npc
-  ${PROTOBUF_LIBRARY}
-  pthread
-  sodium
-  zmqpp
-  zmq
-)
+target_link_libraries(idiot_npc cpp_scenario_node)
 
 install(
   DIRECTORY launch rviz
