@@ -92,7 +92,11 @@ public:
       return lookupUnqualifiedElement(splitted.front());
     } else {
       auto top_scope = lookupUnqualifiedScope(splitted.front());
-      return lookupQualifiedElement(top_scope, splitted.begin() + 1, splitted.end());
+      if (top_scope) {
+        return lookupQualifiedElement(top_scope, splitted.begin() + 1, splitted.end());
+      } else {
+        return Element{};
+      }
     }
   }
 
@@ -148,7 +152,7 @@ private:
       if (found.size() == 1) {
         scope = found.front();
       } else if (found.empty()) {
-        THROW_SYNTAX_ERROR("undefined reference to ", *iter);
+        return Element{};
       } else if (found.size() > 1) {
         THROW_SYNTAX_ERROR("ambiguous reference to ", *iter);
       }
@@ -156,7 +160,7 @@ private:
 
     auto found = scope->enviroments.find(*(name_end - 1));
     if (found == scope->enviroments.end()) {
-      THROW_SYNTAX_ERROR("undefined reference to ", *(name_end - 1));
+      return Element{};
     }
     return found->second;
   }
