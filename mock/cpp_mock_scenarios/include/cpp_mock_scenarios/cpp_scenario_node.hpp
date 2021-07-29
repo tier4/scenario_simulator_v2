@@ -32,9 +32,9 @@ public:
     const std::string & node_name, const std::string & map_path,
     const std::string & scenario_filename, const bool verbose, const rclcpp::NodeOptions & option);
   void start();
-
-private:
+protected:
   traffic_simulator::API api_;
+private:
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;
   rclcpp::TimerBase::SharedPtr update_timer_;

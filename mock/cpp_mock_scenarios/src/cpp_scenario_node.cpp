@@ -26,6 +26,7 @@ CppScenarioNode::CppScenarioNode(
 void CppScenarioNode::start()
 {
   onInitialize();
+  api_.initialize(1.0, 0.05);
   using namespace std::chrono_literals;
   update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::onUpdate, this));
 }
