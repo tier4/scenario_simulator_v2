@@ -39,6 +39,7 @@ target_link_libraries(traffic_simulation_demo cpp_scenario_node)
 
 add_subdirectory(src/follow_front_entity)
 add_subdirectory(src/collision)
+add_subdirectory(src/lane_change)
 
 install(
   DIRECTORY launch rviz
