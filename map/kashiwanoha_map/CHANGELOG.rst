@@ -2,6 +2,12 @@
 Changelog for package kashiwanoha_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#408 <https://github.com/tier4/scenario_simulator_v2/issues/408>`_ from RobotecAI/issue/AJD-239-non_hardcoded_map
+* kashiwanoha_map package map files added
+* Contributors: Piotr Zyskowski, Tatsuya Yamasaki
+
 0.4.1 (2021-07-30)
 ------------------
 
