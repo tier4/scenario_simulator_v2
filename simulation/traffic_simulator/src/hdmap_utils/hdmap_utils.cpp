@@ -239,9 +239,9 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
 }
 
 boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose)
+  geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
-  const auto lanelet_id = getClosetLaneletId(pose);
+  const auto lanelet_id = getClosetLaneletId(pose, include_crosswalk);
   if (!lanelet_id) {
     return boost::none;
   }
@@ -263,22 +263,34 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
 }
 
 boost::optional<std::int64_t> HdMapUtils::getClosetLaneletId(
-  geometry_msgs::msg::Pose pose, double distance_thresh)
+  geometry_msgs::msg::Pose pose, double distance_thresh, bool include_crosswalk)
 {
   lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
     lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 3);
-  const auto nearest_road_lanelet =
-    excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
-  if (nearest_road_lanelet.empty()) {
-    return boost::none;
+  if (include_crosswalk) {
+    if (nearest_lanelet.empty()) {
+      return boost::none;
+    }
+    if (nearest_lanelet.front().first > distance_thresh) {
+      return boost::none;
+    }
+    lanelet::Lanelet closest_lanelet;
+    closest_lanelet = nearest_lanelet.front().second;
+    return closest_lanelet.id();
+  } else {
+    const auto nearest_road_lanelet =
+      excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
+    if (nearest_road_lanelet.empty()) {
+      return boost::none;
+    }
+    if (nearest_road_lanelet.front().first > distance_thresh) {
+      return boost::none;
+    }
+    lanelet::Lanelet closest_lanelet;
+    closest_lanelet = nearest_road_lanelet.front().second;
+    return closest_lanelet.id();
   }
-  if (nearest_road_lanelet.front().first > distance_thresh) {
-    return boost::none;
-  }
-  lanelet::Lanelet closest_lanelet;
-  closest_lanelet = nearest_road_lanelet.front().second;
-  return closest_lanelet.id();
 }
 
 double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)

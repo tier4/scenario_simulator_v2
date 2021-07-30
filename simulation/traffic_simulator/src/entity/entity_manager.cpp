@@ -235,7 +235,11 @@ auto EntityManager::getLaneletPose(const std::string & name)
   if (status->lanelet_pose_valid) {
     return status->lanelet_pose;
   }
-  return toLaneletPose(status->pose);
+  bool include_crosswalk = true;
+  if (getEntityType(name).type == openscenario_msgs::msg::EntityType::VEHICLE) {
+    include_crosswalk = false;
+  }
+  return toLaneletPose(status->pose, include_crosswalk);
 }
 
 auto EntityManager::getLongitudinalDistance(
