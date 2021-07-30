@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Fix problems in coordinate conversion from world to lane in pedestrian entity.
 
 ## Version 0.4.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.1) on Github :fa-github:
