@@ -42,19 +42,15 @@ void CppScenarioNode::start()
 
 void CppScenarioNode::stop(Result result)
 {
-  switch(result)
-  {
-    case Result::SUCCESS:
-    {
+  switch (result) {
+    case Result::SUCCESS: {
       std::cout << "cpp_scenario:success" << std::endl;
       break;
     }
-    case Result::FAILURE:
-    {
+    case Result::FAILURE: {
       std::cerr << "cpp_scenario:failure" << std::endl;
       break;
     }
-
   }
   update_timer_->cancel();
   rclcpp::shutdown();

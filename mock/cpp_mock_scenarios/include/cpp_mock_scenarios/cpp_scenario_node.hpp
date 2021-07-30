@@ -25,11 +25,7 @@
 
 namespace cpp_mock_scenarios
 {
-enum class Result
-{
-  SUCCESS = 0,
-  FAILURE = 1
-};
+enum class Result { SUCCESS = 0, FAILURE = 1 };
 
 class CppScenarioNode : public rclcpp::Node
 {

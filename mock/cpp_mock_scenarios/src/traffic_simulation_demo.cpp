@@ -40,7 +40,7 @@ public:
 private:
   void onUpdate() override
   {
-    if(api_.getCurrentTime() >= 60) {
+    if (api_.getCurrentTime() >= 60) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     if (api_.getCurrentTime() >= 4 && api_.entityExists("tom")) {
