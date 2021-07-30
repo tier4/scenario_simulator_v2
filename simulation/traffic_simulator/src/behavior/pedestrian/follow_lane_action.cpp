@@ -42,6 +42,8 @@ BT::NodeStatus FollowLaneAction::tick()
     setOutput("updated_status", stopAtEndOfRoad());
     return BT::NodeStatus::RUNNING;
   }
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), entity_status.lanelet_pose.lanelet_id);
   auto following_lanelets =
     hdmap_utils->getFollowingLanelets(entity_status.lanelet_pose.lanelet_id);
   if (!target_speed) {
