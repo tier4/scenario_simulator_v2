@@ -2,6 +2,13 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#409 <https://github.com/tier4/scenario_simulator_v2/issues/409>`_ from tier4/feature/autoware/pose-with-covariance
+* Remove unneeded definitions
+* Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support

@@ -2,6 +2,12 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#417 <https://github.com/tier4/scenario_simulator_v2/issues/417>`_ from tier4/feature/add_mock_scenarios
+* remove test dir
+* Contributors: Masaya Kataoka
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition

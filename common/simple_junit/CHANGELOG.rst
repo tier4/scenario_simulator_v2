@@ -2,6 +2,9 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition

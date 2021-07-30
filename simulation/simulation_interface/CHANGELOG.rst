@@ -2,6 +2,11 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
+* Contributors: yamacir-kit
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge pull request `#411 <https://github.com/tier4/scenario_simulator_v2/issues/411>`_ from tier4/doc/run_scenario_test_with_docker

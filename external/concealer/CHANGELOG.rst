@@ -2,6 +2,15 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#409 <https://github.com/tier4/scenario_simulator_v2/issues/409>`_ from tier4/feature/autoware/pose-with-covariance
+* Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
+* Update class Autoware to publish LocalizationPose for each frame
+* Change topic name of PoseWithCovarianceStamped publisher
+* Add PoseWithCovarianceStamped publisher to class 'Autoware'
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support
