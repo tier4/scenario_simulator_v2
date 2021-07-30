@@ -23,8 +23,6 @@ from launch.actions import DeclareLaunchArgument, OpaqueFunction, Shutdown
 
 from launch.conditions import IfCondition
 
-from launch.launch_context import LaunchContext
-
 from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node, LifecycleNode
@@ -34,13 +32,15 @@ from pathlib import Path
 
 def launch_setup(context, *args, **kwargs):
     autoware_launch_file = LaunchConfiguration(
-        "autoware-launch-file", default="planning_simulator.launch.xml"
+        "autoware-launch-file",
+        default="planning_simulator.launch.xml"
         # use the below launch file to enable AutowareAuto instead of ArchitectureProposal
         # "autoware-launch-file", default="autoware_auto.launch.py"
     )
 
     autoware_launch_package = LaunchConfiguration(
-        "autoware-launch-package", default="autoware_launch"
+        "autoware-launch-package",
+        default="autoware_launch"
         # use the below package to enable AutowareAuto instead of ArchitectureProposal
         # "autoware-launch-package", default="scenario_test_runner_launch"
     )
@@ -174,9 +174,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             name="simple_sensor_simulator",
             output="screen",
-            parameters=[
-                {"port": port},
-            ],
+            parameters=[{"port": port}],
         ),
         LifecycleNode(
             package="openscenario_interpreter",
@@ -197,10 +195,7 @@ def launch_setup(context, *args, **kwargs):
             package="rviz2",
             executable="rviz2",
             name="rviz2",
-            output={
-                "stderr": "log",
-                "stdout": "log",
-            },
+            output={"stderr": "log", "stdout": "log"},
             condition=IfCondition(with_rviz),
             arguments=[
                 "-d",

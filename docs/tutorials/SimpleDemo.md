@@ -10,7 +10,7 @@ Do you want to know how to do that, please refer [this documentation](BuildInstr
 Only you have to do is type this command in your terminal.
 
 ```bash
-ros2 launch traffic_simulator mock_test.launch.py
+ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=idiot_npc scenario:=traffic_simulation_demo with_rviz:=true timeout:=60
 ```
 
 You can see ego vehicle running in kashiwanoha.
