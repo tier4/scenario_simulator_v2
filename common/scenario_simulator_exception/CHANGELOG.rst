@@ -2,6 +2,9 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.1 (2021-07-30)
+------------------
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
