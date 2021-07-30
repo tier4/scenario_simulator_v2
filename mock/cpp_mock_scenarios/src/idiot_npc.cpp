@@ -43,9 +43,9 @@ private:
     double current_time = api_.getCurrentTime();
     if (api_.checkCollision("ego", "npc")) {
       if (current_time <= 3.0) {
-        stop(false);
+        stop(cpp_mock_scenarios::Result::FAILURE);
       } else {
-        stop(true);
+        stop(cpp_mock_scenarios::Result::SUCCESS);
       }
     }
   }
