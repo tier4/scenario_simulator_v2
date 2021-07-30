@@ -90,10 +90,15 @@ jobs:
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
           ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
 
-      - name: Scenario test with cpp scenarios
+      - name: Run Idiot NPC Scenario
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=idiot_npc timeout:=5 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run Traffic Simulation Demo Scenario
+        run: |
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo timeout:=70 with_rviz:=True  > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Collect coverage
