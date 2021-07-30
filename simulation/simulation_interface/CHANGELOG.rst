@@ -2,8 +2,8 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.1 (2021-07-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
 * Contributors: yamacir-kit
 
