@@ -38,15 +38,22 @@ public:
   }
 
 private:
-  void onUpdate() override {}
+  bool requested = false;
+  void onUpdate() override 
+  {
+    if(!requested)
+    {
+      api_.requestLaneChange("ego", 34513);
+      requested = true;
+    }
+  }
   void onInitialize() override
   {
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
+      "ego", traffic_simulator::helper::constructLaneletPose(34462, 20, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 10, true);
-    api_.requestLaneChange("ego", traffic_simulator::entity::Direction::RIGHT);
   }
 };
 
