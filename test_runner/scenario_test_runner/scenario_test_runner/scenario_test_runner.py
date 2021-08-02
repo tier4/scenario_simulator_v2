@@ -25,7 +25,7 @@ from typing import List
 
 import rclpy
 from openscenario_utility.conversion import convert
-from openscenario_utility.validation import XOSCValidator, ReachPositionConditionValidator
+from openscenario_utility.validation import XOSCValidator
 from scenario_test_runner.lifecycle_controller import LifecycleController
 from scenario_test_runner.workflow import (
     Expect,
@@ -162,6 +162,7 @@ class ScenarioTestRunner(LifecycleController):
 
     def run_scenario(self, scenario: Scenario):
         converted_scenarios = convert_scenarios([scenario], self.output_directory)
+
         is_valid = XOSCValidator(False)
 
         for each in converted_scenarios:
@@ -185,15 +186,7 @@ class ScenarioTestRunner(LifecycleController):
         """
         length = len(scenarios)
 
-        scenario_validators = list()
-        scenario_validators.append(ReachPositionConditionValidator())
-
         for index, each in enumerate(scenarios):
-
-            for validator in scenario_validators:
-                valid = validator(each.path)
-                if not valid:
-                    self.get_logger().warn(validator.get_warning_message())
 
             self.get_logger().info(
                 "Run "
