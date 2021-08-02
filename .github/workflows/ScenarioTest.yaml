@@ -108,6 +108,18 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=accelerate_and_follow timeout:=15 with_rviz:=True
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run decelerate_and_follow front entity scenario
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=decelerate_and_follow timeout:=15 with_rviz:=True
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run lanechange_left scenario
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left timeout:=15 with_rviz:=True
+          cat log.txt | grep "Scenario Succeed"
+
       - name: Collect coverage
         run: |
           cd ~/ros2_ws
