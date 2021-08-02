@@ -39,12 +39,12 @@ public:
 
 private:
   bool requested = false;
-  void onUpdate() override 
+  void onUpdate() override
   {
-    if(api_.isInLanelet("ego", 34513, 0.1)) {
+    if (api_.isInLanelet("ego", 34513, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    if(api_.getCurrentTime() >= 10.0) {
+    if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
