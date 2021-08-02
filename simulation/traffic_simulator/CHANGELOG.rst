@@ -2,6 +2,29 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2021-07-30)
+------------------
+* Merge pull request `#425 <https://github.com/tier4/scenario_simulator_v2/issues/425>`_ from tier4/fix/add_include_crosswalk_option
+* Merge pull request `#408 <https://github.com/tier4/scenario_simulator_v2/issues/408>`_ from RobotecAI/issue/AJD-239-non_hardcoded_map
+* apply reformat
+* use calculateEntityStatusUpdated function
+* kashiwanoha_map package map files added
+* Contributors: Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki
+
+0.4.1 (2021-07-30)
+------------------
+* Merge pull request `#421 <https://github.com/tier4/scenario_simulator_v2/issues/421>`_ from tier4/fix/npc_target_speed_in_follow_front_entity_action
+* fix velocity planner logic
+* apply reformat
+* Merge pull request `#419 <https://github.com/tier4/scenario_simulator_v2/issues/419>`_ from tier4/feature/rename_moc_to_mock
+* enable set waypoints
+* fix login in follow front entity action
+* remove launch install line
+* remove moc directory
+* move to mock pacakge
+* Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support
