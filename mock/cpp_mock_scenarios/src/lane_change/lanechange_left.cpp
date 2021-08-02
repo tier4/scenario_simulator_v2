@@ -41,13 +41,12 @@ private:
   bool requested = false;
   void onUpdate() override 
   {
-    /*
-    if(!requested)
-    {
-      api_.requestLaneChange("ego", 34513);
-      requested = true;
+    if(api_.isInLanelet("ego", 34513, 0.1)) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    */
+    if(api_.getCurrentTime() >= 10.0) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
   }
   void onInitialize() override
   {
