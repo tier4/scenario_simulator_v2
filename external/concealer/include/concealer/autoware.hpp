@@ -92,7 +92,6 @@ public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
-    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)),
     spinner(
       [this](auto future) {
         while (rclcpp::ok() and
@@ -108,7 +107,8 @@ public:
           "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
-    updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); })) {}
+    updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); })),
+    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)) {}
 
   virtual ~Autoware() = default;
 
