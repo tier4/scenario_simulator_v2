@@ -186,12 +186,22 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double c = cx_ * ratio - cy_;
     double d = (dx_ - fx) * ratio - (dy_ - fy);
     auto solutions = solver_.solveCubicEquation(a, b, c, d);
+    /*
+    if(!solutions.empty()) {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), "a : " << a << ",b : " << b << ",c : " << c << ",d : " << d);
+    }
+    */
     for (const auto solution : solutions) {
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), solver_.cubicFunction(a, b, c, d, solution));
       double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
       double tx = std::fabs(x - point0.x) / std::fabs(point1.x - point0.x);
       double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
       double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
-      if (0 < tx && tx < 1 && 0 < ty && ty < 1 && 0 < solution && solution < 1) {
+      double poly_x = (1 - tx) * point1.x + tx * point0.x;
+      double poly_y = (1 - ty) * point1.y + ty * point0.y;
+      double error = std::hypot(poly_x - x, poly_y - y);
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), error);
+      if (error < 2.0 && 0 < tx && tx < 1 && 0 < ty && ty < 1 && 0 < solution && solution < 1) {
         s_values.emplace_back(solution);
       }
     }
