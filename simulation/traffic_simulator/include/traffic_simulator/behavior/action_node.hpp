@@ -40,8 +40,6 @@ public:
   bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
   std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnRoute(
     const std::vector<std::int64_t> & route_lanelets) const;
-  boost::optional<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatus(
-    const std::vector<std::int64_t> & following_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & following_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
@@ -104,6 +102,10 @@ public:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_entity_status;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list;
   std::vector<std::int64_t> route_lanelets;
+
+private:
+  boost::optional<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatus(
+    const std::vector<std::int64_t> & following_lanelets) const;
 };
 }  // namespace entity_behavior
 

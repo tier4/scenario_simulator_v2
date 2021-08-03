@@ -302,11 +302,18 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEnti
   const std::vector<std::int64_t> & route_lanelets) const
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
+  auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
   for (const auto & status : other_entity_status) {
     if (
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        status.second.lanelet_pose.lanelet_id) >= 1) {
+      conflicting_entity_status.push_back(status.second);
+    }
+    if (
+      std::count(
+        conflicting_lanes.begin(), conflicting_lanes.end(),
         status.second.lanelet_pose.lanelet_id) >= 1) {
       conflicting_entity_status.push_back(status.second);
     }
@@ -317,16 +324,8 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEnti
 boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatus(
   const std::vector<std::int64_t> & following_lanelets) const
 {
-  auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
-  std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
-  for (const auto & status : other_entity_status) {
-    if (
-      std::count(
-        conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.lanelet_pose.lanelet_id) >= 1) {
-      conflicting_entity_status.push_back(status.second);
-    }
-  }
+  std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status =
+    getConflictingEntityStatusOnRoute(following_lanelets);
   std::vector<double> dists;
   std::vector<std::pair<int, double>> collision_points;
   for (const auto & status : conflicting_entity_status) {
@@ -369,7 +368,7 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
 bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
-  auto conflicting_lane = hdmap_utils->getConflictingLaneIds(following_lanelets);
+  auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       std::count(
@@ -379,7 +378,7 @@ bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & follow
     }
     if (
       std::count(
-        conflicting_lane.begin(), conflicting_lane.end(),
+        conflicting_lanes.begin(), conflicting_lanes.end(),
         status.second.lanelet_pose.lanelet_id) >= 1) {
       return true;
     }
