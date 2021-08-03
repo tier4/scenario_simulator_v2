@@ -36,6 +36,7 @@ namespace utils
 {
 namespace
 {
+[[maybe_unused]]
 bool exists(const std::vector<int> & array, const int element)
 {
   return std::find(array.begin(), array.end(), element) != array.end();
@@ -51,6 +52,7 @@ bool exists(const std::vector<int> & array, const int element)
  * @param  contacting_lanelet_ids [array of lanelet ids that is contacting with
  * search_point]
  */
+[[maybe_unused]]
 void getContactingLanelets(
   const lanelet::LaneletMapPtr lanelet_map,
   const lanelet::traffic_rules::TrafficRulesPtr traffic_rules,

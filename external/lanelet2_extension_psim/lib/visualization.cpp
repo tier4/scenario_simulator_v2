@@ -62,6 +62,7 @@ void adjacentPoints(
   }
 }
 
+[[maybe_unused]]
 double hypot(const geometry_msgs::msg::Point32 & p0, const geometry_msgs::msg::Point32 & p1)
 {
   return sqrt(pow((p1.x - p0.x), 2.0) + pow((p1.y - p0.y), 2.0));
