@@ -38,10 +38,10 @@ public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
   bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
-  std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnRoute(
+  std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnCrossWalk(
     const std::vector<std::int64_t> & route_lanelets) const;
-  boost::optional<double> getDistanceToConflictingEntity(
-    const std::vector<std::int64_t> & following_lanelets) const;
+  std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnLane(
+    const std::vector<std::int64_t> & route_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & route_lanelets,
     const traffic_simulator::math::CatmullRomSpline & spline);
@@ -104,6 +104,9 @@ public:
   std::vector<std::int64_t> route_lanelets;
 
 private:
+  boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
+    const traffic_simulator::math::CatmullRomSpline & spline,
+    const openscenario_msgs::msg::EntityStatus & status);
   boost::optional<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatus(
     const std::vector<std::int64_t> & following_lanelets) const;
 };

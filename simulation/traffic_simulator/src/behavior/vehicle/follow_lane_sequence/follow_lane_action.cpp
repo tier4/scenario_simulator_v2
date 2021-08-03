@@ -96,7 +96,8 @@ BT::NodeStatus FollowLaneAction::tick()
     }
     auto distance_to_stopline =
       hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets);
+    const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
+    auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, spline);
     if (distance_to_stopline) {
       if (
         distance_to_stopline.get() <=

@@ -84,13 +84,14 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   const auto waypoints = calculateWaypoints();
   auto distance_to_stopline =
     hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-  auto distance_to_crossing_entity = getDistanceToConflictingEntity(route_lanelets);
+  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, spline);
   distance_to_front_entity_ = getDistanceToFrontEntity();
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
-  if (distance_to_crossing_entity) {
-    if (distance_to_front_entity_.get() > distance_to_crossing_entity.get()) {
+  if (distance_to_conflicting_entity) {
+    if (distance_to_front_entity_.get() > distance_to_conflicting_entity.get()) {
       return BT::NodeStatus::FAILURE;
     }
   }
