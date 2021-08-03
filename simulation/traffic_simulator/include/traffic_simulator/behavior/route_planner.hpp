@@ -35,6 +35,7 @@ public:
   std::vector<std::int64_t> getRouteLanelets(
     openscenario_msgs::msg::LaneletPose entity_lanelet_pose, double horizon = 100);
   void cancelGoal();
+  std::vector<openscenario_msgs::msg::LaneletPose> getGoalposes();
 
 private:
   void cancelGoal(const openscenario_msgs::msg::LaneletPose & entity_lanelet_pose);

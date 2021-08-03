@@ -93,6 +93,8 @@ public:
 
   virtual auto getWaypoints() -> const openscenario_msgs::msg::WaypointsArray = 0;
 
+  virtual auto getGoalposes() ->  std::vector<openscenario_msgs::msg::LaneletPose> =0;
+
   virtual void setDriverModel(const openscenario_msgs::msg::DriverModel &) {}
 
   /*   */ void setEntityTypeList(

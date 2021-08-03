@@ -94,6 +94,8 @@ public:
 
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
 
+  std::vector<openscenario_msgs::msg::LaneletPose> getGoalposes() override { return route_planner_ptr_->getGoalposes(); }
+
   const openscenario_msgs::msg::WaypointsArray getWaypoints() override
   {
     return openscenario_msgs::msg::WaypointsArray();
