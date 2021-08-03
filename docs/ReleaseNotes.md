@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Fix problems in finding front vehicle entity in conflicting lane.
 
 ## Version 0.4.2
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.2) on Github :fa-github:
