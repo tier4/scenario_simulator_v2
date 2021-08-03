@@ -369,10 +369,17 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflicting
 bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
+  auto conflicting_lane = hdmap_utils->getConflictingLaneIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        status.second.lanelet_pose.lanelet_id) >= 1) {
+      return true;
+    }
+    if (
+      std::count(
+        conflicting_lane.begin(), conflicting_lane.end(),
         status.second.lanelet_pose.lanelet_id) >= 1) {
       return true;
     }
