@@ -26,44 +26,36 @@
 #include <string>
 #include <vector>
 
-class IdiotNpcScenario : public cpp_mock_scenarios::CppScenarioNode
+class DecelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit IdiotNpcScenario(const rclcpp::NodeOptions & option)
+  explicit DecelerateAndFollowScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
-      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
+      "idiot_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }
 
 private:
+  bool requested = false;
   void onUpdate() override
   {
-    double current_time = api_.getCurrentTime();
-    if (api_.checkCollision("ego", "npc")) {
-      if (current_time <= 3.0) {
-        stop(false);
-      } else {
-        stop(true);
-      }
+    if (api_.isInLanelet("ego", 34513, 0.1)) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
+    if (api_.getCurrentTime() >= 10.0) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
   void onInitialize() override
   {
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("ego", 15, true);
-    openscenario_msgs::msg::DriverModel driver_model;
-    driver_model.see_around = false;
-    api_.setDriverModel("ego", driver_model);
-    api_.spawn(false, "npc", getVehicleParameters());
-    api_.setEntityStatus(
-      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
-      traffic_simulator::helper::constructActionStatus(0));
-    api_.setTargetSpeed("npc", 5, true);
+      "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
+      traffic_simulator::helper::constructActionStatus(10));
+    api_.setTargetSpeed("ego", 10, true);
+    api_.requestLaneChange("ego", 34513);
   }
 };
 
@@ -71,7 +63,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<IdiotNpcScenario>(options);
+  auto component = std::make_shared<DecelerateAndFollowScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

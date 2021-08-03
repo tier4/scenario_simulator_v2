@@ -40,12 +40,17 @@ void CppScenarioNode::start()
   update_timer_ = this->create_wall_timer(50ms, std::bind(&CppScenarioNode::update, this));
 }
 
-void CppScenarioNode::stop(bool success)
+void CppScenarioNode::stop(Result result)
 {
-  if (success) {
-    std::cout << "cpp_scenario:success" << std::endl;
-  } else {
-    std::cerr << "cpp_scenario:failure" << std::endl;
+  switch (result) {
+    case Result::SUCCESS: {
+      std::cout << "cpp_scenario:success" << std::endl;
+      break;
+    }
+    case Result::FAILURE: {
+      std::cerr << "cpp_scenario:failure" << std::endl;
+      break;
+    }
   }
   update_timer_->cancel();
   rclcpp::shutdown();
