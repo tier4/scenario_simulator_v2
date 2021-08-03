@@ -18,7 +18,7 @@
 from pathlib import Path
 from pkg_resources import resource_string
 from sys import exit
-from openscenario_utility.conversion import from_yaml, load_yaml
+from openscenario_utility.conversion import convert
 
 import argparse
 import xmlschema
@@ -65,8 +65,8 @@ class ReachPositionConditionValidator(ScenarioValidator):
         super().__init__()
         self.warning_message = "ReachPositionCondition position does not match the last position of the path"
 
-    def __call__(self, path: Path):
-        scenario = self.schema.to_dict(str(path))
+    def __call__(self, scenario):
+
         # Search for the last Routing Action destionation:
         last_destination = find_in_dict(
             'Position', find_in_dict('RoutingAction', scenario)[-1])
@@ -76,3 +76,38 @@ class ReachPositionConditionValidator(ScenarioValidator):
             'Position', find_in_dict('ReachPositionCondition', scenario)[-1])
 
         return reach_position_conditon == last_destination
+
+
+def validate_file():
+
+    schema = xmlschema.XMLSchema(
+        resource_string(
+            __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+    )
+
+    scenario_validators = list()
+    scenario_validators.append(ReachPositionConditionValidator())
+
+    parser = argparse.ArgumentParser(
+        description="Validate if the Scenario Files pass the conditions checked by validators"
+    )
+    parser.add_argument("file_paths", type=Path, nargs="+")
+
+    args = parser.parse_args()
+
+    for path in args.file_paths:
+        scenarios = []
+        paths = []
+        if path.suffix == '.xosc':
+            paths.append(path)
+            scenarios.append(schema.to_dict(str(path)))
+        else:
+            output = Path("/tmp").joinpath("xosc")
+            for converted_path in convert(path, output, verbose=False):
+                paths.append(converted_path)
+                scenarios.append(schema.to_dict(str(converted_path)))
+
+        for scenario, path in zip(scenarios, paths):
+            for validator in scenario_validators:
+                result = validator(scenario)
+                print(str(path) + " : " + str(result))
