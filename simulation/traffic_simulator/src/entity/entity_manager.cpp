@@ -535,7 +535,6 @@ openscenario_msgs::msg::EntityStatus EntityManager::updateNpcLogic(
   const std::string & name,
   const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list)
 {
-  configuration.verbose = true;
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }

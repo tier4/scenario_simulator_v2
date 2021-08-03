@@ -18,6 +18,7 @@
 #include <set>
 #include <string>
 #include <traffic_simulator/behavior/action_node.hpp>
+#include <traffic_simulator/math/bounding_box.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -241,6 +242,18 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
   return boost::none;
 }
 
+boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
+  const traffic_simulator::math::CatmullRomSpline & spline,
+  const openscenario_msgs::msg::EntityStatus & status)
+{
+  if (status.lanelet_pose_valid) {
+    const auto polygon = traffic_simulator::math::transformPoints(
+      status.pose, traffic_simulator::math::getPointsFromBbox(status.bounding_box));
+    return spline.getCollisionPointIn2D(polygon);
+  }
+  return boost::none;
+}
+
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & route_lanelets,
   const traffic_simulator::math::CatmullRomSpline & spline)
@@ -250,6 +263,12 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   std::set<double> distances;
   for (const auto & status : crosswalk_entity_status) {
     const auto s = getDistanceToTargetEntityOnCrosswalk(spline, status);
+    if (s) {
+      distances.insert(s.get());
+    }
+  }
+  for (const auto & status : lane_entity_status) {
+    const auto s = getDistanceToTargetEntityPolygon(spline, status);
     if (s) {
       distances.insert(s.get());
     }
