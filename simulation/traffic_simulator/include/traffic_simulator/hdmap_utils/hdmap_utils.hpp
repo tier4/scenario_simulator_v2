@@ -113,7 +113,10 @@ public:
     double tangent_vector_size = 100);
   boost::optional<geometry_msgs::msg::Vector3> getTangentVector(std::int64_t lanelet_id, double s);
   std::vector<std::int64_t> getRoute(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
-  std::vector<std::int64_t> getConflictingCrosswalkIds(std::vector<std::int64_t> lanelet_ids) const;
+  std::vector<std::int64_t> getConflictingCrosswalkIds(
+    const std::vector<std::int64_t> & lanelet_ids) const;
+  std::vector<std::int64_t> getConflictingLaneIds(
+    const std::vector<std::int64_t> & lanelet_ids) const;
   boost::optional<double> getCollisionPointInLaneCoordinate(
     std::int64_t lanelet_id, std::int64_t crossing_lanelet_id);
   const visualization_msgs::msg::MarkerArray generateMarker() const;
