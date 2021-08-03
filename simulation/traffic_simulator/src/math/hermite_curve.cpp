@@ -16,6 +16,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <vector>
 
@@ -164,8 +165,8 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     auto solutions = solver_.solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
     for (const auto solution : solutions) {
       double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
-      double t = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
-      if (0 < t && t < 1) {
+      double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
+      if (0 < ty && ty < 1 && 0 < solution && solution < 1) {
         s_values.emplace_back(solution);
       }
     }
@@ -174,9 +175,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     for (const auto solution : solutions) {
       double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
       double tx = std::fabs(x - point0.x) / std::fabs(point1.x - point0.x);
-      double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
-      double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
-      if (0 < tx && tx < 1 && 0 < ty && ty < 1) {
+      if (0 < tx && tx < 1 && 0 < solution && solution < 1) {
         s_values.emplace_back(solution);
       }
     }
@@ -188,9 +187,11 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     double d = (dx_ - fx) * ratio - (dy_ - fy);
     auto solutions = solver_.solveCubicEquation(a, b, c, d);
     for (const auto solution : solutions) {
+      double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
+      double tx = std::fabs(x - point0.x) / std::fabs(point1.x - point0.x);
       double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
-      double t = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
-      if (0 < t && t < 1) {
+      double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
+      if (0 < tx && tx < 1 && 0 < ty && ty < 1 && 0 < solution && solution < 1) {
         s_values.emplace_back(solution);
       }
     }
