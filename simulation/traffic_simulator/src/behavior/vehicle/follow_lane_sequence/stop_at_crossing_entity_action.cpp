@@ -132,7 +132,6 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     target_linear_speed = boost::none;
   }
   if (!distance_to_stop_target_) {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
     setOutput("updated_status", calculateEntityStatusUpdated(0));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
