@@ -110,7 +110,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
   auto distance_to_stopline =
     hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-  const auto distance_to_front_entity = getDistanceToFrontEntity();
+  const auto distance_to_front_entity = getDistanceToFrontEntity(spline);
   if ((distance_to_front_entity || distance_to_stopline) && distance_to_stop_target_) {
     if (distance_to_front_entity.get() <= distance_to_stop_target_.get()) {
       in_stop_sequence_ = false;
@@ -132,6 +132,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     target_linear_speed = boost::none;
   }
   if (!distance_to_stop_target_) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
     setOutput("updated_status", calculateEntityStatusUpdated(0));
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);

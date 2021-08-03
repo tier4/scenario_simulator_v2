@@ -79,7 +79,8 @@ BT::NodeStatus FollowLaneAction::tick()
     if (getRightOfWayEntities(route_lanelets).size() != 0) {
       return BT::NodeStatus::FAILURE;
     }
-    auto distance_to_front_entity = getDistanceToFrontEntity();
+    const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
+    auto distance_to_front_entity = getDistanceToFrontEntity(spline);
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.get() <=
@@ -96,7 +97,6 @@ BT::NodeStatus FollowLaneAction::tick()
     }
     auto distance_to_stopline =
       hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-    const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
     auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, spline);
     if (distance_to_stopline) {
       if (

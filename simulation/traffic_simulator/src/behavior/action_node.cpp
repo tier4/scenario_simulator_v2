@@ -190,45 +190,40 @@ boost::optional<double> ActionNode::getDistanceToStopLine(
   return hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints);
 }
 
-boost::optional<double> ActionNode::getDistanceToFrontEntity()
+boost::optional<double> ActionNode::getDistanceToFrontEntity(
+  const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  auto status = getFrontEntityStatus();
-  if (!status) {
+  std::set<double> distances;
+  for (const auto & each : other_entity_status) {
+    const auto distance = getDistanceToTargetEntityPolygon(spline, each.second);
+    if (distance) {
+      distances.emplace(distance.get());
+    }
+  }
+  if (distances.empty()) {
     return boost::none;
   }
-  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
+  return *distances.begin();
 }
 
-boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
+boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus(
+  const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  boost::optional<double> front_entity_distance, front_entity_speed;
-  std::string front_entity_name = "";
+  std::vector<double> distances;
+  std::vector<openscenario_msgs::msg::EntityStatus> status_list;
   for (const auto & each : other_entity_status) {
-    if (!entity_status.lanelet_pose_valid || !each.second.lanelet_pose_valid) {
-      continue;
-    }
-    boost::optional<double> distance =
-      hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, each.second.lanelet_pose);
+    const auto distance = getDistanceToTargetEntityPolygon(spline, each.second);
     if (distance) {
-      if (distance.get() < 40) {
-        if (!front_entity_distance && !front_entity_speed) {
-          front_entity_speed = each.second.action_status.twist.linear.x;
-          front_entity_distance = distance.get();
-          front_entity_name = each.first;
-        } else {
-          if (front_entity_distance.get() > distance.get()) {
-            front_entity_speed = each.second.action_status.twist.linear.x;
-            front_entity_distance = distance.get();
-            front_entity_name = each.first;
-          }
-        }
-      }
+      distances.emplace_back(distance.get());
+      status_list.emplace_back(each.second);
     }
   }
-  if (!front_entity_distance && !front_entity_speed) {
+  if (distances.empty()) {
     return boost::none;
   }
-  return other_entity_status[front_entity_name];
+  size_t index =
+    std::distance(distances.begin(), std::max_element(distances.begin(), distances.end()));
+  return status_list[index];
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
