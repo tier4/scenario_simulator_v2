@@ -27,38 +27,40 @@
 
 namespace openscenario_interpreter
 {
-struct ScopeImpl
+struct EnvironmentFrame
 {
 private:
   friend struct Scope;
 
-  const std::string scope_name;
+  // const std::string scope_name;
 
   std::unordered_map<std::string, Element> environments;
 
-  ScopeImpl * parent = nullptr;
+  EnvironmentFrame * parent = nullptr;
 
-  std::unordered_map<std::string, ScopeImpl *> named_children;
+  std::unordered_map<std::string, EnvironmentFrame *> named_children;
 
-  std::vector<ScopeImpl *> anonymous_children;
+  std::vector<EnvironmentFrame *> anonymous_children;
 
-  ScopeImpl() = default;
+  EnvironmentFrame() = default;
 
-  ScopeImpl(ScopeImpl & parent, const std::string & name) : scope_name(name), parent(&parent)
+  EnvironmentFrame(EnvironmentFrame & parent, const std::string & name)
+  :  // scope_name(name),
+    parent(&parent)
   {
     if (name.empty() or name.find("anonymous") == 0) {
       parent.anonymous_children.push_back(this);
     } else {
-      auto ret = parent.named_children.insert({name, this});
+      auto ret = parent.named_children.emplace(name, this);
       if (!ret.second) {
-        THROW_SYNTAX_ERROR("'", name, "' is duplicated in this scope");
+        THROW_SYNTAX_ERROR(std::quoted(name), " is duplicated in this scope");
       }
     }
   }
 
-  ScopeImpl(const ScopeImpl &) = delete;
+  EnvironmentFrame(const EnvironmentFrame &) = delete;
 
-  ScopeImpl(ScopeImpl &&) = delete;
+  EnvironmentFrame(EnvironmentFrame &&) = delete;
 
 public:
   auto addElement(const std::string & name, Element element) -> void
@@ -109,21 +111,21 @@ private:
     return Element{};
   }
 
-  auto lookupChildScope(const std::string & name) const -> std::list<const ScopeImpl *>
+  auto lookupChildScope(const std::string & name) const -> std::list<const EnvironmentFrame *>
   {
     auto found = named_children.find(name);
     if (found != named_children.end()) {
       return {found->second};
     }
 
-    std::list<const ScopeImpl *> ret;
+    std::list<const EnvironmentFrame *> ret;
     for (auto & child : anonymous_children) {
       ret.merge(child->lookupChildScope(name));
     }
     return ret;
   }
 
-  auto lookupUnqualifiedScope(const std::string & name) const -> const ScopeImpl *
+  auto lookupUnqualifiedScope(const std::string & name) const -> const EnvironmentFrame *
   {
     if (parent == nullptr) {  // this is global scope
       return name.empty() ? this : nullptr;
@@ -141,8 +143,8 @@ private:
   }
 
   template <typename Iterator>
-  auto lookupQualifiedElement(const ScopeImpl * scope, Iterator name_begin, Iterator name_end) const
-    -> Element
+  auto lookupQualifiedElement(
+    const EnvironmentFrame * scope, Iterator name_begin, Iterator name_end) const -> Element
   {
     for (auto iter = name_begin; iter != name_end - 1; ++iter) {
       auto found = scope->lookupChildScope(*iter);
@@ -165,7 +167,7 @@ private:
 
 class Scope
 {
-  const std::shared_ptr<ScopeImpl> impl;
+  const std::shared_ptr<EnvironmentFrame> frame;
 
 public:
   const std::string name;
@@ -181,13 +183,15 @@ public:
   Scope() = delete;
 
   explicit Scope(const boost::filesystem::path & pathname)
-  : impl(new ScopeImpl()), pathname(pathname)
+  : frame(new EnvironmentFrame()), pathname(pathname)
   {
   }
 
 private:
-  explicit Scope(const Scope & parent, const std::string & name, std::shared_ptr<ScopeImpl> impl_)
-  : impl(std::move(impl_)),
+  explicit Scope(
+    const Scope & parent, const std::string & name,
+    const std::shared_ptr<EnvironmentFrame> & frame_)
+  : frame(frame_),
     name(name),
     actors(parent.actors),
     pathname(parent.pathname),
@@ -207,15 +211,16 @@ public:
 
   auto makeChildScope(const std::string & name) const
   {
-    return Scope{*this, name, std::shared_ptr<ScopeImpl>(new ScopeImpl(*impl, name))};
+    return Scope{
+      *this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name))};
   }
 
   auto addElement(const std::string & name_, const Element & element)
   {
-    return impl->addElement(name_, element);
+    return frame->addElement(name_, element);
   }
 
-  auto findElement(const std::string & name_) const { return impl->findElement(name_); }
+  auto findElement(const std::string & name_) const { return frame->findElement(name_); }
 };
 }  // namespace openscenario_interpreter
 
