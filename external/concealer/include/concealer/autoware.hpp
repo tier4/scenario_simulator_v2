@@ -65,7 +65,7 @@ class Autoware : public rclcpp::Node,
 
   std::thread spinner;
 
-  const rclcpp::TimerBase::SharedPtr updater;
+  rclcpp::TimerBase::SharedPtr updater;
 
   std::exception_ptr thrown;
 
@@ -88,6 +88,10 @@ protected:
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
   void shutdownAutoware();
 
+  void createUpdater() {
+      updater = create_wall_timer(std::chrono::milliseconds(5), [this](){ this->update(); });
+  }
+
 public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
@@ -107,7 +111,6 @@ public:
           "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
-    updater(create_wall_timer(std::chrono::milliseconds(5), [this]() { return update(); })),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)) {}
 
   virtual ~Autoware() = default;

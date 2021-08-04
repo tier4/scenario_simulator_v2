@@ -163,6 +163,7 @@ public:
     INIT_PUBLISHER(InitialPose, "/localization/initialpose"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/trajectory", []() {})
   {
+    createUpdater();
     waitpid_options = WNOHANG;
   }
 
