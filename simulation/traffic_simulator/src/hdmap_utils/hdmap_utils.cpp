@@ -51,6 +51,8 @@ namespace hdmap_utils
 HdMapUtils::HdMapUtils(
   const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint & origin)
 {
+  (void)origin;
+
   lanelet::projection::MGRSProjector projector;
 
   lanelet::ErrorMessages errors;
