@@ -36,7 +36,7 @@ private:
 
   std::unordered_map<std::string, Element> environments;
 
-  EnvironmentFrame * parent = nullptr;
+  EnvironmentFrame * const parent = nullptr;
 
   std::unordered_map<std::string, EnvironmentFrame *> named_children;
 
@@ -65,8 +65,8 @@ private:
 public:
   auto addElement(const std::string & name, Element element) -> void
   {
-    if (std::any_of(name.begin(), name.end(), boost::is_any_of(": ,."))) {
-      THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':', ' ', ',' or '.' ");
+    if (name.find(":") != std::string::npos) {
+      THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
     }
 
     environments.insert(std::make_pair(name, std::move(element)));
@@ -201,9 +201,8 @@ private:
   }
 
 public:
-  explicit Scope(const Scope &) = default;  // note: shallow copy
-
-  explicit Scope(Scope &&) = default;
+  Scope(const Scope &) = default;  // note: shallow copy
+  Scope(Scope &&) noexcept = default;
 
   auto localScope() const noexcept -> const auto & { return *this; }
 
@@ -211,8 +210,8 @@ public:
 
   auto makeChildScope(const std::string & name) const
   {
-    return Scope{
-      *this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name))};
+    return Scope(
+      *this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name)));
   }
 
   auto addElement(const std::string & name_, const Element & element)
