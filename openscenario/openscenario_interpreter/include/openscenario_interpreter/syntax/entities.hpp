@@ -37,8 +37,8 @@ struct Entities : std::unordered_map<std::string, Element>
   template <typename Node>
   explicit Entities(const Node & node, Scope & outer_scope)
   {
-    callWithElements(node, "ScenarioObject", 0, unbounded, [&](auto && node) mutable {
-      this->emplace(
+    callWithElements(node, "ScenarioObject", 0, unbounded, [&](auto && node) {
+      emplace(
         readAttribute<ScenarioObject::Name>("name", node, outer_scope),
         make<ScenarioObject>(node, outer_scope));
     });
