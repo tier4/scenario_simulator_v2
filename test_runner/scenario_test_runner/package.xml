@@ -18,7 +18,7 @@
   <exec_depend>openscenario_utility</exec_depend>
 
   <!-- AutowareAuto launch -->
-  <exec_depend>scenario_test_runner_launch</exec_depend>
+  <!-- exec_depend>scenario_test_runner_launch</exec_depend -->
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_pep257</test_depend>
