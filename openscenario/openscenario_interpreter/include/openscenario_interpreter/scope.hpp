@@ -46,7 +46,7 @@ private:
 
   ScopeImpl(ScopeImpl & parent, const std::string & name) : scope_name(name), parent(&parent)
   {
-    if (name.empty() || name.find("anonymous") == 0) {
+    if (name.empty() or name.find("anonymous") == 0) {
       parent.anonymous_children.push_back(this);
     } else {
       auto ret = parent.named_children.insert({name, this});
@@ -57,6 +57,7 @@ private:
   }
 
   ScopeImpl(const ScopeImpl &) = delete;
+
   ScopeImpl(ScopeImpl &&) = delete;
 
 public:
@@ -162,19 +163,14 @@ private:
   }
 };
 
-struct Scope
+class Scope
 {
-  using Actor = EntityRef;
-
-  // private:
   const std::shared_ptr<ScopeImpl> impl;
 
 public:
   const std::string name;
 
-  std::list<Actor> actors;
-
-  /* ---- GLOBAL ------------------------------------------------------------ */
+  std::list<EntityRef> actors;
 
   const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
@@ -201,14 +197,13 @@ private:
   }
 
 public:
-  // note: shallow copy
-  Scope(const Scope &) = default;
-  Scope(Scope &&) = default;
+  explicit Scope(const Scope &) = default;  // note: shallow copy
 
-  // clang-format off
-  auto localScope()       noexcept ->       auto & { return *this; }
+  explicit Scope(Scope &&) = default;
+
   auto localScope() const noexcept -> const auto & { return *this; }
-  // clang-format on
+
+  auto localScope() noexcept -> auto & { return *this; }
 
   auto makeChildScope(const std::string & name) const
   {

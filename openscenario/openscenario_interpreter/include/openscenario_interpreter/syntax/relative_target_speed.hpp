@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/speed_target_value_type.hpp>
 
@@ -24,16 +25,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== RelativeTargetSpeed ==================================================
+/* ---- RelativeTargetSpeed ----------------------------------------------------
  *
- * <xsd:complexType name="RelativeTargetSpeed">
- *   <xsd:attribute name="entityRef" type="String" use="required"/>
- *   <xsd:attribute name="value" type="Double" use="required"/>
- *   <xsd:attribute name="speedTargetValueType" type="SpeedTargetValueType" use="required"/>
- *   <xsd:attribute name="continuous" type="Boolean" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="RelativeTargetSpeed">
+ *    <xsd:attribute name="entityRef" type="String" use="required"/>
+ *    <xsd:attribute name="value" type="Double" use="required"/>
+ *    <xsd:attribute name="speedTargetValueType" type="SpeedTargetValueType" use="required"/>
+ *    <xsd:attribute name="continuous" type="Boolean" use="required"/>
+ *  </xsd:complexType>
  *
- * ======================================================================== */
+ * -------------------------------------------------------------------------- */
 struct RelativeTargetSpeed
 {
   const String entity_ref;
@@ -46,11 +47,11 @@ struct RelativeTargetSpeed
 
   template <typename Node, typename Scope>
   explicit RelativeTargetSpeed(const Node & node, Scope & scope)
-  : entity_ref{readAttribute<String>("entityRef", node, scope)},
-    value{readAttribute<Double>("value", node, scope)},
-    speed_target_value_type{readAttribute<SpeedTargetValueType>(
-      "speedTargetValueType", node, scope, SpeedTargetValueType())},
-    continuous{readAttribute<Boolean>("continuous", node, scope, Boolean())}
+  : entity_ref(readAttribute<String>("entityRef", node, scope)),
+    value(readAttribute<Double>("value", node, scope)),
+    speed_target_value_type(readAttribute<SpeedTargetValueType>(
+      "speedTargetValueType", node, scope, SpeedTargetValueType())),
+    continuous(readAttribute<Boolean>("continuous", node, scope, Boolean()))
   {
   }
 
@@ -69,13 +70,12 @@ struct RelativeTargetSpeed
     }
   }
 
-  std::function<bool(const Scope::Actor & actor)> getIsEnd() const
+  std::function<bool(const EntityRef & actor)> getIsEnd() const
   {
     if (continuous) {
       return [](const auto &) { return false; };  // ends never
     } else {
-      return [calc_absolute_target_speed =
-                getCalculateAbsoluteTargetSpeed()](const Scope::Actor & actor) {
+      return [calc_absolute_target_speed = getCalculateAbsoluteTargetSpeed()](const auto & actor) {
         try {
           const auto compare = Rule(Rule::equalTo);
           return compare(

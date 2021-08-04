@@ -17,26 +17,27 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ==== AbsoluteTargetSpeed ====================================================
+/* ---- AbsoluteTargetSpeed ----------------------------------------------------
  *
- * <xsd:complexType name="AbsoluteTargetSpeed">
- *   <xsd:attribute name="value" type="Double" use="required"/>
- * </xsd:complexType>
+ *  <xsd:complexType name="AbsoluteTargetSpeed">
+ *    <xsd:attribute name="value" type="Double" use="required"/>
+ *  </xsd:complexType>
  *
- * ========================================================================== */
+ * -------------------------------------------------------------------------- */
 struct AbsoluteTargetSpeed
 {
   const Double value;
 
   template <typename Node>
   explicit AbsoluteTargetSpeed(const Node & node, Scope & scope)
-  : value{readAttribute<Double>("value", node, scope)}
+  : value(readAttribute<Double>("value", node, scope))
   {
   }
 
@@ -47,7 +48,7 @@ struct AbsoluteTargetSpeed
 
   auto getIsEnd() const
   {
-    return [target_speed = value](const Scope::Actor & actor) {  // is_end
+    return [target_speed = value](const EntityRef & actor) {  // is_end
       try {
         const auto compare = Rule(Rule::equalTo);
         return compare(getEntityStatus(actor).action_status.twist.linear.x, target_speed);

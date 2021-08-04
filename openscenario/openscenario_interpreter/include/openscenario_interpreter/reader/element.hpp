@@ -112,7 +112,8 @@ auto readElements(const std::string & name, const XML & node, Ts &&... xs)
 }
 
 template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
-auto readElementsAsElement(const std::string & name, const XML & node, Ts &&... xs)
+auto readElementsAsElement(
+  const std::string & name, const XML & node, Ts &&... xs)  // XXX UGLY NAME!!!
 {
   std::list<Element> elements;
 
