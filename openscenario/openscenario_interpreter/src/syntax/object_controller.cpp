@@ -1,4 +1,3 @@
-
 // Copyright 2015-2021 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +19,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-bool ObjectController::EgoExists = false;
+bool ObjectController::ego_exists = false;
 }
 }  // namespace openscenario_interpreter

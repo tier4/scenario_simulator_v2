@@ -66,13 +66,14 @@ struct TrafficSignalControllerAction : public Scope
   auto start()
   {
     auto found = localScope().findElement(traffic_signal_controller_ref);
-    if (!(found && found.is<TrafficSignalController>())) {
+    if (found and found.is<TrafficSignalController>()) {
+      found.as<TrafficSignalController>().changePhaseByName(phase);
+      return unspecified;
+    } else {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
         " is not declared in this scope");
     }
-    found.as<TrafficSignalController>().changePhaseByName(phase);
-    return unspecified;
   }
 
   static auto endsImmediately() -> bool { return true; }

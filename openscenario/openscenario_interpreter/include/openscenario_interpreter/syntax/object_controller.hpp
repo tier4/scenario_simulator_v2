@@ -38,7 +38,7 @@ inline namespace syntax
 struct ObjectController : public ComplexType
 {
   // inline static bool EgoExists = false;
-  static bool EgoExists;
+  static bool ego_exists;
 
   explicit ObjectController()  // ObjectController is optional element.
   : ComplexType(unspecified)
@@ -54,7 +54,7 @@ struct ObjectController : public ComplexType
         std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {
-    EgoExists |= isEgo();
+    ego_exists |= isEgo();
   }
 
   bool isEgo() &

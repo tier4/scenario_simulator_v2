@@ -104,7 +104,7 @@ public:
       readAttribute<Double>("delay", node, outer_scope, std::numeric_limits<double>::quiet_NaN())),
     reference(readAttribute<std::string>("reference", node, outer_scope, std::string{})),
     phases(readElements<Phase, 0>("Phase", node, outer_scope)),
-    current_phase(phases.begin(), phases.end(), phases.end()),
+    current_phase(std::begin(phases), std::end(phases), std::end(phases)),
     change_to_begin_time(boost::none),
     current_phase_started_at(std::numeric_limits<decltype(current_phase_started_at)>::min())
   {

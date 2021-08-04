@@ -48,6 +48,8 @@ struct ParameterDeclaration
     });
   }
 
+  ParameterDeclaration() = default;
+
   template <typename Node>
   explicit ParameterDeclaration(const Node & node, Scope & scope)
   : name{readAttribute<String>("name", node, scope)},

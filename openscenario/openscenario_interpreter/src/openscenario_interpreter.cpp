@@ -127,6 +127,8 @@ try {
     "-a",  //
     "-o", boost::filesystem::path(osc_path).replace_extension("").string());
 
+  ObjectController::ego_exists = false;  // XXX DIRTY HACK
+
   script.rebind<OpenScenario>(osc_path);
 
   auto configuration = traffic_simulator::Configuration(
@@ -136,7 +138,7 @@ try {
   {
     configuration.auto_sink = false;
 
-    configuration.initialize_duration = ObjectController::EgoExists ? 30 : 0;
+    configuration.initialize_duration = ObjectController::ego_exists ? 30 : 0;
 
     configuration.scenario_path = osc_path;
 
