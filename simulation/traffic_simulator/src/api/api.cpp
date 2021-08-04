@@ -398,4 +398,16 @@ bool API::updateFrame()
     return true;
   }
 }
+
+void API::requestLaneChange(const std::string & name, const std::int64_t & lanelet_id)
+{
+  entity_manager_ptr_->requestLaneChange(name, lanelet_id);
+}
+
+void API::requestLaneChange(
+  const std::string & name, const traffic_simulator::entity::Direction & direction)
+{
+  entity_manager_ptr_->requestLaneChange(name, direction);
+}
+
 }  // namespace traffic_simulator

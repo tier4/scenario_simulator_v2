@@ -21,10 +21,10 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_executable(view_kashiwanoha
-  src/view_kashiwanoha.cpp
+ament_auto_add_library(cpp_scenario_node
+  src/cpp_scenario_node.cpp
 )
-target_link_libraries(view_kashiwanoha
+target_link_libraries(cpp_scenario_node
   ${PROTOBUF_LIBRARY}
   pthread
   sodium
@@ -32,16 +32,14 @@ target_link_libraries(view_kashiwanoha
   zmq
 )
 
-ament_auto_add_executable(idiot_npc
-  src/idiot_npc.cpp
+ament_auto_add_executable(traffic_simulation_demo
+  src/traffic_simulation_demo.cpp
 )
-target_link_libraries(idiot_npc
-  ${PROTOBUF_LIBRARY}
-  pthread
-  sodium
-  zmqpp
-  zmq
-)
+target_link_libraries(traffic_simulation_demo cpp_scenario_node)
+
+add_subdirectory(src/follow_front_entity)
+add_subdirectory(src/collision)
+add_subdirectory(src/lane_change)
 
 install(
   DIRECTORY launch rviz

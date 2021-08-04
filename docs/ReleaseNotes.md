@@ -2,6 +2,15 @@
 
 ## Difference between the latest release and master
 
+## Version 0.4.2
+- [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.2) on Github :fa-github:
+- Fix problems in coordinate conversion from world to lane in pedestrian entity.
+- Adding include_crosswalk option to the HdMapUtils::getClosetLaneletId() and HdMapUtils::toLaneletPose()
+
+## Version 0.4.1
+- [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.1) on Github :fa-github:
+- Fix problem in follow front entity action, velocity planner was ignored requested target speed.
+
 ## Version 0.4.0
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.0) on Github :fa-github:
 - Support OpenSCENARIO 1.0 TrafficSignal features (RoadNetwork.TrafficSignalController, Action and Condition).

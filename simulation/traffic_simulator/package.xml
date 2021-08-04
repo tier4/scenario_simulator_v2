@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>0.4.0</version>
+  <version>0.4.2</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -38,7 +38,6 @@
   <depend>visualization_msgs</depend>
 
   <!--<exec_depend>lexus_rx_450h_description</exec_depend> -->
-  <exec_depend>kashiwanoha_map</exec_depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>
