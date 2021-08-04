@@ -106,22 +106,19 @@ auto record_end()
   }
 }
 
+#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
+
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 try {
   INTERPRETER_INFO_STREAM("Configuring.");
 
-  // NOTE: Wait for parameters to be set.
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-
-#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
+  std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
   GET_PARAMETER(intended_result);
   GET_PARAMETER(local_frame_rate);
   GET_PARAMETER(local_real_time_factor);
   GET_PARAMETER(osc_path);
   GET_PARAMETER(output_directory);
-
-#undef GET_PARAMETER
 
   record_start(
     "-a",  //
@@ -140,7 +137,7 @@ try {
       std::any_of(
         std::cbegin(script.as<OpenScenario>().entities),
         std::cend(script.as<OpenScenario>().entities),
-        [](auto & each) {
+        [](auto && each) {
           return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
         })
         ? 30
@@ -168,6 +165,8 @@ try {
   return Interpreter::Result::FAILURE;
 }
 
+#undef GET_PARAMETER
+
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("Activating.");
@@ -180,7 +179,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   (*publisher_of_context).on_activate();
 
   timer = create_wall_timer(period, [this, period]() {
-    withExceptionHandler([this, period]() {
+    guard([this, period]() {
       if (script) {
         if (not script.as<OpenScenario>().complete()) {
           const auto evaluate_time = execution_timer.invoke("evaluate", [&] {

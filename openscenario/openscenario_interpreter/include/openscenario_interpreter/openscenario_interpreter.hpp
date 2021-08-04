@@ -83,7 +83,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   }
 
   template <typename Thunk>
-  void withExceptionHandler(Thunk && thunk)
+  void guard(Thunk && thunk)
   {
     try {
       return thunk();
