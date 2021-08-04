@@ -34,7 +34,7 @@ private:
 
   const std::string scope_name;
 
-  std::unordered_map<std::string, Element> enviroments;
+  std::unordered_map<std::string, Element> environments;
 
   ScopeImpl * parent = nullptr;
 
@@ -66,7 +66,7 @@ public:
       THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':', ' ', ',' or '.' ");
     }
 
-    enviroments.insert(std::make_pair(name, std::move(element)));
+    environments.insert(std::make_pair(name, std::move(element)));
   }
 
   auto findElement(const std::string & name) const -> Element
@@ -100,8 +100,8 @@ private:
   auto lookupUnqualifiedElement(const std::string & name) const -> Element
   {
     for (auto * p = this; p != nullptr; p = p->parent) {
-      auto found = p->enviroments.find(name);
-      if (found != p->enviroments.end()) {
+      auto found = p->environments.find(name);
+      if (found != p->environments.end()) {
         return found->second;
       }
     }
@@ -154,8 +154,8 @@ private:
       }
     }
 
-    auto found = scope->enviroments.find(*(name_end - 1));
-    if (found == scope->enviroments.end()) {
+    auto found = scope->environments.find(*(name_end - 1));
+    if (found == scope->environments.end()) {
       return Element{};
     }
     return found->second;

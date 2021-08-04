@@ -197,7 +197,7 @@ public:
       }
     }
   }
-};  // namespace syntax
+};
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
