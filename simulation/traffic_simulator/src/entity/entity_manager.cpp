@@ -569,7 +569,8 @@ void EntityManager::update(const double current_time, const double step_time)
   const std::vector<std::string> entity_names = getEntityNames();
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
-      const auto status = updateNpcLogic(entity_name, type_list);
+      auto status = updateNpcLogic(entity_name, type_list);
+      status.bounding_box = getBoundingBox(entity_name);
       all_status.emplace(entity_name, status);
     }
   }

@@ -211,7 +211,11 @@ boost::optional<double> ActionNode::getDistanceToFrontEntity(
   if (!status) {
     return boost::none;
   }
-  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("check collision to front entity"), __FILE__ << "," << __LINE__);
+  const auto ret = getDistanceToTargetEntityPolygon(spline, status.get());
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("check collision to front entity"), __FILE__ << "," << __LINE__);
+  return ret;
+  //return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
 }
 
 boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
