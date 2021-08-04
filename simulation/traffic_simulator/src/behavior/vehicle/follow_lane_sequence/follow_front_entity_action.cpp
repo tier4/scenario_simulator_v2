@@ -100,7 +100,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  auto front_entity_status = getFrontEntityStatus(spline);
+  auto front_entity_status = getFrontEntityStatus();
   if (!front_entity_status) {
     return BT::NodeStatus::FAILURE;
   }
