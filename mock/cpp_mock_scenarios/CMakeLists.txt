@@ -32,15 +32,14 @@ target_link_libraries(cpp_scenario_node
   zmq
 )
 
-ament_auto_add_executable(idiot_npc
-  src/idiot_npc.cpp
-)
-target_link_libraries(idiot_npc cpp_scenario_node)
-
 ament_auto_add_executable(traffic_simulation_demo
   src/traffic_simulation_demo.cpp
 )
 target_link_libraries(traffic_simulation_demo cpp_scenario_node)
+
+add_subdirectory(src/follow_front_entity)
+add_subdirectory(src/collision)
+add_subdirectory(src/lane_change)
 
 install(
   DIRECTORY launch rviz
