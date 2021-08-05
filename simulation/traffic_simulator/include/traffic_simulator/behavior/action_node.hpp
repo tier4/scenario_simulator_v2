@@ -41,7 +41,10 @@ public:
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & route_lanelets,
     const traffic_simulator::math::CatmullRomSpline & spline);
-  boost::optional<openscenario_msgs::msg::EntityStatus> getFrontEntityStatus();
+  boost::optional<openscenario_msgs::msg::EntityStatus> getFrontEntityStatus(
+    const traffic_simulator::math::CatmullRomSpline & spline);
+  boost::optional<std::string> getFrontEntityName(
+    const traffic_simulator::math::CatmullRomSpline & spline);
   double calculateStopDistance() const;
   boost::optional<double> getDistanceToFrontEntity(
     const traffic_simulator::math::CatmullRomSpline & spline);
@@ -99,6 +102,9 @@ public:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_entity_status;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list;
   std::vector<std::int64_t> route_lanelets;
+  openscenario_msgs::msg::EntityStatus getEntityStatus(const std::string target_name) const;
+  boost::optional<double> getDistanceToTargetEntityPolygon(
+    const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name);
 
 private:
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(

@@ -194,32 +194,27 @@ boost::optional<double> ActionNode::getDistanceToStopLine(
 boost::optional<double> ActionNode::getDistanceToFrontEntity(
   const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  auto status = getFrontEntityStatus();
+  auto status = getFrontEntityStatus(spline);
   if (!status) {
     return boost::none;
   }
   return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
 }
 
-boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
+boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus(
+  const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  boost::optional<double> front_entity_distance, front_entity_speed;
+  boost::optional<double> front_entity_distance;
   std::string front_entity_name = "";
   for (const auto & each : other_entity_status) {
-    if (!entity_status.lanelet_pose_valid || !each.second.lanelet_pose_valid) {
-      continue;
-    }
-    boost::optional<double> distance =
-      hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, each.second.lanelet_pose);
+    const auto distance = getDistanceToTargetEntityPolygon(spline, each.first);
     if (distance) {
       if (distance.get() < 40) {
-        if (!front_entity_distance && !front_entity_speed) {
-          front_entity_speed = each.second.action_status.twist.linear.x;
+        if (!front_entity_distance) {
           front_entity_distance = distance.get();
           front_entity_name = each.first;
         } else {
           if (front_entity_distance.get() > distance.get()) {
-            front_entity_speed = each.second.action_status.twist.linear.x;
             front_entity_distance = distance.get();
             front_entity_name = each.first;
           }
@@ -227,7 +222,7 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
       }
     }
   }
-  if (!front_entity_distance && !front_entity_speed) {
+  if (!front_entity_distance) {
     return boost::none;
   }
   return other_entity_status[front_entity_name];
@@ -240,6 +235,25 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
     return spline.getCollisionPointIn2D(polygon);
+  }
+  return boost::none;
+}
+
+openscenario_msgs::msg::EntityStatus ActionNode::getEntityStatus(
+  const std::string target_name) const
+{
+  if (other_entity_status.find(target_name) != other_entity_status.end()) {
+    return other_entity_status.at(target_name);
+  }
+  THROW_SIMULATION_ERROR("other entity : ", target_name, " does not exist.");
+}
+
+boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
+  const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name)
+{
+  const auto status = getEntityStatus(target_name);
+  if (status.lanelet_pose_valid == true) {
+    return getDistanceToTargetEntityPolygon(spline, status);
   }
   return boost::none;
 }
