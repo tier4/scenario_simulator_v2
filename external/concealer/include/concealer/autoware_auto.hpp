@@ -216,6 +216,9 @@ public:
     setVehicleKinematicState(current_pose, current_twist);
     setVehicleStateReport();
   }
+  double getAcceleration() const override {
+      return getVehicleControlCommand().long_accel_mps2;
+  }
 
   double getVelocity() const override {
     return getVehicleControlCommand().velocity_mps;

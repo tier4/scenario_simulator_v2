@@ -334,7 +334,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER_ACC: {
         Eigen::VectorXd input(3);
 
-        input << autoware->getVelocity(), autoware->getSteeringAngle(), autoware->getGearSign();
+        input << autoware->getAcceleration(), autoware->getSteeringAngle(), autoware->getGearSign();
 
               (*vehicle_model_ptr_).setInput(input);
       } break;

@@ -569,6 +569,10 @@ public:
     setTransform(current_pose);
   }
 
+  double getAcceleration() const override {
+      return getVehicleCommand().control.acceleration;
+  }
+
   double getVelocity() const override {
     return getVehicleCommand().control.velocity;
   }

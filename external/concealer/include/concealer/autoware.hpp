@@ -144,6 +144,8 @@ public:
 
   virtual void update() = 0;
 
+  virtual double getAcceleration() const = 0;
+
   virtual double getVelocity() const = 0;
 
   virtual double getSteeringAngle() const = 0;
