@@ -71,6 +71,16 @@ void PedestrianEntity::requestAcquirePosition(
   route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
 }
 
+void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
+{
+  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose);
+  if (lanelet_pose) {
+    requestAcquirePosition(lanelet_pose.get());
+  } else {
+    THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
+  }
+}
+
 void PedestrianEntity::cancelRequest() { tree_ptr_->setRequest("none"); }
 
 void PedestrianEntity::setTargetSpeed(double target_speed, bool continuous)

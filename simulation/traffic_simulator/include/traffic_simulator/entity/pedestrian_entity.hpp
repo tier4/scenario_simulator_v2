@@ -53,6 +53,8 @@ public:
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) override;
 
+  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+
   void requestWalkStraight() override;
 
   void cancelRequest();

@@ -61,6 +61,16 @@ void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::Lanelet
   }
 }
 
+void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
+{
+  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose);
+  if (lanelet_pose) {
+    requestAcquirePosition(lanelet_pose.get());
+  } else {
+    THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
+  }
+}
+
 void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
   tree_ptr_->setRequest("lane_change");

@@ -61,6 +61,8 @@ public:
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
 
+  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+
   void requestLaneChange(const std::int64_t to_lanelet_id);
 
   void cancelRequest();
