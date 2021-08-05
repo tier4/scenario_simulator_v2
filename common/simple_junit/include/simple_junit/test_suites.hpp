@@ -77,6 +77,38 @@ public:
 };
 
 /*
+    <xs:element name="failure">
+        <xs:complexType mixed="true">
+            <xs:attribute name="type" type="xs:string" use="optional"/>
+            <xs:attribute name="message" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+*/
+
+struct Failure
+{
+  std::string type, message;
+
+  explicit Failure(const std::string & type, const std::string & message)
+  : type(type), message(message)
+  {
+  }
+
+  friend auto operator<<(pugi::xml_node node, const Failure & failure) -> pugi::xml_node
+  {
+    if (not failure.type.empty()) {
+      node.append_attribute("type") = failure.type.c_str();
+    }
+
+    if (not failure.message.empty()) {
+      node.append_attribute("message") = failure.message.c_str();
+    }
+
+    return node;
+  }
+};
+
+/*
     <xs:element name="error">
         <xs:complexType mixed="true">
             <xs:attribute name="type" type="xs:string" use="optional"/>
@@ -133,6 +165,8 @@ struct SimpleTestCase
 
   std::vector<Error> error;
 
+  std::vector<Failure> failure;
+
   explicit SimpleTestCase(const std::string & name) : name(name) {}
 
   friend auto operator<<(pugi::xml_node node, const SimpleTestCase & testcase) -> pugi::xml_node
@@ -143,6 +177,10 @@ struct SimpleTestCase
 
     for (const auto & each : testcase.error) {
       current_node.append_child("error") << each;
+    }
+
+    for (const auto & each : testcase.failure) {
+      current_node.append_child("failure") << each;
     }
 
     return node;

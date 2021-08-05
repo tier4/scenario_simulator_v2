@@ -290,6 +290,11 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
           .error.emplace_back(current_error_type, current_error_what);
         break;
 
+      case junit::TestResult::FAILURE:
+        simple_test_suites.testsuite(suite_name)
+          .testcase(case_name)
+          .failure.emplace_back(current_error_type, current_error_what);
+
       default:
         break;
     }
