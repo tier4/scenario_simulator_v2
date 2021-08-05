@@ -131,17 +131,6 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   return math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
 }
 
-auto EntityManager::getConflictingEntityOnRouteLanelets(
-  const std::string & name, const double horizon) -> std::vector<std::int64_t>
-{
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    THROW_SEMANTIC_ERROR("entity : ", name, " does not exist");
-  }
-  const auto route = getRouteLanelets(name, horizon);
-  return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
-}
-
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
 
 auto EntityManager::getDistanceToCrosswalk(
@@ -579,7 +568,8 @@ void EntityManager::update(const double current_time, const double step_time)
   const std::vector<std::string> entity_names = getEntityNames();
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
-      const auto status = updateNpcLogic(entity_name, type_list);
+      auto status = updateNpcLogic(entity_name, type_list);
+      status.bounding_box = getBoundingBox(entity_name);
       all_status.emplace(entity_name, status);
     }
   }

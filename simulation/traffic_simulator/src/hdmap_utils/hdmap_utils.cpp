@@ -157,8 +157,23 @@ boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
   return boost::none;
 }
 
+std::vector<std::int64_t> HdMapUtils::getConflictingLaneIds(
+  const std::vector<std::int64_t> & lanelet_ids) const
+{
+  std::vector<std::int64_t> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto conflicting_lanelets =
+      lanelet::utils::getConflictingLanelets(vehicle_routing_graph_ptr_, lanelet);
+    for (const auto & conflicting_lanelet : conflicting_lanelets) {
+      ret.emplace_back(conflicting_lanelet.id());
+    }
+  }
+  return ret;
+}
+
 std::vector<std::int64_t> HdMapUtils::getConflictingCrosswalkIds(
-  std::vector<std::int64_t> lanelet_ids) const
+  const std::vector<std::int64_t> & lanelet_ids) const
 {
   std::vector<std::int64_t> ret;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;

@@ -230,9 +230,6 @@ public:
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;
 
-  auto getConflictingEntityOnRouteLanelets(const std::string & name, const double horizon)
-    -> std::vector<std::int64_t>;
-
   auto getCurrentTime() const noexcept -> double;
 
   auto getDistanceToCrosswalk(const std::string & name, const std::int64_t target_crosswalk_id)
