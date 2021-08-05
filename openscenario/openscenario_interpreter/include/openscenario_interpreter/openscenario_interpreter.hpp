@@ -51,6 +51,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   junit::TestSuites test_suites;
 
+  junit::SimpleTestSuites simple_test_suites;
+
   const junit::TestResult ERROR = junit::TestResult::ERROR;
   const junit::TestResult FAILURE = junit::TestResult::FAILURE;
   const junit::TestResult SUCCESS = junit::TestResult::SUCCESS;

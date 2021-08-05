@@ -39,6 +39,9 @@ namespace openscenario_interpreter
 #define INTERPRETER_ERROR_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
 
+#define DECLARE_PARAMETER(IDENTIFIER) \
+  declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
+
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
@@ -48,19 +51,16 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp")
 {
-#define DECLARE_PARAMETER(IDENTIFIER) \
-  declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
-
   DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
 
-#undef DECLARE_PARAMETER
-
   reset();
 }
+
+#undef DECLARE_PARAMETER
 
 void Interpreter::report(
   const junit::TestResult & result,  //
@@ -277,6 +277,14 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
     current_error_what);
 
   test_suites.write(output_directory + "/result.junit.xml");
+
+  {
+    simple_test_suites  //
+      .testsuite(script.as<OpenScenario>().pathname.parent_path().stem().string())
+      .testcase(script.as<OpenScenario>().pathname.string());
+
+    simple_test_suites.save("/tmp/scenario_test_runner/new-result.junit.xml", "  ");
+  }
 
   script.reset();
 
