@@ -54,6 +54,20 @@ void VehicleEntity::requestAssignRoute(
   }
 }
 
+void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
+{
+  std::vector<openscenario_msgs::msg::LaneletPose> route;
+  for (const auto & waypoint : waypoints) {
+    const auto lanelet_waypoint = hdmap_utils_ptr_->getLaneletPose(waypoint);
+    if (lanelet_waypoint) {
+      route.emplace_back(lanelet_waypoint.get());
+    } else {
+      THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
+    }
+  }
+  requestAssignRoute(route);
+}
+
 void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
   if (status_ and status_->lanelet_pose_valid) {

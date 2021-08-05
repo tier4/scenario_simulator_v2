@@ -83,6 +83,8 @@ public:
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
 
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+
   const std::string getCurrentAction() const override { return tree_ptr_->getCurrentAction(); }
 
   std::vector<std::int64_t> getRouteLanelets(double horizon = 100) override
