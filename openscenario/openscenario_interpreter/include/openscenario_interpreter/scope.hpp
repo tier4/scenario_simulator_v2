@@ -32,7 +32,7 @@ struct EnvironmentFrame
 private:
   friend struct Scope;
 
-  // const std::string scope_name;
+  const std::string scope_name;
 
   std::unordered_map<std::string, Element> environments;
 
@@ -45,10 +45,9 @@ private:
   EnvironmentFrame() = default;
 
   EnvironmentFrame(EnvironmentFrame & parent, const std::string & name)
-  :  // scope_name(name),
-    parent(&parent)
+  : scope_name(name), parent(&parent)
   {
-    if (name.empty() or name.find("anonymous") == 0) {
+    if (name.empty()) {
       parent.anonymous_children.push_back(this);
     } else {
       auto ret = parent.named_children.emplace(name, this);
@@ -65,7 +64,7 @@ private:
 public:
   auto addElement(const std::string & name, Element element) -> void
   {
-    if (name.find(":") != std::string::npos) {
+    if (name.find(':') != std::string::npos) {
       THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
     }
 
@@ -79,7 +78,8 @@ public:
       const char * delim = "::";
       const std::size_t delim_len = 2;
 
-      std::size_t prev_pos = 0, pos = 0;
+      std::size_t prev_pos = 0;
+      std::size_t pos = 0;
       while ((pos = name.find(delim, prev_pos)) != std::string::npos) {
         splitted.push_back(name.substr(prev_pos, pos - prev_pos));
         prev_pos = pos + delim_len;
@@ -99,16 +99,80 @@ public:
     }
   }
 
+  auto getQualifiedName() const -> std::string
+  {
+    std::list<const EnvironmentFrame *> ancestors;
+    for (auto * p = this; p != nullptr; p = p->parent) {
+      ancestors.push_back(p);
+    }
+    std::string ret;
+    for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
+      ret += "::";
+      ret += (*it)->scope_name.empty() ? "{anonymous}" : (*it)->scope_name;
+    }
+    return ret;
+  }
+
 private:
+  auto lookupChildElement(const std::string & name) const -> Element
+  {
+    std::vector<const EnvironmentFrame *> same_level{this};
+
+    while (not same_level.empty()) {
+      std::vector<const EnvironmentFrame *> next_level;
+      std::vector<Element> ret;
+
+      for (auto * frame : same_level) {
+        auto found = frame->environments.find(name);
+        if (found != frame->environments.end()) {
+          ret.push_back(found->second);
+        }
+
+        for (auto * f : frame->anonymous_children) {
+          next_level.push_back(f);
+        }
+      }
+
+      if (ret.size() == 1) {
+        return ret.front();
+      }
+
+      if (ret.size() > 1) {
+        THROW_SYNTAX_ERROR("ambiguous reference to ", name);
+      }
+
+      same_level = std::move(next_level);
+    }
+    return Element{};
+  }
+
   auto lookupUnqualifiedElement(const std::string & name) const -> Element
   {
     for (auto * p = this; p != nullptr; p = p->parent) {
-      auto found = p->environments.find(name);
-      if (found != p->environments.end()) {
-        return found->second;
+      auto found = p->lookupChildElement(name);
+      if (found) {
+        return found;
       }
     }
     return Element{};
+  }
+
+  template <typename Iterator>
+  static auto lookupQualifiedElement(
+    const EnvironmentFrame * scope, Iterator name_begin, Iterator name_end) -> Element
+  {
+    for (auto iter = name_begin; iter != name_end - 1; ++iter) {
+      auto found = scope->lookupChildScope(*iter);
+      if (found.size() == 1) {
+        scope = found.front();
+      } else if (found.empty()) {
+        return Element{};
+      } else if (found.size() > 1) {
+        THROW_SYNTAX_ERROR("ambiguous reference to ", *iter);
+      }
+    }
+
+    return scope->lookupChildElement(*(name_end - 1));
   }
 
   auto lookupChildScope(const std::string & name) const -> std::list<const EnvironmentFrame *>
@@ -140,28 +204,6 @@ private:
       }
       return nullptr;
     }
-  }
-
-  template <typename Iterator>
-  auto lookupQualifiedElement(
-    const EnvironmentFrame * scope, Iterator name_begin, Iterator name_end) const -> Element
-  {
-    for (auto iter = name_begin; iter != name_end - 1; ++iter) {
-      auto found = scope->lookupChildScope(*iter);
-      if (found.size() == 1) {
-        scope = found.front();
-      } else if (found.empty()) {
-        return Element{};
-      } else if (found.size() > 1) {
-        THROW_SYNTAX_ERROR("ambiguous reference to ", *iter);
-      }
-    }
-
-    auto found = scope->environments.find(*(name_end - 1));
-    if (found == scope->environments.end()) {
-      return Element{};
-    }
-    return found->second;
   }
 };
 

@@ -83,6 +83,9 @@ struct ParameterCondition : private Scope
 
     try {
       const auto & parameter = localScope().findElement(parameter_ref);
+      if (!parameter) {
+        THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
+      }
       try {
         return asBoolean(overloads.at(parameter.type())(compare, parameter, value));
       } catch (const std::out_of_range &) {
