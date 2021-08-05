@@ -1,7 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
-- Vehicle entity yeild to merging entity. See also [this video.](https://user-images.githubusercontent.com/10348912/128287863-8a2db025-d1af-4e54-b5a3-08e5d2e168e4.mp4)
+- Enables vehicle entity yeild to merging entity. See also [this video.](https://user-images.githubusercontent.com/10348912/128287863-8a2db025-d1af-4e54-b5a3-08e5d2e168e4.mp4)
 
 ## Version 0.4.2
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.2) on Github :fa-github:
