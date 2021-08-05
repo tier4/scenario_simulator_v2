@@ -457,23 +457,30 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
 {
-  std::vector<geometry_msgs::msg::PoseStamped> route;
+  std::vector<geometry_msgs::msg::Pose> route;
 
   for (const auto & waypoint : waypoints) {
-    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint));
+    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint).pose);
   }
   requestAssignRoute(route);
 }
 
-void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & route) override
+void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & route)
 {
-  assert(0 < route.size());
+  std::vector<geometry_msgs::msg::PoseStamped> route_stamped;
+  for(const auto & waypoint : route) {
+    geometry_msgs::msg::PoseStamped waypoint_stamped;
+    waypoint_stamped.header.frame_id = "map";
+    waypoint_stamped.pose = waypoint;
+    route_stamped.emplace_back(waypoint_stamped);
+  }
+  assert(0 < route_stamped.size());
   if (not autoware.initialized()) {
     autoware.initialize(getStatus().pose);
-    autoware.plan(route);
+    autoware.plan(route_stamped);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    autoware.plan(route);
+    autoware.plan(route_stamped);
     autoware.engage();
   }
 }

@@ -60,7 +60,7 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
 {
   std::vector<openscenario_msgs::msg::LaneletPose> route;
   for (const auto & waypoint : waypoints) {
-    const auto lanelet_waypoint = hdmap_utils_ptr_->getLaneletPose(waypoint);
+    const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint);
     if (lanelet_waypoint) {
       route.emplace_back(lanelet_waypoint.get());
     } else {

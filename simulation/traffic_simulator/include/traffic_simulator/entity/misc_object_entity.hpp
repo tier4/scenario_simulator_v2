@@ -71,7 +71,7 @@ public:
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
