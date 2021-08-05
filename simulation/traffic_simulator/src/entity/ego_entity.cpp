@@ -468,7 +468,7 @@ void EgoEntity::requestAssignRoute(
 void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & route)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route_stamped;
-  for(const auto & waypoint : route) {
+  for (const auto & waypoint : route) {
     geometry_msgs::msg::PoseStamped waypoint_stamped;
     waypoint_stamped.header.frame_id = "map";
     waypoint_stamped.pose = waypoint;

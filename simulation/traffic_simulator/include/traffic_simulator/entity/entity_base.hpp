@@ -133,7 +133,7 @@ public:
 
   virtual void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) = 0;
-  
+
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints) = 0;
 
   virtual void requestLaneChange(const std::int64_t){};
