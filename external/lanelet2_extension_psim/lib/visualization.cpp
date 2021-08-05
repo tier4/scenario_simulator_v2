@@ -62,7 +62,8 @@ void adjacentPoints(
   }
 }
 
-double hypot(const geometry_msgs::msg::Point32 & p0, const geometry_msgs::msg::Point32 & p1)
+[[maybe_unused]] double hypot(
+  const geometry_msgs::msg::Point32 & p0, const geometry_msgs::msg::Point32 & p1)
 {
   return sqrt(pow((p1.x - p0.x), 2.0) + pow((p1.y - p0.y), 2.0));
 }
@@ -278,7 +279,7 @@ visualization_msgs::msg::Marker polygonAsMarker(
   marker.id = polygon.id();
   marker.ns = name_space;
   marker.type = visualization_msgs::msg::Marker::TRIANGLE_LIST;
-  marker.lifetime = rclcpp::Duration(0);
+  marker.lifetime = rclcpp::Duration::from_seconds(0);
   marker.pose.position.x = 0.0;
   marker.pose.position.y = 0.0;
   marker.pose.position.z = 0.0;
