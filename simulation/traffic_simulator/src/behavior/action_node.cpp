@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
@@ -22,7 +23,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <rclcpp/rclcpp.hpp>
 
 namespace entity_behavior
 {
@@ -194,28 +194,11 @@ boost::optional<double> ActionNode::getDistanceToStopLine(
 boost::optional<double> ActionNode::getDistanceToFrontEntity(
   const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  /*
-  std::set<double> distances;
-  for (const auto & each : other_entity_status) {
-    const auto distance = getDistanceToTargetEntityPolygon(spline, each.second);
-    if (distance) {
-      distances.emplace(distance.get());
-    }
-  }
-  if (distances.empty()) {
-    return boost::none;
-  }
-  return *distances.begin();
-  */
   auto status = getFrontEntityStatus();
   if (!status) {
     return boost::none;
   }
-  RCLCPP_ERROR_STREAM(rclcpp::get_logger("check collision to front entity"), __FILE__ << "," << __LINE__);
-  const auto ret = getDistanceToTargetEntityPolygon(spline, status.get());
-  RCLCPP_ERROR_STREAM(rclcpp::get_logger("check collision to front entity"), __FILE__ << "," << __LINE__);
-  return ret;
-  //return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
+  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
 }
 
 boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
