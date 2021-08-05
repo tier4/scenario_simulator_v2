@@ -50,7 +50,7 @@ private:
     if (api_.checkCollision("ego", "npc")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (api_.getCurrentTime() >= 30) {
+    if (api_.getCurrentTime() >= 10) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -63,7 +63,7 @@ private:
     api_.spawn(false, "npc", getVehicleParameters());
     api_.setEntityStatus(
       "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
-      traffic_simulator::helper::constructActionStatus(20));
+      traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("npc", 10, true);
   }
 };
