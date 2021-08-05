@@ -126,6 +126,12 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=merge_left timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run acquire_position_in_world_frame scenario
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=acquire_position_in_world_frame timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
       - name: Collect coverage
         run: |
           cd ~/ros2_ws
