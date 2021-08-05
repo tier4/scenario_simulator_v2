@@ -77,6 +77,38 @@ public:
 };
 
 /*
+    <xs:element name="error">
+        <xs:complexType mixed="true">
+            <xs:attribute name="type" type="xs:string" use="optional"/>
+            <xs:attribute name="message" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+*/
+
+struct Error
+{
+  std::string type, message;
+
+  explicit Error(const std::string & type, const std::string & message)
+  : type(type), message(message)
+  {
+  }
+
+  friend auto operator<<(pugi::xml_node node, const Error & error) -> pugi::xml_node
+  {
+    if (not error.type.empty()) {
+      node.append_attribute("type") = error.type.c_str();
+    }
+
+    if (not error.message.empty()) {
+      node.append_attribute("message") = error.message.c_str();
+    }
+
+    return node;
+  }
+};
+
+/*
     <xs:element name="testcase">
         <xs:complexType>
             <xs:sequence>
@@ -97,18 +129,21 @@ public:
 
 struct SimpleTestCase
 {
-  const std::string name;
+  const std::string name, assertions, time, classname, status;
 
-  boost::optional<std::string> assertions;
-  boost::optional<std::string> time;
-  boost::optional<std::string> classname;
-  boost::optional<std::string> status;
+  std::vector<Error> error;
 
   explicit SimpleTestCase(const std::string & name) : name(name) {}
 
   friend auto operator<<(pugi::xml_node node, const SimpleTestCase & testcase) -> pugi::xml_node
   {
-    node.append_child("testcase").append_attribute("name") = testcase.name.c_str();
+    auto current_node = node.append_child("testcase");
+
+    current_node.append_attribute("name") = testcase.name.c_str();
+
+    for (const auto & each : testcase.error) {
+      current_node.append_child("error") << each;
+    }
 
     return node;
   }
@@ -156,10 +191,12 @@ struct SimpleTestSuite : private std::unordered_map<std::string, SimpleTestCase>
 
   friend auto operator<<(pugi::xml_node node, const SimpleTestSuite & testsuite) -> pugi::xml_node
   {
-    node.append_child("testsuite").append_attribute("name") = testsuite.name.c_str();
+    auto current_node = node.append_child("testsuite");
+
+    current_node.append_attribute("name") = testsuite.name.c_str();
 
     for (const auto & testcase : testsuite) {
-      node.child("testsuite") << std::get<1>(testcase);
+      current_node << std::get<1>(testcase);
     }
 
     return node;
@@ -198,17 +235,17 @@ struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuit
 
   friend auto operator<<(pugi::xml_node node, const SimpleTestSuites & testsuites) -> pugi::xml_node
   {
-    node.append_child("testsuites");
+    auto current_node = node.append_child("testsuites");
 
     for (const auto & testsuite : testsuites) {
-      node.child("testsuites") << std::get<1>(testsuite);
+      current_node << std::get<1>(testsuite);
     }
 
     return node;
   }
 
   template <typename... Ts>
-  auto save(Ts &&... xs) const
+  auto write_to(Ts &&... xs) const
   {
     pugi::xml_document document;
 

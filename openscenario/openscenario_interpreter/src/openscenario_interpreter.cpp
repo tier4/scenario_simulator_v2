@@ -279,11 +279,22 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   test_suites.write(output_directory + "/result.junit.xml");
 
   {
-    simple_test_suites  //
-      .testsuite(script.as<OpenScenario>().pathname.parent_path().stem().string())
-      .testcase(script.as<OpenScenario>().pathname.string());
+    const auto suite_name = script.as<OpenScenario>().pathname.parent_path().stem().string();
 
-    simple_test_suites.save("/tmp/scenario_test_runner/new-result.junit.xml", "  ");
+    const auto case_name = script.as<OpenScenario>().pathname.stem().string();
+
+    switch (current_result) {
+      case junit::TestResult::ERROR:
+        simple_test_suites.testsuite(suite_name)
+          .testcase(case_name)
+          .error.emplace_back(current_error_type, current_error_what);
+        break;
+
+      default:
+        break;
+    }
+
+    simple_test_suites.write_to("/tmp/scenario_test_runner/new-result.junit.xml", "  ");
   }
 
   script.reset();
