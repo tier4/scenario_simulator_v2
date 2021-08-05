@@ -39,16 +39,21 @@ public:
 
 private:
   bool requested = false;
-  void onUpdate() override {}
+  void onUpdate() override
+  {
+    if (api_.isInLanelet("ego", 34408, 0.1)) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
+  }
   void onInitialize() override
   {
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(3));
-    api_.setTargetSpeed("ego", 3, true);
+      traffic_simulator::helper::constructActionStatus(10));
+    api_.setTargetSpeed("ego", 10, true);
     const geometry_msgs::msg::Pose goal_pose =
-      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34513, 20, 0, 0, 0, 0));
+      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0));
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };
