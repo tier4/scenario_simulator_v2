@@ -194,14 +194,14 @@ boost::optional<double> ActionNode::getDistanceToStopLine(
 boost::optional<double> ActionNode::getDistanceToFrontEntity(
   const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  auto status = getFrontEntityStatus(spline);
-  if (!status) {
+  auto name = getFrontEntityName(spline);
+  if(!name) {
     return boost::none;
   }
-  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
+  return getDistanceToTargetEntityPolygon(spline, name.get());
 }
 
-boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus(
+boost::optional<std::string> ActionNode::getFrontEntityName(
   const traffic_simulator::math::CatmullRomSpline & spline)
 {
   boost::optional<double> front_entity_distance;
@@ -225,7 +225,10 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
   if (!front_entity_distance) {
     return boost::none;
   }
-  return other_entity_status[front_entity_name];
+  if(front_entity_name == "") {
+    THROW_SIMULATION_ERROR("name of front entity is empty.");
+  }
+  return front_entity_name;
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
