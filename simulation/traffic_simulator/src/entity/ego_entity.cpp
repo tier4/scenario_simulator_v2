@@ -451,15 +451,7 @@ void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose
 
 void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
-  /*
-  const auto lanelet_pose = toLaneletPose(goal_pose);
-  if (lanelet_pose) {
-    requestAcquirePosition(name, lanelet_pose.get());
-  }
-  else {
-    THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
-  }
-  */
+  requestAssignRoute({map_pose});
 }
 
 void EgoEntity::requestAssignRoute(
@@ -470,9 +462,12 @@ void EgoEntity::requestAssignRoute(
   for (const auto & waypoint : waypoints) {
     route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint));
   }
+  requestAssignRoute(route);
+}
 
+void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & route) override
+{
   assert(0 < route.size());
-
   if (not autoware.initialized()) {
     autoware.initialize(getStatus().pose);
     autoware.plan(route);

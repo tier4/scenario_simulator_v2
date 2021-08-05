@@ -101,6 +101,8 @@ public:
 
   void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> &) override;
 
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+
   void requestLaneChange(const std::int64_t) override;
 
   auto setStatus(const openscenario_msgs::msg::EntityStatus & status) -> bool override;
