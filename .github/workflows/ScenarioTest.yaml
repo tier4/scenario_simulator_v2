@@ -99,25 +99,31 @@ jobs:
       - name: Run traffic simulation demo scenario
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo timeout:=70 with_rviz:=True  > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo timeout:=70 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run accelerate and follow front entity scenario
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=accelerate_and_follow timeout:=15 with_rviz:=True
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=accelerate_and_follow timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run decelerate_and_follow front entity scenario
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=decelerate_and_follow timeout:=15 with_rviz:=True
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=decelerate_and_follow timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run lanechange_left scenario
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left timeout:=15 with_rviz:=True
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run merge_left scenario
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=merge_left timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Collect coverage

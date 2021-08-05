@@ -38,18 +38,14 @@ public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
   bool foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const;
-  std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnRoute(
-    const std::vector<std::int64_t> & route_lanelets) const;
-  boost::optional<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatus(
-    const std::vector<std::int64_t> & following_lanelets) const;
-  boost::optional<double> getDistanceToConflictingEntity(
-    const std::vector<std::int64_t> & following_lanelets) const;
   boost::optional<double> getDistanceToConflictingEntity(
     const std::vector<std::int64_t> & route_lanelets,
     const traffic_simulator::math::CatmullRomSpline & spline);
-  boost::optional<openscenario_msgs::msg::EntityStatus> getFrontEntityStatus();
+  boost::optional<std::string> getFrontEntityName(
+    const traffic_simulator::math::CatmullRomSpline & spline);
   double calculateStopDistance() const;
-  boost::optional<double> getDistanceToFrontEntity();
+  boost::optional<double> getDistanceToFrontEntity(
+    const traffic_simulator::math::CatmullRomSpline & spline);
   boost::optional<double> getDistanceToStopLine(
     const std::vector<std::int64_t> & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints);
@@ -104,6 +100,23 @@ public:
   std::unordered_map<std::string, openscenario_msgs::msg::EntityStatus> other_entity_status;
   std::unordered_map<std::string, openscenario_msgs::msg::EntityType> entity_type_list;
   std::vector<std::int64_t> route_lanelets;
+  openscenario_msgs::msg::EntityStatus getEntityStatus(const std::string target_name) const;
+  boost::optional<double> getDistanceToTargetEntityPolygon(
+    const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name);
+
+private:
+  boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
+    const traffic_simulator::math::CatmullRomSpline & spline,
+    const openscenario_msgs::msg::EntityStatus & status);
+  boost::optional<double> getDistanceToTargetEntityPolygon(
+    const traffic_simulator::math::CatmullRomSpline & spline,
+    const openscenario_msgs::msg::EntityStatus & status);
+  boost::optional<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatus(
+    const std::vector<std::int64_t> & following_lanelets) const;
+  std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnCrossWalk(
+    const std::vector<std::int64_t> & route_lanelets) const;
+  std::vector<openscenario_msgs::msg::EntityStatus> getConflictingEntityStatusOnLane(
+    const std::vector<std::int64_t> & route_lanelets) const;
 };
 }  // namespace entity_behavior
 

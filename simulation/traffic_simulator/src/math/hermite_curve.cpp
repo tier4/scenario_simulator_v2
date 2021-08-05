@@ -16,6 +16,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <vector>
 
@@ -151,11 +152,11 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   geometry_msgs::msg::Point point0, geometry_msgs::msg::Point point1, bool search_backward) const
 {
   std::vector<double> s_values;
-  double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
+  // double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
   double fx = point0.x;
-  double ex = (point0.x - point1.x) / l;
+  double ex = (point1.x - point0.x);
   double fy = point0.y;
-  double ey = (point0.y - point1.y) / l;
+  double ey = (point1.y - point0.y);
   constexpr double e = std::numeric_limits<double>::epsilon();
   if (std::abs(point0.x - point1.x) <= e) {
     if (std::abs(point0.y - point1.y) <= e) {
@@ -163,30 +164,36 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
     auto solutions = solver_.solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
     for (const auto solution : solutions) {
-      double t = (point0.y - fy) / ey;
-      if (std::fabs(t) < l) {
+      double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
+      double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
+      if (0 < ty && ty < 1 && 0 < solution && solution < 1) {
         s_values.emplace_back(solution);
       }
     }
   } else if (std::abs(point0.y - point1.y) <= e) {
     auto solutions = solver_.solveCubicEquation(ay_, by_, cy_, dy_ - fy);
     for (const auto solution : solutions) {
-      double t = (point0.x - fx) / ex;
-      if (std::fabs(t) < l) {
+      double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
+      double tx = std::fabs(x - point0.x) / std::fabs(point1.x - point0.x);
+      if (0 < tx && tx < 1 && 0 < solution && solution < 1) {
         s_values.emplace_back(solution);
       }
     }
   } else {
-    double ratio = ey / ex;
-    double a = ax_ * ratio - ay_;
-    double b = bx_ * ratio - by_;
-    double c = cx_ * ratio - cy_;
-    double d = (dx_ - fx) * ratio - (dy_ - fy);
+    double a = ay_ * ey - ax_ * ey;
+    double b = by_ * ey - bx_ * ey;
+    double c = cy_ * ex - cx_ * ey;
+    double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
     auto solutions = solver_.solveCubicEquation(a, b, c, d);
     for (const auto solution : solutions) {
+      double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
+      double tx = std::fabs(x - point0.x) / std::fabs(point1.x - point0.x);
       double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
-      double t = (y - fy) / ratio;
-      if (std::fabs(t) < l) {
+      double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
+      double poly_x = (1 - tx) * point1.x + tx * point0.x;
+      double poly_y = (1 - ty) * point1.y + ty * point0.y;
+      double error = std::hypot(poly_x - x, poly_y - y);
+      if (error < 3 && 0 < tx && tx < 1 && 0 < ty && ty < 1 && 0 < solution && solution < 1) {
         s_values.emplace_back(solution);
       }
     }

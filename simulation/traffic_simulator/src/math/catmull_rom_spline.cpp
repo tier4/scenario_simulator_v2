@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <limits>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
