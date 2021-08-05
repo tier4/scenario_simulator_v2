@@ -41,10 +41,13 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34513, 0.1)) {
+    if (api_.isInLanelet("ego", 34510, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     if (api_.getCurrentTime() >= 10.0) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (api_.checkCollision("ego", "npc")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
   }
@@ -53,9 +56,13 @@ private:
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
-      traffic_simulator::helper::constructActionStatus(10));
-    api_.setTargetSpeed("ego", 10, true);
+      traffic_simulator::helper::constructActionStatus(5));
+    api_.setTargetSpeed("ego", 5, true);
     api_.requestLaneChange("ego", 34513);
+    api_.spawn(false, "npc", getVehicleParameters());
+    api_.setEntityStatus(
+      "npc", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
+      traffic_simulator::helper::constructActionStatus(10));
   }
 };
 
