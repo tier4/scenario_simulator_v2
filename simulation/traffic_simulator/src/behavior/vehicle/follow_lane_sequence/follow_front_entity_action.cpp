@@ -87,7 +87,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
   auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, spline);
   const auto front_entity_name = getFrontEntityName(spline);
-  if(!front_entity_name) {
+  if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
   distance_to_front_entity_ = getDistanceToTargetEntityPolygon(spline, front_entity_name.get());

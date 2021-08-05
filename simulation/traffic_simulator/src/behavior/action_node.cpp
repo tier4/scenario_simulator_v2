@@ -195,7 +195,7 @@ boost::optional<double> ActionNode::getDistanceToFrontEntity(
   const traffic_simulator::math::CatmullRomSpline & spline)
 {
   auto name = getFrontEntityName(spline);
-  if(!name) {
+  if (!name) {
     return boost::none;
   }
   return getDistanceToTargetEntityPolygon(spline, name.get());
@@ -225,7 +225,7 @@ boost::optional<std::string> ActionNode::getFrontEntityName(
   if (!front_entity_distance) {
     return boost::none;
   }
-  if(front_entity_name == "") {
+  if (front_entity_name == "") {
     THROW_SIMULATION_ERROR("name of front entity is empty.");
   }
   return front_entity_name;
