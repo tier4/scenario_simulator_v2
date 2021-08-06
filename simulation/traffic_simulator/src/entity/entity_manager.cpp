@@ -355,29 +355,6 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
-auto EntityManager::getSValueInRoute(
-  const std::string & name, const std::vector<std::int64_t> & route) -> boost::optional<double>
-{
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return boost::none;
-  }
-  const auto lanelet_pose = getLaneletPose(name);
-  if (!lanelet_pose) {
-    return boost::none;
-  }
-  double s = 0;
-  for (const auto id : route) {
-    if (id == lanelet_pose->lanelet_id) {
-      s = s + lanelet_pose->s;
-      return s;
-    } else {
-      s = s + hdmap_utils_ptr_->getLaneletLength(id);
-    }
-  }
-  return boost::none;
-}
-
 auto EntityManager::getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray
 {
   if (current_time_ < 0) {
