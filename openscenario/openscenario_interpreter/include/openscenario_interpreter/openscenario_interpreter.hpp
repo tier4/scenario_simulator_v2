@@ -29,7 +29,6 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
-#include <simple_junit/test_suites.hpp>  // DEPRECATED
 #include <string>
 #include <utility>
 
@@ -58,7 +57,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  common::JUnit5 simple_test_suites;
+  common::JUnit5 results;
 
   boost::variant<common::Pass, common::Failure, common::junit::Error> result;
 

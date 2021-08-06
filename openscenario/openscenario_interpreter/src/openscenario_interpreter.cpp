@@ -251,7 +251,7 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   INTERPRETER_INFO_STREAM("CleaningUp.");
 
   {
-    simple_test_suites.name = script.as<OpenScenario>().pathname.parent_path().parent_path().string();
+    results.name = script.as<OpenScenario>().pathname.parent_path().parent_path().string();
 
     const auto suite_name = script.as<OpenScenario>().pathname.parent_path().stem().string();
 
@@ -260,17 +260,17 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
     boost::apply_visitor(
       overload(
         [&](const common::junit::Pass &) {
-          simple_test_suites.testsuite(suite_name).testcase(case_name);
+          results.testsuite(suite_name).testcase(case_name);
         },
         [&](const common::junit::Failure & it) {
-          simple_test_suites.testsuite(suite_name).testcase(case_name).failure.push_back(it);
+          results.testsuite(suite_name).testcase(case_name).failure.push_back(it);
         },
         [&](const common::junit::Error & it) {
-          simple_test_suites.testsuite(suite_name).testcase(case_name).error.push_back(it);
+          results.testsuite(suite_name).testcase(case_name).error.push_back(it);
         }),
       result);
 
-    simple_test_suites.write_to("/tmp/scenario_test_runner/result.junit.xml", "  ");
+    results.write_to("/tmp/scenario_test_runner/result.junit.xml", "  ");
   }
 
   script.reset();
