@@ -373,13 +373,13 @@ void EntityManager::getGoalposes(const std::string & name, std::vector<openscena
 
 void EntityManager::getGoalposes(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals)
 {
-  std::vector<openscenario_msgs::msg::LaneletPose>  lanelet_poses;
+  std::vector<openscenario_msgs::msg::LaneletPose> lanelet_poses;
   if (current_time_ < 0) {
     goals = std::vector<geometry_msgs::msg::Pose>();
   }
   getGoalposes(name, lanelet_poses);
   for (const auto lanelet_pose : lanelet_poses) {
-    goals.push_back(toMapPose( lanelet_pose));
+    goals.push_back(toMapPose(lanelet_pose));
   }
 }
 
@@ -593,14 +593,11 @@ void EntityManager::update(const double current_time, const double step_time)
         break;
     }
     status_with_traj.waypoint = getWaypoints(status.first);
-
     std::vector<geometry_msgs::msg::Pose> goals;
     getGoalposes(status.first,goals);
     for (const auto goal: goals){
-      int i=0;
-      status_with_traj.goalposes[i] = goal;
+      status_with_traj.goalposes.push_back(goal);
     }
-
     const auto obstacle = getObstacle(status.first);
     if (obstacle) {
       status_with_traj.obstacle = obstacle.get();

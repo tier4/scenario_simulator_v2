@@ -101,7 +101,7 @@ std::vector<openscenario_msgs::msg::LaneletPose> RoutePlanner::getGoalposes()
   goalposes={};
   auto waypoint_queue_tmp_=waypoint_queue_;
   for (int i=0 ; ! waypoint_queue_tmp_.empty() ; i++) {
-    goalposes[i] = waypoint_queue_tmp_.front();
+    goalposes.push_back(waypoint_queue_tmp_.front());
     waypoint_queue_tmp_.pop();
   }
   return goalposes;
