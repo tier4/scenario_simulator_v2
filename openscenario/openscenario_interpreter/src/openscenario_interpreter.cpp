@@ -33,13 +33,6 @@
 
 namespace openscenario_interpreter
 {
-#define INTERPRETER_INFO_STREAM(...) \
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
-
-// NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-#define INTERPRETER_ERROR_STREAM(...) \
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
-
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
 
@@ -62,16 +55,6 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 }
 
 #undef DECLARE_PARAMETER
-
-void Interpreter::report(
-  const junit::TestResult &,  //
-  const std::string &,        //
-  const std::string &)
-{
-  INTERPRETER_INFO_STREAM("Deactivate myself.");
-  deactivate();
-  INTERPRETER_INFO_STREAM("Deactivated myself.");
-}
 
 pid_t record_process_id = 0;
 
@@ -248,20 +231,6 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
       [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
       [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
     result);
-
-  // std::stringstream message;
-  // {
-  //   message << (current_result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m")
-  //           << current_error_type.c_str();
-  //
-  //   if (not current_error_what.empty()) {
-  //     message << " (" << current_error_what.c_str() << ")";
-  //   }
-  //
-  //   message << "\x1b[0m";
-  // }
-  //
-  // RCLCPP_INFO_STREAM(get_logger(), message.str());
 
   record_end();
 
