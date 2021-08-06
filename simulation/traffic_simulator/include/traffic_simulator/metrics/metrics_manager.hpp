@@ -54,6 +54,8 @@ public:
 
   const bool write_file_every_frame;
 
+  MetricLifecycle getLifecycle(const std::string & name);
+
 private:
   bool verbose_;
 

@@ -57,7 +57,7 @@ void CppScenarioNode::stop(Result result)
   std::exit(0);
 }
 
-void checkConfiguration(const traffic_simulator::Configuration & configuration)
+void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration & configuration)
 {
   try {
     configuration.getLanelet2MapFile();
