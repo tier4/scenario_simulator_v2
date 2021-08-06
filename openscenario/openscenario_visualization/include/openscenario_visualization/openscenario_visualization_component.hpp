@@ -110,6 +110,7 @@ private:
    */
   const visualization_msgs::msg::MarkerArray generateMarker(
     const openscenario_msgs::msg::EntityStatus & status,
+    const std::vector<geometry_msgs::msg::Pose> & goalposes,
     const openscenario_msgs::msg::WaypointsArray & waypoints,
     const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find);
   /**

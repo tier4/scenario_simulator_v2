@@ -90,7 +90,7 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
   }
   for (const auto & data : msg->data) {
     auto marker_array =
-      generateMarker(data.status, data.waypoint, data.obstacle, data.obstacle_find);
+      generateMarker(data.status, data.goalposes, data.waypoint, data.obstacle, data.obstacle_find);
     std::copy(
       marker_array.markers.begin(), marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
@@ -118,6 +118,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
 
 const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
   const openscenario_msgs::msg::EntityStatus & status,
+  const std::vector<geometry_msgs::msg::Pose> & goalposes,
   const openscenario_msgs::msg::WaypointsArray & waypoints,
   const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find)
 {
@@ -135,6 +136,35 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       color = color_utils::makeColorMsg("lightskyblue", 0.99);
       break;
   }
+
+  if (goalposes.size() != 0) {
+    // std::vector<geometry_msgs::msg::Point> goalpoints;
+    // for (std::vector::size_type int i=0; i< goalposes.size() ;i++){
+    //   goalpoints.push_back(goalposes[i].position);
+    // }
+    // traffic_simulator::math::CatmullRomSpline spline(goalpoints);
+    for (std::vector<geometry_msgs::msg::Pose>::size_type i=0; i< goalposes.size() ;i++){
+      visualization_msgs::msg::Marker goalpose_marker;
+      goalpose_marker.header.frame_id = "map";
+      goalpose_marker.header.stamp = stamp;
+      goalpose_marker.ns = status.name;
+      goalpose_marker.id = 4;
+      goalpose_marker.action = goalpose_marker.ADD;
+      goalpose_marker.type = 0;//arrow
+
+      goalpose_marker.pose = goalposes[i];
+    
+      goalpose_marker.color = color;
+      goalpose_marker.color.a = 0.8;
+      // goalpose_marker.colors =
+      //   std::vector<std_msgs::msg::ColorRGBA>(num_points * 2, goalpose_marker.color);
+      goalpose_marker.scale.x = 1.0;
+      goalpose_marker.scale.y = 1.0;
+      goalpose_marker.scale.z = 1.0;
+      ret.markers.emplace_back(goalpose_marker);
+    }
+  }
+  
   visualization_msgs::msg::Marker bbox;
   bbox.header.frame_id = status.name;
   bbox.header.stamp = stamp;
