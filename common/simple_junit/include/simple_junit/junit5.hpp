@@ -18,12 +18,20 @@
 #include <boost/optional.hpp>
 #include <pugixml.hpp>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
+
+namespace xs
+{
+using string = std::string;
+}  // namespace xs
 
 namespace common
 {
 inline namespace simple_junit
 {
+enum class Passed {};
+
 /*
     <xs:element name="failure">
         <xs:complexType mixed="true">
@@ -35,9 +43,9 @@ inline namespace simple_junit
 
 struct Failure
 {
-  std::string type, message;
+  xs::string type, message;
 
-  explicit Failure(const std::string & type, const std::string & message)
+  explicit Failure(const xs::string & type, const xs::string & message)
   : type(type), message(message)
   {
   }
@@ -67,9 +75,9 @@ struct Failure
 
 struct Error
 {
-  std::string type, message;
+  xs::string type, message;
 
-  explicit Error(const std::string & type, const std::string & message)
+  explicit Error(const xs::string & type, const xs::string & message)
   : type(type), message(message)
   {
   }
@@ -87,6 +95,53 @@ struct Error
     return node;
   }
 };
+
+/*
+    <xs:element name="properties">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="property" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+*/
+
+struct Properties
+{
+  // TODO
+};
+
+/*
+    <xs:element name="property">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="value" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+*/
+
+struct Property
+{
+  // TODO
+};
+
+/*
+    <xs:element name="skipped" type="xs:string"/>
+*/
+
+using Skipped = xs::string;
+
+/*
+    <xs:element name="system-out" type="xs:string"/>
+*/
+
+using SystemOut = xs::string;
+
+/*
+    <xs:element name="system-err" type="xs:string"/>
+*/
+
+using SystemErr = xs::string;
 
 /*
     <xs:element name="testcase">
@@ -109,19 +164,51 @@ struct Error
 
 struct SimpleTestCase
 {
-  const std::string name, assertions, time, classname, status;
+  Skipped skipped;
 
   std::vector<Error> error;
 
   std::vector<Failure> failure;
 
-  explicit SimpleTestCase(const std::string & name) : name(name) {}
+  std::vector<SystemOut> system_out;
+
+  std::vector<SystemErr> system_err;
+
+  const xs::string name;
+
+  xs::string assertions;
+
+  xs::string time;
+
+  xs::string classname;
+
+  xs::string status;
+
+  explicit SimpleTestCase(const xs::string & name) : name(name) {}
 
   friend auto operator<<(pugi::xml_node node, const SimpleTestCase & testcase) -> pugi::xml_node
   {
     auto current_node = node.append_child("testcase");
 
     current_node.append_attribute("name") = testcase.name.c_str();
+
+    if (not testcase.assertions.empty()) {
+      current_node.append_attribute("assertions") = testcase.assertions.c_str();
+    }
+
+    if (not testcase.time.empty()) {
+      current_node.append_attribute("time") = testcase.time.c_str();
+    }
+
+    if (not testcase.classname.empty()) {
+      current_node.append_attribute("classname") = testcase.classname.c_str();
+    }
+
+    if (not testcase.status.empty()) {
+      current_node.append_attribute("status") = testcase.status.c_str();
+    }
+
+    // TODO skipped
 
     for (const auto & each : testcase.error) {
       current_node.append_child("error") << each;
@@ -130,6 +217,10 @@ struct SimpleTestCase
     for (const auto & each : testcase.failure) {
       current_node.append_child("failure") << each;
     }
+
+    // TODO system-out
+
+    // TODO system-err
 
     return node;
   }
@@ -159,13 +250,13 @@ struct SimpleTestCase
     </xs:element>
 */
 
-struct SimpleTestSuite : private std::unordered_map<std::string, SimpleTestCase>
+struct SimpleTestSuite : private std::unordered_map<xs::string, SimpleTestCase>
 {
-  const std::string name;
+  const xs::string name;
 
-  explicit SimpleTestSuite(const std::string & name) : name(name) {}
+  explicit SimpleTestSuite(const xs::string & name) : name(name) {}
 
-  auto testcase(const std::string & name) -> auto &
+  auto testcase(const xs::string & name) -> auto &
   {
     try {
       return at(name);
@@ -209,7 +300,7 @@ struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuit
 {
   explicit SimpleTestSuites() = default;
 
-  auto testsuite(const std::string & name) -> auto &
+  auto testsuite(const xs::string & name) -> auto &
   {
     try {
       return at(name);
@@ -240,6 +331,8 @@ struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuit
     document.save_file(std::forward<decltype(xs)>(xs)...);
   }
 };
+
+using JUnit5 = SimpleTestSuites;
 }  // namespace simple_junit
 }  // namespace common
 

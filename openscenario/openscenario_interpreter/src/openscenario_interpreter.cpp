@@ -301,7 +301,7 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
         break;
     }
 
-    simple_test_suites.write_to("/tmp/scenario_test_runner/new-result.junit.xml", "  ");
+    simple_test_suites.write_to("/tmp/scenario_test_runner/result.junit.xml", "  ");
   }
 
   script.reset();
