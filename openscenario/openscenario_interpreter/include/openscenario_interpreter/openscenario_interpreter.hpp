@@ -27,7 +27,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <simple_junit/test_suites.hpp>
+#include <simple_junit/junit5.hpp>
+#include <simple_junit/test_suites.hpp>  // DEPRECATED
 #include <string>
 #include <utility>
 
@@ -49,9 +50,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  junit::TestSuites test_suites;
+  // [[deprecated]] junit::TestSuites test_suites;
 
-  junit::SimpleTestSuites simple_test_suites;
+  common::SimpleTestSuites simple_test_suites;
 
   const junit::TestResult ERROR = junit::TestResult::ERROR;
   const junit::TestResult FAILURE = junit::TestResult::FAILURE;

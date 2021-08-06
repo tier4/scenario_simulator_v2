@@ -268,15 +268,15 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
 
-  test_suites.addTestCase(
-    script.as<OpenScenario>().pathname.parent_path().stem().string(),
-    script.as<OpenScenario>().pathname.string(),  // case-name (XXX: DIRTY HACK!!!)
-    0,                                            // time
-    current_result,                               //
-    current_error_type,                           //
-    current_error_what);
-
-  test_suites.write(output_directory + "/result.junit.xml");
+  // test_suites.addTestCase(
+  //   script.as<OpenScenario>().pathname.parent_path().stem().string(),
+  //   script.as<OpenScenario>().pathname.string(),  // case-name (XXX: DIRTY HACK!!!)
+  //   0,                                            // time
+  //   current_result,                               //
+  //   current_error_type,                           //
+  //   current_error_what);
+  //
+  // test_suites.write(output_directory + "/result.junit.xml");
 
   {
     const auto suite_name = script.as<OpenScenario>().pathname.parent_path().stem().string();
@@ -294,8 +294,10 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
         simple_test_suites.testsuite(suite_name)
           .testcase(case_name)
           .failure.emplace_back(current_error_type, current_error_what);
+        break;
 
       default:
+        simple_test_suites.testsuite(suite_name).testcase(case_name);
         break;
     }
 
