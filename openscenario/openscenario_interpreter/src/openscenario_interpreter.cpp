@@ -64,14 +64,10 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 #undef DECLARE_PARAMETER
 
 void Interpreter::report(
-  const junit::TestResult & result,  //
-  const std::string & type,          //
-  const std::string & what)
+  const junit::TestResult &,  //
+  const std::string &,        //
+  const std::string &)
 {
-  current_result = result;
-  current_error_type = type;
-  current_error_what = what;
-
   INTERPRETER_INFO_STREAM("Deactivate myself.");
   deactivate();
   INTERPRETER_INFO_STREAM("Deactivated myself.");
@@ -245,20 +241,27 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 
   connection.~API();  // Deactivate simulator
 
-  std::stringstream message;
-  {
-    message << (current_result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m")
-            << current_error_type.c_str();
-
-    if (not current_error_what.empty()) {
-      message << " (" << current_error_what.c_str() << ")";
-    }
-
-    message << "\x1b[0m";
-  }
-
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-  RCLCPP_INFO_STREAM(get_logger(), message.str());
+  boost::apply_visitor(
+    overload(
+      [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
+    result);
+
+  // std::stringstream message;
+  // {
+  //   message << (current_result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m")
+  //           << current_error_type.c_str();
+  //
+  //   if (not current_error_what.empty()) {
+  //     message << " (" << current_error_what.c_str() << ")";
+  //   }
+  //
+  //   message << "\x1b[0m";
+  // }
+  //
+  // RCLCPP_INFO_STREAM(get_logger(), message.str());
 
   record_end();
 
@@ -268,16 +271,6 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
-
-  // test_suites.addTestCase(
-  //   script.as<OpenScenario>().pathname.parent_path().stem().string(),
-  //   script.as<OpenScenario>().pathname.string(),  // case-name (XXX: DIRTY HACK!!!)
-  //   0,                                            // time
-  //   current_result,                               //
-  //   current_error_type,                           //
-  //   current_error_what);
-  //
-  // test_suites.write(output_directory + "/result.junit.xml");
 
   {
     const auto suite_name = script.as<OpenScenario>().pathname.parent_path().stem().string();
@@ -296,24 +289,6 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
           simple_test_suites.testsuite(suite_name).testcase(case_name).error.push_back(it);
         }),
       result);
-
-    // switch (current_result) {
-    //   case junit::TestResult::ERROR:
-    //     simple_test_suites.testsuite(suite_name)
-    //       .testcase(case_name)
-    //       .error.emplace_back(current_error_type, current_error_what);
-    //     break;
-    //
-    //   case junit::TestResult::FAILURE:
-    //     simple_test_suites.testsuite(suite_name)
-    //       .testcase(case_name)
-    //       .failure.emplace_back(current_error_type, current_error_what);
-    //     break;
-    //
-    //   default:
-    //     simple_test_suites.testsuite(suite_name).testcase(case_name);
-    //     break;
-    // }
 
     simple_test_suites.write_to("/tmp/scenario_test_runner/result.junit.xml", "  ");
   }

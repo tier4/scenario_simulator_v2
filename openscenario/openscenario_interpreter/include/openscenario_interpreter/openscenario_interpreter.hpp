@@ -53,14 +53,14 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   // [[deprecated]] junit::TestSuites test_suites;
 
-  const junit::TestResult ERROR = junit::TestResult::ERROR;
-  const junit::TestResult FAILURE = junit::TestResult::FAILURE;
-  const junit::TestResult SUCCESS = junit::TestResult::SUCCESS;
+  [[deprecated]] const junit::TestResult ERROR = junit::TestResult::ERROR;
+  [[deprecated]] const junit::TestResult FAILURE = junit::TestResult::FAILURE;
+  [[deprecated]] const junit::TestResult SUCCESS = junit::TestResult::SUCCESS;
 
-  junit::TestResult current_result;
+  [[deprecated]] junit::TestResult current_result;
 
-  std::string current_error_type;
-  std::string current_error_what;
+  [[deprecated]] std::string current_error_type;
+  [[deprecated]] std::string current_error_what;
 
   common::JUnit5 simple_test_suites;
 
@@ -70,11 +70,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   void reset()
   {
-    current_result = junit::TestResult::FAILURE;
-    current_error_type = "Failure";
-    current_error_what =
-      "The simulation time has exceeded the time specified by the scenario_test_runner";
-
     result = common::junit::Failure(
       "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner");
   }
