@@ -1,1 +1,7 @@
 comment: false
+
+flags:
+  front-end:
+    paths:
+      - simulation
+    carryforward: false
