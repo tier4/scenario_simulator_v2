@@ -313,7 +313,9 @@ struct SimpleTestSuite : private std::unordered_map<xs::string, SimpleTestCase>
 
 struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuite>
 {
-  explicit SimpleTestSuites() = default;
+  xs::string name;
+
+  explicit SimpleTestSuites(const xs::string & name = "") : name(name) {}
 
   auto testsuite(const xs::string & name) -> auto &
   {
@@ -328,6 +330,10 @@ struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuit
   friend auto operator<<(pugi::xml_node node, const SimpleTestSuites & testsuites) -> pugi::xml_node
   {
     auto current_node = node.append_child("testsuites");
+
+    if (not testsuites.name.empty()) {
+      current_node.append_attribute("name") = testsuites.name.c_str();
+    }
 
     for (const auto & testsuite : testsuites) {
       current_node << std::get<1>(testsuite);

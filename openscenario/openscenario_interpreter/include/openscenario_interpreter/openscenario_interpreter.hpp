@@ -64,12 +64,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   ExecutionTimer<> execution_timer;
 
-  void reset()
-  {
-    result = common::junit::Failure(
-      "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner");
-  }
-
   template <typename T, typename... Ts>
   auto deactivate(Ts &&... xs) -> void
   {

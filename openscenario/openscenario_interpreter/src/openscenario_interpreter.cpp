@@ -50,8 +50,6 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
-
-  reset();
 }
 
 #undef DECLARE_PARAMETER
@@ -91,6 +89,17 @@ auto record_end()
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 try {
   INTERPRETER_INFO_STREAM("Configuring.");
+
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  The scenario_test_runner that launched this node considers that "the
+   *  scenario is not expected to finish" or "an abnormality has occurred that
+   *  prevents the interpreter from terminating itself" after the specified
+   *  time (specified by --global-timeout), and deactivates this node.
+   *
+   * ------------------------------------------------------------------------ */
+  result = common::junit::Failure(
+    "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner");
 
   std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
@@ -242,6 +251,8 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   INTERPRETER_INFO_STREAM("CleaningUp.");
 
   {
+    simple_test_suites.name = script.as<OpenScenario>().pathname.parent_path().parent_path().string();
+
     const auto suite_name = script.as<OpenScenario>().pathname.parent_path().stem().string();
 
     const auto case_name = script.as<OpenScenario>().pathname.stem().string();
@@ -263,8 +274,6 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   }
 
   script.reset();
-
-  reset();
 
   return Interpreter::Result::SUCCESS;
 }
