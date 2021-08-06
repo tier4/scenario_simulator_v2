@@ -1,7 +1,7 @@
 comment: false
 
 flags:
-  front-end:
+  cpp_mock_test:
     paths:
       - simulation
     carryforward: false
