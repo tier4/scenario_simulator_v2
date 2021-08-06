@@ -28,9 +28,9 @@ using string = std::string;
 
 namespace common
 {
-inline namespace simple_junit
+inline namespace junit
 {
-enum class Passed {};
+enum class Pass {};  // NOTE: tag type
 
 /*
     <xs:element name="failure">
@@ -77,8 +77,7 @@ struct Error
 {
   xs::string type, message;
 
-  explicit Error(const xs::string & type, const xs::string & message)
-  : type(type), message(message)
+  explicit Error(const xs::string & type, const xs::string & message) : type(type), message(message)
   {
   }
 
@@ -333,7 +332,7 @@ struct SimpleTestSuites : private std::unordered_map<std::string, SimpleTestSuit
 };
 
 using JUnit5 = SimpleTestSuites;
-}  // namespace simple_junit
+}  // namespace junit
 }  // namespace common
 
 #endif  // SIMPLE_JUNIT__JUNIT5_HPP_

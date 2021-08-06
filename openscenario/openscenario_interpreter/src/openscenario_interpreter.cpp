@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/variant/detail/apply_visitor_unary.hpp>
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
@@ -283,23 +284,36 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 
     const auto case_name = script.as<OpenScenario>().pathname.stem().string();
 
-    switch (current_result) {
-      case junit::TestResult::ERROR:
-        simple_test_suites.testsuite(suite_name)
-          .testcase(case_name)
-          .error.emplace_back(current_error_type, current_error_what);
-        break;
+    boost::apply_visitor(
+      overload(
+        [&](const common::junit::Pass &) {
+          simple_test_suites.testsuite(suite_name).testcase(case_name);
+        },
+        [&](const common::junit::Failure & it) {
+          simple_test_suites.testsuite(suite_name).testcase(case_name).failure.push_back(it);
+        },
+        [&](const common::junit::Error & it) {
+          simple_test_suites.testsuite(suite_name).testcase(case_name).error.push_back(it);
+        }),
+      result);
 
-      case junit::TestResult::FAILURE:
-        simple_test_suites.testsuite(suite_name)
-          .testcase(case_name)
-          .failure.emplace_back(current_error_type, current_error_what);
-        break;
-
-      default:
-        simple_test_suites.testsuite(suite_name).testcase(case_name);
-        break;
-    }
+    // switch (current_result) {
+    //   case junit::TestResult::ERROR:
+    //     simple_test_suites.testsuite(suite_name)
+    //       .testcase(case_name)
+    //       .error.emplace_back(current_error_type, current_error_what);
+    //     break;
+    //
+    //   case junit::TestResult::FAILURE:
+    //     simple_test_suites.testsuite(suite_name)
+    //       .testcase(case_name)
+    //       .failure.emplace_back(current_error_type, current_error_what);
+    //     break;
+    //
+    //   default:
+    //     simple_test_suites.testsuite(suite_name).testcase(case_name);
+    //     break;
+    // }
 
     simple_test_suites.write_to("/tmp/scenario_test_runner/result.junit.xml", "  ");
   }

@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
+#include <boost/variant.hpp>
 #include <exception>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
@@ -52,8 +53,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   // [[deprecated]] junit::TestSuites test_suites;
 
-  common::JUnit5 simple_test_suites;
-
   const junit::TestResult ERROR = junit::TestResult::ERROR;
   const junit::TestResult FAILURE = junit::TestResult::FAILURE;
   const junit::TestResult SUCCESS = junit::TestResult::SUCCESS;
@@ -63,6 +62,10 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   std::string current_error_type;
   std::string current_error_what;
 
+  common::JUnit5 simple_test_suites;
+
+  boost::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
+
   ExecutionTimer<> execution_timer;
 
   void reset()
@@ -71,18 +74,23 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     current_error_type = "Failure";
     current_error_what =
       "The simulation time has exceeded the time specified by the scenario_test_runner";
+
+    result = common::junit::Failure(
+      "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner");
   }
 
   void report(const junit::TestResult &, const std::string &, const std::string & = "");
 
-#define CATCH(TYPE)                       \
-  catch (const TYPE & error)              \
-  {                                       \
-    if (intended_result == "error") {     \
-      report(SUCCESS, #TYPE);             \
-    } else {                              \
-      report(ERROR, #TYPE, error.what()); \
-    }                                     \
+#define CATCH(TYPE)                                       \
+  catch (const TYPE & error)                              \
+  {                                                       \
+    if (intended_result == "error") {                     \
+      result = common::junit::Pass();                     \
+      report(SUCCESS, #TYPE);                             \
+    } else {                                              \
+      result = common::junit::Error(#TYPE, error.what()); \
+      report(ERROR, #TYPE, error.what());                 \
+    }                                                     \
   }
 
   template <typename Thunk>
@@ -95,8 +103,10 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     catch (const SpecialAction<EXIT_SUCCESS> &)  // from CustomCommandAction::exitSuccess
     {
       if (intended_result == "success") {
+        result = common::junit::Pass();
         report(SUCCESS, "Success");
       } else {
+        result = common::junit::Failure("UnintendedSuccess", "Expected " + intended_result);
         report(FAILURE, "UnintendedSuccess", "Expected " + intended_result);
       }
     }
@@ -104,8 +114,10 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     catch (const SpecialAction<EXIT_FAILURE> &)  // from CustomCommandAction::exitFailure
     {
       if (intended_result == "failure") {
+        result = common::junit::Pass();
         report(SUCCESS, "IntendedFailure");
       } else {
+        result = common::junit::Failure("Failure", "Expected " + intended_result);
         report(FAILURE, "Failure", "Expected " + intended_result);
       }
     }
@@ -118,6 +130,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     catch (...)  // FINAL BARRIER
     {
+      result = common::junit::Error("UnknownError", "An unknown exception has occurred");
       report(ERROR, "UnknownError", "An unknown exception has occurred");
     }
   }
