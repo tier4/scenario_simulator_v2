@@ -54,12 +54,7 @@ class Scenario:
 
     """
 
-    def __init__(
-        self,
-        path: Path,
-        expect: Expect,
-        frame_rate: float,
-    ):
+    def __init__(self, path: Path, expect: Expect, frame_rate: float):
 
         self.path = substitute_ros_package(path).resolve()
 
@@ -81,11 +76,7 @@ class Workflow:
 
     """
 
-    def __init__(
-        self,
-        path: Path,
-        global_frame_rate: float,
-    ):
+    def __init__(self, path: Path, global_frame_rate: float):
 
         self.path = path
 

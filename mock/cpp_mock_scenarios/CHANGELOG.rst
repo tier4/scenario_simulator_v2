@@ -2,6 +2,52 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2021-07-30)
+------------------
+
+0.4.1 (2021-07-30)
+------------------
+* Merge pull request `#419 <https://github.com/tier4/scenario_simulator_v2/issues/419>`_ from tier4/feature/rename_moc_to_mock
+* apply reformat
+* Merge pull request `#418 <https://github.com/tier4/scenario_simulator_v2/issues/418>`_ from tier4/feature/add_cpp_scenario_node
+* update docs
+* move to mock pacakge
+* rename entity
+* apply reformat and with_rviz argument
+* remove view_kashiwanoha scenario
+* add shutdown handler
+* enable shutdown when fail or success
+* add lanelet2 parameter
+* add stop function
+* fix compile errors
+* add getparameters function
+* addOnInitialize
+* add configure function
+* Merge pull request `#417 <https://github.com/tier4/scenario_simulator_v2/issues/417>`_ from tier4/feature/add_mock_scenarios
+* apply reformat
+* enable colorlize output
+* add termcolor
+* remove lifecycle
+* add error trigger
+* remove sys.ext
+* modify handler
+* remove launch
+* modify cmakelist.txt
+* remove depends
+* remove test dir
+* add test
+* update launch file
+* add shutdown handler
+* Contributors: Masaya Kataoka
+
+0.4.0 (2021-07-27)
+------------------
+* Merge pull request `#402 <https://github.com/tier4/scenario_simulator_v2/issues/402>`_ from tier4/feature/interpreter/logic-file
+* Update class Configuration to assert given map_path
+* Add new struct 'Configuration' for class 'API'
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.3.0 (2021-07-13)
 ------------------
 * Merge branch 'master' into traffic_signal_actions

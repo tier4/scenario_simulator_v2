@@ -2,6 +2,40 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.2 (2021-07-30)
+------------------
+
+0.4.1 (2021-07-30)
+------------------
+* Merge pull request `#418 <https://github.com/tier4/scenario_simulator_v2/issues/418>`_ from tier4/feature/add_cpp_scenario_node
+* apply reformat and with_rviz argument
+* Merge pull request `#417 <https://github.com/tier4/scenario_simulator_v2/issues/417>`_ from tier4/feature/add_mock_scenarios
+* remove test dir
+* Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
+* Contributors: Masaya Kataoka, yamacir-kit
+
+0.4.0 (2021-07-27)
+------------------
+* Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support
+* Lipsticks
+* Add free function 'doller' emulates shell's '$(...)' expression
+* fix rclpy.init API usage
+* Merge pull request `#402 <https://github.com/tier4/scenario_simulator_v2/issues/402>`_ from tier4/feature/interpreter/logic-file
+* Lipsticks
+* Update EgoEntity to occupy one Autoware each
+* Remove debug codes from EgoEntity
+* Add member function 'get*MapFile' to struct Configuration
+* Update EgoEntity's constructor to receive Configuration
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/logic-file
+* Merge pull request `#401 <https://github.com/tier4/scenario_simulator_v2/issues/401>`_ from tier4/fix/typo
+* fix typo described in https://github.com/tier4/scenario_simulator_v2/issues/398
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/acquire-position-action
+* Merge pull request `#390 <https://github.com/tier4/scenario_simulator_v2/issues/390>`_ from tier4/feature/interpreter/traffic-signal-controller-condition
+* Update test scenario 'all-in-one'
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, yamacir-kit
+
 0.3.0 (2021-07-13)
 ------------------
 * Merge pull request `#386 <https://github.com/tier4/scenario_simulator_v2/issues/386>`_ from tier4/feature/interpreter/misc-object

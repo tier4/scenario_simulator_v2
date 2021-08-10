@@ -84,13 +84,18 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   const auto waypoints = calculateWaypoints();
   auto distance_to_stopline =
     hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
-  auto distance_to_crossing_entity = getDistanceToConflictingEntity(route_lanelets);
-  distance_to_front_entity_ = getDistanceToFrontEntity();
+  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
+  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, spline);
+  const auto front_entity_name = getFrontEntityName(spline);
+  if (!front_entity_name) {
+    return BT::NodeStatus::FAILURE;
+  }
+  distance_to_front_entity_ = getDistanceToTargetEntityPolygon(spline, front_entity_name.get());
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
-  if (distance_to_crossing_entity) {
-    if (distance_to_front_entity_.get() > distance_to_crossing_entity.get()) {
+  if (distance_to_conflicting_entity) {
+    if (distance_to_front_entity_.get() > distance_to_conflicting_entity.get()) {
       return BT::NodeStatus::FAILURE;
     }
   }
@@ -99,25 +104,39 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  auto front_entity_status = getFrontEntityStatus();
-  if (!front_entity_status) {
-    return BT::NodeStatus::FAILURE;
+  auto front_entity_status = getEntityStatus(front_entity_name.get());
+  if (!target_speed) {
+    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+  }
+  if (target_speed.get() <= front_entity_status.action_status.twist.linear.x) {
+    auto entity_status_updated = calculateEntityStatusUpdated(target_speed.get());
+    setOutput("updated_status", entity_status_updated);
+    const auto obstacle = calculateObstacle(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacle", obstacle);
+    return BT::NodeStatus::RUNNING;
   }
   if (
     distance_to_front_entity_.get() >=
     (calculateStopDistance() + vehicle_parameters.bounding_box.dimensions.x + 5)) {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.get().action_status.twist.linear.x + 2);
+      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x + 2);
     setOutput("updated_status", entity_status_updated);
+    const auto obstacle = calculateObstacle(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   } else if (distance_to_front_entity_.get() <= calculateStopDistance()) {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.get().action_status.twist.linear.x - 2);
+      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x - 2);
     setOutput("updated_status", entity_status_updated);
+    const auto obstacle = calculateObstacle(waypoints);
+    setOutput("waypoints", waypoints);
+    setOutput("obstacle", obstacle);
     return BT::NodeStatus::RUNNING;
   } else {
     auto entity_status_updated =
-      calculateEntityStatusUpdated(front_entity_status.get().action_status.twist.linear.x);
+      calculateEntityStatusUpdated(front_entity_status.action_status.twist.linear.x);
     setOutput("updated_status", entity_status_updated);
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);

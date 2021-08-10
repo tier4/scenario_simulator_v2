@@ -62,7 +62,8 @@ public:
     const visualization_msgs::msg::MarkerArray & a2) const;
   std::vector<geometry_msgs::msg::Point> toMapPoints(
     std::int64_t lanelet_id, std::vector<double> s);
-  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(geometry_msgs::msg::Pose pose);
+  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
 
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
@@ -112,7 +113,10 @@ public:
     double tangent_vector_size = 100);
   boost::optional<geometry_msgs::msg::Vector3> getTangentVector(std::int64_t lanelet_id, double s);
   std::vector<std::int64_t> getRoute(std::int64_t from_lanelet_id, std::int64_t to_lanelet_id);
-  std::vector<std::int64_t> getConflictingCrosswalkIds(std::vector<std::int64_t> lanelet_ids) const;
+  std::vector<std::int64_t> getConflictingCrosswalkIds(
+    const std::vector<std::int64_t> & lanelet_ids) const;
+  std::vector<std::int64_t> getConflictingLaneIds(
+    const std::vector<std::int64_t> & lanelet_ids) const;
   boost::optional<double> getCollisionPointInLaneCoordinate(
     std::int64_t lanelet_id, std::int64_t crossing_lanelet_id);
   const visualization_msgs::msg::MarkerArray generateMarker() const;
@@ -120,7 +124,7 @@ public:
   const std::unordered_map<std::int64_t, std::vector<std::int64_t>> getRightOfWayLaneletIds(
     std::vector<std::int64_t> lanelet_ids) const;
   boost::optional<std::int64_t> getClosetLaneletId(
-    geometry_msgs::msg::Pose pose, double distance_thresh = 30.0);
+    geometry_msgs::msg::Pose pose, double distance_thresh = 30.0, bool include_crosswalk = false);
   const std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id);
   const std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id);
   const std::vector<std::int64_t> getTrafficLightIds() const;

@@ -36,6 +36,7 @@ setup(
             "validate-xosc = openscenario_utility.validation:main",
             "yaml2xosc     = openscenario_utility.conversion:main",
             "validate-scenario = openscenario_utility.scenario_validation:validate_file"
-        ],
+        ]
+
     },
 )

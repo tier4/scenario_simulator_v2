@@ -94,15 +94,14 @@ public:
   {
     geographic_msgs::msg::GeoPoint origin;
     {
-      node.declare_parameter("origin_latitude", 0.0);
-      node.declare_parameter("origin_longitude", 0.0);
-      // node.declare_parameter("origin_altitude", 0.0);
+      if (!node.has_parameter("origin_latitude")) {
+        node.declare_parameter("origin_latitude", 0.0);
+      }
+      if (!node.has_parameter("origin_longitude")) {
+        node.declare_parameter("origin_longitude", 0.0);
+      }
       node.get_parameter("origin_latitude", origin.latitude);
       node.get_parameter("origin_longitude", origin.longitude);
-      // node.get_parameter("origin_altitude", origin.altitude);
-      node.undeclare_parameter("origin_latitude");
-      node.undeclare_parameter("origin_longitude");
-      // node.undeclare_parameter("origin_altitude");
     }
 
     return origin;
@@ -231,9 +230,6 @@ public:
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> boost::optional<double>;
 
-  auto getConflictingEntityOnRouteLanelets(const std::string & name, const double horizon)
-    -> std::vector<std::int64_t>;
-
   auto getCurrentTime() const noexcept -> double;
 
   auto getDistanceToCrosswalk(const std::string & name, const std::int64_t target_crosswalk_id)
@@ -276,9 +272,6 @@ public:
   // clang-format on
 
   auto getStepTime() const noexcept -> double;
-
-  auto getSValueInRoute(const std::string & name, const std::vector<std::int64_t> & route)
-    -> boost::optional<double>;
 
   auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
 

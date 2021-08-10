@@ -19,7 +19,7 @@ plugins:
 palette:
   scheme: slate
 
-copyright: 'Copyright &copy; 2020- Tier IV, Inc.'
+copyright: "Copyright &copy; 2020- Tier IV, Inc."
 
 markdown_extensions:
   - attr_list
@@ -29,7 +29,7 @@ markdown_extensions:
   - mdx_unimoji
   - plantuml_markdown: { server: http://www.plantuml.com/plantuml }
   - pymdownx.arithmatex
-  - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg }
+  - pymdownx.emoji: { emoji_generator: !!python/name:pymdownx.emoji.to_svg  }
   - pymdownx.highlight
   - pymdownx.superfences
   - toc: { permalink: "#" }
@@ -50,31 +50,32 @@ extra_javascript:
 nav:
   - Home: README.md
   - Tutorials:
-    - tutorials/BuildInstructions.md
-    - tutorials/SimpleDemo.md
-    - tutorials/RunWithDocker.md
+      - tutorials/BuildInstructions.md
+      - tutorials/SimpleDemo.md
+      - tutorials/RunWithDocker.md
+      - tutorials/RunTestScenarioWithDocker.md
   - User Guide:
-    - Scenario Editor:
-      - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
-      - user_guide/scenario_editor/CreateSimpleScenario.md
-      - user_guide/scenario_editor/EditExistingScenario.md
-      - user_guide/scenario_editor/ChangeCoordinate.md
-      - Place an entity to relative position: user_guide/scenario_editor/RelativePosition.md
-    - Scenario Test Runner:
-      - Overview: user_guide/scenario_test_runner/ScenarioTestRunner.md
-      - user_guide/scenario_test_runner/ScenarioFormatConversion.md
-      - user_guide/scenario_test_runner/HowToWriteWorkflowFile.md
-      - user_guide/scenario_test_runner/Tips.md
+      - Scenario Editor:
+          - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
+          - user_guide/scenario_editor/CreateSimpleScenario.md
+          - user_guide/scenario_editor/EditExistingScenario.md
+          - user_guide/scenario_editor/ChangeCoordinate.md
+          - Place an entity to relative position: user_guide/scenario_editor/RelativePosition.md
+      - Scenario Test Runner:
+          - Overview: user_guide/scenario_test_runner/ScenarioTestRunner.md
+          - user_guide/scenario_test_runner/ScenarioFormatConversion.md
+          - user_guide/scenario_test_runner/HowToWriteWorkflowFile.md
+          - user_guide/scenario_test_runner/Tips.md
   - Design:
-    - About: design/About.md
-    - design/AutowareAPI.md
-    - design/ErrorCategories.md
-    - design/OpenSCENARIOSupport.md
-    - design/SimpleSensorSimulator.md
-    - design/SystemArchitecture.md
-    - design/TrafficSimulator.md
-    - design/ZeroMQ.md
+      - About: design/About.md
+      - design/AutowareAPI.md
+      - design/ErrorCategories.md
+      - design/OpenSCENARIOSupport.md
+      - design/SimpleSensorSimulator.md
+      - design/SystemArchitecture.md
+      - design/TrafficSimulator.md
+      - design/ZeroMQ.md
   - Package Details: package/About.md
   - Release Notes: ReleaseNotes.md
-  - Contact Infomation: etc/ContactUs.md
+  - Contact Information: etc/ContactUs.md
   - LICENSE: LICENSE.md

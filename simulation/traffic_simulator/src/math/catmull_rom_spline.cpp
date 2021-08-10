@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <limits>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
@@ -105,22 +106,22 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
 }
 
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
-  double start_s, double end_s, double num_points) const
+  double start_s, double end_s, double resolution) const
 {
   std::vector<geometry_msgs::msg::Point> traj;
-  num_points = std::fabs(num_points);
+  resolution = std::fabs(resolution);
   double s = start_s;
   if (start_s < end_s) {
     while (s < end_s) {
       auto p = getPoint(s);
       traj.emplace_back(p);
-      s = s + num_points;
+      s = s + resolution;
     }
   } else {
     while (s < end_s) {
       auto p = getPoint(s);
       traj.emplace_back(p);
-      s = s - num_points;
+      s = s - resolution;
     }
   }
   return traj;
