@@ -16,9 +16,11 @@
 # limitations under the License.
 
 from pathlib import Path
+from typing import List
 from pkg_resources import resource_string
 from sys import exit
 from openscenario_utility.conversion import convert
+from scenario_test_runner.workflow import Workflow
 
 import argparse
 import xmlschema
@@ -77,10 +79,53 @@ class ReachPositionConditionValidator(ScenarioValidator):
 
         return reach_position_conditon == last_destination
 
-def validate_workflow():
-    pass
+def validate_file(path: Path, schema: xmlschema.XMLSchema, validators: List[ScenarioValidator]):
+        scenarios = []
+        paths = []
+        if path.suffix == '.xosc':
+            paths.append(path)
+            scenarios.append(schema.to_dict(str(path)))
+        else:
+            output = Path("/tmp").joinpath("xosc")
+            for converted_path in convert(path, output, verbose=False):
+                paths.append(converted_path)
+                scenarios.append(schema.to_dict(str(converted_path)))
 
-def validate_file():
+        for scenario, path in zip(scenarios, paths):
+            overall_result = True
+            try:
+                for validator in validators:
+                    if not validator(scenario):
+                        overall_result = False
+            except:
+                overall_result = False
+            print(str(path) + " : " + str(overall_result))
+
+
+def validate_workflow():
+
+    schema = xmlschema.XMLSchema(
+    resource_string(
+        __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
+    )
+
+    scenario_validators = list()
+    scenario_validators.append(ReachPositionConditionValidator())
+
+    parser = argparse.ArgumentParser(
+        description="Validate if the Workflow Files pass the conditions checked by validators"
+    )
+    parser.add_argument("workflow_paths", type=Path, nargs="+")
+
+    args = parser.parse_args()
+
+    for path in args.workflow_paths:
+        workflow = Workflow(path, 30.0)
+        for scenario in workflow.scenarios:
+            validate_file(scenario.path, schema, scenario_validators)
+
+
+def validate_scenario():
 
     schema = xmlschema.XMLSchema(
         resource_string(
@@ -98,18 +143,4 @@ def validate_file():
     args = parser.parse_args()
 
     for path in args.file_paths:
-        scenarios = []
-        paths = []
-        if path.suffix == '.xosc':
-            paths.append(path)
-            scenarios.append(schema.to_dict(str(path)))
-        else:
-            output = Path("/tmp").joinpath("xosc")
-            for converted_path in convert(path, output, verbose=False):
-                paths.append(converted_path)
-                scenarios.append(schema.to_dict(str(converted_path)))
-
-        for scenario, path in zip(scenarios, paths):
-            for validator in scenario_validators:
-                result = validator(scenario)
-                print(str(path) + " : " + str(result))
+        validate_file(path, schema, scenario_validators)

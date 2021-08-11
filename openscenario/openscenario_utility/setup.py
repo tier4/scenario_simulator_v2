@@ -35,7 +35,7 @@ setup(
         "console_scripts": [
             "validate-xosc = openscenario_utility.validation:main",
             "yaml2xosc     = openscenario_utility.conversion:main",
-            "validate-scenario = openscenario_utility.scenario_validation:validate_file",
+            "validate-scenario = openscenario_utility.scenario_validation:validate_scenario",
             "validate-workflow = openscenario_utility.scenario_validation:validate_workflow"
         ]
 
