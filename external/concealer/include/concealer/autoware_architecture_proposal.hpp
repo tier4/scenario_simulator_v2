@@ -45,9 +45,15 @@ class AutowareArchitectureProposal : public Autoware,
 {
   friend class TransitionAssertion<AutowareArchitectureProposal>;
 
-  void sendSIGINT() override {
-    ::kill(process_id, SIGINT);
-  }
+  void sendSIGINT() override;
+
+  bool isReady() noexcept;
+
+  bool isNotReady() noexcept;
+
+  void checkAutowareState();
+
+  bool is_ready = false;
 
   /// FROM MiscellaneousAPI ///
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,6 +322,8 @@ class AutowareArchitectureProposal : public Autoware,
    * ------------------------------------------------------------------------ */
   using VehicleCommand = autoware_vehicle_msgs::msg::VehicleCommand;
 
+  // this macro is used only once
+  // however is is created to keep consistency with the previous DEFINE_SUBSCRIPTION macro usage
   DEFINE_SUBSCRIPTION_WITH_OVERRIDE(VehicleCommand);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -471,20 +479,6 @@ public:
     DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
 #undef DEFINE_STATE_PREDICATE
-
-    bool is_ready = false;
-
-    auto isReady() noexcept { return is_ready or (is_ready = isWaitingForRoute()); }
-
-    auto isNotReady() noexcept { return not isReady(); }
-
-    void checkAutowareState()
-    {
-      if (isReady() and isEmergency()) {
-        // throw common::AutowareError("Autoware is in emergency state now");
-      }
-    }
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   template<typename... Ts>
@@ -523,84 +517,30 @@ public:
     setLaneChangeApproval();
   }
 
-  virtual ~AutowareArchitectureProposal() {
-    shutdownAutoware();
-  }
+  virtual ~AutowareArchitectureProposal();
 
-  void initialize(const geometry_msgs::msg::Pose & initial_pose) override {
-    if (not std::exchange(initialize_was_called, true)) {
-      task_queue.delay([this, initial_pose]() {
-        set(initial_pose);
-        waitForAutowareStateToBeInitializingVehicle();
-        waitForAutowareStateToBeWaitingForRoute([&]() { setInitialPose(initial_pose); });
-      });
-    }
-  }
+  void initialize(const geometry_msgs::msg::Pose &) override;
 
-  void plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) override {
-    assert(!route.empty());
+  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) override;
 
-    task_queue.delay([this, route] {
-      waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
-      setGoalPose(route.back());
-      for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-        setCheckpoint(each);
-      }
-      waitForAutowareStateToBePlanning();
-      waitForAutowareStateToBeWaitingForEngage();  // NOTE: Autoware.IV 0.11.1 waits about 3 sec from the completion of Planning until the transition to WaitingForEngage.
-    });
-  }
+  void engage() override;
 
-  void engage() override {
-    task_queue.delay(
-        [this]() { waitForAutowareStateToBeDriving([this]() { setAutowareEngage(true); }); });
-  }
+  void update() override;
 
-  void update() override {
-    setCurrentControlMode();
-    setCurrentShift(current_twist);
-    setCurrentSteering(current_twist);
-    setCurrentTwist(current_twist);
-    setCurrentVelocity(current_twist);
-    setLocalizationPose(current_pose);
-    setLocalizationTwist(current_twist);
-    setTransform(current_pose);
-  }
+  double getAcceleration() const override;
 
-  double getAcceleration() const override {
-      return getVehicleCommand().control.acceleration;
-  }
+  double getVelocity() const override;
 
-  double getVelocity() const override {
-    return getVehicleCommand().control.velocity;
-  }
+  double getSteeringAngle() const override;
 
-  double getSteeringAngle() const override {
-    return getVehicleCommand().control.steering_angle;
-  }
+  double getGearSign() const override;
 
-  double getGearSign() const override {
-    return getVehicleCommand().shift.data == autoware_vehicle_msgs::msg::Shift::REVERSE ? -1.0 : 1.0;
-  }
+  openscenario_msgs::msg::WaypointsArray getWaypoints() const override;
 
-  openscenario_msgs::msg::WaypointsArray getWaypoints() const override {
-    openscenario_msgs::msg::WaypointsArray waypoints;
+  double restrictTargetSpeed(double) const override;
 
-    for (const auto & point : getTrajectory().points) {
-      waypoints.waypoints.emplace_back(point.pose.position);
-    }
+  std::string getAutowareStateMessage() const override;
 
-    return waypoints;
-  }
-
-  double restrictTargetSpeed(double value) const override {
-    // no restrictions here
-    return value;
-  }
-
-  std::string getAutowareStateMessage() const override {
-    return getAutowareStatus().autoware_state;
-  }
 };
 }  // namespace concealer
 

@@ -30,9 +30,7 @@ namespace concealer
 {
 class AutowareAuto : public Autoware
 {
-  void sendSIGINT() override {
-    sudokill(process_id);
-  }
+  void sendSIGINT() override;
 
   /// FROM MiscellaneousAPI ///
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,46 +105,8 @@ class AutowareAuto : public Autoware
   using Trajectory = autoware_auto_msgs::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
 
-  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override {
-    // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
-    autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
+  autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
 
-    auto vehicle_control_command = getVehicleControlCommand();
-
-    vehicle_command.header.stamp = vehicle_control_command.stamp;
-
-    vehicle_command.control.steering_angle = vehicle_control_command.front_wheel_angle_rad;
-    vehicle_command.control.velocity = vehicle_control_command.velocity_mps;
-    vehicle_command.control.acceleration = vehicle_control_command.long_accel_mps2;
-
-    auto vehicle_state_command = getVehicleStateCommand();
-
-    // handle gear enum remapping
-    switch (vehicle_state_command.gear) {
-      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_DRIVE:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-        break;
-      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-        break;
-      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_PARK:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-        break;
-      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_LOW:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-        break;
-      case autoware_auto_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
-        vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-        break;
-    }
-
-    // these fields are hard-coded because they are not present in AutowareAuto
-    vehicle_command.header.frame_id = "";
-    vehicle_command.control.steering_angle_velocity = 0.0;
-    vehicle_command.emergency = 0;
-
-    return vehicle_command;
-  }
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 public:
@@ -165,94 +125,29 @@ public:
     waitpid_options = WNOHANG;
   }
 
-  virtual ~AutowareAuto() {
-    shutdownAutoware();
-  }
+  virtual ~AutowareAuto();
 
-  void initialize(const geometry_msgs::msg::Pose & initial_pose) override {
-    if (not std::exchange(initialize_was_called, true)) {
-      task_queue.delay([this, initial_pose]() {
-        // TODO: wait for a correct state if necessary once state monitoring is there
-        set(initial_pose);
-        setInitialPose(initial_pose);
-      });
-    }
-  }
+  void initialize(const geometry_msgs::msg::Pose &) override;
+  
+  void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) override;
 
-  void plan(const std::vector<geometry_msgs::msg::PoseStamped> & route) override {
-    assert(!route.empty());
+  void engage() override;
 
-    if (route.size() > 1) {
-      AUTOWARE_WARN_STREAM(
-          "AutowareAuto received route consisting of "
-              << route.size() << " poses but it does not support checkpoints. Ignoring first "
-              << route.size() - 1 << " poses and treating last pose as the goal.");
-    }
+  void update() override;
 
-    task_queue.delay([this, route]() {
-      // TODO: replace this sleep with proper state wait logic once state monitoring is there (waitForAutowareStateToBeWaitingForRoute)
-      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-      geometry_msgs::msg::PoseStamped gp;
-      gp.pose = route.back().pose;
-      gp.pose.position.z = 0.0;
-      gp.header.stamp = get_clock()->now();
-      gp.header.frame_id = "map";
-      setGoalPose(gp);
-    });
-  }
+  double getAcceleration() const override;
 
-  void engage() override {
-    task_queue.delay(
-        // Engage is not implemented in Autoware.Auto
-        [this]() {});
-  }
+  double getVelocity() const override;
 
+  double getSteeringAngle() const override;
 
-  void update() override {
-    setTransform(current_pose);
-    setVehicleKinematicState(current_pose, current_twist);
-    setVehicleStateReport();
-  }
-  double getAcceleration() const override {
-      return getVehicleControlCommand().long_accel_mps2;
-  }
+  double getGearSign() const override;
 
-  double getVelocity() const override {
-    return getVehicleControlCommand().velocity_mps;
-  }
+  openscenario_msgs::msg::WaypointsArray getWaypoints() const override;
 
-  double getSteeringAngle() const override {
-    return getVehicleControlCommand().front_wheel_angle_rad;
-  }
+  double restrictTargetSpeed(double) const override;
 
-  double getGearSign() const override {
-    return getVehicleStateCommand().gear == autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE ? -1.0 : +1.0;
-  }
-
-  openscenario_msgs::msg::WaypointsArray getWaypoints() const override {
-    openscenario_msgs::msg::WaypointsArray waypoints;
-
-    for (const auto & point : getTrajectory().points) {
-      geometry_msgs::msg::Point waypoint;
-      waypoint.x = point.x;
-      waypoint.y = point.y;
-      waypoint.z = 0;
-      waypoints.waypoints.push_back(waypoint);
-    }
-
-    return waypoints;
-  }
-
-  double restrictTargetSpeed(double) const override {
-    // non-zero initial speed prevents behavioral planner from planning so it must be restricted to 0
-    return 0;
-  }
-
-  std::string getAutowareStateMessage() const override {
-    // TODO: implement when state monitoring is there
-    return {};
-  }
-
+  std::string getAutowareStateMessage() const override;
 };
 
 }  // namespace concealer
