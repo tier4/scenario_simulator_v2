@@ -30,7 +30,6 @@
 #include <unordered_map>
 #include <vector>
 
-
 template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
@@ -41,7 +40,6 @@ auto getParameter(const std::string & name, T value = {})
 
   return value;
 }
-
 
 namespace traffic_simulator
 {

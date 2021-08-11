@@ -20,24 +20,22 @@
 #include <sys/wait.h>
 
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
+#include <chrono>
+#include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/conversion.hpp>
 #include <concealer/define_macro.hpp>
-#include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
 #include <concealer/utility/autoware_stream.hpp>
 #include <concealer/utility/visibility.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
-#include <openscenario_msgs/msg/waypoints_array.hpp>
-
-#include <chrono>
 #include <exception>
 #include <future>
+#include <geometry_msgs/msg/twist_stamped.hpp>
 #include <mutex>
+#include <openscenario_msgs/msg/waypoints_array.hpp>
 #include <thread>
 #include <utility>
-
 
 namespace concealer
 {
@@ -54,8 +52,7 @@ namespace concealer
  *        initialize, plan, and engage.
  *
  * -------------------------------------------------------------------------- */
-class Autoware : public rclcpp::Node,
-                 public ContinuousTransformBroadcaster<Autoware>
+class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Autoware>
 {
   friend class ContinuousTransformBroadcaster<Autoware>;
 
@@ -88,9 +85,7 @@ protected:
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
   void shutdownAutoware();
 
-  void createUpdater() {
-      updater = create_wall_timer(std::chrono::milliseconds(5), [this](){ this->update(); });
-  }
+  void createUpdater();
 
 public:
   template <typename... Ts>
@@ -111,7 +106,9 @@ public:
           "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
-    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...)) {}
+    process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
+  {
+  }
 
   virtual ~Autoware() = default;
 
@@ -172,7 +169,10 @@ public:
 
   auto set(const geometry_msgs::msg::Pose & pose) -> const auto & { return current_pose = pose; }
 
-  auto set(const geometry_msgs::msg::Twist & twist) -> const auto & { return current_twist = twist; }
+  auto set(const geometry_msgs::msg::Twist & twist) -> const auto &
+  {
+    return current_twist = twist;
+  }
 };
 }  // namespace concealer
 

@@ -18,7 +18,6 @@
 // NOTE: headers are lexicographically sorted.
 
 #include <autoware_vehicle_msgs/msg/engage.hpp>
-
 #include <boost/mpl/and.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/float32.hpp>

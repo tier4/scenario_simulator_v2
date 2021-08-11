@@ -15,12 +15,6 @@
 #ifndef CONCEALER__AUTOWARE_ARCHITECTURE_PROPOSAL_HPP_
 #define CONCEALER__AUTOWARE_ARCHITECTURE_PROPOSAL_HPP_
 
-#include <boost/range/adaptor/sliced.hpp>
-
-#include <concealer/autoware.hpp>
-#include <concealer/conversion.hpp>
-#include <concealer/define_macro.hpp>
-
 #include <autoware_api_msgs/msg/awapi_autoware_status.hpp>
 #include <autoware_api_msgs/msg/awapi_vehicle_status.hpp>
 #include <autoware_api_msgs/msg/velocity_limit.hpp>
@@ -30,13 +24,16 @@
 #include <autoware_planning_msgs/msg/route.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_system_msgs/msg/autoware_state.hpp>
-#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode.hpp>
+#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <autoware_vehicle_msgs/msg/shift_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/steering.hpp>
 #include <autoware_vehicle_msgs/msg/turn_signal.hpp>
 #include <autoware_vehicle_msgs/msg/vehicle_command.hpp>
-
+#include <boost/range/adaptor/sliced.hpp>
+#include <concealer/autoware.hpp>
+#include <concealer/conversion.hpp>
+#include <concealer/define_macro.hpp>
 
 namespace concealer
 {
@@ -256,46 +253,46 @@ class AutowareArchitectureProposal : public Autoware,
     *  Topic: /localization/pose_with_covariance
     *
     * ------------------------------------------------------------------------ */
-   using LocalizationPose = geometry_msgs::msg::PoseWithCovarianceStamped;
+  using LocalizationPose = geometry_msgs::msg::PoseWithCovarianceStamped;
 
-   DEFINE_PUBLISHER(LocalizationPose);
+  DEFINE_PUBLISHER(LocalizationPose);
 
-   auto setLocalizationPose(
-     const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
-     const std::array<double, 36> & covariance = {}) -> decltype(auto)
-   {
-     geometry_msgs::msg::PoseWithCovarianceStamped pose_with_covariance_stamped;
-     {
-       pose_with_covariance_stamped.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-       pose_with_covariance_stamped.header.frame_id = "map";
-       pose_with_covariance_stamped.pose.pose = pose;
-       pose_with_covariance_stamped.pose.covariance = covariance;
-     }
+  auto setLocalizationPose(
+    const geometry_msgs::msg::Pose & pose = geometry_msgs::msg::Pose(),
+    const std::array<double, 36> & covariance = {}) -> decltype(auto)
+  {
+    geometry_msgs::msg::PoseWithCovarianceStamped pose_with_covariance_stamped;
+    {
+      pose_with_covariance_stamped.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+      pose_with_covariance_stamped.header.frame_id = "map";
+      pose_with_covariance_stamped.pose.pose = pose;
+      pose_with_covariance_stamped.pose.covariance = covariance;
+    }
 
-     return setLocalizationPose(pose_with_covariance_stamped);
-   }
+    return setLocalizationPose(pose_with_covariance_stamped);
+  }
 
-   /* ---- LocalizationTwist ----------------------------------------------------
-    *
-    *  Topic: /localization/twist
-    *
-    * ------------------------------------------------------------------------ */
-   using LocalizationTwist = CurrentTwist;
+  /* ---- LocalizationTwist ----------------------------------------------------
+ *
+ *  Topic: /localization/twist
+ *
+ * ------------------------------------------------------------------------ */
+  using LocalizationTwist = CurrentTwist;
 
-   DEFINE_PUBLISHER(LocalizationTwist);
+  DEFINE_PUBLISHER(LocalizationTwist);
 
-   decltype(auto) setLocalizationTwist(
-     const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
-   {
-     LocalizationTwist localization_twist;
-     {
-       localization_twist.header.stamp = get_clock()->now();
-       localization_twist.header.frame_id = "map";
-       localization_twist.twist = twist;
-     }
+  decltype(auto) setLocalizationTwist(
+    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
+  {
+    LocalizationTwist localization_twist;
+    {
+      localization_twist.header.stamp = get_clock()->now();
+      localization_twist.header.frame_id = "map";
+      localization_twist.twist = twist;
+    }
 
-     return setLocalizationTwist(localization_twist);
-   }
+    return setLocalizationTwist(localization_twist);
+  }
 
   /* ---- Trajectory -----------------------------------------------------------
    *
@@ -469,21 +466,20 @@ public:
   }                                                                                           \
   static_assert(true, "")
 
-    DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
-    DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
-    DEFINE_STATE_PREDICATE(Planning, PLANNING);
-    DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
-    DEFINE_STATE_PREDICATE(Driving, DRIVING);
-    DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
-    DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
-    DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
+  DEFINE_STATE_PREDICATE(InitializingVehicle, INITIALIZING_VEHICLE);
+  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
+  DEFINE_STATE_PREDICATE(Planning, PLANNING);
+  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
+  DEFINE_STATE_PREDICATE(Driving, DRIVING);
+  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
+  DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
+  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
 #undef DEFINE_STATE_PREDICATE
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  template<typename... Ts>
-  CONCEALER_PUBLIC explicit
-  AutowareArchitectureProposal(Ts &&... xs)
+  template <typename... Ts>
+  CONCEALER_PUBLIC explicit AutowareArchitectureProposal(Ts &&... xs)
   : Autoware(std::forward<decltype(xs)>(xs)...),
     /// MiscellaneousAPI
     INIT_PUBLISHER(Checkpoint, "/planning/mission_planning/checkpoint"),
@@ -491,11 +487,11 @@ public:
     INIT_PUBLISHER(CurrentShift, "/vehicle/status/shift"),
     INIT_PUBLISHER(CurrentSteering, "/vehicle/status/steering"),
     INIT_PUBLISHER(CurrentTurnSignal, "/vehicle/status/turn_signal"),
-    INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
     INIT_PUBLISHER(CurrentTwist, "/vehicle/status/twist"),
     INIT_PUBLISHER(CurrentVelocity, "/vehicle/status/velocity"),
     INIT_PUBLISHER(GoalPose, "/planning/mission_planning/goal"),
     INIT_PUBLISHER(InitialPose, "/initialpose"),
+    INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
     INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
@@ -540,7 +536,6 @@ public:
   double restrictTargetSpeed(double) const override;
 
   std::string getAutowareStateMessage() const override;
-
 };
 }  // namespace concealer
 

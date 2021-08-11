@@ -23,7 +23,6 @@
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <traffic_simulator/metrics/out_of_range_metric.hpp>
 
-
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -116,8 +115,7 @@ struct ScenarioObject
               name, "/perception/object_recognition/objects", 0.1));
           } else if (autoware_type == "auto") {
             attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-              traffic_simulator::helper::LidarType::VLP16, name,
-              "/perception/points_nonground"));
+              traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
 
             // Autoware.Auto does not currently support object prediction
             // however it is work-in-progress for Cargo ODD

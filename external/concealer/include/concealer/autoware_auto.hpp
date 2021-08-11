@@ -15,16 +15,13 @@
 #ifndef CONCEALER__AUTOWARE_AUTO_HPP_
 #define CONCEALER__AUTOWARE_AUTO_HPP_
 
-#include <concealer/autoware.hpp>
-#include <concealer/define_macro.hpp>
-
 #include <autoware_auto_msgs/msg/trajectory.hpp>
 #include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
 #include <autoware_auto_msgs/msg/vehicle_state_report.hpp>
-
-
+#include <concealer/autoware.hpp>
+#include <concealer/define_macro.hpp>
 
 namespace concealer
 {
@@ -66,7 +63,7 @@ class AutowareAuto : public Autoware
   using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
   DEFINE_PUBLISHER(VehicleKinematicState);
   decltype(auto) setVehicleKinematicState(
-      const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
+    const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
   {
     VehicleKinematicState kinematic_state;
     {
@@ -128,7 +125,7 @@ public:
   virtual ~AutowareAuto();
 
   void initialize(const geometry_msgs::msg::Pose &) override;
-  
+
   void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) override;
 
   void engage() override;

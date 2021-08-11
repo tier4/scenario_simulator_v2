@@ -26,7 +26,6 @@
 #include <utility>
 #include <vector>
 
-
 namespace traffic_simulator
 {
 namespace entity
@@ -142,25 +141,25 @@ EgoEntity::EgoEntity(
   auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
 
   if (autoware_type == "proposal") {
-    autoware = std::make_unique<concealer::AutowareArchitectureProposal>(getParameter<std::string>("autoware_launch_package"),
-                                                                         getParameter<std::string>("autoware_launch_file"),
-                                                                         "map_path:=" + configuration.map_path.string(),
-                                                                         "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                                                                         "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                                                                         "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                                                                         "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                                                                         "rviz_config:=" + configuration.rviz_config_path.string(),
-                                                                         "scenario_simulation:=true");
+    autoware = std::make_unique<concealer::AutowareArchitectureProposal>(
+      getParameter<std::string>("autoware_launch_package"),
+      getParameter<std::string>("autoware_launch_file"),
+      "map_path:=" + configuration.map_path.string(),
+      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+      "sensor_model:=" + getParameter<std::string>("sensor_model"),
+      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
   } else if (autoware_type == "auto") {
-    autoware = std::make_unique<concealer::AutowareAuto>(getParameter<std::string>("autoware_launch_package"),
-                                                         getParameter<std::string>("autoware_launch_file"),
-                                                         "map_path:=" + configuration.map_path.string(),
-                                                         "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-                                                         "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                                                         "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                                                         "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-                                                         "rviz_config:=" + configuration.rviz_config_path.string(),
-                                                         "scenario_simulation:=true");
+    autoware = std::make_unique<concealer::AutowareAuto>(
+      getParameter<std::string>("autoware_launch_package"),
+      getParameter<std::string>("autoware_launch_file"),
+      "map_path:=" + configuration.map_path.string(),
+      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+      "sensor_model:=" + getParameter<std::string>("sensor_model"),
+      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
 
   } else {
     throw std::invalid_argument("Invalid autoware_type = " + autoware_type);
