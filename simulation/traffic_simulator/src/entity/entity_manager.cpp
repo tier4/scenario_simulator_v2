@@ -131,17 +131,6 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
   return math::getPolygonDistance(pose0, bbox0, pose1, bbox1);
 }
 
-auto EntityManager::getConflictingEntityOnRouteLanelets(
-  const std::string & name, const double horizon) -> std::vector<std::int64_t>
-{
-  auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    THROW_SEMANTIC_ERROR("entity : ", name, " does not exist");
-  }
-  const auto route = getRouteLanelets(name, horizon);
-  return hdmap_utils_ptr_->getConflictingCrosswalkIds(route);
-}
-
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
 
 auto EntityManager::getDistanceToCrosswalk(
@@ -366,29 +355,6 @@ auto EntityManager::getRelativePose(const std::string & from, const std::string 
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
-auto EntityManager::getSValueInRoute(
-  const std::string & name, const std::vector<std::int64_t> & route) -> boost::optional<double>
-{
-  const auto it = entities_.find(name);
-  if (it == entities_.end()) {
-    return boost::none;
-  }
-  const auto lanelet_pose = getLaneletPose(name);
-  if (!lanelet_pose) {
-    return boost::none;
-  }
-  double s = 0;
-  for (const auto id : route) {
-    if (id == lanelet_pose->lanelet_id) {
-      s = s + lanelet_pose->s;
-      return s;
-    } else {
-      s = s + hdmap_utils_ptr_->getLaneletLength(id);
-    }
-  }
-  return boost::none;
-}
-
 auto EntityManager::getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray
 {
   if (current_time_ < 0) {
@@ -579,7 +545,8 @@ void EntityManager::update(const double current_time, const double step_time)
   const std::vector<std::string> entity_names = getEntityNames();
   for (const auto & entity_name : entity_names) {
     if (entities_[entity_name]->statusSet()) {
-      const auto status = updateNpcLogic(entity_name, type_list);
+      auto status = updateNpcLogic(entity_name, type_list);
+      status.bounding_box = getBoundingBox(entity_name);
       all_status.emplace(entity_name, status);
     }
   }

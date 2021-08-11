@@ -31,40 +31,38 @@ class DecelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit DecelerateAndFollowScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
-      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
+      "idiot_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }
 
 private:
+  bool requested = false;
   void onUpdate() override
   {
-    double ego_accel = api_.getEntityStatus("ego").action_status.accel.linear.x;
-    double ego_twist = api_.getEntityStatus("ego").action_status.twist.linear.x;
-    // double npc_accel = api_.getEntityStatus("npc").action_status.accel.linear.x;
-    double npc_twist = api_.getEntityStatus("npc").action_status.twist.linear.x;
-    if (ego_twist > (npc_twist + 1) && ego_accel > 0) {
+    if (api_.isInLanelet("ego", 34510, 0.1)) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
+    if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.checkCollision("ego", "npc")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    if (api_.getCurrentTime() >= 10) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
   void onInitialize() override
   {
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(15));
+      "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
+      traffic_simulator::helper::constructActionStatus(5));
+    api_.setTargetSpeed("ego", 5, true);
+    api_.requestLaneChange("ego", 34513);
     api_.spawn(false, "npc", getVehicleParameters());
     api_.setEntityStatus(
-      "npc", traffic_simulator::helper::constructLaneletPose(34741, 10, 0),
+      "npc", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.setTargetSpeed("npc", 10, true);
   }
 };
 

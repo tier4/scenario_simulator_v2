@@ -23,6 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         rosdistro: [foxy, galactic]
+        test_flags: [cpp_mock_test, openscenario_interpreter]
     steps:
       - uses: actions/checkout@v2-beta
 
@@ -85,39 +86,52 @@ jobs:
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.base --initial
 
       - name: Scenario test
+        if: matrix.test_flags == 'openscenario_interpreter'
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
           ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
 
       - name: Run idiot NPC scenario
+        if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=idiot_npc timeout:=5 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run traffic simulation demo scenario
+        if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo timeout:=70 with_rviz:=True  > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo timeout:=70 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run accelerate and follow front entity scenario
+        if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=accelerate_and_follow timeout:=15 with_rviz:=True
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=accelerate_and_follow timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run decelerate_and_follow front entity scenario
+        if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=decelerate_and_follow timeout:=15 with_rviz:=True
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=decelerate_and_follow timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run lanechange_left scenario
+        if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left timeout:=15 with_rviz:=True
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run merge_left scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=merge_left timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Collect coverage
@@ -133,7 +147,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: /home/runner/ros2_ws/lcov.total.filtered
-          flags: scenario_test
+          flags: ${{ matrix.test_flags }}
           name: scenario_simulator_v2
 
       - name: Notify Slack

@@ -15,6 +15,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/math/polynomial_solver.hpp>
 #include <vector>
 
@@ -35,7 +36,7 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
-  constexpr double e = std::numeric_limits<float>::epsilon();
+  constexpr double e = std::numeric_limits<double>::epsilon();
   if (std::fabs(a) < e) {
     if (std::fabs(b) < e) {
       if (min_value <= 0 && 0 <= max_value) {
@@ -55,7 +56,7 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const
 {
   std::vector<double> candidates, ret;
-  constexpr double e = std::numeric_limits<float>::epsilon();
+  constexpr double e = std::numeric_limits<double>::epsilon();
   if (std::fabs(a) < e) {
     return solveLinearEquation(b, c);
   }
@@ -78,7 +79,7 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
 std::vector<double> PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
 {
-  constexpr double e = std::numeric_limits<float>::epsilon();
+  constexpr double e = std::numeric_limits<double>::epsilon();
   if (std::fabs(a) < e) {
     return solveQuadraticEquation(b, c, d);
   }
@@ -102,7 +103,7 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
 int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, double c) const
 {
   x = std::vector<double>(3);
-  const double eps = 1e-14;
+  const double eps = std::numeric_limits<double>::epsilon();
   double a2 = a * a;
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
