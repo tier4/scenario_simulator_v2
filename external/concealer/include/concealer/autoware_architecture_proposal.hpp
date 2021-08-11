@@ -46,8 +46,6 @@ class AutowareArchitectureProposal : public Autoware,
   friend class TransitionAssertion<AutowareArchitectureProposal>;
 
   void sendSIGINT() override {
-    std::cout << "AutowareArchitectureProposal::sendSIGINT" << std::endl;
-
     ::kill(process_id, SIGINT);
   }
 

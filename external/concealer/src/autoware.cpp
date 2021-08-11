@@ -31,7 +31,6 @@ void Autoware::shutdownAutoware()
 
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
   {
-    // TODO: test if it works
     sendSIGINT();
   }
 
@@ -77,8 +76,6 @@ void Autoware::shutdownAutoware()
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (3/3) Waiting for Autoware to be exited.");
   {
     int status = 0;
-
-    std::cout << "waitpid_options = " << waitpid_options << std::endl;
 
     if (waitpid(process_id, &status, waitpid_options) < 0) {
       AUTOWARE_SYSTEM_ERROR("waitpid");

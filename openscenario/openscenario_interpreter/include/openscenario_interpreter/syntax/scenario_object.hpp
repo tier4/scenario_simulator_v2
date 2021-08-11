@@ -107,8 +107,6 @@ struct ScenarioObject
         if (object_controller.isEgo()) {
           auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
 
-          std::cout << "ScenarioObject::autoware_type = " << autoware_type << std::endl;
-
           if (autoware_type == "proposal") {
             attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
               traffic_simulator::helper::LidarType::VLP16, name,

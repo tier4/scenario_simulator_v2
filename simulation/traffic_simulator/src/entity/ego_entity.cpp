@@ -14,8 +14,6 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <concealer/autoware_auto.hpp>
-#include <concealer/autoware_architecture_proposal.hpp>
 #include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
@@ -142,8 +140,6 @@ EgoEntity::EgoEntity(
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
   auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
-
-  std::cout << "EgoEntity::autoware_type = " << autoware_type << std::endl;
 
   if (autoware_type == "proposal") {
     autoware = std::make_unique<concealer::AutowareArchitectureProposal>(getParameter<std::string>("autoware_launch_package"),
@@ -336,7 +332,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
         input << autoware->getAcceleration(), autoware->getSteeringAngle(), autoware->getGearSign();
 
-              (*vehicle_model_ptr_).setInput(input);
+        (*vehicle_model_ptr_).setInput(input);
       } break;
 
       default:

@@ -31,8 +31,6 @@ namespace concealer
 class AutowareAuto : public Autoware
 {
   void sendSIGINT() override {
-    std::cout << "AutowareAuto::sendSIGINT" << std::endl;
-
     sudokill(process_id);
   }
 
@@ -204,7 +202,6 @@ public:
   }
 
   void engage() override {
-    // TODO: remove this and test
     task_queue.delay(
         // Engage is not implemented in Autoware.Auto
         [this]() {});
