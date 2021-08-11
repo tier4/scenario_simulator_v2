@@ -77,6 +77,8 @@ class ReachPositionConditionValidator(ScenarioValidator):
 
         return reach_position_conditon == last_destination
 
+def validate_workflow():
+    pass
 
 def validate_file():
 
