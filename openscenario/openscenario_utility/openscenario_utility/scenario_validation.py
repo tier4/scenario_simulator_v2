@@ -18,7 +18,7 @@
 from pathlib import Path
 from typing import List
 from pkg_resources import resource_string
-from sys import exit
+from sys import exit, modules
 from openscenario_utility.conversion import convert
 from scenario_test_runner.workflow import Workflow
 
@@ -109,15 +109,16 @@ def validate_workflow():
         __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
     )
 
-    scenario_validators = list()
-    scenario_validators.append(ReachPositionConditionValidator())
-
     parser = argparse.ArgumentParser(
         description="Validate if the Workflow Files pass the conditions checked by validators"
     )
-    parser.add_argument("workflow_paths", type=Path, nargs="+")
-
+    parser.add_argument("--workflow_paths", type=Path, nargs="+")
+    parser.add_argument("--validators", nargs="+")
     args = parser.parse_args()
+
+    scenario_validators = list()
+    for validator in args.validators:
+        scenario_validators.append(getattr(modules[__name__],validator)())
 
     for path in args.workflow_paths:
         workflow = Workflow(path, 30.0)
@@ -132,15 +133,16 @@ def validate_scenario():
             __name__, "resources/OpenSCENARIO.xsd").decode("utf-8")
     )
 
-    scenario_validators = list()
-    scenario_validators.append(ReachPositionConditionValidator())
-
     parser = argparse.ArgumentParser(
         description="Validate if the Scenario Files pass the conditions checked by validators"
     )
-    parser.add_argument("file_paths", type=Path, nargs="+")
-
+    parser.add_argument("--file_paths", type=Path, nargs="+")
+    parser.add_argument("--validators", nargs="+")
     args = parser.parse_args()
+
+    scenario_validators = list()
+    for validator in args.validators:
+        scenario_validators.append(getattr(modules[__name__],validator)())
 
     for path in args.file_paths:
         validate_file(path, schema, scenario_validators)
