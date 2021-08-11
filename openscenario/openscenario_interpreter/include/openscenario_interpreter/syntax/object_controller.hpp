@@ -37,8 +37,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectController : public ComplexType
 {
-  // inline static int ego_num = 0;
-  static int ego_num;
+  // inline static int ego_count= 0;
+  static int ego_count;
 
   explicit ObjectController()  // ObjectController is optional element.
   : ComplexType(unspecified)
@@ -54,10 +54,17 @@ struct ObjectController : public ComplexType
         std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, std::forward<decltype(xs)>(xs)...); })))
   // clang-format on
   {
-    ego_num++;
+    if (isEgo()) {
+      ego_count++;
+    }
   }
 
-  ~ObjectController() { ego_num--; }
+  ~ObjectController()
+  {
+    if (isEgo()) {
+      ego_count--;
+    }
+  }
 
   bool isEgo() &
   {

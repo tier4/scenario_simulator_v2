@@ -19,6 +19,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-int ObjectController::ego_num = 0;
+int ObjectController::ego_count = 0;
 }
 }  // namespace openscenario_interpreter

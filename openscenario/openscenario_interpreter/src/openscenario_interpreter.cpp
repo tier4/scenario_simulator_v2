@@ -136,7 +136,7 @@ try {
   {
     configuration.auto_sink = false;
 
-    configuration.initialize_duration = ObjectController::ego_num > 0 ? 30 : 0;
+    configuration.initialize_duration = ObjectController::ego_count > 0 ? 30 : 0;
 
     configuration.scenario_path = osc_path;
 
