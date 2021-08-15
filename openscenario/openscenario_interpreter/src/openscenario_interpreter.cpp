@@ -122,15 +122,7 @@ try {
   {
     configuration.auto_sink = false;
 
-    configuration.initialize_duration =
-      std::any_of(
-        std::cbegin(script.as<OpenScenario>().entities),
-        std::cend(script.as<OpenScenario>().entities),
-        [](auto && each) {
-          return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
-        })
-        ? 30
-        : 0;
+    configuration.initialize_duration = ObjectController::ego_count > 0 ? 30 : 0;
 
     configuration.scenario_path = osc_path;
 
