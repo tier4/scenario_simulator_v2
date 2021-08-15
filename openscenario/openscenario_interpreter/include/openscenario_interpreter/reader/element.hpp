@@ -112,13 +112,13 @@ auto readElements(const std::string & name, const XML & node, Ts &&... xs)
 }
 
 template <typename T, Cardinality MinOccurs, Cardinality MaxOccurs = unbounded, typename... Ts>
-auto readSharedElements(const std::string & name, const XML & node, Ts &&... xs)
+auto readElementsAsElement(
+  const std::string & name, const XML & node, Ts &&... xs)  // XXX UGLY NAME!!!
 {
-  std::list<std::shared_ptr<T>> elements;
+  std::list<Element> elements;
 
   callWithElements(node, name, MinOccurs, MaxOccurs, [&](auto && x) {
-    elements.emplace_back(
-      std::make_shared<T>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...));
+    elements.emplace_back(make<T>(std::forward<decltype(x)>(x), std::forward<decltype(xs)>(xs)...));
   });
 
   return elements;

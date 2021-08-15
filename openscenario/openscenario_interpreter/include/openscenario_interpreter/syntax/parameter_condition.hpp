@@ -60,8 +60,7 @@ struct ParameterCondition : private Scope
     std::stringstream description;
 
     description << "The value of parameter " << std::quoted(parameter_ref) << " = "
-                << localScope().parameters.at(parameter_ref) << " " << compare << " " << value
-                << "?";
+                << localScope().findElement(parameter_ref) << " " << compare << " " << value << "?";
 
     return description.str();
   }
@@ -83,7 +82,10 @@ struct ParameterCondition : private Scope
       };
 
     try {
-      const auto & parameter = localScope().parameters.at(parameter_ref);
+      const auto & parameter = localScope().findElement(parameter_ref);
+      if (!parameter) {
+        THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
+      }
       try {
         return asBoolean(overloads.at(parameter.type())(compare, parameter, value));
       } catch (const std::out_of_range &) {

@@ -19,7 +19,9 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <stdexcept>  // std::runtime_error
 #include <string>
 #include <type_traits>  // std::true_type
@@ -70,7 +72,7 @@ struct CustomCommandAction : private Scope
       applyWalkStraightAction(actor);
     }
 
-    for (const auto actor : current_scope.actors) {
+    for (const auto & actor : current_scope.actors) {
       applyWalkStraightAction(actor);
     }
 
@@ -100,7 +102,6 @@ struct CustomCommandAction : private Scope
   static int test(const std::vector<std::string> & args, const Scope &)
   {
     std::cout << "test" << std::endl;
-
     for (auto iter = std::cbegin(args); iter != std::cend(args); ++iter) {
       std::cout << "  args[" << std::distance(std::cbegin(args), iter) << "] = " << *iter << "\n";
     }

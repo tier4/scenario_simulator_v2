@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_SET_ACTION_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
@@ -62,7 +63,7 @@ struct ParameterSetAction : private Scope
     };
     // clang-format on
 
-    const auto parameter = parameters.at(parameter_ref);
+    const auto parameter = findElement(parameter_ref);
 
     overloads.at(parameter.type())(parameter, value);
 
