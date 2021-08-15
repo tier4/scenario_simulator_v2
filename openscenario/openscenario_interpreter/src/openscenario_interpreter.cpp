@@ -253,15 +253,13 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   {
     results.name = script.as<OpenScenario>().pathname.parent_path().parent_path().string();
 
-    const auto suite_name = script.as<OpenScenario>().pathname.parent_path().stem().string();
+    const auto suite_name = script.as<OpenScenario>().pathname.parent_path().filename().string();
 
     const auto case_name = script.as<OpenScenario>().pathname.stem().string();
 
     boost::apply_visitor(
       overload(
-        [&](const common::junit::Pass &) {
-          results.testsuite(suite_name).testcase(case_name);
-        },
+        [&](const common::junit::Pass &) { results.testsuite(suite_name).testcase(case_name); },
         [&](const common::junit::Failure & it) {
           results.testsuite(suite_name).testcase(case_name).failure.push_back(it);
         },
