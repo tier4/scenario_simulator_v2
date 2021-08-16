@@ -34,8 +34,6 @@ inline namespace syntax
  *    </xsd:all>
  *  </xsd:complexType>
  *
- *  TODO REMOVE EXTENSION
- *
  * -------------------------------------------------------------------------- */
 struct AcquirePositionAction : private Scope
 {
@@ -47,25 +45,15 @@ struct AcquirePositionAction : private Scope
   {
   }
 
-  std::unordered_map<String, Boolean> accomplishments;
+  static constexpr auto accomplished() -> bool { return true; }
 
-  auto reset()
+  static constexpr auto endsImmediately() -> bool { return true; };
+
+  auto start() -> Element
   {
-    accomplishments.clear();
-
-    for (const auto & actor : actors) {
-      accomplishments.emplace(actor, false);
-    }
-  }
-
-  auto start()
-  {
-    reset();
-
     const auto acquire_position = overload(
       [](const WorldPosition & position, auto && actor) {
-        return applyAcquirePositionAction(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+        return applyAcquirePositionAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
       },
       [](const RelativeWorldPosition & position, auto && actor) {
         return applyAcquirePositionAction(
@@ -82,32 +70,6 @@ struct AcquirePositionAction : private Scope
 
     return unspecified;
   }
-
-  auto update()
-  {
-    const auto reach_position = overload(
-      [](const WorldPosition & position, auto && actor) {
-        return evaluateReachPositionCondition(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
-      },
-      [](const RelativeWorldPosition & position, auto && actor) {
-        return evaluateReachPositionCondition(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
-      },
-      [](const LanePosition & position, auto && actor) {
-        return evaluateReachPositionCondition(
-          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position), 1.0);
-      });
-
-    for (auto && each : accomplishments) {
-      std::get<1>(each) =
-        std::get<1>(each) or apply<bool>(reach_position, position, std::get<0>(each));
-    }
-  }
-
-  static constexpr auto accomplished() { return true; }
-
-  static constexpr bool endsImmediately() { return true; };
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
