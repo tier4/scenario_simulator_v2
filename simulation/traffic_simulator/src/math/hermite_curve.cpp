@@ -139,9 +139,9 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       s_values.emplace_back(s.get());
     }
   }
-  if(close_start_end) {
-    const auto p0 = *polygon.end();
-    const auto p1 = *polygon.begin();
+  if (close_start_end) {
+    const auto p0 = polygon[n - 1];
+    const auto p1 = polygon[0];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
       s_values.emplace_back(s.get());
@@ -201,7 +201,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       double poly_x = (1 - tx) * point1.x + tx * point0.x;
       double poly_y = (1 - ty) * point1.y + ty * point0.y;
       double error = std::hypot(poly_x - x, poly_y - y);
-      if (error < 3 && 0 < tx && tx < 1 && 0 < ty && ty < 1 && 0 < solution && solution < 1) {
+      if (error < 3) {
         s_values.emplace_back(solution);
       }
     }
