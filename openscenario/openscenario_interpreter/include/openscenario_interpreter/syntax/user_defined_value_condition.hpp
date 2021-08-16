@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 
 namespace openscenario_interpreter
@@ -43,7 +44,7 @@ struct UserDefinedValueCondition
 
   const Rule compare;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit UserDefinedValueCondition(const Node & node, Scope & scope)
   : name(readAttribute<String>("name", node, scope)),
     value(readAttribute<String>("value", node, scope)),

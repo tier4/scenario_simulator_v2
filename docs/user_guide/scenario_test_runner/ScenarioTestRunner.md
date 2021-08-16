@@ -19,7 +19,7 @@ RoadNetwork:
       filepath: lanelet2_map.osm
 ```
 
-and add the full path to your Lanelet2 map file based on your local setp. For example;
+and add the full path to your Lanelet2 map file based on your local setup. For example;
 
 ```bash
 RoadNetwork:
