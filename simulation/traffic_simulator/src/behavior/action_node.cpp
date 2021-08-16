@@ -237,7 +237,6 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), "crosswalk");
     const auto s = spline.getCollisionPointIn2D(polygon, false, true);
     return s;
   }
