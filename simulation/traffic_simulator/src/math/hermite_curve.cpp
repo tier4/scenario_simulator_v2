@@ -188,8 +188,8 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       }
     }
   } else {
-    double a = ay_ * ey - ax_ * ey;
-    double b = by_ * ey - bx_ * ey;
+    double a = ay_ * ex - ax_ * ey;
+    double b = by_ * ex - bx_ * ey;
     double c = cy_ * ex - cx_ * ey;
     double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
     auto solutions = solver_.solveCubicEquation(a, b, c, d);
