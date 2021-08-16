@@ -37,10 +37,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Route : private Scope
+struct Route : public Scope
 {
-  const String name;
-
   const Boolean closed;
 
   const ParameterDeclarations parameter_declarations;
@@ -49,9 +47,8 @@ struct Route : private Scope
 
   template <typename Node>
   explicit Route(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope),
-    name(readAttribute<String>("name", node, outer_scope)),
-    closed(readAttribute<Boolean>("closed", node, outer_scope, Boolean())),
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
+    closed(readAttribute<Boolean>("closed", node, localScope(), Boolean())),
     parameter_declarations(
       readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope()))
   {

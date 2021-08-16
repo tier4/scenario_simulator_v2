@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 
 namespace openscenario_interpreter
 {
@@ -57,14 +58,13 @@ struct TrafficSignalControllerCondition : private Scope
 
   auto evaluate()
   {
-    try {
-      const auto & controller =
-        localScope().traffic_signal_controllers.at(traffic_signal_controller_ref);
-      assert(controller);
-      current_phase_name = (*controller).currentPhaseName();
-      current_phase_since = (*controller).currentPhaseSince();
+    const auto & found = localScope().findElement(traffic_signal_controller_ref);
+    if (found && found.is<TrafficSignalController>()) {
+      const auto & controller = found.as<TrafficSignalController>();
+      current_phase_name = controller.currentPhaseName();
+      current_phase_since = controller.currentPhaseSince();
       return asBoolean(current_phase_name == phase);
-    } catch (const std::out_of_range &) {
+    } else {
       THROW_SYNTAX_ERROR(
         "TrafficSignalController ", std::quoted(traffic_signal_controller_ref),
         " is not declared in this scope");

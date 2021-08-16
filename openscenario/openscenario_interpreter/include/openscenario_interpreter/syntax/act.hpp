@@ -35,18 +35,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Act : private Scope, public StoryboardElement<Act>, public Elements
+struct Act : public Scope, public StoryboardElement<Act>, public Elements
 {
-  const String name;
-
   Trigger start_trigger;
 
   Element stop_trigger;
 
   template <typename Node>
   explicit Act(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope),
-    name(readAttribute<String>("name", node, outer_scope)),
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
     start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {
     callWithElements(node, "ManeuverGroup", 1, unbounded, [&](auto && node) {

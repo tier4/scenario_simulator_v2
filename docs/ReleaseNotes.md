@@ -1,12 +1,13 @@
 # Release Notes
 
 ## Difference between the latest release and master
-- Enables vehicle entity yield to merging entity. See also [this video.](https://user-images.githubusercontent.com/10348912/128287863-8a2db025-d1af-4e54-b5a3-08e5d2e168e4.mp4)
+- Enables vehicle entity yield to merging entity. See also [this video](https://user-images.githubusercontent.com/10348912/128287863-8a2db025-d1af-4e54-b5a3-08e5d2e168e4.mp4).
+- Simplify the contents of the scenario test result file `result.junit.xml`.
 
 ## Version 0.4.2
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.2) on Github :fa-github:
 - Fix problems in coordinate conversion from world to lane in pedestrian entity.
-- Adding include_crosswalk option to the HdMapUtils::getClosetLaneletId() and HdMapUtils::toLaneletPose()
+- Adding `include_crosswalk` option to the HdMapUtils::getClosetLaneletId() and HdMapUtils::toLaneletPose()
 
 ## Version 0.4.1
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.1) on Github :fa-github:

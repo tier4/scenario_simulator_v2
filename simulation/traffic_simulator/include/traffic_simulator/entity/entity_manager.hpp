@@ -273,9 +273,6 @@ public:
 
   auto getStepTime() const noexcept -> double;
 
-  auto getSValueInRoute(const std::string & name, const std::vector<std::int64_t> & route)
-    -> boost::optional<double>;
-
   auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
 
   bool isEgo(const std::string & name) const;

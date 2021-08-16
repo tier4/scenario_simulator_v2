@@ -40,10 +40,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Pedestrian : private Scope
+struct Pedestrian : public Scope
 {
-  const String name;
-
   const Double mass;
 
   const String model;
@@ -56,10 +54,9 @@ struct Pedestrian : private Scope
 
   const Properties properties;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit Pedestrian(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope),
-    name(readAttribute<String>("name", node, localScope())),
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
     mass(readAttribute<Double>("mass", node, localScope())),
     model(readAttribute<String>("model", node, localScope())),
     pedestrian_category(

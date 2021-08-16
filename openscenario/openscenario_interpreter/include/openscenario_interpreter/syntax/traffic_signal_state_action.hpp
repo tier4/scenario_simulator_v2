@@ -33,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalStateAction : private Scope
+struct TrafficSignalStateAction
 {
   /* ---- NOTE -----------------------------------------------------------------
    *
@@ -56,9 +56,8 @@ struct TrafficSignalStateAction : private Scope
 
   template <typename Node>
   explicit TrafficSignalStateAction(const Node & node, Scope & current_scope)
-  : Scope(current_scope),
-    name(readAttribute<String>("name", node, static_cast<Scope &>(*this))),
-    state(readAttribute<String>("state", node, static_cast<Scope &>(*this)))
+  : name(readAttribute<String>("name", node, current_scope)),
+    state(readAttribute<String>("state", node, current_scope))
   {
   }
 
