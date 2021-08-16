@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <utility>
 
@@ -44,18 +45,18 @@ struct TeleportAction : private Scope
 
   const std::true_type accomplished{};
 
-  decltype(auto) operator()(const WorldPosition & world_position, const Scope::Actor & actor) const
+  decltype(auto) operator()(const WorldPosition & world_position, const EntityRef & actor) const
   {
     return setEntityStatus(actor, static_cast<geometry_msgs::msg::Pose>(world_position));
   }
 
-  decltype(auto) operator()(const LanePosition & lane_position, const Scope::Actor & actor) const
+  decltype(auto) operator()(const LanePosition & lane_position, const EntityRef & actor) const
   {
     return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position));
   }
 
   decltype(auto) operator()(
-    const RelativeWorldPosition & relative_world_position, const Scope::Actor & actor) const
+    const RelativeWorldPosition & relative_world_position, const EntityRef & actor) const
   {
     return setEntityStatus(
       actor,

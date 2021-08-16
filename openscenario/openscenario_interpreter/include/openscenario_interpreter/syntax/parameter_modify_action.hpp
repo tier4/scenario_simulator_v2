@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_MODIFY_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_MODIFY_ACTION_HPP_
 
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/modify_rule.hpp>
 
 namespace openscenario_interpreter
@@ -49,7 +50,7 @@ struct ParameterModifyAction : Scope
 
   auto evaluate()
   try {
-    const auto target = parameters.at(parameter_ref);
+    const auto target = localScope().findElement(parameter_ref);
     if (rule.is<ParameterAddValueRule>()) {
       return rule.as<ParameterAddValueRule>()(target);
     } else {

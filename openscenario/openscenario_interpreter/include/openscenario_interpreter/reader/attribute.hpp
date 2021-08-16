@@ -37,30 +37,27 @@ template <typename Scope>
 auto substitute(std::string attribute, Scope & scope)
 {
   static const std::regex substitution_syntax{R"((.*)\$\((([\w-]+)\s?([^\)]*))\)(.*))"};
+  static const std::unordered_map<
+    std::string, std::function<std::string(const std::string &, Scope &)> >
+    substitutions{
+      {"find-pkg-share",
+       [](auto && package_name, auto &&) {
+         return ament_index_cpp::get_package_share_directory(package_name);
+       }},
+
+      {"var",
+       [](auto && name, auto && scope) -> String {
+         const auto found = scope.findElement(name);
+         if (found) {
+           return boost::lexical_cast<String>(found);
+         } else {
+           return "";
+         }
+       }},
+      {"dirname", [](auto &&, auto && scope) { return scope.pathname.parent_path().string(); }}};
 
   std::smatch match{};
-
   while (std::regex_match(attribute, match, substitution_syntax)) {
-    static const std::unordered_map<
-      std::string, std::function<std::string(const std::string &, Scope &)> >
-      substitutions{
-        {"find-pkg-share",
-         [](auto && package_name, auto &&) {
-           return ament_index_cpp::get_package_share_directory(package_name);
-         }},
-
-        {"var",
-         [](auto && name, auto && scope) -> String {
-           const auto iter{scope.parameters.find(name)};
-           if (iter != std::end(scope.parameters)) {
-             return boost::lexical_cast<String>(std::get<1>(*iter));
-           } else {
-             return "";
-           }
-         }},
-
-        {"dirname", [](auto &&, auto && scope) { return scope.pathname.parent_path().string(); }}};
-
     const auto iter{substitutions.find(match.str(3))};
 
     if (iter != std::end(substitutions)) {
@@ -88,9 +85,9 @@ T readAttribute(const std::string & name, const Node & node, const Scope & scope
       return T();
 #endif
     } else if (value.front() == '$') {
-      const auto iter{scope.parameters.find(value.substr(1))};
-      if (iter != std::end(scope.parameters)) {
-        return boost::lexical_cast<T>(boost::lexical_cast<String>(cdr(*iter)));
+      const auto found = scope.findElement(value.substr(1));
+      if (found) {
+        return boost::lexical_cast<T>(boost::lexical_cast<String>(found));
       } else {
         throw SyntaxError(
           "There is no parameter named ", std::quoted(value.substr(1)), " (Attribute ",

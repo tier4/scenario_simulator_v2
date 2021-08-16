@@ -33,7 +33,7 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Private : private Scope
+struct Private : public Scope
 {
   const String entity_ref;
 
