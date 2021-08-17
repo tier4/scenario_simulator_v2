@@ -146,7 +146,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   bbox.pose.orientation.z = 0.0;
   bbox.pose.orientation.w = 1.0;
   bbox.type = bbox.LINE_LIST;
-  bbox.lifetime = rclcpp::Duration(0.1);
+  bbox.lifetime = rclcpp::Duration::from_seconds(0.1);
   geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
 
   p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
@@ -253,7 +253,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text.scale.x = 0.0;
   text.scale.y = 0.0;
   text.scale.z = 0.6;
-  text.lifetime = rclcpp::Duration(0.1);
+  text.lifetime = rclcpp::Duration::from_seconds(0.1);
   text.text = status.name;
   text.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text);
@@ -292,7 +292,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   arrow.scale.x = 1.0;
   arrow.scale.y = 1.0;
   arrow.scale.z = 1.0;
-  arrow.lifetime = rclcpp::Duration(0.1);
+  arrow.lifetime = rclcpp::Duration::from_seconds(0.1);
   arrow.color = color_utils::makeColorMsg("red", 0.99);
   ret.markers.emplace_back(arrow);
 
@@ -315,7 +315,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.x = 0.0;
   text_action.scale.y = 0.0;
   text_action.scale.z = 0.4;
-  text_action.lifetime = rclcpp::Duration(0.1);
+  text_action.lifetime = rclcpp::Duration::from_seconds(0.1);
   text_action.text = status.action_status.current_action;
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);

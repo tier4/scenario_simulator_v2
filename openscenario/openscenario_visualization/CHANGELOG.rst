@@ -2,6 +2,16 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2021-08-17)
+------------------
+* Merge pull request `#432 <https://github.com/tier4/scenario_simulator_v2/issues/432>`_ from tier4/fix/suppress_warnings
+* fix rclcpp::Duration deprecated
+* add Werror
+* Merge remote-tracking branch 'origin/master' into namespace
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* Merge branch 'master' into namespace
+* Contributors: Hiroki OTA, Masaya Kataoka, kyabe2718, yamacir-kit
+
 0.4.2 (2021-07-30)
 ------------------
 

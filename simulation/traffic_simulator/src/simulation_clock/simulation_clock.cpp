@@ -20,7 +20,7 @@ namespace traffic_simulator
 SimulationClock::SimulationClock(rcl_clock_type_t clock_type, bool use_raw_clock)
 : rclcpp::Clock(clock_type),
   use_raw_clock(use_raw_clock),
-  step_time_duration_(0),
+  step_time_duration_(rclcpp::Duration::from_seconds(0)),
   initialized_(false)
 {
 }

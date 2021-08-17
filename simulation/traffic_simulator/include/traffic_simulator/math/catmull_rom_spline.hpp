@@ -49,10 +49,11 @@ public:
     double tolerance = 0.001);
   double getSquaredDistanceIn2D(geometry_msgs::msg::Point point, double s) const;
   boost::optional<double> getCollisionPointIn2D(
-    geometry_msgs::msg::Point point0, geometry_msgs::msg::Point point1,
+    const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false) const;
   boost::optional<double> getCollisionPointIn2D(
-    std::vector<geometry_msgs::msg::Point> polygon, bool search_backward = false) const;
+    const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
+    bool close_start_end = true) const;
   const openscenario_msgs::msg::CatmullRomSpline toRosMsg() const;
   const geometry_msgs::msg::Point getRightBoundsPoint(
     double width, double s, double z_offset = 0) const;
