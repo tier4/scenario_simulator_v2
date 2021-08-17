@@ -40,7 +40,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Event : private Scope, public StoryboardElement<Event>
 {
-  const String name;  // Name of the event.
+  using Scope::name;
 
   const Priority priority;  // Priority of each event.
 
@@ -50,10 +50,9 @@ struct Event : private Scope, public StoryboardElement<Event>
 
   template <typename XML>
   explicit Event(const XML & node, Scope & outer_scope)
-  : Scope(outer_scope),
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
     StoryboardElement(
       readAttribute<UnsignedInt>("maximumExecutionCount", node, localScope(), UnsignedInt(1))),
-    name(readAttribute<String>("name", node, localScope())),
     priority(readAttribute<Priority>("priority", node, localScope())),
     start_trigger(readElement<Trigger>("StartTrigger", node, localScope()))
   {

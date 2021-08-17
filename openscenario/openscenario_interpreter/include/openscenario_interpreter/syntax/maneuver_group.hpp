@@ -37,21 +37,16 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
+struct ManeuverGroup : public Scope, public StoryboardElement<ManeuverGroup>, public Elements
 {
-  const String name;
-
-  Scope inner_scope;
-
   const Actors actors;
 
   template <typename Node>
   explicit ManeuverGroup(const Node & node, Scope & outer_scope)
-  : StoryboardElement(readAttribute<UnsignedInteger>(
-      "maximumExecutionCount", node, outer_scope, UnsignedInteger())),
-    name(readAttribute<String>("name", node, outer_scope)),
-    inner_scope(outer_scope),
-    actors(readElement<Actors>("Actors", node, inner_scope))
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
+    StoryboardElement(readAttribute<UnsignedInteger>(
+      "maximumExecutionCount", node, localScope(), UnsignedInteger())),
+    actors(readElement<Actors>("Actors", node, localScope()))
   {
     callWithElements(node, "CatalogReference", 0, unbounded, [&](auto && node) {
       throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name());
@@ -59,7 +54,7 @@ struct ManeuverGroup : public StoryboardElement<ManeuverGroup>, public Elements
     });
 
     callWithElements(node, "Maneuver", 0, unbounded, [&](auto && node) {
-      return push_back(readStoryboardElement<Maneuver>(node, inner_scope));
+      return push_back(readStoryboardElement<Maneuver>(node, localScope()));
     });
   }
 

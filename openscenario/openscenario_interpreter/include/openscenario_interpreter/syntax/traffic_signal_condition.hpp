@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalCondition : private Scope
+struct TrafficSignalCondition
 {
   const String name;
 
@@ -45,11 +45,10 @@ struct TrafficSignalCondition : private Scope
 
   using LaneletId = TrafficSignalState::LaneletId;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit TrafficSignalCondition(const Node & node, Scope & scope)
-  : Scope(scope),
-    name(readAttribute<String>("name", node, localScope())),
-    state(readAttribute<String>("state", node, localScope()))
+  : name(readAttribute<String>("name", node, scope)),
+    state(readAttribute<String>("state", node, scope))
   {
   }
 

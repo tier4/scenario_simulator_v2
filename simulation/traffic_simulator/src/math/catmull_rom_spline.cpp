@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <limits>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
@@ -282,12 +283,13 @@ double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
 }
 
 boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
-  std::vector<geometry_msgs::msg::Point> polygon, bool search_backward) const
+  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
+  bool close_start_end) const
 {
   size_t n = curves_.size();
   if (search_backward) {
     for (size_t i = 0; i < n; i++) {
-      auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward);
+      auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
       if (s) {
         return getSInSplineCurve(n - 1 - i, s.get());
       }
@@ -295,7 +297,7 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     return boost::none;
   } else {
     for (size_t i = 0; i < n; i++) {
-      auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward);
+      auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
       if (s) {
         return getSInSplineCurve(i, s.get());
       }
@@ -306,7 +308,8 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
 }
 
 boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
-  geometry_msgs::msg::Point point0, geometry_msgs::msg::Point point1, bool search_backward) const
+  const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
+  bool search_backward) const
 {
   size_t n = curves_.size();
   if (search_backward) {

@@ -56,7 +56,7 @@ struct SpeedActionTarget : public Element
     }
   }
 
-  std::function<bool(const Scope::Actor & actor)> getIsEnd() const
+  std::function<bool(const EntityRef & actor)> getIsEnd() const
   {
     if (is<AbsoluteTargetSpeed>()) {
       return as<AbsoluteTargetSpeed>().getIsEnd();

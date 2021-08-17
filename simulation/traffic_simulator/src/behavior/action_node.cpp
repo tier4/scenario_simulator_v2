@@ -14,10 +14,12 @@
 
 #include <algorithm>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
 #include <traffic_simulator/behavior/action_node.hpp>
+#include <traffic_simulator/math/bounding_box.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -189,34 +191,30 @@ boost::optional<double> ActionNode::getDistanceToStopLine(
   return hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints);
 }
 
-boost::optional<double> ActionNode::getDistanceToFrontEntity()
+boost::optional<double> ActionNode::getDistanceToFrontEntity(
+  const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  auto status = getFrontEntityStatus();
-  if (!status) {
+  auto name = getFrontEntityName(spline);
+  if (!name) {
     return boost::none;
   }
-  return hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, status->lanelet_pose);
+  return getDistanceToTargetEntityPolygon(spline, name.get());
 }
 
-boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntityStatus()
+boost::optional<std::string> ActionNode::getFrontEntityName(
+  const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  boost::optional<double> front_entity_distance{0.0}, front_entity_speed{0.0};
+  boost::optional<double> front_entity_distance;
   std::string front_entity_name = "";
   for (const auto & each : other_entity_status) {
-    if (!entity_status.lanelet_pose_valid || !each.second.lanelet_pose_valid) {
-      continue;
-    }
-    boost::optional<double> distance =
-      hdmap_utils->getLongitudinalDistance(entity_status.lanelet_pose, each.second.lanelet_pose);
+    const auto distance = getDistanceToTargetEntityPolygon(spline, each.first);
     if (distance) {
       if (distance.get() < 40) {
-        if (!front_entity_distance && !front_entity_speed) {
-          front_entity_speed = each.second.action_status.twist.linear.x;
+        if (!front_entity_distance) {
           front_entity_distance = distance.get();
           front_entity_name = each.first;
         } else {
           if (front_entity_distance.get() > distance.get()) {
-            front_entity_speed = each.second.action_status.twist.linear.x;
             front_entity_distance = distance.get();
             front_entity_name = each.first;
           }
@@ -224,28 +222,74 @@ boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getFrontEntity
       }
     }
   }
-  if (!front_entity_distance && !front_entity_speed) {
+  if (!front_entity_distance) {
     return boost::none;
   }
-  return other_entity_status[front_entity_name];
+  if (front_entity_name == "") {
+    THROW_SIMULATION_ERROR("name of front entity is empty.");
+  }
+  return front_entity_name;
+}
+
+boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
+  const traffic_simulator::math::CatmullRomSpline & spline,
+  const openscenario_msgs::msg::EntityStatus & status)
+{
+  if (status.lanelet_pose_valid) {
+    auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
+    return spline.getCollisionPointIn2D(polygon, false, true);
+  }
+  return boost::none;
+}
+
+openscenario_msgs::msg::EntityStatus ActionNode::getEntityStatus(
+  const std::string target_name) const
+{
+  if (other_entity_status.find(target_name) != other_entity_status.end()) {
+    return other_entity_status.at(target_name);
+  }
+  THROW_SIMULATION_ERROR("other entity : ", target_name, " does not exist.");
+}
+
+boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
+  const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name)
+{
+  const auto status = getEntityStatus(target_name);
+  if (status.lanelet_pose_valid == true) {
+    return getDistanceToTargetEntityPolygon(spline, status);
+  }
+  return boost::none;
+}
+
+boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
+  const traffic_simulator::math::CatmullRomSpline & spline,
+  const openscenario_msgs::msg::EntityStatus & status)
+{
+  if (status.lanelet_pose_valid) {
+    const auto polygon = traffic_simulator::math::transformPoints(
+      status.pose, traffic_simulator::math::getPointsFromBbox(status.bounding_box));
+    return spline.getCollisionPointIn2D(polygon);
+  }
+  return boost::none;
 }
 
 boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   const std::vector<std::int64_t> & route_lanelets,
   const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  auto conflicting_entity_status = getConflictingEntityStatusOnRoute(route_lanelets);
-  if (conflicting_entity_status.empty()) {
-    return boost::none;
-  }
+  auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
+  auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);
   std::set<double> distances;
-  for (const auto status : conflicting_entity_status) {
-    if (status.lanelet_pose_valid) {
-      auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
-      auto s = spline.getCollisionPointIn2D(polygon);
-      if (s) {
-        distances.insert(s.get());
-      }
+  for (const auto & status : crosswalk_entity_status) {
+    const auto s = getDistanceToTargetEntityOnCrosswalk(spline, status);
+    if (s) {
+      distances.insert(s.get());
+    }
+  }
+  for (const auto & status : lane_entity_status) {
+    const auto s = getDistanceToTargetEntityPolygon(spline, status);
+    if (s) {
+      distances.insert(s.get());
     }
   }
   if (distances.empty()) {
@@ -254,55 +298,11 @@ boost::optional<double> ActionNode::getDistanceToConflictingEntity(
   return *distances.begin();
 }
 
-boost::optional<double> ActionNode::getDistanceToConflictingEntity(
-  const std::vector<std::int64_t> & following_lanelets) const
-{
-  auto conflicting_entity_status = getConflictingEntityStatus(following_lanelets);
-  if (!conflicting_entity_status) {
-    return boost::none;
-  }
-  std::vector<double> dists;
-  std::vector<std::pair<int, double>> collision_points;
-  for (const auto & lanelet_id : following_lanelets) {
-    auto stop_position_s = hdmap_utils->getCollisionPointInLaneCoordinate(
-      lanelet_id, conflicting_entity_status->lanelet_pose.lanelet_id);
-    if (stop_position_s) {
-      auto dist = hdmap_utils->getLongitudinalDistance(
-        entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s, lanelet_id,
-        stop_position_s.get());
-      if (dist) {
-        dists.push_back(dist.get());
-        collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
-      }
-    }
-  }
-  if (dists.size() != 0) {
-    auto iter = std::min_element(dists.begin(), dists.end());
-    size_t index = std::distance(dists.begin(), iter);
-    double stop_s = collision_points[index].second;
-    std::int64_t stop_lanelet_id = collision_points[index].first;
-    geometry_msgs::msg::Vector3 rpy;
-    geometry_msgs::msg::Twist twist;
-    geometry_msgs::msg::Accel accel;
-    openscenario_msgs::msg::EntityStatus stop_target_status;
-    stop_target_status.lanelet_pose.lanelet_id = stop_lanelet_id;
-    stop_target_status.lanelet_pose.s = stop_s;
-    stop_target_status.lanelet_pose.rpy = rpy;
-    stop_target_status.action_status.twist = twist;
-    stop_target_status.action_status.accel = accel;
-    auto dist_to_stop_target = hdmap_utils->getLongitudinalDistance(
-      entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s,
-      stop_target_status.lanelet_pose.lanelet_id, stop_target_status.lanelet_pose.s);
-    return dist_to_stop_target;
-  }
-  return boost::none;
-}
-
-std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatusOnRoute(
+std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatusOnCrossWalk(
   const std::vector<std::int64_t> & route_lanelets) const
 {
-  auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
+  auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       std::count(
@@ -314,65 +314,36 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEnti
   return conflicting_entity_status;
 }
 
-boost::optional<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatus(
-  const std::vector<std::int64_t> & following_lanelets) const
+std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getConflictingEntityStatusOnLane(
+  const std::vector<std::int64_t> & route_lanelets) const
 {
-  auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
   std::vector<openscenario_msgs::msg::EntityStatus> conflicting_entity_status;
+  auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       std::count(
-        conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        conflicting_lanes.begin(), conflicting_lanes.end(),
         status.second.lanelet_pose.lanelet_id) >= 1) {
       conflicting_entity_status.push_back(status.second);
     }
   }
-  std::vector<double> dists;
-  std::vector<std::pair<int, double>> collision_points;
-  for (const auto & status : conflicting_entity_status) {
-    for (const auto & lanelet_id : following_lanelets) {
-      auto stop_position_s =
-        hdmap_utils->getCollisionPointInLaneCoordinate(lanelet_id, status.lanelet_pose.lanelet_id);
-      if (stop_position_s) {
-        auto dist = hdmap_utils->getLongitudinalDistance(
-          entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s, lanelet_id,
-          stop_position_s.get());
-        if (dist) {
-          dists.push_back(dist.get());
-          collision_points.push_back(std::make_pair(lanelet_id, stop_position_s.get()));
-        }
-      }
-    }
-  }
-  if (dists.size() != 0) {
-    auto iter = std::max_element(dists.begin(), dists.end());
-    size_t index = std::distance(dists.begin(), iter);
-    double stop_s = collision_points[index].second;
-    std::int64_t stop_lanelet_id = collision_points[index].first;
-    geometry_msgs::msg::Vector3 rpy;
-    geometry_msgs::msg::Twist twist;
-    geometry_msgs::msg::Accel accel;
-    openscenario_msgs::msg::EntityStatus conflicting_entity_status;
-    conflicting_entity_status.lanelet_pose.lanelet_id = stop_lanelet_id;
-    conflicting_entity_status.lanelet_pose.s = stop_s;
-    conflicting_entity_status.lanelet_pose.offset = 0;
-    conflicting_entity_status.lanelet_pose.rpy = rpy;
-    conflicting_entity_status.action_status.twist = twist;
-    conflicting_entity_status.action_status.accel = accel;
-    conflicting_entity_status.pose =
-      hdmap_utils->toMapPose(conflicting_entity_status.lanelet_pose).pose;
-    return conflicting_entity_status;
-  }
-  return boost::none;
+  return conflicting_entity_status;
 }
 
 bool ActionNode::foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const
 {
   auto conflicting_crosswalks = hdmap_utils->getConflictingCrosswalkIds(following_lanelets);
+  auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        status.second.lanelet_pose.lanelet_id) >= 1) {
+      return true;
+    }
+    if (
+      std::count(
+        conflicting_lanes.begin(), conflicting_lanes.end(),
         status.second.lanelet_pose.lanelet_id) >= 1) {
       return true;
     }

@@ -1,1 +1,7 @@
 comment: false
+
+flags:
+  cpp_mock_test:
+    paths:
+      - simulation
+    carryforward: false
