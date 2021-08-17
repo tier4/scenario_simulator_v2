@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/variant/detail/apply_visitor_unary.hpp>
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
@@ -62,8 +61,12 @@ auto record_start(Ts &&... xs)
   record_process_id = fork();
 
   const std::vector<std::string> argv{
-    "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
-    "record", std::forward<decltype(xs)>(xs)...};
+    "python3",
+    boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""),
+    "bag",     //
+    "record",  //
+    "--all",   //
+    std::forward<decltype(xs)>(xs)...};
 
   if (record_process_id < 0) {
     throw std::system_error(errno, std::system_category());

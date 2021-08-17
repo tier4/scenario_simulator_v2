@@ -235,28 +235,6 @@ class MiscellaneousAPI
     return setInitialPose(initial_pose);
   }
 
-  /* ---- LocalizationTwist ----------------------------------------------------
-   *
-   *  Topic: /localization/twist
-   *
-   * ------------------------------------------------------------------------ */
-  using LocalizationTwist = CurrentTwist;
-
-  DEFINE_PUBLISHER(LocalizationTwist);
-
-  decltype(auto) setLocalizationTwist(
-    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
-  {
-    LocalizationTwist localization_twist;
-    {
-      localization_twist.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      localization_twist.header.frame_id = "map";
-      localization_twist.twist = twist;
-    }
-
-    return setLocalizationTwist(localization_twist);
-  }
-
   /* ---- LocalizationPose -----------------------------------------------------
    *
    *  Topic: /localization/pose_with_covariance
@@ -279,6 +257,28 @@ class MiscellaneousAPI
     }
 
     return setLocalizationPose(pose_with_covariance_stamped);
+  }
+
+  /* ---- LocalizationTwist ----------------------------------------------------
+   *
+   *  Topic: /localization/twist
+   *
+   * ------------------------------------------------------------------------ */
+  using LocalizationTwist = CurrentTwist;
+
+  DEFINE_PUBLISHER(LocalizationTwist);
+
+  decltype(auto) setLocalizationTwist(
+    const geometry_msgs::msg::Twist & twist = geometry_msgs::msg::Twist())
+  {
+    LocalizationTwist localization_twist;
+    {
+      localization_twist.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+      localization_twist.header.frame_id = "map";
+      localization_twist.twist = twist;
+    }
+
+    return setLocalizationTwist(localization_twist);
   }
 
   /* ---- Trajectory -----------------------------------------------------------
