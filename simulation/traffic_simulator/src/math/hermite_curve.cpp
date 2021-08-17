@@ -203,6 +203,7 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       double poly_x = (1 - tx) * point1.x + tx * point0.x;
       double poly_y = (1 - ty) * point1.y + ty * point0.y;
       double error = std::hypot(poly_x - x, poly_y - y);
+      /// @note Hard coded parameter, torelance of the collision point.
       if (error < 0.1) {
         s_values.emplace_back(solution);
       }
