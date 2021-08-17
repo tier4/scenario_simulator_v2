@@ -2,6 +2,13 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into namespace
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* Merge branch 'master' into namespace
+* Contributors: Masaya Kataoka, kyabe2718, yamacir-kit
+
 0.4.2 (2021-07-30)
 ------------------
 

@@ -2,6 +2,19 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#432 <https://github.com/tier4/scenario_simulator_v2/issues/432>`_ from tier4/fix/suppress_warnings
+* fix reorder
+* Merge remote-tracking branch 'origin/master' into namespace
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* Update class Autoware to publish LocalizationPose for each frame
+* Change topic name of PoseWithCovarianceStamped publisher
+* Add PoseWithCovarianceStamped publisher to class 'Autoware'
+* Merge branch 'master' into namespace
+* Merge branch 'master' into namespace
+* Contributors: Hiroki OTA, Masaya Kataoka, kyabe2718, yamacir-kit
+
 0.4.2 (2021-07-30)
 ------------------
 
