@@ -124,7 +124,8 @@ double HermiteCurve::getNewtonMethodStepSize(
 }
 
 boost::optional<double> HermiteCurve::getCollisionPointIn2D(
-  std::vector<geometry_msgs::msg::Point> polygon, bool search_backward, bool close_start_end) const
+  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
+  bool close_start_end) const
 {
   size_t n = polygon.size();
   if (n <= 1) {
@@ -157,7 +158,8 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
 }
 
 boost::optional<double> HermiteCurve::getCollisionPointIn2D(
-  geometry_msgs::msg::Point point0, geometry_msgs::msg::Point point1, bool search_backward) const
+  const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
+  bool search_backward) const
 {
   std::vector<double> s_values;
   // double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
