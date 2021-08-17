@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Checking collision between crosswalk and waypoints in lane coordinate
+- Remove division in checking collision function in order to avoid zero-division.
 - Enables vehicle entity yield to merging entity. See also [this video](https://user-images.githubusercontent.com/10348912/128287863-8a2db025-d1af-4e54-b5a3-08e5d2e168e4.mp4).
 - Simplify the contents of the scenario test result file `result.junit.xml`.
 

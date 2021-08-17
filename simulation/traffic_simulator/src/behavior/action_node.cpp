@@ -237,7 +237,7 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
-    return spline.getCollisionPointIn2D(polygon);
+    return spline.getCollisionPointIn2D(polygon, false, true);
   }
   return boost::none;
 }
