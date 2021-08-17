@@ -2,8 +2,8 @@
 Changelog for package lanelet2_extension_psim
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.3 (2021-08-17)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
 * Merge branch 'master' into namespace
 * Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/lane_change_npc_distance_in_lane_coordinate

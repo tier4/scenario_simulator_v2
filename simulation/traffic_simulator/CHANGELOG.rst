@@ -2,8 +2,8 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.3 (2021-08-17)
+------------------
 * Merge pull request `#432 <https://github.com/tier4/scenario_simulator_v2/issues/432>`_ from tier4/fix/suppress_warnings
 * remove boost none in getFrontEntityName logic
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
