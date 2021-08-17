@@ -26,19 +26,15 @@ inline namespace scenario_simulator_exception
 struct Error : public std::runtime_error
 {
   template <typename... Ts>
-  explicit Error(Ts &&... xs)
-  : std::runtime_error{concatenate(std::forward<decltype(xs)>(xs)..., ".")}
+  explicit Error(Ts &&... xs) : std::runtime_error(concatenate(std::forward<decltype(xs)>(xs)...))
   {
   }
 };
 
-#define DEFINE_ERROR_CATEGORY(TYPENAME)                                                       \
-  struct TYPENAME : public Error                                                              \
-  {                                                                                           \
-    template <typename... Ts>                                                                 \
-    explicit TYPENAME(Ts &&... xs) : Error{#TYPENAME ": ", std::forward<decltype(xs)>(xs)...} \
-    {                                                                                         \
-    }                                                                                         \
+#define DEFINE_ERROR_CATEGORY(TYPENAME) \
+  struct TYPENAME : public Error        \
+  {                                     \
+    using Error::Error;                 \
   }
 
 // Autoware encountered some problem that led to a simulation failure.
