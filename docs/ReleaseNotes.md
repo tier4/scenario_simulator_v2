@@ -1,6 +1,9 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+## Version 0.4.3
+- [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.3) on Github :fa-github:
 - Checking collision between crosswalk and waypoints in lane coordinate
 - Remove division in checking collision function in order to avoid zero-division.
 - Enables vehicle entity yield to merging entity. See also [this video](https://user-images.githubusercontent.com/10348912/128287863-8a2db025-d1af-4e54-b5a3-08e5d2e168e4.mp4).
