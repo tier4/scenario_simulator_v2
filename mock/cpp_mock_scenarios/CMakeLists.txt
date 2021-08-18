@@ -42,7 +42,7 @@ add_subdirectory(src/collision)
 add_subdirectory(src/lane_change)
 add_subdirectory(src/merge)
 add_subdirectory(src/metrics)
-# add_subdirectory(src/phase_control)
+add_subdirectory(src/traffic_light)
 
 install(
   DIRECTORY launch rviz
