@@ -61,12 +61,8 @@ auto record_start(Ts &&... xs)
   record_process_id = fork();
 
   const std::vector<std::string> argv{
-    "python3",
-    boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""),
-    "bag",     //
-    "record",  //
-    "--all",   //
-    std::forward<decltype(xs)>(xs)...};
+    "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
+    "record", std::forward<decltype(xs)>(xs)...};
 
   if (record_process_id < 0) {
     throw std::system_error(errno, std::system_category());
@@ -102,7 +98,7 @@ try {
    *
    * ------------------------------------------------------------------------ */
   result = common::junit::Failure(
-    "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner");
+    "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner.");
 
   std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
@@ -139,9 +135,7 @@ try {
 
   connect(shared_from_this(), configuration);
 
-  initialize(
-    local_real_time_factor,
-    1 / local_frame_rate * local_real_time_factor);  // interval_upper_bound
+  initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
   return Interpreter::Result::SUCCESS;
 } catch (const openscenario_interpreter::SyntaxError & error) {
@@ -174,8 +168,6 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
               nlohmann::json json;
               {
                 json << script.as<OpenScenario>();
-
-                // std::cout << json.dump(2) << std::endl;  // DEBUG
               }
 
               context.stamp = now();
@@ -226,7 +218,7 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 
   (*publisher_of_context).on_deactivate();
 
-  connection.~API();  // Deactivate simulator
+  connection.~API();  // Deactivate traffic_simulator
 
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
   boost::apply_visitor(

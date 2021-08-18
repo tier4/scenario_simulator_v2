@@ -48,9 +48,13 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
   String intended_result;
+
   double local_frame_rate;
+
   double local_real_time_factor;
+
   String osc_path;
+
   String output_directory;
 
   Element script;
@@ -75,10 +79,12 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     INTERPRETER_INFO_STREAM("Deactivated myself.");
   }
 
+  auto isAnErrorIntended() const -> bool { return intended_result == "error"; }
+
 #define CATCH(TYPE)                                          \
   catch (const TYPE & error)                                 \
   {                                                          \
-    if (intended_result == "error") {                        \
+    if (isAnErrorIntended()) {                               \
       deactivate<common::Pass>();                            \
     } else {                                                 \
       deactivate<common::junit::Error>(#TYPE, error.what()); \
@@ -86,7 +92,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   }
 
   template <typename Thunk>
-  void guard(Thunk && thunk)
+  auto guard(Thunk && thunk) -> decltype(auto)
   {
     try {
       return thunk();
