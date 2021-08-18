@@ -19,15 +19,15 @@ namespace metrics
 {
 void OutOfRangeMetric::update()
 {
-  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
+  const auto status = entity_manager_ptr_->getEntityStatus(target_entity);
   if (!status) {
-    THROW_SIMULATION_ERROR("failed to get target entity status.");
+    THROW_SIMULATION_ERROR("failed to get status of target_entity (", target_entity, ")");
     return;
   }
 
   const auto jerk_opt = entity_manager_ptr_->getLinearJerk(target_entity);
   if (!jerk_opt) {
-    THROW_SIMULATION_ERROR("failed to get target entity linear jerk.");
+    THROW_SIMULATION_ERROR("failed to get linear jerk of target_entity (", target_entity, ")");
     return;
   }
 
@@ -36,17 +36,23 @@ void OutOfRangeMetric::update()
   linear_jerk_ = jerk_opt.get();
 
   if (!(min_velocity <= linear_velocity_ && linear_velocity_ <= max_velocity)) {
-    failure(SPECIFICATION_VIOLATION("velocity is out of range"));
+    failure(SPECIFICATION_VIOLATION(
+      "current velocity (which is ", linear_velocity_, ") is out of range (which is [",
+      min_velocity, ", ", max_velocity, "])"));
     return;
   }
 
   if (!(min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration)) {
-    failure(SPECIFICATION_VIOLATION("acceleration is out of range"));
+    failure(SPECIFICATION_VIOLATION(
+      "current acceleration (which is ", linear_acceleration_, ") is out of range (which is [",
+      min_acceleration, ", ", max_acceleration, "])"));
     return;
   }
 
   if (!(min_jerk <= linear_jerk_ && linear_jerk_ <= max_jerk)) {
-    failure(SPECIFICATION_VIOLATION("jerk is out of range"));
+    failure(SPECIFICATION_VIOLATION(
+      "current jerk (which is ", linear_jerk_, ") is out of range (which is [", min_jerk, ", ",
+      max_jerk, "])"));
     return;
   }
 
