@@ -139,8 +139,16 @@ jobs:
           cd ~/ros2_ws
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.test
           lcov --config-file .lcovrc -a lcov.base -a lcov.test -o lcov.total
-          lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/src/vendor/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" -o lcov.total.filtered
-
+          lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" \
+            "/opt/ros/*" "/usr/*" \
+            "${PWD}/src/scenario_simulator_v2/common/*" \
+            "${PWD}/src/scenario_simulator_v2/external/*" \
+            "${PWD}/src/scenario_simulator_v2/mock/*" \
+            "${PWD}/src/scenario_simulator_v2/openscenario/*" \
+            "${PWD}/src/scenario_simulator_v2/simulation/simulation/simple_sensor_simulator/*" \
+            "${PWD}/src/scenario_simulator_v2/simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/*" \
+            "${PWD}/src/scenario_simulator_v2/simulation/simple_sensor_simulator/src/sensor_simulation/*" \
+            -o lcov.total.filtered
       - name: publish codecov result
         uses: codecov/codecov-action@v1.2.1
         if: always()
