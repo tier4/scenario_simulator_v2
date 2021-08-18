@@ -493,6 +493,7 @@ public:
     INIT_PUBLISHER(InitialPose, "/initialpose"),
     INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
     INIT_PUBLISHER(LocalizationTwist, "/localization/twist"),
+    INIT_PUBLISHER(LocalizationPose, "/localization/pose_with_covariance"),
     INIT_SUBSCRIPTION(Trajectory, "/planning/scenario_planning/trajectory", []() {}),
     INIT_SUBSCRIPTION(TurnSignalCommand, "/control/turn_signal_cmd", []() {}),
     INIT_SUBSCRIPTION(VehicleCommand, "/control/vehicle_cmd", []() {}),
