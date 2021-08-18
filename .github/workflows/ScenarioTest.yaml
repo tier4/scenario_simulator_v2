@@ -134,7 +134,19 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=merge_left timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
-      - name: Collect coverage
+
+      - name: Collect coverage for openscenario_interpreter
+        if: matrix.test_flags == 'openscenario_interpreter'
+        run: |
+          cd ~/ros2_ws
+          lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.test
+          lcov --config-file .lcovrc -a lcov.base -a lcov.test -o lcov.total
+          lcov --config-file .lcovrc -r lcov.total "*/build/*" "*/install/*" "*/test/*" "*/CMakeCCompilerId.c" "*/CMakeCXXCompilerId.cpp" "*_msgs/*" \
+            "/opt/ros/*" "/usr/*" \
+            -o lcov.total.filtered
+
+      - name: Collect coverage for cpp_mock_test
+        if: matrix.test_flags == 'cpp_mock_test'
         run: |
           cd ~/ros2_ws
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.test
@@ -148,6 +160,9 @@ jobs:
             "${PWD}/src/scenario_simulator_v2/simulation/simulation/simple_sensor_simulator/*" \
             "${PWD}/src/scenario_simulator_v2/simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/*" \
             "${PWD}/src/scenario_simulator_v2/simulation/simple_sensor_simulator/src/sensor_simulation/*" \
+            "${PWD}/src/scenario_simulator_v2/simulation/simulation_interface/src/example.cpp" \
+            "${PWD}/src/scenario_simulator_v2/simulation/traffic_simulator/src/vehicle_model/*" \
+            "${PWD}/src/scenario_simulator_v2/simulation/traffic_simulator/include/traffic_simulator/vehicle_model/*" \
             -o lcov.total.filtered
       - name: publish codecov result
         uses: codecov/codecov-action@v1.2.1
