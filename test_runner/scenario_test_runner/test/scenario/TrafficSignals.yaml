@@ -22,14 +22,12 @@ OpenSCENARIO:
     TrafficSignals:
       TrafficSignalController:
         - name: controller-1
-          delay: 0
-          reference: ''
           Phase:
             - name: phase-1
               duration: 10
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'green' }
-                - { trafficSignalId: '34802', state: 'noArrow' }
+                - { trafficSignalId: '34802', state: 'none' }
             - name: phase-2
               duration: 10
               TrafficSignalState:

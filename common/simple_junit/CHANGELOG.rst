@@ -2,6 +2,30 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2021-08-17)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/follow_front_entity_behavior
+* Merge pull request `#430 <https://github.com/tier4/scenario_simulator_v2/issues/430>`_ from tier4/feature/interpreter/error-message
+* Update script 'result_checker'
+* Update junit result types to be stream insertable
+* Update Interpreter to store current-result as variant of JUnit5 element
+* Add some type aliases
+* Add new header 'junit5.hpp'
+* Add new struct 'Failure' for experimental JUnit library
+* Add new struct 'Error' for experimental JUnit library
+* Add experimental JUnit library
+* Merge remote-tracking branch 'origin/master' into namespace
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* Merge branch 'master' into namespace
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
+0.4.2 (2021-07-30)
+------------------
+
+0.4.1 (2021-07-30)
+------------------
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition

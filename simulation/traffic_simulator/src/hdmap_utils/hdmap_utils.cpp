@@ -51,6 +51,8 @@ namespace hdmap_utils
 HdMapUtils::HdMapUtils(
   const boost::filesystem::path & lanelet2_map_path, const geographic_msgs::msg::GeoPoint & origin)
 {
+  (void)origin;
+
   lanelet::projection::MGRSProjector projector;
 
   lanelet::ErrorMessages errors;
@@ -157,8 +159,23 @@ boost::optional<double> HdMapUtils::getCollisionPointInLaneCoordinate(
   return boost::none;
 }
 
+std::vector<std::int64_t> HdMapUtils::getConflictingLaneIds(
+  const std::vector<std::int64_t> & lanelet_ids) const
+{
+  std::vector<std::int64_t> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto conflicting_lanelets =
+      lanelet::utils::getConflictingLanelets(vehicle_routing_graph_ptr_, lanelet);
+    for (const auto & conflicting_lanelet : conflicting_lanelets) {
+      ret.emplace_back(conflicting_lanelet.id());
+    }
+  }
+  return ret;
+}
+
 std::vector<std::int64_t> HdMapUtils::getConflictingCrosswalkIds(
-  std::vector<std::int64_t> lanelet_ids) const
+  const std::vector<std::int64_t> & lanelet_ids) const
 {
   std::vector<std::int64_t> ret;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
@@ -239,9 +256,9 @@ std::vector<std::pair<double, lanelet::Lanelet>> HdMapUtils::excludeSubtypeLanel
 }
 
 boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose)
+  geometry_msgs::msg::Pose pose, bool include_crosswalk)
 {
-  const auto lanelet_id = getClosetLaneletId(pose);
+  const auto lanelet_id = getClosetLaneletId(pose, include_crosswalk);
   if (!lanelet_id) {
     return boost::none;
   }
@@ -263,22 +280,34 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
 }
 
 boost::optional<std::int64_t> HdMapUtils::getClosetLaneletId(
-  geometry_msgs::msg::Pose pose, double distance_thresh)
+  geometry_msgs::msg::Pose pose, double distance_thresh, bool include_crosswalk)
 {
   lanelet::BasicPoint2d search_point(pose.position.x, pose.position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
     lanelet::geometry::findNearest(lanelet_map_ptr_->laneletLayer, search_point, 3);
-  const auto nearest_road_lanelet =
-    excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
-  if (nearest_road_lanelet.empty()) {
-    return boost::none;
+  if (include_crosswalk) {
+    if (nearest_lanelet.empty()) {
+      return boost::none;
+    }
+    if (nearest_lanelet.front().first > distance_thresh) {
+      return boost::none;
+    }
+    lanelet::Lanelet closest_lanelet;
+    closest_lanelet = nearest_lanelet.front().second;
+    return closest_lanelet.id();
+  } else {
+    const auto nearest_road_lanelet =
+      excludeSubtypeLaneletsWithDistance(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
+    if (nearest_road_lanelet.empty()) {
+      return boost::none;
+    }
+    if (nearest_road_lanelet.front().first > distance_thresh) {
+      return boost::none;
+    }
+    lanelet::Lanelet closest_lanelet;
+    closest_lanelet = nearest_road_lanelet.front().second;
+    return closest_lanelet.id();
   }
-  if (nearest_road_lanelet.front().first > distance_thresh) {
-    return boost::none;
-  }
-  lanelet::Lanelet closest_lanelet;
-  closest_lanelet = nearest_road_lanelet.front().second;
-  return closest_lanelet.id();
 }
 
 double HdMapUtils::getSpeedLimit(std::vector<std::int64_t> lanelet_ids)

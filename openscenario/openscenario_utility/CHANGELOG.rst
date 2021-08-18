@@ -2,6 +2,27 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2021-08-17)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/follow_front_entity_behavior
+* Merge pull request `#430 <https://github.com/tier4/scenario_simulator_v2/issues/430>`_ from tier4/feature/interpreter/error-message
+* Merge remote-tracking branch 'origin/master' into namespace
+* Update openscenario_utility to install marker explicitly
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* remove test dir
+* Merge branch 'master' into namespace
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
+0.4.2 (2021-07-30)
+------------------
+
+0.4.1 (2021-07-30)
+------------------
+* Merge pull request `#417 <https://github.com/tier4/scenario_simulator_v2/issues/417>`_ from tier4/feature/add_mock_scenarios
+* remove test dir
+* Contributors: Masaya Kataoka
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/traffic-signal-controller-condition

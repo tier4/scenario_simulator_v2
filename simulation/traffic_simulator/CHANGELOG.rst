@@ -2,6 +2,88 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2021-08-17)
+------------------
+* Merge pull request `#432 <https://github.com/tier4/scenario_simulator_v2/issues/432>`_ from tier4/fix/suppress_warnings
+* remove boost none in getFrontEntityName logic
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
+* Merge pull request `#440 <https://github.com/tier4/scenario_simulator_v2/issues/440>`_ from tier4/fix/follow_front_entity_behavior
+* leave @note line
+* use const &
+* use const &
+* remove unused temporal value
+* fix torerance
+* remove debug lines
+* fix cubic function
+* enable check collision
+* Merge branch 'master' into namespace
+* change default value
+* add close_start_end option
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/error-message
+* Merge pull request `#434 <https://github.com/tier4/scenario_simulator_v2/issues/434>`_ from tier4/feature/remove_get_s_valueIn_route
+* remove unused functions
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/error-message
+* Merge pull request `#433 <https://github.com/tier4/scenario_simulator_v2/issues/433>`_ from tier4/feature/yeild_to_merging_entity
+* apply reformat
+* remove debug lines
+* add getEntityStatus function
+* apply reformat
+* get polygon to the other status
+* fix to old version get longitudinal distance function
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/lane_change_npc_distance_in_lane_coordinate
+* fix no return
+* fix unused
+* fix uninitialized
+* fix rclcpp::Duration deprecated
+* add Werror
+* change quadratic function
+* Merge remote-tracking branch 'origin/master' into namespace
+* check error
+* fix s value
+* check tx and ty value
+* fix othre conditions
+* fix collision solver for cubic function
+* enable calculate distance to front entity by spline
+* enable get distance between polygon
+* remove unused result
+* remove debug lines
+* use getConflictingEntityStatusOnRoute in getConflictingEntityStatus function
+* enable get conflicting vehicle entity in foundConflictingEntity function
+* remove unused function
+* add std::vector<std::int64_t> HdMapUtils::getConflictingLaneIds
+* Merge pull request `#429 <https://github.com/tier4/scenario_simulator_v2/issues/429>`_ from tier4/feature/add_cpp_scenarios
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* set initial value for current_s\_
+* fix argument name
+* fix compile errors
+* Merge branch 'fix/add_include_crosswalk_option' of github.com:tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* Merge branch 'master' into namespace
+* Merge branch 'master' into namespace
+* Contributors: Hiroki OTA, Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
+0.4.2 (2021-07-30)
+------------------
+* Merge pull request `#425 <https://github.com/tier4/scenario_simulator_v2/issues/425>`_ from tier4/fix/add_include_crosswalk_option
+* Merge pull request `#408 <https://github.com/tier4/scenario_simulator_v2/issues/408>`_ from RobotecAI/issue/AJD-239-non_hardcoded_map
+* apply reformat
+* use calculateEntityStatusUpdated function
+* kashiwanoha_map package map files added
+* Contributors: Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki
+
+0.4.1 (2021-07-30)
+------------------
+* Merge pull request `#421 <https://github.com/tier4/scenario_simulator_v2/issues/421>`_ from tier4/fix/npc_target_speed_in_follow_front_entity_action
+* fix velocity planner logic
+* apply reformat
+* Merge pull request `#419 <https://github.com/tier4/scenario_simulator_v2/issues/419>`_ from tier4/feature/rename_moc_to_mock
+* enable set waypoints
+* fix login in follow front entity action
+* remove launch install line
+* remove moc directory
+* move to mock pacakge
+* Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support

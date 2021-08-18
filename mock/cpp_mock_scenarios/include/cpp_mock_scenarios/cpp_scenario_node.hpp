@@ -25,6 +25,8 @@
 
 namespace cpp_mock_scenarios
 {
+enum class Result { SUCCESS = 0, FAILURE = 1 };
+
 class CppScenarioNode : public rclcpp::Node
 {
 public:
@@ -33,7 +35,7 @@ public:
     const std::string & lanelet2_map_file, const std::string & scenario_filename,
     const bool verbose, const rclcpp::NodeOptions & option);
   void start();
-  void stop(bool success = true);
+  void stop(Result result);
 
 protected:
   traffic_simulator::API api_;

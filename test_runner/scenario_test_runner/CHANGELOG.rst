@@ -2,6 +2,37 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2021-08-17)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/follow_front_entity_behavior
+* Merge pull request `#430 <https://github.com/tier4/scenario_simulator_v2/issues/430>`_ from tier4/feature/interpreter/error-message
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/error-message
+* Merge pull request `#420 <https://github.com/tier4/scenario_simulator_v2/issues/420>`_ from tier4/namespace
+* Update script 'result_checker'
+* fix bugs of name resolution with anonymous scope and change all-in-one.yaml to require name resolution
+* Merge remote-tracking branch 'origin/master' into namespace
+* Resolve warnings from setuptools
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* trivial fix
+* fix traffic signals
+* remove test dir
+* Merge branch 'master' into namespace
+* Merge branch 'master' into namespace
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
+0.4.2 (2021-07-30)
+------------------
+
+0.4.1 (2021-07-30)
+------------------
+* Merge pull request `#418 <https://github.com/tier4/scenario_simulator_v2/issues/418>`_ from tier4/feature/add_cpp_scenario_node
+* apply reformat and with_rviz argument
+* Merge pull request `#417 <https://github.com/tier4/scenario_simulator_v2/issues/417>`_ from tier4/feature/add_mock_scenarios
+* remove test dir
+* Merge remote-tracking branch 'origin/master' into feature/autoware/pose-with-covariance
+* Contributors: Masaya Kataoka, yamacir-kit
+
 0.4.0 (2021-07-27)
 ------------------
 * Merge pull request `#407 <https://github.com/tier4/scenario_simulator_v2/issues/407>`_ from tier4/feature/galactic_support
