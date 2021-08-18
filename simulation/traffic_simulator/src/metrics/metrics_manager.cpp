@@ -35,7 +35,7 @@ void MetricsManager::setVerbose(const bool verbose) { verbose_ = verbose; }
 
 MetricLifecycle MetricsManager::getLifecycle(const std::string & name)
 {
-  if(metrics_.find(name) == metrics_.end()) {
+  if (metrics_.find(name) == metrics_.end()) {
     THROW_SEMANTIC_ERROR("metrics name : ", name, " does not exist.");
   }
   return metrics_.at(name)->getLifecycle();

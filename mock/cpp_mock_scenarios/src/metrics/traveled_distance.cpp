@@ -41,7 +41,7 @@ private:
   void onUpdate() override
   {
     if (api_.getCurrentTime() >= 10 && 10.1 >= api_.getCurrentTime()) {
-      if(api_.getMetricLifecycle("ego_traveled_distance") != metrics::MetricLifecycle::ACTIVE) {
+      if (api_.getMetricLifecycle("ego_traveled_distance") != metrics::MetricLifecycle::ACTIVE) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
@@ -54,7 +54,7 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(3));
     api_.setTargetSpeed("ego", 3, true);
-    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance","ego");
+    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
   }
 };
 

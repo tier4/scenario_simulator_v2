@@ -73,6 +73,7 @@ public:
       const simulation_api_schema::AttachDetectionSensorRequest &,
       simulation_api_schema::AttachDetectionSensorResponse &)>
       attach_detection_sensor_func);
+  ~MultiServer();
 
 private:
   void poll();
