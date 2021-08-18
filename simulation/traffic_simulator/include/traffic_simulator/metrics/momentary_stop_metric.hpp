@@ -25,14 +25,11 @@ class MomentaryStopMetric : public MetricBase
 public:
   enum class StopTargetLaneletType { STOP_LINE, CROSSWALK };
   MomentaryStopMetric(
-    std::string target_entity, double min_velocity, double max_velocity, double min_acceleration,
-    double max_acceleration, std::int64_t stop_target_lanelet_id,
-    StopTargetLaneletType stop_target_lanelet_type, double stop_sequence_start_distance,
-    double stop_sequence_end_distance, double stop_duration)
+    std::string target_entity, double min_acceleration, double max_acceleration,
+    std::int64_t stop_target_lanelet_id, StopTargetLaneletType stop_target_lanelet_type,
+    double stop_sequence_start_distance, double stop_sequence_end_distance, double stop_duration)
   : MetricBase("MomentaryStop"),
     target_entity(target_entity),
-    min_velocity(min_velocity),
-    max_velocity(max_velocity),
     min_acceleration(min_acceleration),
     max_acceleration(max_acceleration),
     stop_target_lanelet_id(stop_target_lanelet_id),
@@ -47,8 +44,6 @@ public:
   void update() override;
   bool activateTrigger() override;
   const std::string target_entity;
-  const double min_velocity;
-  const double max_velocity;
   const double min_acceleration;
   const double max_acceleration;
   const std::int64_t stop_target_lanelet_id;
@@ -60,7 +55,6 @@ public:
 
 private:
   double linear_acceleration_;
-  double linear_velocity_;
   double standstill_duration_;
   double distance_to_stopline_;
 };

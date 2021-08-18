@@ -40,25 +40,24 @@ void MomentaryStopMetric::update()
     THROW_SIMULATION_ERROR("failed to calculate distance to stop line.");
   }
   distance_to_stopline_ = distance.get();
-  linear_velocity_ = status->action_status.twist.linear.x;
   linear_acceleration_ = status->action_status.accel.linear.x;
-  if (!(min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration)) {
+  if (min_acceleration <= linear_acceleration_ && linear_acceleration_ <= max_acceleration) {
+    auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
+    if (!standstill_duration) {
+      THROW_SIMULATION_ERROR("failed to calculate standstill duration.");
+    }
+    standstill_duration_ = standstill_duration.get();
+    if (
+      entity_manager_ptr_->isStopping(target_entity) &&
+      standstill_duration.get() >= stop_duration) {
+      success();
+    }
+    if (distance.get() <= stop_sequence_end_distance) {
+      failure(SPECIFICATION_VIOLATION("overrun detected"));
+    }
+    return;
+  } else {
     failure(SPECIFICATION_VIOLATION("acceleration is out of range"));
-  }
-  if (!(min_velocity <= linear_velocity_ && linear_velocity_ <= max_velocity)) {
-    failure(SPECIFICATION_VIOLATION("velocity is out of range"));
-  }
-  auto standstill_duration = entity_manager_ptr_->getStandStillDuration(target_entity);
-  if (!standstill_duration) {
-    THROW_SIMULATION_ERROR("failed to calculate standstill duration.");
-  }
-  standstill_duration_ = standstill_duration.get();
-  if (
-    entity_manager_ptr_->isStopping(target_entity) && standstill_duration.get() >= stop_duration) {
-    success();
-  }
-  if (distance.get() <= stop_sequence_end_distance) {
-    failure(SPECIFICATION_VIOLATION("overrun detected"));
   }
 }
 
@@ -94,7 +93,6 @@ nlohmann::json MomentaryStopMetric::to_json()
   nlohmann::json json = MetricBase::to_base_json();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {
     json["linear_acceleration"] = linear_acceleration_;
-    json["linear_velocity"] = linear_velocity_;
     json["stop_duration"] = standstill_duration_;
     json["distance_to_stopline"] = distance_to_stopline_;
   }
