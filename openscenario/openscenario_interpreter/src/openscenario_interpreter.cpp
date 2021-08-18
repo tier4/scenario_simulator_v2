@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/variant/detail/apply_visitor_unary.hpp>
 #define OPENSCENARIO_INTERPRETER_ALLOW_ATTRIBUTES_TO_BE_BLANK
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
@@ -32,12 +33,8 @@
 
 namespace openscenario_interpreter
 {
-#define INTERPRETER_INFO_STREAM(...) \
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
-
-// NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-#define INTERPRETER_ERROR_STREAM(...) \
-  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
+#define DECLARE_PARAMETER(IDENTIFIER) \
+  declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
 
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
@@ -48,33 +45,14 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   osc_path(""),
   output_directory("/tmp")
 {
-#define DECLARE_PARAMETER(IDENTIFIER) \
-  declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
-
   DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
+}
 
 #undef DECLARE_PARAMETER
-
-  reset();
-}
-
-void Interpreter::report(
-  const junit::TestResult & result,  //
-  const std::string & type,          //
-  const std::string & what)
-{
-  current_result = result;
-  current_error_type = type;
-  current_error_what = what;
-
-  INTERPRETER_INFO_STREAM("Deactivate myself.");
-  deactivate();
-  INTERPRETER_INFO_STREAM("Deactivated myself.");
-}
 
 pid_t record_process_id = 0;
 
@@ -106,22 +84,30 @@ auto record_end()
   }
 }
 
+#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
+
 Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
 try {
   INTERPRETER_INFO_STREAM("Configuring.");
 
-  // NOTE: Wait for parameters to be set.
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  /* ---- NOTE -----------------------------------------------------------------
+   *
+   *  The scenario_test_runner that launched this node considers that "the
+   *  scenario is not expected to finish" or "an abnormality has occurred that
+   *  prevents the interpreter from terminating itself" after the specified
+   *  time (specified by --global-timeout), and deactivates this node.
+   *
+   * ------------------------------------------------------------------------ */
+  result = common::junit::Failure(
+    "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner");
 
-#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
+  std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
   GET_PARAMETER(intended_result);
   GET_PARAMETER(local_frame_rate);
   GET_PARAMETER(local_real_time_factor);
   GET_PARAMETER(osc_path);
   GET_PARAMETER(output_directory);
-
-#undef GET_PARAMETER
 
   record_start(
     "-a",  //
@@ -136,15 +122,7 @@ try {
   {
     configuration.auto_sink = false;
 
-    configuration.initialize_duration =
-      std::any_of(
-        std::cbegin(script.as<OpenScenario>().entities),
-        std::cend(script.as<OpenScenario>().entities),
-        [](auto & each) {
-          return std::get<1>(each).template as<ScenarioObject>().object_controller.isEgo();
-        })
-        ? 30
-        : 0;
+    configuration.initialize_duration = ObjectController::ego_count > 0 ? 30 : 0;
 
     configuration.scenario_path = osc_path;
 
@@ -168,6 +146,8 @@ try {
   return Interpreter::Result::FAILURE;
 }
 
+#undef GET_PARAMETER
+
 Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("Activating.");
@@ -180,7 +160,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   (*publisher_of_context).on_activate();
 
   timer = create_wall_timer(period, [this, period]() {
-    withExceptionHandler([this, period]() {
+    guard([this, period]() {
       if (script) {
         if (not script.as<OpenScenario>().complete()) {
           const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
@@ -245,20 +225,13 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
 
   connection.~API();  // Deactivate simulator
 
-  std::stringstream message;
-  {
-    message << (current_result == SUCCESS ? "\x1b[32m" : "\x1b[1;31m")
-            << current_error_type.c_str();
-
-    if (not current_error_what.empty()) {
-      message << " (" << current_error_what.c_str() << ")";
-    }
-
-    message << "\x1b[0m";
-  }
-
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
-  RCLCPP_INFO_STREAM(get_logger(), message.str());
+  boost::apply_visitor(
+    overload(
+      [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
+      [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
+    result);
 
   record_end();
 
@@ -269,19 +242,28 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
 
-  test_suites.addTestCase(
-    script.as<OpenScenario>().pathname.parent_path().stem().string(),
-    script.as<OpenScenario>().pathname.string(),  // case-name (XXX: DIRTY HACK!!!)
-    0,                                            // time
-    current_result,                               //
-    current_error_type,                           //
-    current_error_what);
+  {
+    results.name = script.as<OpenScenario>().pathname.parent_path().parent_path().string();
 
-  test_suites.write(output_directory + "/result.junit.xml");
+    const auto suite_name = script.as<OpenScenario>().pathname.parent_path().filename().string();
+
+    const auto case_name = script.as<OpenScenario>().pathname.stem().string();
+
+    boost::apply_visitor(
+      overload(
+        [&](const common::junit::Pass &) { results.testsuite(suite_name).testcase(case_name); },
+        [&](const common::junit::Failure & it) {
+          results.testsuite(suite_name).testcase(case_name).failure.push_back(it);
+        },
+        [&](const common::junit::Error & it) {
+          results.testsuite(suite_name).testcase(case_name).error.push_back(it);
+        }),
+      result);
+
+    results.write_to("/tmp/scenario_test_runner/result.junit.xml", "  ");
+  }
 
   script.reset();
-
-  reset();
 
   return Interpreter::Result::SUCCESS;
 }

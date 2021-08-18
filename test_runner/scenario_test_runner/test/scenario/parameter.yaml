@@ -1,0 +1,147 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 0
+    revMinor: 0
+    date: "2020-03-20T12:00:00"
+    author: ""
+    description: "Minimal scenario"
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: value
+        parameterType: double
+        value: 2.0
+      - name: cmd
+        parameterType: string
+        value: echo global
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+    Story:
+      name: "story"
+      Act:
+        - name: "act"
+          StartTrigger:
+            ConditionGroup:
+              - Condition:
+                  - name: ''
+                    delay: 0
+                    conditionEdge: none
+                    ByValueCondition:
+                      SimulationTimeCondition:
+                        value: 0
+                        rule: greaterThan
+          ManeuverGroup:
+            - name: "maneuver-group"
+              maximumExecutionCount: 1
+              Actors:
+                selectTriggeringEntities: false
+              Maneuver:
+                - name: 'maneuver0'
+                  ParameterDeclarations:
+                    ParameterDeclaration:
+                      - name: cmd
+                        parameterType: string
+                        value: echo maneuver0
+                  Event:
+                    - name: 'event0'
+                      priority: overwrite
+                      StartTrigger:
+                      Action:
+                        - name: 'action0'
+                          UserDefinedAction:
+                            CustomCommandAction:
+                              type: null
+
+                - name: 'maneuver1'
+                  ParameterDeclarations:
+                    ParameterDeclaration:
+                      - name: cmd
+                        parameterType: string
+                        value: echo maneuver1
+                  Event:
+                    - name: 'event'
+                      priority: overwrite
+                      StartTrigger:
+                        ConditionGroup:
+                          - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    value: 1.0
+                                    rule: greaterThan
+                      Action:
+                        - name: 'action1'
+                          UserDefinedAction:
+                            CustomCommandAction:
+                              type: $cmd              # => maneuver1
+                        - name: 'action2'
+                          UserDefinedAction:
+                            CustomCommandAction:
+                              type: $maneuver1::cmd   # => maneuver1
+                        - name: 'action3'
+                          UserDefinedAction:
+                            CustomCommandAction:
+                              type: $::cmd            # => global
+                        - name: 'action4'
+                          UserDefinedAction:
+                            CustomCommandAction:
+                              type: $maneuver0::cmd   # => maneuver0
+                        # - name: 'action5'
+                        #   UserDefinedAction:
+                        #     CustomCommandAction:
+                        #       type: $maneuver2::cmd # backward reference will result in an error
+                        - name: 'action6'
+                          UserDefinedAction:
+                            CustomCommandAction:
+                              type: $story::act::maneuver-group::maneuver1::cmd # => maneuver1
+                        - name: 'action7'
+                          UserDefinedAction:
+                            CustomCommandAction: # full modification
+                              type: $::Storyboard::story::act::maneuver-group::maneuver1::cmd # => maneuver1
+
+                - name: 'maneuver2'
+                  ParameterDeclarations:
+                    ParameterDeclaration:
+                      - name: cmd
+                        parameterType: string
+                        value: echo maneuver2
+                  Event:
+                    - name: ''
+                      priority: overwrite
+                      StartTrigger:
+                        ConditionGroup:
+                          - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition:
+                                  SimulationTimeCondition:
+                                    value: $value
+                                    rule: greaterThan
+                      Action:
+                        - name: ''
+                          UserDefinedAction:
+                            CustomCommandAction:
+                              type: exitFailure
+    StopTrigger:
+      ConditionGroup:
+        - Condition:
+          - name: "condition"
+            delay: 0
+            conditionEdge: none
+            ByValueCondition:
+              SimulationTimeCondition:
+                rule: greaterThan
+                value: 10.0

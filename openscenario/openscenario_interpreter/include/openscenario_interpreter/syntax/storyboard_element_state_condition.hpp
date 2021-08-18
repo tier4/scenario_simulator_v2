@@ -68,7 +68,7 @@ struct StoryboardElementStateCondition : private Scope
   {
     try {
       last_checked_value = localScope()
-                             .storyboard_elements.at(storyboard_element_ref)
+                             .findElement(storyboard_element_ref)
                              .currentState()
                              .as<StoryboardElementState>();
       return asBoolean(last_checked_value == state);

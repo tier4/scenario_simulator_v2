@@ -36,13 +36,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Story : private Scope, public StoryboardElement<Story>, public Elements
+struct Story : public Scope, public StoryboardElement<Story>, public Elements
 {
-  const String name;
-
   template <typename Node>
   explicit Story(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope), name(readAttribute<String>("name", node, localScope()))
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope)))
   {
     callWithElements(node, "ParameterDeclarations", 0, 1, [&](auto && node) {
       return make<ParameterDeclarations>(node, localScope());

@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_DECLARATION_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <string>
 #include <vector>
 
@@ -49,7 +50,7 @@ struct ParameterDeclaration
 
   ParameterDeclaration() = default;
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit ParameterDeclaration(const Node & node, Scope & scope)
   : name{readAttribute<String>("name", node, scope)},
     parameter_type{readAttribute<ParameterType>("parameterType", node, scope)},
@@ -67,7 +68,7 @@ struct ParameterDeclaration
         "  - \'\n"
         "  - \"\n"};
     } else {
-      scope.parameters.emplace(name, evaluate());
+      scope.addElement(name, evaluate());
     }
   }
 

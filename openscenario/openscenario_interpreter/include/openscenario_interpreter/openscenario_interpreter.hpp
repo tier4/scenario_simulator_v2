@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
+#include <boost/variant.hpp>
 #include <exception>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
@@ -27,9 +28,16 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <simple_junit/test_suites.hpp>
+#include <simple_junit/junit5.hpp>
 #include <string>
 #include <utility>
+
+#define INTERPRETER_INFO_STREAM(...) \
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
+
+// NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+#define INTERPRETER_ERROR_STREAM(...) \
+  RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
 
 namespace openscenario_interpreter
 {
@@ -49,41 +57,36 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   std::shared_ptr<rclcpp::TimerBase> timer;
 
-  junit::TestSuites test_suites;
+  common::JUnit5 results;
 
-  const junit::TestResult ERROR = junit::TestResult::ERROR;
-  const junit::TestResult FAILURE = junit::TestResult::FAILURE;
-  const junit::TestResult SUCCESS = junit::TestResult::SUCCESS;
-
-  junit::TestResult current_result;
-
-  std::string current_error_type;
-  std::string current_error_what;
+  boost::variant<common::Pass, common::Failure, common::junit::Error> result;
 
   ExecutionTimer<> execution_timer;
 
-  void reset()
+  template <typename T, typename... Ts>
+  auto deactivate(Ts &&... xs) -> void
   {
-    current_result = junit::TestResult::FAILURE;
-    current_error_type = "Failure";
-    current_error_what =
-      "The simulation time has exceeded the time specified by the scenario_test_runner";
+    result = T(std::forward<decltype(xs)>(xs)...);
+
+    INTERPRETER_INFO_STREAM("Deactivate myself.");
+
+    rclcpp_lifecycle::LifecycleNode::deactivate();
+
+    INTERPRETER_INFO_STREAM("Deactivated myself.");
   }
 
-  void report(const junit::TestResult &, const std::string &, const std::string & = "");
-
-#define CATCH(TYPE)                       \
-  catch (const TYPE & error)              \
-  {                                       \
-    if (intended_result == "error") {     \
-      report(SUCCESS, #TYPE);             \
-    } else {                              \
-      report(ERROR, #TYPE, error.what()); \
-    }                                     \
+#define CATCH(TYPE)                                          \
+  catch (const TYPE & error)                                 \
+  {                                                          \
+    if (intended_result == "error") {                        \
+      deactivate<common::Pass>();                            \
+    } else {                                                 \
+      deactivate<common::junit::Error>(#TYPE, error.what()); \
+    }                                                        \
   }
 
   template <typename Thunk>
-  void withExceptionHandler(Thunk && thunk)
+  void guard(Thunk && thunk)
   {
     try {
       return thunk();
@@ -92,18 +95,18 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     catch (const SpecialAction<EXIT_SUCCESS> &)  // from CustomCommandAction::exitSuccess
     {
       if (intended_result == "success") {
-        report(SUCCESS, "Success");
+        deactivate<common::Pass>();
       } else {
-        report(FAILURE, "UnintendedSuccess", "Expected " + intended_result);
+        deactivate<common::Failure>("UnintendedSuccess", "Expected " + intended_result);
       }
     }
 
     catch (const SpecialAction<EXIT_FAILURE> &)  // from CustomCommandAction::exitFailure
     {
       if (intended_result == "failure") {
-        report(SUCCESS, "IntendedFailure");
+        deactivate<common::Pass>();
       } else {
-        report(FAILURE, "Failure", "Expected " + intended_result);
+        deactivate<common::Failure>("Failure", "Expected " + intended_result);
       }
     }
 
@@ -115,7 +118,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     catch (...)  // FINAL BARRIER
     {
-      report(ERROR, "UnknownError", "An unknown exception has occurred");
+      deactivate<common::junit::Error>("UnknownError", "An unknown exception has occurred");
     }
   }
 

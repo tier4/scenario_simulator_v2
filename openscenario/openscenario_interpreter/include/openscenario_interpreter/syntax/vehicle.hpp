@@ -43,10 +43,8 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Vehicle : private Scope  // for ParameterDeclarations
+struct Vehicle : public Scope  // for ParameterDeclarations
 {
-  const String name;  // Name of the vehicle type.
-
   const VehicleCategory vehicle_category;  // Category of the vehicle (bicycle, train,...).
 
   const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
@@ -59,10 +57,9 @@ struct Vehicle : private Scope  // for ParameterDeclarations
 
   Properties properties;  // Additional properties as name value pairs.
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit Vehicle(const Node & node, Scope & outer_scope)
-  : Scope(outer_scope),
-    name(readAttribute<String>("name", node, localScope())),
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
     vehicle_category(readAttribute<VehicleCategory>("vehicleCategory", node, localScope())),
     parameter_declarations(
       readElement<ParameterDeclarations>("ParameterDeclarations", node, localScope())),

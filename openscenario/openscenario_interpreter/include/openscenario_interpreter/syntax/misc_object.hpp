@@ -42,13 +42,11 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct MiscObject : private Scope
+struct MiscObject : public Scope
 {
   const Double mass;  // Mass of the miscellaneous object. Unit: Kg; Range: [0..inf[.
 
   const MiscObjectCategory misc_object_category;  // Categorization of the miscellaneous object.
-
-  const String name;  // Name of the miscellaneous object type.
 
   // const String
   //   model3d;  // Definition of the model of the miscellaneous object as a model type or a relative or absolute file path.
@@ -59,13 +57,12 @@ struct MiscObject : private Scope
 
   Properties properties;  // Property definitions for the miscellaneous object.
 
-  template <typename Tree, typename Scope>
+  template <typename Tree>
   explicit MiscObject(const Tree & tree, Scope & scope)
-  // clang-format off
-  : Scope(scope),
+  : Scope(scope.makeChildScope(readAttribute<String>("name", tree, scope))),
+    // clang-format off
     mass                  (readAttribute<Double               >("mass",                  tree, localScope())),
     misc_object_category  (readAttribute<MiscObjectCategory   >("miscObjectCategory",    tree, localScope())),
-    name                  (readAttribute<String               >("name",                  tree, localScope())),
     // model3d               (readAttribute<String               >("model3d",               tree, localScope())),
     parameter_declarations(readElement  <ParameterDeclarations>("ParameterDeclarations", tree, localScope())),
     bounding_box          (readElement  <BoundingBox          >("BoundingBox",           tree, localScope())),

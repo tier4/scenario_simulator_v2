@@ -204,31 +204,26 @@ boost::optional<double> ActionNode::getDistanceToFrontEntity(
 boost::optional<std::string> ActionNode::getFrontEntityName(
   const traffic_simulator::math::CatmullRomSpline & spline)
 {
-  boost::optional<double> front_entity_distance;
-  std::string front_entity_name = "";
+  std::vector<double> distances;
+  std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
     const auto distance = getDistanceToTargetEntityPolygon(spline, each.first);
     if (distance) {
       if (distance.get() < 40) {
-        if (!front_entity_distance) {
-          front_entity_distance = distance.get();
-          front_entity_name = each.first;
-        } else {
-          if (front_entity_distance.get() > distance.get()) {
-            front_entity_distance = distance.get();
-            front_entity_name = each.first;
-          }
-        }
+        entities.emplace_back(each.first);
+        distances.emplace_back(distance.get());
       }
     }
   }
-  if (!front_entity_distance) {
+  if (entities.size() != distances.size()) {
+    THROW_SIMULATION_ERROR("size of entities and distances vector does not match.");
+  }
+  if (distances.empty()) {
     return boost::none;
   }
-  if (front_entity_name == "") {
-    THROW_SIMULATION_ERROR("name of front entity is empty.");
-  }
-  return front_entity_name;
+  std::vector<double>::iterator iter = std::min_element(distances.begin(), distances.end());
+  size_t index = std::distance(distances.begin(), iter);
+  return entities[index];
 }
 
 boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
@@ -237,7 +232,7 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
-    return spline.getCollisionPointIn2D(polygon);
+    return spline.getCollisionPointIn2D(polygon, false, true);
   }
   return boost::none;
 }

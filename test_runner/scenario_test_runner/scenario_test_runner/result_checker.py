@@ -18,56 +18,56 @@
 import argparse
 import sys
 import xml.etree.ElementTree as ET
-import os
+
+from pathlib import Path
 
 
 class ResultChecker:
-    """Class to check scenario testing result is good or not."""
+    """Check results of scenario-test are all passed or not."""
 
     def __init__(self):
         pass
 
+    def is_rosbag_directory(self, path):
+        found_db3 = False
+        found_metadata = False
+
+        for each in path.iterdir():
+            if each.name == "metadata.yaml":
+                found_metadata = True
+            elif each.suffix == ".db3":
+                found_db3 = True
+
+        return found_db3 and found_metadata
+
     def check(self, result):
-        tree = ET.parse(result)
-        testsuites = tree.getroot()
-        for testsuite in testsuites:
-            print("checking testsuite : " + testsuite.attrib["name"])
-            index = 1
-            for testcase in testsuite:
-                xosc_path = testcase.attrib["name"]
-                print(
-                    "["
-                    + str(index)
-                    + "/"
-                    + str(testsuite.items()[1][1])
-                    + "] checking result of "
-                    + xosc_path
+        suites = ET.parse(result).getroot()
+
+        all_ok = True
+
+        for suite in suites:
+            for case in suite:
+
+                def is_passed():
+                    if case.find("failure") is not None:
+                        print("[FAILED] " + str(here) + ".xosc")
+                        return False
+                    elif case.find("error") is not None:
+                        print("[ERROR!] " + str(here) + ".xosc")
+                        return False
+                    else:
+                        print("[PASSED] " + str(here) + ".xosc")
+                        return True
+
+                here = Path(
+                    suites.attrib["name"], suite.attrib["name"], case.attrib["name"]
                 )
-                for result in testcase:
-                    if result.tag == "failure":
-                        print("unexpected failure")
-                        sys.exit(1)
-                    if result.tag == "error":
-                        print("unexpected error")
-                        sys.exit(1)
-                print("expected result")
-                rosbag_dir = os.path.splitext(xosc_path)[0]
-                print("checking log directory " + rosbag_dir)
-                db3_found = False
-                metadata_found = False
-                for filename in os.listdir(rosbag_dir):
-                    if filename == "metadata.yaml":
-                        metadata_found = True
-                    elif os.path.splitext(filename)[1] == ".db3":
-                        db3_found = True
-                if db3_found and metadata_found:
-                    print("rosbag file found")
-                else:
-                    print("rosbag not found")
-                    sys.exit(1)
-                index = index + 1
-                print("")
-        sys.exit(0)
+
+                this_is_ok = is_passed() and self.is_rosbag_directory(here)
+
+                all_ok = all_ok and this_is_ok
+
+        sys.exit(0 if all_ok else 1)
 
 
 def main():
