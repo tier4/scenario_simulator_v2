@@ -30,29 +30,13 @@
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
 
-namespace openscenario_interpreter
-{
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
 
-Interpreter::Interpreter(const rclcpp::NodeOptions & options)
-: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
-  publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  intended_result("success"),
-  local_frame_rate(30),
-  local_real_time_factor(1.0),
-  osc_path(""),
-  output_directory("/tmp")
+#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
+
+namespace openscenario_interpreter
 {
-  DECLARE_PARAMETER(intended_result);
-  DECLARE_PARAMETER(local_frame_rate);
-  DECLARE_PARAMETER(local_real_time_factor);
-  DECLARE_PARAMETER(osc_path);
-  DECLARE_PARAMETER(output_directory);
-}
-
-#undef DECLARE_PARAMETER
-
 pid_t record_process_id = 0;
 
 template <typename... Ts>
@@ -83,9 +67,23 @@ auto record_end()
   }
 }
 
-#define GET_PARAMETER(IDENTIFIER) get_parameter(#IDENTIFIER, IDENTIFIER)
+Interpreter::Interpreter(const rclcpp::NodeOptions & options)
+: rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
+  publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
+  intended_result("success"),
+  local_frame_rate(30),
+  local_real_time_factor(1.0),
+  osc_path(""),
+  output_directory("/tmp")
+{
+  DECLARE_PARAMETER(intended_result);
+  DECLARE_PARAMETER(local_frame_rate);
+  DECLARE_PARAMETER(local_real_time_factor);
+  DECLARE_PARAMETER(osc_path);
+  DECLARE_PARAMETER(output_directory);
+}
 
-Interpreter::Result Interpreter::on_configure(const rclcpp_lifecycle::State &)
+auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 try {
   INTERPRETER_INFO_STREAM("Configuring.");
 
@@ -143,9 +141,7 @@ try {
   return Interpreter::Result::FAILURE;
 }
 
-#undef GET_PARAMETER
-
-Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
+auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("Activating.");
 
@@ -210,7 +206,7 @@ Interpreter::Result Interpreter::on_activate(const rclcpp_lifecycle::State &)
   return Interpreter::Result::SUCCESS;
 }
 
-Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
+auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("Deactivating.");
 
@@ -233,7 +229,7 @@ Interpreter::Result Interpreter::on_deactivate(const rclcpp_lifecycle::State &)
   return Interpreter::Result::SUCCESS;
 }
 
-Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
+auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
 
@@ -263,7 +259,7 @@ Interpreter::Result Interpreter::on_cleanup(const rclcpp_lifecycle::State &)
   return Interpreter::Result::SUCCESS;
 }
 
-Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
+auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("ShuttingDown.");
 
@@ -272,7 +268,7 @@ Interpreter::Result Interpreter::on_shutdown(const rclcpp_lifecycle::State &)
   return Interpreter::Result::SUCCESS;
 }
 
-Interpreter::Result Interpreter::on_error(const rclcpp_lifecycle::State &)
+auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("ErrorProcessing.");
 

@@ -136,17 +136,17 @@ public:
 
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
-  Result on_configure(const rclcpp_lifecycle::State &) override;
+  auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
 
-  Result on_activate(const rclcpp_lifecycle::State &) override;
+  auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
 
-  Result on_deactivate(const rclcpp_lifecycle::State &) override;
+  auto on_deactivate(const rclcpp_lifecycle::State &) -> Result override;
 
-  Result on_cleanup(const rclcpp_lifecycle::State &) override;
+  auto on_cleanup(const rclcpp_lifecycle::State &) -> Result override;
 
-  Result on_shutdown(const rclcpp_lifecycle::State &) override;
+  auto on_shutdown(const rclcpp_lifecycle::State &) -> Result override;
 
-  Result on_error(const rclcpp_lifecycle::State &) override;
+  auto on_error(const rclcpp_lifecycle::State &) -> Result override;
 };
 }  // namespace openscenario_interpreter
 
