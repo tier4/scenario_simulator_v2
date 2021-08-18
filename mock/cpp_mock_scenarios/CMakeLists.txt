@@ -41,6 +41,8 @@ add_subdirectory(src/follow_front_entity)
 add_subdirectory(src/collision)
 add_subdirectory(src/lane_change)
 add_subdirectory(src/merge)
+add_subdirectory(src/metrics)
+# add_subdirectory(src/phase_control)
 
 install(
   DIRECTORY launch rviz

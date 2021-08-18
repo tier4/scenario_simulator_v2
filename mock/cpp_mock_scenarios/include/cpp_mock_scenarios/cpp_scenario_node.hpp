@@ -57,8 +57,11 @@ private:
       configuration.verbose = verbose;
       configuration.initialize_duration = 0;
     }
+    checkConfiguration(configuration);
     return configuration;
   }
+
+  void checkConfiguration(const traffic_simulator::Configuration & configuration);
 };
 
 }  // namespace cpp_mock_scenarios
