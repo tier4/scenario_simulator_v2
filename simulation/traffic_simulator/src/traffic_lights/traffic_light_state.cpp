@@ -55,6 +55,7 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightColor & datum)
     case TrafficLightColor::RED:    return os << "red";
     case TrafficLightColor::GREEN:  return os << "green";
     case TrafficLightColor::YELLOW: return os << "yellow";
+    default:                        return os << "error";
   }
   // clang-format on
 }
@@ -123,6 +124,7 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightArrow & datum)
     case TrafficLightArrow::STRAIGHT: return os << "straight";
     case TrafficLightArrow::LEFT:     return os << "left";
     case TrafficLightArrow::RIGHT:    return os << "right";
+    default:                          return os << "error";
   }
   // clang-format on
 }

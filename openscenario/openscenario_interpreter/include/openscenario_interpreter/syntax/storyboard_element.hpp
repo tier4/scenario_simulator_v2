@@ -18,6 +18,8 @@
 #include <boost/mpl/and.hpp>
 #include <cstddef>
 #include <limits>
+#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <string>
 #include <type_traits>
@@ -126,14 +128,15 @@ protected:
 
   auto unique(const std::string & name) { return cdr(names.emplace(name)); }
 
-  template <typename U, typename Node, typename Scope, typename... Ts>
+  template <typename U, typename Node, typename... Ts>
   decltype(auto) readStoryboardElement(const Node & node, Scope & inner_scope, Ts &&... xs)
   {
     const auto name = rename(readAttribute<String>("name", node, inner_scope));
 
     if (unique(name)) {
-      return inner_scope.storyboard_elements[name] =
-               make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
+      auto element = make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
+      inner_scope.addElement(name, element);
+      return element;
     } else {
       throw SyntaxError(
         "Detected redefinition of StoryboardElement named ", std::quoted(name), " (class ",

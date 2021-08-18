@@ -212,6 +212,11 @@ OpenSCENARIO:
                   EntityRef: []
                 Maneuver:
                   - name: ""
+                    ParameterDeclarations:
+                      ParameterDeclaration:
+                        - name: count
+                          parameterType: unsignedInt
+                          value: 0
                     Event:
                       - name: ""
                         priority: parallel
@@ -219,23 +224,46 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: "if (count < *count-max)"
+                                - name: "if (global count < *count-max)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: ::count
+                                      rule: lessThan
+                                      value: *count-max
+                        Action:
+                          - name: "global count += 1"
+                            GlobalAction:
+                              ParameterAction:
+                                parameterRef: ::count
+                                ModifyAction:
+                                  Rule:
+                                    AddValue:
+                                      value: 1
+                      - name: ""
+                        priority: parallel
+                        maximumExecutionCount: 100
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: "if (local count < 1000)"
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
                                     ParameterCondition:
                                       parameterRef: count
                                       rule: lessThan
-                                      value: *count-max
+                                      value: &countup-local-count-max 1000
                         Action:
-                          - name: "count += 1"
+                          - name: "local count += 10"
                             GlobalAction:
                               ParameterAction:
                                 parameterRef: count
                                 ModifyAction:
                                   Rule:
                                     AddValue:
-                                      value: 1
+                                      value: 10
             StartTrigger:
               ConditionGroup:
                 - Condition:
@@ -244,7 +272,7 @@ OpenSCENARIO:
                       conditionEdge: none
                       ByValueCondition:
                         ParameterCondition:
-                          parameterRef: count
+                          parameterRef: ::count
                           rule: equalTo
                           value: *count-default
           - name: "obstacle"
@@ -483,7 +511,7 @@ OpenSCENARIO:
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitSuccess
-                      - name: "failure if"
+                      - name: "failure if 1"
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
@@ -495,6 +523,15 @@ OpenSCENARIO:
                                     SimulationTimeCondition:
                                       value: 180
                                       rule: greaterThan
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      - name: "failure if 2"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
                             - Condition:
                                 - name: ""
                                   delay: 0
@@ -508,22 +545,40 @@ OpenSCENARIO:
                                       CollisionCondition:
                                         EntityRef:
                                           entityRef: ego
-                            # - Condition:
-                            #     - name: ""
-                            #       delay: 0
-                            #       conditionEdge: none
-                            #       ByEntityCondition:
-                            #         TriggeringEntities:
-                            #           triggeringEntitiesRule: any
-                            #           EntityRef:
-                            #             - entityRef: ego
-                            #         EntityCondition:
-                            #           TimeHeadwayCondition:
-                            #             entityRef: vehicle-1
-                            #             value: 0.5
-                            #             freespace: true
-                            #             alongRoute: true
-                            #             rule: lessThan
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      # - name: "failure if 3"
+                      #   priority: parallel
+                      #   StartTrigger:
+                      #     ConditionGroup:
+                      #       - Condition:
+                      #           - name: ""
+                      #             delay: 0
+                      #             conditionEdge: none
+                      #             ByEntityCondition:
+                      #               TriggeringEntities:
+                      #                 triggeringEntitiesRule: any
+                      #                 EntityRef:
+                      #                   - entityRef: ego
+                      #               EntityCondition:
+                      #                 TimeHeadwayCondition:
+                      #                   entityRef: vehicle-1
+                      #                   value: 0.5
+                      #                   freespace: true
+                      #                   alongRoute: true
+                      #                   rule: lessThan
+                      #   Action:
+                      #     - name: "return EXIT_FAILURE"
+                      #       UserDefinedAction:
+                      #         CustomCommandAction:
+                      #           type: exitFailure
+                      - name: "failure if 4"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
                             - Condition:
                                 - name: ""
                                   delay: 0
@@ -537,6 +592,15 @@ OpenSCENARIO:
                                       AccelerationCondition:
                                         rule: greaterThan
                                         value: 10
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      - name: "failure if 5"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
                             - Condition:
                                 - name: ""
                                   delay: 0
@@ -550,6 +614,15 @@ OpenSCENARIO:
                                     EntityCondition:
                                       StandStillCondition:
                                         duration: 10
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      - name: "failure if 6"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
                             - Condition:
                                 - name: ""
                                   delay: 0
@@ -564,6 +637,15 @@ OpenSCENARIO:
                                       SpeedCondition:
                                         rule: greaterThan
                                         value: 10
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      - name: "failure if 7"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
                             - Condition:
                                 - name: ""
                                   delay: 0
@@ -580,6 +662,15 @@ OpenSCENARIO:
                                         relativeDistanceType: cartesianDistance
                                         rule: greaterThan
                                         value: 100
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      - name: "failure if 8"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
                             - Condition:
                                 - name: ""
                                   delay: 0
@@ -589,6 +680,15 @@ OpenSCENARIO:
                                       parameterRef: count
                                       rule: greaterThan
                                       value: *count-max
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      - name: "failure if 9"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
                             - Condition:
                                 - name: ""
                                   delay: 0
@@ -603,6 +703,93 @@ OpenSCENARIO:
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitFailure
+                      - name: "failure if 10"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: countup!::count
+                                      rule: greaterThan
+                                      value: *countup-local-count-max
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      - name: "failure if 11"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: count
+                                      rule: greaterThan
+                                      value: 100
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: after-maneuver::count
+                                      rule: greaterThan
+                                      value: 100
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: after-maneuver::count
+                                      rule: greaterThan
+                                      value: 100
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    ParameterCondition:
+                                      parameterRef: _EndCondition::after-maneuver::count
+                                      rule: greaterThan
+                                      value: 100
+                        Action:
+                          - name: "return EXIT_FAILURE"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                  - name: "after-maneuver"
+                    ParameterDeclarations:
+                      ParameterDeclaration:
+                        - name: count
+                          parameterType: unsignedInt
+                          value: 100
+                    Event:
+                      - name: "dummy event"
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1.0
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: echo dummy event
             StartTrigger:
               ConditionGroup:
                 - Condition:

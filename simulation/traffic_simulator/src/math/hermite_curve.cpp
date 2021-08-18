@@ -124,7 +124,8 @@ double HermiteCurve::getNewtonMethodStepSize(
 }
 
 boost::optional<double> HermiteCurve::getCollisionPointIn2D(
-  std::vector<geometry_msgs::msg::Point> polygon, bool search_backward) const
+  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
+  bool close_start_end) const
 {
   size_t n = polygon.size();
   if (n <= 1) {
@@ -134,6 +135,14 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   for (size_t i = 0; i < (n - 1); i++) {
     const auto p0 = polygon[i];
     const auto p1 = polygon[i + 1];
+    auto s = getCollisionPointIn2D(p0, p1, search_backward);
+    if (s) {
+      s_values.emplace_back(s.get());
+    }
+  }
+  if (close_start_end) {
+    const auto p0 = polygon[n - 1];
+    const auto p1 = polygon[0];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
       s_values.emplace_back(s.get());
@@ -149,7 +158,8 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
 }
 
 boost::optional<double> HermiteCurve::getCollisionPointIn2D(
-  geometry_msgs::msg::Point point0, geometry_msgs::msg::Point point1, bool search_backward) const
+  const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
+  bool search_backward) const
 {
   std::vector<double> s_values;
   // double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
@@ -180,8 +190,8 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       }
     }
   } else {
-    double a = ay_ * ey - ax_ * ey;
-    double b = by_ * ey - bx_ * ey;
+    double a = ay_ * ex - ax_ * ey;
+    double b = by_ * ex - bx_ * ey;
     double c = cy_ * ex - cx_ * ey;
     double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
     auto solutions = solver_.solveCubicEquation(a, b, c, d);
@@ -193,7 +203,8 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
       double poly_x = (1 - tx) * point1.x + tx * point0.x;
       double poly_y = (1 - ty) * point1.y + ty * point0.y;
       double error = std::hypot(poly_x - x, poly_y - y);
-      if (error < 3 && 0 < tx && tx < 1 && 0 < ty && ty < 1 && 0 < solution && solution < 1) {
+      /// @note Hard coded parameter, torelance of the collision point.
+      if (error < 0.1) {
         s_values.emplace_back(solution);
       }
     }

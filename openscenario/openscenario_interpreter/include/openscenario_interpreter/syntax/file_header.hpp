@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HEADER_HPP_
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scope.hpp>
 
 namespace openscenario_interpreter
 {
@@ -44,7 +45,7 @@ struct FileHeader
 
   const String author;
 
-  template <typename Tree, typename Scope>
+  template <typename Tree>
   explicit FileHeader(const Tree & tree, Scope & outer_scope)
   : revMajor(readAttribute<UnsignedShort>("revMajor", tree, outer_scope)),
     revMinor(readAttribute<UnsignedShort>("revMinor", tree, outer_scope)),

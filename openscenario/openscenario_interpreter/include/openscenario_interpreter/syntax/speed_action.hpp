@@ -63,7 +63,7 @@ struct SpeedAction : private Scope
   }
 
 private:
-  void startImpl(const Scope::Actor & actor)
+  void startImpl(const EntityRef & actor)
   {
     auto calc_absolute_target_speed = speed_action_target.getCalculateAbsoluteTargetSpeed();
     double current_absolute_target_speed = calc_absolute_target_speed();
@@ -87,7 +87,7 @@ private:
     if (speed_action_target.is<RelativeTargetSpeed>()) {
       // dynamics_shape is not taken in account
       update_and_check = [calc_absolute_target_speed,
-                          is_end = std::move(is_end)](const Scope::Actor & actor) -> bool {
+                          is_end = std::move(is_end)](const EntityRef & actor) -> bool {
         setTargetSpeed(actor, calc_absolute_target_speed(), true);
         return is_end(actor);
       };
@@ -112,7 +112,7 @@ public:
   {
     for (auto && each : accomplishments) {
       each.second =
-        each.second or (update_and_check ? update_and_check(Scope::Actor(each.first)) : true);
+        each.second or (update_and_check ? update_and_check(EntityRef(each.first)) : true);
     }
   }
 
@@ -129,7 +129,7 @@ public:
   }
 
 private:
-  std::function<bool(const Scope::Actor &)> update_and_check;
+  std::function<bool(const EntityRef &)> update_and_check;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -38,19 +38,17 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Action : public StoryboardElement<Action>, public Element
+struct Action : public Scope, public StoryboardElement<Action>, public Element
 {
-  const String name;
-
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit Action(const Node & node, Scope & scope)
   // clang-format off
-  : Element(
+  : Scope(scope.makeChildScope(readAttribute<String>("name", node, scope))),
+    Element(
       choice(node,
-        std::make_pair(     "GlobalAction", [&](auto && node) { return make<     GlobalAction>(node, scope); }),
-        std::make_pair("UserDefinedAction", [&](auto && node) { return make<UserDefinedAction>(node, scope); }),
-        std::make_pair(    "PrivateAction", [&](auto && node) { return make<    PrivateAction>(node, scope); }))),
-    name(readAttribute<String>("name", node, scope))
+        std::make_pair(     "GlobalAction", [this](auto && node) { return make<     GlobalAction>(node, localScope()); }),
+        std::make_pair("UserDefinedAction", [this](auto && node) { return make<UserDefinedAction>(node, localScope()); }),
+        std::make_pair(    "PrivateAction", [this](auto && node) { return make<    PrivateAction>(node, localScope()); })))
   // clang-format on
   {
   }
