@@ -79,8 +79,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     INTERPRETER_INFO_STREAM("Deactivated myself.");
   }
 
-  auto isAnErrorIntended() const -> bool { return intended_result == "error"; }
-
 #define CATCH(TYPE)                                          \
   catch (const TYPE & error)                                 \
   {                                                          \
@@ -129,6 +127,10 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   }
 
 #undef CATCH
+
+  auto isAnErrorIntended() const -> bool;
+
+  auto publishCurrentContext() const -> void;
 
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
