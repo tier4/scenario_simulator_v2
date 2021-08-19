@@ -167,46 +167,28 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   double ex = (point1.x - point0.x);
   double fy = point0.y;
   double ey = (point1.y - point0.y);
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::abs(point0.x - point1.x) <= e) {
-    if (std::abs(point0.y - point1.y) <= e) {
-      return boost::none;
+  double a = ay_ * ex - ax_ * ey;
+  double b = by_ * ex - bx_ * ey;
+  double c = cy_ * ex - cx_ * ey;
+  double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
+  auto solutions = solver_.solveCubicEquation(a, b, c, d);
+  for (const auto solution : solutions) {
+    double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
+    double tx = (x - point0.x) / (point1.x - point0.x);
+    double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
+    double ty = (y - point0.y) / (point1.y - point0.y);
+    double poly_x = (1 - tx) * point1.x + tx * point0.x;
+    double poly_y = (1 - ty) * point1.y + ty * point0.y;
+    if (0 > tx || tx > 1) {
+      continue;
     }
-    auto solutions = solver_.solveCubicEquation(ax_, bx_, cx_, dx_ - fx);
-    for (const auto solution : solutions) {
-      double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
-      double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
-      if (0 < ty && ty < 1 && 0 < solution && solution < 1) {
-        s_values.emplace_back(solution);
-      }
+    if (0 > ty || ty > 1) {
+      continue;
     }
-  } else if (std::abs(point0.y - point1.y) <= e) {
-    auto solutions = solver_.solveCubicEquation(ay_, by_, cy_, dy_ - fy);
-    for (const auto solution : solutions) {
-      double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
-      double tx = std::fabs(x - point0.x) / std::fabs(point1.x - point0.x);
-      if (0 < tx && tx < 1 && 0 < solution && solution < 1) {
-        s_values.emplace_back(solution);
-      }
-    }
-  } else {
-    double a = ay_ * ex - ax_ * ey;
-    double b = by_ * ex - bx_ * ey;
-    double c = cy_ * ex - cx_ * ey;
-    double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
-    auto solutions = solver_.solveCubicEquation(a, b, c, d);
-    for (const auto solution : solutions) {
-      double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
-      double tx = std::fabs(x - point0.x) / std::fabs(point1.x - point0.x);
-      double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
-      double ty = std::fabs(y - point0.y) / std::fabs(point1.y - point0.y);
-      double poly_x = (1 - tx) * point1.x + tx * point0.x;
-      double poly_y = (1 - ty) * point1.y + ty * point0.y;
-      double error = std::hypot(poly_x - x, poly_y - y);
-      /// @note Hard coded parameter, torelance of the collision point.
-      if (error < 0.1) {
-        s_values.emplace_back(solution);
-      }
+    double error = std::hypot(poly_x - x, poly_y - y);
+    /// @note Hard coded parameter, torelance of the collision point.
+    if (error < 3) {
+      s_values.emplace_back(solution);
     }
   }
   if (s_values.empty()) {

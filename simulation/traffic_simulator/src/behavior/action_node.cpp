@@ -231,8 +231,11 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityOnCrosswalk(
   const openscenario_msgs::msg::EntityStatus & status)
 {
   if (status.lanelet_pose_valid) {
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
-    return spline.getCollisionPointIn2D(polygon, false, true);
+    const auto s = spline.getCollisionPointIn2D(polygon, false, true);
+    std::cout << __FILE__ << "," << __LINE__ << std::endl;
+    return s;
   }
   return boost::none;
 }
@@ -263,7 +266,7 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
   if (status.lanelet_pose_valid) {
     const auto polygon = traffic_simulator::math::transformPoints(
       status.pose, traffic_simulator::math::getPointsFromBbox(status.bounding_box));
-    return spline.getCollisionPointIn2D(polygon);
+    return spline.getCollisionPointIn2D(polygon, false, true);
   }
   return boost::none;
 }
