@@ -2,6 +2,7 @@
 
 ## Difference between the latest release and master
 - Add a new metrics module which detects vel, acc and jerk out of range. (Contribution by [kyabe2718](https://github.com/kyabe2718)).
+- Fix phase control feature in traffic light manager class. [Link](https://github.com/tier4/scenario_simulator_v2/pull/450)
 
 ## Version 0.4.3
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.3) on Github :fa-github:
