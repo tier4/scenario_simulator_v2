@@ -134,6 +134,8 @@ MultiServer::MultiServer(
   thread_ = std::thread(&MultiServer::start_poll, this);
 }
 
+MultiServer::~MultiServer() { thread_.join(); }
+
 void MultiServer::poll()
 {
   poller_.poll(0.0001);
