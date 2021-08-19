@@ -43,8 +43,8 @@ void TrafficLight::setArrow(const TrafficLightArrow arrow) { arrow_phase_.setSta
 double TrafficLight::getColorPhaseDuration() const { return color_phase_.getPhaseDuration(); }
 double TrafficLight::getArrowPhaseDuration() const { return arrow_phase_.getPhaseDuration(); }
 
-TrafficLightArrow TrafficLight::getArrow() const { return arrow_phase_.getState(); }
 TrafficLightColor TrafficLight::getColor() const { return color_phase_.getState(); }
+TrafficLightArrow TrafficLight::getArrow() const { return arrow_phase_.getState(); }
 
 void TrafficLight::update(const double step_time)
 {
@@ -54,7 +54,11 @@ void TrafficLight::update(const double step_time)
 
   const auto previous_color = getColor();
   color_phase_.update(step_time);
-  color_changed_ = (previous_color != getColor());
+  if (previous_color != getColor()) {
+    color_changed_ = true;
+  } else {
+    color_changed_ = false;
+  }
 }
 
 const geometry_msgs::msg::Point & TrafficLight::getPosition(const TrafficLightColor & color) const
