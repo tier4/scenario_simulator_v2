@@ -55,8 +55,6 @@ void OutOfRangeMetric::update()
       max_jerk, "])"));
     return;
   }
-
-  success();
 }
 
 nlohmann::json OutOfRangeMetric::to_json()
