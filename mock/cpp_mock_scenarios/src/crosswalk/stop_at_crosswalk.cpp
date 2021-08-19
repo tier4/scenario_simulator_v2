@@ -41,6 +41,9 @@ private:
   void onUpdate() override
   {
     const auto t = api_.getCurrentTime();
+    if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
     if (t >= 10) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
