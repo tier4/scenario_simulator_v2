@@ -117,8 +117,8 @@ void TrafficLightManager::update(const double step_time)
 {
   publishTrafficLightStateArray();
 
-  for (const auto & light : traffic_lights_) {
-    std::get<1>(light).update(step_time);
+  for (auto & light : traffic_lights_) {
+    light.second.update(step_time);
   }
 
   if (std::any_of(
@@ -127,7 +127,6 @@ void TrafficLightManager::update(const double step_time)
           return std::get<1>(id_and_traffic_light).colorChanged();
         })) {
     deleteAllMarkers();
-    // RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
   }
 
   drawMarkers();
