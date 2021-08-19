@@ -162,7 +162,6 @@ boost::optional<double> HermiteCurve::getCollisionPointIn2D(
   bool search_backward) const
 {
   std::vector<double> s_values;
-  // double l = std::hypot(point0.x - point1.x, point0.y - point1.y);
   double fx = point0.x;
   double ex = (point1.x - point0.x);
   double fy = point0.y;
