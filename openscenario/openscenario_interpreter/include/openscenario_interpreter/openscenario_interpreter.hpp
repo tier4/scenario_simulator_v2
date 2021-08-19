@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
 #include <boost/variant.hpp>
-#include <exception>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
@@ -29,7 +28,6 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
-#include <string>
 #include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \

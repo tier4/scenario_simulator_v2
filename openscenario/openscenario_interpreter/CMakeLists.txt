@@ -28,12 +28,10 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_UTILITY_SOURCES}
   src/object.cpp
   src/openscenario_interpreter.cpp
-  src/procedure.cpp)
+  src/procedure.cpp
+  src/record.cpp)
 
-target_link_libraries(${PROJECT_NAME}
-  Boost::filesystem
-  glog
-  pugixml)
+target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "openscenario_interpreter::Interpreter")
 

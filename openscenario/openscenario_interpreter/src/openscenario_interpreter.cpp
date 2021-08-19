@@ -20,15 +20,12 @@
 // clang-format on
 
 #include <algorithm>
-#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <concealer/execute.hpp>
-#include <memory>
+#include <boost/filesystem/operations.hpp>  // boost::filesystem::is_directory
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
+#include <openscenario_interpreter/record.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-#include <string>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -37,37 +34,6 @@
 
 namespace openscenario_interpreter
 {
-namespace record
-{
-pid_t process_id = 0;
-
-template <typename... Ts>
-auto start(Ts &&... xs) -> pid_t
-{
-  const std::vector<std::string> argv{
-    "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
-    "record", std::forward<decltype(xs)>(xs)...};
-
-  if ((process_id = fork()) < 0) {
-    throw std::system_error(errno, std::system_category());
-  } else if (process_id == 0 and concealer::execute(argv) < 0) {
-    std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
-    std::exit(EXIT_FAILURE);
-  } else {
-    return process_id;
-  }
-}
-
-auto stop() -> void
-{
-  int status = 0;
-
-  if (::kill(process_id, SIGINT) or waitpid(process_id, &status, 0) < 0) {
-    std::exit(EXIT_FAILURE);
-  }
-}
-}  // namespace record
-
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
