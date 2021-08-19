@@ -48,8 +48,10 @@ private:
       }
     }
     if (t >= 10.1) {
-      if (color != traffic_simulator::TrafficLightColor::YELLOW) {
+      if (color == traffic_simulator::TrafficLightColor::YELLOW) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
+      } else {
+        stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
   }
