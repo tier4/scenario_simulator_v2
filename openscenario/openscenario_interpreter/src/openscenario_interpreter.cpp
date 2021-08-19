@@ -37,35 +37,36 @@
 
 namespace openscenario_interpreter
 {
-pid_t record_process_id = 0;
+namespace record
+{
+pid_t process_id = 0;
 
 template <typename... Ts>
-auto record_start(Ts &&... xs)
+auto start(Ts &&... xs) -> pid_t
 {
-  record_process_id = fork();
-
   const std::vector<std::string> argv{
     "python3", boost::algorithm::replace_all_copy(concealer::dollar("which ros2"), "\n", ""), "bag",
     "record", std::forward<decltype(xs)>(xs)...};
 
-  if (record_process_id < 0) {
+  if ((process_id = fork()) < 0) {
     throw std::system_error(errno, std::system_category());
-  } else if (record_process_id == 0 and concealer::execute(argv) < 0) {
+  } else if (process_id == 0 and concealer::execute(argv) < 0) {
     std::cout << std::system_error(errno, std::system_category()).what() << std::endl;
     std::exit(EXIT_FAILURE);
   } else {
-    return record_process_id;
+    return process_id;
   }
 }
 
-auto record_end()
+auto stop() -> void
 {
   int status = 0;
 
-  if (::kill(record_process_id, SIGINT) or waitpid(record_process_id, &status, 0) < 0) {
+  if (::kill(process_id, SIGINT) or waitpid(process_id, &status, 0) < 0) {
     std::exit(EXIT_FAILURE);
   }
 }
+}  // namespace record
 
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
@@ -120,7 +121,7 @@ try {
   GET_PARAMETER(osc_path);
   GET_PARAMETER(output_directory);
 
-  record_start(
+  record::start(
     "-a",  //
     "-o", boost::filesystem::path(osc_path).replace_extension("").string());
 
@@ -227,7 +228,7 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
       [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
     result);
 
-  record_end();
+  record::stop();
 
   return Interpreter::Result::SUCCESS;
 }
