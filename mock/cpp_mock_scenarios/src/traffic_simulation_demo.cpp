@@ -125,9 +125,9 @@ private:
       traffic_simulator::helper::constructActionStatus());
     std::vector<std::pair<double, traffic_simulator::TrafficLightColor>> phase;
     phase = {
-      {10, traffic_simulator::TrafficLightColor::GREEN},
-      {10, traffic_simulator::TrafficLightColor::YELLOW},
-      {10, traffic_simulator::TrafficLightColor::RED}};
+      {1, traffic_simulator::TrafficLightColor::GREEN},
+      {1, traffic_simulator::TrafficLightColor::YELLOW},
+      {1, traffic_simulator::TrafficLightColor::RED}};
     api_.setTrafficLightColorPhase(34802, phase);
   }
 

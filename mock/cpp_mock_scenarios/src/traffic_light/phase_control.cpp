@@ -38,9 +38,7 @@ public:
   }
 
 private:
-  void onUpdate() override
-  {
-  }
+  void onUpdate() override {}
 
   void onInitialize() override
   {

@@ -113,9 +113,13 @@ void TrafficLightManager::drawMarkers() const
   marker_pub_->publish(msg);
 }
 
-void TrafficLightManager::update(const double)
+void TrafficLightManager::update(const double step_time)
 {
   publishTrafficLightStateArray();
+
+  for (const auto & light : traffic_lights_) {
+    std::get<1>(light).update(step_time);
+  }
 
   if (std::any_of(
         std::begin(traffic_lights_), std::end(traffic_lights_),
@@ -123,6 +127,7 @@ void TrafficLightManager::update(const double)
           return std::get<1>(id_and_traffic_light).colorChanged();
         })) {
     deleteAllMarkers();
+    // RCLCPP_ERROR_STREAM(rclcpp::get_logger("test"), __FILE__ << "," << __LINE__);
   }
 
   drawMarkers();
