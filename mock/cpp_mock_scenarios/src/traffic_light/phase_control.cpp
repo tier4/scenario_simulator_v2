@@ -38,7 +38,21 @@ public:
   }
 
 private:
-  void onUpdate() override {}
+  void onUpdate() override
+  {
+    const auto t = api_.getCurrentTime();
+    const auto color = api_.getTrafficLightColor(34802);
+    if (0 < t && t <= 9.9) {
+      if (color != traffic_simulator::TrafficLightColor::GREEN) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
+    }
+    if (t >= 10.1) {
+      if (color != traffic_simulator::TrafficLightColor::YELLOW) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      }
+    }
+  }
 
   void onInitialize() override
   {

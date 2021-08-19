@@ -45,6 +45,9 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
+    if (api_.getCurrentTime() >= 12) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
   }
 
   void onInitialize() override
