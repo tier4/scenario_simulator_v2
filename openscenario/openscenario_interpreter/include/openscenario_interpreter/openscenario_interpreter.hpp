@@ -76,6 +76,10 @@ public:
 
   auto isAnErrorIntended() const -> bool;
 
+  auto isFailureIntended() const -> bool;
+
+  auto isSuccessIntended() const -> bool;
+
   auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
 
   auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
@@ -105,23 +109,17 @@ public:
 
     catch (const SpecialAction<EXIT_SUCCESS> & action)  // from CustomCommandAction::exitSuccess
     {
-      if (intended_result == "success") {
-        set<common::Pass>();
-      } else {
-        set<common::Failure>("UnintendedSuccess", "Expected " + intended_result);
-      }
-
+      const auto what = "Expected " + intended_result;
+      isSuccessIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Failure>("UnintendedSuccess", what);
       return handle(action);
     }
 
     catch (const SpecialAction<EXIT_FAILURE> & action)  // from CustomCommandAction::exitFailure
     {
-      if (intended_result == "failure") {
-        set<common::Pass>();
-      } else {
-        set<common::Failure>("Failure", "Expected " + intended_result);
-      }
-
+      const auto what = "Expected " + intended_result;
+      isFailureIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Failure>("Failure", what);
       return handle(action);
     }
 

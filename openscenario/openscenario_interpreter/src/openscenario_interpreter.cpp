@@ -57,6 +57,10 @@ auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 
 auto Interpreter::isAnErrorIntended() const -> bool { return intended_result == "error"; }
 
+auto Interpreter::isFailureIntended() const -> bool { return intended_result == "failure"; }
+
+auto Interpreter::isSuccessIntended() const -> bool { return intended_result == "success"; }
+
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 try {
   INTERPRETER_INFO_STREAM("Configuring.");
@@ -127,7 +131,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
   timer = create_wall_timer(currentLocalFrameRate(), [this]() {
     withExceptionHandler(
-      [this](auto &&...) { rclcpp_lifecycle::LifecycleNode::deactivate(); },
+      [this](auto &&...) { deactivate(); },
       [this]() -> void {
         if (script) {
           if (not script.as<OpenScenario>().complete()) {
