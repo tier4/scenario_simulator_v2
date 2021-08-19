@@ -126,19 +126,16 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("Activating.");
 
-  const auto period =
-    std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
-
   execution_timer.clear();
 
   (*publisher_of_context).on_activate();
 
   assert((*publisher_of_context).is_activated());
 
-  timer = create_wall_timer(period, [this, period]() {
+  timer = create_wall_timer(currentLocalFrameRate(), [this]() {
     withExceptionHandler(
       [this](auto &&...) { rclcpp_lifecycle::LifecycleNode::deactivate(); },
-      [this, period]() -> void {
+      [this]() -> void {
         if (script) {
           if (not script.as<OpenScenario>().complete()) {
             const auto evaluate_time = execution_timer.invoke("evaluate", [&] {
@@ -147,7 +144,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
               return 0 <= getCurrentTime();  // statistics only if 0 <= getCurrentTime()
             });
 
-            if (0 <= getCurrentTime() and period < evaluate_time) {
+            if (0 <= getCurrentTime() and currentLocalFrameRate() < evaluate_time) {
               using namespace std::chrono;
               const auto time_ms = duration_cast<milliseconds>(evaluate_time).count();
               const auto & time_statistics = execution_timer.getStatistics("evaluate");
@@ -155,7 +152,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
                 get_logger(),
                 "The execution time of evaluate() ("
                   << time_ms << " ms) is not in time. The current local frame rate ("
-                  << local_frame_rate << " Hz) (period = " << period.count()
+                  << local_frame_rate << " Hz) (period = " << currentLocalFrameRate().count()
                   << " ms) is too high. If the frame rate is less than "
                   << static_cast<unsigned int>(1.0 / time_ms * 1e3)
                   << " Hz, you will make it. (Statistics: count = " << time_statistics.count()

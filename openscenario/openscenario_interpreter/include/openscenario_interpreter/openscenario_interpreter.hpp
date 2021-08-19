@@ -65,6 +65,11 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   ExecutionTimer<> execution_timer;
 
+  auto currentLocalFrameRate() const
+  {
+    return std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
+  }
+
   template <typename T, typename... Ts>
   auto set(Ts &&... xs) -> void
   {
