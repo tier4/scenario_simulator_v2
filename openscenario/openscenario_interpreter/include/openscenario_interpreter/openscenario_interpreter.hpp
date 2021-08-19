@@ -61,7 +61,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   common::JUnit5 results;
 
-  boost::variant<common::Pass, common::Failure, common::junit::Error> result;
+  boost::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
 
   ExecutionTimer<> execution_timer;
 
@@ -71,25 +71,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
     result = T(std::forward<decltype(xs)>(xs)...);
   }
 
-  auto makeDefaultExceptionHandler()
-  {
-    return [this](auto &&...) { rclcpp_lifecycle::LifecycleNode::deactivate(); };
-  }
-
-#define CATCH(TYPE)                                   \
-  catch (const TYPE & error)                          \
-  {                                                   \
-    if (isAnErrorIntended()) {                        \
-      set<common::Pass>();                            \
-    } else {                                          \
-      set<common::junit::Error>(#TYPE, error.what()); \
-    }                                                 \
-                                                      \
-    return handle(error);                             \
-  }
-
   template <typename ExceptionHandler, typename Thunk>
-  auto guard(ExceptionHandler && handle, Thunk && thunk) -> decltype(auto)
+  auto withExceptionHandler(ExceptionHandler && handle, Thunk && thunk) -> decltype(auto)
   {
     try {
       return thunk();
@@ -117,11 +100,36 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       return handle(action);
     }
 
-    CATCH(AutowareError)
-    CATCH(SemanticError)
-    CATCH(SimulationError)
-    CATCH(SyntaxError)
-    CATCH(InternalError)  // NOTE: InternalError MUST BE LAST OF CATCH STATEMENTS.
+    catch (const AutowareError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("AutowareError", error.what());
+      return handle(error);
+    }
+
+    catch (const SemanticError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("SemanticError", error.what());
+      return handle(error);
+    }
+
+    catch (const SimulationError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("SimulationError", error.what());
+      return handle(error);
+    }
+
+    catch (const SyntaxError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("SyntaxError", error.what());
+      return handle(error);
+    }
+
+    catch (const std::runtime_error & error)  // NOTE: MUST BE LAST OF CATCH STATEMENTS.
+    {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("InternalError", error.what());
+      return handle(error);
+    }
 
     catch (...)  // FINAL BARRIER
     {
@@ -129,8 +137,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       return handle();
     }
   }
-
-#undef CATCH
 
   auto isAnErrorIntended() const -> bool;
 

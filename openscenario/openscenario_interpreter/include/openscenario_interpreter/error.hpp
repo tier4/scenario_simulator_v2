@@ -29,8 +29,6 @@
 
 namespace openscenario_interpreter
 {
-using InternalError = std::exception;
-
 using common::AutowareError;
 using common::Error;
 using common::SemanticError;
