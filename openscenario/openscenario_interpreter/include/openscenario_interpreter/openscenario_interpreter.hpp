@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
 #include <boost/variant.hpp>
+#include <chrono>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
@@ -65,10 +66,29 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   ExecutionTimer<> execution_timer;
 
-  auto currentLocalFrameRate() const
-  {
-    return std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
-  }
+  using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+
+public:
+  OPENSCENARIO_INTERPRETER_PUBLIC
+  explicit Interpreter(const rclcpp::NodeOptions &);
+
+  auto currentLocalFrameRate() const -> std::chrono::milliseconds;
+
+  auto isAnErrorIntended() const -> bool;
+
+  auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_deactivate(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_cleanup(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_shutdown(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_error(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto publishCurrentContext() const -> void;
 
   template <typename T, typename... Ts>
   auto set(Ts &&... xs) -> void
@@ -142,28 +162,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
       return handle();
     }
   }
-
-  auto isAnErrorIntended() const -> bool;
-
-  auto publishCurrentContext() const -> void;
-
-public:
-  OPENSCENARIO_INTERPRETER_PUBLIC
-  explicit Interpreter(const rclcpp::NodeOptions &);
-
-  using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-
-  auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
-
-  auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
-
-  auto on_deactivate(const rclcpp_lifecycle::State &) -> Result override;
-
-  auto on_cleanup(const rclcpp_lifecycle::State &) -> Result override;
-
-  auto on_shutdown(const rclcpp_lifecycle::State &) -> Result override;
-
-  auto on_error(const rclcpp_lifecycle::State &) -> Result override;
 };
 }  // namespace openscenario_interpreter
 

@@ -50,19 +50,12 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
 }
 
-auto Interpreter::isAnErrorIntended() const -> bool { return intended_result == "error"; }
-
-auto Interpreter::publishCurrentContext() const -> void
+auto Interpreter::currentLocalFrameRate() const -> std::chrono::milliseconds
 {
-  Context context;
-  {
-    nlohmann::json json;
-    context.stamp = now();
-    context.data = (json << script.as<OpenScenario>()).dump();
-  }
-
-  (*publisher_of_context).publish(context);
+  return std::chrono::milliseconds(static_cast<unsigned int>(1 / local_frame_rate * 1000));
 }
+
+auto Interpreter::isAnErrorIntended() const -> bool { return intended_result == "error"; }
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 try {
@@ -242,6 +235,18 @@ auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
   timer.reset();
 
   return Interpreter::Result::SUCCESS;
+}
+
+auto Interpreter::publishCurrentContext() const -> void
+{
+  Context context;
+  {
+    nlohmann::json json;
+    context.stamp = now();
+    context.data = (json << script.as<OpenScenario>()).dump();
+  }
+
+  (*publisher_of_context).publish(context);
 }
 }  // namespace openscenario_interpreter
 
