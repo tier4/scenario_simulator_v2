@@ -66,50 +66,55 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   ExecutionTimer<> execution_timer;
 
   template <typename T, typename... Ts>
-  auto deactivate(Ts &&... xs) -> void
+  auto set(Ts &&... xs) -> void
   {
     result = T(std::forward<decltype(xs)>(xs)...);
-
-    INTERPRETER_INFO_STREAM("Deactivate myself.");
-
-    rclcpp_lifecycle::LifecycleNode::deactivate();
-
-    INTERPRETER_INFO_STREAM("Deactivated myself.");
   }
 
-#define CATCH(TYPE)                                          \
-  catch (const TYPE & error)                                 \
-  {                                                          \
-    if (isAnErrorIntended()) {                               \
-      deactivate<common::Pass>();                            \
-    } else {                                                 \
-      deactivate<common::junit::Error>(#TYPE, error.what()); \
-    }                                                        \
+  auto makeDefaultExceptionHandler()
+  {
+    return [this](auto &&...) { rclcpp_lifecycle::LifecycleNode::deactivate(); };
   }
 
-  template <typename Thunk>
-  auto guard(Thunk && thunk) -> decltype(auto)
+#define CATCH(TYPE)                                   \
+  catch (const TYPE & error)                          \
+  {                                                   \
+    if (isAnErrorIntended()) {                        \
+      set<common::Pass>();                            \
+    } else {                                          \
+      set<common::junit::Error>(#TYPE, error.what()); \
+    }                                                 \
+                                                      \
+    return handle(error);                             \
+  }
+
+  template <typename ExceptionHandler, typename Thunk>
+  auto guard(ExceptionHandler && handle, Thunk && thunk) -> decltype(auto)
   {
     try {
       return thunk();
     }
 
-    catch (const SpecialAction<EXIT_SUCCESS> &)  // from CustomCommandAction::exitSuccess
+    catch (const SpecialAction<EXIT_SUCCESS> & action)  // from CustomCommandAction::exitSuccess
     {
       if (intended_result == "success") {
-        deactivate<common::Pass>();
+        set<common::Pass>();
       } else {
-        deactivate<common::Failure>("UnintendedSuccess", "Expected " + intended_result);
+        set<common::Failure>("UnintendedSuccess", "Expected " + intended_result);
       }
+
+      return handle(action);
     }
 
-    catch (const SpecialAction<EXIT_FAILURE> &)  // from CustomCommandAction::exitFailure
+    catch (const SpecialAction<EXIT_FAILURE> & action)  // from CustomCommandAction::exitFailure
     {
       if (intended_result == "failure") {
-        deactivate<common::Pass>();
+        set<common::Pass>();
       } else {
-        deactivate<common::Failure>("Failure", "Expected " + intended_result);
+        set<common::Failure>("Failure", "Expected " + intended_result);
       }
+
+      return handle(action);
     }
 
     CATCH(AutowareError)
@@ -120,7 +125,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
     catch (...)  // FINAL BARRIER
     {
-      deactivate<common::junit::Error>("UnknownError", "An unknown exception has occurred");
+      set<common::junit::Error>("UnknownError", "An unknown exception has occurred");
+      return handle();
     }
   }
 
