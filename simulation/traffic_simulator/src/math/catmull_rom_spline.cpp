@@ -434,13 +434,13 @@ bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::
 {
   constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::abs(p0.x - p1.x) > e) {
-    return false;
+    return false;  // LCOV_EXCL_LINE
   }
   if (std::abs(p0.y - p1.y) > e) {
-    return false;
+    return false;  // LCOV_EXCL_LINE
   }
   if (std::abs(p0.z - p1.z) > e) {
-    return false;
+    return false;  // LCOV_EXCL_LINE
   }
   return true;
 }
