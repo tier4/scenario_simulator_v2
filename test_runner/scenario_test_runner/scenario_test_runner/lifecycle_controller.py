@@ -148,7 +148,7 @@ class LifecycleController(Node):
                 + self.get_lifecycle_state()
                 + " now, but "
                 + state_expects
-                + ".\x1b[0m"
+                + " expected.\x1b[0m"
             )
 
     def activate_node(self):
