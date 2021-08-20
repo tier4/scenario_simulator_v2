@@ -134,6 +134,7 @@ TEST(Math, CatmullRomSpline1)
   if (collision_s) {
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
   }
+  EXPECT_THROW(spline.getCurveIndexAndS(-10), common::SemanticError);
 }
 
 TEST(Math, CatmullRomSpline2)

@@ -343,10 +343,10 @@ boost::optional<double> CatmullRomSpline::getSValue(
     }
   }
   if (s_values.size() != error_values.size()) {
-    THROW_SIMULATION_ERROR("s values and error values size are does not match");
+    THROW_SIMULATION_ERROR("s values and error values size are does not match");  // LCOV_EXCL_LINE
   }
   if (s_values.size() != curve_index.size()) {
-    THROW_SIMULATION_ERROR("s values and error values size are does not match");
+    THROW_SIMULATION_ERROR("s values and error values size are does not match");  // LCOV_EXCL_LINE
   }
   if (s_values.empty()) {
     return boost::none;
@@ -425,7 +425,7 @@ bool CatmullRomSpline::checkConnection() const
     }
   }
   if (curves_.empty()) {
-    THROW_SIMULATION_ERROR("curve size should not be zero"); // LCOV_EXCL_LINE
+    THROW_SIMULATION_ERROR("curve size should not be zero");  // LCOV_EXCL_LINE
   }
   return true;
 }
