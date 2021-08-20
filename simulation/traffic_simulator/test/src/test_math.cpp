@@ -147,6 +147,8 @@ TEST(Math, CatmullRomSpline2)
   p2.y = 5;
   auto points = {p0, p1, p2};
   EXPECT_NO_THROW(auto spline = traffic_simulator::math::CatmullRomSpline(points));
+  auto spline = traffic_simulator::math::CatmullRomSpline(points);
+  EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0);
 }
 
 TEST(Math, CatmullRomSpline3)
