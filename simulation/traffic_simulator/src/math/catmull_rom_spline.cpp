@@ -25,14 +25,6 @@ namespace traffic_simulator
 {
 namespace math
 {
-CatmullRomSpline::CatmullRomSpline(
-  const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves)
-{
-  for (const auto & curve : hermite_curves) {
-    curves_.emplace_back(HermiteCurve(curve));
-  }
-}
-
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
   double width, size_t num_points, double z_offset)
 {
