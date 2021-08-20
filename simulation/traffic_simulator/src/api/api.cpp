@@ -25,6 +25,11 @@
 
 namespace traffic_simulator
 {
+metrics::MetricLifecycle API::getMetricLifecycle(const std::string & name)
+{
+  return metrics_manager_.getLifecycle(name);
+}
+
 void API::setVerbose(const bool verbose)
 {
   metrics_manager_.setVerbose(verbose);

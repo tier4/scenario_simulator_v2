@@ -113,9 +113,13 @@ void TrafficLightManager::drawMarkers() const
   marker_pub_->publish(msg);
 }
 
-void TrafficLightManager::update(const double)
+void TrafficLightManager::update(const double step_time)
 {
   publishTrafficLightStateArray();
+
+  for (auto & light : traffic_lights_) {
+    light.second.update(step_time);
+  }
 
   if (std::any_of(
         std::begin(traffic_lights_), std::end(traffic_lights_),

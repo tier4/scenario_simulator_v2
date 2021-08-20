@@ -2,6 +2,48 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2021-08-17)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
+* Merge branch 'master' into namespace
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/error-message
+* Merge pull request `#433 <https://github.com/tier4/scenario_simulator_v2/issues/433>`_ from tier4/feature/yeild_to_merging_entity
+* update decelerate and follow scenario
+* add merge scenario
+* add merge scenario
+* fix to old version get longitudinal distance function
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/lane_change_npc_distance_in_lane_coordinate
+* Merge remote-tracking branch 'origin/master' into namespace
+* Merge pull request `#429 <https://github.com/tier4/scenario_simulator_v2/issues/429>`_ from tier4/feature/add_cpp_scenarios
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* apply reformat
+* add stop function
+* renam node
+* fix lanelet path
+* fix scenario
+* fix compile errors
+* add decelerate and follow scenario
+* apply reformat
+* add test scenario for following front entity
+* change to enum value
+* apply reformat
+* enable colorlize output
+* add termcolor
+* remove lifecycle
+* add error trigger
+* remove sys.ext
+* modify handler
+* remove launch
+* modify cmakelist.txt
+* remove depends
+* remove test dir
+* add test
+* update launch file
+* add shutdown handler
+* Merge branch 'master' into namespace
+* Merge branch 'master' into namespace
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.4.2 (2021-07-30)
 ------------------
 

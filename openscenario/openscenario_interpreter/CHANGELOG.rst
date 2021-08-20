@@ -2,6 +2,45 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.3 (2021-08-17)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/follow_front_entity_behavior
+* Merge pull request `#430 <https://github.com/tier4/scenario_simulator_v2/issues/430>`_ from tier4/feature/interpreter/error-message
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/error-message
+* Merge pull request `#420 <https://github.com/tier4/scenario_simulator_v2/issues/420>`_ from tier4/namespace
+* Fix openscenario_interpreter to set certain directory name to suitename
+* fix ego_count
+* Cleanup
+* Update script 'result_checker'
+* Remove deprecated data members from Interpreter
+* Update junit result types to be stream insertable
+* Update Interpreter to store current-result as variant of JUnit5 element
+* Add some type aliases
+* Add new header 'junit5.hpp'
+* Add new struct 'Failure' for experimental JUnit library
+* fix bugs of name resolution with anonymous scope and change all-in-one.yaml to require name resolution
+* Add new struct 'Error' for experimental JUnit library
+* Add experimental JUnit library
+* remove explicit from copy/move constructor
+* Rename struct 'ScopeImpl' to 'EnvironmentFrame'
+* Lipsticks
+* Lipsticks
+* Remove type alias 'Scope::Actor'
+* Fix typos
+* Merge remote-tracking branch 'origin/master' into namespace
+* Lipsticks
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator.auto into feature/add_cpp_scenarios
+* fix
+* trivial fix
+* fix
+* fix traffic signals
+* Remove unneeded definitions
+* Merge branch 'master' into namespace
+* Merge branch 'master' into namespace
+* fix scope
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718, yamacir-kit
+
 0.4.2 (2021-07-30)
 ------------------
 

@@ -70,6 +70,7 @@ distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
 curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | \
   sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
 sudo apt-get update
+sudo apt install -y nvidia-docker2
 ```
 
 If you finished installing docker and nvidia-docker2, please type the commands below.
@@ -115,7 +116,7 @@ rocker is a docker support tool for ROS.
 It enables us to run rviz inside docker very easily.  
 You can install rocker via pip3.
 ```bash
-sudo pip3 install rocker
+sudo pip3 install git+https://github.com/osrf/rocker.git
 ```
 
 After install rocker, please check rocker works correctly.  
