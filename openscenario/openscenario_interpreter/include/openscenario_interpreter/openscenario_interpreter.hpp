@@ -80,6 +80,8 @@ public:
 
   auto isSuccessIntended() const -> bool;
 
+  auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
+
   auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
 
   auto on_activate(const rclcpp_lifecycle::State &) -> Result override;

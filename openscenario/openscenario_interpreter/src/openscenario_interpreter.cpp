@@ -61,6 +61,30 @@ auto Interpreter::isFailureIntended() const -> bool { return intended_result == 
 
 auto Interpreter::isSuccessIntended() const -> bool { return intended_result == "success"; }
 
+auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
+{
+  auto configuration = traffic_simulator::Configuration(
+    boost::filesystem::is_directory(script.as<OpenScenario>().logic_file)
+      ? script.as<OpenScenario>().logic_file
+      : script.as<OpenScenario>().logic_file.parent_path());
+  {
+    configuration.auto_sink = false;
+
+    configuration.initialize_duration = ObjectController::ego_count > 0 ? 30 : 0;
+
+    configuration.scenario_path = osc_path;
+
+    // XXX DIRTY HACK!!!
+    if (
+      not boost::filesystem::is_directory(script.as<OpenScenario>().logic_file) and
+      script.as<OpenScenario>().logic_file.extension() == ".osm") {
+      configuration.lanelet2_map_file = script.as<OpenScenario>().logic_file.filename().string();
+    }
+  }
+
+  return configuration;
+}
+
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 try {
   INTERPRETER_INFO_STREAM("Configuring.");
@@ -90,33 +114,14 @@ try {
 
   script.rebind<OpenScenario>(osc_path);
 
-  auto configuration = traffic_simulator::Configuration(
-    boost::filesystem::is_directory(script.as<OpenScenario>().logic_file)
-      ? script.as<OpenScenario>().logic_file
-      : script.as<OpenScenario>().logic_file.parent_path());
-  {
-    configuration.auto_sink = false;
-
-    configuration.initialize_duration = ObjectController::ego_count > 0 ? 30 : 0;
-
-    configuration.scenario_path = osc_path;
-
-    // XXX DIRTY HACK!!!
-    if (
-      not boost::filesystem::is_directory(script.as<OpenScenario>().logic_file) and
-      script.as<OpenScenario>().logic_file.extension() == ".osm") {
-      configuration.lanelet2_map_file = script.as<OpenScenario>().logic_file.filename().string();
-    }
-  }
-
-  connect(shared_from_this(), configuration);
+  connect(shared_from_this(), makeCurrentConfiguration());
 
   initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
-  return Interpreter::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;  // => Inactive
 } catch (const openscenario_interpreter::SyntaxError & error) {
   INTERPRETER_ERROR_STREAM(error.what());
-  return Interpreter::Result::FAILURE;
+  return Interpreter::Result::FAILURE;  // => Unconfigured
 }
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
@@ -190,7 +195,7 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 
   record::stop();
 
-  return Interpreter::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;  // => Inactive
 }
 
 auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
@@ -220,16 +225,7 @@ auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 
   script.reset();
 
-  return Interpreter::Result::SUCCESS;
-}
-
-auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
-{
-  INTERPRETER_INFO_STREAM("ShuttingDown.");
-
-  timer.reset();
-
-  return Interpreter::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;  // => Unconfigured
 }
 
 auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
@@ -238,7 +234,16 @@ auto Interpreter::on_error(const rclcpp_lifecycle::State &) -> Result
 
   timer.reset();
 
-  return Interpreter::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;  // => Unconfigured
+}
+
+auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
+{
+  INTERPRETER_INFO_STREAM("ShuttingDown.");
+
+  timer.reset();
+
+  return Interpreter::Result::SUCCESS;  // => Finalized
 }
 
 auto Interpreter::publishCurrentContext() const -> void
