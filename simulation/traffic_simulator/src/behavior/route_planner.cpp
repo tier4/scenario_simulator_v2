@@ -95,12 +95,12 @@ void RoutePlanner::cancelGoal(const openscenario_msgs::msg::LaneletPose & entity
   }
 }
 
-std::vector<openscenario_msgs::msg::LaneletPose> RoutePlanner::getGoalposes()
+std::vector<openscenario_msgs::msg::LaneletPose> RoutePlanner::getGoalPoses()
 {
   std::vector<openscenario_msgs::msg::LaneletPose> goalposes;
-  goalposes={};
-  auto waypoint_queue_tmp_=waypoint_queue_;
-  for (int i=0 ; ! waypoint_queue_tmp_.empty() ; i++) {
+  goalposes = {};
+  auto waypoint_queue_tmp_ = waypoint_queue_;
+  for (int i = 0; !waypoint_queue_tmp_.empty(); i++) {
     goalposes.push_back(waypoint_queue_tmp_.front());
     waypoint_queue_tmp_.pop();
   }

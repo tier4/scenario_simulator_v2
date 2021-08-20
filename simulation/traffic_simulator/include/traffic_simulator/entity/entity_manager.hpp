@@ -275,9 +275,10 @@ public:
 
   auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
 
-  void getGoalposes(const std::string & name, std::vector<openscenario_msgs::msg::LaneletPose> & goals);
+  void getGoalPoses(
+    const std::string & name, std::vector<openscenario_msgs::msg::LaneletPose> & goals);
 
-  void getGoalposes(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals);
+  void getGoalPoses(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals);
 
   bool isEgo(const std::string & name) const;
 

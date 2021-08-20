@@ -39,8 +39,11 @@ public:
     return result;
   }
 
-  std::vector<openscenario_msgs::msg::LaneletPose> getGoalposes() override { return {}; } //return {}?
-  
+  std::vector<openscenario_msgs::msg::LaneletPose> getGoalPoses() override
+  {
+    return {};
+  }  //return {}?
+
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
 
   auto getRouteLanelets(const double) -> std::vector<std::int64_t> override

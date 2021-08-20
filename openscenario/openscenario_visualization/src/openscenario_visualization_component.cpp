@@ -89,8 +89,8 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     markers_.erase(markers_.find(name));
   }
   for (const auto & data : msg->data) {
-    auto marker_array =
-      generateMarker(data.status, data.goalposes, data.waypoint, data.obstacle, data.obstacle_find);
+    auto marker_array = generateMarker(
+      data.status, data.goal_poses, data.waypoint, data.obstacle, data.obstacle_find);
     std::copy(
       marker_array.markers.begin(), marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
@@ -118,7 +118,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
 
 const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
   const openscenario_msgs::msg::EntityStatus & status,
-  const std::vector<geometry_msgs::msg::Pose> & goalposes,
+  const std::vector<geometry_msgs::msg::Pose> & goal_poses,
   const openscenario_msgs::msg::WaypointsArray & waypoints,
   const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find)
 {
@@ -137,23 +137,24 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
       break;
   }
 
-  if (goalposes.size() != 0) {
-    goalposes_max_size = std::max(goalposes_max_size, int(goalposes.size()));
-    for (std::vector<geometry_msgs::msg::Pose>::size_type i = 0; i < goalposes_max_size; i++){
-      if (i < goalposes.size()){
+  if (goal_poses.size() != 0) {
+    goal_poses_max_size = std::max(goal_poses_max_size, int(goal_poses.size()));
+    for (std::vector<geometry_msgs::msg::Pose>::size_type i = 0; i < unsigned(goal_poses_max_size);
+         i++) {
+      if (i < goal_poses.size()) {
         visualization_msgs::msg::Marker goalpose_marker;
         goalpose_marker.header.frame_id = "map";
         goalpose_marker.header.stamp = stamp;
         goalpose_marker.ns = status.name;
-        goalpose_marker.id = 10 + int(goalposes_max_size - goalposes.size() + i);
+        goalpose_marker.id = 10 + int(goal_poses_max_size - goal_poses.size() + i);
         goalpose_marker.action = goalpose_marker.ADD;
-        goalpose_marker.type = 0;//arrow
-        goalpose_marker.pose = goalposes[i];
+        goalpose_marker.type = 0;  //arrow
+        goalpose_marker.pose = goal_poses[i];
         goalpose_marker.color = color;
         goalpose_marker.scale.x = 1.6;
         goalpose_marker.scale.y = 0.2;
         goalpose_marker.scale.z = 0.2;
-        goalpose_marker.lifetime = rclcpp::Duration(0.1);
+        goalpose_marker.lifetime = rclcpp::Duration::from_seconds(0.1);
         ret.markers.emplace_back(goalpose_marker);
 
         visualization_msgs::msg::Marker goalpose_text_marker;
@@ -161,11 +162,11 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
         goalpose_text_marker.header.frame_id = "map";
         goalpose_text_marker.header.stamp = stamp;
         goalpose_text_marker.ns = status.name;
-        goalpose_text_marker.id = 100 + int(goalposes_max_size - goalposes.size() + i);
+        goalpose_text_marker.id = 100 + int(goal_poses_max_size - goal_poses.size() + i);
         goalpose_text_marker.action = goalpose_text_marker.ADD;
-        goalpose_text_marker.pose.position.x = goalposes[i].position.x;
-        goalpose_text_marker.pose.position.y = goalposes[i].position.y;
-        goalpose_text_marker.pose.position.z = goalposes[i].position.z +1.0;
+        goalpose_text_marker.pose.position.x = goal_poses[i].position.x;
+        goalpose_text_marker.pose.position.y = goal_poses[i].position.y;
+        goalpose_text_marker.pose.position.z = goal_poses[i].position.z + 1.0;
         goalpose_text_marker.pose.orientation.x = 0.0;
         goalpose_text_marker.pose.orientation.y = 0.0;
         goalpose_text_marker.pose.orientation.z = 0.0;
@@ -174,36 +175,37 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
         goalpose_text_marker.scale.x = 0.0;
         goalpose_text_marker.scale.y = 0.0;
         goalpose_text_marker.scale.z = 0.6;
-        goalpose_text_marker.lifetime = rclcpp::Duration(0.1);
-        goalpose_text_marker.text = status.name + "_goal_" + std::to_string(int(goalposes_max_size - goalposes.size() +i));
+        goalpose_text_marker.lifetime = rclcpp::Duration::from_seconds(0.1);
+        goalpose_text_marker.text =
+          status.name + "_goal_" + std::to_string(int(goal_poses_max_size - goal_poses.size() + i));
         goalpose_text_marker.color = color_utils::makeColorMsg("white", 0.99);
         ret.markers.emplace_back(goalpose_text_marker);
-      }else{
+      } else {
         visualization_msgs::msg::Marker goalpose_marker;
         goalpose_marker.action = goalpose_marker.DELETE;
-        goalpose_marker.id = 10 + int(i - (goalposes_max_size - goalposes.size()));
+        goalpose_marker.id = 10 + int(i - (goal_poses_max_size - goal_poses.size()));
         goalpose_marker.ns = status.name;
         ret.markers.emplace_back(goalpose_marker);
         visualization_msgs::msg::Marker goalpose_text_marker;
         goalpose_text_marker.action = goalpose_text_marker.DELETE;
-        goalpose_text_marker.id = 100 + int(i - (goalposes_max_size - goalposes.size()));
+        goalpose_text_marker.id = 100 + int(i - (goal_poses_max_size - goal_poses.size()));
         goalpose_text_marker.ns = status.name;
         ret.markers.emplace_back(goalpose_text_marker);
       }
     }
-  }else{
+  } else {
     visualization_msgs::msg::Marker goalpose_marker;
     goalpose_marker.action = goalpose_marker.DELETE;
-    goalpose_marker.id = 10 + int(goalposes_max_size - 1);
+    goalpose_marker.id = 10 + int(goal_poses_max_size - 1);
     goalpose_marker.ns = status.name;
     ret.markers.emplace_back(goalpose_marker);
     visualization_msgs::msg::Marker goalpose_text_marker;
     goalpose_text_marker.action = goalpose_text_marker.DELETE;
-    goalpose_text_marker.id = 100 + int(goalposes_max_size - 1);
+    goalpose_text_marker.id = 100 + int(goal_poses_max_size - 1);
     goalpose_text_marker.ns = status.name;
     ret.markers.emplace_back(goalpose_text_marker);
   }
-  
+
   visualization_msgs::msg::Marker bbox;
   bbox.header.frame_id = status.name;
   bbox.header.stamp = stamp;
