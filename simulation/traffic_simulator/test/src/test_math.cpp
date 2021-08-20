@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/distance.hpp>
@@ -143,9 +144,11 @@ TEST(Math, CatmullRomSpline2)
   p1.y = 3;
   geometry_msgs::msg::Point p2;
   p2.x = 2;
-  p2.y = 5;
+  p2.y = 6;
   auto points = {p0, p1, p2};
   EXPECT_NO_THROW(auto spline = traffic_simulator::math::CatmullRomSpline(points));
+  auto spline = traffic_simulator::math::CatmullRomSpline(points);
+  EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0);
 }
 
 TEST(Math, CatmullRomSpline3)
@@ -244,6 +247,16 @@ TEST(Math, CatmullRomSpline7)
   // std::cout << "result = " << spline.getSValue(p).get() << std::endl;
   EXPECT_TRUE(spline.getSValue(p).get() > 0.099);
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
+}
+
+TEST(Math, CatmullRomSpline8)
+{
+  EXPECT_THROW(
+    traffic_simulator::math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
+    common::SemanticError);
+  EXPECT_THROW(
+    traffic_simulator::math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(1)),
+    common::SemanticError);
 }
 
 TEST(Math, BoundingBox0)
