@@ -177,7 +177,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       });
   });
 
-  return Interpreter::Result::SUCCESS;
+  return Interpreter::Result::SUCCESS;  // => Active
 }
 
 auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
@@ -206,27 +206,6 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
 auto Interpreter::on_cleanup(const rclcpp_lifecycle::State &) -> Result
 {
   INTERPRETER_INFO_STREAM("CleaningUp.");
-
-  {
-    results.name = script.as<OpenScenario>().pathname.parent_path().parent_path().string();
-
-    const auto suite_name = script.as<OpenScenario>().pathname.parent_path().filename().string();
-
-    const auto case_name = script.as<OpenScenario>().pathname.stem().string();
-
-    boost::apply_visitor(
-      overload(
-        [&](const common::junit::Pass &) { results.testsuite(suite_name).testcase(case_name); },
-        [&](const common::junit::Failure & it) {
-          results.testsuite(suite_name).testcase(case_name).failure.push_back(it);
-        },
-        [&](const common::junit::Error & it) {
-          results.testsuite(suite_name).testcase(case_name).error.push_back(it);
-        }),
-      result);
-
-    results.write_to("/tmp/scenario_test_runner/result.junit.xml", "  ");
-  }
 
   script.reset();
 

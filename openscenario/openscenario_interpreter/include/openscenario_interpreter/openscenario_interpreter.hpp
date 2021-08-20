@@ -100,6 +100,24 @@ public:
   auto set(Ts &&... xs) -> void
   {
     result = T(std::forward<decltype(xs)>(xs)...);
+
+    const auto suite_name = boost::filesystem::path(osc_path).parent_path().filename().string();
+
+    const auto case_name = boost::filesystem::path(osc_path).stem().string();
+
+    boost::apply_visitor(
+      overload(
+        [&](const common::junit::Pass &) { results.testsuite(suite_name).testcase(case_name); },
+        [&](const common::junit::Failure & it) {
+          results.testsuite(suite_name).testcase(case_name).failure.push_back(it);
+        },
+        [&](const common::junit::Error & it) {
+          results.testsuite(suite_name).testcase(case_name).error.push_back(it);
+        }),
+      result);
+
+    results.write_to(
+      (boost::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
   }
 
   template <typename ExceptionHandler, typename Thunk>
