@@ -131,7 +131,9 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
 {
   size_t n = control_points.size() - 1;
   if (control_points.size() <= 2) {
-    THROW_SEMANTIC_ERROR("numbers of control points are not enough.");
+    THROW_SEMANTIC_ERROR(
+      control_points.size(),
+      " control points are only exists. At minimin, 2 control points are required");
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {
