@@ -406,7 +406,8 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
 bool CatmullRomSpline::checkConnection() const
 {
   if (control_points.size() != (curves_.size() + 1)) {
-    THROW_SIMULATION_ERROR("number of control points and curves does not match.");
+    THROW_SIMULATION_ERROR(                                    // LCOV_EXCL_LINE
+      "number of control points and curves does not match.");  // LCOV_EXCL_LINE
   }
   for (size_t i = 0; i < curves_.size(); i++) {
     const auto control_point0 = control_points[i];
@@ -416,9 +417,11 @@ bool CatmullRomSpline::checkConnection() const
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
     } else if (!equals(control_point0, p0)) {
-      THROW_SIMULATION_ERROR("start point of the curve number ", i, " does not match");
+      THROW_SIMULATION_ERROR(                                       // LCOV_EXCL_LINE
+        "start point of the curve number ", i, " does not match");  // LCOV_EXCL_LINE
     } else if (!equals(control_point1, p1)) {
-      THROW_SIMULATION_ERROR("end point of the curve number ", i, " does not match");
+      THROW_SIMULATION_ERROR(                                     // LCOV_EXCL_LINE
+        "end point of the curve number ", i, " does not match");  // LCOV_EXCL_LINE
     }
   }
   if (curves_.empty()) {
