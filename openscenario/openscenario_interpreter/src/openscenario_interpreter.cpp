@@ -86,42 +86,47 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
 }
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
-try {
+{
   INTERPRETER_INFO_STREAM("Configuring.");
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  The scenario_test_runner that launched this node considers that "the
-   *  scenario is not expected to finish" or "an abnormality has occurred that
-   *  prevents the interpreter from terminating itself" after the specified
-   *  time (specified by --global-timeout), and deactivates this node.
-   *
-   * ------------------------------------------------------------------------ */
-  result = common::junit::Failure(
-    "Timeout", "The simulation time has exceeded the time specified by the scenario_test_runner.");
+  return withExceptionHandler(
+    [this](auto &&...) {
+      return Interpreter::Result::FAILURE;  // => Unconfigured
+    },
+    [this]() {
+      /* ---- NOTE -------------------------------------------------------------
+       *
+       *  The scenario_test_runner that launched this node considers that "the
+       *  scenario is not expected to finish" or "an abnormality has occurred
+       *  that prevents the interpreter from terminating itself" after the
+       *  specified time (specified by --global-timeout), and deactivates this
+       *  node.
+       *
+       * -------------------------------------------------------------------- */
+      result = common::junit::Failure(
+        "Timeout",
+        "The simulation time has exceeded the time specified by the scenario_test_runner.");
 
-  std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
+      std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
-  GET_PARAMETER(intended_result);
-  GET_PARAMETER(local_frame_rate);
-  GET_PARAMETER(local_real_time_factor);
-  GET_PARAMETER(osc_path);
-  GET_PARAMETER(output_directory);
+      GET_PARAMETER(intended_result);
+      GET_PARAMETER(local_frame_rate);
+      GET_PARAMETER(local_real_time_factor);
+      GET_PARAMETER(osc_path);
+      GET_PARAMETER(output_directory);
 
-  record::start(
-    "-a",  //
-    "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+      record::start(
+        "-a",  //
+        "-o", boost::filesystem::path(osc_path).replace_extension("").string());
 
-  script.rebind<OpenScenario>(osc_path);
+      script.rebind<OpenScenario>(osc_path);
 
-  connect(shared_from_this(), makeCurrentConfiguration());
+      connect(shared_from_this(), makeCurrentConfiguration());
 
-  initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
+      initialize(local_real_time_factor, 1 / local_frame_rate * local_real_time_factor);
 
-  return Interpreter::Result::SUCCESS;  // => Inactive
-} catch (const openscenario_interpreter::SyntaxError & error) {
-  INTERPRETER_ERROR_STREAM(error.what());
-  return Interpreter::Result::FAILURE;  // => Unconfigured
+      return Interpreter::Result::SUCCESS;  // => Inactive
+    });
 }
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result

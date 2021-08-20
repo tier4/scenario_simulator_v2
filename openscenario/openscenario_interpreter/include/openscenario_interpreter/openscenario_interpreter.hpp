@@ -82,17 +82,17 @@ public:
 
   auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
 
-  auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
-
   auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
-
-  auto on_deactivate(const rclcpp_lifecycle::State &) -> Result override;
 
   auto on_cleanup(const rclcpp_lifecycle::State &) -> Result override;
 
-  auto on_shutdown(const rclcpp_lifecycle::State &) -> Result override;
+  auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_deactivate(const rclcpp_lifecycle::State &) -> Result override;
 
   auto on_error(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_shutdown(const rclcpp_lifecycle::State &) -> Result override;
 
   auto publishCurrentContext() const -> void;
 
