@@ -425,7 +425,7 @@ bool CatmullRomSpline::checkConnection() const
     }
   }
   if (curves_.empty()) {
-    THROW_SIMULATION_ERROR("curve size should not be zero");
+    THROW_SIMULATION_ERROR("curve size should not be zero"); // LCOV_EXCL_LINE
   }
   return true;
 }
