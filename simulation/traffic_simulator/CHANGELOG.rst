@@ -2,6 +2,33 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#451 <https://github.com/tier4/scenario_simulator_v2/issues/451>`_ from tier4/feature/out-of-range-metric
+* Merge pull request `#452 <https://github.com/tier4/scenario_simulator_v2/issues/452>`_ from tier4/fix/stop_at_crossing_entity_behavior
+* remove unused line
+* remove unused line
+* add test scenario
+* fix problems in stop_at_crossing_entity action
+* Merge pull request `#450 <https://github.com/tier4/scenario_simulator_v2/issues/450>`_ from tier4/fix/phase_control
+* fix
+* add OutOfRangeMetric when vehicle is spawned
+* enable filter result
+* remove const
+* fix problems in TrafficLightManager::update() function
+* Merge pull request `#448 <https://github.com/tier4/scenario_simulator_v2/issues/448>`_ from tier4/feature/add_cpp_scenarios
+* add call thread::join in destructor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios
+* Merge pull request `#446 <https://github.com/tier4/scenario_simulator_v2/issues/446>`_ from tier4/feature/out-of-range-metric
+* fix exception message
+* add out_of_range_metric.cpp to CMakeLists.txt
+* add OutOfRangeMetric
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios
+* Merge branch 'master' into feature/acc-vel-out-of-range
+* add linear velocity to MomentaryStopMetric
+* add metrics scenario
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718
+
 0.4.3 (2021-08-17)
 ------------------
 * Merge pull request `#432 <https://github.com/tier4/scenario_simulator_v2/issues/432>`_ from tier4/fix/suppress_warnings
