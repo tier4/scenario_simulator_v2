@@ -57,7 +57,7 @@ void ReactionTimeMetric::update()
 
 nlohmann::json ReactionTimeMetric::to_json()
 {
-  nlohmann::json json = MetricBase::to_base_json();
+  nlohmann::json json = MetricBase::toBaseJson();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {
     json["elapsed_duration"] = elapsed_duration_;
     json["current linear jerk"] = current_linear_jerk_;

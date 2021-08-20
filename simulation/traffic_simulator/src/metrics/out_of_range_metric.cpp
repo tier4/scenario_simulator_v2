@@ -57,7 +57,7 @@ void OutOfRangeMetric::update()
 
 nlohmann::json OutOfRangeMetric::to_json()
 {
-  nlohmann::json json = MetricBase::to_base_json();
+  nlohmann::json json = MetricBase::toBaseJson();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {
     json["linear_velocity"] = linear_velocity_;
     json["linear_acceleration"] = linear_acceleration_;

@@ -37,7 +37,7 @@ void TraveledDistanceMetric::update()
 
 nlohmann::json TraveledDistanceMetric::to_json()
 {
-  nlohmann::json json = MetricBase::to_base_json();
+  nlohmann::json json = MetricBase::toBaseJson();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {
     json["traveled_distance"] = traveled_distance;
   }
