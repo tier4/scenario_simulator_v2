@@ -58,7 +58,7 @@ public:
 
   void update() override;
   bool activateTrigger() override { return true; }
-  nlohmann::json to_json() override;
+  nlohmann::json toJson() override;
 
   const std::string target_entity;
   const double min_velocity;

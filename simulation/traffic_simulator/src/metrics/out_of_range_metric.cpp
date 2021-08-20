@@ -55,7 +55,7 @@ void OutOfRangeMetric::update()
   }
 }
 
-nlohmann::json OutOfRangeMetric::to_json()
+nlohmann::json OutOfRangeMetric::toJson()
 {
   nlohmann::json json = MetricBase::toBaseJson();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {

@@ -88,7 +88,7 @@ bool MomentaryStopMetric::activateTrigger()
   return false;
 }
 
-nlohmann::json MomentaryStopMetric::to_json()
+nlohmann::json MomentaryStopMetric::toJson()
 {
   nlohmann::json json = MetricBase::toBaseJson();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {
