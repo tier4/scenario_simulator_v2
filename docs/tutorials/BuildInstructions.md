@@ -42,7 +42,7 @@ sh install_depends.sh foxy
 ```bash
 cd ~/scenario_simulator_ws
 source /opt/ros/foxy/setup.bash
-rosdep install -iry --from-paths src --rosdistro foxy
+rosdep install -iry --from-paths src/scenario_simulator_v2 --rosdistro foxy
 ```
 
 ## Build scenario_simulator_vs

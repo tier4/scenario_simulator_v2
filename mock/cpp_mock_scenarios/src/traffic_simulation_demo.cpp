@@ -86,7 +86,7 @@ private:
     api_.setEntityStatus(
       "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
       traffic_simulator::helper::constructActionStatus(10));
-    api_.setTargetSpeed("ego", 10, true);
+    api_.setTargetSpeed("ego", 8, true);
     api_.spawn(false, "tom", getPedestrianParameters());
     api_.setEntityStatus(
       "tom", "ego", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
@@ -125,9 +125,9 @@ private:
       traffic_simulator::helper::constructActionStatus());
     std::vector<std::pair<double, traffic_simulator::TrafficLightColor>> phase;
     phase = {
-      {10, traffic_simulator::TrafficLightColor::GREEN},
-      {10, traffic_simulator::TrafficLightColor::YELLOW},
-      {10, traffic_simulator::TrafficLightColor::RED}};
+      {1, traffic_simulator::TrafficLightColor::GREEN},
+      {1, traffic_simulator::TrafficLightColor::YELLOW},
+      {1, traffic_simulator::TrafficLightColor::RED}};
     api_.setTrafficLightColorPhase(34802, phase);
   }
 

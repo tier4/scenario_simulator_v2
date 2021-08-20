@@ -10,6 +10,7 @@ Do you want to know how to do that, please refer [this documentation](BuildInstr
 Only you have to do is type this command in your terminal.
 
 ```bash
+source ~/scenario_simulator_ws/install/local_setup.bash
 ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=idiot_npc scenario:=traffic_simulation_demo with_rviz:=true timeout:=60
 ```
 

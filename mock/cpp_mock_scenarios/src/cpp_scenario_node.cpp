@@ -56,4 +56,14 @@ void CppScenarioNode::stop(Result result)
   rclcpp::shutdown();
   std::exit(0);
 }
+
+void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration & configuration)
+{
+  try {
+    configuration.getLanelet2MapFile();
+    configuration.getPointCloudMapFile();
+  } catch (const common::SimulationError &) {
+    stop(Result::FAILURE);
+  }
+}
 }  // namespace cpp_mock_scenarios
