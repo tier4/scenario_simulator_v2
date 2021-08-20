@@ -243,7 +243,7 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
       return std::make_pair(i, s - prev_s);
     }
   }
-  THROW_SIMULATION_ERROR("failed to calculate curve index");
+  THROW_SIMULATION_ERROR("failed to calculate curve index");  // LCOV_EXCL_LINE
 }
 
 double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
@@ -257,7 +257,7 @@ double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
       ret = ret + curves_[i].getLength();
     }
   }
-  THROW_SEMANTIC_ERROR("curve index does not match");
+  THROW_SEMANTIC_ERROR("curve index does not match");  // LCOV_EXCL_LINE
 }
 
 boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
