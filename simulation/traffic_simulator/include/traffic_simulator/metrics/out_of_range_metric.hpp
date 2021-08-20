@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__METRICS__OUT_OF_RANGE_METRIC_HPP_
 #define TRAFFIC_SIMULATOR__METRICS__OUT_OF_RANGE_METRIC_HPP_
 
+#include <limits>
 #include <string>
 #include <traffic_simulator/metrics/metric_base.hpp>
 
@@ -23,6 +24,24 @@ namespace metrics
 class OutOfRangeMetric : public MetricBase
 {
 public:
+  struct Config
+  {
+    std::string target_entity;
+    double min_velocity = -std::numeric_limits<double>::max();
+    double max_velocity = std::numeric_limits<double>::max();
+    double min_acceleration = -std::numeric_limits<double>::max();
+    double max_acceleration = std::numeric_limits<double>::max();
+    double min_jerk = -std::numeric_limits<double>::max();
+    double max_jerk = std::numeric_limits<double>::max();
+  };
+
+  explicit OutOfRangeMetric(const Config & config)
+  : OutOfRangeMetric(
+      config.target_entity, config.min_velocity, config.max_velocity, config.min_acceleration,
+      config.max_acceleration, config.min_jerk, config.max_jerk)
+  {
+  }
+
   OutOfRangeMetric(
     std::string target_entity, double min_velocity, double max_velocity, double min_acceleration,
     double max_acceleration, double min_jerk, double max_jerk)
