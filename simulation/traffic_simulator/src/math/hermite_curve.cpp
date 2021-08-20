@@ -337,15 +337,11 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurventureValue() const
 
 double HermiteCurve::getMaximum2DCurvature() const
 {
-  std::vector<double> curvatures;
-  /**
-   * @brief 0.1 is a sampling resolution of the curvature
-   */
-  for (double s = 0; s <= 1; s = s + 0.1) {
-    double curvature = get2DCurvature(s);
-    curvatures.push_back(curvature);
+  const auto values = get2DMinMaxCurventureValue();
+  if(std::fabs(values.first) > std::fabs(values.second)) {
+    return values.first;
   }
-  return *std::max_element(curvatures.begin(), curvatures.end());
+  return values.second;
 }
 
 double HermiteCurve::getLength(size_t num_points) const
