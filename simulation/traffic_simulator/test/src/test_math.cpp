@@ -144,7 +144,7 @@ TEST(Math, CatmullRomSpline2)
   p1.y = 3;
   geometry_msgs::msg::Point p2;
   p2.x = 2;
-  p2.y = 5;
+  p2.y = 6;
   auto points = {p0, p1, p2};
   EXPECT_NO_THROW(auto spline = traffic_simulator::math::CatmullRomSpline(points));
   auto spline = traffic_simulator::math::CatmullRomSpline(points);

@@ -319,6 +319,22 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale) const
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
+std::pair<double, double> HermiteCurve::get2DMinMaxCurventureValue() const
+{
+  std::pair<double, double> ret;
+  std::vector<double> curvatures;
+  /**
+   * @brief 0.1 is a sampling resolution of the curvature
+   */
+  for (double s = 0; s <= 1; s = s + 0.1) {
+    double curvature = get2DCurvature(s);
+    curvatures.push_back(curvature);
+  }
+  ret.first = *std::min_element(curvatures.begin(), curvatures.end());
+  ret.second = *std::max_element(curvatures.begin(), curvatures.end());
+  return ret;
+}
+
 double HermiteCurve::getMaximum2DCurvature() const
 {
   std::vector<double> curvatures;
