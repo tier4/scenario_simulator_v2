@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/distance.hpp>
@@ -244,6 +245,16 @@ TEST(Math, CatmullRomSpline7)
   // std::cout << "result = " << spline.getSValue(p).get() << std::endl;
   EXPECT_TRUE(spline.getSValue(p).get() > 0.099);
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
+}
+
+TEST(Math, CatmullRomSpline8)
+{
+  EXPECT_THROW(
+    traffic_simulator::math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
+    common::SemanticError);
+  EXPECT_THROW(
+    traffic_simulator::math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(1)),
+    common::SemanticError);
 }
 
 TEST(Math, BoundingBox0)
