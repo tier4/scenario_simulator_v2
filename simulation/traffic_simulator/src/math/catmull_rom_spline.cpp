@@ -380,7 +380,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 double CatmullRomSpline::getMaximum2DCurvature() const
 {
   if (maximum_2d_curvatures_.empty()) {
-    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");
+    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");  // LCOV_EXCL_LINE
   }
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }
