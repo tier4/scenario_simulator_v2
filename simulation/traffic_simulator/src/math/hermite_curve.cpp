@@ -302,7 +302,7 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale) const
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
-std::pair<double, double> HermiteCurve::get2DMinMaxCurventureValue() const
+std::pair<double, double> HermiteCurve::get2DMinMaxCurvatureValue() const
 {
   std::pair<double, double> ret;
   std::vector<double> curvatures;
@@ -320,7 +320,7 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurventureValue() const
 
 double HermiteCurve::getMaximum2DCurvature() const
 {
-  const auto values = get2DMinMaxCurventureValue();
+  const auto values = get2DMinMaxCurvatureValue();
   if (std::fabs(values.first) > std::fabs(values.second)) {
     return values.first;
   }

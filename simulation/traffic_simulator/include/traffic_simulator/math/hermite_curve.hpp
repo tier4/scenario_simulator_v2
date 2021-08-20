@@ -68,7 +68,7 @@ public:
     bool close_start_end = true) const;
 
 private:
-  std::pair<double, double> get2DMinMaxCurventureValue() const;
+  std::pair<double, double> get2DMinMaxCurvatureValue() const;
   double length_;
   double getNewtonMethodStepSize(
     geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
