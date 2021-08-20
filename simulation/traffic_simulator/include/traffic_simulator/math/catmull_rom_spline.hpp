@@ -16,7 +16,6 @@
 
 #include <exception>
 #include <geometry_msgs/msg/point.hpp>
-#include <openscenario_msgs/msg/catmull_rom_spline.hpp>
 #include <string>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <utility>
@@ -30,7 +29,6 @@ class CatmullRomSpline
 {
 public:
   CatmullRomSpline() = delete;
-  explicit CatmullRomSpline(const openscenario_msgs::msg::CatmullRomSpline & spline);
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   double getLength() const { return total_length_; }
   double getMaximum2DCurvature() const;

@@ -119,13 +119,6 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   return traj;
 }
 
-CatmullRomSpline::CatmullRomSpline(const openscenario_msgs::msg::CatmullRomSpline & spline)
-{
-  for (const auto & curve : spline.curves) {
-    curves_.emplace_back(HermiteCurve(curve));
-  }
-}
-
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
 : control_points(control_points)
 {

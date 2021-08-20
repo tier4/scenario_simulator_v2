@@ -43,23 +43,6 @@ HermiteCurve::HermiteCurve(
 {
 }
 
-HermiteCurve::HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve)
-: ax_(curve.ax),
-  bx_(curve.bx),
-  cx_(curve.cx),
-  dx_(curve.dx),
-  ay_(curve.ax),
-  by_(curve.by),
-  cy_(curve.cy),
-  dy_(curve.dy),
-  az_(curve.ax),
-  bz_(curve.bz),
-  cz_(curve.cz),
-  dz_(curve.dz),
-  length_(getLength(100))
-{
-}
-
 HermiteCurve::HermiteCurve(
   geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
   geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec)
@@ -338,7 +321,7 @@ std::pair<double, double> HermiteCurve::get2DMinMaxCurventureValue() const
 double HermiteCurve::getMaximum2DCurvature() const
 {
   const auto values = get2DMinMaxCurventureValue();
-  if(std::fabs(values.first) > std::fabs(values.second)) {
+  if (std::fabs(values.first) > std::fabs(values.second)) {
     return values.first;
   }
   return values.second;
