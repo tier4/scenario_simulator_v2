@@ -2,6 +2,24 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.4 (2021-08-20)
+------------------
+* Merge pull request `#452 <https://github.com/tier4/scenario_simulator_v2/issues/452>`_ from tier4/fix/stop_at_crossing_entity_behavior
+* add collision check
+* add test scenario
+* Merge pull request `#450 <https://github.com/tier4/scenario_simulator_v2/issues/450>`_ from tier4/fix/phase_control
+* modify check condition
+* modify success condition
+* fix problems in TrafficLightManager::update() function
+* Merge pull request `#448 <https://github.com/tier4/scenario_simulator_v2/issues/448>`_ from tier4/feature/add_cpp_scenarios
+* add phase_control scenario
+* add call thread::join in destructor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios
+* Merge branch 'master' into feature/acc-vel-out-of-range
+* add metrics scenario
+* apply reformat
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, kyabe2718
+
 0.4.3 (2021-08-17)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings

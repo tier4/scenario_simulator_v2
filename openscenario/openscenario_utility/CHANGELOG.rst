@@ -2,6 +2,12 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.4 (2021-08-20)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios
+* Merge branch 'master' into feature/acc-vel-out-of-range
+* Contributors: MasayaKataoka, kyabe2718
+
 0.4.3 (2021-08-17)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/suppress_warnings
