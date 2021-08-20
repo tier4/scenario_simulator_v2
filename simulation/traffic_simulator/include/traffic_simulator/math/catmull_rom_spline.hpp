@@ -52,7 +52,6 @@ public:
   boost::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const;
-  const openscenario_msgs::msg::CatmullRomSpline toRosMsg() const;
   const geometry_msgs::msg::Point getRightBoundsPoint(
     double width, double s, double z_offset = 0) const;
   const geometry_msgs::msg::Point getLeftBoundsPoint(

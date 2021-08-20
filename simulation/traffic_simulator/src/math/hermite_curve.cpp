@@ -81,24 +81,6 @@ HermiteCurve::HermiteCurve(
   length_ = getLength(100);
 }
 
-const openscenario_msgs::msg::HermiteCurve HermiteCurve::toRosMsg() const
-{
-  openscenario_msgs::msg::HermiteCurve curve;
-  curve.ax = ax_;
-  curve.bx = bx_;
-  curve.cx = cx_;
-  curve.dx = dx_;
-  curve.ay = ay_;
-  curve.by = by_;
-  curve.cy = cy_;
-  curve.dy = dy_;
-  curve.az = az_;
-  curve.bz = bz_;
-  curve.cz = cz_;
-  curve.dz = dz_;
-  return curve;
-}
-
 double HermiteCurve::getSquaredDistanceIn2D(
   geometry_msgs::msg::Point point, double s, bool autoscale) const
 {

@@ -68,7 +68,6 @@ public:
   boost::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const;
-  const openscenario_msgs::msg::HermiteCurve toRosMsg() const;
 
 private:
   double length_;

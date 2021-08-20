@@ -233,15 +233,6 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   checkConnection();
 }
 
-const openscenario_msgs::msg::CatmullRomSpline CatmullRomSpline::toRosMsg() const
-{
-  openscenario_msgs::msg::CatmullRomSpline spline;
-  for (const auto & curve : curves_) {
-    spline.curves.emplace_back(curve.toRosMsg());
-  }
-  return spline;
-}
-
 std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
 {
   if (s < 0) {
