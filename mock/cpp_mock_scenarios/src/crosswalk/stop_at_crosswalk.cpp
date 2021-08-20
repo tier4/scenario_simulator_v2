@@ -26,13 +26,13 @@
 #include <string>
 #include <vector>
 
-class AccelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
+class TrafficSimulationDemoScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit AccelerateAndFollowScenario(const rclcpp::NodeOptions & option)
+  explicit TrafficSimulationDemoScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
-      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
+      "idiot_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }
@@ -40,13 +40,18 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() >= 10 && 10.1 >= api_.getCurrentTime()) {
-      if (api_.getMetricLifecycle("ego_traveled_distance") != metrics::MetricLifecycle::ACTIVE) {
+    const auto t = api_.getCurrentTime();
+    if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (t >= 10) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
+    }
+    if (t >= 6.3 && 6.8 >= t) {
+      const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
+      if (std::fabs(0.01) <= vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
-    }
-    if (api_.getCurrentTime() >= 12) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
 
@@ -54,18 +59,29 @@ private:
   {
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
-      traffic_simulator::helper::constructActionStatus(3));
-    api_.setTargetSpeed("ego", 3, true);
-    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
+      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0),
+      traffic_simulator::helper::constructActionStatus(10));
+    api_.setTargetSpeed("ego", 8, true);
+    api_.spawn(
+      false, "bob", getPedestrianParameters(),
+      traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      traffic_simulator::helper::constructActionStatus(1));
+    api_.setTargetSpeed("bob", 1, true);
+    api_.requestAssignRoute(
+      "ego", std::vector<openscenario_msgs::msg::LaneletPose>{
+               traffic_simulator::helper::constructLaneletPose(34675, 0.0),
+               traffic_simulator::helper::constructLaneletPose(34690, 0.0)});
   }
+
+private:
+  bool lanechange_executed_;
 };
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<AccelerateAndFollowScenario>(options);
+  auto component = std::make_shared<TrafficSimulationDemoScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

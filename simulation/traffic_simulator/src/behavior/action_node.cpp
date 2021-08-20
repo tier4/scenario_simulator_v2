@@ -263,7 +263,7 @@ boost::optional<double> ActionNode::getDistanceToTargetEntityPolygon(
   if (status.lanelet_pose_valid) {
     const auto polygon = traffic_simulator::math::transformPoints(
       status.pose, traffic_simulator::math::getPointsFromBbox(status.bounding_box));
-    return spline.getCollisionPointIn2D(polygon);
+    return spline.getCollisionPointIn2D(polygon, false, true);
   }
   return boost::none;
 }
