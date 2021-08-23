@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <traffic_simulator/metrics/out_of_range_metric.hpp>
 
 namespace openscenario_interpreter
 {
@@ -79,9 +80,17 @@ struct ScenarioObject
   {
     auto spawn_entity = overload(
       [this](const Vehicle & vehicle) {
-        return spawn(
-          object_controller.isEgo(), name,
-          static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
+        const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
+        const auto & performance = parameters.performance;
+        metrics::OutOfRangeMetric::Config config;
+        config.target_entity = name;
+        config.min_velocity = -performance.max_speed;
+        config.max_velocity = performance.max_speed;
+        config.min_acceleration = -performance.max_deceleration;
+        config.max_acceleration = performance.max_acceleration;
+
+        connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", config);
+        return spawn(object_controller.isEgo(), name, parameters);
       },
       [this](const Pedestrian & pedestrian) {
         return spawn(

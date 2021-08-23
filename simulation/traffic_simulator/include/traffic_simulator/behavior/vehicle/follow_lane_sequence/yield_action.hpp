@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE__FOLLOW_LANE_SEQUENCE__YIELD_ACTION_HPP_
 
-#include <openscenario_msgs/msg/entity_trajectory.hpp>
 #include <string>
 #include <traffic_simulator/behavior/vehicle/vehicle_action_node.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>

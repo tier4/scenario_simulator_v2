@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
 #include <boost/variant.hpp>
-#include <exception>
+#include <chrono>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
@@ -29,7 +29,6 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
-#include <string>
 #include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \
@@ -48,9 +47,13 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
   String intended_result;
+
   double local_frame_rate;
+
   double local_real_time_factor;
+
   String osc_path;
+
   String output_directory;
 
   Element script;
@@ -59,88 +62,126 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode
 
   common::JUnit5 results;
 
-  boost::variant<common::Pass, common::Failure, common::junit::Error> result;
+  boost::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
 
   ExecutionTimer<> execution_timer;
 
-  template <typename T, typename... Ts>
-  auto deactivate(Ts &&... xs) -> void
-  {
-    result = T(std::forward<decltype(xs)>(xs)...);
-
-    INTERPRETER_INFO_STREAM("Deactivate myself.");
-
-    rclcpp_lifecycle::LifecycleNode::deactivate();
-
-    INTERPRETER_INFO_STREAM("Deactivated myself.");
-  }
-
-#define CATCH(TYPE)                                          \
-  catch (const TYPE & error)                                 \
-  {                                                          \
-    if (intended_result == "error") {                        \
-      deactivate<common::Pass>();                            \
-    } else {                                                 \
-      deactivate<common::junit::Error>(#TYPE, error.what()); \
-    }                                                        \
-  }
-
-  template <typename Thunk>
-  void guard(Thunk && thunk)
-  {
-    try {
-      return thunk();
-    }
-
-    catch (const SpecialAction<EXIT_SUCCESS> &)  // from CustomCommandAction::exitSuccess
-    {
-      if (intended_result == "success") {
-        deactivate<common::Pass>();
-      } else {
-        deactivate<common::Failure>("UnintendedSuccess", "Expected " + intended_result);
-      }
-    }
-
-    catch (const SpecialAction<EXIT_FAILURE> &)  // from CustomCommandAction::exitFailure
-    {
-      if (intended_result == "failure") {
-        deactivate<common::Pass>();
-      } else {
-        deactivate<common::Failure>("Failure", "Expected " + intended_result);
-      }
-    }
-
-    CATCH(AutowareError)
-    CATCH(SemanticError)
-    CATCH(SimulationError)
-    CATCH(SyntaxError)
-    CATCH(InternalError)  // NOTE: InternalError MUST BE LAST OF CATCH STATEMENTS.
-
-    catch (...)  // FINAL BARRIER
-    {
-      deactivate<common::junit::Error>("UnknownError", "An unknown exception has occurred");
-    }
-  }
-
-#undef CATCH
+  using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
   explicit Interpreter(const rclcpp::NodeOptions &);
 
-  using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+  auto currentLocalFrameRate() const -> std::chrono::milliseconds;
 
-  Result on_configure(const rclcpp_lifecycle::State &) override;
+  auto isAnErrorIntended() const -> bool;
 
-  Result on_activate(const rclcpp_lifecycle::State &) override;
+  auto isFailureIntended() const -> bool;
 
-  Result on_deactivate(const rclcpp_lifecycle::State &) override;
+  auto isSuccessIntended() const -> bool;
 
-  Result on_cleanup(const rclcpp_lifecycle::State &) override;
+  auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
 
-  Result on_shutdown(const rclcpp_lifecycle::State &) override;
+  auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
 
-  Result on_error(const rclcpp_lifecycle::State &) override;
+  auto on_cleanup(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_configure(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_deactivate(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_error(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto on_shutdown(const rclcpp_lifecycle::State &) -> Result override;
+
+  auto publishCurrentContext() const -> void;
+
+  template <typename T, typename... Ts>
+  auto set(Ts &&... xs) -> void
+  {
+    result = T(std::forward<decltype(xs)>(xs)...);
+
+    results.name = boost::filesystem::path(osc_path).parent_path().parent_path().string();
+
+    const auto suite_name = boost::filesystem::path(osc_path).parent_path().filename().string();
+
+    const auto case_name = boost::filesystem::path(osc_path).stem().string();
+
+    boost::apply_visitor(
+      overload(
+        [&](const common::junit::Pass &) { results.testsuite(suite_name).testcase(case_name); },
+        [&](const common::junit::Failure & it) {
+          results.testsuite(suite_name).testcase(case_name).failure.push_back(it);
+        },
+        [&](const common::junit::Error & it) {
+          results.testsuite(suite_name).testcase(case_name).error.push_back(it);
+        }),
+      result);
+
+    results.write_to(
+      (boost::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
+  }
+
+  template <typename ExceptionHandler, typename Thunk>
+  auto withExceptionHandler(ExceptionHandler && handle, Thunk && thunk) -> decltype(auto)
+  {
+    try {
+      return thunk();
+    }
+
+    catch (const SpecialAction<EXIT_SUCCESS> & action)  // from CustomCommandAction::exitSuccess
+    {
+      const auto what = "Expected " + intended_result;
+      isSuccessIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Failure>("UnintendedSuccess", what);
+      return handle(action);
+    }
+
+    catch (const SpecialAction<EXIT_FAILURE> & action)  // from CustomCommandAction::exitFailure
+    {
+      const auto what = "Expected " + intended_result;
+      isFailureIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Failure>("Failure", what);
+      return handle(action);
+    }
+
+    catch (const AutowareError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("AutowareError", error.what());
+      return handle(error);
+    }
+
+    catch (const SemanticError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("SemanticError", error.what());
+      return handle(error);
+    }
+
+    catch (const SimulationError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("SimulationError", error.what());
+      return handle(error);
+    }
+
+    catch (const SyntaxError & error) {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("SyntaxError", error.what());
+      return handle(error);
+    }
+
+    catch (const std::runtime_error & error)  // NOTE: MUST BE LAST OF CATCH STATEMENTS.
+    {
+      isAnErrorIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("InternalError", error.what());
+      return handle(error);
+    }
+
+    catch (...)  // FINAL BARRIER
+    {
+      set<common::junit::Error>("UnknownError", "An unknown exception has occurred");
+      return handle();
+    }
+  }
 };
 }  // namespace openscenario_interpreter
 

@@ -26,7 +26,7 @@ private:                                                        \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE; \
                                                                 \
 public:                                                         \
-  const auto & get##TYPE() const                                \
+  auto get##TYPE() const->const auto &                          \
   {                                                             \
     const auto lock = static_cast<const Node &>(*this).lock();  \
     return CONCEALER_CURRENT_VALUE_OF(TYPE);                    \
@@ -38,7 +38,7 @@ private:                                                             \
   rclcpp::Publisher<TYPE>::SharedPtr publisher_of_##TYPE;            \
                                                                      \
 public:                                                              \
-  decltype(auto) set##TYPE(const TYPE & message)                     \
+  auto set##TYPE(const TYPE & message)->decltype(auto)               \
   {                                                                  \
     return std::atomic_load(&publisher_of_##TYPE)->publish(message); \
   }                                                                  \

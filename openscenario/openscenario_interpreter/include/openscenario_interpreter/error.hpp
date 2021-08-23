@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__ERROR_HPP_
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
+#include <exception>
 #include <iomanip>
 #include <openscenario_interpreter/utility/demangle.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -28,8 +29,6 @@
 
 namespace openscenario_interpreter
 {
-using InternalError = std::exception;
-
 using common::AutowareError;
 using common::Error;
 using common::SemanticError;

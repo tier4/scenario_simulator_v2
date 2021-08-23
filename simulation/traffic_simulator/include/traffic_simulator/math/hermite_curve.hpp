@@ -21,7 +21,6 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <openscenario_msgs/msg/hermite_curve.hpp>
 #include <traffic_simulator/math/polynomial_solver.hpp>
 #include <vector>
 
@@ -38,7 +37,6 @@ private:
   traffic_simulator::math::PolynomialSolver solver_;
 
 public:
-  explicit HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve);
   HermiteCurve(
     geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
     geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec);
@@ -68,9 +66,9 @@ public:
   boost::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const;
-  const openscenario_msgs::msg::HermiteCurve toRosMsg() const;
 
 private:
+  std::pair<double, double> get2DMinMaxCurvatureValue() const;
   double length_;
   double getNewtonMethodStepSize(
     geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
