@@ -44,9 +44,6 @@ bool checkCollision2D(
   if (bg::intersects(poly0, poly1)) {
     return true;
   }
-  if (bg::intersects(poly1, poly0)) {
-    return true;
-  }
   if (bg::disjoint(poly0, poly1)) {
     return false;
   }

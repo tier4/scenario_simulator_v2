@@ -10,14 +10,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Axle.msg
   msg/Axles.msg
   msg/BoundingBox.msg
-  msg/CatmullRomSpline.msg
   msg/DriverModel.msg
   msg/EntityStatus.msg
   msg/EntityStatusWithTrajectory.msg
   msg/EntityStatusWithTrajectoryArray.msg
-  msg/EntityTrajectory.msg
   msg/EntityType.msg
-  msg/HermiteCurve.msg
   msg/LaneletPose.msg
   msg/LaneletPoseAndStatus.msg
   msg/MapPoseAndStatus.msg
