@@ -26,19 +26,15 @@ inline namespace scenario_simulator_exception
 struct Error : public std::runtime_error
 {
   template <typename... Ts>
-  explicit Error(Ts &&... xs)
-  : std::runtime_error{concatenate(std::forward<decltype(xs)>(xs)..., ".")}
+  explicit Error(Ts &&... xs) : std::runtime_error(concatenate(std::forward<decltype(xs)>(xs)...))
   {
   }
 };
 
-#define DEFINE_ERROR_CATEGORY(TYPENAME)                                                       \
-  struct TYPENAME : public Error                                                              \
-  {                                                                                           \
-    template <typename... Ts>                                                                 \
-    explicit TYPENAME(Ts &&... xs) : Error{#TYPENAME ": ", std::forward<decltype(xs)>(xs)...} \
-    {                                                                                         \
-    }                                                                                         \
+#define DEFINE_ERROR_CATEGORY(TYPENAME) \
+  struct TYPENAME : public Error        \
+  {                                     \
+    using Error::Error;                 \
   }
 
 // Autoware encountered some problem that led to a simulation failure.
@@ -62,7 +58,6 @@ DEFINE_ERROR_CATEGORY(SyntaxError);
 
 #define THROW_ERROR(TYPENAME, ...) throw TYPENAME(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
 
-#define THROW_AUTOWARE_ERROR(...) /*    */ THROW_ERROR(common::AutowareError, __VA_ARGS__)
 #define THROW_SEMANTIC_ERROR(...) /*    */ THROW_ERROR(common::SemanticError, __VA_ARGS__)
 #define THROW_SIMULATION_ERROR(...) /*  */ THROW_ERROR(common::SimulationError, __VA_ARGS__)
 #define THROW_SPECIFICATION_VIOLATION(...) THROW_ERROR(common::SpecificationViolation, __VA_ARGS__)

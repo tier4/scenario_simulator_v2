@@ -19,7 +19,6 @@
 
 #include <memory>
 #include <openscenario_msgs/msg/driver_model.hpp>
-#include <openscenario_msgs/msg/entity_trajectory.hpp>
 #include <openscenario_msgs/msg/obstacle.hpp>
 #include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <openscenario_msgs/msg/waypoints_array.hpp>

@@ -2,6 +2,14 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.4 (2021-08-20)
+------------------
+* Merge pull request `#448 <https://github.com/tier4/scenario_simulator_v2/issues/448>`_ from tier4/feature/add_cpp_scenarios
+* add call thread::join in destructor
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios
+* Merge branch 'master' into feature/acc-vel-out-of-range
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, kyabe2718
+
 0.4.3 (2021-08-17)
 ------------------
 * Merge remote-tracking branch 'origin/master' into namespace

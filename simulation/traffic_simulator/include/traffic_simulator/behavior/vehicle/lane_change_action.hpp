@@ -21,7 +21,6 @@
 #include <boost/optional.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/entity_status.hpp>
-#include <openscenario_msgs/msg/entity_trajectory.hpp>
 #include <string>
 #include <traffic_simulator/behavior/vehicle/vehicle_action_node.hpp>
 #include <traffic_simulator/entity/vehicle_parameter.hpp>
