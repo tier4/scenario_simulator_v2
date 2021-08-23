@@ -42,7 +42,7 @@ const openscenario_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoi
   }
   const auto ids = hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id);
   traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
-  double s_in_spline;
+  double s_in_spline = 0;
   for (const auto id : ids) {
     if (id == entity_status.lanelet_pose.lanelet_id) {
       s_in_spline = s_in_spline + entity_status.lanelet_pose.s;
