@@ -20,6 +20,7 @@
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <traffic_simulator/behavior/vehicle/follow_lane_sequence/move_backward_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <traffic_simulator/behavior/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
@@ -42,6 +43,7 @@ BehaviorTree::BehaviorTree()
   factory_.registerNodeType<follow_lane_sequence::StopAtStopLineAction>("StopAtStopLine");
   factory_.registerNodeType<follow_lane_sequence::StopAtTrafficLightAction>("StopAtTrafficLight");
   factory_.registerNodeType<follow_lane_sequence::YieldAction>("Yield");
+  factory_.registerNodeType<follow_lane_sequence::MoveBackwardAction>("MoveBackward");
   factory_.registerNodeType<LaneChangeAction>("LaneChange");
   tree_ = factory_.createTreeFromFile(path);
   current_action_ = "root";
