@@ -71,6 +71,7 @@ BT::NodeStatus MoveBackwardAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
+  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }

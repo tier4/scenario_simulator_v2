@@ -104,11 +104,6 @@ public:
   boost::optional<double> getDistanceToTargetEntityPolygon(
     const traffic_simulator::math::CatmullRomSpline & spline, const std::string target_name);
 
-protected:
-  openscenario_msgs::msg::EntityStatus calculateEntityStatusUpdated(
-    const traffic_simulator::math::CatmullRomSpline & spline, double s_in_spline,
-    double target_speed, double max_speed);
-
 private:
   boost::optional<double> getDistanceToTargetEntityOnCrosswalk(
     const traffic_simulator::math::CatmullRomSpline & spline,
