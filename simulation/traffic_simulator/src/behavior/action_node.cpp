@@ -147,6 +147,12 @@ openscenario_msgs::msg::EntityStatus ActionNode::calculateEntityStatusUpdated(
     pose_new.position.y = trans_vec(1) + entity_status.pose.position.y;
     pose_new.position.z = trans_vec(2) + entity_status.pose.position.z;
     ret.pose = pose_new;
+  }
+  const auto lane_pose = hdmap_utils->toLaneletPose(ret.pose);
+  if (lane_pose) {
+    ret.lanelet_pose_valid = true;
+    ret.lanelet_pose = lane_pose.get();
+  } else {
     ret.lanelet_pose_valid = false;
   }
   return ret;
