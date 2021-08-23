@@ -82,6 +82,9 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
+  if (waypoints.waypoints.empty()) {
+    return BT::NodeStatus::FAILURE;
+  }
   auto distance_to_stopline =
     hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
   const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
