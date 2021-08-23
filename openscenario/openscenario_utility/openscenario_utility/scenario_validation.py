@@ -69,15 +69,15 @@ class ReachPositionConditionValidator(ScenarioValidator):
 
     def __call__(self, scenario):
 
-        # Search for the last Routing Action destionation:
+        # Search for the last Routing Action destination:
         last_destination = find_in_dict(
             'Position', find_in_dict('RoutingAction', scenario)[-1])
 
         # Search for ReachPositionCondition:
-        reach_position_conditon = find_in_dict(
+        reach_position_condition = find_in_dict(
             'Position', find_in_dict('ReachPositionCondition', scenario)[-1])
 
-        return reach_position_conditon == last_destination
+        return reach_position_condition == last_destination
 
 def validate_file(path: Path, schema: xmlschema.XMLSchema, validators: List[ScenarioValidator]):
         scenarios = []
