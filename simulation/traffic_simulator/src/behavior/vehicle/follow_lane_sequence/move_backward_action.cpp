@@ -52,7 +52,7 @@ const openscenario_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoi
     }
   }
   openscenario_msgs::msg::WaypointsArray waypoints;
-  waypoints.waypoints = spline.getTrajectory(s_in_spline, s_in_spline - getHorizon(), 1.0);
+  waypoints.waypoints = spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0);
   return waypoints;
 }
 
@@ -71,7 +71,6 @@ BT::NodeStatus MoveBackwardAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
-  const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }

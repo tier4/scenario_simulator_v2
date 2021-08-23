@@ -100,6 +100,9 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   double start_s, double end_s, double resolution) const
 {
+  if (start_s > end_s) {
+    return getTrajectory(end_s, start_s, resolution);
+  }
   std::vector<geometry_msgs::msg::Point> traj;
   resolution = std::fabs(resolution);
   double s = start_s;
