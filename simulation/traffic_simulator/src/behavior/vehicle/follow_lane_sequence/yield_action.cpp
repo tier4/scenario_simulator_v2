@@ -105,6 +105,9 @@ BT::NodeStatus YieldAction::tick()
     }
     setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
     const auto waypoints = calculateWaypoints();
+    if (waypoints.waypoints.empty()) {
+      return BT::NodeStatus::FAILURE;
+    }
     const auto obstacle = calculateObstacle(waypoints);
     setOutput("waypoints", waypoints);
     setOutput("obstacle", obstacle);
@@ -117,6 +120,9 @@ BT::NodeStatus YieldAction::tick()
   }
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   const auto waypoints = calculateWaypoints();
+  if (waypoints.waypoints.empty()) {
+    return BT::NodeStatus::FAILURE;
+  }
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
   setOutput("obstacle", obstacle);

@@ -75,6 +75,9 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   const auto waypoints = calculateWaypoints();
+  if (waypoints.waypoints.empty()) {
+    return BT::NodeStatus::FAILURE;
+  }
   if (driver_model.see_around) {
     if (getRightOfWayEntities(route_lanelets).size() != 0) {
       return BT::NodeStatus::FAILURE;
