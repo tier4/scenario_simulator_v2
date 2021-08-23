@@ -67,9 +67,6 @@ BT::NodeStatus MoveBackwardAction::tick()
   if (!entity_status.lanelet_pose_valid) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!driver_model.see_around) {
-    return BT::NodeStatus::FAILURE;
-  }
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
