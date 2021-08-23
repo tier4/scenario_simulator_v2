@@ -37,7 +37,23 @@ const openscenario_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoi
   if (!entity_status.lanelet_pose_valid) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  return openscenario_msgs::msg::WaypointsArray();
+  if (entity_status.action_status.twist.linear.x >= 0) {
+    return openscenario_msgs::msg::WaypointsArray();
+  }
+  const auto ids = hdmap_utils->getPreviousLanelets(entity_status.lanelet_pose.lanelet_id);
+  traffic_simulator::math::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
+  double s_in_spline;
+  for (const auto id : ids) {
+    if (id == entity_status.lanelet_pose.lanelet_id) {
+      s_in_spline = s_in_spline + entity_status.lanelet_pose.s;
+      break;
+    } else {
+      s_in_spline = hdmap_utils->getLaneletLength(id) + s_in_spline;
+    }
+  }
+  openscenario_msgs::msg::WaypointsArray waypoints;
+  waypoints.waypoints = spline.getTrajectory(s_in_spline, s_in_spline - getHorizon(), 1.0);
+  return waypoints;
 }
 
 void MoveBackwardAction::getBlackBoardValues() { VehicleActionNode::getBlackBoardValues(); }
@@ -54,10 +70,10 @@ BT::NodeStatus MoveBackwardAction::tick()
   if (!driver_model.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
+  const auto waypoints = calculateWaypoints();
+  if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto waypoints = calculateWaypoints();
   setOutput("updated_status", calculateEntityStatusUpdated(target_speed.get()));
   const auto obstacle = calculateObstacle(waypoints);
   setOutput("waypoints", waypoints);
