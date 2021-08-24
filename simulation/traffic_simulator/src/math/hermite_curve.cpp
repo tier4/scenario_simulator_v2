@@ -75,11 +75,13 @@ double HermiteCurve::getSquaredDistanceIn2D(
 }
 
 double HermiteCurve::getNewtonMethodStepSize(
-  geometry_msgs::msg::Point point, double s, bool autoscale) const
+  geometry_msgs::msg::Point point, double s /*, bool autoscale*/) const
 {
+  /*
   if (autoscale) {
     s = s / getLength();
   }
+  */
   const auto point_on_curve = getPoint(s, autoscale);
   double s2 = std::pow(s, 2);
   double x_term_diff = 2 * (point.x - point_on_curve.x) * (-3 * ax_ * s2 - 2 * bx_ * s - cx_);

@@ -29,10 +29,6 @@ namespace traffic_simulator
 {
 namespace math
 {
-class HermiteCurveTest : public ::testing::Test
-{
-};
-
 class HermiteCurve
 {
 private:
@@ -77,8 +73,7 @@ private:
   std::pair<double, double> get2DMinMaxCurvatureValue() const;
   double length_;
   double getNewtonMethodStepSize(
-    geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
-  FRIEND_TEST(HermiteCurveTest, getNewtonMethodStepSize);
+    geometry_msgs::msg::Point point, double s, /*bool autoscale = false*/) const;
 };
 }  // namespace math
 }  // namespace traffic_simulator
