@@ -61,9 +61,20 @@ TEST(PolynomialSolverTest, QuadraticFunction)
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
-  auto ret = solver.solveQuadraticEquation(2, 3, -5, 0, 2);
-  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
-  EXPECT_DOUBLE_EQ(ret[0], 1);
+  for (int a = -20; a < 20; a = a + 1) {
+    for (int b = -20; b < 20; b = b + 1) {
+      for (int c = -20; c < 20; c = c + 1) {
+        auto ret = solver.solveQuadraticEquation(
+          static_cast<double>(a), static_cast<double>(b), static_cast<double>(c), 0, 1);
+        for (const auto & solution : ret) {
+          EXPECT_TRUE(checkValuetWithTorelance(
+            solver.quadraticFunction(
+              static_cast<double>(a), static_cast<double>(b), static_cast<double>(c), solution),
+            0.0, 1e-10));
+        }
+      }
+    }
+  }
 }
 
 TEST(PolynomialSolverTest, SolveCubicEquation)
