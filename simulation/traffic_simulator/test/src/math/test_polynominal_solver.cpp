@@ -18,6 +18,17 @@
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/polynomial_solver.hpp>
 
+bool checkValuetWithTorelance(double value, double expected, double torelance)
+{
+  if (torelance < 0) {
+    throw std::logic_error("torelance should be over 0");
+  }
+  if (std::fabs(value - expected) < torelance) {
+    return true;
+  }
+  return false;
+}
+
 TEST(PolynomialSolverTest, SolveLinearEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
@@ -25,15 +36,10 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
     for (double b = -20; b < 20; b = b + 0.1) {
       auto ret = solver.solveLinearEquation(a, b, 0, 1);
       for (const auto & solution : ret) {
-        // EXPECT_DOUBLE_EQ(solution, );
+        EXPECT_TRUE(checkValuetWithTorelance(solver.linearFunction(a, b, solution), 0.0, 1e-10));
       }
     }
   }
-  /*
-  auto ret = solver.solveLinearEquation(-20, 3, 0, 1);
-  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
-  EXPECT_DOUBLE_EQ(ret[0], 0.15);
-  */
 }
 
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
