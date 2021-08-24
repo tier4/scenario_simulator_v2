@@ -21,9 +21,19 @@
 TEST(PolynomialSolverTest, SolveLinearEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
+  for (double a = -20; a < 20; a = a + 0.1) {
+    for (double b = -20; b < 20; b = b + 0.1) {
+      auto ret = solver.solveLinearEquation(a, b, 0, 1);
+      for (const auto & solution : ret) {
+        // EXPECT_DOUBLE_EQ(solution, );
+      }
+    }
+  }
+  /*
   auto ret = solver.solveLinearEquation(-20, 3, 0, 1);
   EXPECT_EQ(ret.size(), static_cast<size_t>(1));
   EXPECT_DOUBLE_EQ(ret[0], 0.15);
+  */
 }
 
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
