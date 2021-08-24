@@ -26,7 +26,7 @@ private:                                                           \
   rclcpp::Subscription<TYPE>::SharedPtr subscription_of_##TYPE;    \
                                                                    \
 public:                                                            \
-  const auto & get##TYPE() const->const auto &                     \
+  auto get##TYPE() const->const auto &                             \
   {                                                                \
     const auto lock = static_cast<const Autoware &>(*this).lock(); \
     return CONCEALER_CURRENT_VALUE_OF(TYPE);                       \

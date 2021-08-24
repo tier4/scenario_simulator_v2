@@ -96,4 +96,9 @@ bool Autoware::ready() const
   return task_queue.exhausted();
 }
 
+void Autoware::createUpdater()
+{
+  updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
+}
+
 }  // namespace concealer
