@@ -90,20 +90,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
 
-  ament_add_gtest(test_math test/src/test_math.cpp)
-  target_link_libraries(test_math traffic_simulator)
-
-  ament_add_gtest(test_polynominal_solver test/src/math/test_polynominal_solver.cpp)
-  target_link_libraries(test_polynominal_solver traffic_simulator)
-
-  ament_add_gtest(test_hermite_curve test/src/math/test_hermite_curve.cpp)
-  target_link_libraries(test_hermite_curve traffic_simulator)
-
-  ament_add_gtest(test_catmull_rom_spline test/src/math/test_catmull_rom_spline.cpp)
-  target_link_libraries(test_catmull_rom_spline traffic_simulator)
-
-  ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
-  target_link_libraries(test_hdmap_utils traffic_simulator)
+  add_subdirectory(test)
 endif()
 
 ament_auto_package()
