@@ -17,7 +17,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 
-TEST(Math, CatmullRomSpline1)
+TEST(CatmullRomSpline, CatmullRomSpline1)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -45,7 +45,7 @@ TEST(Math, CatmullRomSpline1)
   }
 }
 
-TEST(Math, CatmullRomSpline2)
+TEST(CatmullRomSpline, CatmullRomSpline2)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -60,7 +60,7 @@ TEST(Math, CatmullRomSpline2)
   EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0);
 }
 
-TEST(Math, CatmullRomSpline3)
+TEST(CatmullRomSpline, CatmullRomSpline3)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -76,7 +76,7 @@ TEST(Math, CatmullRomSpline3)
   EXPECT_NO_THROW(auto spline = traffic_simulator::math::CatmullRomSpline(points));
 }
 
-TEST(Math, CatmullRomSpline4)
+TEST(CatmullRomSpline, CatmullRomSpline4)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -95,7 +95,7 @@ TEST(Math, CatmullRomSpline4)
   EXPECT_NO_THROW(auto spline = traffic_simulator::math::CatmullRomSpline(points));
 }
 
-TEST(Math, CatmullRomSpline5)
+TEST(CatmullRomSpline, CatmullRomSpline5)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -115,7 +115,7 @@ TEST(Math, CatmullRomSpline5)
   EXPECT_DOUBLE_EQ(point.z, 0);
 }
 
-TEST(Math, CatmullRomSpline6)
+TEST(CatmullRomSpline, CatmullRomSpline6)
 {
   geometry_msgs::msg::Point p0;
   p0.x = -30.9281;
@@ -137,7 +137,7 @@ TEST(Math, CatmullRomSpline6)
   auto spline = traffic_simulator::math::CatmullRomSpline(points);
 }
 
-TEST(Math, CatmullRomSpline7)
+TEST(CatmullRomSpline, CatmullRomSpline7)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -158,7 +158,7 @@ TEST(Math, CatmullRomSpline7)
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
 }
 
-TEST(Math, CatmullRomSpline8)
+TEST(CatmullRomSpline, CatmullRomSpline8)
 {
   EXPECT_THROW(
     traffic_simulator::math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
