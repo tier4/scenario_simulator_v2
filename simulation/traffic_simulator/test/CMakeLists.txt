@@ -1,20 +1,4 @@
-ament_add_gtest(test_polynominal_solver src/math/test_polynominal_solver.cpp)
-target_link_libraries(test_polynominal_solver traffic_simulator)
-
-ament_add_gtest(test_hermite_curve src/math/test_hermite_curve.cpp)
-target_link_libraries(test_hermite_curve traffic_simulator)
-
-ament_add_gtest(test_catmull_rom_spline src/math/test_catmull_rom_spline.cpp)
-target_link_libraries(test_catmull_rom_spline traffic_simulator)
-
-ament_add_gtest(test_bounding_box src/math/test_bounding_box.cpp)
-target_link_libraries(test_bounding_box traffic_simulator)
-
-ament_add_gtest(test_uuid src/math/test_uuid.cpp)
-target_link_libraries(test_uuid traffic_simulator)
-
-ament_add_gtest(test_distance src/math/test_distance.cpp)
-target_link_libraries(test_distance traffic_simulator)
+add_subdirectory(src/math)
 
 ament_add_gtest(test_hdmap_utils src/test_hdmap_utils.cpp)
 target_link_libraries(test_hdmap_utils traffic_simulator)
