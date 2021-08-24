@@ -22,30 +22,6 @@
 #include <traffic_simulator/math/polynomial_solver.hpp>
 #include <traffic_simulator/math/uuid.hpp>
 
-TEST(Math, PolynomialSolver1)
-{
-  traffic_simulator::math::PolynomialSolver solver;
-  auto ret = solver.solveLinearEquation(-20, 3, 0, 1);
-  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
-  EXPECT_DOUBLE_EQ(ret[0], 0.15);
-}
-
-TEST(Math, PolynomialSolver2)
-{
-  traffic_simulator::math::PolynomialSolver solver;
-  auto ret = solver.solveQuadraticEquation(2, 3, -5, 0, 2);
-  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
-  EXPECT_DOUBLE_EQ(ret[0], 1);
-}
-
-TEST(Math, PolynomialSolver3)
-{
-  traffic_simulator::math::PolynomialSolver solver;
-  auto ret = solver.solveCubicEquation(1, -2, -11, 12, 0, 2);
-  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
-  EXPECT_DOUBLE_EQ(ret[0], 1);
-}
-
 TEST(Math, HermiteCurve1)
 {
   geometry_msgs::msg::Pose start_pose, goal_pose;

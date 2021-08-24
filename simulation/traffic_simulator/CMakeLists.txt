@@ -93,6 +93,9 @@ if(BUILD_TESTING)
   ament_add_gtest(test_math test/src/test_math.cpp)
   target_link_libraries(test_math traffic_simulator)
 
+  ament_add_gtest(test_polynominal_solver test/src/math/test_polynominal_solver.cpp)
+  target_link_libraries(test_polynominal_solver traffic_simulator)
+
   ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
   target_link_libraries(test_hdmap_utils traffic_simulator)
 endif()
