@@ -29,6 +29,14 @@ bool checkValuetWithTorelance(double value, double expected, double torelance)
   return false;
 }
 
+TEST(PolynomialSolverTest, LinearFunction)
+{
+  traffic_simulator::math::PolynomialSolver solver;
+  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 1, 2), 3);
+  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 0, 2), 2);
+  EXPECT_DOUBLE_EQ(solver.linearFunction(0, 0, 2), 0);
+}
+
 TEST(PolynomialSolverTest, SolveLinearEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
