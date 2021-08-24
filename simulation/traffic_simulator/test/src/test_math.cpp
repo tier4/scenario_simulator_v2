@@ -55,6 +55,17 @@ TEST(Math, HermiteCurve1)
   goal_vec.x = 1;
   traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
   EXPECT_DOUBLE_EQ(curve.getLength(), 1);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.1, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.2, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.3, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.4, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.5, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.6, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.7, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.8, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.9, true), 0);
+  EXPECT_DOUBLE_EQ(curve.get2DCurvature(1.0, true), 0);
   EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
   EXPECT_DOUBLE_EQ(curve.getMaximum2DCurvature(), 0);
