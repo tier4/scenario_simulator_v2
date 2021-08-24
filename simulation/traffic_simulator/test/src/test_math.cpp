@@ -17,14 +17,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/distance.hpp>
-#include <traffic_simulator/math/uuid.hpp>
-
-TEST(Math, UUID)
-{
-  EXPECT_STREQ(
-    traffic_simulator::math::generateUUID("test").c_str(),
-    traffic_simulator::math::generateUUID("test").c_str());
-}
 
 TEST(Math, Distance0)
 {
