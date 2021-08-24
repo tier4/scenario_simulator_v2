@@ -80,9 +80,24 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
 TEST(PolynomialSolverTest, SolveCubicEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
-  auto ret = solver.solveCubicEquation(1, -2, -11, 12, 0, 2);
-  EXPECT_EQ(ret.size(), static_cast<size_t>(1));
-  EXPECT_DOUBLE_EQ(ret[0], 1);
+  for (int a = -10; a < 10; a = a + 1) {
+    for (int b = -10; b < 10; b = b + 1) {
+      for (int c = -10; c < 10; c = c + 1) {
+        for (int d = -10; d < 10; d = d + 1) {
+          auto ret = solver.solveCubicEquation(
+            static_cast<double>(a), static_cast<double>(b), static_cast<double>(c),
+            static_cast<double>(d), 0, 1);
+          for (const auto & solution : ret) {
+            EXPECT_TRUE(checkValuetWithTorelance(
+              solver.cubicFunction(
+                static_cast<double>(a), static_cast<double>(b), static_cast<double>(c),
+                static_cast<double>(d), solution),
+              0.0, 1e-10));
+          }
+        }
+      }
+    }
+  }
 }
 
 int main(int argc, char ** argv)
