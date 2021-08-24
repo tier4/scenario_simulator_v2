@@ -53,8 +53,8 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
 TEST(PolynomialSolverTest, QuadraticFunction)
 {
   traffic_simulator::math::PolynomialSolver solver;
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 13);
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 12);
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);
 }
 
