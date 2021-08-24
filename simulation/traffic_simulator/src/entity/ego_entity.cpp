@@ -55,17 +55,17 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
+  auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
   std::string vehicle_model_type;
 
-  if (autoware_type == "proposal") {
+  if (architecture_type == "tier4/proposal") {
     vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
-  } else if (autoware_type == "auto") {
+  } else if (architecture_type == "awf/auto") {
     // hard-coded for now
     // it would require changes in https://github.com/tier4/lexus_description.iv.universe
     vehicle_model_type = "IDEAL_STEER";
   } else {
-    THROW_SEMANTIC_ERROR("Unsupported autoware_type ", autoware_type);
+    THROW_SEMANTIC_ERROR("Unsupported architecture-type ", architecture_type);
   }
 
   if (vehicle_model_type == "IDEAL_STEER") {
@@ -129,42 +129,44 @@ auto makeSimulationModel(
   }
 }
 
+auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware> {
+  auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
+
+  if (architecture_type == "tier4/proposal") {
+    return std::make_unique<concealer::AutowareArchitectureProposal>(
+        getParameter<std::string>("autoware_launch_package"),
+        getParameter<std::string>("autoware_launch_file"),
+        "map_path:=" + configuration.map_path.string(),
+        "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+        "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+        "sensor_model:=" + getParameter<std::string>("sensor_model"),
+        "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+        "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
+  } else if (architecture_type == "awf/auto") {
+    return std::make_unique<concealer::AutowareAuto>(
+        getParameter<std::string>("autoware_launch_package"),
+        getParameter<std::string>("autoware_launch_file"),
+        "map_path:=" + configuration.map_path.string(),
+        "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+        "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+        "sensor_model:=" + getParameter<std::string>("sensor_model"),
+        "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+        "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
+  } else {
+    throw std::invalid_argument("Invalid architecture-type = " + architecture_type);
+  }
+}
+
 EgoEntity::EgoEntity(
   const std::string & name,             //
   const Configuration & configuration,  //
   const double step_time,               //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
+  autoware(makeAutoware(configuration)),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
-  auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
-
-  if (autoware_type == "proposal") {
-    autoware = std::make_unique<concealer::AutowareArchitectureProposal>(
-      getParameter<std::string>("autoware_launch_package"),
-      getParameter<std::string>("autoware_launch_file"),
-      "map_path:=" + configuration.map_path.string(),
-      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-      "sensor_model:=" + getParameter<std::string>("sensor_model"),
-      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
-  } else if (autoware_type == "auto") {
-    autoware = std::make_unique<concealer::AutowareAuto>(
-      getParameter<std::string>("autoware_launch_package"),
-      getParameter<std::string>("autoware_launch_file"),
-      "map_path:=" + configuration.map_path.string(),
-      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-      "sensor_model:=" + getParameter<std::string>("sensor_model"),
-      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
-
-  } else {
-    throw std::invalid_argument("Invalid autoware_type = " + autoware_type);
-  }
-
   entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
 }
 

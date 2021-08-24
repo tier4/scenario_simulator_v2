@@ -32,32 +32,32 @@ from pathlib import Path
 
 def launch_setup(context, *args, **kwargs):
     # Autoware Type
-    autoware_types = ["auto", "proposal"]
-    autoware_type = LaunchConfiguration("autoware_type", default="proposal")
+    architecture_types = ["awf/auto", "tier4/proposal"]
+    architecture_type = LaunchConfiguration("architecture-type", default="tier4/proposal")
 
-    if autoware_type.perform(context) not in autoware_types:
+    if architecture_type.perform(context) not in architecture_types:
         raise KeyError(
-            f"autoware_type = {autoware_type.perform(context)} is not supported. Choose one of {autoware_types}.")
+            f"architecture-type = {architecture_type.perform(context)} is not supported. Choose one of {architecture_types}.")
 
-    print(f"autoware_type = {autoware_type.perform(context)}")
+    print(f"architecture-type = {architecture_type.perform(context)}")
 
     # Autoware Launch Package
     autoware_launch_package_defaults = {
-        "auto": "scenario_test_runner_launch",
-        "proposal": "autoware_launch"
+        "awf/auto": "scenario_test_runner_launch",
+        "tier4/proposal": "autoware_launch"
     }
     autoware_launch_package = LaunchConfiguration(
-        "autoware-launch-package", default=autoware_launch_package_defaults[autoware_type.perform(context)]
+        "autoware-launch-package", default=autoware_launch_package_defaults[architecture_type.perform(context)]
     )
     print(f"autoware_launch_package = {autoware_launch_package.perform(context)}")
 
     # Autoware Launch File
     autoware_launch_file_defaults = {
-        "auto": "autoware_auto.launch.py",
-        "proposal": "planning_simulator.launch.xml"
+        "awf/auto": "autoware_auto.launch.py",
+        "tier4/proposal": "planning_simulator.launch.xml"
     }
     autoware_launch_file = LaunchConfiguration(
-        "autoware-launch-file", default=autoware_launch_file_defaults[autoware_type.perform(context)]
+        "autoware-launch-file", default=autoware_launch_file_defaults[architecture_type.perform(context)]
     )
     print(f"autoware_launch_file = {autoware_launch_file.perform(context)}")
 
@@ -88,7 +88,7 @@ def launch_setup(context, *args, **kwargs):
         parameters = [
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
-            {"autoware_type": autoware_type},
+            {"architecture-type": architecture_type},
             {"port": port},
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
@@ -120,7 +120,7 @@ def launch_setup(context, *args, **kwargs):
             "autoware-launch-package", default_value=autoware_launch_package
         ),
         DeclareLaunchArgument(
-            "autoware_type", default_value=autoware_type
+            "architecture-type", default_value=architecture_type
         ),
         DeclareLaunchArgument("global-frame-rate", default_value=global_frame_rate),
         DeclareLaunchArgument(

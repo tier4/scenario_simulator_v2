@@ -104,16 +104,16 @@ struct ScenarioObject
       if (is<Vehicle>()) {
         applyAssignControllerAction(name, object_controller);
         if (object_controller.isEgo()) {
-          auto autoware_type = getParameter<std::string>("autoware_type", std::string(""));
+          auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
 
-          if (autoware_type == "proposal") {
+          if (architecture_type == "tier4/proposal") {
             attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
               traffic_simulator::helper::LidarType::VLP16, name,
               "/sensing/lidar/no_ground/pointcloud"));
 
             attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
               name, "/perception/object_recognition/objects", 0.1));
-          } else if (autoware_type == "auto") {
+          } else if (architecture_type == "awf/auto") {
             attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
               traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
 
@@ -122,7 +122,7 @@ struct ScenarioObject
             // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
             // topic name is yet unknown
           } else {
-            throw std::invalid_argument("Invalid autoware_type = " + autoware_type);
+            throw std::invalid_argument("Invalid architecture-type = " + architecture_type);
           }
         }
       }

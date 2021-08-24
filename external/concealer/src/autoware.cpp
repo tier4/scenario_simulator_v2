@@ -21,7 +21,6 @@ void Autoware::shutdownAutoware()
 {
   AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publlishing/subscribing.");
   {
-    updater.reset();
     if (spinner.joinable()) {
       promise.set_value();
       spinner.join();
@@ -95,11 +94,6 @@ bool Autoware::ready() const
   task_queue.rethrow();
   rethrow();
   return task_queue.exhausted();
-}
-
-void Autoware::createUpdater()
-{
-  updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
 }
 
 }  // namespace concealer

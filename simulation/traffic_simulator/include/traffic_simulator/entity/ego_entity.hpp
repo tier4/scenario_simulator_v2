@@ -59,7 +59,7 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  std::unique_ptr<concealer::Autoware> autoware;
+  const std::unique_ptr<concealer::Autoware> autoware;
 
   const VehicleModelType vehicle_model_type_;
 
