@@ -17,7 +17,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 
-TEST(CatmullRomSpline, CatmullRomSpline1)
+TEST(CatmullRomSpline, GetCollisionPointIn2D)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -45,7 +45,7 @@ TEST(CatmullRomSpline, CatmullRomSpline1)
   }
 }
 
-TEST(CatmullRomSpline, CatmullRomSpline2)
+TEST(CatmullRomSpline, Maximum2DCurvature)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -60,7 +60,7 @@ TEST(CatmullRomSpline, CatmullRomSpline2)
   EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0);
 }
 
-TEST(CatmullRomSpline, CatmullRomSpline3)
+TEST(CatmullRomSpline, Interpolate3Points)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -76,7 +76,7 @@ TEST(CatmullRomSpline, CatmullRomSpline3)
   EXPECT_NO_THROW(auto spline = traffic_simulator::math::CatmullRomSpline(points));
 }
 
-TEST(CatmullRomSpline, CatmullRomSpline4)
+TEST(CatmullRomSpline, Interpolate4Points)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -95,7 +95,7 @@ TEST(CatmullRomSpline, CatmullRomSpline4)
   EXPECT_NO_THROW(auto spline = traffic_simulator::math::CatmullRomSpline(points));
 }
 
-TEST(CatmullRomSpline, CatmullRomSpline5)
+TEST(CatmullRomSpline, GetPoint)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -115,29 +115,7 @@ TEST(CatmullRomSpline, CatmullRomSpline5)
   EXPECT_DOUBLE_EQ(point.z, 0);
 }
 
-TEST(CatmullRomSpline, CatmullRomSpline6)
-{
-  geometry_msgs::msg::Point p0;
-  p0.x = -30.9281;
-  p0.y = -23.1708;
-  p0.z = -0.132544;
-  geometry_msgs::msg::Point p1;
-  p1.x = -29.2938;
-  p1.y = -22.2938;
-  p1.z = -0.162124;
-  geometry_msgs::msg::Point p2;
-  p2.x = -27.6596;
-  p2.y = -21.4167;
-  p2.z = -0.191704;
-  geometry_msgs::msg::Point p3;
-  p3.x = -33.0324;
-  p3.y = -92.7566;
-  p3.z = 2.28524;
-  auto points = {p0, p1, p2, p3};
-  auto spline = traffic_simulator::math::CatmullRomSpline(points);
-}
-
-TEST(CatmullRomSpline, CatmullRomSpline7)
+TEST(CatmullRomSpline, GetSValue)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
@@ -158,7 +136,7 @@ TEST(CatmullRomSpline, CatmullRomSpline7)
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
 }
 
-TEST(CatmullRomSpline, CatmullRomSpline8)
+TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointisAreNotEnough)
 {
   EXPECT_THROW(
     traffic_simulator::math::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
