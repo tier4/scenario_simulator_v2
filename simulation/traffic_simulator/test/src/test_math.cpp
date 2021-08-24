@@ -82,6 +82,8 @@ TEST(Math, HermiteCurve1)
   goal.x = 0.1;
   goal.y = -1.0;
   auto collision_s = curve.getCollisionPointIn2D(start, goal);
+  EXPECT_FALSE(curve.getCollisionPointIn2D({}));
+  EXPECT_FALSE(curve.getCollisionPointIn2D({start}));
   EXPECT_TRUE(collision_s);
   if (collision_s) {
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
