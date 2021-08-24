@@ -18,7 +18,7 @@
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/distance.hpp>
 
-TEST(Math, Distance0)
+TEST(Distance, PointToPoint)
 {
   geometry_msgs::msg::Point p0, p1;
   EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 0);
@@ -28,7 +28,7 @@ TEST(Math, Distance0)
   EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), std::sqrt(2));
 }
 
-TEST(Math, Distance1)
+TEST(Distance, PoseToPose)
 {
   geometry_msgs::msg::Pose p0, p1;
   EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), 0);
@@ -38,7 +38,7 @@ TEST(Math, Distance1)
   EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), std::sqrt(2));
 }
 
-TEST(Math, Distance2)
+TEST(Distance, PointToPose)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Pose p1;
@@ -49,7 +49,7 @@ TEST(Math, Distance2)
   EXPECT_DOUBLE_EQ(traffic_simulator::math::getDistance(p0, p1), std::sqrt(2));
 }
 
-TEST(Math, Distance3)
+TEST(Distance, PoseToPoint)
 {
   geometry_msgs::msg::Pose p0;
   geometry_msgs::msg::Point p1;
