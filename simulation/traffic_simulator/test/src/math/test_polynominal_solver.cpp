@@ -15,12 +15,8 @@
 #include <gtest/gtest.h>
 
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/math/bounding_box.hpp>
-#include <traffic_simulator/math/catmull_rom_spline.hpp>
-#include <traffic_simulator/math/distance.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/polynomial_solver.hpp>
-#include <traffic_simulator/math/uuid.hpp>
 
 TEST(PolynomialSolver, SolveLinearEquation)
 {

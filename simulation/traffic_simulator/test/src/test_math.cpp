@@ -18,84 +18,8 @@
 #include <traffic_simulator/math/bounding_box.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/distance.hpp>
-#include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/polynomial_solver.hpp>
 #include <traffic_simulator/math/uuid.hpp>
-
-TEST(Math, HermiteCurve1)
-{
-  geometry_msgs::msg::Pose start_pose, goal_pose;
-  geometry_msgs::msg::Vector3 start_vec, goal_vec;
-  goal_pose.position.x = 1;
-  start_vec.x = 1;
-  goal_vec.x = 1;
-  traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
-  EXPECT_DOUBLE_EQ(curve.getLength(), 1);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.1, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.2, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.3, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.4, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.5, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.6, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.7, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.8, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.9, true), 0);
-  EXPECT_DOUBLE_EQ(curve.get2DCurvature(1.0, true), 0);
-  EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
-  EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
-  EXPECT_DOUBLE_EQ(curve.getMaximum2DCurvature(), 0);
-  geometry_msgs::msg::Point p;
-  p.x = 0.1;
-  p.y = 0;
-  p.z = 0;
-  EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) && (curve.getSValue(p, true).get() < 0.101));
-  geometry_msgs::msg::Point start;
-  start.x = 0.1;
-  start.y = 1.0;
-  geometry_msgs::msg::Point goal;
-  goal.x = 0.1;
-  goal.y = -1.0;
-  auto collision_s = curve.getCollisionPointIn2D(start, goal);
-  EXPECT_FALSE(curve.getCollisionPointIn2D({}));
-  EXPECT_FALSE(curve.getCollisionPointIn2D({start}));
-  EXPECT_TRUE(collision_s);
-  if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
-  }
-}
-
-TEST(Math, HermiteCurve2)
-{
-  geometry_msgs::msg::Pose start_pose, goal_pose;
-  geometry_msgs::msg::Vector3 start_vec, goal_vec;
-  goal_pose.position.x = 1;
-  start_vec.x = 1;
-  goal_vec.x = 1;
-  traffic_simulator::math::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
-  EXPECT_DOUBLE_EQ(curve.getLength(), 1);
-  EXPECT_DOUBLE_EQ(curve.getPoint(0.5, false).x, 0.5);
-  EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
-  EXPECT_DOUBLE_EQ(curve.getMaximum2DCurvature(), 0);
-  geometry_msgs::msg::Point p;
-  p.x = 0.1;
-  p.y = 0;
-  p.z = 0;
-  EXPECT_TRUE(curve.getSValue(p, true));
-  EXPECT_TRUE((curve.getSValue(p, true).get() > 0.099) && (curve.getSValue(p, true).get() < 0.101));
-  geometry_msgs::msg::Point start;
-  start.x = 0.1;
-  start.y = 1.0;
-  geometry_msgs::msg::Point goal;
-  goal.x = 0.2;
-  goal.y = -1.0;
-  auto collision_s = curve.getCollisionPointIn2D(start, goal);
-  EXPECT_TRUE(collision_s);
-  if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.get(), 0.15);
-  }
-}
 
 TEST(Math, CatmullRomSpline1)
 {
