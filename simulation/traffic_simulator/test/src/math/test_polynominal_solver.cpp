@@ -22,7 +22,7 @@
 #include <traffic_simulator/math/polynomial_solver.hpp>
 #include <traffic_simulator/math/uuid.hpp>
 
-TEST(PolynomialSolver, PolynomialSolver1)
+TEST(PolynomialSolver, SolveLinearEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
   auto ret = solver.solveLinearEquation(-20, 3, 0, 1);
@@ -30,7 +30,7 @@ TEST(PolynomialSolver, PolynomialSolver1)
   EXPECT_DOUBLE_EQ(ret[0], 0.15);
 }
 
-TEST(PolynomialSolver, PolynomialSolver2)
+TEST(PolynomialSolver, SolveQuadraticEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
   auto ret = solver.solveQuadraticEquation(2, 3, -5, 0, 2);
@@ -38,7 +38,7 @@ TEST(PolynomialSolver, PolynomialSolver2)
   EXPECT_DOUBLE_EQ(ret[0], 1);
 }
 
-TEST(PolynomialSolver, PolynomialSolver3)
+TEST(PolynomialSolver, SolveCubicEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
   auto ret = solver.solveCubicEquation(1, -2, -11, 12, 0, 2);
