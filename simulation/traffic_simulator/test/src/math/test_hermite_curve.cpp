@@ -16,7 +16,7 @@
 
 #include <traffic_simulator/math/hermite_curve.hpp>
 
-TEST(HermiteCurve, HermiteCurve1)
+TEST(HermiteCurveTest, HermiteCurve1)
 {
   geometry_msgs::msg::Pose start_pose, goal_pose;
   geometry_msgs::msg::Vector3 start_vec, goal_vec;
@@ -60,7 +60,7 @@ TEST(HermiteCurve, HermiteCurve1)
   }
 }
 
-TEST(HermiteCurve, HermiteCurve2)
+TEST(HermiteCurveTest, HermiteCurve2)
 {
   geometry_msgs::msg::Pose start_pose, goal_pose;
   geometry_msgs::msg::Vector3 start_vec, goal_vec;
@@ -90,6 +90,8 @@ TEST(HermiteCurve, HermiteCurve2)
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.15);
   }
 }
+
+TEST(HermiteCurveTest, getNewtonMethodStepSize) {}
 
 int main(int argc, char ** argv)
 {

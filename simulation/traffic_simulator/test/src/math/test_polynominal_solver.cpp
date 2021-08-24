@@ -18,7 +18,7 @@
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/polynomial_solver.hpp>
 
-TEST(PolynomialSolver, SolveLinearEquation)
+TEST(PolynomialSolverTest, SolveLinearEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
   auto ret = solver.solveLinearEquation(-20, 3, 0, 1);
@@ -26,7 +26,7 @@ TEST(PolynomialSolver, SolveLinearEquation)
   EXPECT_DOUBLE_EQ(ret[0], 0.15);
 }
 
-TEST(PolynomialSolver, SolveQuadraticEquation)
+TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
   auto ret = solver.solveQuadraticEquation(2, 3, -5, 0, 2);
@@ -34,7 +34,7 @@ TEST(PolynomialSolver, SolveQuadraticEquation)
   EXPECT_DOUBLE_EQ(ret[0], 1);
 }
 
-TEST(PolynomialSolver, SolveCubicEquation)
+TEST(PolynomialSolverTest, SolveCubicEquation)
 {
   traffic_simulator::math::PolynomialSolver solver;
   auto ret = solver.solveCubicEquation(1, -2, -11, 12, 0, 2);
