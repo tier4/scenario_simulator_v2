@@ -14,11 +14,18 @@
 
 #include <gtest/gtest.h>
 
+#include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/uuid.hpp>
 
 TEST(UUID, GenerateFromSameSeed)
 {
+  for (int i = 0; i < 100; i++) {
+    std::string seed = "seed_" + std::to_string(i);
+    EXPECT_STREQ(
+      traffic_simulator::math::generateUUID(seed).c_str(),
+      traffic_simulator::math::generateUUID(seed).c_str());
+  }
   EXPECT_STREQ(
     traffic_simulator::math::generateUUID("test").c_str(),
     traffic_simulator::math::generateUUID("test").c_str());
