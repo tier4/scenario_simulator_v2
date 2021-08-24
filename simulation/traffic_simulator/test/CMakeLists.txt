@@ -1,6 +1,3 @@
-ament_add_gtest(test_math src/test_math.cpp)
-target_link_libraries(test_math traffic_simulator)
-
 ament_add_gtest(test_polynominal_solver src/math/test_polynominal_solver.cpp)
 target_link_libraries(test_polynominal_solver traffic_simulator)
 
@@ -15,6 +12,9 @@ target_link_libraries(test_bounding_box traffic_simulator)
 
 ament_add_gtest(test_uuid src/math/test_uuid.cpp)
 target_link_libraries(test_uuid traffic_simulator)
+
+ament_add_gtest(test_distance src/math/test_distance.cpp)
+target_link_libraries(test_distance traffic_simulator)
 
 ament_add_gtest(test_hdmap_utils src/test_hdmap_utils.cpp)
 target_link_libraries(test_hdmap_utils traffic_simulator)
