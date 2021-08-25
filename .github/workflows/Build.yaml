@@ -74,6 +74,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
-          flags: unittests
+          flags: unittests-${{ matrix.package }}
           env_vars: ROS_DISTRO
           name: ${{ matrix.package }}
