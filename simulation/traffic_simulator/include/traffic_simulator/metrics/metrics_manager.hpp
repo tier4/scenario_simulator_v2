@@ -59,6 +59,7 @@ public:
   bool exists(const std::string & name) const;
 
 private:
+
   bool verbose_;
 
   nlohmann::json log_;

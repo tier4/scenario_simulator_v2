@@ -39,6 +39,10 @@ public:
 private:
   void onUpdate() override
   {
+    if(!api_.metricExists("ego_momentary_stop"))
+    {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
     if (
       api_.metricExists("ego_momentary_stop") &&
       api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::FAILURE) {
