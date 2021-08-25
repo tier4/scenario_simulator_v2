@@ -106,6 +106,9 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
+  if (waypoints.waypoints.empty()) {
+    return BT::NodeStatus::FAILURE;
+  }
   const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
   distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, spline);
   auto distance_to_stopline =

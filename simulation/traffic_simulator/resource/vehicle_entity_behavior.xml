@@ -116,6 +116,22 @@
                     obstacle="{obstacle}"
                     driver_model="{driver_model}"
                     traffic_light_manager="{traffic_light_manager}"/>
+                <MoveBackward name="move_backward"
+                    waypoints="{waypoints}"
+                    request="{request}"
+                    hdmap_utils="{hdmap_utils}"
+                    current_time="{current_time}"
+                    step_time="{step_time}"
+                    entity_status="{entity_status}"
+                    vehicle_parameters="{vehicle_parameters}"
+                    updated_status="{updated_status}"
+                    target_speed="{target_speed}"
+                    other_entity_status="{other_entity_status}"
+                    entity_type_list="{entity_type_list}"
+                    route_lanelets="{route_lanelets}"
+                    obstacle="{obstacle}"
+                    driver_model="{driver_model}"
+                    traffic_light_manager="{traffic_light_manager}"/>
             </Fallback>
         </Fallback>
     </Fallback>

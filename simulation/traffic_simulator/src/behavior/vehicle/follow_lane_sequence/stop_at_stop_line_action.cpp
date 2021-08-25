@@ -101,6 +101,9 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
+  if (waypoints.waypoints.empty()) {
+    return BT::NodeStatus::FAILURE;
+  }
   distance_to_stopline_ = hdmap_utils->getDistanceToStopLine(route_lanelets, waypoints.waypoints);
   if (std::fabs(entity_status.action_status.twist.linear.x) < 0.001) {
     if (distance_to_stopline_) {

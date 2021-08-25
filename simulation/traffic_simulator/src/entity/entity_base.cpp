@@ -31,14 +31,6 @@ EntityBase::EntityBase(const std::string & type, const std::string & name)
   status_ = boost::none;
 }
 
-EntityBase::EntityBase(
-  const std::string & type, const std::string & name,
-  const openscenario_msgs::msg::EntityStatus & initial_state)
-: EntityBase(type, name)
-{
-  status_ = initial_state;
-}
-
 void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }

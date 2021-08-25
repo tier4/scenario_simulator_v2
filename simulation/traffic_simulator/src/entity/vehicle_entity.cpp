@@ -26,17 +26,6 @@ namespace traffic_simulator
 namespace entity
 {
 VehicleEntity::VehicleEntity(
-  const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  const openscenario_msgs::msg::VehicleParameters & params)
-: EntityBase(params.vehicle_category, name, initial_state),
-  parameters(params),
-  tree_ptr_(std::make_shared<entity_behavior::vehicle::BehaviorTree>())
-{
-  entity_type_.type = openscenario_msgs::msg::EntityType::VEHICLE;
-  tree_ptr_->setValueToBlackBoard("vehicle_parameters", parameters);
-}
-
-VehicleEntity::VehicleEntity(
   const std::string & name, const openscenario_msgs::msg::VehicleParameters & params)
 : EntityBase(params.vehicle_category, name),
   parameters(params),

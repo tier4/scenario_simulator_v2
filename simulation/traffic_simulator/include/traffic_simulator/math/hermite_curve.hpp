@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
 #define TRAFFIC_SIMULATOR__MATH__HERMITE_CURVE_HPP_
 
+#include <gtest/gtest.h>
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/optional.hpp>
@@ -31,6 +32,7 @@ namespace math
 class HermiteCurve
 {
 private:
+  friend class HermiteCurveTest;
   double ax_, bx_, cx_, dx_;
   double ay_, by_, cy_, dy_;
   double az_, bz_, cz_, dz_;
@@ -71,7 +73,7 @@ private:
   std::pair<double, double> get2DMinMaxCurvatureValue() const;
   double length_;
   double getNewtonMethodStepSize(
-    geometry_msgs::msg::Point point, double s, bool autoscale = false) const;
+    geometry_msgs::msg::Point point, double s /*, bool autoscale = false*/) const;
 };
 }  // namespace math
 }  // namespace traffic_simulator
