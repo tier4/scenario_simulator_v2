@@ -31,7 +31,7 @@ public:
   explicit MomentaryStopScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
-      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, true, option)
+      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
   {
     start();
   }
@@ -39,13 +39,15 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::FAILURE) {
+    if (
+      api_.metricExists("ego_momentary_stop") &&
+      api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::FAILURE) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (api_.getCurrentTime() >= 4.4) {
-      if (api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::SUCCESS) {
-        stop(cpp_mock_scenarios::Result::SUCCESS);
-      }
+    if (
+      api_.metricExists("ego_momentary_stop") &&
+      api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::SUCCESS) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
 

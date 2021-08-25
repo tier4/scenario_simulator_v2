@@ -31,11 +31,19 @@ MetricsManager::MetricsManager(
 {
 }
 
+bool MetricsManager::exists(const std::string & name) const
+{
+  if (metrics_.find(name) == metrics_.end()) {
+    return false;
+  }
+  return true;
+}
+
 void MetricsManager::setVerbose(const bool verbose) { verbose_ = verbose; }
 
 MetricLifecycle MetricsManager::getLifecycle(const std::string & name)
 {
-  if (metrics_.find(name) == metrics_.end()) {
+  if (!exists(name)) {
     THROW_SEMANTIC_ERROR("metrics name : ", name, " does not exist.");
   }
   return metrics_.at(name)->getLifecycle();
