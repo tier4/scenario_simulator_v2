@@ -13,9 +13,15 @@ ament_auto_add_executable(reaction_time
 )
 target_link_libraries(reaction_time cpp_scenario_node)
 
+ament_auto_add_executable(out_of_range
+  out_of_range.cpp
+)
+target_link_libraries(out_of_range cpp_scenario_node)
+
 install(TARGETS
   traveled_distance
   momentary_stop
   reaction_time
+  out_of_range
   DESTINATION lib/cpp_mock_scenarios
 )
