@@ -62,11 +62,12 @@ private:
       traffic_simulator::helper::constructActionStatus(3));
     api_.setTargetSpeed("ego", 3, true);
     metrics::OutOfRangeMetric::Config config;
+    config.target_entity = "ego";
     config.min_velocity = 2.95;
     config.max_velocity = 3.05;
     config.min_acceleration = -0.1;
     config.max_acceleration = 0.1;
-    api_.addMetric<metrics::OutOfRangeMetric>("ego_out_of_range", "ego", config);
+    api_.addMetric<metrics::OutOfRangeMetric>("ego_out_of_range", config);
   }
 };
 
