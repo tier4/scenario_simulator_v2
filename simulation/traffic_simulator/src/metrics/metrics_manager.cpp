@@ -62,7 +62,7 @@ void MetricsManager::calculate()
     if (metric.second->getLifecycle() == MetricLifecycle::ACTIVE) {
       metric.second->update();
     }
-    log[metric.first] = metric.second->to_json();
+    log[metric.first] = metric.second->toJson();
     if (verbose_) {
       std::cout << "metric : " << metric.first << " => " << log[metric.first] << std::endl;
     }

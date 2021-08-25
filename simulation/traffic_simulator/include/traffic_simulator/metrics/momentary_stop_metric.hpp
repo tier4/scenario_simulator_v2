@@ -51,7 +51,7 @@ public:
   const double stop_sequence_start_distance;
   const double stop_sequence_end_distance;
   const double stop_duration;
-  nlohmann::json to_json();
+  nlohmann::json toJson();
 
 private:
   double linear_acceleration_;

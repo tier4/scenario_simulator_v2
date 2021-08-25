@@ -29,7 +29,7 @@ public:
     bool check_lower_threshold = true);
   ~ReactionTimeMetric() override = default;
   void update() override;
-  nlohmann::json to_json();
+  nlohmann::json toJson();
   bool activateTrigger() override;
   const std::string target_entity;
   const double maximum_reaction_time;
