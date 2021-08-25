@@ -36,9 +36,10 @@ public:
    * @param stop_target_lanelet_id Lanelet ID of the stop target.
    * @param stop_target_lanelet_type Type of the stop target.
    * @param stop_sequence_start_distance If the entity get closer to the stop target and the distance between target enity
-   *  and stop target under the stop_sequence_start_distance, this metrics become active state.
-   * @param stop_sequence_end_distance 
-   * @param stop_duration 
+   *  and stop target under the stop_sequence_start_distance, this metrics becomes active state.
+   * @param stop_sequence_end_distance If the target entity and stop target under this value and the target entity does not stopped,
+   * this metrics becomes failure state.
+   * @param stop_duration If the metrics is in active state and stop longer than stop_duration, then the metric become success.
    */
   MomentaryStopMetric(
     std::string target_entity, double min_acceleration, double max_acceleration,
