@@ -90,11 +90,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
 
-  ament_add_gtest(test_math test/src/test_math.cpp)
-  target_link_libraries(test_math traffic_simulator)
-
-  ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
-  target_link_libraries(test_hdmap_utils traffic_simulator)
+  add_subdirectory(test)
 endif()
 
 ament_auto_package()

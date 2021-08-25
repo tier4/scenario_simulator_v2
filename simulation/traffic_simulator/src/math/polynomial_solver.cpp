@@ -23,6 +23,8 @@ namespace traffic_simulator
 {
 namespace math
 {
+double PolynomialSolver::linearFunction(double a, double b, double t) const { return a * t + b; }
+
 double PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
 {
   return a * t * t * t + b * t * t + c * t + d;

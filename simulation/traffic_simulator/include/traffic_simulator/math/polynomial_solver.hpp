@@ -74,6 +74,15 @@ public:
  * @return double result of quadratic function
  */
   double quadraticFunction(double a, double b, double c, double t) const;
+  /**
+ * @brief calculate result of quadratic function a*t + b
+ *
+ * @param a
+ * @param b
+ * @param t
+ * @return double result of quadratic function
+ */
+  double linearFunction(double a, double b, double t) const;
 
 private:
   /**
