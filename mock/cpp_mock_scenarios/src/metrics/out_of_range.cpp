@@ -47,9 +47,7 @@ private:
       }
     }
     // LCOV_EXCL_STOP
-    if (
-      api_.getCurrentTime() >= 12 && api_.metricExists("ego_out_of_range") &&
-      api_.getMetricLifecycle("ego_out_of_range") == metrics::MetricLifecycle::SUCCESS) {
+    if (api_.getCurrentTime() >= 12 && api_.metricExists("ego_out_of_range")) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
