@@ -24,6 +24,8 @@ jobs:
       matrix:
         rosdistro: [foxy, galactic]
         test_flags: [cpp_mock_test, openscenario_interpreter]
+    env:
+      ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
       - uses: actions/checkout@v2-beta
 
@@ -198,7 +200,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: /home/runner/ros2_ws/lcov.total.filtered
           flags: ${{ matrix.test_flags }}
-          env_vars: ${{ matrix.rosdistro }}
+          env_vars: ROS_DISTRO
           name: scenario_simulator_v2
 
       - name: Notify Slack
