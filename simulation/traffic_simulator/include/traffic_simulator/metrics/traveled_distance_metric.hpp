@@ -23,6 +23,11 @@ namespace metrics
 class TraveledDistanceMetric : public MetricBase
 {
 public:
+  /**
+   * @brief Construct a new Traveled Distance Metric object
+   * 
+   * @param target_entity name of the target entity
+   */
   explicit TraveledDistanceMetric(std::string target_entity);
   ~TraveledDistanceMetric() override = default;
   void update() override;
