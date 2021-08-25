@@ -39,6 +39,7 @@ public:
 private:
   void onUpdate() override
   {
+    // LCOV_EXCL_START
     if(!api_.metricExists("ego_momentary_stop"))
     {
       stop(cpp_mock_scenarios::Result::FAILURE);
@@ -48,6 +49,7 @@ private:
       api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::FAILURE) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+    // LCOV_EXCL_STOP
     if (
       api_.metricExists("ego_momentary_stop") &&
       api_.getMetricLifecycle("ego_momentary_stop") == metrics::MetricLifecycle::SUCCESS) {
