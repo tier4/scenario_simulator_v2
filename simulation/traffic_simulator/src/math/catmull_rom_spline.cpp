@@ -313,20 +313,6 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   return boost::none;
 }
 
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int num_points) const
-{
-  std::vector<geometry_msgs::msg::Point> ret;
-  if (num_points <= 1) {
-    THROW_SIMULATION_ERROR("trajectory points should be more than 2, num_points = ", num_points);
-  }
-  double seg_size = total_length_ / (num_points - 1);
-  for (int i = 0; i < num_points; i++) {
-    double s = seg_size * static_cast<double>(i);
-    ret.emplace_back(getPoint(s));
-  }
-  return ret;
-}
-
 boost::optional<double> CatmullRomSpline::getSValue(
   geometry_msgs::msg::Point position, double threshold_distance, unsigned int initial_num_points,
   unsigned int max_iteration, double tolerance)
@@ -419,12 +405,12 @@ bool CatmullRomSpline::checkConnection() const
     const auto p1 = curves_[i].getPoint(1, false);
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
-    } else if (!equals(control_point0, p0)) {
+    } else if (!equals(control_point0, p0)) {                       // LCOV_EXCL_LINE
       THROW_SIMULATION_ERROR(                                       // LCOV_EXCL_LINE
         "start point of the curve number ", i, " does not match");  // LCOV_EXCL_LINE
-    } else if (!equals(control_point1, p1)) {
-      THROW_SIMULATION_ERROR(                                     // LCOV_EXCL_LINE
-        "end point of the curve number ", i, " does not match");  // LCOV_EXCL_LINE
+    } else if (!equals(control_point1, p1)) {                       // LCOV_EXCL_LINE
+      THROW_SIMULATION_ERROR(                                       // LCOV_EXCL_LINE
+        "end point of the curve number ", i, " does not match");    // LCOV_EXCL_LINE
     }
   }
   if (curves_.empty()) {

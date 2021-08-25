@@ -25,16 +25,6 @@ namespace traffic_simulator
 namespace entity
 {
 PedestrianEntity::PedestrianEntity(
-  const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
-  const openscenario_msgs::msg::PedestrianParameters & params)
-: EntityBase(params.pedestrian_category, name, initial_state), parameters(params)
-{
-  entity_type_.type = openscenario_msgs::msg::EntityType::PEDESTRIAN;
-  tree_ptr_ = std::make_shared<entity_behavior::pedestrian::BehaviorTree>();
-  tree_ptr_->setValueToBlackBoard("pedestrian_parameters", parameters);
-}
-
-PedestrianEntity::PedestrianEntity(
   const std::string & name, const openscenario_msgs::msg::PedestrianParameters & params)
 : EntityBase(params.pedestrian_category, name), parameters(params)
 {
