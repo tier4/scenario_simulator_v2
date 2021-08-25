@@ -197,7 +197,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: /home/runner/ros2_ws/lcov.total.filtered
-          flags: ${{ matrix.test_flags }}
+          flags: ${{ matrix.test_flags }}-${{ matrix.rosdistro }}
           name: scenario_simulator_v2
 
       - name: Notify Slack
