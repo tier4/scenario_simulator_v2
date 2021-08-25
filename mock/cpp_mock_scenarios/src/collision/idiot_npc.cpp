@@ -42,8 +42,10 @@ private:
   {
     double current_time = api_.getCurrentTime();
     if (api_.checkCollision("ego", "npc")) {
+      // LCOV_EXCL_START
       if (current_time <= 3.0) {
         stop(cpp_mock_scenarios::Result::FAILURE);
+        // LCOV_EXCL_STOP
       } else {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       }

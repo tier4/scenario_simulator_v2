@@ -40,11 +40,13 @@ public:
 private:
   void onUpdate() override
   {
+    // LCOV_EXCL_START
     if (api_.getCurrentTime() >= 10 && 10.1 >= api_.getCurrentTime()) {
       if (api_.getMetricLifecycle("ego_traveled_distance") != metrics::MetricLifecycle::ACTIVE) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
+    // LCOV_EXCL_STOP
     if (api_.getCurrentTime() >= 12) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
