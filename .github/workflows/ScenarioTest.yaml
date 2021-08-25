@@ -184,7 +184,6 @@ jobs:
             "/opt/ros/*" "/usr/*" \
             "${PWD}/src/scenario_simulator_v2/common/*" \
             "${PWD}/src/scenario_simulator_v2/external/*" \
-            "${PWD}/src/scenario_simulator_v2/mock/*" \
             "${PWD}/src/scenario_simulator_v2/openscenario/*" \
             "${PWD}/src/scenario_simulator_v2/simulation/simulation/simple_sensor_simulator/*" \
             "${PWD}/src/scenario_simulator_v2/simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/*" \
