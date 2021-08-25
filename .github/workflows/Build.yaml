@@ -46,6 +46,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
       - name: Setup ROS2 ${{ matrix.rosdistro }} environment
         uses: ros-tooling/setup-ros@v0.2
         with:

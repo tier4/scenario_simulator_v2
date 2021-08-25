@@ -28,6 +28,8 @@ jobs:
       ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
       - uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
 
       - name: Install ROS2 via Debian Packages
         run: |
