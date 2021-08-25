@@ -44,4 +44,12 @@ Traveled distance metric calculates total traveled distance for target entity.
 ### Momentary Stop
 
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1MomentaryStopMetric/)  
-Momentary stop metric enable us to check the target entity can stop in front of the crosswalk / stop line.
+Momentary stop metric enable us to check the target entity can stop in front of the crosswalk and stop line.
+
+### Reaction Time
+Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1ReactionTimeMetric/)  
+Reaction time metric enable us to check the target entity follow the front entity speed.
+
+### Out of range
+Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1OutOfRangeMetric/)  
+Out of range metric enables us to check the velocity, acceleration, jerk of target entity is in the valid range or not.
