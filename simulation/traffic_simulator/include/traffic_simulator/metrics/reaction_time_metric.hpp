@@ -23,6 +23,15 @@ namespace metrics
 class ReactionTimeMetric : public MetricBase
 {
 public:
+  /**
+   * @brief Construct a new Reaction Time Metric object
+   * @param target_entity name of the target entity
+   * @param maximum_reaction_time maximum time
+   * @param jerk_upper_threshold If check_upper_threshold = true and the jerk of target entity overs this value, the metric becoms failure state.
+   * @param jerk_lower_threshold If check_lower_threshold = true the jerk of target entity unders this value, the metric becoms failure state.
+   * @param check_upper_threshold If true, check upper threadhold of the jerk.
+   * @param check_lower_threshold If true, check lower threadhold of the jerk.
+   */
   explicit ReactionTimeMetric(
     std::string target_entity, double maximum_reaction_time, double jerk_upper_threshold,
     double jerk_lower_threshold, bool check_upper_threshold = true,
