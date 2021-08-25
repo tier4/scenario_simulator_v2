@@ -62,9 +62,14 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
 
   std::thread spinner;
 
-  rclcpp::TimerBase::SharedPtr updater;
+  const rclcpp::TimerBase::SharedPtr updater;
 
   std::exception_ptr thrown;
+
+  decltype(auto) createUpdater()
+  {
+    return create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
+  }
 
 protected:
   const pid_t process_id;
@@ -85,8 +90,6 @@ protected:
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
   void shutdownAutoware();
 
-  void createUpdater();
-
 public:
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
@@ -106,6 +109,7 @@ public:
           "\x1b[32mShutting down Autoware: (1/3) Stoped publlishing/subscribing.\x1b[0m");
       },
       std::move(promise.get_future())),
+    updater(createUpdater()),
     process_id(ros2_launch(std::forward<decltype(xs)>(xs)...))
   {
   }
@@ -139,7 +143,7 @@ public:
    * -------------------------------------------------------------------------- */
   virtual void plan(const std::vector<geometry_msgs::msg::PoseStamped> &) = 0;
 
-  virtual void update() = 0;
+  virtual void update() {}
 
   virtual double getAcceleration() const = 0;
 

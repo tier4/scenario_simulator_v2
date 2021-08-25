@@ -508,8 +508,6 @@ public:
     INIT_SUBSCRIPTION(VehicleStatus, "/awapi/vehicle/get/status", []() {})
   {
     waitpid_options = 0;
-
-    createUpdater();
     setLaneChangeApproval();
   }
 
