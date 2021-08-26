@@ -144,6 +144,31 @@ TEST(CatmullRomSpline, GetSValue)
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
 }
 
+TEST(CatmullRomSpline, GetTrajectory)
+{
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  p1.x = 1;
+  geometry_msgs::msg::Point p2;
+  p2.x = 2;
+  geometry_msgs::msg::Point p3;
+  p3.x = 3;
+  auto points = {p0, p1, p2, p3};
+  auto spline = traffic_simulator::math::CatmullRomSpline(points);
+  auto trajectory = spline.getTrajectory(0, 3, 1.0);
+  EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
+  EXPECT_DOUBLE_EQ(trajectory[0].x, 0);
+  EXPECT_DOUBLE_EQ(trajectory[1].x, 1);
+  EXPECT_DOUBLE_EQ(trajectory[2].x, 2);
+  EXPECT_DOUBLE_EQ(trajectory[3].x, 3);
+  trajectory = spline.getTrajectory(3, 0, 1.0);
+  EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
+  EXPECT_DOUBLE_EQ(trajectory[0].x, 0);
+  EXPECT_DOUBLE_EQ(trajectory[1].x, 1);
+  EXPECT_DOUBLE_EQ(trajectory[2].x, 2);
+  EXPECT_DOUBLE_EQ(trajectory[3].x, 3);
+}
+
 TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointisAreNotEnough)
 {
   EXPECT_THROW(
