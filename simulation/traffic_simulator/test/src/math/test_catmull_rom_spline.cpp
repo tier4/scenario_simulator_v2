@@ -163,10 +163,10 @@ TEST(CatmullRomSpline, GetTrajectory)
   EXPECT_DOUBLE_EQ(trajectory[3].x, 3);
   trajectory = spline.getTrajectory(3, 0, 1.0);
   EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
-  EXPECT_DOUBLE_EQ(trajectory[0].x, 0);
-  EXPECT_DOUBLE_EQ(trajectory[1].x, 1);
-  EXPECT_DOUBLE_EQ(trajectory[2].x, 2);
-  EXPECT_DOUBLE_EQ(trajectory[3].x, 3);
+  EXPECT_DOUBLE_EQ(trajectory[0].x, 3);
+  EXPECT_DOUBLE_EQ(trajectory[1].x, 2);
+  EXPECT_DOUBLE_EQ(trajectory[2].x, 1);
+  EXPECT_DOUBLE_EQ(trajectory[3].x, 0);
 }
 
 TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointisAreNotEnough)

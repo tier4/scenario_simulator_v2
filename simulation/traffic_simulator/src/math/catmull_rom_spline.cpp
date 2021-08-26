@@ -101,17 +101,26 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   double start_s, double end_s, double resolution) const
 {
   if (start_s > end_s) {
-    return getTrajectory(end_s, start_s, resolution);
+    std::vector<geometry_msgs::msg::Point> ret;
+    resolution = std::fabs(resolution);
+    double s = start_s;
+    while (s >= end_s) {
+      auto p = getPoint(s);
+      ret.emplace_back(p);
+      s = s - resolution;
+    }
+    return ret;
+  } else {
+    std::vector<geometry_msgs::msg::Point> ret;
+    resolution = std::fabs(resolution);
+    double s = start_s;
+    while (s <= end_s) {
+      auto p = getPoint(s);
+      ret.emplace_back(p);
+      s = s + resolution;
+    }
+    return ret;
   }
-  std::vector<geometry_msgs::msg::Point> traj;
-  resolution = std::fabs(resolution);
-  double s = start_s;
-  while (s <= end_s) {
-    auto p = getPoint(s);
-    traj.emplace_back(p);
-    s = s + resolution;
-  }
-  return traj;
 }
 
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
