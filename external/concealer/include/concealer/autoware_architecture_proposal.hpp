@@ -509,7 +509,7 @@ public:
   {
     waitpid_options = 0;
 
-    createUpdater();
+    resetTimerCallback();
     setLaneChangeApproval();
   }
 

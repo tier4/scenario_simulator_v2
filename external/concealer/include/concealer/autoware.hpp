@@ -79,13 +79,15 @@ protected:
 
   geometry_msgs::msg::Twist current_twist;
 
+  // this method is purely virtual because different Autoware types are killed differently
+  // currently, we are not sure why this is the case so detailed investigation is needed
   virtual void sendSIGINT() = 0;
 
   // method called in destructor of a derived class
   // because it is difficult to differentiate shutting down behavior in destructor of a base class
   void shutdownAutoware();
 
-  void createUpdater();
+  void resetTimerCallback();
 
 public:
   template <typename... Ts>

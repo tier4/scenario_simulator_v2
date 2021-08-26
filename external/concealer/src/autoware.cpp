@@ -96,7 +96,7 @@ bool Autoware::ready() const
   return task_queue.exhausted();
 }
 
-void Autoware::createUpdater()
+void Autoware::resetTimerCallback()
 {
   updater = create_wall_timer(std::chrono::milliseconds(5), [this]() { this->update(); });
 }
