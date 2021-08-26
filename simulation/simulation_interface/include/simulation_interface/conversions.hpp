@@ -107,7 +107,7 @@ void toMsg(
   openscenario_msgs::msg::MiscObjectParameters & p);
 void toProto(
   const openscenario_msgs::msg::ActionStatus & s, openscenario_msgs::ActionStatus & proto);
-void toMsg(openscenario_msgs::ActionStatus & proto, const openscenario_msgs::msg::ActionStatus & s);
+void toMsg(const openscenario_msgs::ActionStatus & proto, openscenario_msgs::msg::ActionStatus & s);
 void toProto(
   const openscenario_msgs::msg::LaneletPose & pose, openscenario_msgs::LaneletPose & proto);
 void toMsg(
