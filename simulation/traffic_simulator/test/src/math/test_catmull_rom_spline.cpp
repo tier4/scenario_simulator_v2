@@ -142,6 +142,10 @@ TEST(CatmullRomSpline, GetSValue)
   // std::cout << "result = " << spline.getSValue(p).get() << std::endl;
   EXPECT_TRUE(spline.getSValue(p).get() > 0.099);
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
+  p.x = 10;
+  p.y = 0;
+  p.z = 0;
+  EXPECT_FALSE(spline.getSValue(p, 3));
 }
 
 TEST(CatmullRomSpline, GetTrajectory)
