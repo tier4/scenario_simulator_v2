@@ -486,6 +486,9 @@ TEST(Conversion, EntityType)
   msg.type = msg.EGO;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
   EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::VEHICLE);
+  msg.type = msg.MISC_OBJECT;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(proto, openscenario_msgs::EntityType::MISC_OBJECT);
 }
 
 TEST(Conversion, LaneletPose)
