@@ -286,6 +286,18 @@ TEST(Conversion, ConvertVehicleParametrs)
   // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
 }
 
+TEST(Conversion, ConvertPedestrianParametrs)
+{
+  openscenario_msgs::PedestrianParameters proto;
+  openscenario_msgs::msg::PedestrianParameters p;
+  EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
+  EXPECT_STREQ(p.name.c_str(), proto.name().c_str());
+  EXPECT_STREQ(p.pedestrian_category.c_str(), proto.pedestrian_category().c_str());
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
+  EXPECT_STREQ(p.name.c_str(), proto.name().c_str());
+  EXPECT_STREQ(p.pedestrian_category.c_str(), proto.pedestrian_category().c_str());
+}
+
 TEST(Conversion, ConvertMiscObjectParametrs)
 {
   openscenario_msgs::MiscObjectParameters proto;
