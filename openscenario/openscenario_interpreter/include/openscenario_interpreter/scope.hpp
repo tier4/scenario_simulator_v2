@@ -50,10 +50,11 @@ private:
     if (name.empty()) {
       parent.anonymous_children.push_back(this);
     } else {
-      auto ret = parent.named_children.emplace(name, this);
-      if (!ret.second) {
-        THROW_SYNTAX_ERROR(std::quoted(name), " is duplicated in this scope");
-      }
+      parent.named_children.emplace(name, this);
+      // auto ret = parent.named_children.emplace(name, this);
+      // if (!ret.second) {
+      //   THROW_SYNTAX_ERROR(std::quoted(name), " is duplicated in this scope");
+      // }
     }
   }
 
