@@ -57,7 +57,7 @@ void MetricBase::failure(const common::scenario_simulator_exception::Specificati
   lifecycle_ = MetricLifecycle::FAILURE;
 }
 
-nlohmann::json MetricBase::to_base_json()
+nlohmann::json MetricBase::toBaseJson()
 {
   nlohmann::json json;
   json["type"] = metrics_type;

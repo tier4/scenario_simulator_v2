@@ -40,14 +40,7 @@ public:
 private:
   void onUpdate() override
   {
-    // LCOV_EXCL_START
-    if (api_.getCurrentTime() >= 10 && 10.1 >= api_.getCurrentTime()) {
-      if (api_.getMetricLifecycle("ego_traveled_distance") != metrics::MetricLifecycle::ACTIVE) {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      }
-    }
-    // LCOV_EXCL_STOP
-    if (api_.getCurrentTime() >= 12) {
+    if (api_.getCurrentTime() >= 5 && api_.metricExists("ego_out_of_range")) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -59,7 +52,13 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(3));
     api_.setTargetSpeed("ego", 3, true);
-    api_.addMetric<metrics::TraveledDistanceMetric>("ego_traveled_distance", "ego");
+    metrics::OutOfRangeMetric::Config config;
+    config.target_entity = "ego";
+    config.min_velocity = 2.95;
+    config.max_velocity = 3.05;
+    config.min_acceleration = -0.1;
+    config.max_acceleration = 0.1;
+    api_.addMetric<metrics::OutOfRangeMetric>("ego_out_of_range", config);
   }
 };
 

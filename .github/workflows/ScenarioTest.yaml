@@ -152,6 +152,27 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traveled_distance timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run momentary stop scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=momentary_stop timeout:=20 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+          
+      - name: Run reaction_time scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=reaction_time timeout:=10 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run out_of_range scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=out_of_range timeout:=7 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
       - name: Run stop_at_crosswalk scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
