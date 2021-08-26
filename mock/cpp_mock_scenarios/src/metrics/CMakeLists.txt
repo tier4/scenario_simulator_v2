@@ -3,7 +3,25 @@ ament_auto_add_executable(traveled_distance
 )
 target_link_libraries(traveled_distance cpp_scenario_node)
 
+ament_auto_add_executable(momentary_stop
+  momentary_stop.cpp
+)
+target_link_libraries(momentary_stop cpp_scenario_node)
+
+ament_auto_add_executable(reaction_time
+  reaction_time.cpp
+)
+target_link_libraries(reaction_time cpp_scenario_node)
+
+ament_auto_add_executable(out_of_range
+  out_of_range.cpp
+)
+target_link_libraries(out_of_range cpp_scenario_node)
+
 install(TARGETS
   traveled_distance
+  momentary_stop
+  reaction_time
+  out_of_range
   DESTINATION lib/cpp_mock_scenarios
 )

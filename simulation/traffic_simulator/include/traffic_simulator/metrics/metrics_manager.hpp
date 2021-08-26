@@ -56,6 +56,8 @@ public:
 
   MetricLifecycle getLifecycle(const std::string & name);
 
+  bool exists(const std::string & name) const;
+
 private:
   bool verbose_;
 
