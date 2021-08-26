@@ -341,9 +341,8 @@ TEST(Conversion, ConvertActionStatus)
   EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
   EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
   EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
-  // action = openscenario_msgs::msg::ActionStatus();
+  action = openscenario_msgs::msg::ActionStatus();
   simulation_interface::toMsg(proto, action);
-  /*
   EXPECT_STREQ(action.current_action.c_str(), proto.current_action().c_str());
   EXPECT_DOUBLE_EQ(action.twist.linear.x, proto.twist().linear().x());
   EXPECT_DOUBLE_EQ(action.twist.linear.y, proto.twist().linear().y());
@@ -357,7 +356,6 @@ TEST(Conversion, ConvertActionStatus)
   EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
   EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
   EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
-  */
 }
 
 TEST(Conversion, Time)
