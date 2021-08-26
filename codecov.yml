@@ -5,6 +5,13 @@ flags:
     paths:
       - simulation
     carryforward: false
+  with_openscenario_interpreter:
+    paths:
+      - simulation
+      - openscenario
+      - test_runner
+      - common
+      - external
   unittests-concealer:
     paths:
       - external/concealer
