@@ -43,13 +43,17 @@ private:
     const auto t = api_.getCurrentTime();
     const auto color = api_.getTrafficLightColor(34802);
     if (0 < t && t <= 9.9) {
+      // LCOV_EXCL_START
       if (color != traffic_simulator::TrafficLightColor::GREEN) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
+      // LCOV_EXCL_STOP
     }
     if (t >= 10.1) {
+      // LCOV_EXCL_START
       if (color == traffic_simulator::TrafficLightColor::YELLOW) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
+        // LCOV_EXCL_STOP
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }

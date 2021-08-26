@@ -1,0 +1,4 @@
+add_subdirectory(src/math)
+
+ament_add_gtest(test_hdmap_utils src/test_hdmap_utils.cpp)
+target_link_libraries(test_hdmap_utils traffic_simulator)

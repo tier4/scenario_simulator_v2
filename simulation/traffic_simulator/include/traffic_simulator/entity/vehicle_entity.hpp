@@ -41,10 +41,6 @@ class VehicleEntity : public EntityBase
 {
 public:
   VehicleEntity(
-    const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    const openscenario_msgs::msg::VehicleParameters & parameters);
-
-  VehicleEntity(
     const std::string & name, const openscenario_msgs::msg::VehicleParameters & parameters);
 
   ~VehicleEntity() override = default;

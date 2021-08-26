@@ -24,8 +24,12 @@ jobs:
       matrix:
         rosdistro: [foxy, galactic]
         test_flags: [cpp_mock_test, openscenario_interpreter]
+    env:
+      ROS_DISTRO: ${{ matrix.rosdistro }}
     steps:
       - uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
 
       - name: Install ROS2 via Debian Packages
         run: |
@@ -148,11 +152,39 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traveled_distance timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run momentary stop scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=momentary_stop timeout:=20 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+          
+      - name: Run reaction_time scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=reaction_time timeout:=10 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run out_of_range scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=out_of_range timeout:=7 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
       - name: Run stop_at_crosswalk scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=stop_at_crosswalk timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run move_backward scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=move_backward timeout:=10 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Collect coverage for openscenario_interpreter
@@ -175,7 +207,6 @@ jobs:
             "/opt/ros/*" "/usr/*" \
             "${PWD}/src/scenario_simulator_v2/common/*" \
             "${PWD}/src/scenario_simulator_v2/external/*" \
-            "${PWD}/src/scenario_simulator_v2/mock/*" \
             "${PWD}/src/scenario_simulator_v2/openscenario/*" \
             "${PWD}/src/scenario_simulator_v2/simulation/simulation/simple_sensor_simulator/*" \
             "${PWD}/src/scenario_simulator_v2/simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/*" \
@@ -191,6 +222,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
           files: /home/runner/ros2_ws/lcov.total.filtered
           flags: ${{ matrix.test_flags }}
+          env_vars: ROS_DISTRO
           name: scenario_simulator_v2
 
       - name: Notify Slack

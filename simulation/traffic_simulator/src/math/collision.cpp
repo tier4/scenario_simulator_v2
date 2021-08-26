@@ -47,7 +47,7 @@ bool checkCollision2D(
   if (bg::disjoint(poly0, poly1)) {
     return false;
   }
-  return true;
+  return true;  // LCOV_EXCL_LINE
 }
 }  // namespace math
 }  // namespace traffic_simulator

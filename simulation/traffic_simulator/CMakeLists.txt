@@ -31,6 +31,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/behavior/vehicle/behavior_tree.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
   src/behavior/vehicle/follow_lane_sequence/follow_lane_action.cpp
+  src/behavior/vehicle/follow_lane_sequence/move_backward_action.cpp
   src/behavior/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
   src/behavior/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
   src/behavior/vehicle/follow_lane_sequence/stop_at_traffic_light_action.cpp
@@ -89,11 +90,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
   find_package(ament_cmake_gtest REQUIRED)
 
-  ament_add_gtest(test_math test/src/test_math.cpp)
-  target_link_libraries(test_math traffic_simulator)
-
-  ament_add_gtest(test_hdmap_utils test/src/test_hdmap_utils.cpp)
-  target_link_libraries(test_hdmap_utils traffic_simulator)
+  add_subdirectory(test)
 endif()
 
 ament_auto_package()

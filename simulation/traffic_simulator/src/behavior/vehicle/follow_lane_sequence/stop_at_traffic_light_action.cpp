@@ -100,6 +100,9 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
+  if (waypoints.waypoints.empty()) {
+    return BT::NodeStatus::FAILURE;
+  }
   const auto spline = traffic_simulator::math::CatmullRomSpline(waypoints.waypoints);
   const auto distance_to_traffic_stop_line =
     hdmap_utils->getDistanceToTrafficLightStopLine(route_lanelets, waypoints.waypoints);

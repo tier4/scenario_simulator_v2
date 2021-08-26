@@ -35,10 +35,6 @@ class PedestrianEntity : public EntityBase
 {
 public:
   PedestrianEntity(
-    const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    const openscenario_msgs::msg::PedestrianParameters & parameters);
-
-  PedestrianEntity(
     const std::string & name, const openscenario_msgs::msg::PedestrianParameters & parameters);
 
   const openscenario_msgs::msg::PedestrianParameters parameters;
