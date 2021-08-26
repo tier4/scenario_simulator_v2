@@ -33,13 +33,21 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
   geometry_msgs::msg::Point goal;
   goal.x = 0.1;
   goal.y = -1.0;
-  auto collision_s = spline.getCollisionPointIn2D(start, goal);
+  auto collision_s = spline.getCollisionPointIn2D(start, goal, false);
   EXPECT_TRUE(collision_s);
   if (collision_s) {
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
   }
-  collision_s = spline.getCollisionPointIn2D(start, goal, false);
+  collision_s = spline.getCollisionPointIn2D({start, goal}, false);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
+  collision_s = spline.getCollisionPointIn2D(start, goal, true);
   EXPECT_TRUE(collision_s);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
+  collision_s = spline.getCollisionPointIn2D({start, goal}, true);
   if (collision_s) {
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
   }
