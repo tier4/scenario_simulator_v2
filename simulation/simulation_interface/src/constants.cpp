@@ -31,8 +31,6 @@ std::string enumToString(const TransportProtocol & protocol)
       return "tcp";
     case TransportProtocol::UDP:
       return "udp";
-    default:
-      return "";
   }
 }
 
@@ -43,8 +41,6 @@ std::string enumToString(const HostName & hostname)
       return "localhost";
     case HostName::ANY:
       return "*";
-    default:
-      return "";
   }
 }
 }  // namespace simulation_interface
