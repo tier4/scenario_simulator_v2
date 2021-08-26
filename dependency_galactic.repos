@@ -10,11 +10,3 @@ repositories:
     type: git
     url: https://github.com/tier4/pilot.auto.git
     version: ros2
-  lanelet2:
-    type: git
-    url: https://github.com/fzi-forschungszentrum-informatik/Lanelet2.git
-    version: master
-  mrt_cmake_modules:
-    type: git
-    url: https://github.com/KIT-MRT/mrt_cmake_modules
-    version: master
