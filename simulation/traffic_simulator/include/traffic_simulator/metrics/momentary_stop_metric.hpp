@@ -35,7 +35,7 @@ public:
    * @param max_acceleration Maximum acceleration in stopping sequence.
    * @param stop_target_lanelet_id Lanelet ID of the stop target.
    * @param stop_target_lanelet_type Type of the stop target.
-   * @param stop_sequence_start_distance If the entity get closer to the stop target and the distance between target enity
+   * @param stop_sequence_start_distance If the entity get closer to the stop target and the distance between target entity
    *  and stop target under the stop_sequence_start_distance, this metrics becomes active state.
    * @param stop_sequence_end_distance If the target entity and stop target under this value and the target entity does not stopped,
    * this metrics becomes failure state.

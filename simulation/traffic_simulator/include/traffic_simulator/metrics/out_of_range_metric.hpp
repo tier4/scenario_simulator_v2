@@ -45,11 +45,11 @@ public:
   /**
    * @brief Construct a new Out Of Range Metric object
    * @param target_entity Name of target entity
-   * @param min_velocity If the velociy of the target entity unders this value, this metrics becomes failure state.
-   * @param max_velocity If the velociy of the target entity overs this value, this metrics becomes failure state.
-   * @param min_acceleration If the acceleration of the target entity unders this value, this metrics becomes failure state.
+   * @param min_velocity If the velocity of the target entity go below this value, this metrics becomes failure state.
+   * @param max_velocity If the velocity of the target entity overs this value, this metrics becomes failure state.
+   * @param min_acceleration If the acceleration of the target entity go below this value, this metrics becomes failure state.
    * @param max_acceleration If the acceleration of the target entity overs this value, this metrics becomes failure state.
-   * @param min_jerk If the jerk of the target entity unders this value, this metrics becomes failure state.
+   * @param min_jerk If the jerk of the target entity go below this value, this metrics becomes failure state.
    * @param max_jerk If the jerk of the target entity overs this value, this metrics becomes failure state.
    */
   OutOfRangeMetric(
