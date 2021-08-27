@@ -16,7 +16,6 @@
 
 #include <exception>
 #include <geometry_msgs/msg/point.hpp>
-#include <openscenario_msgs/msg/catmull_rom_spline.hpp>
 #include <string>
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <utility>
@@ -30,9 +29,6 @@ class CatmullRomSpline
 {
 public:
   CatmullRomSpline() = delete;
-  explicit CatmullRomSpline(const openscenario_msgs::msg::CatmullRomSpline & spline);
-  explicit CatmullRomSpline(
-    const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves);
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   double getLength() const { return total_length_; }
   double getMaximum2DCurvature() const;
@@ -40,7 +36,6 @@ public:
   const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s) const;
   const geometry_msgs::msg::Pose getPose(double s) const;
-  const std::vector<geometry_msgs::msg::Point> getTrajectory(int num_points) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution) const;
   boost::optional<double> getSValue(
@@ -54,7 +49,6 @@ public:
   boost::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const;
-  const openscenario_msgs::msg::CatmullRomSpline toRosMsg() const;
   const geometry_msgs::msg::Point getRightBoundsPoint(
     double width, double s, double z_offset = 0) const;
   const geometry_msgs::msg::Point getLeftBoundsPoint(

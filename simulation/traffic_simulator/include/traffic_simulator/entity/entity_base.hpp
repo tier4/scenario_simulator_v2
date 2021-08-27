@@ -48,10 +48,6 @@ public:
 
   EntityBase(const std::string & type, const std::string & name);
 
-  EntityBase(
-    const std::string & type, const std::string & name,
-    const openscenario_msgs::msg::EntityStatus & initial_state);
-
   virtual ~EntityBase() = default;
 
 public:

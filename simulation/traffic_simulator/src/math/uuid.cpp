@@ -35,10 +35,9 @@ namespace math
 {
 std::string generateUUID(const std::string & seed)
 {
-  boost::uuids::uuid base = boost::uuids::string_generator()("0123456789abcdef0123456789abcdef");
-  boost::uuids::name_generator gen(base);
-  boost::uuids::uuid uuid = gen(seed);
-  return boost::lexical_cast<std::string>(uuid);
+  boost::uuids::name_generator gen(
+    boost::uuids::string_generator()("0123456789abcdef0123456789abcdef"));
+  return boost::lexical_cast<std::string>(gen(seed));
 }
 }  // namespace math
 }  // namespace traffic_simulator

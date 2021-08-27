@@ -1,4 +1,4 @@
-// Copyright 2015-2021 Tier IV, Inc. All rights reserved.
+// Copyright 2015-2020 Tier IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__AUTOWARE_DEF_HPP_
-#define CONCEALER__AUTOWARE_DEF_HPP_
+#include <sys/wait.h>
 
-// uncomment this line to enable AutowareAuto instead of ArchitectureProposal
-// #define AUTOWARE_AUTO
+#include <openscenario_interpreter/record.hpp>
 
-#ifndef AUTOWARE_AUTO
-#define AUTOWARE_ARCHITECTURE_PROPOSAL
-#endif  // AUTOWARE_AUTO
+namespace openscenario_interpreter
+{
+namespace record
+{
+pid_t process_id = 0;
 
-#endif  // CONCEALER__AUTOWARE_DEF_HPP_
+auto stop() -> void
+{
+  int status = 0;
+
+  if (::kill(process_id, SIGINT) or waitpid(process_id, &status, 0) < 0) {
+    std::exit(EXIT_FAILURE);
+  }
+}
+}  // namespace record
+}  // namespace openscenario_interpreter

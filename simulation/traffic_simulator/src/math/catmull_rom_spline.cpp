@@ -25,14 +25,6 @@ namespace traffic_simulator
 {
 namespace math
 {
-CatmullRomSpline::CatmullRomSpline(
-  const std::vector<openscenario_msgs::msg::HermiteCurve> & hermite_curves)
-{
-  for (const auto & curve : hermite_curves) {
-    curves_.emplace_back(HermiteCurve(curve));
-  }
-}
-
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
   double width, size_t num_points, double z_offset)
 {
@@ -108,6 +100,9 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   double start_s, double end_s, double resolution) const
 {
+  if (start_s > end_s) {
+    return getTrajectory(end_s, start_s, resolution);
+  }
   std::vector<geometry_msgs::msg::Point> traj;
   resolution = std::fabs(resolution);
   double s = start_s;
@@ -127,19 +122,14 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
   return traj;
 }
 
-CatmullRomSpline::CatmullRomSpline(const openscenario_msgs::msg::CatmullRomSpline & spline)
-{
-  for (const auto & curve : spline.curves) {
-    curves_.emplace_back(HermiteCurve(curve));
-  }
-}
-
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
 : control_points(control_points)
 {
   size_t n = control_points.size() - 1;
   if (control_points.size() <= 2) {
-    THROW_SEMANTIC_ERROR("numbers of control points are not enough.");
+    THROW_SEMANTIC_ERROR(
+      control_points.size(),
+      " control points are only exists. At minimum, 2 control points are required");
   }
   for (size_t i = 0; i < n; i++) {
     if (i == 0) {
@@ -239,15 +229,6 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   checkConnection();
 }
 
-const openscenario_msgs::msg::CatmullRomSpline CatmullRomSpline::toRosMsg() const
-{
-  openscenario_msgs::msg::CatmullRomSpline spline;
-  for (const auto & curve : curves_) {
-    spline.curves.emplace_back(curve.toRosMsg());
-  }
-  return spline;
-}
-
 std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
 {
   if (s < 0) {
@@ -265,7 +246,7 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
       return std::make_pair(i, s - prev_s);
     }
   }
-  THROW_SIMULATION_ERROR("failed to calculate curve index");
+  THROW_SIMULATION_ERROR("failed to calculate curve index");  // LCOV_EXCL_LINE
 }
 
 double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
@@ -279,7 +260,7 @@ double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
       ret = ret + curves_[i].getLength();
     }
   }
-  THROW_SEMANTIC_ERROR("curve index does not match");
+  THROW_SEMANTIC_ERROR("curve index does not match");  // LCOV_EXCL_LINE
 }
 
 boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
@@ -332,20 +313,6 @@ boost::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   return boost::none;
 }
 
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(int num_points) const
-{
-  std::vector<geometry_msgs::msg::Point> ret;
-  if (num_points <= 1) {
-    THROW_SIMULATION_ERROR("trajectory points should be more than 2, num_points = ", num_points);
-  }
-  double seg_size = total_length_ / (num_points - 1);
-  for (int i = 0; i < num_points; i++) {
-    double s = seg_size * static_cast<double>(i);
-    ret.emplace_back(getPoint(s));
-  }
-  return ret;
-}
-
 boost::optional<double> CatmullRomSpline::getSValue(
   geometry_msgs::msg::Point position, double threshold_distance, unsigned int initial_num_points,
   unsigned int max_iteration, double tolerance)
@@ -365,10 +332,10 @@ boost::optional<double> CatmullRomSpline::getSValue(
     }
   }
   if (s_values.size() != error_values.size()) {
-    THROW_SIMULATION_ERROR("s values and error values size are does not match");
+    THROW_SIMULATION_ERROR("s values and error values size are does not match");  // LCOV_EXCL_LINE
   }
   if (s_values.size() != curve_index.size()) {
-    THROW_SIMULATION_ERROR("s values and error values size are does not match");
+    THROW_SIMULATION_ERROR("s values and error values size are does not match");  // LCOV_EXCL_LINE
   }
   if (s_values.empty()) {
     return boost::none;
@@ -402,7 +369,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 double CatmullRomSpline::getMaximum2DCurvature() const
 {
   if (maximum_2d_curvatures_.empty()) {
-    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");
+    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");  // LCOV_EXCL_LINE
   }
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }
@@ -428,7 +395,8 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
 bool CatmullRomSpline::checkConnection() const
 {
   if (control_points.size() != (curves_.size() + 1)) {
-    THROW_SIMULATION_ERROR("number of control points and curves does not match.");
+    THROW_SIMULATION_ERROR(                                    // LCOV_EXCL_LINE
+      "number of control points and curves does not match.");  // LCOV_EXCL_LINE
   }
   for (size_t i = 0; i < curves_.size(); i++) {
     const auto control_point0 = control_points[i];
@@ -437,14 +405,16 @@ bool CatmullRomSpline::checkConnection() const
     const auto p1 = curves_[i].getPoint(1, false);
     if (equals(control_point0, p0) && equals(control_point1, p1)) {
       continue;
-    } else if (!equals(control_point0, p0)) {
-      THROW_SIMULATION_ERROR("start point of the curve number ", i, " does not match");
-    } else if (!equals(control_point1, p1)) {
-      THROW_SIMULATION_ERROR("end point of the curve number ", i, " does not match");
+    } else if (!equals(control_point0, p0)) {                       // LCOV_EXCL_LINE
+      THROW_SIMULATION_ERROR(                                       // LCOV_EXCL_LINE
+        "start point of the curve number ", i, " does not match");  // LCOV_EXCL_LINE
+    } else if (!equals(control_point1, p1)) {                       // LCOV_EXCL_LINE
+      THROW_SIMULATION_ERROR(                                       // LCOV_EXCL_LINE
+        "end point of the curve number ", i, " does not match");    // LCOV_EXCL_LINE
     }
   }
   if (curves_.empty()) {
-    THROW_SIMULATION_ERROR("curve size should not be zero");
+    THROW_SIMULATION_ERROR("curve size should not be zero");  // LCOV_EXCL_LINE
   }
   return true;
 }
@@ -453,13 +423,13 @@ bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::
 {
   constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::abs(p0.x - p1.x) > e) {
-    return false;
+    return false;  // LCOV_EXCL_LINE
   }
   if (std::abs(p0.y - p1.y) > e) {
-    return false;
+    return false;  // LCOV_EXCL_LINE
   }
   if (std::abs(p0.z - p1.z) > e) {
-    return false;
+    return false;  // LCOV_EXCL_LINE
   }
   return true;
 }

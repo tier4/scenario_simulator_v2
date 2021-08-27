@@ -131,12 +131,18 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.action_status = entity_status.action_status;
       setOutput("updated_status", entity_status_updated);
       const auto waypoints = calculateWaypoints();
+      if (waypoints.waypoints.empty()) {
+        return BT::NodeStatus::FAILURE;
+      }
       const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);
       return BT::NodeStatus::RUNNING;
     } else {
       const auto waypoints = calculateWaypoints();
+      if (waypoints.waypoints.empty()) {
+        return BT::NodeStatus::FAILURE;
+      }
       const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);

@@ -43,23 +43,6 @@ HermiteCurve::HermiteCurve(
 {
 }
 
-HermiteCurve::HermiteCurve(const openscenario_msgs::msg::HermiteCurve & curve)
-: ax_(curve.ax),
-  bx_(curve.bx),
-  cx_(curve.cx),
-  dx_(curve.dx),
-  ay_(curve.ax),
-  by_(curve.by),
-  cy_(curve.cy),
-  dy_(curve.dy),
-  az_(curve.ax),
-  bz_(curve.bz),
-  cz_(curve.cz),
-  dz_(curve.dz),
-  length_(getLength(100))
-{
-}
-
 HermiteCurve::HermiteCurve(
   geometry_msgs::msg::Pose start_pose, geometry_msgs::msg::Pose goal_pose,
   geometry_msgs::msg::Vector3 start_vec, geometry_msgs::msg::Vector3 goal_vec)
@@ -81,24 +64,6 @@ HermiteCurve::HermiteCurve(
   length_ = getLength(100);
 }
 
-const openscenario_msgs::msg::HermiteCurve HermiteCurve::toRosMsg() const
-{
-  openscenario_msgs::msg::HermiteCurve curve;
-  curve.ax = ax_;
-  curve.bx = bx_;
-  curve.cx = cx_;
-  curve.dx = dx_;
-  curve.ay = ay_;
-  curve.by = by_;
-  curve.cy = cy_;
-  curve.dy = dy_;
-  curve.az = az_;
-  curve.bz = bz_;
-  curve.cz = cz_;
-  curve.dz = dz_;
-  return curve;
-}
-
 double HermiteCurve::getSquaredDistanceIn2D(
   geometry_msgs::msg::Point point, double s, bool autoscale) const
 {
@@ -110,16 +75,18 @@ double HermiteCurve::getSquaredDistanceIn2D(
 }
 
 double HermiteCurve::getNewtonMethodStepSize(
-  geometry_msgs::msg::Point point, double s, bool autoscale) const
+  geometry_msgs::msg::Point point, double s /*, bool autoscale*/) const
 {
+  /*
   if (autoscale) {
     s = s / getLength();
   }
-  const auto point_on_curve = getPoint(s, autoscale);
+  */
+  const auto point_on_curve = getPoint(s, false /*autoscale*/);
   double s2 = std::pow(s, 2);
   double x_term_diff = 2 * (point.x - point_on_curve.x) * (-3 * ax_ * s2 - 2 * bx_ * s - cx_);
   double y_term_diff = 2 * (point.y - point_on_curve.y) * (-3 * ay_ * s2 - 2 * by_ * s - cy_);
-  double ret = getSquaredDistanceIn2D(point, s, autoscale) / (x_term_diff + y_term_diff);
+  double ret = getSquaredDistanceIn2D(point, s, false /*autoscale*/) / (x_term_diff + y_term_diff);
   return ret;
 }
 
@@ -337,8 +304,9 @@ double HermiteCurve::get2DCurvature(double s, bool autoscale) const
   return (x_dot * y_dot_dot - x_dot_dot * y_dot) / std::pow(x_dot * x_dot + y_dot * y_dot, 1.5);
 }
 
-double HermiteCurve::getMaximum2DCurvature() const
+std::pair<double, double> HermiteCurve::get2DMinMaxCurvatureValue() const
 {
+  std::pair<double, double> ret;
   std::vector<double> curvatures;
   /**
    * @brief 0.1 is a sampling resolution of the curvature
@@ -347,7 +315,18 @@ double HermiteCurve::getMaximum2DCurvature() const
     double curvature = get2DCurvature(s);
     curvatures.push_back(curvature);
   }
-  return *std::max_element(curvatures.begin(), curvatures.end());
+  ret.first = *std::min_element(curvatures.begin(), curvatures.end());
+  ret.second = *std::max_element(curvatures.begin(), curvatures.end());
+  return ret;
+}
+
+double HermiteCurve::getMaximum2DCurvature() const
+{
+  const auto values = get2DMinMaxCurvatureValue();
+  if (std::fabs(values.first) > std::fabs(values.second)) {
+    return values.first;
+  }
+  return values.second;
 }
 
 double HermiteCurve::getLength(size_t num_points) const

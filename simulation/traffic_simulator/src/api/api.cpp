@@ -30,6 +30,8 @@ metrics::MetricLifecycle API::getMetricLifecycle(const std::string & name)
   return metrics_manager_.getLifecycle(name);
 }
 
+bool API::metricExists(const std::string & name) { return metrics_manager_.exists(name); }
+
 void API::setVerbose(const bool verbose)
 {
   metrics_manager_.setVerbose(verbose);

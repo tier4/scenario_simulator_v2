@@ -37,8 +37,8 @@ public:
   void success();
   void failure(const common::scenario_simulator_exception::SpecificationViolation & error);
   void activate();
-  virtual nlohmann::json to_json() = 0;
-  nlohmann::json to_base_json();
+  virtual nlohmann::json toJson() = 0;
+  nlohmann::json toBaseJson();
   void setEntityManager(
     std::shared_ptr<traffic_simulator::entity::EntityManager> entity_manager_ptr);
   const std::string metrics_type;

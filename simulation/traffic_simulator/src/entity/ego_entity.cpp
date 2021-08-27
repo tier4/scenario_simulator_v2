@@ -14,7 +14,6 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <concealer/autoware_def.hpp>
 #include <functional>
 #include <memory>
 #include <openscenario_msgs/msg/waypoints_array.hpp>
@@ -26,17 +25,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-
-template <typename T>
-auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
 
 namespace traffic_simulator
 {
@@ -67,15 +55,18 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  const auto vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
-#endif
-#ifdef AUTOWARE_AUTO
-  // hard-coded for now
-  // it would require changes in https://github.com/tier4/lexus_description.iv.universe
-  // please, let us know if we should do that
-  const auto vehicle_model_type = "IDEAL_STEER";
-#endif
+  auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
+  std::string vehicle_model_type;
+
+  if (architecture_type == "tier4/proposal") {
+    vehicle_model_type = getParameter<std::string>("vehicle_model_type", "IDEAL_STEER");
+  } else if (architecture_type == "awf/auto") {
+    // hard-coded for now
+    // it would require changes in https://github.com/tier4/lexus_description.iv.universe
+    vehicle_model_type = "IDEAL_STEER";
+  } else {
+    THROW_SEMANTIC_ERROR("Unsupported architecture-type ", architecture_type);
+  }
 
   if (vehicle_model_type == "IDEAL_STEER") {
     return VehicleModelType::IDEAL_STEER;
@@ -138,96 +129,67 @@ auto makeSimulationModel(
   }
 }
 
+auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
+{
+  auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
+
+  if (architecture_type == "tier4/proposal") {
+    return std::make_unique<concealer::AutowareArchitectureProposal>(
+      getParameter<std::string>("autoware_launch_package"),
+      getParameter<std::string>("autoware_launch_file"),
+      "map_path:=" + configuration.map_path.string(),
+      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+      "sensor_model:=" + getParameter<std::string>("sensor_model"),
+      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
+  } else if (architecture_type == "awf/auto") {
+    return std::make_unique<concealer::AutowareAuto>(
+      getParameter<std::string>("autoware_launch_package"),
+      getParameter<std::string>("autoware_launch_file"),
+      "map_path:=" + configuration.map_path.string(),
+      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+      "sensor_model:=" + getParameter<std::string>("sensor_model"),
+      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
+  } else {
+    throw std::invalid_argument("Invalid architecture-type = " + architecture_type);
+  }
+}
+
 EgoEntity::EgoEntity(
   const std::string & name,             //
   const Configuration & configuration,  //
   const double step_time,               //
   const openscenario_msgs::msg::VehicleParameters & parameters)
 : VehicleEntity(name, parameters),
-  autoware(
-    getParameter<std::string>("autoware_launch_package"),
-    getParameter<std::string>("autoware_launch_file"),
-    "map_path:=" + configuration.map_path.string(),
-    "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-    "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-    "sensor_model:=" + getParameter<std::string>("sensor_model"),
-    "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-    "rviz_config:=" + configuration.rviz_config_path.string(),  //
-    "scenario_simulation:=true"),
+  autoware(makeAutoware(configuration)),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
   entity_type_.type = openscenario_msgs::msg::EntityType::EGO;
 }
 
-void EgoEntity::engage() { autoware.engage(); }
+void EgoEntity::engage() { autoware->engage(); }
 
 auto EgoEntity::getVehicleCommand() -> const autoware_vehicle_msgs::msg::VehicleCommand
 {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  return autoware.getVehicleCommand();
-#endif
-#ifdef AUTOWARE_AUTO
-  // gathering information and converting it to autoware_vehicle_msgs::msg::VehicleCommand
-  autoware_vehicle_msgs::msg::VehicleCommand vehicle_command;
-
-  auto vehicle_control_command = autoware.getVehicleControlCommand();
-
-  vehicle_command.header.stamp = vehicle_control_command.stamp;
-
-  vehicle_command.control.steering_angle = vehicle_control_command.front_wheel_angle_rad;
-  vehicle_command.control.velocity = vehicle_control_command.velocity_mps;
-  vehicle_command.control.acceleration = vehicle_control_command.long_accel_mps2;
-
-  auto vehicle_state_command = autoware.getVehicleStateCommand();
-
-  // handle gear enum remapping
-  switch (vehicle_state_command.gear) {
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_DRIVE:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_PARK:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_LOW:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
-      break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
-      vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
-      break;
-  }
-
-  // these fields are hard-coded because they are not present in AutowareAuto
-  vehicle_command.header.frame_id = "";
-  vehicle_command.control.steering_angle_velocity = 0.0;
-  vehicle_command.emergency = 0;
-
-  return vehicle_command;
-#endif
+  return autoware->getVehicleCommand();
 }
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
   std::stringstream message;
-  {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-    // *** getAutowareStatus - FundamentalAPI dependency ***
-    const auto & state = autoware.getAutowareStatus().autoware_state;
 
-    message << (state.empty() ? "Starting" : state)  //
-            << "_(t_=_"                              //
-            << std::fixed                            //
-            << std::setprecision(2)                  //
-            << (status_ ? status_->time : 0)         //
-            << ")";
-#endif
-#ifdef AUTOWARE_AUTO
-    // TODO: implement Autoware.Auto equivalent when state monitoring is there
-#endif
-  }
+  const auto state{autoware->getAutowareStateMessage()};
+
+  message << (state.empty() ? "Starting" : state)  //
+          << "_(t_=_"                              //
+          << std::fixed                            //
+          << std::setprecision(2)                  //
+          << (status_ ? status_->time : 0)         //
+          << ")";
 
   return message.str();
 }
@@ -321,25 +283,7 @@ auto EgoEntity::getObstacle() -> boost::optional<openscenario_msgs::msg::Obstacl
 
 auto EgoEntity::getWaypoints() -> const openscenario_msgs::msg::WaypointsArray
 {
-  openscenario_msgs::msg::WaypointsArray waypoints;
-
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-  // Trajectory returned by getTrajectory() is a different message between AAP and AA
-  for (const auto & point : autoware.getTrajectory().points) {
-    waypoints.waypoints.emplace_back(point.pose.position);
-  }
-#endif
-#ifdef AUTOWARE_AUTO
-  for (const auto & point : autoware.getTrajectory().points) {
-    geometry_msgs::msg::Point waypoint;
-    waypoint.x = point.x;
-    waypoint.y = point.y;
-    waypoint.z = 0;
-    waypoints.waypoints.push_back(waypoint);
-  }
-#endif
-
-  return waypoints;
+  return autoware->getWaypoints();
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)
@@ -365,7 +309,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         initial_pose_.get().orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
     }
 
-    autoware.set(current_pose);
+    autoware->set(current_pose);
 
     geometry_msgs::msg::Twist current_twist;
     {
@@ -373,23 +317,14 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    autoware.set(current_twist);
+    autoware->set(current_twist);
   } else {
     switch (vehicle_model_type_) {
       case VehicleModelType::IDEAL_STEER:
       case VehicleModelType::DELAY_STEER: {
         Eigen::VectorXd input(2);
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        input <<  //
-          autoware.getVehicleCommand().control.velocity,
-          autoware.getVehicleCommand().control.steering_angle;
-#endif
-#ifdef AUTOWARE_AUTO
-        input <<  //
-          autoware.getVehicleControlCommand().velocity_mps,
-          autoware.getVehicleControlCommand().front_wheel_angle_rad;
-#endif
+        input << autoware->getVelocity(), autoware->getSteeringAngle();
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -397,23 +332,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       case VehicleModelType::DELAY_STEER_ACC: {
         Eigen::VectorXd input(3);
 
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        using autoware_vehicle_msgs::msg::Shift;
-
-        input <<  //
-          autoware.getVehicleCommand().control.acceleration,
-          autoware.getVehicleCommand().control.steering_angle,
-          autoware.getVehicleCommand().shift.data == Shift::REVERSE ? -1.0 : 1.0;
-#endif
-#ifdef AUTOWARE_AUTO
-        input <<  //
-          autoware.getVehicleControlCommand().velocity_mps,
-          autoware.getVehicleControlCommand().front_wheel_angle_rad,
-          autoware.getVehicleStateCommand().gear ==
-              autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE
-            ? -1.0
-            : +1.0;
-#endif
+        input << autoware->getAcceleration(), autoware->getSteeringAngle(), autoware->getGearSign();
 
         (*vehicle_model_ptr_).setInput(input);
       } break;
@@ -441,7 +360,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 auto EgoEntity::ready() const -> bool
 {
   // NOTE: Autoware::ready() will notify you with an exception if Autoware has detected any anomalies at the time of the call.
-  return autoware.ready();
+  return autoware->ready();
 }
 
 void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
@@ -460,13 +379,13 @@ void EgoEntity::requestAssignRoute(
 
   assert(0 < route.size());
 
-  if (not autoware.initialized()) {
-    autoware.initialize(getStatus().pose);
-    autoware.plan(route);
+  if (not autoware->initialized()) {
+    autoware->initialize(getStatus().pose);
+    autoware->plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    autoware.plan(route);
-    autoware.engage();
+    autoware->plan(route);
+    autoware->engage();
   }
 }
 
@@ -484,15 +403,15 @@ bool EgoEntity::setStatus(const openscenario_msgs::msg::EntityStatus & status)
 
   const auto current_pose = getStatus().pose;
 
-  if (autoware.initialized()) {
+  if (autoware->initialized()) {
     geometry_msgs::msg::Twist current_twist;
     {
       current_twist.linear.x = (*vehicle_model_ptr_).getVx();
       current_twist.angular.z = (*vehicle_model_ptr_).getWz();
     }
 
-    autoware.set(current_pose);
-    autoware.set(current_twist);
+    autoware->set(current_pose);
+    autoware->set(current_twist);
   }
 
   if (!initial_pose_) {
@@ -507,39 +426,21 @@ void EgoEntity::setTargetSpeed(double value, bool)
   switch (vehicle_model_type_) {
     case VehicleModelType::IDEAL_STEER: {
       Eigen::VectorXd v(3);
-      {
-        v << 0, 0, 0;
-      }
+      v << 0, 0, 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;
 
     case VehicleModelType::DELAY_STEER: {
       Eigen::VectorXd v(5);
-      {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        v << 0, 0, 0, value, 0;
-#endif
-#ifdef AUTOWARE_AUTO
-        // non-zero initial speed prevents behavioral planner from planning
-        v << 0, 0, 0, 0, 0;
-#endif
-      }
+      v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;
 
     case VehicleModelType::DELAY_STEER_ACC: {
       Eigen::VectorXd v(6);
-      {
-#ifdef AUTOWARE_ARCHITECTURE_PROPOSAL
-        v << 0, 0, 0, value, 0, 0;
-#endif
-#ifdef AUTOWARE_AUTO
-        // non-zero initial speed prevents behavioral planner from planning
-        v << 0, 0, 0, 0, 0, 0;
-#endif
-      }
+      v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0, 0;
 
       (*vehicle_model_ptr_).setState(v);
     } break;

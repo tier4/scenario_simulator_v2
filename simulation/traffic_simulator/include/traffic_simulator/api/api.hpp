@@ -100,6 +100,8 @@ public:
 
   metrics::MetricLifecycle getMetricLifecycle(const std::string & name);
 
+  bool metricExists(const std::string & name);
+
   void setVerbose(const bool verbose);
 
   bool spawn(

@@ -26,9 +26,6 @@ class MiscObjectEntity : public EntityBase
 {
 public:
   MiscObjectEntity(
-    const std::string & name, const openscenario_msgs::msg::EntityStatus & initial_state,
-    const openscenario_msgs::msg::MiscObjectParameters & params);
-  MiscObjectEntity(
     const std::string & name, const openscenario_msgs::msg::MiscObjectParameters & params);
   void onUpdate(double, double) override;
   auto getBoundingBox() const -> const openscenario_msgs::msg::BoundingBox override;
