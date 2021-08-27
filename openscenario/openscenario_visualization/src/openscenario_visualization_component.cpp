@@ -89,8 +89,8 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
     markers_.erase(markers_.find(name));
   }
   for (const auto & data : msg->data) {
-    auto marker_array = generateMarker(
-      data.status, data.goal_pose, data.waypoint, data.obstacle, data.obstacle_find);
+    auto marker_array =
+      generateMarker(data.status, data.goal_pose, data.waypoint, data.obstacle, data.obstacle_find);
     std::copy(
       marker_array.markers.begin(), marker_array.markers.end(),
       std::back_inserter(current_marker.markers));
