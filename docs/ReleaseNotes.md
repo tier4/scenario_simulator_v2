@@ -1,20 +1,20 @@
 # Release Notes
 
 ## Difference between the latest release and master
-- Add move_backward scenario. [Link](https://github.com/tier4/scenario_simulator_v2/pull/461)
-- Fix problems in CppScenarioNode::start() function, onInitialize() function was called before starting simulation. (Contribution by [prybicki](https://github.com/prybicki)).
-- Fix problems in initializing current_time value in entity manager class. (Contribution by [Robotec.ai](https://robotec.ai/)).
+- Add `move_backward` scenario. [Link](https://github.com/tier4/scenario_simulator_v2/pull/461)
+- Fix problems in `CppScenarioNode::start()` function, `onInitialize()` function was called before starting simulation (Contribution by [prybicki](https://github.com/prybicki)).
+- Fix problems in initializing `current_time` value in entity manager class (Contribution by [Robotec.ai](https://robotec.ai/)).
 - Supports the option (--architecture-type) to select between AutowareArchitectureProposal and Autoware.Auto (Contribution by [Robotec.ai](https://robotec.ai/)).
 
 ## Version 0.4.4
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.4) on Github :fa-github:
-- Add a new metrics module which detects vel, acc and jerk out of range. (Contribution by [kyabe2718](https://github.com/kyabe2718)).
+- Add a new metrics module which detects vel, acc and jerk out of range (Contribution by [kyabe2718](https://github.com/kyabe2718)).
 - Fix phase control feature in traffic light manager class. [Link](https://github.com/tier4/scenario_simulator_v2/pull/450)
 - Fix problems in crossing entity on crosswalk. [link](https://github.com/tier4/scenario_simulator_v2/pull/452)
 
 ## Version 0.4.3
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.3) on Github :fa-github:
-- Checking collision between crosswalk and waypoints in lane coordinate
+- Checking collision between crosswalk and waypoints in lane coordinate.
 - Remove division in checking collision function in order to avoid zero-division.
 - Enables vehicle entity yield to merging entity. See also [this video](https://user-images.githubusercontent.com/10348912/128287863-8a2db025-d1af-4e54-b5a3-08e5d2e168e4.mp4).
 - Simplify the contents of the scenario test result file `result.junit.xml`.
