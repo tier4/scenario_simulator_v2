@@ -18,7 +18,8 @@
 #include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/optional.hpp>
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_architecture_proposal.hpp>
+#include <concealer/autoware_auto.hpp>
 #include <memory>
 #include <openscenario_msgs/msg/entity_type.hpp>
 #include <string>
@@ -28,6 +29,17 @@
 #include <traffic_simulator/vehicle_model/sim_model_time_delay.hpp>
 #include <unordered_map>
 #include <vector>
+
+template <typename T>
+auto getParameter(const std::string & name, T value = {})
+{
+  rclcpp::Node node{"get_parameter", "simulation"};
+
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
+
+  return value;
+}
 
 namespace traffic_simulator
 {
@@ -47,7 +59,7 @@ enum class VehicleModelType {
 
 class EgoEntity : public VehicleEntity
 {
-  concealer::Autoware autoware;
+  const std::unique_ptr<concealer::Autoware> autoware;
 
   const VehicleModelType vehicle_model_type_;
 
