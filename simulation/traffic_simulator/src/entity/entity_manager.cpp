@@ -598,7 +598,7 @@ void EntityManager::update(const double current_time, const double step_time)
     std::vector<geometry_msgs::msg::Pose> goals;
     getGoalPoses(status.first, goals);
     for (const auto goal : goals) {
-      status_with_traj.goal_poses.push_back(goal);
+      status_with_traj.goal_pose.push_back(goal);
     }
     const auto obstacle = getObstacle(status.first);
     if (obstacle) {
