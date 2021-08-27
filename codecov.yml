@@ -5,3 +5,70 @@ flags:
     paths:
       - simulation
     carryforward: false
+  with_openscenario_interpreter:
+    paths:
+      - simulation
+      - openscenario
+      - test_runner
+      - common
+      - external
+  unittests-concealer:
+    paths:
+      - external/concealer
+    carryforward: false
+  unittests-cpp_mock_scenarios:
+    paths:
+      - mock/cpp_mock_scenarios
+    carryforward: false
+  unittests-kashiwanoha_map:
+    paths:
+      - map/kashiwanoha_map
+    carryforward: false
+  unittests-lanelet2_extension_psim:
+    paths:
+      - external/lanelet2_extension_psim
+    carryforward: false
+  unittests-openscenario_interpreter:
+    paths:
+      - openscenario/openscenario_interpreter
+    carryforward: false
+  unittests-openscenario_msgs:
+    paths:
+      - openscenario/openscenario_msgs
+    carryforward: false
+  unittests-openscenario_utility:
+    paths:
+      - openscenario/openscenario_utility
+    carryforward: false
+  unittests-openscenario_visualization:
+    path:
+      - openscenario/openscenario_visualization
+    carryforward: false
+  unittests-scenario_simulator_exception:
+    path:
+      - common/scenario_simulator_exception
+    carryforward: false
+  unittests-scenario_simulator_v2:
+    path:
+      - scenario_simulator_v2
+    carryforward: false
+  unittests-scenario_test_runner:
+    path:
+      - test_runner/scenario_test_runner
+    carryforward: false
+  unittests-simple_junit:
+    path:
+      - common/simple_junit
+    carryforward: false
+  unittests-simple_sensor_simulator:
+    path:
+      - simulation/simple_sensor_simulator
+    carryforward: false
+  unittests-simulation_interface:
+    path:
+      - simulation/simulation_interface
+    carryforward: false
+  unittests-traffic_simulator:
+    path:
+      - simulation/traffic_simulator
+    carryforward: false
