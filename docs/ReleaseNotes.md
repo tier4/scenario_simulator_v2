@@ -1,7 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
-- Add arrow markers to visualize goal poses of entities.
+- Add arrow markers to visualize goal poses of entities. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 
 ## Version 0.4.4
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.4) on Github :fa-github:
