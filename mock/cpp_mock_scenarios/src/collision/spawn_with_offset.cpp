@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-class SpawnTestScenario : public cpp_mock_scenarios::CppScenarioNode
+class SpawnWithOffsetScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit SpawnTestScenario(const rclcpp::NodeOptions & option)
+  explicit SpawnWithOffsetScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "spanw_test",
       ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
@@ -39,7 +39,16 @@ public:
   }
 
 private:
-  void onUpdate() override {}
+  void onUpdate() override
+  {
+    const auto t = api_.getCurrentTime();
+    if (t > 5) {
+      stop(cpp_mock_scenarios::Result::SUCCESS);
+    } else {
+      if (api_.checkCollision("ego", "bob")) {
+      }
+    }
+  }
 
   void onInitialize() override
   {
@@ -60,7 +69,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<SpawnTestScenario>(options);
+  auto component = std::make_shared<SpawnWithOffsetScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
