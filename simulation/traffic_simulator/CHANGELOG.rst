@@ -2,6 +2,85 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix/offset calculation in lane coordinte (`#476 <https://github.com/tier4/scenario_simulator_v2/issues/476>`_)
+* Merge pull request `#475 <https://github.com/tier4/scenario_simulator_v2/issues/475>`_ from tier4/feature/add_math_test
+* Merge pull request `#437 <https://github.com/tier4/scenario_simulator_v2/issues/437>`_ from RobotecAI/issue/AJD-237-remove_autoware_compilation_flag
+* add getSvalue test
+* modify test cases in getTrajectory
+* add test case for get trajectory function
+* add test case for search backwards
+* fix compile errors
+* remove using
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/misc
+* Feature/metrics test (`#469 <https://github.com/tier4/scenario_simulator_v2/issues/469>`_)
+* Feature/remove unused constructor (`#465 <https://github.com/tier4/scenario_simulator_v2/issues/465>`_)
+* Merge pull request `#464 <https://github.com/tier4/scenario_simulator_v2/issues/464>`_ from tier4/feature/add_math_test
+* fix build and formatting after rebase
+* review changes
+* apply clang-format
+* cleanup
+* AAP acceleration fix
+* make Autoware switch based on autoware_type parameter
+* AAP builds
+* first version that builds without flag and works with AA on autoware-simple scenario
+* move Autoware differences from ego_entity to concealer
+* WIP: move Autoware differences from ego_entity to concealer
+* remove unused temporal value
+* add collision test case
+* add subdirectory
+* enable matrix test
+* add test cases for solve quadratic equation
+* fix quadratic function ans
+* add quadratic function case
+* add LinerFunction case
+* add range test
+* add LinerFunction
+* update uuid test case
+* change test name
+* remove math.cpp
+* add uuid case
+* modify testcase name
+* add bounding box test case
+* add subdirectory
+* add catmull rom spline test cases
+* remove unused code
+* remove unused test case
+* add fixture class
+* add hermite curve test cases
+* change test case name
+* split test cases
+* add test cases for getCollisionPositionIn2D function
+* add test case for auto scale
+* initialize current_time\_ with negative value so setTargetSpped and setTargetVelocity are deterministic (`#462 <https://github.com/tier4/scenario_simulator_v2/issues/462>`_)
+* Feature/move backward action (`#461 <https://github.com/tier4/scenario_simulator_v2/issues/461>`_)
+* Merge pull request `#457 <https://github.com/tier4/scenario_simulator_v2/issues/457>`_ from tier4/feature/math_test
+* fix typo
+* add // LCOV_EXCL_LINE
+* chceck
+* add test cases
+* add  // LCOV_EXCL_LINE
+* add  // LCOV_EXCL_LINE
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* add // LCOV_EXCL_LINE
+* add // LCOV_EXCL_LINE
+* remove unused message
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
+* add test case in maximum curventure
+* add get2DMinMaxCurventureValue function
+* adding test cases
+* remove unused message
+* add error test
+* modify error message
+* remove unused constractor
+* remove unused line
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge branch 'master' into AJD-238_scenario_validation
+* Contributors: Daniel Marczak, Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, yamacir-kit
+
 0.4.4 (2021-08-20)
 ------------------
 * Merge pull request `#451 <https://github.com/tier4/scenario_simulator_v2/issues/451>`_ from tier4/feature/out-of-range-metric

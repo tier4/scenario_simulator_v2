@@ -2,6 +2,30 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#437 <https://github.com/tier4/scenario_simulator_v2/issues/437>`_ from RobotecAI/issue/AJD-237-remove_autoware_compilation_flag
+* review changes
+* cleanup
+* autoware auto launch dependency in scenario test runner
+* make Autoware switch based on autoware_type parameter
+* introduce ROS param for autoware_type
+* switch to AutowareAuto
+* code review fixes
+* Merge pull request `#444 <https://github.com/tier4/scenario_simulator_v2/issues/444>`_ from tier4/feature/interpreter/cleanup-error-messages
+* Fix SyntaxError `Init.Actions should end immediately` of test scenario `Property.isBlind`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
+* Add member function 'Interpreter::publishCurrentContext'
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Lipsticks
+* Merge branch 'master' into AJD-238_scenario_validation
+* removed validation from scenario_test_runner
+* removed unused import
+* added test scenario with different routing goal and end condition
+* ReachPositionConditionValidator added
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, yamacir-kit
+
 0.4.4 (2021-08-20)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios
