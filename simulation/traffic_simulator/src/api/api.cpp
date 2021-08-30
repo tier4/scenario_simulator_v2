@@ -130,7 +130,6 @@ bool API::spawn(
   simulation_interface::toProto(params, *req.mutable_parameters());
   spawn_misc_object_entity_client_.call(req, res);
   return res.result().success();
-  return true;
 }
 
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
