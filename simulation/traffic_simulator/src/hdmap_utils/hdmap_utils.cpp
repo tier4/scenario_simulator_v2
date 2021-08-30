@@ -764,11 +764,12 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   rpy.x = 0.0;
   rpy.y = 0.0;
   rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
+  rpy = quaternion_operation::convertQuaternionToEulerAngle(
+    quaternion_operation::convertEulerAngleToQuaternion(rpy) * quat);
   ret.pose.position.x = ret.pose.position.x - std::sin(rpy.z) * offset;
   ret.pose.position.y = ret.pose.position.y - std::cos(rpy.z) * offset;
   ret.pose.position.z = ret.pose.position.z;
   ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  ret.pose.orientation = ret.pose.orientation * quat;
   return ret;
 }
 

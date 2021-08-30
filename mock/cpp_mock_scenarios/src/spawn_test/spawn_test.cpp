@@ -26,27 +26,26 @@
 #include <string>
 #include <vector>
 
-class AccelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
+class SpawnTestScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit AccelerateAndFollowScenario(const rclcpp::NodeOptions & option)
+  explicit SpawnTestScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "spanw_test", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
+      "spanw_test",
+      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
       "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
   {
     start();
   }
 
 private:
-  void onUpdate() override
-  {
-  }
+  void onUpdate() override {}
 
   void onInitialize() override
   {
     api_.spawn(false, "ego", getVehicleParameters());
     api_.setEntityStatus(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.2, 0.9734),
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0.2, 1.3),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("ego", 0, true);
     api_.spawn(
@@ -61,7 +60,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<AccelerateAndFollowScenario>(options);
+  auto component = std::make_shared<SpawnTestScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

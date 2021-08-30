@@ -28,7 +28,7 @@ struct Catalog
             <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
             <BoundingBox>
                 <Center x='1.5' y='0.0' z='0.9'/>
-                <Dimensions width='2.1' length='4.5' height='1.8'/>
+                <Dimensions width='1.245' length='2.178' height='1.87'/>
             </BoundingBox>
             <Axles>
                 <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
@@ -43,8 +43,8 @@ struct Catalog
     R"(
     <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
             <BoundingBox>
-                <Center x='0.0' y='0.0' z='0.5'/>
-                <Dimensions width='1.0' length='1.0' height='2.0'/>
+                <Center x='0.0' y='0.0' z='1.0'/>
+                <Dimensions width='0.8' length='0.8' height='2.0'/>
             </BoundingBox>
             <Properties/>
         </Pedestrian>)";
