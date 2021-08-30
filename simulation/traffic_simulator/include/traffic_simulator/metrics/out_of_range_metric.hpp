@@ -42,6 +42,16 @@ public:
   {
   }
 
+  /**
+   * @brief Construct a new Out Of Range Metric object
+   * @param target_entity Name of target entity
+   * @param min_velocity If the velocity of the target entity go below this value, this metrics becomes failure state.
+   * @param max_velocity If the velocity of the target entity overs this value, this metrics becomes failure state.
+   * @param min_acceleration If the acceleration of the target entity go below this value, this metrics becomes failure state.
+   * @param max_acceleration If the acceleration of the target entity overs this value, this metrics becomes failure state.
+   * @param min_jerk If the jerk of the target entity go below this value, this metrics becomes failure state.
+   * @param max_jerk If the jerk of the target entity overs this value, this metrics becomes failure state.
+   */
   OutOfRangeMetric(
     std::string target_entity, double min_velocity, double max_velocity, double min_acceleration,
     double max_acceleration, double min_jerk, double max_jerk)
@@ -58,7 +68,7 @@ public:
 
   void update() override;
   bool activateTrigger() override { return true; }
-  nlohmann::json to_json() override;
+  nlohmann::json toJson() override;
 
   const std::string target_entity;
   const double min_velocity;

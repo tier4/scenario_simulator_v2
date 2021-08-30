@@ -17,6 +17,7 @@
 
 #include <traffic_simulator/metrics/metric_base.hpp>
 #include <traffic_simulator/metrics/momentary_stop_metric.hpp>
+#include <traffic_simulator/metrics/out_of_range_metric.hpp>
 #include <traffic_simulator/metrics/reaction_time_metric.hpp>
 #include <traffic_simulator/metrics/traveled_distance_metric.hpp>
 

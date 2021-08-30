@@ -58,7 +58,7 @@ struct Failure
 
   friend auto operator<<(std::ostream & os, const Failure & failure) -> std::ostream &
   {
-    return os << "\x1b[33m" << failure.type << ": " << failure.message << "\x1b[0m";
+    return os << "\x1b[1;31m" << failure.type << ": " << failure.message << "\x1b[0m";
   }
 
   friend auto operator<<(pugi::xml_node node, const Failure & failure) -> pugi::xml_node
@@ -94,7 +94,7 @@ struct Error
 
   friend auto operator<<(std::ostream & os, const Error & error) -> std::ostream &
   {
-    return os << "\x1b[31m" << error.type << ": " << error.message << "\x1b[0m";
+    return os << "\x1b[1;31m" << error.type << ": " << error.message << "\x1b[0m";
   }
 
   friend auto operator<<(pugi::xml_node node, const Error & error) -> pugi::xml_node

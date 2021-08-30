@@ -41,15 +41,14 @@ boost::optional<double> getPolygonDistance(
 {
   const auto poly0 = get2DPolygon(pose0, bbox0);
   const auto poly1 = get2DPolygon(pose1, bbox1);
-  namespace bg = boost::geometry;
-  if (bg::intersects(poly0, poly1)) {
+  if (boost::geometry::intersects(poly0, poly1)) {
     return boost::none;
   }
-  if (bg::intersects(poly1, poly0)) {
+  if (boost::geometry::intersects(poly1, poly0)) {
     return boost::none;
   }
-  if (bg::disjoint(poly0, poly1)) {
-    return bg::distance(poly0, poly1);
+  if (boost::geometry::disjoint(poly0, poly1)) {
+    return boost::geometry::distance(poly0, poly1);
   }
   return boost::none;
 }
@@ -58,9 +57,8 @@ const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<doubl
   const geometry_msgs::msg::Pose & pose, const openscenario_msgs::msg::BoundingBox & bbox)
 {
   auto points = transformPoints(pose, getPointsFromBbox(bbox));
-  namespace bg = boost::geometry;
-  typedef bg::model::d2::point_xy<double> bg_point;
-  bg::model::polygon<bg_point> poly;
+  typedef boost::geometry::model::d2::point_xy<double> bg_point;
+  boost::geometry::model::polygon<bg_point> poly;
   poly.outer().push_back(bg_point(points[0].x, points[0].y));
   poly.outer().push_back(bg_point(points[1].x, points[1].y));
   poly.outer().push_back(bg_point(points[2].x, points[2].y));

@@ -31,11 +31,19 @@ MetricsManager::MetricsManager(
 {
 }
 
+bool MetricsManager::exists(const std::string & name) const
+{
+  if (metrics_.find(name) == metrics_.end()) {
+    return false;
+  }
+  return true;
+}
+
 void MetricsManager::setVerbose(const bool verbose) { verbose_ = verbose; }
 
 MetricLifecycle MetricsManager::getLifecycle(const std::string & name)
 {
-  if (metrics_.find(name) == metrics_.end()) {
+  if (!exists(name)) {
     THROW_SEMANTIC_ERROR("metrics name : ", name, " does not exist.");
   }
   return metrics_.at(name)->getLifecycle();
@@ -54,7 +62,7 @@ void MetricsManager::calculate()
     if (metric.second->getLifecycle() == MetricLifecycle::ACTIVE) {
       metric.second->update();
     }
-    log[metric.first] = metric.second->to_json();
+    log[metric.first] = metric.second->toJson();
     if (verbose_) {
       std::cout << "metric : " << metric.first << " => " << log[metric.first] << std::endl;
     }
@@ -68,7 +76,7 @@ void MetricsManager::calculate()
     if (metrics_[name]->getLifecycle() == MetricLifecycle::FAILURE) {
       metrics_[name]->throwException();
     }
-    metrics_.erase(name);
+    // metrics_.erase(name);
   }
   log_[std::to_string(entity_manager_ptr_->getCurrentTime())] = log;
   file_ << log_;

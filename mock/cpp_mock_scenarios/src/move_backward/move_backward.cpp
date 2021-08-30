@@ -40,13 +40,16 @@ public:
 private:
   void onUpdate() override
   {
+    // LCOV_EXCL_START
     if (api_.getCurrentTime() > 5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
+    // LCOV_EXCL_START
     double ego_twist = api_.getEntityStatus("ego").action_status.twist.linear.x;
     if (ego_twist >= -2.9) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+    // LCOV_EXCL_STOP
   }
 
   void onInitialize() override
