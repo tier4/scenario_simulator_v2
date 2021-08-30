@@ -2,6 +2,24 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2021-08-30)
+------------------
+* Merge pull request `#412 <https://github.com/tier4/scenario_simulator_v2/issues/412>`_ from RobotecAI/AJD-238_scenario_validation
+* code review fixes
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* added parameter for selection of validators
+* added method validate-workflow
+* init commit for validate-workflow
+* Merge branch 'master' into AJD-238_scenario_validation
+* scenario validator for files working as seperate executable
+* scenario validation code moved to seperate file
+* restored validation.py file
+* code review fixes
+* ReachPositionConditionValidator added
+* Contributors: MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, yamacir-kit
+
 0.4.4 (2021-08-20)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios

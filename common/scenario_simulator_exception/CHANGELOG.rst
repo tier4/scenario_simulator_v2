@@ -2,6 +2,17 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2021-08-30)
+------------------
+* Merge pull request `#444 <https://github.com/tier4/scenario_simulator_v2/issues/444>`_ from tier4/feature/interpreter/cleanup-error-messages
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Simplify Error type definitions
+* Merge branch 'master' into AJD-238_scenario_validation
+* Contributors: Masaya Kataoka, MasayaKataoka, Wojciech Jaworski, yamacir-kit
+
 0.4.4 (2021-08-20)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios

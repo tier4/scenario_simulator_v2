@@ -2,6 +2,23 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2021-08-30)
+------------------
+* Fix/offset calculation in lane coordinte (`#476 <https://github.com/tier4/scenario_simulator_v2/issues/476>`_)
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/misc
+* Feature/metrics test (`#469 <https://github.com/tier4/scenario_simulator_v2/issues/469>`_)
+* Feature/mock coverage (`#467 <https://github.com/tier4/scenario_simulator_v2/issues/467>`_)
+* Feature/move backward action (`#461 <https://github.com/tier4/scenario_simulator_v2/issues/461>`_)
+* Merge pull request `#459 <https://github.com/tier4/scenario_simulator_v2/issues/459>`_ from prybicki/patch-2
+* Fix usage of uninitialized ZMQ API
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge branch 'master' into AJD-238_scenario_validation
+* Contributors: Masaya Kataoka, MasayaKataoka, Peter Rybicki, Wojciech Jaworski, yamacir-kit
+
 0.4.4 (2021-08-20)
 ------------------
 * Merge pull request `#452 <https://github.com/tier4/scenario_simulator_v2/issues/452>`_ from tier4/fix/stop_at_crossing_entity_behavior
