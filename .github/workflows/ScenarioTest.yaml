@@ -96,11 +96,18 @@ jobs:
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
           ros2 run scenario_test_runner result_checker /tmp/scenario_test_runner/result.junit.xml
 
-      - name: Run idiot NPC scenario
+      - name: Run crashing NPC scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=idiot_npc timeout:=5 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc timeout:=5 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run spawn with offset scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=spawn_with_offset timeout:=15
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run traffic simulation demo scenario

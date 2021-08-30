@@ -5,6 +5,7 @@
 - Fix problems in `CppScenarioNode::start()` function, `onInitialize()` function was called before starting simulation (Contribution by [prybicki](https://github.com/prybicki)).
 - Fix problems in initializing `current_time` value in entity manager class (Contribution by [Robotec.ai](https://robotec.ai/)).
 - Supports the option (--architecture-type) to select between AutowareArchitectureProposal and Autoware.Auto (Contribution by [Robotec.ai](https://robotec.ai/)).
+- Fix problems in HdMap::toMapPose function, offset distance was calculated from tangent vector. [Link](https://github.com/tier4/scenario_simulator_v2/pull/476)
 
 ## Version 0.4.4
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.4) on Github :fa-github:
