@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.5 (2021-08-30)
+------------------
 * Fix/offset calculation in lane coordinte (`#476 <https://github.com/tier4/scenario_simulator_v2/issues/476>`_)
 * Merge remote-tracking branch 'origin/master' into fix/interpreter/misc
 * Feature/metrics test (`#469 <https://github.com/tier4/scenario_simulator_v2/issues/469>`_)

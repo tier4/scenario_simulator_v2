@@ -2,8 +2,8 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.5 (2021-08-30)
+------------------
 * Merge pull request `#412 <https://github.com/tier4/scenario_simulator_v2/issues/412>`_ from RobotecAI/AJD-238_scenario_validation
 * code review fixes
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages

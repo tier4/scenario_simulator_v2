@@ -2,8 +2,8 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.5 (2021-08-30)
+------------------
 * Merge pull request `#457 <https://github.com/tier4/scenario_simulator_v2/issues/457>`_ from tier4/feature/math_test
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
 * remove unused message

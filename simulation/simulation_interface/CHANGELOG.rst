@@ -2,8 +2,8 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.5 (2021-08-30)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages

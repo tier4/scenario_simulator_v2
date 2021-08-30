@@ -2,8 +2,8 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.5 (2021-08-30)
+------------------
 * Merge pull request `#472 <https://github.com/tier4/scenario_simulator_v2/issues/472>`_ from tier4/fix/interpreter/misc
 * Change junit::Failure's output color to red from yellow
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
