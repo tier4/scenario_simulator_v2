@@ -26,12 +26,13 @@
 #include <string>
 #include <vector>
 
-class AccelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
+class PhaseControlScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit AccelerateAndFollowScenario(const rclcpp::NodeOptions & option)
+  explicit PhaseControlScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
+      "phase_control",
+      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
       "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
   {
     start();
@@ -80,7 +81,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<AccelerateAndFollowScenario>(options);
+  auto component = std::make_shared<PhaseControlScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
