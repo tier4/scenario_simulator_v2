@@ -1,6 +1,9 @@
 # Release Notes
 
 ## Difference between the latest release and master
+
+## Version 0.4.5
+- [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.5) on Github :fa-github:
 - Add `move_backward` scenario. [Link](https://github.com/tier4/scenario_simulator_v2/pull/461)
 - Fix problems in `CppScenarioNode::start()` function, `onInitialize()` function was called before starting simulation (Contribution by [prybicki](https://github.com/prybicki)).
 - Fix problems in initializing `current_time` value in entity manager class (Contribution by [Robotec.ai](https://robotec.ai/)).
