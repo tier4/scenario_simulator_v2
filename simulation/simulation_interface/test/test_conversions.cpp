@@ -212,12 +212,34 @@ TEST(Conversion, VehicleParametrs)
 {
   openscenario_msgs::VehicleParameters proto;
   openscenario_msgs::msg::VehicleParameters p;
-  // p.property.is_ego = true;
+  p.name = "foo";
+  p.vehicle_category = "bar";
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  p.bounding_box = box;
+  openscenario_msgs::msg::Performance performance;
+  performance.max_speed = 10;
+  performance.max_deceleration = 3;
+  p.performance = performance;
+  openscenario_msgs::msg::Axle axle;
+  axle.max_steering = 30;
+  axle.position_x = 3;
+  axle.position_z = 14;
+  axle.track_width = -10;
+  axle.wheel_diameter = 53;
+  p.axles.front_axle = axle;
+  p.axles.rear_axle = axle;
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
-  // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
-  // p.property.is_ego = false;
+  EXPECT_VEHICLE_PARAMETERS_EQ(p, proto);
+  p = openscenario_msgs::msg::VehicleParameters();
+  EXPECT_DOUBLE_EQ(p.bounding_box.dimensions.x, 0);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
-  // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
+  EXPECT_VEHICLE_PARAMETERS_EQ(p, proto);
 }
 
 TEST(Conversion, PedestrianParametrs)

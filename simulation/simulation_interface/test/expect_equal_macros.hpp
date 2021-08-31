@@ -93,6 +93,13 @@
   EXPECT_POINT_EQ(msg.center, proto.center()); \
   EXPECT_VECTOR3_EQ(msg.dimensions, proto.dimensions());
 
+#define EXPECT_VEHICLE_PARAMETERS_EQ(msg, proto)                                \
+  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());                         \
+  EXPECT_STREQ(msg.vehicle_category.c_str(), proto.vehicle_category().c_str()); \
+  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());               \
+  EXPECT_PERFORMANCE_EQ(msg.performance, proto.performance());                  \
+  EXPECT_AXLES_EQ(msg.axles, proto.axles());
+
 /**
  * @brief Expect equal macros for autoware related messages.
  */
