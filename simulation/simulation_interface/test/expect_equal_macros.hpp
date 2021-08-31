@@ -29,19 +29,17 @@
 #include <string>
 
 /**
- * @brief Macros for checking ROS2 message and protobuf structure is equal.
+ * @brief Expect equal macros for std_msgs.
  */
-
-#define EXPECT_CONTROL_COMMAND_EQ(msg, proto)                                     \
-  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());                               \
-  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
-  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
-  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
 
 #define EXPECT_HEADER_EQ(msg, proto)                            \
   EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str()); \
   EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());                \
   EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
+
+/**
+ * @brief Expect equal macros for geometry_msgs.
+ */
 
 #define EXPECT_POINT_EQ(msg, proto)   \
   EXPECT_DOUBLE_EQ(msg.x, proto.x()); \
@@ -71,6 +69,10 @@
   EXPECT_VECTOR3_EQ(msg.linear, proto.linear()); \
   EXPECT_VECTOR3_EQ(msg.angular, proto.angular());
 
+/**
+ * @brief Expect equal macros for openscenario_msgs.
+ */
+
 #define EXPECT_PERFORMANCE_EQ(msg, proto)                           \
   EXPECT_DOUBLE_EQ(msg.max_speed, proto.max_speed());               \
   EXPECT_DOUBLE_EQ(msg.max_acceleration, proto.max_acceleration()); \
@@ -86,5 +88,15 @@
 #define EXPECT_AXLES_EQ(msg, proto)                  \
   EXPECT_AXLE_EQ(msg.front_axle, proto.front_axle()) \
   EXPECT_AXLE_EQ(msg.rear_axle, proto.rear_axle())
+
+/**
+ * @brief Expect equal macros for autoware related messages.
+ */
+
+#define EXPECT_CONTROL_COMMAND_EQ(msg, proto)                                     \
+  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());                               \
+  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
+  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
+  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
 
 #endif  //
