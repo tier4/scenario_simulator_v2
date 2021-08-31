@@ -37,7 +37,7 @@ def architecture_types():
 def default_autoware_launch_package_of(architecture_type):
     if architecture_type not in architecture_types():
         raise KeyError(
-            f"architecture_type = {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
         )
     return {
         "awf/auto": "scenario_test_runner_launch",
@@ -48,7 +48,7 @@ def default_autoware_launch_package_of(architecture_type):
 def default_autoware_launch_file_of(architecture_type):
     if architecture_type not in architecture_types():
         raise KeyError(
-            f"architecture_type = {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
         )
     return {
         "awf/auto": "autoware_auto.launch.py",
@@ -64,44 +64,50 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
     global_timeout          = LaunchConfiguration("global_timeout",          default=180)
+    launch_autoware         = LaunchConfiguration("launch_autoware",         default=True)
     launch_rviz             = LaunchConfiguration("launch_rviz",             default=False)
     output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
+    port                    = LaunchConfiguration("port",                    default=8080)
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
     workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
     # fmt: on
 
-    port = 8080
+    print(f"architecture_type       := {architecture_type.perform(context)}")
+    print(f"autoware_launch_file    := {autoware_launch_file.perform(context)}")
+    print(f"autoware_launch_package := {autoware_launch_package.perform(context)}")
+    print(f"global_frame_rate       := {global_frame_rate.perform(context)}")
+    print(f"global_real_time_factor := {global_real_time_factor.perform(context)}")
+    print(f"global_timeout          := {global_timeout.perform(context)}")
+    print(f"launch_autoware         := {launch_autoware.perform(context)}")
+    print(f"launch_rviz             := {launch_rviz.perform(context)}")
+    print(f"output_directory        := {output_directory.perform(context)}")
+    print(f"port                    := {port.perform(context)}")
+    print(f"scenario                := {scenario.perform(context)}")
+    print(f"sensor_model            := {sensor_model.perform(context)}")
+    print(f"vehicle_model           := {vehicle_model.perform(context)}")
+    print(f"workflow                := {workflow.perform(context)}")
 
     def make_parameters():
-        print(f"architecture_type       = {architecture_type.perform(context)}")
-        print(f"autoware_launch_file    = {autoware_launch_file.perform(context)}")
-        print(f"autoware_launch_package = {autoware_launch_package.perform(context)}")
-        print(f"vehicle_model           = {vehicle_model.perform(context)}")
-
         parameters = [
+            {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
-            {"architecture_type": architecture_type},
+            {"launch_autoware": launch_autoware},
             {"port": port},
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
         ]
 
+        def description():
+            return get_package_share_directory(
+                vehicle_model.perform(context) + "_description"
+            )
+
         if vehicle_model.perform(context):
-            parameters.append(
-                get_package_share_directory(
-                    vehicle_model.perform(context) + "_description"
-                )
-                + "/config/vehicle_info.param.yaml"
-            )
-            parameters.append(
-                get_package_share_directory(
-                    vehicle_model.perform(context) + "_description"
-                )
-                + "/config/simulator_model.param.yaml"
-            )
+            parameters.append(description() + "/config/vehicle_info.param.yaml")
+            parameters.append(description() + "/config/simulator_model.param.yaml")
 
         return parameters
 
@@ -113,6 +119,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_frame_rate",       default_value=global_frame_rate      ),
         DeclareLaunchArgument("global_real_time_factor", default_value=global_real_time_factor),
         DeclareLaunchArgument("global_timeout",          default_value=global_timeout         ),
+        DeclareLaunchArgument("launch_autoware",         default_value=launch_autoware        ),
         DeclareLaunchArgument("launch_rviz",             default_value=launch_rviz            ),
         DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
         DeclareLaunchArgument("scenario",                default_value=scenario               ),
@@ -128,18 +135,14 @@ def launch_setup(context, *args, **kwargs):
             output="screen",
             on_exit=Shutdown(),
             arguments=[
-                "--global-frame-rate",
-                global_frame_rate,
-                "--global-real-time-factor",
-                global_real_time_factor,
-                "--global-timeout",
-                global_timeout,
-                "--output-directory",
-                output_directory,
-                "--scenario",
-                scenario,
-                "--workflow",
-                workflow,
+                # fmt: off
+                "--global-frame-rate",       global_frame_rate,
+                "--global-real-time-factor", global_real_time_factor,
+                "--global-timeout",          global_timeout,
+                "--output-directory",        output_directory,
+                "--scenario",                scenario,
+                "--workflow",                workflow,
+                # fmt: on
             ],
         ),
         Node(
