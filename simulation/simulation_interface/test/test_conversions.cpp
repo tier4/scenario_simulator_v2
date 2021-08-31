@@ -51,6 +51,19 @@
   EXPECT_QUATERNION_EQ(msg.orientation, proto.orientation()); \
   EXPECT_POINT_EQ(msg.position, proto.position());
 
+#define EXPECT_VECTOR3_EQ(msg, proto) \
+  EXPECT_DOUBLE_EQ(msg.x, proto.x()); \
+  EXPECT_DOUBLE_EQ(msg.y, proto.y()); \
+  EXPECT_DOUBLE_EQ(msg.z, proto.z());
+
+#define EXPECT_TWIST_EQ(msg, proto)              \
+  EXPECT_VECTOR3_EQ(msg.linear, proto.linear()); \
+  EXPECT_VECTOR3_EQ(msg.angular, proto.angular());
+
+#define EXPECT_ACCEL_EQ(msg, proto)              \
+  EXPECT_VECTOR3_EQ(msg.linear, proto.linear()); \
+  EXPECT_VECTOR3_EQ(msg.angular, proto.angular());
+
 void checkActionStatus(
   openscenario_msgs::ActionStatus proto, openscenario_msgs::msg::ActionStatus action)
 {
@@ -127,15 +140,11 @@ TEST(Conversion, Vector)
   vec.y = 2;
   vec.z = 3.0;
   simulation_interface::toProto(vec, proto);
-  EXPECT_DOUBLE_EQ(vec.x, proto.x());
-  EXPECT_DOUBLE_EQ(vec.y, proto.y());
-  EXPECT_DOUBLE_EQ(vec.z, proto.z());
+  EXPECT_VECTOR3_EQ(vec, proto);
   vec = geometry_msgs::msg::Vector3();
   EXPECT_DOUBLE_EQ(vec.x, 0);
   simulation_interface::toMsg(proto, vec);
-  EXPECT_DOUBLE_EQ(vec.x, proto.x());
-  EXPECT_DOUBLE_EQ(vec.y, proto.y());
-  EXPECT_DOUBLE_EQ(vec.z, proto.z());
+  EXPECT_VECTOR3_EQ(vec, proto);
 }
 
 TEST(Conversion, Twist)
@@ -146,21 +155,11 @@ TEST(Conversion, Twist)
   twist.linear.y = 2;
   twist.linear.z = 3.0;
   simulation_interface::toProto(twist, proto);
-  EXPECT_DOUBLE_EQ(twist.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(twist.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(twist.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(twist.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(twist.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(twist.angular.z, proto.angular().z());
+  EXPECT_TWIST_EQ(twist, proto);
   twist = geometry_msgs::msg::Twist();
   EXPECT_DOUBLE_EQ(twist.linear.x, 0);
   simulation_interface::toMsg(proto, twist);
-  EXPECT_DOUBLE_EQ(twist.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(twist.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(twist.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(twist.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(twist.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(twist.angular.z, proto.angular().z());
+  EXPECT_TWIST_EQ(twist, proto);
 }
 
 TEST(Conversion, Accel)
@@ -171,21 +170,11 @@ TEST(Conversion, Accel)
   accel.linear.y = 2;
   accel.linear.z = 3.0;
   simulation_interface::toProto(accel, proto);
-  EXPECT_DOUBLE_EQ(accel.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(accel.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(accel.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(accel.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(accel.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
+  EXPECT_ACCEL_EQ(accel, proto);
   accel = geometry_msgs::msg::Accel();
   EXPECT_DOUBLE_EQ(accel.linear.x, 0);
   simulation_interface::toMsg(proto, accel);
-  EXPECT_DOUBLE_EQ(accel.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(accel.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(accel.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(accel.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(accel.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
+  EXPECT_ACCEL_EQ(accel, proto);
 }
 
 TEST(Conversion, Performance)
