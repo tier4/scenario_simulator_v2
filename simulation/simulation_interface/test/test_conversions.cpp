@@ -25,6 +25,10 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 
+/**
+ * @brief Macros for checking ROS2 message and protobuf structure is equal.
+ */
+
 #define EXPECT_CONTROL_COMMAND_EQ(msg, proto)                                     \
   EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());                               \
   EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
@@ -64,6 +68,22 @@
   EXPECT_VECTOR3_EQ(msg.linear, proto.linear()); \
   EXPECT_VECTOR3_EQ(msg.angular, proto.angular());
 
+#define EXPECT_PERFORMANCE_EQ(msg, proto)                           \
+  EXPECT_DOUBLE_EQ(msg.max_speed, proto.max_speed());               \
+  EXPECT_DOUBLE_EQ(msg.max_acceleration, proto.max_acceleration()); \
+  EXPECT_DOUBLE_EQ(msg.max_deceleration, proto.max_deceleration());
+
+#define EXPECT_AXLE_EQ(msg, proto)                              \
+  EXPECT_DOUBLE_EQ(msg.max_steering, proto.max_steering());     \
+  EXPECT_DOUBLE_EQ(msg.wheel_diameter, proto.wheel_diameter()); \
+  EXPECT_DOUBLE_EQ(msg.track_width, proto.track_width());       \
+  EXPECT_DOUBLE_EQ(msg.position_x, proto.position_x());         \
+  EXPECT_DOUBLE_EQ(msg.position_z, proto.position_z());
+
+#define EXPECT_AXLES_EQ(msg, proto)                  \
+  EXPECT_AXLE_EQ(msg.front_axle, proto.front_axle()) \
+  EXPECT_AXLE_EQ(msg.rear_axle, proto.rear_axle())
+
 void checkActionStatus(
   openscenario_msgs::ActionStatus proto, openscenario_msgs::msg::ActionStatus action)
 {
@@ -81,6 +101,10 @@ void checkActionStatus(
   EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
   EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
 }
+
+/**
+ * @brief Test cases
+ */
 
 TEST(Conversion, Point)
 {
@@ -184,15 +208,14 @@ TEST(Conversion, Performance)
   performance.max_speed = 10;
   performance.max_deceleration = 3;
   simulation_interface::toProto(performance, proto);
+  EXPECT_PERFORMANCE_EQ(performance, proto);
   EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
   EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
   EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
   performance = openscenario_msgs::msg::Performance();
   EXPECT_DOUBLE_EQ(performance.max_speed, 0);
   simulation_interface::toMsg(proto, performance);
-  EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
-  EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
-  EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
+  EXPECT_PERFORMANCE_EQ(performance, proto);
 }
 
 TEST(Conversion, Axle)
@@ -205,19 +228,11 @@ TEST(Conversion, Axle)
   axle.track_width = -10;
   axle.wheel_diameter = 53;
   simulation_interface::toProto(axle, proto);
-  EXPECT_DOUBLE_EQ(axle.max_steering, proto.max_steering());
-  EXPECT_DOUBLE_EQ(axle.position_x, proto.position_x());
-  EXPECT_DOUBLE_EQ(axle.position_z, proto.position_z());
-  EXPECT_DOUBLE_EQ(axle.track_width, proto.track_width());
-  EXPECT_DOUBLE_EQ(axle.wheel_diameter, proto.wheel_diameter());
+  EXPECT_AXLE_EQ(axle, proto);
   axle = openscenario_msgs::msg::Axle();
   EXPECT_DOUBLE_EQ(axle.max_steering, 0);
   simulation_interface::toMsg(proto, axle);
-  EXPECT_DOUBLE_EQ(axle.max_steering, proto.max_steering());
-  EXPECT_DOUBLE_EQ(axle.position_x, proto.position_x());
-  EXPECT_DOUBLE_EQ(axle.position_z, proto.position_z());
-  EXPECT_DOUBLE_EQ(axle.track_width, proto.track_width());
-  EXPECT_DOUBLE_EQ(axle.wheel_diameter, proto.wheel_diameter());
+  EXPECT_AXLE_EQ(axle, proto);
 }
 
 TEST(Conversion, Axles)
@@ -235,44 +250,12 @@ TEST(Conversion, Axles)
   axles.rear_axle.track_width = 14;
   axles.rear_axle.wheel_diameter = 122;
   simulation_interface::toProto(axles, proto);
-  EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, proto.front_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_x, proto.front_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_z, proto.front_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.front_axle.track_width, proto.front_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.front_axle.wheel_diameter, proto.front_axle().wheel_diameter());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.max_steering, proto.rear_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_x, proto.rear_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_z, proto.rear_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.track_width, proto.rear_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
+  EXPECT_AXLES_EQ(axles, proto);
   axles = openscenario_msgs::msg::Axles();
   EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, 0);
   simulation_interface::toMsg(proto, axles);
-  EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, proto.front_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_x, proto.front_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_z, proto.front_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.front_axle.track_width, proto.front_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.front_axle.wheel_diameter, proto.front_axle().wheel_diameter());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.max_steering, proto.rear_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_x, proto.rear_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_z, proto.rear_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.track_width, proto.rear_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
+  EXPECT_AXLES_EQ(axles, proto);
 }
-
-/*
-TEST(Conversion, Property)
-{
-  openscenario_msgs::Property proto;
-  openscenario_msgs::msg::Property p;
-  EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
-  EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
-  // p.is_ego = true;
-  // EXPECT_EQ(proto.is_ego(), p.is_ego);
-  // p.is_ego = false;
-  // EXPECT_EQ(proto.is_ego(), p.is_ego);
-}
-*/
 
 TEST(Conversion, VehicleParametrs)
 {
