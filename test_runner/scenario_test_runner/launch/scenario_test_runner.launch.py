@@ -63,7 +63,7 @@ def launch_setup(context, *args, **kwargs):
     autoware_launch_package = LaunchConfiguration("autoware_launch_package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
-    global_timeout          = LaunchConfiguration("global-timeout",          default=180)
+    global_timeout          = LaunchConfiguration("global_timeout",          default=180)
     output_directory        = LaunchConfiguration("output-directory",        default=Path("/tmp"))
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
@@ -123,7 +123,7 @@ def launch_setup(context, *args, **kwargs):
             "simulation will be slower than in reality.",
         ),
         DeclareLaunchArgument(
-            "global-timeout",
+            "global_timeout",
             default_value=global_timeout,
             description="Specify the simulation time limit. This time limit is "
             "independent of the simulation playback speed determined by the "
