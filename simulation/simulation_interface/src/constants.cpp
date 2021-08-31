@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <simulation_interface/constants.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 
 namespace simulation_interface
@@ -32,6 +33,7 @@ std::string enumToString(const TransportProtocol & protocol)
     case TransportProtocol::UDP:
       return "udp";
   }
+  THROW_SIMULATION_ERROR("Protocol should be TCP or UDP.");
 }
 
 std::string enumToString(const HostName & hostname)
@@ -42,5 +44,6 @@ std::string enumToString(const HostName & hostname)
     case HostName::ANY:
       return "*";
   }
+  THROW_SIMULATION_ERROR("Hostname protocol should be LOCALHOST or ANY.");
 }
 }  // namespace simulation_interface
