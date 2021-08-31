@@ -100,6 +100,16 @@
   EXPECT_PERFORMANCE_EQ(msg.performance, proto.performance());                  \
   EXPECT_AXLES_EQ(msg.axles, proto.axles());
 
+#define EXPECT_PEDESTRIAN_PARAMETERS_EQ(msg, proto)                                   \
+  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());                               \
+  EXPECT_STREQ(msg.pedestrian_category.c_str(), proto.pedestrian_category().c_str()); \
+  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());
+
+#define EXPECT_MISC_OBJECT_PARAMETERS_EQ(msg, proto)                                    \
+  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());                                 \
+  EXPECT_STREQ(msg.misc_object_category.c_str(), proto.misc_object_category().c_str()); \
+  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());
+
 /**
  * @brief Expect equal macros for autoware related messages.
  */
@@ -110,4 +120,4 @@
   EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
   EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
 
-#endif  //
+#endif  // SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_

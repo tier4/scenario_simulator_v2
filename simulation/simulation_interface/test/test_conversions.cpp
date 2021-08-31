@@ -246,24 +246,43 @@ TEST(Conversion, PedestrianParametrs)
 {
   openscenario_msgs::PedestrianParameters proto;
   openscenario_msgs::msg::PedestrianParameters p;
+  p.name = "foo";
+  p.pedestrian_category = "bar";
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  p.bounding_box = box;
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
-  EXPECT_STREQ(p.name.c_str(), proto.name().c_str());
-  EXPECT_STREQ(p.pedestrian_category.c_str(), proto.pedestrian_category().c_str());
+  EXPECT_PEDESTRIAN_PARAMETERS_EQ(p, proto);
+  p = openscenario_msgs::msg::PedestrianParameters();
+  EXPECT_DOUBLE_EQ(p.bounding_box.dimensions.x, 0);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
-  EXPECT_STREQ(p.name.c_str(), proto.name().c_str());
-  EXPECT_STREQ(p.pedestrian_category.c_str(), proto.pedestrian_category().c_str());
+  EXPECT_PEDESTRIAN_PARAMETERS_EQ(p, proto);
 }
 
 TEST(Conversion, MiscObjectParametrs)
 {
   openscenario_msgs::MiscObjectParameters proto;
   openscenario_msgs::msg::MiscObjectParameters p;
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  p.bounding_box = box;
   p.misc_object_category = "obstacle";
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
-  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+  EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
   p.misc_object_category = "";
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
   EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+  EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
 }
 
 TEST(Conversion, ActionStatus)
