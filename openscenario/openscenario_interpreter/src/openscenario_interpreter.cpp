@@ -66,7 +66,8 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
   {
     configuration.auto_sink = false;
 
-    configuration.initialize_duration = ObjectController::ego_count > 0 ? 30 : 0;
+    configuration.initialize_duration =
+      ObjectController::ego_count > 0 ? getParameter<int>("initialize_duration") : 0;
 
     configuration.scenario_path = osc_path;
 

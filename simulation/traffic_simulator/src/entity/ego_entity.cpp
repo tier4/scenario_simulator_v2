@@ -131,11 +131,9 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  auto architecture_type = getParameter<std::string>("architecture_type", "unspecified");
+  const auto architecture_type = getParameter<std::string>("architecture_type", "unspecified");
 
-  auto launch_autoware = getParameter<bool>("launch_autoware", true);
-
-  if (not launch_autoware) {
+  if (not getParameter<bool>("launch_autoware", true)) {
     return nullptr;
   } else if (architecture_type == "tier4/proposal") {
     return std::make_unique<concealer::AutowareArchitectureProposal>(

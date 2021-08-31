@@ -64,6 +64,7 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
     global_timeout          = LaunchConfiguration("global_timeout",          default=180)
+    initialize_duration     = LaunchConfiguration("initialize_duration",     default=30)
     launch_autoware         = LaunchConfiguration("launch_autoware",         default=True)
     launch_rviz             = LaunchConfiguration("launch_rviz",             default=False)
     output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
@@ -80,6 +81,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"global_frame_rate       := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor := {global_real_time_factor.perform(context)}")
     print(f"global_timeout          := {global_timeout.perform(context)}")
+    print(f"initialize_duration     := {initialize_duration.perform(context)}")
     print(f"launch_autoware         := {launch_autoware.perform(context)}")
     print(f"launch_rviz             := {launch_rviz.perform(context)}")
     print(f"output_directory        := {output_directory.perform(context)}")
@@ -94,6 +96,7 @@ def launch_setup(context, *args, **kwargs):
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
+            {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
             {"sensor_model": sensor_model},
