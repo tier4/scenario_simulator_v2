@@ -106,57 +106,20 @@ def launch_setup(context, *args, **kwargs):
         return parameters
 
     return [
-        DeclareLaunchArgument("architecture_type", default_value=architecture_type),
-        DeclareLaunchArgument(
-            "autoware_launch_file", default_value=autoware_launch_file
-        ),
-        DeclareLaunchArgument(
-            "autoware_launch_package", default_value=autoware_launch_package
-        ),
-        DeclareLaunchArgument("global_frame_rate", default_value=global_frame_rate),
-        DeclareLaunchArgument(
-            "global_real_time_factor",
-            default_value=global_real_time_factor,
-            description="Specify the ratio of simulation time to real time. If "
-            "you set a value greater than 1, the simulation will be faster "
-            "than in reality, and if you set a value less than 1, the "
-            "simulation will be slower than in reality.",
-        ),
-        DeclareLaunchArgument(
-            "global_timeout",
-            default_value=global_timeout,
-            description="Specify the simulation time limit. This time limit is "
-            "independent of the simulation playback speed determined by the "
-            "option real_time_factor. It also has nothing to do with "
-            "SimulationTimeCondition in OpenSCENARIO format.",
-        ),
-        DeclareLaunchArgument(
-            "output_directory",
-            default_value=output_directory,
-            description="Specify the output destination directory of the "
-            "generated file including the result file.",
-        ),
-        DeclareLaunchArgument(
-            "launch_rviz",
-            default_value=launch_rviz,
-            description="if true, launch Autoware with given rviz configuration.",
-        ),
-        DeclareLaunchArgument(
-            "scenario",
-            default_value=scenario,
-            description="Specify a scenario file (.yaml or .xosc) you want to "
-            "execute. If a workflow file is also specified by the --workflow "
-            "option at the same time, this option takes precedence (that is, "
-            "only one scenario passed to the --scenario option will be executed"
-            ").",
-        ),
-        DeclareLaunchArgument("sensor_model", default_value=sensor_model),
-        DeclareLaunchArgument("vehicle_model", default_value=vehicle_model),
-        DeclareLaunchArgument(
-            "workflow",
-            default_value=workflow,
-            description="Specify a workflow file (.yaml) you want to execute.",
-        ),
+        # fmt: off
+        DeclareLaunchArgument("architecture_type",       default_value=architecture_type      ),
+        DeclareLaunchArgument("autoware_launch_file",    default_value=autoware_launch_file   ),
+        DeclareLaunchArgument("autoware_launch_package", default_value=autoware_launch_package),
+        DeclareLaunchArgument("global_frame_rate",       default_value=global_frame_rate      ),
+        DeclareLaunchArgument("global_real_time_factor", default_value=global_real_time_factor),
+        DeclareLaunchArgument("global_timeout",          default_value=global_timeout         ),
+        DeclareLaunchArgument("launch_rviz",             default_value=launch_rviz            ),
+        DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
+        DeclareLaunchArgument("scenario",                default_value=scenario               ),
+        DeclareLaunchArgument("sensor_model",            default_value=sensor_model           ),
+        DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
+        DeclareLaunchArgument("workflow",                default_value=workflow               ),
+        # fmt: on
         Node(
             package="scenario_test_runner",
             executable="scenario_test_runner",
