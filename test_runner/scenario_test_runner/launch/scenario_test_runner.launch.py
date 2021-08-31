@@ -61,7 +61,7 @@ def launch_setup(context, *args, **kwargs):
     architecture_type       = LaunchConfiguration("architecture_type",       default="tier4/proposal")
     autoware_launch_file    = LaunchConfiguration("autoware_launch_file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package = LaunchConfiguration("autoware_launch_package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
-    global_frame_rate       = LaunchConfiguration("global-frame-rate",       default=30.0)
+    global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global-real-time-factor", default=1.0)
     global_timeout          = LaunchConfiguration("global-timeout",          default=180)
     output_directory        = LaunchConfiguration("output-directory",        default=Path("/tmp"))
@@ -113,7 +113,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument(
             "autoware_launch_package", default_value=autoware_launch_package
         ),
-        DeclareLaunchArgument("global-frame-rate", default_value=global_frame_rate),
+        DeclareLaunchArgument("global_frame_rate", default_value=global_frame_rate),
         DeclareLaunchArgument(
             "global-real-time-factor",
             default_value=global_real_time_factor,
