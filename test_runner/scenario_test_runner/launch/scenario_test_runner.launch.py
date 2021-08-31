@@ -59,7 +59,7 @@ def default_autoware_launch_file_of(architecture_type):
 def launch_setup(context, *args, **kwargs):
     # fmt: off
     architecture_type       = LaunchConfiguration("architecture_type",       default="tier4/proposal")
-    autoware_launch_file    = LaunchConfiguration("autoware-launch-file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
+    autoware_launch_file    = LaunchConfiguration("autoware_launch_file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package = LaunchConfiguration("autoware-launch-package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
     global_frame_rate       = LaunchConfiguration("global-frame-rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global-real-time-factor", default=1.0)
@@ -108,7 +108,7 @@ def launch_setup(context, *args, **kwargs):
     return [
         DeclareLaunchArgument("architecture_type", default_value=architecture_type),
         DeclareLaunchArgument(
-            "autoware-launch-file", default_value=autoware_launch_file
+            "autoware_launch_file", default_value=autoware_launch_file
         ),
         DeclareLaunchArgument(
             "autoware-launch-package", default_value=autoware_launch_package
