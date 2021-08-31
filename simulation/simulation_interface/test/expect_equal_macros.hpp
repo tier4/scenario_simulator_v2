@@ -38,6 +38,17 @@
   EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
 
 /**
+ * @brief Expect equal macros for builtin_interfaces
+ */
+#define EXPECT_TIME_EQ(msg, proto)         \
+  EXPECT_EQ(msg.nanosec, proto.nanosec()); \
+  EXPECT_EQ(msg.sec, proto.sec());
+
+#define EXPECT_DURATION_EQ(msg, proto)     \
+  EXPECT_EQ(msg.nanosec, proto.nanosec()); \
+  EXPECT_EQ(msg.sec, proto.sec());
+
+/**
  * @brief Expect equal macros for geometry_msgs.
  */
 
@@ -139,5 +150,11 @@
   EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
   EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
   EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
+
+#define EXPECT_VEHICLE_COMMAND_EQ(msg, proto)              \
+  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control()); \
+  EXPECT_EQ(msg.shift.data, proto.shift().data());         \
+  EXPECT_TRUE(msg.shift.data == proto.shift().data());     \
+  EXPECT_EQ(msg.shift.data, proto.shift().data());
 
 #endif  // SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_

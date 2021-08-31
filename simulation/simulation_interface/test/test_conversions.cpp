@@ -353,13 +353,11 @@ TEST(Conversion, Time)
   msg.nanosec = 1;
   msg.sec = 2;
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_TIME_EQ(msg, proto);
   msg.nanosec = 0;
   msg.sec = 0;
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_TIME_EQ(msg, proto);
 }
 
 TEST(Conversion, Duration)
@@ -369,13 +367,11 @@ TEST(Conversion, Duration)
   msg.nanosec = 1;
   msg.sec = 2;
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_DURATION_EQ(msg, proto);
   msg.nanosec = 0;
   msg.sec = 0;
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_DURATION_EQ(msg, proto);
 }
 
 TEST(Conversion, Header)
@@ -443,10 +439,7 @@ TEST(Conversion, VehicleCommand)
   msg.header.stamp.nanosec = 99;
   msg.header.stamp.sec = 3;
   simulation_interface::toProto(msg, proto);
-  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
-  EXPECT_TRUE(msg.shift.data == proto.shift().data());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
   msg.shift.data = 1023;
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
@@ -454,10 +447,7 @@ TEST(Conversion, VehicleCommand)
   EXPECT_EQ(msg.emergency, proto.emergency());
   msg = autoware_vehicle_msgs::msg::VehicleCommand();
   simulation_interface::toMsg(proto, msg);
-  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
-  EXPECT_TRUE(msg.shift.data == proto.shift().data());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
   msg.shift.data = 1023;
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
