@@ -340,6 +340,10 @@ TEST(Conversion, EntityStatus)
   status.lanelet_pose_valid = false;
   simulation_interface::toProto(status, proto);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
+  status = openscenario_msgs::msg::EntityStatus();
+  EXPECT_TRUE(status.lanelet_pose_valid);
+  simulation_interface::toMsg(proto, status);
+  EXPECT_ENTITY_STATUS_EQ(status, proto);
 }
 
 TEST(Conversion, Time)
