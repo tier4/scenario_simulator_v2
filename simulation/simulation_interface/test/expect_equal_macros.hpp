@@ -115,6 +115,19 @@
   EXPECT_TWIST_EQ(msg.twist, proto.twist());                                \
   EXPECT_ACCEL_EQ(msg.accel, proto.accel());
 
+#define EXPECT_LANELET_POSE_EQ(msg, proto)       \
+  EXPECT_EQ(msg.lanelet_id, proto.lanelet_id()); \
+  EXPECT_DOUBLE_EQ(msg.s, proto.s());            \
+  EXPECT_DOUBLE_EQ(msg.offset, proto.offset());  \
+  EXPECT_VECTOR3_EQ(msg.rpy, proto.rpy());
+
+#define EXPECT_ENTITY_STATUS_EQ(msg, proto)                          \
+  EXPECT_DOUBLE_EQ(msg.time, proto.time());                          \
+  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());              \
+  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());    \
+  EXPECT_ACTION_STATUS_EQ(msg.action_status, proto.action_status()); \
+  EXPECT_POSE_EQ(msg.pose, proto.pose());
+
 /**
  * @brief Expect equal macros for autoware related messages.
  */

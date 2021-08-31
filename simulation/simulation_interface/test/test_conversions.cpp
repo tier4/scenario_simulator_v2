@@ -455,20 +455,10 @@ TEST(Conversion, LaneletPose)
   pose.rpy.y = 5.1;
   pose.rpy.z = 1.3;
   EXPECT_NO_THROW(simulation_interface::toProto(pose, proto));
-  EXPECT_EQ(pose.lanelet_id, proto.lanelet_id());
-  EXPECT_DOUBLE_EQ(pose.s, proto.s());
-  EXPECT_DOUBLE_EQ(pose.offset, proto.offset());
-  EXPECT_DOUBLE_EQ(pose.rpy.x, proto.rpy().x());
-  EXPECT_DOUBLE_EQ(pose.rpy.y, proto.rpy().y());
-  EXPECT_DOUBLE_EQ(pose.rpy.z, proto.rpy().z());
+  EXPECT_LANELET_POSE_EQ(pose, proto);
   pose = openscenario_msgs::msg::LaneletPose();
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, pose));
-  EXPECT_EQ(pose.lanelet_id, proto.lanelet_id());
-  EXPECT_DOUBLE_EQ(pose.s, proto.s());
-  EXPECT_DOUBLE_EQ(pose.offset, proto.offset());
-  EXPECT_DOUBLE_EQ(pose.rpy.x, proto.rpy().x());
-  EXPECT_DOUBLE_EQ(pose.rpy.y, proto.rpy().y());
-  EXPECT_DOUBLE_EQ(pose.rpy.z, proto.rpy().z());
+  EXPECT_LANELET_POSE_EQ(pose, proto);
 }
 
 int main(int argc, char ** argv)
