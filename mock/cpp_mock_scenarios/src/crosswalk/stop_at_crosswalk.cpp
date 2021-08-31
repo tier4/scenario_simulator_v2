@@ -26,12 +26,12 @@
 #include <string>
 #include <vector>
 
-class TrafficSimulationDemoScenario : public cpp_mock_scenarios::CppScenarioNode
+class StopAtCrosswalkScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit TrafficSimulationDemoScenario(const rclcpp::NodeOptions & option)
+  explicit StopAtCrosswalkScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
@@ -83,7 +83,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<TrafficSimulationDemoScenario>(options);
+  auto component = std::make_shared<StopAtCrosswalkScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

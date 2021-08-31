@@ -31,7 +31,8 @@ class IdiotNpcScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit IdiotNpcScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
+      "crashing_npc",
+      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
       "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
   {
     start();

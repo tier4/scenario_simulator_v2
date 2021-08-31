@@ -2,6 +2,39 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2021-08-30)
+------------------
+* Merge pull request `#437 <https://github.com/tier4/scenario_simulator_v2/issues/437>`_ from RobotecAI/issue/AJD-237-remove_autoware_compilation_flag
+* Merge pull request `#472 <https://github.com/tier4/scenario_simulator_v2/issues/472>`_ from tier4/fix/interpreter/misc
+* Disable variable-name duplication check
+* review changes
+* apply clang-format
+* cleanup
+* make Autoware switch based on autoware_type parameter
+* remove unnecessary autoware_def include from openscenario_interpreter
+* openscenario_interpreter uses ROS param instead of build flag to determine autoware
+* Merge pull request `#444 <https://github.com/tier4/scenario_simulator_v2/issues/444>`_ from tier4/feature/interpreter/cleanup-error-messages
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Fix to set missing testsuites-name
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
+* Move result file generation into member function `Interpreter::set<T>`
+* Update `Interpreter::on_configure` to use `withExceptionHandler`
+* Add new member function `Interpreter::makeCurrentConfiguration`
+* Lipsticks
+* Reorder Interpreter's member functions to be lexicographically
+* Add member function `Interpreter::currentLocalFrameRate`
+* Remove macro `CATCH` from class `Interpreter`
+* Update function `guard` to receive exception handler
+* Move functions (in namespace record) into new `header record.hpp`
+* Move function 'record_start' and 'record_end' into namespace 'record'
+* Add member function 'Interpreter::publishCurrentContext'
+* Lipsticks
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Lipsticks
+* Merge branch 'master' into AJD-238_scenario_validation
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, yamacir-kit
+
 0.4.4 (2021-08-20)
 ------------------
 * Merge pull request `#451 <https://github.com/tier4/scenario_simulator_v2/issues/451>`_ from tier4/feature/out-of-range-metric

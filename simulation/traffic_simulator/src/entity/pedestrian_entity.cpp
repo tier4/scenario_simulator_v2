@@ -46,6 +46,20 @@ void PedestrianEntity::requestAssignRoute(
   route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, waypoints);
 }
 
+void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
+{
+  std::vector<openscenario_msgs::msg::LaneletPose> route;
+  for (const auto & waypoint : waypoints) {
+    const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint);
+    if (lanelet_waypoint) {
+      route.emplace_back(lanelet_waypoint.get());
+    } else {
+      THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
+    }
+  }
+  requestAssignRoute(route);
+}
+
 void PedestrianEntity::requestWalkStraight() { tree_ptr_->setRequest("walk_straight"); }
 
 void PedestrianEntity::requestAcquirePosition(
@@ -59,6 +73,16 @@ void PedestrianEntity::requestAcquirePosition(
     return;
   }
   route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
+}
+
+void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
+{
+  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose);
+  if (lanelet_pose) {
+    requestAcquirePosition(lanelet_pose.get());
+  } else {
+    THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
+  }
 }
 
 void PedestrianEntity::cancelRequest() { tree_ptr_->setRequest("none"); }

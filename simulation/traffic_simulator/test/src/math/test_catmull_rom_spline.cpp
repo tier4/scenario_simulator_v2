@@ -33,13 +33,21 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
   geometry_msgs::msg::Point goal;
   goal.x = 0.1;
   goal.y = -1.0;
-  auto collision_s = spline.getCollisionPointIn2D(start, goal);
+  auto collision_s = spline.getCollisionPointIn2D(start, goal, false);
   EXPECT_TRUE(collision_s);
   if (collision_s) {
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
   }
-  collision_s = spline.getCollisionPointIn2D(start, goal, false);
+  collision_s = spline.getCollisionPointIn2D({start, goal}, false);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
+  collision_s = spline.getCollisionPointIn2D(start, goal, true);
   EXPECT_TRUE(collision_s);
+  if (collision_s) {
+    EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
+  }
+  collision_s = spline.getCollisionPointIn2D({start, goal}, true);
   if (collision_s) {
     EXPECT_DOUBLE_EQ(collision_s.get(), 0.1);
   }
@@ -134,6 +142,35 @@ TEST(CatmullRomSpline, GetSValue)
   // std::cout << "result = " << spline.getSValue(p).get() << std::endl;
   EXPECT_TRUE(spline.getSValue(p).get() > 0.099);
   EXPECT_TRUE(spline.getSValue(p).get() < 0.101);
+  p.x = 10;
+  p.y = 0;
+  p.z = 0;
+  EXPECT_FALSE(spline.getSValue(p, 3));
+}
+
+TEST(CatmullRomSpline, GetTrajectory)
+{
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  p1.x = 1;
+  geometry_msgs::msg::Point p2;
+  p2.x = 2;
+  geometry_msgs::msg::Point p3;
+  p3.x = 3;
+  auto points = {p0, p1, p2, p3};
+  auto spline = traffic_simulator::math::CatmullRomSpline(points);
+  auto trajectory = spline.getTrajectory(0, 3, 1.0);
+  EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
+  EXPECT_DOUBLE_EQ(trajectory[0].x, 0);
+  EXPECT_DOUBLE_EQ(trajectory[1].x, 1);
+  EXPECT_DOUBLE_EQ(trajectory[2].x, 2);
+  EXPECT_DOUBLE_EQ(trajectory[3].x, 3);
+  trajectory = spline.getTrajectory(3, 0, 1.0);
+  EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
+  EXPECT_DOUBLE_EQ(trajectory[0].x, 3);
+  EXPECT_DOUBLE_EQ(trajectory[1].x, 2);
+  EXPECT_DOUBLE_EQ(trajectory[2].x, 1);
+  EXPECT_DOUBLE_EQ(trajectory[3].x, 0);
 }
 
 TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointisAreNotEnough)
