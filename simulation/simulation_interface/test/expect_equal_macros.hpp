@@ -154,7 +154,7 @@
 #define EXPECT_VEHICLE_COMMAND_EQ(msg, proto)              \
   EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control()); \
   EXPECT_EQ(msg.shift.data, proto.shift().data());         \
-  EXPECT_TRUE(msg.shift.data == proto.shift().data());     \
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_EQ(msg.emergency, proto.emergency());             \
+  EXPECT_HEADER_EQ(msg.header, proto.header());
 
 #endif  // SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_
