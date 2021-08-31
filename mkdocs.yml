@@ -79,4 +79,5 @@ nav:
   - Package Details: package/About.md
   - Release Notes: ReleaseNotes.md
   - Contact Information: etc/ContactUs.md
+  - Development Rules: etc/DevelopmentRules.md
   - LICENSE: LICENSE.md
