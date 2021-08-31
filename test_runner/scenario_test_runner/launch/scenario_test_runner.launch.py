@@ -64,11 +64,11 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
     global_timeout          = LaunchConfiguration("global_timeout",          default=180)
+    launch_rviz             = LaunchConfiguration("launch_rviz",             default=False)
     output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
-    with_rviz               = LaunchConfiguration("with-rviz",               default=False)
     workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
     # fmt: on
 
@@ -137,8 +137,8 @@ def launch_setup(context, *args, **kwargs):
             "generated file including the result file.",
         ),
         DeclareLaunchArgument(
-            "with_rviz",
-            default_value=with_rviz,
+            "launch_rviz",
+            default_value=launch_rviz,
             description="if true, launch Autoware with given rviz configuration.",
         ),
         DeclareLaunchArgument(
@@ -207,7 +207,7 @@ def launch_setup(context, *args, **kwargs):
             executable="rviz2",
             name="rviz2",
             output={"stderr": "log", "stdout": "log"},
-            condition=IfCondition(with_rviz),
+            condition=IfCondition(launch_rviz),
             arguments=[
                 "-d",
                 str(
