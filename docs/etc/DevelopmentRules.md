@@ -27,7 +27,7 @@ fix branch will be merged into master branch and deleted.
 
 ### Release
 Only maintainers create this branch.  
-Nameing rules are below.  
+Naming rules are below.  
 
 ```
 release/prepare_(version_tag)
@@ -44,8 +44,8 @@ If you modify source code, you should be pass all checks below.
 
 |                                                                                                 Budge                                                                                                  |                          Description                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| [![ScenarioTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml)    | Build all packages and runnnig integration test.               |
-| [![BuildTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml)                     | Build each package independentry and run linter and unit test. |
+| [![ScenarioTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/ScenarioTest.yaml)    | Build all packages and running integration test.               |
+| [![BuildTest](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Build.yaml)                     | Build each package independently and run linter and unit test. |
 | [![Docker](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)                      | Build docker image.                                            |
 | [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build documentation site.                                      |
 | [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run spell checker and leave comment.                           |
@@ -63,7 +63,7 @@ If you modify only documentation, you should pass checks below.
 | [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run spell checker and leave comment.                           |
 
 ### Code review
-More than one [maintiner](/etc/ContactUs) approve your code and check all test cases are pased, your code will be merged into master branch.  
+More than one [maintainer](/etc/ContactUs) approve your code and check all test cases are passed, your code will be merged into master branch.  
 Your contribution will be recorded in [release note.](/ReleaseNotes)
 
 ### How to merge your contribution
@@ -72,6 +72,6 @@ Each branches create merge commit and merge into master branch.
 ## Push rule
 If you push your source code to scenario_simulator_v2, please follow these guidelines.
 
-1. If you are try to solving urgent problem which only can be solve with force push, please contact to the maintainer and aftter the maintainer allowed it, then you can execute force push.
+1. If you are try to solving urgent problem which only can be solve with force push, please contact to the maintainer and after the maintainer allowed it, then you can execute force push.
 1. Anyone can execute force push to the master branch.
 1. Pushing your source code to the master branch is principle prohibited.
