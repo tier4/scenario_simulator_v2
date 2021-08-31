@@ -110,6 +110,11 @@
   EXPECT_STREQ(msg.misc_object_category.c_str(), proto.misc_object_category().c_str()); \
   EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());
 
+#define EXPECT_ACTION_STATUS_EQ(msg, proto)                                 \
+  EXPECT_STREQ(msg.current_action.c_str(), proto.current_action().c_str()); \
+  EXPECT_TWIST_EQ(msg.twist, proto.twist());                                \
+  EXPECT_ACCEL_EQ(msg.accel, proto.accel());
+
 /**
  * @brief Expect equal macros for autoware related messages.
  */
