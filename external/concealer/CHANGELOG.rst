@@ -2,6 +2,35 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.4.5 (2021-08-30)
+------------------
+* Merge pull request `#437 <https://github.com/tier4/scenario_simulator_v2/issues/437>`_ from RobotecAI/issue/AJD-237-remove_autoware_compilation_flag
+* minor changes: createUpdater -> resetTimerCallback and comment on sendSIGINT
+* Revert "make the updater constant"
+* make the updater constant
+* fix build and formatting after rebase
+* review changes
+* warning fixes
+* apply clang-format
+* add .cpp files for autowares
+* cleanup
+* AAP acceleration fix
+* pure virtual function call fix
+* warining fixes
+* make Autoware switch based on autoware_type parameter
+* AAP builds
+* first version that builds without flag and works with AA on autoware-simple scenario
+* move Autoware differences from ego_entity to concealer
+* WIP: move Autoware differences from ego_entity to concealer
+* switch to AutowareAuto
+* Merge pull request `#444 <https://github.com/tier4/scenario_simulator_v2/issues/444>`_ from tier4/feature/interpreter/cleanup-error-messages
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/math_test
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
+* Lipsticks
+* Merge branch 'master' into AJD-238_scenario_validation
+* Contributors: Masaya Kataoka, MasayaKataoka, Piotr Zyskowski, Tatsuya Yamasaki, Wojciech Jaworski, danielm1405, yamacir-kit
+
 0.4.4 (2021-08-20)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_cpp_scenarios

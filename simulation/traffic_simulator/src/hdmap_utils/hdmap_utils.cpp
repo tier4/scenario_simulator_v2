@@ -668,7 +668,7 @@ boost::optional<std::pair<traffic_simulator::math::HermiteCurve, double>>
 HdMapUtils::getLaneChangeTrajectory(
   geometry_msgs::msg::Pose from_pose, std::int64_t to_lanelet_id,
   double maximum_curvature_threshold, double target_trajectory_length,
-  double forward_distance_threashold)
+  double forward_distance_threshold)
 {
   double to_length = getLaneletLength(to_lanelet_id);
   std::vector<double> evaluation, target_s;
@@ -678,7 +678,7 @@ HdMapUtils::getLaneChangeTrajectory(
     auto goal_pose = toMapPose(to_lanelet_id, to_s, 0);
     if (
       traffic_simulator::math::getRelativePose(from_pose, goal_pose.pose).position.x <=
-      forward_distance_threashold) {
+      forward_distance_threshold) {
       continue;
     }
     double start_to_goal_dist = std::sqrt(
@@ -763,12 +763,14 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0.0;
   rpy.y = 0.0;
-  rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
+  rpy.z = std::atan2(tangent_vec.y, tangent_vec.x) + M_PI_2;
+  rpy = quaternion_operation::convertQuaternionToEulerAngle(
+    quaternion_operation::convertEulerAngleToQuaternion(rpy) * quat);
   ret.pose.position.x = ret.pose.position.x - std::sin(rpy.z) * offset;
   ret.pose.position.y = ret.pose.position.y - std::cos(rpy.z) * offset;
   ret.pose.position.z = ret.pose.position.z;
+  rpy.z = rpy.z - M_PI_2;
   ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  ret.pose.orientation = ret.pose.orientation * quat;
   return ret;
 }
 

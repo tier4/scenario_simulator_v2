@@ -43,10 +43,34 @@ void VehicleEntity::requestAssignRoute(
   }
 }
 
+void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
+{
+  std::vector<openscenario_msgs::msg::LaneletPose> route;
+  for (const auto & waypoint : waypoints) {
+    const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint);
+    if (lanelet_waypoint) {
+      route.emplace_back(lanelet_waypoint.get());
+    } else {
+      THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
+    }
+  }
+  requestAssignRoute(route);
+}
+
 void VehicleEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose)
 {
   if (status_ and status_->lanelet_pose_valid) {
     route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, lanelet_pose);
+  }
+}
+
+void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
+{
+  const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose);
+  if (lanelet_pose) {
+    requestAcquirePosition(lanelet_pose.get());
+  } else {
+    THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
 }
 

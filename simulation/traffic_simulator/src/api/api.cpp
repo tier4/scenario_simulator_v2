@@ -72,6 +72,7 @@ bool API::spawn(
     simulation_api_schema::SpawnVehicleEntityResponse res;
     req.set_is_ego(true);
     simulation_interface::toProto(params, *req.mutable_parameters());
+    req.mutable_parameters()->set_name(name);
     spawn_vehicle_entity_client_.call(req, res);
     return res.result().success();
   } else {
@@ -107,6 +108,7 @@ bool API::spawn(
   simulation_api_schema::SpawnPedestrianEntityRequest req;
   simulation_api_schema::SpawnPedestrianEntityResponse res;
   simulation_interface::toProto(params, *req.mutable_parameters());
+  req.mutable_parameters()->set_name(name);
   spawn_pedestrian_entity_client_.call(req, res);
   return res.result().success();
 }
@@ -128,9 +130,9 @@ bool API::spawn(
   simulation_api_schema::SpawnMiscObjectEntityRequest req;
   simulation_api_schema::SpawnMiscObjectEntityResponse res;
   simulation_interface::toProto(params, *req.mutable_parameters());
+  req.mutable_parameters()->set_name(name);
   spawn_misc_object_entity_client_.call(req, res);
   return res.result().success();
-  return true;
 }
 
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
