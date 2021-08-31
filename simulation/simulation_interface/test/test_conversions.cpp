@@ -36,6 +36,39 @@
   EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());                \
   EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
 
+#define EXPECT_POINT_EQ(msg, proto)   \
+  EXPECT_DOUBLE_EQ(msg.x, proto.x()); \
+  EXPECT_DOUBLE_EQ(msg.y, proto.y()); \
+  EXPECT_DOUBLE_EQ(msg.z, proto.z());
+
+#define EXPECT_QUATERNION_EQ(msg, proto) \
+  EXPECT_DOUBLE_EQ(msg.x, proto.x());    \
+  EXPECT_DOUBLE_EQ(msg.y, proto.y());    \
+  EXPECT_DOUBLE_EQ(msg.z, proto.z());    \
+  EXPECT_DOUBLE_EQ(msg.w, proto.w());
+
+#define EXPECT_POSE_EQ(msg, proto)                            \
+  EXPECT_QUATERNION_EQ(msg.orientation, proto.orientation()); \
+  EXPECT_POINT_EQ(msg.position, proto.position());
+
+void checkActionStatus(
+  openscenario_msgs::ActionStatus proto, openscenario_msgs::msg::ActionStatus action)
+{
+  EXPECT_STREQ(action.current_action.c_str(), proto.current_action().c_str());
+  EXPECT_DOUBLE_EQ(action.twist.linear.x, proto.twist().linear().x());
+  EXPECT_DOUBLE_EQ(action.twist.linear.y, proto.twist().linear().y());
+  EXPECT_DOUBLE_EQ(action.twist.linear.z, proto.twist().linear().z());
+  EXPECT_DOUBLE_EQ(action.twist.angular.x, proto.twist().angular().x());
+  EXPECT_DOUBLE_EQ(action.twist.angular.y, proto.twist().angular().y());
+  EXPECT_DOUBLE_EQ(action.twist.angular.z, proto.twist().angular().z());
+  EXPECT_DOUBLE_EQ(action.accel.linear.x, proto.accel().linear().x());
+  EXPECT_DOUBLE_EQ(action.accel.linear.y, proto.accel().linear().y());
+  EXPECT_DOUBLE_EQ(action.accel.linear.z, proto.accel().linear().z());
+  EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
+  EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
+  EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
+}
+
 TEST(Conversion, Point)
 {
   geometry_msgs::Point proto;
@@ -44,15 +77,11 @@ TEST(Conversion, Point)
   p.y = 2;
   p.z = 3.1;
   simulation_interface::toProto(p, proto);
-  EXPECT_DOUBLE_EQ(p.x, proto.x());
-  EXPECT_DOUBLE_EQ(p.y, proto.y());
-  EXPECT_DOUBLE_EQ(p.z, proto.z());
+  EXPECT_POINT_EQ(p, proto);
   p = geometry_msgs::msg::Point();
   EXPECT_DOUBLE_EQ(p.x, 0);
   simulation_interface::toMsg(proto, p);
-  EXPECT_DOUBLE_EQ(p.x, proto.x());
-  EXPECT_DOUBLE_EQ(p.y, proto.y());
-  EXPECT_DOUBLE_EQ(p.z, proto.z());
+  EXPECT_POINT_EQ(p, proto);
 }
 
 TEST(Conversion, Quaternion)
@@ -64,17 +93,11 @@ TEST(Conversion, Quaternion)
   q.z = 3.1;
   q.w = -10;
   simulation_interface::toProto(q, proto);
-  EXPECT_DOUBLE_EQ(q.x, proto.x());
-  EXPECT_DOUBLE_EQ(q.y, proto.y());
-  EXPECT_DOUBLE_EQ(q.z, proto.z());
-  EXPECT_DOUBLE_EQ(q.w, proto.w());
+  EXPECT_QUATERNION_EQ(q, proto);
   q = geometry_msgs::msg::Quaternion();
   EXPECT_DOUBLE_EQ(q.x, 0);
   simulation_interface::toMsg(proto, q);
-  EXPECT_DOUBLE_EQ(q.x, proto.x());
-  EXPECT_DOUBLE_EQ(q.y, proto.y());
-  EXPECT_DOUBLE_EQ(q.z, proto.z());
-  EXPECT_DOUBLE_EQ(q.w, proto.w());
+  EXPECT_QUATERNION_EQ(q, proto);
 }
 
 TEST(Conversion, Pose)
@@ -89,23 +112,11 @@ TEST(Conversion, Pose)
   p.orientation.z = 0;
   p.orientation.w = 1;
   simulation_interface::toProto(p, proto);
-  EXPECT_DOUBLE_EQ(p.position.x, proto.position().x());
-  EXPECT_DOUBLE_EQ(p.position.y, proto.position().y());
-  EXPECT_DOUBLE_EQ(p.position.z, proto.position().z());
-  EXPECT_DOUBLE_EQ(p.orientation.x, proto.orientation().x());
-  EXPECT_DOUBLE_EQ(p.orientation.y, proto.orientation().y());
-  EXPECT_DOUBLE_EQ(p.orientation.z, proto.orientation().z());
-  EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
+  EXPECT_POSE_EQ(p, proto);
   p = geometry_msgs::msg::Pose();
   EXPECT_DOUBLE_EQ(p.position.x, 0);
   simulation_interface::toMsg(proto, p);
-  EXPECT_DOUBLE_EQ(p.position.x, proto.position().x());
-  EXPECT_DOUBLE_EQ(p.position.y, proto.position().y());
-  EXPECT_DOUBLE_EQ(p.position.z, proto.position().z());
-  EXPECT_DOUBLE_EQ(p.orientation.x, proto.orientation().x());
-  EXPECT_DOUBLE_EQ(p.orientation.y, proto.orientation().y());
-  EXPECT_DOUBLE_EQ(p.orientation.z, proto.orientation().z());
-  EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
+  EXPECT_POSE_EQ(p, proto);
 }
 
 TEST(Conversion, Vector)
@@ -328,34 +339,18 @@ TEST(Conversion, ActionStatus)
   action.accel.angular.y = 0.5;
   action.accel.angular.z = 98;
   simulation_interface::toProto(action, proto);
-  EXPECT_STREQ(action.current_action.c_str(), proto.current_action().c_str());
-  EXPECT_DOUBLE_EQ(action.twist.linear.x, proto.twist().linear().x());
-  EXPECT_DOUBLE_EQ(action.twist.linear.y, proto.twist().linear().y());
-  EXPECT_DOUBLE_EQ(action.twist.linear.z, proto.twist().linear().z());
-  EXPECT_DOUBLE_EQ(action.twist.angular.x, proto.twist().angular().x());
-  EXPECT_DOUBLE_EQ(action.twist.angular.y, proto.twist().angular().y());
-  EXPECT_DOUBLE_EQ(action.twist.angular.z, proto.twist().angular().z());
-  EXPECT_DOUBLE_EQ(action.accel.linear.x, proto.accel().linear().x());
-  EXPECT_DOUBLE_EQ(action.accel.linear.y, proto.accel().linear().y());
-  EXPECT_DOUBLE_EQ(action.accel.linear.z, proto.accel().linear().z());
-  EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
-  EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
-  EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
+  checkActionStatus(proto, action);
   action = openscenario_msgs::msg::ActionStatus();
   simulation_interface::toMsg(proto, action);
-  EXPECT_STREQ(action.current_action.c_str(), proto.current_action().c_str());
-  EXPECT_DOUBLE_EQ(action.twist.linear.x, proto.twist().linear().x());
-  EXPECT_DOUBLE_EQ(action.twist.linear.y, proto.twist().linear().y());
-  EXPECT_DOUBLE_EQ(action.twist.linear.z, proto.twist().linear().z());
-  EXPECT_DOUBLE_EQ(action.twist.angular.x, proto.twist().angular().x());
-  EXPECT_DOUBLE_EQ(action.twist.angular.y, proto.twist().angular().y());
-  EXPECT_DOUBLE_EQ(action.twist.angular.z, proto.twist().angular().z());
-  EXPECT_DOUBLE_EQ(action.accel.linear.x, proto.accel().linear().x());
-  EXPECT_DOUBLE_EQ(action.accel.linear.y, proto.accel().linear().y());
-  EXPECT_DOUBLE_EQ(action.accel.linear.z, proto.accel().linear().z());
-  EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
-  EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
-  EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
+  checkActionStatus(proto, action);
+}
+
+TEST(Conversion, EntityStatus)
+{
+  openscenario_msgs::EntityStatus proto;
+  openscenario_msgs::msg::EntityStatus status;
+  status.name = "test";
+  // status.pose = "example";
 }
 
 TEST(Conversion, Time)
