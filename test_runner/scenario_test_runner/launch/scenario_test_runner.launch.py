@@ -62,7 +62,7 @@ def launch_setup(context, *args, **kwargs):
     autoware_launch_file    = LaunchConfiguration("autoware_launch_file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package = LaunchConfiguration("autoware_launch_package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
-    global_real_time_factor = LaunchConfiguration("global-real-time-factor", default=1.0)
+    global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
     global_timeout          = LaunchConfiguration("global-timeout",          default=180)
     output_directory        = LaunchConfiguration("output-directory",        default=Path("/tmp"))
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
@@ -115,7 +115,7 @@ def launch_setup(context, *args, **kwargs):
         ),
         DeclareLaunchArgument("global_frame_rate", default_value=global_frame_rate),
         DeclareLaunchArgument(
-            "global-real-time-factor",
+            "global_real_time_factor",
             default_value=global_real_time_factor,
             description="Specify the ratio of simulation time to real time. If "
             "you set a value greater than 1, the simulation will be faster "
