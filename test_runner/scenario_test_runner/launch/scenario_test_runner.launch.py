@@ -64,7 +64,7 @@ def launch_setup(context, *args, **kwargs):
     global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
     global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
     global_timeout          = LaunchConfiguration("global_timeout",          default=180)
-    output_directory        = LaunchConfiguration("output-directory",        default=Path("/tmp"))
+    output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
@@ -131,7 +131,7 @@ def launch_setup(context, *args, **kwargs):
             "SimulationTimeCondition in OpenSCENARIO format.",
         ),
         DeclareLaunchArgument(
-            "output-directory",
+            "output_directory",
             default_value=output_directory,
             description="Specify the output destination directory of the "
             "generated file including the result file.",
