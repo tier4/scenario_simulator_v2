@@ -125,8 +125,12 @@ public:
 
   virtual void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose) = 0;
 
+  virtual void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) = 0;
+
   virtual void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) = 0;
+
+  virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints) = 0;
 
   virtual void requestLaneChange(const std::int64_t){};
 

@@ -76,7 +76,7 @@ struct ReachPositionCondition
     const auto reach_position = overload(
       [](const WorldPosition & position, auto && triggering_entity, auto && tolerance) {
         return evaluateReachPositionCondition(
-          triggering_entity, static_cast<openscenario_msgs::msg::LaneletPose>(position), tolerance);
+          triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), tolerance);
       },
       [](const RelativeWorldPosition & position, auto && triggering_entity, auto && tolerance) {
         return evaluateReachPositionCondition(

@@ -58,7 +58,17 @@ public:
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override
+  {
+    THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
+  }
+
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose &) override
+  {
+    THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
+  }
+
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }

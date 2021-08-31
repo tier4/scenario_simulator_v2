@@ -368,16 +368,36 @@ void EgoEntity::requestAcquirePosition(const openscenario_msgs::msg::LaneletPose
   requestAssignRoute({lanelet_pose});
 }
 
+void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
+{
+  requestAssignRoute({map_pose});
+}
+
 void EgoEntity::requestAssignRoute(
   const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints)
+{
+  std::vector<geometry_msgs::msg::Pose> route;
+
+  for (const auto & waypoint : waypoints) {
+    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint).pose);
+  }
+
+  requestAssignRoute(route);
+}
+
+void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> & waypoints)
 {
   std::vector<geometry_msgs::msg::PoseStamped> route;
 
   for (const auto & waypoint : waypoints) {
-    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint));
-  }
+    geometry_msgs::msg::PoseStamped pose_stamped;
+    {
+      pose_stamped.header.frame_id = "map";
+      pose_stamped.pose = waypoint;
+    }
 
-  assert(0 < route.size());
+    route.push_back(pose_stamped);
+  }
 
   if (not autoware->initialized()) {
     autoware->initialize(getStatus().pose);

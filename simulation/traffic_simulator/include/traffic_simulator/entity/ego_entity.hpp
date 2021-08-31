@@ -109,7 +109,11 @@ public:
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose &) override;
 
+  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+
   void requestAssignRoute(const std::vector<openscenario_msgs::msg::LaneletPose> &) override;
+
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   void requestLaneChange(const std::int64_t) override;
 
