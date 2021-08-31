@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Fix problems in setting entity names in proto message. [Link](https://github.com/tier4/scenario_simulator_v2/pull/481) (Contribution by [prybicki](https://github.com/prybicki)).
+- Fix problems in never hit line. [Link](https://github.com/tier4/scenario_simulator_v2/pull/480) (Contribution by [prybicki](https://github.com/prybicki)).
 
 ## Version 0.4.5
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.5) on Github :fa-github:
