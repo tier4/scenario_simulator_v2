@@ -55,7 +55,7 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto getVehicleModelType()
 {
-  auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
+  auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
   std::string vehicle_model_type;
 
   if (architecture_type == "tier4/proposal") {
@@ -65,7 +65,7 @@ auto getVehicleModelType()
     // it would require changes in https://github.com/tier4/lexus_description.iv.universe
     vehicle_model_type = "IDEAL_STEER";
   } else {
-    THROW_SEMANTIC_ERROR("Unsupported architecture-type ", architecture_type);
+    THROW_SEMANTIC_ERROR("Unsupported architecture_type ", architecture_type);
   }
 
   if (vehicle_model_type == "IDEAL_STEER") {
@@ -131,7 +131,7 @@ auto makeSimulationModel(
 
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
-  auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
+  auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
 
   if (architecture_type == "tier4/proposal") {
     return std::make_unique<concealer::AutowareArchitectureProposal>(
@@ -154,7 +154,7 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
       "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
       "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
   } else {
-    throw std::invalid_argument("Invalid architecture-type = " + architecture_type);
+    throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
   }
 }
 
