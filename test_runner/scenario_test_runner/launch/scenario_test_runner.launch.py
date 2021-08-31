@@ -35,6 +35,10 @@ def architecture_types():
 
 
 def default_autoware_launch_package_of(architecture_type):
+    if architecture_type not in architecture_types():
+        raise KeyError(
+            f"architecture-type = {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+        )
     return {
         "awf/auto": "scenario_test_runner_launch",
         "tier4/proposal": "autoware_launch",
@@ -42,6 +46,10 @@ def default_autoware_launch_package_of(architecture_type):
 
 
 def default_autoware_launch_file_of(architecture_type):
+    if architecture_type not in architecture_types():
+        raise KeyError(
+            f"architecture-type = {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+        )
     return {
         "awf/auto": "autoware_auto.launch.py",
         "tier4/proposal": "planning_simulator.launch.xml",
@@ -49,51 +57,28 @@ def default_autoware_launch_file_of(architecture_type):
 
 
 def launch_setup(context, *args, **kwargs):
-    architecture_type = LaunchConfiguration(
-        "architecture-type", default="tier4/proposal"
-    )
-
-    autoware_launch_package = LaunchConfiguration(
-        "autoware-launch-package",
-        default=default_autoware_launch_package_of(architecture_type.perform(context)),
-    )
-
-    autoware_launch_file = LaunchConfiguration(
-        "autoware-launch-file",
-        default=default_autoware_launch_file_of(architecture_type.perform(context)),
-    )
-
-    global_frame_rate = LaunchConfiguration("global-frame-rate", default=30.0)
-
-    global_real_time_factor = LaunchConfiguration(
-        "global-real-time-factor", default=1.0
-    )
-
-    global_timeout = LaunchConfiguration("global-timeout", default=180)
-
-    output_directory = LaunchConfiguration("output-directory", default=Path("/tmp"))
-
-    scenario = LaunchConfiguration("scenario", default=Path("/dev/null"))
-
-    sensor_model = LaunchConfiguration("sensor_model", default="")
-
-    vehicle_model = LaunchConfiguration("vehicle_model", default="")
-
-    with_rviz = LaunchConfiguration("with-rviz", default=False)
-
-    workflow = LaunchConfiguration("workflow", default=Path("/dev/null"))
+    # fmt: off
+    architecture_type       = LaunchConfiguration("architecture-type",       default="tier4/proposal")
+    autoware_launch_file    = LaunchConfiguration("autoware-launch-file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
+    autoware_launch_package = LaunchConfiguration("autoware-launch-package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    global_frame_rate       = LaunchConfiguration("global-frame-rate",       default=30.0)
+    global_real_time_factor = LaunchConfiguration("global-real-time-factor", default=1.0)
+    global_timeout          = LaunchConfiguration("global-timeout",          default=180)
+    output_directory        = LaunchConfiguration("output-directory",        default=Path("/tmp"))
+    scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
+    sensor_model            = LaunchConfiguration("sensor_model",            default="")
+    vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
+    with_rviz               = LaunchConfiguration("with-rviz",               default=False)
+    workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
+    # fmt: on
 
     port = 8080
 
     def make_parameters():
-        if architecture_type.perform(context) not in architecture_types():
-            raise KeyError(
-                f"architecture-type = {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
-            )
-
-        print(f"architecture-type = {architecture_type.perform(context)}")
+        print(f"architecture-type       = {architecture_type.perform(context)}")
+        print(f"autoware_launch_file    = {autoware_launch_file.perform(context)}")
         print(f"autoware_launch_package = {autoware_launch_package.perform(context)}")
-        print(f"autoware_launch_file = {autoware_launch_file.perform(context)}")
+        print(f"vehicle_model           = {vehicle_model.perform(context)}")
 
         parameters = [
             {"autoware_launch_file": autoware_launch_file},
@@ -103,8 +88,6 @@ def launch_setup(context, *args, **kwargs):
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
         ]
-
-        print("vehicle_model = " + vehicle_model.perform(context))
 
         if vehicle_model.perform(context):
             parameters.append(
