@@ -87,7 +87,11 @@
 
 #define EXPECT_AXLES_EQ(msg, proto)                  \
   EXPECT_AXLE_EQ(msg.front_axle, proto.front_axle()) \
-  EXPECT_AXLE_EQ(msg.rear_axle, proto.rear_axle())
+  EXPECT_AXLE_EQ(msg.rear_axle, proto.rear_axle());
+
+#define EXPECT_BOUNDING_BOX_EQ(msg, proto)     \
+  EXPECT_POINT_EQ(msg.center, proto.center()); \
+  EXPECT_VECTOR3_EQ(msg.dimensions, proto.dimensions());
 
 /**
  * @brief Expect equal macros for autoware related messages.

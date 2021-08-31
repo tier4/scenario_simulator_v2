@@ -190,6 +190,24 @@ TEST(Conversion, Axles)
   EXPECT_AXLES_EQ(axles, proto);
 }
 
+TEST(Conversion, BoundingBox)
+{
+  openscenario_msgs::BoundingBox proto;
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  simulation_interface::toProto(box, proto);
+  EXPECT_BOUNDING_BOX_EQ(box, proto);
+  box = openscenario_msgs::msg::BoundingBox();
+  EXPECT_DOUBLE_EQ(box.center.x, 0);
+  simulation_interface::toMsg(proto, box);
+  EXPECT_BOUNDING_BOX_EQ(box, proto);
+}
+
 TEST(Conversion, VehicleParametrs)
 {
   openscenario_msgs::VehicleParameters proto;
