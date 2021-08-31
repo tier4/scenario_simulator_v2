@@ -296,7 +296,50 @@ TEST(Conversion, EntityStatus)
   openscenario_msgs::EntityStatus proto;
   openscenario_msgs::msg::EntityStatus status;
   status.name = "test";
-  // status.pose = "example";
+  status.time = 3.0;
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  status.bounding_box = box;
+  openscenario_msgs::msg::ActionStatus action;
+  action.current_action = "test";
+  action.twist.linear.x = 1.0;
+  action.twist.linear.y = 2.0;
+  action.twist.linear.z = 3.0;
+  action.twist.angular.x = -20;
+  action.twist.angular.y = -4.2;
+  action.twist.angular.z = 9;
+  action.accel.linear.x = 3.0;
+  action.accel.linear.y = 908;
+  action.accel.linear.z = 987.0;
+  action.accel.angular.x = 0.3;
+  action.accel.angular.y = 0.5;
+  action.accel.angular.z = 98;
+  status.action_status = action;
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 4.0;
+  pose.position.y = 1.2;
+  pose.position.z = 5.1;
+  pose.orientation.x = 0.3;
+  pose.orientation.y = 8.3;
+  pose.orientation.z = 9.3;
+  pose.orientation.w = 10.2;
+  status.pose = pose;
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = 23;
+  lanelet_pose.s = 1.0;
+  lanelet_pose.offset = 3.5;
+  lanelet_pose.rpy.x = 3.4;
+  lanelet_pose.rpy.y = 5.1;
+  lanelet_pose.rpy.z = 1.3;
+  status.lanelet_pose = lanelet_pose;
+  status.lanelet_pose_valid = false;
+  simulation_interface::toProto(status, proto);
+  EXPECT_ENTITY_STATUS_EQ(status, proto);
 }
 
 TEST(Conversion, Time)
@@ -362,6 +405,7 @@ TEST(Conversion, ControlCommand)
   msg.steering_angle_velocity = 0;
   msg.velocity = 0;
   simulation_interface::toMsg(proto, msg);
+  EXPECT_CONTROL_COMMAND_EQ(msg, proto);
 }
 
 TEST(Conversion, Shift)

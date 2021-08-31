@@ -126,7 +126,9 @@
   EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());              \
   EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());    \
   EXPECT_ACTION_STATUS_EQ(msg.action_status, proto.action_status()); \
-  EXPECT_POSE_EQ(msg.pose, proto.pose());
+  EXPECT_POSE_EQ(msg.pose, proto.pose());                            \
+  EXPECT_LANELET_POSE_EQ(msg.lanelet_pose, proto.lanelet_pose());    \
+  EXPECT_EQ(msg.lanelet_pose_valid, proto.lanelet_pose_valid());
 
 /**
  * @brief Expect equal macros for autoware related messages.
