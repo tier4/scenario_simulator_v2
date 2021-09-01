@@ -69,6 +69,7 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz             = LaunchConfiguration("launch_rviz",             default=False)
     output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
     port                    = LaunchConfiguration("port",                    default=8080)
+    record                  = LaunchConfiguration("record",                  default=True)
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
@@ -86,6 +87,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_rviz             := {launch_rviz.perform(context)}")
     print(f"output_directory        := {output_directory.perform(context)}")
     print(f"port                    := {port.perform(context)}")
+    print(f"record                  := {record.perform(context)}")
     print(f"scenario                := {scenario.perform(context)}")
     print(f"sensor_model            := {sensor_model.perform(context)}")
     print(f"vehicle_model           := {vehicle_model.perform(context)}")
@@ -99,6 +101,7 @@ def launch_setup(context, *args, **kwargs):
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
+            {"record": record},
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
         ]
