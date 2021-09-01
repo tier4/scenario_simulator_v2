@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
+#include <autoware_debug_msgs/msg/string_stamped.hpp>
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
@@ -65,15 +66,36 @@ struct CustomCommandAction : private Scope
 
   const std::true_type accomplished{};
 
+  static auto applyFaultInjectionAction(const std::vector<std::string> & events, const Scope &)
+    -> int
+  {
+    static auto node = rclcpp::Node("fault_injector", "simulation");
+
+    static auto publisher = node.create_publisher<autoware_debug_msgs::msg::StringStamped>(
+      "/simulation/fault_injection", rclcpp::QoS(1).reliable());
+
+    for (const auto & event : events) {
+      autoware_debug_msgs::msg::StringStamped message;
+      {
+        message.stamp = node.now();
+        message.data = event;
+      };
+
+      (*publisher).publish(message);
+    }
+
+    return events.size();
+  }
+
   static int walkStraightAction(
     const std::vector<std::string> & actors, const Scope & current_scope)
   {
     for (const auto & actor : actors) {
-      applyWalkStraightAction(actor);
+      openscenario_interpreter::applyWalkStraightAction(actor);
     }
 
     for (const auto & actor : current_scope.actors) {
-      applyWalkStraightAction(actor);
+      openscenario_interpreter::applyWalkStraightAction(actor);
     }
 
     return current_scope.actors.size();
@@ -112,6 +134,7 @@ struct CustomCommandAction : private Scope
   const std::unordered_map<
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     builtins{
+      std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
       std::make_pair("WalkStraightAction", walkStraightAction),
       std::make_pair("error", error),
       std::make_pair("exitFailure", exitFailure),
