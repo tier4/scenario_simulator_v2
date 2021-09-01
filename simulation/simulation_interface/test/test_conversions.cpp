@@ -189,7 +189,7 @@ TEST(Conversion, BoundingBox)
   EXPECT_BOUNDING_BOX_EQ(box, proto);
 }
 
-TEST(Conversion, VehicleParametrs)
+TEST(Conversion, VehicleParameters)
 {
   openscenario_msgs::VehicleParameters proto;
   openscenario_msgs::msg::VehicleParameters p;
@@ -223,7 +223,7 @@ TEST(Conversion, VehicleParametrs)
   EXPECT_VEHICLE_PARAMETERS_EQ(p, proto);
 }
 
-TEST(Conversion, PedestrianParametrs)
+TEST(Conversion, PedestrianParameters)
 {
   openscenario_msgs::PedestrianParameters proto;
   openscenario_msgs::msg::PedestrianParameters p;
@@ -245,7 +245,7 @@ TEST(Conversion, PedestrianParametrs)
   EXPECT_PEDESTRIAN_PARAMETERS_EQ(p, proto);
 }
 
-TEST(Conversion, MiscObjectParametrs)
+TEST(Conversion, MiscObjectParameters)
 {
   openscenario_msgs::MiscObjectParameters proto;
   openscenario_msgs::msg::MiscObjectParameters p;
