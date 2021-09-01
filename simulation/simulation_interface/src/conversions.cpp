@@ -428,10 +428,9 @@ void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_m
       proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::LOW);
       break;
     default:
-      THROW_SEMANTIC_ERROR(
+      THROW_SIMULATION_ERROR(
         "shift position is invalid while converting ROS2 message to proto, shit position is ",
         proto.data());
-      break;
   }
 }
 
@@ -457,10 +456,9 @@ void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::ms
       shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
       break;
     default:
-      THROW_SEMANTIC_ERROR(
+      THROW_SIMULATION_ERROR(
         "shift position is invalid while converting proto to ROS2 message, shit position is ",
         proto.data());
-      break;
   }
 }
 

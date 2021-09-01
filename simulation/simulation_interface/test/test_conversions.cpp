@@ -436,7 +436,8 @@ TEST(Conversion, Shift)
   EXPECT_EQ(msg.data, proto.data());
   msg.data = 1023;
   EXPECT_THROW(
-    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
 }
 
 TEST(Conversion, VehicleCommand)
@@ -456,7 +457,8 @@ TEST(Conversion, VehicleCommand)
   EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
   msg.shift.data = 1023;
   EXPECT_THROW(
-    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
   EXPECT_HEADER_EQ(msg.header, proto.header());
   EXPECT_EQ(msg.emergency, proto.emergency());
   msg = autoware_vehicle_msgs::msg::VehicleCommand();
@@ -464,7 +466,8 @@ TEST(Conversion, VehicleCommand)
   EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
   msg.shift.data = 1023;
   EXPECT_THROW(
-    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
   EXPECT_HEADER_EQ(msg.header, proto.header());
   EXPECT_EQ(msg.emergency, proto.emergency());
 }
