@@ -482,7 +482,7 @@ TEST(Conversion, Shift)
   simulation_interface::toMsg(proto, msg);
   EXPECT_EQ(msg.data, proto.data());
   /**
-   * @note Invalida value input
+   * @note Invalid value input
    */
   msg.data = 1023;
   EXPECT_THROW(

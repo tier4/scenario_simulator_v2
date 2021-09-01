@@ -58,34 +58,34 @@ public:
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     initialize_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::initialize),
     update_frame_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::update_frame),
     update_sensor_frame_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::update_sensor_frame),
     spawn_vehicle_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::spawn_vehicle_entity),
     spawn_pedestrian_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::spawn_pedestrian_entity),
     spawn_misc_object_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::spawn_misc_object_entity),
     despawn_entity_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::despawn_entity),
     update_entity_status_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::update_entity_status),
     attach_lidar_sensor_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::attach_lidar_sensor),
     attach_detection_sensor_client_(
-      simulation_interface::protocol, simulation_interface::HostName::LOCLHOST,
+      simulation_interface::protocol, simulation_interface::HostName::LOCALHOST,
       simulation_interface::ports::attach_detection_sensor)
   {
     metrics_manager_.setEntityManager(entity_manager_ptr_);

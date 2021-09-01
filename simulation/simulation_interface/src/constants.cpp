@@ -41,7 +41,7 @@ std::string enumToString(const TransportProtocol & protocol)
 std::string enumToString(const HostName & hostname)
 {
   switch (hostname) {
-    case HostName::LOCLHOST:
+    case HostName::LOCALHOST:
       return "localhost";
     case HostName::ANY:
       return "*";
