@@ -424,6 +424,9 @@ TEST(Conversion, ControlCommand)
 
 TEST(Conversion, Shift)
 {
+  /**
+   * @note Convert low shift value
+   */
   autoware_vehicle_msgs::Shift proto;
   proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
   autoware_vehicle_msgs::msg::Shift msg;
@@ -434,6 +437,53 @@ TEST(Conversion, Shift)
   EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toMsg(proto, msg);
   EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert parking shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::PARKING;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert drive shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert reverse shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert none shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::NONE;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Invalida value input
+   */
   msg.data = 1023;
   EXPECT_THROW(
     simulation_interface::toProto(msg, proto),
