@@ -133,28 +133,32 @@ auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concea
 {
   const auto architecture_type = getParameter<std::string>("architecture_type", "unspecified");
 
-  if (not getParameter<bool>("launch_autoware", true)) {
-    return nullptr;
-  } else if (architecture_type == "tier4/proposal") {
-    return std::make_unique<concealer::AutowareArchitectureProposal>(
-      getParameter<std::string>("autoware_launch_package"),
-      getParameter<std::string>("autoware_launch_file"),
-      "map_path:=" + configuration.map_path.string(),
-      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-      "sensor_model:=" + getParameter<std::string>("sensor_model"),
-      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
+  if (architecture_type == "tier4/proposal") {
+    return getParameter<bool>("launch_autoware", true)
+             ? std::make_unique<concealer::AutowareArchitectureProposal>(
+                 getParameter<std::string>("autoware_launch_package"),
+                 getParameter<std::string>("autoware_launch_file"),
+                 "map_path:=" + configuration.map_path.string(),
+                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "rviz_config:=" + configuration.rviz_config_path.string(),
+                 "scenario_simulation:=true")
+             : std::make_unique<concealer::AutowareArchitectureProposal>();
   } else if (architecture_type == "awf/auto") {
-    return std::make_unique<concealer::AutowareAuto>(
-      getParameter<std::string>("autoware_launch_package"),
-      getParameter<std::string>("autoware_launch_file"),
-      "map_path:=" + configuration.map_path.string(),
-      "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
-      "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-      "sensor_model:=" + getParameter<std::string>("sensor_model"),
-      "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
-      "rviz_config:=" + configuration.rviz_config_path.string(), "scenario_simulation:=true");
+    return getParameter<bool>("launch_autoware", true)
+             ? std::make_unique<concealer::AutowareAuto>(
+                 getParameter<std::string>("autoware_launch_package"),
+                 getParameter<std::string>("autoware_launch_file"),
+                 "map_path:=" + configuration.map_path.string(),
+                 "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
+                 "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
+                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "rviz_config:=" + configuration.rviz_config_path.string(),
+                 "scenario_simulation:=true")
+             : std::make_unique<concealer::AutowareAuto>();
   } else {
     throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
   }
