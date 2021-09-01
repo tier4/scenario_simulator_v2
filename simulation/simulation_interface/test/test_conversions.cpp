@@ -15,28 +15,12 @@
 #include <geometry_msgs.pb.h>
 #include <gtest/gtest.h>
 
-#include <geometry_msgs/msg/accel.hpp>
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <geometry_msgs/msg/quaternion.hpp>
-#include <geometry_msgs/msg/twist.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <simulation_interface/conversions.hpp>
-#include <string>
+#include "expect_equal_macros.hpp"
+/**
+ * @brief Test cases
+ */
 
-#define EXPECT_CONTROL_COMMAND_EQ(msg, proto)                                     \
-  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());                               \
-  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
-  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
-  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
-
-#define EXPECT_HEADER_EQ(msg, proto)                            \
-  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str()); \
-  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());                \
-  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
-
-TEST(Conversion, ConvertPoint)
+TEST(Conversion, Point)
 {
   geometry_msgs::Point proto;
   geometry_msgs::msg::Point p;
@@ -44,18 +28,14 @@ TEST(Conversion, ConvertPoint)
   p.y = 2;
   p.z = 3.1;
   simulation_interface::toProto(p, proto);
-  EXPECT_DOUBLE_EQ(p.x, proto.x());
-  EXPECT_DOUBLE_EQ(p.y, proto.y());
-  EXPECT_DOUBLE_EQ(p.z, proto.z());
+  EXPECT_POINT_EQ(p, proto);
   p = geometry_msgs::msg::Point();
   EXPECT_DOUBLE_EQ(p.x, 0);
   simulation_interface::toMsg(proto, p);
-  EXPECT_DOUBLE_EQ(p.x, proto.x());
-  EXPECT_DOUBLE_EQ(p.y, proto.y());
-  EXPECT_DOUBLE_EQ(p.z, proto.z());
+  EXPECT_POINT_EQ(p, proto);
 }
 
-TEST(Conversion, ConvertQuaternion)
+TEST(Conversion, Quaternion)
 {
   geometry_msgs::Quaternion proto;
   geometry_msgs::msg::Quaternion q;
@@ -64,20 +44,14 @@ TEST(Conversion, ConvertQuaternion)
   q.z = 3.1;
   q.w = -10;
   simulation_interface::toProto(q, proto);
-  EXPECT_DOUBLE_EQ(q.x, proto.x());
-  EXPECT_DOUBLE_EQ(q.y, proto.y());
-  EXPECT_DOUBLE_EQ(q.z, proto.z());
-  EXPECT_DOUBLE_EQ(q.w, proto.w());
+  EXPECT_QUATERNION_EQ(q, proto);
   q = geometry_msgs::msg::Quaternion();
   EXPECT_DOUBLE_EQ(q.x, 0);
   simulation_interface::toMsg(proto, q);
-  EXPECT_DOUBLE_EQ(q.x, proto.x());
-  EXPECT_DOUBLE_EQ(q.y, proto.y());
-  EXPECT_DOUBLE_EQ(q.z, proto.z());
-  EXPECT_DOUBLE_EQ(q.w, proto.w());
+  EXPECT_QUATERNION_EQ(q, proto);
 }
 
-TEST(Conversion, ConvertPose)
+TEST(Conversion, Pose)
 {
   geometry_msgs::Pose proto;
   geometry_msgs::msg::Pose p;
@@ -89,26 +63,14 @@ TEST(Conversion, ConvertPose)
   p.orientation.z = 0;
   p.orientation.w = 1;
   simulation_interface::toProto(p, proto);
-  EXPECT_DOUBLE_EQ(p.position.x, proto.position().x());
-  EXPECT_DOUBLE_EQ(p.position.y, proto.position().y());
-  EXPECT_DOUBLE_EQ(p.position.z, proto.position().z());
-  EXPECT_DOUBLE_EQ(p.orientation.x, proto.orientation().x());
-  EXPECT_DOUBLE_EQ(p.orientation.y, proto.orientation().y());
-  EXPECT_DOUBLE_EQ(p.orientation.z, proto.orientation().z());
-  EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
+  EXPECT_POSE_EQ(p, proto);
   p = geometry_msgs::msg::Pose();
   EXPECT_DOUBLE_EQ(p.position.x, 0);
   simulation_interface::toMsg(proto, p);
-  EXPECT_DOUBLE_EQ(p.position.x, proto.position().x());
-  EXPECT_DOUBLE_EQ(p.position.y, proto.position().y());
-  EXPECT_DOUBLE_EQ(p.position.z, proto.position().z());
-  EXPECT_DOUBLE_EQ(p.orientation.x, proto.orientation().x());
-  EXPECT_DOUBLE_EQ(p.orientation.y, proto.orientation().y());
-  EXPECT_DOUBLE_EQ(p.orientation.z, proto.orientation().z());
-  EXPECT_DOUBLE_EQ(p.orientation.w, proto.orientation().w());
+  EXPECT_POSE_EQ(p, proto);
 }
 
-TEST(Conversion, ConvertVector)
+TEST(Conversion, Vector)
 {
   geometry_msgs::Vector3 proto;
   geometry_msgs::msg::Vector3 vec;
@@ -116,18 +78,14 @@ TEST(Conversion, ConvertVector)
   vec.y = 2;
   vec.z = 3.0;
   simulation_interface::toProto(vec, proto);
-  EXPECT_DOUBLE_EQ(vec.x, proto.x());
-  EXPECT_DOUBLE_EQ(vec.y, proto.y());
-  EXPECT_DOUBLE_EQ(vec.z, proto.z());
+  EXPECT_VECTOR3_EQ(vec, proto);
   vec = geometry_msgs::msg::Vector3();
   EXPECT_DOUBLE_EQ(vec.x, 0);
   simulation_interface::toMsg(proto, vec);
-  EXPECT_DOUBLE_EQ(vec.x, proto.x());
-  EXPECT_DOUBLE_EQ(vec.y, proto.y());
-  EXPECT_DOUBLE_EQ(vec.z, proto.z());
+  EXPECT_VECTOR3_EQ(vec, proto);
 }
 
-TEST(Conversion, ConvertTwist)
+TEST(Conversion, Twist)
 {
   geometry_msgs::Twist proto;
   geometry_msgs::msg::Twist twist;
@@ -135,24 +93,14 @@ TEST(Conversion, ConvertTwist)
   twist.linear.y = 2;
   twist.linear.z = 3.0;
   simulation_interface::toProto(twist, proto);
-  EXPECT_DOUBLE_EQ(twist.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(twist.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(twist.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(twist.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(twist.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(twist.angular.z, proto.angular().z());
+  EXPECT_TWIST_EQ(twist, proto);
   twist = geometry_msgs::msg::Twist();
   EXPECT_DOUBLE_EQ(twist.linear.x, 0);
   simulation_interface::toMsg(proto, twist);
-  EXPECT_DOUBLE_EQ(twist.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(twist.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(twist.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(twist.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(twist.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(twist.angular.z, proto.angular().z());
+  EXPECT_TWIST_EQ(twist, proto);
 }
 
-TEST(Conversion, ConvertAccel)
+TEST(Conversion, Accel)
 {
   geometry_msgs::Accel proto;
   geometry_msgs::msg::Accel accel;
@@ -160,42 +108,31 @@ TEST(Conversion, ConvertAccel)
   accel.linear.y = 2;
   accel.linear.z = 3.0;
   simulation_interface::toProto(accel, proto);
-  EXPECT_DOUBLE_EQ(accel.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(accel.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(accel.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(accel.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(accel.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
+  EXPECT_ACCEL_EQ(accel, proto);
   accel = geometry_msgs::msg::Accel();
   EXPECT_DOUBLE_EQ(accel.linear.x, 0);
   simulation_interface::toMsg(proto, accel);
-  EXPECT_DOUBLE_EQ(accel.linear.x, proto.linear().x());
-  EXPECT_DOUBLE_EQ(accel.linear.y, proto.linear().y());
-  EXPECT_DOUBLE_EQ(accel.linear.z, proto.linear().z());
-  EXPECT_DOUBLE_EQ(accel.angular.x, proto.angular().x());
-  EXPECT_DOUBLE_EQ(accel.angular.y, proto.angular().y());
-  EXPECT_DOUBLE_EQ(accel.angular.z, proto.angular().z());
+  EXPECT_ACCEL_EQ(accel, proto);
 }
 
-TEST(Conversion, ConvertPerformance)
+TEST(Conversion, Performance)
 {
   openscenario_msgs::Performance proto;
   openscenario_msgs::msg::Performance performance;
   performance.max_speed = 10;
   performance.max_deceleration = 3;
   simulation_interface::toProto(performance, proto);
+  EXPECT_PERFORMANCE_EQ(performance, proto);
   EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
   EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
   EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
   performance = openscenario_msgs::msg::Performance();
   EXPECT_DOUBLE_EQ(performance.max_speed, 0);
   simulation_interface::toMsg(proto, performance);
-  EXPECT_DOUBLE_EQ(performance.max_acceleration, proto.max_acceleration());
-  EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
-  EXPECT_DOUBLE_EQ(performance.max_speed, proto.max_speed());
+  EXPECT_PERFORMANCE_EQ(performance, proto);
 }
 
-TEST(Conversion, ConvertAxle)
+TEST(Conversion, Axle)
 {
   openscenario_msgs::Axle proto;
   openscenario_msgs::msg::Axle axle;
@@ -205,22 +142,14 @@ TEST(Conversion, ConvertAxle)
   axle.track_width = -10;
   axle.wheel_diameter = 53;
   simulation_interface::toProto(axle, proto);
-  EXPECT_DOUBLE_EQ(axle.max_steering, proto.max_steering());
-  EXPECT_DOUBLE_EQ(axle.position_x, proto.position_x());
-  EXPECT_DOUBLE_EQ(axle.position_z, proto.position_z());
-  EXPECT_DOUBLE_EQ(axle.track_width, proto.track_width());
-  EXPECT_DOUBLE_EQ(axle.wheel_diameter, proto.wheel_diameter());
+  EXPECT_AXLE_EQ(axle, proto);
   axle = openscenario_msgs::msg::Axle();
   EXPECT_DOUBLE_EQ(axle.max_steering, 0);
   simulation_interface::toMsg(proto, axle);
-  EXPECT_DOUBLE_EQ(axle.max_steering, proto.max_steering());
-  EXPECT_DOUBLE_EQ(axle.position_x, proto.position_x());
-  EXPECT_DOUBLE_EQ(axle.position_z, proto.position_z());
-  EXPECT_DOUBLE_EQ(axle.track_width, proto.track_width());
-  EXPECT_DOUBLE_EQ(axle.wheel_diameter, proto.wheel_diameter());
+  EXPECT_AXLE_EQ(axle, proto);
 }
 
-TEST(Conversion, ConvertAxles)
+TEST(Conversion, Axles)
 {
   openscenario_msgs::Axles proto;
   openscenario_msgs::msg::Axles axles;
@@ -235,70 +164,109 @@ TEST(Conversion, ConvertAxles)
   axles.rear_axle.track_width = 14;
   axles.rear_axle.wheel_diameter = 122;
   simulation_interface::toProto(axles, proto);
-  EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, proto.front_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_x, proto.front_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_z, proto.front_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.front_axle.track_width, proto.front_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.front_axle.wheel_diameter, proto.front_axle().wheel_diameter());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.max_steering, proto.rear_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_x, proto.rear_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_z, proto.rear_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.track_width, proto.rear_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
+  EXPECT_AXLES_EQ(axles, proto);
   axles = openscenario_msgs::msg::Axles();
   EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, 0);
   simulation_interface::toMsg(proto, axles);
-  EXPECT_DOUBLE_EQ(axles.front_axle.max_steering, proto.front_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_x, proto.front_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.front_axle.position_z, proto.front_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.front_axle.track_width, proto.front_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.front_axle.wheel_diameter, proto.front_axle().wheel_diameter());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.max_steering, proto.rear_axle().max_steering());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_x, proto.rear_axle().position_x());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.position_z, proto.rear_axle().position_z());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.track_width, proto.rear_axle().track_width());
-  EXPECT_DOUBLE_EQ(axles.rear_axle.wheel_diameter, proto.rear_axle().wheel_diameter());
+  EXPECT_AXLES_EQ(axles, proto);
 }
 
-/*
-TEST(Conversion, ConvertProperty)
+TEST(Conversion, BoundingBox)
 {
-  openscenario_msgs::Property proto;
-  openscenario_msgs::msg::Property p;
-  EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
-  EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
-  // p.is_ego = true;
-  // EXPECT_EQ(proto.is_ego(), p.is_ego);
-  // p.is_ego = false;
-  // EXPECT_EQ(proto.is_ego(), p.is_ego);
+  openscenario_msgs::BoundingBox proto;
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  simulation_interface::toProto(box, proto);
+  EXPECT_BOUNDING_BOX_EQ(box, proto);
+  box = openscenario_msgs::msg::BoundingBox();
+  EXPECT_DOUBLE_EQ(box.center.x, 0);
+  simulation_interface::toMsg(proto, box);
+  EXPECT_BOUNDING_BOX_EQ(box, proto);
 }
-*/
 
-TEST(Conversion, ConvertVehicleParametrs)
+TEST(Conversion, VehicleParameters)
 {
   openscenario_msgs::VehicleParameters proto;
   openscenario_msgs::msg::VehicleParameters p;
-  // p.property.is_ego = true;
+  p.name = "foo";
+  p.vehicle_category = "bar";
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  p.bounding_box = box;
+  openscenario_msgs::msg::Performance performance;
+  performance.max_speed = 10;
+  performance.max_deceleration = 3;
+  p.performance = performance;
+  openscenario_msgs::msg::Axle axle;
+  axle.max_steering = 30;
+  axle.position_x = 3;
+  axle.position_z = 14;
+  axle.track_width = -10;
+  axle.wheel_diameter = 53;
+  p.axles.front_axle = axle;
+  p.axles.rear_axle = axle;
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
-  // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
-  // p.property.is_ego = false;
+  EXPECT_VEHICLE_PARAMETERS_EQ(p, proto);
+  p = openscenario_msgs::msg::VehicleParameters();
+  EXPECT_DOUBLE_EQ(p.bounding_box.dimensions.x, 0);
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
-  // EXPECT_EQ(proto.property().is_ego(), p.property.is_ego);
+  EXPECT_VEHICLE_PARAMETERS_EQ(p, proto);
 }
 
-TEST(Conversion, ConvertMiscObjectParametrs)
+TEST(Conversion, PedestrianParameters)
+{
+  openscenario_msgs::PedestrianParameters proto;
+  openscenario_msgs::msg::PedestrianParameters p;
+  p.name = "foo";
+  p.pedestrian_category = "bar";
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  p.bounding_box = box;
+  EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
+  EXPECT_PEDESTRIAN_PARAMETERS_EQ(p, proto);
+  p = openscenario_msgs::msg::PedestrianParameters();
+  EXPECT_DOUBLE_EQ(p.bounding_box.dimensions.x, 0);
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
+  EXPECT_PEDESTRIAN_PARAMETERS_EQ(p, proto);
+}
+
+TEST(Conversion, MiscObjectParameters)
 {
   openscenario_msgs::MiscObjectParameters proto;
   openscenario_msgs::msg::MiscObjectParameters p;
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  p.bounding_box = box;
   p.misc_object_category = "obstacle";
   EXPECT_NO_THROW(simulation_interface::toProto(p, proto));
-  EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+  EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
   p.misc_object_category = "";
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, p));
   EXPECT_STREQ(p.misc_object_category.c_str(), proto.misc_object_category().c_str());
+  EXPECT_MISC_OBJECT_PARAMETERS_EQ(p, proto);
 }
 
-TEST(Conversion, ConvertActionStatus)
+TEST(Conversion, ActionStatus)
 {
   openscenario_msgs::ActionStatus proto;
   openscenario_msgs::msg::ActionStatus action;
@@ -316,19 +284,66 @@ TEST(Conversion, ConvertActionStatus)
   action.accel.angular.y = 0.5;
   action.accel.angular.z = 98;
   simulation_interface::toProto(action, proto);
-  EXPECT_STREQ(action.current_action.c_str(), proto.current_action().c_str());
-  EXPECT_DOUBLE_EQ(action.twist.linear.x, proto.twist().linear().x());
-  EXPECT_DOUBLE_EQ(action.twist.linear.y, proto.twist().linear().y());
-  EXPECT_DOUBLE_EQ(action.twist.linear.z, proto.twist().linear().z());
-  EXPECT_DOUBLE_EQ(action.twist.angular.x, proto.twist().angular().x());
-  EXPECT_DOUBLE_EQ(action.twist.angular.y, proto.twist().angular().y());
-  EXPECT_DOUBLE_EQ(action.twist.angular.z, proto.twist().angular().z());
-  EXPECT_DOUBLE_EQ(action.accel.linear.x, proto.accel().linear().x());
-  EXPECT_DOUBLE_EQ(action.accel.linear.y, proto.accel().linear().y());
-  EXPECT_DOUBLE_EQ(action.accel.linear.z, proto.accel().linear().z());
-  EXPECT_DOUBLE_EQ(action.accel.angular.x, proto.accel().angular().x());
-  EXPECT_DOUBLE_EQ(action.accel.angular.y, proto.accel().angular().y());
-  EXPECT_DOUBLE_EQ(action.accel.angular.z, proto.accel().angular().z());
+  EXPECT_ACTION_STATUS_EQ(action, proto);
+  action = openscenario_msgs::msg::ActionStatus();
+  EXPECT_DOUBLE_EQ(action.twist.linear.x, 0);
+  simulation_interface::toMsg(proto, action);
+  EXPECT_ACTION_STATUS_EQ(action, proto);
+}
+
+TEST(Conversion, EntityStatus)
+{
+  openscenario_msgs::EntityStatus proto;
+  openscenario_msgs::msg::EntityStatus status;
+  status.name = "test";
+  status.time = 3.0;
+  openscenario_msgs::msg::BoundingBox box;
+  box.center.x = 1.0;
+  box.center.y = 1.23;
+  box.center.z = 43.0;
+  box.dimensions.x = 12.3;
+  box.dimensions.y = 3.9;
+  box.dimensions.z = 4.0;
+  status.bounding_box = box;
+  openscenario_msgs::msg::ActionStatus action;
+  action.current_action = "test";
+  action.twist.linear.x = 1.0;
+  action.twist.linear.y = 2.0;
+  action.twist.linear.z = 3.0;
+  action.twist.angular.x = -20;
+  action.twist.angular.y = -4.2;
+  action.twist.angular.z = 9;
+  action.accel.linear.x = 3.0;
+  action.accel.linear.y = 908;
+  action.accel.linear.z = 987.0;
+  action.accel.angular.x = 0.3;
+  action.accel.angular.y = 0.5;
+  action.accel.angular.z = 98;
+  status.action_status = action;
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 4.0;
+  pose.position.y = 1.2;
+  pose.position.z = 5.1;
+  pose.orientation.x = 0.3;
+  pose.orientation.y = 8.3;
+  pose.orientation.z = 9.3;
+  pose.orientation.w = 10.2;
+  status.pose = pose;
+  openscenario_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = 23;
+  lanelet_pose.s = 1.0;
+  lanelet_pose.offset = 3.5;
+  lanelet_pose.rpy.x = 3.4;
+  lanelet_pose.rpy.y = 5.1;
+  lanelet_pose.rpy.z = 1.3;
+  status.lanelet_pose = lanelet_pose;
+  status.lanelet_pose_valid = false;
+  simulation_interface::toProto(status, proto);
+  EXPECT_ENTITY_STATUS_EQ(status, proto);
+  status = openscenario_msgs::msg::EntityStatus();
+  EXPECT_TRUE(status.lanelet_pose_valid);
+  simulation_interface::toMsg(proto, status);
+  EXPECT_ENTITY_STATUS_EQ(status, proto);
 }
 
 TEST(Conversion, Time)
@@ -338,13 +353,11 @@ TEST(Conversion, Time)
   msg.nanosec = 1;
   msg.sec = 2;
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_TIME_EQ(msg, proto);
   msg.nanosec = 0;
   msg.sec = 0;
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_TIME_EQ(msg, proto);
 }
 
 TEST(Conversion, Duration)
@@ -354,13 +367,11 @@ TEST(Conversion, Duration)
   msg.nanosec = 1;
   msg.sec = 2;
   simulation_interface::toProto(msg, proto);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_DURATION_EQ(msg, proto);
   msg.nanosec = 0;
   msg.sec = 0;
   simulation_interface::toMsg(proto, msg);
-  EXPECT_EQ(msg.nanosec, proto.nanosec());
-  EXPECT_EQ(msg.sec, proto.sec());
+  EXPECT_DURATION_EQ(msg, proto);
 }
 
 TEST(Conversion, Header)
@@ -379,6 +390,20 @@ TEST(Conversion, Header)
   EXPECT_HEADER_EQ(msg, proto);
 }
 
+TEST(Conversion, Clock)
+{
+  rosgraph_msgs::msg::Clock msg;
+  rosgraph_msgs::Clock proto;
+  msg.clock.nanosec = 12;
+  msg.clock.sec = 11;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_CLOCK_EQ(msg, proto);
+  msg = rosgraph_msgs::msg::Clock();
+  EXPECT_EQ(msg.clock.nanosec, static_cast<uint32_t>(0));
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_CLOCK_EQ(msg, proto);
+}
+
 TEST(Conversion, ControlCommand)
 {
   autoware_control_msgs::ControlCommand proto;
@@ -394,10 +419,14 @@ TEST(Conversion, ControlCommand)
   msg.steering_angle_velocity = 0;
   msg.velocity = 0;
   simulation_interface::toMsg(proto, msg);
+  EXPECT_CONTROL_COMMAND_EQ(msg, proto);
 }
 
 TEST(Conversion, Shift)
 {
+  /**
+   * @note Convert low shift value
+   */
   autoware_vehicle_msgs::Shift proto;
   proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::PARKING);
   autoware_vehicle_msgs::msg::Shift msg;
@@ -408,9 +437,57 @@ TEST(Conversion, Shift)
   EXPECT_FALSE(msg.data == proto.data());
   simulation_interface::toMsg(proto, msg);
   EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert parking shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::PARKING;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert drive shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert reverse shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Convert none shift value
+   */
+  msg.data = autoware_vehicle_msgs::msg::Shift::NONE;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toProto(msg, proto);
+  EXPECT_EQ(msg.data, proto.data());
+  msg.data = autoware_vehicle_msgs::msg::Shift::LOW;
+  EXPECT_FALSE(msg.data == proto.data());
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_EQ(msg.data, proto.data());
+  /**
+   * @note Invalid value input
+   */
   msg.data = 1023;
   EXPECT_THROW(
-    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
 }
 
 TEST(Conversion, VehicleCommand)
@@ -427,24 +504,20 @@ TEST(Conversion, VehicleCommand)
   msg.header.stamp.nanosec = 99;
   msg.header.stamp.sec = 3;
   simulation_interface::toProto(msg, proto);
-  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
-  EXPECT_TRUE(msg.shift.data == proto.shift().data());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
   msg.shift.data = 1023;
   EXPECT_THROW(
-    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
   EXPECT_HEADER_EQ(msg.header, proto.header());
   EXPECT_EQ(msg.emergency, proto.emergency());
   msg = autoware_vehicle_msgs::msg::VehicleCommand();
   simulation_interface::toMsg(proto, msg);
-  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
-  EXPECT_TRUE(msg.shift.data == proto.shift().data());
-  EXPECT_EQ(msg.shift.data, proto.shift().data());
+  EXPECT_VEHICLE_COMMAND_EQ(msg, proto);
   msg.shift.data = 1023;
   EXPECT_THROW(
-    simulation_interface::toProto(msg, proto), common::scenario_simulator_exception::SemanticError);
+    simulation_interface::toProto(msg, proto),
+    common::scenario_simulator_exception::SimulationError);
   EXPECT_HEADER_EQ(msg.header, proto.header());
   EXPECT_EQ(msg.emergency, proto.emergency());
 }
@@ -456,9 +529,41 @@ TEST(Conversion, EntityType)
   msg.type = msg.VEHICLE;
   EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
   EXPECT_EQ(proto, openscenario_msgs::EntityType::VEHICLE);
+  msg.type = msg.MISC_OBJECT;
+  EXPECT_NO_THROW(simulation_interface::toProto(msg, proto));
+  EXPECT_EQ(proto, openscenario_msgs::EntityType::MISC_OBJECT);
+  proto = openscenario_msgs::EntityType::VEHICLE;
   msg.type = msg.EGO;
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
   EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::VEHICLE);
+  msg.type = msg.VEHICLE;
+  proto = openscenario_msgs::EntityType::EGO;
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::EGO);
+  msg.type = msg.VEHICLE;
+  proto = openscenario_msgs::EntityType::PEDESTRIAN;
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::PEDESTRIAN);
+  proto = openscenario_msgs::EntityType::MISC_OBJECT;
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, msg));
+  EXPECT_EQ(msg.type, openscenario_msgs::msg::EntityType::MISC_OBJECT);
+}
+
+TEST(Conversion, LaneletPose)
+{
+  openscenario_msgs::msg::LaneletPose pose;
+  openscenario_msgs::LaneletPose proto;
+  pose.lanelet_id = 23;
+  pose.s = 1.0;
+  pose.offset = 3.5;
+  pose.rpy.x = 3.4;
+  pose.rpy.y = 5.1;
+  pose.rpy.z = 1.3;
+  EXPECT_NO_THROW(simulation_interface::toProto(pose, proto));
+  EXPECT_LANELET_POSE_EQ(pose, proto);
+  pose = openscenario_msgs::msg::LaneletPose();
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, pose));
+  EXPECT_LANELET_POSE_EQ(pose, proto);
 }
 
 int main(int argc, char ** argv)

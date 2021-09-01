@@ -12,8 +12,8 @@ Currently, macOS and Windows are not supported yet.
 Please follow the instructions below.
 
 <iframe
-    src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.docker.com%2Fengine%2Finstall%2F" 
-    title="Install Docker Engine" 
+    src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.docker.com%2Fengine%2Finstall%2F"
+    title="Install Docker Engine"
     class="embed-card embed-webcard"
     scrolling="no"
     frameborder="0"
@@ -25,11 +25,11 @@ If you finished installing docker, please type the commands below in order to ch
 docker run hello-world
 ```
 
-You can see the output like below if you have succeeded to install docker.  
+You can see the output like below if you have succeeded to install docker.
 ```bash
 Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
-b8dfde127a29: Pull complete 
+b8dfde127a29: Pull complete
 Digest: sha256:f2266cbfc127c960fd30e76b7c792dc23b588c0db76233517e1891a4e357d519
 Status: Downloaded newer image for hello-world:latest
 
@@ -93,7 +93,7 @@ You can see the outputs like below.
 | 23%   38C    P0    60W / 250W |    772MiB / 11175MiB |      0%      Default |
 |                               |                      |                  N/A |
 +-------------------------------+----------------------+----------------------+
-                                                                               
+
 +-----------------------------------------------------------------------------+
 | Processes:                                                                  |
 |  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
@@ -104,30 +104,30 @@ You can see the outputs like below.
 
 ## Install rocker
 
-<iframe 
-  class="hatenablogcard" 
-  style="width:100%;height:155px;max-width:450px;" 
-  title="rocker" 
-  src="https://hatenablog-parts.com/embed?url=https://github.com/osrf/rocker" 
+<iframe
+  class="hatenablogcard"
+  style="width:100%;height:155px;max-width:450px;"
+  title="rocker"
+  src="https://hatenablog-parts.com/embed?url=https://github.com/osrf/rocker"
   width="300" height="150" frameborder="0" scrolling="no">
 </iframe>
 
-rocker is a docker support tool for ROS.  
-It enables us to run rviz inside docker very easily.  
+rocker is a docker support tool for ROS.
+It enables us to run rviz inside docker very easily.
 You can install rocker via pip3.
 ```bash
 sudo pip3 install git+https://github.com/osrf/rocker.git
 ```
 
-After install rocker, please check rocker works correctly.  
-If your machine has GPU(s), please type the commands below.  
+After install rocker, please check rocker works correctly.
+If your machine has GPU(s), please type the commands below.
 ```bash
 rocker --nvidia --x11 osrf/ros:crystal-desktop rviz2
 ```
-You can see rviz working on docker.  
+You can see rviz working on docker.
 ![Running rviz inside rocker](../image/rviz_with_rocker.png "running rviz inside rocker.")
 
-If your machine has no GPU, please type the commands below.  
+If your machine has no GPU, please type the commands below.
 ```bash
 rocker --x11 osrf/ros:crystal-desktop rviz2
 ```
@@ -150,13 +150,13 @@ Please type this commands and run [simple demo](SimpleDemo.md) in your local ter
 If your local machine has NVIDIA GPUs,
 
 ```bash
-rocker --nvidia --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo with_rviz:=true timeout:=60
+rocker --nvidia --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
 
 If your local machine does not have NVIDIA GPUs,
 
 ```bash
-rocker --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo with_rviz:=true timeout:=60
+rocker --x11 scenario_simulator_v2 ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
 
 ### Running with docker image from Docker Hub.
@@ -173,14 +173,14 @@ If your local machine has NVIDIA GPUs,
 
 ```bash
 docker pull tier4/scenario_simulator_v2:latest
-rocker --nvidia --x11 tier4/scenario_simulator_v2:latest ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo with_rviz:=true timeout:=60
+rocker --nvidia --x11 tier4/scenario_simulator_v2:latest ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
 
 If your local machine does not have NVIDIA GPUs,
 
 ```bash
 docker pull tier4/scenario_simulator_v2:latest
-rocker --x11 tier4/scenario_simulator_v2:latest ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo with_rviz:=true timeout:=60
+rocker --x11 tier4/scenario_simulator_v2:latest ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
 
 <video
