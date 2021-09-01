@@ -30,10 +30,12 @@ std::string enumToString(const TransportProtocol & protocol)
   switch (protocol) {
     case TransportProtocol::TCP:
       return "tcp";
+      /*
     case TransportProtocol::UDP:
-      return "udp";
+      return "udp";              
+      */
   }
-  THROW_SIMULATION_ERROR("Protocol should be TCP or UDP.");
+  THROW_SIMULATION_ERROR("Protocol should be TCP.");  // LCOV_EXCL_LINE
 }
 
 std::string enumToString(const HostName & hostname)
@@ -44,6 +46,6 @@ std::string enumToString(const HostName & hostname)
     case HostName::ANY:
       return "*";
   }
-  THROW_SIMULATION_ERROR("Hostname protocol should be LOCALHOST or ANY.");
+  THROW_SIMULATION_ERROR("Hostname protocol should be LOCALHOST or ANY.");  // LCOV_EXCL_LINE
 }
 }  // namespace simulation_interface

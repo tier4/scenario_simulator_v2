@@ -19,7 +19,7 @@
 
 namespace simulation_interface
 {
-enum class TransportProtocol { TCP, UDP };
+enum class TransportProtocol { TCP /*, UDP*/ };
 
 std::string enumToString(const TransportProtocol & protocol);
 
