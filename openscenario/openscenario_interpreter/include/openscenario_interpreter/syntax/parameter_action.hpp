@@ -36,21 +36,21 @@ inline namespace syntax
  * </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-#define ELEMENT(NAME)                                                                  \
-  std::make_pair(#NAME, [&](auto && child) {                                           \
-    return make<Parameter##NAME>(                                                      \
-      child, outer_scope, readAttribute<String>("parameterRef", parent, outer_scope)); \
-  })
 
 struct ParameterAction : public Element
 {
   template <typename Node, typename Scope>
   explicit ParameterAction(const Node & parent, Scope & outer_scope)
-  : Element(choice(parent, ELEMENT(SetAction), ELEMENT(ModifyAction)))
+  // clang-format off
+  : Element(
+      choice(parent,
+        std::make_pair(   "SetAction", [&](auto && node) { return make<   ParameterSetAction>(node, outer_scope, readAttribute<String>("parameterRef", parent, outer_scope)); }),
+        std::make_pair("ModifyAction", [&](auto && node) { return make<ParameterModifyAction>(node, outer_scope, readAttribute<String>("parameterRef", parent, outer_scope)); })))
+  // clang-format on
   {
   }
 
-  static bool endsImmediately() { return true; }
+  static auto endsImmediately() -> bool { return true; }
 };
 
 #undef ELEMENT

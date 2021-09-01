@@ -25,3 +25,5 @@ See also [LICENSE](LICENSE).
 ## Why this framework is v2?
 This package is re-designed [scenario runner](https://github.com/tier4/scenario_runner.iv.universe) developed by [Tier IV, Inc.](https://tier4.jp/en/), so we named this framework as "scenario_simulator_v2"
 
+## Development rules
+See also [this page.](/etc/DevelopmentRules)

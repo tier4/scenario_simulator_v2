@@ -26,12 +26,13 @@
 #include <string>
 #include <vector>
 
-class TraveledDistanceScenario : public cpp_mock_scenarios::CppScenarioNode
+class OutOfRangeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit TraveledDistanceScenario(const rclcpp::NodeOptions & option)
+  explicit OutOfRangeScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "idiot_npc", ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
+      "out_of_ramge",
+      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
       "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
   {
     start();
@@ -66,7 +67,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<TraveledDistanceScenario>(options);
+  auto component = std::make_shared<OutOfRangeScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

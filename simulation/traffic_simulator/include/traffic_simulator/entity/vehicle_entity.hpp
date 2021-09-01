@@ -57,6 +57,8 @@ public:
 
   void requestAcquirePosition(const openscenario_msgs::msg::LaneletPose & lanelet_pose);
 
+  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+
   void requestLaneChange(const std::int64_t to_lanelet_id);
 
   void cancelRequest();
@@ -94,6 +96,8 @@ public:
 
   void requestAssignRoute(
     const std::vector<openscenario_msgs::msg::LaneletPose> & waypoints) override;
+
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   const std::string getCurrentAction() const { return tree_ptr_->getCurrentAction(); }
 
