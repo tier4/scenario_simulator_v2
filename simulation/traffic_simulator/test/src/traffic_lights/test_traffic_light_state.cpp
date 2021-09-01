@@ -29,6 +29,21 @@ TEST(TrafficLights, makeLampState)
   EXPECT_EQ(
     traffic_simulator::makeLampState(traffic_simulator::TrafficLightColor::YELLOW).type,
     autoware_perception_msgs::msg::LampState::YELLOW);
+  EXPECT_THROW(
+    traffic_simulator::makeLampState(traffic_simulator::TrafficLightColor::NONE),
+    std::out_of_range);
+  EXPECT_EQ(
+    traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::STRAIGHT).type,
+    autoware_perception_msgs::msg::LampState::UP);
+  EXPECT_EQ(
+    traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::RIGHT).type,
+    autoware_perception_msgs::msg::LampState::RIGHT);
+  EXPECT_EQ(
+    traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::LEFT).type,
+    autoware_perception_msgs::msg::LampState::LEFT);
+  EXPECT_THROW(
+    traffic_simulator::makeLampState(traffic_simulator::TrafficLightArrow::NONE),
+    std::out_of_range);
 }
 
 int main(int argc, char ** argv)
