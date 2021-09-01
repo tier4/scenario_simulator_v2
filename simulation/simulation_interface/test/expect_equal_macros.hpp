@@ -49,6 +49,11 @@
   EXPECT_EQ(msg.sec, proto.sec());
 
 /**
+ * @brief Expect equal macro for rosgraph_msgs
+ */
+#define EXPECT_CLOCK_EQ(msg, proto) EXPECT_TIME_EQ(msg.clock, proto.clock());
+
+/**
  * @brief Expect equal macros for geometry_msgs.
  */
 

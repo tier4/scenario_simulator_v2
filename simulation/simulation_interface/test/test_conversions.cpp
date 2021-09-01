@@ -390,6 +390,20 @@ TEST(Conversion, Header)
   EXPECT_HEADER_EQ(msg, proto);
 }
 
+TEST(Conversion, Clock)
+{
+  rosgraph_msgs::msg::Clock msg;
+  rosgraph_msgs::Clock proto;
+  msg.clock.nanosec = 12;
+  msg.clock.sec = 11;
+  simulation_interface::toProto(msg, proto);
+  EXPECT_CLOCK_EQ(msg, proto);
+  msg = rosgraph_msgs::msg::Clock();
+  EXPECT_EQ(msg.clock.nanosec, static_cast<uint32_t>(0));
+  simulation_interface::toMsg(proto, msg);
+  EXPECT_CLOCK_EQ(msg, proto);
+}
+
 TEST(Conversion, ControlCommand)
 {
   autoware_control_msgs::ControlCommand proto;
