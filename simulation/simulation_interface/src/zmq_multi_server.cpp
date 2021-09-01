@@ -21,7 +21,7 @@ template <typename Proto>
 zmqpp::message toZMQ(const Proto & proto)
 {
   zmqpp::message msg;
-  std::string serialized_str;
+  std::string serialized_str = "";
   proto.SerializeToString(&serialized_str);
   msg << serialized_str;
   return msg;

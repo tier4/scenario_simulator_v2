@@ -52,26 +52,6 @@ target_link_libraries(simulation_interface
   zmq
 )
 
-ament_auto_add_executable(example
-  src/example.cpp
-  src/conversions.cpp
-  src/constants.cpp
-  ${PROTO_SRCS}
-)
-target_link_libraries(example
-  ${PROTOBUF_LIBRARY}
-  Boost::thread
-  pthread
-  sodium
-  zmqpp
-  zmq
-)
-
-install(TARGETS
-  example
-  DESTINATION lib/${PROJECT_NAME}
-)
-
 install(TARGETS simulation_interface
   EXPORT export_simulation_interface
   ARCHIVE DESTINATION lib

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/constants.hpp>
 #include <string>
 
@@ -29,22 +30,22 @@ std::string enumToString(const TransportProtocol & protocol)
   switch (protocol) {
     case TransportProtocol::TCP:
       return "tcp";
+      /*
     case TransportProtocol::UDP:
-      return "udp";
-    default:
-      return "";
+      return "udp";              
+      */
   }
+  THROW_SIMULATION_ERROR("Protocol should be TCP.");  // LCOV_EXCL_LINE
 }
 
 std::string enumToString(const HostName & hostname)
 {
   switch (hostname) {
-    case HostName::LOCLHOST:
+    case HostName::LOCALHOST:
       return "localhost";
     case HostName::ANY:
       return "*";
-    default:
-      return "";
   }
+  THROW_SIMULATION_ERROR("Hostname protocol should be LOCALHOST or ANY.");  // LCOV_EXCL_LINE
 }
 }  // namespace simulation_interface
