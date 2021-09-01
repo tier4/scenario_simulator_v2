@@ -32,134 +32,134 @@
  * @brief Expect equal macros for std_msgs.
  */
 
-#define EXPECT_HEADER_EQ(msg, proto)                            \
-  EXPECT_STREQ(msg.frame_id.c_str(), proto.frame_id().c_str()); \
-  EXPECT_EQ(msg.stamp.sec, proto.stamp().sec());                \
-  EXPECT_EQ(msg.stamp.nanosec, proto.stamp().nanosec());
+#define EXPECT_HEADER_EQ(MSG, PROTO)                            \
+  EXPECT_STREQ(MSG.frame_id.c_str(), PROTO.frame_id().c_str()); \
+  EXPECT_EQ(MSG.stamp.sec, PROTO.stamp().sec());                \
+  EXPECT_EQ(MSG.stamp.nanosec, PROTO.stamp().nanosec());
 
 /**
  * @brief Expect equal macros for builtin_interfaces
  */
-#define EXPECT_TIME_EQ(msg, proto)         \
-  EXPECT_EQ(msg.nanosec, proto.nanosec()); \
-  EXPECT_EQ(msg.sec, proto.sec());
+#define EXPECT_TIME_EQ(MSG, PROTO)         \
+  EXPECT_EQ(MSG.nanosec, PROTO.nanosec()); \
+  EXPECT_EQ(MSG.sec, PROTO.sec());
 
-#define EXPECT_DURATION_EQ(msg, proto)     \
-  EXPECT_EQ(msg.nanosec, proto.nanosec()); \
-  EXPECT_EQ(msg.sec, proto.sec());
+#define EXPECT_DURATION_EQ(MSG, PROTO)     \
+  EXPECT_EQ(MSG.nanosec, PROTO.nanosec()); \
+  EXPECT_EQ(MSG.sec, PROTO.sec());
 
 /**
  * @brief Expect equal macro for rosgraph_msgs
  */
-#define EXPECT_CLOCK_EQ(msg, proto) EXPECT_TIME_EQ(msg.clock, proto.clock());
+#define EXPECT_CLOCK_EQ(MSG, PROTO) EXPECT_TIME_EQ(MSG.clock, PROTO.clock());
 
 /**
  * @brief Expect equal macros for geometry_msgs.
  */
 
-#define EXPECT_POINT_EQ(msg, proto)   \
-  EXPECT_DOUBLE_EQ(msg.x, proto.x()); \
-  EXPECT_DOUBLE_EQ(msg.y, proto.y()); \
-  EXPECT_DOUBLE_EQ(msg.z, proto.z());
+#define EXPECT_POINT_EQ(MSG, PROTO)   \
+  EXPECT_DOUBLE_EQ(MSG.x, PROTO.x()); \
+  EXPECT_DOUBLE_EQ(MSG.y, PROTO.y()); \
+  EXPECT_DOUBLE_EQ(MSG.z, PROTO.z());
 
-#define EXPECT_QUATERNION_EQ(msg, proto) \
-  EXPECT_DOUBLE_EQ(msg.x, proto.x());    \
-  EXPECT_DOUBLE_EQ(msg.y, proto.y());    \
-  EXPECT_DOUBLE_EQ(msg.z, proto.z());    \
-  EXPECT_DOUBLE_EQ(msg.w, proto.w());
+#define EXPECT_QUATERNION_EQ(MSG, PROTO) \
+  EXPECT_DOUBLE_EQ(MSG.x, PROTO.x());    \
+  EXPECT_DOUBLE_EQ(MSG.y, PROTO.y());    \
+  EXPECT_DOUBLE_EQ(MSG.z, PROTO.z());    \
+  EXPECT_DOUBLE_EQ(MSG.w, PROTO.w());
 
-#define EXPECT_POSE_EQ(msg, proto)                            \
-  EXPECT_QUATERNION_EQ(msg.orientation, proto.orientation()); \
-  EXPECT_POINT_EQ(msg.position, proto.position());
+#define EXPECT_POSE_EQ(MSG, PROTO)                            \
+  EXPECT_QUATERNION_EQ(MSG.orientation, PROTO.orientation()); \
+  EXPECT_POINT_EQ(MSG.position, PROTO.position());
 
-#define EXPECT_VECTOR3_EQ(msg, proto) \
-  EXPECT_DOUBLE_EQ(msg.x, proto.x()); \
-  EXPECT_DOUBLE_EQ(msg.y, proto.y()); \
-  EXPECT_DOUBLE_EQ(msg.z, proto.z());
+#define EXPECT_VECTOR3_EQ(MSG, PROTO) \
+  EXPECT_DOUBLE_EQ(MSG.x, PROTO.x()); \
+  EXPECT_DOUBLE_EQ(MSG.y, PROTO.y()); \
+  EXPECT_DOUBLE_EQ(MSG.z, PROTO.z());
 
-#define EXPECT_TWIST_EQ(msg, proto)              \
-  EXPECT_VECTOR3_EQ(msg.linear, proto.linear()); \
-  EXPECT_VECTOR3_EQ(msg.angular, proto.angular());
+#define EXPECT_TWIST_EQ(MSG, PROTO)              \
+  EXPECT_VECTOR3_EQ(MSG.linear, PROTO.linear()); \
+  EXPECT_VECTOR3_EQ(MSG.angular, PROTO.angular());
 
-#define EXPECT_ACCEL_EQ(msg, proto)              \
-  EXPECT_VECTOR3_EQ(msg.linear, proto.linear()); \
-  EXPECT_VECTOR3_EQ(msg.angular, proto.angular());
+#define EXPECT_ACCEL_EQ(MSG, PROTO)              \
+  EXPECT_VECTOR3_EQ(MSG.linear, PROTO.linear()); \
+  EXPECT_VECTOR3_EQ(MSG.angular, PROTO.angular());
 
 /**
  * @brief Expect equal macros for openscenario_msgs.
  */
 
-#define EXPECT_PERFORMANCE_EQ(msg, proto)                           \
-  EXPECT_DOUBLE_EQ(msg.max_speed, proto.max_speed());               \
-  EXPECT_DOUBLE_EQ(msg.max_acceleration, proto.max_acceleration()); \
-  EXPECT_DOUBLE_EQ(msg.max_deceleration, proto.max_deceleration());
+#define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                           \
+  EXPECT_DOUBLE_EQ(MSG.max_speed, PROTO.max_speed());               \
+  EXPECT_DOUBLE_EQ(MSG.max_acceleration, PROTO.max_acceleration()); \
+  EXPECT_DOUBLE_EQ(MSG.max_deceleration, PROTO.max_deceleration());
 
-#define EXPECT_AXLE_EQ(msg, proto)                              \
-  EXPECT_DOUBLE_EQ(msg.max_steering, proto.max_steering());     \
-  EXPECT_DOUBLE_EQ(msg.wheel_diameter, proto.wheel_diameter()); \
-  EXPECT_DOUBLE_EQ(msg.track_width, proto.track_width());       \
-  EXPECT_DOUBLE_EQ(msg.position_x, proto.position_x());         \
-  EXPECT_DOUBLE_EQ(msg.position_z, proto.position_z());
+#define EXPECT_AXLE_EQ(MSG, PROTO)                              \
+  EXPECT_DOUBLE_EQ(MSG.max_steering, PROTO.max_steering());     \
+  EXPECT_DOUBLE_EQ(MSG.wheel_diameter, PROTO.wheel_diameter()); \
+  EXPECT_DOUBLE_EQ(MSG.track_width, PROTO.track_width());       \
+  EXPECT_DOUBLE_EQ(MSG.position_x, PROTO.position_x());         \
+  EXPECT_DOUBLE_EQ(MSG.position_z, PROTO.position_z());
 
-#define EXPECT_AXLES_EQ(msg, proto)                  \
-  EXPECT_AXLE_EQ(msg.front_axle, proto.front_axle()) \
-  EXPECT_AXLE_EQ(msg.rear_axle, proto.rear_axle());
+#define EXPECT_AXLES_EQ(MSG, PROTO)                  \
+  EXPECT_AXLE_EQ(MSG.front_axle, PROTO.front_axle()) \
+  EXPECT_AXLE_EQ(MSG.rear_axle, PROTO.rear_axle());
 
-#define EXPECT_BOUNDING_BOX_EQ(msg, proto)     \
-  EXPECT_POINT_EQ(msg.center, proto.center()); \
-  EXPECT_VECTOR3_EQ(msg.dimensions, proto.dimensions());
+#define EXPECT_BOUNDING_BOX_EQ(MSG, PROTO)     \
+  EXPECT_POINT_EQ(MSG.center, PROTO.center()); \
+  EXPECT_VECTOR3_EQ(MSG.dimensions, PROTO.dimensions());
 
-#define EXPECT_VEHICLE_PARAMETERS_EQ(msg, proto)                                \
-  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());                         \
-  EXPECT_STREQ(msg.vehicle_category.c_str(), proto.vehicle_category().c_str()); \
-  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());               \
-  EXPECT_PERFORMANCE_EQ(msg.performance, proto.performance());                  \
-  EXPECT_AXLES_EQ(msg.axles, proto.axles());
+#define EXPECT_VEHICLE_PARAMETERS_EQ(MSG, PROTO)                                \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());                         \
+  EXPECT_STREQ(MSG.vehicle_category.c_str(), PROTO.vehicle_category().c_str()); \
+  EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());               \
+  EXPECT_PERFORMANCE_EQ(MSG.performance, PROTO.performance());                  \
+  EXPECT_AXLES_EQ(MSG.axles, PROTO.axles());
 
-#define EXPECT_PEDESTRIAN_PARAMETERS_EQ(msg, proto)                                   \
-  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());                               \
-  EXPECT_STREQ(msg.pedestrian_category.c_str(), proto.pedestrian_category().c_str()); \
-  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());
+#define EXPECT_PEDESTRIAN_PARAMETERS_EQ(MSG, PROTO)                                   \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());                               \
+  EXPECT_STREQ(MSG.pedestrian_category.c_str(), PROTO.pedestrian_category().c_str()); \
+  EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());
 
-#define EXPECT_MISC_OBJECT_PARAMETERS_EQ(msg, proto)                                    \
-  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());                                 \
-  EXPECT_STREQ(msg.misc_object_category.c_str(), proto.misc_object_category().c_str()); \
-  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());
+#define EXPECT_MISC_OBJECT_PARAMETERS_EQ(MSG, PROTO)                                    \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());                                 \
+  EXPECT_STREQ(MSG.misc_object_category.c_str(), PROTO.misc_object_category().c_str()); \
+  EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());
 
-#define EXPECT_ACTION_STATUS_EQ(msg, proto)                                 \
-  EXPECT_STREQ(msg.current_action.c_str(), proto.current_action().c_str()); \
-  EXPECT_TWIST_EQ(msg.twist, proto.twist());                                \
-  EXPECT_ACCEL_EQ(msg.accel, proto.accel());
+#define EXPECT_ACTION_STATUS_EQ(MSG, PROTO)                                 \
+  EXPECT_STREQ(MSG.current_action.c_str(), PROTO.current_action().c_str()); \
+  EXPECT_TWIST_EQ(MSG.twist, PROTO.twist());                                \
+  EXPECT_ACCEL_EQ(MSG.accel, PROTO.accel());
 
-#define EXPECT_LANELET_POSE_EQ(msg, proto)       \
-  EXPECT_EQ(msg.lanelet_id, proto.lanelet_id()); \
-  EXPECT_DOUBLE_EQ(msg.s, proto.s());            \
-  EXPECT_DOUBLE_EQ(msg.offset, proto.offset());  \
-  EXPECT_VECTOR3_EQ(msg.rpy, proto.rpy());
+#define EXPECT_LANELET_POSE_EQ(MSG, PROTO)       \
+  EXPECT_EQ(MSG.lanelet_id, PROTO.lanelet_id()); \
+  EXPECT_DOUBLE_EQ(MSG.s, PROTO.s());            \
+  EXPECT_DOUBLE_EQ(MSG.offset, PROTO.offset());  \
+  EXPECT_VECTOR3_EQ(MSG.rpy, PROTO.rpy());
 
-#define EXPECT_ENTITY_STATUS_EQ(msg, proto)                          \
-  EXPECT_DOUBLE_EQ(msg.time, proto.time());                          \
-  EXPECT_STREQ(msg.name.c_str(), proto.name().c_str());              \
-  EXPECT_BOUNDING_BOX_EQ(msg.bounding_box, proto.bounding_box());    \
-  EXPECT_ACTION_STATUS_EQ(msg.action_status, proto.action_status()); \
-  EXPECT_POSE_EQ(msg.pose, proto.pose());                            \
-  EXPECT_LANELET_POSE_EQ(msg.lanelet_pose, proto.lanelet_pose());    \
-  EXPECT_EQ(msg.lanelet_pose_valid, proto.lanelet_pose_valid());
+#define EXPECT_ENTITY_STATUS_EQ(MSG, PROTO)                          \
+  EXPECT_DOUBLE_EQ(MSG.time, PROTO.time());                          \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());              \
+  EXPECT_BOUNDING_BOX_EQ(MSG.bounding_box, PROTO.bounding_box());    \
+  EXPECT_ACTION_STATUS_EQ(MSG.action_status, PROTO.action_status()); \
+  EXPECT_POSE_EQ(MSG.pose, PROTO.pose());                            \
+  EXPECT_LANELET_POSE_EQ(MSG.lanelet_pose, PROTO.lanelet_pose());    \
+  EXPECT_EQ(MSG.lanelet_pose_valid, PROTO.lanelet_pose_valid());
 
 /**
  * @brief Expect equal macros for autoware related messages.
  */
 
-#define EXPECT_CONTROL_COMMAND_EQ(msg, proto)                                     \
-  EXPECT_DOUBLE_EQ(msg.velocity, proto.velocity());                               \
-  EXPECT_DOUBLE_EQ(msg.steering_angle_velocity, proto.steering_angle_velocity()); \
-  EXPECT_DOUBLE_EQ(msg.steering_angle, proto.steering_angle());                   \
-  EXPECT_DOUBLE_EQ(msg.acceleration, proto.acceleration());
+#define EXPECT_CONTROL_COMMAND_EQ(MSG, PROTO)                                     \
+  EXPECT_DOUBLE_EQ(MSG.velocity, PROTO.velocity());                               \
+  EXPECT_DOUBLE_EQ(MSG.steering_angle_velocity, PROTO.steering_angle_velocity()); \
+  EXPECT_DOUBLE_EQ(MSG.steering_angle, PROTO.steering_angle());                   \
+  EXPECT_DOUBLE_EQ(MSG.acceleration, PROTO.acceleration());
 
-#define EXPECT_VEHICLE_COMMAND_EQ(msg, proto)              \
-  EXPECT_CONTROL_COMMAND_EQ(msg.control, proto.control()); \
-  EXPECT_EQ(msg.shift.data, proto.shift().data());         \
-  EXPECT_EQ(msg.emergency, proto.emergency());             \
-  EXPECT_HEADER_EQ(msg.header, proto.header());
+#define EXPECT_VEHICLE_COMMAND_EQ(MSG, PROTO)              \
+  EXPECT_CONTROL_COMMAND_EQ(MSG.control, PROTO.control()); \
+  EXPECT_EQ(MSG.shift.data, PROTO.shift().data());         \
+  EXPECT_EQ(MSG.emergency, PROTO.emergency());             \
+  EXPECT_HEADER_EQ(MSG.header, PROTO.header());
 
 #endif  // SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_
