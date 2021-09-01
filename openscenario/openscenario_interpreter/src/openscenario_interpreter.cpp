@@ -66,7 +66,8 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
   {
     configuration.auto_sink = false;
 
-    configuration.initialize_duration = ObjectController::ego_count > 0 ? 30 : 0;
+    configuration.initialize_duration =
+      ObjectController::ego_count > 0 ? getParameter<int>("initialize_duration") : 0;
 
     configuration.scenario_path = osc_path;
 
@@ -111,9 +112,9 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
 
-      record::start(
-        "-a",  //
-        "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+      if (getParameter<bool>("record", true)) {
+        record::start("-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+      }
 
       script.rebind<OpenScenario>(osc_path);
 
@@ -194,7 +195,9 @@ auto Interpreter::on_deactivate(const rclcpp_lifecycle::State &) -> Result
       [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
     result);
 
-  record::stop();
+  if (getParameter<bool>("record", true)) {
+    record::stop();
+  }
 
   return Interpreter::Result::SUCCESS;  // => Inactive
 }

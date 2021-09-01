@@ -67,7 +67,7 @@ class Autoware : public rclcpp::Node, public ContinuousTransformBroadcaster<Auto
   std::exception_ptr thrown;
 
 protected:
-  const pid_t process_id;
+  const pid_t process_id = 0;
 
   int waitpid_options = 0;
 
@@ -90,6 +90,23 @@ protected:
   void resetTimerCallback();
 
 public:
+  CONCEALER_PUBLIC explicit Autoware()
+  : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+    spinner(
+      [this](auto future) {
+        while (rclcpp::ok() and
+               future.wait_for(std::chrono::milliseconds(1)) == std::future_status::timeout) {
+          try {
+            rclcpp::spin_some(get_node_base_interface());
+          } catch (...) {
+            thrown = std::current_exception();
+          }
+        }
+      },
+      std::move(promise.get_future()))
+  {
+  }
+
   template <typename... Ts>
   CONCEALER_PUBLIC explicit Autoware(Ts &&... xs)
   : rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),

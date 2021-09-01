@@ -3,7 +3,7 @@
 **Note! This demo does not use Autoware. Ego Vehicle is interpreted as an NPC**
 
 Before you try to run this demo, you have to build and install scenario_simulator_v2 in your local computer.
-Do you want to know how to do that, please refer [this documentation](BuildInstructions.md). 
+Do you want to know how to do that, please refer [this documentation](BuildInstructions.md).
 
 ## How to run simple demo
 
@@ -11,7 +11,7 @@ Only you have to do is type this command in your terminal.
 
 ```bash
 source ~/scenario_simulator_ws/install/local_setup.bash
-ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo with_rviz:=true timeout:=60
+ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc scenario:=traffic_simulation_demo launch_rviz:=true timeout:=60
 ```
 
 You can see ego vehicle running in kashiwanoha.

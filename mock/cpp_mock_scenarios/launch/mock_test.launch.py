@@ -74,7 +74,7 @@ def on_stdout_output(event: launch.Event) -> None:
 def generate_launch_description():
     timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
-    with_rviz = LaunchConfiguration("with_rviz", default=False)
+    launch_rviz = LaunchConfiguration("launch_rviz", default=False)
     scenario_node = Node(
         package="cpp_mock_scenarios",
         executable=scenario,
@@ -103,8 +103,8 @@ def generate_launch_description():
                 "timeout", default_value=timeout, description="Timeout in seconds."
             ),
             DeclareLaunchArgument(
-                "with_rviz",
-                default_value=with_rviz,
+                "launch_rviz",
+                default_value=launch_rviz,
                 description="If true, launch with rviz.",
             ),
             scenario_node,
@@ -129,7 +129,7 @@ def generate_launch_description():
                 executable="rviz2",
                 name="rviz2",
                 output={"stderr": "log", "stdout": "log"},
-                condition=IfCondition(with_rviz),
+                condition=IfCondition(launch_rviz),
                 arguments=[
                     "-d",
                     str(

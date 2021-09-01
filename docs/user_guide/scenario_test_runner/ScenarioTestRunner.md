@@ -46,7 +46,7 @@ This is the setting to let Ego vehicle run without connecting to Autoware for te
 
 ## How to Test Single Scenario
 ```bash
-ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:='/home/user-name/scenario-folder/t4v2.yaml' with_rviz:=true
+ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:='/home/user-name/scenario-folder/t4v2.yaml' launch_rviz:=true
 ```
 The workflow file defines how to execute scenarios.
 If you want to know how to write the workflow file, read [here.](./HowToWriteWorkflowFile.md)
