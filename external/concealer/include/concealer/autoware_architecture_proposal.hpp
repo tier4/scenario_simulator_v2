@@ -273,10 +273,10 @@ class AutowareArchitectureProposal : public Autoware,
   }
 
   /* ---- LocalizationTwist ----------------------------------------------------
- *
- *  Topic: /localization/twist
- *
- * ------------------------------------------------------------------------ */
+   *
+   *  Topic: /localization/twist
+   *
+   * ------------------------------------------------------------------------ */
   using LocalizationTwist = CurrentTwist;
 
   DEFINE_PUBLISHER(LocalizationTwist);

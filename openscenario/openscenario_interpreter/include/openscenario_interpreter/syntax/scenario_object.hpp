@@ -104,7 +104,7 @@ struct ScenarioObject
       if (is<Vehicle>()) {
         applyAssignControllerAction(name, object_controller);
         if (object_controller.isEgo()) {
-          auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
+          auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
 
           if (architecture_type == "tier4/proposal") {
             attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
@@ -122,7 +122,7 @@ struct ScenarioObject
             // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
             // topic name is yet unknown
           } else {
-            throw std::invalid_argument("Invalid architecture-type = " + architecture_type);
+            throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
           }
         }
       }

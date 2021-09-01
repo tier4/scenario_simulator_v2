@@ -105,7 +105,8 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
       engaged = true;
     } else {
       throw common::AutowareError(
-        "Autoware does not respond. It is likely that some nodes were corrupted during launch");
+        "Autoware did not reach an engageable state within the specified time "
+        "(initialize_duration). It is likely that some nodes were corrupted during launch");
     }
   }
 };

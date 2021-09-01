@@ -27,57 +27,59 @@ void Autoware::shutdownAutoware()
     }
   }
 
-  AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
-  {
-    sendSIGINT();
-  }
-
-  AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Terminating Autoware.");
-  {
-    sigset_t mask{};
+  if (process_id != 0) {
+    AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
     {
-      sigset_t orig_mask{};
+      sendSIGINT();
+    }
 
-      sigemptyset(&mask);
-      sigaddset(&mask, SIGCHLD);
+    AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Terminating Autoware.");
+    {
+      sigset_t mask{};
+      {
+        sigset_t orig_mask{};
 
-      if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0) {
-        AUTOWARE_SYSTEM_ERROR("sigprocmask");
+        sigemptyset(&mask);
+        sigaddset(&mask, SIGCHLD);
+
+        if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0) {
+          AUTOWARE_SYSTEM_ERROR("sigprocmask");
+          std::exit(EXIT_FAILURE);
+        }
+      }
+
+      timespec timeout{};
+      {
+        timeout.tv_sec = 5;
+        timeout.tv_nsec = 0;
+      }
+
+      while (sigtimedwait(&mask, NULL, &timeout) < 0) {
+        switch (errno) {
+          case EINTR:  // Interrupted by a signal other than SIGCHLD.
+            break;
+
+          case EAGAIN:
+            AUTOWARE_ERROR_STREAM(
+              "Shutting down Autoware: (2/3) Autoware launch process does not respond. Kill it.");
+            kill(process_id, SIGKILL);
+            break;
+
+          default:
+            AUTOWARE_SYSTEM_ERROR("sigtimedwait");
+            std::exit(EXIT_FAILURE);
+        }
+      }
+    }
+
+    AUTOWARE_INFO_STREAM("Shutting down Autoware: (3/3) Waiting for Autoware to be exited.");
+    {
+      int status = 0;
+
+      if (waitpid(process_id, &status, waitpid_options) < 0) {
+        AUTOWARE_SYSTEM_ERROR("waitpid");
         std::exit(EXIT_FAILURE);
       }
-    }
-
-    timespec timeout{};
-    {
-      timeout.tv_sec = 5;
-      timeout.tv_nsec = 0;
-    }
-
-    while (sigtimedwait(&mask, NULL, &timeout) < 0) {
-      switch (errno) {
-        case EINTR:  // Interrupted by a signal other than SIGCHLD.
-          break;
-
-        case EAGAIN:
-          AUTOWARE_ERROR_STREAM(
-            "Shutting down Autoware: (2/3) Autoware launch process does not respond. Kill it.");
-          kill(process_id, SIGKILL);
-          break;
-
-        default:
-          AUTOWARE_SYSTEM_ERROR("sigtimedwait");
-          std::exit(EXIT_FAILURE);
-      }
-    }
-  }
-
-  AUTOWARE_INFO_STREAM("Shutting down Autoware: (3/3) Waiting for Autoware to be exited.");
-  {
-    int status = 0;
-
-    if (waitpid(process_id, &status, waitpid_options) < 0) {
-      AUTOWARE_SYSTEM_ERROR("waitpid");
-      std::exit(EXIT_FAILURE);
     }
   }
 }
