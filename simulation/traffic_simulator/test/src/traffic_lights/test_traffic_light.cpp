@@ -144,7 +144,15 @@ TEST(TrafficLights, setColorPhase)
   color_phases.emplace_back(std::make_pair<double, traffic_simulator::TrafficLightColor>(
     10, traffic_simulator::TrafficLightColor::YELLOW));
   light.setColorPhase(color_phases);
+  EXPECT_DOUBLE_EQ(light.getColorPhaseDuration(), 30);
   EXPECT_EQ(light.id, static_cast<std::int64_t>(302120));
+  EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
+  light.update(10);
+  EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::GREEN);
+  light.update(10);
+  EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::YELLOW);
+  light.update(10);
+  EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
 }
 
 int main(int argc, char ** argv)
