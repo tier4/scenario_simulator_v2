@@ -129,6 +129,14 @@ OpenSCENARIO:
                                             offset: 0
                                             Orientation: { type: relative, h: 0, p: 0, r: 0 }
                                         tolerance: 0.5
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: ego.currentState
+                                      rule: equalTo
+                                      value: ArrivedGoal
                         Action:
                           - name: ''
                             UserDefinedAction:

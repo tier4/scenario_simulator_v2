@@ -15,8 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__USER_DEFINED_VALUE_CONDITION_HPP_
 
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
+#include <regex>
 
 namespace openscenario_interpreter
 {
@@ -44,6 +46,8 @@ struct UserDefinedValueCondition
 
   const Rule compare;
 
+  String last_checked_value;
+
   template <typename Node>
   explicit UserDefinedValueCondition(const Node & node, Scope & scope)
   : name(readAttribute<String>("name", node, scope)),
@@ -52,11 +56,31 @@ struct UserDefinedValueCondition
   {
   }
 
-  String last_checked_value;
+  auto evaluate()
+  {
+    static const std::regex pattern{R"(([^\.]+)\.(.+))"};
 
-  auto evaluate() { return asBoolean(compare(last_checked_value, value)); }
+    if (std::smatch result; std::regex_match(name, result, pattern)) {
+      PRINT(name);
+      PRINT(result.str(0));
+      PRINT(result.str(1));
+      PRINT(result.str(2));
 
-  auto description() const
+      static const std::unordered_map<std::string, std::function<std::string(const std::string &)>>
+        dispatch{
+          std::make_pair("currentState", [](auto&&... xs) { return evaluateCurrentState(std::forward<decltype(xs)>(xs)...); }),
+        };
+
+      PRINT(description());
+
+      return asBoolean(
+        compare(last_checked_value = dispatch.at(result.str(2))(result.str(1)), value));
+    } else {
+      throw SyntaxError(__FILE__, ":", __LINE__);
+    }
+  }
+
+  auto description() const -> std::string
   {
     std::stringstream description;
 
