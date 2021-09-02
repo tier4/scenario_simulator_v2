@@ -48,37 +48,27 @@ struct UserDefinedValueCondition
 
   String last_checked_value;
 
+  std::function<std::string()> evaluateValue;
+
   template <typename Node>
   explicit UserDefinedValueCondition(const Node & node, Scope & scope)
   : name(readAttribute<String>("name", node, scope)),
     value(readAttribute<String>("value", node, scope)),
     compare(readAttribute<Rule>("rule", node, scope))
   {
-  }
-
-  auto evaluate()
-  {
     static const std::regex pattern{R"(([^\.]+)\.(.+))"};
 
     if (std::smatch result; std::regex_match(name, result, pattern)) {
-      PRINT(name);
-      PRINT(result.str(0));
-      PRINT(result.str(1));
-      PRINT(result.str(2));
-
-      static const std::unordered_map<std::string, std::function<std::string(const std::string &)>>
-        dispatch{
-          std::make_pair("currentState", [](auto&&... xs) { return evaluateCurrentState(std::forward<decltype(xs)>(xs)...); }),
-        };
-
-      PRINT(description());
-
-      return asBoolean(
-        compare(last_checked_value = dispatch.at(result.str(2))(result.str(1)), value));
+      const std::unordered_map<std::string, std::function<std::string()>> dispatch{
+        std::make_pair("currentState", [result]() { return evaluateCurrentState(result.str(1)); }),
+      };
+      evaluateValue = dispatch.at(result.str(2));  // XXX catch
     } else {
       throw SyntaxError(__FILE__, ":", __LINE__);
     }
   }
+
+  auto evaluate() { return asBoolean(compare(last_checked_value = evaluateValue(), value)); }
 
   auto description() const -> std::string
   {
