@@ -36,11 +36,9 @@ public:
     if (phase_.empty()) {
       THROW_SEMANTIC_ERROR("phase is empty");
     } else {
-      double duration = 0;
-      for (const auto & phase : phase_) {
-        duration = duration + phase.first;
-      }
-      return duration;
+      return std::accumulate(
+        std::begin(phase_), std::end(phase_), static_cast<double>(0),
+        [](const auto & lhs, const auto & rhs) { return lhs + rhs.first; });
     }
   }
 
