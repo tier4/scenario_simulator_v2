@@ -135,6 +135,7 @@ RENAME(applyAssignRouteAction, requestAssignRoute);
 RENAME(applyLaneChangeAction, requestLaneChange);
 RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
+RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(getTrafficSignalArrow, getTrafficLightArrow);
 RENAME(getTrafficSignalColor, getTrafficLightColor);

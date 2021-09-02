@@ -188,8 +188,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(engage);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
-  FORWARD_TO_ENTITY_MANAGER(getEntityNames);
+  FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
+  FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
