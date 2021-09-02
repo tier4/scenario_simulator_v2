@@ -33,6 +33,52 @@ TEST(TrafficLightManager, getIds)
   EXPECT_EQ(ids.size(), static_cast<size_t>(2));
 }
 
+TEST(TrafficLightManager, setColor)
+{
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  geographic_msgs::msg::GeoPoint origin;
+  origin.latitude = 35.61836750154;
+  origin.longitude = 139.78066608243;
+  const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
+  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, nullptr, nullptr, nullptr, "map");
+  const auto ids = manager.getIds();
+  for (const auto id : ids) {
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::GREEN);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::GREEN);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::YELLOW);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::YELLOW);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::RED);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::RED);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::NONE);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
+  }
+}
+
+TEST(TrafficLightManager, setArrow)
+{
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  geographic_msgs::msg::GeoPoint origin;
+  origin.latitude = 35.61836750154;
+  origin.longitude = 139.78066608243;
+  const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
+  traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, nullptr, nullptr, nullptr, "map");
+  const auto ids = manager.getIds();
+  for (const auto id : ids) {
+    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::NONE);
+    manager.setArrow(id, traffic_simulator::TrafficLightArrow::LEFT);
+    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::LEFT);
+    manager.setArrow(id, traffic_simulator::TrafficLightArrow::RIGHT);
+    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::RIGHT);
+    manager.setArrow(id, traffic_simulator::TrafficLightArrow::STRAIGHT);
+    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::STRAIGHT);
+    manager.setArrow(id, traffic_simulator::TrafficLightArrow::NONE);
+    EXPECT_EQ(manager.getArrow(id), traffic_simulator::TrafficLightArrow::NONE);
+  }
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
