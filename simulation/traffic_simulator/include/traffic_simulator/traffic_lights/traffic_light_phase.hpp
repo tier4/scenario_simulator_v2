@@ -64,7 +64,7 @@ public:
       return;
     }
     elapsed_time_ = elapsed_time_ + step_time;
-    if (elapsed_time_ > getPhaseDuration()) {
+    if (elapsed_time_ >= getPhaseDuration()) {
       elapsed_time_ = elapsed_time_ - getPhaseDuration();
     }
   }
