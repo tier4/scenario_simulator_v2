@@ -41,7 +41,6 @@ public:
 private:
   void onUpdate() override
   {
-    // LCOV_EXCL_START
     if (api_.getCurrentTime() > 5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }

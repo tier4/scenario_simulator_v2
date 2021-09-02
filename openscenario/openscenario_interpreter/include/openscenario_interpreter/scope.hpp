@@ -34,11 +34,11 @@ private:
 
   const std::string scope_name;
 
-  std::unordered_map<std::string, Element> environments;
+  std::unordered_multimap<std::string, Element> environments;
 
   EnvironmentFrame * const parent = nullptr;
 
-  std::unordered_map<std::string, EnvironmentFrame *> named_children;
+  std::unordered_multimap<std::string, EnvironmentFrame *> named_children;
 
   std::vector<EnvironmentFrame *> anonymous_children;
 
@@ -51,10 +51,6 @@ private:
       parent.anonymous_children.push_back(this);
     } else {
       parent.named_children.emplace(name, this);
-      // auto ret = parent.named_children.emplace(name, this);
-      // if (!ret.second) {
-      //   THROW_SYNTAX_ERROR(std::quoted(name), " is duplicated in this scope");
-      // }
     }
   }
 
@@ -69,7 +65,7 @@ public:
       THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
     }
 
-    environments.insert(std::make_pair(name, std::move(element)));
+    environments.emplace(name, std::move(element));
   }
 
   auto findElement(const std::string & name) const -> Element
@@ -108,7 +104,7 @@ public:
     }
     std::string ret;
     for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
-      ret += "::";
+      ret += (it == ancestors.rbegin() ? "" : "::");
       ret += (*it)->scope_name.empty() ? "{anonymous}" : (*it)->scope_name;
     }
     return ret;
@@ -124,9 +120,9 @@ private:
       std::vector<Element> ret;
 
       for (auto * frame : same_level) {
-        auto found = frame->environments.find(name);
-        if (found != frame->environments.end()) {
-          ret.push_back(found->second);
+        auto range = frame->environments.equal_range(name);
+        for (auto it = range.first; it != range.second; ++it) {
+          ret.push_back(it->second);
         }
 
         for (auto * f : frame->anonymous_children) {
@@ -139,7 +135,7 @@ private:
       }
 
       if (ret.size() > 1) {
-        THROW_SYNTAX_ERROR("ambiguous reference to ", name);
+        THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(name));
       }
 
       same_level = std::move(next_level);
@@ -169,7 +165,7 @@ private:
       } else if (found.empty()) {
         return Element{};
       } else if (found.size() > 1) {
-        THROW_SYNTAX_ERROR("ambiguous reference to ", *iter);
+        THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(*iter));
       }
     }
 
@@ -178,14 +174,16 @@ private:
 
   auto lookupChildScope(const std::string & name) const -> std::list<const EnvironmentFrame *>
   {
-    auto found = named_children.find(name);
-    if (found != named_children.end()) {
-      return {found->second};
-    }
-
+    auto range = named_children.equal_range(name);
     std::list<const EnvironmentFrame *> ret;
-    for (auto & child : anonymous_children) {
-      ret.merge(child->lookupChildScope(name));
+    if (range.first != range.second) {
+      for (auto it = range.first; it != range.second; ++it) {
+        ret.push_back(it->second);
+      }
+    } else {
+      for (auto & child : anonymous_children) {
+        ret.merge(child->lookupChildScope(name));
+      }
     }
     return ret;
   }
