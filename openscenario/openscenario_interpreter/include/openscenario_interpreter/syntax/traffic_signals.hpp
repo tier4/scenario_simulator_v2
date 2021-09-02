@@ -46,7 +46,7 @@ public:
   template <typename Node>
   explicit TrafficSignals(const Node & node, Scope & outer_scope)
   {
-    for (Element element : readElementsAsElement<TrafficSignalController, 0>(
+    for (auto & element : readElementsAsElement<TrafficSignalController, 0>(
            "TrafficSignalController", node, outer_scope)) {
       auto controller = std::dynamic_pointer_cast<TrafficSignalController>(element);
 
