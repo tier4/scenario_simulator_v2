@@ -37,7 +37,7 @@ public:
       THROW_SEMANTIC_ERROR("phase is empty");
     } else {
       double duration = 0;
-      for (const auto phase : phase_) {
+      for (const auto & phase : phase_) {
         duration = duration + phase.first;
       }
       return duration;
