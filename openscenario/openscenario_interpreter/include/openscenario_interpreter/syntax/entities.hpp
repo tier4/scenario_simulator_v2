@@ -38,9 +38,10 @@ struct Entities : std::unordered_map<std::string, Element>
   explicit Entities(const Node & node, Scope & outer_scope)
   {
     callWithElements(node, "ScenarioObject", 0, unbounded, [&](auto && node) {
-      emplace(
-        readAttribute<ScenarioObject::Name>("name", node, outer_scope),
-        make<ScenarioObject>(node, outer_scope));
+      auto name = readAttribute<std::string>("name", node, outer_scope);
+      auto element = make<ScenarioObject>(node, outer_scope);
+      emplace(name, element);
+      outer_scope.addElement(name, element);
     });
 
     callWithElements(node, "EntitySelection", 0, unbounded, [&](auto && node) {
