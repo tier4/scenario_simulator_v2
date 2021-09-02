@@ -72,6 +72,27 @@ TEST(TrafficLights, getColorPosition)
     light.getPosition(traffic_simulator::TrafficLightArrow::STRAIGHT), common::SemanticError);
 }
 
+TEST(TrafficLights, getArrowPosition)
+{
+  std::unordered_map<traffic_simulator::TrafficLightArrow, geometry_msgs::msg::Point> arrow;
+  arrow[traffic_simulator::TrafficLightArrow::STRAIGHT] = getPoint(0);
+  arrow[traffic_simulator::TrafficLightArrow::LEFT] = getPoint(1);
+  arrow[traffic_simulator::TrafficLightArrow::RIGHT] = getPoint(2);
+  traffic_simulator::TrafficLight light(0, {}, arrow);
+  EXPECT_THROW(
+    light.getPosition(traffic_simulator::TrafficLightArrow::NONE), common::SemanticError);
+  EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightArrow::STRAIGHT), getPoint(0));
+  EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightArrow::LEFT), getPoint(1));
+  EXPECT_POINT_EQ(light.getPosition(traffic_simulator::TrafficLightArrow::RIGHT), getPoint(2));
+  EXPECT_THROW(
+    light.getPosition(traffic_simulator::TrafficLightColor::NONE), common::SemanticError);
+  EXPECT_THROW(
+    light.getPosition(traffic_simulator::TrafficLightColor::GREEN), common::SemanticError);
+  EXPECT_THROW(
+    light.getPosition(traffic_simulator::TrafficLightColor::YELLOW), common::SemanticError);
+  EXPECT_THROW(light.getPosition(traffic_simulator::TrafficLightColor::RED), common::SemanticError);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
