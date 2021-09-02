@@ -202,18 +202,25 @@ TEST(TrafficLights, setColorAndArrowPhase)
   EXPECT_DOUBLE_EQ(light.getArrowPhaseDuration(), 15);
   EXPECT_EQ(light.id, static_cast<std::int64_t>(302120));
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::STRAIGHT);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::GREEN);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::RIGHT);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::YELLOW);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::LEFT);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::STRAIGHT);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::GREEN);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::RIGHT);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::YELLOW);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::LEFT);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::STRAIGHT);
 }
 
 int main(int argc, char ** argv)
