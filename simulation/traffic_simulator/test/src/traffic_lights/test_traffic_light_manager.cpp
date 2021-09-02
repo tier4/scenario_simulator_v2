@@ -28,8 +28,8 @@ TEST(TrafficLightManager, getIds)
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
   traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, nullptr, nullptr, nullptr, "map");
   const auto ids = manager.getIds();
-  EXPECT_EQ(std::count_if(ids.begin(), ids.end(), [](int x) { return x == 34836; }), 1);
-  EXPECT_EQ(std::count_if(ids.begin(), ids.end(), [](int x) { return x == 34802; }), 1);
+  EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34836) == ids.end());
+  EXPECT_FALSE(std::find(ids.begin(), ids.end(), 34802) == ids.end());
   EXPECT_EQ(ids.size(), static_cast<size_t>(2));
 }
 
