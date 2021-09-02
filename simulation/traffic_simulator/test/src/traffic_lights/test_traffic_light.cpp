@@ -148,25 +148,25 @@ TEST(TrafficLights, setColorPhase)
   EXPECT_DOUBLE_EQ(light.getArrowPhaseDuration(), std::numeric_limits<double>::infinity());
   EXPECT_EQ(light.id, static_cast<std::int64_t>(302120));
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
-  // EXPECT_THROW(light.getArrow(), common::SemanticError);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::NONE);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::GREEN);
-  // EXPECT_THROW(light.getArrow(), common::SemanticError);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::NONE);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::YELLOW);
-  // EXPECT_THROW(light.getArrow(), common::SemanticError);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::NONE);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
-  // EXPECT_THROW(light.getArrow(), common::SemanticError);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::NONE);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::GREEN);
-  // EXPECT_THROW(light.getArrow(), common::SemanticError);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::NONE);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::YELLOW);
-  // EXPECT_THROW(light.getArrow(), common::SemanticError);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::NONE);
   light.update(10);
   EXPECT_EQ(light.getColor(), traffic_simulator::TrafficLightColor::RED);
-  // EXPECT_THROW(light.getArrow(), common::SemanticError);
+  EXPECT_EQ(light.getArrow(), traffic_simulator::TrafficLightArrow::NONE);
 }
 
 TEST(TrafficLights, setColorAndArrowPhase)
