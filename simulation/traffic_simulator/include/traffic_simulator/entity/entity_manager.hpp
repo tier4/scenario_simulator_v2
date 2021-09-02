@@ -212,8 +212,6 @@ public:
     const std::string & name,
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list);
 
-  void broadcastBaseLinkTransform();
-
   void broadcastEntityTransform();
 
   void broadcastTransform(
