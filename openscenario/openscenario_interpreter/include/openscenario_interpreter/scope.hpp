@@ -104,7 +104,7 @@ public:
     }
     std::string ret;
     for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
-      ret += "::";
+      ret += (it == ancestors.rbegin() ? "" : "::");
       ret += (*it)->scope_name.empty() ? "{anonymous}" : (*it)->scope_name;
     }
     return ret;
@@ -135,7 +135,7 @@ private:
       }
 
       if (ret.size() > 1) {
-        THROW_SYNTAX_ERROR("ambiguous reference to ", name);
+        THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(name));
       }
 
       same_level = std::move(next_level);
@@ -165,7 +165,7 @@ private:
       } else if (found.empty()) {
         return Element{};
       } else if (found.size() > 1) {
-        THROW_SYNTAX_ERROR("ambiguous reference to ", *iter);
+        THROW_SYNTAX_ERROR("ambiguous reference to ", std::quoted(*iter));
       }
     }
 
