@@ -121,7 +121,9 @@ private:
 
       for (auto * frame : same_level) {
         auto range = frame->environments.equal_range(name);
-        ret.insert(ret.end(), range.first, range.second);
+        for (auto it = range.first; it != range.second; ++it) {
+          ret.push_back(it->second);
+        }
 
         for (auto * f : frame->anonymous_children) {
           next_level.push_back(f);
@@ -173,13 +175,15 @@ private:
   auto lookupChildScope(const std::string & name) const -> std::list<const EnvironmentFrame *>
   {
     auto range = named_children.equal_range(name);
-    if (range.first != range.second) {
-      return std::list<const EnvironmentFrame *>(range.first, range.second);
-    }
-
     std::list<const EnvironmentFrame *> ret;
-    for (auto & child : anonymous_children) {
-      ret.merge(child->lookupChildScope(name));
+    if (range.first != range.second) {
+      for (auto it = range.first; it != range.second; ++it) {
+        ret.push_back(it->second);
+      }
+    } else {
+      for (auto & child : anonymous_children) {
+        ret.merge(child->lookupChildScope(name));
+      }
     }
     return ret;
   }
