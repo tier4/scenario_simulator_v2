@@ -1,3 +1,6 @@
+ament_add_gtest(traffic_light test_traffic_light.cpp)
+target_link_libraries(traffic_light traffic_simulator)
+
 ament_add_gtest(test_traffic_light_state test_traffic_light_state.cpp)
 target_link_libraries(test_traffic_light_state traffic_simulator)
 

@@ -31,10 +31,7 @@ ContextPanel::ContextPanel(QWidget * parent) : Panel(parent), ui_(new Ui::Contex
   spin_thread_ = std::thread(&ContextPanel::spin, this);
 }
 
-ContextPanel::~ContextPanel()
-{
-  runnning_ = false;
-}
+ContextPanel::~ContextPanel() { runnning_ = false; }
 
 void ContextPanel::onInitialize() { parentWidget()->setVisible(true); }
 
