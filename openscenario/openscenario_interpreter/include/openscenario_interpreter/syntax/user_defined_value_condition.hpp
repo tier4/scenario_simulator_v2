@@ -58,7 +58,9 @@ struct UserDefinedValueCondition
   {
     static const std::regex pattern{R"(([^\.]+)\.(.+))"};
 
-    if (std::smatch result; std::regex_match(name, result, pattern)) {
+    std::smatch result;
+
+    if (std::regex_match(name, result, pattern)) {
       const std::unordered_map<std::string, std::function<std::string()>> dispatch{
         std::make_pair("currentState", [result]() { return evaluateCurrentState(result.str(1)); }),
       };
