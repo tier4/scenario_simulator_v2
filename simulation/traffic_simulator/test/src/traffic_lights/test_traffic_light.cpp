@@ -123,6 +123,30 @@ TEST(TrafficLights, getColorAndArrowPosition)
   EXPECT_EQ(light.id, static_cast<std::int64_t>(0));
 }
 
+TEST(TrafficLights, setColorPhase)
+{
+  std::unordered_map<traffic_simulator::TrafficLightColor, geometry_msgs::msg::Point>
+    color_positions;
+  color_positions[traffic_simulator::TrafficLightColor::GREEN] = getPoint(0);
+  color_positions[traffic_simulator::TrafficLightColor::YELLOW] = getPoint(1);
+  color_positions[traffic_simulator::TrafficLightColor::RED] = getPoint(2);
+  std::unordered_map<traffic_simulator::TrafficLightArrow, geometry_msgs::msg::Point>
+    arrow_positions;
+  arrow_positions[traffic_simulator::TrafficLightArrow::STRAIGHT] = getPoint(3);
+  arrow_positions[traffic_simulator::TrafficLightArrow::LEFT] = getPoint(4);
+  arrow_positions[traffic_simulator::TrafficLightArrow::RIGHT] = getPoint(5);
+  traffic_simulator::TrafficLight light(302120, color_positions, arrow_positions);
+  std::vector<std::pair<double, traffic_simulator::TrafficLightColor> > color_phases;
+  color_phases.emplace_back(std::make_pair<double, traffic_simulator::TrafficLightColor>(
+    10, traffic_simulator::TrafficLightColor::RED));
+  color_phases.emplace_back(std::make_pair<double, traffic_simulator::TrafficLightColor>(
+    10, traffic_simulator::TrafficLightColor::GREEN));
+  color_phases.emplace_back(std::make_pair<double, traffic_simulator::TrafficLightColor>(
+    10, traffic_simulator::TrafficLightColor::YELLOW));
+  light.setColorPhase(color_phases);
+  EXPECT_EQ(light.id, static_cast<std::int64_t>(302120));
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
