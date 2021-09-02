@@ -42,15 +42,18 @@ TEST(TrafficLightManager, setColor)
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
   traffic_simulator::TrafficLightManager manager(hdmap_utils_ptr, nullptr, nullptr, nullptr, "map");
-  EXPECT_EQ(manager.getColor(34836), traffic_simulator::TrafficLightColor::NONE);
-  manager.setColor(34836, traffic_simulator::TrafficLightColor::GREEN);
-  EXPECT_EQ(manager.getColor(34836), traffic_simulator::TrafficLightColor::GREEN);
-  manager.setColor(34836, traffic_simulator::TrafficLightColor::YELLOW);
-  EXPECT_EQ(manager.getColor(34836), traffic_simulator::TrafficLightColor::YELLOW);
-  manager.setColor(34836, traffic_simulator::TrafficLightColor::RED);
-  EXPECT_EQ(manager.getColor(34836), traffic_simulator::TrafficLightColor::RED);
-  manager.setColor(34836, traffic_simulator::TrafficLightColor::NONE);
-  EXPECT_EQ(manager.getColor(34836), traffic_simulator::TrafficLightColor::NONE);
+  const auto ids = manager.getIds();
+  for (const auto id : ids) {
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::GREEN);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::GREEN);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::YELLOW);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::YELLOW);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::RED);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::RED);
+    manager.setColor(id, traffic_simulator::TrafficLightColor::NONE);
+    EXPECT_EQ(manager.getColor(id), traffic_simulator::TrafficLightColor::NONE);
+  }
 }
 
 int main(int argc, char ** argv)
