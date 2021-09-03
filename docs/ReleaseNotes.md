@@ -5,6 +5,7 @@
 - Fix problems in never hit line. [Link](https://github.com/tier4/scenario_simulator_v2/pull/480) (Contribution by [Robotec.ai](https://robotec.ai/)).
 - Start support getting longitudinal distance to the behind entity in API::getLongitudinalDistance function. [Link](https://github.com/tier4/scenario_simulator_v2/pull/486)
 - Fix problems in update/getPhaseDuration function in traffic light class. [Link](https://github.com/tier4/scenario_simulator_v2/pull/492)
+- Update dependency for message types of Autoware to reference `AutowareArchitectureProposal_msgs` instread of `AutowareArchitectureProposal.iv`.
 
 ## Version 0.4.5
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.5) on Github :fa-github:
