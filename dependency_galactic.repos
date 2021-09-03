@@ -6,7 +6,7 @@ repositories:
   operational-design-domains:
     type: git
     url: https://gitlab.com/autowarefoundation/operational-design-domains
-  AutowareArchitectureProposal.iv:
+  AutowareArchitectureProposal_msgs:
     type: git
-    url: https://github.com/tier4/AutowareArchitectureProposal.iv.git
-    version: ros2
+    url: https://github.com/tier4/AutowareArchitectureProposal_msgs.git
+    version: main
