@@ -65,18 +65,6 @@ jobs:
           cd ~/ros2_ws
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
 
-      - name: Clone autoware packages
-        run: |
-          cd ~/ros2_ws/src
-          mv -v autoware/awapi/autoware_api_msgs              ./
-          mv -v autoware/common/msgs/autoware_control_msgs    ./
-          mv -v autoware/common/msgs/autoware_debug_msgs      ./
-          mv -v autoware/common/msgs/autoware_perception_msgs ./
-          mv -v autoware/common/msgs/autoware_planning_msgs   ./
-          mv -v autoware/common/msgs/autoware_system_msgs     ./
-          mv -v autoware/common/msgs/autoware_vehicle_msgs    ./
-          rm -rf autoware
-
       - name: Resolve rosdep
         run: |
           cd ~/ros2_ws
@@ -165,7 +153,7 @@ jobs:
           source ~/ros2_ws/install/setup.bash
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=momentary_stop timeout:=20 > log.txt
           cat log.txt | grep "Scenario Succeed"
-          
+
       - name: Run reaction_time scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
