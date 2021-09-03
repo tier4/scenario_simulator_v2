@@ -47,17 +47,9 @@ struct ScenarioObject
  *  NOTE: This framework expresses xsd:group as mixin.
  *
  * ------------------------------------------------------------------------- */
-: public EntityObject
+: public Scope,
+  public EntityObject
 {
-  /* ---- name -----------------------------------------------------------------
-   *
-   *  Identifier of the scenario object.
-   *
-   * ------------------------------------------------------------------------ */
-  using Name = String;
-
-  const Name name;
-
   /* ---- ObjectController -----------------------------------------------------
    *
    *  Controller of the EntityObject instance.
@@ -67,11 +59,11 @@ struct ScenarioObject
 
   static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
-  template <typename Node, typename Scope>
+  template <typename Node>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
-  : EntityObject(node, outer_scope),
-    name(readAttribute<String>("name", node, outer_scope)),
-    object_controller(readElement<ObjectController>("ObjectController", node, outer_scope))
+  : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
+    EntityObject(node, localScope()),
+    object_controller(readElement<ObjectController>("ObjectController", node, localScope()))
   {
   }
 
@@ -104,7 +96,7 @@ struct ScenarioObject
       if (is<Vehicle>()) {
         applyAssignControllerAction(name, object_controller);
         if (object_controller.isEgo()) {
-          auto architecture_type = getParameter<std::string>("architecture-type", std::string(""));
+          auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
 
           if (architecture_type == "tier4/proposal") {
             attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
@@ -122,7 +114,7 @@ struct ScenarioObject
             // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
             // topic name is yet unknown
           } else {
-            throw std::invalid_argument("Invalid architecture-type = " + architecture_type);
+            throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
           }
         }
       }

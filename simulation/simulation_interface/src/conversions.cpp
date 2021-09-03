@@ -279,8 +279,10 @@ void toProto(const openscenario_msgs::msg::EntityType & type, openscenario_msgs:
     proto = openscenario_msgs::EntityType::MISC_OBJECT;
     return;
   }
+  // LCOV_EXCL_START
   std::string message = "type of the Entity Type is invalid!\ntype is " + std::to_string(type.type);
   THROW_SIMULATION_ERROR(message);
+  // LCOV_EXCL_STOP
 }
 
 void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::EntityType & type)
@@ -301,8 +303,10 @@ void toMsg(const openscenario_msgs::EntityType & proto, openscenario_msgs::msg::
     type.type = openscenario_msgs::msg::EntityType::MISC_OBJECT;
     return;
   }
+  // LCOV_EXCL_START
   std::string message = "type of the Entity Type is invalid!";
   THROW_SIMULATION_ERROR(message);
+  // LCOV_EXCL_STOP
 }
 
 void toProto(
@@ -424,10 +428,9 @@ void toProto(const autoware_vehicle_msgs::msg::Shift & shift, autoware_vehicle_m
       proto.set_data(autoware_vehicle_msgs::SHIFT_POSITIONS::LOW);
       break;
     default:
-      THROW_SEMANTIC_ERROR(
+      THROW_SIMULATION_ERROR(
         "shift position is invalid while converting ROS2 message to proto, shit position is ",
         proto.data());
-      break;
   }
 }
 
@@ -453,10 +456,9 @@ void toMsg(const autoware_vehicle_msgs::Shift & proto, autoware_vehicle_msgs::ms
       shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
       break;
     default:
-      THROW_SEMANTIC_ERROR(
+      THROW_SIMULATION_ERROR(
         "shift position is invalid while converting proto to ROS2 message, shit position is ",
         proto.data());
-      break;
   }
 }
 

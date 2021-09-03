@@ -35,7 +35,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalControllerCondition : private Scope
+struct TrafficSignalControllerCondition
 {
   const String
     phase;  // Name of the phase of the signal controller to be reached for the condition to become true. The available phases are defined in type RoadNetwork under the property trafficSignalControllers.
@@ -43,22 +43,23 @@ struct TrafficSignalControllerCondition : private Scope
   const String
     traffic_signal_controller_ref;  //  ID of the referenced signal controller in a road network.
 
-  template <typename Tree>
-  explicit TrafficSignalControllerCondition(const Tree & tree, const Scope & scope)
-  : Scope(scope),
-    phase(readAttribute<String>("phase", tree, localScope())),
-    traffic_signal_controller_ref(
-      readAttribute<String>("trafficSignalControllerRef", tree, localScope()))
-  {
-  }
-
   String current_phase_name;
 
   Double current_phase_since;
 
+  Scope scope;
+
+  template <typename Tree>
+  explicit TrafficSignalControllerCondition(const Tree & tree, const Scope & scope)
+  : phase(readAttribute<String>("phase", tree, scope)),
+    traffic_signal_controller_ref(readAttribute<String>("trafficSignalControllerRef", tree, scope)),
+    scope(scope)
+  {
+  }
+
   auto evaluate()
   {
-    const auto & found = localScope().findElement(traffic_signal_controller_ref);
+    const auto & found = scope.findElement(traffic_signal_controller_ref);
     if (found && found.is<TrafficSignalController>()) {
       const auto & controller = found.as<TrafficSignalController>();
       current_phase_name = controller.currentPhaseName();

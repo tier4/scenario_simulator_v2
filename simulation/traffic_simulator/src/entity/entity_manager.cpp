@@ -244,7 +244,16 @@ auto EntityManager::getLongitudinalDistance(
       const auto distance = hdmap_utils_ptr_->getLongitudinalDistance(
         from_status->lanelet_pose.lanelet_id, from_status->lanelet_pose.s,
         to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s);
-      return (distance && distance <= max_distance) ? distance : boost::none;
+      if (distance && distance <= max_distance) {
+        return distance;
+      }
+      const auto distance_behind = hdmap_utils_ptr_->getLongitudinalDistance(
+        to_status->lanelet_pose.lanelet_id, to_status->lanelet_pose.s,
+        from_status->lanelet_pose.lanelet_id, from_status->lanelet_pose.s);
+      if (distance_behind && distance_behind <= max_distance) {
+        return -1 * distance_behind.get();
+      }
+      return boost::none;
     } else {
       return boost::none;
     }

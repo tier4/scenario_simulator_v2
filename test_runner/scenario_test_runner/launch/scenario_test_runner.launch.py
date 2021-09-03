@@ -30,142 +30,109 @@ from launch_ros.actions import Node, LifecycleNode
 from pathlib import Path
 
 
-def launch_setup(context, *args, **kwargs):
-    # Autoware Type
-    architecture_types = ["awf/auto", "tier4/proposal"]
-    architecture_type = LaunchConfiguration("architecture-type", default="tier4/proposal")
+def architecture_types():
+    return ["awf/auto", "tier4/proposal"]
 
-    if architecture_type.perform(context) not in architecture_types:
+
+def default_autoware_launch_package_of(architecture_type):
+    if architecture_type not in architecture_types():
         raise KeyError(
-            f"architecture-type = {architecture_type.perform(context)} is not supported. Choose one of {architecture_types}.")
-
-    print(f"architecture-type = {architecture_type.perform(context)}")
-
-    # Autoware Launch Package
-    autoware_launch_package_defaults = {
+            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+        )
+    return {
         "awf/auto": "scenario_test_runner_launch",
-        "tier4/proposal": "autoware_launch"
-    }
-    autoware_launch_package = LaunchConfiguration(
-        "autoware-launch-package", default=autoware_launch_package_defaults[architecture_type.perform(context)]
-    )
-    print(f"autoware_launch_package = {autoware_launch_package.perform(context)}")
+        "tier4/proposal": "autoware_launch",
+    }[architecture_type]
 
-    # Autoware Launch File
-    autoware_launch_file_defaults = {
+
+def default_autoware_launch_file_of(architecture_type):
+    if architecture_type not in architecture_types():
+        raise KeyError(
+            f"architecture_type := {architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
+        )
+    return {
         "awf/auto": "autoware_auto.launch.py",
-        "tier4/proposal": "planning_simulator.launch.xml"
-    }
-    autoware_launch_file = LaunchConfiguration(
-        "autoware-launch-file", default=autoware_launch_file_defaults[architecture_type.perform(context)]
-    )
-    print(f"autoware_launch_file = {autoware_launch_file.perform(context)}")
+        "tier4/proposal": "planning_simulator.launch.xml",
+    }[architecture_type]
 
-    global_frame_rate = LaunchConfiguration("global-frame-rate", default=30.0)
 
-    global_real_time_factor = LaunchConfiguration(
-        "global-real-time-factor", default=1.0
-    )
+def launch_setup(context, *args, **kwargs):
+    # fmt: off
+    architecture_type       = LaunchConfiguration("architecture_type",       default="tier4/proposal")
+    autoware_launch_file    = LaunchConfiguration("autoware_launch_file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
+    autoware_launch_package = LaunchConfiguration("autoware_launch_package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
+    global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
+    global_timeout          = LaunchConfiguration("global_timeout",          default=180)
+    initialize_duration     = LaunchConfiguration("initialize_duration",     default=30)
+    launch_autoware         = LaunchConfiguration("launch_autoware",         default=True)
+    launch_rviz             = LaunchConfiguration("launch_rviz",             default=False)
+    output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
+    port                    = LaunchConfiguration("port",                    default=8080)
+    record                  = LaunchConfiguration("record",                  default=True)
+    scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
+    sensor_model            = LaunchConfiguration("sensor_model",            default="")
+    vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
+    workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
+    # fmt: on
 
-    global_timeout = LaunchConfiguration("global-timeout", default=180)
-
-    output_directory = LaunchConfiguration("output-directory", default=Path("/tmp"))
-
-    scenario = LaunchConfiguration("scenario", default=Path("/dev/null"))
-
-    sensor_model = LaunchConfiguration("sensor_model", default="")
-
-    vehicle_model = LaunchConfiguration("vehicle_model", default="")
-
-    with_rviz = LaunchConfiguration("with-rviz", default=False)
-
-    workflow = LaunchConfiguration("workflow", default=Path("/dev/null"))
-
-    port = 8080
+    print(f"architecture_type       := {architecture_type.perform(context)}")
+    print(f"autoware_launch_file    := {autoware_launch_file.perform(context)}")
+    print(f"autoware_launch_package := {autoware_launch_package.perform(context)}")
+    print(f"global_frame_rate       := {global_frame_rate.perform(context)}")
+    print(f"global_real_time_factor := {global_real_time_factor.perform(context)}")
+    print(f"global_timeout          := {global_timeout.perform(context)}")
+    print(f"initialize_duration     := {initialize_duration.perform(context)}")
+    print(f"launch_autoware         := {launch_autoware.perform(context)}")
+    print(f"launch_rviz             := {launch_rviz.perform(context)}")
+    print(f"output_directory        := {output_directory.perform(context)}")
+    print(f"port                    := {port.perform(context)}")
+    print(f"record                  := {record.perform(context)}")
+    print(f"scenario                := {scenario.perform(context)}")
+    print(f"sensor_model            := {sensor_model.perform(context)}")
+    print(f"vehicle_model           := {vehicle_model.perform(context)}")
+    print(f"workflow                := {workflow.perform(context)}")
 
     def make_parameters():
-
         parameters = [
+            {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
-            {"architecture-type": architecture_type},
+            {"initialize_duration": initialize_duration},
+            {"launch_autoware": launch_autoware},
             {"port": port},
+            {"record": record},
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
         ]
 
-        print("vehicle_model = " + vehicle_model.perform(context))
+        def description():
+            return get_package_share_directory(
+                vehicle_model.perform(context) + "_description"
+            )
 
         if vehicle_model.perform(context):
-            parameters.append(
-                get_package_share_directory(
-                    vehicle_model.perform(context) + "_description"
-                )
-                + "/config/vehicle_info.param.yaml"
-            )
-            parameters.append(
-                get_package_share_directory(
-                    vehicle_model.perform(context) + "_description"
-                )
-                + "/config/simulator_model.param.yaml"
-            )
+            parameters.append(description() + "/config/vehicle_info.param.yaml")
+            parameters.append(description() + "/config/simulator_model.param.yaml")
 
         return parameters
 
     return [
-        DeclareLaunchArgument(
-            "autoware-launch-file", default_value=autoware_launch_file
-        ),
-        DeclareLaunchArgument(
-            "autoware-launch-package", default_value=autoware_launch_package
-        ),
-        DeclareLaunchArgument(
-            "architecture-type", default_value=architecture_type
-        ),
-        DeclareLaunchArgument("global-frame-rate", default_value=global_frame_rate),
-        DeclareLaunchArgument(
-            "global-real-time-factor",
-            default_value=global_real_time_factor,
-            description="Specify the ratio of simulation time to real time. If "
-            "you set a value greater than 1, the simulation will be faster "
-            "than in reality, and if you set a value less than 1, the "
-            "simulation will be slower than in reality.",
-        ),
-        DeclareLaunchArgument(
-            "global-timeout",
-            default_value=global_timeout,
-            description="Specify the simulation time limit. This time limit is "
-            "independent of the simulation playback speed determined by the "
-            "option real_time_factor. It also has nothing to do with "
-            "SimulationTimeCondition in OpenSCENARIO format.",
-        ),
-        DeclareLaunchArgument(
-            "output-directory",
-            default_value=output_directory,
-            description="Specify the output destination directory of the "
-            "generated file including the result file.",
-        ),
-        DeclareLaunchArgument(
-            "with_rviz",
-            default_value=with_rviz,
-            description="if true, launch Autoware with given rviz configuration.",
-        ),
-        DeclareLaunchArgument(
-            "scenario",
-            default_value=scenario,
-            description="Specify a scenario file (.yaml or .xosc) you want to "
-            "execute. If a workflow file is also specified by the --workflow "
-            "option at the same time, this option takes precedence (that is, "
-            "only one scenario passed to the --scenario option will be executed"
-            ").",
-        ),
-        DeclareLaunchArgument("sensor_model", default_value=sensor_model),
-        DeclareLaunchArgument("vehicle_model", default_value=vehicle_model),
-        DeclareLaunchArgument(
-            "workflow",
-            default_value=workflow,
-            description="Specify a workflow file (.yaml) you want to execute.",
-        ),
+        # fmt: off
+        DeclareLaunchArgument("architecture_type",       default_value=architecture_type      ),
+        DeclareLaunchArgument("autoware_launch_file",    default_value=autoware_launch_file   ),
+        DeclareLaunchArgument("autoware_launch_package", default_value=autoware_launch_package),
+        DeclareLaunchArgument("global_frame_rate",       default_value=global_frame_rate      ),
+        DeclareLaunchArgument("global_real_time_factor", default_value=global_real_time_factor),
+        DeclareLaunchArgument("global_timeout",          default_value=global_timeout         ),
+        DeclareLaunchArgument("launch_autoware",         default_value=launch_autoware        ),
+        DeclareLaunchArgument("launch_rviz",             default_value=launch_rviz            ),
+        DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
+        DeclareLaunchArgument("scenario",                default_value=scenario               ),
+        DeclareLaunchArgument("sensor_model",            default_value=sensor_model           ),
+        DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
+        DeclareLaunchArgument("workflow",                default_value=workflow               ),
+        # fmt: on
         Node(
             package="scenario_test_runner",
             executable="scenario_test_runner",
@@ -174,18 +141,14 @@ def launch_setup(context, *args, **kwargs):
             output="screen",
             on_exit=Shutdown(),
             arguments=[
-                "--global-frame-rate",
-                global_frame_rate,
-                "--global-real-time-factor",
-                global_real_time_factor,
-                "--global-timeout",
-                global_timeout,
-                "--output-directory",
-                output_directory,
-                "--scenario",
-                scenario,
-                "--workflow",
-                workflow,
+                # fmt: off
+                "--global-frame-rate",       global_frame_rate,
+                "--global-real-time-factor", global_real_time_factor,
+                "--global-timeout",          global_timeout,
+                "--output-directory",        output_directory,
+                "--scenario",                scenario,
+                "--workflow",                workflow,
+                # fmt: on
             ],
         ),
         Node(
@@ -216,7 +179,7 @@ def launch_setup(context, *args, **kwargs):
             executable="rviz2",
             name="rviz2",
             output={"stderr": "log", "stdout": "log"},
-            condition=IfCondition(with_rviz),
+            condition=IfCondition(launch_rviz),
             arguments=[
                 "-d",
                 str(
