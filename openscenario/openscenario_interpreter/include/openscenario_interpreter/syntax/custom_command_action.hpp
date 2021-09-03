@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
 #include <autoware_debug_msgs/msg/string_stamped.hpp>
-#include <autoware_simulation_msgs/msg/simulation_events.hpp>
+// #include <autoware_simulation_msgs/msg/simulation_events.hpp>
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
@@ -84,6 +84,28 @@ struct CustomCommandAction : private Scope
 
       (*publisher).publish(message);
     }
+
+    // auto makeFaultInjectionEvent = [](const auto & name) {
+    //   autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+    //   {
+    //     fault_injection_event.level = autoware_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+    //     fault_injection_event.name = name;
+    //   }
+    //
+    //   return fault_injection_event;
+    // };
+    //
+    // auto makeFaultInjectionEvents = [&]() {
+    //   autoware_simulation_msgs::msg::SimulationEvents simulation_events;
+    //   {
+    //     simulation_events.stamp = node.now();
+    //     for (const auto & event : events) {
+    //       simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
+    //     }
+    //   }
+    //
+    //   return simulation_events;
+    // };
 
     return events.size();
   }
