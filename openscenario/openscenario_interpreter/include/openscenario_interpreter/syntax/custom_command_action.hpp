@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
 #include <autoware_debug_msgs/msg/string_stamped.hpp>
+#include <autoware_simulation_msgs/msg/simulation_events.hpp>
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>

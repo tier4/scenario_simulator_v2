@@ -9,6 +9,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>autoware_simulation_msgs</depend>
   <depend>concealer</depend>
   <depend>geometry_msgs</depend>
   <depend>libgoogle-glog-dev</depend>

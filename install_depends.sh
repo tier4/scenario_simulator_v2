@@ -13,6 +13,7 @@ cp -r "$repository_root/external/autoware/common/msgs/autoware_control_msgs"    
 cp -r "$repository_root/external/autoware/common/msgs/autoware_debug_msgs"      "$repository_root/external"
 cp -r "$repository_root/external/autoware/common/msgs/autoware_perception_msgs" "$repository_root/external"
 cp -r "$repository_root/external/autoware/common/msgs/autoware_planning_msgs"   "$repository_root/external"
+cp -r "$repository_root/external/autoware/common/msgs/autoware_simulation_msgs" "$repository_root/external"
 cp -r "$repository_root/external/autoware/common/msgs/autoware_system_msgs"     "$repository_root/external"
 cp -r "$repository_root/external/autoware/common/msgs/autoware_vehicle_msgs"    "$repository_root/external"
 
