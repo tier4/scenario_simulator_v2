@@ -7,6 +7,7 @@
 - Fix problems in update/getPhaseDuration function in traffic light class. [Link](https://github.com/tier4/scenario_simulator_v2/pull/492)
 - Update dependency for message types of Autoware to reference `AutowareArchitectureProposal_msgs` instead of `AutowareArchitectureProposal.iv`.
 - Add to the AutowareArchitectureProposal_api_msgs to the .repos file. [Link](https://github.com/tier4/scenario_simulator_v2/pull/496)
+- Fix rotation calculation in toMapPose function. [Link](https://github.com/tier4/scenario_simulator_v2/pull/500)
 
 ## Version 0.4.5
 - [Release Page](https://github.com/tier4/scenario_simulator_v2/releases/0.4.5) on Github :fa-github:
