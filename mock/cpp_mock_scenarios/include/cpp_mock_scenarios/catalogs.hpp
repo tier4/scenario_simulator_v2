@@ -26,6 +26,27 @@ struct Catalog
   {
     openscenario_msgs::msg::VehicleParameters parameters;
     parameters.name = "vehicle.volkswagen.t";
+    parameters.vehicle_category = "car";
+    parameters.performance.max_speed = 69.444;
+    parameters.performance.max_acceleration = 200;
+    parameters.performance.max_deceleration = 10.0;
+    parameters.bounding_box.center.x = 1.5;
+    parameters.bounding_box.center.y = 0.0;
+    parameters.bounding_box.center.z = 0.9;
+    parameters.bounding_box.dimensions.x = 2.1;
+    parameters.bounding_box.dimensions.y = 4.5;
+    parameters.bounding_box.dimensions.z = 1.8;
+    parameters.axles.front_axle.max_steering = 0.5;
+    parameters.axles.front_axle.wheel_diameter = 0.6;
+    parameters.axles.front_axle.track_width = 1.8;
+    parameters.axles.front_axle.position_x = 3.1;
+    parameters.axles.front_axle.position_z = 0.3;
+    parameters.axles.rear_axle.max_steering = 0.0;
+    parameters.axles.rear_axle.wheel_diameter = 0.6;
+    parameters.axles.rear_axle.track_width = 1.8;
+    parameters.axles.rear_axle.position_x = 0.0;
+    parameters.axles.rear_axle.position_z = 0.3;
+    return parameters;
   }
 
   std::string vehicle_catalog_xml =
