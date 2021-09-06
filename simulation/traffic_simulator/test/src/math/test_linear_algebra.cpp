@@ -19,7 +19,11 @@
 TEST(LINEAR_ALGEBRA, GET_SIZE)
 {
   geometry_msgs::msg::Vector3 vec;
-  EXPECT_DOUBLE_EQ(traffic_simulator::math::size(vec), 0.0);
+  EXPECT_DOUBLE_EQ(traffic_simulator::math::getSize(vec), 0.0);
+  vec.x = 1.0;
+  vec.y = 0.0;
+  vec.z = 3.0;
+  EXPECT_DOUBLE_EQ(traffic_simulator::math::getSize(vec), std::sqrt(10.0));
 }
 
 TEST(LINEAR_ALGEBRA, NORMALIZE)
@@ -33,6 +37,7 @@ TEST(LINEAR_ALGEBRA, NORMALIZE)
   EXPECT_DOUBLE_EQ(vec.x, 0.31622776601683794);
   EXPECT_DOUBLE_EQ(vec.y, 0.0);
   EXPECT_DOUBLE_EQ(vec.z, 0.94868329805051377);
+  EXPECT_DOUBLE_EQ(traffic_simulator::math::getSize(vec), 1.0);
 }
 
 int main(int argc, char ** argv)

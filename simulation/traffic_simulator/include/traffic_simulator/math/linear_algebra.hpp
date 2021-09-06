@@ -27,6 +27,8 @@ namespace math
 {
 double getSize(geometry_msgs::msg::Vector3 vec);
 geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec);
+geometry_msgs::msg::Vector3 operator*(geometry_msgs::msg::Vector3 vec, double value);
+geometry_msgs::msg::Vector3 operator*(double value, geometry_msgs::msg::Vector3 vec);
 }  // namespace math
 }  // namespace traffic_simulator
 
