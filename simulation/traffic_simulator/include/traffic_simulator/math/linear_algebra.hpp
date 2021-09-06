@@ -15,8 +15,19 @@
 #ifndef TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_
 #define TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_
 
+#include <math.h>
+
+#include <geometry_msgs/msg/vector3.hpp>
+#include <limits>
+#include <scenario_simulator_exception/exception.hpp>
+
+namespace traffic_simulator
+{
 namespace math
 {
+double getSize(geometry_msgs::msg::Vector3 vec);
+geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec);
 }  // namespace math
+}  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_

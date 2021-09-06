@@ -12,27 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <gtest/gtest.h>
+
 #include <traffic_simulator/math/linear_algebra.hpp>
 
-namespace traffic_simulator
+TEST(LINEAR_ALGEBRA, GET_SIZE)
 {
-namespace math
-{
-double getSize(geometry_msgs::msg::Vector3 vec) { return std::hypot(vec.x, vec.y, vec.z); }
-
-geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
-{
-  double size = getSize(vec);
-  if (std::fabs(size) <= std::numeric_limits<double>::epsilon()) {
-    THROW_SIMULATION_ERROR(
-      "size of vector (", vec.x, ",", vec.y, ",", vec.z, ") is, ", size,
-      " size of the vector you want to normalize should be over ",
-      std::numeric_limits<double>::epsilon());
-  }
-  vec.x = vec.x / size;
-  vec.y = vec.y / size;
-  vec.z = vec.z / size;
-  return vec;
+  geometry_msgs::msg::Vector3 vec;
+  EXPECT_DOUBLE_EQ(traffic_simulator::math::size(vec), 0.0);
 }
-}  // namespace math
-}  // namespace traffic_simulator
+
+TEST(LINEAR_ALGEBRA, NORMALIZE)
+{
+  geometry_msgs::msg::Vector3 vec;
+  EXPECT_THROW(traffic_simulator::math::normalize(vec), common::SimulationError);
+  vec.x = 1.0;
+  vec.y = 0.0;
+  vec.z = 3.0;
+  vec = traffic_simulator::math::normalize(vec);
+  EXPECT_DOUBLE_EQ(vec.x, 0.31622776601683794);
+  EXPECT_DOUBLE_EQ(vec.y, 0.0);
+  EXPECT_DOUBLE_EQ(vec.z, 0.94868329805051377);
+}
+
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
