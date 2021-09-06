@@ -70,7 +70,7 @@ struct CustomCommandAction : private Scope
   static auto applyFaultInjectionAction(const std::vector<std::string> & events, const Scope &)
     -> int
   {
-    static rclcpp::Node node{"fault_injector", "simulation"};
+    static rclcpp::Node node{"custom_command_action/fault_injection_action", "simulation"};
 
     // static auto publisher = node.create_publisher<autoware_debug_msgs::msg::StringStamped>(
     //   "/simulation/fault_injection", rclcpp::QoS(1).reliable());

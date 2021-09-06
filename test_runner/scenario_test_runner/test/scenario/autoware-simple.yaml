@@ -1,12 +1,14 @@
 ScenarioModifiers:
   ScenarioModifier:
-    - { name: HOGE, start: 0, step: 2, stop: 5 }
-    # - { name: FUGA, start: 1, step: 0.5, stop: 2 }
+    - name: DUMMY
+      start: 0
+      step: 2
+      stop: 5
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 0
-    date: '2021-02-01T08:31:04.600Z'
+    date: '2021-09-06T09:09:41.856Z'
     description: ''
     author: ''
   ParameterDeclarations:
@@ -25,24 +27,30 @@ OpenSCENARIO:
           name: ''
           vehicleCategory: car
           BoundingBox:
-            Center: { x: 0, y: 0, z: 0 }
-            Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
+            Center:
+              x: 0
+              y: 0
+              z: 1.25
+            Dimensions:
+              width: 2.25
+              length: 4.77
+              height: 2.5
           Performance:
-            maxSpeed: 30
+            maxSpeed: 50
             maxAcceleration: INF
             maxDeceleration: INF
           Axles:
             FrontAxle:
-              maxSteering: 3.1415
+              maxSteering: 0.5236
               wheelDiameter: 0.6
               trackWidth: 4
               positionX: 1
               positionZ: 0.3
             RearAxle:
-              maxSteering: 3.1415
+              maxSteering: 0.5236
               wheelDiameter: 0.6
               trackWidth: 4
-              positionX: -1
+              positionX: 0
               positionZ: 0.3
           Properties:
             Property: []
@@ -51,7 +59,8 @@ OpenSCENARIO:
             name: ''
             Properties:
               Property:
-                - { name: isEgo, value: 'true' }
+                - name: isEgo
+                  value: 'true'
   Storyboard:
     Init:
       Actions:
@@ -107,7 +116,7 @@ OpenSCENARIO:
                   - name: ''
                     Event:
                       - name: ''
-                        priority: overwrite
+                        priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -127,7 +136,11 @@ OpenSCENARIO:
                                             laneId: '34507'
                                             s: 50
                                             offset: 0
-                                            Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: 0
+                                              r: 0
                                         tolerance: 0.5
                                 - name: ''
                                   delay: 0
@@ -143,7 +156,7 @@ OpenSCENARIO:
                               CustomCommandAction:
                                 type: exitSuccess
                       - name: ''
-                        priority: overwrite
+                        priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -170,12 +183,4 @@ OpenSCENARIO:
                           value: 0
                           rule: greaterThan
     StopTrigger:
-      ConditionGroup:
-        - Condition:
-            - name: ''
-              delay: 0
-              conditionEdge: none
-              ByValueCondition:
-                SimulationTimeCondition:
-                  value: 300
-                  rule: greaterThan
+      ConditionGroup: []
