@@ -225,12 +225,3 @@ jobs:
           flags: ${{ matrix.test_flags }}
           env_vars: ROS_DISTRO
           name: scenario_simulator_v2
-
-      - name: Notify Slack
-        uses: 8398a7/action-slack@v2
-        if: failure()
-        with:
-          status: ${{ job.status }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
