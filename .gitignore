@@ -12,6 +12,7 @@ external/autoware_debug_msgs
 external/lanelet2
 external/mrt_cmake_modules
 external/AutowareArchitectureProposal_msgs
+external/AutowareArchitectureProposal_api_msgs
 html
 latex
 scenario_simulator.tar
