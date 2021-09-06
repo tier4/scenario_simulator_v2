@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Add arrow markers to visualize goal poses of entities. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
 - Fix problems in setting entity names in proto message. [Link](https://github.com/tier4/scenario_simulator_v2/pull/481) (Contribution by [Robotec.ai](https://robotec.ai/)).
 - Fix problems in never hit line. [Link](https://github.com/tier4/scenario_simulator_v2/pull/480) (Contribution by [Robotec.ai](https://robotec.ai/)).
 - Start support getting longitudinal distance to the behind entity in API::getLongitudinalDistance function. [Link](https://github.com/tier4/scenario_simulator_v2/pull/486)
