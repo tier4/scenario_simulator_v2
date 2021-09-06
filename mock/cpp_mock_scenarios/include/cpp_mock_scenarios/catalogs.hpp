@@ -22,6 +22,12 @@
 
 struct Catalog
 {
+  openscenario_msgs::msg::VehicleParameters vehicle()
+  {
+    openscenario_msgs::msg::VehicleParameters parameters;
+    parmeters.name = "vehicle.volkswagen.t";
+  }
+
   std::string vehicle_catalog_xml =
     R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
             <ParameterDeclarations/>
