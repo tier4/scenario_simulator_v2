@@ -58,14 +58,15 @@ bool API::spawn(
   const bool is_ego, const std::string & name,
   const openscenario_msgs::msg::VehicleParameters & params)
 {
-  if (is_ego and
-    not entity_manager_ptr_->entityExists(name) and
+  if (
+    is_ego and not entity_manager_ptr_->entityExists(name) and
     not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::EgoEntity>(
       name, configuration, clock_.getStepTime(), params)) {
     return false;
   }
-  if (not is_ego and
-      not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(name, params)) {
+  if (
+    not is_ego and
+    not entity_manager_ptr_->spawnEntity<traffic_simulator::entity::VehicleEntity>(name, params)) {
     return false;
   }
   if (configuration.standalone_mode) {
