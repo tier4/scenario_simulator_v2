@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
 #include <autoware_debug_msgs/msg/string_stamped.hpp>
-// #include <autoware_simulation_msgs/msg/simulation_events.hpp>
+#include <autoware_simulation_msgs/msg/simulation_events.hpp>
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
@@ -72,40 +72,48 @@ struct CustomCommandAction : private Scope
   {
     static rclcpp::Node node{"fault_injector", "simulation"};
 
-    static auto publisher = node.create_publisher<autoware_debug_msgs::msg::StringStamped>(
+    // static auto publisher = node.create_publisher<autoware_debug_msgs::msg::StringStamped>(
+    //   "/simulation/fault_injection", rclcpp::QoS(1).reliable());
+    //
+    // for (const auto & event : events) {
+    //   autoware_debug_msgs::msg::StringStamped message;
+    //   {
+    //     message.stamp = node.now();
+    //     message.data = event;
+    //   };
+    //
+    //   (*publisher).publish(message);
+    // }
+
+    static auto publisher = node.create_publisher<autoware_simulation_msgs::msg::SimulationEvents>(
       "/simulation/fault_injection", rclcpp::QoS(1).reliable());
 
-    for (const auto & event : events) {
-      autoware_debug_msgs::msg::StringStamped message;
+    auto makeFaultInjectionEvent = [](const auto & name) {
+      autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
       {
-        message.stamp = node.now();
-        message.data = event;
-      };
+        fault_injection_event.level = autoware_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+        fault_injection_event.name = name;
+      }
 
-      (*publisher).publish(message);
-    }
+      return fault_injection_event;
+    };
 
-    // auto makeFaultInjectionEvent = [](const auto & name) {
-    //   autoware_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-    //   {
-    //     fault_injection_event.level = autoware_simulation_msgs::msg::FaultInjectionEvent::ERROR;
-    //     fault_injection_event.name = name;
-    //   }
-    //
-    //   return fault_injection_event;
-    // };
-    //
-    // auto makeFaultInjectionEvents = [&]() {
-    //   autoware_simulation_msgs::msg::SimulationEvents simulation_events;
-    //   {
-    //     simulation_events.stamp = node.now();
-    //     for (const auto & event : events) {
-    //       simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
-    //     }
-    //   }
-    //
-    //   return simulation_events;
-    // };
+    auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
+      const auto now = node.now();
+
+      autoware_simulation_msgs::msg::SimulationEvents simulation_events;
+      {
+        simulation_events.stamp = now;
+
+        for (const auto & event : events) {
+          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
+        }
+      }
+
+      return simulation_events;
+    };
+
+    (*publisher).publish(makeFaultInjectionEvents(events));
 
     return events.size();
   }
