@@ -65,11 +65,6 @@ jobs:
           sh install_depends.sh ${{ matrix.rosdistro }}
           cd ~/ros2_ws
 
-      - name: Resolve rosdep
-        run: |
-          cd ~/ros2_ws
-          rosdep install -iry --from-paths src --rosdistro ${{ matrix.rosdistro }}
-
       - name: Build packages
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
