@@ -18,6 +18,15 @@ namespace traffic_simulator
 {
 namespace math
 {
+geometry_msgs::msg::Vector3 vector3(double x, double y, double z)
+{
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = x;
+  vec.y = y;
+  vec.z = z;
+  return vec;
+}
+
 double getSize(geometry_msgs::msg::Vector3 vec) { return std::hypot(vec.x, vec.y, vec.z); }
 
 geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
@@ -46,6 +55,16 @@ geometry_msgs::msg::Vector3 operator*(geometry_msgs::msg::Vector3 vec, double va
 geometry_msgs::msg::Vector3 operator*(double value, geometry_msgs::msg::Vector3 vec)
 {
   return vec * value;
+}
+
+geometry_msgs::msg::Vector3 multiply(geometry_msgs::msg::Vector3 vec, double value)
+{
+  return vec * value;
+}
+
+geometry_msgs::msg::Vector3 multiply(double value, geometry_msgs::msg::Vector3 vec)
+{
+  return value * vec;
 }
 }  // namespace math
 }  // namespace traffic_simulator

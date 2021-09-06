@@ -16,6 +16,8 @@
 
 #include <traffic_simulator/math/linear_algebra.hpp>
 
+#include "../expect_eq_macros.hpp"
+
 TEST(LINEAR_ALGEBRA, GET_SIZE)
 {
   geometry_msgs::msg::Vector3 vec;
@@ -38,6 +40,17 @@ TEST(LINEAR_ALGEBRA, NORMALIZE)
   EXPECT_DOUBLE_EQ(vec.y, 0.0);
   EXPECT_DOUBLE_EQ(vec.z, 0.94868329805051377);
   EXPECT_DOUBLE_EQ(traffic_simulator::math::getSize(vec), 1.0);
+}
+
+TEST(LINEAR_ALGEBRA, MULTIPLY)
+{
+  geometry_msgs::msg::Vector3 vec = traffic_simulator::math::vector3(0, 3, 1);
+  EXPECT_VECTOR3_EQ(
+    traffic_simulator::math::multiply(vec, 1.0), traffic_simulator::math::vector3(0, 3, 1));
+  EXPECT_VECTOR3_EQ(
+    traffic_simulator::math::multiply(vec, 2.0), traffic_simulator::math::vector3(0, 6, 2));
+  EXPECT_VECTOR3_EQ(
+    traffic_simulator::math::multiply(vec, 1.0), traffic_simulator::math::multiply(1.0, vec));
 }
 
 int main(int argc, char ** argv)
