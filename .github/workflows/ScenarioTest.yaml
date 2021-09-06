@@ -74,7 +74,7 @@ jobs:
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
-          colcon build --symlink-install --ament-cmake-args -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1" --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          colcon build --symlink-install --packages-up-to scenario_simulator_v2 --ament-cmake-args -DCMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage -DCOVERAGE_RUN=1" --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
           lcov --config-file .lcovrc --base-directory ${PWD} --capture --directory build -o lcov.base --initial
 
       - name: Scenario test
