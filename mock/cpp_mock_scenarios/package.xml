@@ -9,7 +9,6 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>cargo_delivery</depend>
   <depend>traffic_simulator</depend>
   <depend>simple_sensor_simulator</depend>
 

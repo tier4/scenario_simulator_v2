@@ -31,8 +31,7 @@ class CppScenarioNode : public rclcpp::Node
 {
 public:
   explicit CppScenarioNode(
-    const std::string & node_name, const std::string & map_path,
-    const std::string & lanelet2_map_file, const std::string & scenario_filename,
+    const std::string & node_name, const std::string & scenario_filename,
     const bool verbose, const rclcpp::NodeOptions & option);
   void start();
   void stop(Result result);
@@ -49,12 +48,18 @@ private:
   virtual void onInitialize() = 0;
   rclcpp::TimerBase::SharedPtr update_timer_;
   auto configure(
-    const std::string & map_path, const std::string & lanelet2_map_file,
     const std::string & scenario_filename, const bool verbose) -> traffic_simulator::Configuration
   {
+    std::string map_path;
+    std::string osm_file;
+    this->declare_parameter<std::string>("map_path", "");
+    this->declare_parameter<std::string>("osm_file", "lanelet2_map.osm");
+    this->get_parameter("map_path", map_path);
+    this->get_parameter("osm_file", osm_file);
+
     auto configuration = traffic_simulator::Configuration(map_path);
     {
-      configuration.lanelet2_map_file = lanelet2_map_file;
+      configuration.lanelet2_map_file = osm_file;
       // configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
       configuration.scenario_path = scenario_filename;
       configuration.verbose = verbose;

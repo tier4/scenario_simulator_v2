@@ -14,7 +14,6 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -30,9 +29,7 @@ class MomentaryStopScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit MomentaryStopScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "momentary_stop",
-      ament_index_cpp::get_package_share_directory("cargo_delivery") + "/maps/kashiwa",
-      "lanelet2_map_with_private_road_and_walkway_ele_fix.osm", __FILE__, false, option)
+      "momentary_stop", __FILE__, false, option)
   {
     start();
   }
