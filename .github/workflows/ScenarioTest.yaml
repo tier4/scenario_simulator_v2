@@ -62,8 +62,8 @@ jobs:
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           sudo apt install -y python3-pip python3-rosdep2 python3-vcstool python3-colcon-common-extensions
           rosdep update
-          cd ~/ros2_ws
           sh install_depends.sh ${{ matrix.rosdistro }}
+          cd ~/ros2_ws
 
       - name: Resolve rosdep
         run: |
