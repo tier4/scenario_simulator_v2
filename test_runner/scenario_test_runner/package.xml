@@ -13,7 +13,6 @@
   <depend>rclpy</depend>
 
   <exec_depend>simple_sensor_simulator</exec_depend>
-  <exec_depend>lexus_description</exec_depend>
   <exec_depend>openscenario_interpreter</exec_depend>
   <exec_depend>openscenario_utility</exec_depend>
 
