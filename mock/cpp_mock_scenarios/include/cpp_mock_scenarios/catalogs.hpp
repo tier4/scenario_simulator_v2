@@ -16,9 +16,9 @@
 #define CPP_MOCK_SCENARIOS__CATALOGS_HPP_
 
 #include <openscenario_msgs/msg/misc_object_parameters.hpp>
+#include <openscenario_msgs/msg/pedestrian_parameters.hpp>
+#include <openscenario_msgs/msg/vehicle_parameters.hpp>
 #include <string>
-#include <traffic_simulator/entity/pedestrian_parameter.hpp>
-#include <traffic_simulator/entity/vehicle_parameter.hpp>
 
 auto getVehicleParameters() -> openscenario_msgs::msg::VehicleParameters
 {

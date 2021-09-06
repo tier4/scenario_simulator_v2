@@ -24,7 +24,6 @@
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/pedestrian_parameter.hpp>
 #include <vector>
 
 namespace traffic_simulator
