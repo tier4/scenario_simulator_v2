@@ -51,6 +51,28 @@ TEST(LINEAR_ALGEBRA, MULTIPLY)
   EXPECT_VECTOR3_EQ((vec * 2.0), (2.0 * vec));
 }
 
+TEST(LINEAR_ALGEBRA, ADDITION)
+{
+  geometry_msgs::msg::Vector3 vec = traffic_simulator::math::vector3(0, 3, 1);
+  EXPECT_VECTOR3_EQ((vec + vec), (2.0 * vec));
+  geometry_msgs::msg::Point p;
+  p.x = 0;
+  p.y = 3;
+  p.z = 1;
+  EXPECT_VECTOR3_EQ((p + vec), (2.0 * vec));
+}
+
+TEST(LINEAR_ALGEBRA, SUBTRACTION)
+{
+  geometry_msgs::msg::Vector3 vec = traffic_simulator::math::vector3(0, 3, 1);
+  EXPECT_VECTOR3_EQ((vec - vec), geometry_msgs::msg::Vector3());
+  geometry_msgs::msg::Point p;
+  p.x = 0;
+  p.y = 3;
+  p.z = 1;
+  EXPECT_VECTOR3_EQ((p - vec), geometry_msgs::msg::Vector3());
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
