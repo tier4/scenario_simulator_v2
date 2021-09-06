@@ -20,37 +20,7 @@
 #include <traffic_simulator/entity/pedestrian_parameter.hpp>
 #include <traffic_simulator/entity/vehicle_parameter.hpp>
 
-struct Catalog
-{
-  std::string vehicle_catalog_xml =
-    R"(<Vehicle name= 'vehicle.volkswagen.t2' vehicleCategory='car'>
-            <ParameterDeclarations/>
-            <Performance maxSpeed='69.444' maxAcceleration='200' maxDeceleration='10.0'/>
-            <BoundingBox>
-                <Center x='1.5' y='0.0' z='0.9'/>
-                <Dimensions width='2.1' length='4.5' height='1.8'/>
-            </BoundingBox>
-            <Axles>
-                <FrontAxle maxSteering='0.5' wheelDiameter='0.6' trackWidth='1.8' positionX='3.1' positionZ='0.3'/>
-                <RearAxle maxSteering='0.0' wheelDiameter='0.6' trackWidth='1.8' positionX='0.0' positionZ='0.3'/>
-            </Axles>
-            <Properties>
-                <Property name='type' value='ego_vehicle'/>
-            </Properties>
-        </Vehicle>)";
-
-  std::string pedestrian_catalog_xml =
-    R"(
-    <Pedestrian model='bob' mass='0.0' name='Bob' pedestrianCategory='pedestrian'>
-            <BoundingBox>
-                <Center x='0.0' y='0.0' z='0.5'/>
-                <Dimensions width='1.0' length='1.0' height='2.0'/>
-            </BoundingBox>
-            <Properties/>
-        </Pedestrian>)";
-};
-
-openscenario_msgs::msg::VehicleParameters getVehicleParameters()
+auto getVehicleParameters() -> openscenario_msgs::msg::VehicleParameters
 {
   openscenario_msgs::msg::VehicleParameters parameters;
   parameters.name = "vehicle.volkswagen.t";
@@ -79,10 +49,16 @@ openscenario_msgs::msg::VehicleParameters getVehicleParameters()
 
 auto getPedestrianParameters() -> openscenario_msgs::msg::PedestrianParameters
 {
-  pugi::xml_document catalog_xml_doc;
-  Catalog catalog;
-  catalog_xml_doc.load_string(catalog.pedestrian_catalog_xml.c_str());
-  return traffic_simulator::entity::PedestrianParameters(catalog_xml_doc).toRosMsg();
+  openscenario_msgs::msg::PedestrianParameters parameters;
+  parameters.name = "pedestrian";
+  parameters.pedestrian_category = "pedestrian";
+  parameters.bounding_box.center.x = 0.0;
+  parameters.bounding_box.center.y = 0.0;
+  parameters.bounding_box.center.z = 0.5;
+  parameters.bounding_box.dimensions.x = 1.0;
+  parameters.bounding_box.dimensions.y = 1.0;
+  parameters.bounding_box.dimensions.z = 2.0;
+  return parameters;
 }
 
 auto getMiscObjectParameters() -> openscenario_msgs::msg::MiscObjectParameters
