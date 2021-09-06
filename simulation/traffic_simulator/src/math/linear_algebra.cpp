@@ -43,28 +43,59 @@ geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
   vec.z = vec.z / size;
   return vec;
 }
-
-geometry_msgs::msg::Vector3 operator*(geometry_msgs::msg::Vector3 vec, double value)
-{
-  vec.x = vec.x * value;
-  vec.y = vec.y * value;
-  vec.z = vec.z * value;
-  return vec;
-}
-
-geometry_msgs::msg::Vector3 operator*(double value, geometry_msgs::msg::Vector3 vec)
-{
-  return vec * value;
-}
-
-geometry_msgs::msg::Vector3 multiply(geometry_msgs::msg::Vector3 vec, double value)
-{
-  return vec * value;
-}
-
-geometry_msgs::msg::Vector3 multiply(double value, geometry_msgs::msg::Vector3 vec)
-{
-  return value * vec;
-}
 }  // namespace math
 }  // namespace traffic_simulator
+
+geometry_msgs::msg::Vector3 operator*(const geometry_msgs::msg::Vector3 & vec, double value)
+{
+  geometry_msgs::msg::Vector3 ret;
+  ret.x = vec.x * value;
+  ret.y = vec.y * value;
+  ret.z = vec.z * value;
+  return ret;
+}
+
+geometry_msgs::msg::Vector3 operator*(double value, const geometry_msgs::msg::Vector3 & vec)
+{
+  return vec * value;
+}
+
+geometry_msgs::msg::Point operator+(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  geometry_msgs::msg::Point ret;
+  ret.x = v0.x + v1.x;
+  ret.y = v0.y + v1.y;
+  ret.z = v0.z + v1.z;
+  return ret;
+}
+
+geometry_msgs::msg::Vector3 operator+(
+  const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  geometry_msgs::msg::Vector3 ret;
+  ret.x = v0.x + v1.x;
+  ret.y = v0.y + v1.y;
+  ret.z = v0.z + v1.z;
+  return ret;
+}
+
+geometry_msgs::msg::Point operator-(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  geometry_msgs::msg::Point ret;
+  ret.x = v0.x - v1.x;
+  ret.y = v0.y - v1.y;
+  ret.z = v0.z - v1.z;
+  return ret;
+}
+
+geometry_msgs::msg::Vector3 operator-(
+  const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
+{
+  geometry_msgs::msg::Vector3 ret;
+  ret.x = v0.x - v1.x;
+  ret.y = v0.y - v1.y;
+  ret.z = v0.z - v1.z;
+  return ret;
+}

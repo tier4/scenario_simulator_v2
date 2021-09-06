@@ -17,6 +17,7 @@
 
 #include <math.h>
 
+#include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <limits>
 #include <scenario_simulator_exception/exception.hpp>
@@ -28,11 +29,18 @@ namespace math
 geometry_msgs::msg::Vector3 vector3(double x, double y, double z);
 double getSize(geometry_msgs::msg::Vector3 vec);
 geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec);
-geometry_msgs::msg::Vector3 operator*(geometry_msgs::msg::Vector3 vec, double value);
-geometry_msgs::msg::Vector3 operator*(double value, geometry_msgs::msg::Vector3 vec);
-geometry_msgs::msg::Vector3 multiply(geometry_msgs::msg::Vector3 vec, double value);
-geometry_msgs::msg::Vector3 multiply(double value, geometry_msgs::msg::Vector3 vec);
 }  // namespace math
 }  // namespace traffic_simulator
+
+geometry_msgs::msg::Vector3 operator*(const geometry_msgs::msg::Vector3 & vec, double value);
+geometry_msgs::msg::Vector3 operator*(double value, const geometry_msgs::msg::Vector3 & vec);
+geometry_msgs::msg::Point operator+(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1);
+geometry_msgs::msg::Vector3 operator+(
+  const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
+geometry_msgs::msg::Point operator-(
+  const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1);
+geometry_msgs::msg::Vector3 operator-(
+  const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
 
 #endif  // TRAFFIC_SIMULATOR__MATH__LINEAR_ALGEBRA_HPP_

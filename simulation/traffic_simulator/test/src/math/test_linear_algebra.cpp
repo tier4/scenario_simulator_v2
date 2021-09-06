@@ -45,12 +45,10 @@ TEST(LINEAR_ALGEBRA, NORMALIZE)
 TEST(LINEAR_ALGEBRA, MULTIPLY)
 {
   geometry_msgs::msg::Vector3 vec = traffic_simulator::math::vector3(0, 3, 1);
-  EXPECT_VECTOR3_EQ(
-    traffic_simulator::math::multiply(vec, 1.0), traffic_simulator::math::vector3(0, 3, 1));
-  EXPECT_VECTOR3_EQ(
-    traffic_simulator::math::multiply(vec, 2.0), traffic_simulator::math::vector3(0, 6, 2));
-  EXPECT_VECTOR3_EQ(
-    traffic_simulator::math::multiply(vec, 1.0), traffic_simulator::math::multiply(1.0, vec));
+  vec * 1.0;
+  EXPECT_VECTOR3_EQ((vec * 1.0), traffic_simulator::math::vector3(0, 3, 1));
+  EXPECT_VECTOR3_EQ((vec * 2.0), traffic_simulator::math::vector3(0, 6, 2));
+  EXPECT_VECTOR3_EQ((vec * 2.0), (2.0 * vec));
 }
 
 int main(int argc, char ** argv)

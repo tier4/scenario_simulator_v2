@@ -41,6 +41,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/math/catmull_rom_spline.hpp>
 #include <traffic_simulator/math/hermite_curve.hpp>
+#include <traffic_simulator/math/linear_algebra.hpp>
 #include <traffic_simulator/math/transfrom.hpp>
 #include <unordered_map>
 #include <utility>
@@ -759,20 +760,15 @@ geometry_msgs::msg::PoseStamped HdMapUtils::toMapPose(
   ret.header.frame_id = "map";
   const auto spline = getCenterPointsSpline(lanelet_id);
   ret.pose = spline->getPose(s);
+  const auto normal_vec = spline->getNormalVector(s);
+  const auto diff = traffic_simulator::math::normalize(normal_vec) * offset;
+  ret.pose.position = ret.pose.position + diff;
   const auto tangent_vec = spline->getTangentVector(s);
-  // const auto normal_vec = spline->getNormalVector(s);
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0.0;
   rpy.y = 0.0;
-  rpy.z = std::atan2(tangent_vec.y, tangent_vec.x) + M_PI_2;
-  // rpy.z = std::atan2(normal_vec.y, normal_vec.x);
-  rpy = quaternion_operation::convertQuaternionToEulerAngle(
-    quaternion_operation::convertEulerAngleToQuaternion(rpy) * quat);
-  ret.pose.position.x = ret.pose.position.x - std::sin(rpy.z) * offset;
-  ret.pose.position.y = ret.pose.position.y - std::cos(rpy.z) * offset;
-  ret.pose.position.z = ret.pose.position.z;
-  rpy.z = rpy.z - M_PI_2;
-  ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
+  ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) * quat;
   return ret;
 }
 
