@@ -32,23 +32,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-void EntityManager::broadcastBaseLinkTransform()
-{
-  // for (const auto & name : getEntityNames()) {
-  //   if (getEntityType(name).type == openscenario_msgs::msg::EntityType::EGO) {
-  //     auto status = getEntityStatus(name);
-  //     if (status) {
-  //       geometry_msgs::msg::PoseStamped pose;
-  //       pose.pose = status->pose;
-  //       pose.header.stamp = clock_ptr_->now();
-  //       pose.header.frame_id = "base_link";
-  //       broadcastTransform(pose, false);
-  //     }
-  //     return;
-  //   }
-  // }
-}
-
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
@@ -64,7 +47,6 @@ void EntityManager::broadcastEntityTransform()
       }
     }
   }
-  // broadcastBaseLinkTransform();
 }
 
 void EntityManager::broadcastTransform(

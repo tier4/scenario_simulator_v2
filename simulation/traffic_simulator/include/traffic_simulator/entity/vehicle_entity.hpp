@@ -24,7 +24,6 @@
 #include <traffic_simulator/behavior/vehicle/behavior_tree.hpp>
 #include <traffic_simulator/behavior/vehicle/lane_change_action.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/vehicle_parameter.hpp>
 
 // headers in pugixml
 #include <boost/optional.hpp>
