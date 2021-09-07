@@ -4,7 +4,7 @@ import "builtin_interfaces.proto";
 package std_msgs;
 
 /**
- * Protobuf definiciton of [std_msgs::msgs::Header type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/std_msgs/msg/Header.msg)
+ * Protobuf definicion of [std_msgs::msgs::Header type in ROS2.](https://github.com/ros2/common_interfaces/blob/master/std_msgs/msg/Header.msg)
  **/
 message Header {
   /**
