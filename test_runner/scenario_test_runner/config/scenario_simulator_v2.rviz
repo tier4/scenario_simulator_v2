@@ -11,19 +11,19 @@ Panels:
         - /Planning1/ScenarioPlanning1/LaneDriving1
         - /Simulation1
         - /Simulation1/Lanelet Marker1/Topic1
-      Splitter Ratio: 0.4971751272678375
+      spliter Ratio: 0.4971751272678375
     Tree Height: 651
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
     Expanded: ~
     Name: Tool Properties
-    Splitter Ratio: 0.5886790156364441
+    spliter Ratio: 0.5886790156364441
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
     Name: Views
-    Splitter Ratio: 0.5
+    spliter Ratio: 0.5
   - Class: autoware_localization_rviz_plugin/InitialPoseButtonPanel
     Name: InitialPoseButtonPanel
 Visualization Manager:

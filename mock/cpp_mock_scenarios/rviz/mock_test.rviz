@@ -9,7 +9,7 @@ Panels:
         - /Simulation1/Lanelet1
         - /Simulation1/Lanelet1/Topic1
         - /Simulation1/Lanelet1/Namespaces1
-      Splitter Ratio: 0.5
+      spliter Ratio: 0.5
     Tree Height: 1147
   - Class: rviz_common/Selection
     Name: Selection
@@ -17,12 +17,12 @@ Panels:
     Expanded:
       - /Publish Point1
     Name: Tool Properties
-    Splitter Ratio: 0.5886790156364441
+    spliter Ratio: 0.5886790156364441
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
     Name: Views
-    Splitter Ratio: 0.5
+    spliter Ratio: 0.5
 Visualization Manager:
   Class: ""
   Displays:
