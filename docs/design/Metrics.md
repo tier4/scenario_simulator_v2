@@ -1,6 +1,6 @@
 # Metrics
 
-Metrics classs allow you to check Autoware way of driving is valid or not.
+Metrics class allow you to check Autoware way of driving is valid or not.
 
 ## Lifecycle
 
@@ -27,7 +27,7 @@ update function in metrics class was called in every simulation frame in this st
 In this state, metrics class does not calculate metrics any more.
 
 ### Failure
-In this state, metrics class throw specification vaiolation error.
+In this state, metrics class throw specification violation error.
 
 ## What types of metrics can we use?
 
