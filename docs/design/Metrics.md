@@ -31,13 +31,13 @@ In this state, metrics class throw specification vaiolation error.
 
 ## What types of metrics can we use?
 
-If you wnat to use metrics class with C++ API, all you have to do is call API::addMetric function.
+If you want to use metrics class with C++ API, all you have to do is call API::addMetric function.
 
 ```C++
 api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...);
 ```
 
-### Traveled Distace
+### Traveled Distance
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1TraveledDistanceMetric/#public-functions)  
 Traveled distance metric calculates total traveled distance for target entity.
 
