@@ -14,9 +14,6 @@
   <depend>visualization_msgs</depend>
   <depend>openscenario_msgs</depend>
   <depend>traffic_simulator</depend>
-  <depend>pluginlib</depend>
-  <depend>openscenario_interpreter_msgs</depend>
-  <depend>rviz2</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>
