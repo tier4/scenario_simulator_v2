@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Entity1
         - /TF1/Frames1
-      spliter Ratio: 0.642276406288147
+      split Ratio: 0.642276406288147
     Tree Height: 1140
   - Class: rviz/Selection
     Name: Selection
@@ -16,12 +16,12 @@ Panels:
       - /2D Nav Goal1
       - /Publish Point1
     Name: Tool Properties
-    spliter Ratio: 0.5886790156364441
+    split Ratio: 0.5886790156364441
   - Class: rviz/Views
     Expanded:
       - /Current View1
     Name: Views
-    spliter Ratio: 0.5
+    split Ratio: 0.5
   - Class: rviz/Time
     Experimental: false
     Name: Time
