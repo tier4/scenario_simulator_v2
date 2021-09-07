@@ -118,7 +118,7 @@ struct CustomCommandAction : private Scope
     return events.size();
   }
 
-  static int walkStraightAction(
+  static int applyWalkStraightAction(
     const std::vector<std::string> & actors, const Scope & current_scope)
   {
     for (const auto & actor : actors) {
@@ -166,7 +166,7 @@ struct CustomCommandAction : private Scope
     std::string, std::function<int(const std::vector<std::string> &, const Scope &)>>
     builtins{
       std::make_pair("FaultInjectionAction", applyFaultInjectionAction),
-      std::make_pair("WalkStraightAction", walkStraightAction),
+      std::make_pair("WalkStraightAction", applyWalkStraightAction),
       std::make_pair("error", error),
       std::make_pair("exitFailure", exitFailure),
       std::make_pair("exitSuccess", exitSuccess),
