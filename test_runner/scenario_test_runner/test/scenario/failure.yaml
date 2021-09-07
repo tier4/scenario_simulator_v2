@@ -25,7 +25,7 @@ OpenSCENARIO:
     LogicFile:
       filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.$(var extension)"
     SceneGraphFile:
-      filepath: "$(dirname)/hoge.txt"
+      filepath: "$(dirname)/foo.txt"
     TrafficSignals:
   Entities:
   Storyboard:
@@ -44,9 +44,9 @@ OpenSCENARIO:
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
-                    - entityRef: hoge
-                    - entityRef: fuga
-                    - entityRef: piyo
+                    - entityRef: foo
+                    - entityRef: bar
+                    - entityRef: baz
                 Maneuver:
                   - name: maneuver
                     Event:

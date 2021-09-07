@@ -29,7 +29,7 @@ OpenSCENARIO:
     LogicFile:
       filepath: "$(find-pkg-share $(var map-name))/map/lanelet2_map.$(var extension)"
     SceneGraphFile:
-      filepath: "$(dirname)/hoge.txt"
+      filepath: "$(dirname)/foo.txt"
     TrafficSignals:
   Entities:
   Storyboard:
@@ -42,7 +42,7 @@ OpenSCENARIO:
               value: INITIAL-VALUE
         UserDefinedAction:
           CustomCommandAction:
-            type: test(hoge, "hello, world!", 3.14)
+            type: test(foo, "hello, world!", 3.14)
     Story:
       - name: story
         Act:
@@ -53,9 +53,9 @@ OpenSCENARIO:
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
-                    - entityRef: hoge
-                    - entityRef: fuga
-                    - entityRef: piyo
+                    - entityRef: foo
+                    - entityRef: bar
+                    - entityRef: baz
                 Maneuver:
                   - name: maneuver
                     Event:
