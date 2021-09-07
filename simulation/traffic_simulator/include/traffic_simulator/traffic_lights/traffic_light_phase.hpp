@@ -37,7 +37,7 @@ public:
       THROW_SEMANTIC_ERROR("phase is empty");
     } else {
       return std::accumulate(
-        std::begin(phase_), std::end(phase_), 0,
+        std::begin(phase_), std::end(phase_), static_cast<double>(0),
         [](const auto & lhs, const auto & rhs) { return lhs + rhs.first; });
     }
   }
@@ -64,7 +64,7 @@ public:
       return;
     }
     elapsed_time_ = elapsed_time_ + step_time;
-    if (elapsed_time_ > getPhaseDuration()) {
+    if (elapsed_time_ >= getPhaseDuration()) {
       elapsed_time_ = elapsed_time_ - getPhaseDuration();
     }
   }

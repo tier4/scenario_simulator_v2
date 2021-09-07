@@ -212,8 +212,6 @@ public:
     const std::string & name,
     const std::unordered_map<std::string, openscenario_msgs::msg::EntityType> & type_list);
 
-  void broadcastBaseLinkTransform();
-
   void broadcastEntityTransform();
 
   void broadcastTransform(
@@ -275,6 +273,11 @@ public:
   auto getStepTime() const noexcept -> double;
 
   auto getWaypoints(const std::string & name) -> openscenario_msgs::msg::WaypointsArray;
+
+  void getGoalPoses(
+    const std::string & name, std::vector<openscenario_msgs::msg::LaneletPose> & goals);
+
+  void getGoalPoses(const std::string & name, std::vector<geometry_msgs::msg::Pose> & goals);
 
   bool isEgo(const std::string & name) const;
 

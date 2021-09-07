@@ -108,8 +108,10 @@ private:
    * @param obstacle obstacles in waypoint
    * @return const visualization_msgs::msg::MarkerArray markers which describes entity bounding box and it's status.
    */
+  int goal_pose_max_size = 0;
   const visualization_msgs::msg::MarkerArray generateMarker(
     const openscenario_msgs::msg::EntityStatus & status,
+    const std::vector<geometry_msgs::msg::Pose> & goal_pose,
     const openscenario_msgs::msg::WaypointsArray & waypoints,
     const openscenario_msgs::msg::Obstacle & obstacle, bool obstacle_find);
   /**

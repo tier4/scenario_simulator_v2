@@ -24,7 +24,6 @@
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/behavior/target_speed_planner.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
-#include <traffic_simulator/entity/pedestrian_parameter.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -93,6 +92,11 @@ public:
   }
 
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override { return boost::none; }
+
+  std::vector<openscenario_msgs::msg::LaneletPose> getGoalPoses() override
+  {
+    return route_planner_ptr_->getGoalPoses();
+  }
 
   const openscenario_msgs::msg::WaypointsArray getWaypoints() override
   {
