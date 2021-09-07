@@ -55,6 +55,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/math/polynomial_solver.cpp
   src/math/transform.cpp
   src/math/uuid.cpp
+  src/math/linear_algebra.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
   src/metrics/momentary_stop_metric.cpp
