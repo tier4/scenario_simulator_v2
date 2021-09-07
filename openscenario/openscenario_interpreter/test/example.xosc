@@ -230,7 +230,7 @@
 
     <StopTrigger>
       <ConditionGroup>
-        <!-- UNSUPPORTED EndofRoadCondition -->
+        <!-- UNSUPPORTED EndOfRoadCondition -->
 
         <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>
