@@ -117,6 +117,11 @@ public:
     }
   }
 
+  std::vector<openscenario_msgs::msg::LaneletPose> getGoalPoses() override
+  {
+    return route_planner_ptr_->getGoalPoses();
+  }
+
   boost::optional<openscenario_msgs::msg::Obstacle> getObstacle() override
   {
     return tree_ptr_->getObstacle();
