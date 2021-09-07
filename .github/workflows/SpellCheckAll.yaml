@@ -14,7 +14,7 @@ jobs:
         run: |
           curl --silent --show-error \
             --output .github/workflows/.cspell.json \
-            https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/cspell/.cspell.json
+            https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/feature/scenario_simulator_v2/cspell/.cspell.json
 
       - name: Prepare node
         uses: actions/setup-node@v2
