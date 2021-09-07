@@ -347,20 +347,20 @@ boost::optional<int> HdMapUtils::getLaneChangeableLaneletId(
 std::vector<std::int64_t> HdMapUtils::getPreviousLanelets(std::int64_t lanelet_id, double distance)
 {
   std::vector<std::int64_t> ret;
-  double total_dist = 0.0;
+  double total_distance = 0.0;
   ret.push_back(lanelet_id);
-  while (total_dist < distance) {
+  while (total_distance < distance) {
     auto ids = getPreviousLaneletIds(lanelet_id, "straight");
     if (ids.size() != 0) {
       lanelet_id = ids[0];
-      total_dist = total_dist + getLaneletLength(lanelet_id);
+      total_distance = total_distance + getLaneletLength(lanelet_id);
       ret.push_back(lanelet_id);
       continue;
     } else {
       auto else_ids = getPreviousLaneletIds(lanelet_id);
       if (else_ids.size() != 0) {
         lanelet_id = else_ids[0];
-        total_dist = total_dist + getLaneletLength(lanelet_id);
+        total_distance = total_distance + getLaneletLength(lanelet_id);
         ret.push_back(lanelet_id);
         continue;
       } else {
@@ -389,13 +389,13 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     return {};
   }
   std::vector<std::int64_t> ret;
-  double total_dist = 0.0;
+  double total_distance = 0.0;
   bool found = false;
   for (const auto id : candidate_lanelet_ids) {
     if (found) {
       ret.emplace_back(id);
-      total_dist = total_dist + getLaneletLength(id);
-      if (total_dist > distance) {
+      total_distance = total_distance + getLaneletLength(id);
+      if (total_distance > distance) {
         return ret;
       }
     }
@@ -409,7 +409,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   if (!found) {
     THROW_SEMANTIC_ERROR("lanelet id does not match");
   }
-  if (total_dist > distance) {
+  if (total_distance > distance) {
     return ret;
   }
   std::int64_t end_lanelet = candidate_lanelet_ids[candidate_lanelet_ids.size() - 1];
@@ -422,22 +422,22 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   std::int64_t lanelet_id, double distance, bool include_self)
 {
   std::vector<std::int64_t> ret;
-  double total_dist = 0.0;
+  double total_distance = 0.0;
   if (include_self) {
     ret.push_back(lanelet_id);
   }
-  while (total_dist < distance) {
+  while (total_distance < distance) {
     const auto straight_ids = getNextLaneletIds(lanelet_id, "straight");
     if (straight_ids.size() != 0) {
       lanelet_id = straight_ids[0];
-      total_dist = total_dist + getLaneletLength(lanelet_id);
+      total_distance = total_distance + getLaneletLength(lanelet_id);
       ret.push_back(lanelet_id);
       continue;
     }
     const auto ids = getNextLaneletIds(lanelet_id);
     if (ids.size() != 0) {
       lanelet_id = ids[0];
-      total_dist = total_dist + getLaneletLength(lanelet_id);
+      total_distance = total_distance + getLaneletLength(lanelet_id);
       ret.push_back(lanelet_id);
       continue;
     } else {
@@ -682,11 +682,12 @@ HdMapUtils::getLaneChangeTrajectory(
       forward_distance_threshold) {
       continue;
     }
-    double start_to_goal_dist = std::sqrt(
+    double start_to_goal_distance = std::sqrt(
       std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
       std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
-    auto traj = getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_dist * 0.5);
+    auto traj =
+      getLaneChangeTrajectory(from_pose, to_lanelet_id, to_s, start_to_goal_distance * 0.5);
     if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
       double eval = std::fabs(target_trajectory_length - traj.getLength());
       evaluation.push_back(eval);
@@ -823,14 +824,14 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
   if (route.empty()) {
     return boost::none;
   }
-  double dist = 0;
+  double distance = 0;
   for (const auto lanelet_id : route) {
     if (lanelet_id == from_lanelet_id) {
-      dist = dist + getLaneletLength(from_lanelet_id) - from_s;
+      distance = distance + getLaneletLength(from_lanelet_id) - from_s;
     } else if (lanelet_id == to_lanelet_id) {
-      dist = dist + to_s;
+      distance = distance + to_s;
     } else {
-      dist = dist + getLaneletLength(lanelet_id);
+      distance = distance + getLaneletLength(lanelet_id);
     }
   }
   return dist;
