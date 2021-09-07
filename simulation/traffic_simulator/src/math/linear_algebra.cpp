@@ -27,7 +27,10 @@ geometry_msgs::msg::Vector3 vector3(double x, double y, double z)
   return vec;
 }
 
-double getSize(geometry_msgs::msg::Vector3 vec) { return std::hypot(vec.x, vec.y, vec.z); }
+double getSize(geometry_msgs::msg::Vector3 vec)
+{
+  return std::sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+}
 
 geometry_msgs::msg::Vector3 normalize(geometry_msgs::msg::Vector3 vec)
 {
