@@ -103,7 +103,7 @@ std::vector<openscenario_msgs::msg::EntityStatus> ActionNode::getOtherEntityStat
 boost::optional<double> ActionNode::getYieldStopDistance(
   const std::vector<std::int64_t> & following_lanelets)
 {
-  std::set<double> dists;
+  std::set<double> distances;
   for (const auto & lanelet : following_lanelets) {
     const auto right_of_way_ids = hdmap_utils->getRightOfWayLaneletIds(lanelet);
     for (const auto right_of_way_id : right_of_way_ids) {
@@ -112,12 +112,12 @@ boost::optional<double> ActionNode::getYieldStopDistance(
         auto distance = hdmap_utils->getLongitudinalDistance(
           entity_status.lanelet_pose.lanelet_id, entity_status.lanelet_pose.s, lanelet, 0);
         if (distance) {
-          dists.insert(distance.get());
+          distances.insert(distance.get());
         }
       }
     }
-    if (dists.size() != 0) {
-      return *dists.begin();
+    if (distances.size() != 0) {
+      return *distances.begin();
     }
   }
   return boost::none;
