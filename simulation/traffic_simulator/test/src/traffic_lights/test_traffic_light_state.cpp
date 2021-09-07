@@ -46,6 +46,27 @@ TEST(TrafficLights, makeLampState)
     std::out_of_range);
 }
 
+TEST(TraffigLights, OPERATOR_INSERT)
+{
+  std::stringstream ss;
+  ss << traffic_simulator::TrafficLightArrow::STRAIGHT;
+  EXPECT_STREQ(ss.str().c_str(), "straight");
+  ss << traffic_simulator::TrafficLightArrow::NONE;
+  EXPECT_STREQ(ss.str().c_str(), "none");
+  ss << traffic_simulator::TrafficLightArrow::LEFT;
+  EXPECT_STREQ(ss.str().c_str(), "left");
+  ss << traffic_simulator::TrafficLightArrow::RIGHT;
+  EXPECT_STREQ(ss.str().c_str(), "right");
+  ss << traffic_simulator::TrafficLightColor::NONE;
+  EXPECT_STREQ(ss.str().c_str(), "none");
+  ss << traffic_simulator::TrafficLightColor::RED;
+  EXPECT_STREQ(ss.str().c_str(), "red");
+  ss << traffic_simulator::TrafficLightColor::GREEN;
+  EXPECT_STREQ(ss.str().c_str(), "green");
+  ss << traffic_simulator::TrafficLightColor::YELLOW;
+  EXPECT_STREQ(ss.str().c_str(), "yellow");
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
