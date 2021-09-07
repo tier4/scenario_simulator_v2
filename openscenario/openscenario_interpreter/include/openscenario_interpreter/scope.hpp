@@ -70,7 +70,7 @@ public:
 
   auto findElement(const std::string & name) const -> Element
   {
-    std::vector<std::string> splitted;
+    std::vector<std::string> splitt;
     {
       const char * delim = "::";
       const std::size_t delim_len = 2;
@@ -78,18 +78,18 @@ public:
       std::size_t prev_pos = 0;
       std::size_t pos = 0;
       while ((pos = name.find(delim, prev_pos)) != std::string::npos) {
-        splitted.push_back(name.substr(prev_pos, pos - prev_pos));
+        splitt.push_back(name.substr(prev_pos, pos - prev_pos));
         prev_pos = pos + delim_len;
       }
-      splitted.push_back(name.substr(prev_pos, pos));
+      splitt.push_back(name.substr(prev_pos, pos));
     }
 
-    if (splitted.size() == 1) {
-      return lookupUnqualifiedElement(splitted.front());
+    if (splitt.size() == 1) {
+      return lookupUnqualifiedElement(splitt.front());
     } else {
-      auto top_scope = lookupUnqualifiedScope(splitted.front());
+      auto top_scope = lookupUnqualifiedScope(splitt.front());
       if (top_scope) {
-        return lookupQualifiedElement(top_scope, splitted.begin() + 1, splitted.end());
+        return lookupQualifiedElement(top_scope, splitt.begin() + 1, splitt.end());
       } else {
         return Element{};
       }
