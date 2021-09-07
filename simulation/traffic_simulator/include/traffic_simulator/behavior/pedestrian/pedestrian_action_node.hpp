@@ -21,7 +21,6 @@
 #include <openscenario_msgs/msg/pedestrian_parameters.hpp>
 #include <string>
 #include <traffic_simulator/behavior/action_node.hpp>
-#include <traffic_simulator/entity/pedestrian_parameter.hpp>
 
 namespace entity_behavior
 {

@@ -18,3 +18,6 @@ target_link_libraries(test_distance traffic_simulator)
 
 ament_add_gtest(test_collision test_collision.cpp)
 target_link_libraries(test_collision traffic_simulator)
+
+ament_add_gtest(test_linear_algebra test_linear_algebra.cpp)
+target_link_libraries(test_linear_algebra traffic_simulator)
