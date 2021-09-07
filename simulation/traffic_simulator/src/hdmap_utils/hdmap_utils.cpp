@@ -413,7 +413,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
     return ret;
   }
   std::int64_t end_lanelet = candidate_lanelet_ids[candidate_lanelet_ids.size() - 1];
-  const auto followings = getFollowingLanelets(end_lanelet, distance - total_dist, false);
+  const auto followings = getFollowingLanelets(end_lanelet, distance - total_distance, false);
   std::copy(followings.begin(), followings.end(), std::back_inserter(ret));
   return ret;
 }
@@ -834,7 +834,7 @@ boost::optional<double> HdMapUtils::getLongitudinalDistance(
       distance = distance + getLaneletLength(lanelet_id);
     }
   }
-  return dist;
+  return distance;
 }
 
 const autoware_auto_msgs::msg::HADMapBin HdMapUtils::toMapBin()
