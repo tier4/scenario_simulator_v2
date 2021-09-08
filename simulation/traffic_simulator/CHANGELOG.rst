@@ -374,9 +374,9 @@ Changelog for package traffic_simulator
 * fix typo
 * update branch
 * apply reformat
-* enable chache length
+* enable cache length
 * apply reformat
-* add route chache
+* add route cache
 * Merge pull request `#316 <https://github.com/tier4/scenario_simulator_v2/issues/316>`_ from tier4/fix/hold_stream
 * Merge branch 'master' of github.com:tier4/scenario_simulator.auto into fix/hold_stream
 * apply reformat

@@ -18,12 +18,12 @@
 #include <traffic_simulator/math/hermite_curve.hpp>
 #include <traffic_simulator/math/polynomial_solver.hpp>
 
-bool checkValuetWithTorelance(double value, double expected, double torelance)
+bool checkValueWithTolerance(double value, double expected, double tolerance)
 {
-  if (torelance < 0) {
-    throw std::logic_error("torelance should be over 0");
+  if (tolerance < 0) {
+    throw std::logic_error("tolerance should be over 0");
   }
-  if (std::fabs(value - expected) < torelance) {
+  if (std::fabs(value - expected) < tolerance) {
     return true;
   }
   return false;
@@ -44,7 +44,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
     for (double b = -20; b < 20; b = b + 0.1) {
       auto ret = solver.solveLinearEquation(a, b, 0, 1);
       for (const auto & solution : ret) {
-        EXPECT_TRUE(checkValuetWithTorelance(solver.linearFunction(a, b, solution), 0.0, 1e-10));
+        EXPECT_TRUE(checkValueWithTolerance(solver.linearFunction(a, b, solution), 0.0, 1e-10));
       }
     }
   }
@@ -67,7 +67,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
         auto ret = solver.solveQuadraticEquation(
           static_cast<double>(a), static_cast<double>(b), static_cast<double>(c), 0, 1);
         for (const auto & solution : ret) {
-          EXPECT_TRUE(checkValuetWithTorelance(
+          EXPECT_TRUE(checkValueWithTolerance(
             solver.quadraticFunction(
               static_cast<double>(a), static_cast<double>(b), static_cast<double>(c), solution),
             0.0, 1e-10));
@@ -88,7 +88,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
             static_cast<double>(a), static_cast<double>(b), static_cast<double>(c),
             static_cast<double>(d), 0, 1);
           for (const auto & solution : ret) {
-            EXPECT_TRUE(checkValuetWithTorelance(
+            EXPECT_TRUE(checkValueWithTolerance(
               solver.cubicFunction(
                 static_cast<double>(a), static_cast<double>(b), static_cast<double>(c),
                 static_cast<double>(d), solution),

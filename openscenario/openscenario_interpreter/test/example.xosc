@@ -3,9 +3,9 @@
   <FileHeader revMajor="1" revMinor="42" date="2020-08-06T12:00:00" description="test" author="Tatsuya Yamasaki"/>
   
   <ParameterDeclarations>
-    <ParameterDeclaration name="hoge" parameterType="string" value="Hello, world!"/>
-    <ParameterDeclaration name="fuga" parameterType="double" value="42"/>
-    <ParameterDeclaration name="piyo" parameterType="string" value="$hoge"/>
+    <ParameterDeclaration name="foo" parameterType="string" value="Hello, world!"/>
+    <ParameterDeclaration name="bar" parameterType="double" value="42"/>
+    <ParameterDeclaration name="baz" parameterType="string" value="$foo"/>
   </ParameterDeclarations>
 
   <CatalogLocations>
@@ -230,7 +230,7 @@
 
     <StopTrigger>
       <ConditionGroup>
-        <!-- UNSUPPORTED EndofRoadCondition -->
+        <!-- UNSUPPORTED EndOfRoadCondition -->
 
         <Condition name="" conditionEdge="none" delay="0">
           <ByEntityCondition>

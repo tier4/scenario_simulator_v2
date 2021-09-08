@@ -1,5 +1,5 @@
-ament_add_gtest(test_polynominal_solver test_polynominal_solver.cpp)
-target_link_libraries(test_polynominal_solver traffic_simulator)
+ament_add_gtest(test_polynomial_solver test_polynomial_solver.cpp)
+target_link_libraries(test_polynomial_solver traffic_simulator)
 
 ament_add_gtest(test_hermite_curve test_hermite_curve.cpp)
 target_link_libraries(test_hermite_curve traffic_simulator)

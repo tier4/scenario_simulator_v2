@@ -26,7 +26,7 @@ path: /tmp/simple.xosc
 ```yaml
 success: Simulation terminated by success condition action.
 failure: Simulation terminated by failure condition action.
-exception: Simulation terminated by exceptions in openscenario_intertretor component.
+exception: Simulation terminated by exceptions in openscenario_interpreter component.
 ```
 
 ## Examples

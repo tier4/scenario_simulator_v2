@@ -43,7 +43,7 @@ public:
   {
     if (!exists(from, to)) {
       THROW_SIMULATION_ERROR(
-        "route from : ", from, " to : ", to, " does not exists on route chache.");
+        "route from : ", from, " to : ", to, " does not exists on route cache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
     const auto ret = data_.at({from, to});
@@ -74,7 +74,7 @@ public:
   std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route chache.");
+      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return data_.at(lanelet_id);
@@ -83,7 +83,7 @@ public:
     std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route chache.");
+      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return splines_[lanelet_id];
@@ -116,7 +116,7 @@ public:
   double getLength(std::int64_t lanelet_id)
   {
     if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route chache.");
+      THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return data_[lanelet_id];
