@@ -34,11 +34,7 @@ struct DeleteEntityAction
   {
   }
 
-  decltype(auto) operator()(const String & entity_ref) const
-  {
-    despawn(entity_ref);
-    return unspecified;
-  }
+  inline auto operator()(const String & entity_ref) const -> void { despawn(entity_ref); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

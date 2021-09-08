@@ -37,12 +37,19 @@ struct AddEntityAction
   const Position position;
 
   template <typename Node, typename Scope>
-  explicit AddEntityAction(const Node & node, Scope & outer_scope)
-  : position(readElement<Position>("Position", node, outer_scope))
+  explicit AddEntityAction(const Node & node, Scope & current_scope)
+  : position(readElement<Position>("Position", node, current_scope))
   {
   }
 
-  auto operator()(const String & /* entity_ref */) const { return unspecified; }
+  static auto accomplished() noexcept -> bool { return endsImmediately(); }
+
+  static auto endsImmediately() noexcept -> bool { return true; }
+
+  inline auto operator()(const std::string &) const -> void
+  {
+    // TODO
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

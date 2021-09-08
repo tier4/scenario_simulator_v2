@@ -51,17 +51,18 @@ struct TeleportAction : private Scope
   {
     auto teleport_action = overload(
       [](const WorldPosition & position, const auto & actor) {
-        return setEntityStatus(actor, static_cast<geometry_msgs::msg::Pose>(position));
+        return applyTeleportAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
       },
       [](const RelativeWorldPosition & position, const auto & actor) {
-        return setEntityStatus(
+        return applyTeleportAction(
           actor,
           position.reference,  // name
           position,            // geometry_msgs::msg::Point
           position.orientation);
       },
       [](const LanePosition & position, const auto & actor) {
-        return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+        return applyTeleportAction(
+          actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
       });
 
     for (const auto & actor : actors) {

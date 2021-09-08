@@ -112,7 +112,7 @@ FORWARD_TO_SIMULATION_API(getCurrentTime);
 FORWARD_TO_SIMULATION_API(initialize);
 FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
-FORWARD_TO_SIMULATION_API(setEntityStatus);
+FORWARD_TO_SIMULATION_API(setEntityStatus);  // XXX DEPRECATED
 FORWARD_TO_SIMULATION_API(setTargetSpeed);
 FORWARD_TO_SIMULATION_API(spawn);
 FORWARD_TO_SIMULATION_API(updateFrame);
@@ -133,6 +133,7 @@ RENAME(applyAcquirePositionAction, requestAcquirePosition);
 RENAME(applyAssignControllerAction, setDriverModel);
 RENAME(applyAssignRouteAction, requestAssignRoute);
 RENAME(applyLaneChangeAction, requestLaneChange);
+RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
 RENAME(evaluateReachPositionCondition, reachPosition);
