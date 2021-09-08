@@ -203,7 +203,7 @@ OpenSCENARIO:
     Story:
       - name: "main"
         Act:
-          - name: "count_up!"
+          - name: "count-up!"
             ManeuverGroup:
               - maximumExecutionCount: 1
                 name: ""
@@ -254,7 +254,7 @@ OpenSCENARIO:
                                     ParameterCondition:
                                       parameterRef: count
                                       rule: lessThan
-                                      value: &count_up-local-count-max 1000
+                                      value: &count-up-local-count-max 1000
                         Action:
                           - name: "local count += 10"
                             GlobalAction:
@@ -695,7 +695,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     StoryboardElementStateCondition:
-                                      storyboardElementRef: "count_up!"
+                                      storyboardElementRef: "count-up!"
                                       storyboardElementType: act
                                       state: skipTransition
                         Action:
@@ -713,9 +713,9 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     ParameterCondition:
-                                      parameterRef: count_up!::count
+                                      parameterRef: count-up!::count
                                       rule: greaterThan
-                                      value: *count_up-local-count-max
+                                      value: *count-up-local-count-max
                         Action:
                           - name: "return EXIT_FAILURE"
                             UserDefinedAction:
