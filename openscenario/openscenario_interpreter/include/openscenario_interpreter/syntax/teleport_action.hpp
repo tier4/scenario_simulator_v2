@@ -47,35 +47,22 @@ struct TeleportAction : private Scope
 
   static constexpr auto endsImmediately() noexcept -> bool { return true; };
 
-  // decltype(auto) operator()(const WorldPosition & world_position, const EntityRef & actor) const
-  // {
-  //   return setEntityStatus(actor, static_cast<geometry_msgs::msg::Pose>(world_position));
-  // }
-  //
-  // decltype(auto) operator()(const LanePosition & lane_position, const EntityRef & actor) const
-  // {
-  //   return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(lane_position));
-  // }
-  //
-  // decltype(auto) operator()(
-  //   const RelativeWorldPosition & relative_world_position, const EntityRef & actor) const
-  // {
-  //   return setEntityStatus(
-  //     actor,
-  //     relative_world_position.reference,  // name
-  //     relative_world_position,            // geometry_msgs::msg::Point
-  //     relative_world_position.orientation);
-  // }
-
-  void start() const
+  auto start() const -> void
   {
-    // clang-format off
     auto teleport_action = overload(
-      [](const         WorldPosition & position, const auto & actor) { return setEntityStatus(actor, static_cast<geometry_msgs::msg::Pose           >(position)); },
-      [](const RelativeWorldPosition & position, const auto & actor) { return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(position)); },
-      [](const          LanePosition & position, const auto & actor) { return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(position)); }
-      );
-    // clang-format on
+      [](const WorldPosition & position, const auto & actor) {
+        return setEntityStatus(actor, static_cast<geometry_msgs::msg::Pose>(position));
+      },
+      [](const RelativeWorldPosition & position, const auto & actor) {
+        return setEntityStatus(
+          actor,
+          position.reference,  // name
+          position,            // geometry_msgs::msg::Point
+          position.orientation);
+      },
+      [](const LanePosition & position, const auto & actor) {
+        return setEntityStatus(actor, static_cast<openscenario_msgs::msg::LaneletPose>(position));
+      });
 
     for (const auto & actor : actors) {
       apply(teleport_action, position, actor);
