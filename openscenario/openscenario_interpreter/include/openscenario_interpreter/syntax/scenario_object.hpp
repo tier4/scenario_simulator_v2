@@ -96,13 +96,13 @@ struct ScenarioObject
       if (is<Vehicle>()) {
         applyAssignControllerAction(name, object_controller);
         if (object_controller.isEgo()) {
-          auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
+          const auto architecture_type =
+            getParameter<std::string>("architecture_type", std::string(""));
 
           if (architecture_type == "tier4/proposal") {
             attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
               traffic_simulator::helper::LidarType::VLP16, name,
               "/sensing/lidar/no_ground/pointcloud"));
-
             attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
               name, "/perception/object_recognition/objects", 0.1));
           } else if (architecture_type == "awf/auto") {
