@@ -162,7 +162,13 @@ openscenario_msgs::msg::EntityStatus PedestrianActionNode::calculateEntityStatus
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
-  entity_status_updated.lanelet_pose_valid = false;
+  const auto lanelet_pose = hdmap_utils->toLaneletPose(pose_new, true);
+  if (lanelet_pose) {
+    entity_status_updated.lanelet_pose_valid = true;
+    entity_status_updated.lanelet_pose = lanelet_pose.get();
+  } else {
+    entity_status_updated.lanelet_pose_valid = false;
+  }
   return entity_status_updated;
 }
 }  // namespace entity_behavior
