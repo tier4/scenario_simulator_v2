@@ -91,42 +91,42 @@ jobs:
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc timeout:=5 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=crashing_npc osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=5 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run spawn with offset scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=spawn_with_offset timeout:=15
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=spawn_with_offset osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run traffic simulation demo scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo timeout:=70 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traffic_simulation_demo map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=70 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run accelerate and follow front entity scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=accelerate_and_follow timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=accelerate_and_follow osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run decelerate_and_follow front entity scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=decelerate_and_follow timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=decelerate_and_follow osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run lanechange_left scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run lanechange_right scenario
@@ -154,21 +154,21 @@ jobs:
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=merge_left timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=merge_left map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run phase_control scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=phase_control timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=phase_control osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run traveled_distance scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traveled_distance timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traveled_distance osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run standstill_duration scenario
@@ -182,28 +182,28 @@ jobs:
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=momentary_stop timeout:=20 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=momentary_stop osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=20 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run reaction_time scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=reaction_time timeout:=10 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=reaction_time osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=10 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run out_of_range scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=out_of_range timeout:=7 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=out_of_range osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=7 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run stop_at_crosswalk scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=stop_at_crosswalk timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=stop_at_crosswalk map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run walk_straight scenario
@@ -217,13 +217,13 @@ jobs:
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=move_backward timeout:=10 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=move_backward osm_file:=lanelet2_map_with_private_road_and_walkway_ele_fix.osm map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=10 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run get_longitudinal_distance scenario
         run: |
           source ~/ros2_ws/install/setup.bash
-          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=get_longitudinal_distance timeout:=15 > log.txt
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=get_longitudinal_distance map_path:="$(ros2 pkg prefix kashiwanoha_map)/share/kashiwanoha_map/map" timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
       - name: Run acquire_route action
