@@ -56,6 +56,12 @@
 
 #define EXPECT_ACTION_STATUS_EQ(DATA0, DATA1) \
   EXPECT_ACCEL_EQ(DATA0.accel, DATA1.accel);  \
-  EXPECT_TWIST_EQ(DATA0.twist, DATA1.twist)
+  EXPECT_TWIST_EQ(DATA0.twist, DATA1.twist);  \
+  EXPECT_STREQ(DATA0.current_action.c_str(), DATA1.current_action.c_str());
+
+#define EXPECT_DETECTION_SENSOR_CONFIGURATION_EQ(DATA0, DATA1)          \
+  EXPECT_STREQ(DATA0.entity().c_str(), DATA1.entity().c_str());         \
+  EXPECT_STREQ(DATA0.topic_name().c_str(), DATA1.topic_name().c_str()); \
+  EXPECT_DOUBLE_EQ(DATA0.update_duration(), DATA1.update_duration());
 
 #endif  // TRAFFIC_SIMULATOR__TEST__EXPECT_EQ_MACROS_HPP_
