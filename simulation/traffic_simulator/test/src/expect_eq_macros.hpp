@@ -46,9 +46,16 @@
   EXPECT_DOUBLE_EQ(DATA0.offset, DATA1.offset);  \
   EXPECT_VECTOR3_EQ(DATA0.rpy, DATA1.rpy);
 
-#define EXPECT_VECTOR3_EQ(V0, V1) \
-  EXPECT_DOUBLE_EQ(V0.x, V1.x);   \
-  EXPECT_DOUBLE_EQ(V0.y, V1.y);   \
-  EXPECT_DOUBLE_EQ(V0.z, V1.z);
+#define EXPECT_TWIST_EQ(DATA0, DATA1)            \
+  EXPECT_VECTOR3_EQ(DATA0.linear, DATA1.linear); \
+  EXPECT_VECTOR3_EQ(DATA0.angular, DATA1.angular);
+
+#define EXPECT_ACCEL_EQ(DATA0, DATA1)            \
+  EXPECT_VECTOR3_EQ(DATA0.linear, DATA1.linear); \
+  EXPECT_VECTOR3_EQ(DATA0.angular, DATA1.angular);
+
+#define EXPECT_ACTION_STATUS_EQ(DATA0, DATA1) \
+  EXPECT_ACCEL_EQ(DATA0.accel, DATA1.accel);  \
+  EXPECT_TWIST_EQ(DATA0.twist, DATA1.twist)
 
 #endif  // TRAFFIC_SIMULATOR__TEST__EXPECT_EQ_MACROS_HPP_

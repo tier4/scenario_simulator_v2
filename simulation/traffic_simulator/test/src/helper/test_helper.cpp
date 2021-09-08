@@ -62,6 +62,17 @@ TEST(HELPER, LANELET_POSE)
   ss << lanelet_pose;
 }
 
+TEST(HELPER, ACTION_STATUS)
+{
+  const auto action_status = traffic_simulator::helper::constructActionStatus(3, 4, 5, 1);
+  openscenario_msgs::msg::ActionStatus expect_action_status;
+  expect_action_status.twist.linear.x = 3;
+  expect_action_status.twist.angular.z = 4;
+  expect_action_status.accel.linear.x = 5;
+  expect_action_status.accel.angular.z = 1;
+  EXPECT_ACTION_STATUS_EQ(action_status, expect_action_status);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
