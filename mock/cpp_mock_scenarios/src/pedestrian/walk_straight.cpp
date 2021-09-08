@@ -43,13 +43,7 @@ private:
     const auto t = api_.getCurrentTime();
     // LCOV_EXCL_START
     if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
-      stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
-    }
-    if (t >= 6.3 && 6.8 >= t) {
-      const auto vel = api_.getEntityStatus("ego").action_status.twist.linear.x;
-      if (std::fabs(0.01) <= vel) {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      }
+      stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
     if (t >= 10) {
@@ -69,7 +63,6 @@ private:
       traffic_simulator::helper::constructLaneletPose(34378, 0.0),
       traffic_simulator::helper::constructActionStatus(1));
     api_.requestWalkStraight("bob");
-    api_.setTargetSpeed("bob", 1, true);
     api_.requestAssignRoute(
       "ego", std::vector<openscenario_msgs::msg::LaneletPose>{
                traffic_simulator::helper::constructLaneletPose(34675, 0.0),

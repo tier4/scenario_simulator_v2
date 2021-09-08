@@ -64,7 +64,8 @@ public:
     std::int64_t lanelet_id, std::vector<double> s);
   boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
     geometry_msgs::msg::Pose pose, bool include_crosswalk = false);
-
+  boost::optional<openscenario_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose pose, std::int64_t lanelet_id);
   geometry_msgs::msg::PoseStamped toMapPose(
     std::int64_t lanelet_id, double s, double offset, geometry_msgs::msg::Quaternion quat);
   geometry_msgs::msg::PoseStamped toMapPose(openscenario_msgs::msg::LaneletPose lanelet_pose);

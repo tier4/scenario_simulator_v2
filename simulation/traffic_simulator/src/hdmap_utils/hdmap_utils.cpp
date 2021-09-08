@@ -280,6 +280,11 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   return lanelet_pose;
 }
 
+boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
+{
+}
+
 boost::optional<std::int64_t> HdMapUtils::getClosetLaneletId(
   geometry_msgs::msg::Pose pose, double distance_thresh, bool include_crosswalk)
 {
