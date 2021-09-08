@@ -10,5 +10,6 @@ target_link_libraries(lanechange_right cpp_scenario_node)
 
 install(TARGETS
   lanechange_left
+  lanechange_right
   DESTINATION lib/cpp_mock_scenarios
 )
