@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-class LaneChangeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
+class LaneChangeRightScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit LaneChangeLeftScenario(const rclcpp::NodeOptions & option)
+  explicit LaneChangeRightScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
@@ -55,7 +55,8 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34513, 10, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 10, true);
-    api_.requestLaneChange("ego", 34462);
+    api_.requestLaneChange("ego", traffic_simulator::entity::Direction::RIGHT);
+    // api_.requestLaneChange("ego", 34462);
   }
 };
 
@@ -63,7 +64,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<LaneChangeLeftScenario>(options);
+  auto component = std::make_shared<LaneChangeRightScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
