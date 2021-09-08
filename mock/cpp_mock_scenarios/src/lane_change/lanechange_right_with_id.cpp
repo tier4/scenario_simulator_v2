@@ -44,9 +44,11 @@ private:
     if (api_.isInLanelet("ego", 34462, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
+    // LCOV_EXCL_START
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+    // LCOV_EXCL_STOP
   }
   void onInitialize() override
   {

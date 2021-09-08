@@ -150,7 +150,6 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_right_with_id timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
-
       - name: Run merge_left scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
