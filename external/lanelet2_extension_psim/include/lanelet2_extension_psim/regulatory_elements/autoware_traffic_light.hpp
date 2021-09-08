@@ -84,7 +84,7 @@ private:
 static lanelet::RegisterRegulatoryElement<AutowareTrafficLight> regAutowareTraffic;
 
 // moved to lanelet2_extension/lib/autoware_traffic_light.cpp to avoid multiple
-// defintion errors
+// definition errors
 /*
 #if __cplusplus < 201703L
 constexpr char AutowareTrafficLight::RuleName[];      // instanciate string in

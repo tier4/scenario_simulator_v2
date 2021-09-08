@@ -34,8 +34,8 @@ TEST(UUID, GenerateFromSameSeed)
 TEST(UUID, GenerateFromAnotherSeed)
 {
   EXPECT_STRNE(
-    traffic_simulator::math::generateUUID("hoge").c_str(),
-    traffic_simulator::math::generateUUID("fuga").c_str());
+    traffic_simulator::math::generateUUID("foo").c_str(),
+    traffic_simulator::math::generateUUID("bar").c_str());
 }
 
 int main(int argc, char ** argv)

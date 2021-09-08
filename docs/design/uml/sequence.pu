@@ -13,7 +13,7 @@ scenario_test_runner -> Autoware : launch autoware.
 loop run single test case
     scenario_test_runner -> scenario_test_runner : resolve path in workflow file\nand generate/validate .xosc files.
 
-    openscenario_interpreter_node -> scenario_test_runner: become uncofigured status
+    openscenario_interpreter_node -> scenario_test_runner: become unconfigured status
     scenario_test_runner -> openscenario_interpreter_node:configure
 
     openscenario_interpreter_node -> openscenario_interpreter_node: resolve path of the\nlanelet2 map and load it.

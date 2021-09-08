@@ -14,6 +14,9 @@ on:
       - "workflows/NotifyFailure.yaml"
       - "workflows/Release.yaml"
       - "workflows/SpellCheck.yaml"
+  push:
+    branches:
+      - master
 jobs:
   job1:
     name: ScenarioTest
