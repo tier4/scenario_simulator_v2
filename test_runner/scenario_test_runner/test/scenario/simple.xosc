@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
-  <FileHeader revMajor="0" revMinor="0" date="2020-10-16T13:00:00" description="hoge" author="Tatsuya Yamasaki"/>
+  <FileHeader revMajor="0" revMinor="0" date="2020-10-16T13:00:00" description="foo" author="Tatsuya Yamasaki"/>
   <ParameterDeclarations>
     <ParameterDeclaration name="map-name" parameterType="string" value="kashiwanoha"/>
   </ParameterDeclarations>

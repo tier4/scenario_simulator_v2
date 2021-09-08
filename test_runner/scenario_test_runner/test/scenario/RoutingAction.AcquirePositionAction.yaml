@@ -107,7 +107,7 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: 'if ego reachs destination-1'
+                                - name: 'if ego reaches destination-1'
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -140,7 +140,7 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: 'if ego reachs destination-1'
+                                - name: 'if ego reaches destination-1'
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:

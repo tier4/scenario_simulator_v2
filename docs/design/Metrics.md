@@ -1,6 +1,6 @@
 # Metrics
 
-Metrics classs allow you to check Autoware way of driving is valid or not.
+Metrics class allow you to check Autoware way of driving is valid or not.
 
 ## Lifecycle
 
@@ -27,17 +27,17 @@ update function in metrics class was called in every simulation frame in this st
 In this state, metrics class does not calculate metrics any more.
 
 ### Failure
-In this state, metrics class throw specification vaiolation error.
+In this state, metrics class throw specification violation error.
 
 ## What types of metrics can we use?
 
-If you wnat to use metrics class with C++ API, all you have to do is call API::addMetric function.
+If you want to use metrics class with C++ API, all you have to do is call API::addMetric function.
 
 ```C++
 api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...);
 ```
 
-### Traveled Distace
+### Traveled Distance
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1TraveledDistanceMetric/#public-functions)  
 Traveled distance metric calculates total traveled distance for target entity.
 

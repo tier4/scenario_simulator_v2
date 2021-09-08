@@ -46,6 +46,58 @@ TEST(TrafficLights, makeLampState)
     std::out_of_range);
 }
 
+TEST(TrafficLights, OPERATOR_INSERT)
+{
+  std::stringstream ss;
+  ss << traffic_simulator::TrafficLightArrow::STRAIGHT;
+  EXPECT_STREQ(ss.str().c_str(), "straight");
+  ss = std::stringstream();
+  ss << traffic_simulator::TrafficLightArrow::NONE;
+  EXPECT_STREQ(ss.str().c_str(), "none");
+  ss = std::stringstream();
+  ss << traffic_simulator::TrafficLightArrow::LEFT;
+  EXPECT_STREQ(ss.str().c_str(), "left");
+  ss = std::stringstream();
+  ss << traffic_simulator::TrafficLightArrow::RIGHT;
+  EXPECT_STREQ(ss.str().c_str(), "right");
+  ss = std::stringstream();
+  ss << traffic_simulator::TrafficLightColor::NONE;
+  EXPECT_STREQ(ss.str().c_str(), "none");
+  ss = std::stringstream();
+  ss << traffic_simulator::TrafficLightColor::RED;
+  EXPECT_STREQ(ss.str().c_str(), "red");
+  ss = std::stringstream();
+  ss << traffic_simulator::TrafficLightColor::GREEN;
+  EXPECT_STREQ(ss.str().c_str(), "green");
+  ss = std::stringstream();
+  ss << traffic_simulator::TrafficLightColor::YELLOW;
+  EXPECT_STREQ(ss.str().c_str(), "yellow");
+}
+
+TEST(TrafficLights, OPERATOR_INPUT)
+{
+  traffic_simulator::TrafficLightArrow arrow;
+  std::stringstream("straight") >> arrow;
+  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::STRAIGHT);
+  std::stringstream("none") >> arrow;
+  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::NONE);
+  std::stringstream("left") >> arrow;
+  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::LEFT);
+  std::stringstream("right") >> arrow;
+  EXPECT_EQ(arrow, traffic_simulator::TrafficLightArrow::RIGHT);
+  EXPECT_THROW(std::stringstream("invalid") >> arrow, common::SimulationError);
+  traffic_simulator::TrafficLightColor color;
+  std::stringstream("red") >> color;
+  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::RED);
+  std::stringstream("green") >> color;
+  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::GREEN);
+  std::stringstream("yellow") >> color;
+  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::YELLOW);
+  std::stringstream("none") >> color;
+  EXPECT_EQ(color, traffic_simulator::TrafficLightColor::NONE);
+  EXPECT_THROW(std::stringstream("invalid") >> color, common::SimulationError);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

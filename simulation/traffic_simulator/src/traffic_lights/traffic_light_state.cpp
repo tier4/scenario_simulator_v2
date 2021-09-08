@@ -38,11 +38,11 @@ std::istream & operator>>(std::istream & is, TrafficLightColor & datum)
 
   try {
     datum = conversions.at(value);
-  } catch (const std::out_of_range &) {
-    THROW_SIMULATION_ERROR(
-      "an invalid value : ", value,
-      "was specified for type 'traffic_simulator::TrafficLightColor'");
-  }
+  } catch (const std::out_of_range &) {                                  // LCOV_EXCL_LINE
+    THROW_SIMULATION_ERROR(                                              // LCOV_EXCL_LINE
+      "an invalid value : ", value,                                      // LCOV_EXCL_LINE
+      "was specified for type 'traffic_simulator::TrafficLightColor'");  // LCOV_EXCL_LINE
+  }                                                                      // LCOV_EXCL_LINE
 
   return is;
 }
@@ -55,7 +55,7 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightColor & datum)
     case TrafficLightColor::RED:    return os << "red";
     case TrafficLightColor::GREEN:  return os << "green";
     case TrafficLightColor::YELLOW: return os << "yellow";
-    default:                        return os << "error";
+    default:                        return os << "error"; // LCOV_EXCL_LINE
   }
   // clang-format on
 }
@@ -107,11 +107,11 @@ std::istream & operator>>(std::istream & is, TrafficLightArrow & datum)
 
   try {
     datum = conversions.at(value);
-  } catch (const std::out_of_range &) {
-    THROW_SIMULATION_ERROR(
-      "An invalid value : ", value,
-      " was specified for type 'traffic_simulator::TrafficLightArrow'");
-  }
+  } catch (const std::out_of_range &) {                                   // LCOV_EXCL_LINE
+    THROW_SIMULATION_ERROR(                                               // LCOV_EXCL_LINE
+      "An invalid value : ", value,                                       // LCOV_EXCL_LINE
+      " was specified for type 'traffic_simulator::TrafficLightArrow'");  // LCOV_EXCL_LINE
+  }                                                                       // LCOV_EXCL_LINE
 
   return is;
 }
@@ -124,7 +124,7 @@ std::ostream & operator<<(std::ostream & os, const TrafficLightArrow & datum)
     case TrafficLightArrow::STRAIGHT: return os << "straight";
     case TrafficLightArrow::LEFT:     return os << "left";
     case TrafficLightArrow::RIGHT:    return os << "right";
-    default:                          return os << "error";
+    default:                          return os << "error"; // LCOV_EXCL_LINE
   }
   // clang-format on
 }

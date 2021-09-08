@@ -24,7 +24,7 @@ alt failed
 end
 
 Autoware API -->+ Autoware : send goal
-Autoware -->- Autoware API : planing result
+Autoware -->- Autoware API : planning result
 alt failed
     Autoware API ->> Autoware : terminate
 end

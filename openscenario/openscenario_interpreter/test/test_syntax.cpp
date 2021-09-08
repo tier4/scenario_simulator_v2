@@ -102,9 +102,9 @@ TEST(syntax, dummy) { ASSERT_TRUE(true); }
 // {
 //   using openscenario_interpreter::make;
 //
-//   const auto hoge {make<Double>(3.14)};
+//   const auto foo {make<Double>(3.14)};
 //
-//   const auto result {hoge.evaluate()};
+//   const auto result {foo.evaluate()};
 //
 //   EXPECT_TRUE(result.is<Double>());
 //   EXPECT_TRUE(result.as<Double>().data = 3.14);
