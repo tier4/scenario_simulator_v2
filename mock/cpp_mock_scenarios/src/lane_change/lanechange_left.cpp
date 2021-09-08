@@ -29,8 +29,7 @@ class LaneChangeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit LaneChangeLeftScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "lanechange_left", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("lanechange_left", __FILE__, false, option)
   {
     start();
   }

@@ -29,8 +29,7 @@ class MoveBackwardScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit MoveBackwardScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "move_backward", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("move_backward", __FILE__, false, option)
   {
     start();
   }

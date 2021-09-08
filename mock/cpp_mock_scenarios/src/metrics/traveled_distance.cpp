@@ -29,8 +29,7 @@ class TraveledDistanceScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit TraveledDistanceScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "traveled_distance", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("traveled_distance", __FILE__, false, option)
   {
     start();
   }

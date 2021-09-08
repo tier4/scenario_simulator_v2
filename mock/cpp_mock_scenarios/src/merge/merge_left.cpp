@@ -29,8 +29,7 @@ class MergeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit MergeLeftScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "merge_left", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("merge_left", __FILE__, false, option)
   {
     start();
   }

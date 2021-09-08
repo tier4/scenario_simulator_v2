@@ -29,8 +29,7 @@ class AccelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit AccelerateAndFollowScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "accelerate_and_follow", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("accelerate_and_follow", __FILE__, false, option)
   {
     start();
   }

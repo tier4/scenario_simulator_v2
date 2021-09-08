@@ -29,8 +29,7 @@ class PhaseControlScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit PhaseControlScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "phase_control", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("phase_control", __FILE__, false, option)
   {
     start();
   }

@@ -29,8 +29,7 @@ class TrafficSimulationDemoScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit TrafficSimulationDemoScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "traffic_simulation_demo", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("traffic_simulation_demo", __FILE__, false, option)
   {
     start();
   }

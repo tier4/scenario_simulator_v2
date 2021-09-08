@@ -29,8 +29,7 @@ class StopAtCrosswalkScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit StopAtCrosswalkScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "stop_at_crosswalk", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("stop_at_crosswalk", __FILE__, false, option)
   {
     start();
   }

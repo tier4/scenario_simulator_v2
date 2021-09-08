@@ -29,8 +29,7 @@ class SpawnWithOffsetScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit SpawnWithOffsetScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "spawn_with_offset", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("spawn_with_offset", __FILE__, false, option)
   {
     start();
   }

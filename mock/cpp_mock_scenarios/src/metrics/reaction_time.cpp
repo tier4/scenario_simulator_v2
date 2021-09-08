@@ -29,8 +29,7 @@ class ReactionTimeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit ReactionTimeScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "reaction_time", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("reaction_time", __FILE__, false, option)
   {
     start();
   }

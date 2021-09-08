@@ -31,8 +31,8 @@ class CppScenarioNode : public rclcpp::Node
 {
 public:
   explicit CppScenarioNode(
-    const std::string & node_name, const std::string & scenario_filename,
-    const bool verbose, const rclcpp::NodeOptions & option);
+    const std::string & node_name, const std::string & scenario_filename, const bool verbose,
+    const rclcpp::NodeOptions & option);
   void start();
   void stop(Result result);
   void expectThrow() { exception_expect_ = true; }
@@ -47,8 +47,8 @@ private:
   virtual void onUpdate() = 0;
   virtual void onInitialize() = 0;
   rclcpp::TimerBase::SharedPtr update_timer_;
-  auto configure(
-    const std::string & scenario_filename, const bool verbose) -> traffic_simulator::Configuration
+  auto configure(const std::string & scenario_filename, const bool verbose)
+    -> traffic_simulator::Configuration
   {
     std::string map_path;
     std::string osm_file;

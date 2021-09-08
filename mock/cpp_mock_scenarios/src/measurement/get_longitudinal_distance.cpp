@@ -29,8 +29,7 @@ class GetLongitudinalDistanceScenario : public cpp_mock_scenarios::CppScenarioNo
 {
 public:
   explicit GetLongitudinalDistanceScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "get_longitudinal_distance", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("get_longitudinal_distance", __FILE__, false, option)
   {
     start();
   }

@@ -28,8 +28,7 @@ class MomentaryStopScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit MomentaryStopScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "momentary_stop", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("momentary_stop", __FILE__, false, option)
   {
     start();
   }

@@ -29,8 +29,7 @@ class IdiotNpcScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit IdiotNpcScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "crashing_npc", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("crashing_npc", __FILE__, false, option)
   {
     start();
   }

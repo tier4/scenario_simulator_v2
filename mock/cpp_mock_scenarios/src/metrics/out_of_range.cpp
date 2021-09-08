@@ -29,8 +29,7 @@ class OutOfRangeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit OutOfRangeScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode(
-      "out_of_range", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode("out_of_range", __FILE__, false, option)
   {
     start();
   }
