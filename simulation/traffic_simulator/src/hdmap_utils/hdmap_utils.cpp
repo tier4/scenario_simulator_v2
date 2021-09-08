@@ -263,7 +263,13 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   if (!lanelet_id) {
     return boost::none;
   }
-  const auto spline = getCenterPointsSpline(lanelet_id.get());
+  return toLaneletPose(pose, lanelet_id.get());
+}
+
+boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
+  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
+{
+  const auto spline = getCenterPointsSpline(lanelet_id);
   const auto s = spline->getSValue(pose.position);
   if (!s) {
     return boost::none;
@@ -273,16 +279,11 @@ boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
     quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
   double offset = spline->getSquaredDistanceIn2D(pose.position, s.get());
   openscenario_msgs::msg::LaneletPose lanelet_pose;
-  lanelet_pose.lanelet_id = lanelet_id.get();
+  lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s.get();
   lanelet_pose.offset = offset;
   lanelet_pose.rpy = rpy;
   return lanelet_pose;
-}
-
-boost::optional<openscenario_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
-  geometry_msgs::msg::Pose pose, std::int64_t lanelet_id)
-{
 }
 
 boost::optional<std::int64_t> HdMapUtils::getClosetLaneletId(
