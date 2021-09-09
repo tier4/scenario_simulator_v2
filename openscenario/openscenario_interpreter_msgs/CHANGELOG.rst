@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.0 (2021-09-09)
+------------------
 * Merge branch 'master' into add-goalpose
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel

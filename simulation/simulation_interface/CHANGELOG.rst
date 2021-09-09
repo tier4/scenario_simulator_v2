@@ -2,8 +2,8 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.5.0 (2021-09-09)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/dockerfile
 * Merge pull request `#503 <https://github.com/tier4/scenario_simulator_v2/issues/503>`_ from tier4/feature/cleanup_code
