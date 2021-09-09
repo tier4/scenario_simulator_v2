@@ -62,8 +62,8 @@ struct OpenScenario : public Scope
   template <typename... Ts>
   explicit OpenScenario(Ts &&... xs)
   : Scope(std::forward<decltype(xs)>(xs)...),
-    file_header(
-      readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), localScope())),
+    file_header(readElement<FileHeader>(
+      "FileHeader", load(global().pathname).child("OpenSCENARIO"), localScope())),
     category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, localScope())),
     frame(0)
   {

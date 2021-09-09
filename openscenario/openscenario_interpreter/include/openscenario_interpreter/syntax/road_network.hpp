@@ -68,12 +68,12 @@ struct RoadNetwork
     scene_graph_file(readElement<File>("SceneGraphFile", node, outer_scope)),
     traffic_signals(readElement<TrafficSignals>("TrafficSignals", node, outer_scope))
   {
-    outer_scope.logic_file = logic_file;
-    outer_scope.scene_graph_file = scene_graph_file;
+    outer_scope.global().logic_file = logic_file;
+    outer_scope.global().scene_graph_file = scene_graph_file;
   }
 
   template <typename... Ts>
-  decltype(auto) evaluate(Ts &&... xs)
+  auto evaluate(Ts &&... xs) -> decltype(auto)
   {
     return traffic_signals.evaluate(std::forward<decltype(xs)>(xs)...);
   }

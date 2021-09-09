@@ -37,8 +37,8 @@ struct AddEntityAction
   const Position position;
 
   template <typename Node, typename Scope>
-  explicit AddEntityAction(const Node & node, Scope & current_scope)
-  : position(readElement<Position>("Position", node, current_scope))
+  explicit AddEntityAction(const Node & node, Scope & scope)
+  : position(readElement<Position>("Position", node, scope))
   {
   }
 
