@@ -42,16 +42,18 @@ void OutOfRangeMetric::update()
     return;
   }
 
-  const auto jerk_opt = entity_manager_ptr_->getLinearJerk(target_entity);
-
-  if (!jerk_opt) {
-    linear_jerk_ = jerk_opt.get();
-    if (!(min_jerk <= linear_jerk_ && linear_jerk_ <= max_jerk)) {
-      failure(SPECIFICATION_VIOLATION(
-        "current jerk (which is ", linear_jerk_, ") is out of range (which is [", min_jerk, ", ",
-        max_jerk, "])"));
-      return;
+  if (!jerk_callback_ptr_) {
+    const auto jerk_opt = entity_manager_ptr_->getLinearJerk(target_entity);
+    if (!jerk_opt) {
+      linear_jerk_ = jerk_opt.get();
     }
+  }
+
+  if (!(min_jerk <= linear_jerk_ && linear_jerk_ <= max_jerk)) {
+    failure(SPECIFICATION_VIOLATION(
+      "current jerk (which is ", linear_jerk_, ") is out of range (which is [", min_jerk, ", ",
+      max_jerk, "])"));
+    return;
   }
 }
 
