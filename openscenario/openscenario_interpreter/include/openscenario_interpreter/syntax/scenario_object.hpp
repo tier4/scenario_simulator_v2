@@ -50,12 +50,7 @@ struct ScenarioObject
 : public Scope,
   public EntityObject
 {
-  /* ---- ObjectController -----------------------------------------------------
-   *
-   *  Controller of the EntityObject instance.
-   *
-   * ------------------------------------------------------------------------ */
-  ObjectController object_controller;
+  ObjectController object_controller;  // Controller of the EntityObject instance.
 
   static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
 
@@ -76,19 +71,18 @@ struct ScenarioObject
         metrics::OutOfRangeMetric::Config config;
         config.target_entity = name;
         config.min_velocity = -performance.max_speed;
-        config.max_velocity = performance.max_speed;
+        config.max_velocity = +performance.max_speed;
         config.min_acceleration = -performance.max_deceleration;
-        config.max_acceleration = performance.max_acceleration;
-
+        config.max_acceleration = +performance.max_acceleration;
         connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", config);
-        return spawn(object_controller.isEgo(), name, parameters);
+        return applyAddEntityAction(object_controller.isEgo(), name, parameters);
       },
       [this](const Pedestrian & pedestrian) {
-        return spawn(
+        return applyAddEntityAction(
           false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
       },
       [this](const MiscObject & misc_object) {
-        return spawn(
+        return applyAddEntityAction(
           false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
       });
 
@@ -125,7 +119,7 @@ struct ScenarioObject
   }
 };
 
-std::ostream & operator<<(std::ostream &, const ScenarioObject &);
+auto operator<<(std::ostream &, const ScenarioObject &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -113,7 +113,6 @@ FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
 FORWARD_TO_SIMULATION_API(setEntityStatus);  // XXX DEPRECATED
 FORWARD_TO_SIMULATION_API(setTargetSpeed);
-FORWARD_TO_SIMULATION_API(spawn);
 FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
@@ -129,6 +128,7 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
 RENAME(applyAcquirePositionAction, requestAcquirePosition);
+RENAME(applyAddEntityAction, spawn);
 RENAME(applyAssignControllerAction, setDriverModel);
 RENAME(applyAssignRouteAction, requestAssignRoute);
 RENAME(applyDeleteEntityAction, despawn);
