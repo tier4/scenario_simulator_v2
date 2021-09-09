@@ -8,8 +8,14 @@ ament_auto_add_executable(assign_route_in_world_frame
 )
 target_link_libraries(assign_route_in_world_frame cpp_scenario_node)
 
+ament_auto_add_executable(cancel_request
+  cancel_request.cpp
+)
+target_link_libraries(cancel_request cpp_scenario_node)
+
 install(TARGETS
   acquire_position_in_world_frame
   assign_route_in_world_frame
+  cancel_request
   DESTINATION lib/cpp_mock_scenarios
 )
