@@ -2,6 +2,45 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/dockerfile
+* Merge pull request `#503 <https://github.com/tier4/scenario_simulator_v2/issues/503>`_ from tier4/feature/cleanup_code
+* fix typo
+* fix typo in rviz
+* fix typo
+* fix typo of split
+* fix typo of SCENARIO
+* change aori to rage
+* use foo/bar/baz
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_test_traffic_light
+* Merge pull request `#490 <https://github.com/tier4/scenario_simulator_v2/issues/490>`_ from tier4/fix/scenario-object-scope
+* add a new scenario to check duplicated parameter
+* fix bug
+* delay ambiguity check until reference
+* trivial fix
+* ScenarioObject creates the scope
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_traffic_light
+* Merge pull request `#482 <https://github.com/tier4/scenario_simulator_v2/issues/482>`_ from tier4/feature/scenario_test_runner/launch-autoware-option
+* Merge branch 'master' into add-goalpose
+* Update class `TransitionAssertion` to use ROS parameter `initialize_duration`
+* Support new option `record:=<boolean>`
+* Support new option `initialize_duration`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Rename option `architecture-type` to `architecture_type`
+* Feature/request acuire position in world coordinate (`#439 <https://github.com/tier4/scenario_simulator_v2/issues/439>`_)
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, kyabe2718, yamacir-kit
+
 0.4.5 (2021-08-30)
 ------------------
 * Merge pull request `#437 <https://github.com/tier4/scenario_simulator_v2/issues/437>`_ from RobotecAI/issue/AJD-237-remove_autoware_compilation_flag

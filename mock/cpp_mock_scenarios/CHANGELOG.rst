@@ -2,6 +2,53 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#507 <https://github.com/tier4/scenario_simulator_v2/issues/507>`_ from tier4/feature/add_scenario
+* update lane assing logic for pedestrian
+* apply reformat
+* enable visualize position
+* add LCOV_EXEL line
+* add lane change scenarios to the workflow
+* use direction
+* fix test scenario
+* add lanechange_right
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/dockerfile
+* Merge pull request `#503 <https://github.com/tier4/scenario_simulator_v2/issues/503>`_ from tier4/feature/cleanup_code
+* fix typo in rviz
+* fix typo
+* fix typo of REVERSE
+* fix typo of range
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_test_traffic_light
+* Merge pull request `#498 <https://github.com/tier4/scenario_simulator_v2/issues/498>`_ from tier4/feature/remove_unused_codes_in_entity
+* remove pedestrian_parameters.hpp and vehicle_parameters.hpp
+* enable generate pedestrian parameters without xml
+* modify get parameters function
+* enable get vehicle parameter without xml
+* fix compile error
+* modify catalog
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_traffic_light
+* Merge pull request `#487 <https://github.com/tier4/scenario_simulator_v2/issues/487>`_ from tier4/feature/get_longituninal_distance_behind
+* add test cases for get longitudinal distance
+* Merge pull request `#482 <https://github.com/tier4/scenario_simulator_v2/issues/482>`_ from tier4/feature/scenario_test_runner/launch-autoware-option
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Rename launch-argument `with-rviz` to `launch_rviz`
+* Feature/request acuire position in world coordinate (`#439 <https://github.com/tier4/scenario_simulator_v2/issues/439>`_)
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.4.5 (2021-08-30)
 ------------------
 * Fix/offset calculation in lane coordinte (`#476 <https://github.com/tier4/scenario_simulator_v2/issues/476>`_)

@@ -2,6 +2,53 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/dockerfile
+* Merge pull request `#503 <https://github.com/tier4/scenario_simulator_v2/issues/503>`_ from tier4/feature/cleanup_code
+* change to count-up
+* fix typo in rviz
+* fix typo
+* change to count_up
+* fix typo of reaches
+* fix some typo
+* update HOGE/FUGA
+* use foo/bar/baz
+* Revert "Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel"
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_test_traffic_light
+* Merge pull request `#490 <https://github.com/tier4/scenario_simulator_v2/issues/490>`_ from tier4/fix/scenario-object-scope
+* add a new scenario to check duplicated parameter
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_traffic_light
+* Merge pull request `#482 <https://github.com/tier4/scenario_simulator_v2/issues/482>`_ from tier4/feature/scenario_test_runner/launch-autoware-option
+* Merge branch 'master' into add-goalpose
+* Support new option `record:=<boolean>`
+* Support new option `initialize_duration`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Add new launch-argument `launch-autoware:=<boolean>`
+* Lipsticks
+* Rename launch-argument `with-rviz` to `launch_rviz`
+* Rename launch-argument `output-directory` to `output_directory`
+* Rename launch-arugment `global-timeout` to `global_timeout`
+* Rename launch-argument `global-real-time-factor` to `global_real_time_factor`
+* Rename launch-arugment `global-frame-rate` to `global_frame_rate`
+* Rename option `autoware-launch-package` to `autoware_launch_package`
+* Rename option `autoware-launch-file` to `autoware_launch_file`
+* Rename option `architecture-type` to `architecture_type`
+* Update scenario_test_runner.launch.py options to align vertically
+* Lipsticks
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* update rviz
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura, kyabe2718, yamacir-kit
+
 0.4.5 (2021-08-30)
 ------------------
 * Merge pull request `#437 <https://github.com/tier4/scenario_simulator_v2/issues/437>`_ from RobotecAI/issue/AJD-237-remove_autoware_compilation_flag

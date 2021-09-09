@@ -2,6 +2,16 @@
 Changelog for package kashiwanoha_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Contributors: Masaya Kataoka, MasayaKataoka
+
 0.4.5 (2021-08-30)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages

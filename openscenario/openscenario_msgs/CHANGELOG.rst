@@ -2,6 +2,30 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#507 <https://github.com/tier4/scenario_simulator_v2/issues/507>`_ from tier4/feature/add_scenario
+* update lane assing logic for pedestrian
+* Merge branch 'master' into fix/offset_calculation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_test_traffic_light
+* Merge pull request `#458 <https://github.com/tier4/scenario_simulator_v2/issues/458>`_ from Utaro-M/add-goalpose
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_traffic_light
+* Merge pull request `#485 <https://github.com/tier4/scenario_simulator_v2/issues/485>`_ from tier4/feature/test_simulation_interface
+* Merge branch 'master' into add-goalpose
+* remove unused message
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' into add-goalpose
+* fix typo
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* fix typo
+* add getGoalposes()
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura
+
 0.4.5 (2021-08-30)
 ------------------
 * Merge pull request `#457 <https://github.com/tier4/scenario_simulator_v2/issues/457>`_ from tier4/feature/math_test

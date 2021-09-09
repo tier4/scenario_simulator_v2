@@ -2,6 +2,116 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#507 <https://github.com/tier4/scenario_simulator_v2/issues/507>`_ from tier4/feature/add_scenario
+* update lane assing logic for pedestrian
+* split function
+* apply reformat
+* enable get lanelet pose while walk straight action
+* Merge pull request `#505 <https://github.com/tier4/scenario_simulator_v2/issues/505>`_ from tier4/feature/test_helper
+* modify line
+* add test case for lidar sensor
+* add test case for constructing action status
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/dockerfile
+* Merge pull request `#503 <https://github.com/tier4/scenario_simulator_v2/issues/503>`_ from tier4/feature/cleanup_code
+* gix some typo
+* remove dists
+* fix some typo
+* fix filename
+* use foo/bar/baz
+* fix typo of Bounding
+* fix typo of polynomial
+* fix typo of cache
+* fix typo of Valuet
+* fix compile error
+* change dist to distance
+* fix typo of tolerance
+* add test case for helper function
+* Merge pull request `#501 <https://github.com/tier4/scenario_simulator_v2/issues/501>`_ from tier4/feature/add_test_traffic_light
+* Merge pull request `#500 <https://github.com/tier4/scenario_simulator_v2/issues/500>`_ from tier4/fix/offset_calculation
+* add test cases for >> operator
+* add ss = std::stringstream(); lines
+* add test case for operator <<
+* Merge branch 'master' into fix/offset_calculation
+* add // LCOV_EXCL_LINE
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_test_traffic_light
+* remove std::hypot(x,y,z)
+* Merge pull request `#458 <https://github.com/tier4/scenario_simulator_v2/issues/458>`_ from Utaro-M/add-goalpose
+* add subtraction
+* Merge pull request `#486 <https://github.com/tier4/scenario_simulator_v2/issues/486>`_ from prybicki/patch-5
+* fix toMapPose function
+* add test cases
+* add operator override
+* add getSize function
+* Fix bad formatting
+* add linear algebra.cpp
+* Merge pull request `#498 <https://github.com/tier4/scenario_simulator_v2/issues/498>`_ from tier4/feature/remove_unused_codes_in_entity
+* remove pedestrian_parameters.hpp and vehicle_parameters.hpp
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_unused_codes_in_entity
+* fix typo
+* Merge branch 'master' into add-goalpose
+* Merge pull request `#492 <https://github.com/tier4/scenario_simulator_v2/issues/492>`_ from tier4/feature/add_traffic_light_test
+* use static cast in std::accumulate function
+* use reference
+* remove unused function
+* remove unused function
+* add test cases for getArrow function
+* add test line
+* remove std::accumulate because of overflow
+* fix update logic in traffic light phase class
+* add update line in test case
+* add setColorPhase test cases
+* fix error
+* fix values
+* add getColorAndArrowPosition test cases
+* add test cases for getArrowPosition
+* add expect macro
+* add set arrow function
+* use foreach
+* add test cases for setColor function
+* remove test case file
+* add new test case source
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge pull request `#489 <https://github.com/tier4/scenario_simulator_v2/issues/489>`_ from tier4/feature/test_traffic_light
+* use std::find instead of std::count_if
+* add test case for getIDs
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_traffic_light
+* add new test case file
+* Merge pull request `#487 <https://github.com/tier4/scenario_simulator_v2/issues/487>`_ from tier4/feature/get_longituninal_distance_behind
+* add test case for arrow and NONE type
+* enable get distance from behind entity
+* Merge pull request `#482 <https://github.com/tier4/scenario_simulator_v2/issues/482>`_ from tier4/feature/scenario_test_runner/launch-autoware-option
+* Merge pull request `#485 <https://github.com/tier4/scenario_simulator_v2/issues/485>`_ from tier4/feature/test_simulation_interface
+* add test case for makeLampState function
+* Update `EgoEntity` to default construct `Autoware` if `launch_autoware == false`
+* Merge branch 'master' into add-goalpose
+* fix typo
+* Set name in the proto request for non-ego vehicles
+* Support new option `initialize_duration`
+* Update class `EgoEntity` to don't instantiate class `Autoware` if `launch_autoware == false`
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Rename option `architecture-type` to `architecture_type`
+* Remove unreachable return in API::spawn (`#480 <https://github.com/tier4/scenario_simulator_v2/issues/480>`_)
+* Set correct entity names in proto messages (`#481 <https://github.com/tier4/scenario_simulator_v2/issues/481>`_)
+* Feature/request acuire position in world coordinate (`#439 <https://github.com/tier4/scenario_simulator_v2/issues/439>`_)
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* fix typo
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* fix typo
+* add goalpose arrow
+* add getGoalposes()
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Contributors: Masaya Kataoka, MasayaKataoka, Peter Rybicki, Piotr Rybicki, Tatsuya Yamasaki, Yutaro Matsuura, yamacir-kit
+
 0.4.5 (2021-08-30)
 ------------------
 * Fix/offset calculation in lane coordinte (`#476 <https://github.com/tier4/scenario_simulator_v2/issues/476>`_)
