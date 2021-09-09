@@ -46,7 +46,7 @@ private:
       api_.cancelRequest("ego");
       canceled = true;
     }
-    if (api_.isInLanelet("ego", 34508, 0.1)) {
+    if (api_.isInLanelet("ego", 34507, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
