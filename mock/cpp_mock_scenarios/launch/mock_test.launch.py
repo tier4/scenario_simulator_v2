@@ -75,17 +75,11 @@ def generate_launch_description():
     timeout = LaunchConfiguration("timeout", default=10)
     scenario = LaunchConfiguration("scenario", default="")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
-    map_path = LaunchConfiguration("map_path", default=str(Path.cwd()))
-    osm_file = LaunchConfiguration("osm_file", default="lanelet2_map.osm")
     scenario_node = Node(
         package="cpp_mock_scenarios",
         executable=scenario,
         name=scenario,
         output="screen",
-        parameters=[{
-            "map_path": map_path,
-            "osm_file": osm_file
-        }],
         arguments=[("__log_level:=info")],
     )
     io_handler = OnProcessIO(

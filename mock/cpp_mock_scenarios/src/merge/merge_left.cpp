@@ -14,6 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <openscenario_msgs/msg/driver_model.hpp>
@@ -29,7 +30,9 @@ class MergeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
   explicit MergeLeftScenario(const rclcpp::NodeOptions & option)
-  : cpp_mock_scenarios::CppScenarioNode("merge_left", __FILE__, false, option)
+  : cpp_mock_scenarios::CppScenarioNode(
+      "merge_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }

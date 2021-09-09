@@ -9,6 +9,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>kashiwanoha_map</depend>
   <depend>traffic_simulator</depend>
   <depend>simple_sensor_simulator</depend>
 

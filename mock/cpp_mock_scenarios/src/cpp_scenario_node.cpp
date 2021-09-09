@@ -18,7 +18,8 @@
 namespace cpp_mock_scenarios
 {
 CppScenarioNode::CppScenarioNode(
-  const std::string & node_name, const std::string & scenario_filename, const bool verbose,
+  const std::string & node_name, const std::string & map_path,
+  const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
   const rclcpp::NodeOptions & option)
 : Node(node_name, option),
   api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose)),
