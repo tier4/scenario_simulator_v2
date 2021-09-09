@@ -45,10 +45,10 @@ TEST(VEHICLE_ENTITYT, UPDATE_ENTITY_TIMESTAMP)
   status.lanelet_pose = traffic_simulator::helper::constructLaneletPose(34741, 0, 0);
   status.action_status = traffic_simulator::helper::constructActionStatus(3);
   status.bounding_box = entity.getBoundingBox();
-  EXPECT_DOUBLE_EQ(status.time, 0.0);
   EXPECT_NO_THROW(entity.setStatus(status));
+  EXPECT_DOUBLE_EQ(entity.getStatus().time, 0.0);
   EXPECT_NO_THROW(entity.updateEntityStatusTimestamp(3));
-  EXPECT_DOUBLE_EQ(status.time, 3.0);
+  EXPECT_DOUBLE_EQ(entity.getStatus().time, 3.0);
 }
 
 int main(int argc, char ** argv)

@@ -219,6 +219,18 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=get_longitudinal_distance timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run acquire_route action
+        run : |
+            source ~/ros2_ws/install/setup.bash
+            ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=acquire_position_in_world_frame timeout:=15 > log.txt
+            cat log.txt | grep "Scenario Succeed"
+
+      - name: Run assign_route action
+        run : |
+            source ~/ros2_ws/install/setup.bash
+            ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=assign_route_in_world_frame timeout:=15 > log.txt
+            cat log.txt | grep "Scenario Succeed"
+
       - name: Collect coverage for with_openscenario_interpreter
         if: matrix.test_flags == 'with_openscenario_interpreter'
         run: |
