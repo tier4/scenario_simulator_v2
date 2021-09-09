@@ -48,17 +48,6 @@ struct OpenScenario : public Scope
 
   std::size_t frame;
 
-  auto load(const boost::filesystem::path & pathname) -> const auto &
-  {
-    const auto result = script.load_file(pathname.string().c_str());
-
-    if (!result) {
-      throw SyntaxError(result.description(), ": ", pathname);
-    } else {
-      return script;
-    }
-  }
-
   template <typename... Ts>
   explicit OpenScenario(Ts &&... xs)
   : Scope(std::forward<decltype(xs)>(xs)...),
@@ -75,6 +64,17 @@ struct OpenScenario : public Scope
   {
     ++frame;
     return category.evaluate();
+  }
+
+  auto load(const boost::filesystem::path & pathname) -> const pugi::xml_node &
+  {
+    const auto result = script.load_file(pathname.string().c_str());
+
+    if (not result) {
+      throw SyntaxError(result.description(), ": ", pathname);
+    } else {
+      return script;
+    }
   }
 };
 

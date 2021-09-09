@@ -214,10 +214,6 @@ class Scope
   {
     const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
-    boost::filesystem::path logic_file;  // NOTE: Assigned by RoadNetwork's constructor.
-
-    boost::filesystem::path scene_graph_file;  // NOTE: Assigned by RoadNetwork's constructor.
-
     explicit GlobalEnvironment(const boost::filesystem::path pathname) : pathname(pathname) {}
   };
 

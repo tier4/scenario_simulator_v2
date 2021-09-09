@@ -59,7 +59,8 @@ auto Interpreter::isSuccessIntended() const -> bool { return intended_result == 
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
-  const auto logic_file = script.as<OpenScenario>().global().logic_file;
+  const boost::filesystem::path logic_file =
+    script.as<OpenScenario>().category.as<ScenarioDefinition>().road_network.logic_file.filepath;
 
   auto configuration = traffic_simulator::Configuration(
     boost::filesystem::is_directory(logic_file) ? logic_file : logic_file.parent_path());
