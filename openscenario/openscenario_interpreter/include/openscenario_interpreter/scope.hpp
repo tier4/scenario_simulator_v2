@@ -59,7 +59,7 @@ private:
   explicit EnvironmentFrame(EnvironmentFrame &&) = delete;
 
 public:
-  auto addElement(const std::string & name, Element element) -> void
+  auto insert(const std::string & name, Element element) -> void
   {
     if (name.find(':') != std::string::npos) {
       THROW_SYNTAX_ERROR("Identifier '", name, "' contains ':'");
@@ -259,9 +259,9 @@ public:
       *this, name, std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*frame, name)));
   }
 
-  auto addElement(const std::string & name_, const Element & element)
+  auto insert(const std::string & name_, const Element & element)
   {
-    return frame->addElement(name_, element);
+    return frame->insert(name_, element);
   }
 
   auto findElement(const std::string & name_) const { return frame->findElement(name_); }

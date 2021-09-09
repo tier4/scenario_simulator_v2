@@ -41,7 +41,7 @@ struct Entities
       auto name = readAttribute<std::string>("name", node, scope);
       auto element = make<ScenarioObject>(node, scope);
       scope.global().entities.emplace(name, element);
-      scope.addElement(name, element);
+      // scope.insert(name, element);
     });
 
     callWithElements(node, "EntitySelection", 0, unbounded, [&](auto && node) {
