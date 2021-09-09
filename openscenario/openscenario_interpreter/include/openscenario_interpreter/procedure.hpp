@@ -106,7 +106,6 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
-FORWARD_TO_SIMULATION_API(despawn);
 FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
 FORWARD_TO_SIMULATION_API(initialize);
@@ -132,6 +131,7 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 RENAME(applyAcquirePositionAction, requestAcquirePosition);
 RENAME(applyAssignControllerAction, setDriverModel);
 RENAME(applyAssignRouteAction, requestAssignRoute);
+RENAME(applyDeleteEntityAction, despawn);
 RENAME(applyLaneChangeAction, requestLaneChange);
 RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);

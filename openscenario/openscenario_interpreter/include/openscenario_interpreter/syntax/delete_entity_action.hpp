@@ -34,7 +34,10 @@ struct DeleteEntityAction
   {
   }
 
-  inline auto operator()(const String & entity_ref) const -> void { despawn(entity_ref); }
+  inline auto operator()(const String & entity_ref) const -> void
+  {
+    applyDeleteEntityAction(entity_ref);
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
