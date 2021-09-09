@@ -44,9 +44,11 @@ private:
     if (api_.isInLanelet("ego", 34513, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
+    // LCOV_EXCL_START
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+    // LCOV_EXCL_STOP
   }
   void onInitialize() override
   {
@@ -55,7 +57,8 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34462, 10, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 10, true);
-    api_.requestLaneChange("ego", 34513);
+    // api_.requestLaneChange("ego", 34513);
+    api_.requestLaneChange("ego", traffic_simulator::entity::Direction::LEFT);
   }
 };
 
