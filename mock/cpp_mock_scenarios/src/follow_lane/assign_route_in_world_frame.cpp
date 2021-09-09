@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-class AcquirePositionInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
+class AcquireRouteInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit AcquirePositionInWorldFrame(const rclcpp::NodeOptions & option)
+  explicit AcquireRouteInWorldFrame(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "idiot_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
@@ -41,7 +41,7 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34408, 0.1)) {
+    if (api_.isInLanelet("ego", 34630, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -52,9 +52,12 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
       traffic_simulator::helper::constructActionStatus(10));
     api_.setTargetSpeed("ego", 10, true);
-    const geometry_msgs::msg::Pose goal_pose =
-      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0));
-    api_.requestAcquirePosition("ego", goal_pose);
+    std::vector<geometry_msgs::msg::Pose> goal_poses;
+    goal_poses.emplace_back(
+      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0)));
+    goal_poses.emplace_back(
+      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 10, 0, 0, 0, 0)));
+    api_.requestAssignRoute("ego", goal_poses);
   }
 };
 
@@ -62,7 +65,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<AcquirePositionInWorldFrame>(options);
+  auto component = std::make_shared<AcquireRouteInWorldFrame>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
