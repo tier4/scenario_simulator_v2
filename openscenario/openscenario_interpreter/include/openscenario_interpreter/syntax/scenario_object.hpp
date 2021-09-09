@@ -80,6 +80,10 @@ struct ScenarioObject
         config.min_acceleration = -performance.max_deceleration;
         config.max_acceleration = performance.max_acceleration;
 
+        if (object_controller.isEgo()) {
+          config.jerk_topic = "/planning/motion_velocity_optimizer/closest_jerk";
+        }
+
         connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", config);
         return spawn(object_controller.isEgo(), name, parameters);
       },
