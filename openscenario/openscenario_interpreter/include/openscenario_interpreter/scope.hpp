@@ -214,6 +214,8 @@ class Scope
   {
     const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
+    std::unordered_map<std::string, Element> entities;  // ScenarioObject or EntitySelection
+
     explicit GlobalEnvironment(const boost::filesystem::path pathname) : pathname(pathname) {}
   };
 

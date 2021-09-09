@@ -58,7 +58,7 @@ struct ScenarioDefinition
     catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, outer_scope)),
     road_network(readElement<RoadNetwork>("RoadNetwork", node, outer_scope)),
     entities(readElement<Entities>("Entities", node, outer_scope)),
-    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope, entities))
+    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope))
   {
   }
 

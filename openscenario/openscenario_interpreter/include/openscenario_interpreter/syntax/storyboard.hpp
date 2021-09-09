@@ -42,14 +42,11 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   Trigger stop_trigger;
 
-  const Entities & entities;
-
   template <typename Node>
-  explicit Storyboard(const Node & node, Scope & outer_scope, const Entities & entities)
+  explicit Storyboard(const Node & node, Scope & outer_scope)
   : Scope(outer_scope.makeChildScope("Storyboard")),
     init(readElement<Init>("Init", node, localScope())),
-    stop_trigger(readElement<Trigger>("StopTrigger", node, localScope())),
-    entities(entities)
+    stop_trigger(readElement<Trigger>("StopTrigger", node, localScope()))
   {
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Story>(node, localScope()));
@@ -64,7 +61,7 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   void start()
   {
-    for (const auto & each : entities) {
+    for (const auto & each : global().entities) {
       std::get<1>(each).evaluate();
     }
 
@@ -96,10 +93,12 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
       for (auto && story : *this) {
         story.evaluate();
       }
-    } else if (std::all_of(std::cbegin(entities), std::cend(entities), [&](const auto & each) {
-                 return openscenario_interpreter::ready(std::get<0>(each));
-               })) {
-      for (const auto & each : entities) {
+    } else if (std::all_of(
+                 std::cbegin(global().entities), std::cend(global().entities),
+                 [&](const auto & each) {
+                   return openscenario_interpreter::ready(std::get<0>(each));
+                 })) {
+      for (const auto & each : global().entities) {
         engage(each.first);
       }
       engaged = true;
