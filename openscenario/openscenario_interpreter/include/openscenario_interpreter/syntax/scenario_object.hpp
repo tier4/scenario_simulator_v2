@@ -60,7 +60,7 @@ struct ScenarioObject
   {
   }
 
-  auto enableOutOfRangeMetric(const Vehicle & vehicle) -> void
+  auto activateOutOfRangeMetric(const Vehicle & vehicle) const -> bool
   {
     const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
 
@@ -74,44 +74,51 @@ struct ScenarioObject
     }
 
     connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
+
+    return true;
+  }
+
+  auto activateSensors() -> bool
+  {
+    if (object_controller.isEgo()) {
+      const auto architecture_type = getParameter<std::string>("architecture_type", "");
+      if (architecture_type == "tier4/proposal") {
+        return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+                 traffic_simulator::helper::LidarType::VLP16, name,
+                 "/sensing/lidar/no_ground/pointcloud")) and
+               attachDetectionSensor(
+                 traffic_simulator::helper::constructDetectionSensorConfiguration(
+                   name, "/perception/object_recognition/objects", 0.1));
+      } else if (architecture_type == "awf/auto") {
+        return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+          traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
+        // Autoware.Auto does not currently support object prediction
+        // however it is work-in-progress for Cargo ODD
+        // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
+        // topic name is yet unknown
+      } else {
+        throw SemanticError(
+          "Unexpected architecture_type ", std::quoted(architecture_type), " specified");
+      }
+    } else {
+      return true;
+    }
   }
 
   auto evaluate()
   {
     auto spawn_entity = overload(
       [this](const Vehicle & vehicle) {
-        enableOutOfRangeMetric(vehicle);
-
-        applyAddEntityAction(
-          object_controller.isEgo(), name,
-          static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
-
-        applyAssignControllerAction(name, object_controller);
-
-        if (object_controller.isEgo()) {
-          const auto architecture_type =
-            getParameter<std::string>("architecture_type", std::string(""));
-
-          if (architecture_type == "tier4/proposal") {
-            attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-              traffic_simulator::helper::LidarType::VLP16, name,
-              "/sensing/lidar/no_ground/pointcloud"));
-            attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-              name, "/perception/object_recognition/objects", 0.1));
-          } else if (architecture_type == "awf/auto") {
-            attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-              traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
-
-            // Autoware.Auto does not currently support object prediction
-            // however it is work-in-progress for Cargo ODD
-            // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
-            // topic name is yet unknown
-          } else {
-            throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
-          }
+        if (not applyAddEntityAction(
+              object_controller.isEgo(), name,
+              static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
+          return false;
+        } else {
+          applyAssignControllerAction(name, object_controller);
+          activateSensors();
+          activateOutOfRangeMetric(vehicle);
+          return true;
         }
-
-        return true;  // XXX DIRTY HACK!
       },
       [this](const Pedestrian & pedestrian) {
         return applyAddEntityAction(
