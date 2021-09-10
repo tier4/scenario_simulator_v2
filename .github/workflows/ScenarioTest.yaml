@@ -14,6 +14,9 @@ on:
       - "workflows/NotifyFailure.yaml"
       - "workflows/Release.yaml"
       - "workflows/SpellCheck.yaml"
+  push:
+    branches:
+      - master
 jobs:
   job1:
     name: ScenarioTest
@@ -126,6 +129,27 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run lanechange_right scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_right timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run lanechange_left_with_id scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_left_with_id timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
+      - name: Run lanechange_right_with_id scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=lanechange_right_with_id timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
       - name: Run merge_left scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
@@ -175,6 +199,13 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=stop_at_crosswalk timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run walk_straight scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=walk_straight timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
       - name: Run move_backward scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
@@ -187,6 +218,24 @@ jobs:
           source ~/ros2_ws/install/setup.bash
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=get_longitudinal_distance timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
+
+      - name: Run acquire_route action
+        run : |
+            source ~/ros2_ws/install/setup.bash
+            ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=acquire_position_in_world_frame timeout:=15 > log.txt
+            cat log.txt | grep "Scenario Succeed"
+
+      - name: Run assign_route action
+        run : |
+            source ~/ros2_ws/install/setup.bash
+            ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=assign_route_in_world_frame timeout:=15 > log.txt
+            cat log.txt | grep "Scenario Succeed"
+
+      - name: Run cancel_request action
+        run: |
+            source ~/ros2_ws/install/setup.bash
+            ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=cancel_request timeout:=15 > log.txt
+            cat log.txt | grep "Scenario Succeed"
 
       - name: Collect coverage for with_openscenario_interpreter
         if: matrix.test_flags == 'with_openscenario_interpreter'

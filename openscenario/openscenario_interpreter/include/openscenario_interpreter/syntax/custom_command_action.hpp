@@ -191,12 +191,12 @@ struct CustomCommandAction : private Scope
   {
     /* ---- NOTE ---------------------------------------------------------------
      *
-     *  <CustomCommandAction type="function(hoge, &quot;hello, world!&quot;, 3.14)"/>
+     *  <CustomCommandAction type="function(foo, &quot;hello, world!&quot;, 3.14)"/>
      *
-     *  result[0] = function(hoge, "hello, world!", 3.14)
+     *  result[0] = function(foo, "hello, world!", 3.14)
      *  result[1] = function
-     *  result[2] = (hoge, "hello, world!", 3.14)
-     *  result[3] = hoge, "hello, world!", 3.14
+     *  result[2] = (foo, "hello, world!", 3.14)
+     *  result[3] = foo, "hello, world!", 3.14
      *
      * ---------------------------------------------------------------------- */
     static const std::regex pattern{R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)"};

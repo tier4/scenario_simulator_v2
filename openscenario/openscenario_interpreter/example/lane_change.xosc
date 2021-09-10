@@ -260,7 +260,7 @@
           </Maneuver>
         </ManeuverGroup>
 
-        <ManeuverGroup name="aori" maximumExecutionCount="1">
+        <ManeuverGroup name="rage" maximumExecutionCount="1">
           <Actors selectTriggeringEntities="false">
             <EntityRef entityRef="npc"/>
           </Actors>

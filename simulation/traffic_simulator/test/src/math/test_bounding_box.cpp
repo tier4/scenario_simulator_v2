@@ -17,7 +17,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/math/bounding_box.hpp>
 
-TEST(BoundigBox, GetPolygonDistanceWithCollision)
+TEST(BoundingBox, GetPolygonDistanceWithCollision)
 {
   geometry_msgs::msg::Pose pose0;
   openscenario_msgs::msg::BoundingBox bbox0;
@@ -32,7 +32,7 @@ TEST(BoundigBox, GetPolygonDistanceWithCollision)
   EXPECT_EQ(traffic_simulator::math::getPolygonDistance(pose0, bbox0, pose1, bbox1), boost::none);
 }
 
-TEST(BoundigBox, GetPolygonDistanceWithoutCollision)
+TEST(BoundingBox, GetPolygonDistanceWithoutCollision)
 {
   geometry_msgs::msg::Pose pose0;
   openscenario_msgs::msg::BoundingBox bbox0;

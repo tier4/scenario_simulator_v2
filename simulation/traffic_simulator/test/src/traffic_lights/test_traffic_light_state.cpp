@@ -46,7 +46,7 @@ TEST(TrafficLights, makeLampState)
     std::out_of_range);
 }
 
-TEST(TraffigLights, OPERATOR_INSERT)
+TEST(TrafficLights, OPERATOR_INSERT)
 {
   std::stringstream ss;
   ss << traffic_simulator::TrafficLightArrow::STRAIGHT;
@@ -74,7 +74,7 @@ TEST(TraffigLights, OPERATOR_INSERT)
   EXPECT_STREQ(ss.str().c_str(), "yellow");
 }
 
-TEST(TraffigLights, OPERATOR_INPUT)
+TEST(TrafficLights, OPERATOR_INPUT)
 {
   traffic_simulator::TrafficLightArrow arrow;
   std::stringstream("straight") >> arrow;

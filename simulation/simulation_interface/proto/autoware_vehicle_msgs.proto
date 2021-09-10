@@ -16,7 +16,7 @@ enum SHIFT_POSITIONS {
 message Shift { SHIFT_POSITIONS data = 1; }
 
 /**
- * Protobuf defintion of the autoware_vehicle_msgs/msg/VehicleCommand type in
+ * Protobuf definition of the autoware_vehicle_msgs/msg/VehicleCommand type in
  *ROS2.
  **/
 message VehicleCommand {

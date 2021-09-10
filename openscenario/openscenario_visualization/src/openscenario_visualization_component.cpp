@@ -142,68 +142,68 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
     for (std::vector<geometry_msgs::msg::Pose>::size_type i = 0; i < unsigned(goal_pose_max_size);
          i++) {
       if (i < goal_pose.size()) {
-        visualization_msgs::msg::Marker goalpose_marker;
-        goalpose_marker.header.frame_id = "map";
-        goalpose_marker.header.stamp = stamp;
-        goalpose_marker.ns = status.name;
-        goalpose_marker.id = 10 + int(goal_pose_max_size - goal_pose.size() + i);
-        goalpose_marker.action = goalpose_marker.ADD;
-        goalpose_marker.type = 0;  //arrow
-        goalpose_marker.pose = goal_pose[i];
-        goalpose_marker.color = color;
-        goalpose_marker.scale.x = 1.6;
-        goalpose_marker.scale.y = 0.2;
-        goalpose_marker.scale.z = 0.2;
-        goalpose_marker.lifetime = rclcpp::Duration::from_seconds(0.1);
-        ret.markers.emplace_back(goalpose_marker);
+        visualization_msgs::msg::Marker goal_pose_marker;
+        goal_pose_marker.header.frame_id = "map";
+        goal_pose_marker.header.stamp = stamp;
+        goal_pose_marker.ns = status.name;
+        goal_pose_marker.id = 10 + int(goal_pose_max_size - goal_pose.size() + i);
+        goal_pose_marker.action = goal_pose_marker.ADD;
+        goal_pose_marker.type = 0;  //arrow
+        goal_pose_marker.pose = goal_pose[i];
+        goal_pose_marker.color = color;
+        goal_pose_marker.scale.x = 1.6;
+        goal_pose_marker.scale.y = 0.2;
+        goal_pose_marker.scale.z = 0.2;
+        goal_pose_marker.lifetime = rclcpp::Duration::from_seconds(0.1);
+        ret.markers.emplace_back(goal_pose_marker);
 
-        visualization_msgs::msg::Marker goalpose_text_marker;
-        goalpose_text_marker.type = goalpose_text_marker.TEXT_VIEW_FACING;
-        goalpose_text_marker.header.frame_id = "map";
-        goalpose_text_marker.header.stamp = stamp;
-        goalpose_text_marker.ns = status.name;
-        goalpose_text_marker.id = 100 + int(goal_pose_max_size - goal_pose.size() + i);
-        goalpose_text_marker.action = goalpose_text_marker.ADD;
-        goalpose_text_marker.pose.position.x = goal_pose[i].position.x;
-        goalpose_text_marker.pose.position.y = goal_pose[i].position.y;
-        goalpose_text_marker.pose.position.z = goal_pose[i].position.z + 1.0;
-        goalpose_text_marker.pose.orientation.x = 0.0;
-        goalpose_text_marker.pose.orientation.y = 0.0;
-        goalpose_text_marker.pose.orientation.z = 0.0;
-        goalpose_text_marker.pose.orientation.w = 1.0;
-        goalpose_text_marker.type = goalpose_text_marker.TEXT_VIEW_FACING;
-        goalpose_text_marker.scale.x = 0.0;
-        goalpose_text_marker.scale.y = 0.0;
-        goalpose_text_marker.scale.z = 0.6;
-        goalpose_text_marker.lifetime = rclcpp::Duration::from_seconds(0.1);
-        goalpose_text_marker.text =
+        visualization_msgs::msg::Marker goal_pose_text_marker;
+        goal_pose_text_marker.type = goal_pose_text_marker.TEXT_VIEW_FACING;
+        goal_pose_text_marker.header.frame_id = "map";
+        goal_pose_text_marker.header.stamp = stamp;
+        goal_pose_text_marker.ns = status.name;
+        goal_pose_text_marker.id = 100 + int(goal_pose_max_size - goal_pose.size() + i);
+        goal_pose_text_marker.action = goal_pose_text_marker.ADD;
+        goal_pose_text_marker.pose.position.x = goal_pose[i].position.x;
+        goal_pose_text_marker.pose.position.y = goal_pose[i].position.y;
+        goal_pose_text_marker.pose.position.z = goal_pose[i].position.z + 1.0;
+        goal_pose_text_marker.pose.orientation.x = 0.0;
+        goal_pose_text_marker.pose.orientation.y = 0.0;
+        goal_pose_text_marker.pose.orientation.z = 0.0;
+        goal_pose_text_marker.pose.orientation.w = 1.0;
+        goal_pose_text_marker.type = goal_pose_text_marker.TEXT_VIEW_FACING;
+        goal_pose_text_marker.scale.x = 0.0;
+        goal_pose_text_marker.scale.y = 0.0;
+        goal_pose_text_marker.scale.z = 0.6;
+        goal_pose_text_marker.lifetime = rclcpp::Duration::from_seconds(0.1);
+        goal_pose_text_marker.text =
           status.name + "_goal_" + std::to_string(int(goal_pose_max_size - goal_pose.size() + i));
-        goalpose_text_marker.color = color_utils::makeColorMsg("white", 0.99);
-        ret.markers.emplace_back(goalpose_text_marker);
+        goal_pose_text_marker.color = color_utils::makeColorMsg("white", 0.99);
+        ret.markers.emplace_back(goal_pose_text_marker);
       } else {
-        visualization_msgs::msg::Marker goalpose_marker;
-        goalpose_marker.action = goalpose_marker.DELETE;
-        goalpose_marker.id = 10 + int(i - (goal_pose_max_size - goal_pose.size()));
-        goalpose_marker.ns = status.name;
-        ret.markers.emplace_back(goalpose_marker);
-        visualization_msgs::msg::Marker goalpose_text_marker;
-        goalpose_text_marker.action = goalpose_text_marker.DELETE;
-        goalpose_text_marker.id = 100 + int(i - (goal_pose_max_size - goal_pose.size()));
-        goalpose_text_marker.ns = status.name;
-        ret.markers.emplace_back(goalpose_text_marker);
+        visualization_msgs::msg::Marker goal_pose_marker;
+        goal_pose_marker.action = goal_pose_marker.DELETE;
+        goal_pose_marker.id = 10 + int(i - (goal_pose_max_size - goal_pose.size()));
+        goal_pose_marker.ns = status.name;
+        ret.markers.emplace_back(goal_pose_marker);
+        visualization_msgs::msg::Marker goal_pose_text_marker;
+        goal_pose_text_marker.action = goal_pose_text_marker.DELETE;
+        goal_pose_text_marker.id = 100 + int(i - (goal_pose_max_size - goal_pose.size()));
+        goal_pose_text_marker.ns = status.name;
+        ret.markers.emplace_back(goal_pose_text_marker);
       }
     }
   } else {
-    visualization_msgs::msg::Marker goalpose_marker;
-    goalpose_marker.action = goalpose_marker.DELETE;
-    goalpose_marker.id = 10 + int(goal_pose_max_size - 1);
-    goalpose_marker.ns = status.name;
-    ret.markers.emplace_back(goalpose_marker);
-    visualization_msgs::msg::Marker goalpose_text_marker;
-    goalpose_text_marker.action = goalpose_text_marker.DELETE;
-    goalpose_text_marker.id = 100 + int(goal_pose_max_size - 1);
-    goalpose_text_marker.ns = status.name;
-    ret.markers.emplace_back(goalpose_text_marker);
+    visualization_msgs::msg::Marker goal_pose_marker;
+    goal_pose_marker.action = goal_pose_marker.DELETE;
+    goal_pose_marker.id = 10 + int(goal_pose_max_size - 1);
+    goal_pose_marker.ns = status.name;
+    ret.markers.emplace_back(goal_pose_marker);
+    visualization_msgs::msg::Marker goal_pose_text_marker;
+    goal_pose_text_marker.action = goal_pose_text_marker.DELETE;
+    goal_pose_text_marker.id = 100 + int(goal_pose_max_size - 1);
+    goal_pose_text_marker.ns = status.name;
+    ret.markers.emplace_back(goal_pose_text_marker);
   }
 
   visualization_msgs::msg::Marker bbox;
@@ -373,11 +373,9 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.ns = status.name;
   text_action.id = 3;
   text_action.action = text_action.ADD;
-  text_action.pose.position.x =
-    status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  text_action.pose.position.x = status.bounding_box.center.x;
   text_action.pose.position.y = status.bounding_box.center.y;
-  text_action.pose.position.z =
-    status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5 + 0.5;
+  text_action.pose.position.z = status.bounding_box.center.z;
   text_action.pose.orientation.x = 0.0;
   text_action.pose.orientation.y = 0.0;
   text_action.pose.orientation.z = 0.0;
@@ -388,6 +386,10 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration::from_seconds(0.1);
   text_action.text = status.action_status.current_action;
+  if (status.lanelet_pose_valid) {
+    text_action.text = text_action.text + "\nid:" + std::to_string(status.lanelet_pose.lanelet_id) +
+                       "\ns:" + std::to_string(status.lanelet_pose.s);
+  }
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);
 

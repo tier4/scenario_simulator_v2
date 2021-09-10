@@ -75,12 +75,6 @@ geometry_msgs::msg::Pose constructPose(
   return pose;
 }
 
-std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose)
-{
-  os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
-  return os;
-}
-
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   std::string entity, std::string topic_name, double update_duration)
 {
@@ -158,3 +152,9 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 
 }  // namespace helper
 }  // namespace traffic_simulator
+
+std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose)
+{
+  os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
+  return os;
+}

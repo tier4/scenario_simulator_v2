@@ -88,8 +88,6 @@ geometry_msgs::msg::Vector3 constructRPYfromQuaternion(geometry_msgs::msg::Quate
 geometry_msgs::msg::Pose constructPose(
   double x, double y, double z, double roll, double pitch, double yaw);
 
-std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose);
-
 enum class LidarType { VLP16, VLP32 };
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
@@ -101,5 +99,7 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 
 }  // namespace helper
 }  // namespace traffic_simulator
+
+std::ostream & operator<<(std::ostream & os, const openscenario_msgs::msg::LaneletPose & ll_pose);
 
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_

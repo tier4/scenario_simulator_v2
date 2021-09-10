@@ -96,7 +96,7 @@ struct ConditionEdge
      *  time t. This edge is provided for simply defining assertions such as
      *  "Did the Ego car pass over checkpoint X?
      *
-     *  This is NOT an OpenSCEANRIO 1.0.0 standard feature (Tier IV extension).
+     *  This is NOT an OpenSCENARIO 1.0.0 standard feature (Tier IV extension).
      *
      * ---------------------------------------------------------------------- */
     sticky,

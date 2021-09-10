@@ -52,7 +52,7 @@ public:
 
   void requestWalkStraight() override;
 
-  void cancelRequest();
+  void cancelRequest() override;
 
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override
   {

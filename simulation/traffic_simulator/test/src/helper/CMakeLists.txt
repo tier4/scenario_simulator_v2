@@ -1,0 +1,2 @@
+ament_add_gtest(test_helper test_helper.cpp)
+target_link_libraries(test_helper traffic_simulator)

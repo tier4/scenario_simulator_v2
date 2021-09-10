@@ -3,7 +3,25 @@ ament_auto_add_executable(lanechange_left
 )
 target_link_libraries(lanechange_left cpp_scenario_node)
 
+ament_auto_add_executable(lanechange_left_with_id
+lanechange_left_with_id.cpp
+)
+target_link_libraries(lanechange_left_with_id cpp_scenario_node)
+
+ament_auto_add_executable(lanechange_right
+  lanechange_right.cpp
+)
+target_link_libraries(lanechange_right cpp_scenario_node)
+
+ament_auto_add_executable(lanechange_right_with_id
+lanechange_right_with_id.cpp
+)
+target_link_libraries(lanechange_right_with_id cpp_scenario_node)
+
 install(TARGETS
   lanechange_left
+  lanechange_left_with_id
+  lanechange_right
+  lanechange_right_with_id
   DESTINATION lib/cpp_mock_scenarios
 )

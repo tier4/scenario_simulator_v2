@@ -156,7 +156,7 @@ OpenSCENARIO:
     Story:
       - name: ''
         Act:
-          - name: hoge
+          - name: foo
             ManeuverGroup:
               - maximumExecutionCount: 1
                 name: ''

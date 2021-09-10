@@ -54,7 +54,7 @@ class Color:
     BOLD = "\038[1m"
     UNDERLINE = "\033[4m"
     INVISIBLE = "\033[08m"
-    REVERCE = "\033[07m"
+    REVERSE = "\033[07m"
 
 
 def on_stderr_output(event: launch.Event) -> None:

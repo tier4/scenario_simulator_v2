@@ -18,15 +18,50 @@
 #include <gtest/gtest.h>
 
 #include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 
-#define EXPECT_POINT_EQ(P0, P1) \
-  EXPECT_DOUBLE_EQ(P0.x, P1.x); \
-  EXPECT_DOUBLE_EQ(P0.y, P1.y); \
-  EXPECT_DOUBLE_EQ(P0.z, P1.z);
+#define EXPECT_POINT_EQ(DATA0, DATA1) \
+  EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x); \
+  EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y); \
+  EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z);
 
-#define EXPECT_VECTOR3_EQ(V0, V1) \
-  EXPECT_DOUBLE_EQ(V0.x, V1.x);   \
-  EXPECT_DOUBLE_EQ(V0.y, V1.y);   \
-  EXPECT_DOUBLE_EQ(V0.z, V1.z);
+#define EXPECT_VECTOR3_EQ(DATA0, DATA1) \
+  EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x);   \
+  EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y);   \
+  EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z);
+
+#define EXPECT_QUATERNION_EQ(DATA0, DATA1) \
+  EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x);      \
+  EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y);      \
+  EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z);      \
+  EXPECT_DOUBLE_EQ(DATA0.w, DATA1.w);
+
+#define EXPECT_POSE_EQ(DATA0, DATA1)               \
+  EXPECT_POINT_EQ(DATA0.position, DATA1.position); \
+  EXPECT_QUATERNION_EQ(DATA0.orientation, DATA1.orientation);
+
+#define EXPECT_LANELET_POSE_EQ(DATA0, DATA1)     \
+  EXPECT_EQ(DATA0.lanelet_id, DATA1.lanelet_id); \
+  EXPECT_DOUBLE_EQ(DATA0.s, DATA1.s);            \
+  EXPECT_DOUBLE_EQ(DATA0.offset, DATA1.offset);  \
+  EXPECT_VECTOR3_EQ(DATA0.rpy, DATA1.rpy);
+
+#define EXPECT_TWIST_EQ(DATA0, DATA1)            \
+  EXPECT_VECTOR3_EQ(DATA0.linear, DATA1.linear); \
+  EXPECT_VECTOR3_EQ(DATA0.angular, DATA1.angular);
+
+#define EXPECT_ACCEL_EQ(DATA0, DATA1)            \
+  EXPECT_VECTOR3_EQ(DATA0.linear, DATA1.linear); \
+  EXPECT_VECTOR3_EQ(DATA0.angular, DATA1.angular);
+
+#define EXPECT_ACTION_STATUS_EQ(DATA0, DATA1) \
+  EXPECT_ACCEL_EQ(DATA0.accel, DATA1.accel);  \
+  EXPECT_TWIST_EQ(DATA0.twist, DATA1.twist);  \
+  EXPECT_STREQ(DATA0.current_action.c_str(), DATA1.current_action.c_str());
+
+#define EXPECT_DETECTION_SENSOR_CONFIGURATION_EQ(DATA0, DATA1)          \
+  EXPECT_STREQ(DATA0.entity().c_str(), DATA1.entity().c_str());         \
+  EXPECT_STREQ(DATA0.topic_name().c_str(), DATA1.topic_name().c_str()); \
+  EXPECT_DOUBLE_EQ(DATA0.update_duration(), DATA1.update_duration());
 
 #endif  // TRAFFIC_SIMULATOR__TEST__EXPECT_EQ_MACROS_HPP_
