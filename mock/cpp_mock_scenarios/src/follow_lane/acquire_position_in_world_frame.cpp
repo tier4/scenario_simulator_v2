@@ -26,10 +26,10 @@
 #include <string>
 #include <vector>
 
-class DecelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
+class AcquirePositionInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit DecelerateAndFollowScenario(const rclcpp::NodeOptions & option)
+  explicit AcquirePositionInWorldFrame(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "idiot_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
@@ -62,7 +62,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<DecelerateAndFollowScenario>(options);
+  auto component = std::make_shared<AcquirePositionInWorldFrame>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

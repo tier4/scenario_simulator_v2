@@ -373,11 +373,9 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.ns = status.name;
   text_action.id = 3;
   text_action.action = text_action.ADD;
-  text_action.pose.position.x =
-    status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
+  text_action.pose.position.x = status.bounding_box.center.x;
   text_action.pose.position.y = status.bounding_box.center.y;
-  text_action.pose.position.z =
-    status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5 + 0.5;
+  text_action.pose.position.z = status.bounding_box.center.z;
   text_action.pose.orientation.x = 0.0;
   text_action.pose.orientation.y = 0.0;
   text_action.pose.orientation.z = 0.0;
@@ -388,6 +386,10 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   text_action.scale.z = 0.4;
   text_action.lifetime = rclcpp::Duration::from_seconds(0.1);
   text_action.text = status.action_status.current_action;
+  if (status.lanelet_pose_valid) {
+    text_action.text = text_action.text + "\nid:" + std::to_string(status.lanelet_pose.lanelet_id) +
+                       "\ns:" + std::to_string(status.lanelet_pose.s);
+  }
   text_action.color = color_utils::makeColorMsg("white", 0.99);
   ret.markers.emplace_back(text_action);
 

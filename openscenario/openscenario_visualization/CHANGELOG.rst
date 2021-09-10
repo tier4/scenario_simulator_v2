@@ -2,6 +2,46 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.0 (2021-09-09)
+------------------
+* Merge pull request `#507 <https://github.com/tier4/scenario_simulator_v2/issues/507>`_ from tier4/feature/add_scenario
+* modify visualiza position
+* enable visualize position
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/dockerfile
+* Merge pull request `#503 <https://github.com/tier4/scenario_simulator_v2/issues/503>`_ from tier4/feature/cleanup_code
+* fix typo of goal_pose
+* Revert "Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel"
+* Merge branch 'master' into fix/offset_calculation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/add_test_traffic_light
+* Merge pull request `#458 <https://github.com/tier4/scenario_simulator_v2/issues/458>`_ from Utaro-M/add-goalpose
+* add new test case source
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* fix format
+* fix typo
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* fix typo
+* add goal_pose arrow marker
+* add goalpose arrow
+* visualization save
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* avoid clash when visualizing context
+* add spin thread
+* stop selection after select topic
+* update panel
+* use std::chrono and thread
+* add topic list
+* enable visualize icon
+* enable add panel to the rviz
+* configure directory
+* enable pass compile
+* apply reformat
+* add depends
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura
+
 0.4.5 (2021-08-30)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages

@@ -149,6 +149,11 @@ public:
 
   /*   */ void updateStandStillDuration(const double step_time);
 
+  virtual void cancelRequest()
+  {
+    THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support cancel request");
+  }
+
 protected:
   boost::optional<openscenario_msgs::msg::LaneletPose> next_waypoint_;
   boost::optional<openscenario_msgs::msg::EntityStatus> status_;

@@ -2,6 +2,63 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.5.0 (2021-09-09)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_helper
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/dockerfile
+* Merge pull request `#503 <https://github.com/tier4/scenario_simulator_v2/issues/503>`_ from tier4/feature/cleanup_code
+* gix some typo
+* fix typo of definition
+* fix typo of definition
+* fix typo of definicion
+* fix typo of action
+* Merge branch 'master' into add-goalpose
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_traffic_light
+* Merge pull request `#485 <https://github.com/tier4/scenario_simulator_v2/issues/485>`_ from tier4/feature/test_simulation_interface
+* change character
+* Merge branch 'master' into add-goalpose
+* fix typo
+* fix typo
+* add test cases for enum value
+* change error type
+* add testcase for clock conversion
+* enable ignore unreachable lines
+* initialize string value
+* remove unused enum value
+* modify expect macro for vehicle command
+* add EXPECT_VEHICLE_EQ macro
+* add test cases for toMsg function in Entity Status message
+* add test cases for entity status
+* add macros for lanelet pose
+* add EXPECT_ACTION_STATUS_EQ macro
+* add test cases for pedestrian and misc object parameters
+* add test case for vehicle parameters
+* fix include
+* add test case for bounding box
+* add some comments
+* split files
+* add EXPECT_AXLE_EQ and EXPECT_AXLES_EQ macro
+* add EXPECT_TWIST_EQ, EXPECT_ACCEL_EQ macro
+* add macros
+* apply reformat
+* remove warning
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/test_simulation_interface
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* add test case for entity type conversion
+* add test case for converting misc object type
+* add test case for lanelet pose
+* add test cases
+* add test case
+* enable convert pedestrian parameters
+* remove default label
+* remove unused example
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/context_panel
+* Merge branch 'master' of github.com:tier4/scenario_simulator.auto into feature/context_panel
+* Contributors: Masaya Kataoka, MasayaKataoka, Tatsuya Yamasaki, Yutaro Matsuura
+
 0.4.5 (2021-08-30)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/cleanup-error-messages
