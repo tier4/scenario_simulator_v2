@@ -47,7 +47,7 @@ std::string trim(const std::string & string, const char * trimCharacterList = " 
   const std::string str1 = trim(readFromFile(FILE1)); \
   EXPECT_STREQ(str0.c_str(), str1.c_str());
 
-TEST(SIMPLE_JUNIT, SUCCESS)
+TEST(SIMPLE_JUNIT, PASS)
 {
   common::junit::JUnit5 junit;
   junit.testsuite("example_suites");
@@ -55,7 +55,7 @@ TEST(SIMPLE_JUNIT, SUCCESS)
   junit.write_to("result.junit.xml");
   EXPECT_TEXT_FILE_EQ(
     "result.junit.xml",
-    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/success.junit.xml");
+    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/pass.junit.xml");
 }
 
 TEST(SIMPLE_JUNIT, FAILURE)
@@ -68,6 +68,21 @@ TEST(SIMPLE_JUNIT, FAILURE)
   EXPECT_TEXT_FILE_EQ(
     "result.junit.xml",
     ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/failure.junit.xml");
+}
+
+TEST(SIMPLE_JUNIT, ERROR)
+{
+  common::junit::JUnit5 junit;
+  junit.testsuite("example_suites");
+  common::junit::Error error_case("example_error", "error_test_case");
+  junit.testsuite("example_suite").testcase("example_case").error.push_back(error_case);
+  junit.write_to("result.junit.xml");
+  std::cout << ament_index_cpp::get_package_share_directory("simple_junit") +
+                 "/expected/error.junit.xml"
+            << std::endl;
+  EXPECT_TEXT_FILE_EQ(
+    "result.junit.xml",
+    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/error.junit.xml");
 }
 
 int main(int argc, char ** argv)
