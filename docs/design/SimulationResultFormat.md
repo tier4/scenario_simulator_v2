@@ -17,7 +17,7 @@ Example of result file is here.
 </testsuites>
 ```
 
-If you want to know about junit format, please refer [this](https://help.catchsoftware.com/display/ET/JUnit+Format).
+This format is a Junit5 format.
 
 ### Test Case Result
 #### Failure
@@ -75,7 +75,7 @@ graph TB
     check_base_class_of_exception --> UnknownError
 ```
 
-If you want to know all exception types defined in scenario simulator exception package, please look at [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp).
+If you want to know all exception types defined in scenario simulator exception package, please look at [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document.](ErrorCategories)
 
 ## Usage of simple_junit
 
