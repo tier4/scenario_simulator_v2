@@ -77,12 +77,23 @@ TEST(SIMPLE_JUNIT, ERROR)
   common::junit::Error error_case("example_error", "error_test_case");
   junit.testsuite("example_suite").testcase("example_case").error.push_back(error_case);
   junit.write_to("result.junit.xml");
-  std::cout << ament_index_cpp::get_package_share_directory("simple_junit") +
-                 "/expected/error.junit.xml"
-            << std::endl;
   EXPECT_TEXT_FILE_EQ(
     "result.junit.xml",
     ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/error.junit.xml");
+}
+
+TEST(SIMPLE_JUNIT, COMPLEX)
+{
+  common::junit::JUnit5 junit;
+  junit.testsuite("example_suites");
+  common::junit::Error error_case("example_error", "error_test_case");
+  junit.testsuite("example_suite").testcase("example_case").error.push_back(error_case);
+  common::junit::Failure failure_case("example_failure", "failure_test_case");
+  junit.testsuite("example_suite").testcase("example_case").failure.push_back(failure_case);
+  junit.write_to("result.junit.xml");
+  EXPECT_TEXT_FILE_EQ(
+    "result.junit.xml",
+    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/complex.junit.xml");
 }
 
 int main(int argc, char ** argv)

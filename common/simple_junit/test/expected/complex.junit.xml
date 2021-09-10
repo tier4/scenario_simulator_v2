@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<testsuites>
+	<testsuite name="example_suite">
+		<testcase name="example_case">
+			<error type="example_error" message="error_test_case" />
+			<failure type="example_failure" message="failure_test_case" />
+		</testcase>
+	</testsuite>
+	<testsuite name="example_suites" />
+</testsuites>
