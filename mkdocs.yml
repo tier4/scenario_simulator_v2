@@ -75,7 +75,8 @@ nav:
       - design/SystemArchitecture.md
       - design/TrafficSimulator.md
       - design/ZeroMQ.md
-      - Metrics: design/Metrics.md
+      - design/Metrics.md
+      - design/SimulationResultFormat.md
   - Package Details: package/About.md
   - Release Notes: ReleaseNotes.md
   - Contact Information: etc/ContactUs.md
