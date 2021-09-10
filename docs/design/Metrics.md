@@ -2,6 +2,35 @@
 
 Metrics class allow you to check Autoware way of driving is valid or not.
 
+## How it works
+
+```mermaid
+graph RL;
+  subgraph metric
+    inactive
+    active
+    failure
+    success
+
+    inactive --> |Start calculation| active
+    active --> failure
+    active --> success
+  end
+  your_application
+  API
+  your_application --> |Link| API
+  API --> |Add metric| inactive
+  failure --> |Throw Exception| API
+  API --> |Handle Exception| your_application
+```
+
+You can add metric by using API below,
+```C++
+api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...);
+```
+If the metric detects specification violation, then the metric move to failure lifecycle and throw errors.  
+Thrown exception was handled by your application.
+
 ## Lifecycle
 
 Each metrics has a lifecycle.
@@ -15,6 +44,7 @@ stateDiagram
   Success --> [*]
   Failure --> [*]
 ```
+
 ### Inactive
 In this state, metrics class does not start calculating metrics.
 If the activateTrigger function in each metrics class returns true, then the metrics moves to Active state.
