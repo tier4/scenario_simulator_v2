@@ -60,28 +60,34 @@ struct ScenarioObject
   {
   }
 
+  auto enableOutOfRangeMetric(const Vehicle & vehicle) -> void
+  {
+    const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
+
+    metrics::OutOfRangeMetric::Config configuration;
+    {
+      configuration.target_entity = name;
+      configuration.min_velocity = -parameters.performance.max_speed;
+      configuration.max_velocity = +parameters.performance.max_speed;
+      configuration.min_acceleration = -parameters.performance.max_deceleration;
+      configuration.max_acceleration = +parameters.performance.max_acceleration;
+    }
+
+    connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
+  }
+
   auto evaluate()
   {
     auto spawn_entity = overload(
       [this](const Vehicle & vehicle) {
-        connection.addMetric<metrics::OutOfRangeMetric>(
-          name + "-out-of-range", makeOutOfRangeMetric(vehicle));
-        return applyAddEntityAction(
+        enableOutOfRangeMetric(vehicle);
+
+        applyAddEntityAction(
           object_controller.isEgo(), name,
           static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
-      },
-      [this](const Pedestrian & pedestrian) {
-        return applyAddEntityAction(
-          false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
-      },
-      [this](const MiscObject & misc_object) {
-        return applyAddEntityAction(
-          false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
-      });
 
-    if (apply<bool>(spawn_entity, static_cast<const EntityObject &>(*this))) {
-      if (is<Vehicle>()) {
         applyAssignControllerAction(name, object_controller);
+
         if (object_controller.isEgo()) {
           const auto architecture_type =
             getParameter<std::string>("architecture_type", std::string(""));
@@ -104,27 +110,23 @@ struct ScenarioObject
             throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
           }
         }
-      }
+
+        return true;  // XXX DIRTY HACK!
+      },
+      [this](const Pedestrian & pedestrian) {
+        return applyAddEntityAction(
+          false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+      },
+      [this](const MiscObject & misc_object) {
+        return applyAddEntityAction(
+          false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
+      });
+
+    if (apply<bool>(spawn_entity, static_cast<const EntityObject &>(*this))) {
       return unspecified;
     } else {
       throw SemanticError("Failed to spawn entity ", std::quoted(name));
     }
-  }
-
-  auto makeOutOfRangeMetric(const Vehicle & vehicle) -> metrics::OutOfRangeMetric::Config
-  {
-    const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
-
-    metrics::OutOfRangeMetric::Config configuration;
-    {
-      configuration.target_entity = name;
-      configuration.min_velocity = -parameters.performance.max_speed;
-      configuration.max_velocity = +parameters.performance.max_speed;
-      configuration.min_acceleration = -parameters.performance.max_deceleration;
-      configuration.max_acceleration = +parameters.performance.max_acceleration;
-    }
-
-    return configuration;
   }
 };
 
