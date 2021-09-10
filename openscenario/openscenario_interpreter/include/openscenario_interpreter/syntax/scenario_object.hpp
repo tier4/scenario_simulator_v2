@@ -52,8 +52,6 @@ struct ScenarioObject
 {
   ObjectController object_controller;  // Controller of the EntityObject instance.
 
-  static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
-
   template <typename Node>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
   : Scope(outer_scope.makeChildScope(readAttribute<String>("name", node, outer_scope))),
@@ -66,16 +64,11 @@ struct ScenarioObject
   {
     auto spawn_entity = overload(
       [this](const Vehicle & vehicle) {
-        const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
-        const auto & performance = parameters.performance;
-        metrics::OutOfRangeMetric::Config config;
-        config.target_entity = name;
-        config.min_velocity = -performance.max_speed;
-        config.max_velocity = +performance.max_speed;
-        config.min_acceleration = -performance.max_deceleration;
-        config.max_acceleration = +performance.max_acceleration;
-        connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", config);
-        return applyAddEntityAction(object_controller.isEgo(), name, parameters);
+        connection.addMetric<metrics::OutOfRangeMetric>(
+          name + "-out-of-range", makeOutOfRangeMetric(vehicle));
+        return applyAddEntityAction(
+          object_controller.isEgo(), name,
+          static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle));
       },
       [this](const Pedestrian & pedestrian) {
         return applyAddEntityAction(
@@ -116,6 +109,22 @@ struct ScenarioObject
     } else {
       throw SemanticError("Failed to spawn entity ", std::quoted(name));
     }
+  }
+
+  auto makeOutOfRangeMetric(const Vehicle & vehicle) -> metrics::OutOfRangeMetric::Config
+  {
+    const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
+
+    metrics::OutOfRangeMetric::Config configuration;
+    {
+      configuration.target_entity = name;
+      configuration.min_velocity = -parameters.performance.max_speed;
+      configuration.max_velocity = +parameters.performance.max_speed;
+      configuration.min_acceleration = -parameters.performance.max_deceleration;
+      configuration.max_acceleration = +parameters.performance.max_acceleration;
+    }
+
+    return configuration;
   }
 };
 
