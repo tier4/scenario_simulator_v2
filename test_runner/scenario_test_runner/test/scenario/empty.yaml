@@ -10,7 +10,9 @@ OpenSCENARIO:
   CatalogLocations:
   RoadNetwork:
     LogicFile:
-      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
+      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
+    SceneGraphFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map/pointcloud_map.pcd
     TrafficSignals:
   Entities:
   Storyboard:

@@ -7,8 +7,10 @@ OpenSCENARIO:
     ParameterDeclaration: []
   CatalogLocations:
   RoadNetwork:
-    LogicFile: { filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm" }
-    SceneGraphFile: { filepath: lanelet2_map.pcd }
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm
+    SceneGraphFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map/pointcloud_map.pcd
     TrafficSignals:
       TrafficSignalController: []
   Entities:
