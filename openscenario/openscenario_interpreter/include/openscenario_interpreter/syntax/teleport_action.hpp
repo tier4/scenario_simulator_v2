@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <utility>
@@ -67,11 +68,13 @@ struct TeleportAction : private Scope
       });
 
     for (const auto & actor : actors) {
-      const auto entity = global().entities.at(actor);
+      // const auto entity = global().entities.at(actor);
+      //
+      // if (not entity.as<ScenarioObject>().is_added) {
+      //   entity.evaluate();
+      // }
 
-      if (not entity.as<ScenarioObject>().is_added) {
-        entity.evaluate();
-      }
+      AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
 
       apply(teleport_action, position, actor);
     }

@@ -16,7 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 
 namespace openscenario_interpreter
 {
@@ -31,13 +33,18 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AddEntityAction
+struct AddEntityAction : private Scope
 {
   const Position position;
 
-  template <typename Node, typename Scope>
-  explicit AddEntityAction(const Node & node, Scope & scope)
-  : position(readElement<Position>("Position", node, scope))
+  explicit AddEntityAction(const Scope & scope, const Position & position)
+  : Scope(scope), position(position)
+  {
+  }
+
+  template <typename Tree>
+  explicit AddEntityAction(const Tree & tree, Scope & scope)
+  : Scope(scope), position(readElement<Position>("Position", tree, scope))
   {
   }
 
@@ -45,9 +52,43 @@ struct AddEntityAction
 
   static auto endsImmediately() noexcept -> bool { return true; }
 
-  inline auto operator()(const std::string &) const -> void
-  {
-    // TODO
+  inline auto operator()(const std::string & entity_ref) const -> void
+  try {
+    const auto entity = global().entities.at(entity_ref);  // TODO: catch
+
+    auto add_entity_action = overload(
+
+      [&](const Vehicle & vehicle) {
+        if (not applyAddEntityAction(
+              entity.as<ScenarioObject>().object_controller.isEgo(),  //
+              entity_ref,                                             //
+              static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
+          return false;
+        } else {
+          applyAssignControllerAction(entity_ref, entity.as<ScenarioObject>().object_controller);
+          entity.as<ScenarioObject>().activateSensors();
+          entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
+          return true;
+        }
+      },
+
+      [&](const Pedestrian & pedestrian) {
+        return applyAddEntityAction(
+          false, entity_ref, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
+      },
+
+      [&](const MiscObject & misc_object) {
+        return applyAddEntityAction(
+          false, entity_ref,
+          static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
+      });
+
+    if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {
+      // TODO bool => void
+      apply<bool>(add_entity_action, entity.as<EntityObject>());
+    }
+  } catch (const std::out_of_range &) {
+    throw SemanticError("No such name of entity ", std::quoted(entity_ref));
   }
 };
 }  // namespace syntax
