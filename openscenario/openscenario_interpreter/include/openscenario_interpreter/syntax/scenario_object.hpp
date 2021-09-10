@@ -105,37 +105,6 @@ struct ScenarioObject
       return true;
     }
   }
-
-  // auto evaluate()
-  // {
-  //   auto spawn_entity = overload(
-  //     [this](const Vehicle & vehicle) {
-  //       if (not applyAddEntityAction(
-  //             object_controller.isEgo(), name,
-  //             static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
-  //         return false;
-  //       } else {
-  //         applyAssignControllerAction(name, object_controller);
-  //         activateSensors();
-  //         activateOutOfRangeMetric(vehicle);
-  //         return true;
-  //       }
-  //     },
-  //     [this](const Pedestrian & pedestrian) {
-  //       return applyAddEntityAction(
-  //         false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
-  //     },
-  //     [this](const MiscObject & misc_object) {
-  //       return applyAddEntityAction(
-  //         false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
-  //     });
-  //
-  //   if (apply<bool>(spawn_entity, static_cast<const EntityObject &>(*this))) {
-  //     return asBoolean(is_added = true);
-  //   } else {
-  //     throw SemanticError("Failed to spawn entity ", std::quoted(name));
-  //   }
-  // }
 };
 
 auto operator<<(std::ostream &, const ScenarioObject &) -> std::ostream &;

@@ -54,38 +54,34 @@ struct AddEntityAction : private Scope
 
   inline auto operator()(const std::string & entity_ref) const -> void
   try {
-    const auto entity = global().entities.at(entity_ref);  // TODO: catch
+    const auto entity = global().entities.at(entity_ref);
 
     auto add_entity_action = overload(
 
       [&](const Vehicle & vehicle) {
-        if (not applyAddEntityAction(
+        if (applyAddEntityAction(
               entity.as<ScenarioObject>().object_controller.isEgo(),  //
               entity_ref,                                             //
               static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
-          return false;
-        } else {
           applyAssignControllerAction(entity_ref, entity.as<ScenarioObject>().object_controller);
           entity.as<ScenarioObject>().activateSensors();
           entity.as<ScenarioObject>().activateOutOfRangeMetric(vehicle);
-          return true;
         }
       },
 
       [&](const Pedestrian & pedestrian) {
-        return applyAddEntityAction(
+        applyAddEntityAction(
           false, entity_ref, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
       },
 
       [&](const MiscObject & misc_object) {
-        return applyAddEntityAction(
+        applyAddEntityAction(
           false, entity_ref,
           static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
       });
 
     if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {
-      // TODO bool => void
-      apply<bool>(add_entity_action, entity.as<EntityObject>());
+      apply<void>(add_entity_action, entity.as<EntityObject>());
     }
   } catch (const std::out_of_range &) {
     throw SemanticError("No such name of entity ", std::quoted(entity_ref));
