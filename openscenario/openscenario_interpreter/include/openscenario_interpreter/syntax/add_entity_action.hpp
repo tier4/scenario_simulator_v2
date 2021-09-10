@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
-#include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
 {

@@ -61,14 +61,10 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   void start()
   {
-    for (const auto & each : global().entities) {
-      std::get<1>(each).evaluate();
-    }
-
     init.evaluate();  // NOTE RENAME TO 'start'?
   }
 
-  decltype(auto) stopTriggered() { return stop_trigger.evaluate().as<Boolean>(); }
+  auto stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
 
   void stop()
   {
@@ -80,9 +76,9 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   auto accomplished() const
   {
-    auto check = [](auto && each) { return each.template as<Story>().complete(); };
-
-    return std::all_of(std::begin(*this), std::end(*this), check);
+    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+      return each.template as<Story>().complete();
+    });
   }
 
   bool engaged = false;

@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -43,11 +44,11 @@ struct TeleportAction : private Scope
   {
   }
 
-  static constexpr auto accomplished() noexcept -> bool { return true; }
+  static auto accomplished() noexcept -> bool { return true; }
 
-  static constexpr auto endsImmediately() noexcept -> bool { return true; };
+  static auto endsImmediately() noexcept -> bool { return true; };
 
-  auto start() const -> void
+  inline auto start() const -> void
   {
     auto teleport_action = overload(
       [](const WorldPosition & position, const auto & actor) {
@@ -66,6 +67,12 @@ struct TeleportAction : private Scope
       });
 
     for (const auto & actor : actors) {
+      const auto entity = global().entities.at(actor);
+
+      if (not entity.as<ScenarioObject>().is_added) {
+        entity.evaluate();
+      }
+
       apply(teleport_action, position, actor);
     }
   }

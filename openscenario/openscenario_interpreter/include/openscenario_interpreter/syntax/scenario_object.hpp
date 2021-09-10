@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -51,6 +50,8 @@ struct ScenarioObject
   public EntityObject
 {
   ObjectController object_controller;  // Controller of the EntityObject instance.
+
+  bool is_added = false;  // NOTE: Is applied AddEntityAction?
 
   template <typename Node>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
@@ -130,7 +131,7 @@ struct ScenarioObject
       });
 
     if (apply<bool>(spawn_entity, static_cast<const EntityObject &>(*this))) {
-      return unspecified;
+      return asBoolean(is_added = true);
     } else {
       throw SemanticError("Failed to spawn entity ", std::quoted(name));
     }
