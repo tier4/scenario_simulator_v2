@@ -42,15 +42,19 @@ void CollisionMetric::update()
   if (!entity_manager_ptr_->getEntityStatus(target_entity)) {
     return;
   }
+  std::vector<std::string> check_targets;
   if (check_collision_with_all_entities_) {
-    for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
-      if (entity_manager_ptr_->getEntityStatus(entity_name)) {
-        if (entity_manager_ptr_->checkCollision(target_entity, entity_name)) {
-          failure(SPECIFICATION_VIOLATION(
-            "Collision detected, entity : ", target_entity, "and entity : ", entity_name,
-            " was collided."));
-          return;
-        }
+    check_targets = entity_manager_ptr_->getEntityNames();
+  } else {
+    check_targets = check_targets_;
+  }
+  for (const auto & entity_name : check_targets) {
+    if (entity_manager_ptr_->getEntityStatus(entity_name)) {
+      if (entity_manager_ptr_->checkCollision(target_entity, entity_name)) {
+        failure(SPECIFICATION_VIOLATION(
+          "Collision detected, entity : ", target_entity, "and entity : ", entity_name,
+          " was collided."));
+        return;
       }
     }
   }
