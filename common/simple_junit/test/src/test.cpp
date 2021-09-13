@@ -104,12 +104,20 @@ TEST(SIMPLE_JUNIT, COMPLEX)
     ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/complex.junit.xml");
 }
 
-TEST(SIMPLE_JUNIT, ASSERTION)
+TEST(SIMPLE_JUNIT, ATTRIBUTES)
 {
   common::junit::JUnit5 junit;
   junit.testsuite("example_suites");
-  common::junit::Failure failure_case("example_failure", "failure_test_case");
+  common::junit::Failure failure_case("example_attributes", "attributes_test_case");
   junit.testsuite("example_suite").testcase("example_case").failure.push_back(failure_case);
+  junit.testsuite("example_suite").testcase("example_case").assertions = "example_assertion";
+  junit.testsuite("example_suite").testcase("example_case").time = "10";
+  junit.testsuite("example_suite").testcase("example_case").classname = "example_class";
+  junit.testsuite("example_suite").testcase("example_case").status = "failure";
+  junit.write_to("result.junit.xml", " ");
+  EXPECT_TEXT_FILE_EQ(
+    "result.junit.xml", ament_index_cpp::get_package_share_directory("simple_junit") +
+                          "/expected/attributes.junit.xml");
 }
 
 int main(int argc, char ** argv)
