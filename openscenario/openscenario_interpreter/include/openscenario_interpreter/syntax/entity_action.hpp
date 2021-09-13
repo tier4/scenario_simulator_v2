@@ -61,14 +61,14 @@ struct EntityAction : public Element
   inline auto evaluate() const
   {
     // clang-format off
-    static const std::unordered_map<std::type_index, std::function<void(const String &)>> overloads
+    static const std::unordered_map<std::type_index, std::function<void(const EntityAction &, const String &)>> overloads
     {
-      { typeid(   AddEntityAction), [this](auto &&... xs) { return as<   AddEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
-      { typeid(DeleteEntityAction), [this](auto &&... xs) { return as<DeleteEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
+      { typeid(   AddEntityAction), [](const EntityAction & entity_action, auto &&... xs) { return entity_action.as<   AddEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
+      { typeid(DeleteEntityAction), [](const EntityAction & entity_action, auto &&... xs) { return entity_action.as<DeleteEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
     };
     // clang-format on
 
-    overloads.at(type())(entity_ref);  // TODO(yamacir-kit) CATCH std::out_of_range
+    overloads.at(type())(*this, entity_ref);  // TODO(yamacir-kit) CATCH std::out_of_range
 
     return unspecified;
   }

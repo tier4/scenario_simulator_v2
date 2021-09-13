@@ -68,8 +68,11 @@ struct TeleportAction : private Scope
       });
 
     for (const auto & actor : actors) {
-      AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
-      apply(teleport_action, position, actor);
+      if (not global().entities.at(actor).as<ScenarioObject>().is_added) {
+        AddEntityAction(localScope(), position)(actor);  // NOTE: Tier IV extension
+      } else {
+        apply(teleport_action, position, actor);
+      }
     }
   }
 };

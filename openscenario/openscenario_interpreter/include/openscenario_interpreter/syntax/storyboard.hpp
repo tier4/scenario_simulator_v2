@@ -89,13 +89,16 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
       for (auto && story : *this) {
         story.evaluate();
       }
-    } else if (std::all_of(
+    } else if (std::all_of(  // XXX DIRTY HACK!!!
                  std::cbegin(global().entities), std::cend(global().entities),
                  [&](const auto & each) {
-                   return openscenario_interpreter::ready(std::get<0>(each));
+                   return not std::get<1>(each).template as<ScenarioObject>().is_added or
+                          openscenario_interpreter::ready(std::get<0>(each));
                  })) {
       for (const auto & each : global().entities) {
-        engage(each.first);
+        if (std::get<1>(each).template as<ScenarioObject>().is_added) {
+          engage(std::get<0>(each));
+        }
       }
       engaged = true;
     } else {

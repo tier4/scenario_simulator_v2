@@ -56,10 +56,27 @@ struct AddEntityAction : private Scope
   try {
     const auto entity = global().entities.at(entity_ref);
 
+    // XXX DIRTY HACK!!!
+#define APPLY_ADD_ENTITY_ACTION(...)                                                               \
+  apply<bool>(                                                                                     \
+    overload(                                                                                      \
+      [&](const WorldPosition & position) {                                                        \
+        return applyAddEntityAction(__VA_ARGS__, static_cast<geometry_msgs::msg::Pose>(position)); \
+      },                                                                                           \
+      [&](const RelativeWorldPosition & position) {                                                \
+        return applyAddEntityAction(                                                               \
+          __VA_ARGS__, position.reference, position, position.orientation);                        \
+      },                                                                                           \
+      [&](const LanePosition & position) {                                                         \
+        return applyAddEntityAction(                                                               \
+          __VA_ARGS__, static_cast<openscenario_msgs::msg::LaneletPose>(position));                \
+      }),                                                                                          \
+    position)
+
     auto add_entity_action = overload(
 
       [&](const Vehicle & vehicle) {
-        if (applyAddEntityAction(
+        if (APPLY_ADD_ENTITY_ACTION(
               entity.as<ScenarioObject>().object_controller.isEgo(),  //
               entity_ref,                                             //
               static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle))) {
@@ -70,18 +87,22 @@ struct AddEntityAction : private Scope
       },
 
       [&](const Pedestrian & pedestrian) {
-        applyAddEntityAction(
+        APPLY_ADD_ENTITY_ACTION(
           false, entity_ref, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
       },
 
       [&](const MiscObject & misc_object) {
-        applyAddEntityAction(
+        APPLY_ADD_ENTITY_ACTION(
           false, entity_ref,
           static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
       });
 
     if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {
       apply<void>(add_entity_action, entity.as<EntityObject>());
+    } else {
+      throw SemanticError(
+        "Applying action AddEntityAction to an entity ", std::quoted(entity_ref),
+        " that has already been added.");
     }
   } catch (const std::out_of_range &) {
     throw SemanticError("No such name of entity ", std::quoted(entity_ref));
