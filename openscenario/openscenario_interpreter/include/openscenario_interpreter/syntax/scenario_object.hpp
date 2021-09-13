@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -50,14 +49,9 @@ struct ScenarioObject
 : public Scope,
   public EntityObject
 {
-  /* ---- ObjectController -----------------------------------------------------
-   *
-   *  Controller of the EntityObject instance.
-   *
-   * ------------------------------------------------------------------------ */
-  ObjectController object_controller;
+  ObjectController object_controller;  // Controller of the EntityObject instance.
 
-  static_assert(IsOptionalElement<ObjectController>::value, "minOccurs=\"0\"");
+  bool is_added = false;  // NOTE: Is applied AddEntityAction?
 
   template <typename Node>
   explicit ScenarioObject(const Node & node, Scope & outer_scope)
@@ -67,65 +61,53 @@ struct ScenarioObject
   {
   }
 
-  auto evaluate()
+  auto activateOutOfRangeMetric(const Vehicle & vehicle) const -> bool
   {
-    auto spawn_entity = overload(
-      [this](const Vehicle & vehicle) {
-        const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
-        const auto & performance = parameters.performance;
-        metrics::OutOfRangeMetric::Config config;
-        config.target_entity = name;
-        config.min_velocity = -performance.max_speed;
-        config.max_velocity = performance.max_speed;
-        config.min_acceleration = -performance.max_deceleration;
-        config.max_acceleration = performance.max_acceleration;
+    const auto parameters = static_cast<openscenario_msgs::msg::VehicleParameters>(vehicle);
 
-        connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", config);
-        return spawn(object_controller.isEgo(), name, parameters);
-      },
-      [this](const Pedestrian & pedestrian) {
-        return spawn(
-          false, name, static_cast<openscenario_msgs::msg::PedestrianParameters>(pedestrian));
-      },
-      [this](const MiscObject & misc_object) {
-        return spawn(
-          false, name, static_cast<openscenario_msgs::msg::MiscObjectParameters>(misc_object));
-      });
+    metrics::OutOfRangeMetric::Config configuration;
+    {
+      configuration.target_entity = name;
+      configuration.min_velocity = -parameters.performance.max_speed;
+      configuration.max_velocity = +parameters.performance.max_speed;
+      configuration.min_acceleration = -parameters.performance.max_deceleration;
+      configuration.max_acceleration = +parameters.performance.max_acceleration;
+    }
 
-    if (apply<bool>(spawn_entity, static_cast<const EntityObject &>(*this))) {
-      if (is<Vehicle>()) {
-        applyAssignControllerAction(name, object_controller);
-        if (object_controller.isEgo()) {
-          auto architecture_type = getParameter<std::string>("architecture_type", std::string(""));
+    connection.addMetric<metrics::OutOfRangeMetric>(name + "-out-of-range", configuration);
 
-          if (architecture_type == "tier4/proposal") {
-            attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-              traffic_simulator::helper::LidarType::VLP16, name,
-              "/sensing/lidar/no_ground/pointcloud"));
+    return true;
+  }
 
-            attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-              name, "/perception/object_recognition/objects", 0.1));
-          } else if (architecture_type == "awf/auto") {
-            attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-              traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
-
-            // Autoware.Auto does not currently support object prediction
-            // however it is work-in-progress for Cargo ODD
-            // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
-            // topic name is yet unknown
-          } else {
-            throw std::invalid_argument("Invalid architecture_type = " + architecture_type);
-          }
-        }
+  auto activateSensors() -> bool
+  {
+    if (object_controller.isEgo()) {
+      const auto architecture_type = getParameter<std::string>("architecture_type", "");
+      if (architecture_type == "tier4/proposal") {
+        return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+                 traffic_simulator::helper::LidarType::VLP16, name,
+                 "/sensing/lidar/no_ground/pointcloud")) and
+               attachDetectionSensor(
+                 traffic_simulator::helper::constructDetectionSensorConfiguration(
+                   name, "/perception/object_recognition/objects", 0.1));
+      } else if (architecture_type == "awf/auto") {
+        return attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+          traffic_simulator::helper::LidarType::VLP16, name, "/perception/points_nonground"));
+        // Autoware.Auto does not currently support object prediction
+        // however it is work-in-progress for Cargo ODD
+        // msgs are already implemented and autoware_auto_msgs::msg::PredictedObjects will probably be used here
+        // topic name is yet unknown
+      } else {
+        throw SemanticError(
+          "Unexpected architecture_type ", std::quoted(architecture_type), " specified");
       }
-      return unspecified;
     } else {
-      throw SemanticError("Failed to spawn entity ", std::quoted(name));
+      return true;
     }
   }
 };
 
-std::ostream & operator<<(std::ostream &, const ScenarioObject &);
+auto operator<<(std::ostream &, const ScenarioObject &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

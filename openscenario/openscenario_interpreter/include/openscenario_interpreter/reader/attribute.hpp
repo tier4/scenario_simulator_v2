@@ -54,7 +54,8 @@ auto substitute(std::string attribute, Scope & scope)
            return "";
          }
        }},
-      {"dirname", [](auto &&, auto && scope) { return scope.pathname.parent_path().string(); }}};
+      {"dirname",
+       [](auto &&, auto && scope) { return scope.global().pathname.parent_path().string(); }}};
 
   std::smatch match{};
   while (std::regex_match(attribute, match, substitution_syntax)) {

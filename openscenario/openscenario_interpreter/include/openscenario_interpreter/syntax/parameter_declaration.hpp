@@ -52,23 +52,23 @@ struct ParameterDeclaration
 
   template <typename Node>
   explicit ParameterDeclaration(const Node & node, Scope & scope)
-  : name{readAttribute<String>("name", node, scope)},
-    parameter_type{readAttribute<ParameterType>("parameterType", node, scope)},
-    value{readAttribute<String>("value", node, scope)}
+  : name(readAttribute<String>("name", node, scope)),
+    parameter_type(readAttribute<ParameterType>("parameterType", node, scope)),
+    value(readAttribute<String>("value", node, scope))
   {
     if (name.substr(0, 3) == "OSC") {
-      throw SyntaxError{
+      throw SyntaxError(
         "Parameter names starting with \"OSC\" are reserved for special use in future versions "
-        "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix."};
+        "of OpenSCENARIO. Generally, it is forbidden to use the OSC prefix.");
     } else if (includes(name, {' ', '$', '\'', '"'})) {
-      throw SyntaxError{
+      throw SyntaxError(
         "In parameter names, usage of symbols is restricted. Symbols that must not be used are:\n"
         "  - \" \" (blank space)\n"
         "  - $\n"
         "  - \'\n"
-        "  - \"\n"};
+        "  - \"\n");
     } else {
-      scope.addElement(name, evaluate());
+      scope.insert(name, evaluate());
     }
   }
 
