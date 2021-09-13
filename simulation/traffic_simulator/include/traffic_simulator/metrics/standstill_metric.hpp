@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
-#define TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#ifndef TRAFFIC_SIMULATOR__METRICS__STANDSTILL_METRIC_HPP_
+#define TRAFFIC_SIMULATOR__METRICS__STANDSTILL_METRIC_HPP_
 
 #include <boost/optional.hpp>
 #include <limits>
@@ -45,4 +45,4 @@ private:
 };
 }  // namespace metrics
 
-#endif  // TRAFFIC_SIMULATOR__METRICS__TRAVELED_DISTANCE_METRIC_HPP_
+#endif  // TRAFFIC_SIMULATOR__METRICS__STANDSTILL_METRIC_HPP_
