@@ -23,11 +23,17 @@ ament_auto_add_executable(standstill_duration
 )
 target_link_libraries(standstill_duration cpp_scenario_node)
 
+ament_auto_add_executable(collision
+  collision.cpp
+)
+target_link_libraries(collision cpp_scenario_node)
+
 install(TARGETS
   traveled_distance
   momentary_stop
   reaction_time
   out_of_range
   standstill_duration
+  collision
   DESTINATION lib/cpp_mock_scenarios
 )

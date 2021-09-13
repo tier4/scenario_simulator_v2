@@ -25,12 +25,14 @@ class CollisionMetric : public MetricBase
 public:
   /**
    * @brief Construct a new Traveled Distance Metric object
+   * If you call this constructor, collision metric check collision with all entities.
    * 
    * @param target_entity name of the target entity
    */
   explicit CollisionMetric(std::string target_entity);
   /**
    * @brief Construct a new Collision Metric object
+   * If your call this contructor, collision metric check collision with check target entities.
    * 
    * @param target_entity name of the target entity
    * @param check_targets targets which you want to check collision
