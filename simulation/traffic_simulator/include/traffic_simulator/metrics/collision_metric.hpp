@@ -32,7 +32,7 @@ public:
   explicit CollisionMetric(std::string target_entity);
   /**
    * @brief Construct a new Collision Metric object
-   * If your call this contructor, collision metric check collision with check target entities.
+   * If your call this constructor, collision metric check collision with check target entities.
    * 
    * @param target_entity name of the target entity
    * @param check_targets targets which you want to check collision
