@@ -120,6 +120,17 @@ TEST(SIMPLE_JUNIT, ATTRIBUTES)
                           "/expected/attributes.junit.xml");
 }
 
+TEST(SIMPLE_JUNIT, TESTSUITES_NAME)
+{
+  common::junit::JUnit5 junit;
+  junit.testsuite("example_suites");
+  junit.name = "example_name";
+  junit.write_to("result.junit.xml", " ");
+  EXPECT_TEXT_FILE_EQ(
+    "result.junit.xml", ament_index_cpp::get_package_share_directory("simple_junit") +
+                          "/expected/testsuites_name.junit.xml");
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
