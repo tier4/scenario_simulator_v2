@@ -171,6 +171,13 @@ jobs:
           ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=traveled_distance timeout:=15 > log.txt
           cat log.txt | grep "Scenario Succeed"
 
+      - name: Run standstill_duration scenario
+        if: matrix.test_flags == 'cpp_mock_test'
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          ros2 launch cpp_mock_scenarios mock_test.launch.py scenario:=standstill_duration timeout:=15 > log.txt
+          cat log.txt | grep "Scenario Succeed"
+
       - name: Run momentary stop scenario
         if: matrix.test_flags == 'cpp_mock_test'
         run: |
