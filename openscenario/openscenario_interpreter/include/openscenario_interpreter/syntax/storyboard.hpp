@@ -42,14 +42,11 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   Trigger stop_trigger;
 
-  const Entities & entities;
-
   template <typename Node>
-  explicit Storyboard(const Node & node, Scope & outer_scope, const Entities & entities)
+  explicit Storyboard(const Node & node, Scope & outer_scope)
   : Scope(outer_scope.makeChildScope("Storyboard")),
     init(readElement<Init>("Init", node, localScope())),
-    stop_trigger(readElement<Trigger>("StopTrigger", node, localScope())),
-    entities(entities)
+    stop_trigger(readElement<Trigger>("StopTrigger", node, localScope()))
   {
     callWithElements(node, "Story", 1, unbounded, [&](auto && node) {
       return push_back(readStoryboardElement<Story>(node, localScope()));
@@ -64,14 +61,10 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   void start()
   {
-    for (const auto & each : entities) {
-      std::get<1>(each).evaluate();
-    }
-
     init.evaluate();  // NOTE RENAME TO 'start'?
   }
 
-  decltype(auto) stopTriggered() { return stop_trigger.evaluate().as<Boolean>(); }
+  auto stopTriggered() -> bool { return stop_trigger.evaluate().as<Boolean>(); }
 
   void stop()
   {
@@ -83,9 +76,9 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
 
   auto accomplished() const
   {
-    auto check = [](auto && each) { return each.template as<Story>().complete(); };
-
-    return std::all_of(std::begin(*this), std::end(*this), check);
+    return std::all_of(std::begin(*this), std::end(*this), [](auto && each) {
+      return each.template as<Story>().complete();
+    });
   }
 
   bool engaged = false;
@@ -96,11 +89,16 @@ struct Storyboard : public Scope, public StoryboardElement<Storyboard>, public E
       for (auto && story : *this) {
         story.evaluate();
       }
-    } else if (std::all_of(std::cbegin(entities), std::cend(entities), [&](const auto & each) {
-                 return openscenario_interpreter::ready(std::get<0>(each));
-               })) {
-      for (const auto & each : entities) {
-        engage(each.first);
+    } else if (std::all_of(  // XXX DIRTY HACK!!!
+                 std::cbegin(global().entities), std::cend(global().entities),
+                 [&](const auto & each) {
+                   return not std::get<1>(each).template as<ScenarioObject>().is_added or
+                          openscenario_interpreter::ready(std::get<0>(each));
+                 })) {
+      for (const auto & each : global().entities) {
+        if (std::get<1>(each).template as<ScenarioObject>().is_added) {
+          engage(std::get<0>(each));
+        }
       }
       engaged = true;
     } else {

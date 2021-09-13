@@ -135,7 +135,7 @@ protected:
 
     if (unique(name)) {
       auto element = make<U>(node, inner_scope, std::forward<decltype(xs)>(xs)...);
-      inner_scope.addElement(name, element);
+      inner_scope.insert(name, element);
       return element;
     } else {
       throw SyntaxError(

@@ -46,8 +46,11 @@ constexpr auto unbounded = std::numeric_limits<Cardinality>::max();
 
 template <typename Callee>
 void callWithElements(
-  const XML & parent, const std::string & name, const Cardinality min_occurs,
-  const Cardinality max_occurs, Callee && call_with)
+  const XML & parent,            //
+  const std::string & name,      //
+  const Cardinality min_occurs,  //
+  const Cardinality max_occurs,  //
+  Callee && call_with)
 {
   const auto children = parent.children(name.c_str());
 
@@ -72,13 +75,6 @@ void callWithElements(
       parent.name(), " requires class ", name, " at least ", min_occurs, " element",
       (1 < min_occurs ? "s" : ""), ", but there is no specification");
   }
-}
-
-template <typename Callee>
-[[deprecated]] decltype(auto) callWithElement(
-  const XML & parent, const std::string & name, Callee && call_with)
-{
-  return callWithElements(parent, name, 1, 1, std::forward<decltype(call_with)>(call_with));
 }
 
 template <typename T, typename... Ts>
@@ -125,7 +121,7 @@ auto readElementsAsElement(
 }
 
 template <typename... Ts>
-decltype(auto) choice(const XML & node, Ts &&... xs)
+auto choice(const XML & node, Ts &&... xs) -> decltype(auto)
 {
   const std::unordered_map<std::string, std::function<Element(const XML &)>> callees{
     std::forward<decltype(xs)>(xs)...};

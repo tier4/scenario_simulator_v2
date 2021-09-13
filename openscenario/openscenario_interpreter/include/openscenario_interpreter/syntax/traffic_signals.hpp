@@ -48,9 +48,8 @@ public:
   {
     for (auto & element : readElementsAsElement<TrafficSignalController, 0>(
            "TrafficSignalController", node, outer_scope)) {
-      auto controller = std::dynamic_pointer_cast<TrafficSignalController>(element);
-
-      outer_scope.addElement(controller->name, element);
+      const auto controller = std::dynamic_pointer_cast<TrafficSignalController>(element);
+      outer_scope.insert(controller->name, element);
       traffic_signal_controllers.push_back(std::move(controller));
     }
 

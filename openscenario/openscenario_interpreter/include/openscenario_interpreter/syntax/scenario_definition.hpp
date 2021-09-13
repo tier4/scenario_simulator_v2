@@ -40,7 +40,6 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ScenarioDefinition
 {
-  ASSERT_IS_OPTIONAL_ELEMENT(ParameterDeclarations);
   const ParameterDeclarations parameter_declarations;
 
   const CatalogLocations catalog_locations;
@@ -58,7 +57,7 @@ struct ScenarioDefinition
     catalog_locations(readElement<CatalogLocations>("CatalogLocations", node, outer_scope)),
     road_network(readElement<RoadNetwork>("RoadNetwork", node, outer_scope)),
     entities(readElement<Entities>("Entities", node, outer_scope)),
-    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope, entities))
+    storyboard(readElement<Storyboard>("Storyboard", node, outer_scope))
   {
   }
 
@@ -73,9 +72,11 @@ struct ScenarioDefinition
   }
 };
 
-std::ostream & operator<<(std::ostream &, const ScenarioDefinition &);
+ASSERT_IS_OPTIONAL_ELEMENT(ParameterDeclarations);
 
-nlohmann::json & operator<<(nlohmann::json &, const ScenarioDefinition &);
+auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;
+
+auto operator<<(nlohmann::json &, const ScenarioDefinition &) -> nlohmann::json &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
