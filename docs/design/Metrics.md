@@ -69,17 +69,23 @@ api_.addMetric<T>("name of metric", "arguments for metric you want to check" ...
 
 ### Traveled Distance
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1TraveledDistanceMetric/#public-functions)  
-Traveled distance metric calculates total traveled distance for target entity.
+Traveled distance metric calculates total traveled distance for target entity.  
 
 ### Momentary Stop
 
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1MomentaryStopMetric/)  
-Momentary stop metric enable us to check the target entity can stop in front of the crosswalk and stop line.
+Momentary stop metric enable us to check the target entity can stop in front of the crosswalk and stop line.  
 
 ### Reaction Time
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1ReactionTimeMetric/)  
-Reaction time metric enable us to check the target entity follow the front entity speed.
+Reaction time metric enable us to check the target entity follow the front entity speed.  
 
 ### Out of range
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1OutOfRangeMetric/)  
-Out of range metric enables us to check the velocity, acceleration, jerk of target entity is in the valid range or not.
+Out of range metric enables us to check the velocity, acceleration, jerk of target entity is in the valid range or not.  
+
+### Standstill
+
+Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1StandstillMetric/)  
+Standstill metric enables us to check entity is stacked or not.  
+This metric checks the standstill duration of target entity overs the allowed standstill duration.
