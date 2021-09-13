@@ -29,6 +29,14 @@ public:
    * @param target_entity name of the target entity
    */
   explicit CollisionMetric(std::string target_entity);
+  /**
+   * @brief Construct a new Collision Metric object
+   * 
+   * @param target_entity name of the target entity
+   * @param check_targets targets which you want to check collision
+   */
+  explicit CollisionMetric(
+    std::string target_entity, const std::vector<std::string> & check_targets);
   ~CollisionMetric() override = default;
   void update() override;
   nlohmann::json toJson();
@@ -36,7 +44,8 @@ public:
   const std::string target_entity;
 
 private:
-  double traveled_distance;
+  const std::vector<std::string> check_targets_;
+  const bool check_collision_with_all_entities_;
 };
 }  // namespace metrics
 

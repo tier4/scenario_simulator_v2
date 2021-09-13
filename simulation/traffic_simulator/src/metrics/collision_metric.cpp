@@ -12,26 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/metrics/collision_metric.hpp>
 
 namespace metrics
 {
 CollisionMetric::CollisionMetric(std::string target_entity)
-: MetricBase("TraveledDistance"), target_entity(target_entity)
+: MetricBase("Collision"),
+  target_entity(target_entity),
+  check_targets_({}),
+  check_collision_with_all_entities_(true)
 {
-  traveled_distance = 0;
+}
+
+CollisionMetric::CollisionMetric(
+  std::string target_entity, const std::vector<std::string> & check_targets)
+: MetricBase("Collision"),
+  target_entity(target_entity),
+  check_targets_(check_targets),
+  check_collision_with_all_entities_(false)
+{
 }
 
 bool CollisionMetric::activateTrigger() { return true; }
 
 void CollisionMetric::update()
 {
-  double step_time = entity_manager_ptr_->getStepTime();
-  auto status = entity_manager_ptr_->getEntityStatus(target_entity);
-  if (status) {
-    traveled_distance =
-      traveled_distance + std::fabs(status.get().action_status.twist.linear.x) * step_time;
+  if (!entity_manager_ptr_->getEntityStatus(target_entity)) {
+    return;
+  }
+  if (check_collision_with_all_entities_) {
+    for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
+      if (entity_manager_ptr_->getEntityStatus(entity_name)) {
+        if (entity_manager_ptr_->checkCollision(target_entity, entity_name)) {
+          failure(SPECIFICATION_VIOLATION(
+            "Collision detected, entity : ", target_entity, "and entity : ", entity_name,
+            " was collided."));
+          return;
+        }
+      }
+    }
   }
 }
 
@@ -39,7 +60,6 @@ nlohmann::json CollisionMetric::toJson()
 {
   nlohmann::json json = MetricBase::toBaseJson();
   if (getLifecycle() != MetricLifecycle::INACTIVE) {
-    json["traveled_distance"] = traveled_distance;
   }
   return json;
 }
