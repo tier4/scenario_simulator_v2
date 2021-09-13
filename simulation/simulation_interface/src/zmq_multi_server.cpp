@@ -138,7 +138,8 @@ MultiServer::~MultiServer() { thread_.join(); }
 
 void MultiServer::poll()
 {
-  poller_.poll(0.0001);
+  constexpr long timeout_ms = 1L;
+  poller_.poll(timeout_ms);
   if (poller_.has_input(initialize_sock_)) {
     zmqpp::message request;
     initialize_sock_.receive(request);
