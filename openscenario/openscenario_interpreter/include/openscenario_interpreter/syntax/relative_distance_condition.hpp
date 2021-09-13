@@ -24,58 +24,35 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeDistanceCondition ----------------------------------------------
+/* ---- RelativeDistanceCondition (OpenSCENARIO 1.1) ---------------------------
  *
  *  The current relative distance of a triggering entity/entities to a
  *  reference entity is compared to a given value. The logical operator used
  *  for comparison is defined in the rule attribute.
  *
  *  <xsd:complexType name="RelativeDistanceCondition">
+ *    <xsd:attribute name="coordinateSystem" type="CoordinateSystem"/>
  *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *    <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
- *    <xsd:attribute name="value" type="Double" use="required"/>
  *    <xsd:attribute name="freespace" type="Boolean" use="required"/>
+ *    <xsd:attribute name="relativeDistanceType" type="RelativeDistanceType" use="required"/>
  *    <xsd:attribute name="rule" type="Rule" use="required"/>
+ *    <xsd:attribute name="value" type="Double" use="required"/>
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
 struct RelativeDistanceCondition
 {
-  /* ---- entityRef ------------------------------------------------------------
-   *
-   *  Reference entity.
-   *
-   * ------------------------------------------------------------------------ */
-  const String entity_ref;
+  const String entity_ref;  // Reference entity.
 
-  /* ---- relativeDistanceType -------------------------------------------------
-   *
-   *  The domain the distance is calculated in.
-   *
-   * ------------------------------------------------------------------------ */
-  const RelativeDistanceType relative_distance_type;
-
-  /* ---- value ----------------------------------------------------------------
-   *
-   *  The distance value. Unit: m; Range: [0..inf[.
-   *
-   * ------------------------------------------------------------------------ */
-  const Double value;
-
-  /* ---- freespace ------------------------------------------------------------
-   *
-   *  True: distance is measured between the closest bounding box points.
-   *  False: reference point distance is used.
-   *
-   * ------------------------------------------------------------------------ */
   const Boolean freespace;
+  // True: distance is measured between closest bounding box points. False: reference point distance is used.
 
-  /* ---- rule -----------------------------------------------------------------
-   *
-   *  The operator (less, greater, equal).
-   *
-   * ------------------------------------------------------------------------ */
-  const Rule compare;
+  const RelativeDistanceType relative_distance_type;
+  // Definition of the coordinate system dimension(s) to be used for calculating distances.
+
+  const Rule rule;  // The operator (less, greater, equal).
+
+  const Double value;  // The distance value. Unit: m; Range: [0..inf[.
 
   const TriggeringEntities triggering_entities;
 
@@ -86,10 +63,10 @@ struct RelativeDistanceCondition
     const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
   // clang-format off
   : entity_ref            (readAttribute<String>              ("entityRef",            node, outer_scope)),
-    relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, outer_scope)),
-    value                 (readAttribute<Double>              ("value",                node, outer_scope)),
     freespace             (readAttribute<Boolean>             ("freespace",            node, outer_scope)),
-    compare               (readAttribute<Rule>                ("rule",                 node, outer_scope)),
+    relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, outer_scope)),
+    rule                  (readAttribute<Rule>                ("rule",                 node, outer_scope)),
+    value                 (readAttribute<Double>              ("value",                node, outer_scope)),
     triggering_entities(triggering_entities),
     last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
   // clang-format on
@@ -105,7 +82,7 @@ struct RelativeDistanceCondition
 
     print_to(description, last_checked_values);
 
-    description << " " << compare << " " << value << "?";
+    description << " " << rule << " " << value << "?";
 
     return description.str();
   }
@@ -145,7 +122,7 @@ struct RelativeDistanceCondition
 
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
       last_checked_values.push_back(distance(triggering_entity));
-      return compare(last_checked_values.back(), value);
+      return rule(last_checked_values.back(), value);
     }));
   }
 };

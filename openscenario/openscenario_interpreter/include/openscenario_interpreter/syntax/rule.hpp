@@ -58,7 +58,7 @@ struct Rule
   constexpr operator value_type() const noexcept { return value; }
 
   template <typename T, typename U = T>
-  constexpr decltype(auto) operator()(const T & lhs, const U & rhs) const noexcept
+  constexpr auto operator()(const T & lhs, const U & rhs) const noexcept
   {
     switch (value) {
       case greaterThan:
@@ -82,9 +82,9 @@ static_assert(std::is_standard_layout<Rule>::value, "");
 
 static_assert(std::is_trivial<Rule>::value, "");
 
-std::istream & operator>>(std::istream &, Rule &);
+auto operator>>(std::istream &, Rule &) -> std::istream &;
 
-std::ostream & operator<<(std::ostream &, const Rule &);
+auto operator<<(std::ostream &, const Rule &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
