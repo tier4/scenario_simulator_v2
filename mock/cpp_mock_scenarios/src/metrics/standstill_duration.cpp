@@ -39,21 +39,7 @@ public:
   }
 
 private:
-  void onUpdate() override
-  {
-    /*
-    // LCOV_EXCL_START
-    if (api_.getCurrentTime() >= 10 && 10.1 >= api_.getCurrentTime()) {
-      if (api_.getMetricLifecycle("ego_standstill_duration") != metrics::MetricLifecycle::ACTIVE) {
-        stop(cpp_mock_scenarios::Result::FAILURE);
-      }
-    }
-    // LCOV_EXCL_STOP
-    if (api_.getCurrentTime() >= 12) {
-      stop(cpp_mock_scenarios::Result::SUCCESS);
-    }
-    */
-  }
+  void onUpdate() override {}
 
   void onInitialize() override
   {
@@ -62,7 +48,7 @@ private:
       "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       traffic_simulator::helper::constructActionStatus(0));
     api_.setTargetSpeed("ego", 0, true);
-    api_.addMetric<metrics::StandstillMetric>("ego_standstill_duration", "ego");
+    api_.addMetric<metrics::StandstillMetric>("ego_standstill_duration", "ego", 3);
     expectThrow();
   }
 };
