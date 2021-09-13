@@ -3,6 +3,7 @@
 ## Difference between the latest release and master
 - Support OpenSCENARIO 1.1 `AddEntityAction` ([link](https://github.com/tier4/scenario_simulator_v2/pull/506)).
 - Add StandStillMetric. [Link](https://github.com/tier4/scenario_simulator_v2/pull/520)
+- Add CollisionMetric. [Link](https://github.com/tier4/scenario_simulator_v2/pull/521)
 
 ## Version 0.5.0
 - Add arrow markers to visualize goal poses of entities. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
