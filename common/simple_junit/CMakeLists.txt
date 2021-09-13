@@ -21,9 +21,16 @@ target_link_libraries(${PROJECT_NAME}
   Boost::filesystem
   pugixml)
 
+  install(
+    DIRECTORY test/expected
+    DESTINATION share/${PROJECT_NAME})
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+
+  ament_add_gtest(test_simple_junit test/src/test.cpp)
+  target_link_libraries(test_simple_junit ${PROJECT_NAME})
 endif()
 
 ament_auto_package()
