@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_DISTANCE_CONDITION_HPP_
 
 #include <openscenario_interpreter/procedure.hpp>
+#include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <utility>
@@ -42,6 +43,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeDistanceCondition
 {
+  const CoordinateSystem coordinate_system;
+  // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity".
+
   const String entity_ref;  // Reference entity.
 
   const Boolean freespace;
@@ -60,13 +64,14 @@ struct RelativeDistanceCondition
 
   template <typename Node, typename Scope>
   explicit RelativeDistanceCondition(
-    const Node & node, Scope & outer_scope, const TriggeringEntities & triggering_entities)
+    const Node & node, Scope & scope, const TriggeringEntities & triggering_entities)
   // clang-format off
-  : entity_ref            (readAttribute<String>              ("entityRef",            node, outer_scope)),
-    freespace             (readAttribute<Boolean>             ("freespace",            node, outer_scope)),
-    relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, outer_scope)),
-    rule                  (readAttribute<Rule>                ("rule",                 node, outer_scope)),
-    value                 (readAttribute<Double>              ("value",                node, outer_scope)),
+  : coordinate_system     (readAttribute<CoordinateSystem    >("coordinateSystem",     node, scope, CoordinateSystem::entity)),
+    entity_ref            (readAttribute<String              >("entityRef",            node, scope)),
+    freespace             (readAttribute<Boolean             >("freespace",            node, scope)),
+    relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
+    rule                  (readAttribute<Rule                >("rule",                 node, scope)),
+    value                 (readAttribute<Double              >("value",                node, scope)),
     triggering_entities(triggering_entities),
     last_checked_values(triggering_entities.entity_refs.size(), Double::nan())
   // clang-format on
