@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <testsuites name="example_name">
- <testsuite name="example_suites" />
+  <testsuite name="example_suites" />
 </testsuites>
