@@ -106,7 +106,6 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
-FORWARD_TO_SIMULATION_API(despawn);
 FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
 FORWARD_TO_SIMULATION_API(initialize);
@@ -114,7 +113,6 @@ FORWARD_TO_SIMULATION_API(isInLanelet);
 FORWARD_TO_SIMULATION_API(ready);
 FORWARD_TO_SIMULATION_API(setEntityStatus);
 FORWARD_TO_SIMULATION_API(setTargetSpeed);
-FORWARD_TO_SIMULATION_API(spawn);
 FORWARD_TO_SIMULATION_API(updateFrame);
 
 #undef FORWARD_TO_SIMULATION_API
@@ -130,9 +128,12 @@ FORWARD_TO_SIMULATION_API(updateFrame);
 // NOTE: See OpenSCENARIO 1.1 Figure 2. Actions and conditions
 
 RENAME(applyAcquirePositionAction, requestAcquirePosition);
+RENAME(applyAddEntityAction, spawn);
 RENAME(applyAssignControllerAction, setDriverModel);
 RENAME(applyAssignRouteAction, requestAssignRoute);
+RENAME(applyDeleteEntityAction, despawn);
 RENAME(applyLaneChangeAction, requestLaneChange);
+RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
 RENAME(evaluateReachPositionCondition, reachPosition);

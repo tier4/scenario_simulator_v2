@@ -42,8 +42,6 @@ struct EntityAction : public Element
 {
   const String entity_ref;
 
-  const std::true_type accomplished{};
-
   template <typename Node, typename Scope>
   explicit EntityAction(const Node & node, Scope & outer_scope)
   // clang-format off
@@ -56,20 +54,24 @@ struct EntityAction : public Element
   {
   }
 
-  decltype(auto) evaluate() const
+  static auto accomplished() noexcept -> bool { return endsImmediately(); }
+
+  static auto endsImmediately() noexcept -> bool { return true; }
+
+  inline auto evaluate() const
   {
     // clang-format off
-    static const std::unordered_map<std::type_index, std::function<Element(const String &)>> overloads
+    static const std::unordered_map<std::type_index, std::function<void(const EntityAction &, const String &)>> overloads
     {
-      { typeid(AddEntityAction),    [this](auto &&... xs) { return as<AddEntityAction   >()(std::forward<decltype(xs)>(xs)...); }},
-      { typeid(DeleteEntityAction), [this](auto &&... xs) { return as<DeleteEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
+      { typeid(   AddEntityAction), [](const EntityAction & entity_action, auto &&... xs) { return entity_action.as<   AddEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
+      { typeid(DeleteEntityAction), [](const EntityAction & entity_action, auto &&... xs) { return entity_action.as<DeleteEntityAction>()(std::forward<decltype(xs)>(xs)...); }},
     };
     // clang-format on
 
-    return overloads.at(type())(entity_ref);
-  }
+    overloads.at(type())(*this, entity_ref);  // TODO(yamacir-kit) CATCH std::out_of_range
 
-  static bool endsImmediately() { return true; }
+    return unspecified;
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
