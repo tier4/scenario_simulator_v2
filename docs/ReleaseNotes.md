@@ -1,6 +1,7 @@
 # Release Notes
 
 ## Difference between the latest release and master
+- Support OpenSCENARIO 1.1 `AddEntityAction`.
 
 ## Version 0.5.0
 - Add arrow markers to visualize goal poses of entities. (Contribution by [Utaro-M](https://github.com/Utaro-M)).
