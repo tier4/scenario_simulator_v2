@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/procedure.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <utility>
 
@@ -25,6 +26,11 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+enum class Between {
+  reference_points,             // freespace = false
+  closest_bounding_box_points,  // freespace = true
+};
+
 /* ---- RelativeDistanceCondition (OpenSCENARIO 1.1) ---------------------------
  *
  *  The current relative distance of a triggering entity/entities to a
@@ -92,76 +98,13 @@ struct RelativeDistanceCondition
     return description.str();
   }
 
-  auto distance(const EntityRef & triggering_entity)
+  template <CoordinateSystem::value_type, RelativeDistanceType::value_type, Between>
+  auto distance(const EntityRef &) -> double
   {
-    switch (coordinate_system) {
-      //
-      case CoordinateSystem::entity:
-        //
-        switch (relative_distance_type) {
-          //
-          case RelativeDistanceType::longitudinal:
-            if (freespace) {
-              throw SyntaxError(__FILE__, ":", __LINE__);
-            } else {
-              return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
-            }
-
-          case RelativeDistanceType::lateral:
-            if (freespace) {
-              throw SyntaxError(__FILE__, ":", __LINE__);
-            } else {
-              return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
-            }
-
-          case RelativeDistanceType::cartesianDistance:
-          case RelativeDistanceType::euclidianDistance:
-            if (freespace) {
-              return getBoundingBoxDistance(triggering_entity, entity_ref);
-            } else {
-              return std::hypot(
-                getRelativePose(triggering_entity, entity_ref).position.x,
-                getRelativePose(triggering_entity, entity_ref).position.y);
-            }
-
-          default:
-            throw SyntaxError(__FILE__, ":", __LINE__);
-        }
-
-      case CoordinateSystem::lane:
-        //
-        switch (relative_distance_type) {
-          //
-          case RelativeDistanceType::longitudinal:
-            if (freespace) {
-              throw SyntaxError(__FILE__, ":", __LINE__);
-            } else {
-              return getLongitudinalDistance(triggering_entity, entity_ref);
-            }
-
-          case RelativeDistanceType::lateral:
-            if (freespace) {
-              throw SyntaxError(__FILE__, ":", __LINE__);
-            } else {
-              throw SyntaxError(__FILE__, ":", __LINE__);
-            }
-
-          case RelativeDistanceType::cartesianDistance:
-          case RelativeDistanceType::euclidianDistance:
-            if (freespace) {
-              throw SyntaxError(__FILE__, ":", __LINE__);
-            } else {
-              throw SyntaxError(__FILE__, ":", __LINE__);
-            }
-
-          default:
-            throw SyntaxError(__FILE__, ":", __LINE__);
-        }
-
-      default:
-        throw SyntaxError(__FILE__, ":", __LINE__);
-    }
+    throw SyntaxError(__FILE__, ":", __LINE__);
   }
+
+  auto distance(const EntityRef &) -> double;
 
   auto evaluate()
   {
@@ -173,6 +116,14 @@ struct RelativeDistanceCondition
     }));
   }
 };
+
+template <>
+inline auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::longitudinal, Between::reference_points>(
+  const EntityRef & triggering_entity) -> double
+{
+  return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
