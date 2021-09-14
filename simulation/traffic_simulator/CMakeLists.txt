@@ -52,23 +52,24 @@ ament_auto_add_library(traffic_simulator SHARED
   src/math/collision.cpp
   src/math/distance.cpp
   src/math/hermite_curve.cpp
+  src/math/linear_algebra.cpp
   src/math/polynomial_solver.cpp
   src/math/transform.cpp
   src/math/uuid.cpp
-  src/math/linear_algebra.cpp
+  src/metrics/collision_metric.cpp
   src/metrics/metric_base.cpp
   src/metrics/metrics_manager.cpp
   src/metrics/momentary_stop_metric.cpp
-  src/metrics/reaction_time_metric.cpp
-  src/metrics/traveled_distance_metric.cpp
   src/metrics/out_of_range_metric.cpp
+  src/metrics/reaction_time_metric.cpp
   src/metrics/standstill_metric.cpp
+  src/metrics/traveled_distance_metric.cpp
   src/simulation_clock/simulation_clock.cpp
-  src/traffic/traffic_controller.cpp
-  src/traffic/traffic_sink.cpp
-  src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
   src/traffic_lights/traffic_light_state.cpp
+  src/traffic_lights/traffic_light.cpp
+  src/traffic/traffic_controller.cpp
+  src/traffic/traffic_sink.cpp
   src/vehicle_model/sim_model_ideal.cpp
   src/vehicle_model/sim_model_interface.cpp
   src/vehicle_model/sim_model_time_delay.cpp

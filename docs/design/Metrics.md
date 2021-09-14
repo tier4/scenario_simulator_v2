@@ -89,3 +89,7 @@ Out of range metric enables us to check the velocity, acceleration, jerk of targ
 Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1StandstillMetric/)  
 Standstill metric enables us to check entity is stacked or not.  
 This metric checks the standstill duration of target entity overs the allowed standstill duration.
+
+### Collision
+Class documentation is [here.](https://tier4.github.io/scenario_simulator_v2/package/traffic_simulator/markdown/Classes/classmetrics_1_1CollisionMetric/) 
+Collision metric checks the target entity is colliding to other entity or not.
