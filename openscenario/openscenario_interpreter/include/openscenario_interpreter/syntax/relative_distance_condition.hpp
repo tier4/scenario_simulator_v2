@@ -117,30 +117,13 @@ struct RelativeDistanceCondition
   }
 };
 
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::longitudinal, Between::reference_points>(
-  const EntityRef &) -> double;
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, Between::reference_points>(
-  const EntityRef &) -> double;
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance,
-  Between::closest_bounding_box_points>(const EntityRef &) -> double;
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::reference_points>(
-  const EntityRef &) -> double;
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::longitudinal, Between::reference_points>(
-  const EntityRef &) -> double;
+// clang-format off
+template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::reference_points           >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::lateral,           Between::reference_points           >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance< CoordinateSystem::entity, RelativeDistanceType::longitudinal,      Between::reference_points           >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance< CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      Between::reference_points           >(const EntityRef &) -> double;
+// clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
