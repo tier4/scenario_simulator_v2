@@ -66,27 +66,46 @@ auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) ->
   switch (coordinate_system) {
     case CoordinateSystem::entity:
       switch (relative_distance_type) {
-        case RelativeDistanceType::longitudinal:      return freespace ? distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      Between::closest_bounding_box_points>(triggering_entity)
-                                                                       : distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      Between::reference_points           >(triggering_entity);
-        case RelativeDistanceType::lateral:           return freespace ? distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           Between::closest_bounding_box_points>(triggering_entity)
-                                                                       : distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           Between::reference_points           >(triggering_entity);
-        case RelativeDistanceType::euclidianDistance: return freespace ? distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points>(triggering_entity)
-                                                                       : distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::reference_points           >(triggering_entity);
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::entity,     RelativeDistanceType::longitudinal,      Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::entity,     RelativeDistanceType::longitudinal,      Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::entity,     RelativeDistanceType::lateral,           Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::entity,     RelativeDistanceType::lateral,           Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::entity,     RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::entity,     RelativeDistanceType::euclidianDistance, Between::reference_points            >(triggering_entity);
       }
       break;
 
     case CoordinateSystem::lane:
       switch (relative_distance_type) {
-        case RelativeDistanceType::longitudinal:      return freespace ? distance<CoordinateSystem::lane, RelativeDistanceType::longitudinal,      Between::closest_bounding_box_points>(triggering_entity)
-                                                                       : distance<CoordinateSystem::lane, RelativeDistanceType::longitudinal,      Between::reference_points           >(triggering_entity);
-        case RelativeDistanceType::lateral:           return freespace ? distance<CoordinateSystem::lane, RelativeDistanceType::lateral,           Between::closest_bounding_box_points>(triggering_entity)
-                                                                       : distance<CoordinateSystem::lane, RelativeDistanceType::lateral,           Between::reference_points           >(triggering_entity);
-        case RelativeDistanceType::euclidianDistance: return freespace ? distance<CoordinateSystem::lane, RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points>(triggering_entity)
-                                                                       : distance<CoordinateSystem::lane, RelativeDistanceType::euclidianDistance, Between::reference_points           >(triggering_entity);
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::lane,       RelativeDistanceType::longitudinal,      Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::lane,       RelativeDistanceType::longitudinal,      Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::lane,       RelativeDistanceType::lateral,           Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::lane,       RelativeDistanceType::lateral,           Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::lane,       RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::lane,       RelativeDistanceType::euclidianDistance, Between::reference_points            >(triggering_entity);
       }
       break;
 
-    default:
+    case CoordinateSystem::road:
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::road,       RelativeDistanceType::longitudinal,      Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::road,       RelativeDistanceType::longitudinal,      Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::road,       RelativeDistanceType::lateral,           Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::road,       RelativeDistanceType::lateral,           Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::road,       RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::road,       RelativeDistanceType::euclidianDistance, Between::reference_points            >(triggering_entity);
+      }
+      break;
+
+    case CoordinateSystem::trajectory:
+      switch (relative_distance_type) {
+        case RelativeDistanceType::longitudinal:      return freespace ? distance< CoordinateSystem::trajectory, RelativeDistanceType::longitudinal,      Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::trajectory, RelativeDistanceType::longitudinal,      Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::lateral:           return freespace ? distance< CoordinateSystem::trajectory, RelativeDistanceType::lateral,           Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::trajectory, RelativeDistanceType::lateral,           Between::reference_points            >(triggering_entity);
+        case RelativeDistanceType::euclidianDistance: return freespace ? distance< CoordinateSystem::trajectory, RelativeDistanceType::euclidianDistance, Between::closest_bounding_box_points >(triggering_entity)
+                                                                       : distance< CoordinateSystem::trajectory, RelativeDistanceType::euclidianDistance, Between::reference_points            >(triggering_entity);
+      }
       break;
   }
   // clang-format on
