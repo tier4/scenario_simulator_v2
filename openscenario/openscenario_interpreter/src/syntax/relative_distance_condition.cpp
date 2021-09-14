@@ -18,6 +18,48 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::longitudinal, Between::reference_points>(
+  const EntityRef & triggering_entity) -> double
+{
+  return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::lateral, Between::reference_points>(
+  const EntityRef & triggering_entity) -> double
+{
+  return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance,
+  Between::closest_bounding_box_points>(const EntityRef & triggering_entity) -> double
+{
+  return getBoundingBoxDistance(triggering_entity, entity_ref);
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, Between::reference_points>(
+  const EntityRef & triggering_entity) -> double
+{
+  return std::hypot(
+    getRelativePose(triggering_entity, entity_ref).position.x,
+    getRelativePose(triggering_entity, entity_ref).position.y);
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, Between::reference_points>(
+  const EntityRef & triggering_entity) -> double
+{
+  return getLongitudinalDistance(triggering_entity, entity_ref);
+}
+
 auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) -> double
 {
   switch (coordinate_system) {
@@ -27,71 +69,72 @@ auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) ->
       switch (relative_distance_type) {
         //
         case RelativeDistanceType::longitudinal:
-          if (freespace) {
-            return distance<
-              CoordinateSystem::entity, RelativeDistanceType::longitudinal,
-              Between::closest_bounding_box_points>(triggering_entity);
-          } else {
-            // return std::abs(getRelativePose(triggering_entity, entity_ref).position.x);
-            return distance<
-              CoordinateSystem::entity, RelativeDistanceType::longitudinal,
-              Between::reference_points>(triggering_entity);
-          }
+          return freespace ? distance<
+                               CoordinateSystem::entity, RelativeDistanceType::longitudinal,
+                               Between::closest_bounding_box_points>(triggering_entity)
+                           : distance<
+                               CoordinateSystem::entity, RelativeDistanceType::longitudinal,
+                               Between::reference_points>(triggering_entity);
 
         case RelativeDistanceType::lateral:
-          if (freespace) {
-            throw SyntaxError(__FILE__, ":", __LINE__);
-          } else {
-            return std::abs(getRelativePose(triggering_entity, entity_ref).position.y);
-          }
+          return freespace ? distance<
+                               CoordinateSystem::entity, RelativeDistanceType::lateral,
+                               Between::closest_bounding_box_points>(triggering_entity)
+                           : distance<
+                               CoordinateSystem::entity, RelativeDistanceType::lateral,
+                               Between::reference_points>(triggering_entity);
 
         case RelativeDistanceType::cartesianDistance:
-        case RelativeDistanceType::euclidianDistance:
-          if (freespace) {
-            return getBoundingBoxDistance(triggering_entity, entity_ref);
-          } else {
-            return std::hypot(
-              getRelativePose(triggering_entity, entity_ref).position.x,
-              getRelativePose(triggering_entity, entity_ref).position.y);
-          }
+          [[fallthrough]];  // NOTE: cartesianDistance is deprecated (OpenSCENARIO 1.1)
 
-        default:
-          throw SyntaxError(__FILE__, ":", __LINE__);
+        case RelativeDistanceType::euclidianDistance:
+          return freespace ? distance<
+                               CoordinateSystem::entity, RelativeDistanceType::euclidianDistance,
+                               Between::closest_bounding_box_points>(triggering_entity)
+                           : distance<
+                               CoordinateSystem::entity, RelativeDistanceType::euclidianDistance,
+                               Between::reference_points>(triggering_entity);
       }
+      break;
 
     case CoordinateSystem::lane:
       //
       switch (relative_distance_type) {
         //
         case RelativeDistanceType::longitudinal:
-          if (freespace) {
-            throw SyntaxError(__FILE__, ":", __LINE__);
-          } else {
-            return getLongitudinalDistance(triggering_entity, entity_ref);
-          }
+          return freespace ? distance<
+                               CoordinateSystem::lane, RelativeDistanceType::longitudinal,
+                               Between::closest_bounding_box_points>(triggering_entity)
+                           : distance<
+                               CoordinateSystem::lane, RelativeDistanceType::longitudinal,
+                               Between::reference_points>(triggering_entity);
 
         case RelativeDistanceType::lateral:
-          if (freespace) {
-            throw SyntaxError(__FILE__, ":", __LINE__);
-          } else {
-            throw SyntaxError(__FILE__, ":", __LINE__);
-          }
+          return freespace ? distance<
+                               CoordinateSystem::lane, RelativeDistanceType::lateral,
+                               Between::closest_bounding_box_points>(triggering_entity)
+                           : distance<
+                               CoordinateSystem::lane, RelativeDistanceType::lateral,
+                               Between::reference_points>(triggering_entity);
 
         case RelativeDistanceType::cartesianDistance:
-        case RelativeDistanceType::euclidianDistance:
-          if (freespace) {
-            throw SyntaxError(__FILE__, ":", __LINE__);
-          } else {
-            throw SyntaxError(__FILE__, ":", __LINE__);
-          }
+          [[fallthrough]];  // NOTE: cartesianDistance is deprecated (OpenSCENARIO 1.1)
 
-        default:
-          throw SyntaxError(__FILE__, ":", __LINE__);
+        case RelativeDistanceType::euclidianDistance:
+          return freespace ? distance<
+                               CoordinateSystem::lane, RelativeDistanceType::euclidianDistance,
+                               Between::closest_bounding_box_points>(triggering_entity)
+                           : distance<
+                               CoordinateSystem::lane, RelativeDistanceType::euclidianDistance,
+                               Between::reference_points>(triggering_entity);
       }
+      break;
 
     default:
-      throw SyntaxError(__FILE__, ":", __LINE__);
+      break;
   }
+
+  throw Error(__FILE__, ":", __LINE__);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
