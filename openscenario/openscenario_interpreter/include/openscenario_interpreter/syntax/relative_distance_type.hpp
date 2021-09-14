@@ -22,15 +22,22 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeDistanceType ---------------------------------------------------
+/* ---- RelativeDistanceType (OpenSCENARIO 1.1) --------------------------------
  *
  *  <xsd:simpleType name="RelativeDistanceType">
  *    <xsd:union>
  *      <xsd:simpleType>
  *        <xsd:restriction base="xsd:string">
- *          <xsd:enumeration value="longitudinal"/>
  *          <xsd:enumeration value="lateral"/>
- *          <xsd:enumeration value="cartesianDistance"/>
+ *          <xsd:enumeration value="longitudinal"/>
+ *          <xsd:enumeration value="cartesianDistance">
+ *            <xsd:annotation>
+ *              <xsd:appinfo>
+ *                deprecated
+ *              </xsd:appinfo>
+ *            </xsd:annotation>
+ *          </xsd:enumeration>
+ *          <xsd:enumeration value="euclidianDistance"/>
  *        </xsd:restriction>
  *      </xsd:simpleType>
  *      <xsd:simpleType>
@@ -46,6 +53,7 @@ struct RelativeDistanceType
     longitudinal,
     lateral,
     cartesianDistance,
+    euclidianDistance,
   } value;
 
   explicit RelativeDistanceType() = default;

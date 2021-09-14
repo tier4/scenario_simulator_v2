@@ -46,7 +46,7 @@ struct CoordinateSystem
   enum value_type {
     entity,
     lane,
-    load,
+    road,
     trajectory,
   } value;
 

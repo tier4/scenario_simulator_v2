@@ -34,7 +34,16 @@ auto operator>>(std::istream & is, CoordinateSystem & datum) -> std::istream &
 
   BOILERPLATE(entity);
   BOILERPLATE(lane);
-  BOILERPLATE(load);
+
+#undef BOILERPLATE
+
+#define BOILERPLATE(IDENTIFIER)                                              \
+  if (buffer == #IDENTIFIER) {                                               \
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(CoordinateSystem, buffer); \
+  }                                                                          \
+  static_assert(true, "")
+
+  BOILERPLATE(road);
   BOILERPLATE(trajectory);
 
 #undef BOILERPLATE
@@ -51,7 +60,7 @@ auto operator<<(std::ostream & os, const CoordinateSystem & datum) -> std::ostre
   switch (datum) {
     BOILERPLATE(entity);
     BOILERPLATE(lane);
-    BOILERPLATE(load);
+    BOILERPLATE(road);
     BOILERPLATE(trajectory);
 
     default:
